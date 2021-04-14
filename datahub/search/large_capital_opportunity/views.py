@@ -1,8 +1,16 @@
+from datahub.core.query_utils import (
+    get_front_end_url_expression,
+    get_full_name_expression,
+    get_string_agg_subquery,
+)
+from datahub.investment.opportunity.models import (
+    LargeCapitalOpportunity as DBLargeCapitalOpportunity,
+)
 from datahub.search.large_capital_opportunity import LargeCapitalOpportunitySearchApp
 from datahub.search.large_capital_opportunity.serializers import (
     SearchLargeCapitalOpportunityQuerySerializer,
 )
-from datahub.search.views import register_v4_view, SearchAPIView
+from datahub.search.views import register_v4_view, SearchAPIView, SearchExportAPIView
 
 
 class SearchOpportunityAPIViewMixin:
@@ -91,3 +99,105 @@ class SearchOpportunityAPIViewMixin:
 @register_v4_view()
 class SearchLargeCapitalOpportunityAPIView(SearchOpportunityAPIViewMixin, SearchAPIView):
     """Filtered large capital opportunity search view."""
+
+
+@register_v4_view(sub_path='export')
+class SearchLargeCapitalOpportunityExportAPIView(
+    SearchOpportunityAPIViewMixin,
+    SearchExportAPIView,
+):
+    """Large capital opportunity search export view."""
+
+    queryset = DBLargeCapitalOpportunity.objects.annotate(
+        required_checks_conducted_by_name=get_full_name_expression(
+            'required_checks_conducted_by',
+        ),
+        lead_dit_relationship_manager_name=get_full_name_expression(
+            'lead_dit_relationship_manager',
+        ),
+        created_by_name=get_full_name_expression('created_by'),
+        asset_class_names=get_string_agg_subquery(
+            DBLargeCapitalOpportunity,
+            'asset_classes__name',
+        ),
+        type_names=get_string_agg_subquery(
+            DBLargeCapitalOpportunity,
+            'type__name',
+        ),
+        status_names=get_string_agg_subquery(
+            DBLargeCapitalOpportunity,
+            'status__name',
+        ),
+        promoter_names=get_string_agg_subquery(
+            DBLargeCapitalOpportunity,
+            'promoters__name',
+        ),
+        other_dit_contact_names=get_string_agg_subquery(
+            DBLargeCapitalOpportunity,
+            get_full_name_expression('other_dit_contacts'),
+            ordering=('other_dit_contacts__first_name', 'other_dit_contacts__last_name'),
+        ),
+        investment_type_names=get_string_agg_subquery(
+            DBLargeCapitalOpportunity,
+            'investment_types__name',
+        ),
+        time_horizons_names=get_string_agg_subquery(
+            DBLargeCapitalOpportunity,
+            'time_horizons__name',
+        ),
+        sources_of_funding_names=get_string_agg_subquery(
+            DBLargeCapitalOpportunity,
+            'sources_of_funding__name',
+        ),
+        construction_risks_names=get_string_agg_subquery(
+            DBLargeCapitalOpportunity,
+            'construction_risks__name',
+        ),
+        uk_region_locations_names=get_string_agg_subquery(
+            DBLargeCapitalOpportunity,
+            'uk_region_locations__name',
+        ),
+        reasons_for_abandonment_names=get_string_agg_subquery(
+            DBLargeCapitalOpportunity,
+            'reasons_for_abandonment__name',
+        ),
+        link=get_front_end_url_expression(
+            'largecapitalopportunity',
+            'id',
+            url_suffix='/investments/large-capital-opportunity',
+        ),
+    )
+
+    field_titles = {
+        'created_on': 'Date created',
+        'created_by_name': 'Created by',
+        'id': 'Data Hub opportunity reference',
+        'link': 'Data Hub link',
+        'name': 'Name',
+        'description': 'Description',
+        'type__name': 'Type',
+        'status__name': 'Status',
+        'uk_region_locations_names': 'UK region locations',
+        'promoter_names': 'Promoters',
+        'lead_dit_relationship_manager_name': 'Lead DIT relationship manager',
+        'other_dit_contact_names': 'Other DIT contacts',
+        'required_checks_conducted__name': 'Required checks conducted',
+        'required_checks_conducted_by_name': 'Required checks conducted by',
+        'required_checks_conducted_on': 'Required checks conducted on',
+        'asset_class_names': 'Asset classes',
+        'opportunity_value_type__name': 'Opportunity value type',
+        'opportunity_value': 'Opportunity value',
+        'construction_risks_names': 'Construction risks',
+        'total_investment_sought': 'Total investment sought',
+        'current_investment_secured': 'Current investment secured',
+        'investment_type_names': 'Investment types',
+        'estimated_return_rate__name': 'Estimated return rate',
+        'time_horizons_names': 'Time horizons',
+        'sources_of_funding_names': 'Sources of funding',
+        'dit_support_provided': 'DIT support provided',
+        'funding_supporting_details': 'Funding supporting details',
+        'reasons_for_abandonment_names': 'Reasons for abandonment',
+        'why_abandoned': 'Why abandoned',
+        'why_suspended': 'Why suspended',
+        'modified_on': 'Date last modified',
+    }
