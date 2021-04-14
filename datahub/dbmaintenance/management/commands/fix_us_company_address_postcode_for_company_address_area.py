@@ -16,8 +16,8 @@ logger = getLogger(__name__)
 
 class Command(BaseCommand):
     """
-    Command to query for the ids of duns-linked companies for a particular set of
-    one list tiers and (optionally) particular set of account managers.
+    Command to make US postcodes conform to a standard format and update states
+    accordingly.
     Example of executing this command locally:
         python manage.py fix_us_company_address_postcode_data
     """
