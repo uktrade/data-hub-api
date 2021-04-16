@@ -9,7 +9,7 @@ from datahub.interaction.permissions import (
     IsAssociatedToInvestmentProjectInteractionPermission,
 )
 from datahub.interaction.queryset import get_interaction_queryset
-from datahub.interaction.serializers import InteractionSerializer
+from datahub.interaction.serializers import InteractionSerializer, InteractionSerializerV4
 
 
 class InteractionViewSet(ArchivableViewSetMixin, CoreViewSet):
@@ -21,6 +21,39 @@ class InteractionViewSet(ArchivableViewSetMixin, CoreViewSet):
     )
     serializer_class = InteractionSerializer
     queryset = get_interaction_queryset()
+    filter_backends = (
+        DjangoFilterBackend,
+        IsAssociatedToInvestmentProjectInteractionFilter,
+        OrderingFilter,
+    )
+    filterset_fields = [
+        'company_id',
+        'contacts__id',
+        'event_id',
+        'investment_project_id',
+        'large_capital_opportunity_id',
+    ]
+    ordering_fields = (
+        'company__name',
+        'created_on',
+        'date',
+        'first_name_of_first_contact',
+        'last_name_of_first_contact',
+        'subject',
+    )
+    ordering = ('-date', '-created_on')
+
+
+class InteractionViewSetV4(ArchivableViewSetMixin, CoreViewSet):
+    """Interaction ViewSet v4."""
+
+    permission_classes = (
+        InteractionModelPermissions,
+        IsAssociatedToInvestmentProjectInteractionPermission,
+    )
+    serializer_class = InteractionSerializerV4
+    queryset = get_interaction_queryset()
+    """Do I need .prefetch_related('related_trade_agreements') here?"""
     filter_backends = (
         DjangoFilterBackend,
         IsAssociatedToInvestmentProjectInteractionFilter,
