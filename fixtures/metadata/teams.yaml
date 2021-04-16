@@ -101,6 +101,9 @@
     - - view_largecapitalopportunity
       - opportunity
       - largecapitalopportunity
+    - - export_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
   model: auth.group
 - fields:
     name: DA
@@ -253,6 +256,9 @@
       - opportunity
       - largecapitalopportunity
     - - view_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
+    - - export_largecapitalopportunity
       - opportunity
       - largecapitalopportunity
   model: auth.group
@@ -506,6 +512,9 @@
       - opportunity
       - largecapitalopportunity
     - - view_largecapitalopportunity
+      - opportunity
+      - largecapitalopportunity
+    - - export_largecapitalopportunity
       - opportunity
       - largecapitalopportunity
     - - view_companyexportcountry

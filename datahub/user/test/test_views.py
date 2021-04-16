@@ -5,6 +5,7 @@ from rest_framework.reverse import reverse
 
 from datahub.core.test.factories import GroupFactory, PermissionFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.feature_flag.test.factories import UserFeatureFlagFactory
 from datahub.metadata.test.factories import TeamFactory, TeamRoleFactory
 
 
@@ -79,4 +80,26 @@ class TestUserView(APITestMixin):
                 'disabled_on': None,
             },
             'permissions': expected_permissions,
+            'active_features': [],
         }
+
+    def test_who_am_i_active_features(self):
+        """Active features should include the user's selected active features."""
+        feature_flag = UserFeatureFlagFactory(code='test-feature', is_active=True)
+        inactive_feature_flag = UserFeatureFlagFactory(code='inactive-feature', is_active=False)
+        UserFeatureFlagFactory(code='another-feature', is_active=True)
+
+        user = create_test_user()
+        user.features.add(feature_flag, inactive_feature_flag)
+
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('who_am_i')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        assert 'active_features' in response_data
+        assert response_data['active_features'] == ['test-feature']
