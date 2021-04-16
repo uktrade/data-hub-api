@@ -1,3 +1,20 @@
+# Data Hub API 36.16.0 (2021-04-16)
+
+
+## Features
+
+- **Advisers** Feature flags can now be applied on a per-user basis through Django Admin.
+
+  - Adds a new UserFeatureFlag model
+  - Adds a new "features" field to the Advisor model
+  - Exposes "active_features" on the `whoami` endpoint
+
+## API
+
+- **Investment** A new `POST /v4/search/large-capital-opportunity/export` endpoint has been added
+  that enables export of search results in CSV format.
+
+
 # Data Hub API 36.15.0 (2021-04-13)
 
 

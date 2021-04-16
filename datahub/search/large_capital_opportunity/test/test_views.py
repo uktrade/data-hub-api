@@ -1,16 +1,24 @@
+from cgi import parse_header
 from collections import Counter
+from csv import DictReader
+from io import StringIO
 
 import pytest
+from django.conf import settings
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import CompanyFactory, TeamFactory
 from datahub.core.constants import (
     UKRegion as UKRegionConstant,
 )
 from datahub.core.test_utils import (
     APITestMixin,
+    create_test_user,
+    format_csv_data,
+    get_attr_or_none,
+    join_attr_values,
 )
 from datahub.investment.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
@@ -19,13 +27,19 @@ from datahub.investment.investor_profile.test.constants import (
     ReturnRate as ReturnRateConstant,
     TimeHorizon as TimeHorizonConstant,
 )
+from datahub.investment.opportunity.models import LargeCapitalOpportunity
+from datahub.investment.opportunity.permissions import LargeCapitalOpportunityPermission
 from datahub.investment.opportunity.test.constants import (
     OpportunityValueType as OpportunityValueTypeConstant,
 )
 from datahub.investment.opportunity.test.factories import (
+    CompleteLargeCapitalOpportunityFactory,
     LargeCapitalOpportunityFactory,
 )
 from datahub.search.large_capital_opportunity import LargeCapitalOpportunitySearchApp
+from datahub.search.large_capital_opportunity.views import (
+    SearchLargeCapitalOpportunityExportAPIView,
+)
 
 pytestmark = [
     pytest.mark.django_db,
@@ -428,3 +442,169 @@ class TestSearch(APITestMixin):
         for key in check_item_key_list:
             item = item[key] if item else result[key]
         return item
+
+
+class TestLargeCapitalOpportunityExportView(APITestMixin):
+    """Tests large capital opportunity export view."""
+
+    @pytest.mark.parametrize(
+        'permissions,expected_status_code',
+        (
+            # User has insufficient permissions, deny export
+            (
+                (),
+                status.HTTP_403_FORBIDDEN,
+            ),
+            (
+                (
+                    LargeCapitalOpportunityPermission.view_large_capital_opportunity,
+                ),
+                status.HTTP_403_FORBIDDEN,
+            ),
+            (
+                (
+                    LargeCapitalOpportunityPermission.export,
+                ),
+                status.HTTP_403_FORBIDDEN,
+            ),
+            # User has all necessary permissions, allow export
+            (
+                (
+                    LargeCapitalOpportunityPermission.view_large_capital_opportunity,
+                    LargeCapitalOpportunityPermission.export,
+                ),
+                status.HTTP_200_OK,
+            ),
+        ),
+    )
+    def test_user_with_correct_permissions_can_export_data(
+        self, es, permissions, expected_status_code,
+    ):
+        """Test that only a user with correct permissions can export data."""
+        user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v4:search:large-capital-opportunity-export')
+        response = api_client.post(url)
+        assert response.status_code == expected_status_code
+
+    @pytest.mark.parametrize(
+        'request_sortby,orm_ordering',
+        (
+            ('created_on:desc', '-created_on'),
+            ('modified_on:desc', '-modified_on'),
+            ('name', 'name'),
+        ),
+    )
+    def test_export(self, es_with_collector, request_sortby, orm_ordering):
+        """Test export large capital opportunity search results."""
+        url = reverse('api-v4:search:large-capital-opportunity-export')
+
+        CompleteLargeCapitalOpportunityFactory()
+        with freeze_time('2018-01-01 11:12:13'):
+            LargeCapitalOpportunityFactory()
+
+        es_with_collector.flush_and_refresh()
+
+        data = {}
+        if request_sortby:
+            data['sortby'] = request_sortby
+
+        with freeze_time('2018-01-01 11:12:13'):
+            response = self.api_client.post(url, data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert parse_header(response.get('Content-Disposition')) == (
+            'attachment', {
+                'filename': 'Data Hub - Large capital opportunities - 2018-01-01-11-12-13.csv',
+            },
+        )
+
+        sorted_opportunities = LargeCapitalOpportunity.objects.order_by(orm_ordering, 'pk')
+        response_text = response.getvalue().decode('utf-8-sig')
+        reader = DictReader(StringIO(response_text))
+
+        assert reader.fieldnames == list(
+            SearchLargeCapitalOpportunityExportAPIView.field_titles.values(),
+        )
+
+        expected_row_data = [
+            _build_expected_export_response(opportunity) for opportunity in sorted_opportunities
+        ]
+
+        expected_rows = format_csv_data(expected_row_data)
+
+        # item is an ordered dict so is cast to a dict to make the comparison easier to
+        # interpret in the event of the assert actual_rows == expected_rows failing.
+        actual_rows = [dict(item) for item in reader]
+
+        assert actual_rows == expected_rows
+
+
+def _build_expected_export_response(opportunity):
+    return {
+        'Date created': opportunity.created_on,
+        'Created by': get_attr_or_none(opportunity, 'created_by.name'),
+        'Data Hub opportunity reference': str(opportunity.pk),
+        'Data Hub link': (
+            f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["largecapitalopportunity"]}'
+            f'/{opportunity.pk}/investments/large-capital-opportunity'
+        ),
+        'Name': opportunity.name,
+        'Description': opportunity.description,
+        'Type': get_attr_or_none(
+            opportunity, 'type.name',
+        ),
+        'Status': get_attr_or_none(
+            opportunity, 'status.name',
+        ),
+        'UK region locations': join_attr_values(
+            opportunity.uk_region_locations.order_by('name'),
+        ),
+        'Promoters': join_attr_values(
+            opportunity.promoters.order_by('name'),
+        ),
+        'Lead DIT relationship manager': opportunity.lead_dit_relationship_manager.name,
+        'Other DIT contacts': get_attr_or_none(
+            opportunity, 'other_dit_contacts.name',
+        ),
+        'Required checks conducted': get_attr_or_none(
+            opportunity, 'required_checks_conducted.name',
+        ),
+        'Required checks conducted by': get_attr_or_none(
+            opportunity, 'required_checks_conducted_by.name',
+        ),
+        'Required checks conducted on': opportunity.required_checks_conducted_on,
+        'Asset classes': join_attr_values(
+            opportunity.asset_classes.order_by('name'),
+        ),
+        'Opportunity value type': get_attr_or_none(
+            opportunity, 'opportunity_value_type.name',
+        ),
+        'Opportunity value': opportunity.opportunity_value,
+        'Construction risks': join_attr_values(
+            opportunity.construction_risks.order_by('name'),
+        ),
+        'Total investment sought': opportunity.total_investment_sought,
+        'Current investment secured': opportunity.current_investment_secured,
+        'Investment types': join_attr_values(
+            opportunity.investment_types.order_by('name'),
+        ),
+        'Estimated return rate': get_attr_or_none(
+            opportunity, 'estimated_return_rate.name',
+        ),
+        'Time horizons': join_attr_values(
+            opportunity.time_horizons.order_by('name'),
+        ),
+        'Sources of funding': join_attr_values(
+            opportunity.sources_of_funding.order_by('name'),
+        ),
+        'DIT support provided': opportunity.dit_support_provided,
+        'Funding supporting details': opportunity.funding_supporting_details,
+        'Reasons for abandonment': join_attr_values(
+            opportunity.reasons_for_abandonment.order_by('name'),
+        ),
+        'Why abandoned': opportunity.why_abandoned,
+        'Why suspended': opportunity.why_suspended,
+        'Date last modified': opportunity.modified_on,
+    }

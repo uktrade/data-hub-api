@@ -55,6 +55,14 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
                 ),
             },
         ),
+        (
+            'OTHER',
+            {
+                'fields': (
+                    'features',
+                ),
+            },
+        ),
     )
     add_fieldsets = (
         (
@@ -75,6 +83,7 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
         '=dit_team__pk',
         'dit_team__name',
     )
+    filter_horizontal = ('features',)
     ordering = ('email',)
 
     def get_urls(self):
