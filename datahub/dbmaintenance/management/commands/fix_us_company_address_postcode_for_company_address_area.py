@@ -64,10 +64,9 @@ class Command(BaseCommand):
         """
         if area_code:
             administrative_area = self.get_us_administrative_area_by_code(area_code)
-            if administrative_area:
-                us_company.address_area_id = administrative_area.id
-                us_company.save(force_update=True)
-                logger.info(f'Updated area "{area_code}" for "{us_company.address_postcode}"')
+            us_company.address_area_id = administrative_area.id
+            us_company.save(force_update=True)
+            logger.info(f'Updated area "{area_code}" for "{us_company.address_postcode}"')
 
     def update_registered_address_area(self, area_code, us_company):
         """
@@ -77,11 +76,10 @@ class Command(BaseCommand):
         """
         if area_code:
             administrative_area = self.get_us_administrative_area_by_code(area_code)
-            if administrative_area:
-                us_company.registered_address_area_id = administrative_area.id
-                us_company.save(force_update=True)
-                logger.info(f'Updated registered area "{area_code}"'
-                            f' for "{us_company.registered_address_postcode}"')
+            us_company.registered_address_area_id = administrative_area.id
+            us_company.save(force_update=True)
+            logger.info(f'Updated registered area "{area_code}"'
+                        f' for "{us_company.registered_address_postcode}"')
 
     def get_area_code(self, post_code):
         """
@@ -89,7 +87,7 @@ class Command(BaseCommand):
         :param post_code: Post Code from an address
         :return: An area code based on the format states list
         """
-        if post_code:
+        if is_not_blank(post_code):
             for zip_prefix, area_code, _area_name in US_ZIP_STATES:
                 if post_code.startswith(zip_prefix):
                     return area_code
