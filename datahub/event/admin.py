@@ -7,8 +7,9 @@ from django.utils.timezone import now
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin, DisabledOnFilter
-from datahub.event.models import Event, EventType, LocationType, Programme, TradeAgreement
+from datahub.event.models import Event, EventType, LocationType, Programme
 from datahub.metadata.admin import DisableableMetadataAdmin
+from datahub.metadata.models import TradeAgreement
 
 
 def confirm_action(title, action_message):

@@ -100,7 +100,7 @@ class EventSerializer(BaseEventSerializer):
     """Event serialiser for V3 endpoint."""
 
     related_trade_agreements = NestedRelatedField(
-        'event.TradeAgreement', many=True, required=False, allow_empty=True,
+        'metadata.TradeAgreement', many=True, required=False, allow_empty=True,
     )
 
     class Meta:
@@ -149,7 +149,7 @@ class EventSerializerV4(BaseEventSerializer):
 
     has_related_trade_agreements = serializers.BooleanField(required=True)
     related_trade_agreements = NestedRelatedField(
-        'event.TradeAgreement', many=True, required=True, allow_empty=True,
+        'metadata.TradeAgreement', many=True, required=True, allow_empty=True,
     )
 
     def validate(self, attrs):

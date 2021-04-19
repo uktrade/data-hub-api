@@ -96,6 +96,15 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         help_text='This is the `Email user ID` that is shown for this user in Staff SSO.',
     )
 
+    features = models.ManyToManyField(
+        'feature_flag.UserFeatureFlag',
+        related_name='advisers',
+        blank=True,
+        help_text=(
+            "User's feature flags. Note that the feature flag also needs to be set to active."
+        ),
+    )
+
     objects = AdviserManager()
 
     USERNAME_FIELD = 'email'
@@ -103,16 +112,21 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     # with the createsuperuser management command.
     REQUIRED_FIELDS = ['sso_email_user_id']
 
-    @cached_property
-    def name(self):
-        """Full name shorthand."""
-        return join_truthy_strings(self.first_name, self.last_name)
+    class Meta:
+        indexes = [
+            models.Index(fields=['first_name', 'last_name']),
+            models.Index(fields=['date_joined', 'id']),
+        ]
+        verbose_name = 'adviser'
 
     def __str__(self):
         """Admin displayed human readable name."""
         return self.name or '(no name)'
 
-    # Django User methods, required for Admin interface
+    @cached_property
+    def name(self):
+        """Full name shorthand."""
+        return join_truthy_strings(self.first_name, self.last_name)
 
     def get_full_name(self):
         """Returns the first_name plus the last_name, with a space in between."""
@@ -143,9 +157,9 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
             return None
         return domain.lower()
 
-    class Meta:
-        indexes = [
-            models.Index(fields=['first_name', 'last_name']),
-            models.Index(fields=['date_joined', 'id']),
-        ]
-        verbose_name = 'adviser'
+    @cached_property
+    def active_features(self):
+        """
+        :returns: Features that are currently active.
+        """
+        return self.features.filter(is_active=True).values_list('code', flat=True)

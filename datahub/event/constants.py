@@ -14,8 +14,14 @@ class Programme(Enum):
 class TradeAgreement(Enum):
     """Trade agreement constants"""
 
-    uk_australia = Constant('Australia', '50370070-71f9-4ada-ae2c-cd0a737ba5e2')
-    uk_japan = Constant('Japan', '05587f64-b976-425e-8763-3557c7936632')
+    uk_australia = Constant(
+        'UK-Australia Mutual Recognition Agreement',
+        '50370070-71f9-4ada-ae2c-cd0a737ba5e2',
+    )
+    uk_japan = Constant(
+        'UK-Japan Comprehensive Economic Partnership Agreement',
+        '05587f64-b976-425e-8763-3557c7936632',
+    )
 
 
 class LocationType(Enum):
