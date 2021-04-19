@@ -301,5 +301,7 @@ def test_audit_log(post_code, expected_result):
     call_command('fix_us_company_address_postcode_for_company_address_area')
 
     company.refresh_from_db()
+    assert company.address_postcode == expected_result
+    assert company.registered_address_postcode == expected_result
     assert has_reversion_version(company)
     assert has_reversion_comment('US Area and postcode Fix.')

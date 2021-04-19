@@ -41,6 +41,10 @@ class OpportunityValueType(Enum):
         'Capital expenditure',
         '496379ec-7cd2-4746-98f7-143c905dd6aa',
     )
+    gross_development_value = Constant(
+        'Gross development value (GDV)',
+        'edeff484-2bd1-40e6-94ca-0437d6115886',
+    )
 
 
 class SourceOfFunding(Enum):
