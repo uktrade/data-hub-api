@@ -120,9 +120,9 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
     """
     Test postcode is fixed for the purpose of admin area
     generation with valid zip codes format
-    @param post_code: POSTCODE good
-    @param area_code: Area Code to be generated from Command
-    @param area_name: Area Name to describe area code
+    :param post_code: POSTCODE good
+    :param area_code: Area Code to be generated from Command
+    :param area_name: Area Name to describe area code
     """
     company = setup_us_company_with_all_addresses(post_code)
     assert company.address_area is None
