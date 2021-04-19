@@ -59,8 +59,8 @@ class Command(BaseCommand):
     def update_address_area(self, area_code, us_company):
         """
         Update address area with administrative area
-        @param area_code:
-        @param us_company:
+        :param area_code: Area code value
+        :param us_company: United States Company data
         """
         if area_code:
             administrative_area = self.get_us_administrative_area_by_code(area_code)
@@ -72,9 +72,8 @@ class Command(BaseCommand):
     def update_registered_address_area(self, area_code, us_company):
         """
         Update registered address area with administrative area
-        @param area_code:
-        @param us_company:
-        @return:
+        :param area_code: Area code value
+        :param us_company: United States Company data
         """
         if area_code:
             administrative_area = self.get_us_administrative_area_by_code(area_code)
@@ -87,8 +86,8 @@ class Command(BaseCommand):
     def get_area_code(self, post_code):
         """
         Get area code from a postcode
-        @param post_code: Post Code from an address
-        @return: An area code based on the format states list
+        :param post_code: Post Code from an address
+        :return: An area code based on the format states list
         """
         if post_code:
             for zip_prefix, area_code, _area_name in US_ZIP_STATES:
@@ -99,7 +98,7 @@ class Command(BaseCommand):
     def fix_address_postcode(self, us_company):
         """
         Fix address postcode formatting the postcode into an expected format if possible
-        @param us_company: Company record
+        :param us_company: United States company record
         """
         if is_not_blank(us_company.address_postcode):
             log_message = f'Updating address postcode from "{us_company.address_postcode}"'
@@ -112,7 +111,7 @@ class Command(BaseCommand):
     def fix_registered_address_postcode(self, us_company):
         """
         Fix registered address postcode formatting the postcode into an expected format if possible
-        @param us_company:
+         :param us_company: United States company record
         """
         if is_not_blank(us_company.registered_address_postcode):
             log_message = f'Updating registered postcode ' \
@@ -128,8 +127,8 @@ class Command(BaseCommand):
     def format_postcode(self, postcode):
         """
         Format postcode with postcode pattern for united states
-        @param postcode:
-        @return: Formatted us postcode value
+        :param postcode: Postcode string value
+        :return: Formatted US postcode value
         """
         return re.sub(
             CountryPostcodeReplacement.united_states.value.postcode_pattern,
@@ -142,8 +141,8 @@ class Command(BaseCommand):
     def get_us_administrative_area_by_code(self, area_code):
         """
         Gets United States Administrative Area by Area Code
-        @param area_code:
-        @return: First Administrative Area Found
+        :param area_code: Unique ISO administrative area code
+        :return: First Administrative Area Found
         """
         return AdministrativeArea.objects.filter(
             country_id=Country.united_states.value.id,
