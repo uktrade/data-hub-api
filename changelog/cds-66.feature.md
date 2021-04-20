@@ -1,1 +1,2 @@
-Address Area is now be serialized in all rest calls associated with any address type and swagger document.
+Address Area is now serialised within all the address data REST calls, including swagger documentation examples 
+and the MultiAddressModel, utilised within the test samples containing primary and secondary address details.
