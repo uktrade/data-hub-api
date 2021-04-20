@@ -32,7 +32,6 @@ def format_expected_adviser(adviser):
     }
 
 
-# TODO: reconcile this and the other into a shared base util
 def address_area_or_none(address_area):
     """
     Get Formatted Address Area Result
