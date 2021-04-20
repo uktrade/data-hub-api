@@ -43,7 +43,7 @@ v3_urls = [
         ),
     ),
     path('', include((contact_urls.urls_v3, 'contact'), namespace='contact')),
-    path('', include((event_urls, 'event'), namespace='event')),
+    path('', include((event_urls.urls_v3, 'event'), namespace='event')),
     path('', include((feature_flag_urls, 'feature-flag'), namespace='feature-flag')),
     path('', include((interaction_urls, 'interaction'), namespace='interaction')),
     path('', include((investment_urls, 'investment'), namespace='investment')),
@@ -92,4 +92,5 @@ v4_urls = [
     ),
     path('dataset/', include((dataset_urls, 'dataset'), namespace='dataset')),
     path('metadata/', include((metadata_urls, 'metadata'), namespace='metadata')),
+    path('', include((event_urls.urls_v4, 'event'), namespace='event')),
 ]

@@ -114,6 +114,8 @@ class CompleteLargeCapitalOpportunityFactory(LargeCapitalOpportunityFactory):
     opportunity_value = 50000
     opportunity_value_type_id = OpportunityValueTypeConstant.capital_expenditure.value.id
     estimated_return_rate_id = ReturnRateConstant.up_to_five_percent.value.id
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
 
     @to_many_field
     def asset_classes(self):

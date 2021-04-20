@@ -57,6 +57,8 @@ class Event(BaseModel, DisableableModel):
         related_name='+',
     )
     teams = models.ManyToManyField('metadata.Team', blank=True, related_name='+')
+    has_related_trade_agreements = models.BooleanField(null=True, blank=True)
+    related_trade_agreements = models.ManyToManyField('metadata.TradeAgreement', blank=True)
     related_programmes = models.ManyToManyField('Programme', blank=True)
     service = TreeForeignKey(
         'metadata.Service',

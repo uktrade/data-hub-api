@@ -111,6 +111,10 @@ class Country(BaseConstantModel):
         verbose_name_plural = 'countries'
 
 
+class TradeAgreement(BaseConstantModel):
+    """Trade agreements for events"""
+
+
 class AdministrativeArea(BaseConstantModel):
     """
     States, provinces etc. within a country.
@@ -240,6 +244,10 @@ class Service(MPTTModel, _MPTTObjectName, BaseOrderedConstantModel):
         INVESTMENT_PROJECT_INTERACTION = (
             'investment_project_interaction',
             'Investment project interaction',
+        )
+        TRADE_AGREEMENT_INTERACTION = (
+            'trade_agreement_interaction',
+            'Trade agreement interaction',
         )
         # For interactions added to a company that are about not about export or investment
         OTHER_INTERACTION = ('other_interaction', 'Other interaction')

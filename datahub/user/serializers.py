@@ -8,6 +8,7 @@ class WhoAmISerializer(serializers.ModelSerializer):
     """Adviser serializer for that includes a permissions"""
 
     permissions = serializers.SerializerMethodField()
+    active_features = serializers.ListField(child=serializers.CharField(), read_only=True)
     dit_team = TeamSerializer(read_only=True)
 
     class Meta:
@@ -23,6 +24,7 @@ class WhoAmISerializer(serializers.ModelSerializer):
             'telephone_number',
             'dit_team',
             'permissions',
+            'active_features',
         )
         depth = 2
 

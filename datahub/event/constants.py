@@ -11,6 +11,19 @@ class Programme(Enum):
     grown_in_britain = Constant('Grown in Britain', 'd352a68f-aaf4-4c43-b39d-9bca67a8322e')
 
 
+class TradeAgreement(Enum):
+    """Trade agreement constants"""
+
+    uk_australia = Constant(
+        'UK-Australia Mutual Recognition Agreement',
+        '50370070-71f9-4ada-ae2c-cd0a737ba5e2',
+    )
+    uk_japan = Constant(
+        'UK-Japan Comprehensive Economic Partnership Agreement',
+        '05587f64-b976-425e-8763-3557c7936632',
+    )
+
+
 class LocationType(Enum):
     """Location type constants."""
 

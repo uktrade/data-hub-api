@@ -9,8 +9,8 @@ from datahub.event.models import Event
 from datahub.metadata.serializers import SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE
 
 
-class EventSerializer(serializers.ModelSerializer):
-    """Event serialiser."""
+class BaseEventSerializer(serializers.ModelSerializer):
+    """Common functionality between V3 and V4 endpoint"""
 
     default_error_messages = {
         'lead_team_not_in_teams': gettext_lazy('Lead team must be in teams array.'),
@@ -95,6 +95,14 @@ class EventSerializer(serializers.ModelSerializer):
 
         return errors
 
+
+class EventSerializer(BaseEventSerializer):
+    """Event serialiser for V3 endpoint."""
+
+    related_trade_agreements = NestedRelatedField(
+        'metadata.TradeAgreement', many=True, required=False, allow_empty=True,
+    )
+
     class Meta:
         model = Event
         fields = (
@@ -115,6 +123,88 @@ class EventSerializer(serializers.ModelSerializer):
             'name',
             'notes',
             'organiser',
+            'has_related_trade_agreements',
+            'related_trade_agreements',
+            'related_programmes',
+            'start_date',
+            'teams',
+            'service',
+            'uk_region',
+        )
+        read_only_fields = (
+            'archived_documents_url_path',
+            'disabled_on',
+        )
+
+
+class EventSerializerV4(BaseEventSerializer):
+    """Event serialiser for V4 endpoint."""
+
+    default_error_messages = {
+        'related_trade_agreements':
+            gettext_lazy(
+                "'Related trade agreements' is inconsistent with 'Has related trade agreements?'",
+            ),
+    }
+
+    has_related_trade_agreements = serializers.BooleanField(required=True)
+    related_trade_agreements = NestedRelatedField(
+        'metadata.TradeAgreement', many=True, required=True, allow_empty=True,
+    )
+
+    def validate(self, attrs):
+        """Performs cross-field validation."""
+        attrs = super().validate(attrs)
+
+        errors = {}
+        combiner = DataCombiner(self.instance, attrs)
+
+        validators = (
+            self._validate_related_trade_agreements,
+        )
+        for validator in validators:
+            errors.update(validator(combiner))
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return attrs
+
+    def _validate_related_trade_agreements(self, combiner):
+        """Validates trade agreement state for consistency with has_related_trade_agreements"""
+        errors = {}
+        related_trade_agreements_count = len(
+            combiner.get_value_to_many('related_trade_agreements'),
+        )
+        has_related_trade_agreements = combiner.get_value('has_related_trade_agreements')
+
+        if (related_trade_agreements_count == 0 and has_related_trade_agreements) or (
+                related_trade_agreements_count > 0 and not has_related_trade_agreements):
+            errors['related_trade_agreements'] = self.error_messages['related_trade_agreements']
+        return errors
+
+    class Meta:
+        model = Event
+        fields = (
+            'address_1',
+            'address_2',
+            'address_country',
+            'address_country',
+            'address_county',
+            'address_postcode',
+            'address_town',
+            'archived_documents_url_path',
+            'disabled_on',
+            'end_date',
+            'event_type',
+            'id',
+            'lead_team',
+            'location_type',
+            'name',
+            'notes',
+            'organiser',
+            'has_related_trade_agreements',
+            'related_trade_agreements',
             'related_programmes',
             'start_date',
             'teams',

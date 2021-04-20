@@ -368,6 +368,7 @@ SEARCH_APPS = [
     'datahub.search.investment.InvestmentSearchApp',
     'datahub.search.omis.OrderSearchApp',
     'datahub.search.large_investor_profile.LargeInvestorProfileSearchApp',
+    'datahub.search.large_capital_opportunity.LargeCapitalOpportunitySearchApp',
 ]
 
 VCAP_SERVICES = env.json('VCAP_SERVICES', default={})
@@ -566,6 +567,7 @@ DATAHUB_FRONTEND_URL_PREFIXES = {
     'interaction': f'{DATAHUB_FRONTEND_BASE_URL}/interactions',
     'investmentproject': f'{DATAHUB_FRONTEND_BASE_URL}/investments/projects',
     'largecapitalinvestorprofile': f'{DATAHUB_FRONTEND_BASE_URL}/investments/profiles',
+    'largecapitalopportunity': f'{DATAHUB_FRONTEND_BASE_URL}/investments/opportunities',
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
 
     'mi_fdi_dashboard_country': (

@@ -55,11 +55,13 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     address_1 = factory.Sequence(lambda x: f'{x} Fake Lane')
     address_town = 'Woodside'
     address_postcode = factory.Faker('postcode')
+    address_area_id = None
     address_country_id = constants.Country.united_kingdom.value.id
 
     registered_address_1 = factory.Sequence(lambda n: f'{n} Foo st.')
     registered_address_town = 'London'
     registered_address_postcode = factory.Faker('postcode')
+    registered_address_area_id = None
     registered_address_country_id = constants.Country.united_kingdom.value.id
 
     business_type_id = BusinessTypeConstant.private_limited_company.value.id

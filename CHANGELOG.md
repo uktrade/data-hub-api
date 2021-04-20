@@ -1,3 +1,128 @@
+# Data Hub API 36.16.0 (2021-04-16)
+
+
+## Features
+
+- **Advisers** Feature flags can now be applied on a per-user basis through Django Admin.
+
+  - Adds a new UserFeatureFlag model
+  - Adds a new "features" field to the Advisor model
+  - Exposes "active_features" on the `whoami` endpoint
+
+## API
+
+- **Investment** A new `POST /v4/search/large-capital-opportunity/export` endpoint has been added
+  that enables export of search results in CSV format.
+
+
+# Data Hub API 36.15.0 (2021-04-13)
+
+
+## Features
+
+- **Investment** A new search app has been added for Large Capital Opportunity.
+- **Investment** **Investment** Project Proposition has been added to the admin area.
+- Add Trade agreement interaction choice and service update.
+
+## Internal changes
+
+- Trade agreements moved from events to generic metadata in order to add trade agreements to interactions going forward and update trade agreements
+
+## API
+
+- **Investment** A new `POST /v4/search/large-capital-opportunity` endpoint has been added.
+  The endpoint enables the following filters:
+
+  Main filters:
+
+      type
+      status
+      name
+      created_by
+
+  Detail filters:
+
+      uk_region_location
+      promoter
+      promoter_name
+      lead_dit_relationship_manager
+      required_checks_conducted
+      required_checks_conducted_by
+      asset_class
+      opportunity_value_type
+      opportunity_value_start
+      opportunity_value_end
+      construction_risk
+
+  Requirement filters:
+
+      total_investment_sought_start
+      total_investment_sought_end
+      current_investment_secured_start
+      current_investment_secured_end
+      investment_type
+      estimated_return_rate
+      time_horizon
+
+  Extra filters:
+
+      created_on_after
+      created_on_before
+
+
+# Data Hub API 36.14.0 (2021-04-09)
+
+
+## Features
+
+- Companies are now searchable by administrative area.
+
+## Bug fixes
+
+- **Investment** The investment project summary schema now shows specifies the start and end dates with the proper data schema.
+- **Investment** The investment project schema now shows "incomplete_fields" correctly as an array of strings (instead of a plain string).
+
+## Internal changes
+
+- SSO Auth Admin client was updated.
+
+
+# Data Hub API 36.13.0 (2021-04-07)
+
+
+## Features
+
+- **Investment** An Activity Stream endpoint was added for large capital investment opportunities `GET /v3/activity-stream/investment/large-capital-opportunity`.
+- **Investment** The `POST /v4/large-capital-opportunity` endpoint has been updated, so that it only requires a `name` parameter 
+  to create a new opportunity.
+
+## Database schema
+
+- **Events** Two new fields: `has_related_trade_agreements` and `related_trade_agreements` have been added to the events model.
+  These fields are not required on the existing v3 events endpoint.
+
+  A new v4 events has been added where these two fields are marked as required.
+
+
+# Data Hub API 36.12.0 (2021-03-31)
+
+
+## Features
+
+- **Investment** Incomplete fields were added to the investment search endpoint (`POST /v3/search/investment_project`)
+- Added Canada administrative area data.
+- Added event program for partnering with Japan.
+
+## Bug fixes
+
+- **Investment** The investment summary API endpoint was adjusted to only count prospects from the date they were created.
+
+## API
+
+- **Investment** A new endpoint `GET /v4/large-capital-opportunity/<uuid:pk>/audit` has been added that lists changes to a given 
+  opportunity. Refer to the API documentation for the schema.
+
+
 # Data Hub API 36.11.0 (2021-03-24)
 
 

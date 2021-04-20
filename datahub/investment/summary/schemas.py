@@ -31,8 +31,16 @@ class IProjectSummarySchema(AutoSchema):
                             'type': 'object',
                             'properties': {
                                 'label': {'type': 'string', 'example': '2020-21'},
-                                'start': {'type': 'date', 'example': '2020-04-01'},
-                                'end': {'type': 'date', 'example': '2021-03-31'},
+                                'start': {
+                                    'type': 'string',
+                                    'format': 'date',
+                                    'example': '2020-04-01',
+                                },
+                                'end': {
+                                    'type': 'string',
+                                    'format': 'date',
+                                    'example': '2021-03-31',
+                                },
                             },
                         },
                         'totals': {

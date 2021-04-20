@@ -297,6 +297,7 @@ def test_mapping(es):
             'government_assistance': {'type': 'boolean'},
             'gross_value_added': {'type': 'double'},
             'id': {'type': 'keyword'},
+            'incomplete_fields': {'type': 'text'},
             'intermediate_company': {
                 'properties': {
                     'id': {'type': 'keyword'},
@@ -777,7 +778,10 @@ def test_get_basic_search_query():
     }
 
     query = get_basic_search_query(
-        ESInvestmentProject, 'test', offset=5, limit=5,
+        ESInvestmentProject,
+        'test',
+        offset=5,
+        limit=5,
     )
 
     assert query.to_dict() == expected_query
