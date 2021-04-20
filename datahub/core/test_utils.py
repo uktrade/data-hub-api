@@ -19,6 +19,7 @@ from django.utils.timezone import now
 from faker import Faker
 from rest_framework.fields import DateField, DateTimeField
 from rest_framework.test import APIClient
+from reversion.models import Revision, Version
 
 from datahub.core.utils import join_truthy_strings
 from datahub.metadata.models import Team
@@ -479,12 +480,30 @@ def resolve_objects(data, object_resolver=attrgetter('pk')):  # noqa: B008
     return resolve_data(data, value_resolver=resolve_value)
 
 
+def has_reversion_version(model_db):
+    """
+    Check a model db object is stored as a reversion version
+    :param model_db:
+    """
+    versions = Version.objects.get_for_object(model_db)
+    return versions.count() >= 1
+
+
+def has_reversion_comment(comment):
+    """
+    Check for comment in the version
+    :param comment: Comment to do a case insensitive search of comment value
+    """
+    revisions = Revision.objects.filter(comment__icontains=comment)
+    return revisions.count() > 0
+
+
 class HawkMockJSONResponse:
     """
     Mock utility mocking server validation for POST content.
     This is needed when mocking responses when using the APIClient and HawkAuth.
 
-    The default reponse is an empty JSON but can be overridden by passing in a
+    The default response is an empty JSON but can be overridden by passing in a
     response argument into the constructor.
 
     dynamic_reponse = HawkMockJSONResponse(
