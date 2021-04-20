@@ -483,8 +483,8 @@ def resolve_objects(data, object_resolver=attrgetter('pk')):  # noqa: B008
 def has_reversion_version(model_db, count=1):
     """
     Check a model db object is stored as a reversion version
-    :param model_db:
-    :param count: value count
+    :param model_db: Database model that is being audited with reversion
+    :param count: Count the amount of versions that will be returned
     """
     versions = Version.objects.get_for_object(model_db)
     return versions.count() >= count
