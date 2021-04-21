@@ -88,7 +88,7 @@ def setup_us_company_with_registered_address_only(post_code):
         ('12345-1234', '12345-1234'),
         ('12345 - 1234', '12345 - 1234'),
         ('0 12345', '01234'),
-    ]
+    ],
 )
 def test_command_regex_generates_the_expected_postcode_substitution(post_code, expected_result):
     """
@@ -113,7 +113,7 @@ def test_command_regex_generates_the_expected_postcode_substitution(post_code, e
         ('00612-1234', 'PR', 'Puerto Rico'),
         ('01012', 'MA', 'Massachusetts'),
         ('02823', 'RI', 'Rhode Island'),
-    ]
+    ],
 )
 def test_us_company_with_unique_zips_generates_valid_address_area(
         post_code,
@@ -144,7 +144,7 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
         ('03912', 'ME', 'Maine'),
         ('04946', 'ME', 'Maine'),
         ('05067-1234', 'VT', 'Vermont'),
-    ]
+    ],
 )
 def test_us_company_with_address_data_only_will_generate_address_area(
         post_code,
@@ -174,7 +174,7 @@ def test_us_company_with_address_data_only_will_generate_address_area(
         ('05612-1234', 'VT', 'Vermont'),
         ('060123456', 'CT', 'Connecticut'),
         ('07045', 'NJ', 'New Jersey'),
-    ]
+    ],
 )
 def test_us_company_with_unique_zips_generates_the_valid_registered_address_area(
         post_code,
@@ -205,7 +205,7 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
         ('15078', 'PA', 'Pennsylvania'),
         ('19789-4567', 'DE', 'Delaware'),
         ('20067', 'DC', 'District of Columbia'),
-    ]
+    ],
 )
 def test_us_company_with_registered_address_data_only_will_generate_registered_address_area(
         post_code,
@@ -237,7 +237,7 @@ def test_us_company_with_registered_address_data_only_will_generate_registered_a
         ('NY 10174 – 4099', '10174 – 4099'),
         ('NY 10174 - 4099', '10174 - 4099'),
         ('NY 123456789', '123456789'),
-    ]
+    ],
 )
 def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
         post_code,
@@ -269,7 +269,7 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
         ('n/a', 'n/a'),
         ('VA 2210', 'VA 2210'),
         ('tbc', 'tbc'),
-    ]
+    ],
 )
 def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
         post_code,
@@ -296,7 +296,7 @@ def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
         ('1 0402', '10402'),
         ('8520 7402', '07402'),
         ('CA90025', '90025'),
-    ]
+    ],
 )
 def test_audit_log(post_code, expected_result):
     """
@@ -322,7 +322,7 @@ def test_audit_log(post_code, expected_result):
         ('123456789', '123456789'),
         ('8520 7402', '07402'),
         ('CA90025', '90025'),
-    ]
+    ],
 )
 def test_audit_does_not_continue_creating_revisions(post_code, expected_result):
     """
