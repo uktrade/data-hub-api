@@ -46,6 +46,7 @@ from datahub.interaction.test.permissions import (
     NON_RESTRICTED_CHANGE_PERMISSIONS,
     NON_RESTRICTED_VIEW_PERMISSIONS,
 )
+from datahub.interaction.test.views.constants import TradeAgreement
 from datahub.interaction.test.views.utils import resolve_data
 from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -106,8 +107,9 @@ class TestAddInteraction(APITestMixin):
         company = CompanyFactory()
         contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
+        communication_channel = random_obj_for_model(CommunicationChannel)
 
-        url = reverse('api-v3:interaction:collection')
+        url = reverse('api-v4:interaction:collection')
         request_data = {
             'kind': Interaction.Kind.INTERACTION,
             'communication_channel': communication_channel.pk,
@@ -120,6 +122,8 @@ class TestAddInteraction(APITestMixin):
             'contacts': [contact.pk],
             'service': Service.inbound_referral.value.id,
             'was_policy_feedback_provided': False,
+            'has_related_trade_agreements': False,
+            'related_trade_agreements': [],
 
             **resolve_data(extra_data),
         }
@@ -206,7 +210,10 @@ class TestAddInteraction(APITestMixin):
             'archived_reason': None,
             'company_referral': None,
             'large_capital_opportunity': request_data.get('large_capital_opportunity'),
-            'related_trade_agreements': [],
+            'has_related_trade_agreements':
+                request_data.get('has_related_trade_agreements', False),
+            'related_trade_agreements':
+                request_data.get('related_trade_agreements', []),
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -265,7 +272,7 @@ class TestAddInteraction(APITestMixin):
         contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
 
-        url = reverse('api-v3:interaction:collection')
+        url = reverse('api-v4:interaction:collection')
         request_data = {
             'kind': Interaction.Kind.INTERACTION,
             'communication_channel': communication_channel.pk,
@@ -278,10 +285,11 @@ class TestAddInteraction(APITestMixin):
             'contacts': [contact.pk],
             'service': Service.inbound_referral.value.id,
             'was_policy_feedback_provided': False,
+            'has_related_trade_agreements': False,
+            'related_trade_agreements': [],
 
             **resolve_data(extra_data),
         }
-
         api_client = self.create_api_client(user=adviser)
         response = api_client.post(url, request_data)
 
@@ -364,7 +372,10 @@ class TestAddInteraction(APITestMixin):
             'archived_reason': None,
             'company_referral': None,
             'large_capital_opportunity': None,
-            'related_trade_agreements': [],
+            'has_related_trade_agreements':
+                request_data.get('has_related_trade_agreements', False),
+            'related_trade_agreements':
+                request_data.get('related_trade_agreements', []),
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -379,7 +390,7 @@ class TestAddInteraction(APITestMixin):
         contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
 
-        url = reverse('api-v3:interaction:collection')
+        url = reverse('api-v4:interaction:collection')
         request_data = {
             'kind': Interaction.Kind.INTERACTION,
             'communication_channel': communication_channel.pk,
@@ -403,6 +414,8 @@ class TestAddInteraction(APITestMixin):
                         CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                 },
             ],
+            'has_related_trade_agreements': False,
+            'related_trade_agreements': [],
         }
 
         api_client = self.create_api_client(user=adviser)
@@ -473,7 +486,7 @@ class TestAddInteraction(APITestMixin):
         contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
 
-        url = reverse('api-v3:interaction:collection')
+        url = reverse('api-v4:interaction:collection')
         request_data = {
             'date': interaction_date,
             'kind': Interaction.Kind.INTERACTION,
@@ -497,6 +510,8 @@ class TestAddInteraction(APITestMixin):
                         CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                 },
             ],
+            'has_related_trade_agreements': False,
+            'related_trade_agreements': [],
         }
 
         api_client = self.create_api_client(user=adviser)
@@ -524,6 +539,8 @@ class TestAddInteraction(APITestMixin):
                     'subject': ['This field is required.'],
                     'company': ['This field is required.'],
                     'was_policy_feedback_provided': ['This field is required.'],
+                    'has_related_trade_agreements': ['This field is required.'],
+                    'related_trade_agreements': ['This field is required.'],
                 },
             ),
 
@@ -543,6 +560,8 @@ class TestAddInteraction(APITestMixin):
                     ],
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'service': ['This field is required.'],
@@ -564,6 +583,8 @@ class TestAddInteraction(APITestMixin):
                     ],
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'communication_channel': ['This field is required.'],
@@ -587,6 +608,8 @@ class TestAddInteraction(APITestMixin):
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
                     'was_policy_feedback_provided': True,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'policy_areas': ['This field is required.'],
@@ -615,11 +638,62 @@ class TestAddInteraction(APITestMixin):
                     'policy_areas': [],
                     'policy_feedback_notes': '',
                     'policy_issue_types': [],
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'policy_areas': ['This field is required.'],
                     'policy_feedback_notes': ['This field is required.'],
                     'policy_issue_types': ['This field is required.'],
+                },
+            ),
+
+            # at least one trade agreements field required when there are related trade agreements
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.TRADE_AGREEMENT,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': True,
+                },
+                {
+                    'related_trade_agreements': ['This field is required.'],
+                },
+            ),
+
+            # trade agreements field cannot be blank when there are related trade agreements
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.TRADE_AGREEMENT,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': True,
+                    'related_trade_agreements': [],
+                },
+                {
+                    'related_trade_agreements': ['This field is required.'],
                 },
             ),
 
@@ -641,6 +715,8 @@ class TestAddInteraction(APITestMixin):
                     'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'were_countries_discussed': None,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'were_countries_discussed': ['This field is required.'],
@@ -664,6 +740,8 @@ class TestAddInteraction(APITestMixin):
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': None,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'were_countries_discussed': ['This field is required.'],
@@ -686,6 +764,8 @@ class TestAddInteraction(APITestMixin):
                     'service': Service.inbound_referral.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'were_countries_discussed': ['This field is required.'],
@@ -718,6 +798,8 @@ class TestAddInteraction(APITestMixin):
                                 CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'were_countries_discussed': ['This field is required.'],
@@ -746,6 +828,8 @@ class TestAddInteraction(APITestMixin):
 
                     'were_countries_discussed': True,
                     'export_countries': None,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'export_countries': ['This field may not be null.'],
@@ -786,6 +870,8 @@ class TestAddInteraction(APITestMixin):
                                 CompanyExportCountry.Status.FUTURE_INTEREST,
                         },
                     ],
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'non_field_errors':
@@ -816,6 +902,8 @@ class TestAddInteraction(APITestMixin):
                                 CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'export_countries': [{'country': ['This field is required.']}],
@@ -846,6 +934,8 @@ class TestAddInteraction(APITestMixin):
                             },
                         },
                     ],
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'export_countries': [{'status': ['This field is required.']}],
@@ -878,6 +968,8 @@ class TestAddInteraction(APITestMixin):
                             'status': 'foobar',
                         },
                     ],
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'export_countries': [{'status': ['"foobar" is not a valid choice.']}],
@@ -911,6 +1003,8 @@ class TestAddInteraction(APITestMixin):
                                 CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'export_countries': [{'country': ['Must be a valid UUID.']}],
@@ -944,6 +1038,8 @@ class TestAddInteraction(APITestMixin):
                                 CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'export_countries': [
@@ -985,6 +1081,8 @@ class TestAddInteraction(APITestMixin):
                                 CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'export_countries':
@@ -1009,6 +1107,7 @@ class TestAddInteraction(APITestMixin):
                     'service': Service.inbound_referral.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
 
@@ -1021,6 +1120,7 @@ class TestAddInteraction(APITestMixin):
                     'policy_areas': [partial(random_obj_for_model, PolicyArea)],
                     'policy_feedback_notes': 'Policy feedback notes.',
                     'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
+                    'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
                 },
                 {
                     'is_event': ['This field is only valid for service deliveries.'],
@@ -1036,6 +1136,9 @@ class TestAddInteraction(APITestMixin):
                     ],
                     'policy_issue_types': [
                         'This field is only valid when policy feedback has been provided.',
+                    ],
+                    'related_trade_agreements': [
+                        'This field is only valid when there are related trade agreements.',
                     ],
                 },
             ),
@@ -1058,11 +1161,15 @@ class TestAddInteraction(APITestMixin):
                     'dit_participants': None,
                     'was_policy_feedback_provided': None,
                     'policy_feedback_notes': None,
+                    'has_related_trade_agreements': None,
+                    'related_trade_agreements': None,
                 },
                 {
                     'dit_participants': ['This field may not be null.'],
                     'was_policy_feedback_provided': ['This field may not be null.'],
                     'policy_feedback_notes': ['This field may not be null.'],
+                    'has_related_trade_agreements': ['This field may not be null.'],
+                    'related_trade_agreements': ['This field may not be null.'],
                 },
             ),
 
@@ -1082,9 +1189,10 @@ class TestAddInteraction(APITestMixin):
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-
                     'event': None,
                     'is_event': True,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'is_event': ['This field is only valid for service deliveries.'],
@@ -1106,6 +1214,8 @@ class TestAddInteraction(APITestMixin):
                     ],
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
 
                     'event': EventFactory,
@@ -1129,6 +1239,8 @@ class TestAddInteraction(APITestMixin):
                     ],
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
 
                     'dit_participants': [],
                 },
@@ -1156,6 +1268,8 @@ class TestAddInteraction(APITestMixin):
                     ],
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                     'status': 'foobar',
                 },
                 {
@@ -1180,6 +1294,8 @@ class TestAddInteraction(APITestMixin):
                     ],
                     'service': Service.enquiry_or_referral_received.value.id,
                     'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                 },
                 {
                     'service': ['This field is valid for services without children services.'],
@@ -1200,6 +1316,8 @@ class TestAddInteraction(APITestMixin):
                     ],
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                     'status': None,
                 },
                 {
@@ -1224,6 +1342,8 @@ class TestAddInteraction(APITestMixin):
                     'service': Service.inbound_referral.value.id,
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
                     'were_countries_discussed': True,
                 },
                 {
@@ -1236,7 +1356,7 @@ class TestAddInteraction(APITestMixin):
     def test_validation(self, data, errors):
         """Test validation errors."""
         data = resolve_data(data)
-        url = reverse('api-v3:interaction:collection')
+        url = reverse('api-v4:interaction:collection')
         response = self.api_client.post(url, data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -1255,7 +1375,7 @@ class TestAddInteraction(APITestMixin):
         )
         company = CompanyFactory()
         contact = ContactFactory(company=company)
-        url = reverse('api-v3:interaction:collection')
+        url = reverse('api-v4:interaction:collection')
         api_client = self.create_api_client(user=requester)
         response = api_client.post(
             url,
@@ -1273,6 +1393,8 @@ class TestAddInteraction(APITestMixin):
                 'investment_project': project.pk,
                 'service': Service.inbound_referral.value.id,
                 'was_policy_feedback_provided': False,
+                'has_related_trade_agreements': False,
+                'related_trade_agreements': [],
             },
         )
 
@@ -1294,7 +1416,7 @@ class TestAddInteraction(APITestMixin):
             permission_codenames=[InteractionPermission.add_associated_investmentproject],
             dit_team=TeamFactory(),  # different dit team from the project creator
         )
-        url = reverse('api-v3:interaction:collection')
+        url = reverse('api-v4:interaction:collection')
         api_client = self.create_api_client(user=requester)
         response = api_client.post(
             url,
@@ -1312,6 +1434,8 @@ class TestAddInteraction(APITestMixin):
                 'investment_project': project.pk,
                 'service': Service.inbound_referral.value.id,
                 'was_policy_feedback_provided': False,
+                'has_related_trade_agreements': False,
+                'related_trade_agreements': [],
             },
         )
 
@@ -1328,7 +1452,7 @@ class TestAddInteraction(APITestMixin):
         requester = create_test_user(
             permission_codenames=[InteractionPermission.add_associated_investmentproject],
         )
-        url = reverse('api-v3:interaction:collection')
+        url = reverse('api-v4:interaction:collection')
         api_client = self.create_api_client(user=requester)
         response = api_client.post(
             url,
@@ -1345,6 +1469,8 @@ class TestAddInteraction(APITestMixin):
                 'notes': 'hello',
                 'service': Service.inbound_referral.value.id,
                 'was_policy_feedback_provided': False,
+                'has_related_trade_agreements': False,
+                'related_trade_agreements': [],
             },
         )
 
@@ -1374,7 +1500,7 @@ class TestGetInteraction(APITestMixin):
         requester = create_test_user(permission_codenames=permissions)
         interaction = factory()
         api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -1495,6 +1621,7 @@ class TestGetInteraction(APITestMixin):
                 'recipient': format_expected_adviser(company_referral.recipient),
             } if company_referral else None,
             'large_capital_opportunity': None,
+            'has_related_trade_agreements': None,
             'related_trade_agreements': [],
         }
 
@@ -1509,7 +1636,7 @@ class TestGetInteraction(APITestMixin):
             dit_team=project_creator.dit_team,
         )
         api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -1610,6 +1737,7 @@ class TestGetInteraction(APITestMixin):
             'archived_reason': None,
             'company_referral': None,
             'large_capital_opportunity': None,
+            'has_related_trade_agreements': None,
             'related_trade_agreements': [],
         }
 
@@ -1624,7 +1752,7 @@ class TestGetInteraction(APITestMixin):
             dit_team=TeamFactory(),
         )
         api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -1637,7 +1765,7 @@ class TestGetInteraction(APITestMixin):
             dit_team=TeamFactory(),
         )
         api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -1653,7 +1781,7 @@ class TestUpdateInteraction(APITestMixin):
         interaction = CompanyInteractionFactory(subject='I am a subject')
 
         api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.patch(
             url,
             data={
@@ -1672,7 +1800,7 @@ class TestUpdateInteraction(APITestMixin):
         interaction = CompanyInteractionFactory(subject='I am a subject')
 
         api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.patch(
             url,
             data={
@@ -1694,7 +1822,7 @@ class TestUpdateInteraction(APITestMixin):
         )
 
         api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.patch(
             url,
             data={
@@ -1722,7 +1850,7 @@ class TestUpdateInteraction(APITestMixin):
         )
 
         api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.patch(
             url,
             data={
@@ -1750,7 +1878,7 @@ class TestUpdateInteraction(APITestMixin):
         """Test that the theme field can be updated."""
         interaction = CompanyInteractionFactory(theme=initial_value)
 
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(
             url,
             data={
@@ -1765,7 +1893,7 @@ class TestUpdateInteraction(APITestMixin):
         """Test that a theme can't be removed from an interaction."""
         interaction = CompanyInteractionFactory(theme=Interaction.Theme.EXPORT)
 
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(
             url,
             data={
@@ -1816,7 +1944,7 @@ class TestUpdateInteraction(APITestMixin):
             communication_channel=None,
         )
         api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': draft_interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': draft_interaction.pk})
         data = resolve_data(data)
         response = api_client.patch(url, data=data)
 
@@ -1889,7 +2017,7 @@ class TestUpdateInteraction(APITestMixin):
         assert len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) == 0
 
         api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         data = resolve_data(data)
         response = api_client.patch(url, data=data)
 
@@ -1962,7 +2090,7 @@ class TestUpdateInteraction(APITestMixin):
         assert len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) > 0
 
         api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         data = resolve_data(data)
         response = api_client.patch(url, data=data)
 
@@ -1982,7 +2110,7 @@ class TestUpdateInteraction(APITestMixin):
 
         assert len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) == 1
         api_client = self.create_api_client(user=requester)
-        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         data = {
             'subject': 'I am another subject',
         }
@@ -2004,7 +2132,7 @@ class TestUpdateInteraction(APITestMixin):
         contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
 
-        url = reverse('api-v3:interaction:collection')
+        url = reverse('api-v4:interaction:collection')
         request_data = {
             'kind': Interaction.Kind.INTERACTION,
             'communication_channel': communication_channel.pk,
@@ -2028,6 +2156,8 @@ class TestUpdateInteraction(APITestMixin):
                         CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                 },
             ],
+            'has_related_trade_agreements': True,
+            'related_trade_agreements': ['50cf99fd-1150-421d-9e1c-b23750ebf5ca'],
         }
 
         api_client = self.create_api_client(user=adviser)
@@ -2062,7 +2192,7 @@ class TestListInteractions(APITestMixin):
             3, investment_project=project,
         )
 
-        url = reverse('api-v3:interaction:collection')
+        url = reverse('api-v4:interaction:collection')
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -2096,7 +2226,7 @@ class TestListInteractions(APITestMixin):
             2, investment_project=associated_project,
         )
 
-        url = reverse('api-v3:interaction:collection')
+        url = reverse('api-v4:interaction:collection')
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -2118,7 +2248,7 @@ class TestListInteractions(APITestMixin):
             3,
             large_capital_opportunity=opportunity,
         )
-        url = reverse('api-v3:interaction:collection')
+        url = reverse('api-v4:interaction:collection')
         response = api_client.get(url, {
             'large_capital_opportunity_id': opportunity.pk,
         })

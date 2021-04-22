@@ -463,6 +463,7 @@ def resolve_objects(data, object_resolver=attrgetter('pk')):  # noqa: B008
     def resolve_value(value):
         if hasattr(value, 'pk'):
             return object_resolver(value)
+
         return value
 
     return resolve_data(data, value_resolver=resolve_value)

@@ -106,6 +106,9 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
         'invalid_for_investment': gettext_lazy(
             "This value can't be selected for investment interactions.",
         ),
+        'invalid_for_non_trade_agreement': gettext_lazy(
+            'This field is only valid for trade agreement interactions.',
+        ),
         'invalid_for_non_service_delivery': gettext_lazy(
             'This field is only valid for service deliveries.',
         ),
@@ -123,6 +126,9 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
         ),
         'invalid_when_no_policy_feedback': gettext_lazy(
             'This field is only valid when policy feedback has been provided.',
+        ),
+        'invalid_when_no_related_trade_agreement': gettext_lazy(
+            'This field is only valid when there are related trade agreements.',
         ),
         'too_many_contacts_for_event_service_delivery': gettext_lazy(
             'Only one contact can be provided for event service deliveries.',
@@ -690,6 +696,16 @@ class InteractionSerializerV4(BaseInteractionSerializer):
                     OperatorRule('policy_issue_types', bool),
                     OperatorRule('policy_feedback_notes', is_not_blank),
                     when=OperatorRule('was_policy_feedback_provided', bool),
+                ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('related_trade_agreements', bool),
+                    when=OperatorRule('has_related_trade_agreements', bool),
+                ),
+                ValidationRule(
+                    'invalid_when_no_related_trade_agreement',
+                    OperatorRule('related_trade_agreements', not_),
+                    when=OperatorRule('has_related_trade_agreements', not_),
                 ),
                 ValidationRule(
                     'required',
