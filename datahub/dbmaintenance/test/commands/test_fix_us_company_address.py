@@ -160,10 +160,10 @@ def test_us_company_with_address_data_only_will_generate_address_area(
 @pytest.mark.parametrize(
     'post_code, area_code',
     [
-        ('05512', 'MA', 'Massachusetts'),
-        ('05612-1234', 'VT', 'Vermont'),
-        ('060123456', 'CT', 'Connecticut'),
-        ('07045', 'NJ', 'New Jersey'),
+        ('05512', 'MA'),
+        ('05612-1234', 'VT'),
+        ('060123456', 'CT'),
+        ('07045', 'NJ'),
     ],
 )
 def test_us_company_with_unique_zips_generates_the_valid_registered_address_area(
@@ -189,10 +189,10 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
 @pytest.mark.parametrize(
     'post_code, area_code',
     [
-        ('10057', 'NY', 'New York'),
-        ('15078', 'PA', 'Pennsylvania'),
-        ('19789-4567', 'DE', 'Delaware'),
-        ('20067', 'DC', 'District of Columbia'),
+        ('10057', 'NY'),
+        ('15078', 'PA'),
+        ('19789-4567', 'DE'),
+        ('20067', 'DC'),
     ],
 )
 def test_us_company_with_registered_address_data_only_will_generate_registered_address_area(

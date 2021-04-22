@@ -85,7 +85,7 @@ class BaseFixCompanyAddress(BaseCommand):
         :param area_code: Area code value
         :param company: Company data
         """
-        if area_code:
+        if area_code and self.is_valid_postcode_format(company.registered_address_postcode):
             administrative_area = self.get_administrative_area_by_code(area_code)
             company.registered_address_area_id = administrative_area.id
             company.save(force_update=True)
@@ -131,7 +131,7 @@ class BaseFixCompanyAddress(BaseCommand):
         :param area_code: Area code value
         :param company: Company data
         """
-        if area_code:
+        if area_code and self.is_valid_postcode_format(company.address_postcode):
             administrative_area = self.get_administrative_area_by_code(area_code)
             company.address_area_id = administrative_area.id
             company.save(force_update=True)
@@ -162,6 +162,9 @@ class BaseFixCompanyAddress(BaseCommand):
             0,
             re.MULTILINE,
         )
+
+    def is_valid_postcode_format(self, postcode):
+        return re.fullmatch(self.postcode_replacement.postcode_pattern, postcode, re.MULTILINE)
 
     def fix_registered_address_postcode(self, company):
         """

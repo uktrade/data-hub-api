@@ -256,9 +256,6 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
         ('Nb E3B 217', 'Nb E3B 217'),
         ('PO Box 370', 'PO Box 370'),
         ('oooooo', 'oooooo'),
-        ('V1Y-9X1', 'V1Y-9X1'),
-        ('N2V 1N7', 'N2V 1N7'),
-        ('J8Y 3B9', 'J8Y 3B9'),
     ],
 )
 def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
