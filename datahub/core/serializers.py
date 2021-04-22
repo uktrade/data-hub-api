@@ -10,7 +10,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.fields import ReadOnlyField, UUIDField
 
 from datahub.core.validate_utils import DataCombiner
-from datahub.metadata.models import Country
+from datahub.metadata.models import AdministrativeArea, Country
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -331,6 +331,12 @@ class AddressSerializer(serializers.ModelSerializer):
         default='',
         source='{source_prefix}_postcode',
     )
+    area = NestedRelatedField(
+        AdministrativeArea,
+        allow_null=True,
+        required=False,
+        source='{source_prefix}_area',
+    )
     country = NestedRelatedField(
         Country,
         allow_null=True,
@@ -454,5 +460,6 @@ class AddressSerializer(serializers.ModelSerializer):
             'town',
             'county',
             'postcode',
+            'area',
             'country',
         )

@@ -78,7 +78,7 @@ class TestUpdateFromDNB(AdminTestMixin):
 
     def test_post(self, requests_mock, dnb_response):
         """
-        Test that a post request to 'upddate-from-dnb' updates
+        Test that a post request to 'update-from-dnb' updates
         the company.
         """
         _, update_url = self._create_company(
