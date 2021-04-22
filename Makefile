@@ -28,8 +28,11 @@ setup-flake8-hook:
 run-shell:
 	docker-compose run api bash
 
+run-test-reuse-db:
+	docker-compose run api pytest --reuse-db -vv <Add Test File Path>
+
 reindex-es:
 	docker-compose run api python manage.py sync_es
 
 fix-us-areas:
-	docker-compose run api python manage.py fix_us_company_address_postcode_for_company_address_area
+	docker-compose run api python manage.py fix_us_company_address

@@ -12,6 +12,27 @@ CountryPostcodeReplacementConstant = namedtuple(
     ),
 )
 
+CA_ZIP_STATES = (
+    ('A', 'NL', 'Newfoundland and Labrador'),
+    ('B', 'NS', 'Nova Scotia'),
+    ('C', 'PE', 'Prince Edward Island'),
+    ('E', 'NB', 'New Brunswick'),
+    ('G', 'QC', 'Quebec'),
+    ('H', 'QC', 'Quebec'),
+    ('J', 'QC', 'Quebec'),
+    ('K', 'ON', 'Ontario'),
+    ('L', 'ON', 'Ontario'),
+    ('M', 'ON', 'Ontario'),
+    ('N', 'ON', 'Ontario'),
+    ('P', 'ON', 'Ontario'),
+    ('R', 'MB', 'Manitoba'),
+    ('S', 'SK', 'Saskatchewan'),
+    ('T', 'AB', 'Alberta'),
+    ('X', 'NT', 'Northwest Territories'),
+    ('X', 'NU', 'Nunavut'),
+    ('Y', 'YT', 'Yukon'),
+)
+
 US_ZIP_STATES = (
     ('005', 'NY', 'New York'),
     ('006', 'PR', 'Puerto Rico'),
@@ -931,4 +952,11 @@ class CountryPostcodeReplacement(Enum):
         (r'^.*?(?:(\d{5}-\d{4})|(\d{5}\s-\s\d{4})'
          r'|(\d{5}\s–\s\d{4})|(\d{9})|(\d)\s?(\d{4})).*?$'),
         r'\1\2\3\4\5\6',
+    )
+    # https://regex101.com/r/yTwwar/1/ full explanation and examples
+    canada = CountryPostcodeReplacementConstant(
+        Country.canada.value.id,
+        (r'(^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?-?[0-9][A-Z][0-9]$)'
+         r'|^.*?((?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9])'),
+        r'\1\2',
     )
