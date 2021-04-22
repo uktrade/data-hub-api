@@ -19,7 +19,8 @@ class Command(BaseCommand):
     Command to make US postcodes conform to a standard format and update states
     accordingly.
     Example of executing this command locally:
-        python manage.py fix_us_company_address_postcode_data
+        python manage.py fix_us_company_address_postcode_for_company_address_area
+        or use the makefile for developers
     """
 
     def add_arguments(self, parser):
@@ -49,12 +50,20 @@ class Command(BaseCommand):
                 self.update_registered_address_area(area_code, us_company)
 
     def get_us_companies_with_no_areas(self):
-        """United states companies with no areas"""
-        query = Q(address_area_id__isnull=True)
-        query.add(Q(registered_address_area_id__isnull=True), Q.OR)
-        query.add(Q(address_country=Country.united_states.value.id), Q.AND)
-        query.add(Q(registered_address_country=Country.united_states.value.id), Q.OR)
-        return Company.objects.filter(query)
+        """United states companies with no areas and united states
+        or no registered areas and registered country united states
+        """
+        result = Company.objects.filter(
+            Q(
+                Q(address_area_id__isnull=True)
+                & Q(address_country=Country.united_states.value.id),
+            )
+            | Q(
+                Q(registered_address_area_id__isnull=True)
+                & Q(registered_address_country=Country.united_states.value.id),
+            ),
+        )
+        return result
 
     def update_address_area(self, area_code, us_company):
         """

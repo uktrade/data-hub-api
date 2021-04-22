@@ -248,6 +248,7 @@ class TestAddressSerializer(APITestMixin):
                 },
                 {
                     'primary_address': {
+                        'area': None,
                         'line_1': '2',
                         'line_2': 'Main Road',
                         'town': 'London',
@@ -273,6 +274,7 @@ class TestAddressSerializer(APITestMixin):
                 },
                 {
                     'primary_address': {
+                        'area': None,
                         'line_1': '2',
                         'line_2': '',
                         'town': 'London',
@@ -291,6 +293,7 @@ class TestAddressSerializer(APITestMixin):
             (
                 {
                     'primary_address': {
+                        'area': None,
                         'line_1': '2',
                         'line_2': 'Main Road',
                         'town': 'London',
@@ -309,6 +312,7 @@ class TestAddressSerializer(APITestMixin):
                 },
                 {
                     'primary_address': {
+                        'area': None,
                         'line_1': '2',
                         'line_2': 'Main Road',
                         'town': 'London',
@@ -320,6 +324,7 @@ class TestAddressSerializer(APITestMixin):
                         },
                     },
                     'secondary_address': {
+                        'area': None,
                         'line_1': '1',
                         'line_2': 'Hello st.',
                         'town': 'Muckamore',
@@ -348,6 +353,7 @@ class TestAddressSerializer(APITestMixin):
                 },
                 {
                     'primary_address': {
+                        'area': None,
                         'line_1': '2',
                         'line_2': 'Main Road',
                         'town': 'London',
@@ -366,6 +372,7 @@ class TestAddressSerializer(APITestMixin):
             (
                 {
                     'primary_address': {
+                        'area': None,
                         'line_1': '2',
                         'line_2': 'Main Road',
                         'town': 'London',
@@ -384,6 +391,7 @@ class TestAddressSerializer(APITestMixin):
                 },
                 {
                     'primary_address': {
+                        'area': None,
                         'line_1': '2',
                         'line_2': 'Main Road',
                         'town': 'London',
@@ -569,6 +577,8 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_town': 'London',
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
+                    'primary_address_area': None,
+                    'primary_address_area_id': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
 
                     'secondary_address_1': '',
@@ -576,6 +586,7 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address_town': '',
                     'secondary_address_county': '',
                     'secondary_address_postcode': '',
+                    'secondary_address_area': None,
                     'secondary_address_country_id': None,
                 },
                 {
@@ -590,6 +601,7 @@ class TestAddressSerializer(APITestMixin):
                         'town': 'London',
                         'county': 'Greenwich',
                         'postcode': 'SE10 9NN',
+                        'area': None,
                         'country': {
                             'id': '80756b9a-5d95-e211-a939-e4115bead28a',
                             'name': 'United Kingdom',
@@ -607,6 +619,7 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_town': 'London',
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
+                    'primary_address_area_id': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
 
                     'secondary_address_1': '',
@@ -614,6 +627,7 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address_town': '',
                     'secondary_address_county': '',
                     'secondary_address_postcode': '',
+                    'secondary_address_area_id': None,
                     'secondary_address_country_id': None,
                 },
                 {
@@ -630,6 +644,7 @@ class TestAddressSerializer(APITestMixin):
                         'town': 'London',
                         'county': '',
                         'postcode': '',
+                        'area': None,
                         'country': {
                             'id': '80756b9a-5d95-e211-a939-e4115bead28a',
                             'name': 'United Kingdom',
@@ -647,6 +662,7 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_town': 'London',
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
+                    'primary_address_area_id': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
 
                     'secondary_address_1': '1',
@@ -654,6 +670,7 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address_town': 'Muckamore',
                     'secondary_address_county': 'Antrim',
                     'secondary_address_postcode': 'BT41 4QE',
+                    'secondary_address_area_id': None,
                     'secondary_address_country_id': Country.ireland.value.id,
                 },
                 {
@@ -668,6 +685,7 @@ class TestAddressSerializer(APITestMixin):
                         'town': 'London',
                         'county': 'Greenwich',
                         'postcode': 'SE10 9NN',
+                        'area': None,
                         'country': {
                             'id': '80756b9a-5d95-e211-a939-e4115bead28a',
                             'name': 'United Kingdom',
@@ -679,6 +697,7 @@ class TestAddressSerializer(APITestMixin):
                         'town': 'Muckamore',
                         'county': 'Antrim',
                         'postcode': 'BT41 4QE',
+                        'area': None,
                         'country': {
                             'id': '736a9ab2-5d95-e211-a939-e4115bead28a',
                             'name': 'Ireland',
@@ -696,12 +715,14 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_country_id': Country.united_kingdom.value.id,
+                    'primary_address_area_id': None,
 
                     'secondary_address_1': '1',
                     'secondary_address_2': 'Hello st.',
                     'secondary_address_town': 'Muckamore',
                     'secondary_address_county': 'Antrim',
                     'secondary_address_postcode': 'BT41 4QE',
+                    'secondary_address_area_id': None,
                     'secondary_address_country_id': Country.ireland.value.id,
                 },
                 {
@@ -714,6 +735,7 @@ class TestAddressSerializer(APITestMixin):
                         'town': 'London',
                         'county': 'Greenwich',
                         'postcode': 'SE10 9NN',
+                        'area': None,
                         'country': {
                             'id': '80756b9a-5d95-e211-a939-e4115bead28a',
                             'name': 'United Kingdom',
@@ -731,6 +753,7 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_town': 'London',
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
+                    'primary_address_area_id': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
 
                     'secondary_address_1': '1',
@@ -738,6 +761,7 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address_town': 'Muckamore',
                     'secondary_address_county': 'Antrim',
                     'secondary_address_postcode': 'BT41 4QE',
+                    'secondary_address_area_id': None,
                     'secondary_address_country_id': Country.ireland.value.id,
                 },
                 {
@@ -754,6 +778,7 @@ class TestAddressSerializer(APITestMixin):
                         'town': 'London',
                         'county': 'Greenwich',
                         'postcode': 'SE10 9NN',
+                        'area': None,
                         'country': {
                             'id': '80756b9a-5d95-e211-a939-e4115bead28a',
                             'name': 'United Kingdom',
@@ -765,6 +790,7 @@ class TestAddressSerializer(APITestMixin):
                         'town': 'Muckamore',
                         'county': '',
                         'postcode': '',
+                        'area': None,
                         'country': {
                             'id': '736a9ab2-5d95-e211-a939-e4115bead28a',
                             'name': 'Ireland',
@@ -781,6 +807,7 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_town': 'London',
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
+                    'primary_address_area_id': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
 
                     'secondary_address_1': '1',
@@ -788,6 +815,7 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address_town': 'Muckamore',
                     'secondary_address_county': 'Antrim',
                     'secondary_address_postcode': 'BT41 4QE',
+                    'secondary_address_area_id': None,
                     'secondary_address_country_id': Country.ireland.value.id,
                 },
                 {
@@ -807,6 +835,7 @@ class TestAddressSerializer(APITestMixin):
                         'town': 'London',
                         'county': 'Greenwich',
                         'postcode': 'SE10 9NN',
+                        'area': None,
                         'country': {
                             'id': '80756b9a-5d95-e211-a939-e4115bead28a',
                             'name': 'United Kingdom',
@@ -1057,6 +1086,7 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_town': 'London',
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
+                    'primary_address_area': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
 
                     'secondary_address_1': '',
@@ -1064,6 +1094,7 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address_town': '',
                     'secondary_address_county': '',
                     'secondary_address_postcode': '',
+                    'secondary_address_area': None,
                     'secondary_address_country_id': None,
                 },
                 {
@@ -1073,6 +1104,7 @@ class TestAddressSerializer(APITestMixin):
                         'town': 'London',
                         'county': 'Greenwich',
                         'postcode': 'SE10 9NN',
+                        'area': None,
                         'country': {
                             'id': '80756b9a-5d95-e211-a939-e4115bead28a',
                             'name': 'United Kingdom',
@@ -1090,6 +1122,7 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_town': 'London',
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
+                    'primary_address_area': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
 
                     'secondary_address_1': '1',
@@ -1097,6 +1130,7 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address_town': 'Muckamore',
                     'secondary_address_county': 'Antrim',
                     'secondary_address_postcode': 'BT41 4QE',
+                    'secondary_address_area': None,
                     'secondary_address_country_id': Country.ireland.value.id,
                 },
                 {
@@ -1106,6 +1140,7 @@ class TestAddressSerializer(APITestMixin):
                         'town': 'London',
                         'county': 'Greenwich',
                         'postcode': 'SE10 9NN',
+                        'area': None,
                         'country': {
                             'id': '80756b9a-5d95-e211-a939-e4115bead28a',
                             'name': 'United Kingdom',
@@ -1117,6 +1152,7 @@ class TestAddressSerializer(APITestMixin):
                         'town': 'Muckamore',
                         'county': 'Antrim',
                         'postcode': 'BT41 4QE',
+                        'area': None,
                         'country': {
                             'id': '736a9ab2-5d95-e211-a939-e4115bead28a',
                             'name': 'Ireland',
@@ -1133,6 +1169,7 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_town': 'London',
                     'primary_address_county': None,
                     'primary_address_postcode': '',
+                    'primary_address_area': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
 
                     'secondary_address_1': '1',
@@ -1140,6 +1177,7 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address_town': 'Muckamore',
                     'secondary_address_county': '',
                     'secondary_address_postcode': '',
+                    'secondary_address_area': None,
                     'secondary_address_country_id': Country.ireland.value.id,
                 },
                 {
@@ -1149,6 +1187,7 @@ class TestAddressSerializer(APITestMixin):
                         'town': 'London',
                         'county': '',
                         'postcode': '',
+                        'area': None,
                         'country': {
                             'id': '80756b9a-5d95-e211-a939-e4115bead28a',
                             'name': 'United Kingdom',
@@ -1160,6 +1199,7 @@ class TestAddressSerializer(APITestMixin):
                         'town': 'Muckamore',
                         'county': '',
                         'postcode': '',
+                        'area': None,
                         'country': {
                             'id': '736a9ab2-5d95-e211-a939-e4115bead28a',
                             'name': 'Ireland',
