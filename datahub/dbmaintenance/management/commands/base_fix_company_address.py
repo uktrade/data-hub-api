@@ -164,6 +164,11 @@ class BaseFixCompanyAddress(BaseCommand):
         )
 
     def is_valid_postcode_format(self, postcode):
+        """
+        Validates the postcode is valid based one the postcode replacement regex
+        :param postcode: Address Postcode
+        :return: True if valid, False if Invalid
+        """
         return re.fullmatch(self.postcode_replacement.postcode_pattern, postcode, re.MULTILINE)
 
     def fix_registered_address_postcode(self, company):
