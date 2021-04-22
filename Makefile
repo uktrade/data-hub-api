@@ -36,3 +36,6 @@ reindex-es:
 
 fix-us-areas:
 	docker-compose run api python manage.py fix_us_company_address
+
+fix-ca-areas:
+	docker-compose run api python manage.py fix_ca_company_address

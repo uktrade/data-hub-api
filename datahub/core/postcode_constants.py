@@ -28,6 +28,7 @@ CA_ZIP_STATES = (
     ('R', 'MB', 'Manitoba'),
     ('S', 'SK', 'Saskatchewan'),
     ('T', 'AB', 'Alberta'),
+    ('V', 'BC', 'British Columbia'),
     ('X', 'NT', 'Northwest Territories'),
     ('X', 'NU', 'Nunavut'),
     ('Y', 'YT', 'Yukon'),

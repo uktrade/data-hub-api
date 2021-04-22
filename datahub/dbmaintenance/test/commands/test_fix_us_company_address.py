@@ -101,29 +101,27 @@ def test_command_regex_generates_the_expected_postcode_substitution(post_code, e
 
 
 @pytest.mark.parametrize(
-    'post_code, area_code, area_name',
+    'post_code, area_code',
     [
-        ('00589', 'NY', 'New York'),
-        ('00612-1234', 'PR', 'Puerto Rico'),
-        ('01012', 'MA', 'Massachusetts'),
-        ('02823', 'RI', 'Rhode Island'),
+        ('00589', 'NY'),
+        ('00612-1234', 'PR'),
+        ('01012', 'MA'),
+        ('02823', 'RI'),
     ],
 )
 def test_us_company_with_unique_zips_generates_valid_address_area(
         post_code,
-        area_code,
-        area_name):
+        area_code):
     """
     Test postcode is fixed for the purpose of admin area
     generation with valid zip codes format
     :param post_code: POSTCODE good
     :param area_code: Area Code to be generated from Command
-    :param area_name: Area Name to describe area code
     """
     company = setup_us_company_with_all_addresses(post_code)
     assert company.address_area is None
 
-    call_command('fix_us_company_address_postcode_for_company_address_area')
+    call_command('fix_us_company_address')
 
     company.refresh_from_db()
     assert company.address_area is not None
@@ -132,28 +130,26 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
 
 
 @pytest.mark.parametrize(
-    'post_code, area_code, area_name',
+    'post_code, area_code',
     [
-        ('030121234', 'NH', 'New Hampshire'),
-        ('03912', 'ME', 'Maine'),
-        ('04946', 'ME', 'Maine'),
-        ('05067-1234', 'VT', 'Vermont'),
+        ('030121234', 'NH'),
+        ('03912', 'ME'),
+        ('04946', 'ME'),
+        ('05067-1234', 'VT'),
     ],
 )
 def test_us_company_with_address_data_only_will_generate_address_area(
         post_code,
-        area_code,
-        area_name):
+        area_code):
     """
     Test postcode fixes and area generation with address area data
     :param post_code: POSTCODE good
     :param area_code: Area Code to be generated from Command
-    :param area_name: Area Name to describe area code
     """
     company = setup_us_company_with_address_only(post_code)
     assert company.address_area is None
 
-    call_command('fix_us_company_address_postcode_for_company_address_area')
+    call_command('fix_us_company_address')
 
     company.refresh_from_db()
     assert company.address_area is not None
@@ -162,7 +158,7 @@ def test_us_company_with_address_data_only_will_generate_address_area(
 
 
 @pytest.mark.parametrize(
-    'post_code, area_code, area_name',
+    'post_code, area_code',
     [
         ('05512', 'MA', 'Massachusetts'),
         ('05612-1234', 'VT', 'Vermont'),
@@ -172,19 +168,17 @@ def test_us_company_with_address_data_only_will_generate_address_area(
 )
 def test_us_company_with_unique_zips_generates_the_valid_registered_address_area(
         post_code,
-        area_code,
-        area_name):
+        area_code):
     """
     Test registered address postcode fixes and area generation a
     couple of valid Zip Codes using the real DB
     :param post_code: POSTCODE good
     :param area_code: Area Code to be generated from Command
-    :param area_name: Area Name to describe area code
     """
     company = setup_us_company_with_all_addresses(post_code)
     assert company.registered_address_area is None
 
-    call_command('fix_us_company_address_postcode_for_company_address_area')
+    call_command('fix_us_company_address')
 
     company.refresh_from_db()
     assert company.registered_address_area is not None
@@ -193,7 +187,7 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
 
 
 @pytest.mark.parametrize(
-    'post_code, area_code, area_name',
+    'post_code, area_code',
     [
         ('10057', 'NY', 'New York'),
         ('15078', 'PA', 'Pennsylvania'),
@@ -203,18 +197,16 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
 )
 def test_us_company_with_registered_address_data_only_will_generate_registered_address_area(
         post_code,
-        area_code,
-        area_name):
+        area_code):
     """
     Test registered address data only creates data expected
     :param post_code: POSTCODE good
     :param area_code: Area Code to be generated from Command
-    :param area_name: Area Name to describe area code
     """
     company = setup_us_company_with_registered_address_only(post_code)
     assert company.registered_address_area is None
 
-    call_command('fix_us_company_address_postcode_for_company_address_area')
+    call_command('fix_us_company_address')
 
     company.refresh_from_db()
     assert company.registered_address_area is not None
@@ -245,7 +237,7 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
     assert company.address_postcode == post_code
     assert company.registered_address_postcode == post_code
 
-    call_command('fix_us_company_address_postcode_for_company_address_area')
+    call_command('fix_us_company_address')
 
     company.refresh_from_db()
     assert company.address_postcode == expected_result
@@ -275,7 +267,7 @@ def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
     """
     company = setup_us_company_with_all_addresses(post_code)
 
-    call_command('fix_us_company_address_postcode_for_company_address_area')
+    call_command('fix_us_company_address')
 
     company.refresh_from_db()
     assert company.address_postcode == expected_result
@@ -300,7 +292,7 @@ def test_audit_log(post_code, expected_result):
     """
     company = setup_us_company_with_all_addresses(post_code)
 
-    call_command('fix_us_company_address_postcode_for_company_address_area')
+    call_command('fix_us_company_address')
 
     company.refresh_from_db()
     assert company.address_postcode == expected_result
@@ -326,14 +318,14 @@ def test_audit_does_not_continue_creating_revisions(post_code, expected_result):
     """
     company = setup_us_company_with_all_addresses(post_code)
 
-    call_command('fix_us_company_address_postcode_for_company_address_area')
+    call_command('fix_us_company_address')
     company.refresh_from_db()
 
     assert has_reversion_version(company, 1)
     assert company.address_postcode == expected_result
     assert company.registered_address_postcode == expected_result
 
-    call_command('fix_us_company_address_postcode_for_company_address_area')
+    call_command('fix_us_company_address')
     company.refresh_from_db()
 
     assert has_reversion_version(company, 1)
