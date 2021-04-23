@@ -6,8 +6,12 @@ from django.db import models
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.core.utils import get_front_end_url, join_truthy_strings, StrEnum
+from datahub.core.validators import (
+    InternationalTelephoneValidator,
+    TelephoneCountryCodeValidator,
+    TelephoneValidator,
+)
 from datahub.metadata import models as metadata_models
-
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
@@ -60,8 +64,11 @@ class Contact(ArchivableModel, BaseModel):
         on_delete=models.SET_NULL,
     )
     primary = models.BooleanField()
-    telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
-    telephone_number = models.CharField(max_length=MAX_LENGTH)
+    telephone_countrycode = models.CharField(
+        max_length=MAX_LENGTH,
+        validators=[TelephoneCountryCodeValidator()],
+    )
+    telephone_number = models.CharField(validators=[TelephoneValidator()], max_length=MAX_LENGTH)
     email = models.EmailField()
     address_same_as_company = models.BooleanField(default=False)
     address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -73,7 +80,12 @@ class Contact(ArchivableModel, BaseModel):
         on_delete=models.SET_NULL,
     )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    telephone_alternative = models.CharField(
+        validators=[InternationalTelephoneValidator()],
+        max_length=MAX_LENGTH,
+        blank=True,
+        null=True,
+    )
     email_alternative = models.EmailField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     archived_documents_url_path = models.CharField(
