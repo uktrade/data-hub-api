@@ -2,33 +2,26 @@ import re
 from logging import getLogger
 
 import reversion
-from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Q
 
 from datahub.company.models import Company
-from datahub.core.validate_utils import is_blank, is_not_blank
+from datahub.core.validate_utils import is_not_blank
 from datahub.metadata.models import AdministrativeArea
 
 logger = getLogger(__name__)
 
 
-class BaseFixCompanyAddress(BaseCommand):
+class CompanyAddressResolver:
     """
-    Command for fixing company address postcode and areas
+    Command for resolving company address postcode and areas
     """
-
-    help = 'Fix Company address postcodes for the purpose of setting address areas'
 
     def __init__(
             self,
             country_id,
             revision_comment,
             zip_states,
-            postcode_replacement,
-            stdout=None,
-            stderr=None,
-            no_color=False,
-            force_color=False):
+            postcode_replacement):
         """
         Fixing Company address areas by country
         :param country_id: Country identifier associated with the address
@@ -38,30 +31,11 @@ class BaseFixCompanyAddress(BaseCommand):
         identifiers facilitating area mapping
         :param postcode_replacement: Regex patterns to regulate postcode
         replacement
-        :param stdout: Inherited
-        :param stderr: Inherited
-        :param no_color: Inherited
-        :param force_color: Inherited
         """
         self.country_id = country_id
         self.revision_comment = revision_comment
         self.postcode_replacement = postcode_replacement
         self.zip_states = zip_states
-        if self.country_id is None:
-            raise CommandError('Country Id is mandatory')
-        if is_blank(self.revision_comment):
-            self.revision_comment = f'Country {self.country_id} Area and postcode Fix.'
-        if self.zip_states is None:
-            raise CommandError('Zip states are mandatory')
-        if self.postcode_replacement is None:
-            raise CommandError('Country postcode replacement is mandatory')
-        super().__init__(stdout, stderr, no_color, force_color)
-
-    def add_arguments(self, parser):
-        """
-        No arguments needed for the management command.
-        """
-        pass
 
     def get_companies_with_no_areas(self):
         """Companies with no areas and country
@@ -117,7 +91,7 @@ class BaseFixCompanyAddress(BaseCommand):
                 area_code = self.get_area_code(company.registered_address_postcode)
                 self.update_registered_address_area(area_code, company)
 
-    def handle(self, *args, **options):
+    def run(self):
         """
         Run the query and output the results as an info message to the log file.
         """
