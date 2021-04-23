@@ -4,10 +4,10 @@ from decimal import Decimal
 import pytest
 
 from datahub.core.csv import (
-    _transform_csv_value,
     csv_iterator,
     escape,
     INCOMPLETE_CSV_MESSAGE,
+    transform_csv_value,
 )
 
 
@@ -78,7 +78,7 @@ def test_csv_iterator_with_error():
 )
 def test_transform_csv_value(value, expected_value):
     """Test transform csv value"""
-    assert _transform_csv_value(value) == expected_value
+    assert transform_csv_value(value) == expected_value
 
 
 @pytest.mark.parametrize('value,expected_value', [
