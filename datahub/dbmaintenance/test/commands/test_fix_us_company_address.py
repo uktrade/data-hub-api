@@ -117,7 +117,8 @@ def test_command_regex_generates_the_expected_postcode_substitution(post_code, e
 )
 def test_us_company_with_unique_zips_generates_valid_address_area(
         post_code,
-        area_code):
+        area_code,
+):
     """
     Test postcode is fixed for the purpose of admin area
     generation with valid zip codes format
@@ -146,7 +147,8 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
 )
 def test_us_company_with_address_data_only_will_generate_address_area(
         post_code,
-        area_code):
+        area_code,
+):
     """
     Test postcode fixes and area generation with address area data
     :param post_code: POSTCODE good
@@ -174,7 +176,8 @@ def test_us_company_with_address_data_only_will_generate_address_area(
 )
 def test_us_company_with_unique_zips_generates_the_valid_registered_address_area(
         post_code,
-        area_code):
+        area_code,
+):
     """
     Test registered address postcode fixes and area generation a
     couple of valid Zip Codes using the real DB
@@ -203,7 +206,8 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
 )
 def test_us_company_with_registered_address_data_only_will_generate_registered_address_area(
         post_code,
-        area_code):
+        area_code,
+):
     """
     Test registered address data only creates data expected
     :param post_code: POSTCODE good
@@ -233,7 +237,8 @@ def test_us_company_with_registered_address_data_only_will_generate_registered_a
 )
 def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
         post_code,
-        expected_result):
+        expected_result,
+):
     """
     Test Patterns that need fixing in all postcode fields
     :param post_code: Invalid Postcode Format
@@ -265,7 +270,8 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
 )
 def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
         post_code,
-        expected_result):
+        expected_result,
+):
     """
     Test edge cases are preserved
     :param post_code: Invalid Postcode Format

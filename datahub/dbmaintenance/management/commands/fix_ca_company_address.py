@@ -4,8 +4,9 @@ from django.core.management.base import BaseCommand
 
 from datahub.core.constants import Country
 from datahub.core.postcode_constants import CA_ZIP_STATES, CountryPostcodeReplacement
-from datahub.dbmaintenance.resolvers.company_address \
-    import CompanyAddressResolver
+from datahub.dbmaintenance.resolvers.company_address import (
+    CompanyAddressResolver,
+)
 
 logger = getLogger(__name__)
 
@@ -26,15 +27,9 @@ class Command(BaseCommand):
         Resolves Company address issues for Canada
         """
         company_address_resolver = CompanyAddressResolver(
-            Country.canada.value.id,
-            'Canada area and postcode fix.',
-            CA_ZIP_STATES,
-            CountryPostcodeReplacement.canada.value,
+            country_id=Country.canada.value.id,
+            revision_comment='Canada area and postcode fix.',
+            zip_states=CA_ZIP_STATES,
+            postcode_replacement=CountryPostcodeReplacement.canada.value,
         )
         company_address_resolver.run()
-
-    def add_arguments(self, parser):
-        """
-        No arguments needed for the management command.
-        """
-        pass

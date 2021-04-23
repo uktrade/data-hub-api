@@ -21,7 +21,8 @@ class CompanyAddressResolver:
             country_id,
             revision_comment,
             zip_states,
-            postcode_replacement):
+            postcode_replacement,
+    ):
         """
         Fixing Company address areas by country
         :param country_id: Country identifier associated with the address
