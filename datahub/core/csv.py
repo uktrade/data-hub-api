@@ -74,10 +74,10 @@ def escape(payload):
 
 
 def _transform_csv_row(row):
-    return {key: _transform_csv_value(val) for key, val in row.items()}
+    return {key: transform_csv_value(val) for key, val in row.items()}
 
 
-def _transform_csv_value(value):
+def transform_csv_value(value):
     """
     Transforms values before they are written to a CSV file for better compatibility with Excel.
 
