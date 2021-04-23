@@ -1,41 +1,40 @@
-
 from logging import getLogger
+
+from django.core.management.base import BaseCommand
 
 from datahub.core.constants import Country
 from datahub.core.postcode_constants import CountryPostcodeReplacement, US_ZIP_STATES
-from datahub.dbmaintenance.management.commands.base_fix_company_address \
-    import BaseFixCompanyAddress
+from datahub.dbmaintenance.resolvers.company_address \
+    import CompanyAddressResolver
 
 logger = getLogger(__name__)
 
 
-class Command(BaseFixCompanyAddress):
+class Command(BaseCommand):
     """
     Command to make US postcodes conform to a standard format and update states
     accordingly.
     Example of executing this command locally:
-        python manage.py fix_us_company_address_postcode_for_company_address_area
+        python manage.py fix_us_company_address
         or use the makefile for developers
     """
 
     help = 'Fix US Company address postcodes for the purpose of setting address areas'
 
-    def __init__(self, stdout=None, stderr=None, no_color=False, force_color=False):
+    def handle(self, *args, **options):
         """
-        Base for initialising US Company address fixes
-        :param stdout: Inherited
-        :param stderr: Inherited
-        :param no_color: Inherited
-        :param force_color: Inherited
+        Resolves Company address issues for the United States
         """
-        super().__init__(
+        company_address_resolver = CompanyAddressResolver(
             Country.united_states.value.id,
             'US Area and postcode Fix.',
             US_ZIP_STATES,
             CountryPostcodeReplacement.united_states.value,
-            stdout,
-            stderr,
-            no_color,
-            force_color)
-        logger.debug(f'"{self.country_id}" - {self.revision_comment} with '
-                     f'"{self.postcode_replacement}"')
+        )
+        company_address_resolver.run()
+
+    def add_arguments(self, parser):
+        """
+        No arguments needed for the management command.
+        """
+        pass
