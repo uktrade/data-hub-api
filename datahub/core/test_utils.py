@@ -1,7 +1,6 @@
 import json
 from collections.abc import Mapping, Sequence
 from datetime import datetime
-from decimal import Decimal
 from operator import attrgetter
 from secrets import token_hex
 from unittest import mock
@@ -21,6 +20,7 @@ from rest_framework.fields import DateField, DateTimeField
 from rest_framework.test import APIClient
 from reversion.models import Revision, Version
 
+from datahub.core.csv import transform_csv_value
 from datahub.core.utils import join_truthy_strings
 from datahub.metadata.models import Team
 from datahub.oauth.cache import add_token_data_to_cache
@@ -400,20 +400,8 @@ def format_csv_data(rows):
     dictionaries with strings as values.
     """
     return [
-        {key: _format_csv_value(val) for key, val in row.items()} for row in rows
+        {key: str(transform_csv_value(val)) for key, val in row.items()} for row in rows
     ]
-
-
-def _format_csv_value(value):
-    """Converts a value to a string in the way that is expected in CSV exports."""
-    if value is None:
-        return ''
-    if isinstance(value, Decimal):
-        normalized_value = value.normalize()
-        return f'{normalized_value:f}'
-    if isinstance(value, datetime):
-        return value.strftime('%Y-%m-%d %H:%M:%S')
-    return str(value)
 
 
 def construct_mock(**props):
