@@ -64,8 +64,8 @@ class CompanyAddressResolver:
             company.registered_address_area_id = administrative_area.id
             company.save(force_update=True)
             logger.info(
-                f'Updated registered area "{area_code}"'
-                f' for "{company.registered_address_postcode}"'
+                f'Updated registered area "{area_code}"',
+                f' for "{company.registered_address_postcode}"',
             )
 
     def fix_address_postcode(self, company):
@@ -158,8 +158,8 @@ class CompanyAddressResolver:
             company.registered_address_postcode = self.format_postcode(
                 company.registered_address_postcode)
             logger.info(
-                f'{log_message} to registered postcode '
-                f'"{company.registered_address_postcode}"'
+                f'{log_message} to registered postcode ',
+                f'"{company.registered_address_postcode}"',
             )
             company.save(force_update=True)
             return True
