@@ -41,16 +41,23 @@ class CompanyAddressResolver:
     def get_companies_with_no_areas(self):
         """Companies with no areas and country
         or no registered areas and registered country
+        and not archived with a duns value to guarantee the quality of the data
         """
         result = Company.objects.filter(
             Q(
-                Q(address_area_id__isnull=True)
-                & Q(address_country=self.country_id),
+                Q(
+                    Q(address_area_id__isnull=True)
+                    & Q(address_country=self.country_id),
+                )
+                | Q(
+                    Q(registered_address_area_id__isnull=True)
+                    & Q(registered_address_country=self.country_id),
+                )
             )
-            | Q(
-                Q(registered_address_area_id__isnull=True)
-                & Q(registered_address_country=self.country_id),
-            ),
+            & Q(
+                Q(archived=False)
+                & Q(duns_number__isnull=False),
+            )
         )
         return result
 

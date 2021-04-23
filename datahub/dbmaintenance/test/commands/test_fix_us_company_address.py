@@ -22,6 +22,8 @@ def setup_us_company_with_all_addresses(post_code):
         registered_address_postcode=post_code,
         registered_address_area_id=None,
         uk_region_id=None,
+        archived=False,
+        duns_number='123456789',
     )
 
 
@@ -37,6 +39,8 @@ def setup_us_company_with_address_only(post_code):
         registered_address_postcode='',
         registered_address_area_id=None,
         uk_region_id=None,
+        archived=False,
+        duns_number='123456789',
     )
 
 
@@ -52,6 +56,8 @@ def setup_us_company_with_registered_address_only(post_code):
         address_postcode='',
         address_area_id=None,
         uk_region_id=None,
+        archived=False,
+        duns_number='123456789',
     )
 
 
