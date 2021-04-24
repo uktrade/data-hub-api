@@ -52,12 +52,12 @@ class CompanyAddressResolver:
                 | Q(
                     Q(registered_address_area_id__isnull=True)
                     & Q(registered_address_country=self.country_id),
-                )
+                ),
             )
             & Q(
                 Q(archived=False)
                 & Q(duns_number__isnull=False),
-            )
+            ),
         )
         return result
 
