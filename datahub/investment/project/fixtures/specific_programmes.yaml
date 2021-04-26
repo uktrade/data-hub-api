@@ -15,10 +15,10 @@
   fields: {disabled_on: null, name: "Advanced Engineering Supply Chain"}
 - model: investment.specificprogramme
   pk: 7ecf2ca9-c502-4468-9caf-60d879c159c8
-  fields: {disabled_on: null, name: "Regeneration Investment Organisation (RIO)"}
+  fields: {disabled_on: null, name: "Regeneration - Capital Investment"}
 - model: investment.specificprogramme
   pk: 26881936-6823-4ad7-a6e0-41fb9f714dab
-  fields: {disabled_on: null, name: "GREAT Investors Programme"}
+  fields: {disabled_on: null, name: "GREAT Investors - Capital Investment"}
 - model: investment.specificprogramme
   pk: ca8bd4cd-0c6b-4afd-b010-d5b38376c0fc
   fields: {disabled_on: null, name: "HQ-UK"}
@@ -36,13 +36,13 @@
   fields: {disabled_on: null, name: "Infrastructure Investment"}
 - model: investment.specificprogramme
   pk: 6ff1edff-133e-4cb0-9ddc-992a10633731
-  fields: {disabled_on: null, name: "II&I Programme"}
+  fields: {disabled_on: null, name: "Infrastructure - Capital Investment"}
 - model: investment.specificprogramme
   pk: 58b96ea4-f954-41fb-941a-25a6dc903961
   fields: {disabled_on: null, name: "Global Entrepreneur Programme"}
 - model: investment.specificprogramme
   pk: 0f5186d2-6140-4c46-8b89-3a3f02f19953
-  fields: {disabled_on: null, name: "Venture / Equity Capital"}
+  fields: {disabled_on: null, name: "Venture Capital - Capital Investment"}
 - model: investment.specificprogramme
   pk: 451a3d68-cda3-44aa-89a3-8a734f0c9861
   fields: {disabled_on: null, name: "Graduate Entrepreneur Programme"}
