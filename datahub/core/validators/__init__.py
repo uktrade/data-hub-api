@@ -20,6 +20,11 @@ from datahub.core.validators.rules_based import (
     RulesBasedValidator,
     ValidationRule,
 )
+from datahub.core.validators.telephone import (
+    InternationalTelephoneValidator,
+    TelephoneCountryCodeValidator,
+    TelephoneValidator,
+)
 
 __all__ = (
     'AbstractRule',
@@ -32,6 +37,7 @@ __all__ = (
     'EqualsRule',
     'FieldAndError',
     'InRule',
+    'InternationalTelephoneValidator',
     'IsFieldBeingUpdatedAndIsNotBlankRule',
     'IsFieldBeingUpdatedRule',
     'IsFieldRule',
@@ -41,5 +47,7 @@ __all__ = (
     'OperatorRule',
     'RequiredUnlessAlreadyBlankValidator',
     'RulesBasedValidator',
+    'TelephoneCountryCodeValidator',
+    'TelephoneValidator',
     'ValidationRule',
 )
