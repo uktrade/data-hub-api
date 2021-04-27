@@ -181,8 +181,8 @@ def test_us_company_with_address_data_only_will_generate_address_area(
     ],
 )
 def test_us_company_with_unique_zips_generates_the_valid_registered_address_area(
-        post_code,
-        area_code,
+    post_code,
+    area_code,
 ):
     """
     Test registered address postcode fixes and area generation a
@@ -211,8 +211,8 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
     ],
 )
 def test_us_company_with_registered_address_data_only_will_generate_registered_address_area(
-        post_code,
-        area_code,
+    post_code,
+    area_code,
 ):
     """
     Test registered address data only creates data expected
@@ -242,8 +242,8 @@ def test_us_company_with_registered_address_data_only_will_generate_registered_a
     ],
 )
 def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
-        post_code,
-        expected_result,
+    post_code,
+    expected_result,
 ):
     """
     Test Patterns that need fixing in all postcode fields
@@ -275,8 +275,8 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
     ],
 )
 def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
-        post_code,
-        expected_result,
+    post_code,
+    expected_result,
 ):
     """
     Test edge cases are preserved
