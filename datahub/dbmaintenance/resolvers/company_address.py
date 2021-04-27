@@ -17,11 +17,11 @@ class CompanyAddressResolver:
     """
 
     def __init__(
-            self,
-            country_id,
-            revision_comment,
-            zip_states,
-            postcode_replacement,
+        self,
+        country_id,
+        revision_comment,
+        zip_states,
+        postcode_replacement,
     ):
         """
         Fixing Company address areas by country
