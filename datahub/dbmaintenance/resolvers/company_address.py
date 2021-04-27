@@ -161,8 +161,9 @@ class CompanyAddressResolver:
          :param company: company record
         """
         if is_not_blank(company.registered_address_postcode):
-            log_message = f'Updating registered postcode ' \
-                          f'from "{company.registered_address_postcode}"'
+            log_message = (
+                f'Updating registered postcode from "{company.registered_address_postcode}"'
+            )
             company.registered_address_postcode = self.format_postcode(
                 company.registered_address_postcode)
             logger.info(
