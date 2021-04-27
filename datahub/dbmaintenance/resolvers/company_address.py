@@ -165,7 +165,7 @@ class CompanyAddressResolver:
                 f'Updating registered postcode from "{company.registered_address_postcode}"'
             )
             company.registered_address_postcode = self.format_postcode(
-                company.registered_address_postcode
+                company.registered_address_postcode,
             )
             logger.info(
                 f'{log_message} to registered postcode ',
