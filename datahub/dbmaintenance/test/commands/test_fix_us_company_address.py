@@ -95,7 +95,10 @@ def setup_us_company_with_registered_address_only(post_code):
         ('0 12345', '01234'),
     ],
 )
-def test_command_regex_generates_the_expected_postcode_substitution(post_code, expected_result):
+def test_command_regex_generates_the_expected_postcode_substitution(
+    post_code,
+    expected_result,
+):
     """
     Test regex efficiently without connecting to a database
     :param post_code: POSTCODE format good and bad
@@ -122,8 +125,8 @@ def test_command_regex_generates_the_expected_postcode_substitution(post_code, e
     ],
 )
 def test_us_company_with_unique_zips_generates_valid_address_area(
-        post_code,
-        area_code,
+    post_code,
+    area_code,
 ):
     """
     Test postcode is fixed for the purpose of admin area
@@ -152,8 +155,8 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
     ],
 )
 def test_us_company_with_address_data_only_will_generate_address_area(
-        post_code,
-        area_code,
+    post_code,
+    area_code,
 ):
     """
     Test postcode fixes and area generation with address area data
