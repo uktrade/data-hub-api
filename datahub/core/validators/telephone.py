@@ -33,5 +33,5 @@ class TelephoneCountryCodeValidator(RegexValidator):
     Validator for telephone number country code.
     """
 
-    regex = r'^\+\d{1,4}$'
-    message = 'Country code should be preceded with a + sign and consist of one to four numbers'
+    regex = r'^\+?\d{1,4}$'
+    message = 'Country code should consist of one to four numbers'
