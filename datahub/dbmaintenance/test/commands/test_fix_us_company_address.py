@@ -103,10 +103,10 @@ def test_command_regex_generates_the_expected_postcode_substitution(post_code, e
            Command pattern
     """
     resolver = CompanyAddressResolver(
-        None,
-        None,
-        None,
-        CountryPostcodeReplacement.united_states.value,
+        country_id=None,
+        revision_comment=None,
+        zip_states=None,
+        postcode_replacement=CountryPostcodeReplacement.united_states.value,
     )
     actual_result = resolver.format_postcode(post_code)
     assert actual_result == expected_result
