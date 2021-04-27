@@ -127,9 +127,8 @@ class TestContacts(AdminTestMixin):
     @pytest.mark.parametrize(
         'country_code',
         (
-            # Should be prefixed with +
-            '44',
             # Too long
+            '12345',
             '+12345',
             # A string
             '+UK',
@@ -153,16 +152,19 @@ class TestContacts(AdminTestMixin):
         form_errors = response.context_data['adminform'].errors
         assert 'telephone_countrycode' in form_errors
         assert form_errors['telephone_countrycode'] == [
-            'Country code should be preceded with a + sign and consist of one to four numbers',
+            'Country code should consist of one to four numbers',
         ]
 
     @pytest.mark.parametrize(
         'country_code',
         (
+            '44',
             '+44',
+            '1',
             '+1',
             '+998',
             '+1242',
+            '1567',
         ),
     )
     def test_valid_telephone_country_code(self, country_code):
