@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: 8fed6f78-51e6-4b42-b9ab-ee1cf2c54f74
+  fields:
+    disabled_on:
+    order: 530.0
+    segment: Enhanced International Support Services
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_interaction", "export_service_delivery"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
