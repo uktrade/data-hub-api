@@ -176,6 +176,7 @@ class TestAddServiceDelivery(APITestMixin):
             'archived_reason': None,
             'company_referral': None,
             'large_capital_opportunity': None,
+            'related_trade_agreements': [],
         }
 
     @pytest.mark.parametrize(
