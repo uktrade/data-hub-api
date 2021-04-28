@@ -373,6 +373,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             field in dnb_company for field in REQUIRED_REGISTERED_ADDRESS_FIELDS
         )
         registered_address = {
+            'area': None,
             'country': {
                 'id': str(registered_country.id),
                 'name': registered_country.name,
@@ -388,6 +389,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             'name': dnb_company['primary_name'],
             'trading_names': dnb_company['trading_names'],
             'address': {
+                'area': None,
                 'country': {
                     'id': str(country.id),
                     'name': country.name,

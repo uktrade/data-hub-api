@@ -1,3 +1,4 @@
+import re
 from codecs import BOM_UTF8
 from csv import DictWriter
 from datetime import datetime
@@ -45,11 +46,38 @@ def create_csv_response(rows, field_titles, filename):
     return response
 
 
+def escape(payload):
+    """
+    Escape Potentially dangerous CSV payloads.
+
+    This addresses a security issue identified here:
+        https://owasp.org/www-community/attacks/CSV_Injection
+
+    This code is adapted from https://github.com/raphaelm/defusedcsv/
+    """
+    if payload is None:
+        return ''
+
+    def starts_dangerously(value):
+        """Checks if value starts with a potentially dangerous character"""
+        return str(value)[0] in ('@', '+', '-', '=', '|', '%')
+
+    def is_number(value):
+        """Checks if value is a number"""
+        return re.match('^-?[0-9,\\.]+$', str(value))
+
+    if str(payload) and starts_dangerously(payload) and not is_number(payload):
+        payload = str(payload).replace('|', '\\|')
+        payload = "'" + payload
+
+    return payload
+
+
 def _transform_csv_row(row):
-    return {key: _transform_csv_value(val) for key, val in row.items()}
+    return {key: transform_csv_value(val) for key, val in row.items()}
 
 
-def _transform_csv_value(value):
+def transform_csv_value(value):
     """
     Transforms values before they are written to a CSV file for better compatibility with Excel.
 
@@ -65,4 +93,4 @@ def _transform_csv_value(value):
     if isinstance(value, Decimal):
         normalized_value = value.normalize()
         return f'{normalized_value:f}'
-    return value
+    return escape(value)

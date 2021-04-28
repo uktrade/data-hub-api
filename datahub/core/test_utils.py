@@ -1,7 +1,6 @@
 import json
 from collections.abc import Mapping, Sequence
 from datetime import datetime
-from decimal import Decimal
 from operator import attrgetter
 from secrets import token_hex
 from unittest import mock
@@ -19,7 +18,9 @@ from django.utils.timezone import now
 from faker import Faker
 from rest_framework.fields import DateField, DateTimeField
 from rest_framework.test import APIClient
+from reversion.models import Revision, Version
 
+from datahub.core.csv import transform_csv_value
 from datahub.core.utils import join_truthy_strings
 from datahub.metadata.models import Team
 from datahub.oauth.cache import add_token_data_to_cache
@@ -399,20 +400,8 @@ def format_csv_data(rows):
     dictionaries with strings as values.
     """
     return [
-        {key: _format_csv_value(val) for key, val in row.items()} for row in rows
+        {key: str(transform_csv_value(val)) for key, val in row.items()} for row in rows
     ]
-
-
-def _format_csv_value(value):
-    """Converts a value to a string in the way that is expected in CSV exports."""
-    if value is None:
-        return ''
-    if isinstance(value, Decimal):
-        normalized_value = value.normalize()
-        return f'{normalized_value:f}'
-    if isinstance(value, datetime):
-        return value.strftime('%Y-%m-%d %H:%M:%S')
-    return str(value)
 
 
 def construct_mock(**props):
@@ -479,12 +468,31 @@ def resolve_objects(data, object_resolver=attrgetter('pk')):  # noqa: B008
     return resolve_data(data, value_resolver=resolve_value)
 
 
+def has_reversion_version(model_db, version_count=1):
+    """
+    Check a model db object is stored as a reversion version
+    :param model_db: Database model that is being audited with reversion
+    :param version_count: Count the amount of versions found by model data
+    """
+    versions = Version.objects.get_for_object(model_db)
+    return versions.count() == version_count
+
+
+def has_reversion_comment(comment):
+    """
+    Check for comment in the version
+    :param comment: Comment to do a case insensitive search of comment value
+    """
+    revisions = Revision.objects.filter(comment__icontains=comment)
+    return revisions.count() > 0
+
+
 class HawkMockJSONResponse:
     """
     Mock utility mocking server validation for POST content.
     This is needed when mocking responses when using the APIClient and HawkAuth.
 
-    The default reponse is an empty JSON but can be overridden by passing in a
+    The default response is an empty JSON but can be overridden by passing in a
     response argument into the constructor.
 
     dynamic_reponse = HawkMockJSONResponse(
