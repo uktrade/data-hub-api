@@ -565,7 +565,7 @@ class TestContactExportView(APITestMixin):
         reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
         assert reader.fieldnames == list(SearchContactExportAPIView.field_titles.values())
 
-        expected_row_data = [
+        expected_row_data = format_csv_data([
             {
                 'Name': contact.name,
                 'Job title': contact.job_title,
@@ -598,10 +598,12 @@ class TestContactExportView(APITestMixin):
                 'Created by team': get_attr_or_none(contact, 'created_by.dit_team.name'),
             }
             for contact in sorted_contacts
-        ]
+        ])
 
         actual_row_data = [dict(row) for row in reader]
-        assert actual_row_data == format_csv_data(expected_row_data)
+        assert len(actual_row_data) == len(expected_row_data)
+        for index, row in enumerate(actual_row_data):
+            assert row == expected_row_data[index]
         assert matcher.call_count == 1
         assert matcher.last_request.json() == {
             'emails': [contact.email for contact in sorted_contacts],

@@ -3,3 +3,9 @@ repos:
     rev: 3.8.3
     hooks:
       - id: flake8
+      language_version: python3
+  - repo:
+      rev: stable # See versions:
+      hooks:
+        - id: black
+          language_version: python3

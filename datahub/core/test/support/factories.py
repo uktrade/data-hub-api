@@ -76,6 +76,7 @@ class MultiAddressModelFactory(factory.django.DjangoModelFactory):
     primary_address_county = factory.Faker('text')
     primary_address_postcode = factory.Faker('postcode')
     primary_address_town = factory.Faker('city')
+    primary_address_area_id = None
 
     secondary_address_1 = factory.Sequence(lambda n: f'Apt {n}.')
     secondary_address_2 = factory.Sequence(lambda n: f'{n} Foo st.')
@@ -83,6 +84,7 @@ class MultiAddressModelFactory(factory.django.DjangoModelFactory):
     secondary_address_county = factory.Faker('text')
     secondary_address_postcode = factory.Faker('postcode')
     secondary_address_town = factory.Faker('city')
+    secondary_address_area_id = None
 
     class Meta:
         model = 'support.MultiAddressModel'
