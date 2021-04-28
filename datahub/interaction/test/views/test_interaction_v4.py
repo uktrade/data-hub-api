@@ -63,8 +63,7 @@ class TestAddInteraction(APITestMixin):
         'extra_data',
         (
             # company interaction
-            {
-            },
+            {},
             # company interaction with investment theme
             {
                 'theme': Interaction.Theme.INVESTMENT,
@@ -103,7 +102,10 @@ class TestAddInteraction(APITestMixin):
     )
     def test_add(self, extra_data, permissions):
         """Test add a new interaction."""
-        adviser = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
+        adviser = create_test_user(
+            permission_codenames=permissions,
+            dit_team=TeamFactory(),
+        )
         company = CompanyFactory()
         contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
@@ -124,7 +126,6 @@ class TestAddInteraction(APITestMixin):
             'was_policy_feedback_provided': False,
             'has_related_trade_agreements': False,
             'related_trade_agreements': [],
-
             **resolve_data(extra_data),
         }
 
@@ -144,10 +145,10 @@ class TestAddInteraction(APITestMixin):
             'net_company_receipt': None,
             'policy_areas': request_data.get('policy_areas', []),
             'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
-            'policy_issue_types':
-                request_data.get('policy_issue_types', []),
-            'was_policy_feedback_provided':
-                request_data.get('was_policy_feedback_provided', False),
+            'policy_issue_types': request_data.get('policy_issue_types', []),
+            'was_policy_feedback_provided': request_data.get(
+                'was_policy_feedback_provided', False,
+            ),
             'communication_channel': {
                 'id': str(communication_channel.pk),
                 'name': communication_channel.name,
@@ -173,13 +174,15 @@ class TestAddInteraction(APITestMixin):
                 'id': str(company.pk),
                 'name': company.name,
             },
-            'contacts': [{
-                'id': str(contact.pk),
-                'name': contact.name,
-                'first_name': contact.first_name,
-                'last_name': contact.last_name,
-                'job_title': contact.job_title,
-            }],
+            'contacts': [
+                {
+                    'id': str(contact.pk),
+                    'name': contact.name,
+                    'first_name': contact.first_name,
+                    'last_name': contact.last_name,
+                    'job_title': contact.job_title,
+                },
+            ],
             'event': None,
             'service': {
                 'id': str(Service.inbound_referral.value.id),
@@ -210,10 +213,12 @@ class TestAddInteraction(APITestMixin):
             'archived_reason': None,
             'company_referral': None,
             'large_capital_opportunity': request_data.get('large_capital_opportunity'),
-            'has_related_trade_agreements':
-                request_data.get('has_related_trade_agreements', False),
-            'related_trade_agreements':
-                request_data.get('related_trade_agreements', []),
+            'has_related_trade_agreements': request_data.get(
+                'has_related_trade_agreements', False,
+            ),
+            'related_trade_agreements': request_data.get(
+                'related_trade_agreements', [],
+            ),
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -236,8 +241,7 @@ class TestAddInteraction(APITestMixin):
                             'id': Country.canada.value.id,
                             'name': Country.canada.value.name,
                         },
-                        'status':
-                            CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                        'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                     },
                 ],
             },
@@ -250,8 +254,7 @@ class TestAddInteraction(APITestMixin):
                             'id': Country.canada.value.id,
                             'name': Country.canada.value.name,
                         },
-                        'status':
-                            CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                        'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                     },
                 ],
             },
@@ -262,12 +265,17 @@ class TestAddInteraction(APITestMixin):
             },
         ),
     )
-    def test_add_with_export_countries_feature_flag_active(self, extra_data, permissions):
+    def test_add_with_export_countries_feature_flag_active(
+        self, extra_data, permissions,
+    ):
         """
         Test add a new interaction with export countries
         when feature flag is active.
         """
-        adviser = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
+        adviser = create_test_user(
+            permission_codenames=permissions,
+            dit_team=TeamFactory(),
+        )
         company = CompanyFactory()
         contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
@@ -287,7 +295,6 @@ class TestAddInteraction(APITestMixin):
             'was_policy_feedback_provided': False,
             'has_related_trade_agreements': False,
             'related_trade_agreements': [],
-
             **resolve_data(extra_data),
         }
         api_client = self.create_api_client(user=adviser)
@@ -306,10 +313,10 @@ class TestAddInteraction(APITestMixin):
             'net_company_receipt': None,
             'policy_areas': request_data.get('policy_areas', []),
             'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
-            'policy_issue_types':
-                request_data.get('policy_issue_types', []),
-            'was_policy_feedback_provided':
-                request_data.get('was_policy_feedback_provided', False),
+            'policy_issue_types': request_data.get('policy_issue_types', []),
+            'was_policy_feedback_provided': request_data.get(
+                'was_policy_feedback_provided', False,
+            ),
             'communication_channel': {
                 'id': str(communication_channel.pk),
                 'name': communication_channel.name,
@@ -335,13 +342,15 @@ class TestAddInteraction(APITestMixin):
                 'id': str(company.pk),
                 'name': company.name,
             },
-            'contacts': [{
-                'id': str(contact.pk),
-                'name': contact.name,
-                'first_name': contact.first_name,
-                'last_name': contact.last_name,
-                'job_title': contact.job_title,
-            }],
+            'contacts': [
+                {
+                    'id': str(contact.pk),
+                    'name': contact.name,
+                    'first_name': contact.first_name,
+                    'last_name': contact.last_name,
+                    'job_title': contact.job_title,
+                },
+            ],
             'event': None,
             'service': {
                 'id': str(Service.inbound_referral.value.id),
@@ -372,10 +381,12 @@ class TestAddInteraction(APITestMixin):
             'archived_reason': None,
             'company_referral': None,
             'large_capital_opportunity': None,
-            'has_related_trade_agreements':
-                request_data.get('has_related_trade_agreements', False),
-            'related_trade_agreements':
-                request_data.get('related_trade_agreements', []),
+            'has_related_trade_agreements': request_data.get(
+                'has_related_trade_agreements', False,
+            ),
+            'related_trade_agreements': request_data.get(
+                'related_trade_agreements', [],
+            ),
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -385,7 +396,10 @@ class TestAddInteraction(APITestMixin):
         Test add a new interaction with export country
         make sure it syncs across to company as a new entry.
         """
-        adviser = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
+        adviser = create_test_user(
+            permission_codenames=permissions,
+            dit_team=TeamFactory(),
+        )
         company = CompanyFactory()
         contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
@@ -410,8 +424,7 @@ class TestAddInteraction(APITestMixin):
                     'country': {
                         'id': Country.canada.value.id,
                     },
-                    'status':
-                        CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                    'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                 },
             ],
             'has_related_trade_agreements': False,
@@ -473,16 +486,23 @@ class TestAddInteraction(APITestMixin):
         Test add a new interaction with export country
         consolidates to company export countries.
         """
-        adviser = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
+        adviser = create_test_user(
+            permission_codenames=permissions,
+            dit_team=TeamFactory(),
+        )
         company = CompanyFactory()
         with freeze_time(export_country_date):
-            company.export_countries.set([
-                CompanyExportCountryFactory(
-                    company=company,
-                    country=meta_models.Country.objects.get(id=Country.canada.value.id),
-                    status=CompanyExportCountry.Status.NOT_INTERESTED,
-                ),
-            ])
+            company.export_countries.set(
+                [
+                    CompanyExportCountryFactory(
+                        company=company,
+                        country=meta_models.Country.objects.get(
+                            id=Country.canada.value.id,
+                        ),
+                        status=CompanyExportCountry.Status.NOT_INTERESTED,
+                    ),
+                ],
+            )
         contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
 
@@ -506,8 +526,7 @@ class TestAddInteraction(APITestMixin):
                     'country': {
                         'id': Country.canada.value.id,
                     },
-                    'status':
-                        CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                    'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                 },
             ],
             'has_related_trade_agreements': False,
@@ -543,7 +562,6 @@ class TestAddInteraction(APITestMixin):
                     'related_trade_agreements': ['This field is required.'],
                 },
             ),
-
             # service required for complete interaction
             # required fields
             (
@@ -553,12 +571,16 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model, CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
@@ -567,7 +589,6 @@ class TestAddInteraction(APITestMixin):
                     'service': ['This field is required.'],
                 },
             ),
-
             # communication_channel required for complete interaction
             (
                 {
@@ -576,7 +597,9 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
@@ -590,7 +613,6 @@ class TestAddInteraction(APITestMixin):
                     'communication_channel': ['This field is required.'],
                 },
             ),
-
             # policy feedback fields required when policy feedback provided
             (
                 {
@@ -599,14 +621,18 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': True,
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
@@ -617,7 +643,6 @@ class TestAddInteraction(APITestMixin):
                     'policy_issue_types': ['This field is required.'],
                 },
             ),
-
             # policy feedback fields cannot be blank when policy feedback provided
             (
                 {
@@ -626,14 +651,18 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': True,
                     'policy_areas': [],
                     'policy_feedback_notes': '',
@@ -647,7 +676,6 @@ class TestAddInteraction(APITestMixin):
                     'policy_issue_types': ['This field is required.'],
                 },
             ),
-
             # at least one trade agreements field required when there are related trade agreements
             (
                 {
@@ -657,13 +685,18 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': True,
                 },
@@ -671,7 +704,6 @@ class TestAddInteraction(APITestMixin):
                     'related_trade_agreements': ['This field is required.'],
                 },
             ),
-
             # trade agreements field cannot be blank when there are related trade agreements
             (
                 {
@@ -681,13 +713,18 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': True,
                     'related_trade_agreements': [],
@@ -696,7 +733,6 @@ class TestAddInteraction(APITestMixin):
                     'related_trade_agreements': ['This field is required.'],
                 },
             ),
-
             # were_countries_discussed can't be null for export interactions
             (
                 {
@@ -706,14 +742,19 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'were_countries_discussed': None,
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
@@ -731,13 +772,18 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': None,
                     'has_related_trade_agreements': False,
@@ -756,13 +802,18 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
@@ -780,13 +831,18 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': None,
                     'export_countries': [
@@ -794,8 +850,7 @@ class TestAddInteraction(APITestMixin):
                             'country': {
                                 'id': Country.canada.value.id,
                             },
-                            'status':
-                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                     'has_related_trade_agreements': False,
@@ -803,11 +858,11 @@ class TestAddInteraction(APITestMixin):
                 },
                 {
                     'were_countries_discussed': ['This field is required.'],
-                    'export_countries':
-                        ['This field is only valid when countries were discussed.'],
+                    'export_countries': [
+                        'This field is only valid when countries were discussed.',
+                    ],
                 },
             ),
-
             # export_countries cannot be blank when were_countries_discussed is True
             (
                 {
@@ -817,15 +872,19 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
-
                     'were_countries_discussed': True,
                     'export_countries': None,
                     'has_related_trade_agreements': False,
@@ -835,7 +894,6 @@ class TestAddInteraction(APITestMixin):
                     'export_countries': ['This field may not be null.'],
                 },
             ),
-
             # export_countries cannot have same country more than once for a company
             (
                 {
@@ -845,13 +903,18 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': True,
                     'export_countries': [
@@ -859,23 +922,22 @@ class TestAddInteraction(APITestMixin):
                             'country': {
                                 'id': Country.canada.value.id,
                             },
-                            'status':
-                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                         {
                             'country': {
                                 'id': Country.canada.value.id,
                             },
-                            'status':
-                                CompanyExportCountry.Status.FUTURE_INTEREST,
+                            'status': CompanyExportCountry.Status.FUTURE_INTEREST,
                         },
                     ],
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
                 },
                 {
-                    'non_field_errors':
-                        ['A country that was discussed cannot be entered in multiple fields.'],
+                    'non_field_errors': [
+                        'A country that was discussed cannot be entered in multiple fields.',
+                    ],
                 },
             ),
             # export_countries must be fully formed. Status can't be missing
@@ -887,19 +949,23 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': True,
                     'export_countries': [
                         {
-                            'status':
-                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                     'has_related_trade_agreements': False,
@@ -918,13 +984,18 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': True,
                     'export_countries': [
@@ -941,7 +1012,6 @@ class TestAddInteraction(APITestMixin):
                     'export_countries': [{'status': ['This field is required.']}],
                 },
             ),
-
             # export_countries must be fully formed. status must be a valid choice
             (
                 {
@@ -951,13 +1021,18 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': True,
                     'export_countries': [
@@ -972,10 +1047,11 @@ class TestAddInteraction(APITestMixin):
                     'related_trade_agreements': [],
                 },
                 {
-                    'export_countries': [{'status': ['"foobar" is not a valid choice.']}],
+                    'export_countries': [
+                        {'status': ['"foobar" is not a valid choice.']},
+                    ],
                 },
             ),
-
             # export_countries must be fully formed. country ID must be a valid UUID
             (
                 {
@@ -985,13 +1061,18 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': True,
                     'export_countries': [
@@ -999,8 +1080,7 @@ class TestAddInteraction(APITestMixin):
                             'country': {
                                 'id': '1234',
                             },
-                            'status':
-                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                     'has_related_trade_agreements': False,
@@ -1010,7 +1090,6 @@ class TestAddInteraction(APITestMixin):
                     'export_countries': [{'country': ['Must be a valid UUID.']}],
                 },
             ),
-
             # export_countries must be fully formed. country UUID must be a valid Country
             (
                 {
@@ -1020,13 +1099,18 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': True,
                     'export_countries': [
@@ -1034,8 +1118,7 @@ class TestAddInteraction(APITestMixin):
                             'country': {
                                 'id': '4dee26c2-799d-49a8-a533-c30c595c942c',
                             },
-                            'status':
-                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                     'has_related_trade_agreements': False,
@@ -1052,7 +1135,6 @@ class TestAddInteraction(APITestMixin):
                     ],
                 },
             ),
-
             # export_countries cannot be set when were_countries_discussed is False
             (
                 {
@@ -1062,34 +1144,37 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
-
                     'were_countries_discussed': False,
                     'export_countries': [
                         {
                             'country': {
                                 'id': Country.canada.value.id,
                             },
-                            'status':
-                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
                 },
                 {
-                    'export_countries':
-                        ['This field is only valid when countries were discussed.'],
+                    'export_countries': [
+                        'This field is only valid when countries were discussed.',
+                    ],
                 },
             ),
-
             # fields not allowed
             (
                 {
@@ -1099,27 +1184,34 @@ class TestAddInteraction(APITestMixin):
                     'notes': 'hello',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
-
                     # fields not allowed
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
-                        random_obj_for_model, ServiceDeliveryStatus,
+                        random_obj_for_model,
+                        ServiceDeliveryStatus,
                     ),
                     'policy_areas': [partial(random_obj_for_model, PolicyArea)],
                     'policy_feedback_notes': 'Policy feedback notes.',
-                    'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
+                    'policy_issue_types': [
+                        partial(random_obj_for_model, PolicyIssueType),
+                    ],
                     'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
                 },
                 {
@@ -1142,7 +1234,6 @@ class TestAddInteraction(APITestMixin):
                     ],
                 },
             ),
-
             # fields where None is not allowed
             (
                 {
@@ -1152,11 +1243,15 @@ class TestAddInteraction(APITestMixin):
                     'notes': 'hello',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     # fields where None is not allowed
                     'dit_participants': None,
                     'was_policy_feedback_provided': None,
@@ -1172,7 +1267,6 @@ class TestAddInteraction(APITestMixin):
                     'related_trade_agreements': ['This field may not be null.'],
                 },
             ),
-
             # no contradictory messages if event is None but and is_event is True
             (
                 {
@@ -1181,14 +1275,19 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'event': None,
                     'is_event': True,
                     'has_related_trade_agreements': False,
@@ -1198,7 +1297,6 @@ class TestAddInteraction(APITestMixin):
                     'is_event': ['This field is only valid for service deliveries.'],
                 },
             ),
-
             # no duplicate messages for event if provided and is_event is False
             (
                 {
@@ -1207,7 +1305,9 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
@@ -1216,8 +1316,10 @@ class TestAddInteraction(APITestMixin):
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'event': EventFactory,
                     'is_event': False,
                 },
@@ -1226,7 +1328,6 @@ class TestAddInteraction(APITestMixin):
                     'event': ['This field is only valid for service deliveries.'],
                 },
             ),
-
             # dit_participants cannot be empty list
             (
                 {
@@ -1235,22 +1336,24 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
-
                     'dit_participants': [],
                 },
                 {
                     'dit_participants': {
-                        api_settings.NON_FIELD_ERRORS_KEY: ['This list may not be empty.'],
+                        api_settings.NON_FIELD_ERRORS_KEY: [
+                            'This list may not be empty.',
+                        ],
                     },
                 },
             ),
-
             # status must be a valid choice
             (
                 {
@@ -1259,7 +1362,9 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {
@@ -1276,7 +1381,6 @@ class TestAddInteraction(APITestMixin):
                     'status': ['"foobar" is not a valid choice.'],
                 },
             ),
-
             # service must be without children
             (
                 {
@@ -1285,7 +1389,9 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {
@@ -1298,10 +1404,11 @@ class TestAddInteraction(APITestMixin):
                     'related_trade_agreements': [],
                 },
                 {
-                    'service': ['This field is valid for services without children services.'],
+                    'service': [
+                        'This field is valid for services without children services.',
+                    ],
                 },
             ),
-
             (
                 {
                     'kind': Interaction.Kind.INTERACTION,
@@ -1309,7 +1416,9 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
@@ -1324,7 +1433,6 @@ class TestAddInteraction(APITestMixin):
                     'status': ['This field may not be null.'],
                 },
             ),
-
             # were_countries_discussed can't be true for investment theme
             (
                 {
@@ -1334,21 +1442,27 @@ class TestAddInteraction(APITestMixin):
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
                     'contacts': [
-                        lambda: ContactFactory(company=Company.objects.get(name='Martian Island')),
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
                     ],
                     'dit_participants': [
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
                     'were_countries_discussed': True,
                 },
                 {
-                    'were_countries_discussed':
-                        ["This value can't be selected for investment interactions."],
+                    'were_countries_discussed': [
+                        "This value can't be selected for investment interactions.",
+                    ],
                 },
             ),
         ),
@@ -1370,7 +1484,9 @@ class TestAddInteraction(APITestMixin):
         project_creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=project_creator)
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.add_associated_investmentproject],
+            permission_codenames=[
+                InteractionPermission.add_associated_investmentproject,
+            ],
             dit_team=project_creator.dit_team,  # same dit team as the project creator
         )
         company = CompanyFactory()
@@ -1400,12 +1516,16 @@ class TestAddInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
-        assert response_data['dit_participants'][0]['adviser']['id'] == str(requester.pk)
+        assert response_data['dit_participants'][0]['adviser']['id'] == str(
+            requester.pk,
+        )
         assert response_data['investment_project']['id'] == str(project.pk)
         assert response_data['modified_on'] == '2017-04-18T13:25:30.986208Z'
         assert response_data['created_on'] == '2017-04-18T13:25:30.986208Z'
 
-    def test_restricted_user_cannot_add_non_associated_investment_project_interaction(self):
+    def test_restricted_user_cannot_add_non_associated_investment_project_interaction(
+        self,
+    ):
         """
         Test that a restricted user cannot add an interaction for a non-associated investment
         project.
@@ -1413,7 +1533,9 @@ class TestAddInteraction(APITestMixin):
         project_creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=project_creator)
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.add_associated_investmentproject],
+            permission_codenames=[
+                InteractionPermission.add_associated_investmentproject,
+            ],
             dit_team=TeamFactory(),  # different dit team from the project creator
         )
         url = reverse('api-v4:interaction:collection')
@@ -1450,7 +1572,9 @@ class TestAddInteraction(APITestMixin):
     def test_restricted_user_cannot_add_company_interaction(self):
         """Test that a restricted user cannot add a company interaction."""
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.add_associated_investmentproject],
+            permission_codenames=[
+                InteractionPermission.add_associated_investmentproject,
+            ],
         )
         url = reverse('api-v4:interaction:collection')
         api_client = self.create_api_client(user=requester)
@@ -1526,14 +1650,16 @@ class TestGetInteraction(APITestMixin):
                 {
                     'id': str(policy_area.pk),
                     'name': policy_area.name,
-                } for policy_area in interaction.policy_areas.all()
+                }
+                for policy_area in interaction.policy_areas.all()
             ],
             'policy_feedback_notes': interaction.policy_feedback_notes,
             'policy_issue_types': [
                 {
                     'id': str(policy_issue_type.pk),
                     'name': policy_issue_type.name,
-                } for policy_issue_type in interaction.policy_issue_types.all()
+                }
+                for policy_issue_type in interaction.policy_issue_types.all()
             ],
             'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
             'communication_channel': {
@@ -1582,7 +1708,9 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.investment_project.pk),
                 'name': interaction.investment_project.name,
                 'project_code': interaction.investment_project.project_code,
-            } if interaction.investment_project else None,
+            }
+            if interaction.investment_project
+            else None,
             'archived_documents_url_path': interaction.archived_documents_url_path,
             'were_countries_discussed': interaction.were_countries_discussed,
             'export_countries': [
@@ -1619,7 +1747,9 @@ class TestGetInteraction(APITestMixin):
                 'created_by': format_expected_adviser(company_referral.created_by),
                 'created_on': '2017-04-18T13:25:30.986208Z',
                 'recipient': format_expected_adviser(company_referral.recipient),
-            } if company_referral else None,
+            }
+            if company_referral
+            else None,
             'large_capital_opportunity': None,
             'has_related_trade_agreements': None,
             'related_trade_agreements': [],
@@ -1632,7 +1762,9 @@ class TestGetInteraction(APITestMixin):
         project = InvestmentProjectFactory(created_by=project_creator)
         interaction = InvestmentProjectInteractionFactory(investment_project=project)
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.view_associated_investmentproject],
+            permission_codenames=[
+                InteractionPermission.view_associated_investmentproject,
+            ],
             dit_team=project_creator.dit_team,
         )
         api_client = self.create_api_client(user=requester)
@@ -1741,14 +1873,18 @@ class TestGetInteraction(APITestMixin):
             'related_trade_agreements': [],
         }
 
-    def test_restricted_user_cannot_get_non_associated_investment_project_interaction(self):
+    def test_restricted_user_cannot_get_non_associated_investment_project_interaction(
+        self,
+    ):
         """
         Test that a restricted user cannot get a non-associated investment project
         interaction.
         """
         interaction = InvestmentProjectInteractionFactory()
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.view_associated_investmentproject],
+            permission_codenames=[
+                InteractionPermission.view_associated_investmentproject,
+            ],
             dit_team=TeamFactory(),
         )
         api_client = self.create_api_client(user=requester)
@@ -1761,7 +1897,9 @@ class TestGetInteraction(APITestMixin):
         """Test that a restricted user cannot get a company interaction."""
         interaction = CompanyInteractionFactory()
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.view_associated_investmentproject],
+            permission_codenames=[
+                InteractionPermission.view_associated_investmentproject,
+            ],
             dit_team=TeamFactory(),
         )
         api_client = self.create_api_client(user=requester)
@@ -1795,7 +1933,9 @@ class TestUpdateInteraction(APITestMixin):
     def test_restricted_user_cannot_update_company_interaction(self):
         """Test that a restricted user cannot update a company interaction."""
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.change_associated_investmentproject],
+            permission_codenames=[
+                InteractionPermission.change_associated_investmentproject,
+            ],
         )
         interaction = CompanyInteractionFactory(subject='I am a subject')
 
@@ -1810,7 +1950,9 @@ class TestUpdateInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_restricted_user_cannot_update_non_associated_investment_project_interaction(self):
+    def test_restricted_user_cannot_update_non_associated_investment_project_interaction(
+        self,
+    ):
         """
         Test that a restricted user cannot update a non-associated investment project interaction.
         """
@@ -1818,7 +1960,9 @@ class TestUpdateInteraction(APITestMixin):
             subject='I am a subject',
         )
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.change_associated_investmentproject],
+            permission_codenames=[
+                InteractionPermission.change_associated_investmentproject,
+            ],
         )
 
         api_client = self.create_api_client(user=requester)
@@ -1921,7 +2065,10 @@ class TestUpdateInteraction(APITestMixin):
             (
                 {
                     'status': Interaction.Status.COMPLETE,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
                 },
                 {
                     'service': ['This field is required.'],
@@ -1931,7 +2078,9 @@ class TestUpdateInteraction(APITestMixin):
     )
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_draft_update_enforces_required_fields(self, permissions, data, error_response):
+    def test_draft_update_enforces_required_fields(
+        self, permissions, data, error_response,
+    ):
         """
         Test that changing a draft to completed will enforce service and
         communication_channel to be set.
@@ -1948,7 +2097,7 @@ class TestUpdateInteraction(APITestMixin):
         data = resolve_data(data)
         response = api_client.patch(url, data=data)
 
-        assert(response.status_code == status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == error_response
 
     @pytest.mark.parametrize(
@@ -1959,7 +2108,9 @@ class TestUpdateInteraction(APITestMixin):
                     'were_countries_discussed': False,
                 },
                 {
-                    'were_countries_discussed': ['This field is invalid for interaction updates.'],
+                    'were_countries_discussed': [
+                        'This field is invalid for interaction updates.',
+                    ],
                 },
             ),
             (
@@ -1970,14 +2121,17 @@ class TestUpdateInteraction(APITestMixin):
                             'country': {
                                 'id': Country.greece.value.id,
                             },
-                            'status':
-                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
                 {
-                    'were_countries_discussed': ['This field is invalid for interaction updates.'],
-                    'export_countries': ['This field is invalid for interaction updates.'],
+                    'were_countries_discussed': [
+                        'This field is invalid for interaction updates.',
+                    ],
+                    'export_countries': [
+                        'This field is invalid for interaction updates.',
+                    ],
                 },
             ),
             (
@@ -1987,13 +2141,14 @@ class TestUpdateInteraction(APITestMixin):
                             'country': {
                                 'id': Country.greece.value.id,
                             },
-                            'status':
-                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
                 {
-                    'export_countries': ['This field is invalid for interaction updates.'],
+                    'export_countries': [
+                        'This field is invalid for interaction updates.',
+                    ],
                 },
             ),
         ),
@@ -2002,7 +2157,11 @@ class TestUpdateInteraction(APITestMixin):
     @pytest.mark.parametrize('flag', ((True, False)))
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_clean_interaction_update_export_countries_validation_error(
-        self, permissions, data, error_response, flag,
+        self,
+        permissions,
+        data,
+        error_response,
+        flag,
     ):
         """
         Test that a user can't update export countries in an interaction
@@ -2014,14 +2173,16 @@ class TestUpdateInteraction(APITestMixin):
             theme=Interaction.Theme.EXPORT,
         )
 
-        assert len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) == 0
+        assert (
+            len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) == 0
+        )
 
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         data = resolve_data(data)
         response = api_client.patch(url, data=data)
 
-        assert(response.status_code == status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == error_response
 
     @pytest.mark.parametrize(
@@ -2032,7 +2193,9 @@ class TestUpdateInteraction(APITestMixin):
                     'were_countries_discussed': False,
                 },
                 {
-                    'were_countries_discussed': ['This field is invalid for interaction updates.'],
+                    'were_countries_discussed': [
+                        'This field is invalid for interaction updates.',
+                    ],
                 },
             ),
             (
@@ -2043,14 +2206,17 @@ class TestUpdateInteraction(APITestMixin):
                             'country': {
                                 'id': Country.greece.value.id,
                             },
-                            'status':
-                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
                 {
-                    'were_countries_discussed': ['This field is invalid for interaction updates.'],
-                    'export_countries': ['This field is invalid for interaction updates.'],
+                    'were_countries_discussed': [
+                        'This field is invalid for interaction updates.',
+                    ],
+                    'export_countries': [
+                        'This field is invalid for interaction updates.',
+                    ],
                 },
             ),
             (
@@ -2060,13 +2226,14 @@ class TestUpdateInteraction(APITestMixin):
                             'country': {
                                 'id': Country.greece.value.id,
                             },
-                            'status':
-                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
                 {
-                    'export_countries': ['This field is invalid for interaction updates.'],
+                    'export_countries': [
+                        'This field is invalid for interaction updates.',
+                    ],
                 },
             ),
         ),
@@ -2075,7 +2242,11 @@ class TestUpdateInteraction(APITestMixin):
     @pytest.mark.parametrize('flag', ((True, False)))
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_update_export_countries_validation_error(
-        self, permissions, data, error_response, flag,
+        self,
+        permissions,
+        data,
+        error_response,
+        flag,
     ):
         """
         Test that a user can't update export countries in an interaction
@@ -2087,14 +2258,16 @@ class TestUpdateInteraction(APITestMixin):
             export_countries__status=CompanyExportCountry.Status.NOT_INTERESTED,
         )
 
-        assert len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) > 0
+        assert (
+            len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) > 0
+        )
 
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         data = resolve_data(data)
         response = api_client.patch(url, data=data)
 
-        assert(response.status_code == status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == error_response
 
     @pytest.mark.parametrize('flag', ((True, False)))
@@ -2108,7 +2281,9 @@ class TestUpdateInteraction(APITestMixin):
         requester = create_test_user(permission_codenames=permissions)
         interaction = ExportCountriesInteractionFactory()
 
-        assert len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) == 1
+        assert (
+            len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) == 1
+        )
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         data = {
@@ -2122,12 +2297,16 @@ class TestUpdateInteraction(APITestMixin):
 
     @freeze_time('2017-04-18 13:25:30.986208')
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
-    def test_add_interaction_with_company_export_country_check_history(self, permissions):
+    def test_add_interaction_with_company_export_country_check_history(
+        self, permissions,
+    ):
         """
         Test add a new interaction with export country
         check to make sure it is not tracked in company export country history.
         """
-        adviser = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
+        adviser = create_test_user(
+            permission_codenames=permissions, dit_team=TeamFactory(),
+        )
         company = CompanyFactory()
         contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
@@ -2152,8 +2331,7 @@ class TestUpdateInteraction(APITestMixin):
                     'country': {
                         'id': Country.canada.value.id,
                     },
-                    'status':
-                        CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                    'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                 },
             ],
             'has_related_trade_agreements': True,
@@ -2187,9 +2365,13 @@ class TestListInteractions(APITestMixin):
 
         project = InvestmentProjectFactory()
         company = CompanyFactory()
-        company_interactions = CompanyInteractionFactory.create_batch(3, company=company)
+        company_interactions = CompanyInteractionFactory.create_batch(
+            3,
+            company=company,
+        )
         project_interactions = CompanyInteractionFactory.create_batch(
-            3, investment_project=project,
+            3,
+            investment_project=project,
         )
 
         url = reverse('api-v4:interaction:collection')
@@ -2199,7 +2381,9 @@ class TestListInteractions(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == 6
         actual_ids = {i['id'] for i in response_data['results']}
-        expected_ids = {str(i.id) for i in chain(project_interactions, company_interactions)}
+        expected_ids = {
+            str(i.id) for i in chain(project_interactions, company_interactions)
+        }
         assert actual_ids == expected_ids
 
     def test_restricted_user_can_only_list_associated_interactions(self):
@@ -2209,7 +2393,9 @@ class TestListInteractions(APITestMixin):
         """
         creator = AdviserFactory()
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.view_associated_investmentproject],
+            permission_codenames=[
+                InteractionPermission.view_associated_investmentproject,
+            ],
             dit_team=creator.dit_team,
         )
         api_client = self.create_api_client(user=requester)
@@ -2220,10 +2406,12 @@ class TestListInteractions(APITestMixin):
 
         CompanyInteractionFactory.create_batch(3, company=company)
         CompanyInteractionFactory.create_batch(
-            3, investment_project=non_associated_project,
+            3,
+            investment_project=non_associated_project,
         )
         associated_project_interactions = CompanyInteractionFactory.create_batch(
-            2, investment_project=associated_project,
+            2,
+            investment_project=associated_project,
         )
 
         url = reverse('api-v4:interaction:collection')
@@ -2244,14 +2432,19 @@ class TestListInteractions(APITestMixin):
 
         opportunity = LargeCapitalOpportunityFactory()
         CompanyInteractionFactory.create_batch(3)
-        opportunity_interactions = LargeCapitalOpportunityInteractionFactory.create_batch(
-            3,
-            large_capital_opportunity=opportunity,
+        opportunity_interactions = (
+            LargeCapitalOpportunityInteractionFactory.create_batch(
+                3,
+                large_capital_opportunity=opportunity,
+            )
         )
         url = reverse('api-v4:interaction:collection')
-        response = api_client.get(url, {
-            'large_capital_opportunity_id': opportunity.pk,
-        })
+        response = api_client.get(
+            url,
+            {
+                'large_capital_opportunity_id': opportunity.pk,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
