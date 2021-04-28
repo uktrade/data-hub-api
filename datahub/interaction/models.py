@@ -307,6 +307,9 @@ class Interaction(ArchivableModel, BaseModel):
 
     were_countries_discussed = models.BooleanField(null=True)
 
+    has_related_trade_agreements = models.BooleanField(null=True, blank=True)
+    related_trade_agreements = models.ManyToManyField('metadata.TradeAgreement', blank=True)
+
     @property
     def is_event(self):
         """Whether this service delivery is for an event."""
