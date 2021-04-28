@@ -53,7 +53,6 @@ class InteractionViewSetV4(ArchivableViewSetMixin, CoreViewSet):
     )
     serializer_class = InteractionSerializerV4
     queryset = get_interaction_queryset()
-    """Do I need .prefetch_related('related_trade_agreements') here?"""
     filter_backends = (
         DjangoFilterBackend,
         IsAssociatedToInvestmentProjectInteractionFilter,
