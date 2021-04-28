@@ -1,3 +1,27 @@
+# Data Hub API 36.17.0 (2021-04-28)
+
+
+## Features
+
+- Address Area is now serialised within all the address data REST calls, including swagger documentation examples 
+  and the MultiAddressModel, utilised within the test samples containing primary and secondary address details.
+
+## Bug fixes
+
+- **Contacts** Telephone numbers and country codes are now validated for contacts
+- **Contacts** Reduces the strictness of country code validation for contacts - now allows with or without a preceding +
+- **Investment** Updated Specific Programmes (x4) fixtures
+- CSV output is now escaped to protect against CSV injection: https://owasp.org/www-community/attacks/CSV_Injection
+
+## Database schema
+
+- **Interactions** Two new fields: `has_related_trade_agreements` and `related_trade_agreements` have been added to the interactions model.
+  These fields are not required on the existing v3 interactions endpoint.
+
+  A new v4 interactions endpoint has been added where these two fields are marked as required.
+- DB management command for fixing postcodes for US companies and updating the address area to match the fixed postcode where possible
+
+
 # Data Hub API 36.16.0 (2021-04-16)
 
 
