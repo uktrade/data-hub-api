@@ -44,8 +44,17 @@
   pk: 4fb8c6c6-d3aa-4b36-a954-7578e0337f4d
   fields: {disabled_on: null, name: Government Communications, order: 2500.0}
 - model: interaction.policyarea
+  pk: ad169779-e10b-4136-bc60-dd8319da98b9
+  fields: {disabled_on: null, name: Government Procurement, order: 2700.0}
+- model: interaction.policyarea
   pk: 53ca7c82-5851-4bed-908e-92016f77c5b9
   fields: {disabled_on: null, name: Business Regulation, order: 700.0}
+- model: interaction.policyarea
+  pk: 2242e7bd-e54e-4195-a639-3a9e52992c2f
+  fields: {disabled_on: null, name: Company Law and Company Reporting, order: 800.0}
+- model: interaction.policyarea
+  pk: 2164ddd9-fab2-4bcd-ac6c-b033ba7d8c63
+  fields: {disabled_on: null, name: Coronavirus / COVID-19, order: 1050.0}
 - model: interaction.policyarea
   pk: 583c0bb6-d3c5-4e4b-8f25-e861c1e8d9c9
   fields: {disabled_on: null, name: State Aid, order: 4600.0}
@@ -106,7 +115,22 @@
   fields: {disabled_on: null, name: Market Access, order: 3400.0}
 - model: interaction.policyarea
   pk: 9a9ae32a-0a12-4e0f-82f9-17050dd95449
-  fields: {disabled_on: null, name: Environmental Law and Policy, order: 2000.0}
+  fields: {disabled_on: null, name: Environmental / Climate Law and Policy, order: 2000.0}
+- model: interaction.policyarea
+  pk: 4b74bfb3-37a0-42a1-a855-ba661cac090c
+  fields: {disabled_on: null, name: 'Free Trade Agreements: Australia', order: 2420.0}
+- model: interaction.policyarea
+  pk: 31e9b74a-df44-46be-8762-326cc6db4d0d
+  fields: {disabled_on: null, name: 'Free Trade Agreements: Japan', order: 2440.0}
+- model: interaction.policyarea
+  pk: 6687d448-cd16-4199-bf64-4c9cac20f8d8
+  fields: {disabled_on: null, name: 'Free Trade Agreements: New Zealand', order: 2460.0}
+- model: interaction.policyarea
+  pk: e8933d7e-8784-47dc-9cce-69910a1a4a7a
+  fields: {disabled_on: null, name: 'Free Trade Agreements: US', order: 2480.0}
+- model: interaction.policyarea
+  pk: e6453815-7570-4dda-99af-fe536bec9b1d
+  fields: {disabled_on: null, name: 'G2G: Peru Reconstruction', order: 2490.0}
 - model: interaction.policyarea
   pk: 9c5c4f45-09de-4383-83b5-7190c3f58b7b
   fields: {disabled_on: null, name: 'Science, R&D and Innovation', order: 4400.0}
@@ -118,7 +142,7 @@
   fields: {disabled_on: null, name: Devolved Administration - Wales, order: 1500.0}
 - model: interaction.policyarea
   pk: a87aa322-0153-4b1e-a2fd-23a03060204e
-  fields: {disabled_on: null, name: 'Borders, Migration, Immigration and Foreign Travel',
+  fields: {disabled_on: null, name: 'Migration and Immigration',
     order: 600.0}
 - model: interaction.policyarea
   pk: a89151e6-2bf9-43ec-8ac3-c5cbc3e3554f
@@ -151,3 +175,24 @@
 - model: interaction.policyarea
   pk: fb4b00c8-93fb-46f5-bd3d-bf1bd7466a86
   fields: {disabled_on: null, name: Repeal Bill, order: 4200.0}
+- model: interaction.policyarea
+  pk: 7642f0d1-e2f7-435e-abec-3189b27da4e6
+  fields: {disabled_on: null, name: Rules of Origin, order: 5200.0}
+- model: interaction.policyarea
+  pk: 91605903-b24c-4071-a5a2-c31a630b2ce2
+  fields: {disabled_on: null, name: 'COP26 Adaptation and Resilience', order: 6000.0}
+- model: interaction.policyarea
+  pk: 738cf6e1-2147-4d95-b124-285547c6f40f
+  fields: {disabled_on: null, name: 'COP26 Clean Transport, including EV100', order: 6100.0}
+- model: interaction.policyarea
+  pk: 31e8fb37-3337-4293-9689-2d713078aae5
+  fields: {disabled_on: null, name: 'COP26 Energy Transitions, including RE100 and EP100', order: 6200.0}
+- model: interaction.policyarea
+  pk: f251aec3-d696-4189-815e-f68f609fc100
+  fields: {disabled_on: null, name: 'COP26 Finance, including TCFD', order: 6300.0}
+- model: interaction.policyarea
+  pk: 5fa34ad7-4c8e-4ad5-80fe-321318066727
+  fields: {disabled_on: null, name: 'COP26 Nature, including supply chains', order: 6400.0}
+- model: interaction.policyarea
+  pk: 3b58713a-40cb-41b8-aa4f-cf2dfd23251d
+  fields: {disabled_on: null, name: 'Race to Zero, including Science Based Targets', order: 6500.0}
