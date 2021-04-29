@@ -769,3 +769,9 @@ if ES_APM_ENABLED:
     }
 
 ALLOW_TEST_FIXTURE_SETUP = env('ALLOW_TEST_FIXTURE_SETUP', default=False)
+
+# BED API configuration
+BED_USERNAME = env('BED_USERNAME', default=None)
+BED_PASSWORD = env('BED_PASSWORD', default=None)
+BED_SECURITY_TOKEN = env('BED_SECURITY_TOKEN', default=None)
+BED_IS_SANDBOX = env('BED_IS_SANDBOX', default=True)
