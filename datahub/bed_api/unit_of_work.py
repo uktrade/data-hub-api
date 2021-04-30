@@ -58,4 +58,4 @@ class BedUnitOfWork(AbstractUnitOfWork):
         """
         if self.salesforce and self.salesforce.session:
             self.salesforce.session.close()
-        self.salesfoce = None
+        self.salesforce = None
