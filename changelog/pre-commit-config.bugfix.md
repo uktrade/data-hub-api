@@ -1,0 +1,1 @@
+Removes unrequired code in pre-commit-config.yaml file which prevents the flake8 pre-commit hook setup from working correctly.
