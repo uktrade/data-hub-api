@@ -27,7 +27,7 @@ class TestBedFactory:
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_salesforce_instance_generates_sandbox(self, mock_salesforce):
         """
-        Test BedFactory creates an instance with the correct values
+        Test BedFactory creates an instance with the sandbox set to true
         """
         factory = BedFactory()
 
@@ -52,7 +52,7 @@ class TestBedFactory:
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_salesforce_instance_without_sandbox(self, mock_salesforce):
         """
-        Test BedFactory creates an instance with the correct values
+        Test BedFactory creates an instance with the sandbox set to false
         """
         factory = BedFactory()
 
@@ -67,9 +67,11 @@ class TestBedFactory:
             ),
         ]
 
+    # TODO: Remove as this is just to test implementation with real
     def test_integration_salesforce_generates_sales_force_instance(self):
         """
-        Test BedFactory creates an instance with the correct values
+        Test BedFactory integration with the real configuration values generates
+        an actual Salesforce session instance
         """
         factory = BedFactory()
 
