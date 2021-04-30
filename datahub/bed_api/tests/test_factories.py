@@ -15,7 +15,7 @@ def mockenviron(**env_variables):
 
 class TestBedFactory:
     """
-    Test BedFactory for creating BED Salesforce instance class
+    Test BedFactory for creating BED Salesforce instances or sessions
     """
 
     @mockenviron(
@@ -78,3 +78,7 @@ class TestBedFactory:
         actual = factory.create()
 
         assert actual is not None
+        # from pprint import pprint
+        # pprint('---------------------------------')
+        # pprint(actual.Contact.describe())
+        # pprint('---------------------------------')
