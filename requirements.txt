@@ -197,7 +197,7 @@ multidict==4.7.6
     #   yarl
 nodeenv==1.5.0
     # via pre-commit
-notifications-python-client==6.0.2
+notifications-python-client==6.1.0
     # via -r requirements.in
 packaging==20.8
     # via pytest
