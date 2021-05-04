@@ -32,6 +32,9 @@
   pk: 543e4ca4-ed74-d60f-f6bf-1a0fd64b772d
   fields: {disabled_on: null, name: "Export Academy"}
 - model: event.eventtype
+  pk: 235f72cf-d72f-44ab-b904-ece3e763b3bf
+  fields: {disabled_on: null, name: "Levelling Up"}
+- model: event.eventtype
   pk: 48afd8d0-5d95-e211-a939-e4115bead28a
   fields: {disabled_on: '2017-11-24T00:00:00Z', name: "Awayday"}
 - model: event.eventtype
