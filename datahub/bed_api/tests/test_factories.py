@@ -1,16 +1,10 @@
-import os
 from unittest import mock
 
 from datahub.bed_api.factories import BedFactory
 
 
-def mockenviron(**env_variables):
-    """
-    Allow for multiple settings inline
-    :param env_variables:
-    :return: mock.patch.dict of os.environ values
-    """
-    return mock.patch.dict(os.environ, env_variables)
+# TODO: Move to test core
+from datahub.core.test_utils import mock_environ
 
 
 class TestBedFactory:
@@ -18,7 +12,7 @@ class TestBedFactory:
     Test BedFactory for creating BED Salesforce instances or sessions
     """
 
-    @mockenviron(
+    @mock_environ(
         BED_USERNAME='test-user@digital.trade.gov.uk',
         BED_PASSWORD='test-password',
         BED_SECURITY_TOKEN='test-token',
@@ -43,7 +37,7 @@ class TestBedFactory:
             ),
         ]
 
-    @mockenviron(
+    @mock_environ(
         BED_USERNAME='test-user@digital.trade.gov.uk',
         BED_PASSWORD='test-password',
         BED_SECURITY_TOKEN='test-token',
@@ -81,4 +75,8 @@ class TestBedFactory:
         # from pprint import pprint
         # pprint('---------------------------------')
         # pprint(actual.Contact.describe())
+        # Vincent Farah
+        # pprint(actual.Contact.get('0030C00000KSbt4QAD'))
+        # Made Tech sample account
+        # pprint(actual.Account.get('0010C00000KSGD4QAP'))
         # pprint('---------------------------------')
