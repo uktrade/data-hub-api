@@ -27,14 +27,15 @@ class TestIntegrationContactRepositoryShould:
         BED_IS_SANDBOX
     """
 
+    # TODO: Refactor into separate tests
     def test_utilise_crud_operations(self):
         """
         Test BedFactory integration with the real configuration values generates
         an actual Salesforce session instance
         """
         contact_repository = self.create_contact_repository()
-        # Get test Account to associate contact with
         account_repository = self.create_account_repository()
+        # Made Tech test account
         test_account = account_repository.get('0010C00000KSGD4QAP')
         assert test_account is not None
         # from pprint import pprint
@@ -42,11 +43,12 @@ class TestIntegrationContactRepositoryShould:
         # Create minimal contact - TODO: Generate with Faker
         contact = EditContact(
             salutation=Salutation.mrs,
-            first_name='Jane',
+            first_name='Maya',
             last_name='Doe',
-            email='jane.doe@madetech.com',
+            email='maya.doe@madetech.com',
             account_id=test_account['Id'],
         )
+        contact.Suffix = 'Developer'
         contact.MiddleName = 'Middleton'
         contact.Phone = '0797396740'
         contact.MobilePhone = '0797396741'
@@ -58,23 +60,35 @@ class TestIntegrationContactRepositoryShould:
         contact.Business_Area__c = BusinessArea.professional
         # pprint('New Contact ...')
         # pprint(contact.as_blank_clean_dict())
-        # response = contact_repository.upsert(record_id='Id', contact.as_blank_clean_dict())
-        response = contact_repository.add(**contact.as_blank_clean_dict())
-        assert response is not None
-        # pprint(response)
-        # pprint('---------------------------------')
-        # Query Contact
+        contact_add_response = contact_repository.add(contact.as_blank_clean_dict())
+        assert contact_add_response is not None
+        assert contact_add_response['success'] is True
+        new_contact_id = contact_add_response['id']
+        # print('New Contact Response ...')
+        # pprint(contact_add_response)
         actual = contact_repository.query(
-            format_soql(ContactQuery.get_by_id.value.sql, id='0030C00000KSbt4QAD'),
+            format_soql(ContactQuery.get_by_id.value.sql, id=new_contact_id),
         )
         assert actual is not None
         assert actual['totalSize'] == 1
         assert actual['done'] is True
-        assert actual['records'][0]['Id'] == '0030C00000KSbt4QAD'
+        assert actual['records'][0]['Id'] == new_contact_id
 
         #  Update Contact
+        contact.Notes__c = 'Integration Test Notes - Update'
+        update_contact_response = contact_repository.upsert(
+            f'Id/{new_contact_id}', contact.as_blank_clean_dict())
+        # print('Update Contact Response ...')
+        # pprint(update_contact_response)
+        assert update_contact_response is not None
+        assert update_contact_response == 204
 
         #  Finally delete Contact
+        delete_contact_response = contact_repository.delete(new_contact_id)
+        # pprint(delete_contact_response)
+        assert delete_contact_response is not None
+        assert delete_contact_response == 204
+        # pprint('---------------------------------')
 
     # Setup as fixtures ...
     def create_salesforce(self):
