@@ -9,7 +9,6 @@ class BedEntity:
         """Constructor for Id based BED entity"""
         self.Id = None
         self.ParentId = None
-        self.Description = None
         self.Name = None
 
     def as_blank_clean_dict(self):
@@ -70,7 +69,6 @@ class EditContact(BedEntity):
             first_name,
             last_name,
             email,
-            record_type_id=None,
             account_id=None,
     ):
         """Constructor - Mandatory Fields to be assigned with value *"""
@@ -84,20 +82,10 @@ class EditContact(BedEntity):
         self.Job_Title__c = None
         self.Job_Type__c = None
         self.Notes__c = None
-        # Address
-        self.MailingStreet = None
-        self.MailingCity = None
-        self.MailingState = None
-        self.MailingPostalCode = None
-        self.MailingCountry = None
-        self.MailingAddress: Address = None
-        self.OtherAddress: Address = None
         # Phones
         self.Phone = None
         self.MobilePhone = None
-        # Misc lookup fields
-        self.RecordTypeId = record_type_id  # Contact Record Type
-        self.AccountId = account_id  # * Organization Id        self.OwnerId = owner_id
+        self.AccountId = account_id  # * Organization Id
         self.Contact_Type__c = None
         # Business Sector e.g. 'Advanced Manufacturing;Professional & Business Services'
         self.Business_Area__c = None

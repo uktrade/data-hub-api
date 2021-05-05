@@ -1,6 +1,7 @@
 
 from freezegun import freeze_time
 
+from datahub.bed_api.constants import Salutation
 from datahub.bed_api.models import EditContact
 
 
@@ -14,7 +15,7 @@ class TestEditContactShould:
         Should format contact name accordingly
         """
         contact = EditContact(
-            salutation='Mrs.',
+            salutation=Salutation.mrs,
             first_name='Jane',
             last_name='Doe',
             email='jane.doe@email.com',
@@ -29,7 +30,7 @@ class TestEditContactShould:
         Should format contact name accordingly
         """
         contact = EditContact(
-            salutation='Mr.',
+            salutation=Salutation.mr,
             first_name=None,
             last_name='Doe',
             email='jane.doe@email.com',
@@ -44,7 +45,6 @@ class TestEditContactShould:
         and empty values
         """
         expected = {
-            'Description': 'Test strips unused fields',
             'Email': 'john.doe@email.com',
             'FirstName': 'John',
             'Id': 'Test_Identity',
@@ -53,12 +53,10 @@ class TestEditContactShould:
         }
 
         contact = EditContact(
-            salutation='Mr.',
+            salutation=Salutation.mr,
             first_name='John',
             last_name='Doe',
             email='john.doe@email.com',
         )
-        contact.Description = 'Test strips unused fields'
         contact.Id = 'Test_Identity'
-
         assert contact.as_blank_clean_dict() == expected
