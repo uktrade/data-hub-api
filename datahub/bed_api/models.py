@@ -1,4 +1,3 @@
-from datetime import datetime
 
 from datahub.bed_api.utils import remove_blank_from_dict
 
@@ -10,14 +9,8 @@ class BedEntity:
         """Constructor for Id based BED entity"""
         self.Id = None
         self.ParentId = None
-        self.IsDeleted = False
         self.Description = None
         self.Name = None
-        self.LastModifiedDate = datetime.now()
-        self.LastModifiedById = None
-        self.CreatedById = None
-        self.CreatedDate = datetime.now()
-        self.SystemModstamp = datetime.now()
 
     def as_blank_clean_dict(self):
         """
@@ -30,9 +23,9 @@ class BedEntity:
         return result
 
 
-class Account(BedEntity):
+class EditAccount(BedEntity):
     """
-    Salesforce representation of an Organization
+    Salesforce representation of an Organization/Account edit details
     """
 
     def __init__(
@@ -66,7 +59,7 @@ class Account(BedEntity):
         self.IS_Sentiment__c = None
 
 
-class Contact(BedEntity):
+class EditContact(BedEntity):
     """
     Salesforce representation of a Contact
     """
@@ -79,8 +72,6 @@ class Contact(BedEntity):
             email,
             record_type_id=None,
             account_id=None,
-            owner_id=None,
-            last_modified_by_id=None,
     ):
         """Constructor - Mandatory Fields to be assigned with value *"""
         super().__init__()
@@ -106,10 +97,8 @@ class Contact(BedEntity):
         self.MobilePhone = None
         # Misc lookup fields
         self.RecordTypeId = record_type_id  # Contact Record Type
-        self.AccountId = account_id  # * Organization Id
-        self.OwnerId = owner_id
+        self.AccountId = account_id  # * Organization Id        self.OwnerId = owner_id
         self.Contact_Type__c = None
-        self.LastModifiedById = last_modified_by_id
         # Business Sector e.g. 'Advanced Manufacturing;Professional & Business Services'
         self.Business_Area__c = None
 
