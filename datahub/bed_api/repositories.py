@@ -16,20 +16,20 @@ class AbstractRepository(abc.ABC):
         self.salesforce = salesforce
 
     # @abc.abstractmethod
-    def add(self, **kwargs):
+    def add(self, data):
         """
         Creates a new SObject using a POST
-        :param kwargs: A dict of the data to create the SObject from
+        :param data: A dict of the data to create the SObject from
         :return: Returns NotImplementedError
         """
         raise NotImplementedError
 
     # @abc.abstractmethod
-    def upsert(self, record_id, **kwargs):
+    def upsert(self, record_id, data):
         """
         Create or Update based on some unique identifier
         :param record_id: Record identifier
-        :param kwargs: Represents a dictionary of name values:
+        :param data: Represents a dictionary of name values:
         :return: Returns NotImplementedError
         """
         raise NotImplementedError
@@ -125,7 +125,7 @@ class ContactRepository(AbstractRepository):
         :param record_id: Unique identifier for deleting records
         :return: Result of deletion
         """
-        return self.salesforce.Contact.hard_delete(record_id)
+        return self.salesforce.Contact.delete(record_id)
 
     def get(self, record_id):
         """
@@ -145,22 +145,22 @@ class ContactRepository(AbstractRepository):
         """
         return self.salesforce.Contact.get_by_custom_id(custom_id_field, custom_id_value)
 
-    def add(self, **kwargs):
+    def add(self, data):
         """
         Add a new Contact using a POST
-        :param kwargs: A dict of Contact data
+        :param data: A dict of Contact data
         :return: Returns New Contact
         """
-        return self.salesforce.Contact.create(**kwargs)
+        return self.salesforce.Contact.create(data)
 
-    def upsert(self, record_id, **kwargs):
+    def upsert(self, record_id, data):
         """
         Create or Update Contact
-        :param record_id:
-        :param kwargs:
-        :return:
+        :param record_id: Record identifier
+        :param data: Represents a dictionary of name values:
+        :return: Created or updated
         """
-        return self.salesforce.Contact.upsert(record_id, **kwargs)
+        return self.salesforce.Contact.upsert(record_id, data)
 
 
 class AccountRepository(AbstractRepository):
@@ -182,7 +182,7 @@ class AccountRepository(AbstractRepository):
         :param record_id: Unique identifier for deleting records
         :return: Result of deletion
         """
-        return self.salesforce.Account.hard_delete(record_id)
+        return self.salesforce.Account.delete(record_id)
 
     def get(self, record_id):
         """
@@ -202,19 +202,19 @@ class AccountRepository(AbstractRepository):
         """
         return self.salesforce.Account.get_by_custom_id(custom_id_field, custom_id_value)
 
-    def add(self, **kwargs):
+    def add(self, data):
         """
         Add a new Account using a POST
-        :param kwargs: A dict of Account data
+        :param data: A dict of Account data
         :return: Returns New Account
         """
-        return self.salesforce.Contact.create(kwargs.items())
+        return self.salesforce.Contact.create(data)
 
-    def upsert(self, record_id, **kwargs):
+    def upsert(self, record_id, data):
         """
         Create or Update Contact
-        :param record_id:
-        :param kwargs:
-        :return:
+        :param record_id: Record identifier
+        :param data: Represents a dictionary of name values:
+        :return: Created or updated Account
         """
-        return self.salesforce.Account.upsert(record_id, kwargs)
+        return self.salesforce.Account.upsert(record_id, data)
