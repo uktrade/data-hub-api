@@ -1,11 +1,10 @@
-from datetime import datetime
 
 from freezegun import freeze_time
 
-from datahub.bed_api.models import Contact
+from datahub.bed_api.models import EditContact
 
 
-class TestContactShould:
+class TestEditContactShould:
     """
     Contact expectations
     """
@@ -14,7 +13,7 @@ class TestContactShould:
         """
         Should format contact name accordingly
         """
-        contact = Contact(
+        contact = EditContact(
             salutation='Mrs.',
             first_name='Jane',
             last_name='Doe',
@@ -25,11 +24,11 @@ class TestContactShould:
 
         assert contact.name == 'Mrs. Jane Middle Doe Teacher'
 
-    def test_contact_name_outputs__partial_full_name(self):
+    def test_contact_name_outputs_partial_full_name(self):
         """
         Should format contact name accordingly
         """
-        contact = Contact(
+        contact = EditContact(
             salutation='Mr.',
             first_name=None,
             last_name='Doe',
@@ -44,21 +43,16 @@ class TestContactShould:
         Should output contact as dictionary without name, calculated fields
         and empty values
         """
-        now = datetime.now()
         expected = {
-            'CreatedDate': now,
             'Description': 'Test strips unused fields',
             'Email': 'john.doe@email.com',
             'FirstName': 'John',
             'Id': 'Test_Identity',
-            'IsDeleted': False,
-            'LastModifiedDate': now,
             'LastName': 'Doe',
             'Salutation': 'Mr.',
-            'SystemModstamp': now,
         }
 
-        contact = Contact(
+        contact = EditContact(
             salutation='Mr.',
             first_name='John',
             last_name='Doe',

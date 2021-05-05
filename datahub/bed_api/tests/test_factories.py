@@ -1,9 +1,6 @@
 from unittest import mock
 
 from datahub.bed_api.factories import BedFactory
-
-
-# TODO: Move to test core
 from datahub.core.test_utils import mock_environ
 
 
@@ -61,8 +58,18 @@ class TestBedFactory:
             ),
         ]
 
-    # TODO: Remove as this is just to test implementation with real
-    def test_integration_salesforce_generates_sales_force_instance(self):
+
+class TestIntegrationBedFactory:
+    """
+    Integration Tests needing BED configuration within
+    env - see Vault for valid settings
+        BED_USERNAME
+        BED_PASSWORD
+        BED_SECURITY_TOKEN
+        BED_IS_SANDBOX
+    """
+
+    def test_salesforce_generates_sales_force_instance_for_getting_contact_data(self):
         """
         Test BedFactory integration with the real configuration values generates
         an actual Salesforce session instance
@@ -72,11 +79,6 @@ class TestBedFactory:
         actual = factory.create()
 
         assert actual is not None
-        # from pprint import pprint
-        # pprint('---------------------------------')
-        # pprint(actual.Contact.describe())
-        # Vincent Farah
-        # pprint(actual.Contact.get('0030C00000KSbt4QAD'))
-        # Made Tech sample account
-        # pprint(actual.Account.get('0010C00000KSGD4QAP'))
-        # pprint('---------------------------------')
+        contact_query = actual.Contact.describe()
+        assert contact_query is not None
+        assert len(contact_query) > 1
