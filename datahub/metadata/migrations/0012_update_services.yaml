@@ -1,0 +1,24 @@
+- model: metadata.service
+  pk: 3e525e31-5b0a-4562-81cc-2571d7880b3d
+  fields:
+    disabled_on:
+    order: 17000.0
+    segment: Levelling Up
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["export_interaction", "export_service_delivery"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+- model: metadata.service
+  pk: da4751d8-07cd-4266-a365-90f0342bc07f
+  fields:
+    disabled_on:
+    order: 17001.0
+    segment: Levelling Up
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["other_interaction", "other_service_delivery"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
