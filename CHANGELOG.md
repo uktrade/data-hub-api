@@ -1,3 +1,34 @@
+# Data Hub API 36.18.0 (2021-05-05)
+
+
+## Features
+
+- **Interactions** Add `Enhanced International Support Services` as Export interaction and Export service delivery.
+- Add the COP26 service and its child services:
+
+  * Adaptation and Resilience
+  * Clean Transport, including EV100
+  * Energy Transitions, including RE100 and EP100
+  * Finance, including TCFD
+  * Participation at Glasgow/getting involved with COP26
+  * Nature, including supply chains
+  * Race to Zero, including Science Based Targets
+- Add Levelling Up
+
+  Add Specific DIT Export Service or Funding / Levelling Up (Export interaction, Export service delivery)
+  Add Specific Service / Levelling Up (Other interaction, Other service delivery)
+
+## Bug fixes
+
+- Removes unrequired code in pre-commit-config.yaml file which prevents the flake8 pre-commit hook setup from working correctly.
+
+## Database schema
+
+- Postcodes can now be fixed for Canadian companies using a management command. 
+  Running this command will also update the address area to match the fixed postcode where possible.
+  Address area update made more reliable and refined by only updating active companies only containing a D-U-N-S number, guaranteeing the address data to be reliable.
+
+
 # Data Hub API 36.17.0 (2021-04-28)
 
 
