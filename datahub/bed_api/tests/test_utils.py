@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from datahub.bed_api.utils import remove_blank_from_dict
 
 
@@ -29,3 +31,50 @@ class TestRemovingBlanksFromDictShould:
         )
 
         assert remove_blank_from_dict(test_data) == expected
+
+
+def create_success_query_response(record_id):
+    """
+    Create a Salesforce query success response
+    :param record_id: Record identifier value
+    :return: Return a structured success query response
+    """
+    url = f'/services/data/v42.0/sobjects/Contact/{record_id}'
+    attributes = OrderedDict(
+        [
+            ('type', 'Contact'),
+            ('url', url),
+        ],
+    )
+    success_query_response = OrderedDict(
+        [
+            ('totalSize', 1),
+            ('done', True),
+            (
+                'records',
+                [
+                    OrderedDict(
+                        [
+                            ('attributes', attributes),
+                            ('Id', record_id),
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    )
+    return success_query_response
+
+
+def create_fail_query_response():
+    """
+    Create a Salesforce query failed response
+    :return: Return a structured failed query response
+    """
+    failed_query_response = OrderedDict(
+        [
+            ('totalSize', 0),
+            ('done', True),
+        ],
+    )
+    return failed_query_response

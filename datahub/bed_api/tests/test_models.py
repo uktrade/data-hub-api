@@ -59,4 +59,4 @@ class TestEditContactShould:
             email='john.doe@email.com',
         )
         contact.Id = 'Test_Identity'
-        assert contact.as_blank_clean_dict() == expected
+        assert contact.as_values_only_dict() == expected
