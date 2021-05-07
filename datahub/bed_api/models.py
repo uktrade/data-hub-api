@@ -11,15 +11,22 @@ class BedEntity:
         self.ParentId = None
         self.Name = None
 
-    def as_blank_clean_dict(self):
+    def as_values_only_dict(self):
         """
         Generates dictionary with no empty values to optimise data being passed as a dictionary
         Typical scenario is for new records being posted.
         NOTE: If updating be sure to include all values, even blanks,
                 as blank may be valid on an update.
         """
-        result = remove_blank_from_dict(self.__dict__)
+        result = remove_blank_from_dict(self.as_all_values_dict())
         return result
+
+    def as_all_values_dict(self):
+        """
+        Utilises the internal dictionary to generate all values even if blank
+        @return: Generated dictionary of all class values as name value pair
+        """
+        return self.__dict__
 
 
 class EditAccount(BedEntity):
@@ -30,23 +37,37 @@ class EditAccount(BedEntity):
     def __init__(
             self,
             name,
+            high_level_sector,
+            low_level_sector,
+            uk_region=None,  # CHECK: Why is this mandatory?
+            global_office_countries=None,
+            global_hq_country=None,
     ):
         """Constructor - Mandatory Fields to be assigned with value *"""
         super().__init__()
         self.Name = name  # *
-        self.High_Level_Sector__c = None  # *
-        # Digital;Infrastructure;Telecoms
-        self.Low_Level_Sector__c = None  # *
+        self.High_Level_Sector__c = high_level_sector  # *
+        self.Low_Level_Sector__c = low_level_sector  # *
         self.Company_Number__c = None
         self.Company_size__c = None
         self.Companies_House_ID__c = None
         self.BEIS_External_Affairs__c = None
         #  Address
-        self.BillingAddress: Address = None
-        self.ShippingAddress: Address = None
-        self.UK_Region__c = None   # *
-        self.Global_Office_Locations__c = None   # *
-        self.Country_HQ__c = None
+        #  Billing
+        self.BillingStreet = None
+        self.BillingCity = None
+        self.BillingState = None
+        self.BillingPostalCode = None
+        self.BillingCountry = None
+        # Shipping
+        self.ShippingStreet = None
+        self.ShippingCity = None
+        self.ShippingState = None
+        self.ShippingPostalCode = None
+        self.ShippingCountry = None
+        self.UK_Region__c = uk_region   # *
+        self.Global_Office_Locations__c = global_office_countries   # *
+        self.Country_HQ__c = global_hq_country  # *
         self.Location__c = None
         # Misc
         self.FTSE_100__c = False
@@ -104,17 +125,3 @@ class EditContact(BedEntity):
             ],
         )
         return ' '.join(names)
-
-
-class Address:
-    """Bed Address"""
-
-    def __init__(self):
-        """Constructor"""
-        self.Street = None
-        self.City = None
-        self.PostalCode = None
-        self.State = None
-        self.Country = None
-        # Mailing, Shipping, Billing, Home
-        self.AddressType = None

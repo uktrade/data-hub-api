@@ -1,11 +1,13 @@
-import abc
 
-from simple_salesforce import Salesforce
+from simple_salesforce import format_soql, Salesforce
+
+from datahub.bed_api.constants import AccountQuery, ContactQuery
 
 
-class AbstractRepository(abc.ABC):
+class SalesforceRepository:
     """
-    Base Abstract Repository Class fashioned more to fit the Salesforce paradigm
+    Base Salesforce Repository to encapsulate default CRUD operations
+    for interacting with Salesforce API
     """
 
     def __init__(self, salesforce: Salesforce):
@@ -15,7 +17,6 @@ class AbstractRepository(abc.ABC):
         """
         self.salesforce = salesforce
 
-    # @abc.abstractmethod
     def add(self, data):
         """
         Creates a new SObject using a POST
@@ -24,17 +25,24 @@ class AbstractRepository(abc.ABC):
         """
         raise NotImplementedError
 
-    # @abc.abstractmethod
-    def upsert(self, record_id, data):
+    def delete(self, record_id):
         """
-        Create or Update based on some unique identifier
-        :param record_id: Record identifier
-        :param data: Represents a dictionary of name values:
-        :return: Returns NotImplementedError
+        Delete a single item by unique identifier
+        :param record_id: Record id for deleting data
+        :return: NotImplementedError
         """
         raise NotImplementedError
 
-    # @abc.abstractmethod
+    def exists(self, record_id):
+        """
+        Checks if the record exists using the most unique identifier and
+        the most efficient mechanism for checking ie the least content
+        with ideally a head verb
+        :param record_id: Unique identifier value, associated with Id value typically
+        :return: NotImplementedError
+        """
+        raise NotImplementedError
+
     def get(self, record_id):
         """
         Get a single item by unique identifier
@@ -43,7 +51,6 @@ class AbstractRepository(abc.ABC):
         """
         raise NotImplementedError
 
-    # @abc.abstractmethod
     def get_by(self, custom_id_field, custom_id_value):
         """
         Returns the result of a GET by field
@@ -96,17 +103,17 @@ class AbstractRepository(abc.ABC):
             **kwargs,
         )
 
-    # @abc.abstractmethod
-    def delete(self, record_id):
+    def upsert(self, record_id, data):
         """
-        Delete a single item by unique identifier
-        :param record_id: Record id for deleting data
-        :return: NotImplementedError
+        Create or Update based on some unique identifier
+        :param record_id: Record identifier
+        :param data: Represents a dictionary of name values:
+        :return: Returns NotImplementedError
         """
         raise NotImplementedError
 
 
-class ContactRepository(AbstractRepository):
+class ContactRepository(SalesforceRepository):
     """
     Repository pattern for Salesforce interactions with Contacts data
     https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/Contact/FieldsAndRelationships/view
@@ -119,6 +126,14 @@ class ContactRepository(AbstractRepository):
         """
         super().__init__(salesforce=salesforce)
 
+    def add(self, data):
+        """
+        Add a new Contact using a POST
+        :param data: A dict of Contact data
+        :return: Returns New Contact
+        """
+        return self.salesforce.Contact.create(data)
+
     def delete(self, record_id):
         """
         Delete a single item by unique identifier
@@ -127,11 +142,30 @@ class ContactRepository(AbstractRepository):
         """
         return self.salesforce.Contact.delete(record_id)
 
+    def exists(self, record_id):
+        """
+        Checks if the record exists using the most unique identifier
+        :param record_id: Unique identifier value, associated with Id value typically
+        :return: True if it exists and False if it does not
+        """
+        response = self.query(
+            format_soql(
+                ContactQuery.get_by_id.value.sql,
+                id=record_id,
+            ),
+        )
+        return (
+            response is not None
+            and response['totalSize'] >= 1
+            and response['done'] is True
+            and response['records'][0]['Id'] == record_id
+        )
+
     def get(self, record_id):
         """
         Get single item by identifier
         :param record_id: Unique identifier value
-        :return:
+        :return: Result of Contact get by id
         """
         return self.salesforce.Contact.get(record_id)
 
@@ -145,14 +179,6 @@ class ContactRepository(AbstractRepository):
         """
         return self.salesforce.Contact.get_by_custom_id(custom_id_field, custom_id_value)
 
-    def add(self, data):
-        """
-        Add a new Contact using a POST
-        :param data: A dict of Contact data
-        :return: Returns New Contact
-        """
-        return self.salesforce.Contact.create(data)
-
     def upsert(self, record_id, data):
         """
         Create or Update Contact
@@ -163,7 +189,7 @@ class ContactRepository(AbstractRepository):
         return self.salesforce.Contact.upsert(record_id, data)
 
 
-class AccountRepository(AbstractRepository):
+class AccountRepository(SalesforceRepository):
     """
     Repository pattern for Salesforce interactions with Account data
     https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/Account/FieldsAndRelationships/view
@@ -176,6 +202,14 @@ class AccountRepository(AbstractRepository):
         """
         super().__init__(salesforce=salesforce)
 
+    def add(self, data):
+        """
+        Add a new Account using a POST
+        :param data: A dict of Account data
+        :return: Returns New Account
+        """
+        return self.salesforce.Account.create(data)
+
     def delete(self, record_id):
         """
         Delete a single item by unique identifier
@@ -183,6 +217,25 @@ class AccountRepository(AbstractRepository):
         :return: Result of deletion
         """
         return self.salesforce.Account.delete(record_id)
+
+    def exists(self, record_id):
+        """
+        Checks if the record exists using the most unique identifier
+        :param record_id: Unique identifier value, associated with Id value typically
+        :return: True if it exists and False if it does not
+        """
+        response = self.query(
+            format_soql(
+                AccountQuery.get_by_id.value.sql,
+                id=record_id,
+            ),
+        )
+        return (
+            response is not None
+            and response['totalSize'] >= 1
+            and response['done'] is True
+            and response['records'][0]['Id'] == record_id
+        )
 
     def get(self, record_id):
         """
@@ -201,14 +254,6 @@ class AccountRepository(AbstractRepository):
         :return: Contact record or None
         """
         return self.salesforce.Account.get_by_custom_id(custom_id_field, custom_id_value)
-
-    def add(self, data):
-        """
-        Add a new Account using a POST
-        :param data: A dict of Account data
-        :return: Returns New Account
-        """
-        return self.salesforce.Contact.create(data)
 
     def upsert(self, record_id, data):
         """
