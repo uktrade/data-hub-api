@@ -7,12 +7,12 @@
   pk: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
   fields:
     disabled_on: null
-    name: Asia-Pacific
+    name: Asia Pacific
 - model: metadata.overseasregion
   pk: b97749fb-2273-4447-a239-62dd8fb29e01
   fields:
     disabled_on: null
-    name: China
+    name: China and Hong Kong
 - model: metadata.overseasregion
   pk: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
   fields:
@@ -32,7 +32,7 @@
   pk: c4679b44-079e-4394-8bf7-bb0881a5031d
   fields:
     disabled_on: null
-    name: Middle East
+    name: Middle East, Afghanistan and Pakistan
 - model: metadata.overseasregion
   pk: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
   fields:
