@@ -1,16 +1,160 @@
 from unittest import mock
 
+import pytest
 from simple_salesforce import format_soql
 
 from datahub.bed_api.constants import ContactQuery
 from datahub.bed_api.models import EditAccount, EditContact
-from datahub.bed_api.repositories import ContactRepository
+from datahub.bed_api.repositories import AccountRepository, ContactRepository, SalesforceRepository
 from datahub.bed_api.tests.test_utils import (
     create_fail_query_response,
     create_success_query_response,
 )
 
 # TODO: Remove all pprint statements when Unit Tests done with Test data
+
+
+class TestSalesforceRepositoryShould:
+    """Unit tests for Base SalesforceRepository"""
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_query_calls_salesforce_query_with_valid_args(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test query_more calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        repository = SalesforceRepository(mock_salesforce)
+        expected_query = 'test_query'
+        expected_included_delete = True
+
+        repository.query(
+            expected_query,
+            expected_included_delete,
+            test=True,
+        )
+
+        assert mock_salesforce.query.called
+        assert mock_salesforce.query.call_args == mock.call(
+            expected_query,
+            expected_included_delete,
+            test=True,
+        )
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_query_next_calls_salesforce_query_more_with_valid_args(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test query_more calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        repository = SalesforceRepository(mock_salesforce)
+        expected_next_records_identifier = 'test_next_id'
+        expected_identifier_is_url = True
+        expected_included_delete = True
+
+        repository.query_next(
+            expected_next_records_identifier,
+            expected_identifier_is_url,
+            expected_included_delete,
+            test=True,
+        )
+
+        assert mock_salesforce.query_more.called
+        assert mock_salesforce.query_more.call_args == mock.call(
+            expected_next_records_identifier,
+            expected_identifier_is_url,
+            expected_included_delete,
+            test=True,
+        )
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_add_throws_not_implemented_error_by_default(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test add throws NotImplementedError
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        with pytest.raises(NotImplementedError):
+            repository = SalesforceRepository(mock_salesforce)
+
+            repository.add({'TestData': True})
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_delete_throws_not_implemented_error_by_default(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test delete throws NotImplementedError
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        with pytest.raises(NotImplementedError):
+            repository = SalesforceRepository(mock_salesforce)
+
+            repository.delete('test_record_id')
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_exists_throws_not_implemented_error_by_default(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test exists throws NotImplementedError
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        with pytest.raises(NotImplementedError):
+            repository = SalesforceRepository(mock_salesforce)
+
+            repository.exists('test_record_id')
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_get_throws_not_implemented_error_by_default(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test exists throws NotImplementedError
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        with pytest.raises(NotImplementedError):
+            repository = SalesforceRepository(mock_salesforce)
+
+            repository.get('test_record_id')
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_get_by_throws_not_implemented_error_by_default(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test get_by throws NotImplementedError
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        with pytest.raises(NotImplementedError):
+            repository = SalesforceRepository(mock_salesforce)
+
+            repository.get_by('test_field', 'test_record_id')
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_upsert_throws_not_implemented_error_by_default(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test upsert throws NotImplementedError
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        with pytest.raises(NotImplementedError):
+            repository = SalesforceRepository(mock_salesforce)
+
+            repository.upsert('test_record_id', {'TestData': True})
 
 
 class TestContactRepositoryShould:
@@ -45,10 +189,10 @@ class TestContactRepositoryShould:
         Test delete calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
         """
-        contact_repository = ContactRepository(mock_salesforce)
+        repository = ContactRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
 
-        contact_repository.delete(expected_record_id)
+        repository.delete(expected_record_id)
 
         assert mock_salesforce.Contact.delete.called
         assert mock_salesforce.Contact.delete.call_args == mock.call(
@@ -64,15 +208,18 @@ class TestContactRepositoryShould:
         Test exists calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
         """
-        contact_repository = ContactRepository(mock_salesforce)
+        repository = ContactRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
-        success_query_response = create_success_query_response(expected_record_id)
+        success_query_response = create_success_query_response(
+            'Contact',
+            expected_record_id,
+        )
 
         with mock.patch(
             'datahub.bed_api.repositories.ContactRepository.query',
             return_value=success_query_response,
         ):
-            exists_response = contact_repository.exists(expected_record_id)
+            exists_response = repository.exists(expected_record_id)
 
             assert exists_response is True
 
@@ -85,7 +232,7 @@ class TestContactRepositoryShould:
         Test exists calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
         """
-        contact_repository = ContactRepository(mock_salesforce)
+        repository = ContactRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
         failed_query_response = create_fail_query_response()
 
@@ -93,7 +240,7 @@ class TestContactRepositoryShould:
             'datahub.bed_api.repositories.ContactRepository.query',
             return_value=failed_query_response,
         ):
-            exists_response = contact_repository.exists(expected_record_id)
+            exists_response = repository.exists(expected_record_id)
 
             assert exists_response is False
 
@@ -106,13 +253,34 @@ class TestContactRepositoryShould:
         Test get calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
         """
-        contact_repository = ContactRepository(mock_salesforce)
+        repository = ContactRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
 
-        contact_repository.get(expected_record_id)
+        repository.get(expected_record_id)
 
         assert mock_salesforce.Contact.get.called
         assert mock_salesforce.Contact.get.call_args == mock.call(
+            expected_record_id,
+        )
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_get_by_calls_salesforce_contact_get_with_valid_args(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test get_by calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        repository = ContactRepository(mock_salesforce)
+        expected_record_field = 'test_record_field'
+        expected_record_id = 'test_record_id'
+
+        repository.get_by(expected_record_field, expected_record_id)
+
+        assert mock_salesforce.Contact.get_by_custom_id.called
+        assert mock_salesforce.Contact.get_by_custom_id.call_args == mock.call(
+            expected_record_field,
             expected_record_id,
         )
 
@@ -143,15 +311,159 @@ class TestContactRepositoryShould:
 class TestAccountRepositoryShould:
     """Unit tests for AccountRepository"""
 
-#     TODO
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_add_calls_salesforce_contact_add_with_valid_args(
+            self,
+            mock_salesforce,
+            generate_account: EditAccount,
+    ):
+        """
+        Test add calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        :param generate_account: Generated account data
+        """
+        repository = AccountRepository(mock_salesforce)
+
+        repository.add(generate_account.as_values_only_dict())
+
+        assert mock_salesforce.Account.create.called
+        assert mock_salesforce.Account.create.call_args == mock.call(
+            generate_account.as_values_only_dict(),
+        )
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_delete_calls_salesforce_account_delete_with_valid_args(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test delete calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        repository = AccountRepository(mock_salesforce)
+        expected_record_id = 'test_record_id'
+
+        repository.delete(expected_record_id)
+
+        assert mock_salesforce.Account.delete.called
+        assert mock_salesforce.Account.delete.call_args == mock.call(
+            expected_record_id,
+        )
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_exists_return_true_when_query_response_succeeds(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test exists calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        repository = AccountRepository(mock_salesforce)
+        expected_record_id = 'test_record_id'
+        success_query_response = create_success_query_response(
+            'Account',
+            expected_record_id,
+        )
+
+        with mock.patch(
+                'datahub.bed_api.repositories.AccountRepository.query',
+                return_value=success_query_response,
+        ):
+            exists_response = repository.exists(expected_record_id)
+
+            assert exists_response is True
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_exists_return_false_when_query_response_fails(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test exists calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        repository = AccountRepository(mock_salesforce)
+        expected_record_id = 'test_record_id'
+        failed_query_response = create_fail_query_response()
+
+        with mock.patch(
+                'datahub.bed_api.repositories.AccountRepository.query',
+                return_value=failed_query_response,
+        ):
+            exists_response = repository.exists(expected_record_id)
+
+            assert exists_response is False
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_get_calls_salesforce_account_get_with_valid_args(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test get calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        repository = AccountRepository(mock_salesforce)
+        expected_record_id = 'test_record_id'
+
+        repository.get(expected_record_id)
+
+        assert mock_salesforce.Account.get.called
+        assert mock_salesforce.Account.get.call_args == mock.call(
+            expected_record_id,
+        )
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_get_by_calls_salesforce_account_get_with_valid_args(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test get_by calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        repository = AccountRepository(mock_salesforce)
+        expected_record_field = 'test_record_field'
+        expected_record_id = 'test_record_id'
+
+        repository.get_by(expected_record_field, expected_record_id)
+
+        assert mock_salesforce.Account.get_by_custom_id.called
+        assert mock_salesforce.Account.get_by_custom_id.call_args == mock.call(
+            expected_record_field,
+            expected_record_id,
+        )
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_upsert_calls_salesforce_account_upsert_with_valid_args(
+            self,
+            mock_salesforce,
+            generate_account: EditContact,
+    ):
+        """
+        Test add calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        :param generate_account: Generated account data
+        """
+        repository = AccountRepository(mock_salesforce)
+        expected_record_id = 'test_record_id'
+        generate_account.Id = expected_record_id
+
+        repository.upsert(expected_record_id, generate_account.as_values_only_dict())
+
+        assert mock_salesforce.Account.upsert.called
+        assert mock_salesforce.Account.upsert.call_args == mock.call(
+            'test_record_id',
+            generate_account.as_values_only_dict(),
+        )
 
 
-# TODO: Remove all pprint statements when Unit Tests done with Test data
 class TestIntegrationContactWithAccountRepositoryShould:
     """
     Integration Test Contact and Account Repositories as Contact is dependent on an Account
     NOTE: Integration Tests needing BED configuration within
-    env - see Vault for valid sandbox only settings
+    .env - see Vault for valid sandbox only settings
         BED_USERNAME
         BED_PASSWORD
         BED_SECURITY_TOKEN
@@ -293,6 +605,7 @@ class TestIntegrationContactWithAccountRepositoryShould:
         # pprint(contact_add_response)
         contact_exists = contact_repository.exists(contact_id)
         assert contact_exists is True
+        # TODO: Verify all the data has been saved
         return contact_id
 
     def generate_and_assert_account(

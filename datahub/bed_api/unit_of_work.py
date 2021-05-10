@@ -1,7 +1,7 @@
 import abc
 
 from datahub.bed_api.factories import BedFactory
-from datahub.bed_api.repositories import ContactRepository
+from datahub.bed_api.repositories import AccountRepository, ContactRepository
 
 
 class AbstractUnitOfWork(abc.ABC):
@@ -43,6 +43,7 @@ class BedUnitOfWork(AbstractUnitOfWork):
         """
         self.salesforce = self.session_factory().create()
         self.contacts = ContactRepository(self.salesforce)
+        self.accounts = AccountRepository(self.salesforce)
         return super().__enter__()
 
     def __exit__(self, *args):

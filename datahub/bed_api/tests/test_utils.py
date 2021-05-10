@@ -33,13 +33,14 @@ class TestRemovingBlanksFromDictShould:
         assert remove_blank_from_dict(test_data) == expected
 
 
-def create_success_query_response(record_id):
+def create_success_query_response(salesforce_object, record_id):
     """
     Create a Salesforce query success response
     :param record_id: Record identifier value
+    :param salesforce_object: Salesforce object e.g Contact
     :return: Return a structured success query response
     """
-    url = f'/services/data/v42.0/sobjects/Contact/{record_id}'
+    url = f'/services/data/v42.0/sobjects/{salesforce_object}/{record_id}'
     attributes = OrderedDict(
         [
             ('type', 'Contact'),
