@@ -72,7 +72,7 @@ class SalesforceRepository:
         """
         return self.salesforce.query(query, include_deleted, **kwargs)
 
-    def query_more(
+    def query_next(
         self,
         next_records_identifier,
         identifier_is_url=False,
@@ -80,7 +80,7 @@ class SalesforceRepository:
         **kwargs,
     ):
         """
-        Retrieves more results from a query that returned more results
+        Retrieves next or more results from a query that returned more results
         than the batch maximum
         :param next_records_identifier: Either the Id of the next Salesforce
                                      object in the result, or a URL to the
