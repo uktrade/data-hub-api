@@ -29,22 +29,23 @@ class BedUnitOfWork(AbstractUnitOfWork):
     Bed unit of work for interacting with the BED salesforce API
     """
 
-    def __init__(self, session_factory=BedFactory):
+    def __init__(self, session_factory_type=BedFactory):
         """
         Constructor
-        :param session_factory:
+        :param session_factory_type:
         """
-        self.session_factory = session_factory
+        self.session_factory_type = session_factory_type
+        super().__init__()
 
     def __enter__(self):
         """
         Allows with statement to be used
         :return:
         """
-        self.salesforce = self.session_factory().create()
+        self.salesforce = self.session_factory_type().create()
         self.contacts = ContactRepository(self.salesforce)
         self.accounts = AccountRepository(self.salesforce)
-        return super().__enter__()
+        return self
 
     def __exit__(self, *args):
         """
@@ -59,4 +60,3 @@ class BedUnitOfWork(AbstractUnitOfWork):
         """
         if self.salesforce and self.salesforce.session:
             self.salesforce.session.close()
-        self.salesforce = None
