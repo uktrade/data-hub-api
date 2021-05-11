@@ -1,3 +1,4 @@
+import os
 from unittest import mock
 
 import pytest
@@ -459,6 +460,11 @@ class TestAccountRepositoryShould:
         )
 
 
+@pytest.mark.salesforce_test
+@pytest.mark.skipif(
+    'BED_SECURITY_TOKEN' not in os.environ,
+    reason='BED security configuration missing from env file',
+)
 class TestIntegrationContactWithAccountRepositoryShould:
     """
     Integration Test Contact and Account Repositories as Contact is dependent on an Account
@@ -508,6 +514,7 @@ class TestIntegrationContactWithAccountRepositoryShould:
             #  Update Contact
             self.update_and_assert_contact(contact_repository, new_contact_id, faker)
 
+            # TODO Update Account
         finally:
             #  Clean up generated data
             if new_contact_id:

@@ -8,8 +8,6 @@ class BedEntity:
     def __init__(self):
         """Constructor for Id based BED entity"""
         self.Id = None
-        self.ParentId = None
-        self.Name = None
 
     def as_values_only_dict(self):
         """
@@ -35,13 +33,10 @@ class EditAccount(BedEntity):
     """
 
     def __init__(
-            self,
-            name,
-            high_level_sector,
-            low_level_sector,
-            uk_region=None,  # CHECK: Why is this mandatory?
-            global_office_countries=None,
-            global_hq_country=None,
+        self,
+        name,
+        high_level_sector,
+        low_level_sector,
     ):
         """Constructor - Mandatory Fields to be assigned with value *"""
         super().__init__()
@@ -65,9 +60,9 @@ class EditAccount(BedEntity):
         self.ShippingState = None
         self.ShippingPostalCode = None
         self.ShippingCountry = None
-        self.UK_Region__c = uk_region   # *
-        self.Global_Office_Locations__c = global_office_countries   # *
-        self.Country_HQ__c = global_hq_country  # *
+        self.UK_Region__c = None
+        self.Global_Office_Locations__c = None
+        self.Country_HQ__c = None
         self.Location__c = None
         # Misc
         self.FTSE_100__c = False
