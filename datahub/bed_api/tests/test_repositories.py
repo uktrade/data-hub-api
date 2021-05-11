@@ -490,26 +490,31 @@ class TestIntegrationContactWithAccountRepositoryShould:
         """
         # from pprint import pprint
         # pprint('---------------------------------')
-        # Create a new account / organization / company
-        new_account_id = self.generate_and_assert_account(
-            account_repository,
-            generate_account,
-        )
+        new_contact_id = None
+        new_account_id = None
+        try:
+            # Create a new account / organization / company
+            new_account_id = self.generate_and_assert_account(
+                account_repository,
+                generate_account,
+            )
 
-        # Create contact
-        generate_contact.AccountId = new_account_id
-        new_contact_id = self.generate_and_assert_contact(
-            contact_repository,
-            generate_contact,
-        )
+            # Create contact
+            generate_contact.AccountId = new_account_id
+            new_contact_id = self.generate_and_assert_contact(
+                contact_repository,
+                generate_contact,
+            )
+            #  Update Contact
+            self.update_and_assert_contact(contact_repository, new_contact_id, faker)
 
-        #  Update Contact
-        self.update_and_assert_contact(contact_repository, new_contact_id, faker)
-
-        #  Clean up generated data
-        self.delete_and_assert_contact_deletion(contact_repository, new_contact_id)
-        self.delete_and_assert_account_deletion(account_repository, new_account_id)
-        # pprint('---------------------------------')
+        finally:
+            #  Clean up generated data
+            if new_contact_id:
+                self.delete_and_assert_contact_deletion(contact_repository, new_contact_id)
+            if new_account_id:
+                self.delete_and_assert_account_deletion(account_repository, new_account_id)
+            # pprint('---------------------------------')
 
     def delete_and_assert_account_deletion(
             self,
