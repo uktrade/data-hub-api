@@ -1,6 +1,12 @@
+import os
 from collections import OrderedDict
 
 from datahub.bed_api.utils import remove_blank_from_dict
+
+NOT_BED_INTEGRATION_TEST_READY = (
+    'BED_USERNAME' not in os.environ
+    and os.environ['BED_USERNAME'] == 'test-user@digital.trade.gov.uk'
+)
 
 
 class TestRemovingBlanksFromDictShould:
