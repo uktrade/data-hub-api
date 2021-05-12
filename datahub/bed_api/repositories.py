@@ -1,4 +1,3 @@
-
 from simple_salesforce import format_soql, Salesforce
 
 from datahub.bed_api.constants import AccountQuery, ContactQuery
@@ -65,9 +64,9 @@ class SalesforceRepository:
         """
         Return the result of a Salesforce SOQL query as a dict decoded from
         the Salesforce response JSON payload.
-        :param query:
-        :param include_deleted:
-        :param kwargs:
+        :param query: Salesforce SQL query
+        :param include_deleted: Include records marker for deletion
+        :param kwargs: Where filter arguments
         :return: Salesforce SOQL query
         """
         return self.salesforce.query(query, include_deleted, **kwargs)
@@ -177,7 +176,9 @@ class ContactRepository(SalesforceRepository):
         :param custom_id_value: External ID value
         :return: Contact record or None
         """
-        return self.salesforce.Contact.get_by_custom_id(custom_id_field, custom_id_value)
+        return self.salesforce.Contact.get_by_custom_id(
+            custom_id_field, custom_id_value
+        )
 
     def upsert(self, record_id, data):
         """
@@ -253,7 +254,10 @@ class AccountRepository(SalesforceRepository):
         :param custom_id_value: External ID value
         :return: Contact record or None
         """
-        return self.salesforce.Account.get_by_custom_id(custom_id_field, custom_id_value)
+        return self.salesforce.Account.get_by_custom_id(
+            custom_id_field,
+            custom_id_value,
+        )
 
     def upsert(self, record_id, data):
         """

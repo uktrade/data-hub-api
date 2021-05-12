@@ -1,4 +1,3 @@
-
 from datahub.bed_api.utils import remove_blank_from_dict
 
 
@@ -80,12 +79,12 @@ class EditContact(BedEntity):
     """
 
     def __init__(
-            self,
-            salutation,
-            first_name,
-            last_name,
-            email,
-            account_id=None,
+        self,
+        salutation,
+        first_name,
+        last_name,
+        email,
+        account_id=None,
     ):
         """Constructor - Mandatory Fields to be assigned with value *"""
         super().__init__()

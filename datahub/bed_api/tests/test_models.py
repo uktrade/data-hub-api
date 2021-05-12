@@ -1,4 +1,3 @@
-
 from freezegun import freeze_time
 
 from datahub.bed_api.constants import Salutation

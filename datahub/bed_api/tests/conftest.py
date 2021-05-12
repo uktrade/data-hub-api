@@ -118,7 +118,6 @@ def generate_uk_region_name(faker):
             UKRegion.yorkshire_and_the_humber.value.name,
             UKRegion.west_midlands.value.name,
         ),
-
     )
     return uk_region
 
@@ -156,20 +155,23 @@ def generate_country_names(faker):
     """
     countries = faker.random_elements(
         elements=(
-            Country.united_states.value.name,
-            Country.united_kingdom.value.name,
-            # CHECK: ('INVALID_OR_NULL_FOR_RESTRICTED_PICKLIST',
-            #   'fields': ['Global_Office_Locations__c']}]
-            # Country.isle_of_man.value.name,
+            Country.anguilla.value.name,
+            Country.argentina.value.name,
+            Country.azerbaijan.value.name,
+            Country.cayman_islands.value.name,
+            Country.isle_of_man.value.name,
+            Country.japan.value.name,
             Country.canada.value.name,
             Country.france.value.name,
             Country.greece.value.name,
             Country.ireland.value.name,
             Country.italy.value.name,
+            Country.united_states.value.name,
+            Country.united_kingdom.value.name,
+            Country.montserrat.value.name,
         ),
         unique=True,
     )
-    # TODO: Create full list to see issues with mappings like the one above
     return countries
 
 
