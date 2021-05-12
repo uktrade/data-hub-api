@@ -1,4 +1,3 @@
-import os
 from unittest import mock
 
 import pytest
@@ -9,10 +8,8 @@ from datahub.bed_api.models import EditAccount, EditContact
 from datahub.bed_api.repositories import AccountRepository, ContactRepository, SalesforceRepository
 from datahub.bed_api.tests.test_utils import (
     create_fail_query_response,
-    create_success_query_response,
+    create_success_query_response, NOT_BED_INTEGRATION_TEST_READY,
 )
-
-# TODO: Remove all pprint statements when Unit Tests done with Test data
 
 
 class TestSalesforceRepositoryShould:
@@ -462,7 +459,7 @@ class TestAccountRepositoryShould:
 
 @pytest.mark.salesforce_test
 @pytest.mark.skipif(
-    'BED_SECURITY_TOKEN' not in os.environ,
+    NOT_BED_INTEGRATION_TEST_READY,
     reason='BED security configuration missing from env file',
 )
 class TestIntegrationContactWithAccountRepositoryShould:
@@ -494,8 +491,6 @@ class TestIntegrationContactWithAccountRepositoryShould:
         :param generate_account: New account record generated with faker data
         :param generate_contact: New contact record generated with faker data
         """
-        # from pprint import pprint
-        # pprint('---------------------------------')
         new_contact_id = None
         new_account_id = None
         try:
@@ -521,7 +516,6 @@ class TestIntegrationContactWithAccountRepositoryShould:
                 self.delete_and_assert_contact_deletion(contact_repository, new_contact_id)
             if new_account_id:
                 self.delete_and_assert_account_deletion(account_repository, new_account_id)
-            # pprint('---------------------------------')
 
     def delete_and_assert_account_deletion(
             self,
@@ -534,7 +528,6 @@ class TestIntegrationContactWithAccountRepositoryShould:
         :param account_id: Account id to delete
         """
         delete_account_response = account_repository.delete(account_id)
-        # pprint(delete_contact_response)
         assert delete_account_response is not None
         assert delete_account_response == 204
         exists = account_repository.exists(account_id)
@@ -551,7 +544,6 @@ class TestIntegrationContactWithAccountRepositoryShould:
         :param contact_id: Contact id to delete
         """
         delete_contact_response = contact_repository.delete(contact_id)
-        # pprint(delete_contact_response)
         assert delete_contact_response is not None
         assert delete_contact_response == 204
         exists = contact_repository.exists(contact_id)
@@ -578,10 +570,9 @@ class TestIntegrationContactWithAccountRepositoryShould:
             f'Id/{new_contact_id}',
             dict(Notes__c=notes_update),
         )
-        # print('Update Contact Response ...')
-        # pprint(update_contact_response)
         assert update_contact_response is not None
         assert update_contact_response == 204
+
         contact_check = contact_repository.query(
             format_soql(
                 ContactQuery.get_notes_by_id.value.sql,
@@ -606,15 +597,11 @@ class TestIntegrationContactWithAccountRepositoryShould:
         :param contact: Random Generated Contact
         :return: new contact id
         """
-        # pprint('New Contact ...')
-        # pprint(contact.as_values_only_dict())
-        # Test add
         contact_add_response = contact_repository.add(contact.as_values_only_dict())
         assert contact_add_response is not None
         assert contact_add_response['success'] is True
         contact_id = contact_add_response['id']
-        # print('New Contact Response ...')
-        # pprint(contact_add_response)
+
         contact_exists = contact_repository.exists(contact_id)
         assert contact_exists is True
         # TODO: Verify all the data has been saved
@@ -636,7 +623,7 @@ class TestIntegrationContactWithAccountRepositoryShould:
         assert account_add_response['success'] is True
         account_id = account_add_response['id']
         assert account_id is not None
-        # pprint(account_add_response)
+
         account_exists = account_repository.exists(account_id)
         assert account_exists is True
         # TODO: Assert and verify all data created is correct

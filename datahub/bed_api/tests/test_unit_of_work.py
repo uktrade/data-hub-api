@@ -1,9 +1,9 @@
-import os
 from unittest import mock
 
 import pytest
 
 from datahub.bed_api.models import EditAccount, EditContact
+from datahub.bed_api.tests.test_utils import NOT_BED_INTEGRATION_TEST_READY
 from datahub.bed_api.unit_of_work import BedUnitOfWork
 from datahub.core.test_utils import mock_environ
 
@@ -68,8 +68,8 @@ class TestBedUnitOfWorkShould:
     )
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_session_automatically_closes_the_session(
-        self,
-        mock_salesforce,
+            self,
+            mock_salesforce,
     ):
         """Test BedUnitOfWork closes the session"""
         with BedUnitOfWork() as bed_context:
@@ -80,7 +80,7 @@ class TestBedUnitOfWorkShould:
 
 @pytest.mark.salesforce_test
 @pytest.mark.skipif(
-    'BED_SECURITY_TOKEN' not in os.environ,
+    NOT_BED_INTEGRATION_TEST_READY,
     reason='BED security configuration missing from env file',
 )
 class TestIntegrationBedUnitOfWorkShould:

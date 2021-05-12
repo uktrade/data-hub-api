@@ -1,0 +1,1 @@
+It's now possible to interact with BED and Salesforce using the BED salesforce API.
