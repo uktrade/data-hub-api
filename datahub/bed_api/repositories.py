@@ -177,7 +177,8 @@ class ContactRepository(SalesforceRepository):
         :return: Contact record or None
         """
         return self.salesforce.Contact.get_by_custom_id(
-            custom_id_field, custom_id_value
+            custom_id_field,
+            custom_id_value,
         )
 
     def upsert(self, record_id, data):
