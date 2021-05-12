@@ -159,7 +159,8 @@ def generate_country_names(faker):
             Country.argentina.value.name,
             Country.azerbaijan.value.name,
             Country.cayman_islands.value.name,
-            Country.isle_of_man.value.name,
+            # INVALID_OR_NULL_FOR_RESTRICTED_PICKLIST
+            # Country.isle_of_man.value.name,
             Country.japan.value.name,
             Country.canada.value.name,
             Country.france.value.name,
@@ -172,7 +173,7 @@ def generate_country_names(faker):
         ),
         unique=True,
     )
-    return countries
+    return sorted(countries)
 
 
 @pytest.fixture
@@ -240,20 +241,43 @@ def generate_business_area(faker):
 
 
 @pytest.fixture
+def generate_company_number(faker):
+    """
+    Generate random company number
+    :param faker: Faker Library
+    :return: Random company value
+    """
+    company_number = faker.random_element(
+        elements=(
+            '06591591',
+            '6431544',
+            '31079',
+            '39740',
+            '6935579',
+            '10002309',
+            '11163479',
+        ),
+    )
+    return company_number
+
+
+@pytest.fixture
 def generate_account(
     faker,
     generate_high_level_sector,
     generate_low_level_sector,
     generate_uk_region_name,
     generate_country_names,
+    generate_company_number,
 ):
     """
     Generate account with random data
     :param faker:
-    :param generate_high_level_sector:
-    :param generate_low_level_sector:
-    :param generate_uk_region_name:
-    :param generate_country_names:
+    :param generate_high_level_sector: sector mapping
+    :param generate_low_level_sector: sector mapping
+    :param generate_uk_region_name: uk regions
+    :param generate_country_names: country names
+    :param generate_company_number: company numbers
     :return: New EditAccount with random values
     """
     new_account = EditAccount(
@@ -274,6 +298,14 @@ def generate_account(
     new_account.UK_Region__c = generate_uk_region_name
     new_account.Global_Office_Locations__c = ';'.join(generate_country_names)
     new_account.Country_HQ__c = faker.random_element(elements=generate_country_names)
+    # check: # Unable to create/update fields: Company_size__c.
+    #          Please check the security settings of this field and verify that it is read/write
+    # new_account.Company_size__c = faker.random_int()
+    new_account.Company_Number__c = generate_company_number
+    new_account.Companies_House_ID__c = generate_company_number
+    new_account.Location__c = faker.country()
+    new_account.Company_Website__c = faker.url()
+
     return new_account
 
 
@@ -311,4 +343,7 @@ def generate_contact(
     contact.Job_Title__c = faker.job()
     contact.Job_Type__c = generate_job_type
     contact.Business_Area__c = generate_business_area
+    contact.AssistantName = faker.name()
+    contact.Assistant_Email__c = faker.company_email()
+    contact.Assistant_Phone__c = faker.phone_number()
     return contact

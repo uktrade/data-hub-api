@@ -104,6 +104,10 @@ class EditContact(BedEntity):
         self.Contact_Type__c = None
         # Business Sector e.g. 'Advanced Manufacturing;Professional & Business Services'
         self.Business_Area__c = None
+        # Assistant details
+        self.AssistantName = None
+        self.Assistant_Email__c = None
+        self.Assistant_Phone__c = None
 
     @property
     def name(self):
