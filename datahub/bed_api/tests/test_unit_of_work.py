@@ -22,8 +22,8 @@ class TestBedUnitOfWorkShould:
     )
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_sales_force_session_gets_created_and_closed(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test BedUnitOfWork is built with Salesforce session
@@ -48,8 +48,8 @@ class TestBedUnitOfWorkShould:
     )
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_repositories_created(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
          Test BedUnitOfWork is built with Salesforce session
@@ -68,8 +68,8 @@ class TestBedUnitOfWorkShould:
     )
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_session_automatically_closes_the_session(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """Test BedUnitOfWork closes the session"""
         with BedUnitOfWork() as bed_context:
@@ -95,9 +95,9 @@ class TestIntegrationBedUnitOfWorkShould:
     """
 
     def test_creation_and_deletion_of_an_account(
-            self,
-            generate_account: EditAccount,
-            generate_contact: EditContact,
+        self,
+        generate_account: EditAccount,
+        generate_contact: EditContact,
     ):
         """
         Test adding and deleting an account
@@ -145,7 +145,9 @@ class TestIntegrationBedUnitOfWorkShould:
         :param generate_contact: New contact record generated with faker data
         :return: Contact id of new contact
         """
-        contact_add_response = bed_context.contacts.add(generate_contact.as_all_values_dict())
+        contact_add_response = bed_context.contacts.add(
+            generate_contact.as_all_values_dict(),
+        )
         assert contact_add_response is not None
         assert contact_add_response['success'] is True
         contact_id = contact_add_response['id']

@@ -5,10 +5,15 @@ from simple_salesforce import format_soql
 
 from datahub.bed_api.constants import ContactQuery
 from datahub.bed_api.models import EditAccount, EditContact
-from datahub.bed_api.repositories import AccountRepository, ContactRepository, SalesforceRepository
+from datahub.bed_api.repositories import (
+    AccountRepository,
+    ContactRepository,
+    SalesforceRepository,
+)
 from datahub.bed_api.tests.test_utils import (
     create_fail_query_response,
-    create_success_query_response, NOT_BED_INTEGRATION_TEST_READY,
+    create_success_query_response,
+    NOT_BED_INTEGRATION_TEST_READY,
 )
 
 
@@ -17,8 +22,8 @@ class TestSalesforceRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_query_calls_salesforce_query_with_valid_args(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test query_more calls Salesforce with the correct Arguments
@@ -43,8 +48,8 @@ class TestSalesforceRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_query_next_calls_salesforce_query_more_with_valid_args(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test query_more calls Salesforce with the correct Arguments
@@ -72,8 +77,8 @@ class TestSalesforceRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_add_throws_not_implemented_error_by_default(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test add throws NotImplementedError
@@ -86,8 +91,8 @@ class TestSalesforceRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_delete_throws_not_implemented_error_by_default(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test delete throws NotImplementedError
@@ -100,8 +105,8 @@ class TestSalesforceRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_exists_throws_not_implemented_error_by_default(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test exists throws NotImplementedError
@@ -114,8 +119,8 @@ class TestSalesforceRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_get_throws_not_implemented_error_by_default(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test exists throws NotImplementedError
@@ -128,8 +133,8 @@ class TestSalesforceRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_get_by_throws_not_implemented_error_by_default(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test get_by throws NotImplementedError
@@ -142,8 +147,8 @@ class TestSalesforceRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_upsert_throws_not_implemented_error_by_default(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test upsert throws NotImplementedError
@@ -160,9 +165,9 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_add_calls_salesforce_contact_add_with_valid_args(
-            self,
-            mock_salesforce,
-            generate_contact: EditContact,
+        self,
+        mock_salesforce,
+        generate_contact: EditContact,
     ):
         """
         Test add calls Salesforce with the correct Arguments
@@ -180,8 +185,8 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_delete_calls_salesforce_contact_delete_with_valid_args(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test delete calls Salesforce with the correct Arguments
@@ -199,8 +204,8 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_exists_return_true_when_query_response_succeeds(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test exists calls Salesforce with the correct Arguments
@@ -223,8 +228,8 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_exists_return_false_when_query_response_fails(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test exists calls Salesforce with the correct Arguments
@@ -244,8 +249,8 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_get_calls_salesforce_contact_get_with_valid_args(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test get calls Salesforce with the correct Arguments
@@ -263,8 +268,8 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_get_by_calls_salesforce_contact_get_with_valid_args(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test get_by calls Salesforce with the correct Arguments
@@ -284,9 +289,9 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_upsert_calls_salesforce_contact_upsert_with_valid_args(
-            self,
-            mock_salesforce,
-            generate_contact: EditContact,
+        self,
+        mock_salesforce,
+        generate_contact: EditContact,
     ):
         """
         Test add calls Salesforce with the correct Arguments
@@ -311,9 +316,9 @@ class TestAccountRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_add_calls_salesforce_contact_add_with_valid_args(
-            self,
-            mock_salesforce,
-            generate_account: EditAccount,
+        self,
+        mock_salesforce,
+        generate_account: EditAccount,
     ):
         """
         Test add calls Salesforce with the correct Arguments
@@ -331,8 +336,8 @@ class TestAccountRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_delete_calls_salesforce_account_delete_with_valid_args(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test delete calls Salesforce with the correct Arguments
@@ -350,8 +355,8 @@ class TestAccountRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_exists_return_true_when_query_response_succeeds(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test exists calls Salesforce with the correct Arguments
@@ -365,8 +370,8 @@ class TestAccountRepositoryShould:
         )
 
         with mock.patch(
-                'datahub.bed_api.repositories.AccountRepository.query',
-                return_value=success_query_response,
+            'datahub.bed_api.repositories.AccountRepository.query',
+            return_value=success_query_response,
         ):
             exists_response = repository.exists(expected_record_id)
 
@@ -374,8 +379,8 @@ class TestAccountRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_exists_return_false_when_query_response_fails(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test exists calls Salesforce with the correct Arguments
@@ -386,8 +391,8 @@ class TestAccountRepositoryShould:
         failed_query_response = create_fail_query_response()
 
         with mock.patch(
-                'datahub.bed_api.repositories.AccountRepository.query',
-                return_value=failed_query_response,
+            'datahub.bed_api.repositories.AccountRepository.query',
+            return_value=failed_query_response,
         ):
             exists_response = repository.exists(expected_record_id)
 
@@ -395,8 +400,8 @@ class TestAccountRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_get_calls_salesforce_account_get_with_valid_args(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test get calls Salesforce with the correct Arguments
@@ -414,8 +419,8 @@ class TestAccountRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_get_by_calls_salesforce_account_get_with_valid_args(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test get_by calls Salesforce with the correct Arguments
@@ -435,9 +440,9 @@ class TestAccountRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_upsert_calls_salesforce_account_upsert_with_valid_args(
-            self,
-            mock_salesforce,
-            generate_account: EditContact,
+        self,
+        mock_salesforce,
+        generate_account: EditContact,
     ):
         """
         Test add calls Salesforce with the correct Arguments
@@ -474,12 +479,12 @@ class TestIntegrationContactWithAccountRepositoryShould:
     """
 
     def test_create_an_account_with_contact_utilising(
-            self,
-            contact_repository,
-            account_repository,
-            faker,
-            generate_account: EditAccount,
-            generate_contact: EditContact,
+        self,
+        contact_repository,
+        account_repository,
+        faker,
+        generate_account: EditAccount,
+        generate_contact: EditContact,
     ):
         """
         Test BedFactory integration with the contact and account repositories
@@ -513,14 +518,20 @@ class TestIntegrationContactWithAccountRepositoryShould:
         finally:
             #  Clean up generated data
             if new_contact_id:
-                self.delete_and_assert_contact_deletion(contact_repository, new_contact_id)
+                self.delete_and_assert_contact_deletion(
+                    contact_repository,
+                    new_contact_id,
+                )
             if new_account_id:
-                self.delete_and_assert_account_deletion(account_repository, new_account_id)
+                self.delete_and_assert_account_deletion(
+                    account_repository,
+                    new_account_id,
+                )
 
     def delete_and_assert_account_deletion(
-            self,
-            account_repository,
-            account_id,
+        self,
+        account_repository,
+        account_id,
     ):
         """
         Delete generated account from the database
@@ -534,9 +545,9 @@ class TestIntegrationContactWithAccountRepositoryShould:
         assert exists is False
 
     def delete_and_assert_contact_deletion(
-            self,
-            contact_repository,
-            contact_id,
+        self,
+        contact_repository,
+        contact_id,
     ):
         """
         Delete generated contact from the database
@@ -550,10 +561,10 @@ class TestIntegrationContactWithAccountRepositoryShould:
         assert exists is False
 
     def update_and_assert_contact(
-            self,
-            contact_repository,
-            new_contact_id,
-            faker,
+        self,
+        contact_repository,
+        new_contact_id,
+        faker,
     ):
         """
         Update the contact with basic notes testing update
@@ -586,9 +597,9 @@ class TestIntegrationContactWithAccountRepositoryShould:
         assert contact_check['records'][0]['Notes__c'] == notes_update
 
     def generate_and_assert_contact(
-            self,
-            contact_repository,
-            contact: EditContact,
+        self,
+        contact_repository,
+        contact: EditContact,
     ):
         """
         Create Account data on Salesforce testing as many ContactRepository
@@ -608,9 +619,9 @@ class TestIntegrationContactWithAccountRepositoryShould:
         return contact_id
 
     def generate_and_assert_account(
-            self,
-            account_repository,
-            account: EditAccount,
+        self,
+        account_repository,
+        account: EditAccount,
     ):
         """
         Create Account Data on Salesforce using dynamic data
