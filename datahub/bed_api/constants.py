@@ -31,6 +31,15 @@ class AccountQuery(Enum):
     get_name_by_id = QueryConstant('SELECT Id, Name FROM Account WHERE Id = {id}', 'id')
 
 
+class EventQuery(Enum):
+    """Event or Add Interaction Salesforce Queries"""
+
+    get_by_id = QueryConstant(
+        'SELECT Id FROM Event__c WHERE Id = {id}',
+        'id',
+    )
+
+
 class Salutation(str, Enum):
     """Salutations from BED"""
 
@@ -121,3 +130,52 @@ class LowLevelSector(str, Enum):
     digital_infrastructure = 'Digital Infrastructure'
     real_estate = 'Real Estate'
     telecoms = 'Telecoms'
+
+
+class InteractionType(str, Enum):
+    """Interaction Types from BED"""
+
+    bilateral_meeting = 'Bilateral Meeting'
+    brush_by = 'Brush By'
+    conference = 'Conference'
+    email = 'Email'
+    forum = 'Forum'
+    letter = 'Letter'
+    multilateral_meeting = 'Multilateral Meeting'
+    phone_call = 'Phone Call'
+    reception = 'Reception'
+    roadshow = 'Roadshow'
+
+
+class TransparencyStatus(str, Enum):
+    """Transparency Status from BED"""
+
+    draft = 'Draft'
+    confirm = 'Confirm'
+    delete = 'Delete'
+
+
+class IssueTopic(str, Enum):
+    """Issue Topics from BED"""
+
+    covid_19 = 'Covid-19'
+    domestic_policy = 'Domestic Policy'
+    economic_opportunity = 'Economic Opportunity'
+    economic_risk = 'Economic Risk'
+    international_climate = 'International Climate'
+    uk_transition_policy = 'UK Transition Policy'
+
+
+class DepartmentEyes(str, Enum):
+    """Department Eyes from BED"""
+
+    advanced_manufacturing = 'Advanced Manufacturing (BIS)'
+    aviation = 'Aviation (DfT)'
+    civil_society = 'Civil Society'
+    consumer_and_retail = 'Consumer & Retail (BIS)'
+    creative_industries = 'Creative Industries (DCMS)'
+    defence = 'Defence (MoD)'
+    energy = 'Energy (DECC)'
+    environmental_services = 'Environmental Services'
+    financial_services = 'Financial Services (HMT)'
+    food_and_agriculture = 'Food & Agriculture (DEFRA)'

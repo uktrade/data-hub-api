@@ -1,16 +1,29 @@
+import uuid
+
 import pytest
 
 from datahub.bed_api.constants import (
     BusinessArea,
     ContactType,
     HighLevelSector,
+    InteractionType,
+    IssueTopic,
     JobType,
     LowLevelSector,
     Salutation,
+    TransparencyStatus,
 )
 from datahub.bed_api.factories import BedFactory
-from datahub.bed_api.models import EditAccount, EditContact
-from datahub.bed_api.repositories import AccountRepository, ContactRepository
+from datahub.bed_api.models import (
+    EditAccount,
+    EditContact,
+    EditEvent,
+)
+from datahub.bed_api.repositories import (
+    AccountRepository,
+    ContactRepository,
+    EventRepository,
+)
 from datahub.core.constants import Country, UKRegion
 
 
@@ -41,6 +54,17 @@ def account_repository(salesforce):
     :return: Instance of AccountRepository
     """
     repository = AccountRepository(salesforce)
+    return repository
+
+
+@pytest.fixture
+def event_repository(salesforce):
+    """
+    Creates instance of event repository
+    :param salesforce: BedFactory creating an instance of salesforce
+    :return: Instance of EventRepository
+    """
+    repository = EventRepository(salesforce)
     return repository
 
 
@@ -151,7 +175,7 @@ def generate_country_names(faker):
     """
     Generate random country names array
     :param faker: Faker Library
-    :return: Random country names sector value
+    :return: Random country names value
     """
     countries = faker.random_elements(
         elements=(
@@ -174,6 +198,27 @@ def generate_country_names(faker):
         unique=True,
     )
     return sorted(countries)
+
+
+@pytest.fixture
+def generate_issue_topics(faker):
+    """
+    Generate random issue topics array
+    :param faker: Faker Library
+    :return: Random issue topics value
+    """
+    issue_topics = faker.random_elements(
+        elements=(
+            IssueTopic.covid_19,
+            IssueTopic.economic_risk,
+            IssueTopic.domestic_policy,
+            IssueTopic.economic_opportunity,
+            IssueTopic.international_climate,
+            IssueTopic.uk_transition_policy,
+        ),
+        unique=True,
+    )
+    return sorted(issue_topics)
 
 
 @pytest.fixture
@@ -241,6 +286,30 @@ def generate_business_area(faker):
 
 
 @pytest.fixture
+def generate_interaction_type(faker):
+    """
+    Generate random interaction type
+    :param faker: Faker Library
+    :return: Random interaction type
+    """
+    company_number = faker.random_element(
+        elements=(
+            InteractionType.forum,
+            InteractionType.letter,
+            InteractionType.email,
+            InteractionType.bilateral_meeting,
+            InteractionType.brush_by,
+            InteractionType.conference,
+            InteractionType.multilateral_meeting,
+            InteractionType.phone_call,
+            InteractionType.reception,
+            InteractionType.roadshow,
+        ),
+    )
+    return company_number
+
+
+@pytest.fixture
 def generate_company_number(faker):
     """
     Generate random company number
@@ -259,6 +328,23 @@ def generate_company_number(faker):
         ),
     )
     return company_number
+
+
+@pytest.fixture
+def generate_transparency_status(faker):
+    """
+    Generate random transparency status
+    :param faker: Faker Library
+    :return: Random transparency status
+    """
+    transparency_status = faker.random_element(
+        elements=(
+            TransparencyStatus.delete,
+            TransparencyStatus.draft,
+            TransparencyStatus.confirm,
+        ),
+    )
+    return transparency_status
 
 
 @pytest.fixture
@@ -347,3 +433,44 @@ def generate_contact(
     contact.Assistant_Email__c = faker.company_email()
     contact.Assistant_Phone__c = faker.phone_number()
     return contact
+
+
+@pytest.fixture
+def generate_event(
+    faker,
+    generate_interaction_type,
+    generate_uk_region_name,
+    generate_transparency_status,
+    generate_issue_topics,
+):
+    """
+    Generate new EditEvent with random values
+    :param faker:
+    :param generate_interaction_type: Random generate InteractionType
+    :param generate_uk_region_name: Random uk region
+    :param generate_transparency_status: Random transparency status
+    :param  generate_issue_topics: Random issue topics array
+    :return: New EditEvent with random fake data
+    """
+    event = EditEvent(
+        name=faker.text(max_nb_chars=80),
+        datahub_id=str(uuid.uuid4),
+        title=faker.text(max_nb_chars=200),
+    )
+    event.Date__c = faker.date()
+    event.Description__c = faker.text(max_nb_chars=32768)
+    event.Interaction_Type__c = generate_interaction_type
+    event.Webinar_Information__c = faker.text(max_nb_chars=255)
+    event.Location__c = faker.street_address()
+    event.City_Town__c = faker.city()
+    event.Region__c = generate_uk_region_name
+    event.Country__c = faker.country()
+    event.Attendees__c = faker.text(max_nb_chars=131071)
+    event.Contacts_to_share__c = faker.text(max_nb_chars=32768)
+    event.iCal_UID__c = faker.text(max_nb_chars=255)
+    event.Transparency_Reason_for_meeting__c = faker.text(max_nb_chars=32768)
+    event.Transparency_Status__c = generate_transparency_status
+    event.Issue_Topics__c = ';'.join(generate_issue_topics)
+    event.HMG_Lead__c = faker.company_email()
+    # event.Theme__c = TODO: Figure this out when data returns
+    return event

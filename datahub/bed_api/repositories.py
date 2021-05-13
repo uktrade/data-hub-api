@@ -1,6 +1,6 @@
 from simple_salesforce import format_soql, Salesforce
 
-from datahub.bed_api.constants import AccountQuery, ContactQuery
+from datahub.bed_api.constants import AccountQuery, ContactQuery, EventQuery
 
 
 class SalesforceRepository:
@@ -111,6 +111,21 @@ class SalesforceRepository:
         """
         raise NotImplementedError
 
+    def exists_status(self, record_id, response) -> bool:
+        """
+        Check if a record exists by the response
+        :param record_id: Unique identifier
+        :param response: Response returned from query by id
+        :return: True if response assigned, totalSize is
+        greater than 1 and there is a record id the equivalent of that value
+        """
+        return (
+            response is not None
+            and response['totalSize'] >= 1
+            and response['done'] is True
+            and response['records'][0]['Id'] == record_id
+        )
+
 
 class ContactRepository(SalesforceRepository):
     """
@@ -153,12 +168,7 @@ class ContactRepository(SalesforceRepository):
                 id=record_id,
             ),
         )
-        return (
-            response is not None
-            and response['totalSize'] >= 1
-            and response['done'] is True
-            and response['records'][0]['Id'] == record_id
-        )
+        return self.exists_status(record_id, response)
 
     def get(self, record_id):
         """
@@ -232,12 +242,7 @@ class AccountRepository(SalesforceRepository):
                 id=record_id,
             ),
         )
-        return (
-            response is not None
-            and response['totalSize'] >= 1
-            and response['done'] is True
-            and response['records'][0]['Id'] == record_id
-        )
+        return self.exists_status(record_id, response)
 
     def get(self, record_id):
         """
@@ -253,7 +258,7 @@ class AccountRepository(SalesforceRepository):
         :param custom_id_field: API name of a custom field that was defined
                              as an External ID
         :param custom_id_value: External ID value
-        :return: Contact record or None
+        :return: Account record or None
         """
         return self.salesforce.Account.get_by_custom_id(
             custom_id_field,
@@ -262,9 +267,83 @@ class AccountRepository(SalesforceRepository):
 
     def upsert(self, record_id, data):
         """
-        Create or Update Contact
+        Create or Update Account
         :param record_id: Record identifier
         :param data: Represents a dictionary of name values:
         :return: Created or updated Account
         """
         return self.salesforce.Account.upsert(record_id, data)
+
+
+class EventRepository(SalesforceRepository):
+    """
+    Repository pattern for Salesforce interactions with Event or Interaction data
+    https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/01I58000001EcAY/FieldsAndRelationships/view
+    """
+
+    def __init__(self, salesforce: Salesforce):
+        """
+        Constructor
+        :param salesforce: Simple Salesforce representing session information
+        """
+        super().__init__(salesforce=salesforce)
+
+    def add(self, data):
+        """
+        Add a new Event using a POST
+        :param data: A dict of Event data
+        :return: Returns New Account
+        """
+        return self.salesforce.Event__c.create(data)
+
+    def delete(self, record_id):
+        """
+        Delete a single item by unique identifier
+        :param record_id: Unique identifier for deleting records
+        :return: Result of deletion
+        """
+        return self.salesforce.Event__c.delete(record_id)
+
+    def exists(self, record_id):
+        """
+        Checks if the record exists using the most unique identifier
+        :param record_id: Unique identifier value, associated with Id value typically
+        :return: True if it exists and False if it does not
+        """
+        response = self.query(
+            format_soql(
+                EventQuery.get_by_id.value.sql,
+                id=record_id,
+            ),
+        )
+        return self.exists_status(record_id, response)
+
+    def get(self, record_id):
+        """
+        Get single item by identifier
+        :param record_id: Unique identifier value
+        :return:
+        """
+        return self.salesforce.Event__c.get(record_id)
+
+    def get_by(self, custom_id_field, custom_id_value):
+        """
+        Returns the result of a GET by field
+        :param custom_id_field: API name of a custom field that was defined
+                             as an External ID
+        :param custom_id_value: External ID value
+        :return: Event record or None
+        """
+        return self.salesforce.Event__c.get_by_custom_id(
+            custom_id_field,
+            custom_id_value,
+        )
+
+    def upsert(self, record_id, data):
+        """
+        Create or Update Event
+        :param record_id: Record identifier
+        :param data: Represents a dictionary of name values:
+        :return: Created or updated Event
+        """
+        return self.salesforce.Event__c.upsert(record_id, data)
