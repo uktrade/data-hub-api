@@ -4,10 +4,11 @@ import pytest
 from simple_salesforce import format_soql
 
 from datahub.bed_api.constants import ContactQuery
-from datahub.bed_api.models import EditAccount, EditContact
+from datahub.bed_api.models import EditAccount, EditContact, EditEvent
 from datahub.bed_api.repositories import (
     AccountRepository,
     ContactRepository,
+    EventRepository,
     SalesforceRepository,
 )
 from datahub.bed_api.tests.test_utils import (
@@ -460,6 +461,209 @@ class TestAccountRepositoryShould:
             'test_record_id',
             generate_account.as_values_only_dict(),
         )
+
+
+class TestEventRepositoryShould:
+    """Unit tests for EventRepository"""
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_add_calls_salesforce_event_add_with_valid_args(
+            self,
+            mock_salesforce,
+            generate_event: EditEvent,
+    ):
+        """
+        Test add calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        :param generate_event: Generated event data
+        """
+        repository = EventRepository(mock_salesforce)
+
+        repository.add(generate_event.as_values_only_dict())
+
+        assert mock_salesforce.Event__c.create.called
+        assert mock_salesforce.Event__c.create.call_args == mock.call(
+            generate_event.as_values_only_dict(),
+        )
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_delete_calls_salesforce_event_delete_with_valid_args(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test delete calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        repository = EventRepository(mock_salesforce)
+        expected_record_id = 'test_record_id'
+
+        repository.delete(expected_record_id)
+
+        assert mock_salesforce.Event__c.delete.called
+        assert mock_salesforce.Event__c.delete.call_args == mock.call(
+            expected_record_id,
+        )
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_exists_return_true_when_query_response_succeeds(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test exists calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        repository = EventRepository(mock_salesforce)
+        expected_record_id = 'test_record_id'
+        success_query_response = create_success_query_response(
+            'Event__c',
+            expected_record_id,
+        )
+
+        with mock.patch(
+                'datahub.bed_api.repositories.EventRepository.query',
+                return_value=success_query_response,
+        ):
+            exists_response = repository.exists(expected_record_id)
+
+            assert exists_response is True
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_exists_return_false_when_query_response_fails(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test exists calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        repository = EventRepository(mock_salesforce)
+        expected_record_id = 'test_record_id'
+        failed_query_response = create_fail_query_response()
+
+        with mock.patch(
+                'datahub.bed_api.repositories.EventRepository.query',
+                return_value=failed_query_response,
+        ):
+            exists_response = repository.exists(expected_record_id)
+
+            assert exists_response is False
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_get_calls_salesforce_event_get_with_valid_args(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test get calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        repository = EventRepository(mock_salesforce)
+        expected_record_id = 'test_record_id'
+
+        repository.get(expected_record_id)
+
+        assert mock_salesforce.Event__c.get.called
+        assert mock_salesforce.Event__c.get.call_args == mock.call(
+            expected_record_id,
+        )
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_get_by_calls_salesforce_event_get_with_valid_args(
+            self,
+            mock_salesforce,
+    ):
+        """
+        Test get_by calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        """
+        repository = EventRepository(mock_salesforce)
+        expected_record_field = 'test_record_field'
+        expected_record_id = 'test_record_id'
+
+        repository.get_by(expected_record_field, expected_record_id)
+
+        assert mock_salesforce.Event__c.get_by_custom_id.called
+        assert mock_salesforce.Event__c.get_by_custom_id.call_args == mock.call(
+            expected_record_field,
+            expected_record_id,
+        )
+
+    @mock.patch('datahub.bed_api.factories.Salesforce')
+    def test_upsert_calls_salesforce_event_upsert_with_valid_args(
+            self,
+            mock_salesforce,
+            generate_event: EditEvent,
+    ):
+        """
+        Test upsert calls Salesforce with the correct Arguments
+        :param mock_salesforce: Monkeypatch for Salesforce
+        :param generate_event: Generated event data
+        """
+        repository = EventRepository(mock_salesforce)
+        expected_record_id = 'test_record_id'
+        generate_event.Id = expected_record_id
+
+        repository.upsert(expected_record_id, generate_event.as_values_only_dict())
+
+        assert mock_salesforce.Event__c.upsert.called
+        assert mock_salesforce.Event__c.upsert.call_args == mock.call(
+            'test_record_id',
+            generate_event.as_values_only_dict(),
+        )
+
+
+@pytest.mark.salesforce_test
+@pytest.mark.skipif(
+    NOT_BED_INTEGRATION_TEST_READY,
+    reason='BED security configuration missing from env file',
+)
+class TestIntegrationEventRepositoryShould:
+    """
+    Integration Test Event Repositories as Event
+    NOTE: Integration Tests needing BED configuration within
+    .env - see Vault for valid sandbox only settings
+        BED_USERNAME
+        BED_PASSWORD
+        BED_SECURITY_TOKEN
+        BED_IS_SANDBOX
+    """
+
+    def test_create_an_event_utilising(
+            self,
+            event_repository,
+            faker,
+            generate_event: EditEvent,
+    ):
+        """
+        Test BedFactory integration with the contact and account repositories
+        sampling all functions in an idempotent way, generating potential test
+        data for unit tests
+        :param event_repository: EventRepository fixture
+        :param faker: Faker library for generating data
+        :param generate_event: New event record generated with faker data
+        """
+        event_id = None
+        try:
+            # Create and update an event checking data and that the record exists
+
+            # event_response = event_repository.upsert(
+            #     f'Datahub_ID__c/{generate_event.Datahub_ID__c}',
+            #     generate_event.as_values_only_dict(),
+            # )
+            event_response = event_repository.add(
+                generate_event.as_values_only_dict(),
+            )
+            assert event_response is not None
+            assert event_response is not None
+            assert event_response['success'] is True
+            event_id = event_response['id']
+            assert event_id is not None
+            generate_event.Id = event_id
+        finally:
+            # Delete and check event exists
+            assert event_id is not None
 
 
 @pytest.mark.salesforce_test

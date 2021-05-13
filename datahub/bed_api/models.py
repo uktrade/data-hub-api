@@ -1,3 +1,16 @@
+from datetime import date
+
+from datahub.bed_api.constants import (
+    BusinessArea,
+    ContactType,
+    DepartmentEyes,
+    HighLevelSector,
+    InteractionType,
+    JobType,
+    LowLevelSector,
+    Salutation,
+    TransparencyStatus,
+)
 from datahub.bed_api.utils import remove_blank_from_dict
 
 
@@ -6,7 +19,7 @@ class BedEntity:
 
     def __init__(self):
         """Constructor for Id based BED entity"""
-        self.Id = None
+        self.Id: str = None
 
     def as_values_only_dict(self):
         """
@@ -32,44 +45,44 @@ class EditAccount(BedEntity):
     """
 
     def __init__(
-        self,
-        name,
-        high_level_sector,
-        low_level_sector,
+            self,
+            name,
+            high_level_sector,
+            low_level_sector,
     ):
         """Constructor - Mandatory Fields to be assigned with value *"""
         super().__init__()
-        self.Name = name  # *
-        self.High_Level_Sector__c = high_level_sector  # *
-        self.Low_Level_Sector__c = low_level_sector  # *
-        self.Company_Number__c = None
-        self.Company_size__c = None
-        self.Companies_House_ID__c = None
-        self.BEIS_External_Affairs__c = None
+        self.Name: str = name  # *
+        self.High_Level_Sector__c: HighLevelSector = high_level_sector  # *
+        self.Low_Level_Sector__c: LowLevelSector = low_level_sector  # *
+        self.Company_Number__c: str = None
+        self.Company_size__c: int = None
+        self.Companies_House_ID__c: str = None
+        self.BEIS_External_Affairs__c: str = None
         #  Address
         #  Billing
-        self.BillingStreet = None
-        self.BillingCity = None
-        self.BillingState = None
-        self.BillingPostalCode = None
-        self.BillingCountry = None
+        self.BillingStreet: str = None
+        self.BillingCity: str = None
+        self.BillingState: str = None
+        self.BillingPostalCode: str = None
+        self.BillingCountry: str = None
         # Shipping
-        self.ShippingStreet = None
-        self.ShippingCity = None
-        self.ShippingState = None
-        self.ShippingPostalCode = None
-        self.ShippingCountry = None
-        self.UK_Region__c = None
-        self.Global_Office_Locations__c = None
-        self.Country_HQ__c = None
-        self.Location__c = None
+        self.ShippingStreet: str = None
+        self.ShippingCity: str = None
+        self.ShippingState: str = None
+        self.ShippingPostalCode: str = None
+        self.ShippingCountry: str = None
+        self.UK_Region__c: str = None
+        self.Global_Office_Locations__c: str = None
+        self.Country_HQ__c: str = None
+        self.Location__c: str = None  # Country
         # Misc
-        self.FTSE_100__c = False
-        self.FTSE_250__c = False
-        self.Multinational__c = False
-        self.Company_Website__c = None
-        self.EU_Exit_Sentiment__c = None
-        self.Parent_Membership_Organisation__c = None
+        self.FTSE_100__c: bool = False
+        self.FTSE_250__c: bool = False
+        self.Multinational__c: bool = False
+        self.Company_Website__c: str = None
+        self.EU_Exit_Sentiment__c: str = None
+        self.Parent_Membership_Organisation__c: str = None
         self.IS_Sentiment__c = None
 
 
@@ -79,35 +92,34 @@ class EditContact(BedEntity):
     """
 
     def __init__(
-        self,
-        salutation,
-        first_name,
-        last_name,
-        email,
-        account_id=None,
+            self,
+            salutation,
+            first_name,
+            last_name,
+            email,
+            account_id=None,
     ):
         """Constructor - Mandatory Fields to be assigned with value *"""
         super().__init__()
-        self.FirstName = first_name
-        self.MiddleName = None
-        self.LastName = last_name  # *
-        self.Salutation = salutation
-        self.Suffix = None
-        self.Email = email  # *
-        self.Job_Title__c = None
-        self.Job_Type__c = None
-        self.Notes__c = None
+        self.FirstName: str = first_name
+        self.MiddleName: str = None
+        self.LastName: str = last_name  # *
+        self.Salutation: Salutation = salutation
+        self.Suffix: str = None
+        self.Email: str = email  # *
+        self.Job_Title__c: str = None
+        self.Job_Type__c: JobType = None
+        self.Notes__c: str = None
         # Phones
-        self.Phone = None
-        self.MobilePhone = None
-        self.AccountId = account_id  # * Organization Id
-        self.Contact_Type__c = None
-        # Business Sector e.g. 'Advanced Manufacturing;Professional & Business Services'
-        self.Business_Area__c = None
+        self.Phone: str = None
+        self.MobilePhone: str = None
+        self.AccountId: str = account_id  # * Organization Id
+        self.Contact_Type__c: ContactType = None
+        self.Business_Area__c: BusinessArea = None
         # Assistant details
-        self.AssistantName = None
-        self.Assistant_Email__c = None
-        self.Assistant_Phone__c = None
+        self.AssistantName: str = None
+        self.Assistant_Email__c: str = None
+        self.Assistant_Phone__c: str = None
 
     @property
     def name(self):
@@ -123,3 +135,42 @@ class EditContact(BedEntity):
             ],
         )
         return ' '.join(names)
+
+
+class EditEvent(BedEntity):
+    """Salesforce representation of an interaction or event"""
+
+    def __init__(
+        self,
+        name: str,
+        datahub_id: str,
+        title: str = None,
+    ):
+        """Constructor"""
+        self.name: str = name  # *
+        self.Datahub_ID__c: str = datahub_id  # *
+        self.Topic__c: str = title  # *
+        self.Date__c: date = None
+        self.Description__c: str = None
+        self.Interaction_Type__c: InteractionType = None
+        self.Webinar_Information__c: str = None
+        # Address
+        self.Location__c: str = None
+        self.City_Town__c: str = None
+        self.Region__c: str = None  # British Region name
+        self.Country__c: str = None  # Country name
+        self.Attendees__c: str = None
+        # Misc
+        self.For_Your_Eyes_Only__c: bool = False
+        self.Contacts_to_share__c: str = None
+        self.Has_Attachment__c: bool = False
+        self.iCal_UID__c: str = None
+        self.Show_on_Transparency_Return__c: bool = False
+        self.Transparency_Reason_for_meeting__c: str = None
+        self.Transparency_Return_Confirmed__c: bool = False
+        self.Transparency_Status__c: TransparencyStatus = None
+        self.Issue_Topics__c: str = None  # list<IssueTopic> delimited with ;
+        self.Department_Eyes_Only__c: DepartmentEyes = None
+        self.HMG_Lead__c: str = None  # email
+        # Theme
+        self.Theme__c: str = None  # Lookup on Theme ...
