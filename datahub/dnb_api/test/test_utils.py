@@ -269,6 +269,8 @@ class TestUpdateCompanyFromDNB:
             'address_area': None,
             'address_postcode': 'UB6 0F2',
             'address_town': 'GREENFORD',
+            'address_area_name': 'FOO',
+            'address_area_abbrev_name': 'BAR',
             'archived_documents_url_path': original_company.archived_documents_url_path,
             'business_type': original_company.business_type.id,
             'company_number': '01261539',
