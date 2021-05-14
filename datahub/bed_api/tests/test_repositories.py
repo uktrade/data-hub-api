@@ -167,9 +167,9 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_add_calls_salesforce_contact_add_with_valid_args(
-            self,
-            mock_salesforce,
-            generate_contact: EditContact,
+        self,
+        mock_salesforce,
+        generate_contact: EditContact,
     ):
         """
         Test add calls Salesforce with the correct Arguments
@@ -187,8 +187,8 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_delete_calls_salesforce_contact_delete_with_valid_args(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test delete calls Salesforce with the correct Arguments
@@ -206,8 +206,8 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_exists_return_true_when_query_response_succeeds(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test exists calls Salesforce with the correct Arguments
@@ -221,8 +221,8 @@ class TestContactRepositoryShould:
         )
 
         with mock.patch(
-                'datahub.bed_api.repositories.ContactRepository.query',
-                return_value=success_query_response,
+            'datahub.bed_api.repositories.ContactRepository.query',
+            return_value=success_query_response,
         ):
             exists_response = repository.exists(expected_record_id)
 
@@ -230,8 +230,8 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_exists_return_false_when_query_response_fails(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test exists calls Salesforce with the correct Arguments
@@ -242,8 +242,8 @@ class TestContactRepositoryShould:
         failed_query_response = create_fail_query_response()
 
         with mock.patch(
-                'datahub.bed_api.repositories.ContactRepository.query',
-                return_value=failed_query_response,
+            'datahub.bed_api.repositories.ContactRepository.query',
+            return_value=failed_query_response,
         ):
             exists_response = repository.exists(expected_record_id)
 
@@ -251,8 +251,8 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_get_calls_salesforce_contact_get_with_valid_args(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test get calls Salesforce with the correct Arguments
@@ -270,8 +270,8 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_get_by_calls_salesforce_contact_get_with_valid_args(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test get_by calls Salesforce with the correct Arguments
@@ -291,9 +291,9 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_update_calls_salesforce_contact_update_with_valid_args(
-            self,
-            mock_salesforce,
-            generate_contact: EditContact,
+        self,
+        mock_salesforce,
+        generate_contact: EditContact,
     ):
         """
         Test add calls Salesforce with the correct Arguments
@@ -372,8 +372,8 @@ class TestAccountRepositoryShould:
         )
 
         with mock.patch(
-                'datahub.bed_api.repositories.AccountRepository.query',
-                return_value=success_query_response,
+            'datahub.bed_api.repositories.AccountRepository.query',
+            return_value=success_query_response,
         ):
             exists_response = repository.exists(expected_record_id)
 
@@ -393,8 +393,8 @@ class TestAccountRepositoryShould:
         failed_query_response = create_fail_query_response()
 
         with mock.patch(
-                'datahub.bed_api.repositories.AccountRepository.query',
-                return_value=failed_query_response,
+            'datahub.bed_api.repositories.AccountRepository.query',
+            return_value=failed_query_response,
         ):
             exists_response = repository.exists(expected_record_id)
 
@@ -523,8 +523,8 @@ class TestEventRepositoryShould:
         )
 
         with mock.patch(
-                'datahub.bed_api.repositories.EventRepository.query',
-                return_value=success_query_response,
+            'datahub.bed_api.repositories.EventRepository.query',
+            return_value=success_query_response,
         ):
             exists_response = repository.exists(expected_record_id)
 
@@ -544,8 +544,8 @@ class TestEventRepositoryShould:
         failed_query_response = create_fail_query_response()
 
         with mock.patch(
-                'datahub.bed_api.repositories.EventRepository.query',
-                return_value=failed_query_response,
+            'datahub.bed_api.repositories.EventRepository.query',
+            return_value=failed_query_response,
         ):
             exists_response = repository.exists(expected_record_id)
 
