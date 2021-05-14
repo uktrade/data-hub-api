@@ -93,7 +93,6 @@ class EditContact(BedEntity):
 
     def __init__(
             self,
-            salutation,
             first_name,
             last_name,
             email,
@@ -104,7 +103,7 @@ class EditContact(BedEntity):
         self.FirstName: str = first_name
         self.MiddleName: str = None
         self.LastName: str = last_name  # *
-        self.Salutation: Salutation = salutation
+        self.Salutation: Salutation = Salutation.not_applicable
         self.Suffix: str = None
         self.Email: str = email  # *
         self.Job_Title__c: str = None
