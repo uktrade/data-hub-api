@@ -5,6 +5,7 @@ import pytest
 from datahub.bed_api.constants import (
     BusinessArea,
     ContactType,
+    DepartmentEyes,
     HighLevelSector,
     InteractionType,
     IssueTopic,
@@ -348,6 +349,30 @@ def generate_transparency_status(faker):
 
 
 @pytest.fixture
+def generate_department_eyes(faker):
+    """
+    Generate random department eyes
+    :param faker: Faker Library
+    :return: Random transparency status
+    """
+    department_eyes_only = faker.random_element(
+        elements=(
+            DepartmentEyes.advanced_manufacturing,
+            DepartmentEyes.creative_industries,
+            DepartmentEyes.energy,
+            DepartmentEyes.environmental_services,
+            DepartmentEyes.financial_services,
+            DepartmentEyes.food_and_agriculture,
+            DepartmentEyes.consumer_and_retail,
+            DepartmentEyes.civil_society,
+            DepartmentEyes.aviation,
+            DepartmentEyes.defence,
+        ),
+    )
+    return department_eyes_only
+
+
+@pytest.fixture
 def generate_account(
     faker,
     generate_high_level_sector,
@@ -442,6 +467,7 @@ def generate_event(
     generate_uk_region_name,
     generate_transparency_status,
     generate_issue_topics,
+    generate_department_eyes,
 ):
     """
     Generate new EditEvent with random values
@@ -449,28 +475,31 @@ def generate_event(
     :param generate_interaction_type: Random generate InteractionType
     :param generate_uk_region_name: Random uk region
     :param generate_transparency_status: Random transparency status
-    :param  generate_issue_topics: Random issue topics array
+    :param generate_issue_topics: Random issue topics array
+    :param generate_department_eyes: Random department eyes only value
     :return: New EditEvent with random fake data
     """
     event = EditEvent(
         name=faker.text(max_nb_chars=80),
-        datahub_id=str(uuid.uuid4),
+        datahub_id=str(uuid.uuid4()),
         title=faker.text(max_nb_chars=200),
     )
     event.Date__c = faker.date()
-    event.Description__c = faker.text(max_nb_chars=32768)
+    event.Description__c = faker.text(max_nb_chars=300)
     event.Interaction_Type__c = generate_interaction_type
     event.Webinar_Information__c = faker.text(max_nb_chars=255)
+    event.Address__c = faker.address()
     event.Location__c = faker.street_address()
     event.City_Town__c = faker.city()
     event.Region__c = generate_uk_region_name
     event.Country__c = faker.country()
-    event.Attendees__c = faker.text(max_nb_chars=131071)
-    event.Contacts_to_share__c = faker.text(max_nb_chars=32768)
-    event.iCal_UID__c = faker.text(max_nb_chars=255)
-    event.Transparency_Reason_for_meeting__c = faker.text(max_nb_chars=32768)
+    event.Attendees__c = faker.text(max_nb_chars=300)
+    event.Contacts_to_share__c = faker.text(max_nb_chars=300)
+    event.iCal_UID__c = str(uuid.uuid4())
+    event.Transparency_Reason_for_meeting__c = faker.text(max_nb_chars=300)
     event.Transparency_Status__c = generate_transparency_status
     event.Issue_Topics__c = ';'.join(generate_issue_topics)
     event.HMG_Lead__c = faker.company_email()
-    # event.Theme__c = TODO: Figure this out when data returns
+    # event.Theme__c = CHECK: Figure this out when data returns
+    event.Department_Eyes_Only__c = generate_department_eyes
     return event
