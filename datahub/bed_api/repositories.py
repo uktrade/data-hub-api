@@ -102,9 +102,9 @@ class SalesforceRepository:
             **kwargs,
         )
 
-    def upsert(self, record_id, data):
+    def update(self, record_id, data):
         """
-        Create or Update based on some unique identifier
+        Update based on some unique identifier
         :param record_id: Record identifier
         :param data: Represents a dictionary of name values:
         :return: Returns NotImplementedError
@@ -191,14 +191,14 @@ class ContactRepository(SalesforceRepository):
             custom_id_value,
         )
 
-    def upsert(self, record_id, data):
+    def update(self, record_id, data):
         """
-        Create or Update Contact
+        Update Contact
         :param record_id: Record identifier
         :param data: Represents a dictionary of name values:
         :return: Created or updated
         """
-        return self.salesforce.Contact.upsert(record_id, data)
+        return self.salesforce.Contact.update(record_id, data)
 
 
 class AccountRepository(SalesforceRepository):
@@ -265,14 +265,14 @@ class AccountRepository(SalesforceRepository):
             custom_id_value,
         )
 
-    def upsert(self, record_id, data):
+    def update(self, record_id, data):
         """
-        Create or Update Account
+        Update Account
         :param record_id: Record identifier
         :param data: Represents a dictionary of name values:
         :return: Created or updated Account
         """
-        return self.salesforce.Account.upsert(record_id, data)
+        return self.salesforce.Account.update(record_id, data)
 
 
 class EventRepository(SalesforceRepository):
@@ -339,11 +339,11 @@ class EventRepository(SalesforceRepository):
             custom_id_value,
         )
 
-    def upsert(self, record_id, data):
+    def update(self, record_id, data):
         """
-        Create or Update Event
+        Update Event
         :param record_id: Record identifier
         :param data: Represents a dictionary of name values:
         :return: Created or updated Event
         """
-        return self.salesforce.Event__c.upsert(record_id, data)
+        return self.salesforce.Event__c.update(record_id, data)

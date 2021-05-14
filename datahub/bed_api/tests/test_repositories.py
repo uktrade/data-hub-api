@@ -147,18 +147,18 @@ class TestSalesforceRepositoryShould:
             repository.get_by('test_field', 'test_record_id')
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_upsert_throws_not_implemented_error_by_default(
+    def test_update_throws_not_implemented_error_by_default(
             self,
             mock_salesforce,
     ):
         """
-        Test upsert throws NotImplementedError
+        Test update throws NotImplementedError
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         with pytest.raises(NotImplementedError):
             repository = SalesforceRepository(mock_salesforce)
 
-            repository.upsert('test_record_id', {'TestData': True})
+            repository.update('test_record_id', {'TestData': True})
 
 
 class TestContactRepositoryShould:
@@ -289,7 +289,7 @@ class TestContactRepositoryShould:
         )
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_upsert_calls_salesforce_contact_upsert_with_valid_args(
+    def test_update_calls_salesforce_contact_update_with_valid_args(
             self,
             mock_salesforce,
             generate_contact: EditContact,
@@ -303,10 +303,10 @@ class TestContactRepositoryShould:
         expected_record_id = 'test_record_id'
         generate_contact.Id = expected_record_id
 
-        repository.upsert(expected_record_id, generate_contact.as_values_only_dict())
+        repository.update(expected_record_id, generate_contact.as_values_only_dict())
 
-        assert mock_salesforce.Contact.upsert.called
-        assert mock_salesforce.Contact.upsert.call_args == mock.call(
+        assert mock_salesforce.Contact.update.called
+        assert mock_salesforce.Contact.update.call_args == mock.call(
             'test_record_id',
             generate_contact.as_values_only_dict(),
         )
@@ -440,7 +440,7 @@ class TestAccountRepositoryShould:
         )
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_upsert_calls_salesforce_account_upsert_with_valid_args(
+    def test_update_calls_salesforce_account_update_with_valid_args(
             self,
             mock_salesforce,
             generate_account: EditContact,
@@ -454,10 +454,10 @@ class TestAccountRepositoryShould:
         expected_record_id = 'test_record_id'
         generate_account.Id = expected_record_id
 
-        repository.upsert(expected_record_id, generate_account.as_values_only_dict())
+        repository.update(expected_record_id, generate_account.as_values_only_dict())
 
-        assert mock_salesforce.Account.upsert.called
-        assert mock_salesforce.Account.upsert.call_args == mock.call(
+        assert mock_salesforce.Account.update.called
+        assert mock_salesforce.Account.update.call_args == mock.call(
             'test_record_id',
             generate_account.as_values_only_dict(),
         )
@@ -591,13 +591,13 @@ class TestEventRepositoryShould:
         )
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_upsert_calls_salesforce_event_upsert_with_valid_args(
+    def test_update_calls_salesforce_event_update_with_valid_args(
             self,
             mock_salesforce,
             generate_event: EditEvent,
     ):
         """
-        Test upsert calls Salesforce with the correct Arguments
+        Test update calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
         :param generate_event: Generated event data
         """
@@ -605,10 +605,10 @@ class TestEventRepositoryShould:
         expected_record_id = 'test_record_id'
         generate_event.Id = expected_record_id
 
-        repository.upsert(expected_record_id, generate_event.as_values_only_dict())
+        repository.update(expected_record_id, generate_event.as_values_only_dict())
 
-        assert mock_salesforce.Event__c.upsert.called
-        assert mock_salesforce.Event__c.upsert.call_args == mock.call(
+        assert mock_salesforce.Event__c.update.called
+        assert mock_salesforce.Event__c.update.call_args == mock.call(
             'test_record_id',
             generate_event.as_values_only_dict(),
         )
@@ -647,23 +647,47 @@ class TestIntegrationEventRepositoryShould:
         event_id = None
         try:
             # Create and update an event checking data and that the record exists
-
-            # event_response = event_repository.upsert(
-            #     f'Datahub_ID__c/{generate_event.Datahub_ID__c}',
-            #     generate_event.as_values_only_dict(),
-            # )
-            event_response = event_repository.add(
-                generate_event.as_values_only_dict(),
-            )
-            assert event_response is not None
-            assert event_response is not None
-            assert event_response['success'] is True
-            event_id = event_response['id']
+            event_id = self.create_and_assert_event(event_repository, generate_event)
             assert event_id is not None
-            generate_event.Id = event_id
         finally:
             # Delete and check event exists
-            assert event_id is not None
+            if event_id:
+                assert event_id is not None
+
+    def create_and_assert_event(
+        self,
+        event_repository,
+        event: EditEvent,
+    ):
+        """
+        Create event on Salesforce and validate the data passed is generated as expected
+        :param event_repository: EventRepository fixture
+        :param event: New event record generated with faker data
+        :return: New event id
+        """
+        event_response = event_repository.add(
+            event.as_values_only_dict(),
+        )
+        assert event_response is not None
+        assert event_response['success'] is True
+        event_id = event_response['id']
+        assert event_id is not None
+        event.Id = event_id
+        self.assert_all_event_data(event, event_repository)
+        return event_id
+
+    def assert_all_event_data(self, event, event_repository):
+        """
+        Verify all data added onto BED or Salesforce and check the record exists
+        :param event: New event record generated with faker data
+        :param event_repository:
+        :param event_repository: EventRepository fixture
+        """
+        event_exists = event_repository.exists(event.Id)
+        assert event_exists is True
+        event_data = event_repository.get(event.Id)
+        for key, value in event.as_values_only_dict().items():
+            assert event_data[key] == value
 
 
 @pytest.mark.salesforce_test
@@ -780,10 +804,10 @@ class TestIntegrationContactWithAccountRepositoryShould:
         """
         # Example using original edit object sending all values
         # contact.Notes__c = 'Integration Test Notes - Update'
-        # update_contact_response = contact_repository.upsert(
+        # update_contact_response = contact_repository.update(
         #     f'Id/{new_contact_id}', contact.as_values_only_dict())
         notes_update = faker.text(max_nb_chars=100)
-        update_contact_response = contact_repository.upsert(
+        update_contact_response = contact_repository.update(
             f'Id/{new_contact_id}',
             dict(Notes__c=notes_update),
         )

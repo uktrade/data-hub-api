@@ -147,14 +147,16 @@ class EditEvent(BedEntity):
         title: str = None,
     ):
         """Constructor"""
-        self.name: str = name  # *
+        self.Name: str = name  # *
         self.Datahub_ID__c: str = datahub_id  # *
         self.Topic__c: str = title  # *
         self.Date__c: date = None
         self.Description__c: str = None
         self.Interaction_Type__c: InteractionType = None
         self.Webinar_Information__c: str = None
+        # self.Number_of_Attendees__c: int = None # Readonly
         # Address
+        self.Address__c: str = None
         self.Location__c: str = None
         self.City_Town__c: str = None
         self.Region__c: str = None  # British Region name
