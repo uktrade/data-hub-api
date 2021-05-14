@@ -412,8 +412,9 @@ def generate_account(
     # check: # Unable to create/update fields: Company_size__c.
     #          Please check the security settings of this field and verify that it is read/write
     # new_account.Company_size__c = faker.random_int()
-    new_account.Company_Number__c = generate_company_number
-    new_account.Companies_House_ID__c = generate_company_number
+    # Removed as this gets duplicate errors when the same values are recycled
+    # new_account.Company_Number__c = generate_company_number
+    # new_account.Companies_House_ID__c = generate_company_number
     new_account.Location__c = faker.country()
     new_account.Company_Website__c = faker.url()
 
@@ -444,7 +445,7 @@ def generate_contact(
         email=email,
         account_id='0010C00000HGsfFBJH',
     )
-    contact.Salutation = generate_salutation,
+    contact.Salutation = generate_salutation
     contact.Suffix = faker.suffix()
     contact.MiddleName = faker.first_name()
     contact.Phone = faker.phone_number()

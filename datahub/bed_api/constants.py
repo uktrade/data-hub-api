@@ -42,7 +42,7 @@ class EventQuery(Enum):
 
 class Salutation(str, Enum):
     """Salutations from BED"""
-
+    not_applicable = 'N/A'
     mr = 'Mr.'
     mrs = 'Mrs.'
     miss = 'Miss'
