@@ -14,11 +14,11 @@ class TestEditContactShould:
         Should format contact name accordingly
         """
         contact = EditContact(
-            salutation=Salutation.mrs,
             first_name='Jane',
             last_name='Doe',
             email='jane.doe@email.com',
         )
+        contact.Salutation = Salutation.mrs
         contact.MiddleName = 'Middle'
         contact.Suffix = 'Teacher'
 
@@ -29,11 +29,11 @@ class TestEditContactShould:
         Should format contact name accordingly
         """
         contact = EditContact(
-            salutation=Salutation.mr,
             first_name=None,
             last_name='Doe',
             email='jane.doe@email.com',
         )
+        contact.Salutation = Salutation.mr
 
         assert contact.name == 'Mr. Doe'
 
@@ -52,10 +52,10 @@ class TestEditContactShould:
         }
 
         contact = EditContact(
-            salutation=Salutation.mr,
             first_name='John',
             last_name='Doe',
             email='john.doe@email.com',
         )
+        contact.Salutation = Salutation.mr
         contact.Id = 'Test_Identity'
         assert contact.as_values_only_dict() == expected

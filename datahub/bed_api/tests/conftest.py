@@ -439,12 +439,12 @@ def generate_contact(
     lastname = faker.last_name()
     email = f'{firstname.lower()}.{lastname.lower()}@digital.trade.gov.uk'
     contact = EditContact(
-        salutation=generate_salutation,
         first_name=firstname,
         last_name=lastname,
         email=email,
         account_id='0010C00000HGsfFBJH',
     )
+    contact.Salutation = generate_salutation,
     contact.Suffix = faker.suffix()
     contact.MiddleName = faker.first_name()
     contact.Phone = faker.phone_number()
