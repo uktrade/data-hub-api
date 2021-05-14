@@ -644,10 +644,10 @@ class TestIntegrationEventRepositoryShould:
         :param faker: Faker library for generating data
         :param generate_event: New event record generated with faker data
         """
-        event_id = None
         try:
             # Create and update an event checking data and that the record exists
             event_id = self.create_and_assert_event(event_repository, generate_event)
+
             assert event_id is not None
         finally:
             # Delete and check event exists
@@ -855,7 +855,10 @@ class TestIntegrationContactWithAccountRepositoryShould:
         """
         contact_exists = contact_repository.exists(contact.Id)
         assert contact_exists is True
-        contact_data = contact_repository.get_by('Email', contact.Email)
+        contact_data = contact_repository.get_by(
+            'Datahub_ID__c',
+            contact.Datahub_ID__c,
+        )
         for key, value in contact.as_values_only_dict().items():
             assert contact_data[key] == value
 
