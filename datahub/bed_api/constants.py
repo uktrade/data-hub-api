@@ -39,6 +39,13 @@ class EventQuery(Enum):
         'id',
     )
 
+    get_event_by_date = QueryConstant(
+        'SELECT Id FROM Event__c '
+        'WHERE Date__c = {date} '
+        'LIMIT {limit}',
+        'date,limit',
+    )
+
 
 class Salutation(str, Enum):
     """Salutations from BED"""

@@ -1,7 +1,8 @@
+from dateutil import parser
 import pytest
 from simple_salesforce import format_soql
 
-from datahub.bed_api.constants import ContactQuery
+from datahub.bed_api.constants import ContactQuery, EventQuery
 from datahub.bed_api.models import (
     EditAccount,
     EditContact,
@@ -44,16 +45,66 @@ class TestIntegrationEventRepositoryShould:
             # Create and update an event checking data and that the record exists
             event_id = self.create_and_assert_event(event_repository, generate_event)
 
-            # Get
+            # Query and Query More
+            self.assert_and_query_paginated_data(event_repository, generate_event)
 
             assert event_id is not None
         finally:
-            # Delete and check event exists
+            # Delete to clean up integration test
             if event_id:
                 self.delete_and_assert_event_deletion(
                     event_repository,
                     event_id,
                 )
+
+    def assert_and_query_paginated_data(self, event_repository, event):
+        """
+        Uses the repository query and query_more to test querying and paginating
+        data
+        :param event_repository: EventRepository fixture
+        :param event: New event record generated with faker data
+        """
+        # date_filter = date(1976, 2, 11)
+        date_filter = parser.parse(event.Date__c)
+        query = format_soql(
+            EventQuery.get_event_by_date.value.sql,
+            date=date_filter.date(),
+            limit=100,
+        )
+        query_response = event_repository.query(query)
+        self.assert_query_response(query_response)
+        self.assert_records_for_ids(query_response)
+        if 'nextRecordUrl' in query_response:
+            next_records_url = query_response['nextRecordUrl']
+            self.assert_and_query_next(event_repository, next_records_url)
+
+    def assert_and_query_next(self, event_repository, next_records_url):
+        next_query_response = event_repository.query_next(
+            next_records_url,
+            True,
+        )
+        self.assert_query_response(next_query_response)
+        self.assert_records_for_ids(next_query_response)
+
+    def assert_records_for_ids(self, query_response):
+        """
+        Validates the record data for id values assigned
+        :param query_response: Typical query response object
+        returned from Salesforce
+        """
+        for item in query_response['records']:
+            assert item['Id'] is not None
+
+    def assert_query_response(self, query_response):
+        """
+        Validates the Query response comes back with expected data
+        :param query_response: Typical query response object
+        returned from Salesforce
+        """
+        assert query_response is not None
+        assert query_response['done'] is True
+        assert query_response['totalSize'] >= 1
+        assert query_response['records'] is not None
 
     def create_and_assert_event(
         self,
