@@ -93,6 +93,7 @@ class EditContact(BedEntity):
 
     def __init__(
             self,
+            datahub_id,
             first_name,
             last_name,
             email,
@@ -100,6 +101,7 @@ class EditContact(BedEntity):
     ):
         """Constructor - Mandatory Fields to be assigned with value *"""
         super().__init__()
+        self.Datahub_ID__c: str = datahub_id
         self.FirstName: str = first_name
         self.MiddleName: str = None
         self.LastName: str = last_name  # *

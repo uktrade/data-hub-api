@@ -440,6 +440,7 @@ def generate_contact(
     lastname = faker.last_name()
     email = f'{firstname.lower()}.{lastname.lower()}@digital.trade.gov.uk'
     contact = EditContact(
+        datahub_id=str(uuid.uuid4()),
         first_name=firstname,
         last_name=lastname,
         email=email,

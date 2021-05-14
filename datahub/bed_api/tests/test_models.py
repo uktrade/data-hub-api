@@ -14,6 +14,7 @@ class TestEditContactShould:
         Should format contact name accordingly
         """
         contact = EditContact(
+            datahub_id='datahub_id',
             first_name='Jane',
             last_name='Doe',
             email='jane.doe@email.com',
@@ -29,6 +30,7 @@ class TestEditContactShould:
         Should format contact name accordingly
         """
         contact = EditContact(
+            datahub_id='datahub_id',
             first_name=None,
             last_name='Doe',
             email='jane.doe@email.com',
@@ -44,6 +46,7 @@ class TestEditContactShould:
         and empty values
         """
         expected = {
+            'Datahub_ID__c': 'datahub_id',
             'Email': 'john.doe@email.com',
             'FirstName': 'John',
             'Id': 'Test_Identity',
@@ -52,6 +55,7 @@ class TestEditContactShould:
         }
 
         contact = EditContact(
+            datahub_id='datahub_id',
             first_name='John',
             last_name='Doe',
             email='john.doe@email.com',
