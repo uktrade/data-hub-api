@@ -27,7 +27,7 @@ class TestIntegrationEventRepositoryShould:
         BED_IS_SANDBOX
     """
 
-    def test_create_an_event_utilising(
+    def test_crud_operations_event_utilising(
         self,
         event_repository,
         faker,
@@ -41,14 +41,17 @@ class TestIntegrationEventRepositoryShould:
         :param faker: Faker library for generating data
         :param generate_event: New event record generated with faker data
         """
+        event_id = None
         try:
-            # Create and update an event checking data and that the record exists
+            # CREATE event checking data and that the record exists
             event_id = self.create_and_assert_event(event_repository, generate_event)
+            generate_event.Id = event_id
 
-            # Query and Query More
+            # UPDATE event checking the patch
+            self.update_and_assert_event(event_id, event_repository, faker, generate_event)
+
+            # QUERY and QUERY NEXT testing PAGINATION concepts and COUNT Query constructs
             self.assert_and_query_paginated_data(event_repository, generate_event)
-
-            assert event_id is not None
         finally:
             # Delete to clean up integration test
             if event_id:
@@ -56,6 +59,20 @@ class TestIntegrationEventRepositoryShould:
                     event_repository,
                     event_id,
                 )
+
+    def update_and_assert_event(self, event_id, event_repository, faker, event):
+        event.Description__c = faker.text()
+        update_response = event_repository.update(
+            event_id,
+            {
+                'Description__c': event.Description__c
+            },
+        )
+        assert update_response is not None
+        assert update_response == 204
+        event_data_response = event_repository.get(event_id)
+        assert event_data_response is not None
+        assert event_data_response['Description__c'] == event.Description__c
 
     def assert_and_query_paginated_data(self, event_repository, event):
         """
@@ -67,9 +84,10 @@ class TestIntegrationEventRepositoryShould:
         # date_filter = date(1976, 2, 11)
         date_filter = parser.parse(event.Date__c)
         query = format_soql(
-            EventQuery.get_event_by_date.value.sql,
+            EventQuery.get_event_id_by_date.value.sql,
             date=date_filter.date(),
-            limit=100,
+            limit=100,  # take
+            offset=0,  # skip
         )
         query_response = event_repository.query(query)
         self.assert_query_response(query_response)
@@ -77,6 +95,22 @@ class TestIntegrationEventRepositoryShould:
         if 'nextRecordUrl' in query_response:
             next_records_url = query_response['nextRecordUrl']
             self.assert_and_query_next(event_repository, next_records_url)
+        self.assert_count_query(date_filter, event_repository)
+
+    def assert_count_query(self, date_filter, event_repository):
+        """
+        Validates and demonstrates a count
+        :param date_filter: Filter by data from event
+        :param event_repository: EventRepository fixture
+        """
+        query = format_soql(
+            EventQuery.count_event_by_date.value.sql,
+            date=date_filter.date(),
+        )
+        # Count data
+        count_response = event_repository.query(query)
+        self.assert_query_response(count_response)
+        assert count_response['records'][0]['expr0'] >= 1
 
     def assert_and_query_next(self, event_repository, next_records_url):
         next_query_response = event_repository.query_next(
@@ -174,7 +208,7 @@ class TestIntegrationContactWithAccountRepositoryShould:
         BED_IS_SANDBOX
     """
 
-    def test_create_an_account_with_contact_utilising(
+    def test_crud_utilising(
         self,
         contact_repository,
         account_repository,
