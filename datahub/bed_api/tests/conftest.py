@@ -1,3 +1,4 @@
+import datetime
 import uuid
 
 import pytest
@@ -482,23 +483,23 @@ def generate_event(
     :return: New EditEvent with random fake data
     """
     event = EditEvent(
-        name=faker.text(max_nb_chars=80),
+        name=f'Event Integration Test {datetime.datetime.today()}',
         datahub_id=str(uuid.uuid4()),
-        title=faker.text(max_nb_chars=200),
+        title=faker.text(),
     )
     event.Date__c = faker.date()
-    event.Description__c = faker.text(max_nb_chars=300)
+    event.Description__c = faker.text()
     event.Interaction_Type__c = generate_interaction_type
-    event.Webinar_Information__c = faker.text(max_nb_chars=255)
+    event.Webinar_Information__c = faker.text()
     event.Address__c = faker.address()
     event.Location__c = faker.street_address()
     event.City_Town__c = faker.city()
     event.Region__c = generate_uk_region_name
     event.Country__c = faker.country()
-    event.Attendees__c = faker.text(max_nb_chars=300)
-    event.Contacts_to_share__c = faker.text(max_nb_chars=300)
+    event.Attendees__c = faker.text()
+    event.Contacts_to_share__c = faker.text()
     event.iCal_UID__c = str(uuid.uuid4())
-    event.Transparency_Reason_for_meeting__c = faker.text(max_nb_chars=300)
+    event.Transparency_Reason_for_meeting__c = faker.text()
     event.Transparency_Status__c = generate_transparency_status
     event.Issue_Topics__c = ';'.join(generate_issue_topics)
     event.HMG_Lead__c = faker.company_email()
