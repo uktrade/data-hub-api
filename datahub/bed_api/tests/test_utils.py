@@ -1,6 +1,8 @@
 import os
 from collections import OrderedDict
 
+from datahub.bed_api.models import BedEntity
+from datahub.bed_api.repositories import SalesforceRepository
 from datahub.bed_api.utils import remove_blank_from_dict
 
 NOT_BED_INTEGRATION_TEST_READY = (
@@ -86,3 +88,54 @@ def create_fail_query_response():
         ],
     )
     return failed_query_response
+
+
+def delete_and_assert_deletion(
+    repository: SalesforceRepository,
+    record_id,
+):
+    """
+    Delete generated record from the database
+    :param repository: SalesforceRepository type
+    :param record_id: Identifier to delete
+    """
+    delete_contact_response = repository.delete(record_id)
+    assert delete_contact_response is not None
+    assert delete_contact_response == 204
+    exists = repository.exists(record_id)
+    assert exists is False
+
+
+def assert_all_data_exists_on_bed(
+    bed_entity: BedEntity,
+    record_id,
+    repository: SalesforceRepository,
+):
+    """
+    Verifies the get and data posted on Salesforce
+    :param bed_entity: Bed entity that can compare the final data on Salesforce
+    :param record_id:  Unique identifier or Id record
+    :param repository: Salesforce Repository to retrieve data
+    """
+    exists = repository.exists(record_id)
+    assert exists is True
+    salesforce_data = repository.get(record_id)
+    assert salesforce_data is not None
+    for key, value in bed_entity.as_values_only_dict().items():
+        failure_message = (
+            f'Failed property "{key}" with value "{value}"'
+            f' not equal to"{salesforce_data[key]}"'
+        )
+        assert salesforce_data[key] == value, failure_message
+
+
+def remove_newline(value: str) -> str:
+    """
+    Remove new line characters for Salesforce where the value gets stripped down
+    anyway changing the expected value
+    :param value: string value
+    :return: formatted string with no newline values
+    """
+    if value:
+        return value.replace('\n', '')
+    return value
