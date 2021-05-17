@@ -1,5 +1,5 @@
-from dateutil import parser
 import pytest
+from dateutil import parser
 from simple_salesforce import format_soql
 
 from datahub.bed_api.constants import ContactQuery, EventQuery
@@ -7,7 +7,9 @@ from datahub.bed_api.models import (
     EditAccount,
     EditContact,
     EditEvent,
+    EditEventAttendee,
 )
+from datahub.bed_api.repositories import SalesforceRepository
 from datahub.bed_api.tests.test_utils import NOT_BED_INTEGRATION_TEST_READY
 
 
@@ -60,12 +62,25 @@ class TestIntegrationEventRepositoryShould:
                     event_id,
                 )
 
-    def update_and_assert_event(self, event_id, event_repository, faker, event):
+    def update_and_assert_event(
+        self,
+        event_id,
+        event_repository,
+        faker,
+        event,
+    ):
+        """
+        Update and assert the event is updated with the data on Salesforce
+        :param event_id: Event id
+        :param event_repository: EventRepository fixture
+        :param faker: Faker library for generating data
+        :param event: New event record generated with faker data
+        """
         event.Description__c = faker.text()
         update_response = event_repository.update(
             event_id,
             {
-                'Description__c': event.Description__c
+                'Description__c': event.Description__c,
             },
         )
         assert update_response is not None
@@ -113,6 +128,11 @@ class TestIntegrationEventRepositoryShould:
         assert count_response['records'][0]['expr0'] >= 1
 
     def assert_and_query_next(self, event_repository, next_records_url):
+        """
+        Validate the next query and show an example of the usage
+        :param event_repository: EventRepository fixture
+        :param next_records_url: The url generated from the original query
+        """
         next_query_response = event_repository.query_next(
             next_records_url,
             True,
@@ -197,7 +217,7 @@ class TestIntegrationEventRepositoryShould:
     NOT_BED_INTEGRATION_TEST_READY,
     reason='BED security configuration missing from env file',
 )
-class TestIntegrationContactWithAccountRepositoryShould:
+class TestIntegrationContactWithEventAndAccountShould:
     """
     Integration Test Contact and Account Repositories as Contact is dependent on an Account
     NOTE: Integration Tests needing BED configuration within
@@ -212,9 +232,13 @@ class TestIntegrationContactWithAccountRepositoryShould:
         self,
         contact_repository,
         account_repository,
+        event_repository,
+        event_attendee_repository,
         faker,
         generate_account: EditAccount,
         generate_contact: EditContact,
+        generate_event: EditEvent,
+        generate_event_attendee: EditEventAttendee,
     ):
         """
         Test BedFactory integration with the contact and account repositories
@@ -222,12 +246,18 @@ class TestIntegrationContactWithAccountRepositoryShould:
         data for unit tests
         :param contact_repository: ContactRepository fixture
         :param account_repository: AccountRepository fixture
+        :param event_repository: EventRepository fixture
+        :param event_attendee_repository: EventAttendeeRepository fixture
         :param faker: Faker library for generating data
         :param generate_account: New account record generated with faker data
         :param generate_contact: New contact record generated with faker data
+        :param generate_event: New event record generated with faker data
+        :param generate_event_attendee: New event attendee record generated with faker data
         """
         new_contact_id = None
         new_account_id = None
+        new_event_id = None
+        new_event_attendee_id = None
         try:
             # Create a new account / organization / company
             new_account_id = self.generate_and_assert_account(
@@ -243,53 +273,125 @@ class TestIntegrationContactWithAccountRepositoryShould:
             )
 
             #  Update Contact
-            self.update_and_assert_contact(contact_repository, new_contact_id, faker)
+            self.update_and_assert_contact(
+                contact_repository,
+                new_contact_id,
+                faker,
+            )
 
-            # TODO Update Account
+            #  Create event
+            new_event_id = self.generate_assert_event(event_repository, generate_event)
 
+            #  Link Contact as event attendee
+            new_event_attendee_id = self.generate_and_assert_event_attendee(
+                event_attendee_repository,
+                generate_event_attendee,
+                new_contact_id,
+                new_event_id,
+            )
         finally:
             #  Clean up generated data
             if new_contact_id:
-                self.delete_and_assert_contact_deletion(
+                self.delete_and_assert_deletion(
                     contact_repository,
                     new_contact_id,
                 )
             if new_account_id:
-                self.delete_and_assert_account_deletion(
+                self.delete_and_assert_deletion(
                     account_repository,
                     new_account_id,
                 )
+            if new_event_attendee_id:
+                self.delete_and_assert_deletion(
+                    event_attendee_repository,
+                    new_event_attendee_id,
+                )
+            if new_event_id:
+                self.delete_and_assert_deletion(
+                    event_repository,
+                    new_event_id,
+                )
 
-    def delete_and_assert_account_deletion(
-        self,
-        account_repository,
-        account_id,
+    def generate_and_assert_event_attendee(
+            self,
+            event_attendee_repository,
+            event_attendee,
+            contact_id,
+            event_id,
     ):
         """
-        Delete generated account from the database
-        :param account_repository: AccountRepository fixture
-        :param account_id: Account id to delete
+        Create event attendee assigning a contact and event to marry the two
+        :param event_attendee_repository: EventAttendeeRepository fixture
+        :param event_attendee: New event attendee record generated with faker data
+        :param contact_id: New contact id
+        :param event_id:  New event id
+        :return: New event attendee id
         """
-        delete_account_response = account_repository.delete(account_id)
-        assert delete_account_response is not None
-        assert delete_account_response == 204
-        exists = account_repository.exists(account_id)
-        assert exists is False
+        event_attendee.Event__c = event_id
+        event_attendee.Attendee__c = contact_id
+        event_attendee_response = event_attendee_repository.add(
+            event_attendee.as_values_only_dict(),
+        )
+        assert event_attendee_response is not None
+        assert event_attendee_response['success'] is True
+        event_attendee_id = event_attendee_response['id']
+        assert event_attendee_id is not None
+        event_attendee_exists = event_attendee_repository.exists(event_attendee_id)
+        assert event_attendee_exists is True
+        self.assert_all_event_attendee_data(
+            event_attendee,
+            event_attendee_id,
+            event_attendee_repository,
+        )
+        return event_attendee_id
 
-    def delete_and_assert_contact_deletion(
+    def assert_all_event_attendee_data(
         self,
-        contact_repository,
-        contact_id,
+        event_attendee,
+        event_attendee_id,
+        event_attendee_repository,
     ):
         """
-        Delete generated contact from the database
-        :param contact_repository: ContactRepository fixture
-        :param contact_id: Contact id to delete
+        Verifies the get and data posted on Salesforce
+        :param event_attendee: New event attendee record generated with faker data
+        :param event_attendee_id:  New event attendee id
+        :param event_attendee_repository: EventAttendeeRepository fixture
         """
-        delete_contact_response = contact_repository.delete(contact_id)
+        get_event_attendee_data = event_attendee_repository.get(event_attendee_id)
+        assert get_event_attendee_data is not None
+        for key, value in event_attendee.as_values_only_dict().items():
+            assert get_event_attendee_data[key] == value
+
+    def generate_assert_event(self, event_repository, event):
+        """
+        Generate a new event and assert success
+        :param event_repository: EventRepository fixture
+        :param event: New event record generated with faker data
+        :return: New event id
+        """
+        event_response = event_repository.add(
+            event.as_values_only_dict(),
+        )
+        assert event_response is not None
+        assert event_response['success'] is True
+        event_id = event_response['id']
+        assert event_id is not None
+        return event_id
+
+    def delete_and_assert_deletion(
+        self,
+        repository: SalesforceRepository,
+        record_id,
+    ):
+        """
+        Delete generated record from the database
+        :param repository: SalesforceRepository type
+        :param record_id: Identifier to delete
+        """
+        delete_contact_response = repository.delete(record_id)
         assert delete_contact_response is not None
         assert delete_contact_response == 204
-        exists = contact_repository.exists(contact_id)
+        exists = repository.exists(record_id)
         assert exists is False
 
     def update_and_assert_contact(
@@ -306,8 +408,8 @@ class TestIntegrationContactWithAccountRepositoryShould:
         """
         # Example using original edit object sending all values
         # contact.Notes__c = 'Integration Test Notes - Update'
-        # update_contact_response = contact_repository.update(
-        #     f'Id/{new_contact_id}', contact.as_values_only_dict())
+        # update_contact_response = repository.update(
+        #     f'Id/{contact_id}', contact.as_values_only_dict())
         notes_update = faker.text(max_nb_chars=100)
         update_contact_response = contact_repository.update(
             f'Id/{new_contact_id}',
