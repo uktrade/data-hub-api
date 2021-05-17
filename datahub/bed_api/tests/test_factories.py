@@ -13,7 +13,7 @@ class TestBedFactory:
         BED_USERNAME='test-user@digital.trade.gov.uk',
         BED_PASSWORD='test-password',
         BED_SECURITY_TOKEN='test-token',
-        BED_IS_SANDBOX='True',
+        BED_IS_SANDBOX='true',
     )
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_salesforce_instance_generates_sandbox(self, mock_salesforce):
@@ -38,7 +38,7 @@ class TestBedFactory:
         BED_USERNAME='test-user@digital.trade.gov.uk',
         BED_PASSWORD='test-password',
         BED_SECURITY_TOKEN='test-token',
-        BED_IS_SANDBOX='False',
+        BED_IS_SANDBOX='false',
     )
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_salesforce_instance_without_sandbox(self, mock_salesforce):

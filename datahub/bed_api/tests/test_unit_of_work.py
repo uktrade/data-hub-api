@@ -14,7 +14,7 @@ class TestBedUnitOfWorkShould:
         BED_USERNAME='test-user@digital.trade.gov.uk',
         BED_PASSWORD='test-password',
         BED_SECURITY_TOKEN='test-token',
-        BED_IS_SANDBOX='False',
+        BED_IS_SANDBOX='false',
     )
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_sales_force_session_gets_created_and_closed(
@@ -40,7 +40,7 @@ class TestBedUnitOfWorkShould:
         BED_USERNAME='test-user@digital.trade.gov.uk',
         BED_PASSWORD='test-password',
         BED_SECURITY_TOKEN='test-token',
-        BED_IS_SANDBOX='False',
+        BED_IS_SANDBOX='false',
     )
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_repositories_created(
@@ -62,7 +62,7 @@ class TestBedUnitOfWorkShould:
         BED_USERNAME='test-user@digital.trade.gov.uk',
         BED_PASSWORD='test-password',
         BED_SECURITY_TOKEN='test-token',
-        BED_IS_SANDBOX='False',
+        BED_IS_SANDBOX='false',
     )
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_session_automatically_closes_the_session(
