@@ -397,7 +397,7 @@ def generate_account(
 ):
     """
     Generate account with random data
-    :param faker:
+    :param faker: Faker Library
     :param generate_high_level_sector: sector mapping
     :param generate_low_level_sector: sector mapping
     :param generate_uk_region_name: uk regions
@@ -444,7 +444,7 @@ def generate_contact(
 ):
     """
     Generate new EditContact with random values
-    :param faker:
+    :param faker: Faker Library
     :param generate_salutation:
     :param generate_job_type:
     :param generate_business_area:
@@ -487,7 +487,7 @@ def generate_event(
 ):
     """
     Generate new EditEvent with random values
-    :param faker:
+    :param faker: Faker Library
     :param generate_interaction_type: Random generate InteractionType
     :param generate_uk_region_name: Random uk region
     :param generate_transparency_status: Random transparency status
