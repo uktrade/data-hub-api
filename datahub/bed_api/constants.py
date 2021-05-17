@@ -40,7 +40,7 @@ class AccountQuery(Enum):
         'SELECT Id, Name '
         'FROM Account '
         'WHERE Id = {id}',
-        'id'
+        'id',
     )
 
 
@@ -69,8 +69,20 @@ class EventQuery(Enum):
     )
 
 
+class EventAttendeeQuery(Enum):
+    """Event Attendee Salesforce Queries"""
+
+    get_by_id = QueryConstant(
+        'SELECT Id '
+        'FROM Event_Attendee__c '
+        'WHERE Id = {id}',
+        'id',
+    )
+
+
 class Salutation(str, Enum):
     """Salutations from BED"""
+
     not_applicable = 'N/A'
     mr = 'Mr.'
     mrs = 'Mrs.'
