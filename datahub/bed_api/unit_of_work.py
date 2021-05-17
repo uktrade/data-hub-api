@@ -1,7 +1,12 @@
 import abc
 
 from datahub.bed_api.factories import BedFactory
-from datahub.bed_api.repositories import AccountRepository, ContactRepository, EventRepository
+from datahub.bed_api.repositories import (
+    AccountRepository,
+    ContactRepository,
+    EventAttendeeRepository,
+    EventRepository,
+)
 
 
 class AbstractUnitOfWork(abc.ABC):
@@ -46,6 +51,7 @@ class BedUnitOfWork(AbstractUnitOfWork):
         self.contacts = ContactRepository(self.salesforce)
         self.accounts = AccountRepository(self.salesforce)
         self.interactions = EventRepository(self.salesforce)
+        self.attendees = EventAttendeeRepository(self.salesforce)
         return self
 
     def __exit__(self, *args):
