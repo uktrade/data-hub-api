@@ -28,6 +28,7 @@ from datahub.bed_api.repositories import (
     EventAttendeeRepository,
     EventRepository,
 )
+from datahub.bed_api.tests.test_utils import remove_newline
 from datahub.core.constants import Country, UKRegion
 
 
@@ -194,7 +195,8 @@ def generate_country_names(faker):
     """
     countries = faker.random_elements(
         elements=(
-            Country.anguilla.value.name,
+            # INVALID_OR_NULL_FOR_RESTRICTED_PICKLIST
+            # Country.anguilla.value.name,
             Country.argentina.value.name,
             Country.azerbaijan.value.name,
             Country.cayman_islands.value.name,
@@ -208,7 +210,8 @@ def generate_country_names(faker):
             Country.italy.value.name,
             Country.united_states.value.name,
             Country.united_kingdom.value.name,
-            Country.montserrat.value.name,
+            # INVALID_OR_NULL_FOR_RESTRICTED_PICKLIST
+            # Country.montserrat.value.name,
         ),
         unique=True,
     )
@@ -498,7 +501,7 @@ def generate_event(
     event = EditEvent(
         name=f'Event Integration Test {datetime.datetime.today()}',
         datahub_id=str(uuid.uuid4()),
-        title=faker.text(),
+        title=remove_newline(faker.text()),
     )
     event.Date__c = faker.date()
     event.Description__c = faker.text()
