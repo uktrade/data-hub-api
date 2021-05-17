@@ -1,0 +1,96 @@
+- model: metadata.service
+  pk: af33a094-e8e9-4cc2-9af5-4daaea62b78a
+  fields:
+    disabled_on:
+    order: 17003.0
+    segment: COP26
+    parent:
+    contexts: []
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+- model: metadata.service
+  pk: d3a25003-7f32-4087-8dd0-ae9eacf8a281
+  fields:
+    disabled_on:
+    order: 17004.0
+    segment: Adaptation and Resilience
+    parent: af33a094-e8e9-4cc2-9af5-4daaea62b78a
+    contexts: ["other_interaction", other_service_delivery]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+- model: metadata.service
+  pk: 2f97f7f8-e9a8-41d7-ac5d-819846e6f363
+  fields:
+    disabled_on:
+    order: 17005.0
+    segment: Clean Transport, including EV100
+    parent: af33a094-e8e9-4cc2-9af5-4daaea62b78a
+    contexts: ["other_interaction", other_service_delivery]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+- model: metadata.service
+  pk: e3a488c6-59ab-4343-aab7-68875f0afb39
+  fields:
+    disabled_on:
+    order: 17006.0
+    segment: Energy Transitions, including RE100 and EP100
+    parent: af33a094-e8e9-4cc2-9af5-4daaea62b78a
+    contexts: ["other_interaction", other_service_delivery]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+- model: metadata.service
+  pk: 5c13807a-5639-4b1b-8fb6-2531645b49bc
+  fields:
+    disabled_on:
+    order: 17007.0
+    segment: Finance, including TCFD
+    parent: af33a094-e8e9-4cc2-9af5-4daaea62b78a
+    contexts: ["other_interaction", other_service_delivery]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+- model: metadata.service
+  pk: 361b3e67-55c1-4ea2-846c-0515a3f1ae34
+  fields:
+    disabled_on:
+    order: 17008.0
+    segment: Participation at Glasgow/getting involved with COP26
+    parent: af33a094-e8e9-4cc2-9af5-4daaea62b78a
+    contexts: ["other_interaction", other_service_delivery]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+- model: metadata.service
+  pk: 5c13807a-5639-4b1b-8fb6-2531645b49bc
+  fields:
+    disabled_on:
+    order: 17009.0
+    segment: Nature, including supply chains
+    parent: af33a094-e8e9-4cc2-9af5-4daaea62b78a
+    contexts: ["other_interaction", other_service_delivery]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+- model: metadata.service
+  pk: dc5255e5-44d8-461f-a699-0353728bc8eb
+  fields:
+    disabled_on:
+    order: 17010.0
+    segment: Race to Zero, including Science Based Targets
+    parent: af33a094-e8e9-4cc2-9af5-4daaea62b78a
+    contexts: ["other_interaction", other_service_delivery]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
