@@ -57,28 +57,3 @@ class TestBedFactory:
                 security_token='test-token',
             ),
         ]
-
-
-class TestIntegrationBedFactory:
-    """
-    Integration Tests needing BED configuration within
-    env - see Vault for valid settings
-        BED_USERNAME
-        BED_PASSWORD
-        BED_SECURITY_TOKEN
-        BED_IS_SANDBOX
-    """
-
-    def test_salesforce_generates_sales_force_instance_for_getting_contact_data(self):
-        """
-        Test BedFactory integration with the real configuration values generates
-        an actual Salesforce session instance
-        """
-        factory = BedFactory()
-
-        actual = factory.create()
-
-        assert actual is not None
-        contact_query = actual.Contact.describe()
-        assert contact_query is not None
-        assert len(contact_query) > 1
