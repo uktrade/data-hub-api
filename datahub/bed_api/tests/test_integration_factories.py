@@ -1,6 +1,6 @@
 import pytest
-from datahub.bed_api.factories import BedFactory
 
+from datahub.bed_api.factories import BedFactory
 from datahub.bed_api.tests.test_utils import NOT_BED_INTEGRATION_TEST_READY
 
 
