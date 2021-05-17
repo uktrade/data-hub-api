@@ -9,8 +9,11 @@ from datahub.bed_api.models import (
     EditEvent,
     EditEventAttendee,
 )
-from datahub.bed_api.repositories import SalesforceRepository
-from datahub.bed_api.tests.test_utils import NOT_BED_INTEGRATION_TEST_READY
+from datahub.bed_api.tests.test_utils import (
+    assert_all_data_exists_on_bed,
+    delete_and_assert_deletion,
+    NOT_BED_INTEGRATION_TEST_READY,
+)
 
 
 @pytest.mark.salesforce_test
@@ -29,7 +32,7 @@ class TestIntegrationEventRepositoryShould:
         BED_IS_SANDBOX
     """
 
-    def test_crud_operations_event_utilising(
+    def test_fuzz_on_crud_operations_utilising(
         self,
         event_repository,
         faker,
@@ -57,7 +60,7 @@ class TestIntegrationEventRepositoryShould:
         finally:
             # Delete to clean up integration test
             if event_id:
-                self.delete_and_assert_event_deletion(
+                delete_and_assert_deletion(
                     event_repository,
                     event_id,
                 )
@@ -178,38 +181,8 @@ class TestIntegrationEventRepositoryShould:
         assert event_response['success'] is True
         event_id = event_response['id']
         assert event_id is not None
-        event.Id = event_id
-        self.assert_all_event_data(event, event_repository)
+        assert_all_data_exists_on_bed(event, event_id, event_repository)
         return event_id
-
-    def assert_all_event_data(self, event, event_repository):
-        """
-        Verify all data added onto BED or Salesforce and check the record exists
-        :param event: New event record generated with faker data
-        :param event_repository:
-        :param event_repository: EventRepository fixture
-        """
-        event_exists = event_repository.exists(event.Id)
-        assert event_exists is True
-        event_data = event_repository.get(event.Id)
-        for key, value in event.as_values_only_dict().items():
-            assert event_data[key] == value
-
-    def delete_and_assert_event_deletion(
-        self,
-        event_repository,
-        event_id,
-    ):
-        """
-        Delete generated account from the database
-        :param event_repository: EventRepository fixture
-        :param event_id: Account id to delete
-        """
-        delete_event_response = event_repository.delete(event_id)
-        assert delete_event_response is not None
-        assert delete_event_response == 204
-        exists = event_repository.exists(event_id)
-        assert exists is False
 
 
 @pytest.mark.salesforce_test
@@ -228,7 +201,7 @@ class TestIntegrationContactWithEventAndAccountShould:
         BED_IS_SANDBOX
     """
 
-    def test_crud_utilising(
+    def test_fuzz_with_crud_operations_utilising(
         self,
         contact_repository,
         account_repository,
@@ -292,22 +265,22 @@ class TestIntegrationContactWithEventAndAccountShould:
         finally:
             #  Clean up generated data
             if new_contact_id:
-                self.delete_and_assert_deletion(
+                delete_and_assert_deletion(
                     contact_repository,
                     new_contact_id,
                 )
             if new_account_id:
-                self.delete_and_assert_deletion(
+                delete_and_assert_deletion(
                     account_repository,
                     new_account_id,
                 )
             if new_event_attendee_id:
-                self.delete_and_assert_deletion(
+                delete_and_assert_deletion(
                     event_attendee_repository,
                     new_event_attendee_id,
                 )
             if new_event_id:
-                self.delete_and_assert_deletion(
+                delete_and_assert_deletion(
                     event_repository,
                     new_event_id,
                 )
@@ -336,31 +309,12 @@ class TestIntegrationContactWithEventAndAccountShould:
         assert event_attendee_response['success'] is True
         event_attendee_id = event_attendee_response['id']
         assert event_attendee_id is not None
-        event_attendee_exists = event_attendee_repository.exists(event_attendee_id)
-        assert event_attendee_exists is True
-        self.assert_all_event_attendee_data(
+        assert_all_data_exists_on_bed(
             event_attendee,
             event_attendee_id,
             event_attendee_repository,
         )
         return event_attendee_id
-
-    def assert_all_event_attendee_data(
-        self,
-        event_attendee,
-        event_attendee_id,
-        event_attendee_repository,
-    ):
-        """
-        Verifies the get and data posted on Salesforce
-        :param event_attendee: New event attendee record generated with faker data
-        :param event_attendee_id:  New event attendee id
-        :param event_attendee_repository: EventAttendeeRepository fixture
-        """
-        get_event_attendee_data = event_attendee_repository.get(event_attendee_id)
-        assert get_event_attendee_data is not None
-        for key, value in event_attendee.as_values_only_dict().items():
-            assert get_event_attendee_data[key] == value
 
     def generate_assert_event(self, event_repository, event):
         """
@@ -376,23 +330,12 @@ class TestIntegrationContactWithEventAndAccountShould:
         assert event_response['success'] is True
         event_id = event_response['id']
         assert event_id is not None
+        assert_all_data_exists_on_bed(
+            event,
+            event_id,
+            event_repository,
+        )
         return event_id
-
-    def delete_and_assert_deletion(
-        self,
-        repository: SalesforceRepository,
-        record_id,
-    ):
-        """
-        Delete generated record from the database
-        :param repository: SalesforceRepository type
-        :param record_id: Identifier to delete
-        """
-        delete_contact_response = repository.delete(record_id)
-        assert delete_contact_response is not None
-        assert delete_contact_response == 204
-        exists = repository.exists(record_id)
-        assert exists is False
 
     def update_and_assert_contact(
         self,
@@ -447,24 +390,8 @@ class TestIntegrationContactWithEventAndAccountShould:
         assert contact_add_response['success'] is True
         contact_id = contact_add_response['id']
         contact.Id = contact_id
-        self.assert_all_contact_data(contact, contact_repository)
+        assert_all_data_exists_on_bed(contact, contact_id, contact_repository)
         return contact_id
-
-    def assert_all_contact_data(self, contact, contact_repository):
-        """
-        Verify contact exists on Salesforce and the data is the same as the
-        data used to generate teh contact
-        :param contact: Random Generated Contact
-        :param contact_repository: ContactRepository fixture
-        """
-        contact_exists = contact_repository.exists(contact.Id)
-        assert contact_exists is True
-        contact_data = contact_repository.get_by(
-            'Datahub_ID__c',
-            contact.Datahub_ID__c,
-        )
-        for key, value in contact.as_values_only_dict().items():
-            assert contact_data[key] == value
 
     def generate_and_assert_account(
         self,
@@ -483,18 +410,5 @@ class TestIntegrationContactWithEventAndAccountShould:
         account_id = account_add_response['id']
         assert account_id is not None
         account.Id = account_id
-        self.assert_all_account_data(account, account_repository)
+        assert_all_data_exists_on_bed(account, account_id, account_repository)
         return account_id
-
-    def assert_all_account_data(self, account, account_repository):
-        """
-        Verify all data added onto BED or Salesforce and check the record exists
-        :param account: New account record generated with faker data
-        :param account_repository:
-        :param account_repository: AccountRepository fixture
-        """
-        account_exists = account_repository.exists(account.Id)
-        assert account_exists is True
-        account_data = account_repository.get(account.Id)
-        for key, value in account.as_values_only_dict().items():
-            assert account_data[key] == value
