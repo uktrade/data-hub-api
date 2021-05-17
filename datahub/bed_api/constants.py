@@ -83,6 +83,7 @@ class EventAttendeeQuery(Enum):
 class Salutation(str, Enum):
     """Salutations from BED"""
 
+    none = ''
     not_applicable = 'N/A'
     mr = 'Mr.'
     mrs = 'Mrs.'
@@ -99,6 +100,7 @@ class Salutation(str, Enum):
 class ContactType(str, Enum):
     """Contact Types from BED"""
 
+    none = ''
     hmg_contact = 'HMG Contact'
     external = 'External Attendees'
 
@@ -106,6 +108,7 @@ class ContactType(str, Enum):
 class JobType(str, Enum):
     """Job Types from BED"""
 
+    none = ''
     ceo = 'CEO'
     chairperson = 'Chairperson'
     communications = 'Communications'
@@ -134,6 +137,7 @@ class JobType(str, Enum):
 class BusinessArea(str, Enum):
     """Business Area Types from BED"""
 
+    none = ''
     advanced_manufacturing = 'Advanced Manufacturing'
     professional = 'Professional & Business Services'
     civil_society = 'Civil Society'
@@ -150,6 +154,7 @@ class BusinessArea(str, Enum):
 class HighLevelSector(str, Enum):
     """High Level Sector Types from BED"""
 
+    none = ''
     advanced_manufacturing = 'Advanced Manufacturing'
     civil_society = 'Civil Society'
     consumer_and_retail = 'Consumer & Retail'
@@ -165,6 +170,7 @@ class HighLevelSector(str, Enum):
 class LowLevelSector(str, Enum):
     """Low Level Sector Types from BED"""
 
+    none = ''
     consumers = 'Consumers'
     retail = 'Retail'
     digital = 'Digital'
@@ -176,6 +182,7 @@ class LowLevelSector(str, Enum):
 class InteractionType(str, Enum):
     """Interaction Types from BED"""
 
+    none = ''
     bilateral_meeting = 'Bilateral Meeting'
     brush_by = 'Brush By'
     conference = 'Conference'
@@ -191,6 +198,7 @@ class InteractionType(str, Enum):
 class TransparencyStatus(str, Enum):
     """Transparency Status from BED"""
 
+    none = ''
     draft = 'Draft'
     confirm = 'Confirm'
     delete = 'Delete'
@@ -199,6 +207,7 @@ class TransparencyStatus(str, Enum):
 class IssueTopic(str, Enum):
     """Issue Topics from BED"""
 
+    none = ''
     covid_19 = 'Covid-19'
     domestic_policy = 'Domestic Policy'
     economic_opportunity = 'Economic Opportunity'
@@ -210,6 +219,7 @@ class IssueTopic(str, Enum):
 class DepartmentEyes(str, Enum):
     """Department Eyes from BED"""
 
+    none = ''
     advanced_manufacturing = 'Advanced Manufacturing (BIS)'
     aviation = 'Aviation (DfT)'
     civil_society = 'Civil Society'
