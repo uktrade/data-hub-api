@@ -13,7 +13,7 @@ class BedFactory:
         Create a Salesforce instance with configured settings
         @return: Salesforce instance
         """
-        if os.environ['BED_IS_SANDBOX'] == 'True':
+        if os.environ['BED_IS_SANDBOX'] == 'true':
             return Salesforce(
                 username=os.environ['BED_USERNAME'],
                 password=os.environ['BED_PASSWORD'],
