@@ -177,3 +177,20 @@ class EditEvent(BedEntity):
         self.HMG_Lead__c: str = None  # email
         # Theme
         self.Theme__c: str = None  # Lookup on Theme ...
+
+
+class EditEventAttendee(BedEntity):
+    """Salesforce representation of an event attendee"""
+
+    def __init__(
+            self,
+            datahub_id: str,
+            event_id: str,
+            contact_id: str,
+    ):
+        """Constructor"""
+        self.Datahub_ID__c: str = datahub_id  # *
+        self.Event__c: str = event_id  # *
+        self.Attendee__c: str = contact_id  # *
+        self.Name_stub__c: str = None
+        self.Email__c: str = None

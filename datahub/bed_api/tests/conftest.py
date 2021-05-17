@@ -20,10 +20,12 @@ from datahub.bed_api.models import (
     EditAccount,
     EditContact,
     EditEvent,
+    EditEventAttendee,
 )
 from datahub.bed_api.repositories import (
     AccountRepository,
     ContactRepository,
+    EventAttendeeRepository,
     EventRepository,
 )
 from datahub.core.constants import Country, UKRegion
@@ -67,6 +69,17 @@ def event_repository(salesforce):
     :return: Instance of EventRepository
     """
     repository = EventRepository(salesforce)
+    return repository
+
+
+@pytest.fixture
+def event_attendee_repository(salesforce):
+    """
+    Creates instance of event repository
+    :param salesforce: BedFactory creating an instance of salesforce
+    :return: Instance of EventRepository
+    """
+    repository = EventAttendeeRepository(salesforce)
     return repository
 
 
@@ -445,7 +458,7 @@ def generate_contact(
         first_name=firstname,
         last_name=lastname,
         email=email,
-        account_id='0010C00000HGsfFBJH',
+        account_id=str(uuid.uuid4()),
     )
     contact.Salutation = generate_salutation
     contact.Suffix = faker.suffix()
@@ -506,3 +519,21 @@ def generate_event(
     # event.Theme__c = CHECK: Figure this out when data returns
     event.Department_Eyes_Only__c = generate_department_eyes
     return event
+
+
+@pytest.fixture
+def generate_event_attendee(
+    faker,
+):
+    """
+    Generate new Event Attendee test data
+    :param faker: Faker data generator
+    """
+    event_attendee = EditEventAttendee(
+        datahub_id=str(uuid.uuid4()),
+        event_id=str(uuid.uuid4()),
+        contact_id=str(uuid.uuid4()),
+    )
+    event_attendee.Name_stub__c = f'Event Attendee Integration Test {datetime.datetime.today()}'
+    event_attendee.Email__c = faker.company_email()
+    return event_attendee
