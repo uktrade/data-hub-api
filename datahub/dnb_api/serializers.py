@@ -212,7 +212,7 @@ class DNBAddressSerializer(serializers.Serializer):
     area_abbrev_name = serializers.CharField(
         source='address_area_abbrev_name',
         required=False,
-        allow_blank=True
+        allow_blank=True,
     )
 
     def validate_country(self, country):

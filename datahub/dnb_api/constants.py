@@ -21,6 +21,7 @@ ALL_DNB_UPDATED_MODEL_FIELDS = (
     'trading_names',
     'address_1',
     'address_2',
+    'address_area',
     'address_town',
     'address_county',
     'address_country',
