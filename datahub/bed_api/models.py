@@ -1,3 +1,5 @@
+import copy
+
 from datahub.bed_api.constants import (
     BusinessArea,
     ContactType,
@@ -34,7 +36,8 @@ class BedEntity:
         Utilises the internal dictionary to generate all values even if blank
         :return: Generated dictionary of all class values as name value pair
         """
-        return self.__dict__
+        result = copy.deepcopy(self.__dict__)
+        return result
 
 
 class EditAccount(BedEntity):
