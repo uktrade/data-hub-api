@@ -100,7 +100,6 @@ class SalesforceRepository:
                              `identifier_is_url` is False
         :param kwargs: Filters or where clause attributes
         :return: Returns a dict decoded from the Salesforce
-        response JSON payload
         """
         return self.salesforce.query_more(
             next_records_identifier,
@@ -130,7 +129,8 @@ class SalesforceRepository:
             response is not None
             and response['totalSize'] >= 1
             and response['done'] is True
-            and response['records'][0]['Id'] == record_id
+            and len(response['records']) > 0
+            and response['records'][0].get('Id') == record_id
         )
 
 

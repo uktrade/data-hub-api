@@ -1,5 +1,3 @@
-import abc
-
 from datahub.bed_api.factories import BedFactory
 from datahub.bed_api.repositories import (
     AccountRepository,
@@ -9,19 +7,20 @@ from datahub.bed_api.repositories import (
 )
 
 
-class AbstractUnitOfWork(abc.ABC):
+class UnitOfWork:
     """
     Base Unit of Work
     """
 
     def __exit__(self, *args):
         """
-
+        On exit after with context
         :param args:
+        :return: UnitOfWork instance
         """
         self.close_session()
+        return self
 
-    @abc.abstractmethod
     def close_session(self):
         """
         Close any active sessions
@@ -29,7 +28,7 @@ class AbstractUnitOfWork(abc.ABC):
         raise NotImplementedError
 
 
-class BedUnitOfWork(AbstractUnitOfWork):
+class BedUnitOfWork(UnitOfWork):
     """
     Bed unit of work for interacting with the BED salesforce API
     """
@@ -39,13 +38,13 @@ class BedUnitOfWork(AbstractUnitOfWork):
         Constructor
         :param session_factory_type:
         """
-        self.session_factory_type = session_factory_type
         super().__init__()
+        self.session_factory_type = session_factory_type
 
     def __enter__(self):
         """
         Allows with statement to be used
-        :return:
+        :return: BedUnitOfWork instance
         """
         self.salesforce = self.session_factory_type().create()
         self.contacts = ContactRepository(self.salesforce)
