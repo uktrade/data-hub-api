@@ -9,7 +9,15 @@ from datahub.bed_api.constants import (
     JobType,
     LowLevelSector,
     Salutation,
+    SectorsAffected,
     TransparencyStatus,
+    IssueType,
+    UkRegion,
+    PolicyArea,
+    Sentiment,
+    TopIssuesByRank,
+    Classification,
+    LocationsAffected,
 )
 from datahub.bed_api.utils import remove_blank_from_dict
 
@@ -197,3 +205,50 @@ class EditEventAttendee(BedEntity):
         self.Attendee__c = contact_id  # *
         self.Name_stub__c = None
         self.Email__c = None
+
+
+class EditPolicyIssues(BedEntity):
+    """Salesforce representation of an interaction or event"""
+
+    def __init__(
+        self,
+        name: str,
+        datahub_id: str,
+        issue_type: IssueType,
+        company: str,
+        uk_region_affected: UkRegion,
+        policy_area: PolicyArea,
+        sectors_affected: SectorsAffected,
+        sentiment: Sentiment,
+        classification: Classification,
+
+    ):
+        """Constructor"""
+        super().__init__()
+        self.Name = name  # *
+        self.Datahub_ID__c = datahub_id  # *
+        self.Issue_Type__c = issue_type  # *
+        self.Company__c = company  # *
+        self.UK_Affected__c = uk_region_affected  # *
+        self.COVID_19_Related__c = False
+        self.Add_Interactions__c = None
+        self.For_Your_Eyes_Only__c = False
+        self.Policy_Area__c = policy_area  # *
+        self.Sectors_Affected__c = sectors_affected  # *
+        # Information
+        self.Description_of_Issue__c = None
+        self.Issue_Closed__c = False
+        self.Sentiment__c = sentiment  # *
+        self.Classification__c = classification  # *
+        self.Show_On_Report__c = False
+        self.Top_3_Issue__c = TopIssuesByRank.none
+        self.NDP__c = False
+        self.Location_s_Affected__c = LocationsAffected.none
+        # Impact
+        self.Positive_Impact_Value__c = None
+        self.Negative_Impact_value__c = None
+        self.Number_of_Jobs__c = None
+        self.Number_of_Jobs_Lost__c = None
+        self.Number_of_Jobs_At_Risk__c = None
+        self.Number_of_Jobs_Safeguarded__c = None
+        # System Information?

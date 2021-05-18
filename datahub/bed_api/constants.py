@@ -204,8 +204,8 @@ class TransparencyStatus(str, Enum):
     delete = 'Delete'
 
 
-class IssueTopic(str, Enum):
-    """Issue Topics from BED"""
+class IssueType(str, Enum):
+    """Issue Types from BED"""
 
     none = ''
     covid_19 = 'Covid-19'
@@ -214,6 +214,7 @@ class IssueTopic(str, Enum):
     economic_risk = 'Economic Risk'
     international_climate = 'International Climate'
     uk_transition_policy = 'UK Transition Policy'
+    non_eu_trade_priority = 'Non-EU Trade Priority'
 
 
 class DepartmentEyes(str, Enum):
@@ -230,3 +231,60 @@ class DepartmentEyes(str, Enum):
     environmental_services = 'Environmental Services'
     financial_services = 'Financial Services (HMT)'
     food_and_agriculture = 'Food & Agriculture (DEFRA)'
+
+
+class SectorsAffected(str, Enum):
+    """Sector(s) Affected from BED"""
+
+    none = ''
+    advanced_manufacturing = 'Advanced Manufacturing'
+    consumer_and_retail = 'Consumer & Retail'
+    creative_industries = 'Creative Industries'
+    civil_society = 'Civil Society'
+    defense = 'Defence'
+    education_and_research = 'Education & Research'
+    energy = 'Energy'
+    environmental_services = 'Environmental Services'
+    financial_services = 'Financial Services'
+    food_and_agriculture = 'Food & Agriculture'
+    health_and_social_care = 'Health and Social Care'
+    infrastructure_construction_and_housing = 'Infrastructure, Construction & Housing'
+    justice_rights_and_equality = 'Justice, Rights and Equality'
+    life_sciences = 'Life Sciences'
+    materials = 'Materials'
+    media_and_broadcasting = 'Media & Broadcasting'
+    pan_economy_trade_body = 'Pan-Economy Trade Body'
+    professional_and_business_services = 'Professional & Business Services'
+    tech_and_telecoms = 'Tech & Telecoms'
+    tourism = 'Tourism'
+    transport = 'Transport'
+
+    class Sentiment(str, Enum):
+        """Sentiment from BED"""
+
+        none = ''
+        positive = 'Positive'
+        neutral = 'Neutral'
+        negative = 'Negative'
+
+    class Classification(str, Enum):
+        """Classification from BED"""
+
+        none = ''
+        official_sensitive = 'Official-Sensitive'
+        official = 'Official'
+        unclassified = 'Unclassified'
+
+    class TopIssuesByRank(str, Enum):
+        """Top Issues by Rank from BED"""
+        none = ''
+        one = '1'
+        two = '2'
+        three = '3'
+        four = '4'
+        five = '5'
+        six = '6'
+        seven = '7'
+        eight = '8'
+        nine = '9'
+        ten = '10'
