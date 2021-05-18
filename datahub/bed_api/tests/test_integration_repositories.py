@@ -59,11 +59,10 @@ class TestIntegrationEventRepositoryShould:
             self.assert_and_query_paginated_data(event_repository, generate_event)
         finally:
             # Delete to clean up integration test
-            if event_id:
-                delete_and_assert_deletion(
-                    event_repository,
-                    event_id,
-                )
+            delete_and_assert_deletion(
+                event_repository,
+                event_id,
+            )
 
     def update_and_assert_event(
         self,
@@ -159,7 +158,6 @@ class TestIntegrationEventRepositoryShould:
         returned from Salesforce
         """
         assert query_response is not None
-        assert query_response['done'] is True
         assert query_response['totalSize'] >= 1
         assert query_response['records'] is not None
 
@@ -201,7 +199,7 @@ class TestIntegrationContactWithEventAndAccountShould:
         BED_IS_SANDBOX
     """
 
-    def test_fuzz_with_crud_operations_utilising(
+    def test_fuzz_on_crud_operations_utilising(
         self,
         contact_repository,
         account_repository,
@@ -264,26 +262,22 @@ class TestIntegrationContactWithEventAndAccountShould:
             )
         finally:
             #  Clean up generated data
-            if new_contact_id:
-                delete_and_assert_deletion(
-                    contact_repository,
-                    new_contact_id,
-                )
-            if new_account_id:
-                delete_and_assert_deletion(
-                    account_repository,
-                    new_account_id,
-                )
-            if new_event_attendee_id:
-                delete_and_assert_deletion(
-                    event_attendee_repository,
-                    new_event_attendee_id,
-                )
-            if new_event_id:
-                delete_and_assert_deletion(
-                    event_repository,
-                    new_event_id,
-                )
+            delete_and_assert_deletion(
+                contact_repository,
+                new_contact_id,
+            )
+            delete_and_assert_deletion(
+                account_repository,
+                new_account_id,
+            )
+            delete_and_assert_deletion(
+                event_attendee_repository,
+                new_event_attendee_id,
+            )
+            delete_and_assert_deletion(
+                event_repository,
+                new_event_id,
+            )
 
     def generate_and_assert_event_attendee(
             self,

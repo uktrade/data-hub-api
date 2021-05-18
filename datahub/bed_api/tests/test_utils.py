@@ -99,11 +99,12 @@ def delete_and_assert_deletion(
     :param repository: SalesforceRepository type
     :param record_id: Identifier to delete
     """
-    delete_contact_response = repository.delete(record_id)
-    assert delete_contact_response is not None
-    assert delete_contact_response == 204
-    exists = repository.exists(record_id)
-    assert exists is False
+    if record_id and repository:
+        delete_contact_response = repository.delete(record_id)
+        assert delete_contact_response is not None
+        assert delete_contact_response == 204
+        exists = repository.exists(record_id)
+        assert exists is False
 
 
 def assert_all_data_exists_on_bed(
