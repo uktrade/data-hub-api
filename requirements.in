@@ -19,7 +19,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.6
 psycogreen==1.0.2
 
-boto3==1.17.69
+boto3==1.17.73
 
 notifications-python-client==6.1.0
 
@@ -51,20 +51,20 @@ kombu==4.6.11  # Not used directly, but pinned as it has been a source of breaka
 
 # Testing and dev
 pytest==6.2.4
-pytest-django==4.2.0
-pytest-cov==2.11.1
+pytest-django==4.3.0
+pytest-cov==2.12.0
 pytest-xdist==2.2.1
 ipython==7.23.1
 factory-boy==3.2.0
 freezegun==1.1.0
 requests-mock==1.9.2
 django-debug-toolbar==3.2.1
-werkzeug==1.0.1  # Required by runserver_plus - useful for local dev
+werkzeug==2.0.0  # Required by runserver_plus - useful for local dev
 pip-tools==6.1.0
 piprot==0.9.11
 semantic_version==2.8.5
 towncrier==21.3.0
-watchdog[watchmedo]==2.1.0
+watchdog[watchmedo]==2.1.1
 pre-commit==2.12.1
 
 
