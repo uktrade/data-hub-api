@@ -1857,6 +1857,78 @@ class TestPartialUpdateView(APITestMixin):
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
 
+    def test_patch_investor_company_updates_country_investment_originates_from(self):
+        """
+        Test that update of investor company will update country investment originates from
+        if project isn't won.
+        """
+        investor_company = CompanyFactory(
+            address_country_id=constants.Country.united_states.value.id,
+        )
+        project = VerifyWinInvestmentProjectFactory(
+            investor_company=investor_company,
+        )
+        assert (
+            str(project.country_investment_originates_from_id)
+            == constants.Country.united_states.value.id
+        )
+        new_investor_company = CompanyFactory(
+            address_country_id=constants.Country.japan.value.id,
+        )
+        url = reverse(
+            'api-v3:investment:investment-item',
+            kwargs={'pk': project.pk},
+        )
+        request_data = {
+            'investor_company': {
+                'id': str(new_investor_company.pk),
+            },
+        }
+        response = self.api_client.patch(url, data=request_data)
+        assert response.status_code == status.HTTP_200_OK
+
+        project.refresh_from_db()
+        assert (
+            str(project.country_investment_originates_from_id)
+            == constants.Country.japan.value.id
+        )
+
+    def test_patch_won_project_investor_company_doesnt_update_country_of_origin(self):
+        """
+        Test that updating investor company of won project, will not update
+        country investment originates from.
+        """
+        investor_company = CompanyFactory(
+            address_country_id=constants.Country.united_states.value.id,
+        )
+        project = WonInvestmentProjectFactory(
+            investor_company=investor_company,
+        )
+        assert (
+            str(project.country_investment_originates_from_id)
+            == constants.Country.united_states.value.id
+        )
+        new_investor_company = CompanyFactory(
+            address_country_id=constants.Country.japan.value.id,
+        )
+        url = reverse(
+            'api-v3:investment:investment-item',
+            kwargs={'pk': project.pk},
+        )
+        request_data = {
+            'investor_company': {
+                'id': str(new_investor_company.pk),
+            },
+        }
+        response = self.api_client.patch(url, data=request_data)
+        assert response.status_code == status.HTTP_200_OK
+
+        project.refresh_from_db()
+        assert (
+            str(project.country_investment_originates_from_id)
+            == constants.Country.united_states.value.id
+        )
+
     def test_patch_team_success(self):
         """Test successfully partially updating a requirements object."""
         crm_team = constants.Team.crm.value
