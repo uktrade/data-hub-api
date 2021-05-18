@@ -123,12 +123,12 @@ class SalesforceRepository:
         :param record_id: Unique identifier
         :param response: Response returned from query by id
         :return: True if response assigned, totalSize is
-        greater than 1 and there is a record id the equivalent of that value
+                 greater than 1 and there is a record id
+                 the equivalent of that value
         """
         return (
             response is not None
             and response['totalSize'] >= 1
-            and response['done'] is True
             and len(response['records']) > 0
             and response['records'][0].get('Id') == record_id
         )
