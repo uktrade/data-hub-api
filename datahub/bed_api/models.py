@@ -82,7 +82,6 @@ class EditAccount(BedEntity):
         self.ShippingPostalCode = None
         self.ShippingCountry = None
         self.UK_Region__c = None
-        self.Global_Office_Locations__c = None
         self.Country_HQ__c = None
         self.Location__c = None  # Country
         # Misc
