@@ -343,7 +343,7 @@ class PolicyArea(str, Enum):
     law_and_justice = 'Law and Justice'
     local_government = 'Local Government'
     local_growth = 'Local Growth'
-    loss_of_investment_Jobs = 'Loss of Investment / Jobs'
+    loss_of_investment_jobs = 'Loss of Investment / Jobs'
     market_access = 'Market Access'
     migration_and_immigration = 'Migration and Immigration'
     movement_of_goods = 'Movement of Goods'
