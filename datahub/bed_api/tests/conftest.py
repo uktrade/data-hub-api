@@ -20,13 +20,14 @@ from datahub.bed_api.models import (
     EditAccount,
     EditContact,
     EditEvent,
-    EditEventAttendee,
+    EditEventAttendee, EditPolicyIssues,
 )
 from datahub.bed_api.repositories import (
     AccountRepository,
     ContactRepository,
     EventAttendeeRepository,
     EventRepository,
+    PolicyIssuesRepository,
 )
 from datahub.bed_api.tests.test_utils import remove_newline
 from datahub.core.constants import Country, UKRegion
@@ -81,6 +82,17 @@ def event_attendee_repository(salesforce):
     :return: Instance of EventRepository
     """
     repository = EventAttendeeRepository(salesforce)
+    return repository
+
+
+@pytest.fixture
+def policy_issues_repository(salesforce):
+    """
+    Creates instance of policy issues repository
+    :param salesforce: BedFactory creating an instance of salesforce
+    :return: Instance of EventRepository
+    """
+    repository = PolicyIssuesRepository(salesforce)
     return repository
 
 
@@ -213,13 +225,13 @@ def generate_country_names(faker):
 
 
 @pytest.fixture
-def generate_issue_topics(faker):
+def generate_issue_types(faker):
     """
     Generate random issue types array
     :param faker: Faker Library
     :return: Random issue topics value
     """
-    issue_topics = faker.random_elements(
+    issue_types = faker.random_elements(
         elements=(
             IssueType.covid_19,
             IssueType.economic_risk,
@@ -230,7 +242,7 @@ def generate_issue_topics(faker):
         ),
         unique=True,
     )
-    return sorted(issue_topics)
+    return sorted(issue_types)
 
 
 @pytest.fixture
@@ -479,7 +491,7 @@ def generate_event(
     generate_interaction_type,
     generate_uk_region_name,
     generate_transparency_status,
-    generate_issue_topics,
+    generate_issue_types,
     generate_department_eyes,
 ):
     """
@@ -511,7 +523,7 @@ def generate_event(
     event.iCal_UID__c = str(uuid.uuid4())
     event.Transparency_Reason_for_meeting__c = faker.text()
     event.Transparency_Status__c = generate_transparency_status
-    event.Issue_Topics__c = ';'.join(generate_issue_topics)
+    event.Issue_Topics__c = ';'.join(generate_issue_types)
     event.HMG_Lead__c = faker.company_email()
     event.Department_Eyes_Only__c = generate_department_eyes
     return event
@@ -533,3 +545,28 @@ def generate_event_attendee(
     event_attendee.Name_stub__c = f'Event Attendee Integration Test {datetime.datetime.today()}'
     event_attendee.Email__c = faker.company_email()
     return event_attendee
+
+
+@pytest.fixture
+def generate_policy_issues(
+    faker,
+    generate_issue_types,
+):
+    """
+    Generate new Event Attendee test data
+    :param faker: Faker data generator
+    :param generate_issue_types: Data generated for issue types
+    """
+    policy_issues = EditPolicyIssues(
+        name=f'Policy Issues Integration Test {datetime.datetime.today()}',
+        datahub_id=str(uuid.uuid4()),
+        issue_type=';'.join(generate_issue_types),  # TODO: Generator
+        account_id=str(uuid.uuid4()),
+        policy_area=None,  # TODO: Generator
+        sentiment=None,  # TODO: Generator
+        classification=None,  # TODO: Generator
+        sectors_affected=None,  # TODO: Generator
+        uk_region_affected=None,  # TODO: Generator
+    )
+    # TODO: Non mandatory fields
+    return policy_issues
