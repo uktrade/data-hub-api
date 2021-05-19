@@ -375,9 +375,6 @@ class PolicyArea(str, Enum):
     trading_standards_and_product_regulations = 'Trading Standards and Product Regulations'
     transportation = 'Transportation(Freight and People)'
     workforce = 'Workforce'
-    test_new = 'Test New'
-    cop26 = 'COP26'
-    new_new_new = 'New New New'
     cop26_adaptation_and_resilience = (
         'COP26 Adaptation and Resilience'
         '(including CCRI and Climate Action 100+)'
@@ -389,8 +386,8 @@ class PolicyArea(str, Enum):
     cop26_participation_at_glasgow = 'COP26 - Participation at Glasgow'
 
 
-class UkRegionAffected(str, Enum):
-    """UK Region Affected from BED"""
+class RegionOrInternational(str, Enum):
+    """UK Region or International Affected from BED"""
 
     none = ''
     international = 'International'
@@ -411,28 +408,3 @@ class UkRegionAffected(str, Enum):
     guernsey = 'Guernsey'
     jersey = 'Jersey'
     isle_of_man = 'Isle of Man'
-
-
-class LocationsAffected(str, Enum):
-    """Locations Affected from BED"""
-
-    none = ''
-    international = 'International'
-    england = 'England'
-    northern_ireland = 'Northern Ireland'
-    scotland = 'Scotland'
-    wales = 'Wales'
-    north_east = 'North East'
-    north_west = 'North West'
-    central = 'Central'
-    south_east = 'South East'
-    south_west = 'South West'
-    london = 'London'
-    birmingham = 'Birmingham'
-    manchester = 'Manchester'
-    glasgow = 'Glasgow'
-    sheffield = 'Sheffield'
-    edinburgh = 'Edinburgh'
-    liverpool = 'Liverpool'
-    bradford = 'Bradford'
-    newcastle = 'Newcastle'
