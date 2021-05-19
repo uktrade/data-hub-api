@@ -57,6 +57,7 @@ class TestBedUnitOfWorkShould:
             assert bed_context.contacts is not None
             assert bed_context.interactions is not None
             assert bed_context.attendees is not None
+            assert bed_context.policy_issues is not None
 
     @mock_environ(
         BED_USERNAME='test-user@digital.trade.gov.uk',

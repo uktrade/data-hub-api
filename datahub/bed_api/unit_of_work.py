@@ -4,6 +4,7 @@ from datahub.bed_api.repositories import (
     ContactRepository,
     EventAttendeeRepository,
     EventRepository,
+    PolicyIssuesRepository,
 )
 
 
@@ -51,6 +52,7 @@ class BedUnitOfWork(UnitOfWork):
         self.accounts = AccountRepository(self.salesforce)
         self.interactions = EventRepository(self.salesforce)
         self.attendees = EventAttendeeRepository(self.salesforce)
+        self.policy_issues = PolicyIssuesRepository(self.salesforce)
         return self
 
     def __exit__(self, *args):
