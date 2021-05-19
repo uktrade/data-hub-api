@@ -233,6 +233,7 @@ class TestIntegrationContactWithEventAndAccountShould:
         new_account_id = None
         new_event_id = None
         new_event_attendee_id = None
+        # new_policy_issue_id = None
         try:
             # Create a new account / organization / company
             new_account_id = self.generate_and_assert_account(
@@ -266,7 +267,11 @@ class TestIntegrationContactWithEventAndAccountShould:
             )
 
             #  Generate Policy issues assigning the AccountId into the values
-            # TODO: once all the generators have been assigned
+            generate_policy_issues.Company__c = new_account_id
+            generate_policy_issues.Add_Interactions__c = new_event_id
+            # policy_issues_add_response = policy_issues_repository.add(
+            #     generate_policy_issues.as_values_only_dict()
+            # )
 
         finally:
             #  Clean up generated data
