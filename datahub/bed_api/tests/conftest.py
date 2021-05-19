@@ -9,7 +9,7 @@ from datahub.bed_api.constants import (
     DepartmentEyes,
     HighLevelSector,
     InteractionType,
-    IssueTopic,
+    IssueType,
     JobType,
     LowLevelSector,
     Salutation,
@@ -195,13 +195,9 @@ def generate_country_names(faker):
     """
     countries = faker.random_elements(
         elements=(
-            # INVALID_OR_NULL_FOR_RESTRICTED_PICKLIST
-            # Country.anguilla.value.name,
             Country.argentina.value.name,
             Country.azerbaijan.value.name,
             Country.cayman_islands.value.name,
-            # INVALID_OR_NULL_FOR_RESTRICTED_PICKLIST
-            # Country.isle_of_man.value.name,
             Country.japan.value.name,
             Country.canada.value.name,
             Country.france.value.name,
@@ -210,8 +206,6 @@ def generate_country_names(faker):
             Country.italy.value.name,
             Country.united_states.value.name,
             Country.united_kingdom.value.name,
-            # INVALID_OR_NULL_FOR_RESTRICTED_PICKLIST
-            # Country.montserrat.value.name,
         ),
         unique=True,
     )
@@ -221,18 +215,18 @@ def generate_country_names(faker):
 @pytest.fixture
 def generate_issue_topics(faker):
     """
-    Generate random issue topics array
+    Generate random issue types array
     :param faker: Faker Library
     :return: Random issue topics value
     """
     issue_topics = faker.random_elements(
         elements=(
-            IssueTopic.covid_19,
-            IssueTopic.economic_risk,
-            IssueTopic.domestic_policy,
-            IssueTopic.economic_opportunity,
-            IssueTopic.international_climate,
-            IssueTopic.uk_transition_policy,
+            IssueType.covid_19,
+            IssueType.economic_risk,
+            IssueType.domestic_policy,
+            IssueType.economic_opportunity,
+            IssueType.international_climate,
+            IssueType.uk_transition_policy,
         ),
         unique=True,
     )
@@ -519,7 +513,6 @@ def generate_event(
     event.Transparency_Status__c = generate_transparency_status
     event.Issue_Topics__c = ';'.join(generate_issue_topics)
     event.HMG_Lead__c = faker.company_email()
-    # event.Theme__c = CHECK: Figure this out when data returns
     event.Department_Eyes_Only__c = generate_department_eyes
     return event
 
