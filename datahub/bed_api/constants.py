@@ -69,6 +69,17 @@ class EventQuery(Enum):
     )
 
 
+class PolicyIssuesQuery(Enum):
+    """Policy Issues Salesforce Queries"""
+
+    get_by_id = QueryConstant(
+        'SELECT Id '
+        'FROM Policy_Issues__c '
+        'WHERE Id = {id}',
+        'id',
+    )
+
+
 class EventAttendeeQuery(Enum):
     """Event Attendee Salesforce Queries"""
 
@@ -259,32 +270,36 @@ class SectorsAffected(str, Enum):
     tourism = 'Tourism'
     transport = 'Transport'
 
-    class Sentiment(str, Enum):
-        """Sentiment from BED"""
 
-        none = ''
-        positive = 'Positive'
-        neutral = 'Neutral'
-        negative = 'Negative'
+class Sentiment(str, Enum):
+    """Sentiment from BED"""
 
-    class Classification(str, Enum):
-        """Classification from BED"""
+    none = ''
+    positive = 'Positive'
+    neutral = 'Neutral'
+    negative = 'Negative'
 
-        none = ''
-        official_sensitive = 'Official-Sensitive'
-        official = 'Official'
-        unclassified = 'Unclassified'
 
-    class TopIssuesByRank(str, Enum):
-        """Top Issues by Rank from BED"""
-        none = ''
-        one = '1'
-        two = '2'
-        three = '3'
-        four = '4'
-        five = '5'
-        six = '6'
-        seven = '7'
-        eight = '8'
-        nine = '9'
-        ten = '10'
+class Classification(str, Enum):
+    """Classification from BED"""
+
+    none = ''
+    official_sensitive = 'Official-Sensitive'
+    official = 'Official'
+    unclassified = 'Unclassified'
+
+
+class TopIssuesByRank(str, Enum):
+    """Top Issues by Rank from BED"""
+
+    none = ''
+    one = '1'
+    two = '2'
+    three = '3'
+    four = '4'
+    five = '5'
+    six = '6'
+    seven = '7'
+    eight = '8'
+    nine = '9'
+    ten = '10'
