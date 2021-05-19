@@ -1,6 +1,8 @@
 from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
 
+from datahub.company.models import Company
+from datahub.core.constants import InvestmentProjectStage
 from datahub.investment.project.gva_utils import set_gross_value_added_for_investment_project
 from datahub.investment.project.models import (
     GVAMultiplier,
@@ -89,3 +91,28 @@ def update_investment_projects_for_gva_multiplier_post_save(sender, **kwargs):
         update_investment_projects_for_gva_multiplier_task.apply_async(
             args=(instance.pk,),
         )
+
+
+@receiver(
+    post_save,
+    sender=Company,
+    dispatch_uid='update_country_investment_originates_from_post_save',
+)
+def update_country_investment_originates_from(sender, **kwargs):
+    """
+    Updates investment project's country of origin when investor company address country changes.
+    The won investment projects are not updated.
+    """
+    instance = kwargs['instance']
+    created = kwargs['created']
+    if not created:
+        investment_projects = InvestmentProject.objects.filter(
+            investor_company_id=instance.pk,
+        ).exclude(
+            stage_id=InvestmentProjectStage.won.value.id,
+        )
+        for investment_project in investment_projects:
+            investment_project.country_investment_originates_from_id = instance.address_country_id
+            investment_project.save(
+                update_fields=('country_investment_originates_from',),
+            )
