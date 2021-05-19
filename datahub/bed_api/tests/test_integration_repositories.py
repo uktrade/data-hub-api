@@ -7,7 +7,7 @@ from datahub.bed_api.models import (
     EditAccount,
     EditContact,
     EditEvent,
-    EditEventAttendee,
+    EditEventAttendee, EditPolicyIssues,
 )
 from datahub.bed_api.tests.test_utils import (
     assert_all_data_exists_on_bed,
@@ -205,11 +205,13 @@ class TestIntegrationContactWithEventAndAccountShould:
         account_repository,
         event_repository,
         event_attendee_repository,
+        policy_issues_repository,
         faker,
         generate_account: EditAccount,
         generate_contact: EditContact,
         generate_event: EditEvent,
         generate_event_attendee: EditEventAttendee,
+        generate_policy_issues: EditPolicyIssues,
     ):
         """
         Test BedFactory integration with the contact and account repositories
@@ -219,11 +221,13 @@ class TestIntegrationContactWithEventAndAccountShould:
         :param account_repository: AccountRepository fixture
         :param event_repository: EventRepository fixture
         :param event_attendee_repository: EventAttendeeRepository fixture
+        :param policy_issues_repository: PolicyIssuesRepository fixture
         :param faker: Faker library for generating data
         :param generate_account: New account record generated with faker data
         :param generate_contact: New contact record generated with faker data
         :param generate_event: New event record generated with faker data
         :param generate_event_attendee: New event attendee record generated with faker data
+        :param generate_policy_issues: New policy issues record generated with faker data
         """
         new_contact_id = None
         new_account_id = None
@@ -260,6 +264,10 @@ class TestIntegrationContactWithEventAndAccountShould:
                 new_contact_id,
                 new_event_id,
             )
+
+            #  Generate Policy issues assigning the AccountId into the values
+            # TODO: once all the generators have been assigned
+
         finally:
             #  Clean up generated data
             delete_and_assert_deletion(

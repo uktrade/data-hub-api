@@ -430,7 +430,6 @@ def generate_account(
     new_account.ShippingPostalCode = faker.postcode()
     new_account.ShippingCountry = faker.country()
     new_account.UK_Region__c = generate_uk_region_name
-    new_account.Global_Office_Locations__c = ';'.join(generate_country_names)
     new_account.Country_HQ__c = faker.random_element(elements=generate_country_names)
     # check: # Unable to create/update fields: Company_size__c.
     #          Please check the security settings of this field and verify that it is read/write
