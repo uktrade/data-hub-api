@@ -5,6 +5,7 @@ import pytest
 
 from datahub.bed_api.constants import (
     BusinessArea,
+    Classification,
     ContactType,
     DepartmentEyes,
     HighLevelSector,
@@ -12,7 +13,11 @@ from datahub.bed_api.constants import (
     IssueType,
     JobType,
     LowLevelSector,
+    PolicyArea,
     Salutation,
+    SectorsAffected,
+    Sentiment,
+    TopIssuesByRank,
     TransparencyStatus,
 )
 from datahub.bed_api.factories import BedFactory
@@ -372,6 +377,23 @@ def generate_transparency_status(faker):
 
 
 @pytest.fixture
+def generate_sentiment(faker):
+    """
+    Generate sentiment
+    :param faker: Faker Library
+    :return: Random sentiment
+    """
+    sentiment = faker.random_element(
+        elements=(
+            Sentiment.negative,
+            Sentiment.neutral,
+            Sentiment.positive,
+        ),
+    )
+    return sentiment
+
+
+@pytest.fixture
 def generate_department_eyes(faker):
     """
     Generate random department eyes
@@ -393,6 +415,89 @@ def generate_department_eyes(faker):
         ),
     )
     return department_eyes_only
+
+
+@pytest.fixture
+def generate_policy_area(faker):
+    """
+    Generate random policy_area
+    :param faker: Faker Library
+    :return: Random policy area
+    """
+    policy_area = faker.random_element(
+        elements=(
+            PolicyArea.access_to_finance,
+            PolicyArea.access_to_public_funding,
+            PolicyArea.agriculture,
+            PolicyArea.announcement_feedback,
+            PolicyArea.art_culture_sport_and_leisure,
+            PolicyArea.business_regulation,
+            PolicyArea.company_law_and_company_reporting,
+            PolicyArea.cybersecurity,
+            PolicyArea.competition_law_and_policy,
+            PolicyArea.customs_union,
+            PolicyArea.consumer_rights,
+            PolicyArea.cop26_adaptation_and_resilience,
+            PolicyArea.cop26_clean_transport,
+            PolicyArea.cop26_energy_transitions,
+            PolicyArea.cop26_finance,
+            PolicyArea.energy,
+            PolicyArea.other,
+        ),
+    )
+    return policy_area
+
+
+@pytest.fixture
+def generate_classification(faker):
+    """
+    Generate random Classification
+    :param faker: Faker Library
+    :return: Random Classification
+    """
+    classification = faker.random_element(
+        elements=(
+            Classification.official,
+            Classification.official_sensitive,
+            Classification.unclassified,
+        ),
+    )
+    return classification
+
+
+@pytest.fixture
+def generate_sectors_affected(faker):
+    """
+    Generate random SectorsAffected
+    :param faker: Faker Library
+    :return: Random SectorsAffected
+    """
+    sectors_affected = faker.random_element(
+        elements=(
+            SectorsAffected.advanced_manufacturing,
+            SectorsAffected.consumer_and_retail,
+            SectorsAffected.creative_industries,
+            SectorsAffected.civil_society,
+            SectorsAffected.defense,
+            SectorsAffected.education_and_research,
+            SectorsAffected.energy,
+            SectorsAffected.environmental_services,
+            SectorsAffected.financial_services,
+            SectorsAffected.food_and_agriculture,
+            SectorsAffected.health_and_social_care,
+            SectorsAffected.infrastructure_construction_and_housing,
+            SectorsAffected.justice_rights_and_equality,
+            SectorsAffected.life_sciences,
+            SectorsAffected.materials,
+            SectorsAffected.media_and_broadcasting,
+            SectorsAffected.pan_economy_trade_body,
+            SectorsAffected.professional_and_business_services,
+            SectorsAffected.tech_and_telecoms,
+            SectorsAffected.tourism,
+            SectorsAffected.transport,
+        ),
+    )
+    return sectors_affected
 
 
 @pytest.fixture
@@ -499,7 +604,7 @@ def generate_event(
     :param generate_interaction_type: Random generate InteractionType
     :param generate_uk_region_name: Random uk region
     :param generate_transparency_status: Random transparency status
-    :param generate_issue_topics: Random issue topics array
+    :param generate_issue_types: Random issue topics array
     :param generate_department_eyes: Random department eyes only value
     :return: New EditEvent with random fake data
     """
@@ -550,22 +655,37 @@ def generate_event_attendee(
 def generate_policy_issues(
     faker,
     generate_issue_types,
+    generate_uk_region_name,
+    generate_policy_area,
+    generate_sentiment,
+    generate_classification,
+    generate_sectors_affected,
 ):
     """
     Generate new Event Attendee test data
     :param faker: Faker data generator
     :param generate_issue_types: Data generated for issue types
+    :param generate_uk_region_name: Data generated for uk regions
+    :param generate_policy_area: Data generated for policy area
+    :param generate_sentiment: Data generated for sentiment
+    :param generate_classification: Data generated for classification
+    :param generate_sectors_affected: Data generated for sectors effected
     """
     policy_issues = EditPolicyIssues(
         name=f'Policy Issues Integration Test {datetime.datetime.today()}',
         datahub_id=str(uuid.uuid4()),
-        issue_type=';'.join(generate_issue_types),  # TODO: Generator
+        issue_type=';'.join(generate_issue_types),
         account_id=str(uuid.uuid4()),
-        policy_area=None,  # TODO: Generator
-        sentiment=None,  # TODO: Generator
-        classification=None,  # TODO: Generator
-        sectors_affected=None,  # TODO: Generator
-        uk_region_affected=None,  # TODO: Generator
+        policy_area=generate_policy_area,
+        sentiment=generate_sentiment,
+        classification=generate_classification,
+        sectors_affected=generate_sectors_affected,
+        uk_region_affected=generate_uk_region_name,
     )
+    policy_issues.Add_Interactions__c = str(uuid.uuid4())  # Interaction id
+    policy_issues.Description_of_Issue__c = faker.text()
+    policy_issues.Top_3_Issue__c = TopIssuesByRank.eight
+    policy_issues.Location_s_Affected__c = generate_uk_region_name
+    policy_issues.UK_Affected__c = generate_uk_region_name
     # TODO: Non mandatory fields
     return policy_issues

@@ -9,15 +9,14 @@ from datahub.bed_api.constants import (
     InteractionType,
     IssueType,
     JobType,
-    LocationsAffected,
     LowLevelSector,
     PolicyArea,
+    RegionOrInternational,
     Salutation,
     SectorsAffected,
     Sentiment,
     TopIssuesByRank,
     TransparencyStatus,
-    UkRegionAffected,
 )
 from datahub.bed_api.utils import remove_blank_from_dict
 
@@ -215,12 +214,11 @@ class EditPolicyIssues(BedEntity):
         datahub_id: str,
         issue_type: IssueType,
         account_id: str,
-        uk_region_affected: UkRegionAffected,
+        uk_region_affected: RegionOrInternational,
         policy_area: PolicyArea,
         sectors_affected: SectorsAffected,
         sentiment: Sentiment,
         classification: Classification,
-
     ):
         """Constructor"""
         super().__init__()
@@ -243,7 +241,7 @@ class EditPolicyIssues(BedEntity):
         self.Show_On_Report__c = False
         self.Top_3_Issue__c = TopIssuesByRank.none
         self.NDP__c = False
-        self.Location_s_Affected__c = LocationsAffected.none
+        self.Location_s_Affected__c = RegionOrInternational.none
         # Impact
         self.Positive_Impact_Value__c = None
         self.Negative_Impact_value__c = None
