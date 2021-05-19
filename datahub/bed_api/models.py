@@ -2,22 +2,22 @@ import copy
 
 from datahub.bed_api.constants import (
     BusinessArea,
+    Classification,
     ContactType,
     DepartmentEyes,
     HighLevelSector,
     InteractionType,
+    IssueType,
     JobType,
+    LocationsAffected,
     LowLevelSector,
+    PolicyArea,
     Salutation,
     SectorsAffected,
-    TransparencyStatus,
-    IssueType,
-    UkRegion,
-    PolicyArea,
     Sentiment,
     TopIssuesByRank,
-    Classification,
-    LocationsAffected,
+    TransparencyStatus,
+    UkRegionAffected,
 )
 from datahub.bed_api.utils import remove_blank_from_dict
 
@@ -215,8 +215,8 @@ class EditPolicyIssues(BedEntity):
         name: str,
         datahub_id: str,
         issue_type: IssueType,
-        company: str,
-        uk_region_affected: UkRegion,
+        account_id: str,
+        uk_region_affected: UkRegionAffected,
         policy_area: PolicyArea,
         sectors_affected: SectorsAffected,
         sentiment: Sentiment,
@@ -228,7 +228,8 @@ class EditPolicyIssues(BedEntity):
         self.Name = name  # *
         self.Datahub_ID__c = datahub_id  # *
         self.Issue_Type__c = issue_type  # *
-        self.Company__c = company  # *
+        self.Company__c = account_id  # *
+        # Company field is a multi-select
         self.UK_Affected__c = uk_region_affected  # *
         self.COVID_19_Related__c = False
         self.Add_Interactions__c = None
@@ -251,4 +252,3 @@ class EditPolicyIssues(BedEntity):
         self.Number_of_Jobs_Lost__c = None
         self.Number_of_Jobs_At_Risk__c = None
         self.Number_of_Jobs_Safeguarded__c = None
-        # System Information?
