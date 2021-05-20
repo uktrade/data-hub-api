@@ -41,6 +41,6 @@ fix-ca-areas:
 
 black:
 	# pip install black
-    # Assumes local else reference docker
+	# Assumes local else reference docker
 	# Configure the pre-commit-config.yml with black
 	python -m black <Add File Here> --skip-string-normalization
