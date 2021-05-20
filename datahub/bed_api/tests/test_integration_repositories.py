@@ -203,7 +203,7 @@ class TestIntegrationEventRepositoryShould:
     NOT_BED_INTEGRATION_TEST_READY,
     reason='BED security configuration missing from env file',
 )
-class TestIntegrationContactWithEventAndAccountShould:
+class TestIntegrationWithAllAssociatedRepositoriesShould:
     """
     Integration Test Contact and Account Repositories as Contact is dependent on an Account
     NOTE: Integration Tests needing BED configuration within
@@ -214,7 +214,89 @@ class TestIntegrationContactWithEventAndAccountShould:
         BED_IS_SANDBOX
     """
 
-    def test_fuzz_on_crud_operations_utilising(
+    def test_fuzz_on_account_repository(
+            self,
+            account_repository,
+            faker,
+            generate_account: EditAccount,
+    ):
+        """
+        Test account repository for basic crud operations
+        :param account_repository: AccountRepository fixture
+        :param faker: Faker library for generating data
+        :param generate_account: New account record generated with faker data
+        """
+        new_account_id = None
+        try:
+            # ADD new account / organization / company
+            new_account_id = self.add_and_assert_account(
+                account_repository=account_repository,
+                account=generate_account,
+            )
+
+            #  UPDATE Account
+            self.update_and_assert_account(
+                account_repository=account_repository,
+                account_id=new_account_id,
+                faker=faker,
+            )
+        finally:
+            #  Clean up generated data
+            delete_and_assert_deletion(
+                repository=account_repository,
+                record_id=new_account_id,
+            )
+
+    def test_fuzz_on_contact_and_account_repositories(
+            self,
+            contact_repository,
+            account_repository,
+            faker,
+            generate_account: EditAccount,
+            generate_contact: EditContact,
+    ):
+        """
+        Test contact with account as contact is dependent on account
+        :param contact_repository: ContactRepository fixture
+        :param account_repository: AccountRepository fixture
+        :param faker: Faker library for generating data
+        :param generate_account: New account record generated with faker data
+        :param generate_contact: New contact record generated with faker data
+        """
+        new_contact_id = None
+        new_account_id = None
+        try:
+            # ADD new account / organization / company
+            new_account_id = self.add_and_assert_account(
+                account_repository=account_repository,
+                account=generate_account,
+            )
+
+            # ADD contact
+            generate_contact.AccountId = new_account_id
+            new_contact_id = self.add_and_assert_contact(
+                contact_repository=contact_repository,
+                contact=generate_contact,
+            )
+
+            #  UPDATE Contact
+            self.update_and_assert_contact(
+                contact_repository=contact_repository,
+                contact_id=new_contact_id,
+                faker=faker,
+            )
+        finally:
+            #  Clean up generated data
+            delete_and_assert_deletion(
+                repository=contact_repository,
+                record_id=new_contact_id,
+            )
+            delete_and_assert_deletion(
+                repository=account_repository,
+                record_id=new_account_id,
+            )
+
+    def test_fuzz_event_interactions_and_policy_repositories(
         self,
         contact_repository,
         account_repository,
@@ -229,9 +311,7 @@ class TestIntegrationContactWithEventAndAccountShould:
         generate_policy_issues: EditPolicyIssues,
     ):
         """
-        Test BedFactory integration with the several related repositories
-        sampling all functions in an idempotent way, generating fuzz data tests to make sure
-        of the data integrity of sample data
+        Test generating and linking policies and attendee information
         :param contact_repository: ContactRepository fixture
         :param account_repository: AccountRepository fixture
         :param event_repository: EventRepository fixture
@@ -261,13 +341,6 @@ class TestIntegrationContactWithEventAndAccountShould:
             new_contact_id = self.add_and_assert_contact(
                 contact_repository=contact_repository,
                 contact=generate_contact,
-            )
-
-            #  UPDATE Contact
-            self.update_and_assert_contact(
-                contact_repository=contact_repository,
-                contact_id=new_contact_id,
-                faker=faker,
             )
 
             #  ADD event
@@ -401,6 +474,30 @@ class TestIntegrationContactWithEventAndAccountShould:
         )
         return event_id
 
+    def update_and_assert_account(
+        self,
+        account_repository,
+        account_id,
+        faker,
+    ):
+        """
+        Update the account with basic notes testing update
+        :param account_repository: ContactRepository fixture
+        :param account_id: Contact id to update
+        :param faker: Faker library
+        """
+        expected_name = faker.company()
+        update_contact_response = account_repository.update(
+            account_id,
+            dict(Name=expected_name),
+        )
+        assert update_contact_response is not None
+        assert update_contact_response == 204
+
+        account_update_check = account_repository.get(account_id)
+        assert account_update_check is not None
+        assert account_update_check['Name'] == expected_name
+
     def update_and_assert_contact(
         self,
         contact_repository,
@@ -416,7 +513,7 @@ class TestIntegrationContactWithEventAndAccountShould:
         # Example using original edit object sending all values
         # contact.Notes__c = 'Integration Test Notes - Update'
         # update_contact_response = repository.update(
-        #     contact_id, contact.as_values_only_dict())
+        #     account_id, contact.as_values_only_dict())
         notes_update = faker.text(max_nb_chars=100)
         update_contact_response = contact_repository.update(
             contact_id,
