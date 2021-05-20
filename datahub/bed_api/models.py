@@ -33,8 +33,7 @@ class BedEntity:
         NOTE: If updating be sure to include all values, even blanks,
                 as blank may be valid on an update.
         """
-        result = remove_blank_from_dict(self.as_all_values_dict())
-        return result
+        return remove_blank_from_dict(self.as_all_values_dict())
 
     def as_all_values_dict(self):
         """
