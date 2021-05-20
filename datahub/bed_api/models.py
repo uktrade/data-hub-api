@@ -33,16 +33,14 @@ class BedEntity:
         NOTE: If updating be sure to include all values, even blanks,
                 as blank may be valid on an update.
         """
-        result = remove_blank_from_dict(self.as_all_values_dict())
-        return result
+        return remove_blank_from_dict(self.as_all_values_dict())
 
     def as_all_values_dict(self):
         """
         Utilises the internal dictionary to generate all values even if blank
         :return: Generated dictionary of all class values as name value pair
         """
-        result = copy.deepcopy(self.__dict__)
-        return result
+        return copy.deepcopy(self.__dict__)
 
 
 class EditAccount(BedEntity):
