@@ -488,9 +488,9 @@ def formatted_dnb_company_area(dnb_response_uk):
     Get formatted DNB company data.
     """
     dnb_response_area = dnb_response_uk['results'][0].copy()
-    dnb_response_area.update(**{
-        'address_area_abbrev_name': AdministrativeArea.texas.value.area_code,
-    })
+    dnb_response_area.update(
+        address_area_abbrev_name=AdministrativeArea.texas.value.area_code,
+    )
     return format_dnb_company(dnb_response_area)
 
 
