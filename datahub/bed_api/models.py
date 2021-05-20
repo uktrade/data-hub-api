@@ -10,10 +10,8 @@ from datahub.bed_api.constants import (
     IssueType,
     JobType,
     LowLevelSector,
-    PolicyArea,
     RegionOrInternational,
     Salutation,
-    SectorsAffected,
     Sentiment,
     TopIssuesByRank,
     TransparencyStatus,
@@ -215,10 +213,10 @@ class EditPolicyIssues(BedEntity):
         issue_type: IssueType,
         account_id: str,
         uk_region_affected: RegionOrInternational,
-        policy_area: PolicyArea,
-        sectors_affected: SectorsAffected,
-        sentiment: Sentiment,
-        classification: Classification,
+        policy_areas: str,  # Delimited list of PolicyArea
+        sectors_affected: str,  # Delimited list of SectorsAffected
+        sentiment: Sentiment = Sentiment.none,
+        classification: Classification = Classification.none,
     ):
         """Constructor"""
         super().__init__()
@@ -231,7 +229,7 @@ class EditPolicyIssues(BedEntity):
         self.COVID_19_Related__c = False
         self.Add_Interactions__c = None
         self.For_Your_Eyes_Only__c = False
-        self.Policy_Area__c = policy_area  # *
+        self.Policy_Area__c = policy_areas  # *
         self.Sectors_Affected__c = sectors_affected  # *
         # Information
         self.Description_of_Issue__c = None

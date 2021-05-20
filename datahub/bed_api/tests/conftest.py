@@ -152,13 +152,14 @@ def generate_uk_region_name(faker):
     """
     uk_region = faker.random_element(
         elements=(
-            UKRegion.all.value.name,
-            UKRegion.channel_islands.value.name,
+            # CHECK Commented out in the end including others
+            # UKRegion.all.value.name,
+            # UKRegion.channel_islands.value.name,
             UKRegion.alderney.value.name,
             UKRegion.england.value.name,
             UKRegion.east_midlands.value.name,
             UKRegion.east_of_england.value.name,
-            UKRegion.fdi_hub.value.name,
+            # UKRegion.fdi_hub.value.name,
             UKRegion.guernsey.value.name,
             UKRegion.isle_of_man.value.name,
             UKRegion.jersey.value.name,
@@ -166,11 +167,11 @@ def generate_uk_region_name(faker):
             UKRegion.north_east.value.name,
             UKRegion.north_west.value.name,
             UKRegion.northern_ireland.value.name,
-            UKRegion.sark.value.name,
+            # UKRegion.sark.value.name,
             UKRegion.scotland.value.name,
             UKRegion.south_west.value.name,
             UKRegion.south_east.value.name,
-            UKRegion.ukti_dubai_hub.value.name,
+            # UKRegion.ukti_dubai_hub.value.name,
             UKRegion.wales.value.name,
             UKRegion.yorkshire_and_the_humber.value.name,
             UKRegion.west_midlands.value.name,
@@ -248,6 +249,26 @@ def generate_issue_types(faker):
         unique=True,
     )
     return sorted(issue_types)
+
+
+@pytest.fixture
+def generate_issue_type(faker):
+    """
+    Generate random issue type
+    :param faker: Faker Library
+    :return: Random issue type
+    """
+    issue_type = faker.random_element(
+        elements=(
+            IssueType.covid_19,
+            IssueType.economic_risk,
+            IssueType.domestic_policy,
+            IssueType.economic_opportunity,
+            IssueType.international_climate,
+            IssueType.uk_transition_policy,
+        ),
+    )
+    return issue_type
 
 
 @pytest.fixture
@@ -418,13 +439,13 @@ def generate_department_eyes(faker):
 
 
 @pytest.fixture
-def generate_policy_area(faker):
+def generate_policy_areas(faker):
     """
-    Generate random policy_area
+    Generate random policy_area arrays
     :param faker: Faker Library
-    :return: Random policy area
+    :return: Random policy areas array
     """
-    policy_area = faker.random_element(
+    policy_areas = faker.random_elements(
         elements=(
             PolicyArea.access_to_finance,
             PolicyArea.access_to_public_funding,
@@ -444,8 +465,9 @@ def generate_policy_area(faker):
             PolicyArea.energy,
             PolicyArea.other,
         ),
+        unique=True,
     )
-    return policy_area
+    return sorted(policy_areas)
 
 
 @pytest.fixture
@@ -468,11 +490,11 @@ def generate_classification(faker):
 @pytest.fixture
 def generate_sectors_affected(faker):
     """
-    Generate random SectorsAffected
+    Generate random SectorsAffected array
     :param faker: Faker Library
-    :return: Random SectorsAffected
+    :return: Random SectorsAffected array
     """
-    sectors_affected = faker.random_element(
+    sectors_affected = faker.random_elements(
         elements=(
             SectorsAffected.advanced_manufacturing,
             SectorsAffected.consumer_and_retail,
@@ -496,8 +518,9 @@ def generate_sectors_affected(faker):
             SectorsAffected.tourism,
             SectorsAffected.transport,
         ),
+        unique=True,
     )
-    return sectors_affected
+    return sorted(sectors_affected)
 
 
 @pytest.fixture
@@ -536,10 +559,10 @@ def generate_account(
     new_account.ShippingCountry = faker.country()
     new_account.UK_Region__c = generate_uk_region_name
     new_account.Country_HQ__c = faker.random_element(elements=generate_country_names)
-    # check: # Unable to create/update fields: Company_size__c.
+    # CHECK: # Unable to create/update fields: Company_size__c.
     #          Please check the security settings of this field and verify that it is read/write
     # new_account.Company_size__c = faker.random_int()
-    # Removed as this gets duplicate errors when the same values are recycled
+    # NOTE: Removed as this gets duplicate errors when the same values are recycled
     # new_account.Company_Number__c = generate_company_number
     # new_account.Companies_House_ID__c = generate_company_number
     new_account.Location__c = faker.country()
@@ -654,38 +677,41 @@ def generate_event_attendee(
 @pytest.fixture
 def generate_policy_issues(
     faker,
-    generate_issue_types,
+    generate_issue_type,
     generate_uk_region_name,
-    generate_policy_area,
+    generate_policy_areas,
     generate_sentiment,
     generate_classification,
     generate_sectors_affected,
+    generate_country_names,
 ):
     """
     Generate new Event Attendee test data
     :param faker: Faker data generator
-    :param generate_issue_types: Data generated for issue types
+    :param generate_issue_type: Data generated for issue type
     :param generate_uk_region_name: Data generated for uk regions
-    :param generate_policy_area: Data generated for policy area
+    :param generate_policy_areas: Data generated for policy areas
     :param generate_sentiment: Data generated for sentiment
     :param generate_classification: Data generated for classification
     :param generate_sectors_affected: Data generated for sectors effected
+    :param generate_country_names: Data generated for Country names
     """
+    policy_areas = ';'.join(generate_policy_areas)
+    sectors_effected = ';'.join(generate_sectors_affected)
     policy_issues = EditPolicyIssues(
         name=f'Policy Issues Integration Test {datetime.datetime.today()}',
         datahub_id=str(uuid.uuid4()),
-        issue_type=';'.join(generate_issue_types),
+        issue_type=generate_issue_type,
         account_id=str(uuid.uuid4()),
-        policy_area=generate_policy_area,
+        policy_areas=policy_areas,
         sentiment=generate_sentiment,
         classification=generate_classification,
-        sectors_affected=generate_sectors_affected,
+        sectors_affected=sectors_effected,
         uk_region_affected=generate_uk_region_name,
     )
     policy_issues.Add_Interactions__c = str(uuid.uuid4())  # Interaction id
     policy_issues.Description_of_Issue__c = faker.text()
     policy_issues.Top_3_Issue__c = TopIssuesByRank.eight
-    policy_issues.Location_s_Affected__c = generate_uk_region_name
+    policy_issues.Location_s_Affected__c = ';'.join(generate_country_names)
     policy_issues.UK_Affected__c = generate_uk_region_name
-    # TODO: Non mandatory fields
     return policy_issues

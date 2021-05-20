@@ -315,8 +315,9 @@ class PolicyArea(str, Enum):
     announcement_feedback = 'Announcement Feedback'
     art_culture_sport_and_leisure = 'Art, Culture, Sport and Leisure'
     business_regulation = 'Business Regulation'
-    company_law_and_company_reporting = 'Company Law and Company Reporting'
-    competition_law_and_policy = 'Competition Law and Policy'
+    # CHECK: Why \u200b in the data
+    company_law_and_company_reporting = 'Company Law and Company \u200bReporting'
+    competition_law_and_policy = 'Competition \u200bLaw and Policy'
     consumer_rights = 'Consumer Rights'
     customs_union = 'Customs Union'
     cybersecurity = 'Cybersecurity'
@@ -349,7 +350,7 @@ class PolicyArea(str, Enum):
     movement_of_goods = 'Movement of Goods'
     movement_of_people_temporary = (
         'Movement of People - '
-        'Temporary(foreign travel and short term contracts)'
+        'Temporary (foreign travel and short term contracts)'
     )
     movement_of_services = 'Movement of Services'
     national_security = 'National Security'
@@ -373,16 +374,16 @@ class PolicyArea(str, Enum):
     tax_and_revenue = 'Tax and Revenue'
     technology = 'Technology'
     trading_standards_and_product_regulations = 'Trading Standards and Product Regulations'
-    transportation = 'Transportation(Freight and People)'
+    transportation = 'Transportation (Freight and People)'
     workforce = 'Workforce'
     cop26_adaptation_and_resilience = (
-        'COP26 Adaptation and Resilience'
+        'COP26 Adaptation and Resilience '
         '(including CCRI and Climate Action 100+)'
     )
-    cop26_clean_transport = 'COP26 Clean Transport(including EV100)'
-    cop26_energy_transitions = 'COP26 Energy Transitions(including RE100 and EP100)'
-    cop26_finance = 'COP26 Finance(including TCFD)'
-    cop26_nature = 'COP26 Nature(including supply chains)'
+    cop26_clean_transport = 'COP26 Clean Transport (including EV100)'
+    cop26_energy_transitions = 'COP26 Energy Transitions (including RE100 and EP100)'
+    cop26_finance = 'COP26 Finance (including TCFD)'
+    cop26_nature = 'COP26 Nature (including supply chains)'
     cop26_participation_at_glasgow = 'COP26 - Participation at Glasgow'
 
 
