@@ -409,6 +409,7 @@ def generate_sentiment(faker):
             Sentiment.negative,
             Sentiment.neutral,
             Sentiment.positive,
+            Sentiment.none,
         ),
     )
     return sentiment
