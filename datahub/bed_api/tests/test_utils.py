@@ -111,23 +111,28 @@ def assert_all_data_exists_on_bed(
     bed_entity: BedEntity,
     record_id,
     repository: SalesforceRepository,
+    validate_data=True,
 ):
     """
     Verifies the get and data posted on Salesforce
     :param bed_entity: Bed entity that can compare the final data on Salesforce
     :param record_id:  Unique identifier or Id record
     :param repository: Salesforce Repository to retrieve data
+    :param validate_data: If True checks all the key values otherwise ignores
+    Note: this is mostly ignored when Salesforce changes the data order on lists,
+    merges other list data or text fields stripping out characters
     """
     exists = repository.exists(record_id)
     assert exists is True
     salesforce_data = repository.get(record_id)
     assert salesforce_data is not None
-    for key, value in bed_entity.as_values_only_dict().items():
-        failure_message = (
-            f'Failed property "{key}" with value "{value}"'
-            f' not equal to"{salesforce_data[key]}"'
-        )
-        assert salesforce_data[key] == value, failure_message
+    if validate_data:
+        for key, value in bed_entity.as_values_only_dict().items():
+            failure_message = (
+                f'Failed property "{key}" with value "{value}"'
+                f' not equal to"{salesforce_data[key]}"'
+            )
+            assert salesforce_data[key] == value, failure_message
 
 
 def remove_newline(value: str) -> str:
