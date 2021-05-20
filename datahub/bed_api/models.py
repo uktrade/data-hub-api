@@ -40,8 +40,7 @@ class BedEntity:
         Utilises the internal dictionary to generate all values even if blank
         :return: Generated dictionary of all class values as name value pair
         """
-        result = copy.deepcopy(self.__dict__)
-        return result
+        return copy.deepcopy(self.__dict__)
 
 
 class EditAccount(BedEntity):
