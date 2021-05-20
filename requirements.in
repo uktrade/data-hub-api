@@ -11,7 +11,7 @@ django-reversion==3.0.9
 uritemplate==3.0.1  # required for DRF schema features
 whitenoise==5.2.0
 
-chardet==3.0.4
+chardet==4.0.0
 pyyaml==5.4.1
 python-dateutil==2.8.1
 
@@ -19,7 +19,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.6
 psycogreen==1.0.2
 
-boto3==1.17.64
+boto3==1.17.73
 
 notifications-python-client==6.1.0
 
@@ -50,26 +50,26 @@ billiard==3.6.4.0  # Not used directly, but pinned as it has been a source of br
 kombu==4.6.11  # Not used directly, but pinned as it has been a source of breakage in the past
 
 # Testing and dev
-pytest==6.2.3
-pytest-django==4.2.0
-pytest-cov==2.11.1
+pytest==6.2.4
+pytest-django==4.3.0
+pytest-cov==2.12.0
 pytest-xdist==2.2.1
-ipython==7.23.0
+ipython==7.23.1
 factory-boy==3.2.0
 freezegun==1.1.0
 requests-mock==1.9.2
 django-debug-toolbar==3.2.1
-werkzeug==1.0.1  # Required by runserver_plus - useful for local dev
+werkzeug==2.0.0  # Required by runserver_plus - useful for local dev
 pip-tools==6.1.0
 piprot==0.9.11
 semantic_version==2.8.5
 towncrier==21.3.0
-watchdog[watchmedo]==2.1.0
+watchdog[watchmedo]==2.1.1
 pre-commit==2.12.1
 
 
 # Code static analysis
-flake8==3.9.1
+flake8==3.9.2
 flake8-bugbear==21.4.3
 flake8-commas==2.0.0
 flake8-debugger==4.0.0
@@ -86,4 +86,4 @@ gevent==21.1.2
 mohawk==1.1.0
 requests==2.25.1
 requests_toolbelt==0.9.1
-sentry_sdk==1.0.0
+sentry_sdk==1.1.0

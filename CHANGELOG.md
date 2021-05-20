@@ -1,3 +1,9 @@
+# Data Hub API 36.19.0 (2021-05-20)
+## Features
+
+- **Investment** The `country_investment_originates_from` field is now being updated until the investment project is won.
+
+
 # Data Hub API 36.18.0 (2021-05-05)
 
 
