@@ -32,7 +32,7 @@ class TestIntegrationEventRepositoryShould:
         BED_IS_SANDBOX
     """
 
-    def test_fuzz_on_crud_operations_utilising(
+    def test_fuzz_add_update_and_paginate_data(
         self,
         event_repository,
         faker,
@@ -69,7 +69,7 @@ class TestIntegrationEventRepositoryShould:
                 event=generate_event,
             )
         finally:
-            # Delete to clean up integration test
+            # DELETE to clean up integration test
             delete_and_assert_deletion(
                 repository=event_repository,
                 record_id=event_id,
