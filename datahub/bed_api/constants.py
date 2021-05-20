@@ -315,7 +315,7 @@ class PolicyArea(str, Enum):
     announcement_feedback = 'Announcement Feedback'
     art_culture_sport_and_leisure = 'Art, Culture, Sport and Leisure'
     business_regulation = 'Business Regulation'
-    # CHECK: Why \u200b in the data
+    # This value needs to be exactly the same as what is in Salesforce
     company_law_and_company_reporting = 'Company Law and Company \u200bReporting'
     competition_law_and_policy = 'Competition \u200bLaw and Policy'
     consumer_rights = 'Consumer Rights'
