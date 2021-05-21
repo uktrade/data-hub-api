@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
 
@@ -109,8 +110,10 @@ def update_country_investment_originates_from(sender, **kwargs):
         investment_projects = InvestmentProject.objects.filter(
             investor_company_id=instance.pk,
         ).exclude(
-            stage_id=InvestmentProjectStage.won.value.id,
+            Q(stage_id=InvestmentProjectStage.won.value.id)
+            or Q(country_investment_originates_from_id=instance.address_country_id),
         )
+
         for investment_project in investment_projects:
             investment_project.country_investment_originates_from_id = instance.address_country_id
             investment_project.save(
