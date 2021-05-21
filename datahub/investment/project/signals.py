@@ -111,7 +111,7 @@ def update_country_investment_originates_from(sender, **kwargs):
             investor_company_id=instance.pk,
         ).exclude(
             Q(stage_id=InvestmentProjectStage.won.value.id)
-            or Q(country_investment_originates_from_id=instance.address_country_id),
+            | Q(country_investment_originates_from_id=instance.address_country_id),
         )
 
         for investment_project in investment_projects:
