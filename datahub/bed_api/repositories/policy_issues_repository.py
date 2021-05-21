@@ -1,4 +1,4 @@
-from simple_salesforce import format_soql, Salesforce
+from simple_salesforce import format_soql
 
 from datahub.bed_api.constants import (
     PolicyIssuesQuery,
@@ -11,13 +11,6 @@ class PolicyIssuesRepository(SalesforceRepository):
     Repository pattern for Salesforce interactions with Policy Issues data
     https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/01I580000011RrH/FieldsAndRelationships/view
     """
-
-    def __init__(self, salesforce: Salesforce):
-        """
-        Constructor
-        :param salesforce: Simple Salesforce representing session information
-        """
-        super().__init__(salesforce=salesforce)
 
     def add(self, data):
         """
