@@ -1,4 +1,4 @@
-from simple_salesforce import format_soql, Salesforce
+from simple_salesforce import format_soql
 
 from datahub.bed_api.constants import ContactQuery
 from datahub.bed_api.repositories.salesforce_repository import SalesforceRepository
@@ -9,13 +9,6 @@ class ContactRepository(SalesforceRepository):
     Repository pattern for Salesforce interactions with Contacts data
     https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/Contact/FieldsAndRelationships/view
     """
-
-    def __init__(self, salesforce: Salesforce):
-        """
-        Constructor
-        :param salesforce: Simple Salesforce representing session information
-        """
-        super().__init__(salesforce=salesforce)
 
     def add(self, data):
         """

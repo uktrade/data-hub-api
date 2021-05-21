@@ -159,7 +159,6 @@ class EditEvent(BedEntity):
         self.Description__c = None
         self.Interaction_Type__c = InteractionType.none
         self.Webinar_Information__c = None
-        # self.Number_of_Attendees__c = None # Readonly
         # Address
         self.Address__c = None
         self.Location__c = None
