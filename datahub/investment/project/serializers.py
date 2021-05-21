@@ -445,13 +445,22 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         # Store investor company details used for reporting
         # Investor company details may change over time, that's why we need to keep the details
         # at the time of investment project creation and update until the project is won
-        project_isnt_won = (
+        if 'investor_company' not in data:
+            return
+        investor_company = data['investor_company']
+
+        if (
             self.instance
-            and str(self.instance.stage_id) != InvestmentProjectStage.won.value.id
-        )
-        if (not self.instance or project_isnt_won) and 'investor_company' in data:
-            investor_company = data['investor_company']
-            data['country_investment_originates_from'] = investor_company.address_country
+            and (
+                str(self.instance.stage_id) == InvestmentProjectStage.won.value.id
+                or investor_company.address_country
+                == self.instance.country_investment_originates_from
+            )
+        ):
+            # nothing to update, as either project is won or country is the same
+            return
+
+        data['country_investment_originates_from'] = investor_company.address_country
 
     def _check_if_investment_project_can_be_moved_to_verify_win(self, data):
         # only project manager or project assurance adviser can move a project to verify win
