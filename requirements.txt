@@ -237,7 +237,7 @@ pycodestyle==2.7.0
     #   flake8-debugger
     #   flake8-import-order
     #   flake8-print
-pydocstyle==6.0.0
+pydocstyle==6.1.1
     # via
     #   -r requirements.in
     #   flake8-docstrings
