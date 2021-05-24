@@ -367,7 +367,7 @@ watchdog[watchmedo]==2.1.1
     # via -r requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
-werkzeug==2.0.0
+werkzeug==2.0.1
     # via -r requirements.in
 whitenoise==5.2.0
     # via -r requirements.in
