@@ -60,7 +60,6 @@ class EditAccount(BedEntity):
         self.High_Level_Sector__c = high_level_sector  # *
         self.Low_Level_Sector__c = low_level_sector  # *
         self.Company_Number__c = None
-        self.Company_size__c = None  # int value
         self.Companies_House_ID__c = None
         self.BEIS_External_Affairs__c = None
         #  Address

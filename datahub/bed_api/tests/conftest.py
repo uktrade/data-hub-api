@@ -432,9 +432,6 @@ def generate_account(
     new_account.ShippingCountry = faker.country()
     new_account.UK_Region__c = generate_uk_region_name
     new_account.Country_HQ__c = faker.random_element(elements=generate_country_names)
-    # CHECK: # Unable to create/update fields: Company_size__c.
-    #          Please check the security settings of this field and verify that it is read/write
-    # new_account.Company_size__c = faker.random_int()
     # NOTE: Removed as this gets duplicate errors when the same values are recycled
     # new_account.Company_Number__c = generate_company_number
     # new_account.Companies_House_ID__c = generate_company_number
