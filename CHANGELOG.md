@@ -1,3 +1,9 @@
+# Data Hub API 36.20.0 (2021-05-24)
+## Bug fixes
+
+- **Investment** The audit log is no longer updated when there was no change to `country_investment_originates_from`.
+
+
 # Data Hub API 36.19.0 (2021-05-20)
 ## Features
 
