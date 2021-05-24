@@ -1,34 +1,72 @@
-from simple_salesforce import Salesforce
+"""
+If you don't use the unit of work pattern, you can delete:
+ factories.py
+ unit_or_work.py
+ repositories/
+
+Note that this implementation doesn't close sessions.
+"""
+
+from simple_salesforce import format_soql, Salesforce
 
 
-class SalesforceRepository:
+class SalesforceAPI:
     """
     Base Salesforce Repository to encapsulate default CRUD operations
     for interacting with Salesforce API
     """
+    repository_table = None
 
-    def __init__(self, salesforce: Salesforce):
+    def __init__(self, username, password, security_token, domain=None):
         """
-        Salesforce
-        :param salesforce:
+        Create a Salesforce API instance with configured settings
         """
-        self.salesforce = salesforce
+        self.salesforce = Salesforce(
+            username=username,
+            password=password,
+            security_token=security_token,
+            domain=domain,
+        )
 
     def add(self, data):
         """
-        Creates a new SObject using a POST
+        Creates a new SObject
+
         :param data: A dict of the data to create the SObject from
-        :raises: NotImplementedError
+
+        :return: New Salesforce Object
         """
-        raise NotImplementedError
+        return getattr(self.salesforce, self.respository_name).create(data)
+
+    def get(self, record_id):
+        """
+        Get a single item by unique identifier
+
+        :param record_id: Unique identifier value
+
+        :return: Salesforce Object
+        """
+        return getattr(self.salesforce, self.respository_name).get(record_id)
+
+    def update(self, record_id, data):
+        """
+        Update based on some unique identifier
+
+        :param record_id: Record identifier
+        :param data: Represents a dictionary of name values:
+
+        :return: Updated Salesforce Object
+        """
+        return getattr(self.salesforce, self.respository_name).update(record_id, data)
 
     def delete(self, record_id):
         """
         Delete a single item by unique identifier
         :param record_id: Record id for deleting data
-        :raises: NotImplementedError
+
+        :returns: Delete result
         """
-        raise NotImplementedError
+        return getattr(self.salesforce, self.respository_name).delete(record_id)
 
     def exists(self, record_id):
         """
@@ -38,15 +76,27 @@ class SalesforceRepository:
         :param record_id: Unique identifier value, associated with Id value typically
         :raises: NotImplementedError
         """
-        raise NotImplementedError
+        query = f'SELECT Id FROM {self.repository_table} WHERE Id = {{id}}'
+        response = self.query(
+            format_soql(query, id=record_id),
+        )
+        return self.exists_status(record_id, response)
 
-    def get(self, record_id):
+    def exists_status(self, record_id, response) -> bool:
         """
-        Get a single item by unique identifier
-        :param record_id: Unique identifier value
-        :raises: NotImplementedError
+        Check if a record exists by the response
+        :param record_id: Unique identifier
+        :param response: Response returned from query by id
+        :return: True if response assigned, totalSize is
+                 greater than 1 and there is a record id
+                 the equivalent of that value
         """
-        raise NotImplementedError
+        return (
+            response is not None
+            and response['totalSize'] >= 1
+            and len(response['records']) > 0
+            and response['records'][0].get('Id') == record_id
+        )
 
     def get_by(self, custom_id_field, custom_id_value):
         """
@@ -56,7 +106,10 @@ class SalesforceRepository:
         :param custom_id_value: External ID value
         :raises: NotImplementedError
         """
-        raise NotImplementedError
+        return getattr(self.salesforce, self.respository_name).get_by_custom_id(
+            custom_id_field,
+            custom_id_value,
+        )
 
     def query(self, query, include_deleted=False, **kwargs):
         """
@@ -99,29 +152,4 @@ class SalesforceRepository:
             identifier_is_url,
             include_deleted,
             **kwargs,
-        )
-
-    def update(self, record_id, data):
-        """
-        Update based on some unique identifier
-        :param record_id: Record identifier
-        :param data: Represents a dictionary of name values:
-        :raises: NotImplementedError
-        """
-        raise NotImplementedError
-
-    def exists_status(self, record_id, response) -> bool:
-        """
-        Check if a record exists by the response
-        :param record_id: Unique identifier
-        :param response: Response returned from query by id
-        :return: True if response assigned, totalSize is
-                 greater than 1 and there is a record id
-                 the equivalent of that value
-        """
-        return (
-            response is not None
-            and response['totalSize'] >= 1
-            and len(response['records']) > 0
-            and response['records'][0].get('Id') == record_id
         )

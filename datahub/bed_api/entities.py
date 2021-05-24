@@ -43,7 +43,7 @@ class BedEntity:
         return copy.deepcopy(self.__dict__)
 
 
-class EditAccount(BedEntity):
+class Account(BedEntity):
     """
     Salesforce representation of an Organization/Account edit details
     """
@@ -88,7 +88,7 @@ class EditAccount(BedEntity):
         self.IS_Sentiment__c = None
 
 
-class EditContact(BedEntity):
+class Contact(BedEntity):
     """
     Salesforce representation of a Contact
     """
@@ -140,7 +140,7 @@ class EditContact(BedEntity):
         return ' '.join(names)
 
 
-class EditEvent(BedEntity):
+class Event(BedEntity):
     """Salesforce representation of an interaction or event"""
 
     def __init__(
@@ -181,7 +181,7 @@ class EditEvent(BedEntity):
         self.Theme__c = None  # Lookup on Theme ...
 
 
-class EditEventAttendee(BedEntity):
+class EventAttendee(BedEntity):
     """Salesforce representation of an event attendee"""
 
     def __init__(
@@ -199,7 +199,7 @@ class EditEventAttendee(BedEntity):
         self.Email__c = None
 
 
-class EditPolicyIssues(BedEntity):
+class PolicyIssues(BedEntity):
     """Salesforce representation of an interaction or event"""
 
     def __init__(

@@ -55,13 +55,6 @@ class BedUnitOfWork(UnitOfWork):
         self.policy_issues = PolicyIssuesRepository(self.salesforce)
         return self
 
-    def __exit__(self, *args):
-        """
-        Cleans up when the with is finalised
-        :param args:
-        """
-        super().__exit__(*args)
-
     def close_session(self):
         """
         Close session
