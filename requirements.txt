@@ -63,7 +63,7 @@ decorator==5.0.7
     # via ipython
 distlib==0.3.1
     # via virtualenv
-django-axes==5.15.0
+django-axes==5.16.0
     # via -r requirements.in
 django-debug-toolbar==3.2.1
     # via -r requirements.in
