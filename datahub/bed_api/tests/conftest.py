@@ -110,14 +110,7 @@ def generate_high_level_sector(faker):
     """
     high_level_sector = faker.random_element(
         elements=(
-            HighLevelSector.defense,
-            HighLevelSector.food_and_agriculture,
-            HighLevelSector.energy,
-            HighLevelSector.financial_services,
-            HighLevelSector.environmental_services,
-            HighLevelSector.education_and_research,
-            HighLevelSector.creative_industries,
-            HighLevelSector.advanced_manufacturing,
+            HighLevelSector.values(HighLevelSector)
         ),
     )
     return high_level_sector
@@ -132,12 +125,7 @@ def generate_low_level_sector(faker):
     """
     low_level_sector = faker.random_element(
         elements=(
-            LowLevelSector.consumers,
-            LowLevelSector.digital,
-            LowLevelSector.digital_infrastructure,
-            LowLevelSector.retail,
-            LowLevelSector.real_estate,
-            LowLevelSector.telecoms,
+            LowLevelSector.values(LowLevelSector)
         ),
     )
     return low_level_sector
@@ -189,16 +177,7 @@ def generate_salutation(faker):
     """
     salutation = faker.random_element(
         elements=(
-            Salutation.mrs,
-            Salutation.mr,
-            Salutation.prof,
-            Salutation.dame,
-            Salutation.dr,
-            Salutation.lord,
-            Salutation.miss,
-            Salutation.ms,
-            Salutation.sir,
-            Salutation.right_honourable,
+            Salutation.values(Salutation)
         ),
     )
     return salutation
@@ -239,12 +218,7 @@ def generate_issue_types(faker):
     """
     issue_types = faker.random_elements(
         elements=(
-            IssueType.covid_19,
-            IssueType.economic_risk,
-            IssueType.domestic_policy,
-            IssueType.economic_opportunity,
-            IssueType.international_climate,
-            IssueType.uk_transition_policy,
+            IssueType.values(IssueType)
         ),
         unique=True,
     )
@@ -260,12 +234,7 @@ def generate_issue_type(faker):
     """
     issue_type = faker.random_element(
         elements=(
-            IssueType.covid_19,
-            IssueType.economic_risk,
-            IssueType.domestic_policy,
-            IssueType.economic_opportunity,
-            IssueType.international_climate,
-            IssueType.uk_transition_policy,
+            IssueType.values(IssueType)
         ),
     )
     return issue_type
@@ -280,31 +249,7 @@ def generate_job_type(faker):
     """
     job_type = faker.random_element(
         elements=(
-            JobType.consultant,
-            JobType.hr,
-            JobType.ceo,
-            JobType.chairperson,
-            JobType.communications,
-            JobType.corporate_social_responsibility,
-            JobType.director,
-            JobType.education,
-            JobType.engineering,
-            JobType.executive,
-            JobType.finance,
-            JobType.financial_director,
-            JobType.founder,
-            JobType.head_of_public_affairs,
-            JobType.health_professional,
-            JobType.head_of_public_affairs,
-            JobType.hr,
-            JobType.legal,
-            JobType.manager,
-            JobType.operations,
-            JobType.other,
-            JobType.owner,
-            JobType.policy,
-            JobType.president,
-            JobType.public_affairs,
+            JobType.values(JobType)
         ),
     )
     return job_type
@@ -319,17 +264,7 @@ def generate_business_area(faker):
     """
     business_area = faker.random_element(
         elements=(
-            BusinessArea.advanced_manufacturing,
-            BusinessArea.civil_society,
-            BusinessArea.consumer_and_retail,
-            BusinessArea.creative_industries,
-            BusinessArea.defense,
-            BusinessArea.education_and_research,
-            BusinessArea.energy,
-            BusinessArea.environmental_services,
-            BusinessArea.financial_services,
-            BusinessArea.food_and_agriculture,
-            BusinessArea.professional,
+            BusinessArea.values(BusinessArea)
         ),
     )
     return business_area
@@ -342,21 +277,12 @@ def generate_interaction_type(faker):
     :param faker: Faker Library
     :return: Random interaction type
     """
-    company_number = faker.random_element(
+    interaction_type = faker.random_element(
         elements=(
-            InteractionType.forum,
-            InteractionType.letter,
-            InteractionType.email,
-            InteractionType.bilateral_meeting,
-            InteractionType.brush_by,
-            InteractionType.conference,
-            InteractionType.multilateral_meeting,
-            InteractionType.phone_call,
-            InteractionType.reception,
-            InteractionType.roadshow,
+            InteractionType.values(InteractionType)
         ),
     )
-    return company_number
+    return interaction_type
 
 
 @pytest.fixture
@@ -389,9 +315,7 @@ def generate_transparency_status(faker):
     """
     transparency_status = faker.random_element(
         elements=(
-            TransparencyStatus.delete,
-            TransparencyStatus.draft,
-            TransparencyStatus.confirm,
+            TransparencyStatus.values(TransparencyStatus)
         ),
     )
     return transparency_status
@@ -405,12 +329,7 @@ def generate_sentiment(faker):
     :return: Random sentiment
     """
     sentiment = faker.random_element(
-        elements=(
-            Sentiment.negative,
-            Sentiment.neutral,
-            Sentiment.positive,
-            Sentiment.none,
-        ),
+        elements=Sentiment.values(Sentiment),
     )
     return sentiment
 
@@ -424,16 +343,7 @@ def generate_department_eyes(faker):
     """
     department_eyes_only = faker.random_element(
         elements=(
-            DepartmentEyes.advanced_manufacturing,
-            DepartmentEyes.creative_industries,
-            DepartmentEyes.energy,
-            DepartmentEyes.environmental_services,
-            DepartmentEyes.financial_services,
-            DepartmentEyes.food_and_agriculture,
-            DepartmentEyes.consumer_and_retail,
-            DepartmentEyes.civil_society,
-            DepartmentEyes.aviation,
-            DepartmentEyes.defence,
+            DepartmentEyes.values(DepartmentEyes)
         ),
     )
     return department_eyes_only
@@ -448,23 +358,7 @@ def generate_policy_areas(faker):
     """
     policy_areas = faker.random_elements(
         elements=(
-            PolicyArea.access_to_finance,
-            PolicyArea.access_to_public_funding,
-            PolicyArea.agriculture,
-            PolicyArea.announcement_feedback,
-            PolicyArea.art_culture_sport_and_leisure,
-            PolicyArea.business_regulation,
-            PolicyArea.company_law_and_company_reporting,
-            PolicyArea.cybersecurity,
-            PolicyArea.competition_law_and_policy,
-            PolicyArea.customs_union,
-            PolicyArea.consumer_rights,
-            PolicyArea.cop26_adaptation_and_resilience,
-            PolicyArea.cop26_clean_transport,
-            PolicyArea.cop26_energy_transitions,
-            PolicyArea.cop26_finance,
-            PolicyArea.energy,
-            PolicyArea.other,
+            PolicyArea.values(PolicyArea)
         ),
         unique=True,
     )
@@ -480,9 +374,7 @@ def generate_classification(faker):
     """
     classification = faker.random_element(
         elements=(
-            Classification.official,
-            Classification.official_sensitive,
-            Classification.unclassified,
+            Classification.values(Classification)
         ),
     )
     return classification
@@ -497,27 +389,7 @@ def generate_sectors_affected(faker):
     """
     sectors_affected = faker.random_elements(
         elements=(
-            SectorsAffected.advanced_manufacturing,
-            SectorsAffected.consumer_and_retail,
-            SectorsAffected.creative_industries,
-            SectorsAffected.civil_society,
-            SectorsAffected.defense,
-            SectorsAffected.education_and_research,
-            SectorsAffected.energy,
-            SectorsAffected.environmental_services,
-            SectorsAffected.financial_services,
-            SectorsAffected.food_and_agriculture,
-            SectorsAffected.health_and_social_care,
-            SectorsAffected.infrastructure_construction_and_housing,
-            SectorsAffected.justice_rights_and_equality,
-            SectorsAffected.life_sciences,
-            SectorsAffected.materials,
-            SectorsAffected.media_and_broadcasting,
-            SectorsAffected.pan_economy_trade_body,
-            SectorsAffected.professional_and_business_services,
-            SectorsAffected.tech_and_telecoms,
-            SectorsAffected.tourism,
-            SectorsAffected.transport,
+            SectorsAffected.values(SectorsAffected)
         ),
         unique=True,
     )

@@ -91,7 +91,23 @@ class EventAttendeeQuery(Enum):
     )
 
 
-class Salutation(str, Enum):
+class StringEnum(str, Enum):
+    """
+    Enumeration representing lookup and picklist types that cast
+    to a string value
+    """
+
+    def values(self):
+        """
+        Output values as a list
+        :return: Values as list
+        """
+        result = list(map(lambda x: x.value, self._member_map_.values()))
+        result.remove('')
+        return result
+
+
+class Salutation(StringEnum):
     """Salutations from BED"""
 
     none = ''
@@ -108,7 +124,7 @@ class Salutation(str, Enum):
     dame = 'Dame'
 
 
-class ContactType(str, Enum):
+class ContactType(StringEnum):
     """Contact Types from BED"""
 
     none = ''
@@ -116,7 +132,7 @@ class ContactType(str, Enum):
     external = 'External Attendees'
 
 
-class JobType(str, Enum):
+class JobType(StringEnum):
     """Job Types from BED"""
 
     none = ''
@@ -145,7 +161,7 @@ class JobType(str, Enum):
     public_affairs = 'Public Affairs'
 
 
-class BusinessArea(str, Enum):
+class BusinessArea(StringEnum):
     """Business Area Types from BED"""
 
     none = ''
@@ -162,7 +178,7 @@ class BusinessArea(str, Enum):
     food_and_agriculture = 'Food & Agriculture'
 
 
-class HighLevelSector(str, Enum):
+class HighLevelSector(StringEnum):
     """High Level Sector Types from BED"""
 
     none = ''
@@ -178,7 +194,7 @@ class HighLevelSector(str, Enum):
     food_and_agriculture = 'Food & Agriculture'
 
 
-class LowLevelSector(str, Enum):
+class LowLevelSector(StringEnum):
     """Low Level Sector Types from BED"""
 
     none = ''
@@ -190,7 +206,7 @@ class LowLevelSector(str, Enum):
     telecoms = 'Telecoms'
 
 
-class InteractionType(str, Enum):
+class InteractionType(StringEnum):
     """Interaction Types from BED"""
 
     none = ''
@@ -206,7 +222,7 @@ class InteractionType(str, Enum):
     roadshow = 'Roadshow'
 
 
-class TransparencyStatus(str, Enum):
+class TransparencyStatus(StringEnum):
     """Transparency Status from BED"""
 
     none = ''
@@ -215,7 +231,7 @@ class TransparencyStatus(str, Enum):
     delete = 'Delete'
 
 
-class IssueType(str, Enum):
+class IssueType(StringEnum):
     """Issue Types from BED"""
 
     none = ''
@@ -228,7 +244,7 @@ class IssueType(str, Enum):
     non_eu_trade_priority = 'Non-EU Trade Priority'
 
 
-class DepartmentEyes(str, Enum):
+class DepartmentEyes(StringEnum):
     """Department Eyes from BED"""
 
     none = ''
@@ -244,7 +260,7 @@ class DepartmentEyes(str, Enum):
     food_and_agriculture = 'Food & Agriculture (DEFRA)'
 
 
-class SectorsAffected(str, Enum):
+class SectorsAffected(StringEnum):
     """Sector(s) Affected from BED"""
 
     none = ''
@@ -271,7 +287,7 @@ class SectorsAffected(str, Enum):
     transport = 'Transport'
 
 
-class Sentiment(str, Enum):
+class Sentiment(StringEnum):
     """Sentiment from BED"""
 
     none = ''
@@ -280,7 +296,7 @@ class Sentiment(str, Enum):
     negative = 'Negative'
 
 
-class Classification(str, Enum):
+class Classification(StringEnum):
     """Classification from BED"""
 
     none = ''
@@ -289,7 +305,7 @@ class Classification(str, Enum):
     unclassified = 'Unclassified'
 
 
-class TopIssuesByRank(str, Enum):
+class TopIssuesByRank(StringEnum):
     """Top Issues by Rank from BED"""
 
     none = ''
@@ -305,7 +321,7 @@ class TopIssuesByRank(str, Enum):
     ten = '10'
 
 
-class PolicyArea(str, Enum):
+class PolicyArea(StringEnum):
     """Policy Area from BED"""
 
     none = ''
@@ -336,7 +352,8 @@ class PolicyArea(str, Enum):
     gender_pay = 'Gender Pay'
     government_communications = 'Government Communications'
     government_procurement = 'Government Procurement'
-    nhs = 'NHS'
+    # CHECK: why this value is not retained
+    # nhs = 'NHS'
     imports = 'Imports'
     inclusive_economy = 'Inclusive Economy'
     industrial_strategy = 'Industrial Strategy'
@@ -354,8 +371,8 @@ class PolicyArea(str, Enum):
     )
     movement_of_services = 'Movement of Services'
     national_security = 'National Security'
-    new_disruptive_technologies = 'New / Disruptive Technologies'
-    new_investment_jobs = 'New Investment / Jobs'
+    new_disruptive_technologies = 'New/ Disruptive Technologies'
+    new_investment_jobs = 'New Investment/Jobs;'
     northern_powerhouse = 'Northern Powerhouse'
     nuclear = 'Nuclear'
     other = 'Other'
@@ -365,7 +382,7 @@ class PolicyArea(str, Enum):
     repeal_bill = 'Repeal Bill'
     returnships = 'Returnships'
     rules_of_origin = 'Rules of Origin'
-    science_r_and_d_and_innovation = 'Science, R & D and Innovation'
+    science_r_and_d_and_innovation = 'Science, R&D and Innovation'
     social_care = 'Social Care'
     standards = 'Standards'
     state_aid = 'State Aid'
@@ -387,7 +404,7 @@ class PolicyArea(str, Enum):
     cop26_participation_at_glasgow = 'COP26 - Participation at Glasgow'
 
 
-class RegionOrInternational(str, Enum):
+class RegionOrInternational(StringEnum):
     """UK Region or International Affected from BED"""
 
     none = ''
