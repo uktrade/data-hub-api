@@ -18,7 +18,7 @@ class SalesforceRepository:
         """
         Creates a new SObject using a POST
         :param data: A dict of the data to create the SObject from
-        :return: Raises NotImplementedError
+        :raises: NotImplementedError
         """
         raise NotImplementedError
 
@@ -26,7 +26,7 @@ class SalesforceRepository:
         """
         Delete a single item by unique identifier
         :param record_id: Record id for deleting data
-        :return: Raises NotImplementedError
+        :raises: NotImplementedError
         """
         raise NotImplementedError
 
@@ -36,7 +36,7 @@ class SalesforceRepository:
         the most efficient mechanism for checking ie the least content
         with ideally a head verb
         :param record_id: Unique identifier value, associated with Id value typically
-        :return: Raises NotImplementedError
+        :raises: NotImplementedError
         """
         raise NotImplementedError
 
@@ -44,7 +44,7 @@ class SalesforceRepository:
         """
         Get a single item by unique identifier
         :param record_id: Unique identifier value
-        :return: Raises NotImplementedError
+        :raises: NotImplementedError
         """
         raise NotImplementedError
 
@@ -54,7 +54,7 @@ class SalesforceRepository:
         :param custom_id_field: API name of a custom field that was defined
                              as an External ID
         :param custom_id_value: External ID value
-        :return: Raises NotImplementedError
+        :raises: NotImplementedError
         """
         raise NotImplementedError
 
@@ -106,7 +106,7 @@ class SalesforceRepository:
         Update based on some unique identifier
         :param record_id: Record identifier
         :param data: Represents a dictionary of name values:
-        :return: Returns NotImplementedError
+        :raises: NotImplementedError
         """
         raise NotImplementedError
 
