@@ -10,7 +10,9 @@ from datahub.bed_api.repositories import (
 
 class UnitOfWork:
     """
-    Base Unit of Work
+    Unit of Work Unit of Work merges many small database
+    updates in single batch to optimize the number of round-trips e.g.
+        https://martinfowler.com/eaaCatalog/unitOfWork.html
     """
 
     def __exit__(self, *args):
@@ -24,7 +26,7 @@ class UnitOfWork:
 
     def close_session(self):
         """
-        Close any active sessions
+        Close any active sessions or external infrastructure
         """
         raise NotImplementedError
 

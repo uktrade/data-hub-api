@@ -4,7 +4,8 @@ from simple_salesforce import Salesforce
 class SalesforceRepository:
     """
     Base Salesforce Repository to encapsulate default CRUD operations
-    for interacting with Salesforce API
+    for interacting with Salesforce API see repository pattern link for
+    more information https://www.cosmicpython.com/book/chapter_02_repository.html
     """
 
     def __init__(self, salesforce: Salesforce):

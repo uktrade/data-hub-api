@@ -1,6 +1,6 @@
 from unittest import mock
 
-from datahub.bed_api.models import EditAccount, EditContact
+from datahub.bed_api.entities import EditAccount, EditContact
 from datahub.bed_api.repositories import AccountRepository
 from datahub.bed_api.tests.test_utils import (
     create_fail_query_response,

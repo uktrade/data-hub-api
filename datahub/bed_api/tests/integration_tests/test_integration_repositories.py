@@ -3,7 +3,7 @@ from dateutil import parser
 from simple_salesforce import format_soql
 
 from datahub.bed_api.constants import ContactQuery, EventQuery
-from datahub.bed_api.models import (
+from datahub.bed_api.entities import (
     EditAccount,
     EditContact,
     EditEvent,

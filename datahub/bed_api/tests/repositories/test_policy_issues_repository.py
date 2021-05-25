@@ -1,6 +1,6 @@
 from unittest import mock
 
-from datahub.bed_api.models import (
+from datahub.bed_api.entities import (
     EditPolicyIssues,
 )
 from datahub.bed_api.repositories import (
