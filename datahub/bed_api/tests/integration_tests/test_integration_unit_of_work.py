@@ -1,6 +1,6 @@
 import pytest
 
-from datahub.bed_api.models import EditAccount, EditContact
+from datahub.bed_api.entities import EditAccount, EditContact
 from datahub.bed_api.tests.test_utils import NOT_BED_INTEGRATION_TEST_READY
 from datahub.bed_api.unit_of_work import BedUnitOfWork
 

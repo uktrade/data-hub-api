@@ -21,7 +21,7 @@ from datahub.bed_api.constants import (
     TransparencyStatus,
 )
 from datahub.bed_api.factories import BedFactory
-from datahub.bed_api.models import (
+from datahub.bed_api.entities import (
     EditAccount,
     EditContact,
     EditEvent,

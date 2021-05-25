@@ -1,7 +1,7 @@
 from freezegun import freeze_time
 
 from datahub.bed_api.constants import Salutation
-from datahub.bed_api.models import EditContact
+from datahub.bed_api.entities import EditContact
 
 
 class TestEditContactShould:

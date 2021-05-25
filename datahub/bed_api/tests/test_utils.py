@@ -1,7 +1,7 @@
 import os
 from collections import OrderedDict
 
-from datahub.bed_api.models import BedEntity
+from datahub.bed_api.entities import BedEntity
 from datahub.bed_api.repositories import SalesforceRepository
 from datahub.bed_api.utils import remove_blank_from_dict
 
