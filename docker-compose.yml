@@ -16,6 +16,7 @@ services:
       - es
       - redis
       - celery
+      - es-apm
     command: /app/start.sh
 
   celery:

@@ -61,7 +61,6 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     registered_address_1 = factory.Sequence(lambda n: f'{n} Foo st.')
     registered_address_town = 'London'
     registered_address_postcode = factory.Faker('postcode')
-    registered_address_area_id = None
     registered_address_country_id = constants.Country.united_kingdom.value.id
 
     business_type_id = BusinessTypeConstant.private_limited_company.value.id
@@ -112,7 +111,13 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         model = 'company.Company'
 
 
-class SubsidiaryFactory(CompanyFactory):
+class CompanyWithAreaFactory(CompanyFactory):
+    """Company factory with `address_area_id` populated"""
+
+    address_area_id = constants.AdministrativeArea.texas.value.id
+
+
+class SubsidiaryFactory(CompanyWithAreaFactory):
     """Subsidiary factory."""
 
     global_headquarters = factory.SubFactory(
@@ -131,7 +136,7 @@ class OneListCoreTeamMemberFactory(factory.django.DjangoModelFactory):
         model = 'company.OneListCoreTeamMember'
 
 
-class ArchivedCompanyFactory(CompanyFactory):
+class ArchivedCompanyFactory(CompanyWithAreaFactory):
     """Factory for an archived company."""
 
     archived = True
