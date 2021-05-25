@@ -3,10 +3,10 @@ from simple_salesforce import format_soql
 from datahub.bed_api.constants import (
     PolicyIssuesQuery,
 )
-from datahub.bed_api.repositories.salesforce_repository import SalesforceRepository
+from datahub.bed_api.repositories.base_repository import BaseRepository
 
 
-class PolicyIssuesRepository(SalesforceRepository):
+class PolicyIssuesRepository(BaseRepository):
     """
     Repository pattern for Salesforce interactions with Policy Issues data
     https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/01I580000011RrH/FieldsAndRelationships/view

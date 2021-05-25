@@ -7,4 +7,4 @@ from datahub.bed_api.repositories.event_repository import EventRepository  # noq
 from datahub.bed_api.repositories.policy_issues_repository import (  # noqa:F401
     PolicyIssuesRepository,
 )
-from datahub.bed_api.repositories.salesforce_repository import SalesforceRepository  # noqa:F401
+from datahub.bed_api.repositories.base_repository import BaseRepository  # noqa:F401
