@@ -117,7 +117,7 @@ class CompanyWithAreaFactory(CompanyFactory):
     address_area_id = constants.AdministrativeArea.texas.value.id
 
 
-class SubsidiaryFactory(CompanyFactory):
+class SubsidiaryFactory(CompanyWithAreaFactory):
     """Subsidiary factory."""
 
     global_headquarters = factory.SubFactory(
@@ -136,7 +136,7 @@ class OneListCoreTeamMemberFactory(factory.django.DjangoModelFactory):
         model = 'company.OneListCoreTeamMember'
 
 
-class ArchivedCompanyFactory(CompanyFactory):
+class ArchivedCompanyFactory(CompanyWithAreaFactory):
     """Factory for an archived company."""
 
     archived = True
