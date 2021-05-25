@@ -17,7 +17,7 @@ from datahub.dnb_api.constants import (
     ALL_DNB_UPDATED_SERIALIZER_FIELDS,
 )
 from datahub.dnb_api.serializers import DNBCompanySerializer
-from datahub.metadata.models import Country
+from datahub.metadata.models import AdministrativeArea, Country
 
 logger = logging.getLogger(__name__)
 
@@ -151,6 +151,9 @@ def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=()
     country = Country.objects.filter(
         iso_alpha2_code=dnb_company[f'{prefix}_country'],
     ).first() if dnb_company.get(f'{prefix}_country') else None
+    area = AdministrativeArea.objects.filter(
+        area_code=dnb_company[f'{prefix}_area_abbrev_name'],
+    ).first() if dnb_company.get(f'{prefix}_area_abbrev_name') else None
 
     extracted_address = {
         'line_1': dnb_company.get(f'{prefix}_line_1') or '',
@@ -158,8 +161,8 @@ def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=()
         'town': dnb_company.get(f'{prefix}_town') or '',
         'county': dnb_company.get(f'{prefix}_county') or '',
         'postcode': dnb_company.get(f'{prefix}_postcode') or '',
-        'area': None,
         'country': country.id if country else None,
+        'area': area.id if area else None,
     }
 
     for field in ignore_when_missing:
