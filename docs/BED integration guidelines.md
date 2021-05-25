@@ -1,8 +1,8 @@
 # Introduction
 
-The Department of International Trade provides information to the Cabinet Office for capturing business intelligence around interactions using CSV file imports.  The CSV file is then manually altered to service the requirements and formats needed by the BED system inorder to synchronise interactions in a slightly different format, needing reconciliation on a quarterly basis for generating reports needed by the Cabinet Office. 
+The Department of International Trade provides information to the Cabinet Office for capturing business intelligence around interactions using CSV file imports.  The CSV file is then manually altered to service the requirements and formats needed by the BED system in order to synchronise interactions in a slightly different format, needing reconciliation on a quarterly basis for generating reports needed by the Cabinet Office. 
 
-Both systems expose API’s that facilitate REST CRUD operations, therefore with the utilisation of *Celery*, this data synchronisation will occur as a short based daily operation, making sure this is always synchronised and ready anytime in an automated way.  
+Both systems expose APIs that facilitate REST CRUD operations, therefore with the utilisation of *Celery*, this data synchronisation will occur as a short based daily operation, making sure this is always synchronised and ready anytime in an automated way.  
 
 More information on this topic can be found 
 

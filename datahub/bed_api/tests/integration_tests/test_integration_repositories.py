@@ -4,10 +4,10 @@ from simple_salesforce import format_soql
 
 from datahub.bed_api.constants import ContactQuery, EventQuery
 from datahub.bed_api.entities import (
-    EditAccount,
-    EditContact,
-    EditEvent,
-    EditEventAttendee, EditPolicyIssues,
+    Account,
+    Contact,
+    Event,
+    EventAttendee, PolicyIssues,
 )
 from datahub.bed_api.tests.test_utils import (
     assert_all_data_exists_on_bed,
@@ -36,7 +36,7 @@ class TestIntegrationEventRepositoryShould:
         self,
         event_repository,
         faker,
-        generate_event: EditEvent,
+        generate_event: Event,
     ):
         """
         Test BedFactory integration with the contact and account repositories
@@ -175,7 +175,7 @@ class TestIntegrationEventRepositoryShould:
     def add_and_assert_event(
         self,
         event_repository,
-        event: EditEvent,
+        event: Event,
     ):
         """
         Create event on Salesforce and validate the data passed is generated as expected
@@ -215,10 +215,10 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
     """
 
     def test_fuzz_on_account_repository(
-            self,
-            account_repository,
-            faker,
-            generate_account: EditAccount,
+        self,
+        account_repository,
+        faker,
+        generate_account: Account,
     ):
         """
         Test account repository for basic crud operations
@@ -248,12 +248,12 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
             )
 
     def test_fuzz_on_contact_and_account_repositories(
-            self,
-            contact_repository,
-            account_repository,
-            faker,
-            generate_account: EditAccount,
-            generate_contact: EditContact,
+        self,
+        contact_repository,
+        account_repository,
+        faker,
+        generate_account: Account,
+        generate_contact: Contact,
     ):
         """
         Test contact with account as contact is dependent on account
@@ -304,11 +304,11 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
         event_attendee_repository,
         policy_issues_repository,
         faker,
-        generate_account: EditAccount,
-        generate_contact: EditContact,
-        generate_event: EditEvent,
-        generate_event_attendee: EditEventAttendee,
-        generate_policy_issues: EditPolicyIssues,
+        generate_account: Account,
+        generate_contact: Contact,
+        generate_event: Event,
+        generate_event_attendee: EventAttendee,
+        generate_policy_issues: PolicyIssues,
     ):
         """
         Test generating and linking policies and attendee information
@@ -389,7 +389,7 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
 
     def add_and_assert_policy_issues(
         self,
-        policy_issues: EditPolicyIssues,
+        policy_issues: PolicyIssues,
         policy_issues_repository,
         account_id,
         event_id,
@@ -537,7 +537,7 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
     def add_and_assert_contact(
         self,
         contact_repository,
-        contact: EditContact,
+        contact: Contact,
     ):
         """
         Create Account data on Salesforce testing as many ContactRepository
@@ -563,7 +563,7 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
     def add_and_assert_account(
         self,
         account_repository,
-        account: EditAccount,
+        account: Account,
     ):
         """
         Create Account Data on Salesforce using dynamic data

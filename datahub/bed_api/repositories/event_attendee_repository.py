@@ -1,10 +1,10 @@
 from simple_salesforce import format_soql
 
 from datahub.bed_api.constants import EventAttendeeQuery
-from datahub.bed_api.repositories.salesforce_repository import SalesforceRepository
+from datahub.bed_api.repositories.base_repository import BaseRepository
 
 
-class EventAttendeeRepository(SalesforceRepository):
+class EventAttendeeRepository(BaseRepository):
     """
     Repository pattern for Salesforce interactions with Event Attendee data
     https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/01I58000001EcAX/FieldsAndRelationships/view

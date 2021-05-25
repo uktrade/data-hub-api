@@ -1,10 +1,10 @@
 from simple_salesforce import format_soql
 
 from datahub.bed_api.constants import ContactQuery
-from datahub.bed_api.repositories.salesforce_repository import SalesforceRepository
+from datahub.bed_api.repositories.base_repository import BaseRepository
 
 
-class ContactRepository(SalesforceRepository):
+class ContactRepository(BaseRepository):
     """
     Repository pattern for Salesforce interactions with Contacts data
     https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/Contact/FieldsAndRelationships/view
