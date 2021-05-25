@@ -1,10 +1,10 @@
 from simple_salesforce import format_soql
 
 from datahub.bed_api.constants import AccountQuery
-from datahub.bed_api.repositories.salesforce_repository import SalesforceRepository
+from datahub.bed_api.repositories.base_repository import BaseRepository
 
 
-class AccountRepository(SalesforceRepository):
+class AccountRepository(BaseRepository):
     """
     Repository pattern for Salesforce interactions with Account data
     https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/Account/FieldsAndRelationships/view

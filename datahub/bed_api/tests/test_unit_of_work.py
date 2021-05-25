@@ -17,7 +17,7 @@ class TestBedUnitOfWorkShould:
         BED_IS_SANDBOX='false',
     )
     @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_sales_force_session_gets_created_and_closed(
+    def test_salesforce_session_gets_created_and_closed(
         self,
         mock_salesforce,
     ):

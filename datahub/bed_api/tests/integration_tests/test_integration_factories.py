@@ -19,7 +19,7 @@ class TestIntegrationBedFactory:
         BED_IS_SANDBOX
     """
 
-    def test_salesforce_generates_sales_force_instance_for_getting_contact_data(self):
+    def test_salesforce_generates_salesforce_instance_for_getting_contact_data(self):
         """
         Test BedFactory integration with the real configuration values generates
         an actual Salesforce session instance

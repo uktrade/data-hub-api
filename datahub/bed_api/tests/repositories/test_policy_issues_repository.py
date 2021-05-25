@@ -1,7 +1,7 @@
 from unittest import mock
 
 from datahub.bed_api.entities import (
-    EditPolicyIssues,
+    PolicyIssues,
 )
 from datahub.bed_api.repositories import (
     PolicyIssuesRepository,
@@ -19,7 +19,7 @@ class TestPolicyIssuesRepositoryShould:
     def test_add_calls_salesforce_policy_issues_add_with_valid_args(
         self,
         mock_salesforce,
-        generate_policy_issues: EditPolicyIssues,
+        generate_policy_issues: PolicyIssues,
     ):
         """
         Test add calls Salesforce with the correct Arguments
@@ -143,7 +143,7 @@ class TestPolicyIssuesRepositoryShould:
     def test_update_calls_salesforce_policy_issues_update_with_valid_args(
         self,
         mock_salesforce,
-        generate_policy_issues: EditPolicyIssues,
+        generate_policy_issues: PolicyIssues,
     ):
         """
         Test update calls Salesforce with the correct Arguments

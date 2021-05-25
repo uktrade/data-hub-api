@@ -1,6 +1,6 @@
 import pytest
 
-from datahub.bed_api.entities import EditAccount, EditContact
+from datahub.bed_api.entities import Account, Contact
 from datahub.bed_api.tests.test_utils import NOT_BED_INTEGRATION_TEST_READY
 from datahub.bed_api.unit_of_work import BedUnitOfWork
 
@@ -23,8 +23,8 @@ class TestIntegrationBedUnitOfWorkShould:
 
     def test_creation_and_deletion_of_an_account(
         self,
-        generate_account: EditAccount,
-        generate_contact: EditContact,
+        generate_account: Account,
+        generate_contact: Contact,
     ):
         """
         Test adding and deleting an account

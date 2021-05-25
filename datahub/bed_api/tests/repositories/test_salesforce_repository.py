@@ -2,11 +2,11 @@ from unittest import mock
 
 import pytest
 
-from datahub.bed_api.repositories import SalesforceRepository
+from datahub.bed_api.repositories import BaseRepository
 
 
 class TestSalesforceRepositoryShould:
-    """Unit tests for Base SalesforceRepository"""
+    """Unit tests for Base BaseRepository"""
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_query_calls_salesforce_query_with_valid_args(
@@ -17,7 +17,7 @@ class TestSalesforceRepositoryShould:
         Test query_more calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
         """
-        repository = SalesforceRepository(mock_salesforce)
+        repository = BaseRepository(mock_salesforce)
         expected_query = 'test_query'
         expected_included_delete = True
 
@@ -43,7 +43,7 @@ class TestSalesforceRepositoryShould:
         Test query_more calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
         """
-        repository = SalesforceRepository(mock_salesforce)
+        repository = BaseRepository(mock_salesforce)
         expected_next_records_identifier = 'test_next_id'
         expected_identifier_is_url = True
         expected_included_delete = True
@@ -73,7 +73,7 @@ class TestSalesforceRepositoryShould:
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         with pytest.raises(NotImplementedError):
-            repository = SalesforceRepository(mock_salesforce)
+            repository = BaseRepository(mock_salesforce)
 
             repository.add({'TestData': True})
 
@@ -87,7 +87,7 @@ class TestSalesforceRepositoryShould:
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         with pytest.raises(NotImplementedError):
-            repository = SalesforceRepository(mock_salesforce)
+            repository = BaseRepository(mock_salesforce)
 
             repository.delete('test_record_id')
 
@@ -101,7 +101,7 @@ class TestSalesforceRepositoryShould:
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         with pytest.raises(NotImplementedError):
-            repository = SalesforceRepository(mock_salesforce)
+            repository = BaseRepository(mock_salesforce)
 
             repository.exists('test_record_id')
 
@@ -115,7 +115,7 @@ class TestSalesforceRepositoryShould:
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         with pytest.raises(NotImplementedError):
-            repository = SalesforceRepository(mock_salesforce)
+            repository = BaseRepository(mock_salesforce)
 
             repository.get('test_record_id')
 
@@ -129,7 +129,7 @@ class TestSalesforceRepositoryShould:
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         with pytest.raises(NotImplementedError):
-            repository = SalesforceRepository(mock_salesforce)
+            repository = BaseRepository(mock_salesforce)
 
             repository.get_by('test_field', 'test_record_id')
 
@@ -143,6 +143,6 @@ class TestSalesforceRepositoryShould:
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         with pytest.raises(NotImplementedError):
-            repository = SalesforceRepository(mock_salesforce)
+            repository = BaseRepository(mock_salesforce)
 
             repository.update('test_record_id', {'TestData': True})

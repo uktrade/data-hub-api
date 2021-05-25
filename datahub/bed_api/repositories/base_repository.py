@@ -1,17 +1,17 @@
 from simple_salesforce import Salesforce
 
 
-class SalesforceRepository:
+class BaseRepository:
     """
-    Base Salesforce Repository to encapsulate default CRUD operations
+    Base Repository to encapsulate default CRUD operations
     for interacting with Salesforce API see repository pattern link for
     more information https://www.cosmicpython.com/book/chapter_02_repository.html
     """
 
     def __init__(self, salesforce: Salesforce):
         """
-        Salesforce
-        :param salesforce:
+        Constructor
+        :param salesforce: Salesforce instance
         """
         self.salesforce = salesforce
 
@@ -83,15 +83,12 @@ class SalesforceRepository:
         Retrieves next or more results from a query that returned more results
         than the batch maximum
         :param next_records_identifier: Either the Id of the next Salesforce
-                                     object in the result, or a URL to the
-                                     next record in the result
+        object in the result, or a URL to the next record in the result
         :param identifier_is_url: True if `next_records_identifier` should be
-                               treated as a URL, False if
-                               `next_records_identifier` should be treated as
-                               an Id
+        treated as a URL, False if `next_records_identifier` should be treated as
+        an Id
         :param include_deleted: True if the `next_records_identifier` refers to a
-                             query that includes deleted records. Only used if
-                             `identifier_is_url` is False
+        query that includes deleted records. Only used if `identifier_is_url` is False
         :param kwargs: Filters or where clause attributes
         :return: Returns a dict decoded from the Salesforce
         """
@@ -117,8 +114,7 @@ class SalesforceRepository:
         :param record_id: Unique identifier
         :param response: Response returned from query by id
         :return: True if response assigned, totalSize is
-                 greater than 1 and there is a record id
-                 the equivalent of that value
+        greater than 1 and there is a record id the equivalent of that value
         """
         return (
             response is not None
