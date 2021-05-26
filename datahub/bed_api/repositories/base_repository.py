@@ -62,6 +62,7 @@ class BaseRepository:
         Checks if the record exists using the most unique identifier and
         the most efficient mechanism for checking ie the least content
         with ideally a head verb
+
         :param record_id: Unique identifier value, associated with Id value typically
         :raises: NotImplementedError
         """
@@ -72,8 +73,10 @@ class BaseRepository:
     def exists_status(self, record_id, response) -> bool:
         """
         Check if a record exists by the response
+
         :param record_id: Unique identifier
         :param response: Response returned from query by id
+
         :return: True if response assigned, totalSize is greater than 1 and
             there is a record id the equivalent of that value
         """
@@ -87,6 +90,7 @@ class BaseRepository:
     def get_by(self, custom_id_field, custom_id_value):
         """
         Returns the result of a GET by field
+
         :param custom_id_field: API name of a custom field that was defined
             as an External ID
         :param custom_id_value: External ID value
@@ -103,9 +107,11 @@ class BaseRepository:
         the Salesforce response JSON payload.
         See https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/
         soql_sosl/sforce_api_calls_soql_select.htm for more details.
+
         :param query: Salesforce SQL query
         :param include_deleted: Include records marker for deletion
         :param kwargs: Where filter arguments
+
         :return: Salesforce SOQL query
         """
         return self.salesforce.query(query, include_deleted, **kwargs)
