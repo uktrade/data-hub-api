@@ -28,9 +28,8 @@ class UnitOfWork:
 
     def close_session(self):
         """
-        Close any active sessions or external infrastructure
-
-        :raises: NotImplementedError
+        Close any active sessions or external infrastructure or resources
+        needing clean up or closing
         """
         raise NotImplementedError
 

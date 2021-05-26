@@ -8,7 +8,6 @@ class BaseRepository:
     """
 
     entity_name = None
-    entity_query = None
 
     def __init__(self, salesforce: Salesforce):
         """
@@ -66,9 +65,7 @@ class BaseRepository:
         :param record_id: Unique identifier value, associated with Id value typically
         :raises: NotImplementedError
         """
-        # You could just use this...
-        # query = f'SELECT Id FROM {self.entity_name} WHERE Id = {{id}}'
-        query = self.entity_query.get_by_id.value.sql
+        query = f'SELECT Id FROM {self.entity_name} WHERE Id = {{id}}'
         response = self.query(format_soql(query, id=record_id))
         return self.exists_status(record_id, response)
 

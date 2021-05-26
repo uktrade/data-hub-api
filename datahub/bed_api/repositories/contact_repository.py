@@ -1,4 +1,3 @@
-from datahub.bed_api.queries import ContactQuery
 from datahub.bed_api.repositories.base_repository import BaseRepository
 
 
@@ -11,4 +10,3 @@ class ContactRepository(BaseRepository):
     """
 
     entity_name = 'Contact'
-    entity_query = ContactQuery

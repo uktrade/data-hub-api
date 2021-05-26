@@ -1,4 +1,3 @@
-from datahub.bed_api.queries import EventQuery
 from datahub.bed_api.repositories.base_repository import BaseRepository
 
 
@@ -11,4 +10,3 @@ class EventRepository(BaseRepository):
     """
 
     entity_name = 'Event__c'
-    entity_query = EventQuery

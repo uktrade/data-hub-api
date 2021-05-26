@@ -1,4 +1,3 @@
-from datahub.bed_api.queries import AccountQuery
 from datahub.bed_api.repositories.base_repository import BaseRepository
 
 
@@ -11,4 +10,3 @@ class AccountRepository(BaseRepository):
     """
 
     entity_name = 'Account'
-    entity_query = AccountQuery

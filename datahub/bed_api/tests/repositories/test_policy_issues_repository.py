@@ -23,6 +23,7 @@ class TestPolicyIssuesRepositoryShould:
     ):
         """
         Test add calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         :param generate_policy_issues: Generated policy issues data
         """
@@ -42,6 +43,7 @@ class TestPolicyIssuesRepositoryShould:
     ):
         """
         Test delete calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = PolicyIssuesRepository(mock_salesforce)
@@ -61,6 +63,7 @@ class TestPolicyIssuesRepositoryShould:
     ):
         """
         Test exists calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = PolicyIssuesRepository(mock_salesforce)
@@ -85,6 +88,7 @@ class TestPolicyIssuesRepositoryShould:
     ):
         """
         Test exists calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = PolicyIssuesRepository(mock_salesforce)
@@ -106,6 +110,7 @@ class TestPolicyIssuesRepositoryShould:
     ):
         """
         Test get calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = PolicyIssuesRepository(mock_salesforce)
@@ -125,6 +130,7 @@ class TestPolicyIssuesRepositoryShould:
     ):
         """
         Test get_by calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = PolicyIssuesRepository(mock_salesforce)
@@ -147,6 +153,7 @@ class TestPolicyIssuesRepositoryShould:
     ):
         """
         Test update calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         :param generate_policy_issues: Generated event attendee data
         """

@@ -1,7 +1,5 @@
 from unittest import mock
 
-import pytest
-
 from datahub.bed_api.repositories import BaseRepository
 
 
@@ -62,87 +60,3 @@ class TestSalesforceRepositoryShould:
             expected_included_delete,
             test=True,
         )
-
-    @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_add_throws_not_implemented_error_by_default(
-        self,
-        mock_salesforce,
-    ):
-        """
-        Test add throws NotImplementedError
-        :param mock_salesforce: Monkeypatch for Salesforce
-        """
-        with pytest.raises(NotImplementedError):
-            repository = BaseRepository(mock_salesforce)
-
-            repository.add({'TestData': True})
-
-    @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_delete_throws_not_implemented_error_by_default(
-        self,
-        mock_salesforce,
-    ):
-        """
-        Test delete throws NotImplementedError
-        :param mock_salesforce: Monkeypatch for Salesforce
-        """
-        with pytest.raises(NotImplementedError):
-            repository = BaseRepository(mock_salesforce)
-
-            repository.delete('test_record_id')
-
-    @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_exists_throws_not_implemented_error_by_default(
-        self,
-        mock_salesforce,
-    ):
-        """
-        Test exists throws NotImplementedError
-        :param mock_salesforce: Monkeypatch for Salesforce
-        """
-        with pytest.raises(NotImplementedError):
-            repository = BaseRepository(mock_salesforce)
-
-            repository.exists('test_record_id')
-
-    @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_get_throws_not_implemented_error_by_default(
-        self,
-        mock_salesforce,
-    ):
-        """
-        Test exists throws NotImplementedError
-        :param mock_salesforce: Monkeypatch for Salesforce
-        """
-        with pytest.raises(NotImplementedError):
-            repository = BaseRepository(mock_salesforce)
-
-            repository.get('test_record_id')
-
-    @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_get_by_throws_not_implemented_error_by_default(
-        self,
-        mock_salesforce,
-    ):
-        """
-        Test get_by throws NotImplementedError
-        :param mock_salesforce: Monkeypatch for Salesforce
-        """
-        with pytest.raises(NotImplementedError):
-            repository = BaseRepository(mock_salesforce)
-
-            repository.get_by('test_field', 'test_record_id')
-
-    @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_update_throws_not_implemented_error_by_default(
-        self,
-        mock_salesforce,
-    ):
-        """
-        Test update throws NotImplementedError
-        :param mock_salesforce: Monkeypatch for Salesforce
-        """
-        with pytest.raises(NotImplementedError):
-            repository = BaseRepository(mock_salesforce)
-
-            repository.update('test_record_id', {'TestData': True})

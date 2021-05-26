@@ -1,4 +1,3 @@
-from datahub.bed_api.queries import EventAttendeeQuery
 from datahub.bed_api.repositories.base_repository import BaseRepository
 
 
@@ -11,4 +10,3 @@ class EventAttendeeRepository(BaseRepository):
     """
 
     entity_name = 'Event_Attendee__c'
-    entity_query = EventAttendeeQuery

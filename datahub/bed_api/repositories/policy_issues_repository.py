@@ -1,4 +1,3 @@
-from datahub.bed_api.queries import PolicyIssuesQuery
 from datahub.bed_api.repositories.base_repository import BaseRepository
 
 
@@ -11,4 +10,3 @@ class PolicyIssuesRepository(BaseRepository):
     """
 
     entity_name = 'Policy_Issues__c'
-    entity_query = PolicyIssuesQuery
