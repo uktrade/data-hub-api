@@ -15,7 +15,7 @@ class SalesforceAPI:
     Base Salesforce Repository to encapsulate default CRUD operations
     for interacting with Salesforce API
     """
-    repository_table = None
+    repository_name = None
 
     def __init__(self, username, password, security_token, domain=None):
         """
@@ -36,7 +36,7 @@ class SalesforceAPI:
 
         :return: New Salesforce Object
         """
-        return getattr(self.salesforce, self.respository_name).create(data)
+        return getattr(self.salesforce, self.repository_name).create(data)
 
     def get(self, record_id):
         """
@@ -46,7 +46,7 @@ class SalesforceAPI:
 
         :return: Salesforce Object
         """
-        return getattr(self.salesforce, self.respository_name).get(record_id)
+        return getattr(self.salesforce, self.repository_name).get(record_id)
 
     def update(self, record_id, data):
         """
@@ -57,7 +57,7 @@ class SalesforceAPI:
 
         :return: Updated Salesforce Object
         """
-        return getattr(self.salesforce, self.respository_name).update(record_id, data)
+        return getattr(self.salesforce, self.repository_name).update(record_id, data)
 
     def delete(self, record_id):
         """
@@ -67,7 +67,7 @@ class SalesforceAPI:
 
         :returns: Delete result
         """
-        return getattr(self.salesforce, self.respository_name).delete(record_id)
+        return getattr(self.salesforce, self.repository_name).delete(record_id)
 
     def exists(self, record_id):
         """
@@ -78,7 +78,7 @@ class SalesforceAPI:
         :param record_id: Unique identifier value, associated with Id value typically
         :raises: NotImplementedError
         """
-        query = f'SELECT Id FROM {self.repository_table} WHERE Id = {{id}}'
+        query = f'SELECT Id FROM {self.repository_name} WHERE Id = {{id}}'
         response = self.query(
             format_soql(query, id=record_id),
         )
@@ -112,7 +112,7 @@ class SalesforceAPI:
 
         :raises: NotImplementedError
         """
-        return getattr(self.salesforce, self.respository_name).get_by_custom_id(
+        return getattr(self.salesforce, self.repository_name).get_by_custom_id(
             custom_id_field,
             custom_id_value,
         )
