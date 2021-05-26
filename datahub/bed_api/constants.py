@@ -332,8 +332,8 @@ class PolicyArea(StringEnum):
         '(foreign travel and short term contracts)'
     )
     business_regulation = 'Business Regulation'
-    company_law_and_company_reporting = 'Company Law and Company \u200bReporting'
-    competition_law_and_policy = 'Competition \u200bLaw and Policy'
+    company_law_and_company_reporting = 'Company Law and Company Reporting'
+    competition_law_and_policy = 'Competition Law and Policy'
     consumer_rights = 'Consumer Rights'
     customs_union = 'Customs Union'
     devolved_administration_northern_ireland = 'Devolved Administration - Northern Ireland'
