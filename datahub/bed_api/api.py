@@ -123,9 +123,11 @@ class SalesforceAPI:
         the Salesforce response JSON payload.
         See https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/
         soql_sosl/sforce_api_calls_soql_select.htm for more details.
+
         :param query: Salesforce SQL query
         :param include_deleted: Include records marker for deletion
         :param kwargs: Where filter arguments
+
         :return: Salesforce SOQL query
         """
         return self.salesforce.query(query, include_deleted, **kwargs)
