@@ -1,4 +1,4 @@
-from datahub.bed_api.constants import EventQuery
+from datahub.bed_api.queries import EventQuery
 from datahub.bed_api.repositories.base_repository import BaseRepository
 
 

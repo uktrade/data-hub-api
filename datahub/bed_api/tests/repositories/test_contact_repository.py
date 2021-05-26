@@ -1,6 +1,6 @@
 from unittest import mock
 
-from datahub.bed_api.models import EditContact
+from datahub.bed_api.entities import Contact
 from datahub.bed_api.repositories import ContactRepository
 from datahub.bed_api.tests.test_utils import (
     create_fail_query_response,
@@ -15,7 +15,7 @@ class TestContactRepositoryShould:
     def test_add_calls_salesforce_contact_add_with_valid_args(
         self,
         mock_salesforce,
-        generate_contact: EditContact,
+        generate_contact: Contact,
     ):
         """
         Test add calls Salesforce with the correct Arguments
@@ -139,7 +139,7 @@ class TestContactRepositoryShould:
     def test_update_calls_salesforce_contact_update_with_valid_args(
         self,
         mock_salesforce,
-        generate_contact: EditContact,
+        generate_contact: Contact,
     ):
         """
         Test add calls Salesforce with the correct Arguments

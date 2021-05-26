@@ -2,12 +2,12 @@ import pytest
 from dateutil import parser
 from simple_salesforce import format_soql
 
-from datahub.bed_api.constants import ContactQuery, EventQuery
-from datahub.bed_api.models import (
-    EditAccount,
-    EditContact,
-    EditEvent,
-    EditEventAttendee, EditPolicyIssues,
+from datahub.bed_api.queries import ContactQuery, EventQuery
+from datahub.bed_api.entities import (
+    Account,
+    Contact,
+    Event,
+    EventAttendee, PolicyIssues,
 )
 from datahub.bed_api.tests.test_utils import (
     assert_all_data_exists_on_bed,
@@ -36,12 +36,13 @@ class TestIntegrationEventRepositoryShould:
         self,
         event_repository,
         faker,
-        generate_event: EditEvent,
+        generate_event: Event,
     ):
         """
         Test BedFactory integration with the contact and account repositories
         sampling all functions in an idempotent way, generating potential test
         data for unit tests
+
         :param event_repository: EventRepository fixture
         :param faker: Faker library for generating data
         :param generate_event: New event record generated with faker data
@@ -84,6 +85,7 @@ class TestIntegrationEventRepositoryShould:
     ):
         """
         Update and assert the event is updated with the data on Salesforce
+
         :param event_id: Event id
         :param event_repository: EventRepository fixture
         :param faker: Faker library for generating data
@@ -106,6 +108,7 @@ class TestIntegrationEventRepositoryShould:
         """
         Uses the repository query and query_more to test querying and paginating
         data
+
         :param event_repository: EventRepository fixture
         :param event: New event record generated with faker data
         """
@@ -128,6 +131,7 @@ class TestIntegrationEventRepositoryShould:
     def assert_count_query(self, date_filter, event_repository):
         """
         Validates and demonstrates a count
+
         :param date_filter: Filter by data from event
         :param event_repository: EventRepository fixture
         """
@@ -143,6 +147,7 @@ class TestIntegrationEventRepositoryShould:
     def assert_and_query_next(self, event_repository, next_records_url):
         """
         Validate the next query and show an example of the usage
+
         :param event_repository: EventRepository fixture
         :param next_records_url: The url generated from the original query
         """
@@ -156,6 +161,7 @@ class TestIntegrationEventRepositoryShould:
     def assert_records_for_ids(self, query_response):
         """
         Validates the record data for id values assigned
+
         :param query_response: Typical query response object
         returned from Salesforce
         """
@@ -165,6 +171,7 @@ class TestIntegrationEventRepositoryShould:
     def assert_query_response(self, query_response):
         """
         Validates the Query response comes back with expected data
+
         :param query_response: Typical query response object
         returned from Salesforce
         """
@@ -175,12 +182,14 @@ class TestIntegrationEventRepositoryShould:
     def add_and_assert_event(
         self,
         event_repository,
-        event: EditEvent,
+        event: Event,
     ):
         """
         Create event on Salesforce and validate the data passed is generated as expected
+
         :param event_repository: EventRepository fixture
         :param event: New event record generated with faker data
+
         :return: New event id
         """
         event_response = event_repository.add(
@@ -215,13 +224,14 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
     """
 
     def test_fuzz_on_account_repository(
-            self,
-            account_repository,
-            faker,
-            generate_account: EditAccount,
+        self,
+        account_repository,
+        faker,
+        generate_account: Account,
     ):
         """
         Test account repository for basic crud operations
+
         :param account_repository: AccountRepository fixture
         :param faker: Faker library for generating data
         :param generate_account: New account record generated with faker data
@@ -248,15 +258,16 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
             )
 
     def test_fuzz_on_contact_and_account_repositories(
-            self,
-            contact_repository,
-            account_repository,
-            faker,
-            generate_account: EditAccount,
-            generate_contact: EditContact,
+        self,
+        contact_repository,
+        account_repository,
+        faker,
+        generate_account: Account,
+        generate_contact: Contact,
     ):
         """
         Test contact with account as contact is dependent on account
+
         :param contact_repository: ContactRepository fixture
         :param account_repository: AccountRepository fixture
         :param faker: Faker library for generating data
@@ -304,14 +315,15 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
         event_attendee_repository,
         policy_issues_repository,
         faker,
-        generate_account: EditAccount,
-        generate_contact: EditContact,
-        generate_event: EditEvent,
-        generate_event_attendee: EditEventAttendee,
-        generate_policy_issues: EditPolicyIssues,
+        generate_account: Account,
+        generate_contact: Contact,
+        generate_event: Event,
+        generate_event_attendee: EventAttendee,
+        generate_policy_issues: PolicyIssues,
     ):
         """
         Test generating and linking policies and attendee information
+
         :param contact_repository: ContactRepository fixture
         :param account_repository: AccountRepository fixture
         :param event_repository: EventRepository fixture
@@ -389,7 +401,7 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
 
     def add_and_assert_policy_issues(
         self,
-        policy_issues: EditPolicyIssues,
+        policy_issues: PolicyIssues,
         policy_issues_repository,
         account_id,
         event_id,
@@ -397,6 +409,7 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
         """
         Create event policy issue unifying the account and interaction
         data
+
         :param policy_issues: Policy issues record generated with faker data
         :param policy_issues_repository: PolicyIssuesRepository fixture
         :param account_id: Associated Account id
@@ -431,6 +444,7 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
     ):
         """
         Create event attendee assigning a contact and event to link the two
+
         :param event_attendee_repository: EventAttendeeRepository fixture
         :param event_attendee: New event attendee record generated with faker data
         :param contact_id: New contact id
@@ -456,8 +470,10 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
     def add_assert_event(self, event_repository, event):
         """
         Generate a new event and assert success
+
         :param event_repository: EventRepository fixture
         :param event: New event record generated with faker data
+
         :return: New event id
         """
         event_response = event_repository.add(
@@ -482,6 +498,7 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
     ):
         """
         Update the account with basic notes testing update
+
         :param account_repository: ContactRepository fixture
         :param account_id: Contact id to update
         :param faker: Faker library
@@ -506,6 +523,7 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
     ):
         """
         Update the contact with basic notes testing update
+
         :param contact_repository: ContactRepository fixture
         :param contact_id: Contact id to update
         :param faker: Faker library
@@ -537,7 +555,7 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
     def add_and_assert_contact(
         self,
         contact_repository,
-        contact: EditContact,
+        contact: Contact,
     ):
         """
         Create Account data on Salesforce testing as many ContactRepository
@@ -563,12 +581,14 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
     def add_and_assert_account(
         self,
         account_repository,
-        account: EditAccount,
+        account: Account,
     ):
         """
         Create Account Data on Salesforce using dynamic data
+
         :param account_repository: AccountRepository fixture
         :param account: New account record generated with faker data
+
         :return: Account Id
         """
         account_add_response = account_repository.add(

@@ -20,13 +20,14 @@ from datahub.bed_api.constants import (
     TopIssuesByRank,
     TransparencyStatus,
 )
-from datahub.bed_api.factories import BedFactory
-from datahub.bed_api.models import (
-    EditAccount,
-    EditContact,
-    EditEvent,
-    EditEventAttendee, EditPolicyIssues,
+from datahub.bed_api.entities import (
+    Account,
+    Contact,
+    Event,
+    EventAttendee,
+    PolicyIssues,
 )
+from datahub.bed_api.factories import BedFactory
 from datahub.bed_api.repositories import (
     AccountRepository,
     ContactRepository,
@@ -50,7 +51,9 @@ def salesforce():
 def contact_repository(salesforce):
     """
     Creates instance of contact repository
+
     :param salesforce: BedFactory creating an instance of salesforce
+
     :return: Instance of ContactRepository
     """
     repository = ContactRepository(salesforce)
@@ -61,7 +64,9 @@ def contact_repository(salesforce):
 def account_repository(salesforce):
     """
     Creates instance of account repository
+
     :param salesforce: BedFactory creating an instance of salesforce
+
     :return: Instance of AccountRepository
     """
     repository = AccountRepository(salesforce)
@@ -72,7 +77,9 @@ def account_repository(salesforce):
 def event_repository(salesforce):
     """
     Creates instance of event repository
+
     :param salesforce: BedFactory creating an instance of salesforce
+
     :return: Instance of EventRepository
     """
     repository = EventRepository(salesforce)
@@ -83,7 +90,9 @@ def event_repository(salesforce):
 def event_attendee_repository(salesforce):
     """
     Creates instance of event repository
+
     :param salesforce: BedFactory creating an instance of salesforce
+
     :return: Instance of EventRepository
     """
     repository = EventAttendeeRepository(salesforce)
@@ -94,7 +103,9 @@ def event_attendee_repository(salesforce):
 def policy_issues_repository(salesforce):
     """
     Creates instance of policy issues repository
+
     :param salesforce: BedFactory creating an instance of salesforce
+
     :return: Instance of EventRepository
     """
     repository = PolicyIssuesRepository(salesforce)
@@ -105,7 +116,9 @@ def policy_issues_repository(salesforce):
 def generate_high_level_sector(faker):
     """
     Generate random high level sector
+
     :param faker: Faker Library
+
     :return: Random high level sector value
     """
     high_level_sector = faker.random_element(
@@ -120,7 +133,9 @@ def generate_high_level_sector(faker):
 def generate_low_level_sector(faker):
     """
     Generate random low level sector
+
     :param faker: Faker Library
+
     :return: Random low level sector value
     """
     low_level_sector = faker.random_element(
@@ -135,7 +150,9 @@ def generate_low_level_sector(faker):
 def generate_uk_region_name(faker):
     """
     Generate random UK Region name
+
     :param faker: Faker Library
+
     :return: Random UK region name value
     """
     uk_region = faker.random_element(
@@ -172,7 +189,9 @@ def generate_uk_region_name(faker):
 def generate_salutation(faker):
     """
     Generate random salutation
+
     :param faker: Faker Library
+
     :return: Random salutation value
     """
     salutation = faker.random_element(
@@ -187,7 +206,9 @@ def generate_salutation(faker):
 def generate_country_names(faker):
     """
     Generate random country names array
+
     :param faker: Faker Library
+
     :return: Random country names value
     """
     countries = faker.random_elements(
@@ -213,7 +234,9 @@ def generate_country_names(faker):
 def generate_issue_types(faker):
     """
     Generate random issue types array
+
     :param faker: Faker Library
+
     :return: Random issue topics value
     """
     issue_types = faker.random_elements(
@@ -229,7 +252,9 @@ def generate_issue_types(faker):
 def generate_issue_type(faker):
     """
     Generate random issue type
+
     :param faker: Faker Library
+
     :return: Random issue type
     """
     issue_type = faker.random_element(
@@ -244,7 +269,9 @@ def generate_issue_type(faker):
 def generate_job_type(faker):
     """
     Generate random job type
+
     :param faker: Faker Library
+
     :return: Random JobType value
     """
     job_type = faker.random_element(
@@ -259,7 +286,9 @@ def generate_job_type(faker):
 def generate_business_area(faker):
     """
     Generate random business area
+
     :param faker: Faker Library
+
     :return: Random BusinessArea value
     """
     business_area = faker.random_element(
@@ -274,7 +303,9 @@ def generate_business_area(faker):
 def generate_interaction_type(faker):
     """
     Generate random interaction type
+
     :param faker: Faker Library
+
     :return: Random interaction type
     """
     interaction_type = faker.random_element(
@@ -289,7 +320,9 @@ def generate_interaction_type(faker):
 def generate_company_number(faker):
     """
     Generate random company number
+
     :param faker: Faker Library
+
     :return: Random company value
     """
     company_number = faker.random_element(
@@ -310,7 +343,9 @@ def generate_company_number(faker):
 def generate_transparency_status(faker):
     """
     Generate random transparency status
+
     :param faker: Faker Library
+
     :return: Random transparency status
     """
     transparency_status = faker.random_element(
@@ -325,7 +360,9 @@ def generate_transparency_status(faker):
 def generate_sentiment(faker):
     """
     Generate sentiment
+
     :param faker: Faker Library
+
     :return: Random sentiment
     """
     sentiment = faker.random_element(
@@ -338,7 +375,9 @@ def generate_sentiment(faker):
 def generate_department_eyes(faker):
     """
     Generate random department eyes
+
     :param faker: Faker Library
+
     :return: Random transparency status
     """
     department_eyes_only = faker.random_element(
@@ -353,7 +392,9 @@ def generate_department_eyes(faker):
 def generate_policy_areas(faker):
     """
     Generate random policy_area arrays
+
     :param faker: Faker Library
+
     :return: Random policy areas array
     """
     policy_areas = faker.random_elements(
@@ -369,7 +410,9 @@ def generate_policy_areas(faker):
 def generate_classification(faker):
     """
     Generate random Classification
+
     :param faker: Faker Library
+
     :return: Random Classification
     """
     classification = faker.random_element(
@@ -384,7 +427,9 @@ def generate_classification(faker):
 def generate_sectors_affected(faker):
     """
     Generate random SectorsAffected array
+
     :param faker: Faker Library
+
     :return: Random SectorsAffected array
     """
     sectors_affected = faker.random_elements(
@@ -407,15 +452,17 @@ def generate_account(
 ):
     """
     Generate account with random data
+
     :param faker: Faker Library
     :param generate_high_level_sector: sector mapping
     :param generate_low_level_sector: sector mapping
     :param generate_uk_region_name: uk regions
     :param generate_country_names: country names
     :param generate_company_number: company numbers
-    :return: New EditAccount with random values
+
+    :return: New Account with random values
     """
-    new_account = EditAccount(
+    new_account = Account(
         name=faker.company(),
         high_level_sector=generate_high_level_sector,
         low_level_sector=generate_low_level_sector,
@@ -435,7 +482,6 @@ def generate_account(
     # NOTE: Removed as this gets duplicate errors when the same values are recycled
     # new_account.Company_Number__c = generate_company_number
     # new_account.Companies_House_ID__c = generate_company_number
-    new_account.Location__c = faker.country()
     new_account.Company_Website__c = faker.url()
 
     return new_account
@@ -449,17 +495,19 @@ def generate_contact(
     generate_business_area,
 ):
     """
-    Generate new EditContact with random values
+    Generate new Contact with random values
+
     :param faker: Faker Library
     :param generate_salutation:
     :param generate_job_type:
     :param generate_business_area:
-    :return: New EditContact with random fake data
+
+    :return: New Contact with random fake data
     """
     firstname = faker.first_name()
     lastname = faker.last_name()
     email = f'{firstname.lower()}.{lastname.lower()}@digital.trade.gov.uk'
-    contact = EditContact(
+    contact = Contact(
         datahub_id=str(uuid.uuid4()),
         first_name=firstname,
         last_name=lastname,
@@ -492,16 +540,18 @@ def generate_event(
     generate_department_eyes,
 ):
     """
-    Generate new EditEvent with random values
+    Generate new Event with random values
+
     :param faker: Faker Library
     :param generate_interaction_type: Random generate InteractionType
     :param generate_uk_region_name: Random uk region
     :param generate_transparency_status: Random transparency status
     :param generate_issue_types: Random issue topics array
     :param generate_department_eyes: Random department eyes only value
-    :return: New EditEvent with random fake data
+
+    :return: New Event with random fake data
     """
-    event = EditEvent(
+    event = Event(
         name=f'Event Integration Test {datetime.datetime.today()}',
         datahub_id=str(uuid.uuid4()),
         title=remove_newline(faker.text()),
@@ -532,9 +582,10 @@ def generate_event_attendee(
 ):
     """
     Generate new Event Attendee test data
+
     :param faker: Faker data generator
     """
-    event_attendee = EditEventAttendee(
+    event_attendee = EventAttendee(
         datahub_id=str(uuid.uuid4()),
         event_id=str(uuid.uuid4()),
         contact_id=str(uuid.uuid4()),
@@ -557,6 +608,7 @@ def generate_policy_issues(
 ):
     """
     Generate new Event Attendee test data
+
     :param faker: Faker data generator
     :param generate_issue_type: Data generated for issue type
     :param generate_uk_region_name: Data generated for uk regions
@@ -568,7 +620,7 @@ def generate_policy_issues(
     """
     policy_areas = ';'.join(generate_policy_areas)
     sectors_effected = ';'.join(generate_sectors_affected)
-    policy_issues = EditPolicyIssues(
+    policy_issues = PolicyIssues(
         name=f'Policy Issues Integration Test {datetime.datetime.today()}',
         datahub_id=str(uuid.uuid4()),
         issue_type=generate_issue_type,

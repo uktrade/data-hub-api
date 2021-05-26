@@ -1,7 +1,7 @@
 from freezegun import freeze_time
 
 from datahub.bed_api.constants import Salutation
-from datahub.bed_api.models import EditContact
+from datahub.bed_api.entities import Contact
 
 
 class TestEditContactShould:
@@ -13,7 +13,7 @@ class TestEditContactShould:
         """
         Should format contact name accordingly
         """
-        contact = EditContact(
+        contact = Contact(
             datahub_id='datahub_id',
             first_name='Jane',
             last_name='Doe',
@@ -29,7 +29,7 @@ class TestEditContactShould:
         """
         Should format contact name accordingly
         """
-        contact = EditContact(
+        contact = Contact(
             datahub_id='datahub_id',
             first_name=None,
             last_name='Doe',
@@ -54,7 +54,7 @@ class TestEditContactShould:
             'Salutation': 'Mr.',
         }
 
-        contact = EditContact(
+        contact = Contact(
             datahub_id='datahub_id',
             first_name='John',
             last_name='Doe',

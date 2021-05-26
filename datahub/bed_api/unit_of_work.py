@@ -10,13 +10,17 @@ from datahub.bed_api.repositories import (
 
 class UnitOfWork:
     """
-    Base Unit of Work
+    Unit of Work Unit of Work merges many small database
+    updates in single batch to optimize the number of round-trips e.g.
+        https://martinfowler.com/eaaCatalog/unitOfWork.html
     """
 
     def __exit__(self, *args):
         """
         On exit after with context
+
         :param args:
+
         :return: UnitOfWork instance
         """
         self.close_session()
@@ -24,7 +28,9 @@ class UnitOfWork:
 
     def close_session(self):
         """
-        Close any active sessions
+        Close any active sessions or external infrastructure
+
+        :raises: NotImplementedError
         """
         raise NotImplementedError
 
@@ -37,6 +43,7 @@ class BedUnitOfWork(UnitOfWork):
     def __init__(self, session_factory_type=BedFactory):
         """
         Constructor
+
         :param session_factory_type:
         """
         super().__init__()
@@ -45,6 +52,7 @@ class BedUnitOfWork(UnitOfWork):
     def __enter__(self):
         """
         Allows with statement to be used
+
         :return: BedUnitOfWork instance
         """
         self.salesforce = self.session_factory_type().create()

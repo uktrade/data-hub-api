@@ -1,4 +1,4 @@
-from datahub.bed_api.constants import AccountQuery
+from datahub.bed_api.queries import AccountQuery
 from datahub.bed_api.repositories.base_repository import BaseRepository
 
 

@@ -56,9 +56,9 @@ class Account(BedEntity):
     ):
         """Constructor - Mandatory Fields to be assigned with value *"""
         super().__init__()
-        self.Name = name  # *
-        self.High_Level_Sector__c = high_level_sector  # *
-        self.Low_Level_Sector__c = low_level_sector  # *
+        self.Name = name
+        self.High_Level_Sector__c = high_level_sector
+        self.Low_Level_Sector__c = low_level_sector
         self.Company_Number__c = None
         self.Companies_House_ID__c = None
         self.BEIS_External_Affairs__c = None
@@ -77,7 +77,6 @@ class Account(BedEntity):
         self.ShippingCountry = None
         self.UK_Region__c = None
         self.Country_HQ__c = None
-        self.Location__c = None  # Country
         # Misc
         self.FTSE_100__c = False
         self.FTSE_250__c = False
@@ -106,17 +105,17 @@ class Contact(BedEntity):
         self.Datahub_ID__c = datahub_id
         self.FirstName = first_name
         self.MiddleName = None
-        self.LastName = last_name  # *
+        self.LastName = last_name
         self.Salutation = Salutation.not_applicable
         self.Suffix = None
-        self.Email = email  # *
+        self.Email = email
         self.Job_Title__c = None
         self.Job_Type__c: JobType = JobType.none
         self.Notes__c = None
         # Phones
         self.Phone = None
         self.MobilePhone = None
-        self.AccountId = account_id  # * Organization Id
+        self.AccountId = account_id
         self.Contact_Type__c = ContactType.none
         self.Business_Area__c = BusinessArea.none
         # Assistant details
@@ -151,9 +150,9 @@ class Event(BedEntity):
     ):
         """Constructor"""
         super().__init__()
-        self.Name = name  # *
-        self.Datahub_ID__c = datahub_id  # *
-        self.Topic__c = title  # *
+        self.Name = name
+        self.Datahub_ID__c = datahub_id
+        self.Topic__c = title
         self.Date__c = None  # : date
         self.Description__c = None
         self.Interaction_Type__c = InteractionType.none
@@ -192,9 +191,9 @@ class EventAttendee(BedEntity):
     ):
         """Constructor"""
         super().__init__()
-        self.Datahub_ID__c = datahub_id  # *
-        self.Event__c = event_id  # *
-        self.Attendee__c = contact_id  # *
+        self.Datahub_ID__c = datahub_id
+        self.Event__c = event_id
+        self.Attendee__c = contact_id
         self.Name_stub__c = None
         self.Email__c = None
 
@@ -216,22 +215,22 @@ class PolicyIssues(BedEntity):
     ):
         """Constructor"""
         super().__init__()
-        self.Name = name  # *
-        self.Datahub_ID__c = datahub_id  # *
-        self.Issue_Type__c = issue_type  # *
-        self.Company__c = account_id  # *
+        self.Name = name
+        self.Datahub_ID__c = datahub_id
+        self.Issue_Type__c = issue_type
+        self.Company__c = account_id
+        self.Policy_Area__c = policy_areas
+        self.Sectors_Affected__c = sectors_affected
+        self.Sentiment__c = sentiment
+        self.Classification__c = classification
         # Company field is a multi-select
-        self.UK_Affected__c = uk_region_affected  # *
+        self.UK_Affected__c = uk_region_affected
         self.COVID_19_Related__c = False
         self.Add_Interactions__c = None
         self.For_Your_Eyes_Only__c = False
-        self.Policy_Area__c = policy_areas  # *
-        self.Sectors_Affected__c = sectors_affected  # *
         # Information
         self.Description_of_Issue__c = None
         self.Issue_Closed__c = False
-        self.Sentiment__c = sentiment  # *
-        self.Classification__c = classification  # *
         self.Show_On_Report__c = False
         self.Top_3_Issue__c = TopIssuesByRank.none
         self.NDP__c = False

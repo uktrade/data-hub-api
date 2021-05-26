@@ -1,6 +1,6 @@
 from unittest import mock
 
-from datahub.bed_api.models import EditEvent
+from datahub.bed_api.entities import Event
 from datahub.bed_api.repositories import EventRepository
 from datahub.bed_api.tests.test_utils import (
     create_fail_query_response,
@@ -15,7 +15,7 @@ class TestEventRepositoryShould:
     def test_add_calls_salesforce_event_add_with_valid_args(
         self,
         mock_salesforce,
-        generate_event: EditEvent,
+        generate_event: Event,
     ):
         """
         Test add calls Salesforce with the correct Arguments
@@ -139,7 +139,7 @@ class TestEventRepositoryShould:
     def test_update_calls_salesforce_event_update_with_valid_args(
         self,
         mock_salesforce,
-        generate_event: EditEvent,
+        generate_event: Event,
     ):
         """
         Test update calls Salesforce with the correct Arguments

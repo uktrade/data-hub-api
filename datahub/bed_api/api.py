@@ -62,6 +62,7 @@ class SalesforceAPI:
     def delete(self, record_id):
         """
         Delete a single item by unique identifier
+
         :param record_id: Record id for deleting data
 
         :returns: Delete result
@@ -73,6 +74,7 @@ class SalesforceAPI:
         Checks if the record exists using the most unique identifier and
         the most efficient mechanism for checking ie the least content
         with ideally a head verb
+
         :param record_id: Unique identifier value, associated with Id value typically
         :raises: NotImplementedError
         """
@@ -85,8 +87,10 @@ class SalesforceAPI:
     def exists_status(self, record_id, response) -> bool:
         """
         Check if a record exists by the response
+
         :param record_id: Unique identifier
         :param response: Response returned from query by id
+
         :return: True if response assigned, totalSize is
                  greater than 1 and there is a record id
                  the equivalent of that value
@@ -101,9 +105,11 @@ class SalesforceAPI:
     def get_by(self, custom_id_field, custom_id_value):
         """
         Returns the result of a GET by field
+
         :param custom_id_field: API name of a custom field that was defined
                              as an External ID
         :param custom_id_value: External ID value
+
         :raises: NotImplementedError
         """
         return getattr(self.salesforce, self.respository_name).get_by_custom_id(
@@ -134,6 +140,7 @@ class SalesforceAPI:
         """
         Retrieves next or more results from a query that returned more results
         than the batch maximum
+
         :param next_records_identifier: Either the Id of the next Salesforce
                                      object in the result, or a URL to the
                                      next record in the result
@@ -145,6 +152,7 @@ class SalesforceAPI:
                              query that includes deleted records. Only used if
                              `identifier_is_url` is False
         :param kwargs: Filters or where clause attributes
+
         :return: Returns a dict decoded from the Salesforce
         """
         return self.salesforce.query_more(
