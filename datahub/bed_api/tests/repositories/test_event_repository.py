@@ -147,7 +147,7 @@ class TestEventRepositoryShould:
         """
         repository = EventRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
-        generate_event.Id = expected_record_id
+        generate_event.id = expected_record_id
 
         repository.update(expected_record_id, generate_event.as_values_only_dict())
 

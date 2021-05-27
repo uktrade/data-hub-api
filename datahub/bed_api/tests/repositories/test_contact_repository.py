@@ -147,7 +147,7 @@ class TestContactRepositoryShould:
         """
         repository = ContactRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
-        generate_contact.Id = expected_record_id
+        generate_contact.id = expected_record_id
 
         repository.update(expected_record_id, generate_contact.as_values_only_dict())
 

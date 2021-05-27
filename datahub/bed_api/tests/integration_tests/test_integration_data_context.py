@@ -37,7 +37,7 @@ class TestIntegrationBedUnitOfWorkShould:
         with BedDataContext() as bed_data_context:
             try:
                 account_id = self.add_and_assert_account(bed_data_context, generate_account)
-                generate_contact.AccountId = account_id
+                generate_contact.account_id = account_id
                 contact_id = self.add_and_assert_contact(bed_data_context, generate_contact)
             finally:
                 self.delete_and_assert_contact(bed_data_context, contact_id)

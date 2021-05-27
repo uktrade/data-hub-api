@@ -463,26 +463,27 @@ def generate_account(
     :return: New Account with random values
     """
     new_account = Account(
+        datahub_id=str(uuid.uuid4()),
         name=faker.company(),
         high_level_sector=generate_high_level_sector,
         low_level_sector=generate_low_level_sector,
     )
-    new_account.BillingStreet = faker.street_address()
-    new_account.BillingCity = faker.city()
-    new_account.BillingState = faker.street_name()
-    new_account.BillingPostalCode = faker.postcode()
-    new_account.BillingCountry = faker.country()
-    new_account.ShippingStreet = faker.street_name()
-    new_account.ShippingCity = faker.city()
-    new_account.ShippingState = faker.street_name()
-    new_account.ShippingPostalCode = faker.postcode()
-    new_account.ShippingCountry = faker.country()
-    new_account.UK_Region__c = generate_uk_region_name
-    new_account.Country_HQ__c = faker.random_element(elements=generate_country_names)
+    new_account.billing_street = faker.street_address()
+    new_account.billing_city = faker.city()
+    new_account.billing_state = faker.street_name()
+    new_account.billing_postal_code = faker.postcode()
+    new_account.billing_country = faker.country()
+    new_account.shipping_street = faker.street_name()
+    new_account.shipping_city = faker.city()
+    new_account.shipping_state = faker.street_name()
+    new_account.shipping_postal_code = faker.postcode()
+    new_account.shipping_country = faker.country()
+    new_account.uk_region = generate_uk_region_name
+    new_account.country_hq = faker.random_element(elements=generate_country_names)
     # NOTE: Removed as this gets duplicate errors when the same values are recycled
-    # new_account.Company_Number__c = generate_company_number
-    # new_account.Companies_House_ID__c = generate_company_number
-    new_account.Company_Website__c = faker.url()
+    # new_account.company_number = generate_company_number
+    # new_account.companies_house_id = generate_company_number
+    new_account.company_website = faker.url()
 
     return new_account
 
@@ -514,19 +515,19 @@ def generate_contact(
         email=email,
         account_id=str(uuid.uuid4()),
     )
-    contact.Salutation = generate_salutation
-    contact.Suffix = faker.suffix()
-    contact.MiddleName = faker.first_name()
-    contact.Phone = faker.phone_number()
-    contact.MobilePhone = faker.phone_number()
-    contact.Notes__c = faker.text(max_nb_chars=100)
-    contact.Contact_Type__c = ContactType.external
-    contact.Job_Title__c = faker.job()
-    contact.Job_Type__c = generate_job_type
-    contact.Business_Area__c = generate_business_area
-    contact.AssistantName = faker.name()
-    contact.Assistant_Email__c = faker.company_email()
-    contact.Assistant_Phone__c = faker.phone_number()
+    contact.salutation = generate_salutation
+    contact.suffix = faker.suffix()
+    contact.middle_name = faker.first_name()
+    contact.phone = faker.phone_number()
+    contact.mobile_phone = faker.phone_number()
+    contact.notes = faker.text(max_nb_chars=100)
+    contact.contact_type = ContactType.external
+    contact.job_title = faker.job()
+    contact.job_type = generate_job_type
+    contact.business_area = generate_business_area
+    contact.assistant_name = faker.name()
+    contact.assistant_email = faker.company_email()
+    contact.assistant_phone = faker.phone_number()
     return contact
 
 
@@ -556,23 +557,22 @@ def generate_event(
         datahub_id=str(uuid.uuid4()),
         title=remove_newline(faker.text()),
     )
-    event.Date__c = faker.date()
-    event.Description__c = faker.text()
-    event.Interaction_Type__c = generate_interaction_type
-    event.Webinar_Information__c = faker.text()
-    event.Address__c = faker.address()
-    event.Location__c = faker.street_address()
-    event.City_Town__c = faker.city()
-    event.Region__c = generate_uk_region_name
-    event.Country__c = faker.country()
-    event.Attendees__c = faker.text()
-    event.Contacts_to_share__c = faker.text()
-    event.iCal_UID__c = str(uuid.uuid4())
-    event.Transparency_Reason_for_meeting__c = faker.text()
-    event.Transparency_Status__c = generate_transparency_status
-    event.Issue_Topics__c = ';'.join(generate_issue_types)
-    event.HMG_Lead__c = faker.company_email()
-    event.Department_Eyes_Only__c = generate_department_eyes
+    event.event_date = faker.date()
+    event.description = faker.text()
+    event.interaction_type = generate_interaction_type
+    event.webinar_information = faker.text()
+    event.address = faker.address()
+    event.location = faker.street_address()
+    event.city_town = faker.city()
+    event.region = generate_uk_region_name
+    event.country = faker.country()
+    event.attendees = faker.text()
+    event.contacts_to_share = faker.text()
+    event.transparency_reason_for_meeting = faker.text()
+    event.transparency_status = generate_transparency_status
+    event.issue_topics = ';'.join(generate_issue_types)
+    event.hmg_lead_email = faker.company_email()
+    event.department_eyes_only = generate_department_eyes
     return event
 
 
@@ -590,8 +590,8 @@ def generate_event_attendee(
         event_id=str(uuid.uuid4()),
         contact_id=str(uuid.uuid4()),
     )
-    event_attendee.Name_stub__c = f'Event Attendee Integration Test {datetime.datetime.today()}'
-    event_attendee.Email__c = faker.company_email()
+    event_attendee.name = f'Event Attendee Integration Test {datetime.datetime.today()}'
+    event_attendee.email = faker.company_email()
     return event_attendee
 
 
@@ -630,10 +630,10 @@ def generate_policy_issues(
         classification=generate_classification,
         sectors_affected=sectors_effected,
         uk_region_affected=generate_uk_region_name,
+        event_id=str(uuid.uuid4()),  # Interaction id
     )
-    policy_issues.Add_Interactions__c = str(uuid.uuid4())  # Interaction id
-    policy_issues.Description_of_Issue__c = faker.text()
-    policy_issues.Top_3_Issue__c = TopIssuesByRank.eight
-    policy_issues.Location_s_Affected__c = ';'.join(generate_country_names)
-    policy_issues.UK_Affected__c = generate_uk_region_name
+    policy_issues.description = faker.text()
+    policy_issues.issue_rank = TopIssuesByRank.eight
+    policy_issues.location_affected = ';'.join(generate_country_names)
+    policy_issues.uk_region_affected = generate_uk_region_name
     return policy_issues

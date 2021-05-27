@@ -157,7 +157,7 @@ class TestPolicyIssuesRepositoryShould:
         """
         repository = PolicyIssuesRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
-        generate_policy_issues.Id = expected_record_id
+        generate_policy_issues.id = expected_record_id
 
         repository.update(expected_record_id, generate_policy_issues.as_values_only_dict())
 
