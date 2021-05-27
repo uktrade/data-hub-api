@@ -10,8 +10,8 @@ from datahub.bed_api.repositories import (
 
 class DataContext:
     """
-    Unit of Work Unit of Work merges many small database
-    updates in single batch to optimize the number of round-trips e.g.
+    Represents the data context with all the consolidated repositories
+    and functionality that can be applied to a data system
         https://martinfowler.com/eaaCatalog/unitOfWork.html
     """
 
