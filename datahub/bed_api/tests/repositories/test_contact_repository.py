@@ -116,8 +116,8 @@ class TestContactRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_get_by_datahub_id_calls_salesforce_contact_get_with_valid_args(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test get_by calls Salesforce with the correct Arguments

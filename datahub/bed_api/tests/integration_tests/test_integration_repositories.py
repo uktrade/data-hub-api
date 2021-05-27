@@ -511,7 +511,7 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
         assert update_contact_response is not None
         assert update_contact_response == 204
 
-        account_update_check = account_repository(account_id)
+        account_update_check = account_repository.get(account_id)
         assert account_update_check is not None
         assert account_update_check['Name'] == expected_name
 

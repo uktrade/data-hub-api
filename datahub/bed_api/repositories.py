@@ -28,23 +28,6 @@ class ReadRepository:
         """
         return getattr(self.salesforce, self.entity_name).get(record_id)
 
-    def exists_status(self, record_id, response) -> bool:
-        """
-        Check if a record exists by the response
-
-        :param record_id: Unique identifier
-        :param response: Response returned from query by id
-
-        :return: True if response assigned, totalSize is greater than 1 and
-            there is a record id the equivalent of that value
-        """
-        return (
-            response is not None
-            and response['totalSize'] >= 1
-            and len(response['records']) > 0
-            and response['records'][0].get('Id') == record_id
-        )
-
     def exists(self, record_id):
         """
         Checks if the record exists using the most unique identifier and
@@ -56,7 +39,12 @@ class ReadRepository:
         """
         query = f'SELECT Id FROM {self.entity_name} WHERE Id = {{id}}'
         response = self.query(format_soql(query, id=record_id))
-        return self.exists_status(record_id, response)
+        return (
+            response is not None
+            and response['totalSize'] >= 1
+            and len(response['records']) > 0
+            and response['records'][0].get('Id') == record_id
+        )
 
     def get_by(self, custom_id_field, custom_id_value):
         """
@@ -79,10 +67,7 @@ class ReadRepository:
         :param datahub_id_value: External ID value
         :raises: Return data by datahub id
         """
-        return self.get_by(
-            'Datahub_ID__c',
-            datahub_id_value,
-        )
+        return self.get_by('Datahub_ID__c', datahub_id_value)
 
     def query(self, query, include_deleted=False, **kwargs):
         """
@@ -166,3 +151,58 @@ class ReadWriteRepository(ReadRepository):
         :returns: Delete result
         """
         return getattr(self.salesforce, self.entity_name).delete(record_id)
+
+
+class AccountRepository(ReadWriteRepository):
+    """
+    Account Repository to connect to BED Salesforce API
+
+    Repository pattern for Salesforce interactions with Account data
+    https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/Account/FieldsAndRelationships/view
+    """
+
+    entity_name = 'Account'
+
+
+class ContactRepository(ReadWriteRepository):
+    """
+    Contact Repository to connect to BED Salesforce API
+
+    Repository pattern for Salesforce interactions with Contacts data
+    https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/Contact/FieldsAndRelationships/view
+    """
+
+    entity_name = 'Contact'
+
+
+class EventAttendeeRepository(ReadWriteRepository):
+    """
+    Event Attendee Repository to connect to BED Salesforce API
+
+    Repository pattern for Salesforce interactions with Event Attendee data
+    https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/01I58000001EcAX/FieldsAndRelationships/view
+    """
+
+    entity_name = 'Event_Attendee__c'
+
+
+class EventRepository(ReadWriteRepository):
+    """
+    Event Repository to connect to BED Salesforce API
+
+    Repository pattern for Salesforce interactions with Event or Interaction data
+    https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/01I58000001EcAY/FieldsAndRelationships/view
+    """
+
+    entity_name = 'Event__c'
+
+
+class PolicyIssuesRepository(ReadWriteRepository):
+    """
+    Policy Issues Repository to connect to BED Salesforce API
+
+    Repository pattern for Salesforce interactions with Policy Issues data
+    https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/01I580000011RrH/FieldsAndRelationships/view
+    """
+
+    entity_name = 'Policy_Issues__c'
