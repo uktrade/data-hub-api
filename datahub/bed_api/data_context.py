@@ -8,7 +8,7 @@ from datahub.bed_api.repositories import (
 )
 
 
-class UnitOfWork:
+class DataContext:
     """
     Unit of Work Unit of Work merges many small database
     updates in single batch to optimize the number of round-trips e.g.
@@ -21,7 +21,7 @@ class UnitOfWork:
 
         :param args:
 
-        :return: UnitOfWork instance
+        :return: DataContext instance
         """
         self.close_session()
         return self
@@ -34,7 +34,7 @@ class UnitOfWork:
         raise NotImplementedError
 
 
-class BedUnitOfWork(UnitOfWork):
+class BedDataContext(DataContext):
     """
     Bed unit of work for interacting with the BED salesforce API
     """
@@ -52,7 +52,7 @@ class BedUnitOfWork(UnitOfWork):
         """
         Allows with statement to be used
 
-        :return: BedUnitOfWork instance
+        :return: BedDataContext instance
         """
         self.salesforce = self.session_factory_type().create()
         self.contacts = ContactRepository(self.salesforce)
