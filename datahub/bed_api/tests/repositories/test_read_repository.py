@@ -1,10 +1,14 @@
 from unittest import mock
 
-from datahub.bed_api.repositories import ReadWriteRepository
+from datahub.bed_api.repositories import ReadRepository
 
 
-class TestSalesforceRepositoryShould:
-    """Unit tests for Base ReadWriteRepository"""
+class TestSalesforceReadRepositoryShould:
+    """
+    Unit tests for Base ReadRepository for functionality
+    that applies to all repositories like query and
+    query next
+    """
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_query_calls_salesforce_query_with_valid_args(
@@ -15,7 +19,7 @@ class TestSalesforceRepositoryShould:
         Test query_more calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
         """
-        repository = ReadWriteRepository(mock_salesforce)
+        repository = ReadRepository(mock_salesforce)
         expected_query = 'test_query'
         expected_included_delete = True
 
@@ -41,7 +45,7 @@ class TestSalesforceRepositoryShould:
         Test query_more calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
         """
-        repository = ReadWriteRepository(mock_salesforce)
+        repository = ReadRepository(mock_salesforce)
         expected_next_records_identifier = 'test_next_id'
         expected_identifier_is_url = True
         expected_included_delete = True
