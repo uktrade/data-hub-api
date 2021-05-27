@@ -2,7 +2,7 @@ import os
 from collections import OrderedDict
 
 from datahub.bed_api.entities import BedEntity
-from datahub.bed_api.repositories import BaseRepository
+from datahub.bed_api.repositories import ReadRepository, ReadWriteRepository
 from datahub.bed_api.utils import remove_blank_from_dict
 
 NOT_BED_INTEGRATION_TEST_READY = (
@@ -91,12 +91,12 @@ def create_fail_query_response():
 
 
 def delete_and_assert_deletion(
-    repository: BaseRepository,
+    repository: ReadWriteRepository,
     record_id,
 ):
     """
     Delete generated record from the database
-    :param repository: BaseRepository type
+    :param repository: ReadWriteRepository type
     :param record_id: Identifier to delete
     """
     if record_id and repository:
@@ -110,7 +110,7 @@ def delete_and_assert_deletion(
 def assert_all_data_exists_on_bed(
     bed_entity: BedEntity,
     record_id,
-    repository: BaseRepository,
+    repository: ReadRepository,
     validate_data=True,
 ):
     """

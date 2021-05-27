@@ -1,7 +1,7 @@
-from datahub.bed_api.repositories.base_repository import BaseRepository
+from datahub.bed_api.repositories.base_repository import ReadWriteRepository
 
 
-class PolicyIssuesRepository(BaseRepository):
+class PolicyIssuesRepository(ReadWriteRepository):
     """
     Policy Issues Repository to connect to BED Salesforce API
 

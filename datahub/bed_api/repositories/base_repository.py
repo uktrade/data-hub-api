@@ -1,12 +1,13 @@
 from simple_salesforce import format_soql, Salesforce
 
 
-class BaseRepository:
+class ReadRepository:
     """
-    Base Salesforce Repository to encapsulate default CRUD operations for
-    interacting with Salesforce API
+    Base Salesforce Repository to encapsulate dealing with
+    reading Salesforce data only, helping to create
+    a separation of concerns - see CQRS patterns for more information
+    https://martinfowler.com/bliki/CQRS.html
     """
-
     entity_name = None
 
     def __init__(self, salesforce: Salesforce):
@@ -17,16 +18,6 @@ class BaseRepository:
         """
         self.salesforce = salesforce
 
-    def add(self, data):
-        """
-        Creates a new SObject
-
-        :param data: A dict of the data to create the SObject from
-
-        :return: New Salesforce Object
-        """
-        return getattr(self.salesforce, self.entity_name).create(data)
-
     def get(self, record_id):
         """
         Get a single item by unique identifier
@@ -36,39 +27,6 @@ class BaseRepository:
         :return: Fetched Salesforce Object
         """
         return getattr(self.salesforce, self.entity_name).get(record_id)
-
-    def update(self, record_id, data):
-        """
-        Update based on some unique identifier
-
-        :param record_id: Record identifier
-        :param data: Represents a dictionary of name values:
-
-        :return: Updated Salesforce Object
-        """
-        return getattr(self.salesforce, self.entity_name).update(record_id, data)
-
-    def delete(self, record_id):
-        """
-        Delete a single item by unique identifier
-        :param record_id: Record id for deleting data
-
-        :returns: Delete result
-        """
-        return getattr(self.salesforce, self.entity_name).delete(record_id)
-
-    def exists(self, record_id):
-        """
-        Checks if the record exists using the most unique identifier and
-        the most efficient mechanism for checking ie the least content
-        with ideally a head verb
-
-        :param record_id: Unique identifier value, associated with Id value typically
-        :raises: NotImplementedError
-        """
-        query = f'SELECT Id FROM {self.entity_name} WHERE Id = {{id}}'
-        response = self.query(format_soql(query, id=record_id))
-        return self.exists_status(record_id, response)
 
     def exists_status(self, record_id, response) -> bool:
         """
@@ -87,6 +45,19 @@ class BaseRepository:
             and response['records'][0].get('Id') == record_id
         )
 
+    def exists(self, record_id):
+        """
+        Checks if the record exists using the most unique identifier and
+        the most efficient mechanism for checking ie the least content
+        with ideally a head verb
+
+        :param record_id: Unique identifier value, associated with Id value typically
+        :raises: NotImplementedError
+        """
+        query = f'SELECT Id FROM {self.entity_name} WHERE Id = {{id}}'
+        response = self.query(format_soql(query, id=record_id))
+        return self.exists_status(record_id, response)
+
     def get_by(self, custom_id_field, custom_id_value):
         """
         Returns the result of a GET by field
@@ -94,11 +65,23 @@ class BaseRepository:
         :param custom_id_field: API name of a custom field that was defined
             as an External ID
         :param custom_id_value: External ID value
-        :raises: NotImplementedError
+        :raises: Return data by custom id
         """
         return getattr(self.salesforce, self.entity_name).get_by_custom_id(
             custom_id_field,
             custom_id_value,
+        )
+
+    def get_by_datahub_id(self, datahub_id_value):
+        """
+        Returns the result of a GET by datahub identifier value
+
+        :param datahub_id_value: External ID value
+        :raises: Return data by datahub id
+        """
+        return self.get_by(
+            'Datahub_ID__c',
+            datahub_id_value,
         )
 
     def query(self, query, include_deleted=False, **kwargs):
@@ -126,6 +109,7 @@ class BaseRepository:
         """
         Retrieves next or more results from a query that returned more results
         than the batch maximum
+
         :param next_records_identifier: Either the Id of the next Salesforce
             object in the result, or a URL to the next record in the result
         :param identifier_is_url: True if `next_records_identifier` should be
@@ -144,3 +128,41 @@ class BaseRepository:
             include_deleted,
             **kwargs,
         )
+
+
+class ReadWriteRepository(ReadRepository):
+    """
+    Base Salesforce Repository to encapsulate dealing with
+    reading and writing Salesforce Data
+    """
+
+    def add(self, data):
+        """
+        Creates a new SObject
+
+        :param data: A dict of the data to create the SObject from
+
+        :return: New Salesforce Object
+        """
+        return getattr(self.salesforce, self.entity_name).create(data)
+
+    def update(self, record_id, data):
+        """
+        Update based on some unique identifier
+
+        :param record_id: Record identifier
+        :param data: Represents a dictionary of name values:
+
+        :return: Updated Salesforce Object
+        """
+        return getattr(self.salesforce, self.entity_name).update(record_id, data)
+
+    def delete(self, record_id):
+        """
+        Delete a single item by unique identifier
+
+        :param record_id: Record id for deleting data
+
+        :returns: Delete result
+        """
+        return getattr(self.salesforce, self.entity_name).delete(record_id)

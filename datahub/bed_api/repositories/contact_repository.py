@@ -1,7 +1,7 @@
-from datahub.bed_api.repositories.base_repository import BaseRepository
+from datahub.bed_api.repositories.base_repository import ReadWriteRepository
 
 
-class ContactRepository(BaseRepository):
+class ContactRepository(ReadWriteRepository):
     """
     Contact Repository to connect to BED Salesforce API
 

@@ -1,7 +1,7 @@
-from datahub.bed_api.repositories.base_repository import BaseRepository
+from datahub.bed_api.repositories.base_repository import ReadWriteRepository
 
 
-class EventAttendeeRepository(BaseRepository):
+class EventAttendeeRepository(ReadWriteRepository):
     """
     Event Attendee Repository to connect to BED Salesforce API
 
