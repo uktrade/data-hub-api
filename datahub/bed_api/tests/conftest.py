@@ -121,12 +121,10 @@ def generate_high_level_sector(faker):
 
     :return: Random high level sector value
     """
-    high_level_sector = faker.random_element(
-        elements=(
-            HighLevelSector.values(HighLevelSector)
-        ),
+    return get_random_element(
+        faker,
+        HighLevelSector.values(HighLevelSector),
     )
-    return high_level_sector
 
 
 @pytest.fixture
@@ -138,12 +136,10 @@ def generate_low_level_sector(faker):
 
     :return: Random low level sector value
     """
-    low_level_sector = faker.random_element(
-        elements=(
-            LowLevelSector.values(LowLevelSector)
-        ),
+    return get_random_element(
+        faker,
+        LowLevelSector.values(LowLevelSector),
     )
-    return low_level_sector
 
 
 @pytest.fixture
@@ -155,8 +151,9 @@ def generate_uk_region_name(faker):
 
     :return: Random UK region name value
     """
-    uk_region = faker.random_element(
-        elements=(
+    return get_random_element(
+        faker,
+        (
             # CHECK Commented out in the end including others
             # UKRegion.all.value.name,
             # UKRegion.channel_islands.value.name,
@@ -182,7 +179,6 @@ def generate_uk_region_name(faker):
             UKRegion.west_midlands.value.name,
         ),
     )
-    return uk_region
 
 
 @pytest.fixture
@@ -194,12 +190,10 @@ def generate_salutation(faker):
 
     :return: Random salutation value
     """
-    salutation = faker.random_element(
-        elements=(
-            Salutation.values(Salutation)
-        ),
+    return get_random_element(
+        faker,
+        Salutation.values(Salutation),
     )
-    return salutation
 
 
 @pytest.fixture
@@ -211,8 +205,9 @@ def generate_country_names(faker):
 
     :return: Random country names value
     """
-    countries = faker.random_elements(
-        elements=(
+    return get_random_elements(
+        faker,
+        (
             Country.argentina.value.name,
             Country.azerbaijan.value.name,
             Country.cayman_islands.value.name,
@@ -225,9 +220,7 @@ def generate_country_names(faker):
             Country.united_states.value.name,
             Country.united_kingdom.value.name,
         ),
-        unique=True,
     )
-    return sorted(countries)
 
 
 @pytest.fixture
@@ -239,13 +232,10 @@ def generate_issue_types(faker):
 
     :return: Random issue topics value
     """
-    issue_types = faker.random_elements(
-        elements=(
-            IssueType.values(IssueType)
-        ),
-        unique=True,
+    return get_random_elements(
+        faker,
+        IssueType.values(IssueType),
     )
-    return sorted(issue_types)
 
 
 @pytest.fixture
@@ -257,12 +247,10 @@ def generate_issue_type(faker):
 
     :return: Random issue type
     """
-    issue_type = faker.random_element(
-        elements=(
-            IssueType.values(IssueType)
-        ),
+    return get_random_element(
+        faker,
+        IssueType.values(IssueType),
     )
-    return issue_type
 
 
 @pytest.fixture
@@ -274,12 +262,10 @@ def generate_job_type(faker):
 
     :return: Random JobType value
     """
-    job_type = faker.random_element(
-        elements=(
-            JobType.values(JobType)
-        ),
+    return get_random_element(
+        faker,
+        JobType.values(JobType),
     )
-    return job_type
 
 
 @pytest.fixture
@@ -291,12 +277,10 @@ def generate_business_area(faker):
 
     :return: Random BusinessArea value
     """
-    business_area = faker.random_element(
-        elements=(
-            BusinessArea.values(BusinessArea)
-        ),
+    return get_random_element(
+        faker,
+        BusinessArea.values(BusinessArea),
     )
-    return business_area
 
 
 @pytest.fixture
@@ -308,12 +292,10 @@ def generate_interaction_type(faker):
 
     :return: Random interaction type
     """
-    interaction_type = faker.random_element(
-        elements=(
-            InteractionType.values(InteractionType)
-        ),
+    return get_random_element(
+        faker,
+        InteractionType.values(InteractionType),
     )
-    return interaction_type
 
 
 @pytest.fixture
@@ -325,18 +307,13 @@ def generate_company_number(faker):
 
     :return: Random company value
     """
-    company_number = faker.random_element(
-        elements=(
-            '06591591',
-            '6431544',
-            '31079',
-            '39740',
-            '6935579',
-            '10002309',
-            '11163479',
+    return get_random_element(
+        faker,
+        (
+            str(uuid.uuid4()),
+            str(uuid.uuid4()),
         ),
     )
-    return company_number
 
 
 @pytest.fixture
@@ -348,12 +325,10 @@ def generate_transparency_status(faker):
 
     :return: Random transparency status
     """
-    transparency_status = faker.random_element(
-        elements=(
-            TransparencyStatus.values(TransparencyStatus)
-        ),
+    return get_random_element(
+        faker,
+        TransparencyStatus.values(TransparencyStatus),
     )
-    return transparency_status
 
 
 @pytest.fixture
@@ -365,10 +340,10 @@ def generate_sentiment(faker):
 
     :return: Random sentiment
     """
-    sentiment = faker.random_element(
-        elements=Sentiment.values(Sentiment),
+    return get_random_element(
+        faker,
+        Sentiment.values(Sentiment),
     )
-    return sentiment
 
 
 @pytest.fixture
@@ -380,12 +355,10 @@ def generate_department_eyes(faker):
 
     :return: Random transparency status
     """
-    department_eyes_only = faker.random_element(
-        elements=(
-            DepartmentEyes.values(DepartmentEyes)
-        ),
+    return get_random_element(
+        faker,
+        DepartmentEyes.values(DepartmentEyes),
     )
-    return department_eyes_only
 
 
 @pytest.fixture
@@ -397,13 +370,10 @@ def generate_policy_areas(faker):
 
     :return: Random policy areas array
     """
-    policy_areas = faker.random_elements(
-        elements=(
-            PolicyArea.values(PolicyArea)
-        ),
-        unique=True,
+    return get_random_elements(
+        faker,
+        PolicyArea.values(PolicyArea),
     )
-    return sorted(policy_areas)
 
 
 @pytest.fixture
@@ -415,12 +385,10 @@ def generate_classification(faker):
 
     :return: Random Classification
     """
-    classification = faker.random_element(
-        elements=(
-            Classification.values(Classification)
-        ),
+    return get_random_element(
+        faker,
+        Classification.values(Classification),
     )
-    return classification
 
 
 @pytest.fixture
@@ -432,13 +400,10 @@ def generate_sectors_affected(faker):
 
     :return: Random SectorsAffected array
     """
-    sectors_affected = faker.random_elements(
-        elements=(
-            SectorsAffected.values(SectorsAffected)
-        ),
-        unique=True,
+    return get_random_elements(
+        faker,
+        SectorsAffected.values(SectorsAffected),
     )
-    return sorted(sectors_affected)
 
 
 @pytest.fixture
@@ -480,9 +445,8 @@ def generate_account(
     new_account.shipping_country = faker.country()
     new_account.uk_region = generate_uk_region_name
     new_account.country_hq = faker.random_element(elements=generate_country_names)
-    # NOTE: Removed as this gets duplicate errors when the same values are recycled
-    # new_account.company_number = generate_company_number
-    # new_account.companies_house_id = generate_company_number
+    new_account.company_number = generate_company_number
+    new_account.companies_house_id = generate_company_number
     new_account.company_website = faker.url()
 
     return new_account
@@ -637,3 +601,31 @@ def generate_policy_issues(
     policy_issues.location_affected = ';'.join(generate_country_names)
     policy_issues.uk_region_affected = generate_uk_region_name
     return policy_issues
+
+
+def get_random_element(faker, elements):
+    """
+    Get random element from faker using elements list
+
+    :param faker: Faker Library
+    :param elements: List of elements
+
+    :return: Single element of the list
+    """
+    return faker.random_element(elements=elements)
+
+
+def get_random_elements(faker, elements):
+    """
+    Generate random unique sorted elements using elements
+
+    :param faker: Faker Library
+    :param elements: List of elements
+
+    :return: Random unique elements value sorted
+    """
+    result = faker.random_elements(
+        elements=elements,
+        unique=True,
+    )
+    return sorted(result)

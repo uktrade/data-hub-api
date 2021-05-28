@@ -1,8 +1,8 @@
 import pytest
 
+from datahub.bed_api.data_context import BedDataContext
 from datahub.bed_api.entities import Account, Contact
 from datahub.bed_api.tests.test_utils import NOT_BED_INTEGRATION_TEST_READY
-from datahub.bed_api.data_context import BedDataContext
 
 
 @pytest.mark.salesforce_test

@@ -57,6 +57,7 @@ class Account(BedEntity):
     """
     Salesforce representation of an Organization/Account edit details
     """
+
     data_mapping = dict(
         id='Id',
         datahub_id='Datahub_ID__c',

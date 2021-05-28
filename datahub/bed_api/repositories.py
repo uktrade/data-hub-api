@@ -8,6 +8,7 @@ class ReadRepository:
     a separation of concerns - see CQRS patterns for more information
     https://martinfowler.com/bliki/CQRS.html
     """
+
     entity_name = None
 
     def __init__(self, salesforce: Salesforce):
