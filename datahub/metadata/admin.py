@@ -148,6 +148,7 @@ class ServiceAdmin(MPTTModelAdmin, ReadOnlyMetadataAdmin):
 
     fields = ('id', 'segment', 'parent', 'contexts', 'order', 'disabled_on')
     list_display = ('segment', 'get_contexts_display', 'order', 'disabled_on')
+    search_fields = ('pk', 'segment')
     list_filter = (
         DisabledOnFilter,
         ServiceContextFilter,
