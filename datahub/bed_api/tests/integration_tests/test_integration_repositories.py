@@ -17,7 +17,7 @@ from datahub.bed_api.tests.test_utils import (
 )
 class TestIntegrationAccountRepositoryShould:
     """
-    Integration Test Contact and Account Repositories as Contact is dependent on an Account
+    Integration Test Account Repositories
     NOTE: Integration Tests needing BED configuration within
     .env - see Vault for valid sandbox only settings
          BED_USERNAME
