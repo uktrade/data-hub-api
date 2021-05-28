@@ -60,6 +60,11 @@ class TestIntegrationAccountRepositoryShould:
                 account_id=new_account_id,
                 faker=faker,
             )
+
+            # Get by Datahub Id
+            get_response = account_repository.get_by_datahub_id(generate_account.datahub_id)
+            assert get_response is not None
+            assert get_response['Id'] == new_account_id
         finally:
             #  Clean up generated data
             delete_and_assert_deletion(
