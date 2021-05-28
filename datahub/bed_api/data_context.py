@@ -2,9 +2,6 @@ from datahub.bed_api.factories import BedFactory
 from datahub.bed_api.repositories import (
     AccountRepository,
     ContactRepository,
-    EventAttendeeRepository,
-    EventRepository,
-    PolicyIssuesRepository,
 )
 
 
@@ -57,9 +54,6 @@ class BedDataContext(DataContext):
         self.salesforce = self.session_factory_type().create()
         self.contacts = ContactRepository(self.salesforce)
         self.accounts = AccountRepository(self.salesforce)
-        self.interactions = EventRepository(self.salesforce)
-        self.attendees = EventAttendeeRepository(self.salesforce)
-        self.policy_issues = PolicyIssuesRepository(self.salesforce)
         return self
 
     def close_session(self):

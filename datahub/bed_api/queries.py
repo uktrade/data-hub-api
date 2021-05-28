@@ -19,21 +19,3 @@ class ContactQuery(Enum):
         'WHERE Id = {id}',
         'id',
     )
-
-
-class EventQuery(Enum):
-    """Event or Add Interaction Salesforce Queries"""
-
-    count_event_by_date = QueryConstant(
-        'SELECT COUNT(Id) '
-        'FROM Event__c '
-        'WHERE Date__c = {date}',
-        'date',
-    )
-
-    get_event_id_by_date = QueryConstant(
-        'SELECT Id FROM Event__c '
-        'WHERE Date__c = {date} '
-        'LIMIT {limit} OFFSET {offset}',
-        'date,limit,offset',
-    )

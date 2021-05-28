@@ -55,9 +55,6 @@ class TestBedDataContextShould:
             assert mock_salesforce.called
             assert bed_data_context.accounts is not None
             assert bed_data_context.contacts is not None
-            assert bed_data_context.interactions is not None
-            assert bed_data_context.attendees is not None
-            assert bed_data_context.policy_issues is not None
 
     @mock_environ(
         BED_USERNAME='test-user@digital.trade.gov.uk',

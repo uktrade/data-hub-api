@@ -1,41 +1,26 @@
-import datetime
 import uuid
 
 import pytest
 
 from datahub.bed_api.constants import (
     BusinessArea,
-    Classification,
     ContactType,
-    DepartmentEyes,
     HighLevelSector,
-    InteractionType,
-    IssueType,
     JobType,
     LowLevelSector,
     PolicyArea,
     Salutation,
     SectorsAffected,
-    Sentiment,
-    TopIssuesByRank,
-    TransparencyStatus,
 )
 from datahub.bed_api.entities import (
     Account,
     Contact,
-    Event,
-    EventAttendee,
-    PolicyIssues,
 )
 from datahub.bed_api.factories import BedFactory
 from datahub.bed_api.repositories import (
     AccountRepository,
     ContactRepository,
-    EventAttendeeRepository,
-    EventRepository,
-    PolicyIssuesRepository,
 )
-from datahub.bed_api.tests.test_utils import remove_newline
 from datahub.core.constants import Country, UKRegion
 
 
@@ -70,45 +55,6 @@ def account_repository(salesforce):
     :return: Instance of AccountRepository
     """
     repository = AccountRepository(salesforce)
-    return repository
-
-
-@pytest.fixture
-def event_repository(salesforce):
-    """
-    Creates instance of event repository
-
-    :param salesforce: BedFactory creating an instance of salesforce
-
-    :return: Instance of EventRepository
-    """
-    repository = EventRepository(salesforce)
-    return repository
-
-
-@pytest.fixture
-def event_attendee_repository(salesforce):
-    """
-    Creates instance of event repository
-
-    :param salesforce: BedFactory creating an instance of salesforce
-
-    :return: Instance of EventRepository
-    """
-    repository = EventAttendeeRepository(salesforce)
-    return repository
-
-
-@pytest.fixture
-def policy_issues_repository(salesforce):
-    """
-    Creates instance of policy issues repository
-
-    :param salesforce: BedFactory creating an instance of salesforce
-
-    :return: Instance of EventRepository
-    """
-    repository = PolicyIssuesRepository(salesforce)
     return repository
 
 
@@ -224,36 +170,6 @@ def generate_country_names(faker):
 
 
 @pytest.fixture
-def generate_issue_types(faker):
-    """
-    Generate random issue types array
-
-    :param faker: Faker Library
-
-    :return: Random issue topics value
-    """
-    return get_random_elements(
-        faker,
-        IssueType.values(IssueType),
-    )
-
-
-@pytest.fixture
-def generate_issue_type(faker):
-    """
-    Generate random issue type
-
-    :param faker: Faker Library
-
-    :return: Random issue type
-    """
-    return get_random_element(
-        faker,
-        IssueType.values(IssueType),
-    )
-
-
-@pytest.fixture
 def generate_job_type(faker):
     """
     Generate random job type
@@ -284,21 +200,6 @@ def generate_business_area(faker):
 
 
 @pytest.fixture
-def generate_interaction_type(faker):
-    """
-    Generate random interaction type
-
-    :param faker: Faker Library
-
-    :return: Random interaction type
-    """
-    return get_random_element(
-        faker,
-        InteractionType.values(InteractionType),
-    )
-
-
-@pytest.fixture
 def generate_company_number(faker):
     """
     Generate random company number
@@ -317,51 +218,6 @@ def generate_company_number(faker):
 
 
 @pytest.fixture
-def generate_transparency_status(faker):
-    """
-    Generate random transparency status
-
-    :param faker: Faker Library
-
-    :return: Random transparency status
-    """
-    return get_random_element(
-        faker,
-        TransparencyStatus.values(TransparencyStatus),
-    )
-
-
-@pytest.fixture
-def generate_sentiment(faker):
-    """
-    Generate sentiment
-
-    :param faker: Faker Library
-
-    :return: Random sentiment
-    """
-    return get_random_element(
-        faker,
-        Sentiment.values(Sentiment),
-    )
-
-
-@pytest.fixture
-def generate_department_eyes(faker):
-    """
-    Generate random department eyes
-
-    :param faker: Faker Library
-
-    :return: Random transparency status
-    """
-    return get_random_element(
-        faker,
-        DepartmentEyes.values(DepartmentEyes),
-    )
-
-
-@pytest.fixture
 def generate_policy_areas(faker):
     """
     Generate random policy_area arrays
@@ -373,21 +229,6 @@ def generate_policy_areas(faker):
     return get_random_elements(
         faker,
         PolicyArea.values(PolicyArea),
-    )
-
-
-@pytest.fixture
-def generate_classification(faker):
-    """
-    Generate random Classification
-
-    :param faker: Faker Library
-
-    :return: Random Classification
-    """
-    return get_random_element(
-        faker,
-        Classification.values(Classification),
     )
 
 
@@ -444,7 +285,7 @@ def generate_account(
     new_account.shipping_postal_code = faker.postcode()
     new_account.shipping_country = faker.country()
     new_account.uk_region = generate_uk_region_name
-    new_account.country_hq = faker.random_element(elements=generate_country_names)
+    new_account.country_hq = get_random_element(faker, generate_country_names)
     new_account.company_number = generate_company_number
     new_account.companies_house_id = generate_company_number
     new_account.company_website = faker.url()
@@ -493,114 +334,6 @@ def generate_contact(
     contact.assistant_email = faker.company_email()
     contact.assistant_phone = faker.phone_number()
     return contact
-
-
-@pytest.fixture
-def generate_event(
-    faker,
-    generate_interaction_type,
-    generate_uk_region_name,
-    generate_transparency_status,
-    generate_issue_types,
-    generate_department_eyes,
-):
-    """
-    Generate new Event with random values
-
-    :param faker: Faker Library
-    :param generate_interaction_type: Random generate InteractionType
-    :param generate_uk_region_name: Random uk region
-    :param generate_transparency_status: Random transparency status
-    :param generate_issue_types: Random issue topics array
-    :param generate_department_eyes: Random department eyes only value
-
-    :return: New Event with random fake data
-    """
-    event = Event(
-        name=f'Event Integration Test {datetime.datetime.today()}',
-        datahub_id=str(uuid.uuid4()),
-        title=remove_newline(faker.text()),
-    )
-    event.event_date = faker.date()
-    event.description = faker.text()
-    event.interaction_type = generate_interaction_type
-    event.webinar_information = faker.text()
-    event.address = faker.address()
-    event.location = faker.street_address()
-    event.city_town = faker.city()
-    event.region = generate_uk_region_name
-    event.country = faker.country()
-    event.attendees = faker.text()
-    event.contacts_to_share = faker.text()
-    event.transparency_reason_for_meeting = faker.text()
-    event.transparency_status = generate_transparency_status
-    event.issue_topics = ';'.join(generate_issue_types)
-    event.hmg_lead_email = faker.company_email()
-    event.department_eyes_only = generate_department_eyes
-    return event
-
-
-@pytest.fixture
-def generate_event_attendee(
-    faker,
-):
-    """
-    Generate new Event Attendee test data
-
-    :param faker: Faker data generator
-    """
-    event_attendee = EventAttendee(
-        datahub_id=str(uuid.uuid4()),
-        event_id=str(uuid.uuid4()),
-        contact_id=str(uuid.uuid4()),
-    )
-    event_attendee.name = f'Event Attendee Integration Test {datetime.datetime.today()}'
-    event_attendee.email = faker.company_email()
-    return event_attendee
-
-
-@pytest.fixture
-def generate_policy_issues(
-    faker,
-    generate_issue_type,
-    generate_uk_region_name,
-    generate_policy_areas,
-    generate_sentiment,
-    generate_classification,
-    generate_sectors_affected,
-    generate_country_names,
-):
-    """
-    Generate new Event Attendee test data
-
-    :param faker: Faker data generator
-    :param generate_issue_type: Data generated for issue type
-    :param generate_uk_region_name: Data generated for uk regions
-    :param generate_policy_areas: Data generated for policy areas
-    :param generate_sentiment: Data generated for sentiment
-    :param generate_classification: Data generated for classification
-    :param generate_sectors_affected: Data generated for sectors effected
-    :param generate_country_names: Data generated for Country names
-    """
-    policy_areas = ';'.join(generate_policy_areas)
-    sectors_effected = ';'.join(generate_sectors_affected)
-    policy_issues = PolicyIssues(
-        name=f'Policy Issues Integration Test {datetime.datetime.today()}',
-        datahub_id=str(uuid.uuid4()),
-        issue_type=generate_issue_type,
-        account_id=str(uuid.uuid4()),
-        policy_areas=policy_areas,
-        sentiment=generate_sentiment,
-        classification=generate_classification,
-        sectors_affected=sectors_effected,
-        uk_region_affected=generate_uk_region_name,
-        event_id=str(uuid.uuid4()),  # Interaction id
-    )
-    policy_issues.description = faker.text()
-    policy_issues.issue_rank = TopIssuesByRank.eight
-    policy_issues.location_affected = ';'.join(generate_country_names)
-    policy_issues.uk_region_affected = generate_uk_region_name
-    return policy_issues
 
 
 def get_random_element(faker, elements):

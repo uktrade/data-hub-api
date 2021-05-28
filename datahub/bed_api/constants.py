@@ -116,59 +116,6 @@ class LowLevelSector(StringEnum):
     telecoms = 'Telecoms'
 
 
-class InteractionType(StringEnum):
-    """Interaction Types from BED"""
-
-    none = ''
-    bilateral_meeting = 'Bilateral Meeting'
-    brush_by = 'Brush By'
-    conference = 'Conference'
-    email = 'Email'
-    forum = 'Forum'
-    letter = 'Letter'
-    multilateral_meeting = 'Multilateral Meeting'
-    phone_call = 'Phone Call'
-    reception = 'Reception'
-    roadshow = 'Roadshow'
-
-
-class TransparencyStatus(StringEnum):
-    """Transparency Status from BED"""
-
-    none = ''
-    draft = 'Draft'
-    confirm = 'Confirm'
-    delete = 'Delete'
-
-
-class IssueType(StringEnum):
-    """Issue Types from BED"""
-
-    none = ''
-    covid_19 = 'Covid-19'
-    domestic_policy = 'Domestic Policy'
-    economic_opportunity = 'Economic Opportunity'
-    economic_risk = 'Economic Risk'
-    international_climate = 'International Climate'
-    uk_transition_policy = 'UK Transition Policy'
-
-
-class DepartmentEyes(StringEnum):
-    """Department Eyes from BED"""
-
-    none = ''
-    advanced_manufacturing = 'Advanced Manufacturing (BIS)'
-    aviation = 'Aviation (DfT)'
-    civil_society = 'Civil Society'
-    consumer_and_retail = 'Consumer & Retail (BIS)'
-    creative_industries = 'Creative Industries (DCMS)'
-    defence = 'Defence (MoD)'
-    energy = 'Energy (DECC)'
-    environmental_services = 'Environmental Services'
-    financial_services = 'Financial Services (HMT)'
-    food_and_agriculture = 'Food & Agriculture (DEFRA)'
-
-
 class SectorsAffected(StringEnum):
     """Sector(s) Affected from BED"""
 
@@ -194,40 +141,6 @@ class SectorsAffected(StringEnum):
     tech_and_telecoms = 'Tech & Telecoms'
     tourism = 'Tourism'
     transport = 'Transport'
-
-
-class Sentiment(StringEnum):
-    """Sentiment from BED"""
-
-    none = ''
-    positive = 'Positive'
-    neutral = 'Neutral'
-    negative = 'Negative'
-
-
-class Classification(StringEnum):
-    """Classification from BED"""
-
-    none = ''
-    official_sensitive = 'Official-Sensitive'
-    official = 'Official'
-    unclassified = 'Unclassified'
-
-
-class TopIssuesByRank(StringEnum):
-    """Top Issues by Rank from BED"""
-
-    none = ''
-    one = '1'
-    two = '2'
-    three = '3'
-    four = '4'
-    five = '5'
-    six = '6'
-    seven = '7'
-    eight = '8'
-    nine = '9'
-    ten = '10'
 
 
 class PolicyArea(StringEnum):
@@ -309,27 +222,3 @@ class PolicyArea(StringEnum):
     cop26_finance = 'COP26 Finance (including TCFD)'
     cop26_nature = 'COP26 Nature (including supply chains)'
     cop26_participation_at_glasgow = 'COP26 - Participation at Glasgow'
-
-
-class RegionOrInternational(StringEnum):
-    """UK Region or International Affected from BED"""
-
-    none = ''
-    international = 'International'
-    uk_wide = 'UK Wide'
-    england = 'England'
-    northern_ireland = 'Northern Ireland'
-    scotland = 'Scotland'
-    wales = 'Wales'
-    east_of_england = 'East of England'
-    east_midlands = 'East Midlands'
-    london = 'London'
-    north_east = 'North East'
-    north_west = 'North West'
-    south_east = 'South East'
-    south_west = 'South West'
-    west_midlands = 'West Midlands'
-    yorkshire_and_the_humber = 'Yorkshire and the Humber'
-    guernsey = 'Guernsey'
-    jersey = 'Jersey'
-    isle_of_man = 'Isle of Man'

@@ -133,15 +133,3 @@ def assert_all_data_exists_on_bed(
                 f' not equal to"{salesforce_data[key]}"'
             )
             assert salesforce_data[key] == value, failure_message
-
-
-def remove_newline(value: str) -> str:
-    """
-    Remove new line characters for Salesforce where the value gets stripped down
-    anyway changing the expected value
-    :param value: string value
-    :return: formatted string with no newline values
-    """
-    if value:
-        return value.replace('\n', '')
-    return value
