@@ -1,6 +1,6 @@
 from unittest import mock
 
-from datahub.bed_api.entities import Account, Contact
+from datahub.bed_api.entities import Account
 from datahub.bed_api.repositories import AccountRepository
 from datahub.bed_api.tests.test_utils import (
     create_fail_query_response,
@@ -19,6 +19,7 @@ class TestAccountRepositoryShould:
     ):
         """
         Test add calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         :param generate_account: Generated account data
         """
@@ -38,6 +39,7 @@ class TestAccountRepositoryShould:
     ):
         """
         Test delete calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = AccountRepository(mock_salesforce)
@@ -57,6 +59,7 @@ class TestAccountRepositoryShould:
     ):
         """
         Test exists calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = AccountRepository(mock_salesforce)
@@ -81,6 +84,7 @@ class TestAccountRepositoryShould:
     ):
         """
         Test exists calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = AccountRepository(mock_salesforce)
@@ -102,6 +106,7 @@ class TestAccountRepositoryShould:
     ):
         """
         Test get calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = AccountRepository(mock_salesforce)
@@ -121,6 +126,7 @@ class TestAccountRepositoryShould:
     ):
         """
         Test get_by calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = AccountRepository(mock_salesforce)
@@ -138,10 +144,11 @@ class TestAccountRepositoryShould:
     def test_update_calls_salesforce_account_update_with_valid_args(
         self,
         mock_salesforce,
-        generate_account: Contact,
+        generate_account: Account,
     ):
         """
         Test add calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         :param generate_account: Generated account data
         """
