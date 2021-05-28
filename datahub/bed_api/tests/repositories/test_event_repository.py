@@ -115,23 +115,22 @@ class TestEventRepositoryShould:
         )
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_get_by_calls_salesforce_event_get_with_valid_args(
-        self,
-        mock_salesforce,
+    def test_get_by_datahub_id_calls_salesforce_contact_get_with_valid_args(
+            self,
+            mock_salesforce,
     ):
         """
         Test get_by calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = EventRepository(mock_salesforce)
-        expected_record_field = 'test_record_field'
         expected_record_id = 'test_record_id'
 
-        repository.get_by(expected_record_field, expected_record_id)
+        repository.get_by_datahub_id(expected_record_id)
 
         assert mock_salesforce.Event__c.get_by_custom_id.called
         assert mock_salesforce.Event__c.get_by_custom_id.call_args == mock.call(
-            expected_record_field,
+            'Datahub_ID__c',
             expected_record_id,
         )
 
@@ -148,7 +147,7 @@ class TestEventRepositoryShould:
         """
         repository = EventRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
-        generate_event.Id = expected_record_id
+        generate_event.id = expected_record_id
 
         repository.update(expected_record_id, generate_event.as_values_only_dict())
 

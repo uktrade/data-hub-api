@@ -1,8 +1,8 @@
 import pytest
 
+from datahub.bed_api.data_context import BedDataContext
 from datahub.bed_api.entities import Account, Contact
 from datahub.bed_api.tests.test_utils import NOT_BED_INTEGRATION_TEST_READY
-from datahub.bed_api.unit_of_work import BedUnitOfWork
 
 
 @pytest.mark.salesforce_test
@@ -28,15 +28,16 @@ class TestIntegrationBedUnitOfWorkShould:
     ):
         """
         Test adding and deleting an account
+
         :param generate_account: New account record generated with faker data
         :param generate_contact: New contact record generated with faker data
         """
         account_id = None
         contact_id = None
-        with BedUnitOfWork() as bed_data_context:
+        with BedDataContext() as bed_data_context:
             try:
                 account_id = self.add_and_assert_account(bed_data_context, generate_account)
-                generate_contact.AccountId = account_id
+                generate_contact.account_id = account_id
                 contact_id = self.add_and_assert_contact(bed_data_context, generate_contact)
             finally:
                 self.delete_and_assert_contact(bed_data_context, contact_id)
@@ -45,7 +46,8 @@ class TestIntegrationBedUnitOfWorkShould:
     def delete_and_assert_account(self, bed_data_context, account_id):
         """
         Delete the account  if there is a value assigned and verify the deletion
-        :param bed_data_context: BedUnitOfWork
+
+        :param bed_data_context: BedDataContext
         :param account_id: Identifier of the new account record
         """
         if account_id:
@@ -56,7 +58,8 @@ class TestIntegrationBedUnitOfWorkShould:
     def delete_and_assert_contact(self, bed_data_context, contact_id):
         """
         Delete the contact  if there is a value assigned and verify the deletion
-        :param bed_data_context: BedUnitOfWork
+
+        :param bed_data_context: BedDataContext
         :param contact_id: Identifier of the new contact record
         """
         if contact_id:
@@ -67,8 +70,10 @@ class TestIntegrationBedUnitOfWorkShould:
     def add_and_assert_contact(self, bed_data_context, generate_contact):
         """
         Add a contact and verify it exists
-        :param bed_data_context: BedUnitOfWork or db context with salesforce
+
+        :param bed_data_context: BedDataContext or db context with salesforce
         :param generate_contact: New contact record generated with faker data
+
         :return: Contact id of new contact
         """
         contact_add_response = bed_data_context.contacts.add(
@@ -83,8 +88,10 @@ class TestIntegrationBedUnitOfWorkShould:
     def add_and_assert_account(self, bed_data_context, generate_account):
         """
         Add an account via the bed context or unit of work
-        :param bed_data_context: BedUnitOfWork
+
+        :param bed_data_context: BedDataContext
         :param generate_account: New account record generated with faker data
+
         :return: account id of new Account
         """
         account_add_response = bed_data_context.accounts.add(

@@ -51,7 +51,9 @@ def salesforce():
 def contact_repository(salesforce):
     """
     Creates instance of contact repository
+
     :param salesforce: BedFactory creating an instance of salesforce
+
     :return: Instance of ContactRepository
     """
     repository = ContactRepository(salesforce)
@@ -62,7 +64,9 @@ def contact_repository(salesforce):
 def account_repository(salesforce):
     """
     Creates instance of account repository
+
     :param salesforce: BedFactory creating an instance of salesforce
+
     :return: Instance of AccountRepository
     """
     repository = AccountRepository(salesforce)
@@ -73,7 +77,9 @@ def account_repository(salesforce):
 def event_repository(salesforce):
     """
     Creates instance of event repository
+
     :param salesforce: BedFactory creating an instance of salesforce
+
     :return: Instance of EventRepository
     """
     repository = EventRepository(salesforce)
@@ -84,7 +90,9 @@ def event_repository(salesforce):
 def event_attendee_repository(salesforce):
     """
     Creates instance of event repository
+
     :param salesforce: BedFactory creating an instance of salesforce
+
     :return: Instance of EventRepository
     """
     repository = EventAttendeeRepository(salesforce)
@@ -95,7 +103,9 @@ def event_attendee_repository(salesforce):
 def policy_issues_repository(salesforce):
     """
     Creates instance of policy issues repository
+
     :param salesforce: BedFactory creating an instance of salesforce
+
     :return: Instance of EventRepository
     """
     repository = PolicyIssuesRepository(salesforce)
@@ -106,41 +116,44 @@ def policy_issues_repository(salesforce):
 def generate_high_level_sector(faker):
     """
     Generate random high level sector
+
     :param faker: Faker Library
+
     :return: Random high level sector value
     """
-    high_level_sector = faker.random_element(
-        elements=(
-            HighLevelSector.values(HighLevelSector)
-        ),
+    return get_random_element(
+        faker,
+        HighLevelSector.values(HighLevelSector),
     )
-    return high_level_sector
 
 
 @pytest.fixture
 def generate_low_level_sector(faker):
     """
     Generate random low level sector
+
     :param faker: Faker Library
+
     :return: Random low level sector value
     """
-    low_level_sector = faker.random_element(
-        elements=(
-            LowLevelSector.values(LowLevelSector)
-        ),
+    return get_random_element(
+        faker,
+        LowLevelSector.values(LowLevelSector),
     )
-    return low_level_sector
 
 
 @pytest.fixture
 def generate_uk_region_name(faker):
     """
     Generate random UK Region name
+
     :param faker: Faker Library
+
     :return: Random UK region name value
     """
-    uk_region = faker.random_element(
-        elements=(
+    return get_random_element(
+        faker,
+        (
             # CHECK Commented out in the end including others
             # UKRegion.all.value.name,
             # UKRegion.channel_islands.value.name,
@@ -166,33 +179,35 @@ def generate_uk_region_name(faker):
             UKRegion.west_midlands.value.name,
         ),
     )
-    return uk_region
 
 
 @pytest.fixture
 def generate_salutation(faker):
     """
     Generate random salutation
+
     :param faker: Faker Library
+
     :return: Random salutation value
     """
-    salutation = faker.random_element(
-        elements=(
-            Salutation.values(Salutation)
-        ),
+    return get_random_element(
+        faker,
+        Salutation.values(Salutation),
     )
-    return salutation
 
 
 @pytest.fixture
 def generate_country_names(faker):
     """
     Generate random country names array
+
     :param faker: Faker Library
+
     :return: Random country names value
     """
-    countries = faker.random_elements(
-        elements=(
+    return get_random_elements(
+        faker,
+        (
             Country.argentina.value.name,
             Country.azerbaijan.value.name,
             Country.cayman_islands.value.name,
@@ -205,196 +220,190 @@ def generate_country_names(faker):
             Country.united_states.value.name,
             Country.united_kingdom.value.name,
         ),
-        unique=True,
     )
-    return sorted(countries)
 
 
 @pytest.fixture
 def generate_issue_types(faker):
     """
     Generate random issue types array
+
     :param faker: Faker Library
+
     :return: Random issue topics value
     """
-    issue_types = faker.random_elements(
-        elements=(
-            IssueType.values(IssueType)
-        ),
-        unique=True,
+    return get_random_elements(
+        faker,
+        IssueType.values(IssueType),
     )
-    return sorted(issue_types)
 
 
 @pytest.fixture
 def generate_issue_type(faker):
     """
     Generate random issue type
+
     :param faker: Faker Library
+
     :return: Random issue type
     """
-    issue_type = faker.random_element(
-        elements=(
-            IssueType.values(IssueType)
-        ),
+    return get_random_element(
+        faker,
+        IssueType.values(IssueType),
     )
-    return issue_type
 
 
 @pytest.fixture
 def generate_job_type(faker):
     """
     Generate random job type
+
     :param faker: Faker Library
+
     :return: Random JobType value
     """
-    job_type = faker.random_element(
-        elements=(
-            JobType.values(JobType)
-        ),
+    return get_random_element(
+        faker,
+        JobType.values(JobType),
     )
-    return job_type
 
 
 @pytest.fixture
 def generate_business_area(faker):
     """
     Generate random business area
+
     :param faker: Faker Library
+
     :return: Random BusinessArea value
     """
-    business_area = faker.random_element(
-        elements=(
-            BusinessArea.values(BusinessArea)
-        ),
+    return get_random_element(
+        faker,
+        BusinessArea.values(BusinessArea),
     )
-    return business_area
 
 
 @pytest.fixture
 def generate_interaction_type(faker):
     """
     Generate random interaction type
+
     :param faker: Faker Library
+
     :return: Random interaction type
     """
-    interaction_type = faker.random_element(
-        elements=(
-            InteractionType.values(InteractionType)
-        ),
+    return get_random_element(
+        faker,
+        InteractionType.values(InteractionType),
     )
-    return interaction_type
 
 
 @pytest.fixture
 def generate_company_number(faker):
     """
     Generate random company number
+
     :param faker: Faker Library
+
     :return: Random company value
     """
-    company_number = faker.random_element(
-        elements=(
-            '06591591',
-            '6431544',
-            '31079',
-            '39740',
-            '6935579',
-            '10002309',
-            '11163479',
+    return get_random_element(
+        faker,
+        (
+            str(uuid.uuid4()),
+            str(uuid.uuid4()),
         ),
     )
-    return company_number
 
 
 @pytest.fixture
 def generate_transparency_status(faker):
     """
     Generate random transparency status
+
     :param faker: Faker Library
+
     :return: Random transparency status
     """
-    transparency_status = faker.random_element(
-        elements=(
-            TransparencyStatus.values(TransparencyStatus)
-        ),
+    return get_random_element(
+        faker,
+        TransparencyStatus.values(TransparencyStatus),
     )
-    return transparency_status
 
 
 @pytest.fixture
 def generate_sentiment(faker):
     """
     Generate sentiment
+
     :param faker: Faker Library
+
     :return: Random sentiment
     """
-    sentiment = faker.random_element(
-        elements=Sentiment.values(Sentiment),
+    return get_random_element(
+        faker,
+        Sentiment.values(Sentiment),
     )
-    return sentiment
 
 
 @pytest.fixture
 def generate_department_eyes(faker):
     """
     Generate random department eyes
+
     :param faker: Faker Library
+
     :return: Random transparency status
     """
-    department_eyes_only = faker.random_element(
-        elements=(
-            DepartmentEyes.values(DepartmentEyes)
-        ),
+    return get_random_element(
+        faker,
+        DepartmentEyes.values(DepartmentEyes),
     )
-    return department_eyes_only
 
 
 @pytest.fixture
 def generate_policy_areas(faker):
     """
     Generate random policy_area arrays
+
     :param faker: Faker Library
+
     :return: Random policy areas array
     """
-    policy_areas = faker.random_elements(
-        elements=(
-            PolicyArea.values(PolicyArea)
-        ),
-        unique=True,
+    return get_random_elements(
+        faker,
+        PolicyArea.values(PolicyArea),
     )
-    return sorted(policy_areas)
 
 
 @pytest.fixture
 def generate_classification(faker):
     """
     Generate random Classification
+
     :param faker: Faker Library
+
     :return: Random Classification
     """
-    classification = faker.random_element(
-        elements=(
-            Classification.values(Classification)
-        ),
+    return get_random_element(
+        faker,
+        Classification.values(Classification),
     )
-    return classification
 
 
 @pytest.fixture
 def generate_sectors_affected(faker):
     """
     Generate random SectorsAffected array
+
     :param faker: Faker Library
+
     :return: Random SectorsAffected array
     """
-    sectors_affected = faker.random_elements(
-        elements=(
-            SectorsAffected.values(SectorsAffected)
-        ),
-        unique=True,
+    return get_random_elements(
+        faker,
+        SectorsAffected.values(SectorsAffected),
     )
-    return sorted(sectors_affected)
 
 
 @pytest.fixture
@@ -408,35 +417,37 @@ def generate_account(
 ):
     """
     Generate account with random data
+
     :param faker: Faker Library
     :param generate_high_level_sector: sector mapping
     :param generate_low_level_sector: sector mapping
     :param generate_uk_region_name: uk regions
     :param generate_country_names: country names
     :param generate_company_number: company numbers
+
     :return: New Account with random values
     """
     new_account = Account(
+        datahub_id=str(uuid.uuid4()),
         name=faker.company(),
         high_level_sector=generate_high_level_sector,
         low_level_sector=generate_low_level_sector,
     )
-    new_account.BillingStreet = faker.street_address()
-    new_account.BillingCity = faker.city()
-    new_account.BillingState = faker.street_name()
-    new_account.BillingPostalCode = faker.postcode()
-    new_account.BillingCountry = faker.country()
-    new_account.ShippingStreet = faker.street_name()
-    new_account.ShippingCity = faker.city()
-    new_account.ShippingState = faker.street_name()
-    new_account.ShippingPostalCode = faker.postcode()
-    new_account.ShippingCountry = faker.country()
-    new_account.UK_Region__c = generate_uk_region_name
-    new_account.Country_HQ__c = faker.random_element(elements=generate_country_names)
-    # NOTE: Removed as this gets duplicate errors when the same values are recycled
-    # new_account.Company_Number__c = generate_company_number
-    # new_account.Companies_House_ID__c = generate_company_number
-    new_account.Company_Website__c = faker.url()
+    new_account.billing_street = faker.street_address()
+    new_account.billing_city = faker.city()
+    new_account.billing_state = faker.street_name()
+    new_account.billing_postal_code = faker.postcode()
+    new_account.billing_country = faker.country()
+    new_account.shipping_street = faker.street_name()
+    new_account.shipping_city = faker.city()
+    new_account.shipping_state = faker.street_name()
+    new_account.shipping_postal_code = faker.postcode()
+    new_account.shipping_country = faker.country()
+    new_account.uk_region = generate_uk_region_name
+    new_account.country_hq = faker.random_element(elements=generate_country_names)
+    new_account.company_number = generate_company_number
+    new_account.companies_house_id = generate_company_number
+    new_account.company_website = faker.url()
 
     return new_account
 
@@ -450,10 +461,12 @@ def generate_contact(
 ):
     """
     Generate new Contact with random values
+
     :param faker: Faker Library
     :param generate_salutation:
     :param generate_job_type:
     :param generate_business_area:
+
     :return: New Contact with random fake data
     """
     firstname = faker.first_name()
@@ -466,19 +479,19 @@ def generate_contact(
         email=email,
         account_id=str(uuid.uuid4()),
     )
-    contact.Salutation = generate_salutation
-    contact.Suffix = faker.suffix()
-    contact.MiddleName = faker.first_name()
-    contact.Phone = faker.phone_number()
-    contact.MobilePhone = faker.phone_number()
-    contact.Notes__c = faker.text(max_nb_chars=100)
-    contact.Contact_Type__c = ContactType.external
-    contact.Job_Title__c = faker.job()
-    contact.Job_Type__c = generate_job_type
-    contact.Business_Area__c = generate_business_area
-    contact.AssistantName = faker.name()
-    contact.Assistant_Email__c = faker.company_email()
-    contact.Assistant_Phone__c = faker.phone_number()
+    contact.salutation = generate_salutation
+    contact.suffix = faker.suffix()
+    contact.middle_name = faker.first_name()
+    contact.phone = faker.phone_number()
+    contact.mobile_phone = faker.phone_number()
+    contact.notes = faker.text(max_nb_chars=100)
+    contact.contact_type = ContactType.external
+    contact.job_title = faker.job()
+    contact.job_type = generate_job_type
+    contact.business_area = generate_business_area
+    contact.assistant_name = faker.name()
+    contact.assistant_email = faker.company_email()
+    contact.assistant_phone = faker.phone_number()
     return contact
 
 
@@ -493,12 +506,14 @@ def generate_event(
 ):
     """
     Generate new Event with random values
+
     :param faker: Faker Library
     :param generate_interaction_type: Random generate InteractionType
     :param generate_uk_region_name: Random uk region
     :param generate_transparency_status: Random transparency status
     :param generate_issue_types: Random issue topics array
     :param generate_department_eyes: Random department eyes only value
+
     :return: New Event with random fake data
     """
     event = Event(
@@ -506,23 +521,22 @@ def generate_event(
         datahub_id=str(uuid.uuid4()),
         title=remove_newline(faker.text()),
     )
-    event.Date__c = faker.date()
-    event.Description__c = faker.text()
-    event.Interaction_Type__c = generate_interaction_type
-    event.Webinar_Information__c = faker.text()
-    event.Address__c = faker.address()
-    event.Location__c = faker.street_address()
-    event.City_Town__c = faker.city()
-    event.Region__c = generate_uk_region_name
-    event.Country__c = faker.country()
-    event.Attendees__c = faker.text()
-    event.Contacts_to_share__c = faker.text()
-    event.iCal_UID__c = str(uuid.uuid4())
-    event.Transparency_Reason_for_meeting__c = faker.text()
-    event.Transparency_Status__c = generate_transparency_status
-    event.Issue_Topics__c = ';'.join(generate_issue_types)
-    event.HMG_Lead__c = faker.company_email()
-    event.Department_Eyes_Only__c = generate_department_eyes
+    event.event_date = faker.date()
+    event.description = faker.text()
+    event.interaction_type = generate_interaction_type
+    event.webinar_information = faker.text()
+    event.address = faker.address()
+    event.location = faker.street_address()
+    event.city_town = faker.city()
+    event.region = generate_uk_region_name
+    event.country = faker.country()
+    event.attendees = faker.text()
+    event.contacts_to_share = faker.text()
+    event.transparency_reason_for_meeting = faker.text()
+    event.transparency_status = generate_transparency_status
+    event.issue_topics = ';'.join(generate_issue_types)
+    event.hmg_lead_email = faker.company_email()
+    event.department_eyes_only = generate_department_eyes
     return event
 
 
@@ -532,6 +546,7 @@ def generate_event_attendee(
 ):
     """
     Generate new Event Attendee test data
+
     :param faker: Faker data generator
     """
     event_attendee = EventAttendee(
@@ -539,8 +554,8 @@ def generate_event_attendee(
         event_id=str(uuid.uuid4()),
         contact_id=str(uuid.uuid4()),
     )
-    event_attendee.Name_stub__c = f'Event Attendee Integration Test {datetime.datetime.today()}'
-    event_attendee.Email__c = faker.company_email()
+    event_attendee.name = f'Event Attendee Integration Test {datetime.datetime.today()}'
+    event_attendee.email = faker.company_email()
     return event_attendee
 
 
@@ -557,6 +572,7 @@ def generate_policy_issues(
 ):
     """
     Generate new Event Attendee test data
+
     :param faker: Faker data generator
     :param generate_issue_type: Data generated for issue type
     :param generate_uk_region_name: Data generated for uk regions
@@ -578,10 +594,38 @@ def generate_policy_issues(
         classification=generate_classification,
         sectors_affected=sectors_effected,
         uk_region_affected=generate_uk_region_name,
+        event_id=str(uuid.uuid4()),  # Interaction id
     )
-    policy_issues.Add_Interactions__c = str(uuid.uuid4())  # Interaction id
-    policy_issues.Description_of_Issue__c = faker.text()
-    policy_issues.Top_3_Issue__c = TopIssuesByRank.eight
-    policy_issues.Location_s_Affected__c = ';'.join(generate_country_names)
-    policy_issues.UK_Affected__c = generate_uk_region_name
+    policy_issues.description = faker.text()
+    policy_issues.issue_rank = TopIssuesByRank.eight
+    policy_issues.location_affected = ';'.join(generate_country_names)
+    policy_issues.uk_region_affected = generate_uk_region_name
     return policy_issues
+
+
+def get_random_element(faker, elements):
+    """
+    Get random element from faker using elements list
+
+    :param faker: Faker Library
+    :param elements: List of elements
+
+    :return: Single element of the list
+    """
+    return faker.random_element(elements=elements)
+
+
+def get_random_elements(faker, elements):
+    """
+    Generate random unique sorted elements using elements
+
+    :param faker: Faker Library
+    :param elements: List of elements
+
+    :return: Random unique elements value sorted
+    """
+    result = faker.random_elements(
+        elements=elements,
+        unique=True,
+    )
+    return sorted(result)

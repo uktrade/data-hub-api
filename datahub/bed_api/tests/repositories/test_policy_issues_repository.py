@@ -23,6 +23,7 @@ class TestPolicyIssuesRepositoryShould:
     ):
         """
         Test add calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         :param generate_policy_issues: Generated policy issues data
         """
@@ -42,6 +43,7 @@ class TestPolicyIssuesRepositoryShould:
     ):
         """
         Test delete calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = PolicyIssuesRepository(mock_salesforce)
@@ -61,6 +63,7 @@ class TestPolicyIssuesRepositoryShould:
     ):
         """
         Test exists calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = PolicyIssuesRepository(mock_salesforce)
@@ -85,6 +88,7 @@ class TestPolicyIssuesRepositoryShould:
     ):
         """
         Test exists calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = PolicyIssuesRepository(mock_salesforce)
@@ -106,6 +110,7 @@ class TestPolicyIssuesRepositoryShould:
     ):
         """
         Test get calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = PolicyIssuesRepository(mock_salesforce)
@@ -119,23 +124,22 @@ class TestPolicyIssuesRepositoryShould:
         )
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_get_by_calls_salesforce_policy_issues_get_with_valid_args(
-        self,
-        mock_salesforce,
+    def test_get_by_datahub_id_calls_salesforce_contact_get_with_valid_args(
+            self,
+            mock_salesforce,
     ):
         """
         Test get_by calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = PolicyIssuesRepository(mock_salesforce)
-        expected_record_field = 'test_record_field'
         expected_record_id = 'test_record_id'
 
-        repository.get_by(expected_record_field, expected_record_id)
+        repository.get_by_datahub_id(expected_record_id)
 
         assert mock_salesforce.Policy_Issues__c.get_by_custom_id.called
         assert mock_salesforce.Policy_Issues__c.get_by_custom_id.call_args == mock.call(
-            expected_record_field,
+            'Datahub_ID__c',
             expected_record_id,
         )
 
@@ -147,12 +151,13 @@ class TestPolicyIssuesRepositoryShould:
     ):
         """
         Test update calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         :param generate_policy_issues: Generated event attendee data
         """
         repository = PolicyIssuesRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
-        generate_policy_issues.Id = expected_record_id
+        generate_policy_issues.id = expected_record_id
 
         repository.update(expected_record_id, generate_policy_issues.as_values_only_dict())
 

@@ -19,9 +19,9 @@ class TestEditContactShould:
             last_name='Doe',
             email='jane.doe@email.com',
         )
-        contact.Salutation = Salutation.mrs
-        contact.MiddleName = 'Middle'
-        contact.Suffix = 'Teacher'
+        contact.salutation = Salutation.mrs
+        contact.middle_name = 'Middle'
+        contact.suffix = 'Teacher'
 
         assert contact.name == 'Mrs. Jane Middle Doe Teacher'
 
@@ -35,7 +35,7 @@ class TestEditContactShould:
             last_name='Doe',
             email='jane.doe@email.com',
         )
-        contact.Salutation = Salutation.mr
+        contact.salutation = Salutation.mr
 
         assert contact.name == 'Mr. Doe'
 
@@ -60,6 +60,6 @@ class TestEditContactShould:
             last_name='Doe',
             email='john.doe@email.com',
         )
-        contact.Salutation = Salutation.mr
-        contact.Id = 'Test_Identity'
+        contact.salutation = Salutation.mr
+        contact.id = 'Test_Identity'
         assert contact.as_values_only_dict() == expected

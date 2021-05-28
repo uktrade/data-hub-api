@@ -115,7 +115,7 @@ class TestContactRepositoryShould:
         )
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
-    def test_get_by_calls_salesforce_contact_get_with_valid_args(
+    def test_get_by_datahub_id_calls_salesforce_contact_get_with_valid_args(
         self,
         mock_salesforce,
     ):
@@ -124,14 +124,13 @@ class TestContactRepositoryShould:
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = ContactRepository(mock_salesforce)
-        expected_record_field = 'test_record_field'
         expected_record_id = 'test_record_id'
 
-        repository.get_by(expected_record_field, expected_record_id)
+        repository.get_by_datahub_id(expected_record_id)
 
         assert mock_salesforce.Contact.get_by_custom_id.called
         assert mock_salesforce.Contact.get_by_custom_id.call_args == mock.call(
-            expected_record_field,
+            'Datahub_ID__c',
             expected_record_id,
         )
 
@@ -148,7 +147,7 @@ class TestContactRepositoryShould:
         """
         repository = ContactRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
-        generate_contact.Id = expected_record_id
+        generate_contact.id = expected_record_id
 
         repository.update(expected_record_id, generate_contact.as_values_only_dict())
 

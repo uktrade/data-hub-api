@@ -8,30 +8,33 @@ from datahub.bed_api.repositories import (
 )
 
 
-class UnitOfWork:
+class DataContext:
     """
-    Unit of Work Unit of Work merges many small database
-    updates in single batch to optimize the number of round-trips e.g.
+    Represents the data context with all the consolidated repositories
+    and functionality that can be applied to a data system
         https://martinfowler.com/eaaCatalog/unitOfWork.html
     """
 
     def __exit__(self, *args):
         """
         On exit after with context
+
         :param args:
-        :return: UnitOfWork instance
+
+        :return: DataContext instance
         """
         self.close_session()
         return self
 
     def close_session(self):
         """
-        Close any active sessions or external infrastructure
+        Close any active sessions or external infrastructure or resources
+        needing clean up or closing
         """
         raise NotImplementedError
 
 
-class BedUnitOfWork(UnitOfWork):
+class BedDataContext(DataContext):
     """
     Bed unit of work for interacting with the BED salesforce API
     """
@@ -39,6 +42,7 @@ class BedUnitOfWork(UnitOfWork):
     def __init__(self, session_factory_type=BedFactory):
         """
         Constructor
+
         :param session_factory_type:
         """
         super().__init__()
@@ -47,7 +51,8 @@ class BedUnitOfWork(UnitOfWork):
     def __enter__(self):
         """
         Allows with statement to be used
-        :return: BedUnitOfWork instance
+
+        :return: BedDataContext instance
         """
         self.salesforce = self.session_factory_type().create()
         self.contacts = ContactRepository(self.salesforce)
@@ -56,13 +61,6 @@ class BedUnitOfWork(UnitOfWork):
         self.attendees = EventAttendeeRepository(self.salesforce)
         self.policy_issues = PolicyIssuesRepository(self.salesforce)
         return self
-
-    def __exit__(self, *args):
-        """
-        Cleans up when the with is finalised
-        :param args:
-        """
-        super().__exit__(*args)
 
     def close_session(self):
         """

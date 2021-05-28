@@ -11,6 +11,7 @@ class BedFactory:
     def create(self):
         """
         Create a Salesforce instance with configured settings
+
         :return: Salesforce instance
         """
         if os.environ['BED_IS_SANDBOX'] == 'true':
