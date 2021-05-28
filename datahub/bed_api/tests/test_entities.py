@@ -1,5 +1,3 @@
-from freezegun import freeze_time
-
 from datahub.bed_api.constants import HighLevelSector, LowLevelSector
 from datahub.bed_api.entities import Account
 
@@ -9,7 +7,6 @@ class TestEditAccountShould:
     Contact expectations
     """
 
-    @freeze_time('2020-01-01-12:00:00')
     def test_account_outputs_value_only_generated_dictionary(self):
         """
         Should output account as dictionary without name, calculated fields
