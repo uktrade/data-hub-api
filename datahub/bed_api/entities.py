@@ -82,7 +82,7 @@ class Account(BedEntity):
         high_level_sector: HighLevelSector,
         low_level_sector: LowLevelSector,
     ):
-        """Constructor - Mandatory Fields to be assigned with value *"""
+        """Constructor"""
         super().__init__()
         self.name = name
         self.datahub_id = datahub_id
