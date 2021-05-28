@@ -4,7 +4,7 @@ from datahub.bed_api.factories import BedFactory
 from datahub.core.test_utils import mock_environ
 
 
-class TestBedFactoryShould:
+class TestBedFactory:
     """
     Test BedFactory for creating BED Salesforce instances or sessions
     """
