@@ -57,7 +57,7 @@ pytest-xdist==2.2.1
 ipython==7.24.0
 factory-boy==3.2.0
 freezegun==1.1.0
-requests-mock==1.9.2
+requests-mock==1.9.3
 django-debug-toolbar==3.2.1
 werkzeug==2.0.1  # Required by runserver_plus - useful for local dev
 pip-tools==6.1.0
