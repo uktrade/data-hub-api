@@ -28,6 +28,7 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     CompanyReferral.company.field,
     Contact.company.field,
     Interaction.company.field,
+    Interaction.companies.field,
     InvestmentProject.investor_company.field,
     InvestmentProject.intermediate_company.field,
     InvestmentProject.uk_company.field,
@@ -95,7 +96,7 @@ class MergeConfiguration(NamedTuple):
 
 
 MERGE_CONFIGURATION = [
-    MergeConfiguration(Interaction, ('company',)),
+    MergeConfiguration(Interaction, ('company', 'companies')),
     MergeConfiguration(CompanyReferral, ('company',)),
     MergeConfiguration(Contact, ('company',)),
     MergeConfiguration(InvestmentProject, INVESTMENT_PROJECT_COMPANY_FIELDS),
