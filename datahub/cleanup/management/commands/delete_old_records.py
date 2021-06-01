@@ -54,6 +54,7 @@ class Command(BaseCleanupCommand):
                 # before we delete the relevant companies
                 Company._meta.get_field('contacts'): (),
                 Company._meta.get_field('interactions'): (),
+                Company._meta.get_field('company_interactions'): (),
                 Company._meta.get_field('intermediate_investment_projects'): (),
                 Company._meta.get_field('investee_projects'): (),
                 Company._meta.get_field('investor_investment_projects'): (),

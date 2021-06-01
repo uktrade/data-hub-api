@@ -72,6 +72,13 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
         return [ContactFactory(company=self.company)] if self.company else []
 
     @to_many_field
+    def companies(self):
+        """
+        Add support for setting `companies`.
+        """
+        return []
+
+    @to_many_field
     def dit_participants(self, **kwargs):
         """
         Instances of InteractionDITParticipant.
@@ -99,6 +106,25 @@ class CompanyInteractionFactory(InteractionFactoryBase):
     communication_channel = factory.LazyFunction(
         lambda: random_obj_for_model(CommunicationChannel),
     )
+
+
+class CompaniesInteractionFactory(InteractionFactoryBase):
+    """Factory for creating an interaction relating to companies."""
+
+    # TODO: this factory should be removed once `company` field is removed
+    kind = Interaction.Kind.INTERACTION
+    theme = factory.Iterator(tuple(filter(None, Interaction.Theme.values)))
+    communication_channel = factory.LazyFunction(
+        lambda: random_obj_for_model(CommunicationChannel),
+    )
+    company = None
+
+    @to_many_field
+    def companies(self):
+        """
+        Add support for setting `companies`.
+        """
+        return [CompanyFactory()]
 
 
 class CompanyReferralInteractionFactory(CompanyInteractionFactory):
