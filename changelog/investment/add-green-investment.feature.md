@@ -1,0 +1,1 @@
+The field `Green Investment` was added as an investment business activity.
