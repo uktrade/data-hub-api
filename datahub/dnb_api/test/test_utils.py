@@ -16,7 +16,11 @@ from rest_framework import serializers, status
 from reversion.models import Version
 
 from datahub.company.models import Company
-from datahub.company.test.factories import AdviserFactory, CompanyFactory
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyFactory,
+    CompanyWithAreaFactory,
+)
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_MODEL_FIELDS
 from datahub.dnb_api.test.utils import model_to_dict_company
 from datahub.dnb_api.utils import (
@@ -32,7 +36,7 @@ from datahub.dnb_api.utils import (
     rollback_dnb_company_update,
     update_company_from_dnb,
 )
-from datahub.metadata.models import Country
+from datahub.metadata.models import AdministrativeArea, Country
 
 pytestmark = pytest.mark.django_db
 
@@ -239,7 +243,7 @@ class TestUpdateCompanyFromDNB:
     @freeze_time('2019-01-01 11:12:13')
     def test_update_company_from_dnb_all_fields(
         self,
-        formatted_dnb_company,
+        formatted_dnb_company_area,
         base_company_dict,
         adviser_callable,
         update_descriptor,
@@ -249,12 +253,12 @@ class TestUpdateCompanyFromDNB:
         kwarg is not specified.
         """
         duns_number = '123456789'
-        company = CompanyFactory(duns_number=duns_number, pending_dnb_investigation=True)
+        company = CompanyWithAreaFactory(duns_number=duns_number, pending_dnb_investigation=True)
         original_company = Company.objects.get(id=company.id)
         adviser = adviser_callable()
         update_company_from_dnb(
             company,
-            formatted_dnb_company,
+            formatted_dnb_company_area,
             user=adviser,
             update_descriptor=update_descriptor,
         )
@@ -266,7 +270,7 @@ class TestUpdateCompanyFromDNB:
             'address_2': '',
             'address_country': uk_country.id,
             'address_county': '',
-            'address_area': None,
+            'address_area': AdministrativeArea.objects.get(area_code='TX').id,
             'address_postcode': 'UB6 0F2',
             'address_town': 'GREENFORD',
             'archived_documents_url_path': original_company.archived_documents_url_path,
@@ -531,7 +535,7 @@ class TestRollbackDNBCompanyUpdate:
     )
     def test_rollback(
         self,
-        formatted_dnb_company,
+        formatted_dnb_company_area,
         fields,
         expected_fields,
     ):
@@ -539,13 +543,15 @@ class TestRollbackDNBCompanyUpdate:
         Test that rollback_dnb_company_update will roll back all DNB fields.
         """
         with reversion.create_revision():
-            company = CompanyFactory(duns_number=formatted_dnb_company['duns_number'])
+            company = CompanyWithAreaFactory(
+                duns_number=formatted_dnb_company_area['duns_number'],
+            )
 
         original_company = Company.objects.get(id=company.id)
 
         update_company_from_dnb(
             company,
-            formatted_dnb_company,
+            formatted_dnb_company_area,
             update_descriptor='foo',
         )
 

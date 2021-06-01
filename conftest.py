@@ -10,6 +10,7 @@ from django.db.models.signals import post_save
 from elasticsearch.helpers.test import get_test_client
 from pytest_django.lazy_django import skip_if_no_django
 
+from datahub.core.constants import AdministrativeArea
 from datahub.core.test_utils import HawkAPITestClient
 from datahub.dnb_api.utils import format_dnb_company
 from datahub.documents.utils import get_s3_client_for_bucket
@@ -479,6 +480,18 @@ def formatted_dnb_company(dnb_response_uk):
     Get formatted DNB company data.
     """
     return format_dnb_company(dnb_response_uk['results'][0])
+
+
+@pytest.fixture
+def formatted_dnb_company_area(dnb_response_uk):
+    """
+    Get formatted DNB company data.
+    """
+    dnb_response_area = dnb_response_uk['results'][0].copy()
+    dnb_response_area.update(
+        address_area_abbrev_name=AdministrativeArea.texas.value.area_code,
+    )
+    return format_dnb_company(dnb_response_area)
 
 
 def pytest_addoption(parser):

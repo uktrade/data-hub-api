@@ -19,7 +19,7 @@ python-dateutil==2.8.1
 psycopg2==2.8.6
 psycogreen==1.0.2
 
-boto3==1.17.78
+boto3==1.17.84
 
 notifications-python-client==6.1.0
 
@@ -34,11 +34,11 @@ icalendar==4.0.7
 slackclient==2.9.3
 
 # REDIS
-django-redis==4.12.1
+django-redis==5.0.0
 redis==3.5.3
 
 # ES
-elasticsearch==7.12.1
+elasticsearch==7.13.0
 elasticsearch-dsl==7.3.0
 
 # ES APM
@@ -54,10 +54,10 @@ pytest==6.2.4
 pytest-django==4.3.0
 pytest-cov==2.12.0
 pytest-xdist==2.2.1
-ipython==7.23.1
+ipython==7.24.0
 factory-boy==3.2.0
 freezegun==1.1.0
-requests-mock==1.9.2
+requests-mock==1.9.3
 django-debug-toolbar==3.2.1
 werkzeug==2.0.1  # Required by runserver_plus - useful for local dev
 pip-tools==6.1.0
