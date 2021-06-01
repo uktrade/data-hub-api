@@ -208,6 +208,12 @@ class DNBAddressSerializer(serializers.Serializer):
     county = serializers.CharField(source='address_county', required=False, allow_blank=True)
     postcode = serializers.CharField(source='address_postcode', required=False, allow_blank=True)
     country = NestedRelatedField(model=CountryModel, source='address_country')
+    area_name = serializers.CharField(source='address_area_name', required=False, allow_blank=True)
+    area_abbrev_name = serializers.CharField(
+        source='address_area_abbrev_name',
+        required=False,
+        allow_blank=True,
+    )
 
     def validate_country(self, country):
         """

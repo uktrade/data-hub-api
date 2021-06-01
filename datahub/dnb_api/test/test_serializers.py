@@ -1,5 +1,3 @@
-from urllib.parse import urlparse
-
 import pytest
 
 from datahub.company.models import Company
@@ -24,28 +22,6 @@ override_functions = (
         id='blank-for-null-values',
     ),
 )
-
-
-def assert_company_data(company, data):
-    """
-    Check if each field of the given company has the same value as given data.
-    """
-    assert company.name == data['name']
-    assert company.address_1 == data['address']['line_1']
-    assert company.address_2 == data['address']['line_2']
-    assert company.address_town == data['address']['town']
-    assert company.address_county == data['address']['county']
-    assert company.address_postcode == data['address']['postcode']
-    assert str(company.address_country.id) == data['address']['country']['id']
-    assert str(company.business_type.id) == data['business_type']
-    assert str(company.sector.id) == data['sector']
-    assert str(company.uk_region.id) == data['uk_region']
-
-    website = data.get('website')
-    if website not in (None, ''):
-        url = urlparse(website)
-        website = f'{url.scheme or "http"}://{url.path or url.netloc}'
-    assert company.website == website
 
 
 def test_dnb_company_serializer_partial_save(db):

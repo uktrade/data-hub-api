@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: ef4330b8-3107-4d50-a0b4-c8eb4a7f127c
+  fields:
+    disabled_on:
+    order: 514.0
+    segment: Midlands Engine
+    parent: f9dd5fc3-a33a-4024-b512-f345a51d295f
+    contexts: ["export_interaction", "export_service_delivery"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
