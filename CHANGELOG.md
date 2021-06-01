@@ -1,3 +1,19 @@
+# Data Hub API 36.21.0 (2021-06-01)
+## Features
+
+- **Interactions** Adds `Midlands Engine` as `Export Interaction` and `Export Service Delivery` option.
+- **Investment** The field `Green Investment` was added as an investment business activity.
+
+## API
+
+- The DNB API now can receive Administrative Area name and Administrative Area abbreviated name from the DNB service.
+
+## Database schema
+
+- The administrative area table now has a new field of area name.
+  This field is an expanded name for the administrative area code.
+
+
 # Data Hub API 36.20.0 (2021-05-24)
 ## Bug fixes
 
