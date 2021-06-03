@@ -31,12 +31,15 @@ class AdvisorIProjectSummarySerializer(serializers.Serializer):
         end_year = current_financial_year + 2
 
         # Get any projects where this adviser is involved
-        projects = InvestmentProject.objects.filter(
-            Q(client_relationship_manager__id=obj.id)
-            | Q(project_assurance_adviser__id=obj.id)
-            | Q(project_manager__id=obj.id)
-            | Q(team_members__id=obj.id),
-        )
+        # This is done in two stages to get over double counting issues with
+        # distinct when distinct is used in combination with annotate
+        project_ids = InvestmentProject.objects.filter(
+            Q(client_relationship_manager=obj)
+            | Q(project_assurance_adviser=obj)
+            | Q(project_manager=obj)
+            | Q(team_members__adviser=obj),
+        ).values_list('id', flat=True)
+        projects = InvestmentProject.objects.filter(id__in=project_ids)
 
         project_summaries = (
             projects.annotate(
