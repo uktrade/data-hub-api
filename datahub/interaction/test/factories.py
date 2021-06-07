@@ -76,7 +76,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
         """
         Add support for setting `companies`.
         """
-        return []
+        return [self.company] if self.company else []
 
     @to_many_field
     def dit_participants(self, **kwargs):

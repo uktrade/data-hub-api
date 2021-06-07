@@ -287,6 +287,12 @@ class TestCompleteCompanyReferral(APITestMixin):
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
             },
+            'companies': [
+                {
+                    'id': str(interaction.company.pk),
+                    'name': interaction.company.name,
+                },
+            ],
             'contacts': [
                 {
                     'id': str(contact.pk),
