@@ -104,7 +104,7 @@ elastic-apm==6.2.1
     # via -r requirements.in
 elasticsearch-dsl==7.3.0
     # via -r requirements.in
-elasticsearch==7.13.0
+elasticsearch==7.13.1
     # via
     #   -r requirements.in
     #   elasticsearch-dsl
