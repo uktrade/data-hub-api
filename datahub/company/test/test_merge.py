@@ -135,7 +135,7 @@ class TestDuplicateCompanyMerger:
                     CompanyListItem: {'company': 0},
                     CompanyReferral: {'company': 0},
                     Contact: {'company': 3},
-                    Interaction: {'company': 3, 'companies': 0},
+                    Interaction: {'company': 3, 'companies': 3},
                     InvestmentProject: {
                         field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
                     },
@@ -319,7 +319,10 @@ class TestDuplicateCompanyMerger:
             CompanyListItem: {'company': len(source_company_list_items)},
             CompanyReferral: {'company': len(source_referrals)},
             Contact: {'company': len(source_contacts)},
-            Interaction: {'company': len(source_interactions), 'companies': 0},
+            Interaction: {
+                'company': len(source_interactions),
+                'companies': len(source_interactions),
+            },
             InvestmentProject: {
                 field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
             },

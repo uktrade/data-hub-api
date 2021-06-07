@@ -4,7 +4,7 @@ from itertools import chain
 from operator import itemgetter
 
 import pytest
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import NON_FIELD_ERRORS, ObjectDoesNotExist
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -109,7 +109,6 @@ class TestAddInteraction(APITestMixin):
         company = CompanyFactory()
         contact = ContactFactory(company=company)
         communication_channel = random_obj_for_model(CommunicationChannel)
-        communication_channel = random_obj_for_model(CommunicationChannel)
 
         url = reverse('api-v4:interaction:collection')
         request_data = {
@@ -174,6 +173,10 @@ class TestAddInteraction(APITestMixin):
                 'id': str(company.pk),
                 'name': company.name,
             },
+            'companies': [{
+                'id': str(company.pk),
+                'name': company.name,
+            }],
             'contacts': [
                 {
                     'id': str(contact.pk),
@@ -220,6 +223,88 @@ class TestAddInteraction(APITestMixin):
                 'related_trade_agreements', [],
             ),
         }
+
+    @freeze_time('2017-04-18 13:25:30.986208')
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
+    @pytest.mark.parametrize(
+        'extra_data',
+        (
+            # company interaction
+            {},
+            # company interaction with investment theme
+            {
+                'theme': Interaction.Theme.INVESTMENT,
+            },
+            # company interaction with blank notes
+            {
+                'notes': '',
+            },
+            # company interaction with notes
+            {
+                'notes': 'hello',
+            },
+            # interaction with a status
+            {
+                'status': Interaction.Status.DRAFT,
+            },
+            # investment project interaction
+            {
+                'investment_project': InvestmentProjectFactory,
+                'notes': 'hello',
+            },
+            {
+                'theme': Interaction.Theme.LARGE_CAPITAL_OPPORTUNITY,
+                'large_capital_opportunity': LargeCapitalOpportunityFactory,
+            },
+            # company interaction with policy feedback
+            {
+                'was_policy_feedback_provided': True,
+                'policy_areas': [
+                    partial(random_obj_for_model, PolicyArea),
+                ],
+                'policy_feedback_notes': 'Policy feedback notes',
+                'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
+            },
+        ),
+    )
+    def test_add_with_companies(self, extra_data, permissions):
+        """Test add a new interaction with companies."""
+        adviser = create_test_user(
+            permission_codenames=permissions,
+            dit_team=TeamFactory(),
+        )
+        companies = CompanyFactory.create_batch(2)
+        contact = ContactFactory(company=companies[0])
+        communication_channel = random_obj_for_model(CommunicationChannel)
+
+        url = reverse('api-v4:interaction:collection')
+        request_data = {
+            'kind': Interaction.Kind.INTERACTION,
+            'communication_channel': communication_channel.pk,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_participants': [
+                {'adviser': adviser.pk},
+            ],
+            'companies': [company.pk for company in companies],
+            'contacts': [contact.pk],
+            'service': Service.inbound_referral.value.id,
+            'was_policy_feedback_provided': False,
+            'has_related_trade_agreements': False,
+            'related_trade_agreements': [],
+            **resolve_data(extra_data),
+        }
+
+        api_client = self.create_api_client(user=adviser)
+        response = api_client.post(url, request_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+
+        result_companies = set(company['id'] for company in response_data['companies'])
+
+        assert result_companies == set(str(company.id) for company in companies)
+        assert response_data['company']['id'] == str(companies[0].pk)
 
     @freeze_time('2017-04-18 13:25:30.986208')
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
@@ -342,6 +427,10 @@ class TestAddInteraction(APITestMixin):
                 'id': str(company.pk),
                 'name': company.name,
             },
+            'companies': [{
+                'id': str(company.pk),
+                'name': company.name,
+            }],
             'contacts': [
                 {
                     'id': str(contact.pk),
@@ -1465,6 +1554,33 @@ class TestAddInteraction(APITestMixin):
                     ],
                 },
             ),
+            # can't update company and companies at the same time
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'companies': [CompanyFactory],
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
+                    ],
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'dit_participants': [{'adviser': AdviserFactory}],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
+                },
+                {
+                    NON_FIELD_ERRORS: ['Only either a company or companies can be provided.'],
+                },
+            ),
         ),
     )
     def test_validation(self, data, errors):
@@ -1688,6 +1804,10 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
             },
+            'companies': [{
+                'id': str(interaction.company.pk),
+                'name': interaction.company.name,
+            }],
             'contacts': [
                 {
                     'id': str(contact.pk),
@@ -1816,6 +1936,10 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
             },
+            'companies': [{
+                'id': str(interaction.company.pk),
+                'name': interaction.company.name,
+            }],
             'contacts': [
                 {
                     'id': str(contact.pk),

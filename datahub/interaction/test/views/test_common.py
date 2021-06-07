@@ -396,6 +396,9 @@ class TestUpdateInteraction(APITestMixin):
                 'company': CompanyFactory,
             },
             {
+                'companies': [CompanyFactory],
+            },
+            {
                 'contacts': [ContactFactory],
             },
         ),

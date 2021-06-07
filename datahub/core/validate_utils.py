@@ -48,7 +48,6 @@ class DataCombiner:
         Requires the model class to be available.
         """
         field_info = _get_model_field_info(self.model)
-
         if field_name in field_info.relations:
             if field_info.relations[field_name].to_many:
                 value = self.get_value_to_many(field_name)
