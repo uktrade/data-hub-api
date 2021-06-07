@@ -14,7 +14,8 @@ class BedEntity:
 
     def __init__(self):
         """Constructor for id based BED entity"""
-        self.id = None
+        for key in self.data_mapping.keys():
+            setattr(self, key, None)
 
     def as_values_only_dict(self):
         """
@@ -88,25 +89,6 @@ class Account(BedEntity):
         self.datahub_id = datahub_id
         self.high_level_sector = high_level_sector
         self.low_level_sector = low_level_sector
-        self.company_number = None
-        self.companies_house_id = None
-        self.billing_street = None
-        self.billing_city = None
-        self.billing_state = None
-        self.billing_postal_code = None
-        self.billing_country = None
-        self.shipping_street = None
-        self.shipping_city = None
-        self.shipping_state = None
-        self.shipping_postal_code = None
-        self.shipping_country = None
-        self.uk_region = None
-        self.country_hq = None
-        # Misc
         self.is_ftse_100 = False
         self.is_ftse_250 = False
         self.is_multinational = False
-        self.company_website = None
-        self.eu_exit_sentiment = None
-        self.parent_membership_organisation = None
-        self.is_sentiment = None

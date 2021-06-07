@@ -30,7 +30,7 @@ class TestIntegrationAccountRepositoryShould:
         self,
         account_repository,
         faker,
-        generate_account: Account,
+        account: Account,
     ):
         """
         Test account repository for basic crud operations
@@ -44,7 +44,7 @@ class TestIntegrationAccountRepositoryShould:
             # ADD new account / organization / company
             new_account_id = add_and_assert_account(
                 account_repository=account_repository,
-                account=generate_account,
+                account=account,
             )
 
             #  UPDATE Account
@@ -55,7 +55,7 @@ class TestIntegrationAccountRepositoryShould:
             )
 
             # Get by Datahub Id
-            get_response = account_repository.get_by_datahub_id(generate_account.datahub_id)
+            get_response = account_repository.get_by_datahub_id(account.datahub_id)
             assert get_response is not None
             assert get_response['Id'] == new_account_id
         finally:

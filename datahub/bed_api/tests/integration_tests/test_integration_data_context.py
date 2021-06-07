@@ -23,7 +23,7 @@ class TestIntegrationBedUnitOfWorkShould:
 
     def test_creation_and_deletion_of_an_account(
         self,
-        generate_account: Account,
+        account: Account,
     ):
         """
         Test adding and deleting an account
@@ -33,7 +33,7 @@ class TestIntegrationBedUnitOfWorkShould:
         account_id = None
         with BedDataContext() as bed_data_context:
             try:
-                account_id = self.add_and_assert_account(bed_data_context, generate_account)
+                account_id = self.add_and_assert_account(bed_data_context, account)
             finally:
                 self.delete_and_assert_account(bed_data_context, account_id)
 

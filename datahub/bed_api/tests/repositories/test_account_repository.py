@@ -15,7 +15,7 @@ class TestAccountRepositoryShould:
     def test_add_calls_salesforce_contact_add_with_valid_args(
         self,
         mock_salesforce,
-        generate_account: Account,
+        account: Account,
     ):
         """
         Test add calls Salesforce with the correct Arguments
@@ -25,11 +25,11 @@ class TestAccountRepositoryShould:
         """
         repository = AccountRepository(mock_salesforce)
 
-        repository.add(generate_account.as_values_only_dict())
+        repository.add(account.as_values_only_dict())
 
         assert mock_salesforce.Account.create.called
         assert mock_salesforce.Account.create.call_args == mock.call(
-            generate_account.as_values_only_dict(),
+            account.as_values_only_dict(),
         )
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
@@ -144,7 +144,7 @@ class TestAccountRepositoryShould:
     def test_update_calls_salesforce_account_update_with_valid_args(
         self,
         mock_salesforce,
-        generate_account: Account,
+        account: Account,
     ):
         """
         Test add calls Salesforce with the correct Arguments
@@ -154,12 +154,12 @@ class TestAccountRepositoryShould:
         """
         repository = AccountRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
-        generate_account.id = expected_record_id
+        account.id = expected_record_id
 
-        repository.update(expected_record_id, generate_account.as_values_only_dict())
+        repository.update(expected_record_id, account.as_values_only_dict())
 
         assert mock_salesforce.Account.update.called
         assert mock_salesforce.Account.update.call_args == mock.call(
             'test_record_id',
-            generate_account.as_values_only_dict(),
+            account.as_values_only_dict(),
         )
