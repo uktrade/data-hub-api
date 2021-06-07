@@ -1,1 +1,0 @@
-The DNB API now can receive Administrative Area name and Administrative Area abbreviated name from the DNB service. 
