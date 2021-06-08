@@ -8,6 +8,7 @@ from datahub.dataset.core.test import BaseDatasetViewTest
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     CompanyInteractionFactoryWithPolicyFeedback,
+    CompanyInteractionFactoryWithRelatedTradeAgreements,
     EventServiceDeliveryFactory,
     InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
@@ -64,6 +65,10 @@ def get_expected_data_from_interaction(interaction):
             [x.name for x in interaction.policy_issue_types.all()]
             if interaction.policy_areas.exists() else None
         ),
+        'related_trade_agreement_names': (
+            [x.name for x in interaction.related_trade_agreements.all()]
+            if interaction.related_trade_agreements.exists() else None
+        ),
         'sector': get_attr_or_none(interaction, 'company.sector.name'),
         'service_delivery_status__name': get_attr_or_none(
             interaction,
@@ -83,7 +88,7 @@ class TestInteractionsDatasetViewSet(BaseDatasetViewTest):
     """
 
     view_url = reverse('api-v4:dataset:interactions-dataset')
-    factory = CompanyInteractionFactory
+    factory = CompanyInteractionFactoryWithRelatedTradeAgreements
 
     @pytest.mark.parametrize(
         'interaction_factory', (
