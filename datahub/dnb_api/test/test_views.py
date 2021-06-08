@@ -1989,6 +1989,8 @@ class TestCompanyInvestigationView(APITestMixin):
                 'address_county': 'Greater London',
                 'address_postcode': 'W1 0TN',
                 'address_country': 'GB',
+                'address_area_name': 'Texas',
+                'address_area_abbrev_name': 'TX',
             },
         }
         dnb_response = {
@@ -2018,6 +2020,8 @@ class TestCompanyInvestigationView(APITestMixin):
                     'county': 'Greater London',
                     'postcode': 'W1 0TN',
                     'country': constants.Country.united_kingdom.value.id,
+                    'area_name': 'Texas',
+                    'area_abbrev_name': 'TX',
                 },
             },
         )
