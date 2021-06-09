@@ -135,22 +135,13 @@ class Contact(BedEntity):
         super().__init__()
         self.datahub_id = datahub_id
         self.first_name = first_name
-        self.middle_name = None
         self.last_name = last_name
         self.salutation = Salutation.not_applicable
         self.account_id = account_id
-        self.suffix = None
         self.email = email
-        self.job_title = None
         self.job_type: JobType = JobType.none
-        self.notes = None
-        self.phone = None
-        self.mobile_phone = None
         self.contact_type = ContactType.none
         self.business_area = BusinessArea.none
-        self.assistant_name = None
-        self.assistant_email = None
-        self.assistant_phone = None
 
     @property
     def name(self):

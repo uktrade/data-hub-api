@@ -90,8 +90,8 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
         contact_repository,
         account_repository,
         faker,
-        generate_account: Account,
-        generate_contact: Contact,
+        account: Account,
+        contact: Contact,
     ):
         """
         Test contact with account as contact is dependent on account
@@ -99,8 +99,8 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
         :param contact_repository: ContactRepository fixture
         :param account_repository: AccountRepository fixture
         :param faker: Faker library for generating data
-        :param generate_account: New account record generated with faker data
-        :param generate_contact: New contact record generated with faker data
+        :param account: New account record generated with faker data
+        :param contact: New contact record generated with faker data
         """
         new_contact_id = None
         new_account_id = None
@@ -108,14 +108,14 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
             # ADD new account / organization / company
             new_account_id = add_and_assert_account(
                 account_repository=account_repository,
-                account=generate_account,
+                account=account,
             )
 
             # ADD contact
-            generate_contact.account_id = new_account_id
+            contact.account_id = new_account_id
             new_contact_id = add_and_assert_contact(
                 contact_repository=contact_repository,
-                contact=generate_contact,
+                contact=contact,
             )
 
             #  UPDATE Contact

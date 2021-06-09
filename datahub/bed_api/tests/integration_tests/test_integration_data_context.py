@@ -24,7 +24,7 @@ class TestIntegrationBedUnitOfWorkShould:
     def test_creation_and_deletion_of_an_account(
         self,
         account: Account,
-        generate_contact: Contact,
+        contact: Contact,
     ):
         """
         Test adding and deleting an account
@@ -37,8 +37,8 @@ class TestIntegrationBedUnitOfWorkShould:
         with BEDDataContext() as bed_data_context:
             try:
                 account_id = self.add_and_assert_account(bed_data_context, account)
-                generate_contact.account_id = account_id
-                contact_id = self.add_and_assert_contact(bed_data_context, generate_contact)
+                contact.account_id = account_id
+                contact_id = self.add_and_assert_contact(bed_data_context, contact)
             finally:
                 self.delete_and_assert_contact(bed_data_context, contact_id)
                 self.delete_and_assert_account(bed_data_context, account_id)

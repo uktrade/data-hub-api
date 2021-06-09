@@ -128,7 +128,7 @@ def uk_region_name(faker):
 
 
 @pytest.fixture
-def generate_salutation(faker):
+def salutation(faker):
     """
     Generate random salutation
 
@@ -170,7 +170,7 @@ def country_names(faker):
 
 
 @pytest.fixture
-def generate_job_type(faker):
+def job_type(faker):
     """
     Generate random job type
 
@@ -185,7 +185,7 @@ def generate_job_type(faker):
 
 
 @pytest.fixture
-def generate_business_area(faker):
+def business_area(faker):
     """
     Generate random business area
 
@@ -233,7 +233,7 @@ def generate_policy_areas(faker):
 
 
 @pytest.fixture
-def generate_sectors_affected(faker):
+def sectors_affected(faker):
     """
     Generate random SectorsAffected array
 
@@ -294,19 +294,19 @@ def account(
 
 
 @pytest.fixture
-def generate_contact(
+def contact(
     faker,
-    generate_salutation,
-    generate_job_type,
-    generate_business_area,
+    salutation,
+    job_type,
+    business_area,
 ):
     """
     Generate new Contact with random values
 
     :param faker: Faker Library
-    :param generate_salutation:
-    :param generate_job_type:
-    :param generate_business_area:
+    :param salutation: Random Salutation
+    :param job_type: Random JobType
+    :param business_area: Random BusinessArea
 
     :return: New Contact with random fake data
     """
@@ -320,7 +320,7 @@ def generate_contact(
         email=email,
         account_id=str(uuid.uuid4()),
     )
-    contact.salutation = generate_salutation
+    contact.salutation = salutation
     contact.suffix = faker.suffix()
     contact.middle_name = faker.first_name()
     contact.phone = faker.phone_number()
@@ -328,8 +328,8 @@ def generate_contact(
     contact.notes = faker.text(max_nb_chars=100)
     contact.contact_type = ContactType.external
     contact.job_title = faker.job()
-    contact.job_type = generate_job_type
-    contact.business_area = generate_business_area
+    contact.job_type = job_type
+    contact.business_area = business_area
     contact.assistant_name = faker.name()
     contact.assistant_email = faker.company_email()
     contact.assistant_phone = faker.phone_number()
