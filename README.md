@@ -305,7 +305,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `AWS_SECRET_ACCESS_KEY` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
 | `BED_USERNAME` | Yes | Business Engagement Database setup of Salesforce email account  with [bed configuration](https://loginhub--november.lightning.force.com/). |
 | `BED_PASSWORD` | Yes | Business Engagement Database unencrypted login password. |
-| `BED_SECURITY_TOKEN` | Yes | Business Engagement Database generated security token created with [reset security token](https://loginhub--november.lightning.force.com/lightning/settings/personal/ResetApiToken/home). |
+| `BED_TOKEN` | Yes | Business Engagement Database generated security token created with [reset security token](https://loginhub--november.lightning.force.com/lightning/settings/personal/ResetApiToken/home). |
 | `BED_IS_SANDBOX` | Yes | True if this is the sandbox test account. |
 | `CELERY_TASK_ALWAYS_EAGER` | No | Can be set to True when running the app locally to run Celery tasks started from the web process synchronously. Not for use in production. |
 | `CELERY_TASK_SEND_SENT_EVENT` | No | Whether Celery workers send the `task-sent` event (default=True). |

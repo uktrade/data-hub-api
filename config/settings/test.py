@@ -186,5 +186,5 @@ if ADMIN_OAUTH2_ENABLED:
 
 BED_USERNAME = 'test-user@digital.trade.gov.uk'
 BED_PASSWORD = 'test-password'
-BED_SECURITY_TOKEN = 'test-token'
+BED_TOKEN = 'test-token'
 BED_IS_SANDBOX = True

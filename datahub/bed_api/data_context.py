@@ -9,7 +9,6 @@ class DataContext:
     """
     Represents the data context with all the consolidated repositories
     and functionality that can be applied to a data system
-        https://martinfowler.com/eaaCatalog/unitOfWork.html
     """
 
     def __exit__(self, *args):
@@ -31,7 +30,7 @@ class DataContext:
         raise NotImplementedError
 
 
-class BedDataContext(DataContext):
+class BEDDataContext(DataContext):
     """
     Bed unit of work for interacting with the BED salesforce API
     """
@@ -49,7 +48,7 @@ class BedDataContext(DataContext):
         """
         Allows with statement to be used
 
-        :return: BedDataContext instance
+        :return: BEDDataContext instance
         """
         self.salesforce = self.session_factory_type().create()
         self.contacts = ContactRepository(self.salesforce)

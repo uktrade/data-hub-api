@@ -59,7 +59,7 @@ def account_repository(salesforce):
 
 
 @pytest.fixture
-def generate_high_level_sector(faker):
+def high_level_sector(faker):
     """
     Generate random high level sector
 
@@ -74,7 +74,7 @@ def generate_high_level_sector(faker):
 
 
 @pytest.fixture
-def generate_low_level_sector(faker):
+def low_level_sector(faker):
     """
     Generate random low level sector
 
@@ -89,7 +89,7 @@ def generate_low_level_sector(faker):
 
 
 @pytest.fixture
-def generate_uk_region_name(faker):
+def uk_region_name(faker):
     """
     Generate random UK Region name
 
@@ -143,7 +143,7 @@ def generate_salutation(faker):
 
 
 @pytest.fixture
-def generate_country_names(faker):
+def country_names(faker):
     """
     Generate random country names array
 
@@ -200,7 +200,7 @@ def generate_business_area(faker):
 
 
 @pytest.fixture
-def generate_company_number(faker):
+def company_number(faker):
     """
     Generate random company number
 
@@ -248,31 +248,31 @@ def generate_sectors_affected(faker):
 
 
 @pytest.fixture
-def generate_account(
+def account(
     faker,
-    generate_high_level_sector,
-    generate_low_level_sector,
-    generate_uk_region_name,
-    generate_country_names,
-    generate_company_number,
+    high_level_sector,
+    low_level_sector,
+    uk_region_name,
+    country_names,
+    company_number,
 ):
     """
     Generate account with random data
 
     :param faker: Faker Library
-    :param generate_high_level_sector: sector mapping
-    :param generate_low_level_sector: sector mapping
-    :param generate_uk_region_name: uk regions
-    :param generate_country_names: country names
-    :param generate_company_number: company numbers
+    :param high_level_sector: sector mapping
+    :param low_level_sector: sector mapping
+    :param uk_region_name: uk regions
+    :param country_names: country names
+    :param company_number: company numbers
 
     :return: New Account with random values
     """
     new_account = Account(
         datahub_id=str(uuid.uuid4()),
         name=faker.company(),
-        high_level_sector=generate_high_level_sector,
-        low_level_sector=generate_low_level_sector,
+        high_level_sector=high_level_sector,
+        low_level_sector=low_level_sector,
     )
     new_account.billing_street = faker.street_address()
     new_account.billing_city = faker.city()
@@ -284,10 +284,10 @@ def generate_account(
     new_account.shipping_state = faker.street_name()
     new_account.shipping_postal_code = faker.postcode()
     new_account.shipping_country = faker.country()
-    new_account.uk_region = generate_uk_region_name
-    new_account.country_hq = get_random_element(faker, generate_country_names)
-    new_account.company_number = generate_company_number
-    new_account.companies_house_id = generate_company_number
+    new_account.uk_region = uk_region_name
+    new_account.country_hq = faker.random_element(elements=country_names)
+    new_account.company_number = company_number
+    new_account.companies_house_id = company_number
     new_account.company_website = faker.url()
 
     return new_account

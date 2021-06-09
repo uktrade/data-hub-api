@@ -14,16 +14,15 @@ class BedFactory:
 
         :return: Salesforce instance
         """
-        if os.environ['BED_IS_SANDBOX'] == 'true':
+        if os.environ.get('BED_IS_SANDBOX', '').lower() == 'true':
             return Salesforce(
                 username=os.environ['BED_USERNAME'],
                 password=os.environ['BED_PASSWORD'],
-                security_token=os.environ['BED_SECURITY_TOKEN'],
+                security_token=os.environ['BED_TOKEN'],
                 domain='test',
             )
-        else:
-            return Salesforce(
-                username=os.environ['BED_USERNAME'],
-                password=os.environ['BED_PASSWORD'],
-                security_token=os.environ['BED_SECURITY_TOKEN'],
-            )
+        return Salesforce(
+            username=os.environ['BED_USERNAME'],
+            password=os.environ['BED_PASSWORD'],
+            security_token=os.environ['BED_TOKEN'],
+        )

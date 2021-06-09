@@ -25,7 +25,7 @@ class TestIntegrationAccountRepositoryShould:
     .env - see Vault for valid sandbox only settings
          BED_USERNAME
          BED_PASSWORD
-         BED_SECURITY_TOKEN
+         BED_TOKEN
          BED_IS_SANDBOX
     """
 
@@ -33,21 +33,21 @@ class TestIntegrationAccountRepositoryShould:
         self,
         account_repository,
         faker,
-        generate_account: Account,
+        account: Account,
     ):
         """
         Test account repository for basic crud operations
 
         :param account_repository: AccountRepository fixture
         :param faker: Faker library for generating data
-        :param generate_account: New account record generated with faker data
+        :param account: New account record generated with faker data
         """
         new_account_id = None
         try:
             # ADD new account / organization / company
             new_account_id = add_and_assert_account(
                 account_repository=account_repository,
-                account=generate_account,
+                account=account,
             )
 
             #  UPDATE Account
@@ -58,7 +58,7 @@ class TestIntegrationAccountRepositoryShould:
             )
 
             # Get by Datahub Id
-            get_response = account_repository.get_by_datahub_id(generate_account.datahub_id)
+            get_response = account_repository.get_by_datahub_id(account.datahub_id)
             assert get_response is not None
             assert get_response['Id'] == new_account_id
         finally:

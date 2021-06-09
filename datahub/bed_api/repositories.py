@@ -4,9 +4,7 @@ from simple_salesforce import format_soql, Salesforce
 class ReadRepository:
     """
     Base Salesforce Repository to encapsulate dealing with
-    reading Salesforce data only, helping to create
-    a separation of concerns - see CQRS patterns for more information
-    https://martinfowler.com/bliki/CQRS.html
+    reading Salesforce data only
     """
 
     entity_name = None
@@ -42,7 +40,7 @@ class ReadRepository:
         response = self.query(format_soql(query, id=record_id))
         return (
             response is not None
-            and response['totalSize'] >= 1
+            and response['totalSize'] > 0
             and len(response['records']) > 0
             and response['records'][0].get('Id') == record_id
         )
@@ -54,7 +52,8 @@ class ReadRepository:
         :param custom_id_field: API name of a custom field that was defined
             as an External ID
         :param custom_id_value: External ID value
-        :raises: Return data by custom id
+
+        :return: Return data by custom id
         """
         return getattr(self.salesforce, self.entity_name).get_by_custom_id(
             custom_id_field,
@@ -66,7 +65,8 @@ class ReadRepository:
         Returns the result of a GET by datahub identifier value
 
         :param datahub_id_value: External ID value
-        :raises: Return data by datahub id
+
+        :return: Return data by datahub id
         """
         return self.get_by('Datahub_ID__c', datahub_id_value)
 
