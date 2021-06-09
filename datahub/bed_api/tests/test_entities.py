@@ -1,5 +1,3 @@
-from freezegun import freeze_time
-
 from datahub.bed_api.constants import HighLevelSector, LowLevelSector, Salutation
 from datahub.bed_api.entities import Account, Contact
 
@@ -70,7 +68,6 @@ class TestEditContactShould:
 
         assert contact.name == 'Mr. Doe'
 
-    @freeze_time('2020-01-01-12:00:00')
     def test_contact_outputs_value_only_generated_dictionary(self):
         """
         Should output contact as dictionary without name, calculated fields
