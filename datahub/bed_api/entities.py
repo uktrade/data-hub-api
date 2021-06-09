@@ -27,6 +27,7 @@ class BedEntity:
     def as_all_values_dict(self):
         """
         Utilises the internal dictionary to generate all values even if blank
+
         :return: Generated dictionary of all class values as name value pair
         """
         result = dict()

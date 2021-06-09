@@ -9,7 +9,7 @@ def remove_blank_from_dict(data):
             for key, value in data.items()
             if is_not_blank(value) and is_not_blank(remove_blank_from_dict(value))
         )
-    elif isinstance(data, list):
+    if isinstance(data, list):
         return [
             remove_blank_from_dict(value)
             for value in data
