@@ -3,6 +3,7 @@ tests:
 	docker-compose run api bash tests.sh
 
 flake8:
+	docker-compose build
 	docker-compose run api flake8
 
 docker-cleanup:
