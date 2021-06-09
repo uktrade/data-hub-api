@@ -40,8 +40,7 @@ def contact_repository(salesforce):
 
     :return: Instance of ContactRepository
     """
-    repository = ContactRepository(salesforce)
-    return repository
+    return ContactRepository(salesforce)
 
 
 @pytest.fixture
@@ -53,8 +52,7 @@ def account_repository(salesforce):
 
     :return: Instance of AccountRepository
     """
-    repository = AccountRepository(salesforce)
-    return repository
+    return AccountRepository(salesforce)
 
 
 @pytest.fixture
