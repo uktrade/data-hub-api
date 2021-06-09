@@ -38,9 +38,3 @@ fix-us-areas:
 
 fix-ca-areas:
 	docker-compose run api python manage.py fix_ca_company_address
-
-black:
-	# pip install black
-	# Assumes local else reference docker
-	# Configure the pre-commit-config.yml with black
-	python -m black <Add File Here> --skip-string-normalization

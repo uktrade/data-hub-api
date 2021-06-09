@@ -8,7 +8,6 @@ from datahub.bed_api.constants import (
     HighLevelSector,
     JobType,
     LowLevelSector,
-    PolicyArea,
     Salutation,
     SectorsAffected,
 )
@@ -214,21 +213,6 @@ def company_number(faker):
             str(uuid.uuid4()),
             str(uuid.uuid4()),
         ),
-    )
-
-
-@pytest.fixture
-def generate_policy_areas(faker):
-    """
-    Generate random policy_area arrays
-
-    :param faker: Faker Library
-
-    :return: Random policy areas array
-    """
-    return get_random_elements(
-        faker,
-        PolicyArea.values(PolicyArea),
     )
 
 
