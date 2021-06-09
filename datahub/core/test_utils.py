@@ -1,4 +1,5 @@
 import json
+import os
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 from operator import attrgetter
@@ -551,3 +552,12 @@ class HawkMockJSONResponse:
         context.headers['Server-Authorization'] = receiver.response_header
         context.headers['Content-Type'] = self.content_type
         return response
+
+
+def mock_environ(**env_variables):
+    """
+    Allow for multiple settings inline
+    :param env_variables: as dictionary values
+    :return: mock.patch.dict of os.environ values
+    """
+    return mock.patch.dict(os.environ, env_variables)
