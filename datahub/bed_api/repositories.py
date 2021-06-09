@@ -4,9 +4,7 @@ from simple_salesforce import format_soql, Salesforce
 class ReadRepository:
     """
     Base Salesforce Repository to encapsulate dealing with
-    reading Salesforce data only, helping to create
-    a separation of concerns - see CQRS patterns for more information
-    https://martinfowler.com/bliki/CQRS.html
+    reading Salesforce data only
     """
 
     entity_name = None

@@ -8,7 +8,6 @@ class DataContext:
     """
     Represents the data context with all the consolidated repositories
     and functionality that can be applied to a data system
-        https://martinfowler.com/eaaCatalog/unitOfWork.html
     """
 
     def __exit__(self, *args):
