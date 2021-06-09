@@ -16,7 +16,7 @@ from datahub.interaction.models import (
 )
 from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-from datahub.metadata.models import Country
+from datahub.metadata.models import Country, TradeAgreement
 from datahub.metadata.test.factories import ServiceFactory
 
 
@@ -160,6 +160,19 @@ class LargeCapitalOpportunityInteractionFactory(InteractionFactoryBase):
     kind = Interaction.Kind.INTERACTION
     theme = Interaction.Theme.LARGE_CAPITAL_OPPORTUNITY
     large_capital_opportunity = factory.SubFactory(LargeCapitalOpportunityFactory)
+
+
+class CompanyInteractionFactoryWithRelatedTradeAgreements(CompanyInteractionFactory):
+    """Factory for creating a company interaction with related_trade_agreements"""
+
+    has_related_trade_agreements = True
+
+    @to_many_field
+    def related_trade_agreements(self):
+        """
+        related_trade_agreements field.
+        """
+        return TradeAgreement.objects.all()[:3]
 
 
 class ServiceDeliveryFactory(InteractionFactoryBase):
