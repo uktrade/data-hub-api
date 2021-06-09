@@ -30,7 +30,7 @@ class TestIntegrationBedUnitOfWorkShould:
         Test adding and deleting an account
 
         :param account: New account record generated with faker data
-        :param generate_contact: New contact record generated with faker data
+        :param contact: New contact record generated with faker data
         """
         account_id = None
         contact_id = None
@@ -67,17 +67,17 @@ class TestIntegrationBedUnitOfWorkShould:
             contact_exists = bed_data_context.contacts.exists(contact_id)
             assert contact_exists is False
 
-    def add_and_assert_contact(self, bed_data_context, generate_contact):
+    def add_and_assert_contact(self, bed_data_context, contact):
         """
         Add a contact and verify it exists
 
         :param bed_data_context: BedDataContext or db context with salesforce
-        :param generate_contact: New contact record generated with faker data
+        :param contact: New contact record generated with faker data
 
         :return: Contact id of new contact
         """
         contact_add_response = bed_data_context.contacts.add(
-            generate_contact.as_all_values_dict(),
+            contact.as_all_values_dict(),
         )
         assert contact_add_response is not None
         assert contact_add_response['success'] is True

@@ -131,7 +131,7 @@ class Contact(BedEntity):
         email,
         account_id=None,
     ):
-        """Constructor - Mandatory Fields to be assigned with value *"""
+        """Constructor"""
         super().__init__()
         self.datahub_id = datahub_id
         self.first_name = first_name
