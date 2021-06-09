@@ -202,10 +202,6 @@ def update_and_assert_contact(
     :param contact_id: Contact id to update
     :param faker: Faker library
     """
-    # Example using original edit object sending all values
-    # contact.Notes__c = 'Integration Test Notes - Update'
-    # update_contact_response = repository.update(
-    #     account_id, contact.as_values_only_dict())
     notes_update = faker.text(max_nb_chars=100)
     update_contact_response = contact_repository.update(
         contact_id,
