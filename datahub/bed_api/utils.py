@@ -15,5 +15,4 @@ def remove_blank_from_dict(data):
             for value in data
             if is_not_blank(value) and is_not_blank(remove_blank_from_dict(value))
         ]
-    else:
-        return data
+    return data

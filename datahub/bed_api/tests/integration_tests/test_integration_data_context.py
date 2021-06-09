@@ -1,6 +1,6 @@
 import pytest
 
-from datahub.bed_api.data_context import BedDataContext
+from datahub.bed_api.data_context import BEDDataContext
 from datahub.bed_api.entities import Account
 from datahub.bed_api.tests.test_utils import NOT_BED_INTEGRATION_TEST_READY
 
@@ -17,7 +17,7 @@ class TestIntegrationBedUnitOfWorkShould:
     .env - see Vault for valid sandbox only settings
         BED_USERNAME
         BED_PASSWORD
-        BED_SECURITY_TOKEN
+        BED_TOKEN
         BED_IS_SANDBOX
     """
 
@@ -31,7 +31,7 @@ class TestIntegrationBedUnitOfWorkShould:
         :param generate_account: New account record generated with faker data
         """
         account_id = None
-        with BedDataContext() as bed_data_context:
+        with BEDDataContext() as bed_data_context:
             try:
                 account_id = self.add_and_assert_account(bed_data_context, account)
             finally:
@@ -41,7 +41,7 @@ class TestIntegrationBedUnitOfWorkShould:
         """
         Delete the account  if there is a value assigned and verify the deletion
 
-        :param bed_data_context: BedDataContext
+        :param bed_data_context: BEDDataContext
         :param account_id: Identifier of the new account record
         """
         if account_id:
@@ -53,7 +53,7 @@ class TestIntegrationBedUnitOfWorkShould:
         """
         Add an account via the bed context or unit of work
 
-        :param bed_data_context: BedDataContext
+        :param bed_data_context: BEDDataContext
         :param generate_account: New account record generated with faker data
 
         :return: account id of new Account

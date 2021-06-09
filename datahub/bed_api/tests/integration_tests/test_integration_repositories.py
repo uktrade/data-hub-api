@@ -22,7 +22,7 @@ class TestIntegrationAccountRepositoryShould:
     .env - see Vault for valid sandbox only settings
          BED_USERNAME
          BED_PASSWORD
-         BED_SECURITY_TOKEN
+         BED_TOKEN
          BED_IS_SANDBOX
     """
 

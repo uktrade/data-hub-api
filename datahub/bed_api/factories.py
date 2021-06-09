@@ -18,12 +18,11 @@ class BedFactory:
             return Salesforce(
                 username=os.environ['BED_USERNAME'],
                 password=os.environ['BED_PASSWORD'],
-                security_token=os.environ['BED_SECURITY_TOKEN'],
+                security_token=os.environ['BED_TOKEN'],
                 domain='test',
             )
-        else:
-            return Salesforce(
-                username=os.environ['BED_USERNAME'],
-                password=os.environ['BED_PASSWORD'],
-                security_token=os.environ['BED_SECURITY_TOKEN'],
-            )
+        return Salesforce(
+            username=os.environ['BED_USERNAME'],
+            password=os.environ['BED_PASSWORD'],
+            security_token=os.environ['BED_TOKEN'],
+        )

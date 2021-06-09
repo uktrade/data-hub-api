@@ -12,7 +12,7 @@ class TestBedFactory:
     @mock_environ(
         BED_USERNAME='test-user@digital.trade.gov.uk',
         BED_PASSWORD='test-password',
-        BED_SECURITY_TOKEN='test-token',
+        BED_TOKEN='test-token',
         BED_IS_SANDBOX='true',
     )
     @mock.patch('datahub.bed_api.factories.Salesforce')
@@ -37,7 +37,7 @@ class TestBedFactory:
     @mock_environ(
         BED_USERNAME='test-user@digital.trade.gov.uk',
         BED_PASSWORD='test-password',
-        BED_SECURITY_TOKEN='test-token',
+        BED_TOKEN='test-token',
         BED_IS_SANDBOX='false',
     )
     @mock.patch('datahub.bed_api.factories.Salesforce')

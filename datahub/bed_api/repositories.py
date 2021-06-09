@@ -42,7 +42,7 @@ class ReadRepository:
         response = self.query(format_soql(query, id=record_id))
         return (
             response is not None
-            and response['totalSize'] >= 1
+            and response['totalSize'] > 0
             and len(response['records']) > 0
             and response['records'][0].get('Id') == record_id
         )

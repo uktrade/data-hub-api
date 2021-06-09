@@ -1,5 +1,3 @@
-import copy
-
 from datahub.bed_api.constants import (
     HighLevelSector,
     LowLevelSector,
@@ -31,11 +29,10 @@ class BedEntity:
         Utilises the internal dictionary to generate all values even if blank
         :return: Generated dictionary of all class values as name value pair
         """
-        result = copy.deepcopy(self.__dict__)
+        result = dict()
         for key, sales_force_key in self.data_mapping.items():
-            if key in result.keys():
-                result[sales_force_key] = result[key]
-                del result[key]
+            if key in self.__dict__.keys():
+                result[sales_force_key] = self.__dict__[key]
             else:
                 raise NotImplementedError(f'"{key}" is not found within BED system data mappings')
 

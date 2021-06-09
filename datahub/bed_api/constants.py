@@ -12,9 +12,7 @@ class StringEnum(str, Enum):
         Output values as a list
         :return: Values as list
         """
-        result = list(map(lambda x: x.value, self._member_map_.values()))
-        result.remove('')
-        return result
+        return [item.value for item in self._member_map_.values() if item.value != '']
 
 
 class HighLevelSector(StringEnum):
