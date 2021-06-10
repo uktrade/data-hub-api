@@ -1,5 +1,3 @@
-import copy
-
 from datahub.bed_api.constants import (
     BusinessArea,
     Classification,
@@ -26,7 +24,8 @@ class BedEntity:
 
     def __init__(self):
         """Constructor for id based BED entity"""
-        self.id = None
+        for key in self.data_mapping.keys():
+            setattr(self, key, None)
 
     def as_values_only_dict(self):
         """
@@ -40,13 +39,13 @@ class BedEntity:
     def as_all_values_dict(self):
         """
         Utilises the internal dictionary to generate all values even if blank
+
         :return: Generated dictionary of all class values as name value pair
         """
-        result = copy.deepcopy(self.__dict__)
+        result = dict()
         for key, sales_force_key in self.data_mapping.items():
-            if key in result.keys():
-                result[sales_force_key] = result[key]
-                del result[key]
+            if key in self.__dict__.keys():
+                result[sales_force_key] = self.__dict__[key]
             else:
                 raise NotImplementedError(f'"{key}" is not found within BED system data mappings')
 
@@ -94,34 +93,15 @@ class Account(BedEntity):
         high_level_sector: HighLevelSector,
         low_level_sector: LowLevelSector,
     ):
-        """Constructor - Mandatory Fields to be assigned with value *"""
+        """Constructor"""
         super().__init__()
         self.name = name
         self.datahub_id = datahub_id
         self.high_level_sector = high_level_sector
         self.low_level_sector = low_level_sector
-        self.company_number = None
-        self.companies_house_id = None
-        self.billing_street = None
-        self.billing_city = None
-        self.billing_state = None
-        self.billing_postal_code = None
-        self.billing_country = None
-        self.shipping_street = None
-        self.shipping_city = None
-        self.shipping_state = None
-        self.shipping_postal_code = None
-        self.shipping_country = None
-        self.uk_region = None
-        self.country_hq = None
-        # Misc
         self.is_ftse_100 = False
         self.is_ftse_250 = False
         self.is_multinational = False
-        self.company_website = None
-        self.eu_exit_sentiment = None
-        self.parent_membership_organisation = None
-        self.is_sentiment = None
 
 
 class Contact(BedEntity):
@@ -159,26 +139,17 @@ class Contact(BedEntity):
         email,
         account_id=None,
     ):
-        """Constructor - Mandatory Fields to be assigned with value *"""
+        """Constructor"""
         super().__init__()
         self.datahub_id = datahub_id
         self.first_name = first_name
-        self.middle_name = None
         self.last_name = last_name
         self.salutation = Salutation.not_applicable
         self.account_id = account_id
-        self.suffix = None
         self.email = email
-        self.job_title = None
         self.job_type: JobType = JobType.none
-        self.notes = None
-        self.phone = None
-        self.mobile_phone = None
         self.contact_type = ContactType.none
         self.business_area = BusinessArea.none
-        self.assistant_name = None
-        self.assistant_email = None
-        self.assistant_phone = None
 
     @property
     def name(self):

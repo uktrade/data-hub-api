@@ -56,8 +56,7 @@ def contact_repository(salesforce):
 
     :return: Instance of ContactRepository
     """
-    repository = ContactRepository(salesforce)
-    return repository
+    return ContactRepository(salesforce)
 
 
 @pytest.fixture
@@ -69,8 +68,7 @@ def account_repository(salesforce):
 
     :return: Instance of AccountRepository
     """
-    repository = AccountRepository(salesforce)
-    return repository
+    return AccountRepository(salesforce)
 
 
 @pytest.fixture
@@ -95,8 +93,7 @@ def event_attendee_repository(salesforce):
 
     :return: Instance of EventRepository
     """
-    repository = EventAttendeeRepository(salesforce)
-    return repository
+    return EventAttendeeRepository(salesforce)
 
 
 @pytest.fixture
@@ -108,12 +105,11 @@ def policy_issues_repository(salesforce):
 
     :return: Instance of EventRepository
     """
-    repository = PolicyIssuesRepository(salesforce)
-    return repository
+    return PolicyIssuesRepository(salesforce)
 
 
 @pytest.fixture
-def generate_high_level_sector(faker):
+def high_level_sector(faker):
     """
     Generate random high level sector
 
@@ -128,7 +124,7 @@ def generate_high_level_sector(faker):
 
 
 @pytest.fixture
-def generate_low_level_sector(faker):
+def low_level_sector(faker):
     """
     Generate random low level sector
 
@@ -143,7 +139,7 @@ def generate_low_level_sector(faker):
 
 
 @pytest.fixture
-def generate_uk_region_name(faker):
+def uk_region_name(faker):
     """
     Generate random UK Region name
 
@@ -182,7 +178,7 @@ def generate_uk_region_name(faker):
 
 
 @pytest.fixture
-def generate_salutation(faker):
+def salutation(faker):
     """
     Generate random salutation
 
@@ -197,7 +193,7 @@ def generate_salutation(faker):
 
 
 @pytest.fixture
-def generate_country_names(faker):
+def country_names(faker):
     """
     Generate random country names array
 
@@ -254,7 +250,7 @@ def generate_issue_type(faker):
 
 
 @pytest.fixture
-def generate_job_type(faker):
+def job_type(faker):
     """
     Generate random job type
 
@@ -269,7 +265,7 @@ def generate_job_type(faker):
 
 
 @pytest.fixture
-def generate_business_area(faker):
+def business_area(faker):
     """
     Generate random business area
 
@@ -299,7 +295,7 @@ def generate_interaction_type(faker):
 
 
 @pytest.fixture
-def generate_company_number(faker):
+def company_number(faker):
     """
     Generate random company number
 
@@ -392,7 +388,7 @@ def generate_classification(faker):
 
 
 @pytest.fixture
-def generate_sectors_affected(faker):
+def sectors_affected(faker):
     """
     Generate random SectorsAffected array
 
@@ -407,31 +403,31 @@ def generate_sectors_affected(faker):
 
 
 @pytest.fixture
-def generate_account(
+def account(
     faker,
-    generate_high_level_sector,
-    generate_low_level_sector,
-    generate_uk_region_name,
-    generate_country_names,
-    generate_company_number,
+    high_level_sector,
+    low_level_sector,
+    uk_region_name,
+    country_names,
+    company_number,
 ):
     """
     Generate account with random data
 
     :param faker: Faker Library
-    :param generate_high_level_sector: sector mapping
-    :param generate_low_level_sector: sector mapping
-    :param generate_uk_region_name: uk regions
-    :param generate_country_names: country names
-    :param generate_company_number: company numbers
+    :param high_level_sector: sector mapping
+    :param low_level_sector: sector mapping
+    :param uk_region_name: uk regions
+    :param country_names: country names
+    :param company_number: company numbers
 
     :return: New Account with random values
     """
     new_account = Account(
         datahub_id=str(uuid.uuid4()),
         name=faker.company(),
-        high_level_sector=generate_high_level_sector,
-        low_level_sector=generate_low_level_sector,
+        high_level_sector=high_level_sector,
+        low_level_sector=low_level_sector,
     )
     new_account.billing_street = faker.street_address()
     new_account.billing_city = faker.city()
@@ -443,29 +439,29 @@ def generate_account(
     new_account.shipping_state = faker.street_name()
     new_account.shipping_postal_code = faker.postcode()
     new_account.shipping_country = faker.country()
-    new_account.uk_region = generate_uk_region_name
-    new_account.country_hq = faker.random_element(elements=generate_country_names)
-    new_account.company_number = generate_company_number
-    new_account.companies_house_id = generate_company_number
+    new_account.uk_region = uk_region_name
+    new_account.country_hq = faker.random_element(elements=country_names)
+    new_account.company_number = company_number
+    new_account.companies_house_id = company_number
     new_account.company_website = faker.url()
 
     return new_account
 
 
 @pytest.fixture
-def generate_contact(
+def contact(
     faker,
-    generate_salutation,
-    generate_job_type,
-    generate_business_area,
+    salutation,
+    job_type,
+    business_area,
 ):
     """
     Generate new Contact with random values
 
     :param faker: Faker Library
-    :param generate_salutation:
-    :param generate_job_type:
-    :param generate_business_area:
+    :param salutation: Random Salutation
+    :param job_type: Random JobType
+    :param business_area: Random BusinessArea
 
     :return: New Contact with random fake data
     """
@@ -479,7 +475,7 @@ def generate_contact(
         email=email,
         account_id=str(uuid.uuid4()),
     )
-    contact.salutation = generate_salutation
+    contact.salutation = salutation
     contact.suffix = faker.suffix()
     contact.middle_name = faker.first_name()
     contact.phone = faker.phone_number()
@@ -487,8 +483,8 @@ def generate_contact(
     contact.notes = faker.text(max_nb_chars=100)
     contact.contact_type = ContactType.external
     contact.job_title = faker.job()
-    contact.job_type = generate_job_type
-    contact.business_area = generate_business_area
+    contact.job_type = job_type
+    contact.business_area = business_area
     contact.assistant_name = faker.name()
     contact.assistant_email = faker.company_email()
     contact.assistant_phone = faker.phone_number()
@@ -499,7 +495,7 @@ def generate_contact(
 def generate_event(
     faker,
     generate_interaction_type,
-    generate_uk_region_name,
+    uk_region_name,
     generate_transparency_status,
     generate_issue_types,
     generate_department_eyes,
@@ -509,7 +505,7 @@ def generate_event(
 
     :param faker: Faker Library
     :param generate_interaction_type: Random generate InteractionType
-    :param generate_uk_region_name: Random uk region
+    :param uk_region_name: Random uk region
     :param generate_transparency_status: Random transparency status
     :param generate_issue_types: Random issue topics array
     :param generate_department_eyes: Random department eyes only value
@@ -528,7 +524,7 @@ def generate_event(
     event.address = faker.address()
     event.location = faker.street_address()
     event.city_town = faker.city()
-    event.region = generate_uk_region_name
+    event.region = uk_region_name
     event.country = faker.country()
     event.attendees = faker.text()
     event.contacts_to_share = faker.text()
@@ -563,27 +559,27 @@ def generate_event_attendee(
 def generate_policy_issues(
     faker,
     generate_issue_type,
-    generate_uk_region_name,
+    uk_region_name,
     generate_policy_areas,
     generate_sentiment,
     generate_classification,
-    generate_sectors_affected,
-    generate_country_names,
+    sectors_affected,
+    country_names,
 ):
     """
     Generate new Event Attendee test data
 
     :param faker: Faker data generator
     :param generate_issue_type: Data generated for issue type
-    :param generate_uk_region_name: Data generated for uk regions
+    :param uk_region_name: Data generated for uk regions
     :param generate_policy_areas: Data generated for policy areas
     :param generate_sentiment: Data generated for sentiment
     :param generate_classification: Data generated for classification
-    :param generate_sectors_affected: Data generated for sectors effected
-    :param generate_country_names: Data generated for Country names
+    :param sectors_affected: Data generated for sectors effected
+    :param country_names: Data generated for Country names
     """
     policy_areas = ';'.join(generate_policy_areas)
-    sectors_effected = ';'.join(generate_sectors_affected)
+    sectors_effected = ';'.join(sectors_affected)
     policy_issues = PolicyIssues(
         name=f'Policy Issues Integration Test {datetime.datetime.today()}',
         datahub_id=str(uuid.uuid4()),
@@ -593,13 +589,13 @@ def generate_policy_issues(
         sentiment=generate_sentiment,
         classification=generate_classification,
         sectors_affected=sectors_effected,
-        uk_region_affected=generate_uk_region_name,
+        uk_region_affected=uk_region_name,
         event_id=str(uuid.uuid4()),  # Interaction id
     )
     policy_issues.description = faker.text()
     policy_issues.issue_rank = TopIssuesByRank.eight
-    policy_issues.location_affected = ';'.join(generate_country_names)
-    policy_issues.uk_region_affected = generate_uk_region_name
+    policy_issues.location_affected = ';'.join(country_names)
+    policy_issues.uk_region_affected = uk_region_name
     return policy_issues
 
 

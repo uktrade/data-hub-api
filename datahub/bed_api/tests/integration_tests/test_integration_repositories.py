@@ -29,7 +29,7 @@ class TestIntegrationAccountRepositoryShould:
     .env - see Vault for valid sandbox only settings
          BED_USERNAME
          BED_PASSWORD
-         BED_SECURITY_TOKEN
+         BED_TOKEN
          BED_IS_SANDBOX
     """
 
@@ -37,21 +37,21 @@ class TestIntegrationAccountRepositoryShould:
         self,
         account_repository,
         faker,
-        generate_account: Account,
+        account: Account,
     ):
         """
         Test account repository for basic crud operations
 
         :param account_repository: AccountRepository fixture
         :param faker: Faker library for generating data
-        :param generate_account: New account record generated with faker data
+        :param account: New account record generated with faker data
         """
         new_account_id = None
         try:
             # ADD new account / organization / company
             new_account_id = add_and_assert_account(
                 account_repository=account_repository,
-                account=generate_account,
+                account=account,
             )
 
             #  UPDATE Account
@@ -62,7 +62,7 @@ class TestIntegrationAccountRepositoryShould:
             )
 
             # Get by Datahub Id
-            get_response = account_repository.get_by_datahub_id(generate_account.datahub_id)
+            get_response = account_repository.get_by_datahub_id(account.datahub_id)
             assert get_response is not None
             assert get_response['Id'] == new_account_id
         finally:
@@ -195,8 +195,8 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
         contact_repository,
         account_repository,
         faker,
-        generate_account: Account,
-        generate_contact: Contact,
+        account: Account,
+        contact: Contact,
     ):
         """
         Test contact with account as contact is dependent on account
@@ -204,8 +204,8 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
         :param contact_repository: ContactRepository fixture
         :param account_repository: AccountRepository fixture
         :param faker: Faker library for generating data
-        :param generate_account: New account record generated with faker data
-        :param generate_contact: New contact record generated with faker data
+        :param account: New account record generated with faker data
+        :param contact: New contact record generated with faker data
         """
         new_contact_id = None
         new_account_id = None
@@ -213,14 +213,14 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
             # ADD new account / organization / company
             new_account_id = add_and_assert_account(
                 account_repository=account_repository,
-                account=generate_account,
+                account=account,
             )
 
             # ADD contact
-            generate_contact.account_id = new_account_id
+            contact.account_id = new_account_id
             new_contact_id = add_and_assert_contact(
                 contact_repository=contact_repository,
-                contact=generate_contact,
+                contact=contact,
             )
 
             #  UPDATE Contact
@@ -248,8 +248,8 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
         event_attendee_repository,
         policy_issues_repository,
         faker,
-        generate_account: Account,
-        generate_contact: Contact,
+        account: Account,
+        contact: Contact,
         generate_event: Event,
         generate_event_attendee: EventAttendee,
         generate_policy_issues: PolicyIssues,
@@ -263,8 +263,8 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
         :param event_attendee_repository: EventAttendeeRepository fixture
         :param policy_issues_repository: PolicyIssuesRepository fixture
         :param faker: Faker library for generating data
-        :param generate_account: New account record generated with faker data
-        :param generate_contact: New contact record generated with faker data
+        :param account: New account record generated with faker data
+        :param contact: New contact record generated with faker data
         :param generate_event: New event record generated with faker data
         :param generate_event_attendee: New event attendee record generated with faker data
         :param generate_policy_issues: New policy issues record generated with faker data
@@ -278,14 +278,14 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
             # ADD new account / organization / company
             new_account_id = add_and_assert_account(
                 account_repository=account_repository,
-                account=generate_account,
+                account=account,
             )
 
             # ADD contact
-            generate_contact.account_id = new_account_id
+            contact.account_id = new_account_id
             new_contact_id = add_and_assert_contact(
                 contact_repository=contact_repository,
-                contact=generate_contact,
+                contact=contact,
             )
 
             #  ADD event
@@ -534,10 +534,6 @@ def update_and_assert_contact(
     :param contact_id: Contact id to update
     :param faker: Faker library
     """
-    # Example using original edit object sending all values
-    # contact.Notes__c = 'Integration Test Notes - Update'
-    # update_contact_response = repository.update(
-    #     account_id, contact.as_values_only_dict())
     notes_update = faker.text(max_nb_chars=100)
     update_contact_response = contact_repository.update(
         contact_id,

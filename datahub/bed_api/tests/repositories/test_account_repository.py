@@ -1,6 +1,6 @@
 from unittest import mock
 
-from datahub.bed_api.entities import Account, Contact
+from datahub.bed_api.entities import Account
 from datahub.bed_api.repositories import AccountRepository
 from datahub.bed_api.tests.test_utils import (
     create_fail_query_response,
@@ -15,20 +15,21 @@ class TestAccountRepositoryShould:
     def test_add_calls_salesforce_contact_add_with_valid_args(
         self,
         mock_salesforce,
-        generate_account: Account,
+        account: Account,
     ):
         """
         Test add calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
-        :param generate_account: Generated account data
+        :param account: Generated account data
         """
         repository = AccountRepository(mock_salesforce)
 
-        repository.add(generate_account.as_values_only_dict())
+        repository.add(account.as_values_only_dict())
 
         assert mock_salesforce.Account.create.called
         assert mock_salesforce.Account.create.call_args == mock.call(
-            generate_account.as_values_only_dict(),
+            account.as_values_only_dict(),
         )
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
@@ -38,6 +39,7 @@ class TestAccountRepositoryShould:
     ):
         """
         Test delete calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = AccountRepository(mock_salesforce)
@@ -57,6 +59,7 @@ class TestAccountRepositoryShould:
     ):
         """
         Test exists calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = AccountRepository(mock_salesforce)
@@ -81,6 +84,7 @@ class TestAccountRepositoryShould:
     ):
         """
         Test exists calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = AccountRepository(mock_salesforce)
@@ -102,6 +106,7 @@ class TestAccountRepositoryShould:
     ):
         """
         Test get calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = AccountRepository(mock_salesforce)
@@ -121,6 +126,7 @@ class TestAccountRepositoryShould:
     ):
         """
         Test get_by calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
         """
         repository = AccountRepository(mock_salesforce)
@@ -138,21 +144,22 @@ class TestAccountRepositoryShould:
     def test_update_calls_salesforce_account_update_with_valid_args(
         self,
         mock_salesforce,
-        generate_account: Contact,
+        account: Account,
     ):
         """
         Test add calls Salesforce with the correct Arguments
+
         :param mock_salesforce: Monkeypatch for Salesforce
-        :param generate_account: Generated account data
+        :param account: Generated account data
         """
         repository = AccountRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
-        generate_account.id = expected_record_id
+        account.id = expected_record_id
 
-        repository.update(expected_record_id, generate_account.as_values_only_dict())
+        repository.update(expected_record_id, account.as_values_only_dict())
 
         assert mock_salesforce.Account.update.called
         assert mock_salesforce.Account.update.call_args == mock.call(
             'test_record_id',
-            generate_account.as_values_only_dict(),
+            account.as_values_only_dict(),
         )

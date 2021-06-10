@@ -15,20 +15,20 @@ class TestContactRepositoryShould:
     def test_add_calls_salesforce_contact_add_with_valid_args(
         self,
         mock_salesforce,
-        generate_contact: Contact,
+        contact: Contact,
     ):
         """
         Test add calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
-        :param generate_contact: Generated contact data
+        :param contact: Generated contact data
         """
         repository = ContactRepository(mock_salesforce)
 
-        repository.add(generate_contact.as_values_only_dict())
+        repository.add(contact.as_values_only_dict())
 
         assert mock_salesforce.Contact.create.called
         assert mock_salesforce.Contact.create.call_args == mock.call(
-            generate_contact.as_values_only_dict(),
+            contact.as_values_only_dict(),
         )
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
@@ -138,21 +138,21 @@ class TestContactRepositoryShould:
     def test_update_calls_salesforce_contact_update_with_valid_args(
         self,
         mock_salesforce,
-        generate_contact: Contact,
+        contact: Contact,
     ):
         """
         Test add calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
-        :param generate_contact: Generated contact data
+        :param contact: Generated contact data
         """
         repository = ContactRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
-        generate_contact.id = expected_record_id
+        contact.id = expected_record_id
 
-        repository.update(expected_record_id, generate_contact.as_values_only_dict())
+        repository.update(expected_record_id, contact.as_values_only_dict())
 
         assert mock_salesforce.Contact.update.called
         assert mock_salesforce.Contact.update.call_args == mock.call(
             'test_record_id',
-            generate_contact.as_values_only_dict(),
+            contact.as_values_only_dict(),
         )
