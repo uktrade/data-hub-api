@@ -90,7 +90,7 @@ def event_attendee_repository(salesforce):
 
     :param salesforce: BedFactory creating an instance of salesforce
 
-    :return: Instance of EventRepository
+    :return: Instance of EventAttendeeRepository
     """
     return EventAttendeeRepository(salesforce)
 
@@ -102,7 +102,7 @@ def policy_issues_repository(salesforce):
 
     :param salesforce: BedFactory creating an instance of salesforce
 
-    :return: Instance of EventRepository
+    :return: Instance of PolicyIssuesRepository
     """
     return PolicyIssuesRepository(salesforce)
 
