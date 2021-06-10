@@ -1301,125 +1301,6 @@ class TestCompanyChangeRequestView(APITestMixin):
                         'address': {
                             'line_1': '123 Fake Street',
                             'line_2': 'Foo',
-                            'town': 'London',
-                            'county': 'Greater London',
-                            'postcode': 'W1 0TN',
-                            'country': {
-                                'id': constants.Country.united_kingdom.value.id,
-                            },
-                        },
-                        'number_of_employees': 100,
-                        'turnover': 1000,
-                    },
-                },
-                # dnb_request
-                {
-                    'duns_number': '123456789',
-                    'changes': {
-                        'primary_name': 'Foo Bar',
-                        'trading_names': ['Foo Bar INC'],
-                        'domain': 'example.com',
-                        'address_line_1': '123 Fake Street',
-                        'address_line_2': 'Foo',
-                        'address_town': 'London',
-                        'address_county': 'Greater London',
-                        'address_country': 'GB',
-                        'address_postcode': 'W1 0TN',
-                        'employee_number': 100,
-                        'annual_sales': 1000,
-                    },
-                },
-                # dnb_response
-                {
-                    'duns_number': '123456789',
-                    'id': '11111111-2222-3333-4444-555555555555',
-                    'status': 'pending',
-                    'created_on': '2020-01-05T11:00:00',
-                    'changes': {
-                        'primary_name': 'Foo Bar',
-                        'trading_names': ['Foo Bar INC'],
-                        'domain': 'example.com',
-                        'address_line_1': '123 Fake Street',
-                        'address_line_2': 'Foo',
-                        'address_town': 'London',
-                        'address_county': 'Greater London',
-                        'address_country': 'GB',
-                        'address_postcode': 'W1 0TN',
-                        'employee_number': 100,
-                        'annual_sales': 1000,
-                    },
-                },
-                # datahub_response
-                {
-                    'duns_number': '123456789',
-                    'id': '11111111-2222-3333-4444-555555555555',
-                    'status': 'pending',
-                    'created_on': '2020-01-05T11:00:00',
-                    'changes': {
-                        'primary_name': 'Foo Bar',
-                        'trading_names': ['Foo Bar INC'],
-                        'domain': 'example.com',
-                        'address_line_1': '123 Fake Street',
-                        'address_line_2': 'Foo',
-                        'address_town': 'London',
-                        'address_county': 'Greater London',
-                        'address_country': 'GB',
-                        'address_postcode': 'W1 0TN',
-                        'employee_number': 100,
-                        'annual_sales': 1000,
-                    },
-                },
-            ),
-
-            # Website - domain
-            (
-                # change_request
-                {
-                    'duns_number': '123456789',
-                    'changes': {
-                        'website': 'https://example.com/hello',
-                    },
-                },
-                # dnb_request
-                {
-                    'duns_number': '123456789',
-                    'changes': {
-                        'domain': 'example.com',
-                    },
-                },
-                # dnb_response
-                {
-                    'duns_number': '123456789',
-                    'id': '11111111-2222-3333-4444-555555555555',
-                    'status': 'pending',
-                    'created_on': '2020-01-05T11:00:00',
-                    'changes': {
-                        'domain': 'example.com',
-                    },
-                },
-                # datahub_response
-                {
-                    'duns_number': '123456789',
-                    'id': '11111111-2222-3333-4444-555555555555',
-                    'status': 'pending',
-                    'created_on': '2020-01-05T11:00:00',
-                    'changes': {
-                        'domain': 'example.com',
-                    },
-                },
-            ),
-            # Address area is selected
-            (
-                # change_request
-                {
-                    'duns_number': '123456789',
-                    'changes': {
-                        'name': 'Foo Bar',
-                        'trading_names': ['Foo Bar INC'],
-                        'website': 'https://example.com',
-                        'address': {
-                            'line_1': '123 Fake Street',
-                            'line_2': 'Foo',
                             'town': 'Beverly Hills',
                             'county': 'Los Angeles',
                             'area_name': 'California',
@@ -1497,6 +1378,45 @@ class TestCompanyChangeRequestView(APITestMixin):
                     },
                 },
             ),
+
+            # Website - domain
+            (
+                # change_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'website': 'https://example.com/hello',
+                    },
+                },
+                # dnb_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'domain': 'example.com',
+                    },
+                },
+                # dnb_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'domain': 'example.com',
+                    },
+                },
+                # datahub_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'domain': 'example.com',
+                    },
+                },
+            ),
+
             # Address area is not selected
             (
                 # change_request
