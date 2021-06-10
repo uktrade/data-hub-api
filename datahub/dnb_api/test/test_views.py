@@ -2089,7 +2089,7 @@ class TestCompanyInvestigationView(APITestMixin):
                 'address_area_abbrev_name': 'CA',
                 'address_postcode': '91012',
                 'address_country': 'US',
-            }
+            },
         }
 
         dnb_response = {
@@ -2122,7 +2122,7 @@ class TestCompanyInvestigationView(APITestMixin):
                     'postcode': '91012',
                     'country': constants.Country.united_states.value.id,
                 },
-            }
+            },
         )
 
         assert response.status_code == status.HTTP_200_OK
