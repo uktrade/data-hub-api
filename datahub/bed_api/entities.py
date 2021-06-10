@@ -155,7 +155,7 @@ class Contact(BedEntity):
     def name(self):
         """Fullname or name formatted with all name values assigned"""
         names = filter(
-            None,
+            bool,
             [
                 self.salutation,
                 self.first_name,
@@ -205,6 +205,7 @@ class Event(BedEntity):
         title: str = None,
     ):
         """Constructor"""
+
         super().__init__()
         self.name = name
         self.datahub_id = datahub_id
@@ -238,6 +239,7 @@ class EventAttendee(BedEntity):
         contact_id: str,
     ):
         """Constructor"""
+
         super().__init__()
         self.datahub_id = datahub_id
         self.event_id = event_id
@@ -289,6 +291,7 @@ class PolicyIssues(BedEntity):
         classification: Classification = Classification.none,
     ):
         """Constructor"""
+
         super().__init__()
         self.name = name
         self.datahub_id = datahub_id

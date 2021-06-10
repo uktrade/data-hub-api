@@ -13,6 +13,7 @@ class ContactQuery(Enum):
         'WHERE Id = {id}',
         'id',
     )
+
     get_notes_by_id = QueryConstant(
         'SELECT Id, Notes__c '
         'FROM Contact '
