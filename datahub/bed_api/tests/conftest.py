@@ -80,8 +80,7 @@ def event_repository(salesforce):
 
     :return: Instance of EventRepository
     """
-    repository = EventRepository(salesforce)
-    return repository
+    return EventRepository(salesforce)
 
 
 @pytest.fixture
