@@ -15,20 +15,20 @@ class TestEventAttendeeRepositoryShould:
     def test_add_calls_salesforce_event_attendee_add_with_valid_args(
         self,
         mock_salesforce,
-        generate_event_attendee: EventAttendee,
+        event_attendee: EventAttendee,
     ):
         """
         Test add calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
-        :param generate_event_attendee: Generated event atttendee data
+        :param event_attendee: Generated event attendee data
         """
         repository = EventAttendeeRepository(mock_salesforce)
 
-        repository.add(generate_event_attendee.as_values_only_dict())
+        repository.add(event_attendee.as_values_only_dict())
 
         assert mock_salesforce.Event_Attendee__c.create.called
         assert mock_salesforce.Event_Attendee__c.create.call_args == mock.call(
-            generate_event_attendee.as_values_only_dict(),
+            event_attendee.as_values_only_dict(),
         )
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
@@ -116,8 +116,8 @@ class TestEventAttendeeRepositoryShould:
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
     def test_get_by_datahub_id_calls_salesforce_contact_get_with_valid_args(
-            self,
-            mock_salesforce,
+        self,
+        mock_salesforce,
     ):
         """
         Test get_by calls Salesforce with the correct Arguments
@@ -138,21 +138,21 @@ class TestEventAttendeeRepositoryShould:
     def test_update_calls_salesforce_event_attendee_update_with_valid_args(
         self,
         mock_salesforce,
-        generate_event_attendee: EventAttendee,
+        event_attendee: EventAttendee,
     ):
         """
         Test update calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
-        :param generate_event_attendee: Generated event attendee data
+        :param event_attendee: Generated event attendee data
         """
         repository = EventAttendeeRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
-        generate_event_attendee.id = expected_record_id
+        event_attendee.id = expected_record_id
 
-        repository.update(expected_record_id, generate_event_attendee.as_values_only_dict())
+        repository.update(expected_record_id, event_attendee.as_values_only_dict())
 
         assert mock_salesforce.Event_Attendee__c.update.called
         assert mock_salesforce.Event_Attendee__c.update.call_args == mock.call(
             'test_record_id',
-            generate_event_attendee.as_values_only_dict(),
+            event_attendee.as_values_only_dict(),
         )

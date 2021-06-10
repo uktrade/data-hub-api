@@ -93,7 +93,7 @@ class TestIntegrationEventRepositoryShould:
         self,
         event_repository,
         faker,
-        generate_event: Event,
+        event: Event,
     ):
         """
         Test BedFactory integration with the contact and account repositories
@@ -109,22 +109,22 @@ class TestIntegrationEventRepositoryShould:
             # ADD event checking data and that the record exists
             event_id = add_and_assert_event(
                 event_repository=event_repository,
-                event=generate_event,
+                event=event,
             )
-            generate_event.id = event_id
+            event.id = event_id
 
             # UPDATE event checking the patch
             update_and_assert_event(
                 event_id=event_id,
                 event_repository=event_repository,
                 faker=faker,
-                event=generate_event,
+                event=event,
             )
 
             # QUERY and QUERY NEXT testing PAGINATION concepts and COUNT Query constructs
             self.assert_and_query_paginated_data(
                 event_repository=event_repository,
-                event=generate_event,
+                event=event,
             )
         finally:
             # DELETE to clean up integration test
@@ -250,9 +250,9 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
         faker,
         account: Account,
         contact: Contact,
-        generate_event: Event,
-        generate_event_attendee: EventAttendee,
-        generate_policy_issues: PolicyIssues,
+        event: Event,
+        event_attendee: EventAttendee,
+        policy_issues: PolicyIssues,
     ):
         """
         Test generating and linking policies and attendee information
@@ -265,9 +265,9 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
         :param faker: Faker library for generating data
         :param account: New account record generated with faker data
         :param contact: New contact record generated with faker data
-        :param generate_event: New event record generated with faker data
-        :param generate_event_attendee: New event attendee record generated with faker data
-        :param generate_policy_issues: New policy issues record generated with faker data
+        :param event: New event record generated with faker data
+        :param event_attendee: New event attendee record generated with faker data
+        :param policy_issues: New policy issues record generated with faker data
         """
         new_contact_id = None
         new_account_id = None
@@ -291,20 +291,20 @@ class TestIntegrationWithAllAssociatedRepositoriesShould:
             #  ADD event
             new_event_id = add_and_assert_event(
                 event_repository=event_repository,
-                event=generate_event,
+                event=event,
             )
 
             #  Link Contact with CREATE event attendee
             new_event_attendee_id = add_and_assert_event_attendee(
                 event_attendee_repository=event_attendee_repository,
-                event_attendee=generate_event_attendee,
+                event_attendee=event_attendee,
                 contact_id=new_contact_id,
                 event_id=new_event_id,
             )
 
             #  Generate Policy issues assigning the Account and Interaction
             new_policy_issue_id = add_and_assert_policy_issues(
-                policy_issues=generate_policy_issues,
+                policy_issues=policy_issues,
                 policy_issues_repository=policy_issues_repository,
                 account_id=new_account_id,
                 event_id=new_event_id,

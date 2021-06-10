@@ -209,28 +209,14 @@ class Event(BedEntity):
         self.name = name
         self.datahub_id = datahub_id
         self.title = title
-        self.event_date = None  # : date
-        self.description = None
         self.interaction_type = InteractionType.none
-        self.webinar_information = None
-        self.address = None
-        self.location = None
-        self.city_town = None
-        self.region = None  # British Region name
-        self.country = None  # Country name
-        self.attendees = None
+        self.region = RegionOrInternational.none
         self.is_for_your_eyes_only = False
-        self.contacts_to_share = None
         self.has_attachment = False
         self.is_show_on_transparency_return = False
-        self.transparency_reason_for_meeting = None
         self.is_transparency_return_confirmed = False
         self.transparency_status = TransparencyStatus.none
-        self.issue_topics = None  # list<IssueTopic> delimited with ;
         self.department_eyes_only = DepartmentEyes.none
-        self.hmg_lead_email = None  # email
-        # Theme
-        self.theme_id = None  # Lookup on Theme ...
 
 
 class EventAttendee(BedEntity):
@@ -256,8 +242,6 @@ class EventAttendee(BedEntity):
         self.datahub_id = datahub_id
         self.event_id = event_id
         self.attendee_id = contact_id
-        self.name = None
-        self.email = None
 
 
 class PolicyIssues(BedEntity):
@@ -314,20 +298,12 @@ class PolicyIssues(BedEntity):
         self.sectors_affected = sectors_affected
         self.sentiment = sentiment
         self.classification = classification
-        # Company field is a multi-select
         self.uk_region_affected = uk_region_affected
         self.is_covid_19_related = False
         self.event_id = event_id
         self.is_for_your_eyes_only = False
-        self.description = None
         self.is_issue_closed = False
         self.can_show_on_report = False
         self.issue_rank = TopIssuesByRank.none
         self.is_ndp = False
         self.location_affected = RegionOrInternational.none
-        self.positive_impact_value = None
-        self.negative_impact_value = None
-        self.number_of_jobs = None
-        self.number_of_jobs_lost = None
-        self.number_of_jobs_at_risk = None
-        self.number_of_jobs_safeguarded = None

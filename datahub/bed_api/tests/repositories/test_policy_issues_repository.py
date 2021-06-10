@@ -19,21 +19,21 @@ class TestPolicyIssuesRepositoryShould:
     def test_add_calls_salesforce_policy_issues_add_with_valid_args(
         self,
         mock_salesforce,
-        generate_policy_issues: PolicyIssues,
+        policy_issues: PolicyIssues,
     ):
         """
         Test add calls Salesforce with the correct Arguments
 
         :param mock_salesforce: Monkeypatch for Salesforce
-        :param generate_policy_issues: Generated policy issues data
+        :param policy_issues: Generated policy issues data
         """
         repository = PolicyIssuesRepository(mock_salesforce)
 
-        repository.add(generate_policy_issues.as_values_only_dict())
+        repository.add(policy_issues.as_values_only_dict())
 
         assert mock_salesforce.Policy_Issues__c.create.called
         assert mock_salesforce.Policy_Issues__c.create.call_args == mock.call(
-            generate_policy_issues.as_values_only_dict(),
+            policy_issues.as_values_only_dict(),
         )
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
@@ -147,22 +147,22 @@ class TestPolicyIssuesRepositoryShould:
     def test_update_calls_salesforce_policy_issues_update_with_valid_args(
         self,
         mock_salesforce,
-        generate_policy_issues: PolicyIssues,
+        policy_issues: PolicyIssues,
     ):
         """
         Test update calls Salesforce with the correct Arguments
 
         :param mock_salesforce: Monkeypatch for Salesforce
-        :param generate_policy_issues: Generated event attendee data
+        :param policy_issues: Generated event attendee data
         """
         repository = PolicyIssuesRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
-        generate_policy_issues.id = expected_record_id
+        policy_issues.id = expected_record_id
 
-        repository.update(expected_record_id, generate_policy_issues.as_values_only_dict())
+        repository.update(expected_record_id, policy_issues.as_values_only_dict())
 
         assert mock_salesforce.Policy_Issues__c.update.called
         assert mock_salesforce.Policy_Issues__c.update.call_args == mock.call(
             'test_record_id',
-            generate_policy_issues.as_values_only_dict(),
+            policy_issues.as_values_only_dict(),
         )

@@ -15,20 +15,20 @@ class TestEventRepositoryShould:
     def test_add_calls_salesforce_event_add_with_valid_args(
         self,
         mock_salesforce,
-        generate_event: Event,
+        event: Event,
     ):
         """
         Test add calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
-        :param generate_event: Generated event data
+        :param event: Generated event data
         """
         repository = EventRepository(mock_salesforce)
 
-        repository.add(generate_event.as_values_only_dict())
+        repository.add(event.as_values_only_dict())
 
         assert mock_salesforce.Event__c.create.called
         assert mock_salesforce.Event__c.create.call_args == mock.call(
-            generate_event.as_values_only_dict(),
+            event.as_values_only_dict(),
         )
 
     @mock.patch('datahub.bed_api.factories.Salesforce')
@@ -138,21 +138,21 @@ class TestEventRepositoryShould:
     def test_update_calls_salesforce_event_update_with_valid_args(
         self,
         mock_salesforce,
-        generate_event: Event,
+        event: Event,
     ):
         """
         Test update calls Salesforce with the correct Arguments
         :param mock_salesforce: Monkeypatch for Salesforce
-        :param generate_event: Generated event data
+        :param event: Generated event data
         """
         repository = EventRepository(mock_salesforce)
         expected_record_id = 'test_record_id'
-        generate_event.id = expected_record_id
+        event.id = expected_record_id
 
-        repository.update(expected_record_id, generate_event.as_values_only_dict())
+        repository.update(expected_record_id, event.as_values_only_dict())
 
         assert mock_salesforce.Event__c.update.called
         assert mock_salesforce.Event__c.update.call_args == mock.call(
             'test_record_id',
-            generate_event.as_values_only_dict(),
+            event.as_values_only_dict(),
         )
