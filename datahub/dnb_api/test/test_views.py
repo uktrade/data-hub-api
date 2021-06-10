@@ -2083,14 +2083,15 @@ class TestCompanyInvestigationView(APITestMixin):
                 'telephone_number': '123456789',
                 'address_line_1': '23 Code Street',
                 'address_line_2': 'Someplace',
-                'address_town': 'London',
-                'address_county': 'Greater London',
-                'address_postcode': 'W1 0TN',
-                'address_country': 'GB',
-                'address_area_name': 'Texas',
-                'address_area_abbrev_name': 'TX',
-            },
+                'address_town': 'Beverly Hills',
+                'address_county': 'Los Angeles',
+                'address_area_name': 'California',
+                'address_area_abbrev_name': 'CA',
+                'address_postcode': '91012',
+                'address_country': 'US',
+            }
         }
+
         dnb_response = {
             'id': '11111111-2222-3333-4444-555555555555',
             'status': 'pending',
@@ -2114,14 +2115,14 @@ class TestCompanyInvestigationView(APITestMixin):
                 'address': {
                     'line_1': '23 Code Street',
                     'line_2': 'Someplace',
-                    'town': 'London',
-                    'county': 'Greater London',
-                    'postcode': 'W1 0TN',
-                    'country': constants.Country.united_kingdom.value.id,
-                    'area_name': 'Texas',
-                    'area_abbrev_name': 'TX',
+                    'town': 'Beverly Hills',
+                    'county': 'Los Angeles',
+                    'area_name': 'California',
+                    'area_abbrev_name': 'CA',
+                    'postcode': '91012',
+                    'country': constants.Country.united_states.value.id,
                 },
-            },
+            }
         )
 
         assert response.status_code == status.HTTP_200_OK
