@@ -35,7 +35,6 @@ from datahub.bed_api.repositories import (
     EventRepository,
     PolicyIssuesRepository,
 )
-from datahub.bed_api.tests.test_utils import remove_newline
 from datahub.core.constants import Country, UKRegion
 
 
@@ -514,7 +513,7 @@ def event(
     event = Event(
         name=f'Event Integration Test {datetime.datetime.today()}',
         datahub_id=str(uuid.uuid4()),
-        title=remove_newline(faker.text()),
+        title=f'Title on {datetime.datetime.today()}',
     )
     event.event_date = faker.date()
     event.description = faker.text()
