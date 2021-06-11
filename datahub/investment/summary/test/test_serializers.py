@@ -66,7 +66,6 @@ def active_projects(adviser):
     for _index in range(3):
         project = InvestmentProjectFactory(
             stage_id=InvestmentProjectStage.active.value.id,
-            project_manager=adviser,
             estimated_land_date=date(2016, 4, 1),
         )
         InvestmentProjectTeamMemberFactory(investment_project=project, adviser=adviser)
@@ -74,7 +73,6 @@ def active_projects(adviser):
     for _index in range(2):
         project = InvestmentProjectFactory(
             stage_id=InvestmentProjectStage.active.value.id,
-            project_manager=adviser,
             estimated_land_date=date(2015, 5, 1),
         )
         InvestmentProjectTeamMemberFactory(investment_project=project, adviser=adviser)
@@ -272,6 +270,46 @@ class TestAdvisorIProjectSummarySerializer:
             'adviser_id': str(adviser.id),
             'annual_summaries': EXPECTED_ANNUAL_SUMMARIES,
         }
+
+    def test_annual_summaries_include_team_member_projects(self, adviser):
+        """
+        Annual summaries should include counts of projects where adviser is a
+        team member
+        """
+        for _index in range(2):
+            project = InvestmentProjectFactory(
+                stage_id=InvestmentProjectStage.active.value.id,
+                actual_land_date=date(2015, 1, 1),
+            )
+            InvestmentProjectTeamMemberFactory(
+                investment_project=project,
+                adviser=adviser,
+            )
+
+        serializer = AdvisorIProjectSummarySerializer(adviser)
+        assert serializer.data['annual_summaries'][2]['totals']['active']['value'] == 2
+
+    def test_annual_summaries_only_count_team_members_once(self, adviser):
+        """
+        When an adviser is assigned multiple roles on a project, that project
+        should only be counted once in the summary.
+        """
+        project = InvestmentProjectFactory(
+            stage_id=InvestmentProjectStage.active.value.id,
+            project_manager=adviser,
+            estimated_land_date=date(2014, 5, 1),
+        )
+        InvestmentProjectTeamMemberFactory(
+            investment_project=project,
+            adviser=adviser,
+        )
+        InvestmentProjectTeamMemberFactory(
+            investment_project=project,
+            adviser=AdviserFactory(),
+        )
+
+        serializer = AdvisorIProjectSummarySerializer(adviser)
+        assert serializer.data['annual_summaries'][2]['totals']['active']['value'] == 1
 
     def test_unexpected_stage_is_not_included(self, adviser, projects):
         """
