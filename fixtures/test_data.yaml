@@ -901,6 +901,8 @@
     created_on: '2020-02-01T10:00:00Z'
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
     modified_on: '2020-02-01T10:00:00Z'
+    related_trade_agreements:
+      - 20e08a38-95a8-4250-bd5b-9d7f0dfc9387
 
 - model: interaction.interactionditparticipant
   pk: 9

@@ -35,6 +35,12 @@ class InteractionsDatasetView(BaseDatasetView):
                 'policyarea__name',
                 ordering=('policyarea__order',),
             ),
+            related_trade_agreement_names=get_array_agg_subquery(
+                Interaction.related_trade_agreements.through,
+                'interaction',
+                'tradeagreement__name',
+                ordering=('tradeagreement__name',),
+            ),
             policy_issue_type_names=get_array_agg_subquery(
                 Interaction.policy_issue_types.through,
                 'interaction',
@@ -63,6 +69,7 @@ class InteractionsDatasetView(BaseDatasetView):
             'policy_area_names',
             'policy_feedback_notes',
             'policy_issue_type_names',
+            'related_trade_agreement_names',
             'sector',
             'service_delivery_status__name',
             'service_delivery',

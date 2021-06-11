@@ -13,3 +13,6 @@
 - model: interaction.policyissuetype
   pk: fa35595d-780d-4faa-b575-35f1c319bfee
   fields: {disabled_on: null, name: Economic opportunity, order: 400.0}
+- model: interaction.policyissuetype
+  pk: a0d48067-68fd-4d15-ba3c-0054159886b9
+  fields: {disabled_on: null, name: International Climate, order: 600.0}
