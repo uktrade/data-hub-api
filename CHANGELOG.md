@@ -1,3 +1,22 @@
+# Data Hub API 36.22.0 (2021-06-11)
+## Features
+
+- It's now possible to interact with BED and Salesforce using the BED salesforce API.
+- Requesting address areas for company investigations is now tested
+
+## Bug fixes
+
+- **Investment** Fixes the investment summary totals api endpoint GET `api-proxy/v4/adviser/<adviser_id>/investment-summary` 
+
+  This ensures that projects are counted correctly when advisers are team members on a project.
+
+## API
+
+- **Interactions** Expose `related_trade_agreement_names` via GET `v4/dataset/interactions-dataset endpoint`
+
+  This allows data workspace to ingest this information against each interaction
+
+
 # Data Hub API 36.21.0 (2021-06-01)
 ## Features
 
