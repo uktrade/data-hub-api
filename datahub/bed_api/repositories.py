@@ -163,3 +163,47 @@ class AccountRepository(ReadWriteRepository):
     """
 
     entity_name = 'Account'
+
+
+class ContactRepository(ReadWriteRepository):
+    """
+    Contact Repository to connect to BED Salesforce API
+
+    Repository pattern for Salesforce interactions with Contacts data
+    https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/Contact/FieldsAndRelationships/view
+    """
+
+    entity_name = 'Contact'
+
+
+class EventAttendeeRepository(ReadWriteRepository):
+    """
+    Event Attendee Repository to connect to BED Salesforce API
+
+    Repository pattern for Salesforce interactions with Event Attendee data
+    https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/01I58000001EcAX/FieldsAndRelationships/view
+    """
+
+    entity_name = 'Event_Attendee__c'
+
+
+class EventRepository(ReadWriteRepository):
+    """
+    Event Repository to connect to BED Salesforce API
+
+    Repository pattern for Salesforce interactions with Event or Interaction data
+    https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/01I58000001EcAY/FieldsAndRelationships/view
+    """
+
+    entity_name = 'Event__c'
+
+
+class PolicyIssuesRepository(ReadWriteRepository):
+    """
+    Policy Issues Repository to connect to BED Salesforce API
+
+    Repository pattern for Salesforce interactions with Policy Issues data
+    https://loginhub--november.lightning.force.com/lightning/setup/ObjectManager/01I580000011RrH/FieldsAndRelationships/view
+    """
+
+    entity_name = 'Policy_Issues__c'
