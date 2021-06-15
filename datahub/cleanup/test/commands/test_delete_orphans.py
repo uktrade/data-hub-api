@@ -23,7 +23,10 @@ from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields
 from datahub.event.test.factories import EventFactory
-from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.interaction.test.factories import (
+    CompaniesInteractionFactory,
+    CompanyInteractionFactory,
+)
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -63,6 +66,7 @@ MAPPINGS = {
         'dependent_models': (
             (CompanyReferralFactory, 'company'),
             (CompanyInteractionFactory, 'company'),
+            (CompaniesInteractionFactory, 'companies'),
             (ContactFactory, 'company'),
             (ShallowInvestmentProjectFactory, 'intermediate_company'),
             (ShallowInvestmentProjectFactory, 'investor_company'),
