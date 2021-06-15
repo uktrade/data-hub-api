@@ -64,7 +64,7 @@ class DNBCompanySearchView(APIView):
             query_params=request.data,
             request=request,
         )
-
+        
         if upstream_response.status_code == status.HTTP_200_OK:
             response_body = upstream_response.json()
             response_body['results'] = self._format_and_hydrate(

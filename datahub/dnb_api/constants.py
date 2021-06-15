@@ -42,3 +42,5 @@ ALL_DNB_UPDATED_MODEL_FIELDS = (
     'global_ultimate_duns_number',
     'company_number',
 )
+
+NEW_DNB_SEARCH_FEATURE_FLAG="dnb-search-v2"

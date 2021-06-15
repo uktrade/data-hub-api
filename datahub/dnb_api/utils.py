@@ -15,9 +15,11 @@ from datahub.core.serializers import AddressSerializer
 from datahub.dnb_api.constants import (
     ALL_DNB_UPDATED_MODEL_FIELDS,
     ALL_DNB_UPDATED_SERIALIZER_FIELDS,
+    NEW_DNB_SEARCH_FEATURE_FLAG
 )
 from datahub.dnb_api.serializers import DNBCompanySerializer
 from datahub.metadata.models import AdministrativeArea, Country
+from datahub.feature_flag.utils import is_feature_flag_active
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +72,7 @@ class RevisionNotFoundError(Exception):
     Exception for when a revision with the specified comment is not found.
     """
 
-
+#this needs a feature flag to decide whether or not to use the v2 endpoint
 def search_dnb(query_params, request=None):
     """
     Queries the dnb-service with the given query_params. E.g.:
@@ -78,17 +80,27 @@ def search_dnb(query_params, request=None):
         {"duns_number": "29393217", "page_size": 1}
         {"search_term": "brompton", "page_size": 10}
     """
+
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
 
     api_client = _get_api_client(request)
 
-    response = api_client.request(
-        'POST',
-        'companies/search/',
-        json=query_params,
-        timeout=3.0,
-    )
+    if is_feature_flag_active(NEW_DNB_SEARCH_FEATURE_FLAG):
+        response = api_client.request(
+            'POST',
+            'v2/companies/search/',
+            json=query_params,
+            timeout=3.0,
+        )
+    else:
+        response = api_client.request(
+            'POST',
+            'companies/search/',
+            json=query_params,
+            timeout=3.0,
+        )
+
     statsd.incr(f'dnb.search.{response.status_code}')
     return response
 
