@@ -1286,7 +1286,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         assert response.json() == expected_response
 
     @pytest.mark.parametrize(
-        'change_request,dnb_request,dnb_response,datahub_response',
+        'change_request,dnb_request,dnb_response,datahub_response,address_area_id',
         (
 
             # All valid fields
@@ -1303,8 +1303,9 @@ class TestCompanyChangeRequestView(APITestMixin):
                             'line_2': 'Foo',
                             'town': 'Beverly Hills',
                             'county': 'Los Angeles',
-                            'area_name': 'California',
-                            'area_abbrev_name': 'CA',
+                            'area': {
+                                'id': constants.AdministrativeArea.alabama.value.id,
+                            },
                             'postcode': '91012',
                             'country': {
                                 'id': constants.Country.united_states.value.id,
@@ -1325,8 +1326,10 @@ class TestCompanyChangeRequestView(APITestMixin):
                         'address_line_2': 'Foo',
                         'address_town': 'Beverly Hills',
                         'address_county': 'Los Angeles',
-                        'address_area_name': 'California',
-                        'address_area_abbrev_name': 'CA',
+                        'address_area': {
+                            'name': 'Alabama',
+                            'abbrev_name': 'AL',
+                        },
                         'address_country': 'US',
                         'address_postcode': '91012',
                         'employee_number': 100,
@@ -1347,8 +1350,10 @@ class TestCompanyChangeRequestView(APITestMixin):
                         'address_line_2': 'Foo',
                         'address_town': 'Beverly Hills',
                         'address_county': 'Los Angeles',
-                        'address_area_name': 'California',
-                        'address_area_abbrev_name': 'CA',
+                        'address_area': {
+                            'name': 'Alabama',
+                            'abbrev_name': 'AL',
+                        },
                         'address_country': 'US',
                         'address_postcode': '91012',
                         'employee_number': 100,
@@ -1369,14 +1374,18 @@ class TestCompanyChangeRequestView(APITestMixin):
                         'address_line_2': 'Foo',
                         'address_town': 'Beverly Hills',
                         'address_county': 'Los Angeles',
-                        'address_area_name': 'California',
-                        'address_area_abbrev_name': 'CA',
+                        'address_area': {
+                            'name': 'Alabama',
+                            'abbrev_name': 'AL',
+                        },
                         'address_country': 'US',
                         'address_postcode': '91012',
                         'employee_number': 100,
                         'annual_sales': 1000,
                     },
                 },
+                # Address Area id (of initial Company)
+                None,
             ),
 
             # Website - domain
@@ -1415,9 +1424,11 @@ class TestCompanyChangeRequestView(APITestMixin):
                         'domain': 'example.com',
                     },
                 },
+                # Address Area id (of initial Company)
+                None,
             ),
 
-            # Address area is not selected
+            # Address area is not selected, but is associated
             (
                 # change_request
                 {
@@ -1453,8 +1464,10 @@ class TestCompanyChangeRequestView(APITestMixin):
                         'address_line_2': 'Foo',
                         'address_town': 'London',
                         'address_county': 'Greater London',
-                        'address_area_name': '',
-                        'address_area_abbrev_name': '',
+                        'address_area': {
+                            'name': constants.AdministrativeArea.texas.value.name,
+                            'abbrev_name': constants.AdministrativeArea.texas.value.area_code,
+                        },
                         'address_country': 'GB',
                         'address_postcode': 'W1 0TN',
                         'employee_number': 100,
@@ -1475,9 +1488,11 @@ class TestCompanyChangeRequestView(APITestMixin):
                         'address_line_2': 'Foo',
                         'address_town': 'London',
                         'address_county': 'Greater London',
-                        'address_area_name': '',
-                        'address_area_abbrev_name': '',
                         'address_country': 'GB',
+                        'address_area': {
+                            'name': constants.AdministrativeArea.texas.value.name,
+                            'abbrev_name': constants.AdministrativeArea.texas.value.area_code,
+                        },
                         'address_postcode': 'W1 0TN',
                         'employee_number': 100,
                         'annual_sales': 1000,
@@ -1497,14 +1512,18 @@ class TestCompanyChangeRequestView(APITestMixin):
                         'address_line_2': 'Foo',
                         'address_town': 'London',
                         'address_county': 'Greater London',
-                        'address_area_name': '',
-                        'address_area_abbrev_name': '',
+                        'address_area': {
+                            'name': constants.AdministrativeArea.texas.value.name,
+                            'abbrev_name': constants.AdministrativeArea.texas.value.area_code,
+                        },
                         'address_country': 'GB',
                         'address_postcode': 'W1 0TN',
                         'employee_number': 100,
                         'annual_sales': 1000,
                     },
                 },
+                # Address Area id (of initial Company)
+                constants.AdministrativeArea.texas.value.id,
             ),
         ),
     )
@@ -1515,12 +1534,16 @@ class TestCompanyChangeRequestView(APITestMixin):
         dnb_request,
         dnb_response,
         datahub_response,
+        address_area_id,
     ):
         """
         The endpoint should return 200 as well as a valid response
         when it is hit with a valid payload.
         """
-        CompanyFactory(duns_number='123456789')
+        CompanyFactory(
+            duns_number='123456789',
+            address_area_id=address_area_id
+        )
 
         requests_mock.post(
             DNB_CHANGE_REQUEST_URL,
@@ -1647,7 +1670,11 @@ class TestCompanyChangeRequestView(APITestMixin):
         Test that a partial change-request to address sends
         all address fields to dnb-service.
         """
-        company = CompanyFactory(duns_number='123456789')
+        address_area_id = constants.AdministrativeArea.texas.value.id
+        company = CompanyFactory(
+            duns_number='123456789',
+            address_area_id=address_area_id
+        )
         requests_mock.post(
             DNB_CHANGE_REQUEST_URL,
             status_code=status.HTTP_201_CREATED,
@@ -1663,6 +1690,9 @@ class TestCompanyChangeRequestView(APITestMixin):
                     'address_county': company.address_county,
                     'address_country': company.address_country.iso_alpha2_code,
                     'address_postcode': company.address_postcode,
+                    'address_area': {
+                        'id': address_area_id
+                    }
                 },
             },
         )
@@ -1689,6 +1719,10 @@ class TestCompanyChangeRequestView(APITestMixin):
                 'address_county': company.address_county,
                 'address_country': company.address_country.iso_alpha2_code,
                 'address_postcode': company.address_postcode,
+                'address_area': {
+                    'name': constants.AdministrativeArea.texas.value.name,
+                    'abbrev_name': constants.AdministrativeArea.texas.value.area_code,
+                }
             },
         }
 
@@ -2075,7 +2109,9 @@ class TestCompanyInvestigationView(APITestMixin):
         The endpoint should return 200 as well as a valid response when it is hit with a valid
         payload of full investigation details.
         """
-        company = CompanyFactory()
+        company = CompanyFactory(
+            address_area_id=constants.AdministrativeArea.new_york.value.id,
+        )
         dnb_formatted_company_details = {
             'company_details': {
                 'primary_name': 'Joe Bloggs LTD',
@@ -2085,8 +2121,10 @@ class TestCompanyInvestigationView(APITestMixin):
                 'address_line_2': 'Someplace',
                 'address_town': 'Beverly Hills',
                 'address_county': 'Los Angeles',
-                'address_area_name': 'California',
-                'address_area_abbrev_name': 'CA',
+                'address_area': {
+                    'name': constants.AdministrativeArea.new_york.value.name,
+                    'abbrev_name': constants.AdministrativeArea.new_york.value.area_code,
+                },
                 'address_postcode': '91012',
                 'address_country': 'US',
             },
@@ -2117,8 +2155,9 @@ class TestCompanyInvestigationView(APITestMixin):
                     'line_2': 'Someplace',
                     'town': 'Beverly Hills',
                     'county': 'Los Angeles',
-                    'area_name': 'California',
-                    'area_abbrev_name': 'CA',
+                    'address_area': {
+                        'id': constants.AdministrativeArea.new_york.value.id,
+                    },
                     'postcode': '91012',
                     'country': constants.Country.united_states.value.id,
                 },
