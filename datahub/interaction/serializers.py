@@ -1,6 +1,7 @@
 from functools import partial
 from operator import not_
 
+from django.core.exceptions import NON_FIELD_ERRORS
 from django.db.transaction import atomic
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy
@@ -147,8 +148,18 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
     INVALID_FOR_UPDATE = gettext_lazy(
         'This field is invalid for interaction updates.',
     )
+    INVALID_COMPANY_OR_COMPANIES = gettext_lazy(
+        'Only either a company or companies can be provided.',
+    )
 
-    company = NestedRelatedField(Company)
+    company = NestedRelatedField(Company, required=False)
+    companies = NestedRelatedField(
+        Company,
+        many=True,
+        allow_empty=True,
+        # TODO: the field has to be required, once `company` is removed.
+        required=False,
+    )
     contacts = NestedRelatedField(
         Contact,
         many=True,
@@ -223,6 +234,23 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
 
         raise serializers.ValidationError(self.INVALID_FOR_UPDATE)
 
+    def to_internal_value(self, data):
+        """
+        Add support for both `company` and `companies` field.
+
+        TODO: this method should be removed once `company` field is removed.
+        """
+        if 'company' in data and 'companies' in data:
+            raise serializers.ValidationError(
+                {
+                    NON_FIELD_ERRORS: [self.INVALID_COMPANY_OR_COMPANIES],
+                },
+            )
+
+        if 'company' not in data and 'companies' not in data:
+            self.fields['company'].required = True
+        return super().to_internal_value(data)
+
     def validate(self, data):
         """
         Validates and cleans the data.
@@ -231,6 +259,8 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
 
         This is removed because the value is not stored; it is instead inferred from contents
         of the the event field during serialisation.
+
+        It copies company field to companies and other way around.
         """
         self._validate_theme(data)
 
@@ -242,6 +272,12 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
         # TODO: remove this once we give archived a model-level default
         if not self.instance or self.instance.archived is None:
             data['archived'] = False
+
+        # TODO: this should be removed when `company` field is removed.
+        if 'company' in data and data.get('company'):
+            data['companies'] = [data['company']]
+        elif 'companies' in data and len(data.get('companies') or []) > 0:
+            data['company'] = data['companies'][0]
 
         return data
 
@@ -394,6 +430,7 @@ class InteractionSerializer(BaseInteractionSerializer):
         fields = (
             'id',
             'company',
+            'companies',
             'contacts',
             'created_on',
             'created_by',
@@ -595,6 +632,7 @@ class InteractionSerializerV4(BaseInteractionSerializer):
         fields = (
             'id',
             'company',
+            'companies',
             'contacts',
             'created_on',
             'created_by',

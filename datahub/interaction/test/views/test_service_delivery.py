@@ -139,6 +139,10 @@ class TestAddServiceDelivery(APITestMixin):
                 'id': str(company.pk),
                 'name': company.name,
             },
+            'companies': [{
+                'id': str(company.pk),
+                'name': company.name,
+            }],
             'contacts': [{
                 'id': str(contact.pk),
                 'name': contact.name,

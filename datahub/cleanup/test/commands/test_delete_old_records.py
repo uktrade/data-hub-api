@@ -373,6 +373,7 @@ MAPPING = {
         'factory': CompanyInteractionFactory,
         'implicitly_deletable_models': {
             'interaction.Interaction_contacts',
+            'interaction.Interaction_companies',
             'interaction.InteractionDITParticipant',
             'interaction.InteractionExportCountry',
         },
