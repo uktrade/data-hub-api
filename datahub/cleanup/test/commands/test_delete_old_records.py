@@ -38,6 +38,7 @@ from datahub.company_referral.test.factories import (
 from datahub.core.exceptions import DataHubException
 from datahub.core.model_helpers import get_related_fields
 from datahub.interaction.test.factories import (
+    CompaniesInteractionFactory,
     CompanyInteractionFactory,
     InteractionExportCountryFactory,
     InvestmentProjectInteractionFactory,
@@ -160,6 +161,17 @@ MAPPING = {
             {
                 'factory': CompanyInteractionFactory,
                 'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+            {
+                'factory': CompaniesInteractionFactory,
+                'field': 'companies',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
                     {
@@ -361,6 +373,7 @@ MAPPING = {
         'factory': CompanyInteractionFactory,
         'implicitly_deletable_models': {
             'interaction.Interaction_contacts',
+            'interaction.Interaction_companies',
             'interaction.InteractionDITParticipant',
             'interaction.InteractionExportCountry',
         },

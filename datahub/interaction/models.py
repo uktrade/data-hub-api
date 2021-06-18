@@ -217,12 +217,18 @@ class Interaction(ArchivableModel, BaseModel):
     # }
     source = models.JSONField(encoder=DjangoJSONEncoder, blank=True, null=True)
     date = models.DateTimeField()
+    # `company` field will be replaced by `companies` field.
     company = models.ForeignKey(
         'company.Company',
         related_name='%(class)ss',
         blank=True,
         null=True,
         on_delete=models.CASCADE,
+    )
+    companies = models.ManyToManyField(
+        'company.Company',
+        related_name='company_interactions',
+        blank=True,
     )
     contacts = models.ManyToManyField(
         'company.Contact',
