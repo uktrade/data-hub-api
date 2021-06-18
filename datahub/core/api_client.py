@@ -102,6 +102,7 @@ class APIClient:
     def request(self, method, path, **kwargs):
         """Makes an HTTP request."""
         url = urljoin(self._api_url, path)
+
         logger.info(f'Sending request: {method.upper()} {url}')
 
         timeout = kwargs.pop('timeout', self._default_timeout)

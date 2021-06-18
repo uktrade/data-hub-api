@@ -21,9 +21,10 @@ def get_expected_data_from_company(company):
         'address_county': company.address_county,
         'address_country__name': company.address_country.name,
         'address_postcode': company.address_postcode,
-        'address_area': str(company.address_area.id),
-        'address_area__area_name': company.address_area.area_name,
-        'address_area__area_code': company.address_area.area_code,
+        'address_area__name': get_attr_or_none(
+            company,
+            'address_area.name',
+        ),
         'address_town': company.address_town,
         'archived': company.archived,
         'archived_on': format_date_or_datetime(company.archived_on),
@@ -69,7 +70,6 @@ def get_expected_data_from_company(company):
         ),
         'registered_address_county': company.registered_address_county,
         'registered_address_postcode': company.registered_address_postcode,
-        'registered_address_area': company.registered_address_area,
         'registered_address_area__name': get_attr_or_none(
             company,
             'registered_address_area.name',

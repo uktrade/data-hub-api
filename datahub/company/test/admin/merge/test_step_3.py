@@ -135,6 +135,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             )
         target_company = CompanyFactory()
         source_interactions = list(source_company.interactions.all())
+        source_interactions_by_companies = list(source_company.company_interactions.all())
         source_contacts = list(source_company.contacts.all())
         source_orders = list(source_company.orders.all())
         source_referrals = list(source_company.referrals.all())
@@ -166,49 +167,36 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert len(messages) == 1
         assert messages[0].level == django_messages.SUCCESS
 
-        merge_entries = []
-
-        if len(source_interactions) > 0:
-            interaction_noun = _get_verbose_name(len(source_interactions), Interaction)
-            merge_entries.append(
-                f'{len(source_interactions)} {interaction_noun}',
-            )
-
-        if len(source_contacts) > 0:
-            contact_noun = _get_verbose_name(len(source_contacts), Contact)
-            merge_entries.append(
-                f'{len(source_contacts)} {contact_noun}',
-            )
-
+        investment_project_entries = []
         for field, investment_projects in source_investment_projects_by_field.items():
-            num_investment_projects = len(investment_projects)
-            if num_investment_projects > 0:
-                project_noun = _get_verbose_name(num_investment_projects, InvestmentProject)
-                description = FIELD_TO_DESCRIPTION_MAPPING.get(field)
-                merge_entries.append(
-                    f'{num_investment_projects} {project_noun}{description}',
-                )
-
-        if len(source_orders) > 0:
-            order_noun = _get_verbose_name(len(source_orders), Order)
-            merge_entries.append(
-                f'{len(source_orders)} {order_noun}',
+            description = FIELD_TO_DESCRIPTION_MAPPING.get(field)
+            investment_project_entries.append(
+                (
+                    investment_projects,
+                    InvestmentProject,
+                    f'{{num}} {{noun}}{description}',
+                ),
             )
 
-        if len(source_referrals) > 0:
-            referral_noun = _get_verbose_name(len(source_referrals), CompanyReferral)
-            merge_entries.append(
-                f'{len(source_referrals)} {referral_noun}',
-            )
+        entries = [
+            (source_interactions, Interaction, '{num} {noun}'),
+            (
+                source_interactions_by_companies,
+                Interaction,
+                '{num} {noun} as one of participating companies',
+            ),
+            (source_contacts, Contact, '{num} {noun}'),
+            (source_orders, Order, '{num} {noun}'),
+            (source_referrals, CompanyReferral, '{num} {noun}'),
+            (source_company_list_items, CompanyListItem, '{num} {noun}'),
+            *investment_project_entries,
+        ]
 
-        if len(source_company_list_items) > 0:
-            company_list_item_noun = _get_verbose_name(
-                len(source_company_list_items),
-                CompanyListItem,
-            )
-            merge_entries.append(
-                f'{len(source_company_list_items)} {company_list_item_noun}',
-            )
+        merge_entries = []
+        for entry in entries:
+            if len(entry[0]) > 0:
+                noun = _get_verbose_name(len(entry[0]), entry[1])
+                merge_entries.append(entry[2].format(num=len(entry[0]), noun=noun))
 
         merge_entries = ', '.join(merge_entries)
 

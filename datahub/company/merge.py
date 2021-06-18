@@ -28,6 +28,7 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     CompanyReferral.company.field,
     Contact.company.field,
     Interaction.company.field,
+    Interaction.companies.field,
     InvestmentProject.investor_company.field,
     InvestmentProject.intermediate_company.field,
     InvestmentProject.uk_company.field,
@@ -48,9 +49,10 @@ INVESTMENT_PROJECT_COMPANY_FIELDS = (
 )
 
 FIELD_TO_DESCRIPTION_MAPPING = {
-    'investor_company': ' as investor company ',
-    'intermediate_company': ' as intermediate company ',
-    'uk_company': ' as UK company ',
+    'companies': ' as one of participating companies',
+    'investor_company': ' as investor company',
+    'intermediate_company': ' as intermediate company',
+    'uk_company': ' as UK company',
 }
 
 MergeEntrySummary = namedtuple(
@@ -63,27 +65,34 @@ MergeEntrySummary = namedtuple(
 )
 
 
-def _default_object_updater(obj, field, target_company):
+def _default_object_updater(obj, field, target_company, source_company):
+    item = getattr(obj, field)
+    # if the field is m2m, replace the source company with a target company
+    if isinstance(item, models.Manager):
+        item.remove(source_company)
+        item.add(target_company)
+        return
+
     setattr(obj, field, target_company)
     obj.save(update_fields=(field,))
 
 
-def _company_list_item_updater(list_item, field, target_company):
+def _company_list_item_updater(list_item, field, target_company, source_company):
     # If there is already a list item for the target company, delete this list item instead
     # as duplicates are not allowed
     if CompanyListItem.objects.filter(list_id=list_item.list_id, company=target_company).exists():
         list_item.delete()
     else:
-        _default_object_updater(list_item, field, target_company)
+        _default_object_updater(list_item, field, target_company, source_company)
 
 
-def _pipeline_item_updater(pipeline_item, field, target_company):
+def _pipeline_item_updater(pipeline_item, field, target_company, source_company):
     # If there is already a pipeline item for the adviser for the target company
     # delete this item instead as the same company can't be added for the same adviser again
     if PipelineItem.objects.filter(adviser=pipeline_item.adviser, company=target_company).exists():
         pipeline_item.delete()
     else:
-        _default_object_updater(pipeline_item, field, target_company)
+        _default_object_updater(pipeline_item, field, target_company, source_company)
 
 
 class MergeConfiguration(NamedTuple):
@@ -95,7 +104,7 @@ class MergeConfiguration(NamedTuple):
 
 
 MERGE_CONFIGURATION = [
-    MergeConfiguration(Interaction, ('company',)),
+    MergeConfiguration(Interaction, ('company', 'companies')),
     MergeConfiguration(CompanyReferral, ('company',)),
     MergeConfiguration(Contact, ('company',)),
     MergeConfiguration(InvestmentProject, INVESTMENT_PROJECT_COMPANY_FIELDS),
@@ -204,7 +213,7 @@ def _update_objects(configuration: MergeConfiguration, source, target):
 
     for field, filtered_objects in _get_objects_from_configuration(configuration, source):
         for obj in filtered_objects.iterator():
-            configuration.object_updater(obj, field, target)
+            configuration.object_updater(obj, field, target, source)
             objects_updated[field] += 1
     return objects_updated
 

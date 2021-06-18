@@ -120,24 +120,36 @@ class ContactsBelongToCompanyValidator:
     requires_context = True
 
     def __call__(self, data, serializer):
-        """Performs validation."""
+        """
+        Performs validation.
+
+        TODO: this method has do be simplified once `company` field is removed.
+        """
         instance = serializer.instance
         company_has_changed = not instance or (
             'company' in data and data['company'] != instance.company
+        )
+        companies_have_changed = not instance or (
+            'companies' in data and set(data['companies']) != set(instance.companies.all())
         )
 
         contacts_have_changed = not instance or (
             'contacts' in data and set(data['contacts']) != set(instance.contacts.all())
         )
 
-        if not (company_has_changed or contacts_have_changed):
+        if not (company_has_changed or companies_have_changed or contacts_have_changed):
             return
 
         combiner = DataCombiner(instance, data)
         company = combiner.get_value('company')
-        contacts = combiner.get_value_to_many('contacts')
 
-        if any(contact.company != company for contact in contacts):
+        if company_has_changed and company:
+            companies = (company,)
+        else:
+            companies = combiner.get_value_to_many('companies')
+
+        contacts = combiner.get_value_to_many('contacts')
+        if any(contact.company not in companies for contact in contacts):
             raise serializers.ValidationError(
                 'The interaction contacts must belong to the specified company.',
                 code='inconsistent_contacts_and_company',
