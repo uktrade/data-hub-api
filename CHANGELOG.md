@@ -1,3 +1,23 @@
+# Data Hub API 36.23.0 (2021-06-18)
+## Deprecations
+
+- **Interactions** The `company` field is now deprecated for Interactions.
+
+## Features
+
+- Company search results can now be improved by enabling the 'dnb-search-v2' feature flag
+
+## API
+
+- **Interactions** A new `companies` field has been added to Interaction API. The field is being mirrored with the existing `company` field.
+  Both `company` and `companies` cannot be set at the same time.
+  If multiple companies are provided, the first one will be copied to `company` field. Refer to the API documentation for the schema.
+
+## Database schema
+
+- **Interactions** A new field `companies` has been added that will enable Interactions to be associated with multiple companies.
+
+
 # Data Hub API 36.22.0 (2021-06-11)
 ## Features
 
