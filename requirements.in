@@ -21,7 +21,7 @@ psycogreen==1.0.2
 
 boto3==1.17.93
 
-notifications-python-client==6.1.0
+notifications-python-client==6.2.0
 
 # Prometheus
 statsd==3.3.0
