@@ -16,7 +16,7 @@ pyyaml==5.4.1
 python-dateutil==2.8.1
 
 # Persistency layer
-psycopg2==2.8.6
+psycopg2==2.9.1
 psycogreen==1.0.2
 
 boto3==1.17.97
