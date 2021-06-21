@@ -30,6 +30,7 @@ def test_interaction_to_dict(es, factory_cls):
 
     result = Interaction.db_object_to_dict(interaction)
     result['contacts'].sort(key=itemgetter('id'))
+    result['companies'].sort(key=itemgetter('id'))
     result['dit_participants'].sort(key=lambda dit_participant: dit_participant['adviser']['id'])
     result['export_countries'].sort(key=lambda export_country: export_country['country']['id'])
     result['policy_areas'].sort(key=itemgetter('id'))
@@ -45,6 +46,13 @@ def test_interaction_to_dict(es, factory_cls):
             'name': interaction.company.name,
             'trading_names': interaction.company.trading_names,
         } if interaction.company else None,
+        'companies': [
+            {
+                'id': str(company.pk),
+                'name': company.name,
+                'trading_names': company.trading_names,
+            } for company in sorted(interaction.companies.all(), key=attrgetter('id'))
+        ],
         'company_sector': {
             'id': str(interaction.company.sector.pk),
             'name': interaction.company.sector.name,
@@ -141,6 +149,7 @@ def test_service_delivery_to_dict(es):
 
     result = Interaction.db_object_to_dict(interaction)
     result['contacts'].sort(key=itemgetter('id'))
+    result['companies'].sort(key=itemgetter('id'))
     result['dit_participants'].sort(key=lambda dit_participant: dit_participant['adviser']['id'])
 
     assert result == {
@@ -153,6 +162,13 @@ def test_service_delivery_to_dict(es):
             'name': interaction.company.name,
             'trading_names': interaction.company.trading_names,
         },
+        'companies': [
+            {
+                'id': str(company.pk),
+                'name': company.name,
+                'trading_names': company.trading_names,
+            } for company in sorted(interaction.companies.all(), key=attrgetter('id'))
+        ],
         'company_sector': {
             'id': str(interaction.company.sector.pk),
             'name': interaction.company.sector.name,
