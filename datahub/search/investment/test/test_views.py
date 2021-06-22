@@ -95,6 +95,7 @@ def setup_data(es_with_collector, project_with_max_gross_value_added):
             actual_land_date=datetime.date(2010, 8, 13),
             investor_company=CompanyFactory(
                 address_country_id=constants.Country.united_states.value.id,
+                address_area_id=constants.AdministrativeArea.texas.value.id,
             ),
             status=InvestmentProject.Status.ONGOING,
             uk_region_locations=[
