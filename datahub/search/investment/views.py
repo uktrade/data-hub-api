@@ -129,7 +129,7 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
         project_manager_name=get_full_name_expression('project_manager'),
         project_assurance_adviser_name=get_full_name_expression('project_assurance_adviser'),
     )
-    # There is implicit ordering here, guaranteed for <= python3.7 to be insertion order
+    # There is implicit ordering here, guaranteed for python >= 3.7 to be insertion order
     field_titles = {
         'created_on': 'Date created',
         'computed_project_code': 'Project reference',
@@ -139,10 +139,10 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
     }
     field_titles.update(
         {
-            'investor_company__address_town': 'Investor company town or city'
+            'investor_company__address_town': 'Investor company town or city',
         }
         if is_feature_flag_active('state-filter') and is_feature_flag_active('province-filter')
-        else {}
+        else {},
     )
     field_titles.update({
         'investor_company__address_area__name': 'Investor company area',
