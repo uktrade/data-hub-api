@@ -224,13 +224,12 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
         }
         field_titles.update(
             {
-                'investor_company__address_town': 'Investor company town or city',
+                'address_area__name': 'Area',
             }
-            if is_feature_flag_active('state-filter') and is_feature_flag_active('province-filter')
+            if is_feature_flag_active('address-area-company-search')
             else {},
         )
         field_titles.update({
-            'address_area__name': 'Area',
             'uk_region__name': 'UK region',
             'export_to_countries_list': 'Countries exported to',
             'future_interest_countries_list': 'Countries of interest',
