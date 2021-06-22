@@ -7,6 +7,7 @@ from datahub.core.query_utils import (
     get_full_name_expression,
     get_string_agg_subquery,
 )
+from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.investment.project.models import InvestmentProject as DBInvestmentProject
 from datahub.investment.project.query_utils import get_project_code_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
@@ -128,12 +129,22 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
         project_manager_name=get_full_name_expression('project_manager'),
         project_assurance_adviser_name=get_full_name_expression('project_assurance_adviser'),
     )
+    # There is implicit ordering here, guaranteed for <= python3.7 to be insertion order
     field_titles = {
         'created_on': 'Date created',
         'computed_project_code': 'Project reference',
         'name': 'Project name',
         'investor_company__name': 'Investor company',
         'investor_company__address_town': 'Investor company town or city',
+    }
+    field_titles.update(
+        {
+            'investor_company__address_town': 'Investor company town or city'
+        }
+        if is_feature_flag_active('state-filter') and is_feature_flag_active('province-filter')
+        else {}
+    )
+    field_titles.update({
         'investor_company__address_area__name': 'Investor company area',
         'country_investment_originates_from__name': 'Country of origin',
         'investment_type__name': 'Investment type',
@@ -169,4 +180,4 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
         'foreign_equity_investment': 'Foreign equity investment',
         'gva_multiplier__multiplier': 'GVA multiplier',
         'gross_value_added': 'GVA',
-    }
+    })
