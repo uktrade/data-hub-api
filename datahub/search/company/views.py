@@ -14,6 +14,7 @@ from datahub.core.query_utils import (
     get_front_end_url_expression,
     get_string_agg_subquery,
 )
+from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.search.company import CompanySearchApp
 from datahub.search.company.serializers import (
@@ -206,11 +207,21 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
             ),
         ),
     )
+    # There is implicit ordering here, guaranteed for python >= 3.7 to be insertion order
     field_titles = {
         'name': 'Name',
         'link': 'Link',
         'sector_name': 'Sector',
         'address_country__name': 'Country',
+    }
+    field_titles.update(
+        {
+            'investor_company__address_town': 'Investor company town or city',
+        }
+        if is_feature_flag_active('state-filter') and is_feature_flag_active('province-filter')
+        else {},
+    )
+    field_titles.update({
         'address_area__name': 'Area',
         'uk_region__name': 'UK region',
         'export_to_countries_list': 'Countries exported to',
@@ -220,4 +231,4 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
         'number_of_employees_value': 'Number of employees',
         'turnover_value': 'Annual turnover',
         'upper_headquarter_type_name': 'Headquarter type',
-    }
+    })
