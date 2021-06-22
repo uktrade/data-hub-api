@@ -129,55 +129,64 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
         project_manager_name=get_full_name_expression('project_manager'),
         project_assurance_adviser_name=get_full_name_expression('project_assurance_adviser'),
     )
-    # There is implicit ordering here, guaranteed for python >= 3.7 to be insertion order
-    field_titles = {
-        'created_on': 'Date created',
-        'computed_project_code': 'Project reference',
-        'name': 'Project name',
-        'investor_company__name': 'Investor company',
-        'investor_company__address_town': 'Investor company town or city',
-    }
-    field_titles.update(
-        {
+
+    @property
+    def field_titles(self):
+        """
+        Returns field titles for CSV export
+
+        There is implicit ordering here, guaranteed for python >= 3.7 to be insertion order
+        This is a property because we don't want it to evaluate prior to database instantiation
+        """
+        field_titles = {
+            'created_on': 'Date created',
+            'computed_project_code': 'Project reference',
+            'name': 'Project name',
+            'investor_company__name': 'Investor company',
             'investor_company__address_town': 'Investor company town or city',
         }
-        if is_feature_flag_active('state-filter') and is_feature_flag_active('province-filter')
-        else {},
-    )
-    field_titles.update({
-        'investor_company__address_area__name': 'Investor company area',
-        'country_investment_originates_from__name': 'Country of origin',
-        'investment_type__name': 'Investment type',
-        'status_name': 'Status',
-        'stage__name': 'Stage',
-        'link': 'Link',
-        'actual_land_date': 'Actual land date',
-        'estimated_land_date': 'Estimated land date',
-        'fdi_value__name': 'FDI value',
-        'sector_name': 'Sector',
-        'date_of_latest_interaction': 'Date of latest interaction',
-        'project_manager_name': 'Project manager',
-        'client_relationship_manager_name': 'Client relationship manager',
-        'investor_company_global_account_manager': 'Global account manager',
-        'project_assurance_adviser_name': 'Project assurance adviser',
-        'team_member_names': 'Other team members',
-        'delivery_partner_names': 'Delivery partners',
-        'uk_region_location_names': 'Possible UK regions',
-        'actual_uk_region_names': 'Actual UK regions',
-        'specific_programme__name': 'Specific investment programme',
-        'referral_source_activity__name': 'Referral source activity',
-        'referral_source_activity_website__name': 'Referral source activity website',
-        'total_investment': 'Total investment',
-        'number_new_jobs': 'New jobs',
-        'average_salary__name': 'Average salary of new jobs',
-        'number_safeguarded_jobs': 'Safeguarded jobs',
-        'level_of_involvement__name': 'Level of involvement',
-        'r_and_d_budget': 'R&D budget',
-        'non_fdi_r_and_d_budget': 'Associated non-FDI R&D project',
-        'new_tech_to_uk': 'New to world tech',
-        'likelihood_to_land__name': 'Likelihood to land',
-        'fdi_type__name': 'FDI type',
-        'foreign_equity_investment': 'Foreign equity investment',
-        'gva_multiplier__multiplier': 'GVA multiplier',
-        'gross_value_added': 'GVA',
-    })
+        field_titles.update(
+            {
+                'investor_company__address_town': 'Investor company town or city',
+            }
+            if is_feature_flag_active('state-filter') and is_feature_flag_active('province-filter')
+            else {},
+        )
+        field_titles.update({
+            'investor_company__address_area__name': 'Investor company area',
+            'country_investment_originates_from__name': 'Country of origin',
+            'investment_type__name': 'Investment type',
+            'status_name': 'Status',
+            'stage__name': 'Stage',
+            'link': 'Link',
+            'actual_land_date': 'Actual land date',
+            'estimated_land_date': 'Estimated land date',
+            'fdi_value__name': 'FDI value',
+            'sector_name': 'Sector',
+            'date_of_latest_interaction': 'Date of latest interaction',
+            'project_manager_name': 'Project manager',
+            'client_relationship_manager_name': 'Client relationship manager',
+            'investor_company_global_account_manager': 'Global account manager',
+            'project_assurance_adviser_name': 'Project assurance adviser',
+            'team_member_names': 'Other team members',
+            'delivery_partner_names': 'Delivery partners',
+            'uk_region_location_names': 'Possible UK regions',
+            'actual_uk_region_names': 'Actual UK regions',
+            'specific_programme__name': 'Specific investment programme',
+            'referral_source_activity__name': 'Referral source activity',
+            'referral_source_activity_website__name': 'Referral source activity website',
+            'total_investment': 'Total investment',
+            'number_new_jobs': 'New jobs',
+            'average_salary__name': 'Average salary of new jobs',
+            'number_safeguarded_jobs': 'Safeguarded jobs',
+            'level_of_involvement__name': 'Level of involvement',
+            'r_and_d_budget': 'R&D budget',
+            'non_fdi_r_and_d_budget': 'Associated non-FDI R&D project',
+            'new_tech_to_uk': 'New to world tech',
+            'likelihood_to_land__name': 'Likelihood to land',
+            'fdi_type__name': 'FDI type',
+            'foreign_equity_investment': 'Foreign equity investment',
+            'gva_multiplier__multiplier': 'GVA multiplier',
+            'gross_value_added': 'GVA',
+        })
+        return field_titles
