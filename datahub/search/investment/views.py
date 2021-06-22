@@ -134,6 +134,7 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
         'name': 'Project name',
         'investor_company__name': 'Investor company',
         'investor_company__address_town': 'Investor company town or city',
+        'investor_company__address_area__name': 'Investor company area',
         'country_investment_originates_from__name': 'Country of origin',
         'investment_type__name': 'Investment type',
         'status_name': 'Status',
