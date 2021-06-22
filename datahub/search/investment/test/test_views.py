@@ -1117,6 +1117,7 @@ class TestInvestmentProjectExportView(APITestMixin):
                     one_list_tier_id=OneListTier.objects.first().id,
                     one_list_account_owner=AdviserFactory(),
                 ),
+                address_area_id=constants.AdministrativeArea.texas.value.id,
             ),
             country_investment_originates_from_id=constants.Country.japan.value.id,
         )
@@ -1148,6 +1149,7 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Project name': project.name,
                 'Investor company': project.investor_company.name,
                 'Investor company town or city': project.investor_company.address_town,
+                'Investor company area': project.investor_company.address_area.name,
                 'Country of origin':
                     get_attr_or_none(project, 'country_investment_originates_from.name'),
                 'Investment type': get_attr_or_none(project, 'investment_type.name'),
