@@ -1,7 +1,7 @@
 # Data Hub API 36.24.0 (2021-06-23)
 ## Bug fixes
 
-- Interactions companies badgateway is now resolved
+- Interactions companies bad gateway is now resolved
 
 ## API
 
