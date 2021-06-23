@@ -1,3 +1,13 @@
+# Data Hub API 36.24.0 (2021-06-23)
+## Bug fixes
+
+- Interactions companies badgateway is now resolved
+
+## API
+
+- **Interactions** `GET /v3/search`, `POST /v3/search/interaction`: `companies` was added as an array field in search results. This field is intended to replace the `company` field.
+
+
 # Data Hub API 36.23.0 (2021-06-18)
 ## Deprecations
 
