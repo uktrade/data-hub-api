@@ -222,13 +222,10 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
             'sector_name': 'Sector',
             'address_country__name': 'Country',
         }
-        field_titles.update(
-            {
+        if is_feature_flag_active('address-area-company-search'):
+            field_titles.update({
                 'address_area__name': 'Area',
-            }
-            if is_feature_flag_active('address-area-company-search')
-            else {},
-        )
+            })
         field_titles.update({
             'uk_region__name': 'UK region',
             'export_to_countries_list': 'Countries exported to',
