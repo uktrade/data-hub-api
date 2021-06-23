@@ -145,13 +145,10 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
             'investor_company__name': 'Investor company',
             'investor_company__address_town': 'Investor company town or city',
         }
-        field_titles.update(
-            {
+        if is_feature_flag_active('address-area-company-search'):
+            field_titles.update({
                 'investor_company__address_area__name': 'Investor company area',
-            }
-            if is_feature_flag_active('address-area-company-search')
-            else {},
-        )
+            })
         field_titles.update({
             'country_investment_originates_from__name': 'Country of origin',
             'investment_type__name': 'Investment type',
