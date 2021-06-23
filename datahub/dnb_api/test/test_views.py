@@ -1542,7 +1542,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         """
         CompanyFactory(
             duns_number='123456789',
-            address_area_id=address_area_id
+            address_area_id=address_area_id,
         )
 
         requests_mock.post(
@@ -1673,7 +1673,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         address_area_id = constants.AdministrativeArea.texas.value.id
         company = CompanyFactory(
             duns_number='123456789',
-            address_area_id=address_area_id
+            address_area_id=address_area_id,
         )
         requests_mock.post(
             DNB_CHANGE_REQUEST_URL,
@@ -1691,8 +1691,8 @@ class TestCompanyChangeRequestView(APITestMixin):
                     'address_country': company.address_country.iso_alpha2_code,
                     'address_postcode': company.address_postcode,
                     'address_area': {
-                        'id': address_area_id
-                    }
+                        'id': address_area_id,
+                    },
                 },
             },
         )
@@ -1722,7 +1722,7 @@ class TestCompanyChangeRequestView(APITestMixin):
                 'address_area': {
                     'name': constants.AdministrativeArea.texas.value.name,
                     'abbrev_name': constants.AdministrativeArea.texas.value.area_code,
-                }
+                },
             },
         }
 
