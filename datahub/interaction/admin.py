@@ -52,7 +52,7 @@ class InteractionDITParticipantInline(admin.TabularInline):
 class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
     """Interaction admin."""
 
-    autocomplete_fields = ('contacts',)
+    autocomplete_fields = ('contacts', 'companies')
     inlines = (
         InteractionDITParticipantInline,
     )
