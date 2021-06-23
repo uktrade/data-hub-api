@@ -34,6 +34,7 @@ class InteractionSearchApp(SearchApp):
         'event',
     ).prefetch_related(
         'contacts',
+        'companies',
         'policy_areas',
         'policy_issue_types',
         Prefetch(
