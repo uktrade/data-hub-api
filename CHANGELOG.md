@@ -1,3 +1,14 @@
+# Data Hub API 36.25.0 (2021-06-24)
+## Features
+
+- **Investment** It's now possible to view investor company area within investment project area search export CSV file
+
+## Bug fixes
+
+- **Investment** Investor profile now has autocomplete fields to optimise load times
+- **Investment** Large capital opportunity profile now has autocomplete fields to optimise load times
+
+
 # Data Hub API 36.24.0 (2021-06-23)
 ## Bug fixes
 
