@@ -211,7 +211,6 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
         'link': 'Link',
         'sector_name': 'Sector',
         'address_country__name': 'Country',
-        'address_area__name': 'Area',
         'uk_region__name': 'UK region',
         'export_to_countries_list': 'Countries exported to',
         'future_interest_countries_list': 'Countries of interest',
@@ -220,4 +219,5 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
         'number_of_employees_value': 'Number of employees',
         'turnover_value': 'Annual turnover',
         'upper_headquarter_type_name': 'Headquarter type',
+        'address_area__name': 'Area',
     }
