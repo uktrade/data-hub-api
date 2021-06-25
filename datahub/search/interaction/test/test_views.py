@@ -295,7 +295,6 @@ class TestInteractionEntitySearchView(APITestMixin):
 
         for result in results:
             result['contacts'].sort(key=itemgetter('id'))
-            result['companies'].sort(key=itemgetter('id'))
             result['dit_participants'].sort(
                 key=lambda dit_participant: dit_participant['adviser']['id'],
             )
@@ -309,11 +308,6 @@ class TestInteractionEntitySearchView(APITestMixin):
                 'name': interaction.company.name,
                 'trading_names': interaction.company.trading_names,
             },
-            'companies': [{
-                'id': str(company.pk),
-                'name': company.name,
-                'trading_names': company.trading_names,
-            } for company in sorted(interaction.companies.all(), key=attrgetter('id'))],
             'company_sector': {
                 'id': str(interaction.company.sector.pk),
                 'name': interaction.company.sector.name,
@@ -1296,7 +1290,6 @@ class TestInteractionBasicSearch(APITestMixin):
 
         for result in results:
             result['contacts'].sort(key=itemgetter('id'))
-            result['companies'].sort(key=itemgetter('id'))
             result['dit_participants'].sort(
                 key=lambda dit_participant: dit_participant['adviser']['id'],
             )
@@ -1310,13 +1303,6 @@ class TestInteractionBasicSearch(APITestMixin):
                 'name': interaction.company.name,
                 'trading_names': interaction.company.trading_names,
             },
-            'companies': [
-                {
-                    'id': str(company.pk),
-                    'name': company.name,
-                    'trading_names': company.trading_names,
-                } for company in sorted(interaction.companies.all(), key=attrgetter('id'))
-            ],
             'company_one_list_group_tier': {
                 'id': interaction.company.get_one_list_group_tier().pk,
                 'name': interaction.company.get_one_list_group_tier().name,
