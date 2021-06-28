@@ -275,13 +275,6 @@
     name: Pennsylvania
     area_code: PA
 - model: metadata.administrativearea
-  pk: 4a6f5211-9e54-42e9-ba25-7c67be785d1a
-  fields:
-    country: 81756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on:
-    name: Puerto Rico
-    area_code: PR
-- model: metadata.administrativearea
   pk: df23e1bd-255b-4626-aa31-07d94279ecfb
   fields:
     country: 81756b9a-5d95-e211-a939-e4115bead28a
