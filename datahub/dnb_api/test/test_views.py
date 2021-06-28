@@ -2155,7 +2155,7 @@ class TestCompanyInvestigationView(APITestMixin):
                     'line_2': 'Someplace',
                     'town': 'Beverly Hills',
                     'county': 'Los Angeles',
-                    'address_area': {
+                    'area': {
                         'id': constants.AdministrativeArea.new_york.value.id,
                     },
                     'postcode': '91012',
