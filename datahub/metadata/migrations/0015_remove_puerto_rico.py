@@ -8,7 +8,7 @@ def delete_puerto_rico(apps, scheme_editor):
     except AdministrativeArea.DoesNotExist:
         pass
 
-def readd_puerto_rico(apps, scheme_editor):
+def restore_puerto_rico(apps, scheme_editor):
     AdministrativeArea.objects.create(pk='4a6f5211-9e54-42e9-ba25-7c67be785d1a',
         name='Puerto Rico',
         area_code='PR',
@@ -22,5 +22,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(delete_puerto_rico, readd_puerto_rico)
+        migrations.RunPython(delete_puerto_rico, restore_puerto_rico)
     ]
