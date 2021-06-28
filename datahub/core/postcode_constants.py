@@ -36,9 +36,6 @@ CA_ZIP_STATES = (
 
 US_ZIP_STATES = (
     ('005', 'NY', 'New York'),
-    ('006', 'PR', 'Puerto Rico'),
-    ('007', 'PR', 'Puerto Rico'),
-    ('009', 'PR', 'Puerto Rico'),
     ('010', 'MA', 'Massachusetts'),
     ('011', 'MA', 'Massachusetts'),
     ('012', 'MA', 'Massachusetts'),

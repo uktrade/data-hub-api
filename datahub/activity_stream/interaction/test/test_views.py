@@ -52,13 +52,16 @@ def test_interaction_activity(api_client):
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
                     'attributedTo': [
-                        {
-                            'id': f'dit:DataHubCompany:{interaction.company.pk}',
-                            'dit:dunsNumber': interaction.company.duns_number,
-                            'dit:companiesHouseNumber': interaction.company.company_number,
-                            'type': ['Organization', 'dit:Company'],
-                            'name': interaction.company.name,
-                        },
+                        *[
+                            {
+                                'id': f'dit:DataHubCompany:{company.pk}',
+                                'dit:dunsNumber': company.duns_number,
+                                'dit:companiesHouseNumber': company.company_number,
+                                'type': ['Organization', 'dit:Company'],
+                                'name': company.name,
+                            }
+                            for company in interaction.companies.order_by('pk')
+                        ],
                         *[
                             {
                                 'id': f'dit:DataHubAdviser:{participant.adviser.pk}',
@@ -128,13 +131,16 @@ def test_interaction_investment_project_activity(api_client):
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
                     'attributedTo': [
-                        {
-                            'id': f'dit:DataHubCompany:{interaction.company.pk}',
-                            'dit:dunsNumber': interaction.company.duns_number,
-                            'dit:companiesHouseNumber': interaction.company.company_number,
-                            'type': ['Organization', 'dit:Company'],
-                            'name': interaction.company.name,
-                        },
+                        *[
+                            {
+                                'id': f'dit:DataHubCompany:{company.pk}',
+                                'dit:dunsNumber': company.duns_number,
+                                'dit:companiesHouseNumber': company.company_number,
+                                'type': ['Organization', 'dit:Company'],
+                                'name': company.name,
+                            }
+                            for company in interaction.companies.order_by('pk')
+                        ],
                         *[
                             {
                                 'id': f'dit:DataHubAdviser:{participant.adviser.pk}',
@@ -210,13 +216,16 @@ def test_service_delivery_activity(api_client):
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
                     'attributedTo': [
-                        {
-                            'id': f'dit:DataHubCompany:{interaction.company.pk}',
-                            'dit:dunsNumber': interaction.company.duns_number,
-                            'dit:companiesHouseNumber': interaction.company.company_number,
-                            'type': ['Organization', 'dit:Company'],
-                            'name': interaction.company.name,
-                        },
+                        *[
+                            {
+                                'id': f'dit:DataHubCompany:{company.pk}',
+                                'dit:dunsNumber': company.duns_number,
+                                'dit:companiesHouseNumber': company.company_number,
+                                'type': ['Organization', 'dit:Company'],
+                                'name': company.name,
+                            }
+                            for company in interaction.companies.order_by('pk')
+                        ],
                         *[
                             {
                                 'id': f'dit:DataHubAdviser:{participant.adviser.pk}',
@@ -285,13 +294,16 @@ def test_service_delivery_event_activity(api_client):
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
                     'attributedTo': [
-                        {
-                            'id': f'dit:DataHubCompany:{interaction.company.pk}',
-                            'dit:dunsNumber': interaction.company.duns_number,
-                            'dit:companiesHouseNumber': interaction.company.company_number,
-                            'type': ['Organization', 'dit:Company'],
-                            'name': interaction.company.name,
-                        },
+                        *[
+                            {
+                                'id': f'dit:DataHubCompany:{company.pk}',
+                                'dit:dunsNumber': company.duns_number,
+                                'dit:companiesHouseNumber': company.company_number,
+                                'type': ['Organization', 'dit:Company'],
+                                'name': company.name,
+                            }
+                            for company in interaction.companies.order_by('pk')
+                        ],
                         *[
                             {
                                 'id': f'dit:DataHubAdviser:{participant.adviser.pk}',

@@ -1,3 +1,14 @@
+# Data Hub API 36.26.0 (2021-06-28)
+## Features
+
+- **Interactions** The Activity Stream Interactions feed is now publishing `companies` field data instead of `company`.
+- Puerto Rico has been removed as a US state in favour of listing it as a country
+
+## Bug fixes
+
+- **Investment** Large Capital Investor Profile Investor companies further enhanced to optimise opening times
+
+
 # Data Hub API 36.25.0 (2021-06-24)
 ## Features
 
