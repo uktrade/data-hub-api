@@ -374,7 +374,7 @@ vine==1.3.0
     #   celery
 virtualenv==20.4.4
     # via pre-commit
-watchdog[watchmedo]==2.1.2
+watchdog[watchmedo]==2.1.3
     # via -r requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
