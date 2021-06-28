@@ -119,7 +119,6 @@ def test_command_regex_generates_the_expected_postcode_substitution(
     'post_code, area_code',
     [
         ('00589', 'NY'),
-        ('00612-1234', 'PR'),
         ('01012', 'MA'),
         ('02823', 'RI'),
     ],
