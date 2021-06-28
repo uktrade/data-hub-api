@@ -27,6 +27,7 @@ from datahub.core.test_utils import (
     join_attr_values,
     random_obj_for_queryset,
 )
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.investment.project.constants import Involvement, LikelihoodToLand
 from datahub.investment.project.models import InvestmentProject, InvestmentProjectPermission
 from datahub.investment.project.test.factories import (
@@ -1104,6 +1105,7 @@ class TestInvestmentProjectExportView(APITestMixin):
         """Test export of investment project search results."""
         url = reverse('api-v3:search:investment_project-export')
 
+        FeatureFlagFactory(code='address-area-company-search')
         InvestmentProjectFactory()
         InvestmentProjectFactory(cdms_project_code='cdms-code')
         VerifyWinInvestmentProjectFactory()
@@ -1140,7 +1142,7 @@ class TestInvestmentProjectExportView(APITestMixin):
         response_text = response.getvalue().decode('utf-8-sig')
         reader = DictReader(StringIO(response_text))
 
-        assert reader.fieldnames == list(SearchInvestmentExportAPIView.field_titles.values())
+        assert reader.fieldnames == list(SearchInvestmentExportAPIView().field_titles.values())
 
         expected_row_data = [
             {
@@ -1149,7 +1151,9 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Project name': project.name,
                 'Investor company': project.investor_company.name,
                 'Investor company town or city': project.investor_company.address_town,
-                'Investor company area': project.investor_company.address_area.name,
+                'Investor company area': get_attr_or_none(
+                    project, 'investor_company.address_area.name',
+                ),
                 'Country of origin':
                     get_attr_or_none(project, 'country_investment_originates_from.name'),
                 'Investment type': get_attr_or_none(project, 'investment_type.name'),
