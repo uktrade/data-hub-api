@@ -68,7 +68,7 @@ class InteractionActivitySerializer(ActivitySerializer):
                 'dit:archived': instance.archived,
                 'dit:subject': instance.subject,
                 'attributedTo': [
-                    self._get_company(instance.company),
+                    *self._get_companies(instance.companies),
                     *self._get_dit_participants(instance.dit_participants),
                     *self._get_contacts(instance.contacts),
                 ],
