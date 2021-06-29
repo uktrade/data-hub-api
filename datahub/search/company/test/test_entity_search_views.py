@@ -27,6 +27,7 @@ from datahub.core.test_utils import (
     get_attr_or_none,
     random_obj_for_queryset,
 )
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.metadata.models import Country, Sector
 from datahub.metadata.test.factories import TeamFactory
@@ -1081,6 +1082,7 @@ class TestCompanyExportView(APITestMixin):
         orm_ordering,
     ):
         """Test export of company search results."""
+        FeatureFlagFactory(code='address-area-company-search')
         companies_1 = CompanyFactory.create_batch(
             3,
             turnover=None,
@@ -1133,7 +1135,7 @@ class TestCompanyExportView(APITestMixin):
         sorted_company = Company.objects.order_by(orm_ordering, 'pk')
         reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
 
-        assert reader.fieldnames == list(SearchCompanyExportAPIView.field_titles.values())
+        assert reader.fieldnames == list(SearchCompanyExportAPIView().field_titles.values())
 
         expected_row_data = [
             {
