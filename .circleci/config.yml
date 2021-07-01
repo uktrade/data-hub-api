@@ -136,5 +136,5 @@ workflows:
           python_image: python:3.8
           postgres_image: postgres:10
           mi_postgres_image: postgres:9.6
-          es_image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+          es_image: docker.elastic.co/elasticsearch/elasticsearch:7.13.1
           es_apm_image: docker.elastic.co/apm/apm-server:7.7.1
