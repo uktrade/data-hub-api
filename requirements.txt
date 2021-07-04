@@ -106,7 +106,7 @@ djangorestframework==3.12.4
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
-elastic-apm==6.2.2
+elastic-apm==6.2.3
     # via -r requirements.in
 elasticsearch==7.13.1
     # via
