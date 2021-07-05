@@ -1,3 +1,10 @@
+start-dev:
+	[ -z "$(shell docker network ls --filter=name=dh_default -q)" ] && docker network create dh_default || echo 'dh_default network already present'
+	docker-compose -f docker-compose.yml -f docker-compose.single-network.yml up &
+
+stop-dev:
+	docker-compose -f docker-compose.yml -f docker-compose.single-network.yml down
+
 tests:
 	docker-compose build
 	docker-compose run api bash tests.sh
