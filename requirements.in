@@ -1,7 +1,7 @@
 # Django and django related
 django==3.1.12
 djangorestframework==3.12.4
-django-axes==5.19.0
+django-axes==5.20.0
 django-environ==0.4.5
 django-extensions==3.1.3
 django-filter==2.4.0
@@ -19,7 +19,7 @@ python-dateutil==2.8.1
 psycopg2==2.9.1
 psycogreen==1.0.2
 
-boto3==1.17.101
+boto3==1.17.105
 
 notifications-python-client==6.2.0
 
@@ -42,7 +42,7 @@ elasticsearch==7.13.1
 elasticsearch-dsl==7.3.0
 
 # ES APM
-elastic-apm==6.2.2
+elastic-apm==6.2.3
 
 # Celery
 celery[redis]==4.4.7
