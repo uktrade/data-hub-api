@@ -39,3 +39,11 @@ fix-us-areas:
 
 fix-ca-areas:
 	docker-compose run api python manage.py fix_ca_company_address
+
+start-frontend-api-dnb:
+	$(MAKE) -C ../dnb-service start-dnb-for-data-hub-api
+	$(MAKE) -C ../data-hub-frontend start-dev
+
+stop-frontend-api-dnb:
+	$(MAKE) -C ../dnb-service stop-dnb-for-data-hub-api
+	$(MAKE) -C ../data-hub-frontend stop-dev
