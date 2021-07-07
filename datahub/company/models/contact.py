@@ -79,6 +79,12 @@ class Contact(ArchivableModel, BaseModel):
         metadata_models.Country, null=True, blank=True,
         on_delete=models.SET_NULL,
     )
+    address_area = models.ForeignKey(
+        metadata_models.AdministrativeArea,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     telephone_alternative = models.CharField(
         validators=[InternationalTelephoneValidator()],

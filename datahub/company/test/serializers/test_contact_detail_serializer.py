@@ -8,7 +8,7 @@ from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
     CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
 )
-from datahub.company.serializers import ContactDetailSerializer
+from datahub.company.serializers import ContactDetailSerializerV3
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
@@ -35,7 +35,7 @@ def update_contact_task_mock(monkeypatch):
 
 
 @freeze_time(FROZEN_TIME)
-class TestContactSerializer:
+class TestContactSerializerV3:
     """
     Tests for the Contact Serializer. Checking that update / create notify the
     consent service correctly.
@@ -51,7 +51,7 @@ class TestContactSerializer:
         is called.
         """
         contact = self._make_contact()
-        c = ContactDetailSerializer(
+        c = ContactDetailSerializerV3(
             instance=contact,
             context={'request': request},
         )
@@ -77,7 +77,7 @@ class TestContactSerializer:
         is called with partial data.
         """
         contact = self._make_contact()
-        c = ContactDetailSerializer(instance=contact, partial=True)
+        c = ContactDetailSerializerV3(instance=contact, partial=True)
         c.update(c.instance, {
             'accepts_dit_email_marketing': True,
         })
@@ -96,7 +96,7 @@ class TestContactSerializer:
         is called with partial data but `accepts_dit_email_marketing` is missing.
         """
         contact = self._make_contact()
-        c = ContactDetailSerializer(instance=contact, partial=True)
+        c = ContactDetailSerializerV3(instance=contact, partial=True)
         data = {
             'last_name': 'Nelson1',
         }
@@ -138,7 +138,7 @@ class TestContactSerializer:
             'notes': 'lorem ipsum',
             'accepts_dit_email_marketing': True,
         }
-        c = ContactDetailSerializer(data=data, context={'request': request})
+        c = ContactDetailSerializerV3(data=data, context={'request': request})
         c.is_valid(raise_exception=True)
         c.create(c.validated_data)
         update_contact_task_mock.assert_called_once_with(
@@ -178,6 +178,6 @@ class TestContactSerializer:
             status_code=200,
             text=hawk_response,
         )
-        contact_serialized = ContactDetailSerializer(instance=contact)
+        contact_serialized = ContactDetailSerializerV3(instance=contact)
         assert contact_serialized.data['accepts_dit_email_marketing'] is accepts_marketing
         assert requests_mock.call_count == 1

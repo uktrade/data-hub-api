@@ -130,6 +130,7 @@ class TestAddContact(APITestMixin):
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
+            'address_area': None,
             'address_town': 'London',
             'address_county': 'London',
             'address_country': {
@@ -380,6 +381,7 @@ class TestEditContact(APITestMixin):
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
+            'address_area': None,
             'address_town': 'London',
             'address_county': 'London',
             'address_country': {
@@ -560,6 +562,7 @@ class TestViewContact(APITestMixin):
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
+            'address_area': None,
             'address_town': 'London',
             'address_county': 'London',
             'address_country': {
@@ -753,6 +756,7 @@ class TestContactList(APITestMixin):
                 {
                     'address_1': 'Foo st.',
                     'address_2': 'adr 2',
+                    'address_area': None,
                     'address_country': {
                         'id': constants.Country.united_kingdom.value.id,
                         'name': constants.Country.united_kingdom.value.name,

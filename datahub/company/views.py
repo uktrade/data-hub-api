@@ -42,8 +42,10 @@ from datahub.company.serializers import (
     AssignOneListTierAndGlobalAccountManagerSerializer,
     AssignRegionalAccountManagerSerializer,
     CompanySerializer,
-    ContactDetailSerializer,
-    ContactSerializer,
+    ContactDetailSerializerV3,
+    ContactDetailSerializerV4,
+    ContactSerializerV3,
+    ContactSerializerV4,
     OneListCoreTeamMemberSerializer,
     PublicCompanySerializer,
     RemoveAccountManagerSerializer,
@@ -370,7 +372,7 @@ class CompanyAuditViewSet(AuditViewSet):
 class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Contact ViewSet v3."""
 
-    serializer_class = ContactSerializer
+    serializer_class = ContactSerializerV3
     queryset = get_contact_queryset()
     filter_backends = (
         DjangoFilterBackend, OrderingFilter,
@@ -381,10 +383,10 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
     def get_serializer_class(self):
         """
         Overwrites the built in get_serializer_class method in order
-        to return the ContactDetailSerializer if certain actions are called.
+        to return the ContactDetailSerializerV3 if certain actions are called.
         """
         if self.action in ('create', 'retrieve', 'partial_update'):
-            return ContactDetailSerializer
+            return ContactDetailSerializerV3
         return super().get_serializer_class()
 
     def get_additional_data(self, create):
@@ -394,6 +396,32 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
             data['adviser'] = self.request.user
         return data
 
+class ContactViewSetV4(ArchivableViewSetMixin, CoreViewSet):
+    """Contact ViewSet v4."""
+
+    serializer_class = ContactSerializerV4
+    queryset = get_contact_queryset()
+    filter_backends = (
+        DjangoFilterBackend, OrderingFilter,
+    )
+    filterset_fields = ['company_id']
+    ordering = ('-created_on',)
+
+    def get_serializer_class(self):
+        """
+        Overwrites the built in get_serializer_class method in order
+        to return the ContactDetailSerializerV4 if certain actions are called.
+        """
+        if self.action in ('create', 'retrieve', 'partial_update'):
+            return ContactDetailSerializerV4
+        return super().get_serializer_class()
+
+    def get_additional_data(self, create):
+        """Set adviser to the user on model instance creation."""
+        data = super().get_additional_data(create)
+        if create:
+            data['adviser'] = self.request.user
+        return data
 
 class ContactAuditViewSet(AuditViewSet):
     """Contact audit views."""
