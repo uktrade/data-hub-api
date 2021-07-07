@@ -1,12 +1,16 @@
 from datetime import date, datetime
 from decimal import Decimal
+from unittest import mock
 
 import pytest
 import reversion
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import InvestmentProjectStage
-from datahub.interaction.test.factories import InvestmentProjectInteractionFactory
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory,
+    InvestmentProjectInteractionFactory,
+)
 from datahub.investment.project.models import InvestmentDeliveryPartner
 from datahub.investment.project.test.factories import (
     InvestmentProjectFactory,
@@ -279,6 +283,28 @@ def test_investment_project_interaction_changed_sync_to_es(es_with_signals):
             has_interaction=has_interaction,
             name=project_name,
         )
+
+
+@mock.patch('datahub.search.investment.signals.sync_object_async')
+def test_investment_project_synched_only_if_interaction_linked(
+    mocked_sync_object, es_with_signals,
+):
+    """
+    Test sync_object_async not called if no investment project related to an interaction.
+
+    When an interaction without an investment project attached to it is saved, the
+    investment_project_sync_es_interaction_change signal should return without attempting to
+    sync an investment project to elastic search.
+    """
+    interaction = CompanyInteractionFactory()
+    interaction.investment_project = None
+    interaction.save()
+    assert mocked_sync_object.call_count == 0
+
+    investment = InvestmentProjectFactory()
+    interaction.investment_project = investment
+    interaction.save()
+    assert mocked_sync_object.call_count == 5
 
 
 def test_incomplete_fields_syncs_when_project_changes(es_with_signals):
