@@ -29,7 +29,7 @@ def investment_project_sync_es(instance):
 
 def investment_project_sync_es_interaction_change(instance):
     """
-    Sync investment projects in elastic search when related investments change.
+    Sync investment projects in elastic search when related interactions change.
 
     When an interaction changes, the elastic search index is also updated for
     the related investment project. The previous version also needs to be
@@ -51,7 +51,7 @@ def investment_project_sync_es_interaction_change(instance):
     ):
         pks.append(previous_version.field_dict['investment_project_id'])
 
-    for pk in set(pks):
+    for pk in set([pk for pk in pks if pk is not None]):
         sync_object_async(InvestmentSearchApp, pk)
 
 
