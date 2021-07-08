@@ -19,7 +19,14 @@ from datahub.company.test.factories import (
     CompanyFactory,
 )
 from datahub.company.test.utils import address_area_or_none
-from datahub.core.constants import Country, EmployeeRange, HeadquarterType, TurnoverRange, UKRegion
+from datahub.core.constants import (
+    AdministrativeArea,
+    Country,
+    EmployeeRange,
+    HeadquarterType,
+    TurnoverRange,
+    UKRegion,
+)
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
@@ -1313,7 +1320,6 @@ class TestAddCompany(APITestMixin):
                     'address': {
                         'line_1': '75 Stramford Road',
                         'town': 'London',
-                        'area': None,
                         'country': {
                             'id': Country.united_kingdom.value.id,
                         },
@@ -1357,7 +1363,9 @@ class TestAddCompany(APITestMixin):
                     'address': {
                         'line_1': '75 Stramford Road',
                         'town': 'Cordova',
-                        'area': None,
+                        'area': {
+                            'id': AdministrativeArea.texas.value.id,
+                        },
                         'country': {
                             'id': Country.united_states.value.id,
                         },
@@ -1370,7 +1378,10 @@ class TestAddCompany(APITestMixin):
                         'town': 'Cordova',
                         'county': '',
                         'postcode': '',
-                        'area': None,
+                        'area': {
+                            'id': AdministrativeArea.texas.value.id,
+                            'name': AdministrativeArea.texas.value.name,
+                        },
                         'country': {
                             'id': Country.united_states.value.id,
                             'name': Country.united_states.value.name,
@@ -1434,7 +1445,9 @@ class TestAddCompany(APITestMixin):
                     'registered_address': {
                         'line_1': '1 Hello st.',
                         'town': 'Dublin',
-                        'area': None,
+                        'area': {
+                            'id': AdministrativeArea.texas.value.id,
+                        },
                         'country': {
                             'id': Country.ireland.value.id,
                         },
@@ -1447,7 +1460,10 @@ class TestAddCompany(APITestMixin):
                         'town': 'Dublin',
                         'county': '',
                         'postcode': '',
-                        'area': None,
+                        'area': {
+                            'id': AdministrativeArea.texas.value.id,
+                            'name': AdministrativeArea.texas.value.name,
+                        },
                         'country': {
                             'id': Country.ireland.value.id,
                             'name': Country.ireland.value.name,
