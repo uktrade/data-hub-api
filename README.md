@@ -7,6 +7,8 @@ Data Hub API provides an API into Data Hub for Data Hub clients. Using Data Hub 
 
 More guides can be found in the [docs](./docs/) folder.
 
+To instantiate the development environment, please follow one of the three following sets of instructions depending on your use case:
+
 ## Installation with Docker
 
 This project uses Docker compose to setup and run all the necessary components. The docker-compose.yml file provided is meant to be used for running tests and development.
@@ -71,7 +73,7 @@ This project uses Docker compose to setup and run all the necessary components. 
     project.  [See the instructions in the frontend readme to set it up](https://github.com/uktrade/data-hub-frontend/#running-project-within-docker).
     Alternatively use the `make` command documented below if you also want to bring up `dnb-service`
 
-### Starting up data-hub-api, data-hub-frontend and dnb-service together
+### Installation with docker of data-hub-api, data-hub-frontend and dnb-service on same network
 
 There is now a `make` command to bring up the three environments on a single docker network, allowing the services to talk to each other effortlessly
 
