@@ -27,13 +27,19 @@ This project uses Docker compose to setup and run all the necessary components. 
     cp config/settings/sample.env config/settings/.env
     ```
 
-    If you're working with data-hub-frontend and mock-sso, `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID`
-    should be the same as MOCK_SSO_EMAIL_USER_ID in mock-sso’s .env file.
+    If you're working with data-hub-frontend and mock-sso, `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID` should be the same as
+    `MOCK_SSO_EMAIL_USER_ID` in mock-sso environment definition
+    in [data-hub-frontend/docker-compose.frontend.yml](https://github.com/uktrade/data-hub-frontend/blob/master/docker-compose.frontend.yml)
 
 3.  Build and run the necessary containers for the required environment:
 
     ```shell
     docker-compose up
+    ```
+    or
+
+    ```shell
+    make start-dev
     ```
 
     * It will take time for the API container to come up - it will run
@@ -63,6 +69,63 @@ This project uses Docker compose to setup and run all the necessary components. 
 4.  Optionally, you may want to run a local copy of the data hub frontend.
     By default, you can run both the API and the frontend under one docker-compose
     project.  [See the instructions in the frontend readme to set it up](https://github.com/uktrade/data-hub-frontend/#running-project-within-docker).
+    Alternatively use the `make` command documented below if you also want to bring up `dnb-service`
+
+### Starting up data-hub-api, data-hub-frontend and dnb-service together
+
+There is now a `make` command to bring up the three environments on a single docker network, allowing the services to talk to each other effortlessly
+
+1. Clone the repositories
+
+    ```shell
+    git clone https://github.com/uktrade/data-hub-api
+    git clone https://github.com/uktrade/data-hub-frontend
+    git clone https://github.com/uktrade/dnb-service
+    cd data-hub-api
+    ```
+
+2.  Create `.env` files from `sample.env`
+
+    ```shell
+    cp sample.env .env
+    cp config/settings/sample.env config/settings/.env
+    ```
+
+    Ensure `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID` is the same as `MOCK_SSO_EMAIL_USER_ID`
+    in mock-sso environment definition in [data-hub-frontend/docker-compose.frontend.yml](https://github.com/uktrade/data-hub-frontend/blob/master/docker-compose.frontend.yml)
+    and `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID` the same as `DJANGO_SUPERUSER_EMAIL` in
+    data-hub-api .env file otherwise the user may not exist
+
+3. Run make command
+
+    ```shell
+    make start-frontend-api-dnb
+    ```
+
+    * It will take time for the API container to come up - it will run
+      migrations on both DBs, load initial data, sync elasticsearch etc. Watch
+      along in the api container's logs.
+    * **NOTE:**
+      If you are using a linux system, the elasticsearch container may not
+      come up successfully (`data-hub-api_es_1`) - it might be perpetually
+      restarting.
+      If the logs for that container mention something like
+      `max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`,
+      you will need to run the following on your host machine:
+
+      ```shell
+      sudo sysctl -w vm.max_map_count=262144
+      ```
+
+      and append/modify the `vm.max_map_count` setting in `/etc/sysctl.conf` (so
+      that this setting persists after restart):
+
+      ```shell
+      vm.max_map_count=262144
+      ```
+
+      For more information, [see the elasticsearch docs on vm.max_map_count](https://www.elastic.co/guide/en/elasticsearch/reference/6.6/vm-max-map-count.html).
+
 
 ## Native installation (without Docker)
 
