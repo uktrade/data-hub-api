@@ -126,6 +126,11 @@ There is now a `make` command to bring up the three environments on a single doc
 
       For more information, [see the elasticsearch docs on vm.max_map_count](https://www.elastic.co/guide/en/elasticsearch/reference/6.6/vm-max-map-count.html).
 
+4. If you want to stop all the services, run the following make command
+
+    ```shell
+    make stop-frontend-api-dnb
+    ```
 
 ## Native installation (without Docker)
 
