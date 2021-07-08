@@ -96,6 +96,8 @@ There is now a `make` command to bring up the three environments on a single doc
     and `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID` the same as `DJANGO_SUPERUSER_EMAIL` in
     data-hub-api .env file otherwise the user may not exist
 
+    You will also need to add `DNB_SERVICE_BASE_URL` and `DNB_SERVICE_TOKEN` to dnb-service/.env in order to use DnB functionality. These credentials can be found in Vault
+
 3. Run make command
 
     ```shell
