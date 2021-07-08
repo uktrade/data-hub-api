@@ -1,3 +1,10 @@
+start-dev:
+	[ -z "$(shell docker network ls --filter=name=dh_default -q)" ] && docker network create dh_default || echo 'dh_default network already present'
+	docker-compose -f docker-compose.yml -f docker-compose.single-network.yml up &
+
+stop-dev:
+	docker-compose -f docker-compose.yml -f docker-compose.single-network.yml down
+
 tests:
 	docker-compose build
 	docker-compose run api bash tests.sh
@@ -39,3 +46,11 @@ fix-us-areas:
 
 fix-ca-areas:
 	docker-compose run api python manage.py fix_ca_company_address
+
+start-frontend-api-dnb:
+	$(MAKE) -C ../dnb-service start-dnb-for-data-hub-api
+	$(MAKE) -C ../data-hub-frontend start-dev
+
+stop-frontend-api-dnb:
+	$(MAKE) -C ../dnb-service stop-dnb-for-data-hub-api
+	$(MAKE) -C ../data-hub-frontend stop-dev
