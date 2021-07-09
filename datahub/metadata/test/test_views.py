@@ -230,6 +230,27 @@ def test_team_view(metadata_client):
     }
 
 
+def test_autocomplete_teams_view(metadata_client):
+    """Test that the team view can autocomplete."""
+    url = reverse(viewname='api-v4:metadata:team')
+    response = metadata_client.get(url, params={'autocomplete': 'Shen'})
+    assert response.status_code == status.HTTP_200_OK
+    teams = response.json()
+    assert len(teams) == 2
+    assert teams[0]['name'] == 'CBBC Shenyang'
+    assert teams[1]['name'] == 'CBBC Shenzhen'
+
+
+def test_autocomplete_disabled_teams_view(metadata_client):
+    """Test that disabled teams are included in autocomplete."""
+    url = reverse(viewname='api-v4:metadata:team')
+    response = metadata_client.get(url, params={'autocomplete': 'Bhopal'})
+    assert response.status_code == status.HTTP_200_OK
+    teams = response.json()
+    assert len(teams) == 1
+    assert teams[0]['name'] == 'Business Information Centre Bhopal India'
+
+
 class TestServiceView:
     """Tests for the /v4/metadata/service view."""
 
