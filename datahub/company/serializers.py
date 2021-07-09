@@ -145,7 +145,7 @@ class BaseContactSerializer(PermittedFieldsModelSerializer):
     adviser = NestedAdviserField(read_only=True)
     address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True,
-    )
+    ) #wait so this means area can't be validating ever either right?
     archived = serializers.BooleanField(read_only=True)
     archived_on = serializers.DateTimeField(read_only=True)
     archived_reason = serializers.CharField(read_only=True)

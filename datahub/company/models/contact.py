@@ -45,6 +45,7 @@ class Contact(ArchivableModel, BaseModel):
         'address_town': {'required': True},
         'address_county': {'required': False},
         'address_postcode': {'required': False},
+        'address_area': {'required': False},
         'address_country': {'required': True},
     }
 
