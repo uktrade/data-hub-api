@@ -16,6 +16,7 @@ registry.register(
 )
 
 registry.register(
+    filterset_fields=['country'],
     metadata_id='administrative-area',
     model=models.AdministrativeArea,
     queryset=models.AdministrativeArea.objects.select_related(
