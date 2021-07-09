@@ -1,7 +1,7 @@
 from django_filters.rest_framework import CharFilter, FilterSet
 
-
-from datahub.metadata.models import Service
+from datahub.core.autocomplete import AutocompleteFilter
+from datahub.metadata.models import Service, Team
 
 
 class ServiceFilterSet(FilterSet):
@@ -22,4 +22,14 @@ class ServiceFilterSet(FilterSet):
 
     class Meta:
         model = Service
+        fields = ()
+
+
+class TeamFilterSet(FilterSet):
+    """Team filter."""
+
+    autocomplete = AutocompleteFilter(search_fields=('name',))
+
+    class Meta:
+        model = Team
         fields = ()
