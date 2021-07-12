@@ -363,7 +363,7 @@ class TestCompleteCompanyReferral(APITestMixin):
                     'kind': Interaction.Kind.INTERACTION,
                     'communication_channel': lambda: random_obj_for_model(CommunicationChannel),
                     # Any company in the request body should be ignored
-                    'company': CompanyFactory,
+                    'companies': [CompanyFactory],
                 },
                 id='company-is-ignored',
             ),
@@ -372,6 +372,7 @@ class TestCompleteCompanyReferral(APITestMixin):
                     'kind': Interaction.Kind.SERVICE_DELIVERY,
                     'is_event': True,
                     'event': EventFactory,
+                    'company': CompanyFactory,
                 },
                 id='service-delivery',
             ),
@@ -411,7 +412,6 @@ class TestCompleteCompanyReferral(APITestMixin):
         interaction_data = Interaction.objects.values().get(pk=referral.interaction_id)
         expected_interaction_data = {
             # Automatically set fields
-            'company_id': referral.company_id,
             'created_by_id': self.user.pk,
             'created_on': FROZEN_DATETIME,
             'id': referral.interaction_id,
@@ -446,10 +446,14 @@ class TestCompleteCompanyReferral(APITestMixin):
             'archived_reason': None,
             'large_capital_opportunity_id': None,
             'has_related_trade_agreements': None,
+
+            # TODO: a legacy field, remove once interaction.company field is removed
+            'company_id': referral.company_id,
         }
         assert interaction_data == expected_interaction_data
 
         assert list(referral.interaction.contacts.all()) == [contact]
+        assert list(referral.interaction.companies.all()) == [referral.company]
 
         participant = referral.interaction.dit_participants.get()
         assert participant.adviser == self.user

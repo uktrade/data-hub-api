@@ -1,3 +1,9 @@
+# Data Hub API 36.27.0 (2021-07-07)
+## Bug fixes
+
+- **Investment** Logic was added to make sure only interactions with an investment project related to them trigger the syncing of an investment project to elastic search.
+
+
 # Data Hub API 36.26.0 (2021-06-28)
 ## Features
 
