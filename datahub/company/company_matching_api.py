@@ -6,25 +6,25 @@ from datahub.core.api_client import APIClient, HawkAuth
 from datahub.core.exceptions import APIBadGatewayException
 
 
-class CompanyMatchingServiceException(Exception):
+class CompanyMatchingServiceError(Exception):
     """
     Base exception class for Company matching service related errors.
     """
 
 
-class CompanyMatchingServiceHTTPError(CompanyMatchingServiceException):
+class CompanyMatchingServiceHTTPError(CompanyMatchingServiceError):
     """
     Exception for when Company matching service returns an http error status.
     """
 
 
-class CompanyMatchingServiceTimeoutError(CompanyMatchingServiceException):
+class CompanyMatchingServiceTimeoutError(CompanyMatchingServiceError):
     """
     Exception for when a timeout was encountered when connecting to Company matching service.
     """
 
 
-class CompanyMatchingServiceConnectionError(CompanyMatchingServiceException):
+class CompanyMatchingServiceConnectionError(CompanyMatchingServiceError):
     """
     Exception for when an error was encountered when connecting to Company matching service.
     """

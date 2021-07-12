@@ -10,7 +10,7 @@ from django.db.transaction import atomic
 from django.template.defaultfilters import capfirst
 
 from datahub.cleanup.query_utils import get_relations_to_delete, get_unreferenced_objects_query
-from datahub.core.exceptions import SimulationRollback
+from datahub.core.exceptions import SimulationRollbackError
 from datahub.search.deletion import update_es_after_deletions
 
 logger = getLogger(__name__)
@@ -76,8 +76,8 @@ class BaseCleanupCommand(BaseCommand):
 
                 if is_simulation:
                     logger.info('Rolling back deletions...')
-                    raise SimulationRollback()
-        except SimulationRollback:
+                    raise SimulationRollbackError()
+        except SimulationRollbackError:
             logger.info('Deletions rolled back')
 
     def _print_queries(self, model, qs):

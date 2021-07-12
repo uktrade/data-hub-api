@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.exceptions import APIException
 
 
-class DataHubException(Exception):
+class DataHubError(Exception):
     """Base class for Data Hub exceptions (primarily used in thread pool tasks)."""
 
 
@@ -55,5 +55,5 @@ class APINotImplementedException(APIException):
     default_code = 'not_implemented'
 
 
-class SimulationRollback(Exception):
+class SimulationRollbackError(Exception):
     """Used to roll back deletions during a simulation."""

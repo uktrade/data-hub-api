@@ -10,9 +10,9 @@ from datahub.oauth.sso_api_client import (
     get_user_by_email,
     get_user_by_email_user_id,
     introspect_token,
-    SSOInvalidToken,
+    SSOInvalidTokenError,
     SSORequestError,
-    SSOUserDoesNotExist,
+    SSOUserDoesNotExistError,
 )
 
 
@@ -51,14 +51,14 @@ class TestIntrospectToken:
                     'status_code': status.HTTP_401_UNAUTHORIZED,
                     'json': {'active': False},
                 },
-                SSOInvalidToken(),
+                SSOInvalidTokenError(),
             ),
             (
                 {
                     'status_code': status.HTTP_200_OK,
                     'json': {'active': False},
                 },
-                SSOInvalidToken(),
+                SSOInvalidTokenError(),
             ),
             (
                 {'exc': ConnectionError},
@@ -114,7 +114,7 @@ class TestGetUserByEmail:
             ),
             (
                 {'status_code': status.HTTP_404_NOT_FOUND},
-                SSOUserDoesNotExist(),
+                SSOUserDoesNotExistError(),
             ),
             (
                 {'exc': ConnectionError},
@@ -158,7 +158,7 @@ class TestGetUserByEmailUserID:
             ),
             (
                 {'status_code': status.HTTP_404_NOT_FOUND},
-                SSOUserDoesNotExist(),
+                SSOUserDoesNotExistError(),
             ),
             (
                 {'exc': ConnectionError},

@@ -7,9 +7,9 @@ from freezegun import freeze_time
 
 from datahub.company.models import Company
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
-from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedException, link_company_with_dnb
+from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedError, link_company_with_dnb
 from datahub.dnb_api.test.utils import model_to_dict_company
-from datahub.dnb_api.utils import DNBServiceInvalidRequest
+from datahub.dnb_api.utils import DNBServiceInvalidRequestError
 from datahub.metadata.models import Country
 
 pytestmark = pytest.mark.django_db
@@ -79,7 +79,7 @@ def test_link_company_with_dnb_duns_already_set():
     """
     company = CompanyFactory(duns_number='123456788')
     modifying_adviser = AdviserFactory()
-    with pytest.raises(CompanyAlreadyDNBLinkedException):
+    with pytest.raises(CompanyAlreadyDNBLinkedError):
         link_company_with_dnb(company.id, '123456789', modifying_adviser)
 
 
@@ -100,7 +100,7 @@ def test_link_company_with_dnb_sync_task_failure(
     company = CompanyFactory()
     original_company = Company.objects.get(id=company.id)
     modifying_adviser = AdviserFactory()
-    with pytest.raises(DNBServiceInvalidRequest):
+    with pytest.raises(DNBServiceInvalidRequestError):
         link_company_with_dnb(company.id, '123456789', modifying_adviser)
     company.refresh_from_db()
     # Ensure that any changes to the record were rolled back due to the task failure

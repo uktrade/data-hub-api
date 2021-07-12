@@ -4,7 +4,7 @@ import pytest
 from django.conf import settings
 from django.db.models.signals import post_delete, pre_delete
 
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.search.deletion import (
     BULK_CHUNK_SIZE,
     BULK_DELETION_TIMEOUT_SECS,
@@ -50,7 +50,7 @@ def test_delete_documents(es_bulk, mock_es_client):
 
 @mock.patch('datahub.search.elasticsearch.es_bulk')
 def test_delete_documents_with_errors(es_bulk, mock_es_client):
-    """Test that if ES returns a non-404 error, DataHubException is raised."""
+    """Test that if ES returns a non-404 error, DataHubError is raised."""
     es_bulk.return_value = (
         None,
         [
@@ -62,7 +62,7 @@ def test_delete_documents_with_errors(es_bulk, mock_es_client):
     index = 'test-index'
     es_docs = [{'_id': 1}]
 
-    with pytest.raises(DataHubException) as excinfo:
+    with pytest.raises(DataHubError) as excinfo:
         delete_documents(index, es_docs)
 
     assert excinfo.value.args == (
