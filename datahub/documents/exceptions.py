@@ -2,14 +2,14 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.exceptions import APIException
 
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 
 
-class VirusScanException(DataHubException):
+class VirusScanException(DataHubError):
     """Exceptions raised when scanning documents for viruses."""
 
 
-class DocumentDeleteException(DataHubException):
+class DocumentDeleteException(DataHubError):
     """Exceptions raised when deletion of document failed."""
 
 

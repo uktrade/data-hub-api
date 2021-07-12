@@ -21,7 +21,7 @@ from datahub.interaction.models import InteractionPermission
 from datahub.metadata.models import Country as CountryModel
 
 
-class SerializerNotPartial(Exception):
+class SerializerNotPartialError(Exception):
     """
     Exception for when some logic was called which expects a serializer object
     to be self.partial=True.
@@ -140,7 +140,7 @@ class DNBCompanySerializer(CompanySerializer):
         difficult to to prevent updates to this field.
         """
         if not self.partial:
-            raise SerializerNotPartial(
+            raise SerializerNotPartialError(
                 'partial_save() called, but serializer is not set as partial.',
             )
         instance = self.instance

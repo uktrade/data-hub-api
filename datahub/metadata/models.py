@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
 from datahub.core import reversion
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.core.fields import MultipleChoiceField
 from datahub.core.models import BaseConstantModel, BaseOrderedConstantModel, DisableableModel
 from datahub.core.utils import join_truthy_strings
@@ -35,7 +35,7 @@ class _MPTTObjectName:
         while getattr(obj, 'parent', None):
             obj = obj.parent
             if obj in ancestors:
-                raise DataHubException('Recursive hierarchy encountered.')
+                raise DataHubError('Recursive hierarchy encountered.')
             ancestors.append(obj)
         return reversed(ancestors)
 

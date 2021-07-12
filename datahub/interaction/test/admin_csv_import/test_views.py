@@ -15,7 +15,7 @@ from rest_framework import status
 
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.company.test.factories import AdviserFactory
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.interaction.admin_csv_import.cache_utils import (
     _cache_key_for_token,
@@ -371,7 +371,7 @@ class TestImportInteractionsSaveView(AdminTestMixin):
     def test_raises_error_if_file_in_cache_is_invalid(self):
         """
         Test that if the file in the cache fails InteractionCSVForm re-validation,
-        a DataHubException is raised.
+        a DataHubError is raised.
 
         (This should not happen in normal circumstances.)
         """
@@ -387,7 +387,7 @@ class TestImportInteractionsSaveView(AdminTestMixin):
             import_save_urlname,
             kwargs={'token': token},
         )
-        with pytest.raises(DataHubException):
+        with pytest.raises(DataHubError):
             self.client.post(url)
 
     def test_creates_interactions(self):

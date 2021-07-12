@@ -9,7 +9,7 @@ from datahub.oauth.sso_api_client import (
     get_user_by_email,
     get_user_by_email_user_id,
     SSORequestError,
-    SSOUserDoesNotExist,
+    SSOUserDoesNotExistError,
 )
 
 NO_MATCHING_USER_MESSAGE = gettext_lazy(
@@ -93,7 +93,7 @@ class AddAdviserFromSSOForm(forms.ModelForm):
     def _get_user_data_from_sso(self, email):
         try:
             return _fetch_user_data_from_sso(email)
-        except SSOUserDoesNotExist:
+        except SSOUserDoesNotExistError:
             error = ValidationError(NO_MATCHING_USER_MESSAGE, code='no_matching_user')
             self.add_error(None, error)
         except SSORequestError as exc:
@@ -120,5 +120,5 @@ class AddAdviserFromSSOForm(forms.ModelForm):
 def _fetch_user_data_from_sso(email):
     try:
         return get_user_by_email_user_id(email)
-    except SSOUserDoesNotExist:
+    except SSOUserDoesNotExistError:
         return get_user_by_email(email)

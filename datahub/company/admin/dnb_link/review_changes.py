@@ -11,14 +11,14 @@ from rest_framework import serializers
 
 from datahub.company.admin.dnb_link.forms import SelectIdsToLinkForm
 from datahub.company.admin.utils import (
-    AdminException,
+    AdminError,
     format_company_diff,
     redirect_with_messages,
 )
 from datahub.dnb_api.link_company import link_company_with_dnb
 from datahub.dnb_api.utils import (
-    DNBServiceException,
-    DNBServiceInvalidRequest,
+    DNBServiceBaseError,
+    DNBServiceInvalidRequestError,
     get_company,
 )
 
@@ -34,34 +34,34 @@ def _build_error_messages(all_errors):
 
 
 def _link_company_with_dnb(dh_company_id, duns_number, user, error_url):
-    # We don't need to catch CompanyAlreadyDNBLinkedException as our form will
+    # We don't need to catch CompanyAlreadyDNBLinkedError as our form will
     # do this validation for us
     try:
         link_company_with_dnb(dh_company_id, duns_number, user)
 
     except serializers.ValidationError:
         message = 'Data from D&B did not pass the Data Hub validation checks.'
-        raise AdminException([message], error_url)
-    except DNBServiceInvalidRequest:
+        raise AdminError([message], error_url)
+    except DNBServiceInvalidRequestError:
         message = 'No matching company found in D&B database.'
-        raise AdminException([message], error_url)
+        raise AdminError([message], error_url)
 
-    except DNBServiceException:
+    except DNBServiceBaseError:
         message = 'Something went wrong in an upstream service.'
-        raise AdminException([message], error_url)
+        raise AdminError([message], error_url)
 
 
 def _get_company(duns_number, error_url, request=None):
     try:
         return get_company(duns_number, request)
 
-    except DNBServiceInvalidRequest:
+    except DNBServiceInvalidRequestError:
         message = 'No matching company found in D&B database.'
-        raise AdminException([message], error_url)
+        raise AdminError([message], error_url)
 
-    except DNBServiceException:
+    except DNBServiceBaseError:
         message = 'Something went wrong in an upstream service.'
-        raise AdminException([message], error_url)
+        raise AdminError([message], error_url)
 
 
 @redirect_with_messages
@@ -81,7 +81,7 @@ def dnb_link_review_changes(model_admin, request):
     form = SelectIdsToLinkForm(data=request.GET)
     if not form.is_valid():
         messages = _build_error_messages(form.errors)
-        raise AdminException(messages, company_list_page)
+        raise AdminError(messages, company_list_page)
 
     dh_company = form.cleaned_data['company']
     duns_number = form.cleaned_data['duns_number']

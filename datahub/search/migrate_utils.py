@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.search.bulk_sync import sync_app
 from datahub.search.deletion import delete_documents
 from datahub.search.elasticsearch import (
@@ -35,7 +35,7 @@ def _clean_up_aliases_and_indices(search_app):
     read_indices, write_index = es_model.get_read_and_write_indices()
 
     if write_index not in read_indices:
-        raise DataHubException('Write index not in read alias, aborting mapping migration...')
+        raise DataHubError('Write index not in read alias, aborting mapping migration...')
 
     indices_to_remove = read_indices - {write_index}
 

@@ -17,7 +17,7 @@ from django.views.decorators.http import require_POST
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.core.admin import max_upload_size
 from datahub.core.csv import CSV_CONTENT_TYPE
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.interaction.admin_csv_import.cache_utils import (
     CACHE_VALUE_TIMEOUT,
     load_result_counts_by_status,
@@ -112,7 +112,7 @@ class InteractionCSVImportAdmin:
 
         if not form.is_valid():
             # This should not happen, so we simply raise an error to alert us if it does
-            raise DataHubException('Unexpected form re-validation failure')
+            raise DataHubError('Unexpected form re-validation failure')
 
         matching_counts, unmatched_row_collector = form.save(request.user)
         save_result_counts_by_status(token, matching_counts)
