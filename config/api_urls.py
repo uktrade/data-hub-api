@@ -66,7 +66,6 @@ v4_urls = [
     path('', include((company_referral_urls, 'company-referral'), namespace='company-referral')),
     path('dnb/', include((dnb_api_urls, 'dnb_api'), namespace='dnb-api')),
     path('', include((search_urls.urls_v4, 'search'), namespace='search')),
-    path('', include((contact_urls.urls_v4, 'contact'), namespace='contact')),
     path(
         '',
         include(

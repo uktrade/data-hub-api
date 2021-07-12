@@ -124,7 +124,7 @@ class AdviserSerializer(serializers.ModelSerializer):
         )
         depth = 1
 
-class BaseContactSerializer(PermittedFieldsModelSerializer):
+class ContactSerializer(PermittedFieldsModelSerializer):
     """Contact serializer for writing operations V3."""
 
     default_error_messages = {
@@ -146,6 +146,9 @@ class BaseContactSerializer(PermittedFieldsModelSerializer):
     address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True,
     ) #wait so this means area can't be validating ever either right?
+    address_area = NestedRelatedField(
+        meta_models.AdministrativeArea, required=False, allow_null=True,
+    )
     archived = serializers.BooleanField(read_only=True)
     archived_on = serializers.DateTimeField(read_only=True)
     archived_reason = serializers.CharField(read_only=True)
@@ -184,6 +187,7 @@ class BaseContactSerializer(PermittedFieldsModelSerializer):
             'archived_by',
             'created_on',
             'modified_on',
+            'address_area',
         )
         read_only_fields = (
             'archived_documents_url_path',
@@ -210,30 +214,6 @@ class BaseContactSerializer(PermittedFieldsModelSerializer):
             f'company.{ContactPermission.view_contact_document}': 'archived_documents_url_path',
         }
 
-class ContactSerializerV3(BaseContactSerializer):
-    address_area = NestedRelatedField(
-        meta_models.AdministrativeArea, required=False, allow_null=True,
-    )
-    
-    class Meta:
-        model = BaseContactSerializer.Meta.model
-        fields = ('address_area',)+BaseContactSerializer.Meta.fields
-        read_only_fields = BaseContactSerializer.Meta.read_only_fields
-        validators = BaseContactSerializer.Meta.validators
-        permissions = BaseContactSerializer.Meta.permissions
-
-class ContactSerializerV4(BaseContactSerializer):
-    address_area = NestedRelatedField(
-        meta_models.AdministrativeArea, required=True, allow_null=True,
-    )
-    
-    class Meta:
-        model = BaseContactSerializer.Meta.model
-        fields = ('address_area',)+BaseContactSerializer.Meta.fields
-        read_only_fields = BaseContactSerializer.Meta.read_only_fields
-        validators = BaseContactSerializer.Meta.validators
-        permissions = BaseContactSerializer.Meta.permissions
-
 
 class ConsentMarketingField(serializers.BooleanField):
     """
@@ -257,75 +237,16 @@ class ConsentMarketingField(serializers.BooleanField):
         return representation
 
 
-class ContactDetailSerializerV3(ContactSerializerV3):
+class ContactDetailSerializer(ContactSerializer):
     """
-    This is the same as the ContactSerializerV3 except it includes
+    This is the same as the ContactSerializer except it includes
     accepts_dit_email_marketing in the fields. Only 3 endpoints will use this serialiser
     """
 
     accepts_dit_email_marketing = ConsentMarketingField(source='*', required=False)
 
-    class Meta(ContactSerializerV3.Meta):
-        fields = ContactSerializerV3.Meta.fields + ('accepts_dit_email_marketing',)
-
-    def _notify_consent_service(self, validated_data):
-        """
-        Trigger the update_contact_consent task with the current version
-        of `validated_data`. The actual enqueuing of the task happens in the
-        on_commit hook so it won't actually notify the consent service unless
-        the database transaction was successful.
-        """
-        if 'accepts_dit_email_marketing' not in validated_data:
-            # If no consent value in request body
-            return
-        # Remove the accepts_dit_email_marketing from validated_data
-        accepts_dit_email_marketing = validated_data.pop('accepts_dit_email_marketing')
-        # If consent value in POST, notify
-        combiner = DataCombiner(self.instance, validated_data)
-        request = self.context.get('request', None)
-        transaction.on_commit(
-            lambda: update_contact_consent.apply_async(
-                args=(
-                    combiner.get_value('email'),
-                    accepts_dit_email_marketing,
-                ),
-                kwargs={
-                    'modified_at': now().isoformat(),
-                    'zipkin_headers': get_zipkin_headers(request),
-                },
-            ),
-        )
-
-    @transaction.atomic
-    def create(self, validated_data):
-        """
-        Create a new instance using this serializer
-
-        :return: created instance
-        """
-        self._notify_consent_service(validated_data)
-        return super().create(validated_data)
-
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        """
-        Update the given instance with validated_data
-
-        :return: updated instance
-        """
-        self._notify_consent_service(validated_data)
-        return super().update(instance, validated_data)
-
-class ContactDetailSerializerV4(ContactSerializerV4):
-    """
-    This is the same as the ContactSerializerV4 except it includes
-    accepts_dit_email_marketing in the fields. Only 3 endpoints will use this serialiser
-    """
-
-    accepts_dit_email_marketing = ConsentMarketingField(source='*', required=False)
-
-    class Meta(ContactSerializerV4.Meta):
-        fields = ContactSerializerV4.Meta.fields + ('accepts_dit_email_marketing',)
+    class Meta(ContactSerializer.Meta):
+        fields = ContactSerializer.Meta.fields + ('accepts_dit_email_marketing',)
 
     def _notify_consent_service(self, validated_data):
         """
@@ -426,7 +347,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         meta_models.BusinessType, required=False, allow_null=True,
     )
     one_list_group_tier = serializers.SerializerMethodField()
-    contacts = ContactSerializerV3(many=True, read_only=True)
+    contacts = ContactSerializer(many=True, read_only=True)
     transferred_to = NestedRelatedField('company.Company', read_only=True)
     employee_range = NestedRelatedField(
         meta_models.EmployeeRange, required=False, allow_null=True,
