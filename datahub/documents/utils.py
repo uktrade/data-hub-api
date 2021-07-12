@@ -6,7 +6,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.documents.exceptions import DocumentDeleteException
 
 logger = getLogger(__name__)
@@ -30,7 +30,7 @@ def get_document_by_pk(document_pk):
 def get_bucket_credentials(bucket_id):
     """Get S3 credentials for bucket id."""
     if bucket_id not in settings.DOCUMENT_BUCKETS:
-        raise DataHubException(f'Bucket "{bucket_id}" not configured.')
+        raise DataHubError(f'Bucket "{bucket_id}" not configured.')
 
     return settings.DOCUMENT_BUCKETS[bucket_id]
 

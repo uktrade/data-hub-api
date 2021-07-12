@@ -21,25 +21,25 @@ CONSENT_SERVICE_CONNECT_TIMEOUT = 5.0
 CONSENT_SERVICE_READ_TIMEOUT = 30.0
 
 
-class ConsentAPIException(Exception):
+class ConsentAPIError(Exception):
     """
     Base exception class for Consent API related errors.
     """
 
 
-class ConsentAPIHTTPError(ConsentAPIException):
+class ConsentAPIHTTPError(ConsentAPIError):
     """
     Exception for all HTTP errors.
     """
 
 
-class ConsentAPITimeoutError(ConsentAPIException):
+class ConsentAPITimeoutError(ConsentAPIError):
     """
     Exception for when a timeout was encountered when connecting to Consent API.
     """
 
 
-class ConsentAPIConnectionError(ConsentAPIException):
+class ConsentAPIConnectionError(ConsentAPIError):
     """
     Exception for when an error was encountered when connecting to Consent API.
     """

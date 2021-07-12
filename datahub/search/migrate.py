@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.search.elasticsearch import create_index, start_alias_transaction
 from datahub.search.tasks import complete_model_migration, sync_model
 
@@ -49,7 +49,7 @@ def _perform_migration(search_app):
     current_read_indices, current_write_index = es_model.get_read_and_write_indices()
 
     if current_write_index not in current_read_indices:
-        raise DataHubException(
+        raise DataHubError(
             'Cannot migrate Elasticsearch index with a read alias referencing '
             'a different index to the write alias',
         )

@@ -24,13 +24,13 @@ from datahub.metadata.models import AdministrativeArea, Country
 logger = logging.getLogger(__name__)
 
 
-class DNBServiceException(Exception):
+class DNBServiceBaseError(Exception):
     """
     Base exception class for DNBService related errors.
     """
 
 
-class DNBServiceError(DNBServiceException):
+class DNBServiceError(DNBServiceBaseError):
     """
     Exception for when DNB service doesn't return a response with a status code of 200.
     """
@@ -43,25 +43,25 @@ class DNBServiceError(DNBServiceException):
         self.status_code = status_code
 
 
-class DNBServiceInvalidRequest(DNBServiceException):
+class DNBServiceInvalidRequestError(DNBServiceBaseError):
     """
     Exception for when the request to DNB service is not valid.
     """
 
 
-class DNBServiceInvalidResponse(DNBServiceException):
+class DNBServiceInvalidResponseError(DNBServiceBaseError):
     """
     Exception for when the response from DNB service is not valid.
     """
 
 
-class DNBServiceConnectionError(DNBServiceException):
+class DNBServiceConnectionError(DNBServiceBaseError):
     """
     Exception for when an error was encountered when connecting to DNB service.
     """
 
 
-class DNBServiceTimeoutError(DNBServiceException):
+class DNBServiceTimeoutError(DNBServiceBaseError):
     """
     Exception for when a timeout was encountered when connecting to DNB service.
     """
@@ -134,12 +134,12 @@ def get_company(duns_number, request=None):
     if not dnb_companies:
         error_message = f'Cannot find a company with duns_number: {duns_number}'
         logger.error(error_message)
-        raise DNBServiceInvalidRequest(error_message)
+        raise DNBServiceInvalidRequestError(error_message)
 
     if len(dnb_companies) > 1:
         error_message = f'Multiple companies found with duns_number: {duns_number}'
         logger.error(error_message)
-        raise DNBServiceInvalidResponse(error_message)
+        raise DNBServiceInvalidResponseError(error_message)
 
     dnb_company = dnb_companies[0]
 
@@ -149,7 +149,7 @@ def get_company(duns_number, request=None):
             f'did not match searched DUNS number: {duns_number}'
         )
         logger.error(error_message)
-        raise DNBServiceInvalidResponse(error_message)
+        raise DNBServiceInvalidResponseError(error_message)
 
     return format_dnb_company(dnb_companies[0])
 

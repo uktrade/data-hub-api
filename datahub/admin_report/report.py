@@ -4,7 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Model
 from django.utils.timezone import now
 
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 
 # Registry of all defined reports (mapping report IDs to Report instances)
 _registry = {}
@@ -57,9 +57,9 @@ class Report:
     def _validate_attrs(cls):
         missing_attrs = [attr for attr in cls._required_attrs if getattr(cls, attr, None) is None]
         if missing_attrs:
-            raise DataHubException(f'Required report attributes {missing_attrs} not set')
+            raise DataHubError(f'Required report attributes {missing_attrs} not set')
         if 'ID' in cls.field_titles.values():
-            raise DataHubException(
+            raise DataHubError(
                 'ID cannot be used as a column title due to the potential confusion with SYLK '
                 'files in e.g. Excel',
             )

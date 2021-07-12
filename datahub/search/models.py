@@ -4,7 +4,7 @@ from logging import getLogger
 from django.conf import settings
 from elasticsearch_dsl import Document, Keyword, MetaField
 
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.search.apps import get_search_app_by_search_model
 from datahub.search.elasticsearch import (
     alias_exists,
@@ -183,7 +183,7 @@ class BaseESModel(Document):
 
 def _get_write_index(indices):
     if len(indices) != 1:
-        raise DataHubException(
+        raise DataHubError(
             'Unexpected alias state; write alias references multiple indices',
         )
     return next(iter(indices))

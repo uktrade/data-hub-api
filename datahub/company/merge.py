@@ -10,7 +10,7 @@ from datahub.company.models import (
     Contact,
 )
 from datahub.company_referral.models import CompanyReferral
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.core.model_helpers import get_related_fields, get_self_referential_relations
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
@@ -114,7 +114,7 @@ MERGE_CONFIGURATION = [
 ]
 
 
-class MergeNotAllowedError(DataHubException):
+class MergeNotAllowedError(DataHubError):
     """Merging the specified source company into the specified target company is not allowed."""
 
 

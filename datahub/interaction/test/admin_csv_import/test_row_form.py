@@ -9,7 +9,7 @@ from rest_framework import serializers
 
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.company.test.factories import AdviserFactory, ContactFactory
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.core.test_utils import resolve_data
 from datahub.event.test.factories import DisabledEventFactory, EventFactory
 from datahub.interaction.admin_csv_import.duplicate_checking import DuplicateTracker
@@ -1403,7 +1403,7 @@ class TestInteractionCSVRowFormSaving:
         assert form.is_valid()
         assert not form.is_matched()
 
-        with pytest.raises(DataHubException):
+        with pytest.raises(DataHubError):
             form.save(user, source=source)
 
     def test_save_rolls_back_on_error(self, monkeypatch):

@@ -14,7 +14,7 @@ from datahub.company.contact_matching import (
     find_active_contact_by_email_address,
 )
 from datahub.company.models import Advisor
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.core.query_utils import PreferNullConcat
 from datahub.core.utils import join_truthy_strings
 from datahub.event.models import Event
@@ -409,7 +409,7 @@ class InteractionCSVRowForm(forms.Form):
         data = self.cleaned_data
 
         if not self.is_matched():
-            raise DataHubException('Cannot create a serializer dict for an unmatched contact')
+            raise DataHubError('Cannot create a serializer dict for an unmatched contact')
 
         subject = data.get('subject') or data['service'].name
         dit_participants = [
