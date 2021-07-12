@@ -503,7 +503,7 @@ class ExportWinsForCompanyView(APIView):
     """
 
     queryset = Company.objects.prefetch_related(
-        'trasnferred_from',
+        'transferred_from',
     )
     permission_classes = (
         HasPermissions(
