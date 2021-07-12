@@ -12,13 +12,13 @@ from django.views.decorators.http import require_http_methods
 from rest_framework import serializers
 
 from datahub.company.admin.utils import (
-    AdminException,
+    AdminError,
     format_company_diff,
     redirect_with_messages,
 )
 from datahub.dnb_api.utils import (
-    DNBServiceException,
-    DNBServiceInvalidRequest,
+    DNBServiceBaseError,
+    DNBServiceInvalidRequestError,
     get_company,
     update_company_from_dnb,
 )
@@ -57,13 +57,13 @@ def update_from_dnb(model_admin, request, object_id):
     try:
         dnb_company = get_company(dh_company.duns_number, request)
 
-    except DNBServiceInvalidRequest:
+    except DNBServiceInvalidRequestError:
         message = 'No matching company found in D&B database.'
-        raise AdminException([message], company_change_page)
+        raise AdminError([message], company_change_page)
 
-    except DNBServiceException:
+    except DNBServiceBaseError:
         message = 'Something went wrong in an upstream service.'
-        raise AdminException([message], company_change_page)
+        raise AdminError([message], company_change_page)
 
     if request.method == 'GET':
         return TemplateResponse(
@@ -84,4 +84,4 @@ def update_from_dnb(model_admin, request, object_id):
         return HttpResponseRedirect(company_change_page)
     except serializers.ValidationError:
         message = 'Data from D&B did not pass the Data Hub validation checks.'
-        raise AdminException([message], company_change_page)
+        raise AdminError([message], company_change_page)

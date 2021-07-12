@@ -35,7 +35,7 @@ from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
     CompleteCompanyReferralFactory,
 )
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.core.model_helpers import get_related_fields
 from datahub.interaction.test.factories import (
     CompaniesInteractionFactory,
@@ -929,7 +929,7 @@ def test_only_print_queries(model_name, config, monkeypatch, caplog):
 def test_with_es_exception(mocked_bulk):
     """
     Test that if ES returns a 5xx error, the command completes but it also
-    raises a DataHubException with details of the error.
+    raises a DataHubError with details of the error.
     """
     mocked_bulk.return_value = (None, [{'delete': {'status': 500}}])
 
@@ -940,7 +940,7 @@ def test_with_es_exception(mocked_bulk):
 
     _create_model_obj(model_factory, **mapping['expired_objects_kwargs'][0])
 
-    with pytest.raises(DataHubException):
+    with pytest.raises(DataHubError):
         management.call_command(command, model_name)
 
     model = apps.get_model(model_name)
