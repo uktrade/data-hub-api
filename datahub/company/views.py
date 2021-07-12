@@ -394,6 +394,7 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
             data['adviser'] = self.request.user
         return data
 
+
 class ContactAuditViewSet(AuditViewSet):
     """Contact audit views."""
 

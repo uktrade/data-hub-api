@@ -124,6 +124,7 @@ class AdviserSerializer(serializers.ModelSerializer):
         )
         depth = 1
 
+
 class ContactSerializer(PermittedFieldsModelSerializer):
     """Contact serializer for writing operations V3."""
 
@@ -145,7 +146,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
     adviser = NestedAdviserField(read_only=True)
     address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True,
-    ) #wait so this means area can't be validating ever either right?
+    )
     address_area = NestedRelatedField(
         meta_models.AdministrativeArea, required=False, allow_null=True,
     )
