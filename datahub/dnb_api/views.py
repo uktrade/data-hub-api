@@ -37,6 +37,7 @@ from datahub.dnb_api.utils import (
     request_changes,
     search_dnb,
 )
+from datahub.feature_flag.utils import is_feature_flag_active
 
 
 logger = logging.getLogger(__name__)
@@ -335,6 +336,8 @@ class DNBCompanyInvestigationView(APIView):
 
         data = {'company_details': investigation_serializer.validated_data}
         company = data['company_details'].pop('company')
+        if not is_feature_flag_active('company-area-investigation-request'):
+            data['company_details'].pop('address_area', None)
 
         try:
             response = create_investigation(data)

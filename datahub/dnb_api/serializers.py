@@ -18,7 +18,7 @@ from datahub.core.serializers import (
 )
 from datahub.core.validators import EqualsRule, OperatorRule, RulesBasedValidator, ValidationRule
 from datahub.interaction.models import InteractionPermission
-from datahub.metadata.models import Country as CountryModel
+from datahub.metadata.models import AdministrativeArea, Country as CountryModel
 
 
 class SerializerNotPartialError(Exception):
@@ -208,12 +208,16 @@ class DNBAddressSerializer(serializers.Serializer):
     county = serializers.CharField(source='address_county', required=False, allow_blank=True)
     postcode = serializers.CharField(source='address_postcode', required=False, allow_blank=True)
     country = NestedRelatedField(model=CountryModel, source='address_country')
-    area_name = serializers.CharField(source='address_area_name', required=False, allow_blank=True)
-    area_abbrev_name = serializers.CharField(
-        source='address_area_abbrev_name',
-        required=False,
-        allow_blank=True,
-    )
+    area = NestedRelatedField(model=AdministrativeArea, source='address_area', required=False)
+
+    def validate_area(self, area):
+        """
+        Return area name and abbrev_name as an object.
+        """
+        return {
+            'name': area.name,
+            'abbrev_name': area.area_code,
+        }
 
     def validate_country(self, country):
         """
@@ -294,19 +298,26 @@ class DNBCompanyChangeRequestSerializer(serializers.Serializer):
         """
         address_changes = data['changes'].pop('address', {})
         if address_changes:
+            existing_address_data = {
+                'address_line_1': self.company.address_1,
+                'address_line_2': self.company.address_2,
+                'address_town': self.company.address_town,
+                'address_county': self.company.address_county,
+                'address_country': self.company.address_country.iso_alpha2_code,
+                'address_postcode': self.company.address_postcode,
+            }
+            if self.company.address_area:
+                existing_address_data.update({
+                    'address_area': {
+                        'name': self.company.address_area.name,
+                        'abbrev_name': self.company.address_area.area_code,
+                    },
+                })
             data['changes'] = {
                 **data['changes'],
-                **{
-                    'address_line_1': self.company.address_1,
-                    'address_line_2': self.company.address_2,
-                    'address_town': self.company.address_town,
-                    'address_county': self.company.address_county,
-                    'address_country': self.company.address_country.iso_alpha2_code,
-                    'address_postcode': self.company.address_postcode,
-                },
+                **existing_address_data,
                 **address_changes,
             }
-
         return data
 
 
