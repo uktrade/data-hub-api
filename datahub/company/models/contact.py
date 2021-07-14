@@ -82,6 +82,7 @@ class Contact(ArchivableModel, BaseModel):
     )
     address_area = models.ForeignKey(
         metadata_models.AdministrativeArea,
+        related_name='contacts',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
