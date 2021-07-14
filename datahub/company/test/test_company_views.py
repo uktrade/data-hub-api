@@ -33,6 +33,7 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
     random_obj_for_model,
 )
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 
@@ -403,6 +404,30 @@ class TestGetCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['uk_based'] is None
+
+    @pytest.mark.parametrize(
+        'country_id',
+        (
+            Country.united_states.value.id,
+            Country.canada.value.id,
+        ),
+    )
+    def test_get_company_without_area(self, country_id):
+        """
+        Tests the company item view for a US/Canada company without an area
+
+        Checks that the endpoint returns 200
+        """
+        FeatureFlagFactory(code='address-area-company-required-field')
+        company = CompanyFactory(
+            address_country_id=country_id,
+            address_area_id=None,
+        )
+
+        url = reverse('api-v4:company:item', kwargs={'pk': company.id})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
 
     @pytest.mark.parametrize(
         'input_website,expected_website',
@@ -1519,12 +1544,13 @@ class TestAddCompany(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'data,expected_error',
+        'data,expected_error,feature_flags',
         (
             # uk_region is required
             (
                 {'uk_region': None},
                 {'uk_region': ['This field is required.']},
+                [],
             ),
             # partial registered address, other fields are required
             (
@@ -1539,6 +1565,7 @@ class TestAddCompany(APITestMixin):
                         'country': ['This field is required.'],
                     },
                 },
+                [],
             ),
             # address cannot be null
             (
@@ -1548,6 +1575,7 @@ class TestAddCompany(APITestMixin):
                 {
                     'address': ['This field may not be null.'],
                 },
+                [],
             ),
             # address cannot be null
             (
@@ -1564,6 +1592,7 @@ class TestAddCompany(APITestMixin):
                         'town': ['This field may not be null.'],
                     },
                 },
+                [],
             ),
             # address cannot be empty
             (
@@ -1581,6 +1610,7 @@ class TestAddCompany(APITestMixin):
                         'country': ['This field is required.'],
                     },
                 },
+                [],
             ),
             # company_number required if business type == uk establishment
             (
@@ -1598,6 +1628,7 @@ class TestAddCompany(APITestMixin):
                 {
                     'company_number': ['This field is required.'],
                 },
+                [],
             ),
             # country should be UK if business type == uk establishment
             (
@@ -1616,6 +1647,7 @@ class TestAddCompany(APITestMixin):
                     'address_country':
                         ['A UK establishment (branch of non-UK company) must be in the UK.'],
                 },
+                [],
             ),
             # company_number should start with BR if business type == uk establishment
             (
@@ -1634,6 +1666,7 @@ class TestAddCompany(APITestMixin):
                     'company_number':
                         ['This must be a valid UK establishment number, beginning with BR.'],
                 },
+                [],
             ),
             # company_number shouldn't have invalid characters
             (
@@ -1655,6 +1688,7 @@ class TestAddCompany(APITestMixin):
                             '(no symbols, punctuation or spaces).',
                         ],
                 },
+                [],
             ),
             # for US company area is required
             (
@@ -1669,16 +1703,20 @@ class TestAddCompany(APITestMixin):
                     },
                 },
                 {
-                    'area':
-                        [
-                            'This field is required'
+                    'address': {
+                        'address_area': [
+                            'This field is required.',
                         ],
+                    },
                 },
+                ['address-area-company-required-field'],
             ),
         ),
     )
-    def test_validation_error(self, data, expected_error):
+    def test_validation_error(self, data, expected_error, feature_flags):
         """Test validation scenarios."""
+        for feature_flag in feature_flags:
+            FeatureFlagFactory(code=feature_flag)
         post_data = {
             'name': 'Acme',
             'business_type': BusinessTypeConstant.company.value.id,
