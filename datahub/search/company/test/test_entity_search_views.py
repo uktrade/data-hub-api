@@ -1142,7 +1142,7 @@ class TestCompanyExportView(APITestMixin):
                 'Name': company.name,
                 'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{company.pk}',
                 'Sector': get_attr_or_none(company, 'sector.name'),
-                'Area': get_attr_or_none(company, 'address_country.area'),
+                'Area': get_attr_or_none(company, 'address_area.name'),
                 'Country': get_attr_or_none(company, 'address_country.name'),
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
                 'Countries exported to': ', '.join([
