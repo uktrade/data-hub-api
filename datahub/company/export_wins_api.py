@@ -6,25 +6,25 @@ from datahub.core.api_client import APIClient, HawkAuth
 from datahub.core.exceptions import APIBadGatewayException
 
 
-class ExportWinsAPIException(Exception):
+class ExportWinsAPIError(Exception):
     """
     Base exception class for Export Wins API related errors.
     """
 
 
-class ExportWinsAPIHTTPError(ExportWinsAPIException):
+class ExportWinsAPIHTTPError(ExportWinsAPIError):
     """
     Exception for all HTTP errors.
     """
 
 
-class ExportWinsAPITimeoutError(ExportWinsAPIException):
+class ExportWinsAPITimeoutError(ExportWinsAPIError):
     """
     Exception for when a timeout was encountered when connecting to Export Wins API.
     """
 
 
-class ExportWinsAPIConnectionError(ExportWinsAPIException):
+class ExportWinsAPIConnectionError(ExportWinsAPIError):
     """
     Exception for when an error was encountered when connecting to Export Wins API.
     """

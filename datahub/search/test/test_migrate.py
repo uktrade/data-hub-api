@@ -3,7 +3,7 @@ from unittest.mock import ANY, call, Mock
 import pytest
 from django.conf import settings
 
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.search.apps import _load_search_apps, get_search_apps, SearchApp
 from datahub.search.migrate import migrate_app, migrate_apps
 from datahub.search.models import BaseESModel
@@ -197,7 +197,7 @@ def test_migrate_app_with_app_in_invalid_state(monkeypatch, mock_es_client):
         write_index=write_index,
     )
 
-    with pytest.raises(DataHubException):
+    with pytest.raises(DataHubError):
         migrate_app(mock_app)
 
     migrate_model_task_mock.apply_async.assert_not_called()

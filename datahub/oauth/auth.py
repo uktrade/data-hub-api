@@ -10,7 +10,7 @@ from datahub.company.models import Advisor
 from datahub.oauth.cache import add_token_data_to_cache, get_token_data_from_cache
 from datahub.oauth.sso_api_client import (
     introspect_token,
-    SSOInvalidToken,
+    SSOInvalidTokenError,
     SSORequestError,
 )
 from datahub.user_event_log.constants import UserEventType
@@ -87,7 +87,7 @@ def _look_up_token(token, request) -> Tuple[Optional[dict], bool]:
 
     try:
         introspection_data = introspect_token(token, request)
-    except SSOInvalidToken:
+    except SSOInvalidTokenError:
         return None, False
     except SSORequestError:
         logger.exception('SSO introspection request failed')

@@ -2,7 +2,7 @@ from unittest.mock import ANY, Mock
 
 import pytest
 
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.core.test_utils import MockQuerySet
 from datahub.search.migrate_utils import (
     delete_from_secondary_indices_callback,
@@ -116,7 +116,7 @@ class TestResyncAfterMigrate:
             queryset=MockQuerySet([Mock(id=1), Mock(id=2)]),
         )
 
-        with pytest.raises(DataHubException):
+        with pytest.raises(DataHubError):
             resync_after_migrate(mock_app)
 
     def test_resync_with_old_index_referenced(self, monkeypatch, mock_es_client):
@@ -211,7 +211,7 @@ class TestResyncAfterMigrate:
             write_index=write_index,
         )
 
-        with pytest.raises(DataHubException):
+        with pytest.raises(DataHubError):
             resync_after_migrate(mock_app)
 
         # The state is only checked once sync_app has run, as it's making sure nothing has

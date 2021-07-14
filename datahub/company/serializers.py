@@ -233,7 +233,7 @@ class ConsentMarketingField(serializers.BooleanField):
         """Lookup from consent service api/"""
         try:
             representation = consent.get_one(value.email)
-        except consent.ConsentAPIException:
+        except consent.ConsentAPIError:
             representation = False
         return representation
 

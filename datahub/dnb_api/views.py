@@ -14,7 +14,7 @@ from datahub.core import statsd
 from datahub.core.exceptions import APIBadRequestException, APIUpstreamException
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
-from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedException, link_company_with_dnb
+from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedError, link_company_with_dnb
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyChangeRequestSerializer,
@@ -29,14 +29,15 @@ from datahub.dnb_api.utils import (
     create_investigation,
     DNBServiceConnectionError,
     DNBServiceError,
-    DNBServiceInvalidRequest,
-    DNBServiceInvalidResponse,
+    DNBServiceInvalidRequestError,
+    DNBServiceInvalidResponseError,
     DNBServiceTimeoutError,
     get_change_request,
     get_company,
     request_changes,
     search_dnb,
 )
+from datahub.feature_flag.utils import is_feature_flag_active
 
 
 logger = logging.getLogger(__name__)
@@ -173,10 +174,10 @@ class DNBCompanyCreateView(APIView):
         try:
             dnb_company = get_company(duns_number, request)
 
-        except (DNBServiceConnectionError, DNBServiceError, DNBServiceInvalidResponse) as exc:
+        except (DNBServiceConnectionError, DNBServiceError, DNBServiceInvalidResponseError) as exc:
             raise APIUpstreamException(str(exc))
 
-        except DNBServiceInvalidRequest as exc:
+        except DNBServiceInvalidRequestError as exc:
             raise APIBadRequestException(str(exc))
 
         company_serializer = DNBCompanySerializer(
@@ -239,14 +240,14 @@ class DNBCompanyLinkView(APIView):
 
         except (
             DNBServiceConnectionError,
-            DNBServiceInvalidResponse,
+            DNBServiceInvalidResponseError,
             DNBServiceError,
         ) as exc:
             raise APIUpstreamException(str(exc))
 
         except (
-            DNBServiceInvalidRequest,
-            CompanyAlreadyDNBLinkedException,
+            DNBServiceInvalidRequestError,
+            CompanyAlreadyDNBLinkedError,
         ) as exc:
             raise APIBadRequestException(str(exc))
 
@@ -335,6 +336,8 @@ class DNBCompanyInvestigationView(APIView):
 
         data = {'company_details': investigation_serializer.validated_data}
         company = data['company_details'].pop('company')
+        if not is_feature_flag_active('company-area-investigation-request'):
+            data['company_details'].pop('address_area', None)
 
         try:
             response = create_investigation(data)
