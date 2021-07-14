@@ -377,8 +377,13 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         address_source_prefix='registered_address',
         required=False,
         allow_null=True,
+        area_can_be_required=True,
     )
-    address = AddressSerializer(source_model=Company, address_source_prefix='address')
+    address = AddressSerializer(
+        source_model=Company,
+        address_source_prefix='address',
+        area_can_be_required=True,
+    )
     export_countries = CompanyExportCountrySerializer(many=True, read_only=True)
 
     # Use our RelaxedURLField instead to automatically fix URLs without a scheme
@@ -419,7 +424,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
 
         combiner = DataCombiner(self.instance, data)
 
-        return data
+        return super().validate(data)
 
     def validate_headquarter_type(self, headquarter_type):
         """Raises an exception if company is a global hq and has subsidiaries."""
