@@ -277,6 +277,16 @@ def test_autocomplete_disabled_teams_view(metadata_client):
     assert teams[0]['name'] == 'Business Information Centre Bhopal India'
 
 
+def test_filter_by_id_teams_view(metadata_client):
+    """Test that the team view can be filtered by id."""
+    url = reverse(viewname='api-v4:metadata:team')
+    response = metadata_client.get(url, params={'id': 'cff02898-9698-e211-a939-e4115bead28a'})
+    assert response.status_code == status.HTTP_200_OK
+    teams = response.json()
+    assert len(teams) == 1
+    assert teams[0]['name'] == 'Aberdeen City Council'
+
+
 class TestServiceView:
     """Tests for the /v4/metadata/service view."""
 
