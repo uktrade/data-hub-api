@@ -1656,6 +1656,25 @@ class TestAddCompany(APITestMixin):
                         ],
                 },
             ),
+            # for US company area is required
+            (
+                {
+                    'company_number': '123',
+                    'address': {
+                        'line_1': '1000 Mulholland Drive',
+                        'town': 'LA',
+                        'country': {
+                            'id': Country.united_states.value.id,
+                        },
+                    },
+                },
+                {
+                    'area':
+                        [
+                            'This field is required'
+                        ],
+                },
+            ),
         ),
     )
     def test_validation_error(self, data, expected_error):
