@@ -9,7 +9,9 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import ReadOnlyField, UUIDField
 
+from datahub.core.constants import Country as CountryEnum
 from datahub.core.validate_utils import DataCombiner
+from datahub.core.validators import InRule, OperatorRule, RulesBasedValidator, ValidationRule
 from datahub.metadata.models import AdministrativeArea, Country
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -463,3 +465,18 @@ class AddressSerializer(serializers.ModelSerializer):
             'area',
             'country',
         )
+        validators = (
+            RulesBasedValidator(
+                ValidationRule(
+                    'required',
+                    OperatorRule('area', bool),
+                    when=InRule(
+                        'country',
+                        (
+                            CountryEnum.united_states.value.id,
+                            CountryEnum.canada.value.id,
+                        ),
+                    ),
+                ),
+            ),
+        ),
