@@ -32,4 +32,4 @@ class TeamFilterSet(FilterSet):
 
     class Meta:
         model = Team
-        fields = ()
+        fields = ('id',)
