@@ -147,6 +147,9 @@ class ContactSerializer(PermittedFieldsModelSerializer):
     address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True,
     )
+    address_area = NestedRelatedField(
+        meta_models.AdministrativeArea, required=False, allow_null=True,
+    )
     archived = serializers.BooleanField(read_only=True)
     archived_on = serializers.DateTimeField(read_only=True)
     archived_reason = serializers.CharField(read_only=True)
@@ -185,6 +188,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             'archived_by',
             'created_on',
             'modified_on',
+            'address_area',
         )
         read_only_fields = (
             'archived_documents_url_path',
