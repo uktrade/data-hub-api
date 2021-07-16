@@ -26,8 +26,8 @@ from datahub.dnb_api.test.utils import model_to_dict_company
 from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
     DNBServiceError,
-    DNBServiceInvalidRequest,
-    DNBServiceInvalidResponse,
+    DNBServiceInvalidRequestError,
+    DNBServiceInvalidResponseError,
     DNBServiceTimeoutError,
     format_dnb_company,
     get_company,
@@ -132,17 +132,17 @@ def test_get_company_dnb_service_request_error(
     (
         (
             [],
-            DNBServiceInvalidRequest,
+            DNBServiceInvalidRequestError,
             'Cannot find a company with duns_number: 123456789',
         ),
         (
             ['foo', 'bar'],
-            DNBServiceInvalidResponse,
+            DNBServiceInvalidResponseError,
             'Multiple companies found with duns_number: 123456789',
         ),
         (
             [{'duns_number': '012345678'}],
-            DNBServiceInvalidResponse,
+            DNBServiceInvalidResponseError,
             'DUNS number of the company: 012345678 '
             'did not match searched DUNS number: 123456789',
         ),

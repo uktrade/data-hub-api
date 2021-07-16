@@ -62,11 +62,14 @@ class CompanyReferralViewSet(CoreViewSet):
             'referral': referral,
             'user': request.user,
         }
+        # TODO: remove once interaction.company field is removed
+        for unwanted_key in ('company', 'companies'):
+            if unwanted_key in request.data:
+                del request.data[unwanted_key]
+
         data = {
             **request.data,
-            'company': {
-                'id': referral.company.pk,
-            },
+            'companies': [{'id': referral.company.pk}],
         }
         serializer = CompleteCompanyReferralSerializer(
             data=data,

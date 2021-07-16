@@ -20,7 +20,7 @@ from datahub.company.test.factories import (
     OneListCoreTeamMemberFactory,
 )
 from datahub.company_referral.test.factories import CompanyReferralFactory
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.core.model_helpers import get_related_fields
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import (
@@ -382,7 +382,7 @@ def test_only_print_queries(cleanup_configs, monkeypatch, caplog):
 def test_with_es_exception(mocked_bulk):
     """
     Test that if ES returns a 5xx error, the command completes but it also
-    raises a DataHubException with details of the error.
+    raises a DataHubError with details of the error.
     """
     mocked_bulk.return_value = (None, [{'delete': {'status': 500}}])
 
@@ -398,7 +398,7 @@ def test_with_es_exception(mocked_bulk):
     )
     create_orphanable_model(model_factory, filter_config, datetime_older_than_threshold)
 
-    with pytest.raises(DataHubException):
+    with pytest.raises(DataHubError):
         management.call_command(command, model_name)
 
     model = apps.get_model(model_name)

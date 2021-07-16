@@ -15,11 +15,11 @@ class SSORequestError(Exception):
         self.response = response
 
 
-class SSOInvalidToken(Exception):
+class SSOInvalidTokenError(Exception):
     """The token does not exist or has expired."""
 
 
-class SSOUserDoesNotExist(Exception):
+class SSOUserDoesNotExistError(Exception):
     """The token does not exist."""
 
 
@@ -50,12 +50,12 @@ def introspect_token(token, request=None):
         # SSO returns a 401 if the token is invalid (non-existent)
         # So this is treated as a special case
         if exc.response is not None and exc.response.status_code == status.HTTP_401_UNAUTHORIZED:
-            raise SSOInvalidToken()
+            raise SSOInvalidTokenError()
         raise
 
     # This happens if the token exists but has expired
     if not token_data['active']:
-        raise SSOInvalidToken()
+        raise SSOInvalidTokenError()
 
     return token_data
 
@@ -79,7 +79,7 @@ def _get_user(**params):
         return _request('get', 'api/v1/user/introspect/', params=params)
     except SSORequestError as exc:
         if exc.response is not None and exc.response.status_code == status.HTTP_404_NOT_FOUND:
-            raise SSOUserDoesNotExist()
+            raise SSOUserDoesNotExistError()
         raise
 
 

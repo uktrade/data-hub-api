@@ -7,7 +7,7 @@ from datahub.company.admin.adviser_forms import (
     NO_MATCHING_USER_MESSAGE,
 )
 from datahub.company.test.factories import AdviserFactory
-from datahub.oauth.sso_api_client import SSORequestError, SSOUserDoesNotExist
+from datahub.oauth.sso_api_client import SSORequestError, SSOUserDoesNotExistError
 
 
 FAKE_SSO_USER_DATA = {
@@ -72,8 +72,8 @@ class TestAddAdviserFromSSOForm:
         """
         Test that validation fails if there's no matching adviser in Staff SSO.
         """
-        mock_get_user_by_email.side_effect = SSOUserDoesNotExist()
-        mock_get_user_by_email_user_id.side_effect = SSOUserDoesNotExist()
+        mock_get_user_by_email.side_effect = SSOUserDoesNotExistError()
+        mock_get_user_by_email_user_id.side_effect = SSOUserDoesNotExistError()
 
         data = {'search_email': 'search-email@test.test'}
         form = AddAdviserFromSSOForm(data=data)
@@ -123,7 +123,7 @@ class TestAddAdviserFromSSOForm:
         Test that an adviser can be created using its SSO email (when there is no match on
         email user ID).
         """
-        mock_get_user_by_email_user_id.side_effect = SSOUserDoesNotExist()
+        mock_get_user_by_email_user_id.side_effect = SSOUserDoesNotExistError()
         mock_get_user_by_email.return_value = FAKE_SSO_USER_DATA
 
         data = {'search_email': 'search-email@test.test'}

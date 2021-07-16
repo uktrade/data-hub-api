@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy
 
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.core.admin_csv_import import BaseCSVImportForm
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.interaction.admin_csv_import.cache_utils import (
     load_file_contents_and_name,
     save_file_contents_and_name,
@@ -185,7 +185,7 @@ class InteractionCSVForm(BaseCSVImportForm):
                 if not row_form.is_valid() and raise_error_if_invalid:
                     # We are not expecting this to happen. Raise an exception to alert us if
                     # it does.
-                    raise DataHubException('CSV row unexpectedly failed revalidation')
+                    raise DataHubError('CSV row unexpectedly failed revalidation')
 
                 yield row_form
 

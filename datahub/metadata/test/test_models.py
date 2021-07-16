@@ -1,7 +1,7 @@
 import pytest
 from mptt.exceptions import InvalidMove
 
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.metadata.models import Service
 from datahub.metadata.test.factories import SectorFactory
 
@@ -51,7 +51,7 @@ def test_sector_name_recursive_via_parent_unsaved():
     parent = SectorFactory()
     sector = SectorFactory(parent=parent)
     parent.parent = sector
-    with pytest.raises(DataHubException):
+    with pytest.raises(DataHubError):
         sector.name
 
 
@@ -70,7 +70,7 @@ def test_sector_name_level_recursive_unsaved():
     """
     sector = SectorFactory()
     sector.parent = sector
-    with pytest.raises(DataHubException):
+    with pytest.raises(DataHubError):
         sector.name
 
 

@@ -160,6 +160,32 @@ def test_administrative_area_view(metadata_client):
     }
 
 
+def test_administrative_area_by_country_view(metadata_client):
+    """Test that the administrative area view is filtered by country."""
+    usa = Country.objects.get(id='81756b9a-5d95-e211-a939-e4115bead28a')
+    administrative_area = AdministrativeArea.objects.filter(
+        country=usa,
+    ).order_by('name').first()
+
+    url = reverse(viewname='api-v4:metadata:administrative-area')
+    response = metadata_client.get(url, params={'country': usa.id})
+
+    assert response.status_code == status.HTTP_200_OK
+    results = response.json()
+    # 50 States plus District of Columbia (DC)
+    assert len(results) == 51
+    assert results[0] == {
+        'id': str(administrative_area.pk),
+        'name': administrative_area.name,
+        'country': {
+            'id': str(administrative_area.country.pk),
+            'name': administrative_area.country.name,
+        },
+        'disabled_on': format_date_or_datetime(administrative_area.disabled_on),
+        'area_code': administrative_area.area_code,
+    }
+
+
 def test_country_view(metadata_client):
     """Test that the country view includes the country field."""
     country = Country.objects.filter(
@@ -228,6 +254,37 @@ def test_team_view(metadata_client):
         },
         'disabled_on': '2013-03-31T16:21:07Z',
     }
+
+
+def test_autocomplete_teams_view(metadata_client):
+    """Test that the team view can autocomplete."""
+    url = reverse(viewname='api-v4:metadata:team')
+    response = metadata_client.get(url, params={'autocomplete': 'Shen'})
+    assert response.status_code == status.HTTP_200_OK
+    teams = response.json()
+    assert len(teams) == 2
+    assert teams[0]['name'] == 'CBBC Shenyang'
+    assert teams[1]['name'] == 'CBBC Shenzhen'
+
+
+def test_autocomplete_disabled_teams_view(metadata_client):
+    """Test that disabled teams are included in autocomplete."""
+    url = reverse(viewname='api-v4:metadata:team')
+    response = metadata_client.get(url, params={'autocomplete': 'Bhopal'})
+    assert response.status_code == status.HTTP_200_OK
+    teams = response.json()
+    assert len(teams) == 1
+    assert teams[0]['name'] == 'Business Information Centre Bhopal India'
+
+
+def test_filter_by_id_teams_view(metadata_client):
+    """Test that the team view can be filtered by id."""
+    url = reverse(viewname='api-v4:metadata:team')
+    response = metadata_client.get(url, params={'id': 'cff02898-9698-e211-a939-e4115bead28a'})
+    assert response.status_code == status.HTTP_200_OK
+    teams = response.json()
+    assert len(teams) == 1
+    assert teams[0]['name'] == 'Aberdeen City Council'
 
 
 class TestServiceView:

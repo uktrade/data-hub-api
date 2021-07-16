@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from django.db import transaction
 from django.db.models.signals import post_delete, pre_delete
 
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.search.apps import get_search_app_by_model, get_search_apps
 from datahub.search.elasticsearch import bulk, get_client
 from datahub.search.signals import SignalReceiver
@@ -18,7 +18,7 @@ def delete_documents(index, es_docs):
     """
     Deletes `es_docs` from `index`.
 
-    :raises DataHubException: in case of non 404 errors
+    :raises DataHubError: in case of non 404 errors
     """
     delete_actions = (
         _create_delete_action(index, es_doc['_id'])
@@ -34,7 +34,7 @@ def delete_documents(index, es_docs):
 
     non_404_errors = [error for error in errors if error['delete']['status'] != 404]
     if non_404_errors:
-        raise DataHubException(
+        raise DataHubError(
             f'One or more errors during an Elasticsearch bulk deletion operation: '
             f'{non_404_errors!r}',
         )

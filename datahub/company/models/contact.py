@@ -45,6 +45,7 @@ class Contact(ArchivableModel, BaseModel):
         'address_town': {'required': True},
         'address_county': {'required': False},
         'address_postcode': {'required': False},
+        'address_area': {'required': False},
         'address_country': {'required': True},
     }
 
@@ -77,6 +78,13 @@ class Contact(ArchivableModel, BaseModel):
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_country = models.ForeignKey(
         metadata_models.Country, null=True, blank=True,
+        on_delete=models.SET_NULL,
+    )
+    address_area = models.ForeignKey(
+        metadata_models.AdministrativeArea,
+        related_name='contacts',
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
     )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
