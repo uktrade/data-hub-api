@@ -168,6 +168,7 @@ class ContactFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
     company = factory.SubFactory(CompanyFactory)
+    address_area_id = None
     email = 'foo@bar.com'
     job_title = factory.Faker('job')
     primary = True
