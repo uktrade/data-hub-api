@@ -1,5 +1,5 @@
 from datahub.metadata import models
-from datahub.metadata.filters import ServiceFilterSet
+from datahub.metadata.filters import ServiceFilterSet, TeamFilterSet
 from datahub.metadata.registry import registry
 from datahub.metadata.serializers import (
     AdministrativeAreaSerializer,
@@ -16,6 +16,7 @@ registry.register(
 )
 
 registry.register(
+    filterset_fields=['country'],
     metadata_id='administrative-area',
     model=models.AdministrativeArea,
     queryset=models.AdministrativeArea.objects.select_related(
@@ -64,6 +65,7 @@ registry.register(
 )
 registry.register(metadata_id='team-role', model=models.TeamRole)
 registry.register(
+    filterset_class=TeamFilterSet,
     metadata_id='team',
     model=models.Team,
     queryset=models.Team.objects.select_related('role', 'uk_region', 'country'),

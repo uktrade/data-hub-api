@@ -14,7 +14,6 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from config.settings.types import HawkScope
-from datahub.company.autocomplete import AutocompleteFilter
 from datahub.company.company_matching_api import (
     CompanyMatchingServiceConnectionError,
     CompanyMatchingServiceHTTPError,
@@ -55,6 +54,7 @@ from datahub.company.serializers import (
 from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
 from datahub.core.auth import PaaSIPAuthentication
+from datahub.core.autocomplete import AutocompleteFilter
 from datahub.core.exceptions import APIUpstreamException
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
@@ -503,7 +503,7 @@ class ExportWinsForCompanyView(APIView):
     """
 
     queryset = Company.objects.prefetch_related(
-        'trasnferred_from',
+        'transferred_from',
     )
     permission_classes = (
         HasPermissions(

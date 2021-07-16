@@ -4,7 +4,7 @@ from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.dnb_api.serializers import (
     DNBCompanySerializer,
-    SerializerNotPartial,
+    SerializerNotPartialError,
 )
 
 
@@ -54,5 +54,5 @@ def test_dnb_company_serializer_partial_save_serializer_not_partial(db):
         data={'name': 'foobar'},
     )
     serializer.is_valid()
-    with pytest.raises(SerializerNotPartial):
+    with pytest.raises(SerializerNotPartialError):
         serializer.partial_save(duns_number='123456789')

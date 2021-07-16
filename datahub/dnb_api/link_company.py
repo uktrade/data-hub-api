@@ -4,7 +4,7 @@ from datahub.company.models import Company
 from datahub.dnb_api.tasks import sync_company_with_dnb
 
 
-class CompanyAlreadyDNBLinkedException(Exception):
+class CompanyAlreadyDNBLinkedError(Exception):
     """
     An exception to raise when a Data Hub company has already been linked with
     a DNB company record.
@@ -24,7 +24,7 @@ def link_company_with_dnb(
     """
     company = Company.objects.get(id=dh_company_id)
     if company.duns_number:
-        raise CompanyAlreadyDNBLinkedException(
+        raise CompanyAlreadyDNBLinkedError(
             f'Company {company.id} is already linked with duns number {company.duns_number}',
         )
     company.duns_number = duns_number

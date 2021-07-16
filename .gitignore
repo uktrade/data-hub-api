@@ -49,12 +49,14 @@ coverage.xml
 /codecov.sh
 /test-reports/
 /.pytest_cache/
+prof/
 
 # Translations
 *.mo
 *.pot
 
 # Django stuff:
+config/settings/custom.py
 *.log
 
 # Sphinx documentation
@@ -74,8 +76,15 @@ staticfiles
 import.sh
 
 # docker things
+docker-compose.override.yml
 docker-volumes/
 .env
 
 # celery
 celerybeat-schedule
+
+# Pyright
+pyrightconfig.json
+
+# Ctags
+tags

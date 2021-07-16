@@ -147,6 +147,9 @@ class ContactSerializer(PermittedFieldsModelSerializer):
     address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True,
     )
+    address_area = NestedRelatedField(
+        meta_models.AdministrativeArea, required=False, allow_null=True,
+    )
     archived = serializers.BooleanField(read_only=True)
     archived_on = serializers.DateTimeField(read_only=True)
     archived_reason = serializers.CharField(read_only=True)
@@ -185,6 +188,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             'archived_by',
             'created_on',
             'modified_on',
+            'address_area',
         )
         read_only_fields = (
             'archived_documents_url_path',
@@ -229,7 +233,7 @@ class ConsentMarketingField(serializers.BooleanField):
         """Lookup from consent service api/"""
         try:
             representation = consent.get_one(value.email)
-        except consent.ConsentAPIException:
+        except consent.ConsentAPIError:
             representation = False
         return representation
 
@@ -377,8 +381,13 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         address_source_prefix='registered_address',
         required=False,
         allow_null=True,
+        area_can_be_required=True,
     )
-    address = AddressSerializer(source_model=Company, address_source_prefix='address')
+    address = AddressSerializer(
+        source_model=Company,
+        address_source_prefix='address',
+        area_can_be_required=True,
+    )
     export_countries = CompanyExportCountrySerializer(many=True, read_only=True)
 
     # Use our RelaxedURLField instead to automatically fix URLs without a scheme
@@ -419,7 +428,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
 
         combiner = DataCombiner(self.instance, data)
 
-        return data
+        return super().validate(data)
 
     def validate_headquarter_type(self, headquarter_type):
         """Raises an exception if company is a global hq and has subsidiaries."""

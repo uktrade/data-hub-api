@@ -1,3 +1,41 @@
+# Data Hub API 37.0.0 (2021-07-16)
+## Features
+
+- It is now possible to get teams from the teams metadata endpoint by passing the autocomplete param `GET /v4/metadata/team?autocomplete=<query>`
+- It is now possible to filter administrative areas by country from the administrative area metadata endpoint by passing the country id as a param `GET /v4/metadata/administrative-area?country=<uuid>`
+- It is now possible to filter teams by id on the teams metadata endpoint by passing the id param `GET /v4/metadata/team?id=<uuid>`
+
+## Bug fixes
+
+- **Interactions** A bug has been fixed where it was not possible to close a company referral when using the new interaction companies field.
+
+## Internal changes
+
+- The following errors and exceptions have been renamed in order to satisfy the latest changes to `pep8-naming`:
+
+  - `AdminException` was renamed to `AdminError`
+  - `CompanyAlreadyDNBLinkedException` was renamed to `CompanyAlreadyDNBLinkedError`
+  - `CompanyMatchingServiceException` was renamed to `CompanyMatchingServiceError`
+  - `ConsentAPIException` was renamed to `ConsentAPIError`
+  - `DataHubException` was renamed to `DataHubError`
+  - `DNBServiceException` was renamed to `DNBServiceBaseError`
+  - `DNBServiceInvalidRequest` was renamed to `DNBServiceInvalidRequestError`
+  - `DNBServiceInvalidResponse` was renamed to `DNBServiceInvalidResponseError`
+  - `ExportWinsAPIException` was renamed to `ExportWinsAPIError`
+  - `SimulationRollback` was renamed to `SimulationRollbackError`
+  - `SerializerNotPartial` was renamed to `SerializerNotPartialError`
+  - `SSOInvalidToken` was renamed to `SSOInvalidTokenError`
+  - `SSOUserDoesNotExist` was renamed to `SSOUserDoesNotExistError`
+
+## API
+
+- **Companies** `area` is now a required attribute for any `US`/`Canada` Company Address
+
+## Database schema
+
+- Contacts can now store address area information.
+
+
 # Data Hub API 36.27.0 (2021-07-07)
 ## Bug fixes
 

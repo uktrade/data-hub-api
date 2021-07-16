@@ -117,7 +117,7 @@ def redirect_with_messages(func):
     def wrapper(model_admin, request, *args, **kwargs):
         try:
             return func(model_admin, request, *args, **kwargs)
-        except AdminException as exc:
+        except AdminError as exc:
             messages = exc.messages
             redirect_url = exc.redirect_url
             for message in messages:
@@ -126,7 +126,7 @@ def redirect_with_messages(func):
     return wrapper
 
 
-class AdminException(Exception):
+class AdminError(Exception):
     """
     Exception in an admin view. Contains the message to be displayed to the user and the
     redirect_url.
@@ -134,7 +134,7 @@ class AdminException(Exception):
 
     def __init__(self, messages, redirect_url):
         """
-        Initialise the AdminException.
+        Initialise the AdminError.
         """
         self.messages = messages
         self.redirect_url = redirect_url

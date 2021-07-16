@@ -11,7 +11,7 @@ from reversion.models import Revision, Version
 
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.company.test.factories import AdviserFactory
-from datahub.core.exceptions import DataHubException
+from datahub.core.exceptions import DataHubError
 from datahub.interaction.admin_csv_import import file_form
 from datahub.interaction.admin_csv_import.cache_utils import _cache_key_for_token, CacheKeyType
 from datahub.interaction.admin_csv_import.file_form import (
@@ -199,7 +199,7 @@ class TestInteractionCSVForm:
 
         assert form.is_valid()
 
-        with pytest.raises(DataHubException):
+        with pytest.raises(DataHubError):
             form.get_matching_summary(50)
 
     @pytest.mark.parametrize('num_unmatched', (0, 2))
@@ -369,7 +369,7 @@ class TestInteractionCSVForm:
         )
 
         assert form.is_valid()
-        with pytest.raises(DataHubException):
+        with pytest.raises(DataHubError):
             form.save(user)
 
         assert not Interaction.objects.count()
