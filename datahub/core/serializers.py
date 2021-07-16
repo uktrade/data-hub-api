@@ -9,7 +9,10 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import ReadOnlyField, UUIDField
 
+from datahub.core.constants import Country as CountryEnum
 from datahub.core.validate_utils import DataCombiner
+from datahub.core.validators import InRule, OperatorRule, RulesBasedValidator, ValidationRule
+from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata.models import AdministrativeArea, Country
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -350,7 +353,10 @@ class AddressSerializer(serializers.ModelSerializer):
         'country',
     )
 
-    def __init__(self, source_model, *args, address_source_prefix='address', **kwargs):
+    def __init__(
+            self, source_model, *args,
+            address_source_prefix='address', area_can_be_required=False, **kwargs,
+    ):
         """
         Initialises the serializer.
 
@@ -369,6 +375,39 @@ class AddressSerializer(serializers.ModelSerializer):
         for field in self.fields.values():
             field.source = field.source.format(source_prefix=address_source_prefix)
             field.source_attrs = field.source.split('.')
+
+        self.area_can_be_required = area_can_be_required
+        self.address_source_prefix = address_source_prefix
+
+    def get_validators(self):
+        """
+        Append ValidationRule for area depending on feature flag/context
+
+        Only mark area required if country is US/Canada & called from context where area is safe
+        to require, and if feature flag enabled. Currently the only context where area is safe to
+        require is CompanySerializer
+        """
+        validators = super().get_validators()
+        if (
+            self.area_can_be_required
+            and is_feature_flag_active('address-area-company-required-field')
+        ):
+            validators.append(
+                RulesBasedValidator(
+                    ValidationRule(
+                        'required',
+                        OperatorRule(f'{self.address_source_prefix}_area', bool),
+                        when=InRule(
+                            f'{self.address_source_prefix}_country',
+                            (
+                                CountryEnum.united_states.value.id,
+                                CountryEnum.canada.value.id,
+                            ),
+                        ),
+                    ),
+                ),
+            )
+        return validators
 
     def run_validation(self, data=serializers.empty):
         """
