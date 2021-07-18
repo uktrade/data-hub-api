@@ -13,7 +13,7 @@ whitenoise==5.2.0
 
 chardet==4.0.0
 pyyaml==5.4.1
-python-dateutil==2.8.1
+python-dateutil==2.8.2
 
 # Persistency layer
 psycopg2==2.9.1
