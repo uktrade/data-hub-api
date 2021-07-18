@@ -112,7 +112,7 @@ elasticsearch==7.13.3
     # via
     #   -r requirements.in
     #   elasticsearch-dsl
-elasticsearch-dsl==7.3.0
+elasticsearch-dsl==7.4.0
     # via -r requirements.in
 execnet==1.8.0
     # via pytest-xdist

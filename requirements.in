@@ -39,7 +39,7 @@ redis==3.5.3
 
 # ES
 elasticsearch==7.13.3
-elasticsearch-dsl==7.3.0
+elasticsearch-dsl==7.4.0
 
 # ES APM
 elastic-apm==6.3.2
