@@ -35,9 +35,9 @@ def test_mapping(es):
             'address_area': {
                 'properties': {
                     'id': {'type': 'keyword'},
-                    'name': {'normalizer': 'lowercase_asciifolding_normalizer', 'type': 'keyword'}
+                    'name': {'normalizer': 'lowercase_asciifolding_normalizer', 'type': 'keyword'},
                 },
-                'type': 'object'
+                'type': 'object',
             },
             'address_county': {
                 'normalizer': 'lowercase_asciifolding_normalizer',
