@@ -91,7 +91,7 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
 
     db_sort_by_remappings = {
         'address_country.name': 'computed_country_name',
-        'address_area.name': 'computed_area_name'
+        'address_area.name': 'computed_area_name',
     }
     queryset = DBContact.objects.annotate(
         name=get_full_name_expression(),

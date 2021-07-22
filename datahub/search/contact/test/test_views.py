@@ -515,7 +515,6 @@ class TestContactExportView(APITestMixin):
         ContactFactory()
         ContactWithOwnAreaFactory()
 
-
         # These are to test date of and team of latest interaction a bit more thoroughly
         CompanyInteractionFactory.create_batch(2)
         CompanyInteractionFactory(contacts=ContactFactory.create_batch(2))
