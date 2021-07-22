@@ -549,6 +549,7 @@
     address_town: washington
     address_postcode: ne38 0px
     address_country: 81756b9a-5d95-e211-a939-e4115bead28a
+    address_area: ad6db3f6-52f7-4d7f-b989-ed559f6922df
     notes: This is a dummy contact for testing
     created_on: '2017-04-28T15:00:00Z'
     modified_on: '2016-04-05T00:00:00Z'
@@ -566,6 +567,7 @@
     address_1: 24 sunny beach place
     address_town: california
     address_postcode: 90001
+    address_area_id: a88512e0-62d4-4808-95dc-d3beab05d0e9
     address_country: 81756b9a-5d95-e211-a939-e4115bead28a
     notes: This is a dummy contact for testing
     created_on: '2017-04-28T15:00:00Z'
