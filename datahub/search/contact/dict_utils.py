@@ -9,7 +9,9 @@ def computed_address_field(field):
 
         if field == 'address_country':
             return dict_utils.id_name_dict(value)
-
+        
+        if field == 'address_area':
+            return dict_utils.id_name_dict(value)
         return value
 
     return get_field
