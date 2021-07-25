@@ -109,7 +109,7 @@ docopt==0.6.2
     # via notifications-python-client
 elastic-apm==6.3.3
     # via -r requirements.in
-elasticsearch==7.13.3
+elasticsearch==7.13.4
     # via
     #   -r requirements.in
     #   elasticsearch-dsl
