@@ -91,6 +91,7 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
 
     db_sort_by_remappings = {
         'address_country.name': 'computed_country_name',
+        'address_area.name': 'computed_area_name',
     }
     queryset = DBContact.objects.annotate(
         name=get_full_name_expression(),
@@ -100,6 +101,10 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
         computed_country_name=Case(
             When(address_same_as_company=True, then='company__address_country__name'),
             default='address_country__name',
+        ),
+        computed_area_name=Case(
+            When(address_same_as_company=True, then='company__address_area__name'),
+            default='address_area__name',
         ),
         computed_postcode=Case(
             When(address_same_as_company=True, then='company__address_postcode'),
@@ -131,6 +136,7 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
         'company_link': 'Company link',
         'company__uk_region__name': 'Company UK region',
         'computed_country_name': 'Country',
+        'computed_area_name': 'Area',
         'computed_postcode': 'Postcode',
         'full_telephone_number': 'Phone number',
         'email': 'Email address',
