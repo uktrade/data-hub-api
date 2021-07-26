@@ -67,6 +67,7 @@ from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet
 from datahub.investment.project.queryset import get_slim_investment_project_queryset
 
+
 class CompanyFilterSet(FilterSet):
     """Company filter."""
 
@@ -75,6 +76,7 @@ class CompanyFilterSet(FilterSet):
     class Meta:
         model = Company
         fields = ['global_headquarters_id', 'global_ultimate_duns_number']
+
 
 class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Company view set."""
