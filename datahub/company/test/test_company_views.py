@@ -58,6 +58,20 @@ class TestListCompanies(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['count'] == 2
 
+    def test_autocomplete_companies(self):
+        """Test that the companies viewset can autocomplete."""
+        CompanyFactory(name='Apple')
+        CompanyFactory(name='Auburn')
+        CompanyFactory(name='Boom')
+        CompanyFactory(name='Crush')
+        url = reverse(viewname='api-v4:company:collection')
+        response = self.api_client.get(url, data={'autocomplete': 'A'})
+        assert response.status_code == status.HTTP_200_OK
+        companies = response.json()['results']
+        assert len(companies) == 2
+        assert companies[0]['name'] == 'Apple'
+        assert companies[1]['name'] == 'Auburn'
+
     def test_filter_by_global_headquarters(self):
         """Test filtering by global_headquarters_id."""
         ghq = CompanyFactory()
