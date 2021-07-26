@@ -23,11 +23,13 @@ class SearchContactQuerySerializer(EntitySearchQuerySerializer):
     company_sector_descends = SingleOrListField(child=StringUUIDField(), required=False)
     company_uk_region = SingleOrListField(child=StringUUIDField(), required=False)
     address_country = SingleOrListField(child=StringUUIDField(), required=False)
+    address_area = SingleOrListField(child=StringUUIDField(), required=False)
     created_by = SingleOrListField(child=StringUUIDField(), required=False)
     created_on_exists = serializers.BooleanField(required=False)
 
     SORT_BY_FIELDS = (
         'address_country.name',
+        'address_area.name',
         'company.name',
         'created_on',
         'last_name',

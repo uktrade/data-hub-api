@@ -2,12 +2,12 @@ from datahub.search import dict_utils
 
 
 def computed_address_field(field):
-    """Gets Contact address from Company is address_same_as_company."""
+    """Gets Contact address from Company if address_same_as_company."""
     def get_field(contact):
         obj = contact.company if contact.address_same_as_company else contact
         value = getattr(obj, field)
 
-        if field == 'address_country':
+        if field == 'address_country' or field == 'address_area':
             return dict_utils.id_name_dict(value)
 
         return value

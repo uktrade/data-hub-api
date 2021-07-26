@@ -192,6 +192,16 @@ class ContactWithOwnAddressFactory(ContactFactory):
     address_country_id = constants.Country.united_kingdom.value.id
 
 
+class ContactWithOwnAreaFactory(ContactWithOwnAddressFactory):
+    """
+    Factory for a contact with an address different from the contact's
+    company that includes an area
+    """
+
+    address_country_id = constants.Country.united_states.value.id
+    address_area_id = constants.AdministrativeArea.texas.value.id
+
+
 class ArchivedContactFactory(ContactFactory):
     """Factory for an archived contact."""
 
