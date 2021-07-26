@@ -67,6 +67,14 @@ from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet
 from datahub.investment.project.queryset import get_slim_investment_project_queryset
 
+class CompanyFilterSet(FilterSet):
+    """Company filter."""
+
+    autocomplete = AutocompleteFilter(search_fields=('name',))
+
+    class Meta:
+        model = Company
+        fields = ['global_headquarters_id', 'global_ultimate_duns_number']
 
 class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Company view set."""
@@ -74,7 +82,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     serializer_class = CompanySerializer
     unarchive_validators = (NotATransferredCompanyValidator(),)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filterset_fields = ('global_headquarters_id', 'global_ultimate_duns_number')
+    filterset_class = CompanyFilterSet
     ordering_fields = ('name', 'created_on')
     queryset = Company.objects.select_related(
         'address_country',
