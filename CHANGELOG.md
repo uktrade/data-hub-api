@@ -1,3 +1,9 @@
+# Data Hub API 37.1.0 (2021-07-26)
+## Features
+
+- Contact areas are now part of search result data.
+
+
 # Data Hub API 37.0.0 (2021-07-16)
 ## Features
 
