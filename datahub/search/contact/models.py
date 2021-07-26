@@ -16,6 +16,7 @@ class Contact(BaseESModel):
     address_county = fields.NormalizedKeyword()
     address_postcode = Text()
     address_country = fields.id_name_field()
+    address_area = fields.id_name_field()
     address_same_as_company = Boolean()
     adviser = fields.contact_or_adviser_field()
     archived = Boolean()
@@ -69,6 +70,7 @@ class Contact(BaseESModel):
         'address_county': contact_dict_utils.computed_address_field('address_county'),
         'address_postcode': contact_dict_utils.computed_address_field('address_postcode'),
         'address_country': contact_dict_utils.computed_address_field('address_country'),
+        'address_area': contact_dict_utils.computed_address_field('address_area'),
         'company_sector': dict_utils.computed_nested_sector_dict('company.sector'),
         'company_uk_region': dict_utils.computed_nested_id_name_dict('company.uk_region'),
     }

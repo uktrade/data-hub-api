@@ -21,6 +21,7 @@ from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
     ContactWithOwnAddressFactory,
+    ContactWithOwnAreaFactory,
 )
 from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test_utils import (
@@ -512,6 +513,7 @@ class TestContactExportView(APITestMixin):
         ArchivedContactFactory()
         ContactWithOwnAddressFactory()
         ContactFactory()
+        ContactWithOwnAreaFactory()
 
         # These are to test date of and team of latest interaction a bit more thoroughly
         CompanyInteractionFactory.create_batch(2)
@@ -577,6 +579,10 @@ class TestContactExportView(APITestMixin):
                 'Company link':
                     f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{contact.company.pk}',
                 'Company UK region': get_attr_or_none(contact, 'company.uk_region.name'),
+                'Area':
+                    (contact.company.address_area and contact.company.address_area.name)
+                    if contact.address_same_as_company
+                    else (contact.address_area and contact.address_area.name),
                 'Country':
                     contact.company.address_country.name
                     if contact.address_same_as_company

@@ -37,6 +37,7 @@ def test_contact_dbmodel_to_dict(es):
         'address_same_as_company',
         'address_1',
         'address_2',
+        'address_area',
         'address_town',
         'address_county',
         'address_country',
