@@ -1,3 +1,11 @@
+# Data Hub API 37.2.0 (2021-07-27)
+
+
+## Features
+
+- **Companies** It is now possible to provide autocomplete queries to the companies endpoint, by passing the autocomplete param `GET /v4/company?autocomplete=<query>`
+
+
 # Data Hub API 37.1.0 (2021-07-26)
 ## Features
 
