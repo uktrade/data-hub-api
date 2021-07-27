@@ -39,16 +39,6 @@ class Contact(ArchivableModel, BaseModel):
         Comments: For when filtering by email_alternative__iexact
     """
 
-    ADDRESS_VALIDATION_MAPPING = {
-        'address_1': {'required': True},
-        'address_2': {'required': False},
-        'address_town': {'required': True},
-        'address_county': {'required': False},
-        'address_postcode': {'required': False},
-        'address_area': {'required': False},
-        'address_country': {'required': True},
-    }
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     title = models.ForeignKey(
         metadata_models.Title, blank=True, null=True, on_delete=models.SET_NULL,

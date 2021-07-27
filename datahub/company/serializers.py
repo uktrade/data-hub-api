@@ -193,23 +193,32 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         read_only_fields = (
             'archived_documents_url_path',
         )
+        ADDRESS_VALIDATION_MAPPING = {
+            'address_1': {'required': True},
+            'address_2': {'required': False},
+            'address_town': {'required': True},
+            'address_county': {'required': False},
+            'address_postcode': {'required': False},
+            'address_area': {'required': False},
+            'address_country': {'required': True},
+        }
         validators = [
             NotArchivedValidator(),
             RulesBasedValidator(
                 ValidationRule(
                     'address_same_as_company_and_has_address',
                     OperatorRule('address_same_as_company', not_),
-                    when=AnyIsNotBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
+                    when=AnyIsNotBlankRule(ADDRESS_VALIDATION_MAPPING.keys()),
                 ),
                 ValidationRule(
                     'no_address',
                     OperatorRule('address_same_as_company', bool),
-                    when=AllIsBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
+                    when=AllIsBlankRule(ADDRESS_VALIDATION_MAPPING.keys()),
                 ),
             ),
             # Note: This is deliberately after RulesBasedValidator, so that
             # address_same_as_company rules run first.
-            AddressValidator(lazy=True, fields_mapping=Contact.ADDRESS_VALIDATION_MAPPING),
+            AddressValidator(lazy=True, fields_mapping=ADDRESS_VALIDATION_MAPPING),
         ]
         permissions = {
             f'company.{ContactPermission.view_contact_document}': 'archived_documents_url_path',
