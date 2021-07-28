@@ -22,3 +22,6 @@
 - model: metadata.tradeagreement
   pk: 20e08a38-95a8-4250-bd5b-9d7f0dfc9387
   fields: {disabled_on: null, name: 'UK-United States Mutual Recognition Agreement'}
+- model: metadata.tradeagreement
+  pk: 2f796708-ed70-4273-9d92-a671ee567cad
+  fields: {disabled_on: null, name: 'EU-UK Trade Co-operation Agreement'}
