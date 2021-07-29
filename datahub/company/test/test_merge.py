@@ -362,6 +362,102 @@ class TestDuplicateCompanyMerger:
         assert source_company.transferred_to == target_company
 
     @pytest.mark.parametrize(
+        'factory_relation_kwarg,creates_contacts',
+        (
+            ('num_company_list_items', False),
+            ('num_contacts', True),
+            ('num_interactions', True),
+            ('num_orders', True),
+            ('num_referrals', False),
+            ('num_pipeline_items', False),
+        ),
+    )
+    @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
+    @pytest.mark.usefixtures('unrelated_objects')
+    def test_merge_interactions_contacts_succeeds_with_existing_interactions(
+            self,
+            factory_relation_kwarg,
+            creates_contacts,
+            num_related_objects,
+    ):
+        """
+        Tests that perform_merge() moves contacts and interactions to the target company
+        if an interactions already exists on the target company, and marks the source
+        company as archived and transferred.
+        """
+        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=utc)
+        with freeze_time(creation_time):
+            source_company = _company_factory(
+                **{factory_relation_kwarg: num_related_objects},
+            )
+        target_company = CompanyFactory()
+        CompanyInteractionFactory.create_batch(1, company=target_company)
+        user = AdviserFactory()
+
+        source_interactions = list(source_company.interactions.all())
+        source_contacts = list(source_company.contacts.all())
+        source_orders = list(source_company.orders.all())
+        source_referrals = list(source_company.referrals.all())
+        source_company_list_items = list(source_company.company_list_items.all())
+        source_pipeline_list_items = list(source_company.pipeline_list_items.all())
+
+        # Each interaction and order has a contact, so actual number of contacts is
+        # source_num_interactions + source_num_contacts + source_num_orders
+        assert len(source_contacts) == (num_related_objects if creates_contacts else 0)
+
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+
+        with freeze_time(merge_time):
+            result = merge_companies(source_company, target_company, user)
+
+        assert result == {
+            CompanyListItem: {'company': len(source_company_list_items)},
+            CompanyReferral: {'company': len(source_referrals)},
+            Contact: {'company': len(source_contacts)},
+            Interaction: {
+                'company': len(source_interactions) + 1,
+                'companies': len(source_interactions) + 1,
+            },
+            InvestmentProject: {
+                field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
+            },
+            Order: {'company': len(source_orders)},
+            PipelineItem: {'company': len(source_pipeline_list_items)},
+        }
+
+        source_related_objects = [
+            *source_company_list_items,
+            *source_contacts,
+            *source_interactions,
+            *source_orders,
+            *source_referrals,
+            *source_pipeline_list_items,
+        ]
+
+        for obj in source_related_objects:
+            obj.refresh_from_db()
+
+        assert all(obj.company == target_company for obj in source_related_objects)
+        assert all(obj.modified_on == creation_time for obj in source_related_objects)
+
+        source_company.refresh_from_db()
+
+        assert source_company.archived
+        assert source_company.archived_by == user
+        assert source_company.archived_on == merge_time
+        assert source_company.archived_reason == (
+            f'This record is no longer in use and its data has been transferred '
+            f'to {target_company} for the following reason: Duplicate record.'
+        )
+        assert source_company.modified_by == user
+        assert source_company.modified_on == merge_time
+        assert source_company.transfer_reason == Company.TransferReason.DUPLICATE
+        assert source_company.transferred_by == user
+        assert source_company.transferred_on == merge_time
+        assert source_company.transferred_to == target_company
+
+
+    @pytest.mark.parametrize(
         'fields',
         (
             (),
