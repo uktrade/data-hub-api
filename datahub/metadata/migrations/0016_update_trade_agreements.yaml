@@ -1,0 +1,3 @@
+- model: metadata.tradeagreement
+  pk: 72b0f84a-77cd-4216-841f-0a75b56f8174
+  fields: {disabled_on: null, name: 'EU-UK Trade Co-operation Agreement'}

@@ -45,9 +45,8 @@ def pytest_sessionstart(session):
 @pytest.fixture(scope='session')
 def django_db_setup(pytestconfig, django_db_setup, django_db_blocker):
     """Fixture for DB setup."""
-    reuse_db = pytestconfig.getoption('reuse_db')
     with django_db_blocker.unblock():
-        call_command('loadinitialmetadata', force=reuse_db)
+        call_command('loadinitialmetadata', force=True)
 
 
 @pytest.fixture(scope='session', autouse=True)
