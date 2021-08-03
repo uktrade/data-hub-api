@@ -1716,7 +1716,7 @@ class TestAddCompany(APITestMixin):
                         'line_1': '75 Stramford Road',
                         'town': 'Cordova',
                         'country': {
-                            'id': Country.united_states.value.id,
+                            'id': Country.japan.value.id,
                         },
                     },
                 },
