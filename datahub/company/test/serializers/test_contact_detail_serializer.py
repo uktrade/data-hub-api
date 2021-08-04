@@ -236,6 +236,7 @@ class TestContactSerializer:
             'telephone_number': '123456789',
             'address_same_as_company': False,
             'address_1': 'Foo st.',
+            'address_town': 'Bar',
             'address_country': {
                 'id': country_id,
             },
