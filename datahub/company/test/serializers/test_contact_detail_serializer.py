@@ -181,3 +181,66 @@ class TestContactSerializer:
         contact_serialized = ContactDetailSerializer(instance=contact)
         assert contact_serialized.data['accepts_dit_email_marketing'] is accepts_marketing
         assert requests_mock.call_count == 1
+
+    @pytest.mark.parametrize(
+        'country_id, expected_response, is_valid',
+        (
+            (
+                constants.Country.united_states.value.id,
+                {
+                    'address_area': [
+                        'This field is required.',
+                    ],
+                },
+                False,
+            ),
+            (
+                constants.Country.canada.value.id,
+                {
+                    'address_area': [
+                        'This field is required.',
+                    ],
+                },
+                False,
+            ),
+            (
+                constants.Country.united_kingdom.value.id,
+                {},
+                True,
+            ),
+        ),
+    )
+    def test_area_required_validation_on_respective_countries(
+        self,
+        country_id,
+        expected_response,
+        is_valid,
+    ):
+        """
+        Ensure that area required validation is called for appropriate countries
+        and excluded for others
+        """
+        company = CompanyFactory()
+        data = {
+            'title': {
+                'id': constants.Title.admiral_of_the_fleet.value.id,
+            },
+            'first_name': 'Jane',
+            'last_name': 'Doe',
+            'company': {
+                'id': str(company.pk),
+            },
+            'primary': True,
+            'email': 'foo@bar.com',
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'address_same_as_company': False,
+            'address_1': 'Foo st.',
+            'address_country': {
+                'id': country_id,
+            },
+        }
+        contact_serializer = ContactDetailSerializer(data=data, context={'request': request})
+        assert contact_serializer.is_valid(raise_exception=False) is is_valid
+        assert len(contact_serializer.errors) == len(expected_response)
+        assert contact_serializer.errors == expected_response

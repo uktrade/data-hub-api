@@ -206,6 +206,22 @@ class ContactSerializer(PermittedFieldsModelSerializer):
                     OperatorRule('address_same_as_company', bool),
                     when=AllIsBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
                 ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('address_area', bool),
+                    when=EqualsRule(
+                        'address_country',
+                        Country.united_states.value.id,
+                    ),
+                ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('address_area', bool),
+                    when=EqualsRule(
+                        'address_country',
+                        Country.canada.value.id,
+                    ),
+                ),
             ),
             # Note: This is deliberately after RulesBasedValidator, so that
             # address_same_as_company rules run first.
