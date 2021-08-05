@@ -51,6 +51,7 @@ from datahub.core.validators import (
     RulesBasedValidator,
     ValidationRule,
 )
+# from datahub.core.validators import AddressAreaValidator
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import TeamWithGeographyField
 
@@ -210,6 +211,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             # Note: This is deliberately after RulesBasedValidator, so that
             # address_same_as_company rules run first.
             AddressValidator(lazy=True, fields_mapping=Contact.ADDRESS_VALIDATION_MAPPING),
+            # AddressAreaValidator()
         ]
         permissions = {
             f'company.{ContactPermission.view_contact_document}': 'archived_documents_url_path',

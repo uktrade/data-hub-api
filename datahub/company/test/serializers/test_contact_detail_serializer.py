@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 from django.conf import settings
 from freezegun import freeze_time
-from rest_framework.exceptions import ErrorDetail
+# from rest_framework.exceptions import ErrorDetail
 
 from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
@@ -15,7 +15,7 @@ from datahub.core import constants
 from datahub.core.test_utils import (
     HawkMockJSONResponse,
 )
-from datahub.feature_flag.test.factories import FeatureFlagFactory
+# from datahub.feature_flag.test.factories import FeatureFlagFactory
 
 # mark the whole module for db use
 
@@ -185,77 +185,78 @@ class TestContactSerializer:
         assert contact_serialized.data['accepts_dit_email_marketing'] is accepts_marketing
         assert requests_mock.call_count == 1
 
-    @pytest.mark.parametrize(
-        'country_id, expected_response, is_valid',
-        (
-            (
-                constants.Country.united_states.value.id,
-                {
-                    'non_field_errors': [
-                        ErrorDetail(
-                            string='Invalid input.',
-                            code={
-                                'address_area': ['This field is required.'],
-                            },
-                        ),
-                    ],
-                },
-                False,
-            ),
-            (
-                constants.Country.canada.value.id,
-                {
-                    'non_field_errors': [
-                        ErrorDetail(
-                            string='Invalid input.',
-                            code={
-                                'address_area': ['This field is required.'],
-                            },
-                        ),
-                    ],
-                },
-                False,
-            ),
-            (
-                constants.Country.united_kingdom.value.id,
-                {},
-                True,
-            ),
-        ),
-    )
-    def test_area_required_validation_on_respective_countries(
-        self,
-        country_id,
-        expected_response,
-        is_valid,
-    ):
-        """
-        Ensure that area required validation is called for appropriate countries
-        and excluded for others
-        """
-        FeatureFlagFactory(code='address-area-contact-required-field')
-        company = CompanyFactory()
-        data = {
-            'title': {
-                'id': constants.Title.admiral_of_the_fleet.value.id,
-            },
-            'first_name': 'Jane',
-            'last_name': 'Doe',
-            'company': {
-                'id': str(company.pk),
-            },
-            'primary': True,
-            'email': 'foo@bar.com',
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'address_same_as_company': False,
-            'address_1': 'Foo st.',
-            'address_town': 'Bar',
-            'address_country': {
-                'id': country_id,
-            },
-        }
-        contact_serializer = ContactDetailSerializer(data=data, context={'request': request})
-        assert contact_serializer.is_valid(raise_exception=False) is is_valid
-        assert len(contact_serializer.errors) == len(expected_response)
-        assert contact_serializer.errors == expected_response
+    # TODO: Move this test onto the v4ContactSerializer when done
+    # @pytest.mark.parametrize(
+    #     'country_id, expected_response, is_valid',
+    #     (
+    #         (
+    #             constants.Country.united_states.value.id,
+    #             {
+    #                 'non_field_errors': [
+    #                     ErrorDetail(
+    #                         string='Invalid input.',
+    #                         code={
+    #                             'address_area': ['This field is required.'],
+    #                         },
+    #                     ),
+    #                 ],
+    #             },
+    #             False,
+    #         ),
+    #         (
+    #             constants.Country.canada.value.id,
+    #             {
+    #                 'non_field_errors': [
+    #                     ErrorDetail(
+    #                         string='Invalid input.',
+    #                         code={
+    #                             'address_area': ['This field is required.'],
+    #                         },
+    #                     ),
+    #                 ],
+    #             },
+    #             False,
+    #         ),
+    #         (
+    #             constants.Country.united_kingdom.value.id,
+    #             {},
+    #             True,
+    #         ),
+    #     ),
+    # )
+    # def test_area_required_validation_on_respective_countries(
+    #     self,
+    #     country_id,
+    #     expected_response,
+    #     is_valid,
+    # ):
+    #     """
+    #     Ensure that area required validation is called for appropriate countries
+    #     and excluded for others
+    #     """
+    #     FeatureFlagFactory(code='address-area-contact-required-field')
+    #     company = CompanyFactory()
+    #     data = {
+    #         'title': {
+    #             'id': constants.Title.admiral_of_the_fleet.value.id,
+    #         },
+    #         'first_name': 'Jane',
+    #         'last_name': 'Doe',
+    #         'company': {
+    #             'id': str(company.pk),
+    #         },
+    #         'primary': True,
+    #         'email': 'foo@bar.com',
+    #         'telephone_countrycode': '+44',
+    #         'telephone_number': '123456789',
+    #         'address_same_as_company': False,
+    #         'address_1': 'Foo st.',
+    #         'address_town': 'Bar',
+    #         'address_country': {
+    #             'id': country_id,
+    #         },
+    #     }
+    #     contact_serializer = ContactDetailSerializer(data=data, context={'request': request})
+    #     assert contact_serializer.is_valid(raise_exception=False) is is_valid
+    #     assert len(contact_serializer.errors) == len(expected_response)
+    #     assert contact_serializer.errors == expected_response

@@ -1,9 +1,17 @@
 from unittest import mock
+from unittest.mock import Mock
 
 import pytest
 from rest_framework.exceptions import ValidationError
 
-from datahub.core.validators import AddressValidator
+from datahub.core import constants
+from datahub.core.validators import (
+    AddressAreaValidator,
+    AddressValidator,
+)
+from datahub.feature_flag.test.factories import FeatureFlagFactory
+
+pytestmark = pytest.mark.django_db
 
 
 class TestAddressValidator:
@@ -129,3 +137,83 @@ class TestAddressValidator:
         validator = AddressValidator()
         assert not validator.lazy
         assert validator.fields_mapping == validator.DEFAULT_FIELDS_MAPPING
+
+
+class TestAddressAreaValidatorShould:
+    """Tests for the AddressAreaValidator."""
+
+    def test_by_default_no_error_is_raised(self):
+        """Test empty object does not raise exception"""
+        serializer = Mock(instance=Mock(address_country=None))
+        validator = AddressAreaValidator()
+
+        try:
+            validator({}, serializer)
+        except ValidationError:
+            pytest.fail('Should not raise a validator error.')
+
+    def test_by_default_with_feature_flag_no_error_is_raised(self):
+        """Test empty object with feature flag set does not raise exception"""
+        FeatureFlagFactory(code='address-area-contact-required-field')
+        serializer = Mock(instance=Mock(address_country=None))
+        validator = AddressAreaValidator()
+
+        try:
+            validator({}, serializer)
+        except ValidationError:
+            pytest.fail('Should not raise a validator error.')
+
+    @pytest.mark.parametrize(
+        'country_id, expected_response',
+        (
+            (
+                constants.Country.united_states.value.id,
+                {
+                    'address_area': ['This field is required.'],
+                },
+            ),
+            (
+                constants.Country.canada.value.id,
+                {
+                    'address_area': ['This field is required.'],
+                },
+            ),
+        ),
+    )
+    def test_area_required_validation_raised_for_ca_and_us(
+        self,
+        country_id,
+        expected_response,
+    ):
+        """
+        Ensure that area required validation is called for Canada and United States
+        """
+        FeatureFlagFactory(code='address-area-contact-required-field')
+        data = {
+            'address_country': {
+                'id': country_id,
+            },
+        }
+        serializer = Mock(instance=Mock(address_area=None))
+        validator = AddressAreaValidator()
+
+        with pytest.raises(ValidationError) as error:
+            validator(data, serializer)
+
+        assert error.value.args[1] == expected_response
+
+    def test_other_countries_dont_raise_errors(self):
+        """Test countries that are not united states or canada dont throw errors"""
+        FeatureFlagFactory(code='address-area-contact-required-field')
+        data = {
+            'address_country': {
+                'id': constants.Country.united_kingdom.value.id,
+            },
+        }
+        serializer = Mock(instance=Mock(address_area=None))
+        validator = AddressAreaValidator()
+
+        try:
+            validator(data, serializer)
+        except ValidationError:
+            pytest.fail('Should not raise a validator error for United Kingdom.')
