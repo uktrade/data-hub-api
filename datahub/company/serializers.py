@@ -49,7 +49,7 @@ from datahub.core.validators import (
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
     RulesBasedValidator,
-    ValidationRule, InRule,
+    ValidationRule,
 )
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import TeamWithGeographyField
@@ -205,17 +205,6 @@ class ContactSerializer(PermittedFieldsModelSerializer):
                     'no_address',
                     OperatorRule('address_same_as_company', bool),
                     when=AllIsBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
-                ),
-                ValidationRule(
-                    'required',
-                    OperatorRule('address_area', bool),
-                    when=InRule(
-                        'address_country',
-                        (
-                            Country.united_states.value.id,
-                            Country.canada.value.id,
-                        ),
-                    ),
                 ),
             ),
             # Note: This is deliberately after RulesBasedValidator, so that

@@ -1,6 +1,8 @@
 from rest_framework.exceptions import ValidationError
 
+from datahub.core.constants import Country
 from datahub.core.validate_utils import DataCombiner
+from datahub.feature_flag.utils import is_feature_flag_active
 
 
 class AddressValidator:
@@ -70,5 +72,20 @@ class AddressValidator:
             return
 
         errors = self._validate_fields(data_combined)
+        self._validate_address_area(data_combiner, errors)
         if errors:
-            raise ValidationError(errors)
+            raise ValidationError(instance, errors)
+
+    def _validate_address_area(self, data_combiner, errors):
+        country = data_combiner.get_value('address_country')
+        if country and is_feature_flag_active('address-area-contact-required-field'):
+            country_id = str(country.id)
+            is_invalid = (
+                (
+                    country_id == Country.united_states.value.id
+                    or country_id == Country.canada.value.id
+                )
+                and not data_combiner.get_value('address_area')
+            )
+            if is_invalid:
+                errors['address_area'] = [self.message]

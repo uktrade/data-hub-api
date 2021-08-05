@@ -3,6 +3,7 @@ from unittest.mock import Mock
 import pytest
 from django.conf import settings
 from freezegun import freeze_time
+from rest_framework.exceptions import ErrorDetail
 
 from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
@@ -16,6 +17,8 @@ from datahub.core.test_utils import (
 )
 
 # mark the whole module for db use
+from datahub.feature_flag.test.factories import FeatureFlagFactory
+
 pytestmark = pytest.mark.django_db
 
 FROZEN_TIME = '2020-03-13T14:21:24.367265+00:00'
@@ -188,8 +191,13 @@ class TestContactSerializer:
             (
                 constants.Country.united_states.value.id,
                 {
-                    'address_area': [
-                        'This field is required.',
+                    'non_field_errors': [
+                        ErrorDetail(
+                            string='Invalid input.',
+                            code={
+                                'address_area': ['This field is required.'],
+                            },
+                        ),
                     ],
                 },
                 False,
@@ -197,8 +205,13 @@ class TestContactSerializer:
             (
                 constants.Country.canada.value.id,
                 {
-                    'address_area': [
-                        'This field is required.',
+                    'non_field_errors': [
+                        ErrorDetail(
+                            string='Invalid input.',
+                            code={
+                                'address_area': ['This field is required.'],
+                            },
+                        ),
                     ],
                 },
                 False,
@@ -220,6 +233,7 @@ class TestContactSerializer:
         Ensure that area required validation is called for appropriate countries
         and excluded for others
         """
+        FeatureFlagFactory(code='address-area-contact-required-field')
         company = CompanyFactory()
         data = {
             'title': {

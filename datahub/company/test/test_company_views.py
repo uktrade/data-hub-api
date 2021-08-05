@@ -1121,8 +1121,8 @@ class TestUpdateCompany(APITestMixin):
                 },
                 {
                     'address': {
-                        'address_area': ['This field is required.']
-                    }
+                        'address_area': ['This field is required.'],
+                    },
                 },
             ),
             # United states should make registered address area mandatory
@@ -1138,8 +1138,8 @@ class TestUpdateCompany(APITestMixin):
                 },
                 {
                     'registered_address': {
-                        'registered_address_area': ['This field is required.']
-                    }
+                        'registered_address_area': ['This field is required.'],
+                    },
                 }
             ),
             # Canada should make address area mandatory
@@ -1156,8 +1156,8 @@ class TestUpdateCompany(APITestMixin):
                 },
                 {
                     'address': {
-                        'address_area': ['This field is required.']
-                    }
+                        'address_area': ['This field is required.'],
+                    },
                 },
             ),
             # Canada should make registered address area mandatory
@@ -1174,9 +1174,9 @@ class TestUpdateCompany(APITestMixin):
                 },
                 {
                     'registered_address': {
-                        'registered_address_area': ['This field is required.']
-                    }
-                }
+                        'registered_address_area': ['This field is required.'],
+                    },
+                },
             ),
         ),
     )
