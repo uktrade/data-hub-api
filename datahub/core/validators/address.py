@@ -18,9 +18,11 @@ class AddressValidator:
         'address_county': {'required': False},
         'address_postcode': {'required': False},
         'address_country': {'required': True},
+        'address_area': {'required': False},
     }
 
-    def __init__(self, lazy=False, fields_mapping=None):
+    # NOTE: area-required should default to false when v4 is in place
+    def __init__(self, lazy=False, fields_mapping=None, area_required=True):
         """
         Init the params.
 
@@ -29,7 +31,10 @@ class AddressValidator:
             become required only if any of the fields are set.
         :fields_mapping: dict with the field as a key and the value as a dict with
             `required` == True or False
+        :self.area_required: area needs validation based on specific countries
+            with v4 address requirements
         """
+        self.area_required = area_required
         self.lazy = lazy
         if fields_mapping:
             self.fields_mapping = fields_mapping
@@ -72,7 +77,8 @@ class AddressValidator:
             return
 
         errors = self._validate_fields(data_combined)
-        self._validate_address_area(data_combiner, errors)
+        if self.area_required:
+            self._validate_address_area(data_combiner, errors)
         if errors:
             raise ValidationError(instance, errors)
 
