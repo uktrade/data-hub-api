@@ -643,38 +643,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                         BusinessTypeConstant.uk_establishment.value.id,
                     ),
                 ),
-                ValidationRule(
-                    'required',
-                    OperatorRule('address_area', bool),
-                    when=EqualsRule(
-                        'address_country',
-                        Country.united_states.value.id,
-                    ),
-                ),
-                ValidationRule(
-                    'required',
-                    OperatorRule('registered_address_area', bool),
-                    when=EqualsRule(
-                        'registered_address_country',
-                        Country.united_states.value.id,
-                    ),
-                ),
-                ValidationRule(
-                    'required',
-                    OperatorRule('address_area', bool),
-                    when=EqualsRule(
-                        'address_country',
-                        Country.canada.value.id,
-                    ),
-                ),
-                ValidationRule(
-                    'required',
-                    OperatorRule('registered_address_area', bool),
-                    when=EqualsRule(
-                        'registered_address_country',
-                        Country.canada.value.id,
-                    ),
-                ),
             ),
         )
         permissions = {

@@ -1120,7 +1120,9 @@ class TestUpdateCompany(APITestMixin):
                     },
                 },
                 {
-                    'address_area': ['This field is required.'],
+                    'address': {
+                        'address_area': ['This field is required.']
+                    }
                 },
             ),
             # United states should make registered address area mandatory
@@ -1135,8 +1137,10 @@ class TestUpdateCompany(APITestMixin):
                     },
                 },
                 {
-                    'registered_address_area': ['This field is required.'],
-                },
+                    'registered_address': {
+                        'registered_address_area': ['This field is required.']
+                    }
+                }
             ),
             # Canada should make address area mandatory
             (
@@ -1151,7 +1155,9 @@ class TestUpdateCompany(APITestMixin):
                     },
                 },
                 {
-                    'address_area': ['This field is required.'],
+                    'address': {
+                        'address_area': ['This field is required.']
+                    }
                 },
             ),
             # Canada should make registered address area mandatory
@@ -1167,13 +1173,16 @@ class TestUpdateCompany(APITestMixin):
                     },
                 },
                 {
-                    'registered_address_area': ['This field is required.'],
-                },
+                    'registered_address': {
+                        'registered_address_area': ['This field is required.']
+                    }
+                }
             ),
         ),
     )
     def test_validation_error(self, data, expected_error):
         """Test validation scenarios."""
+        FeatureFlagFactory(code='address-area-company-required-field')
         company = CompanyFactory(
             registered_address_1='',
             registered_address_2='',
