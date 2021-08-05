@@ -15,9 +15,9 @@ from datahub.core import constants
 from datahub.core.test_utils import (
     HawkMockJSONResponse,
 )
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 
 # mark the whole module for db use
-from datahub.feature_flag.test.factories import FeatureFlagFactory
 
 pytestmark = pytest.mark.django_db
 

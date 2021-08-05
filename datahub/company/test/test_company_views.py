@@ -1140,7 +1140,7 @@ class TestUpdateCompany(APITestMixin):
                     'registered_address': {
                         'registered_address_area': ['This field is required.'],
                     },
-                }
+                },
             ),
             # Canada should make address area mandatory
             (
