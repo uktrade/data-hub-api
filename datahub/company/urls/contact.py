@@ -27,3 +27,8 @@ urls_v3 = [
     path('contact/<uuid:pk>/unarchive', contact_unarchive, name='unarchive'),
     path('contact/<uuid:pk>/audit', contact_audit, name='audit-item'),
 ]
+
+urls_v4 = [
+    path('contact', contact_collection, name='list'),
+    path('contact/<uuid:pk>', contact_item, name='detail'),
+]
