@@ -218,36 +218,8 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         }
 
 
-class ContactV4Serializer(PermittedFieldsModelSerializer):
+class ContactV4Serializer(ContactSerializer):
     """Contact serializer for writing operations V4."""
-
-    default_error_messages = {
-        'address_same_as_company_and_has_address': gettext_lazy(
-            'Please select either address_same_as_company or enter an address manually, not both!',
-        ),
-        'no_address': gettext_lazy(
-            'Please select either address_same_as_company or enter an address manually.',
-        ),
-    }
-
-    title = NestedRelatedField(
-        meta_models.Title, required=False, allow_null=True,
-    )
-    company = NestedRelatedField(
-        Company, required=False, allow_null=True,
-    )
-    adviser = NestedAdviserField(read_only=True)
-    address_country = NestedRelatedField(
-        meta_models.Country, required=False, allow_null=True,
-    )
-    address_area = NestedRelatedField(
-        meta_models.AdministrativeArea, required=False, allow_null=True,
-    )
-    archived = serializers.BooleanField(read_only=True)
-    archived_on = serializers.DateTimeField(read_only=True)
-    archived_reason = serializers.CharField(read_only=True)
-    archived_by = NestedAdviserField(read_only=True)
-    primary = serializers.BooleanField()
 
     class Meta:
         model = Contact
@@ -300,8 +272,6 @@ class ContactV4Serializer(PermittedFieldsModelSerializer):
                     when=AllIsBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
                 ),
             ),
-            # Note: This is deliberately after RulesBasedValidator, so that
-            # address_same_as_company rules run first.
             AddressValidator(lazy=True, fields_mapping=Contact.ADDRESS_VALIDATION_MAPPING),
         ]
         permissions = {
