@@ -221,70 +221,9 @@ class ContactSerializer(PermittedFieldsModelSerializer):
 class ContactV4Serializer(ContactSerializer):
     """Contact serializer for writing operations V4."""
 
-    class Meta:
-        model = Contact
-        fields = (
-            'id',
-            'title',
-            'first_name',
-            'last_name',
-            'name',
-            'job_title',
-            'company',
-            'adviser',
-            'primary',
-            'telephone_countrycode',
-            'telephone_number',
-            'email',
-            'address_same_as_company',
-            'address_1',
-            'address_2',
-            'address_town',
-            'address_county',
-            'address_country',
-            'address_postcode',
-            'telephone_alternative',
-            'email_alternative',
-            'notes',
-            'archived',
-            'archived_documents_url_path',
-            'archived_on',
-            'archived_reason',
-            'archived_by',
-            'created_on',
-            'modified_on',
-            'address_area',
-        )
-        read_only_fields = (
-            'archived_documents_url_path',
-        )
-        validators = [
-            NotArchivedValidator(),
-            RulesBasedValidator(
-                ValidationRule(
-                    'address_same_as_company_and_has_address',
-                    OperatorRule('address_same_as_company', not_),
-                    when=AnyIsNotBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
-                ),
-                ValidationRule(
-                    'no_address',
-                    OperatorRule('address_same_as_company', bool),
-                    when=AllIsBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
-                ),
-            ),
-            AddressValidator(lazy=True, fields_mapping=Contact.ADDRESS_VALIDATION_MAPPING),
-        ]
-        permissions = {
-            f'company.{ContactPermission.view_contact_document}': 'archived_documents_url_path',
-        }
-
     def get_validators(self):
         """
-        Append ValidationRule for area depending on feature flag/context
-
-        Only mark area required if country is US/Canada & called from context where area is safe
-        to require, and if feature flag enabled. Currently the only context where area is safe to
-        require is CompanySerializer
+        Add validator for address area if the feature flag is enabled
         """
         validators = super().get_validators()
         if is_feature_flag_active('address-area-contact-required-field'):
