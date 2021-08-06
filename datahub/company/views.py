@@ -42,7 +42,9 @@ from datahub.company.serializers import (
     AssignRegionalAccountManagerSerializer,
     CompanySerializer,
     ContactDetailSerializer,
+    ContactDetailV4Serializer,
     ContactSerializer,
+    ContactV4Serializer,
     OneListCoreTeamMemberSerializer,
     PublicCompanySerializer,
     RemoveAccountManagerSerializer,
@@ -395,6 +397,36 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
         """
         if self.action in ('create', 'retrieve', 'partial_update'):
             return ContactDetailSerializer
+        return super().get_serializer_class()
+
+    def get_additional_data(self, create):
+        """Set adviser to the user on model instance creation."""
+        data = super().get_additional_data(create)
+        if create:
+            data['adviser'] = self.request.user
+        return data
+
+
+# TODO: Fix DRY issues
+class ContactV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
+    """Contact ViewSet v4."""
+
+    serializer_class = ContactV4Serializer
+    queryset = get_contact_queryset()
+    filter_backends = (
+        DjangoFilterBackend, OrderingFilter,
+    )
+    filterset_fields = ['company_id']
+    ordering = ('-created_on',)
+
+    def get_serializer_class(self):
+        """
+        Overwrites the built in get_serializer_class method in order
+        to return the ContactDetailSerializer if certain actions are called.
+        """
+        if self.action in ('create', 'retrieve', 'partial_update'):
+
+            return ContactDetailV4Serializer
         return super().get_serializer_class()
 
     def get_additional_data(self, create):

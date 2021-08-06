@@ -1,4 +1,4 @@
-from datahub.core.validators.address import AddressAreaValidator, AddressValidator
+from datahub.core.validators.address import AddressValidator
 from datahub.core.validators.not_archived import NotArchivedValidator
 from datahub.core.validators.one_way_required import RequiredUnlessAlreadyBlankValidator
 from datahub.core.validators.rules_based import (

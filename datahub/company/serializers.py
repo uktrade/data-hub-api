@@ -45,13 +45,14 @@ from datahub.core.validators import (
     AllIsBlankRule,
     AnyIsNotBlankRule,
     EqualsRule,
+    InRule,
     NotArchivedValidator,
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
     RulesBasedValidator,
     ValidationRule,
 )
-# from datahub.core.validators import AddressAreaValidator
+from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import TeamWithGeographyField
 
@@ -211,11 +212,128 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             # Note: This is deliberately after RulesBasedValidator, so that
             # address_same_as_company rules run first.
             AddressValidator(lazy=True, fields_mapping=Contact.ADDRESS_VALIDATION_MAPPING),
-            # AddressAreaValidator()
         ]
         permissions = {
             f'company.{ContactPermission.view_contact_document}': 'archived_documents_url_path',
         }
+
+
+class ContactV4Serializer(PermittedFieldsModelSerializer):
+    """Contact serializer for writing operations V4."""
+
+    default_error_messages = {
+        'address_same_as_company_and_has_address': gettext_lazy(
+            'Please select either address_same_as_company or enter an address manually, not both!',
+        ),
+        'no_address': gettext_lazy(
+            'Please select either address_same_as_company or enter an address manually.',
+        ),
+    }
+
+    title = NestedRelatedField(
+        meta_models.Title, required=False, allow_null=True,
+    )
+    company = NestedRelatedField(
+        Company, required=False, allow_null=True,
+    )
+    adviser = NestedAdviserField(read_only=True)
+    address_country = NestedRelatedField(
+        meta_models.Country, required=False, allow_null=True,
+    )
+    address_area = NestedRelatedField(
+        meta_models.AdministrativeArea, required=False, allow_null=True,
+    )
+    archived = serializers.BooleanField(read_only=True)
+    archived_on = serializers.DateTimeField(read_only=True)
+    archived_reason = serializers.CharField(read_only=True)
+    archived_by = NestedAdviserField(read_only=True)
+    primary = serializers.BooleanField()
+
+    class Meta:
+        model = Contact
+        fields = (
+            'id',
+            'title',
+            'first_name',
+            'last_name',
+            'name',
+            'job_title',
+            'company',
+            'adviser',
+            'primary',
+            'telephone_countrycode',
+            'telephone_number',
+            'email',
+            'address_same_as_company',
+            'address_1',
+            'address_2',
+            'address_town',
+            'address_county',
+            'address_country',
+            'address_postcode',
+            'telephone_alternative',
+            'email_alternative',
+            'notes',
+            'archived',
+            'archived_documents_url_path',
+            'archived_on',
+            'archived_reason',
+            'archived_by',
+            'created_on',
+            'modified_on',
+            'address_area',
+        )
+        read_only_fields = (
+            'archived_documents_url_path',
+        )
+        validators = [
+            NotArchivedValidator(),
+            RulesBasedValidator(
+                ValidationRule(
+                    'address_same_as_company_and_has_address',
+                    OperatorRule('address_same_as_company', not_),
+                    when=AnyIsNotBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
+                ),
+                ValidationRule(
+                    'no_address',
+                    OperatorRule('address_same_as_company', bool),
+                    when=AllIsBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
+                ),
+            ),
+            # Note: This is deliberately after RulesBasedValidator, so that
+            # address_same_as_company rules run first.
+            AddressValidator(lazy=True, fields_mapping=Contact.ADDRESS_VALIDATION_MAPPING),
+        ]
+        permissions = {
+            f'company.{ContactPermission.view_contact_document}': 'archived_documents_url_path',
+        }
+
+    def get_validators(self):
+        """
+        Append ValidationRule for area depending on feature flag/context
+
+        Only mark area required if country is US/Canada & called from context where area is safe
+        to require, and if feature flag enabled. Currently the only context where area is safe to
+        require is CompanySerializer
+        """
+        validators = super().get_validators()
+        if is_feature_flag_active('address-area-contact-required-field'):
+            validators.append(
+                RulesBasedValidator(
+                    ValidationRule(
+                        'required',
+                        OperatorRule('address_area', bool),
+                        when=InRule(
+                            'address_country',
+                            (
+                                Country.united_states.value.id,
+                                Country.canada.value.id,
+                            ),
+                        ),
+                    ),
+                ),
+            )
+        return validators
 
 
 class ConsentMarketingField(serializers.BooleanField):
@@ -241,6 +359,66 @@ class ConsentMarketingField(serializers.BooleanField):
 
 
 class ContactDetailSerializer(ContactSerializer):
+    """
+    This is the same as the ContactSerializer except it includes
+    accepts_dit_email_marketing in the fields. Only 3 endpoints will use this serialiser
+    """
+
+    accepts_dit_email_marketing = ConsentMarketingField(source='*', required=False)
+
+    class Meta(ContactSerializer.Meta):
+        fields = ContactSerializer.Meta.fields + ('accepts_dit_email_marketing',)
+
+    def _notify_consent_service(self, validated_data):
+        """
+        Trigger the update_contact_consent task with the current version
+        of `validated_data`. The actual enqueuing of the task happens in the
+        on_commit hook so it won't actually notify the consent service unless
+        the database transaction was successful.
+        """
+        if 'accepts_dit_email_marketing' not in validated_data:
+            # If no consent value in request body
+            return
+        # Remove the accepts_dit_email_marketing from validated_data
+        accepts_dit_email_marketing = validated_data.pop('accepts_dit_email_marketing')
+        # If consent value in POST, notify
+        combiner = DataCombiner(self.instance, validated_data)
+        request = self.context.get('request', None)
+        transaction.on_commit(
+            lambda: update_contact_consent.apply_async(
+                args=(
+                    combiner.get_value('email'),
+                    accepts_dit_email_marketing,
+                ),
+                kwargs={
+                    'modified_at': now().isoformat(),
+                    'zipkin_headers': get_zipkin_headers(request),
+                },
+            ),
+        )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        """
+        Create a new instance using this serializer
+
+        :return: created instance
+        """
+        self._notify_consent_service(validated_data)
+        return super().create(validated_data)
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        """
+        Update the given instance with validated_data
+
+        :return: updated instance
+        """
+        self._notify_consent_service(validated_data)
+        return super().update(instance, validated_data)
+
+
+class ContactDetailV4Serializer(ContactV4Serializer):
     """
     This is the same as the ContactSerializer except it includes
     accepts_dit_email_marketing in the fields. Only 3 endpoints will use this serialiser

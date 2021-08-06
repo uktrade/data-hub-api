@@ -1,17 +1,13 @@
 from rest_framework.exceptions import ValidationError
 
-from datahub.core.constants import Country
 from datahub.core.validate_utils import DataCombiner
-from datahub.feature_flag.utils import is_feature_flag_active
-
-FIELD_REQUIRED_MESSAGE = 'This field is required.'
 
 
 class AddressValidator:
     """Validator for addresses."""
 
     requires_context = True
-    message = FIELD_REQUIRED_MESSAGE
+    message = 'This field is required.'
 
     DEFAULT_FIELDS_MAPPING = {
         'address_1': {'required': True},
@@ -20,6 +16,7 @@ class AddressValidator:
         'address_county': {'required': False},
         'address_postcode': {'required': False},
         'address_country': {'required': True},
+        'address_area': {'required': False},
     }
 
     def __init__(self, lazy=False, fields_mapping=None):
@@ -78,26 +75,3 @@ class AddressValidator:
         errors = self._validate_fields(data_combined)
         if errors:
             raise ValidationError(instance, errors)
-
-
-class AddressAreaValidator:
-    """Validator for address areas."""
-
-    requires_context = True
-
-    def __call__(self, data, serializer):
-        """Validate the address area."""
-        instance = serializer.instance
-        data_combiner = DataCombiner(instance, data)
-        country = data_combiner.get_value('address_country')
-        if country and is_feature_flag_active('address-area-contact-required-field'):
-            country_id = str(country['id'])
-            is_invalid = (
-                (
-                    country_id == Country.united_states.value.id
-                    or country_id == Country.canada.value.id
-                )
-                and not data_combiner.get_value('address_area')
-            )
-            if is_invalid:
-                raise ValidationError(instance, {'address_area': [FIELD_REQUIRED_MESSAGE]})
