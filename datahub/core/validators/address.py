@@ -28,8 +28,6 @@ class AddressValidator:
             become required only if any of the fields are set.
         :fields_mapping: dict with the field as a key and the value as a dict with
             `required` == True or False
-        :self.area_required: area needs validation based on specific countries
-            with v4 address requirements
         """
         self.lazy = lazy
         if fields_mapping:
