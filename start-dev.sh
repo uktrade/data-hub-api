@@ -4,7 +4,7 @@ python /app/manage.py migrate --database mi --noinput
 python /app/manage.py migrate_es
 # Load initial metadata - ignore errors as we may have already loaded it in to
 # this DB
-python /app/manage.py loadinitialmetadata || true
+python /app/manage.py loadinitialmetadata --force
 # Load initial revisions - ignore errors as we may have already loaded it in to
 # this DB
 python /app/manage.py loaddata /app/fixtures/test_data.yaml || true

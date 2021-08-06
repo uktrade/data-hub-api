@@ -26,7 +26,7 @@ shellplus:
 	docker-compose run api python manage.py shell_plus --ipython
 
 load-metadata:
-	docker-compose run api python manage.py loadinitialmetadata
+	docker-compose run api python manage.py loadinitialmetadata --force
 
 setup-flake8-hook:
 	python3 -m venv env
