@@ -128,6 +128,8 @@ class AdviserSerializer(serializers.ModelSerializer):
 class ContactSerializer(PermittedFieldsModelSerializer):
     """Contact serializer for writing operations V3."""
 
+    """Trivial change"""
+    
     default_error_messages = {
         'address_same_as_company_and_has_address': gettext_lazy(
             'Please select either address_same_as_company or enter an address manually, not both!',
