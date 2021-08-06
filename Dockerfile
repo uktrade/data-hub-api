@@ -18,4 +18,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 ADD . /app/
 
-CMD ./start.sh
+CMD ./start-dev.sh
