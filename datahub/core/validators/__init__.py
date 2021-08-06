@@ -28,7 +28,6 @@ from datahub.core.validators.telephone import (
 
 __all__ = (
     'AbstractRule',
-    'AddressAreaValidator',
     'AddressValidator',
     'AllIsBlankRule',
     'AndRule',

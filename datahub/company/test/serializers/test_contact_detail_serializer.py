@@ -187,6 +187,8 @@ class TestContactSerializer:
 
 @freeze_time(FROZEN_TIME)
 class TestContactCV4SerializerShould:
+    """Tests for the ContactCV4Serializer for Area Changes specifically
+    consent service correctly."""
     @pytest.mark.parametrize(
         'country_id, expected_response, is_valid',
         (

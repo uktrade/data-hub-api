@@ -3,11 +3,7 @@ from unittest import mock
 import pytest
 from rest_framework.exceptions import ValidationError
 
-from datahub.core.validators import (
-    AddressValidator,
-)
-
-pytestmark = pytest.mark.django_db
+from datahub.core.validators import AddressValidator
 
 
 class TestAddressValidator:
