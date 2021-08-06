@@ -1,1 +1,0 @@
-It is now possible to view a new trade agreement `EU-UK Trade Co-operation Agreement` in trade agreements metadata.

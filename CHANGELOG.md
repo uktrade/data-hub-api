@@ -1,3 +1,9 @@
+# Data Hub API 37.3.0 (2021-08-06)
+## Features
+
+- It is now possible to view a new trade agreement `EU-UK Trade Co-operation Agreement` in trade agreements metadata.
+
+
 # Data Hub API 37.2.0 (2021-07-27)
 
 
