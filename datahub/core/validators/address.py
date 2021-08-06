@@ -74,4 +74,4 @@ class AddressValidator:
 
         errors = self._validate_fields(data_combined)
         if errors:
-            raise ValidationError(instance, errors)
+            raise ValidationError(errors)
