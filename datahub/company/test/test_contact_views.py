@@ -888,6 +888,57 @@ class TestContactList(APITestMixin):
         assert {contact['id'] for contact in response.data['results']} == expected_contacts
 
 
+    @pytest.mark.parametrize(
+        'contacts,filter_,expected',
+        (
+            (
+                (
+                    'aaa@aaa.aaa',
+                    'bbb@bbb.bbb',
+                    'ccc@ccc.ccc',
+                ),
+                'bbb@bbb.bbb',
+                {
+                'bbb@bbb.bbb',
+                },
+            ),
+            (
+                (
+                    'aaa@aaa.aaa',
+                    'bbb@bbb.bbb',
+                    'aaa@aaa.aaa',
+                ),
+                'aaa@aaa.aaa',
+                {
+                'aaa@aaa.aaa',
+                'aaa@aaa.aaa',
+                },
+            ),
+            (
+                (
+                    'aaa@aaa.aaa',
+                    'bbb@bbb.bbb',
+                    'aaa@aaa.aaa',
+                ),
+                'xxx@xxx.xxx',
+                set(),
+            ),
+        ),
+    )
+    def test_filter_by_email(self, contacts, filter_, expected):
+        """Test getting contacts by email"""
+        for contact in contacts:
+            ContactFactory(email=contact)
+
+        response = self.api_client.get(
+            reverse('api-v3:contact:list'),
+            data=dict(email=filter_),
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert {res['email'] for res in response.data['results']} == expected
+
+
 class TestContactVersioning(APITestMixin):
     """
     Tests for versions created when interacting with the contact endpoints.
