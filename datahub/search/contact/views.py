@@ -32,6 +32,7 @@ class SearchContactAPIViewMixin:
     }
 
     FILTER_FIELDS = (
+        'email',
         'name',
         'company',
         'company_name',
