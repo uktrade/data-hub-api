@@ -8,7 +8,7 @@ from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
     CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
 )
-from datahub.company.serializers import ContactDetailSerializer
+from datahub.company.serializers import ContactDetailV4Serializer
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
@@ -37,7 +37,7 @@ def update_contact_task_mock(monkeypatch):
 
 
 @freeze_time(FROZEN_TIME)
-class TestContactSerializer:
+class TestContactV4Serializer:
     """
     Tests for the Contact Serializer. Checking that update / create notify the
     consent service correctly.
@@ -53,7 +53,7 @@ class TestContactSerializer:
         is called.
         """
         contact = self._make_contact()
-        c = ContactDetailSerializer(
+        c = ContactDetailV4Serializer(
             instance=contact,
             context={'request': request},
         )
@@ -79,7 +79,7 @@ class TestContactSerializer:
         is called with partial data.
         """
         contact = self._make_contact()
-        c = ContactDetailSerializer(instance=contact, partial=True)
+        c = ContactDetailV4Serializer(instance=contact, partial=True)
         c.update(c.instance, {
             'accepts_dit_email_marketing': True,
         })
@@ -98,7 +98,7 @@ class TestContactSerializer:
         is called with partial data but `accepts_dit_email_marketing` is missing.
         """
         contact = self._make_contact()
-        c = ContactDetailSerializer(instance=contact, partial=True)
+        c = ContactDetailV4Serializer(instance=contact, partial=True)
         data = {
             'last_name': 'Nelson1',
         }
@@ -140,7 +140,7 @@ class TestContactSerializer:
             'notes': 'lorem ipsum',
             'accepts_dit_email_marketing': True,
         }
-        c = ContactDetailSerializer(data=data, context={'request': request})
+        c = ContactDetailV4Serializer(data=data, context={'request': request})
         c.is_valid(raise_exception=True)
         c.create(c.validated_data)
         update_contact_task_mock.assert_called_once_with(
@@ -180,6 +180,67 @@ class TestContactSerializer:
             status_code=200,
             text=hawk_response,
         )
-        contact_serialized = ContactDetailSerializer(instance=contact)
+        contact_serialized = ContactDetailV4Serializer(instance=contact)
         assert contact_serialized.data['accepts_dit_email_marketing'] is accepts_marketing
         assert requests_mock.call_count == 1
+
+        @pytest.mark.parametrize(
+            'country_id, expected_response, is_valid',
+            (
+                (
+                    constants.Country.united_states.value.id,
+                    {
+                        'address_area': ['This field is required.'],
+                    },
+                    False,
+                ),
+                (
+                    constants.Country.canada.value.id,
+                    {
+                        'address_area': ['This field is required.'],
+                    },
+                    False,
+                ),
+                (
+                    constants.Country.united_kingdom.value.id,
+                    {},
+                    True,
+                ),
+            ),
+        )
+        def test_area_required_validation_on_respective_countries(
+            self,
+            country_id,
+            expected_response,
+            is_valid,
+        ):
+            """
+            Ensure that area required validation is called for appropriate countries
+            and excluded for others
+            """
+            FeatureFlagFactory(code='address-area-contact-required-field')
+            company = CompanyFactory()
+            data = {
+                'title': {
+                    'id': constants.Title.admiral_of_the_fleet.value.id,
+                },
+                'first_name': 'Jane',
+                'last_name': 'Doe',
+                'company': {
+                    'id': str(company.pk),
+                },
+                'primary': True,
+                'email': 'foo@bar.com',
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'address_same_as_company': False,
+                'address_1': 'Foo st.',
+                'address_town': 'Bar',
+                'address_country': {
+                    'id': country_id,
+                },
+            }
+            contact_serializer = ContactDetailV4Serializer(data=data, context={'request': request})
+            assert contact_serializer.is_valid(raise_exception=False) is is_valid
+            assert len(contact_serializer.errors) == len(expected_response)
+            assert contact_serializer.errors == expected_response

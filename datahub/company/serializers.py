@@ -225,7 +225,9 @@ class ContactV4Serializer(ContactSerializer):
         """
         Add validator for address area if the feature flag is enabled
         """
+
         validators = super().get_validators()
+        #we need to enable the feature flag in tests for this to work, or get rid of the feature flag
         if is_feature_flag_active('address-area-contact-required-field'):
             validators.append(
                 RulesBasedValidator(
@@ -327,65 +329,14 @@ class ContactDetailSerializer(ContactSerializer):
         return super().update(instance, validated_data)
 
 
-class ContactDetailV4Serializer(ContactV4Serializer):
+class ContactDetailV4Serializer(ContactV4Serializer, ContactDetailSerializer):
     """
     This is the same as the ContactSerializer except it includes
     accepts_dit_email_marketing in the fields. Only 3 endpoints will use this serialiser
     """
 
-    accepts_dit_email_marketing = ConsentMarketingField(source='*', required=False)
-
-    class Meta(ContactSerializer.Meta):
-        fields = ContactSerializer.Meta.fields + ('accepts_dit_email_marketing',)
-
-    def _notify_consent_service(self, validated_data):
-        """
-        Trigger the update_contact_consent task with the current version
-        of `validated_data`. The actual enqueuing of the task happens in the
-        on_commit hook so it won't actually notify the consent service unless
-        the database transaction was successful.
-        """
-        if 'accepts_dit_email_marketing' not in validated_data:
-            # If no consent value in request body
-            return
-        # Remove the accepts_dit_email_marketing from validated_data
-        accepts_dit_email_marketing = validated_data.pop('accepts_dit_email_marketing')
-        # If consent value in POST, notify
-        combiner = DataCombiner(self.instance, validated_data)
-        request = self.context.get('request', None)
-        transaction.on_commit(
-            lambda: update_contact_consent.apply_async(
-                args=(
-                    combiner.get_value('email'),
-                    accepts_dit_email_marketing,
-                ),
-                kwargs={
-                    'modified_at': now().isoformat(),
-                    'zipkin_headers': get_zipkin_headers(request),
-                },
-            ),
-        )
-
-    @transaction.atomic
-    def create(self, validated_data):
-        """
-        Create a new instance using this serializer
-
-        :return: created instance
-        """
-        self._notify_consent_service(validated_data)
-        return super().create(validated_data)
-
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        """
-        Update the given instance with validated_data
-
-        :return: updated instance
-        """
-        self._notify_consent_service(validated_data)
-        return super().update(instance, validated_data)
-
+    class Meta(ContactV4Serializer.Meta):
+        fields = ContactV4Serializer.Meta.fields + ('accepts_dit_email_marketing',)
 
 class CompanyExportCountrySerializer(serializers.ModelSerializer):
     """
