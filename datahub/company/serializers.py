@@ -13,6 +13,7 @@ from datahub.company import consent
 from datahub.company.constants import (
     BusinessTypeConstant,
     OneListTierID,
+    ADDRESS_AREA_VALIDATION_FEATURE_FLAG
 )
 from datahub.company.models import (
     Advisor,
@@ -227,8 +228,7 @@ class ContactV4Serializer(ContactSerializer):
         """
 
         validators = super().get_validators()
-        #we need to enable the feature flag in tests for this to work, or get rid of the feature flag
-        if is_feature_flag_active('address-area-contact-required-field'):
+        if is_feature_flag_active(ADDRESS_AREA_VALIDATION_FEATURE_FLAG):
             validators.append(
                 RulesBasedValidator(
                     ValidationRule(

@@ -13,6 +13,7 @@ from reversion.models import Version
 from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
     CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+    ADDRESS_AREA_VALIDATION_FEATURE_FLAG
 )
 from datahub.company.models import Contact
 from datahub.company.test.factories import ArchivedContactFactory, CompanyFactory, ContactFactory
@@ -25,10 +26,14 @@ from datahub.core.test_utils import (
     HawkMockJSONResponse,
 )
 from datahub.metadata.test.factories import TeamFactory
+from datahub.feature_flag.test.factories import FeatureFlagFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
+@pytest.fixture(autouse=True)
+def address_area_validation_feature_flag():
+    yield FeatureFlagFactory(code=ADDRESS_AREA_VALIDATION_FEATURE_FLAG)
 
 def generate_hawk_response(response):
     """Mocks HAWK server validation for content."""
@@ -289,7 +294,7 @@ class TestAddContact(APITestMixin):
 
     def test_fails_with_us_but_no_area(self):
         """Test that fails if only partial manual address supplied."""
-        #something is very wrong with the list endpoint if this isn't failing
+
         url = reverse('api-v4:contact:list')
         response = self.api_client.post(
             url,
@@ -308,15 +313,16 @@ class TestAddContact(APITestMixin):
                 },
                 'address_1': 'line 1',
                 'address_2': 'line 2',
-                #'address_area': None,
+                'address_area': None,
                 'address_town': 'town',
                 'primary': True,
             },
         )
 
         assert response.data == {
-            'address_country': ['This field is required.'],
-            'address_town': ['This field is required.'],
+            'address_area': [
+                'This field is required.'
+            ]
         }
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
