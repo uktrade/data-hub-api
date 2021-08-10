@@ -154,6 +154,111 @@ class TestAddContact(APITestMixin):
             'modified_on': '2017-04-18T13:25:30.986208Z',
         }
 
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_with_us_manual_address(self, get_consent_fixture):
+        """Test add with manual address."""
+        company = CompanyFactory()
+        get_consent_fixture({
+            'results': [
+                {
+                    'consents': [
+                        'email_marketing',
+                    ],
+                    'email': 'foo@bar.com',
+                },
+            ],
+        })
+        url = reverse('api-v4:contact:list')
+        response = self.api_client.post(
+            url,
+            data={
+                'title': {
+                    'id': constants.Title.admiral_of_the_fleet.value.id,
+                },
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'job_title': 'Head of Sales',
+                'company': {
+                    'id': str(company.pk),
+                },
+                'email': 'foo@bar.com',
+                'email_alternative': 'foo2@bar.com',
+                'primary': True,
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'telephone_alternative': '987654321',
+                'address_same_as_company': False,
+                'address_1': 'Foo st.',
+                'address_2': 'adr 2',
+                'address_town': 'Brooklyn',
+                'address_county': '',
+                'address_country': {
+                    'id': constants.Country.united_states.value.id,
+                    'name': constants.Country.united_states.value.name,
+                },
+                'address_area': {
+                    'id': constants.AdministrativeArea.new_york.value.id,
+                    'name': constants.AdministrativeArea.new_york.value.name
+                },
+                'address_postcode': 'SW1A1AA',
+                'notes': 'lorem ipsum',
+                'accepts_dit_email_marketing': True,
+            },
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json() == {
+            'id': response.json()['id'],
+            'title': {
+                'id': constants.Title.admiral_of_the_fleet.value.id,
+                'name': constants.Title.admiral_of_the_fleet.value.name,
+            },
+            'first_name': 'Oratio',
+            'last_name': 'Nelson',
+            'name': 'Oratio Nelson',
+            'job_title': 'Head of Sales',
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+            },
+            'adviser': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name,
+            },
+            'email': 'foo@bar.com',
+            'email_alternative': 'foo2@bar.com',
+            'primary': True,
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'telephone_alternative': '987654321',
+            'address_same_as_company': False,
+            'address_1': 'Foo st.',
+            'address_2': 'adr 2',
+            'address_area': None,
+            'address_town': 'Brooklyn',
+            'address_county': '',
+            'address_country': {
+                'id': constants.Country.united_states.value.id,
+                'name': constants.Country.united_states.value.name,
+            },
+            'address_area': {
+                'id': constants.AdministrativeArea.new_york.value.id,
+                'name': constants.AdministrativeArea.new_york.value.name
+            },
+            'address_postcode': 'SW1A1AA',
+            'notes': 'lorem ipsum',
+            'accepts_dit_email_marketing': True,
+            'archived': False,
+            'archived_by': None,
+            'archived_documents_url_path': '',
+            'archived_on': None,
+            'archived_reason': None,
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z',
+        }
+
     def test_with_address_same_as_company(self):
         """Test add new contact with same address as company."""
         url = reverse('api-v4:contact:list')
