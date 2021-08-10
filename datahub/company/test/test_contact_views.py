@@ -4,6 +4,7 @@ import pytest
 import reversion
 from django.conf import settings
 from django.utils.timezone import now
+import factory
 from freezegun import freeze_time
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
 from rest_framework import status
@@ -927,8 +928,7 @@ class TestContactList(APITestMixin):
     )
     def test_filter_by_email(self, contacts, filter_, expected):
         """Test getting contacts by email"""
-        for contact in contacts:
-            ContactFactory(email=contact)
+        ContactFactory.create_batch(len(contacts), email=factory.Iterator(contacts))
 
         response = self.api_client.get(
             reverse('api-v3:contact:list'),

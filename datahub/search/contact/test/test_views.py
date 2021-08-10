@@ -466,8 +466,7 @@ class TestSearch(APITestMixin):
         ),
     )
     def test_email_filter(self, es_with_collector, contacts, filter_, expected):
-        for contact in contacts:
-            ContactFactory(email=contact)
+        ContactFactory.create_batch(len(contacts), email=factory.Iterator(contacts))
 
         es_with_collector.flush_and_refresh()
 
