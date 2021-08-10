@@ -7,6 +7,7 @@ from freezegun import freeze_time
 from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
     CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+    ADDRESS_AREA_VALIDATION_FEATURE_FLAG,
 )
 from datahub.company.serializers import ContactDetailV4Serializer
 from datahub.company.test.factories import CompanyFactory, ContactFactory
@@ -193,6 +194,7 @@ class TestContactV4Serializer:
                         'address_area': ['This field is required.'],
                     },
                     False,
+                    None,
                 ),
                 (
                     constants.Country.canada.value.id,
@@ -200,11 +202,24 @@ class TestContactV4Serializer:
                         'address_area': ['This field is required.'],
                     },
                     False,
+                    None,
+                ),
+                (
+                    constants.Country.canada.value.id,
+                    {
+                        'address_area': ['This field is required.'],
+                    },
+                    False,
+                    {
+                        'id': constants.AdministrativeArea.quebec.value.id,
+                        'name': constants.AdministrativeArea.quebec.value.name,
+                    },
                 ),
                 (
                     constants.Country.united_kingdom.value.id,
                     {},
                     True,
+                    None,
                 ),
             ),
         )
@@ -213,12 +228,13 @@ class TestContactV4Serializer:
             country_id,
             expected_response,
             is_valid,
+            address_area
         ):
             """
             Ensure that area required validation is called for appropriate countries
             and excluded for others
             """
-            FeatureFlagFactory(code='address-area-contact-required-field')
+            FeatureFlagFactory(code=ADDRESS_AREA_VALIDATION_FEATURE_FLAG)
             company = CompanyFactory()
             data = {
                 'title': {
@@ -239,6 +255,7 @@ class TestContactV4Serializer:
                 'address_country': {
                     'id': country_id,
                 },
+                'address_area': address_area
             }
             contact_serializer = ContactDetailV4Serializer(data=data, context={'request': request})
             assert contact_serializer.is_valid(raise_exception=False) is is_valid
