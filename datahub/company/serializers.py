@@ -11,9 +11,9 @@ from rest_framework import serializers
 
 from datahub.company import consent
 from datahub.company.constants import (
+    ADDRESS_AREA_VALIDATION_FEATURE_FLAG,
     BusinessTypeConstant,
     OneListTierID,
-    ADDRESS_AREA_VALIDATION_FEATURE_FLAG
 )
 from datahub.company.models import (
     Advisor,
@@ -226,7 +226,6 @@ class ContactV4Serializer(ContactSerializer):
         """
         Add validator for address area if the feature flag is enabled
         """
-
         validators = super().get_validators()
         if is_feature_flag_active(ADDRESS_AREA_VALIDATION_FEATURE_FLAG):
             validators.append(
@@ -337,6 +336,7 @@ class ContactDetailV4Serializer(ContactV4Serializer, ContactDetailSerializer):
 
     class Meta(ContactV4Serializer.Meta):
         fields = ContactV4Serializer.Meta.fields + ('accepts_dit_email_marketing',)
+
 
 class CompanyExportCountrySerializer(serializers.ModelSerializer):
     """

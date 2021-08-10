@@ -154,6 +154,7 @@ class InRule(OperatorRule):
         """
         super().__init__(field, partial(contains, value))
 
+
 class ConditionalRule:
     """A rule that is only checked when a condition is met."""
 

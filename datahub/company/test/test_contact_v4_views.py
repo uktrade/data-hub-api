@@ -1,9 +1,7 @@
 from datetime import date
 
 import pytest
-import reversion
 from django.conf import settings
-from django.utils.timezone import now
 from freezegun import freeze_time
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
 from rest_framework import status
@@ -12,8 +10,8 @@ from reversion.models import Version
 
 from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
+    ADDRESS_AREA_VALIDATION_FEATURE_FLAG,
     CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
-    ADDRESS_AREA_VALIDATION_FEATURE_FLAG
 )
 from datahub.company.models import Contact
 from datahub.company.test.factories import ArchivedContactFactory, CompanyFactory, ContactFactory
@@ -22,18 +20,20 @@ from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
-    format_date_or_datetime,
     HawkMockJSONResponse,
 )
-from datahub.metadata.test.factories import TeamFactory
 from datahub.feature_flag.test.factories import FeatureFlagFactory
+from datahub.metadata.test.factories import TeamFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
+
 @pytest.fixture(autouse=True)
 def address_area_validation_feature_flag():
+    """Setting feature flag for address area validation."""
     yield FeatureFlagFactory(code=ADDRESS_AREA_VALIDATION_FEATURE_FLAG)
+
 
 def generate_hawk_response(response):
     """Mocks HAWK server validation for content."""
@@ -198,7 +198,7 @@ class TestAddContact(APITestMixin):
                 },
                 'address_area': {
                     'id': constants.AdministrativeArea.new_york.value.id,
-                    'name': constants.AdministrativeArea.new_york.value.name
+                    'name': constants.AdministrativeArea.new_york.value.name,
                 },
                 'address_postcode': 'SW1A1AA',
                 'notes': 'lorem ipsum',
@@ -236,7 +236,6 @@ class TestAddContact(APITestMixin):
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
-            'address_area': None,
             'address_town': 'Brooklyn',
             'address_county': '',
             'address_country': {
@@ -245,7 +244,7 @@ class TestAddContact(APITestMixin):
             },
             'address_area': {
                 'id': constants.AdministrativeArea.new_york.value.id,
-                'name': constants.AdministrativeArea.new_york.value.name
+                'name': constants.AdministrativeArea.new_york.value.name,
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
@@ -399,7 +398,6 @@ class TestAddContact(APITestMixin):
 
     def test_fails_with_us_but_no_area(self):
         """Test that fails if only partial manual address supplied."""
-
         url = reverse('api-v4:contact:list')
         response = self.api_client.post(
             url,
@@ -426,8 +424,8 @@ class TestAddContact(APITestMixin):
 
         assert response.data == {
             'address_area': [
-                'This field is required.'
-            ]
+                'This field is required.',
+            ],
         }
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -577,6 +575,7 @@ class TestEditContact(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
+
 
 class TestViewContact(APITestMixin):
     """View contact test case."""

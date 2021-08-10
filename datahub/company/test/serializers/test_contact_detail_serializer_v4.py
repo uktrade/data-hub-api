@@ -6,8 +6,8 @@ from freezegun import freeze_time
 
 from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
-    CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
     ADDRESS_AREA_VALIDATION_FEATURE_FLAG,
+    CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
 )
 from datahub.company.serializers import ContactDetailV4Serializer
 from datahub.company.test.factories import CompanyFactory, ContactFactory
@@ -228,7 +228,7 @@ class TestContactV4Serializer:
             country_id,
             expected_response,
             is_valid,
-            address_area
+            address_area,
         ):
             """
             Ensure that area required validation is called for appropriate countries
@@ -255,7 +255,7 @@ class TestContactV4Serializer:
                 'address_country': {
                     'id': country_id,
                 },
-                'address_area': address_area
+                'address_area': address_area,
             }
             contact_serializer = ContactDetailV4Serializer(data=data, context={'request': request})
             assert contact_serializer.is_valid(raise_exception=False) is is_valid
