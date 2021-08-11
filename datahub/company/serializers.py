@@ -382,11 +382,13 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         required=False,
         allow_null=True,
         area_can_be_required=True,
+        postcode_can_be_required=True,
     )
     address = AddressSerializer(
         source_model=Company,
         address_source_prefix='address',
         area_can_be_required=True,
+        postcode_can_be_required=True,
     )
     export_countries = CompanyExportCountrySerializer(many=True, read_only=True)
 
