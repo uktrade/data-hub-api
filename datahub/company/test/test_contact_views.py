@@ -1,10 +1,10 @@
 from datetime import date
 
+import factory
 import pytest
 import reversion
 from django.conf import settings
 from django.utils.timezone import now
-import factory
 from freezegun import freeze_time
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
 from rest_framework import status
@@ -888,39 +888,21 @@ class TestContactList(APITestMixin):
         expected_contacts = {str(contact.id) for contact in contacts}
         assert {contact['id'] for contact in response.data['results']} == expected_contacts
 
-
     @pytest.mark.parametrize(
         'contacts,filter_,expected',
         (
             (
-                (
-                    'aaa@aaa.aaa',
-                    'bbb@bbb.bbb',
-                    'ccc@ccc.ccc',
-                ),
+                ('aaa@aaa.aaa', 'bbb@bbb.bbb', 'ccc@ccc.ccc'),
                 'bbb@bbb.bbb',
-                {
-                'bbb@bbb.bbb',
-                },
+                {'bbb@bbb.bbb'},
             ),
             (
-                (
-                    'aaa@aaa.aaa',
-                    'bbb@bbb.bbb',
-                    'aaa@aaa.aaa',
-                ),
+                ('aaa@aaa.aaa', 'bbb@bbb.bbb', 'aaa@aaa.aaa'),
                 'aaa@aaa.aaa',
-                {
-                'aaa@aaa.aaa',
-                'aaa@aaa.aaa',
-                },
+                {'aaa@aaa.aaa', 'aaa@aaa.aaa'},
             ),
             (
-                (
-                    'aaa@aaa.aaa',
-                    'bbb@bbb.bbb',
-                    'aaa@aaa.aaa',
-                ),
+                ('aaa@aaa.aaa', 'bbb@bbb.bbb', 'aaa@aaa.aaa'),
                 'xxx@xxx.xxx',
                 set(),
             ),
