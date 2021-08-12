@@ -8,7 +8,6 @@ NOTIFY_DNB_INVESTIGATION_FEATURE_FLAG = 'notify-dnb-investigations'
 AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG = 'automatic-company-archive'
 EXPORT_COUNTRIES_FEATURE_FLAG = 'export-countries-switch'
 UPDATE_CONSENT_SERVICE_FEATURE_FLAG = 'update-consent-service'
-ADDRESS_AREA_VALIDATION_FEATURE_FLAG = 'address-area-contact-required-field'
 
 CONSENT_SERVICE_EMAIL_CONSENT_TYPE = 'email_marketing'
 

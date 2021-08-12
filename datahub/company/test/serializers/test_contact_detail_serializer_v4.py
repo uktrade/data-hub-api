@@ -6,7 +6,6 @@ from freezegun import freeze_time
 
 from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
-    ADDRESS_AREA_VALIDATION_FEATURE_FLAG,
     CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
 )
 from datahub.company.serializers import ContactDetailV4Serializer
@@ -15,8 +14,6 @@ from datahub.core import constants
 from datahub.core.test_utils import (
     HawkMockJSONResponse,
 )
-from datahub.feature_flag.test.factories import FeatureFlagFactory
-
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
@@ -233,7 +230,6 @@ class TestContactV4Serializer:
             Ensure that area required validation is called for appropriate countries
             and excluded for others
             """
-            FeatureFlagFactory(code=ADDRESS_AREA_VALIDATION_FEATURE_FLAG)
             company = CompanyFactory()
             data = {
                 'title': {

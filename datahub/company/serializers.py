@@ -11,7 +11,6 @@ from rest_framework import serializers
 
 from datahub.company import consent
 from datahub.company.constants import (
-    ADDRESS_AREA_VALIDATION_FEATURE_FLAG,
     BusinessTypeConstant,
     OneListTierID,
 )
@@ -53,7 +52,6 @@ from datahub.core.validators import (
     RulesBasedValidator,
     ValidationRule,
 )
-from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import TeamWithGeographyField
 
@@ -227,22 +225,21 @@ class ContactV4Serializer(ContactSerializer):
         Add validator for address area if the feature flag is enabled
         """
         validators = super().get_validators()
-        if is_feature_flag_active(ADDRESS_AREA_VALIDATION_FEATURE_FLAG):
-            validators.append(
-                RulesBasedValidator(
-                    ValidationRule(
-                        'required',
-                        OperatorRule('address_area', bool),
-                        when=InRule(
-                            'address_country',
-                            (
-                                Country.united_states.value.id,
-                                Country.canada.value.id,
-                            ),
+        validators.append(
+            RulesBasedValidator(
+                ValidationRule(
+                    'required',
+                    OperatorRule('address_area', bool),
+                    when=InRule(
+                        'address_country',
+                        (
+                            Country.united_states.value.id,
+                            Country.canada.value.id,
                         ),
                     ),
                 ),
-            )
+            ),
+        )
         return validators
 
 
@@ -331,7 +328,7 @@ class ContactDetailSerializer(ContactSerializer):
 class ContactDetailV4Serializer(ContactV4Serializer, ContactDetailSerializer):
     """
     This is the same as the ContactSerializer except it includes
-    accepts_dit_email_marketing in the fields. Only 3 endpoints will use this serialiser
+    accepts_dit_email_marketing in the fields.
     """
 
     class Meta(ContactV4Serializer.Meta):

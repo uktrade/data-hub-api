@@ -10,7 +10,6 @@ from reversion.models import Version
 
 from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
-    ADDRESS_AREA_VALIDATION_FEATURE_FLAG,
     CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
 )
 from datahub.company.models import Contact
@@ -22,17 +21,10 @@ from datahub.core.test_utils import (
     create_test_user,
     HawkMockJSONResponse,
 )
-from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.metadata.test.factories import TeamFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
-
-
-@pytest.fixture(autouse=True)
-def address_area_validation_feature_flag():
-    """Setting feature flag for address area validation."""
-    yield FeatureFlagFactory(code=ADDRESS_AREA_VALIDATION_FEATURE_FLAG)
 
 
 def generate_hawk_response(response):
