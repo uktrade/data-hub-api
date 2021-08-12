@@ -47,7 +47,7 @@ class TestContactV4Serializer:
     def test_serializer_update_call_task(self, update_contact_task_mock, synchronous_on_commit):
         """
         Ensure that consent service celery task is called when serializer.update
-        is called.
+        is called if accepts_dit_email_marketing is True.
         """
         contact = self._make_contact()
         c = ContactDetailV4Serializer(
@@ -73,7 +73,7 @@ class TestContactV4Serializer:
     ):
         """
         Ensure that consent service celery task is called when serializer.update
-        is called with partial data.
+        is called with partial data if accepts_dit_email_marketing is True.
         """
         contact = self._make_contact()
         c = ContactDetailV4Serializer(instance=contact, partial=True)
@@ -91,7 +91,7 @@ class TestContactV4Serializer:
             synchronous_on_commit,
     ):
         """
-        Ensure that consent service celery task not is called when serializer.update
+        Ensure that consent service celery task is not called when serializer.update
         is called with partial data but `accepts_dit_email_marketing` is missing.
         """
         contact = self._make_contact()
@@ -149,14 +149,13 @@ class TestContactV4Serializer:
         )
 
     @pytest.mark.parametrize('accepts_marketing', (True, False))
-    def test_to_representation(
+    def test_marketing_field_populated_by_consent_service(
         self,
         requests_mock,
         accepts_marketing,
     ):
         """
-        Test accepts_dit_email_marketing fields is populated by the consent service
-        when the feature flag is enabled.
+        Test accepts_dit_email_marketing field is populated by the consent service.
         """
         contact = self._make_contact()
         hawk_response = HawkMockJSONResponse(

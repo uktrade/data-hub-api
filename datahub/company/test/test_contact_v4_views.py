@@ -449,7 +449,7 @@ class TestEditContact(APITestMixin):
     """Edit contact test case."""
 
     def test_patch(self):
-        """Test that it successfully patch an existing contact."""
+        """Test that it successfully patches an existing contact."""
         with freeze_time('2017-04-18 13:25:30.986208'):
             company = CompanyFactory()
 
