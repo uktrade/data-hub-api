@@ -387,7 +387,7 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
     filter_backends = (
         DjangoFilterBackend, OrderingFilter,
     )
-    filterset_fields = ['company_id']
+    filterset_fields = ['company_id', 'email']
     ordering = ('-created_on',)
 
     def get_serializer_class(self):
