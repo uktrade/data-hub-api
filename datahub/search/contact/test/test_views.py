@@ -432,40 +432,24 @@ class TestSearch(APITestMixin):
         'contacts,filter_,expected',
         (
             (
-                (
-                    'aaa@aaa.aaa',
-                    'bbb@bbb.bbb',
-                    'ccc@ccc.ccc',
-                ),
+                ('aaa@aaa.aaa', 'bbb@bbb.bbb', 'ccc@ccc.ccc'),
                 'bbb@bbb.bbb',
-                {
-                'bbb@bbb.bbb',
-                },
+                {'bbb@bbb.bbb'},
             ),
             (
-                (
-                    'aaa@aaa.aaa',
-                    'bbb@bbb.bbb',
-                    'aaa@aaa.aaa',
-                ),
+                ('aaa@aaa.aaa', 'bbb@bbb.bbb', 'aaa@aaa.aaa'),
                 'aaa@aaa.aaa',
-                {
-                'aaa@aaa.aaa',
-                'aaa@aaa.aaa',
-                },
+                {'aaa@aaa.aaa', 'aaa@aaa.aaa'},
             ),
             (
-                (
-                    'aaa@aaa.aaa',
-                    'bbb@bbb.bbb',
-                    'aaa@aaa.aaa',
-                ),
+                ('aaa@aaa.aaa', 'bbb@bbb.bbb', 'aaa@aaa.aaa'),
                 'xxx@xxx.xxx',
                 set(),
             ),
         ),
     )
     def test_email_filter(self, es_with_collector, contacts, filter_, expected):
+        """Tests the email filter"""
         ContactFactory.create_batch(len(contacts), email=factory.Iterator(contacts))
 
         es_with_collector.flush_and_refresh()
