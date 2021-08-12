@@ -61,7 +61,7 @@ class AdministrativeArea(Enum):
         'Quebec',
         '5fc4ea61-75fe-415d-8ff0-2a2034ff6c86',
         'QC',
-        Country.united_states.value.id,
+        Country.canada.value.id,
     )
 
 

@@ -16,7 +16,6 @@ from datahub.core.test_utils import (
 )
 
 # mark the whole module for db use
-
 pytestmark = pytest.mark.django_db
 
 FROZEN_TIME = '2020-03-13T14:21:24.367265+00:00'
