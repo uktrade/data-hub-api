@@ -220,12 +220,8 @@ class ContactSerializer(PermittedFieldsModelSerializer):
 class ContactV4Serializer(ContactSerializer):
     """Contact serializer for writing operations V4."""
 
-    def get_validators(self):
-        """
-        Add validator for address area if the feature flag is enabled
-        """
-        validators = super().get_validators()
-        validators.append(
+    class Meta(ContactSerializer.Meta):
+        validators = ContactSerializer.Meta.validators + [
             RulesBasedValidator(
                 ValidationRule(
                     'required',
@@ -239,8 +235,7 @@ class ContactV4Serializer(ContactSerializer):
                     ),
                 ),
             ),
-        )
-        return validators
+        ]
 
 
 class ConsentMarketingField(serializers.BooleanField):
