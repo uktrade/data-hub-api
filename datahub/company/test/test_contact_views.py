@@ -590,7 +590,141 @@ class TestEditContactV3(EditContactBase):
 
 class TestEditContactV4(EditContactBase):
     endpoint_namespace = 'api-v4'
-    # TODO: add test to ensure patching with area works fine
+
+    def test_patch_area(self):
+        """Test that it successfully patch an existing contact."""
+        with freeze_time('2017-04-18 13:25:30.986208'):
+            company = CompanyFactory()
+
+            contact = ContactFactory(
+                title_id=constants.Title.admiral_of_the_fleet.value.id,
+                first_name='Oratio',
+                last_name='Nelson',
+                job_title='Head of Sales',
+                company=company,
+                email='foo@bar.com',
+                email_alternative='foo2@bar.com',
+                primary=True,
+                adviser=self.user,
+                telephone_countrycode='+44',
+                telephone_number='123456789',
+                telephone_alternative='987654321',
+                address_same_as_company=False,
+                address_1='Foo st.',
+                address_2='adr 2',
+                address_town='London',
+                address_county='London',
+                address_country_id=constants.Country.united_states.value.id,
+                address_postcode='SW1A1AA',
+                notes='lorem ipsum',
+            )
+
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
+        with freeze_time('2017-04-19 13:25:30.986208'):
+            response = self.api_client.patch(
+                url,
+                data={
+                    'address_area': {
+                        'id': constants.AdministrativeArea.new_york.value.id,
+                        'name': constants.AdministrativeArea.new_york.value.name,
+                    },
+                },
+            )
+
+        assert response.status_code == status.HTTP_200_OK, response.data
+        assert response.json() == {
+            'id': response.json()['id'],
+            'title': {
+                'id': constants.Title.admiral_of_the_fleet.value.id,
+                'name': constants.Title.admiral_of_the_fleet.value.name,
+            },
+            'first_name': 'Oratio',
+            'last_name': 'Nelson',
+            'name': 'Oratio Nelson',
+            'job_title': 'Head of Sales',
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+            },
+            'email': 'foo@bar.com',
+            'email_alternative': 'foo2@bar.com',
+            'primary': True,
+            'adviser': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name,
+            },
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'telephone_alternative': '987654321',
+            'address_same_as_company': False,
+            'address_1': 'Foo st.',
+            'address_2': 'adr 2',
+            'address_town': 'London',
+            'address_county': 'London',
+            'address_country': {
+                'id': constants.Country.united_states.value.id,
+                'name': constants.Country.united_states.value.name,
+            },
+            'address_area': {
+                'id': constants.AdministrativeArea.new_york.value.id,
+                'name': constants.AdministrativeArea.new_york.value.name,
+            },
+            'address_postcode': 'SW1A1AA',
+            'notes': 'lorem ipsum',
+            'accepts_dit_email_marketing': False,
+            'archived': False,
+            'archived_by': None,
+            'archived_documents_url_path': contact.archived_documents_url_path,
+            'archived_on': None,
+            'archived_reason': None,
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-19T13:25:30.986208Z',
+        }
+
+    def test_try_to_remove_area(self):
+        """Test that it successfully patch an existing contact."""
+        with freeze_time('2017-04-18 13:25:30.986208'):
+            company = CompanyFactory()
+
+            contact = ContactFactory(
+                title_id=constants.Title.admiral_of_the_fleet.value.id,
+                first_name='Oratio',
+                last_name='Nelson',
+                job_title='Head of Sales',
+                company=company,
+                email='foo@bar.com',
+                email_alternative='foo2@bar.com',
+                primary=True,
+                adviser=self.user,
+                telephone_countrycode='+44',
+                telephone_number='123456789',
+                telephone_alternative='987654321',
+                address_same_as_company=False,
+                address_1='Foo st.',
+                address_2='adr 2',
+                address_town='London',
+                address_county='London',
+                address_area_id=constants.AdministrativeArea.new_york.value.id,
+                address_country_id=constants.Country.united_states.value.id,
+                address_postcode='SW1A1AA',
+                notes='lorem ipsum',
+            )
+
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
+        with freeze_time('2017-04-19 13:25:30.986208'):
+            response = self.api_client.patch(
+                url,
+                data={
+                    'address_area': None
+                },
+            )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.data
+        assert response.json() == {
+            'address_area': ['This field is required.'],
+        }
 
 
 class TestArchiveContact(APITestMixin):
@@ -859,11 +993,18 @@ class ViewContactBase(APITestMixin):
         assert requests_mock.call_count == 1
         assert response.json()['accepts_dit_email_marketing'] is False
 
+
 class TestViewContactV3(ViewContactBase):
+    """Tests for v3 contacts endpoint"""
+
     endpoint_namespace = 'api-v3'
 
+
 class TestViewContactV4(ViewContactBase):
+    """Tests for v4 contacts endpoint"""
+
     endpoint_namespace = 'api-v4'
+
 
 class ContactListBase(APITestMixin):
     """List/filter contacts test case."""
