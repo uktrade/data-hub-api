@@ -51,8 +51,10 @@ def get_consent_fixture(requests_mock):
     )
 
 
-class TestAddContact(APITestMixin):
+class AddContactBase(APITestMixin):
     """Add contact test case."""
+
+    endpoint_namespace = None
 
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_with_manual_address(self, get_consent_fixture):
@@ -68,7 +70,7 @@ class TestAddContact(APITestMixin):
                 },
             ],
         })
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.post(
             url,
             data={
@@ -152,7 +154,7 @@ class TestAddContact(APITestMixin):
 
     def test_with_address_same_as_company(self):
         """Test add new contact with same address as company."""
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.post(
             url,
             data={
@@ -182,7 +184,7 @@ class TestAddContact(APITestMixin):
 
     def test_defaults(self):
         """Test defaults when adding an item."""
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.post(
             url,
             data={
@@ -216,7 +218,7 @@ class TestAddContact(APITestMixin):
 
     def test_fails_with_invalid_email_address(self):
         """Test that fails if the email address is invalid."""
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.post(
             url,
             data={
@@ -240,7 +242,7 @@ class TestAddContact(APITestMixin):
 
     def test_fails_without_address(self):
         """Test that fails without any address."""
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.post(
             url,
             data={
@@ -265,7 +267,7 @@ class TestAddContact(APITestMixin):
 
     def test_fails_with_only_partial_manual_address(self):
         """Test that fails if only partial manual address supplied."""
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.post(
             url,
             data={
@@ -290,7 +292,7 @@ class TestAddContact(APITestMixin):
 
     def test_fails_without_primary_specified(self):
         """Test that fails if primary is not specified."""
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.post(
             url,
             data={
@@ -312,8 +314,154 @@ class TestAddContact(APITestMixin):
         }
 
 
-class TestEditContact(APITestMixin):
+class TestAddContactV3(AddContactBase):
+    endpoint_namespace = 'api-v3'
+
+
+class TestAddContactV4(AddContactBase):
+    endpoint_namespace = 'api-v4'
+
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_with_us_manual_address(self, get_consent_fixture):
+        """Test add with manual address."""
+        company = CompanyFactory()
+        get_consent_fixture({
+            'results': [
+                {
+                    'consents': [
+                        'email_marketing',
+                    ],
+                    'email': 'foo@bar.com',
+                },
+            ],
+        })
+        url = reverse('api-v4:contact:list')
+        response = self.api_client.post(
+            url,
+            data={
+                'title': {
+                    'id': constants.Title.admiral_of_the_fleet.value.id,
+                },
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'job_title': 'Head of Sales',
+                'company': {
+                    'id': str(company.pk),
+                },
+                'email': 'foo@bar.com',
+                'email_alternative': 'foo2@bar.com',
+                'primary': True,
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'telephone_alternative': '987654321',
+                'address_same_as_company': False,
+                'address_1': 'Foo st.',
+                'address_2': 'adr 2',
+                'address_town': 'Brooklyn',
+                'address_county': '',
+                'address_country': {
+                    'id': constants.Country.united_states.value.id,
+                    'name': constants.Country.united_states.value.name,
+                },
+                'address_area': {
+                    'id': constants.AdministrativeArea.new_york.value.id,
+                    'name': constants.AdministrativeArea.new_york.value.name,
+                },
+                'address_postcode': 'SW1A1AA',
+                'notes': 'lorem ipsum',
+                'accepts_dit_email_marketing': True,
+            },
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json() == {
+            'id': response.json()['id'],
+            'title': {
+                'id': constants.Title.admiral_of_the_fleet.value.id,
+                'name': constants.Title.admiral_of_the_fleet.value.name,
+            },
+            'first_name': 'Oratio',
+            'last_name': 'Nelson',
+            'name': 'Oratio Nelson',
+            'job_title': 'Head of Sales',
+            'company': {
+                'id': str(company.pk),
+                'name': company.name,
+            },
+            'adviser': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name,
+            },
+            'email': 'foo@bar.com',
+            'email_alternative': 'foo2@bar.com',
+            'primary': True,
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'telephone_alternative': '987654321',
+            'address_same_as_company': False,
+            'address_1': 'Foo st.',
+            'address_2': 'adr 2',
+            'address_town': 'Brooklyn',
+            'address_county': '',
+            'address_country': {
+                'id': constants.Country.united_states.value.id,
+                'name': constants.Country.united_states.value.name,
+            },
+            'address_area': {
+                'id': constants.AdministrativeArea.new_york.value.id,
+                'name': constants.AdministrativeArea.new_york.value.name,
+            },
+            'address_postcode': 'SW1A1AA',
+            'notes': 'lorem ipsum',
+            'accepts_dit_email_marketing': True,
+            'archived': False,
+            'archived_by': None,
+            'archived_documents_url_path': '',
+            'archived_on': None,
+            'archived_reason': None,
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z',
+        }
+
+    def test_fails_with_us_but_no_area(self):
+        """Test that fails if only partial manual address supplied."""
+        url = reverse('api-v4:contact:list')
+        response = self.api_client.post(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'company': {
+                    'id': CompanyFactory().pk,
+                },
+                'email': 'foo@bar.com',
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'address_country': {
+                    'id': constants.Country.united_states.value.id,
+                    'name': constants.Country.united_states.value.name,
+                },
+                'address_1': 'line 1',
+                'address_2': 'line 2',
+                'address_area': None,
+                'address_town': 'town',
+                'primary': True,
+            },
+        )
+
+        assert response.data == {
+            'address_area': [
+                'This field is required.',
+            ],
+        }
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+class EditContactBase(APITestMixin):
     """Edit contact test case."""
+    endpoint_namespace = None
 
     def test_patch(self):
         """Test that it successfully patch an existing contact."""
@@ -343,7 +491,7 @@ class TestEditContact(APITestMixin):
                 notes='lorem ipsum',
             )
 
-        url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
         with freeze_time('2017-04-19 13:25:30.986208'):
             response = self.api_client.patch(
                 url,
@@ -405,7 +553,7 @@ class TestEditContact(APITestMixin):
         """Test that an archived contact cannot be updated."""
         company = ArchivedContactFactory()
 
-        url = reverse('api-v3:contact:detail', kwargs={'pk': company.pk})
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': company.pk})
         response = self.api_client.patch(
             url,
             data={
@@ -424,7 +572,7 @@ class TestEditContact(APITestMixin):
             archived_documents_url_path='old_path',
         )
 
-        url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
         response = self.api_client.patch(
             url,
             data={
@@ -434,6 +582,15 @@ class TestEditContact(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
+
+
+class TestEditContactV3(EditContactBase):
+    endpoint_namespace = 'api-v3'
+
+
+class TestEditContactV4(EditContactBase):
+    endpoint_namespace = 'api-v4'
+    # TODO: add test to ensure patching with area works fine
 
 
 class TestArchiveContact(APITestMixin):
@@ -500,8 +657,10 @@ class TestArchiveContact(APITestMixin):
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
-class TestViewContact(APITestMixin):
+class ViewContactBase(APITestMixin):
     """View contact test case."""
+
+    endpoint_namespace = None
 
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_view(self):
@@ -531,7 +690,7 @@ class TestViewContact(APITestMixin):
             address_postcode='YO22 4JU',
             notes='lorem ipsum',
         )
-        url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -598,7 +757,7 @@ class TestViewContact(APITestMixin):
         )
         api_client = self.create_api_client(user=user)
 
-        url = reverse('api-v3:contact:detail', kwargs={'pk': contact.id})
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.id})
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -634,7 +793,7 @@ class TestViewContact(APITestMixin):
         )
         api_client = self.create_api_client()
 
-        url = reverse('api-v3:contact:detail', kwargs={'pk': contact.id})
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.id})
         response = api_client.get(url)
 
         assert requests_mock.call_count == 1
@@ -666,7 +825,7 @@ class TestViewContact(APITestMixin):
         )
         api_client = self.create_api_client()
 
-        url = reverse('api-v3:contact:detail', kwargs={'pk': contact.id})
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.id})
         response = api_client.get(url)
 
         assert requests_mock.call_count == 1
@@ -694,21 +853,28 @@ class TestViewContact(APITestMixin):
         )
         api_client = self.create_api_client()
 
-        url = reverse('api-v3:contact:detail', kwargs={'pk': contact.id})
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.id})
         response = api_client.get(url)
 
         assert requests_mock.call_count == 1
         assert response.json()['accepts_dit_email_marketing'] is False
 
+class TestViewContactV3(ViewContactBase):
+    endpoint_namespace = 'api-v3'
 
-class TestContactList(APITestMixin):
+class TestViewContactV4(ViewContactBase):
+    endpoint_namespace = 'api-v4'
+
+class ContactListBase(APITestMixin):
     """List/filter contacts test case."""
+
+    endpoint_namespace = None
 
     def test_contact_list_no_permissions(self):
         """Should return 403"""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -716,7 +882,7 @@ class TestContactList(APITestMixin):
         """Test getting all contacts"""
         ContactFactory.create_batch(5)
 
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -749,7 +915,7 @@ class TestContactList(APITestMixin):
             notes='lorem ipsum',
         )
 
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -818,7 +984,7 @@ class TestContactList(APITestMixin):
         )
         api_client = self.create_api_client(user=user)
 
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -840,7 +1006,7 @@ class TestContactList(APITestMixin):
         )
         api_client = self.create_api_client(user=user)
 
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -861,7 +1027,7 @@ class TestContactList(APITestMixin):
                     ContactFactory(),
                 )
 
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -880,7 +1046,7 @@ class TestContactList(APITestMixin):
         ContactFactory.create_batch(3, company=company1)
         contacts = ContactFactory.create_batch(2, company=company2)
 
-        url = reverse('api-v3:contact:list')
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.get(url, data={'company_id': company2.id})
 
         assert response.status_code == status.HTTP_200_OK
@@ -913,7 +1079,7 @@ class TestContactList(APITestMixin):
         ContactFactory.create_batch(len(contacts), email=factory.Iterator(contacts))
 
         response = self.api_client.get(
-            reverse('api-v3:contact:list'),
+            reverse(f'{self.endpoint_namespace}:contact:list'),
             data=dict(email=filter_),
         )
 
@@ -921,17 +1087,26 @@ class TestContactList(APITestMixin):
         assert {res['email'] for res in response.data['results']} == expected
 
 
-class TestContactVersioning(APITestMixin):
+class TestContactListV3(ContactListBase):
+    endpoint_namespace = 'api-v3'
+
+
+class TestContactListV4(ContactListBase):
+    endpoint_namespace = 'api-v4'
+
+
+class ContactVersioningBase(APITestMixin):
     """
     Tests for versions created when interacting with the contact endpoints.
     """
+    endpoint_namespace = None
 
     def test_add_creates_a_new_version(self):
         """Test that creating a contact creates a new version."""
         assert Version.objects.count() == 0
 
         response = self.api_client.post(
-            reverse('api-v3:contact:list'),
+            reverse(f'{self.endpoint_namespace}:contact:list'),
             data={
                 'first_name': 'Oratio',
                 'last_name': 'Nelson',
@@ -963,7 +1138,7 @@ class TestContactVersioning(APITestMixin):
         assert Version.objects.count() == 0
 
         response = self.api_client.post(
-            reverse('api-v3:contact:list'),
+            reverse(f'{self.endpoint_namespace}:contact:list'),
             data={
                 'first_name': 'Oratio',
                 'last_name': 'Nelson',
@@ -981,7 +1156,7 @@ class TestContactVersioning(APITestMixin):
         )
 
         response = self.api_client.patch(
-            reverse('api-v3:contact:detail', kwargs={'pk': contact.pk}),
+            reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk}),
             data={'first_name': 'New Oratio'},
         )
 
@@ -1002,12 +1177,16 @@ class TestContactVersioning(APITestMixin):
         )
 
         response = self.api_client.patch(
-            reverse('api-v3:contact:detail', kwargs={'pk': contact.pk}),
+            reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk}),
             data={'email': 'invalid'},
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert Version.objects.get_for_object(contact).count() == 0
+
+
+class TestContactV3Versioning(ContactVersioningBase):
+    endpoint_namespace = 'api-v3'
 
     def test_archive_creates_a_new_version(self):
         """Test that archiving a contact creates a new version."""
@@ -1058,6 +1237,10 @@ class TestContactVersioning(APITestMixin):
         version = Version.objects.get_for_object(contact).first()
         assert version.revision.user == self.user
         assert not version.field_dict['archived']
+
+
+class TestContactV4Versioning(ContactVersioningBase):
+    endpoint_namespace = 'api-v4'
 
 
 class TestAuditLogView(APITestMixin):
