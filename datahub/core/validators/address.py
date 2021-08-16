@@ -16,6 +16,7 @@ class AddressValidator:
         'address_county': {'required': False},
         'address_postcode': {'required': False},
         'address_country': {'required': True},
+        'address_area': {'required': False},
     }
 
     def __init__(self, lazy=False, fields_mapping=None):

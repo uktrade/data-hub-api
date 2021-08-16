@@ -62,6 +62,7 @@ v3_urls = [
 # API V4 - new format for addresses
 
 v4_urls = [
+    path('', include((contact_urls.urls_v4, 'contact'), namespace='contact')),
     path('', include((company_urls.urls, 'company'), namespace='company')),
     path('', include((company_referral_urls, 'company-referral'), namespace='company-referral')),
     path('dnb/', include((dnb_api_urls, 'dnb_api'), namespace='dnb-api')),
