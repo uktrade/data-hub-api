@@ -315,10 +315,14 @@ class AddContactBase(APITestMixin):
 
 
 class TestAddContactV3(AddContactBase):
+    """Test v3 of the contact adding endpoint"""
+
     endpoint_namespace = 'api-v3'
 
 
 class TestAddContactV4(AddContactBase):
+    """Test v4 of the contact adding endpoint"""
+
     endpoint_namespace = 'api-v4'
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -461,10 +465,11 @@ class TestAddContactV4(AddContactBase):
 
 class EditContactBase(APITestMixin):
     """Edit contact test case."""
+
     endpoint_namespace = None
 
     def test_patch(self):
-        """Test that it successfully patch an existing contact."""
+        """Test that it successfully patches an existing contact."""
         with freeze_time('2017-04-18 13:25:30.986208'):
             company = CompanyFactory()
 
@@ -585,10 +590,14 @@ class EditContactBase(APITestMixin):
 
 
 class TestEditContactV3(EditContactBase):
+    """Test case for v3 of the edit contacts endpoint"""
+
     endpoint_namespace = 'api-v3'
 
 
 class TestEditContactV4(EditContactBase):
+    """Test case for v4 of the edit contacts endpoint"""
+
     endpoint_namespace = 'api-v4'
 
     def test_patch_area(self):
@@ -717,7 +726,7 @@ class TestEditContactV4(EditContactBase):
             response = self.api_client.patch(
                 url,
                 data={
-                    'address_area': None
+                    'address_area': None,
                 },
             )
 
@@ -995,13 +1004,13 @@ class ViewContactBase(APITestMixin):
 
 
 class TestViewContactV3(ViewContactBase):
-    """Tests for v3 contacts endpoint"""
+    """Tests for v3 view contacts endpoint"""
 
     endpoint_namespace = 'api-v3'
 
 
 class TestViewContactV4(ViewContactBase):
-    """Tests for v4 contacts endpoint"""
+    """Tests for v4 view contacts endpoint"""
 
     endpoint_namespace = 'api-v4'
 
@@ -1229,10 +1238,14 @@ class ContactListBase(APITestMixin):
 
 
 class TestContactListV3(ContactListBase):
+    """Tests for v3 list contacts endpoint"""
+
     endpoint_namespace = 'api-v3'
 
 
 class TestContactListV4(ContactListBase):
+    """Tests for v4 list contacts endpoint"""
+
     endpoint_namespace = 'api-v4'
 
 
@@ -1240,6 +1253,7 @@ class ContactVersioningBase(APITestMixin):
     """
     Tests for versions created when interacting with the contact endpoints.
     """
+
     endpoint_namespace = None
 
     def test_add_creates_a_new_version(self):
@@ -1327,6 +1341,8 @@ class ContactVersioningBase(APITestMixin):
 
 
 class TestContactV3Versioning(ContactVersioningBase):
+    """Tests the V3 contacts versioning endpoint"""
+
     endpoint_namespace = 'api-v3'
 
     def test_archive_creates_a_new_version(self):
@@ -1381,6 +1397,8 @@ class TestContactV3Versioning(ContactVersioningBase):
 
 
 class TestContactV4Versioning(ContactVersioningBase):
+    """Tests the V4 contacts versioning endpoint"""
+
     endpoint_namespace = 'api-v4'
 
 
