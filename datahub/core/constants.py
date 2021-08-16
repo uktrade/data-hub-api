@@ -56,6 +56,14 @@ class AdministrativeArea(Enum):
         Country.united_states.value.id,
     )
 
+    # Canada
+    quebec = AdministrativeAreaConstant(
+        'Quebec',
+        '5fc4ea61-75fe-415d-8ff0-2a2034ff6c86',
+        'QC',
+        Country.canada.value.id,
+    )
+
 
 class SectorCluster(Enum):
     """Sector clusters."""

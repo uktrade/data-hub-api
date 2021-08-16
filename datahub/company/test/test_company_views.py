@@ -1099,7 +1099,7 @@ class TestUpdateCompany(APITestMixin):
                         'line_1': '75 Stramford Road',
                         'town': 'Cordova',
                         'country': {
-                            'id': Country.united_states.value.id,
+                            'id': Country.japan.value.id,
                         },
                     },
                 },
@@ -1108,16 +1108,88 @@ class TestUpdateCompany(APITestMixin):
                         ['A UK establishment (branch of non-UK company) must be in the UK.'],
                 },
             ),
+            # United states should make address area mandatory
+            (
+                {
+                    'address': {
+                        'line_1': '12 First Street',
+                        'town': 'New York',
+                        'country': {
+                            'id': Country.united_states.value.id,
+                        },
+                    },
+                },
+                {
+                    'address': {
+                        'address_area': ['This field is required.'],
+                    },
+                },
+            ),
+            # United states should make registered address area mandatory
+            (
+                {
+                    'registered_address': {
+                        'line_1': '12 First Street',
+                        'town': 'New York',
+                        'country': {
+                            'id': Country.united_states.value.id,
+                        },
+                    },
+                },
+                {
+                    'registered_address': {
+                        'registered_address_area': ['This field is required.'],
+                    },
+                },
+            ),
+            # Canada should make address area mandatory
+            (
+                {
+                    'address': {
+                        'line_1': '5000 Rue Saint-Patrick',
+                        'town': 'Montréal',
+                        'postcode': 'H4E 1A8',
+                        'country': {
+                            'id': Country.canada.value.id,
+                        },
+                    },
+                },
+                {
+                    'address': {
+                        'address_area': ['This field is required.'],
+                    },
+                },
+            ),
+            # Canada should make registered address area mandatory
+            (
+                {
+                    'registered_address': {
+                        'line_1': '5000 Rue Saint-Patrick',
+                        'town': 'Montréal',
+                        'postcode': 'H4E 1A8',
+                        'country': {
+                            'id': Country.canada.value.id,
+                        },
+                    },
+                },
+                {
+                    'registered_address': {
+                        'registered_address_area': ['This field is required.'],
+                    },
+                },
+            ),
         ),
     )
     def test_validation_error(self, data, expected_error):
         """Test validation scenarios."""
+        FeatureFlagFactory(code='address-area-company-required-field')
         company = CompanyFactory(
             registered_address_1='',
             registered_address_2='',
             registered_address_town='',
             registered_address_county='',
             registered_address_postcode='',
+            registered_address_area_id=None,
             registered_address_country_id=None,
         )
 
@@ -1653,7 +1725,7 @@ class TestAddCompany(APITestMixin):
                         'line_1': '75 Stramford Road',
                         'town': 'Cordova',
                         'country': {
-                            'id': Country.united_states.value.id,
+                            'id': Country.japan.value.id,
                         },
                     },
                 },
