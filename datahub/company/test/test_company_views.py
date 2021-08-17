@@ -1420,7 +1420,7 @@ class TestAddCompany(APITestMixin):
     """Tests for adding a company."""
 
     @pytest.mark.parametrize(
-        'data, expected_response, feature_flags',
+        'data,expected_response,feature_flags',
         (
             # uk company
             (
