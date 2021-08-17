@@ -87,9 +87,9 @@ class SearchInvestmentProjectAPIViewMixin:
         ],
     }
 
-    def get_base_query(self, request, validated_data):
-        """Apply financial year filter to the base query."""
-        financial_year_filters = [
+    def get_extra_filters(self, validated_data):
+        """Apply financial year filter."""
+        return Bool(should=[
             Bool(should=[
                 # Non-prospects use actual land date, falling back to estimated land date
                 Bool(
@@ -117,10 +117,7 @@ class SearchInvestmentProjectAPIViewMixin:
                 ]),
             ])
             for financial_year_start in validated_data.get('financial_year_start', [])
-        ]
-        return super().get_base_query(request, validated_data).filter(
-            Bool(should=financial_year_filters),
-        )
+        ])
 
 
 @register_v3_view()
