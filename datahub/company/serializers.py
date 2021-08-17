@@ -45,6 +45,7 @@ from datahub.core.validators import (
     AllIsBlankRule,
     AnyIsNotBlankRule,
     EqualsRule,
+    InRule,
     NotArchivedValidator,
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
@@ -216,6 +217,27 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         }
 
 
+class ContactV4Serializer(ContactSerializer):
+    """Contact serializer for writing operations V4."""
+
+    class Meta(ContactSerializer.Meta):
+        validators = ContactSerializer.Meta.validators + [
+            RulesBasedValidator(
+                ValidationRule(
+                    'required',
+                    OperatorRule('address_area', bool),
+                    when=InRule(
+                        'address_country',
+                        (
+                            Country.united_states.value.id,
+                            Country.canada.value.id,
+                        ),
+                    ),
+                ),
+            ),
+        ]
+
+
 class ConsentMarketingField(serializers.BooleanField):
     """
     ConsentMarketingField will lookup consent data.
@@ -296,6 +318,16 @@ class ContactDetailSerializer(ContactSerializer):
         """
         self._notify_consent_service(validated_data)
         return super().update(instance, validated_data)
+
+
+class ContactDetailV4Serializer(ContactV4Serializer, ContactDetailSerializer):
+    """
+    This is the same as the ContactSerializer except it includes
+    accepts_dit_email_marketing in the fields.
+    """
+
+    class Meta(ContactV4Serializer.Meta):
+        fields = ContactV4Serializer.Meta.fields + ('accepts_dit_email_marketing',)
 
 
 class CompanyExportCountrySerializer(serializers.ModelSerializer):
