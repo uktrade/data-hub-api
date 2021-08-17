@@ -1,0 +1,1 @@
+ New address validation has been added to make postcode a required field for US and Canadian company addresses.
