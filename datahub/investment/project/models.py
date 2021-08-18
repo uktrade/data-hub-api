@@ -20,7 +20,7 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
-from datahub.core.utils import force_uuid, get_front_end_url, StrEnum
+from datahub.core.utils import force_uuid, get_financial_year, get_front_end_url, StrEnum
 from datahub.investment.project import constants
 from datahub.investment.project.validate import validate
 
@@ -221,6 +221,28 @@ class IProjectAbstract(models.Model):
     other_business_activity = models.CharField(
         max_length=MAX_LENGTH, null=True, blank=True,
     )
+
+    @cached_property
+    def financial_year(self):
+        """
+        Gets the relevant financial year.
+
+        Projects in Prospect stage use the created date. Other projects use the
+        Actual Land Date if it has been set falling back to Estimated Land Date.
+        """
+        if self.stage_id == InvestmentProjectStage.prospect.value.id:
+            return get_financial_year(self.created_on)
+        return get_financial_year(self.actual_land_date or self.estimated_land_date)
+
+    @cached_property
+    def financial_year_verbose(self):
+        """Financial year in YYYY-YY format, for example 2021-22."""
+        if self.financial_year:
+            output = f'{self.financial_year}-{str(self.financial_year+1)[-2:]}'
+            if str(self.stage_id) == InvestmentProjectStage.prospect.value.id:
+                # Prospective projects are applicable to all future financial years
+                return f'{output} (onwards)'
+            return output
 
     @property
     def project_code(self):

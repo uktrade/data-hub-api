@@ -909,6 +909,115 @@ class TestSearch(APITestMixin):
         ]
 
 
+class TestSearchFinancialYearFilter(APITestMixin):
+    """Tests the financial year filter on the search endpoint."""
+
+    @pytest.mark.parametrize(
+        'query,num_results',
+        (
+            ({'financial_year_start': ['2014']}, 0),
+            ({'financial_year_start': ['2015']}, 1),
+            ({'financial_year_start': ['2016']}, 1),
+            ({'financial_year_start': ['2022']}, 1),
+            ({'financial_year_start': ['2014', '2015']}, 1),
+        ),
+    )
+    def test_prospects_use_created_date(
+        self,
+        es_with_collector,
+        query,
+        num_results,
+    ):
+        """Created date should be used to filter prospects."""
+        with freeze_time('2015-04-01 11:12:13'):
+            # Prospect created in 2015-16
+            InvestmentProjectFactory(
+                estimated_land_date=datetime.date(2020, 6, 13),
+                actual_land_date=datetime.date(2020, 8, 13),
+                stage_id=constants.InvestmentProjectStage.prospect.value.id,
+                status=InvestmentProject.Status.ONGOING,
+            )
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, query)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == num_results
+        results = response.data['results']
+        assert len(results) == num_results
+
+    @pytest.mark.parametrize(
+        'query,num_results',
+        (
+            ({'financial_year_start': ['2015']}, 0),
+            ({'financial_year_start': ['2016']}, 0),
+            ({'financial_year_start': ['2017']}, 1),
+            ({'financial_year_start': ['2018']}, 0),
+            ({'financial_year_start': ['2017', '2018']}, 1),
+        ),
+    )
+    def test_non_prospects_use_actual_land_date(
+        self,
+        es_with_collector,
+        query,
+        num_results,
+    ):
+        """Actual land date should be used when present."""
+        with freeze_time('2015-04-01 11:12:13'):
+            # Verify Win project created in 2015-16
+            InvestmentProjectFactory(
+                estimated_land_date=datetime.date(2017, 3, 31),
+                actual_land_date=datetime.date(2017, 4, 1),
+                stage_id=constants.InvestmentProjectStage.verify_win.value.id,
+                status=InvestmentProject.Status.ONGOING,
+            )
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, query)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == num_results
+        results = response.data['results']
+        assert len(results) == num_results
+
+    @pytest.mark.parametrize(
+        'query,num_results',
+        (
+            ({'financial_year_start': ['2015']}, 0),
+            ({'financial_year_start': ['2016']}, 1),
+            ({'financial_year_start': ['2017']}, 0),
+            ({'financial_year_start': ['2018']}, 0),
+            ({'financial_year_start': ['2016', '2017']}, 1),
+        ),
+    )
+    def test_non_prospects_fall_back_to_estimated_land_date(
+        self,
+        es_with_collector,
+        query,
+        num_results,
+    ):
+        """Estimated land date should be used when actual land date is not set."""
+        with freeze_time('2015-04-01 11:12:13'):
+            # Active project created in 2015-16
+            InvestmentProjectFactory(
+                estimated_land_date=datetime.date(2017, 3, 31),
+                actual_land_date=None,
+                stage_id=constants.InvestmentProjectStage.active.value.id,
+                status=InvestmentProject.Status.ONGOING,
+            )
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, query)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == num_results
+        results = response.data['results']
+        assert len(results) == num_results
+
+
 class TestSearchPermissions(APITestMixin):
     """Tests search view permissions."""
 

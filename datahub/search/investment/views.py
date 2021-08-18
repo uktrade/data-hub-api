@@ -1,5 +1,14 @@
-from django.db.models import Case, Max, When
+import datetime
 
+from django.db.models import Case, Max, When
+from elasticsearch_dsl.query import (
+    Bool,
+    Exists,
+    Range,
+    Term,
+)
+
+from datahub.core.constants import InvestmentProjectStage
 from datahub.core.query_utils import (
     get_aggregate_subquery,
     get_choices_as_case_expression,
@@ -77,6 +86,38 @@ class SearchInvestmentProjectAPIViewMixin:
             'country_investment_originates_from.id',
         ],
     }
+
+    def get_extra_filters(self, validated_data):
+        """Apply financial year filter."""
+        return Bool(should=[
+            Bool(should=[
+                # Non-prospects use actual land date, falling back to estimated land date
+                Bool(
+                    should=[
+                        Bool(
+                            must=Range(estimated_land_date={
+                                'gte': datetime.date(year=financial_year_start, month=4, day=1),
+                                'lt': datetime.date(year=financial_year_start + 1, month=4, day=1),
+                            }),
+                            must_not=Exists(field='actual_land_date'),
+                        ),
+                        Range(actual_land_date={
+                            'gte': datetime.date(year=financial_year_start, month=4, day=1),
+                            'lt': datetime.date(year=financial_year_start + 1, month=4, day=1),
+                        }),
+                    ],
+                    must_not=Term(**{'stage.id': InvestmentProjectStage.prospect.value.id}),
+                ),
+                # Prospects appear in all financial years from the created date
+                Bool(must=[
+                    Range(created_on={
+                        'lte': datetime.date(year=financial_year_start, month=4, day=1),
+                    }),
+                    Term(**{'stage.id': InvestmentProjectStage.prospect.value.id}),
+                ]),
+            ])
+            for financial_year_start in validated_data.get('financial_year_start', [])
+        ])
 
 
 @register_v3_view()
