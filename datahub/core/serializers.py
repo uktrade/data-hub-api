@@ -381,7 +381,7 @@ class AddressSerializer(serializers.ModelSerializer):
         self.postcode_can_be_required = postcode_can_be_required
         self.address_source_prefix = address_source_prefix
 
-    def area_validator(self, validators):
+    def add_area_validator(self, validators):
         """
         Mark area as required for US and Canadian companies.
         """
@@ -401,7 +401,7 @@ class AddressSerializer(serializers.ModelSerializer):
             ),
         )
 
-    def postcode_validator(self, validators):
+    def add_postcode_validator(self, validators):
         """
         Mark postcode as required for US and Canadian companies.
         """
@@ -434,13 +434,13 @@ class AddressSerializer(serializers.ModelSerializer):
             self.area_can_be_required
             and is_feature_flag_active('address-area-company-required-field')
         ):
-            self.area_validator(validators)
+            self.add_area_validator(validators)
 
         if (
             self.postcode_can_be_required
             and is_feature_flag_active('address-postcode-company-required-field')
         ):
-            self.postcode_validator(validators)
+            self.add_postcode_validator(validators)
         return validators
 
     def run_validation(self, data=serializers.empty):
