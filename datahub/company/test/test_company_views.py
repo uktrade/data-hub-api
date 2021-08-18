@@ -1856,7 +1856,7 @@ class TestAddCompany(APITestMixin):
                         'country': {
                             'id': Country.united_states.value.id,
                         },
-                        'address_area': 'Burbank',
+                        'address_area': AdministrativeArea.alabama.value.id,
                     },
                 },
                 {
@@ -1878,7 +1878,7 @@ class TestAddCompany(APITestMixin):
                         'country': {
                             'id': Country.canada.value.id,
                         },
-                        'address_area': 'Quebec',
+                        'address_area': AdministrativeArea.quebec.value.id,
                     },
                 },
                 {
