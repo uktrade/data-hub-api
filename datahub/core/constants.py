@@ -57,6 +57,12 @@ class AdministrativeArea(Enum):
     )
 
     # Canada
+    alberta = AdministrativeAreaConstant(
+        'Alberta',
+        '75e337c3-23c9-4294-8085-6b1e8c43eb07',
+        'AB',
+        Country.canada.value.id,
+    )
     quebec = AdministrativeAreaConstant(
         'Quebec',
         '5fc4ea61-75fe-415d-8ff0-2a2034ff6c86',
