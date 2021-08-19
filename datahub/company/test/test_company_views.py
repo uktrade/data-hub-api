@@ -1420,7 +1420,7 @@ class TestAddCompany(APITestMixin):
     """Tests for adding a company."""
 
     @pytest.mark.parametrize(
-        'data,expected_response',
+        'data,expected_response,feature_flags',
         (
             # uk company
             (
@@ -1467,13 +1467,15 @@ class TestAddCompany(APITestMixin):
                         'name': HeadquarterType.ghq.value.name,
                     },
                 },
+                [],
             ),
-            # non-UK
+            # US company
             (
                 {
                     'address': {
                         'line_1': '75 Stramford Road',
                         'town': 'Cordova',
+                        'postcode': '91210',
                         'area': {
                             'id': AdministrativeArea.texas.value.id,
                         },
@@ -1488,7 +1490,7 @@ class TestAddCompany(APITestMixin):
                         'line_2': '',
                         'town': 'Cordova',
                         'county': '',
-                        'postcode': '',
+                        'postcode': '91210',
                         'area': {
                             'id': AdministrativeArea.texas.value.id,
                             'name': AdministrativeArea.texas.value.name,
@@ -1500,6 +1502,42 @@ class TestAddCompany(APITestMixin):
                     },
                     'registered_address': None,
                 },
+                ['address-postcode-company-required-field'],
+            ),
+            # Canadian company
+            (
+                {
+                    'address': {
+                        'line_1': '75 Canadian Street',
+                        'town': 'Maple Town',
+                        'postcode': 'AB T0H',
+                        'area': {
+                            'id': AdministrativeArea.alberta.value.id,
+                        },
+                        'country': {
+                            'id': Country.canada.value.id,
+                        },
+                    },
+                },
+                {
+                    'address': {
+                        'line_1': '75 Canadian Street',
+                        'line_2': '',
+                        'town': 'Maple Town',
+                        'county': '',
+                        'postcode': 'AB T0H',
+                        'area': {
+                            'id': AdministrativeArea.alberta.value.id,
+                            'name': AdministrativeArea.alberta.value.name,
+                        },
+                        'country': {
+                            'id': Country.canada.value.id,
+                            'name': Country.canada.value.name,
+                        },
+                    },
+                    'registered_address': None,
+                },
+                ['address-postcode-company-required-field'],
             ),
             # promote a CH company
             (
@@ -1508,6 +1546,7 @@ class TestAddCompany(APITestMixin):
                     'business_type': BusinessTypeConstant.company.value.id,
                 },
                 {'company_number': '1234567890'},
+                [],
             ),
             # no special validation on company_number is done for non UK establishment companies
             (
@@ -1516,6 +1555,7 @@ class TestAddCompany(APITestMixin):
                     'company_number': 'sc000444é',
                 },
                 {'company_number': 'sc000444é'},
+                [],
             ),
             # UK establishment with correct company_number format
             (
@@ -1524,31 +1564,37 @@ class TestAddCompany(APITestMixin):
                     'company_number': 'BR000006',
                 },
                 {'company_number': 'BR000006'},
+                [],
             ),
             # http:// is prepended to the website if a scheme is not present
             (
                 {'website': 'www.google.com'},
                 {'website': 'http://www.google.com'},
+                [],
             ),
             # website is not converted if it includes an http scheme
             (
                 {'website': 'http://www.google.com'},
                 {'website': 'http://www.google.com'},
+                [],
             ),
             # website is not converted if it includes an http scheme
             (
                 {'website': 'https://www.google.com'},
                 {'website': 'https://www.google.com'},
+                [],
             ),
             # website is not converted if it's empty
             (
                 {'website': ''},
                 {'website': ''},
+                [],
             ),
             # website is not converted if it's None
             (
                 {'website': None},
                 {'website': None},
+                [],
             ),
             # registered address is saved
             (
@@ -1581,11 +1627,14 @@ class TestAddCompany(APITestMixin):
                         },
                     },
                 },
+                [],
             ),
         ),
     )
-    def test_success_cases(self, data, expected_response):
+    def test_success_cases(self, data, expected_response, feature_flags):
         """Test success scenarios."""
+        for feature_flag in feature_flags:
+            FeatureFlagFactory(code=feature_flag)
         post_data = {
             'name': 'Acme',
             'business_type': BusinessTypeConstant.company.value.id,
@@ -1796,6 +1845,50 @@ class TestAddCompany(APITestMixin):
                     },
                 },
                 ['address-area-company-required-field'],
+            ),
+            # for US company postcode is required
+            (
+                {
+                    'company_number': '123',
+                    'address': {
+                        'line_1': '1000 Mulholland Drive',
+                        'town': 'LA',
+                        'country': {
+                            'id': Country.united_states.value.id,
+                        },
+                        'address_area': AdministrativeArea.alabama.value.id,
+                    },
+                },
+                {
+                    'address': {
+                        'address_postcode': [
+                            'This field is required.',
+                        ],
+                    },
+                },
+                ['address-postcode-company-required-field'],
+            ),
+            # for Canadian company postcode is required
+            (
+                {
+                    'company_number': '123',
+                    'address': {
+                        'line_1': '1000 Canadian Road',
+                        'town': 'Maple Town',
+                        'country': {
+                            'id': Country.canada.value.id,
+                        },
+                        'address_area': AdministrativeArea.quebec.value.id,
+                    },
+                },
+                {
+                    'address': {
+                        'address_postcode': [
+                            'This field is required.',
+                        ],
+                    },
+                },
+                ['address-postcode-company-required-field'],
             ),
         ),
     )
