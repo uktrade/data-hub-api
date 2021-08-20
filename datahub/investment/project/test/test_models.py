@@ -1,6 +1,6 @@
 """Tests for investment models."""
 
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
 import pytest
@@ -15,6 +15,7 @@ from datahub.investment.project.test.factories import (
     InvestmentProjectFactory,
     InvestmentProjectTeamMemberFactory,
 )
+
 
 pytestmark = pytest.mark.django_db
 
@@ -192,3 +193,69 @@ def test_stage_log_added_when_investment_project_is_created():
             datetime(2017, 4, 28, 17, 35, tzinfo=utc),
         ),
     ]
+
+
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+def test_prospect_financial_year():
+    """Prospects should use created date to determine financial year."""
+    project = InvestmentProjectFactory(
+        stage_id=constants.InvestmentProjectStage.prospect.value.id,
+        estimated_land_date=date(2018, 4, 28),
+        actual_land_date=date(2020, 3, 28),
+    )
+    assert project.financial_year == 2017
+
+
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+def test_non_prospect_financial_year_estimated_land_date():
+    """Use estimated land date when actual land date is not set."""
+    project = InvestmentProjectFactory(
+        stage_id=constants.InvestmentProjectStage.active.value.id,
+        estimated_land_date=date(2018, 4, 28),
+        actual_land_date=None,
+    )
+    assert project.financial_year == 2018
+
+
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+def test_non_prospect_financial_year_actual_land_date():
+    """Use actual land date when it is set."""
+    project = InvestmentProjectFactory(
+        stage_id=constants.InvestmentProjectStage.won.value.id,
+        estimated_land_date=date(2018, 4, 28),
+        actual_land_date=date(2020, 3, 28),
+    )
+    assert project.financial_year == 2019
+
+
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+def test_prospect_financial_year_verbose():
+    """Prospects should use created date to determine financial year."""
+    project = InvestmentProjectFactory(
+        stage_id=constants.InvestmentProjectStage.prospect.value.id,
+        estimated_land_date=date(2018, 4, 28),
+        actual_land_date=date(2020, 3, 28),
+    )
+    assert project.financial_year_verbose == '2017-18 (onwards)'
+
+
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+def test_non_prospect_financial_year_verbose_estimated_land_date():
+    """Use estimated land date when actual land date is not set."""
+    project = InvestmentProjectFactory(
+        stage_id=constants.InvestmentProjectStage.active.value.id,
+        estimated_land_date=date(2018, 4, 28),
+        actual_land_date=None,
+    )
+    assert project.financial_year_verbose == '2018-19'
+
+
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+def test_non_prospect_financial_year_verbose_actual_land_date():
+    """Use actual land date when it is set."""
+    project = InvestmentProjectFactory(
+        stage_id=constants.InvestmentProjectStage.won.value.id,
+        estimated_land_date=date(2018, 4, 28),
+        actual_land_date=date(2020, 3, 28),
+    )
+    assert project.financial_year_verbose == '2019-20'

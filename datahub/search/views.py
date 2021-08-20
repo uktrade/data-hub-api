@@ -215,7 +215,7 @@ class SearchAPIView(APIView):
             *(self.fields_to_exclude or ()),
         )
 
-        return get_search_by_entities_query(
+        query = get_search_by_entities_query(
             entities=entities,
             term=validated_data['original_query'],
             filter_data=filter_data,
@@ -225,6 +225,15 @@ class SearchAPIView(APIView):
             fields_to_include=self.fields_to_include,
             fields_to_exclude=fields_to_exclude,
         )
+
+        extra_filters = self.get_extra_filters(validated_data)
+        if extra_filters:
+            return query.filter(extra_filters)
+        return query
+
+    def get_extra_filters(self, validated_data):
+        """Get any extra filters to apply to the base query."""
+        return None
 
     def post(self, request, format=None):
         """Performs search."""

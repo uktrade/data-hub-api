@@ -355,7 +355,8 @@ class AddressSerializer(serializers.ModelSerializer):
 
     def __init__(
             self, source_model, *args,
-            address_source_prefix='address', area_can_be_required=False, **kwargs,
+            address_source_prefix='address', area_can_be_required=False,
+            postcode_can_be_required=False, **kwargs,
     ):
         """
         Initialises the serializer.
@@ -377,36 +378,69 @@ class AddressSerializer(serializers.ModelSerializer):
             field.source_attrs = field.source.split('.')
 
         self.area_can_be_required = area_can_be_required
+        self.postcode_can_be_required = postcode_can_be_required
         self.address_source_prefix = address_source_prefix
+
+    def add_area_validator(self, validators):
+        """
+        Mark area as required for US and Canadian companies.
+        """
+        validators.append(
+            RulesBasedValidator(
+                ValidationRule(
+                    'required',
+                    OperatorRule(f'{self.address_source_prefix}_area', bool),
+                    when=InRule(
+                        f'{self.address_source_prefix}_country',
+                        (
+                            CountryEnum.united_states.value.id,
+                            CountryEnum.canada.value.id,
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+    def add_postcode_validator(self, validators):
+        """
+        Mark postcode as required for US and Canadian companies.
+        """
+        validators.append(
+            RulesBasedValidator(
+                ValidationRule(
+                    'required',
+                    OperatorRule(f'{self.address_source_prefix}_postcode', bool),
+                    when=InRule(
+                        f'{self.address_source_prefix}_country',
+                        (
+                            CountryEnum.united_states.value.id,
+                            CountryEnum.canada.value.id,
+                        ),
+                    ),
+                ),
+            ),
+        )
 
     def get_validators(self):
         """
-        Append ValidationRule for area depending on feature flag/context
+        Append ValidationRule for area/postcode depending on feature flag/context
 
-        Only mark area required if country is US/Canada & called from context where area is safe
-        to require, and if feature flag enabled. Currently the only context where area is safe to
-        require is CompanySerializer
+        Only mark area/postcode required if country is US/Canada & called from context where area
+        is safe to require, and if feature flag enabled. Currently the only context where area is
+        safe to require is CompanySerializer
         """
         validators = super().get_validators()
         if (
             self.area_can_be_required
             and is_feature_flag_active('address-area-company-required-field')
         ):
-            validators.append(
-                RulesBasedValidator(
-                    ValidationRule(
-                        'required',
-                        OperatorRule(f'{self.address_source_prefix}_area', bool),
-                        when=InRule(
-                            f'{self.address_source_prefix}_country',
-                            (
-                                CountryEnum.united_states.value.id,
-                                CountryEnum.canada.value.id,
-                            ),
-                        ),
-                    ),
-                ),
-            )
+            self.add_area_validator(validators)
+
+        if (
+            self.postcode_can_be_required
+            and is_feature_flag_active('address-postcode-company-required-field')
+        ):
+            self.add_postcode_validator(validators)
         return validators
 
     def run_validation(self, data=serializers.empty):
