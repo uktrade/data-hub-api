@@ -8,7 +8,7 @@ from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
     CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
 )
-from datahub.company.serializers import ContactDetailSerializer
+from datahub.company.serializers import ContactDetailSerializer, ContactDetailV4Serializer
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
@@ -35,11 +35,13 @@ def update_contact_task_mock(monkeypatch):
 
 
 @freeze_time(FROZEN_TIME)
-class TestContactSerializer:
+class ContactSerializerBase:
     """
     Tests for the Contact Serializer. Checking that update / create notify the
     consent service correctly.
     """
+
+    serializer = None
 
     def _make_contact(self):
         contact = ContactFactory()
@@ -48,10 +50,10 @@ class TestContactSerializer:
     def test_serializer_update_call_task(self, update_contact_task_mock, synchronous_on_commit):
         """
         Ensure that consent service celery task is called when serializer.update
-        is called.
+        is called if accepts_dit_email_marketing is True.
         """
         contact = self._make_contact()
-        c = ContactDetailSerializer(
+        c = self.serializer(
             instance=contact,
             context={'request': request},
         )
@@ -74,10 +76,10 @@ class TestContactSerializer:
     ):
         """
         Ensure that consent service celery task is called when serializer.update
-        is called with partial data.
+        is called with partial data if accepts_dit_email_marketing is True.
         """
         contact = self._make_contact()
-        c = ContactDetailSerializer(instance=contact, partial=True)
+        c = self.serializer(instance=contact, partial=True)
         c.update(c.instance, {
             'accepts_dit_email_marketing': True,
         })
@@ -92,11 +94,11 @@ class TestContactSerializer:
             synchronous_on_commit,
     ):
         """
-        Ensure that consent service celery task not is called when serializer.update
+        Ensure that consent service celery task is not called when serializer.update
         is called with partial data but `accepts_dit_email_marketing` is missing.
         """
         contact = self._make_contact()
-        c = ContactDetailSerializer(instance=contact, partial=True)
+        c = self.serializer(instance=contact, partial=True)
         data = {
             'last_name': 'Nelson1',
         }
@@ -138,7 +140,7 @@ class TestContactSerializer:
             'notes': 'lorem ipsum',
             'accepts_dit_email_marketing': True,
         }
-        c = ContactDetailSerializer(data=data, context={'request': request})
+        c = self.serializer(data=data, context={'request': request})
         c.is_valid(raise_exception=True)
         c.create(c.validated_data)
         update_contact_task_mock.assert_called_once_with(
@@ -150,14 +152,13 @@ class TestContactSerializer:
         )
 
     @pytest.mark.parametrize('accepts_marketing', (True, False))
-    def test_to_representation(
+    def test_marketing_field_populated_by_consent_service(
         self,
         requests_mock,
         accepts_marketing,
     ):
         """
-        Test accepts_dit_email_marketing fields is populated by the consent service
-        when the feature flag is enabled.
+        Test accepts_dit_email_marketing field is populated by the consent service.
         """
         contact = self._make_contact()
         hawk_response = HawkMockJSONResponse(
@@ -178,6 +179,100 @@ class TestContactSerializer:
             status_code=200,
             text=hawk_response,
         )
-        contact_serialized = ContactDetailSerializer(instance=contact)
+        contact_serialized = self.serializer(instance=contact)
         assert contact_serialized.data['accepts_dit_email_marketing'] is accepts_marketing
         assert requests_mock.call_count == 1
+
+
+@freeze_time(FROZEN_TIME)
+class TestContactV3Serializer(ContactSerializerBase):
+    """
+    Tests for the Contact V3 Serializer. Checking that update / create notify the
+    consent service correctly.
+    """
+
+    serializer = ContactDetailSerializer
+
+
+@freeze_time(FROZEN_TIME)
+class TestContactV4Serializer(ContactSerializerBase):
+    """
+    Tests for the Contact V4 Serializer. Checking that update / create notify the
+    consent service correctly.
+    """
+
+    serializer = ContactDetailV4Serializer
+
+    @pytest.mark.parametrize(
+        'country_id, expected_response, is_valid, address_area',
+        (
+            (
+                constants.Country.united_states.value.id,
+                {
+                    'address_area': ['This field is required.'],
+                },
+                False,
+                None,
+            ),
+            (
+                constants.Country.canada.value.id,
+                {
+                    'address_area': ['This field is required.'],
+                },
+                False,
+                None,
+            ),
+            (
+                constants.Country.canada.value.id,
+                {},
+                True,
+                {
+                    'id': constants.AdministrativeArea.quebec.value.id,
+                    'name': constants.AdministrativeArea.quebec.value.name,
+                },
+            ),
+            (
+                constants.Country.united_kingdom.value.id,
+                {},
+                True,
+                None,
+            ),
+        ),
+    )
+    def test_area_required_validation_on_respective_countries(
+        self,
+        country_id,
+        expected_response,
+        is_valid,
+        address_area,
+    ):
+        """
+        Ensure that area required validation is called for appropriate countries
+        and excluded for others
+        """
+        company = CompanyFactory()
+        data = {
+            'title': {
+                'id': constants.Title.admiral_of_the_fleet.value.id,
+            },
+            'first_name': 'Jane',
+            'last_name': 'Doe',
+            'company': {
+                'id': str(company.pk),
+            },
+            'primary': True,
+            'email': 'foo@bar.com',
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'address_same_as_company': False,
+            'address_1': 'Foo st.',
+            'address_town': 'Bar',
+            'address_country': {
+                'id': country_id,
+            },
+            'address_area': address_area,
+        }
+        contact_serializer = ContactDetailV4Serializer(data=data, context={'request': request})
+        assert contact_serializer.is_valid(raise_exception=False) is is_valid
+        assert len(contact_serializer.errors) == len(expected_response)
+        assert contact_serializer.errors == expected_response
