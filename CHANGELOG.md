@@ -1,3 +1,21 @@
+# Data Hub API 38.0.0 (2021-08-20)
+## Features
+
+- **Contacts** It's now possible to validate required areas are missing from the API for Canada and United States.
+- **Contacts** The `/v3/contact` and `/v3/search/contact` endpoints can now also be filtered
+  by email using the `email` filter.
+- **Investment** The financial year for an investment project can now be seen as a read only field on the admin page.
+- **Investment** Financial year filters can now be applied to the search investments endpoint.
+
+  `POST /v3/search/investment_project { "financial_year_start": [<years>] }`
+
+  For example, to get investment projects from financial years 2017-18 and 2020-21, you can call:
+  `POST /v3/search/investment_project { "financial_year_start": ["2017", "2020"] }`
+
+  Projects in the "Prospect" stage appear for all financial years from when they are created. Other projects use their actual land date, falling back to estimated land date if that has not been set.
+- New address validation has been added to make postcode a required field for US and Canadian company addresses.
+
+
 # Data Hub API 37.3.0 (2021-08-06)
 ## Features
 
