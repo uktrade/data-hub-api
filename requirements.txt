@@ -77,7 +77,10 @@ django==3.1.12
     #   django-debug-toolbar
     #   django-extensions
     #   django-filter
+<<<<<<< HEAD
     #   django-mptt
+=======
+>>>>>>> e78c8f88 (Bump django-mptt from 0.12.0 to 0.13.1)
     #   django-redis
     #   django-reversion
     #   djangorestframework
@@ -95,7 +98,7 @@ django-ipware==3.0.2
     # via django-axes
 django-js-asset==1.2.2
     # via django-mptt
-django-mptt==0.12.0
+django-mptt==0.13.1
     # via -r requirements.in
 django-pglocks==1.0.4
     # via -r requirements.in
