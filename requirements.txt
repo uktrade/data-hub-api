@@ -31,9 +31,9 @@ billiard==3.6.4.0
     # via
     #   -r requirements.in
     #   celery
-boto3==1.18.21
+boto3==1.18.26
     # via -r requirements.in
-botocore==1.21.21
+botocore==1.21.26
     # via
     #   boto3
     #   s3transfer
@@ -77,10 +77,11 @@ django==3.1.12
     #   django-debug-toolbar
     #   django-extensions
     #   django-filter
+    #   django-mptt
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==5.20.0
+django-axes==5.21.0
     # via -r requirements.in
 django-debug-toolbar==3.2.2
     # via -r requirements.in
