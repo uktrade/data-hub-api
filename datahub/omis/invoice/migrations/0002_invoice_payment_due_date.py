@@ -9,7 +9,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-invoice', '0001_initial'),
+        ('omis_invoice', '0001_initial'),
     ]
 
     operations = [

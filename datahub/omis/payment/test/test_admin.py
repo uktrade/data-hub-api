@@ -31,7 +31,7 @@ class TestRefundAdmin(AdminTestMixin):
 
         assert Refund.objects.count() == 0
 
-        url = reverse('admin:omis-payment_refund_add')
+        url = reverse('admin:omis_payment_refund_add')
         data = {
             'order': order.pk,
             'status': RefundStatus.APPROVED,
@@ -101,7 +101,7 @@ class TestRefundAdmin(AdminTestMixin):
         now_date_str = now_datetime.date().isoformat()
         now_time_str = now_datetime.time().isoformat()
 
-        url = reverse('admin:omis-payment_refund_change', args=(refund.id,))
+        url = reverse('admin:omis_payment_refund_change', args=(refund.id,))
         data = {
             'order': order.pk,
             'status': refund.status,
@@ -258,7 +258,7 @@ class TestRefundAdmin(AdminTestMixin):
         now_date_str = now_datetime.date().isoformat()
         now_time_str = now_datetime.time().isoformat()
 
-        url = reverse('admin:omis-payment_refund_add')
+        url = reverse('admin:omis_payment_refund_add')
         data = {
             'order': order.pk,
             'status': RefundStatus.APPROVED,
@@ -337,7 +337,7 @@ class TestRefundAdmin(AdminTestMixin):
         """Test required fields depending on the status of the refund."""
         refund = refund_factory()
 
-        url = reverse('admin:omis-payment_refund_change', args=(refund.id,))
+        url = reverse('admin:omis_payment_refund_change', args=(refund.id,))
         data = {
             'order': '',
             'status': '',
@@ -386,7 +386,7 @@ class TestRefundAdmin(AdminTestMixin):
         date_str = now_datetime.date().isoformat()
         time_str = now_datetime.time().isoformat()
 
-        url = reverse('admin:omis-payment_refund_change', args=(refund.id,))
+        url = reverse('admin:omis_payment_refund_change', args=(refund.id,))
         default_data = {
             'order': refund.order.pk,
             'requested_on_0': date_str,

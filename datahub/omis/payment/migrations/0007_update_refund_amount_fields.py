@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-payment', '0006_paymentgatewaysession'),
+        ('omis_payment', '0006_paymentgatewaysession'),
     ]
 
     operations = [

@@ -25,7 +25,7 @@ class TestReportAdmin(AdminTestMixin):
         """Test the download of a report."""
         AdviserFactory.create_batch(5)
 
-        url = reverse('admin-report:download-report', kwargs={'report_id': 'all-advisers'})
+        url = reverse('admin_report:download-report', kwargs={'report_id': 'all-advisers'})
 
         user = create_test_user(
             permission_codenames=('view_advisor',),
@@ -67,7 +67,7 @@ class TestReportAdmin(AdminTestMixin):
             one_list_account_owner=None,
         )
 
-        url = reverse('admin-report:download-report', kwargs={'report_id': 'one-list'})
+        url = reverse('admin_report:download-report', kwargs={'report_id': 'one-list'})
 
         user = create_test_user(
             permission_codenames=('view_company',),

@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-quote', '0007_initial_tsandcs'),
+        ('omis_quote', '0007_initial_tsandcs'),
         ('core', '0003_rename_read_permissions'),
     ]
 

@@ -36,6 +36,7 @@ class PaymentGatewaySession(BaseModel):
     objects = PaymentGatewaySessionManager()
 
     class Meta:
+        db_table = 'omis-payment_paymentgatewaysession'
         ordering = ('-created_on', )
 
     def __str__(self):
@@ -175,6 +176,7 @@ class Payment(BaseModel):
     objects = PaymentManager()
 
     class Meta:
+        db_table = 'omis-payment_payment'
         ordering = ('created_on', )
 
     def __str__(self):
@@ -254,6 +256,7 @@ class Refund(BaseModel):
     additional_reference = models.CharField(max_length=100, blank=True)
 
     class Meta:
+        db_table = 'omis-payment_refund'
         ordering = ('created_on', )
 
     def __str__(self):
