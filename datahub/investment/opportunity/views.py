@@ -1,9 +1,20 @@
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 
 from datahub.core.audit import AuditViewSet
+from datahub.core.autocomplete import AutocompleteFilter
 from datahub.core.viewsets import CoreViewSet
 from datahub.investment.opportunity.models import LargeCapitalOpportunity
 from datahub.investment.opportunity.serializers import LargeCapitalOpportunitySerializer
+
+
+class LargeCapitalOpportunityFilterSet(FilterSet):
+    """Large Capital Opportunity filter."""
+
+    autocomplete = AutocompleteFilter(search_fields=('name',))
+
+    class Meta:
+        model = LargeCapitalOpportunity
+        fields = ['investment_projects__id']
 
 
 class LargeCapitalOpportunityViewSet(CoreViewSet):
@@ -11,7 +22,7 @@ class LargeCapitalOpportunityViewSet(CoreViewSet):
 
     serializer_class = LargeCapitalOpportunitySerializer
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('investment_projects__id',)
+    filterset_class = LargeCapitalOpportunityFilterSet
     queryset = LargeCapitalOpportunity.objects.all()
 
 
