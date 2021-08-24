@@ -10,7 +10,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-quote', '0005_adding_read_permissions'),
+        ('omis_quote', '0005_adding_read_permissions'),
     ]
 
     operations = [
@@ -29,6 +29,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='quote',
             name='terms_and_conditions',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='+', to='omis-quote.TermsAndConditions'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='+', to='omis_quote.TermsAndConditions'),
         ),
     ]

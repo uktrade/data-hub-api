@@ -6,4 +6,4 @@ class CoreTestConfig(AppConfig):
     Django App Config for the Order app.
     """
 
-    name = 'core-test'
+    name = 'datahub.core.test.support'

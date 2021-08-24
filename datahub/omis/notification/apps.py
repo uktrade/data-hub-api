@@ -5,7 +5,7 @@ class NotificationConfig(AppConfig):
     """Django App Config for the OMIS Notification app."""
 
     name = 'datahub.omis.notification'
-    label = 'omis-notification'  # namespaced app. Use this e.g. when migrating
+    label = 'omis_notification'  # namespaced app. Use this e.g. when migrating
 
     def ready(self):
         """Registers the signals for this app.

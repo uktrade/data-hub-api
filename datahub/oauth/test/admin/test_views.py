@@ -14,7 +14,7 @@ from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.oauth.admin.forms import AddAccessTokenForm, NO_SSO_EMAIL_USER_ID_MESSAGE
 
 admin_index_url = reverse('admin:index')
-add_access_token_url = reverse('admin-oauth:add-access-token')
+add_access_token_url = reverse('admin_oauth:add-access-token')
 
 
 @pytest.mark.usefixtures('local_memory_cache')

@@ -8,8 +8,6 @@ aiohttp==3.7.4.post0
     # via slackclient
 amqp==2.6.1
     # via kombu
-appnope==0.1.2
-    # via ipython
 argh==0.26.2
     # via watchdog
 asgiref==3.4.1
@@ -70,7 +68,7 @@ decorator==5.1.0
     # via ipython
 distlib==0.3.3
     # via virtualenv
-django==3.1.13
+django==3.2.7
     # via
     #   -r requirements.in
     #   django-axes
@@ -120,7 +118,7 @@ factory-boy==3.2.0
     # via -r requirements.in
 faker==8.14.0
     # via factory-boy
-filelock==3.0.12
+filelock==3.1.0
     # via virtualenv
 flake8==3.9.2
     # via

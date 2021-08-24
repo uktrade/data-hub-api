@@ -1,3 +1,6 @@
+from django.db.models import CharField
+from django.db.models.functions import Cast
+
 from datahub.core.query_utils import (
     get_front_end_url_expression,
     get_full_name_expression,
@@ -118,7 +121,7 @@ class SearchLargeCapitalOpportunityExportAPIView(
         created_by_name=get_full_name_expression('created_by'),
         asset_class_names=get_string_agg_subquery(
             DBLargeCapitalOpportunity,
-            'asset_classes__name',
+            Cast('asset_classes__name', CharField()),
         ),
         type_names=get_string_agg_subquery(
             DBLargeCapitalOpportunity,
@@ -139,27 +142,27 @@ class SearchLargeCapitalOpportunityExportAPIView(
         ),
         investment_type_names=get_string_agg_subquery(
             DBLargeCapitalOpportunity,
-            'investment_types__name',
+            Cast('investment_types__name', CharField()),
         ),
         time_horizons_names=get_string_agg_subquery(
             DBLargeCapitalOpportunity,
-            'time_horizons__name',
+            Cast('time_horizons__name', CharField()),
         ),
         sources_of_funding_names=get_string_agg_subquery(
             DBLargeCapitalOpportunity,
-            'sources_of_funding__name',
+            Cast('sources_of_funding__name', CharField()),
         ),
         construction_risks_names=get_string_agg_subquery(
             DBLargeCapitalOpportunity,
-            'construction_risks__name',
+            Cast('construction_risks__name', CharField()),
         ),
         uk_region_locations_names=get_string_agg_subquery(
             DBLargeCapitalOpportunity,
-            'uk_region_locations__name',
+            Cast('uk_region_locations__name', CharField()),
         ),
         reasons_for_abandonment_names=get_string_agg_subquery(
             DBLargeCapitalOpportunity,
-            'reasons_for_abandonment__name',
+            Cast('reasons_for_abandonment__name', CharField()),
         ),
         link=get_front_end_url_expression(
             'largecapitalopportunity',

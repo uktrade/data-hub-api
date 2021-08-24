@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-payment', '0004_refund'),
+        ('omis_payment', '0004_refund'),
     ]
 
     operations = [

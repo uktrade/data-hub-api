@@ -4,7 +4,7 @@ import factory
 import pytest
 from botocore.stub import Stubber
 from django.conf import settings
-from django.core.cache import CacheHandler
+from django.core.cache import cache
 from django.core.management import call_command
 from django.db.models.signals import post_save
 from elasticsearch.helpers.test import get_test_client
@@ -112,19 +112,11 @@ def s3_stubber():
 
 
 @pytest.fixture()
-def local_memory_cache(monkeypatch):
-    """Configure settings.CACHES to use LocMemCache."""
-    monkeypatch.setitem(
-        settings.CACHES,
-        'default',
-        {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'},
-    )
-    cache_handler = CacheHandler()
-    monkeypatch.setattr('django.core.cache.caches', cache_handler)
-
+def local_memory_cache():
+    """Get local memory cache."""
     yield
 
-    cache_handler['default'].clear()
+    cache.clear()
 
 
 @pytest.fixture

@@ -9,7 +9,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-quote', '0002_cancellation'),
+        ('omis_quote', '0002_cancellation'),
     ]
 
     operations = [
