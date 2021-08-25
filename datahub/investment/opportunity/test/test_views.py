@@ -140,6 +140,20 @@ class TestLargeCapitalOpportunityListView(APITestMixin):
         )
         assert response_data['results'][0]['id'] == str(large_capital_opportunity.pk)
 
+    def test_autocomplete_large_capital_opportunities(self):
+        """Test that the opportunities viewset can autocomplete."""
+        LargeCapitalOpportunityFactory(name='Apple')
+        LargeCapitalOpportunityFactory(name='Auburn')
+        LargeCapitalOpportunityFactory(name='Boom')
+        LargeCapitalOpportunityFactory(name='Crush')
+        url = reverse(viewname='api-v4:large-capital-opportunity:collection')
+        response = self.api_client.get(url, data={'autocomplete': 'A'})
+        assert response.status_code == status.HTTP_200_OK
+        opportunities = response.json()['results']
+        assert len(opportunities) == 2
+        assert opportunities[0]['name'] == 'Apple'
+        assert opportunities[1]['name'] == 'Auburn'
+
 
 class TestUpdateLargeCapitalOpportunityView(APITestMixin):
     """Test updating a large capital opportunity."""
