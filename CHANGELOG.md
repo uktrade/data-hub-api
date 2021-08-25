@@ -1,3 +1,11 @@
+# Data Hub API 38.1.0 (2021-08-25)
+
+
+## Features
+
+- **Investment** It is now possible to provide autocomplete queries to the opportunities endpoint, by passing the autocomplete param `GET /v4/large-capital-opportunity?autocomplete=<query>`
+
+
 # Data Hub API 38.0.0 (2021-08-20)
 ## Features
 
