@@ -12,8 +12,6 @@ apipkg==1.5
     # via execnet
 appdirs==1.4.4
     # via virtualenv
-appnope==0.1.2
-    # via ipython
 argh==0.26.2
     # via watchdog
 asgiref==3.3.4
@@ -150,7 +148,7 @@ flake8-polyfill==1.0.2
     # via pep8-naming
 flake8-print==4.0.0
     # via -r requirements.in
-flake8-quotes==3.2.0
+flake8-quotes==3.3.0
     # via -r requirements.in
 flake8-string-format==0.3.0
     # via -r requirements.in
