@@ -588,6 +588,61 @@ class EditContactBase(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
 
+    @pytest.mark.parametrize('accepts_marketing', (True, False))
+    def test_email_marketing_update(self, get_consent_fixture, accepts_marketing):
+        consent_request_mock = get_consent_fixture({
+            'results': [
+                {
+                    'consents': [
+                        'email_marketing',
+                    ] if accepts_marketing else [],
+                    'email': 'foo@bar.com',
+                },
+            ],
+        })
+        with freeze_time('2017-04-18 13:25:30.986208'):
+            company = CompanyFactory()
+
+            contact = ContactFactory(
+                title_id=constants.Title.admiral_of_the_fleet.value.id,
+                first_name='Oratio',
+                last_name='Nelson',
+                job_title='Head of Sales',
+                company=company,
+                email='foo@bar.com',
+                email_alternative='foo2@bar.com',
+                primary=True,
+                adviser=self.user,
+                telephone_countrycode='+44',
+                telephone_number='123456789',
+                telephone_alternative='987654321',
+                address_same_as_company=False,
+                address_1='Foo st.',
+                address_2='adr 2',
+                address_town='London',
+                address_county='London',
+                address_country_id=constants.Country.united_kingdom.value.id,
+                address_postcode='SW1A1AA',
+                notes='lorem ipsum',
+            )
+
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
+        accepts_marketing_new_value = not accepts_marketing
+        with freeze_time('2017-04-19 13:25:30.986208'):
+            response = self.api_client.patch(
+                url,
+                data={
+                    # toggle the value of marketing
+                    'accepts_dit_email_marketing': accepts_marketing_new_value
+                },
+            )
+
+        assert response.status_code == status.HTTP_200_OK, response.data
+        consent_service_request_payload = consent_request_mock.request_history[0].json()
+        assert consent_service_request_payload['consents'] == [
+            CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+        ] if accepts_marketing_new_value else []
+
 
 class TestEditContactV3(EditContactBase):
     """Test case for v3 of the edit contacts endpoint"""
