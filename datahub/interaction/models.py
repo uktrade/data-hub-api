@@ -279,6 +279,7 @@ class Interaction(ArchivableModel, BaseModel):
     )
 
     # Large capital opportunity
+    has_related_opportunity = models.BooleanField(null=True, blank=True)
     large_capital_opportunity = models.ForeignKey(
         'opportunity.LargeCapitalOpportunity',
         related_name='%(class)ss',

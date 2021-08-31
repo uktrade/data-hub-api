@@ -669,6 +669,7 @@ class InteractionSerializerV4(BaseInteractionSerializer):
             'company_referral',
             'has_related_trade_agreements',
             'related_trade_agreements',
+            'has_related_opportunity',
         )
         read_only_fields = (
             'archived_documents_url_path',
@@ -794,6 +795,16 @@ class InteractionSerializerV4(BaseInteractionSerializer):
                             [Interaction.Theme.EXPORT, Interaction.Theme.OTHER],
                         ),
                     ),
+                ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('large_capital_opportunity', bool),
+                    when=OperatorRule('has_related_opportunity', bool),
+                ),
+                ValidationRule(
+                    'invalid_when_no_related_opportunity',
+                    OperatorRule('large_capital_opportunity', not_),
+                    when=OperatorRule('has_related_opportunity', not_),
                 ),
                 # These two rules are only checked for service deliveries as there's a separate
                 # check that event is blank for interactions above which takes precedence (to
