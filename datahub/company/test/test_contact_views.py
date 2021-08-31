@@ -1,4 +1,5 @@
 from datetime import date
+import logging
 
 import factory
 import pytest
@@ -11,7 +12,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
 
-from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
+from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH, CONSENT_SERVICE_PERSON_PATH_LOOKUP
 from datahub.company.constants import (
     CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
 )
@@ -589,8 +590,9 @@ class EditContactBase(APITestMixin):
         assert response.data['archived_documents_url_path'] == 'old_path'
 
     @pytest.mark.parametrize('accepts_marketing', (True, False))
-    def test_email_marketing_update(self, get_consent_fixture, accepts_marketing):
-        consent_request_mock = get_consent_fixture({
+    def test_email_marketing_update(self, caplog, get_consent_fixture, accepts_marketing, requests_mock):
+        caplog.set_level(logging.INFO)
+        get_consent_fixture({
             'results': [
                 {
                     'consents': [
@@ -600,6 +602,12 @@ class EditContactBase(APITestMixin):
                 },
             ],
         })
+        consent_update_request_mock = requests_mock.post(
+            f'{settings.CONSENT_SERVICE_BASE_URL}'
+            f'{CONSENT_SERVICE_PERSON_PATH}',
+            status_code=200,
+        )
+
         with freeze_time('2017-04-18 13:25:30.986208'):
             company = CompanyFactory()
 
@@ -638,7 +646,7 @@ class EditContactBase(APITestMixin):
             )
 
         assert response.status_code == status.HTTP_200_OK, response.data
-        consent_service_request_payload = consent_request_mock.request_history[0].json()
+        consent_service_request_payload = consent_update_request_mock.request_history[0].json()
         assert consent_service_request_payload['consents'] == [
             CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
         ] if accepts_marketing_new_value else []
