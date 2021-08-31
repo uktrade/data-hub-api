@@ -148,7 +148,7 @@ flake8-polyfill==1.0.2
     # via pep8-naming
 flake8-print==4.0.0
     # via -r requirements.in
-flake8-quotes==3.2.0
+flake8-quotes==3.3.0
     # via -r requirements.in
 flake8-string-format==0.3.0
     # via -r requirements.in
