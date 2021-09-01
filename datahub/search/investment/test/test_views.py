@@ -1132,6 +1132,115 @@ class TestSearchPermissions(APITestMixin):
         assert {result['id'] for result in results} == expected_ids
 
 
+class TestSummaryAggregation(APITestMixin):
+    """Tests that stage counts are provided."""
+
+    def test_unfiltered(self, setup_data):
+        """All results should be counted when not filtered"""
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, {'show_summary': True})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+        assert 'summary' in response.data
+        assert response.data['summary'] == {
+            'prospect': {
+                'label': 'Prospect',
+                'id': constants.InvestmentProjectStage.prospect.value.id,
+                'value': 4,
+            },
+            'assign_pm': {
+                'label': 'Assign PM',
+                'id': constants.InvestmentProjectStage.assign_pm.value.id,
+                'value': 0,
+            },
+            'active': {
+                'label': 'Active',
+                'id': constants.InvestmentProjectStage.active.value.id,
+                'value': 0,
+            },
+            'verify_win': {
+                'label': 'Verify Win',
+                'id': constants.InvestmentProjectStage.verify_win.value.id,
+                'value': 0,
+            },
+            'won': {
+                'label': 'Won',
+                'id': constants.InvestmentProjectStage.won.value.id,
+                'value': 0,
+            },
+        }
+
+    def test_show_summary_empty(self, setup_data):
+        """If show_summary is not present, a summary should not be returned"""
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, {})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+        assert 'summary' not in response.data
+
+    def test_show_summary_false(self, setup_data):
+        """If show_summary is False, a summary should not be returned"""
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, {'show_summary': False})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+        assert 'summary' not in response.data
+
+    def test_filter_by_stage(self, es_with_collector):
+        """Other stage counts should be 0 when filtered by stage"""
+        InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
+        )
+        for _ in range(2):
+            InvestmentProjectFactory(
+                stage_id=constants.InvestmentProjectStage.active.value.id,
+            )
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(
+            url,
+            {
+                'stage': constants.InvestmentProjectStage.active.value.id,
+                'show_summary': True,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert 'summary' in response.data
+        assert response.data['summary'] == {
+            'prospect': {
+                'label': 'Prospect',
+                'id': constants.InvestmentProjectStage.prospect.value.id,
+                'value': 0,
+            },
+            'assign_pm': {
+                'label': 'Assign PM',
+                'id': constants.InvestmentProjectStage.assign_pm.value.id,
+                'value': 0,
+            },
+            'active': {
+                'label': 'Active',
+                'id': constants.InvestmentProjectStage.active.value.id,
+                'value': 2,
+            },
+            'verify_win': {
+                'label': 'Verify Win',
+                'id': constants.InvestmentProjectStage.verify_win.value.id,
+                'value': 0,
+            },
+            'won': {
+                'label': 'Won',
+                'id': constants.InvestmentProjectStage.won.value.id,
+                'value': 0,
+            },
+        }
+
+
 class TestInvestmentProjectExportView(APITestMixin):
     """Tests the investment project export view."""
 
