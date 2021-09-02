@@ -87,6 +87,7 @@ class TestAddInteraction(APITestMixin):
             },
             {
                 'theme': Interaction.Theme.LARGE_CAPITAL_OPPORTUNITY,
+                'has_related_opportunity': True,
                 'large_capital_opportunity': LargeCapitalOpportunityFactory,
             },
             # company interaction with policy feedback
@@ -124,6 +125,7 @@ class TestAddInteraction(APITestMixin):
             'service': Service.inbound_referral.value.id,
             'was_policy_feedback_provided': False,
             'has_related_trade_agreements': False,
+            'has_related_opportunity': False,
             'related_trade_agreements': [],
             **resolve_data(extra_data),
         }
@@ -216,6 +218,9 @@ class TestAddInteraction(APITestMixin):
             'archived_reason': None,
             'company_referral': None,
             'large_capital_opportunity': request_data.get('large_capital_opportunity'),
+            'has_related_opportunity': request_data.get(
+                'has_related_opportunity', False,
+            ),
             'has_related_trade_agreements': request_data.get(
                 'has_related_trade_agreements', False,
             ),
@@ -254,6 +259,7 @@ class TestAddInteraction(APITestMixin):
             },
             {
                 'theme': Interaction.Theme.LARGE_CAPITAL_OPPORTUNITY,
+                'has_related_opportunity': True,
                 'large_capital_opportunity': LargeCapitalOpportunityFactory,
             },
             # company interaction with policy feedback
@@ -291,6 +297,7 @@ class TestAddInteraction(APITestMixin):
             'service': Service.inbound_referral.value.id,
             'was_policy_feedback_provided': False,
             'has_related_trade_agreements': False,
+            'has_related_opportunity': False,
             'related_trade_agreements': [],
             **resolve_data(extra_data),
         }
@@ -379,6 +386,7 @@ class TestAddInteraction(APITestMixin):
             'service': Service.inbound_referral.value.id,
             'was_policy_feedback_provided': False,
             'has_related_trade_agreements': False,
+            'has_related_opportunity': False,
             'related_trade_agreements': [],
             **resolve_data(extra_data),
         }
@@ -470,6 +478,9 @@ class TestAddInteraction(APITestMixin):
             'archived_reason': None,
             'company_referral': None,
             'large_capital_opportunity': None,
+            'has_related_opportunity': request_data.get(
+                'has_related_opportunity', False
+            ),
             'has_related_trade_agreements': request_data.get(
                 'has_related_trade_agreements', False,
             ),
@@ -517,6 +528,7 @@ class TestAddInteraction(APITestMixin):
                 },
             ],
             'has_related_trade_agreements': False,
+            'has_related_opportunity': False,
             'related_trade_agreements': [],
         }
 
@@ -619,6 +631,7 @@ class TestAddInteraction(APITestMixin):
                 },
             ],
             'has_related_trade_agreements': False,
+            'has_related_opportunity': False,
             'related_trade_agreements': [],
         }
 
@@ -672,6 +685,7 @@ class TestAddInteraction(APITestMixin):
                     ),
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -696,6 +710,7 @@ class TestAddInteraction(APITestMixin):
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -724,6 +739,7 @@ class TestAddInteraction(APITestMixin):
                     ),
                     'was_policy_feedback_provided': True,
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -757,6 +773,7 @@ class TestAddInteraction(APITestMixin):
                     'policy_feedback_notes': '',
                     'policy_issue_types': [],
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -765,6 +782,68 @@ class TestAddInteraction(APITestMixin):
                     'policy_issue_types': ['This field is required.'],
                 },
             ),
+
+            # large_capital_opportunity field required when there is a related opportunity
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'has_related_opportunity': True,
+                    'related_trade_agreements': [],
+                },
+                {
+                    'large_capital_opportunity': ['This field is required.'],
+
+                },
+            ),
+            # large capital opportunity field cannot be blank when there is a related opportunity
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'has_related_opportunity': True,
+                    'related_trade_agreements': [],
+                },
+                {
+                    'large_capital_opportunity': ['This field is required.'],
+                },
+            ),
+
+
             # at least one trade agreements field required when there are related trade agreements
             (
                 {
@@ -787,6 +866,7 @@ class TestAddInteraction(APITestMixin):
                         CommunicationChannel,
                     ),
                     'was_policy_feedback_provided': False,
+                    'has_related_opportunity': False,
                     'has_related_trade_agreements': True,
                 },
                 {
@@ -815,6 +895,7 @@ class TestAddInteraction(APITestMixin):
                         CommunicationChannel,
                     ),
                     'was_policy_feedback_provided': False,
+                    'has_related_opportunity': False,
                     'has_related_trade_agreements': True,
                     'related_trade_agreements': [],
                 },
@@ -845,6 +926,7 @@ class TestAddInteraction(APITestMixin):
                         CommunicationChannel,
                     ),
                     'were_countries_discussed': None,
+                    'has_related_opportunity': False,
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
                 },
@@ -875,6 +957,7 @@ class TestAddInteraction(APITestMixin):
                     ),
                     'was_policy_feedback_provided': False,
                     'were_countries_discussed': None,
+                    'has_related_opportunity': False,
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
                 },
@@ -905,6 +988,7 @@ class TestAddInteraction(APITestMixin):
                     ),
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -943,6 +1027,7 @@ class TestAddInteraction(APITestMixin):
                         },
                     ],
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -977,6 +1062,7 @@ class TestAddInteraction(APITestMixin):
                     'were_countries_discussed': True,
                     'export_countries': None,
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -1021,6 +1107,7 @@ class TestAddInteraction(APITestMixin):
                         },
                     ],
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -1058,6 +1145,7 @@ class TestAddInteraction(APITestMixin):
                         },
                     ],
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -1095,6 +1183,7 @@ class TestAddInteraction(APITestMixin):
                         },
                     ],
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -1133,6 +1222,7 @@ class TestAddInteraction(APITestMixin):
                         },
                     ],
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -1173,6 +1263,7 @@ class TestAddInteraction(APITestMixin):
                         },
                     ],
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -1211,6 +1302,7 @@ class TestAddInteraction(APITestMixin):
                         },
                     ],
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -1256,6 +1348,7 @@ class TestAddInteraction(APITestMixin):
                         },
                     ],
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -1380,6 +1473,7 @@ class TestAddInteraction(APITestMixin):
                     'event': None,
                     'is_event': True,
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -1404,6 +1498,7 @@ class TestAddInteraction(APITestMixin):
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                     'communication_channel': partial(
                         random_obj_for_model,
@@ -1432,6 +1527,7 @@ class TestAddInteraction(APITestMixin):
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                     'dit_participants': [],
                 },
@@ -1463,6 +1559,7 @@ class TestAddInteraction(APITestMixin):
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                     'status': 'foobar',
                 },
@@ -1490,6 +1587,7 @@ class TestAddInteraction(APITestMixin):
                     'service': Service.enquiry_or_referral_received.value.id,
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -1515,6 +1613,7 @@ class TestAddInteraction(APITestMixin):
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                     'status': None,
                 },
@@ -1545,6 +1644,7 @@ class TestAddInteraction(APITestMixin):
                     ),
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                     'were_countries_discussed': True,
                 },
@@ -1575,6 +1675,7 @@ class TestAddInteraction(APITestMixin):
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
+                    'has_related_opportunity': False,
                     'related_trade_agreements': [],
                 },
                 {
@@ -1626,6 +1727,7 @@ class TestAddInteraction(APITestMixin):
                 'service': Service.inbound_referral.value.id,
                 'was_policy_feedback_provided': False,
                 'has_related_trade_agreements': False,
+                'has_related_opportunity': False,
                 'related_trade_agreements': [],
             },
         )
@@ -1673,6 +1775,7 @@ class TestAddInteraction(APITestMixin):
                 'service': Service.inbound_referral.value.id,
                 'was_policy_feedback_provided': False,
                 'has_related_trade_agreements': False,
+                'has_related_opportunity': False,
                 'related_trade_agreements': [],
             },
         )
@@ -1710,6 +1813,7 @@ class TestAddInteraction(APITestMixin):
                 'service': Service.inbound_referral.value.id,
                 'was_policy_feedback_provided': False,
                 'has_related_trade_agreements': False,
+                'has_related_opportunity': False,
                 'related_trade_agreements': [],
             },
         )
@@ -1871,6 +1975,7 @@ class TestGetInteraction(APITestMixin):
             if company_referral
             else None,
             'large_capital_opportunity': None,
+            'has_related_opportunity': None,
             'has_related_trade_agreements': None,
             'related_trade_agreements': [],
         }
@@ -1993,6 +2098,7 @@ class TestGetInteraction(APITestMixin):
             'archived_reason': None,
             'company_referral': None,
             'large_capital_opportunity': None,
+            'has_related_opportunity': None,
             'has_related_trade_agreements': None,
             'related_trade_agreements': [],
         }
@@ -2458,6 +2564,7 @@ class TestUpdateInteraction(APITestMixin):
                     'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                 },
             ],
+            'has_related_opportunity': False,
             'has_related_trade_agreements': True,
             'related_trade_agreements': ['50cf99fd-1150-421d-9e1c-b23750ebf5ca'],
         }

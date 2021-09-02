@@ -186,6 +186,7 @@ class LargeCapitalOpportunityInteractionFactory(InteractionFactoryBase):
     kind = Interaction.Kind.INTERACTION
     theme = Interaction.Theme.LARGE_CAPITAL_OPPORTUNITY
     large_capital_opportunity = factory.SubFactory(LargeCapitalOpportunityFactory)
+    has_related_opportunity = True
 
 
 class CompanyInteractionFactoryWithRelatedTradeAgreements(CompanyInteractionFactory):
