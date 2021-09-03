@@ -444,6 +444,7 @@ class TestCompleteCompanyReferral(APITestMixin):
             'archived_documents_url_path': '',
             'archived_on': None,
             'archived_reason': None,
+            'has_related_opportunity': None,
             'large_capital_opportunity_id': None,
             'has_related_trade_agreements': None,
 

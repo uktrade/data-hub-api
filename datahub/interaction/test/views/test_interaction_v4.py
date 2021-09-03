@@ -479,7 +479,7 @@ class TestAddInteraction(APITestMixin):
             'company_referral': None,
             'large_capital_opportunity': None,
             'has_related_opportunity': request_data.get(
-                'has_related_opportunity', False
+                'has_related_opportunity', False,
             ),
             'has_related_trade_agreements': request_data.get(
                 'has_related_trade_agreements', False,
