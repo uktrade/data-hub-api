@@ -258,7 +258,7 @@ pyjwt==2.1.0
     # via notifications-python-client
 pyparsing==2.4.7
     # via packaging
-pytest==6.2.4
+pytest==6.2.5
     # via
     #   -r requirements.in
     #   pytest-cov
