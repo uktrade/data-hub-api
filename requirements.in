@@ -1,8 +1,8 @@
 # Django and django related
 django==3.1.12
 djangorestframework==3.12.4
-django-axes==5.21.0
-django-environ==0.4.5
+django-axes==5.23.0
+django-environ==0.6.0
 django-extensions==3.1.3
 django-filter==2.4.0
 django-mptt==0.13.2
@@ -19,7 +19,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.1
 psycogreen==1.0.2
 
-boto3==1.18.31
+boto3==1.18.36
 
 notifications-python-client==6.2.1
 
@@ -42,7 +42,7 @@ elasticsearch==7.13.4
 elasticsearch-dsl==7.4.0
 
 # ES APM
-elastic-apm==6.3.3
+elastic-apm==6.4.0
 
 # Celery
 celery[redis]==4.4.7
@@ -50,7 +50,7 @@ billiard==3.6.4.0  # Not used directly, but pinned as it has been a source of br
 kombu==4.6.11  # Not used directly, but pinned as it has been a source of breakage in the past
 
 # Testing and dev
-pytest==6.2.4
+pytest==6.2.5
 pytest-django==4.4.0
 pytest-cov==2.12.1
 pytest-xdist==2.3.0
@@ -65,7 +65,7 @@ piprot==0.9.11
 semantic_version==2.8.5
 towncrier==21.3.0
 watchdog[watchmedo]==2.1.5
-pre-commit==2.14.1
+pre-commit==2.15.0
 
 
 # Code static analysis
