@@ -31,9 +31,9 @@ billiard==3.6.4.0
     # via
     #   -r requirements.in
     #   celery
-boto3==1.18.31
+boto3==1.18.36
     # via -r requirements.in
-botocore==1.21.31
+botocore==1.21.36
     # via
     #   boto3
     #   s3transfer
@@ -80,11 +80,11 @@ django==3.1.12
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==5.21.0
+django-axes==5.23.0
     # via -r requirements.in
 django-debug-toolbar==3.2.2
     # via -r requirements.in
-django-environ==0.4.5
+django-environ==0.6.0
     # via -r requirements.in
 django-extensions==3.1.3
     # via -r requirements.in
@@ -106,7 +106,7 @@ djangorestframework==3.12.4
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
-elastic-apm==6.3.3
+elastic-apm==6.4.0
     # via -r requirements.in
 elasticsearch==7.13.4
     # via
@@ -224,7 +224,7 @@ piprot==0.9.11
     # via -r requirements.in
 pluggy==0.13.1
     # via pytest
-pre-commit==2.14.1
+pre-commit==2.15.0
     # via -r requirements.in
 prompt-toolkit==3.0.18
     # via ipython
@@ -258,7 +258,7 @@ pyjwt==2.1.0
     # via notifications-python-client
 pyparsing==2.4.7
     # via packaging
-pytest==6.2.4
+pytest==6.2.5
     # via
     #   -r requirements.in
     #   pytest-cov
