@@ -124,6 +124,52 @@ class SearchInvestmentProjectAPIViewMixin:
 class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, SearchAPIView):
     """Filtered investment project search view."""
 
+    def get_base_query(self, request, validated_data):
+        """Add aggregations to show the number of projects at each stage."""
+        base_query = super().get_base_query(request, validated_data)
+        if validated_data.get('show_summary'):
+            base_query.aggs.bucket('stage', 'terms', field='stage.id')
+        return base_query
+
+    def enhance_response(self, results, response):
+        """Add summary data to the response."""
+        if 'stage' not in results.aggs:
+            return response
+
+        response['summary'] = {
+            InvestmentProjectStage.prospect.name: {
+                'label': 'Prospect',
+                'id': InvestmentProjectStage.prospect.value.id,
+                'value': 0,
+            },
+            InvestmentProjectStage.assign_pm.name: {
+                'label': 'Assign PM',
+                'id': InvestmentProjectStage.assign_pm.value.id,
+                'value': 0,
+            },
+            InvestmentProjectStage.active.name: {
+                'label': 'Active',
+                'id': InvestmentProjectStage.active.value.id,
+                'value': 0,
+            },
+            InvestmentProjectStage.verify_win.name: {
+                'label': 'Verify Win',
+                'id': InvestmentProjectStage.verify_win.value.id,
+                'value': 0,
+            },
+            InvestmentProjectStage.won.name: {
+                'label': 'Won',
+                'id': InvestmentProjectStage.won.value.id,
+                'value': 0,
+            },
+        }
+        for stage_summary in results.aggs['stage'].buckets:
+            stage = InvestmentProjectStage.get_by_id(stage_summary['key'])
+            if stage is not None and stage.name in response['summary']:
+                response['summary'][stage.name]['value'] = stage_summary['doc_count']
+
+        return response
+
 
 @register_v3_view(sub_path='export')
 class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchExportAPIView):
