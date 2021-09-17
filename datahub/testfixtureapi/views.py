@@ -26,7 +26,9 @@ from datahub.investment.project.models import (
     InvestmentProjectTeamMember,
 )
 from datahub.investment.project.proposition.models import Proposition
+from datahub.investment.investor_profile.models import LargeCapitalInvestorProfile
 from datahub.oauth.cache import add_token_data_to_cache
+from datahub.investment.opportunity.models import LargeCapitalOpportunity
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +58,8 @@ def reset_fixtures(request):
         raise Http404
 
     with transaction.atomic():
+        LargeCapitalInvestorProfile.objects.all().delete()
+        LargeCapitalOpportunity.objects.all().delete()
         InvestmentProject.objects.all().delete()
         InvestmentProjectStageLog.objects.all().delete()
         InvestmentProjectTeamMember.objects.all().delete()
