@@ -173,7 +173,7 @@ class ContactSerializerBase:
                 }],
             },
         )
-        requests_mock.post(
+        requests_mock.get(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             status_code=200,

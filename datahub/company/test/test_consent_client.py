@@ -27,7 +27,7 @@ class TestConsentClient:
         """
         Try to get consent status for a single email address
         """
-        matcher = requests_mock.post(
+        matcher = requests_mock.get(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             text=generate_hawk_response({
@@ -53,7 +53,7 @@ class TestConsentClient:
         """
         Try to get consent status for a list of email addresses
         """
-        matcher = requests_mock.post(
+        matcher = requests_mock.get(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             text=generate_hawk_response({
@@ -80,7 +80,7 @@ class TestConsentClient:
         """
         Try to get consent status for a single email address
         """
-        matcher = requests_mock.post(
+        matcher = requests_mock.get(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             text=generate_hawk_response({
@@ -106,7 +106,7 @@ class TestConsentClient:
         """
         Try to get consent status for a list of email addresses
         """
-        matcher = requests_mock.post(
+        matcher = requests_mock.get(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             text=generate_hawk_response({
@@ -201,7 +201,7 @@ class TestConsentClient:
         """
         When the Consent Service responds with a http error, It raises a HTTPError.
         """
-        requests_mock.post(
+        requests_mock.get(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             status_code=response_status,
@@ -232,7 +232,7 @@ class TestConsentClient:
         """
         When the Consent Service responds with a http error, It raises a HTTPError.
         """
-        requests_mock.post(
+        requests_mock.get(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             status_code=response_status,
@@ -258,7 +258,7 @@ class TestConsentClient:
         a ConnectionError or a Timeout Error
         """
         (request_exception, consent_exception) = exceptions
-        requests_mock.post(
+        requests_mock.get(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             exc=request_exception,
@@ -284,7 +284,7 @@ class TestConsentClient:
         a ConnectionError or a Timeout Error
         """
         (request_exception, consent_exception) = exceptions
-        requests_mock.post(
+        requests_mock.get(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{consent.CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             exc=request_exception,

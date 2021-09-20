@@ -1,6 +1,5 @@
 #!/bin/bash -xe
 python /app/manage.py migrate --noinput
-python /app/manage.py migrate --database mi --noinput
 python /app/manage.py migrate_es
 # Load initial metadata - ignore errors as we may have already loaded it in to
 # this DB
