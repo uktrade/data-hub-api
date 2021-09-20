@@ -14,9 +14,6 @@ job_defaults: &job_defaults
     postgres_image:
       type: string
 
-    mi_postgres_image:
-      type: string
-
     publish_coverage:
       type: boolean
       default: false
@@ -33,7 +30,6 @@ job_defaults: &job_defaults
     ACTIVITY_STREAM_ACCESS_KEY_ID: some-id
     ACTIVITY_STREAM_SECRET_ACCESS_KEY: some-secret
     DATABASE_URL: postgresql://postgres:datahub@postgres/datahub
-    MI_DATABASE_URL: postgresql://postgres:datahub@mi-postgres/mi
     DEBUG: 'True'
     DJANGO_SECRET_KEY: changeme
     DJANGO_SETTINGS_MODULE: config.settings.local
@@ -75,12 +71,6 @@ job_defaults: &job_defaults
       name: postgres
       environment:
         POSTGRES_DB: datahub
-        POSTGRES_PASSWORD: datahub
-
-    - image: <<parameters.mi_postgres_image>>
-      name: mi-postgres
-      environment:
-        POSTGRES_DB: mi
         POSTGRES_PASSWORD: datahub
 
   steps:
@@ -135,6 +125,5 @@ workflows:
           publish_coverage: true
           python_image: python:3.8
           postgres_image: postgres:10
-          mi_postgres_image: postgres:9.6
           es_image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
           es_apm_image: docker.elastic.co/apm/apm-server:7.7.1
