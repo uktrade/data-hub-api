@@ -27,21 +27,6 @@ from datahub.search.elasticsearch import (
 from datahub.search.signals import SignalReceiver
 
 
-def pytest_sessionstart(session):
-    """
-    Set tests to use all databases.
-
-    pytest-django does not directly support the databases attribute, so this is a workaround.
-
-    See PRs #397, #416 and #437 in the pytest-django repository on GitHub for more information.
-    """
-    from django.test import TestCase, TransactionTestCase
-
-    databases_to_enable = {'default', 'mi'}
-    TransactionTestCase.databases = databases_to_enable
-    TestCase.databases = databases_to_enable
-
-
 @pytest.fixture(scope='session')
 def django_db_setup(pytestconfig, django_db_setup, django_db_blocker):
     """Fixture for DB setup."""

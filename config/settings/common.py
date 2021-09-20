@@ -129,10 +129,6 @@ LOCAL_APPS = [
     'datahub.testfixtureapi',
 ]
 
-MI_APPS = [
-    'datahub.mi_dashboard',
-]
-
 # Can be used as a way to load a third-party app that has been removed from the
 # default INSTALLED_APPS list so its migrations can be reversed without them
 # being automatically reapplied.
@@ -144,7 +140,7 @@ MI_APPS = [
 # EXTRA_DJANGO_APPS=oauth2_provider ./manage.py migrate --plan oauth2_provider zero
 EXTRA_DJANGO_APPS = env.list('EXTRA_DJANGO_APPS', default=[])
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + MI_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 if set(EXTRA_DJANGO_APPS) & set(INSTALLED_APPS):
     raise ImproperlyConfigured('EXTRA_DJANGO_APPS should not overlap with the default app list')
@@ -183,43 +179,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DATABASE_ROUTERS = ('config.settings.db_router.DBRouter',)
-
-# Check if MI database certificates are provided in the environment variables
-# If they are then write them to the storage and update database options.
-# Certificates should be base64 encoded.
-MI_DATABASE_OPTIONS = {}
-MI_DATABASE_SSLROOTCERT = env('MI_DATABASE_SSLROOTCERT', default=None)
-MI_DATABASE_SSLCERT = env('MI_DATABASE_SSLCERT', default=None)
-MI_DATABASE_SSLKEY = env('MI_DATABASE_SSLKEY', default=None)
-MI_CERT_PERMISSIONS = stat.S_IRUSR | stat.S_IWUSR
-
-if MI_DATABASE_SSLROOTCERT and MI_DATABASE_SSLCERT and MI_DATABASE_SSLKEY:
-    MI_DATABASE_SSLROOTCERT_PATH = CONFIG_DIR('settings/mi/server-ca.pem')
-    MI_DATABASE_SSLCERT_PATH = CONFIG_DIR('settings/mi/client-cert.pem')
-    MI_DATABASE_SSLKEY_PATH = CONFIG_DIR('settings/mi/client-key.pem')
-
-    with open(MI_DATABASE_SSLROOTCERT_PATH, 'wb') as f:
-        f.write(base64.b64decode(MI_DATABASE_SSLROOTCERT))
-    os.chmod(MI_DATABASE_SSLROOTCERT_PATH, MI_CERT_PERMISSIONS)
-
-    with open(MI_DATABASE_SSLCERT_PATH, 'wb') as f:
-        f.write(base64.b64decode(MI_DATABASE_SSLCERT))
-    os.chmod(MI_DATABASE_SSLCERT_PATH, MI_CERT_PERMISSIONS)
-
-    with open(MI_DATABASE_SSLKEY_PATH, 'wb') as f:
-        f.write(base64.b64decode(MI_DATABASE_SSLKEY))
-    os.chmod(MI_DATABASE_SSLKEY_PATH, MI_CERT_PERMISSIONS)
-
-    MI_DATABASE_OPTIONS = {
-        'OPTIONS': {
-            'sslmode': 'verify-ca',
-            'sslrootcert': MI_DATABASE_SSLROOTCERT_PATH,
-            'sslcert': MI_DATABASE_SSLCERT_PATH,
-            'sslkey': MI_DATABASE_SSLKEY_PATH,
-        }
-    }
-
 DATABASES = {
     'default': {
         **env.db('DATABASE_URL'),
@@ -227,13 +186,6 @@ DATABASES = {
         'CONN_MAX_AGE': env.int('DATABASE_CONN_MAX_AGE', 0),
         'DISABLE_SERVER_SIDE_CURSORS': False,
     },
-    'mi': {
-        **env.db('MI_DATABASE_URL'),
-        'ATOMIC_REQUESTS': False,
-        'CONN_MAX_AGE': env.int('MI_DATABASE_DATABASE_CONN_MAX_AGE', 0),
-        'DISABLE_SERVER_SIDE_CURSORS': False,
-        **MI_DATABASE_OPTIONS,
-    }
 }
 
 FIXTURE_DIRS = [
@@ -509,12 +461,6 @@ if REDIS_BASE_URL:
             'schedule': crontab(minute=0, hour=8),
         }
 
-    if env.bool('ENABLE_MI_DASHBOARD_FEED', False):
-        CELERY_BEAT_SCHEDULE['mi_dashboard_feed'] = {
-            'task': 'datahub.mi_dashboard.tasks.mi_investment_project_etl_pipeline',
-            'schedule': crontab(minute=0, hour=1),
-        }
-
     if env.bool('ENABLE_EMAIL_INGESTION', False):
         CELERY_BEAT_SCHEDULE['email_ingestion'] = {
             'task': 'datahub.email_ingestion.tasks.ingest_emails',
@@ -533,19 +479,6 @@ if REDIS_BASE_URL:
 CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER', False)
 CELERY_TASK_SEND_SENT_EVENT = env.bool('CELERY_TASK_SEND_SENT_EVENT', True)
 CELERY_WORKER_TASK_EVENTS = env.bool('CELERY_WORKER_TASK_EVENTS', True)
-
-MI_FDI_DASHBOARD_TASK_DURATION_WARNING_THRESHOLD = env.int(
-    'MI_FDI_DASHBOARD_TASK_DURATION_WARNING_THRESHOLD',
-    default=10 * 60,  # seconds
-)
-
-MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS = (
-    ('sortby', 'estimated_land_date:asc'),
-    ('custom', 'true'),
-    ('stage', InvestmentProjectStage.verify_win.value.id),
-    ('stage', InvestmentProjectStage.won.value.id),
-    ('investor_company_country', ''),
-)
 
 # ADMIN CSV IMPORT
 
@@ -569,10 +502,6 @@ DATAHUB_FRONTEND_URL_PREFIXES = {
     'largecapitalinvestorprofile': f'{DATAHUB_FRONTEND_BASE_URL}/investments/profiles',
     'largecapitalopportunity': f'{DATAHUB_FRONTEND_BASE_URL}/investments/opportunities',
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
-
-    'mi_fdi_dashboard_country': (
-        f'{DATAHUB_FRONTEND_BASE_URL}/investments/projects?{urlencode(MI_FDI_DASHBOARD_COUNTRY_URL_PARAMS)}'
-    )
 }
 
 # OMIS

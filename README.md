@@ -141,7 +141,7 @@ There is now a `make` command to bring up the three environments on a single doc
 Dependencies:
 
 -   Python 3.8.x
--   PostgreSQL 10 (note: PostgreSQL 9.6 is used for the MI database)
+-   PostgreSQL 10
 -   redis 3.2
 -   Elasticsearch 6.8
 
@@ -191,36 +191,26 @@ Dependencies:
     ```
 
 7.  Set `DOCKER_DEV=False` in `.env`
-8.  Create the required PostgreSQL databases:
 
-    ```shell
-    psql -p5432
-    create database datahub;
-    create database mi;
-    ```
-
-    (Most Django apps use the `datahub` database. The `mi` database is used only by the `mi_dashboard` Django app.)
-
-9. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
+8. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
 
     ```shell
     docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:6.8.2
     ```
 
-10. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
+9. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
 
-11. Populate the databases and initialise Elasticsearch:
+10. Populate the databases and initialise Elasticsearch:
 
     ```shell
     ./manage.py migrate
-    ./manage.py migrate --database mi
     ./manage.py migrate_es
 
     ./manage.py loadinitialmetadata
     ./manage.py createinitialrevisions
     ```
 
-12. Optionally, you can load some test data:
+11. Optionally, you can load some test data:
 
     ```shell
     ./manage.py loaddata fixtures/test_data.yaml
@@ -230,7 +220,7 @@ Dependencies:
     and hence the loaded records won‘t be returned by search endpoints until Celery is
     started and the queued tasks have run.
 
-13. Create a superuser:
+12. Create a superuser:
 
     ```shell
     ./manage.py createsuperuser
@@ -238,13 +228,13 @@ Dependencies:
 
     (You can enter any valid email address as the username and SSO email user ID.)
 
-14. Start the server:
+13. Start the server:
 
     ```shell
     ./manage.py runserver
     ```
 
-15. Start celery:
+14. Start celery:
 
     ```shell
     celery worker -A config -l info -Q celery,long-running -B
@@ -443,7 +433,6 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `INVESTMENT_DOCUMENT_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_BUCKET` | No | S3 bucket for investment project documents storage. |
-| `ENABLE_MI_DASHBOARD_FEED` | No | Whether to enable daily MI dashboard feed (default=False). |
 | `MAILBOX_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for mailbox. |
 | `MAILBOX_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for mailbox. |
 | `MAILBOX_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for mailbox. |
@@ -453,11 +442,6 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `MAILBOX_MEETINGS_IMAP_DOMAIN` | No | IMAP domain for the inbox for ingesting meeting invites via IMAP |
 | `MARKET_ACCESS_ACCESS_KEY_ID` | No | A non-secret access key ID used by the Market Access service to access Hawk-authenticated public company endpoints. |
 | `MARKET_ACCESS_SECRET_ACCESS_KEY` | If `MARKET_ACCESS_ACCESS_KEY_ID` is set | A secret key used by the Market Access service to access Hawk-authenticated public company endpoints. |
-| `MI_DATABASE_URL`  | Yes | PostgreSQL server URL (with embedded credentials) for MI dashboard. |
-| `MI_DATABASE_SSLROOTCERT` | No | base64 encoded root certificate for MI database connection. |
-| `MI_DATABASE_SSLCERT` | No | base64 encoded client certificate for MI database connection. |
-| `MI_DATABASE_SSLKEY` | No | base64 encoded client private key for MI database connection. |
-| `MI_FDI_DASHBOARD_TASK_DURATION_WARNING_THRESHOLD` | No | Threshold (in seconds) for emitting warnings about long transfer duration (default=600). |
 | `OMIS_PUBLIC_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `OMIS_PUBLIC_SECRET_ACCESS_KEY`. The holder of the secret key can access the OMIS public endpoints by Hawk authentication. |
 | `OMIS_NOTIFICATION_ADMIN_EMAIL`  | Yes | |
 | `OMIS_NOTIFICATION_API_KEY`  | Yes | |
@@ -474,7 +458,6 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `REPORT_BUCKET` | No | S3 bucket for report storage. |
 | `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
 | `SKIP_ES_MAPPING_MIGRATIONS` | No | If non-empty, skip applying Elasticsearch mapping type migrations on deployment. |
-| `SKIP_MI_DATABASE_MIGRATIONS` | No | If non-empty, skip applying MI database migrations on deployment. Used in environments without a working MI database. |
 | `SLACK_API_TOKEN` | No | (Required if `ENABLE_SLACK_MESSAGING` is truthy) Auth token for connection to Slack API for purposes of sending messages through the datahub.core.realtime_messaging module |
 | `SLACK_MESSAGE_CHANNEL` | No | (Required if `ENABLE_SLACK_MESSAGING` is truthy) Name (or preferably ID) of the channel into which datahub.core.realtime_messaging should send messages |
 | `SSO_ENABLED` | Yes | Whether single sign-on via RFC 7662 token introspection is enabled |
@@ -501,12 +484,6 @@ If using Docker, remember to run these commands inside your container by prefixi
 
 ```shell
 ./manage.py migrate
-```
-
-##### For the MI database
-
-```shell
-./manage.py migrate --database mi
 ```
 
 #### Create django-reversion initial revisions
