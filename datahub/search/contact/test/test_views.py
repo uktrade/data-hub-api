@@ -584,7 +584,7 @@ class TestContactExportView(APITestMixin):
             orm_ordering, 'pk',
         )
 
-        matcher = requests_mock.post(
+        matcher = requests_mock.get(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             text=generate_hawk_response({

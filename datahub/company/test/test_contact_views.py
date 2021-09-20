@@ -43,7 +43,7 @@ def generate_hawk_response(response):
 @pytest.fixture
 def get_consent_fixture(requests_mock):
     """Mock get call to consent service."""
-    yield lambda response: requests_mock.post(
+    yield lambda response: requests_mock.get(
         f'{settings.CONSENT_SERVICE_BASE_URL}'
         f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
         status_code=200,
@@ -928,7 +928,7 @@ class ViewContactBase(APITestMixin):
                 }],
             },
         )
-        requests_mock.post(
+        requests_mock.get(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             status_code=200,
@@ -961,7 +961,7 @@ class ViewContactBase(APITestMixin):
     ):
         """Tests accepts_dit_email_marketing field return false if there is an error."""
         contact = ContactFactory()
-        requests_mock.post(
+        requests_mock.get(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             status_code=response_status,
@@ -989,7 +989,7 @@ class ViewContactBase(APITestMixin):
     ):
         """Tests accepts_dit_email_marketing field return false if there is an error."""
         contact = ContactFactory()
-        requests_mock.post(
+        requests_mock.get(
             f'{settings.CONSENT_SERVICE_BASE_URL}'
             f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             exc=exceptions,
