@@ -162,7 +162,7 @@ def get_many(emails):
 
     try:
         response = api_client.request(
-            'POST',
+            'GET',
             CONSENT_SERVICE_PERSON_PATH_LOOKUP,
             json=body,
             params={'limit': len(emails)},
