@@ -1,3 +1,13 @@
+# Data Hub API 38.3.0 (2021-09-20)
+## Removals
+
+- The `mi_dashboard` app has been removed.
+
+## Internal changes
+
+- **Contacts** Consent Service Client was updated according to Consent Service changes.
+
+
 # Data Hub API 38.2.0 (2021-09-13)
 ## Features
 
