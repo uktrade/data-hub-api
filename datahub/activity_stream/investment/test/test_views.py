@@ -28,7 +28,6 @@ def test_investment_project_added(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/investment/project-added',
         'partOf': 'http://testserver/v3/activity-stream/investment/project-added',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
@@ -100,7 +99,6 @@ def test_investment_project_with_pm_added(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/investment/project-added',
         'partOf': 'http://testserver/v3/activity-stream/investment/project-added',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
@@ -175,7 +173,6 @@ def test_investment_project_verify_win_added(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/investment/project-added',
         'partOf': 'http://testserver/v3/activity-stream/investment/project-added',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
@@ -251,7 +248,6 @@ def test_investment_project_added_with_gva(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/investment/project-added',
         'partOf': 'http://testserver/v3/activity-stream/investment/project-added',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
