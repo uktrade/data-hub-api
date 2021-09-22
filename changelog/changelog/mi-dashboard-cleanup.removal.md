@@ -1,0 +1,1 @@
+Cleanup references around `mi_dashboard` app given it has been removed.
