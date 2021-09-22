@@ -13,7 +13,7 @@ class LargeCapitalOpportunityPagination(ActivityCursorPagination):
     so they get a chance to appear in the Activity Feed quicker.
     """
 
-    ordering = ('modified_on', 'pk')
+    ordering = ('modified_on', 'id')
     summary = 'Large Capital Opportunity Activities Added'
 
 
