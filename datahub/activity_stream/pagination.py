@@ -52,6 +52,5 @@ class ActivityCursorPagination(CursorPagination):
                 'partOf': self.base_url,
                 'orderedItems': data,
                 'next': self.get_next_link(),
-                'previous': self.get_previous_link(),
             },
         )
