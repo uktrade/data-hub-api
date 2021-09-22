@@ -30,7 +30,6 @@ def test_large_capital_investor_profile_activity(api_client):
             'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles',
         'partOf':
             'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
@@ -83,7 +82,6 @@ def test_complete_large_capital_investor_profile_activity(api_client):
         'id': 'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles',
         'partOf':
             'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {

@@ -34,7 +34,6 @@ def test_interaction_activity(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/interaction',
         'partOf': 'http://testserver/v3/activity-stream/interaction',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
@@ -113,7 +112,6 @@ def test_interaction_investment_project_activity(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/interaction',
         'partOf': 'http://testserver/v3/activity-stream/interaction',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
@@ -199,7 +197,6 @@ def test_service_delivery_activity(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/interaction',
         'partOf': 'http://testserver/v3/activity-stream/interaction',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
@@ -277,7 +274,6 @@ def test_service_delivery_event_activity(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/interaction',
         'partOf': 'http://testserver/v3/activity-stream/interaction',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
