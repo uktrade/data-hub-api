@@ -29,7 +29,6 @@ def test_large_capital_opportunity_activity(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity',
         'partOf': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
@@ -85,7 +84,6 @@ def test_complete_large_capital_opportunity_activity(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity',
         'partOf': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {

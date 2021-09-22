@@ -37,10 +37,4 @@ def test_cursor_pagination(factory, endpoint, api_client, monkeypatch):
 
     response = hawk.get(api_client, page_2_url)
     page_2_data = response.json()
-    page_1_url = page_2_data['previous']
     assert len(page_2_data['orderedItems']) == len(interactions) - page_size
-
-    response = hawk.get(api_client, page_1_url)
-    page_1_data_2 = response.json()
-    assert page_1_data['orderedItems'] == page_1_data_2['orderedItems']
-    assert page_1_data_2['next'] == page_2_url

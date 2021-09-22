@@ -32,7 +32,6 @@ def test_omis_order_added_activity(api_client, order_overrides):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/omis/order-added',
         'partOf': 'http://testserver/v3/activity-stream/omis/order-added',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
