@@ -28,7 +28,6 @@ def test_company_referral_activity(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/company-referral',
         'partOf': 'http://testserver/v3/activity-stream/company-referral',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
@@ -109,7 +108,6 @@ def test_closed_company_referral_activity(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/company-referral',
         'partOf': 'http://testserver/v3/activity-stream/company-referral',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
@@ -190,7 +188,6 @@ def test_complete_company_referral_activity(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/company-referral',
         'partOf': 'http://testserver/v3/activity-stream/company-referral',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
@@ -288,7 +285,6 @@ def test_company_referral_activity_without_team_and_contact(api_client):
         'type': 'OrderedCollectionPage',
         'id': 'http://testserver/v3/activity-stream/company-referral',
         'partOf': 'http://testserver/v3/activity-stream/company-referral',
-        'previous': None,
         'next': None,
         'orderedItems': [
             {
