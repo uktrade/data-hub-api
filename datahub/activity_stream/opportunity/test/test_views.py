@@ -20,8 +20,9 @@ def test_large_capital_opportunity_activity(api_client):
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
-    with freeze_time(start):
+    with freeze_time(start) as frozen_datetime:
         opportunity = LargeCapitalOpportunityFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(
             api_client,
             get_url('api-v3:activity-stream:large-capital-opportunity'),
@@ -32,7 +33,9 @@ def test_large_capital_opportunity_activity(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Large Capital Opportunity Activities Added',
         'type': 'OrderedCollectionPage',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(opportunity.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubLargeCapitalOpportunity:{opportunity.id}:Announce',
@@ -72,8 +75,9 @@ def test_complete_large_capital_opportunity_activity(api_client):
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
-    with freeze_time(start):
+    with freeze_time(start) as frozen_datetime:
         opportunity = CompleteLargeCapitalOpportunityFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(
             api_client,
             get_url('api-v3:activity-stream:large-capital-opportunity'),
@@ -87,7 +91,9 @@ def test_complete_large_capital_opportunity_activity(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Large Capital Opportunity Activities Added',
         'type': 'OrderedCollectionPage',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(opportunity.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubLargeCapitalOpportunity:{opportunity.id}:Announce',

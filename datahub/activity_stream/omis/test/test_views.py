@@ -26,8 +26,9 @@ def test_omis_order_added_activity(api_client, order_overrides):
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
-    with freeze_time(start):
+    with freeze_time(start) as frozen_datetime:
         order = OrderFactory(**order_overrides)
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:omis-order-added'))
 
     assert response.status_code == status.HTTP_200_OK
@@ -36,7 +37,9 @@ def test_omis_order_added_activity(api_client, order_overrides):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'OMIS Order Added Activity',
         'type': 'OrderedCollectionPage',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/omis/order-added'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(order.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubOMISOrder:{order.id}:Add',
