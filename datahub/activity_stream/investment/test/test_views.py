@@ -22,8 +22,9 @@ def test_investment_project_added(api_client):
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
-    with freeze_time(start):
+    with freeze_time(start) as frozen_datetime:
         project = InvestmentProjectFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:investment-project-added'))
 
     assert response.status_code == status.HTTP_200_OK
@@ -31,7 +32,9 @@ def test_investment_project_added(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/project-added'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(project.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInvestmentProject:{project.id}:Add',
@@ -93,8 +96,9 @@ def test_investment_project_with_pm_added(api_client):
     numberNewJobs.
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
-    with freeze_time(start):
+    with freeze_time(start) as frozen_datetime:
         project = AssignPMInvestmentProjectFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:investment-project-added'))
 
     assert response.status_code == status.HTTP_200_OK
@@ -102,7 +106,9 @@ def test_investment_project_with_pm_added(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/project-added'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(project.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInvestmentProject:{project.id}:Add',
@@ -167,8 +173,9 @@ def test_investment_project_verify_win_added(api_client):
 
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
-    with freeze_time(start):
+    with freeze_time(start) as frozen_datetime:
         project = VerifyWinInvestmentProjectFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:investment-project-added'))
 
     assert response.status_code == status.HTTP_200_OK
@@ -176,7 +183,9 @@ def test_investment_project_verify_win_added(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/project-added'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(project.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInvestmentProject:{project.id}:Add',
@@ -238,12 +247,13 @@ def test_investment_project_added_with_gva(api_client):
     and tests if its included in the response.
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
-    with freeze_time(start):
+    with freeze_time(start) as frozen_datetime:
         project = InvestmentProjectFactory(
             foreign_equity_investment=10000,
             sector_id=constants.Sector.aerospace_assembly_aircraft.value.id,
             investment_type_id=constants.InvestmentType.fdi.value.id,
         )
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:investment-project-added'))
 
     assert response.status_code == status.HTTP_200_OK
@@ -251,7 +261,9 @@ def test_investment_project_added_with_gva(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/project-added'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(project.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInvestmentProject:{project.id}:Add',

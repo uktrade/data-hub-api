@@ -22,8 +22,9 @@ def test_company_referral_activity(api_client):
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
-    with freeze_time(start):
+    with freeze_time(start) as frozen_datetime:
         company_referral = CompanyReferralFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:company-referrals'))
 
     assert response.status_code == status.HTTP_200_OK
@@ -31,7 +32,9 @@ def test_company_referral_activity(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Company Referral Activities',
         'type': 'OrderedCollectionPage',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/company-referral'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(company_referral.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubCompanyReferral:{company_referral.id}:Announce',
@@ -103,8 +106,9 @@ def test_closed_company_referral_activity(api_client):
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
-    with freeze_time(start):
+    with freeze_time(start) as frozen_datetime:
         company_referral = ClosedCompanyReferralFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:company-referrals'))
 
     assert response.status_code == status.HTTP_200_OK
@@ -112,7 +116,9 @@ def test_closed_company_referral_activity(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Company Referral Activities',
         'type': 'OrderedCollectionPage',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/company-referral'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(company_referral.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubCompanyReferral:{company_referral.id}:Announce',
@@ -184,8 +190,9 @@ def test_complete_company_referral_activity(api_client):
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
-    with freeze_time(start):
+    with freeze_time(start) as frozen_datetime:
         company_referral = CompleteCompanyReferralFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:company-referrals'))
 
     assert response.status_code == status.HTTP_200_OK
@@ -193,7 +200,9 @@ def test_complete_company_referral_activity(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Company Referral Activities',
         'type': 'OrderedCollectionPage',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/company-referral'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(company_referral.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubCompanyReferral:{company_referral.id}:Announce',
@@ -281,9 +290,10 @@ def test_company_referral_activity_without_team_and_contact(api_client):
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
-    with freeze_time(start):
+    with freeze_time(start) as frozen_datetime:
         recipient = AdviserFactory(dit_team=None)
         company_referral = CompanyReferralFactory(recipient=recipient, contact=None)
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:company-referrals'))
 
     assert response.status_code == status.HTTP_200_OK
@@ -291,7 +301,9 @@ def test_company_referral_activity_without_team_and_contact(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Company Referral Activities',
         'type': 'OrderedCollectionPage',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/company-referral'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(company_referral.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubCompanyReferral:{company_referral.id}:Announce',
@@ -350,11 +362,15 @@ def test_company_referrals_ordering(api_client):
     """
     company_referrals = []
 
-    # We create 2 interactions with the same modified_on time
-    with freeze_time():
+    with freeze_time() as frozen_datetime:
         company_referrals += CompanyReferralFactory.create_batch(2)
-    company_referrals += CompanyReferralFactory.create_batch(8)
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:company-referrals'))
+
+        frozen_datetime.tick(datetime.timedelta(microseconds=1))
+        company_referrals += CompanyReferralFactory.create_batch(8)
+
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:company-referrals'))
+
     assert response.status_code == status.HTTP_200_OK
 
     sorted_company_referral_ids = [
