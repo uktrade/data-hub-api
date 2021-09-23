@@ -11,7 +11,6 @@ fi
 dockerize -wait  tcp://postgres:5432 -wait tcp://es:9200  -wait tcp://redis:6379 $es_amp
 
 python /app/manage.py migrate
-python /app/manage.py migrate --database mi
 python /app/manage.py migrate_es
 python /app/manage.py loadinitialmetadata --force
 
