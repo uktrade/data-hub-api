@@ -1,3 +1,21 @@
+# Data Hub API 38.4.0 (2021-09-23)
+## Removals
+
+- **Companies** The `previous` key in the `company_referral` Activty Stream endpoint has been removed.
+- **Interactions** The `previous` key in the `interaction` Activty Stream endpoint has been removed.
+- **Investment** The `previous` key in the `investment` Activty Stream endpoint has been removed.
+- **Investment** The `previous` key in the `investor_profile` Activty Stream endpoint has been removed.
+- **Investment** The `previous` key in the `large-capital-opportunity` Activty Stream endpoint has been removed.
+- **Investment** The `previous` key in the `opportunity` Activty Stream endpoint has been removed.
+- **OMIS** The `previous` key in the `omis` Activty Stream endpoint has been removed.
+- Cleanup references around `mi_dashboard` app given it has been removed.
+
+## Features
+
+- **Investment** The `investment/project-added` Activity Stream endpoint is now ordered by modified time.
+- **OMIS** The `omis/order-added` Activity Stream endpoint is now ordered by modified time.
+
+
 # Data Hub API 38.3.0 (2021-09-20)
 ## Removals
 
