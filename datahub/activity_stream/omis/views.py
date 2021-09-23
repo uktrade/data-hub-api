@@ -11,7 +11,7 @@ class OMISOrderAddedPagination(ActivityCursorPagination):
     OMIS Order added pagination for activity stream.
     """
 
-    ordering = ('created_on', 'id')
+    ordering = ('modified_on', 'id')
     summary = 'OMIS Order Added Activity'
 
 

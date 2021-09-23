@@ -13,7 +13,7 @@ class InteractionCursorPagination(ActivityCursorPagination):
     sometimes the last page will not contain all the updates.
     """
 
-    ordering = ('modified_on', 'pk')
+    ordering = ('modified_on', 'id')
     summary = 'Interaction Activities'
 
 

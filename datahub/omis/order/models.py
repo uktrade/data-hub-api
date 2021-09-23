@@ -303,7 +303,7 @@ class Order(BaseModel):
         )
         indexes = [
             # For activity stream
-            models.Index(fields=('created_on', 'id')),
+            models.Index(fields=('modified_on', 'id')),
         ]
 
     def __str__(self):
