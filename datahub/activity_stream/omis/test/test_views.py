@@ -1,4 +1,7 @@
+import datetime
+
 import pytest
+from freezegun import freeze_time
 from rest_framework import status
 
 from datahub.activity_stream.test import hawk
@@ -22,8 +25,11 @@ def test_omis_order_added_activity(api_client, order_overrides):
     Get a list of OMIS Orders added and test the JSON returned is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    order = OrderFactory(**order_overrides)
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:omis-order-added'))
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start):
+        order = OrderFactory(**order_overrides)
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:omis-order-added'))
+
     assert response.status_code == status.HTTP_200_OK
 
     expected_data = {
