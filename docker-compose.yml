@@ -8,11 +8,10 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://mi-postgres:5432 -wait tcp://es:9200 -wait tcp://es-apm:8200 -wait tcp://redis:6379 -timeout 120s
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://es:9200 -wait tcp://es-apm:8200 -wait tcp://redis:6379 -timeout 120s
     env_file: .env
     depends_on:
       - postgres
-      - mi-postgres
       - es
       - redis
       - es-apm
@@ -23,7 +22,7 @@ services:
       context: .
     volumes:
       - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://mi-postgres:5432 -wait tcp://es:9200 -wait tcp://es-apm:8200 -wait tcp://redis:6379 -wait tcp://api:8000 -timeout 300s
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://es:9200 -wait tcp://es-apm:8200 -wait tcp://redis:6379 -wait tcp://api:8000 -timeout 300s
     env_file: .env
     depends_on:
       - api
@@ -35,13 +34,6 @@ services:
     environment:
       - POSTGRES_DB=datahub
       - POSTGRES_PASSWORD=datahub
-
-  mi-postgres:
-    image: postgres:9.6
-    restart: always
-    environment:
-      - POSTGRES_DB=mi
-      - POSTGRES_PASSWORD=mi
 
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
