@@ -12,7 +12,7 @@ class CompanyReferralCursorPagination(ActivityCursorPagination):
     so they get a chance to appear in the Activity Feed quicker.
     """
 
-    ordering = ('modified_on', 'pk')
+    ordering = ('modified_on', 'id')
     summary = 'Company Referral Activities'
 
 
