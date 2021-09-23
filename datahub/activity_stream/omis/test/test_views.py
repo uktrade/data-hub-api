@@ -36,8 +36,6 @@ def test_omis_order_added_activity(api_client, order_overrides):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'OMIS Order Added Activity',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/omis/order-added',
-        'partOf': 'http://testserver/v3/activity-stream/omis/order-added',
         'next': None,
         'orderedItems': [
             {

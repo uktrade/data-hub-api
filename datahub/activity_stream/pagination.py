@@ -27,9 +27,6 @@ class ActivityCursorPagination(CursorPagination):
 
     summary = None
 
-    def _get_url(self):
-        return self.encode_cursor(self.cursor) if self.cursor else self.base_url
-
     def _get_summary(self):
         if self.summary is None:
             raise ImproperlyConfigured(
@@ -48,8 +45,6 @@ class ActivityCursorPagination(CursorPagination):
                 '@context': 'https://www.w3.org/ns/activitystreams',
                 'summary': self._get_summary(),
                 'type': 'OrderedCollectionPage',
-                'id': self._get_url(),
-                'partOf': self.base_url,
                 'orderedItems': data,
                 'next': self.get_next_link(),
             },

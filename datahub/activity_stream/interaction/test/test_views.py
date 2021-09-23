@@ -36,8 +36,6 @@ def test_interaction_activity(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/interaction',
-        'partOf': 'http://testserver/v3/activity-stream/interaction',
         'next': None,
         'orderedItems': [
             {
@@ -116,8 +114,6 @@ def test_interaction_investment_project_activity(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/interaction',
-        'partOf': 'http://testserver/v3/activity-stream/interaction',
         'next': None,
         'orderedItems': [
             {
@@ -203,8 +199,6 @@ def test_service_delivery_activity(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/interaction',
-        'partOf': 'http://testserver/v3/activity-stream/interaction',
         'next': None,
         'orderedItems': [
             {
@@ -282,8 +276,6 @@ def test_service_delivery_event_activity(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/interaction',
-        'partOf': 'http://testserver/v3/activity-stream/interaction',
         'next': None,
         'orderedItems': [
             {

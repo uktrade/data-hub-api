@@ -31,10 +31,6 @@ def test_large_capital_investor_profile_activity(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Large Capital Investor Profile Activities',
         'type': 'OrderedCollectionPage',
-        'id':
-            'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles',
-        'partOf':
-            'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles',
         'next': None,
         'orderedItems': [
             {
@@ -86,9 +82,6 @@ def test_complete_large_capital_investor_profile_activity(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Large Capital Investor Profile Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles',
-        'partOf':
-            'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles',
         'next': None,
         'orderedItems': [
             {

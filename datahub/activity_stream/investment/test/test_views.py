@@ -31,8 +31,6 @@ def test_investment_project_added(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/investment/project-added',
-        'partOf': 'http://testserver/v3/activity-stream/investment/project-added',
         'next': None,
         'orderedItems': [
             {
@@ -104,8 +102,6 @@ def test_investment_project_with_pm_added(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/investment/project-added',
-        'partOf': 'http://testserver/v3/activity-stream/investment/project-added',
         'next': None,
         'orderedItems': [
             {
@@ -180,8 +176,6 @@ def test_investment_project_verify_win_added(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/investment/project-added',
-        'partOf': 'http://testserver/v3/activity-stream/investment/project-added',
         'next': None,
         'orderedItems': [
             {
@@ -257,8 +251,6 @@ def test_investment_project_added_with_gva(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/investment/project-added',
-        'partOf': 'http://testserver/v3/activity-stream/investment/project-added',
         'next': None,
         'orderedItems': [
             {
