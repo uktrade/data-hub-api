@@ -1,4 +1,7 @@
+import datetime
+
 import pytest
+from freezegun import freeze_time
 from rest_framework import status
 
 from datahub.activity_stream.test import hawk
@@ -16,13 +19,15 @@ def test_large_capital_opportunity_activity(api_client):
     Get a list of large capital opportunities and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    opportunity = LargeCapitalOpportunityFactory()
-    response = hawk.get(
-        api_client,
-        get_url('api-v3:activity-stream:large-capital-opportunity'),
-    )
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start):
+        opportunity = LargeCapitalOpportunityFactory()
+        response = hawk.get(
+            api_client,
+            get_url('api-v3:activity-stream:large-capital-opportunity'),
+        )
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Large Capital Opportunity Activities Added',
@@ -68,11 +73,13 @@ def test_complete_large_capital_opportunity_activity(api_client):
     Get a list of large capital opportunities and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    opportunity = CompleteLargeCapitalOpportunityFactory()
-    response = hawk.get(
-        api_client,
-        get_url('api-v3:activity-stream:large-capital-opportunity'),
-    )
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start):
+        opportunity = CompleteLargeCapitalOpportunityFactory()
+        response = hawk.get(
+            api_client,
+            get_url('api-v3:activity-stream:large-capital-opportunity'),
+        )
 
     def get_multiple_names(values):
         return [{'name': value.name} for value in values]

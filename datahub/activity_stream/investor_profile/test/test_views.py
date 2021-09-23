@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from freezegun import freeze_time
 from rest_framework import status
@@ -17,10 +19,13 @@ def test_large_capital_investor_profile_activity(api_client):
     Get a list of large capital investor profiles and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    investor_profile = LargeCapitalInvestorProfileFactory()
-    response = hawk.get(
-        api_client, get_url('api-v3:activity-stream:large-capital-investor-profiles'),
-    )
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start):
+        investor_profile = LargeCapitalInvestorProfileFactory()
+        response = hawk.get(
+            api_client, get_url('api-v3:activity-stream:large-capital-investor-profiles'),
+        )
+
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
@@ -66,10 +71,12 @@ def test_complete_large_capital_investor_profile_activity(api_client):
     is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    investor_profile = CompleteLargeCapitalInvestorProfileFactory()
-    response = hawk.get(
-        api_client, get_url('api-v3:activity-stream:large-capital-investor-profiles'),
-    )
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start):
+        investor_profile = CompleteLargeCapitalInvestorProfileFactory()
+        response = hawk.get(
+            api_client, get_url('api-v3:activity-stream:large-capital-investor-profiles'),
+        )
 
     def get_multiple_names(values):
         return [{'name': value.name} for value in values]

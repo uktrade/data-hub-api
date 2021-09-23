@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from freezegun import freeze_time
 from rest_framework import status
@@ -24,10 +26,12 @@ def test_interaction_activity(api_client):
     Get a list of interactions and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    interaction = CompanyInteractionFactory()
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start):
+        interaction = CompanyInteractionFactory()
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
@@ -101,11 +105,13 @@ def test_interaction_investment_project_activity(api_client):
     Get a list of interactions and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    interaction = InvestmentProjectInteractionFactory()
-    project = interaction.investment_project
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start):
+        interaction = InvestmentProjectInteractionFactory()
+        project = interaction.investment_project
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
@@ -187,10 +193,12 @@ def test_service_delivery_activity(api_client):
     Get a list of interactions and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    interaction = ServiceDeliveryFactory()
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start):
+        interaction = ServiceDeliveryFactory()
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
@@ -263,11 +271,13 @@ def test_service_delivery_event_activity(api_client):
     Get a list of interactions and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    interaction = EventServiceDeliveryFactory()
-    event = interaction.event
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start):
+        interaction = EventServiceDeliveryFactory()
+        event = interaction.event
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
