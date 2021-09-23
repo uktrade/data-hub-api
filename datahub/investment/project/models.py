@@ -564,7 +564,7 @@ class InvestmentProject(
         )
         indexes = [
             # For activity stream
-            models.Index(fields=('created_on', 'id')),
+            models.Index(fields=('modified_on', 'id')),
         ]
 
     @cached_property
