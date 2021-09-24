@@ -1,0 +1,3 @@
+- model: investment.specificprogramme
+  pk: bf6de1aa-85b5-4228-9bff-0b562caeb320
+  fields: {disabled_on: null, name: "International Capital Investment Support"}
