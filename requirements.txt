@@ -8,8 +8,6 @@ aiohttp==3.7.4.post0
     # via slackclient
 amqp==2.6.1
     # via kombu
-appnope==0.1.2
-    # via ipython
 argh==0.26.2
     # via watchdog
 asgiref==3.4.1
@@ -271,7 +269,7 @@ pytest-django==4.4.0
     # via -r requirements.in
 pytest-forked==1.3.0
     # via pytest-xdist
-pytest-xdist==2.3.0
+pytest-xdist==2.4.0
     # via -r requirements.in
 python-dateutil==2.8.2
     # via
