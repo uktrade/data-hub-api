@@ -8,8 +8,6 @@ aiohttp==3.7.4.post0
     # via slackclient
 amqp==2.6.1
     # via kombu
-appnope==0.1.2
-    # via ipython
 argh==0.26.2
     # via watchdog
 asgiref==3.4.1
@@ -216,7 +214,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==6.2.0
+pip-tools==6.3.0
     # via -r requirements.in
 piprot==0.9.11
     # via -r requirements.in
