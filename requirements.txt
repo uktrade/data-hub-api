@@ -8,8 +8,6 @@ aiohttp==3.7.4.post0
     # via slackclient
 amqp==2.6.1
     # via kombu
-appnope==0.1.2
-    # via ipython
 argh==0.26.2
     # via watchdog
 asgiref==3.4.1
@@ -172,7 +170,7 @@ incremental==21.3.0
     # via towncrier
 iniconfig==1.1.1
     # via pytest
-ipython==7.27.0
+ipython==7.28.0
     # via -r requirements.in
 jedi==0.18.0
     # via ipython
