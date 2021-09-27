@@ -1,3 +1,9 @@
+# Data Hub API 38.5.0 (2021-09-27)
+## Features
+
+- **Investment** A new option for the 'Specific programme' metadata was added called "International Capital Investment Support".
+
+
 # Data Hub API 38.4.0 (2021-09-23)
 ## Removals
 
