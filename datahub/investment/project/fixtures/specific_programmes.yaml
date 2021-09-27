@@ -73,3 +73,6 @@
 - model: investment.specificprogramme
   pk: a7dd7b74-7c50-e411-985c-e4115bead28a
   fields: {disabled_on: "2015-03-02T08:57:05Z", name: "Emerging Markets Contract (Russia)"}
+- model: investment.specificprogramme
+  pk: bf6de1aa-85b5-4228-9bff-0b562caeb320
+  fields: {disabled_on: null, name: "International Capital Investment Support"}
