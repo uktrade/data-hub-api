@@ -1,3 +1,9 @@
+# Data Hub API 38.6.0 (2021-09-28)
+## Internal changes
+
+- **Contacts** Consent Service Client updated according to Consent Service changes.
+
+
 # Data Hub API 38.5.0 (2021-09-27)
 ## Features
 
