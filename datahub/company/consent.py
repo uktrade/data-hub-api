@@ -155,17 +155,13 @@ def get_many(emails):
         }
     }
     """
-    body = {
-        'emails': [email.lower() for email in emails],
-    }
     api_client = _get_client()
 
     try:
         response = api_client.request(
             'GET',
             CONSENT_SERVICE_PERSON_PATH_LOOKUP,
-            json=body,
-            params={'limit': len(emails)},
+            params={'email': [email.lower() for email in emails]},
         )
     except APIBadGatewayException as exc:
         logger.error(exc)
