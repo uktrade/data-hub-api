@@ -1,3 +1,4 @@
+import urllib.parse
 import uuid
 from cgi import parse_header
 from csv import DictReader
@@ -40,7 +41,6 @@ from datahub.metadata.models import Sector as SectorModel
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.contact import ContactSearchApp
 from datahub.search.contact.views import SearchContactExportAPIView
-
 
 pytestmark = [
     pytest.mark.django_db,
@@ -645,9 +645,9 @@ class TestContactExportView(APITestMixin):
         for index, row in enumerate(actual_row_data):
             assert row == expected_row_data[index]
         assert matcher.call_count == 1
-        assert matcher.last_request.json() == {
-            'emails': [contact.email for contact in sorted_contacts],
-        }
+        assert matcher.last_request.query == urllib.parse.urlencode(
+            {'email': [c.email for c in sorted_contacts]}, doseq=True,
+        )
 
 
 def _format_interaction_team_names(interaction):
