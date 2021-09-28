@@ -1,3 +1,5 @@
+import urllib.parse
+
 import pytest
 from django.conf import settings
 from requests.exceptions import ConnectionError, Timeout
@@ -44,8 +46,7 @@ class TestConsentClient:
         assert resp == accepts_marketing
 
         assert matcher.called_once
-        assert matcher.last_request.query == 'limit=1'
-        assert matcher.last_request.json() == {'emails': ['foo@bar.com']}
+        assert matcher.last_request.query == 'email=foo%40bar.com'
 
     @pytest.mark.parametrize('emails', ([], ['foo@bar.com'], ['bar@foo.com', 'foo@bar.com']))
     @pytest.mark.parametrize('accepts_marketing', (True, False))
@@ -72,8 +73,7 @@ class TestConsentClient:
         assert resp == {email: accepts_marketing for email in emails}
 
         assert matcher.called_once
-        assert matcher.last_request.query == f'limit={len(emails)}'
-        assert matcher.last_request.json() == {'emails': emails}
+        assert matcher.last_request.query == urllib.parse.urlencode({'email': emails}, doseq=True)
 
     @pytest.mark.parametrize('accepts_marketing', (True, False))
     def test_get_one_normalises_emails(self, requests_mock, accepts_marketing):
@@ -97,8 +97,7 @@ class TestConsentClient:
         assert resp == accepts_marketing
 
         assert matcher.called_once
-        assert matcher.last_request.query == 'limit=1'
-        assert matcher.last_request.json() == {'emails': ['foo@bar.com']}
+        assert matcher.last_request.query == 'email=foo%40bar.com'
 
     @pytest.mark.parametrize('emails', ([], ['foo@bar.com'], ['bar@foo.com', 'foo@bar.com']))
     @pytest.mark.parametrize('accepts_marketing', (True, False))
@@ -125,8 +124,7 @@ class TestConsentClient:
         assert resp == {email: accepts_marketing for email in emails}
 
         assert matcher.called_once
-        assert matcher.last_request.query == f'limit={len(emails)}'
-        assert matcher.last_request.json() == {'emails': emails}
+        assert matcher.last_request.query == urllib.parse.urlencode({'email': emails}, doseq=True)
 
     @pytest.mark.parametrize('accepts_marketing', (True, False))
     def test_update(self, requests_mock, accepts_marketing):
