@@ -36,6 +36,10 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
     status = SingleOrListField(child=serializers.CharField(), required=False)
     uk_region_location = SingleOrListField(child=StringUUIDField(), required=False)
     financial_year_start = SingleOrListField(child=serializers.IntegerField(), required=False)
+    land_date_financial_year_start = SingleOrListField(
+        child=serializers.IntegerField(),
+        required=False,
+    )
     level_of_involvement_simplified = SingleOrListField(
         child=serializers.ChoiceField(choices=InvestmentProject.Involvement.choices),
         required=False,
