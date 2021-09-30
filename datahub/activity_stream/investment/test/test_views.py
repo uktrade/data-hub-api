@@ -1,4 +1,7 @@
+import datetime
+
 import pytest
+from freezegun import freeze_time
 from rest_framework import status
 
 from datahub.activity_stream.test import hawk
@@ -18,17 +21,20 @@ def test_investment_project_added(api_client):
     Get a list of investment project and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    project = InvestmentProjectFactory()
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:investment-project-added'))
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start) as frozen_datetime:
+        project = InvestmentProjectFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:investment-project-added'))
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/investment/project-added',
-        'partOf': 'http://testserver/v3/activity-stream/investment/project-added',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/project-added'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(project.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInvestmentProject:{project.id}:Add',
@@ -89,17 +95,20 @@ def test_investment_project_with_pm_added(api_client):
     Investment Project with PM will have fields such as totalInvestment and
     numberNewJobs.
     """
-    project = AssignPMInvestmentProjectFactory()
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:investment-project-added'))
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start) as frozen_datetime:
+        project = AssignPMInvestmentProjectFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:investment-project-added'))
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/investment/project-added',
-        'partOf': 'http://testserver/v3/activity-stream/investment/project-added',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/project-added'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(project.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInvestmentProject:{project.id}:Add',
@@ -163,17 +172,20 @@ def test_investment_project_verify_win_added(api_client):
     numberNewJobs and foreignEquityInvestment.
 
     """
-    project = VerifyWinInvestmentProjectFactory()
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:investment-project-added'))
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start) as frozen_datetime:
+        project = VerifyWinInvestmentProjectFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:investment-project-added'))
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/investment/project-added',
-        'partOf': 'http://testserver/v3/activity-stream/investment/project-added',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/project-added'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(project.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInvestmentProject:{project.id}:Add',
@@ -234,21 +246,24 @@ def test_investment_project_added_with_gva(api_client):
     This test adds the necessary fields to compute gross_value_added property
     and tests if its included in the response.
     """
-    project = InvestmentProjectFactory(
-        foreign_equity_investment=10000,
-        sector_id=constants.Sector.aerospace_assembly_aircraft.value.id,
-        investment_type_id=constants.InvestmentType.fdi.value.id,
-    )
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:investment-project-added'))
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start) as frozen_datetime:
+        project = InvestmentProjectFactory(
+            foreign_equity_investment=10000,
+            sector_id=constants.Sector.aerospace_assembly_aircraft.value.id,
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+        )
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:investment-project-added'))
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/investment/project-added',
-        'partOf': 'http://testserver/v3/activity-stream/investment/project-added',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/project-added'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(project.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInvestmentProject:{project.id}:Add',

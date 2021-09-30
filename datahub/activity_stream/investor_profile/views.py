@@ -9,12 +9,8 @@ from datahub.investment.investor_profile.models import LargeCapitalInvestorProfi
 class LargeCapitalInvestorProfileCursorPagination(ActivityCursorPagination):
     """
     Cursor pagination for Large Capital Investor Profile.
-
-    `modified_on` is mutable. Most recently updated company referrals would be consumed first,
-    so they get a chance to appear in the Activity Feed quicker.
     """
 
-    ordering = ('modified_on', 'id')
     summary = 'Large Capital Investor Profile Activities'
 
 
