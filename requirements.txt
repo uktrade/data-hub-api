@@ -90,7 +90,7 @@ django-ipware==4.0.0
     # via django-axes
 django-js-asset==1.2.2
     # via django-mptt
-django-mptt==0.13.3
+django-mptt==0.13.4
     # via -r requirements.in
 django-pglocks==1.0.4
     # via -r requirements.in
