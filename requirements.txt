@@ -8,8 +8,6 @@ aiohttp==3.7.4.post0
     # via slackclient
 amqp==2.6.1
     # via kombu
-argh==0.26.2
-    # via watchdog
 asgiref==3.4.1
     # via django
 async-timeout==3.0.1
@@ -374,7 +372,7 @@ vine==1.3.0
     #   celery
 virtualenv==20.8.1
     # via pre-commit
-watchdog[watchmedo]==2.1.5
+watchdog[watchmedo]==2.1.6
     # via -r requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
