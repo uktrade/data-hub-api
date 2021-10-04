@@ -28,9 +28,9 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('metadata', '0001_squashed_0010_auto_20180613_1553'),
-        ('omis-invoice', '0001_initial'),
+        ('omis_invoice', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('omis-quote', '0001_initial'),
+        ('omis_quote', '0001_initial'),
         ('company', '0001_squashed_0096_company_global_ultimate_duns_number'),
     ]
 
@@ -104,7 +104,7 @@ class Migration(migrations.Migration):
                 ('delivery_date', models.DateField(blank=True, null=True)),
                 ('contact_email', models.EmailField(blank=True, editable=False, help_text='Legacy field. Contact email specified for this order.', max_length=254)),
                 ('contact_phone', models.CharField(blank=True, editable=False, help_text='Legacy field. Contact phone number specified for this order.', max_length=254)),
-                ('quote', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='omis-quote.Quote')),
+                ('quote', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='omis_quote.Quote')),
                 ('status', models.CharField(choices=[('draft', 'Draft'), ('quote_awaiting_acceptance', 'Quote awaiting acceptance'), ('quote_accepted', 'Quote accepted'), ('paid', 'Paid'), ('complete', 'Complete'), ('cancelled', 'Cancelled')], default='draft', max_length=100)),
                 ('po_number', models.CharField(blank=True, max_length=100)),
                 ('discount_label', models.CharField(blank=True, max_length=100)),
@@ -126,7 +126,7 @@ class Migration(migrations.Migration):
                 ('billing_contact_name', models.CharField(blank=True, max_length=255, editable=False, help_text='Legacy field. Billing contact name.')),
                 ('billing_email', models.EmailField(blank=True, max_length=255, editable=False, help_text='Legacy field. Billing email address.')),
                 ('billing_phone', models.CharField(blank=True, max_length=150, editable=False, help_text='Legacy field. Billing phone number.')),
-                ('invoice', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='omis-invoice.Invoice')),
+                ('invoice', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='omis_invoice.Invoice')),
                 ('archived_documents_url_path', models.CharField(blank=True, editable=False, help_text='Legacy field. Link to the archived documents for this order.', max_length=255)),
                 ('completed_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('completed_on', models.DateTimeField(blank=True, null=True)),

@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('omis-payment', '0003_auto_20171019_1639'),
+        ('omis_payment', '0003_auto_20171019_1639'),
     ]
 
     operations = [
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                 ('level2_approved_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('modified_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('order', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='refunds', to='order.Order')),
-                ('payment', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='omis-payment.Payment')),
+                ('payment', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='omis_payment.Payment')),
                 ('requested_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='+', to=settings.AUTH_USER_MODEL)),
             ],
             options={

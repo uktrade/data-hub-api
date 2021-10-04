@@ -18,7 +18,7 @@ def load_initial_ts_and_cs(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-quote', '0006_auto_20171107_1355'),
+        ('omis_quote', '0006_auto_20171107_1355'),
     ]
 
     operations = [

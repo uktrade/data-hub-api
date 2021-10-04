@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('company', '0001_squashed_0096_company_global_ultimate_duns_number'),
-        ('omis-quote', '0003_quote_expires_on'),
+        ('omis_quote', '0003_quote_expires_on'),
     ]
 
     operations = [

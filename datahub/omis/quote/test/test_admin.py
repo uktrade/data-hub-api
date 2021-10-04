@@ -10,7 +10,7 @@ class TestTermsAndConditionsAdmin(AdminTestMixin):
 
     def test_can_add(self):
         """Test that terms and conditions records can be added."""
-        url = reverse('admin:omis-quote_termsandconditions_add')
+        url = reverse('admin:omis_quote_termsandconditions_add')
         data = {'name': 'v1', 'content': 'some content'}
         response = self.client.post(url, data, follow=True)
 
@@ -24,7 +24,7 @@ class TestTermsAndConditionsAdmin(AdminTestMixin):
         """Test that terms and conditions records cannot be deleted."""
         terms = TermsAndConditions.objects.create(name='vtest', content='lorem ipsum')
 
-        url = reverse('admin:omis-quote_termsandconditions_delete', args=(terms.id,))
+        url = reverse('admin:omis_quote_termsandconditions_delete', args=(terms.id,))
         response = self.client.post(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -33,7 +33,7 @@ class TestTermsAndConditionsAdmin(AdminTestMixin):
         """Test that terms and conditions records cannot be changed."""
         terms = TermsAndConditions.objects.create(name='vtest', content='lorem ipsum')
 
-        url = reverse('admin:omis-quote_termsandconditions_change', args=(terms.id,))
+        url = reverse('admin:omis_quote_termsandconditions_change', args=(terms.id,))
         data = {'name': 'v2', 'content': 'new content'}
         response = self.client.post(url, data, follow=True)
 

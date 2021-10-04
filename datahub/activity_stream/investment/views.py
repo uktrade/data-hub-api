@@ -12,7 +12,6 @@ class IProjectCreatedPagination(ActivityCursorPagination):
     Investment Project added CursorPagination for activity stream.
     """
 
-    ordering = ('modified_on', 'id')
     summary = 'Investment Activities Added'
 
 

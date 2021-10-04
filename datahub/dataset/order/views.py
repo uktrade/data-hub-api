@@ -1,4 +1,5 @@
-from django.db.models import Max, Sum
+from django.db.models import CharField, Max, Sum
+from django.db.models.functions import Cast
 
 from datahub.core.query_utils import get_aggregate_subquery, get_string_agg_subquery
 from datahub.dataset.core.views import BaseDatasetView
@@ -21,7 +22,7 @@ class OMISDatasetView(BaseDatasetView):
             refund_created=get_aggregate_subquery(Order, Max('refunds__created_on')),
             refund_total_amount=get_aggregate_subquery(Order, Sum('refunds__total_amount')),
             sector_name=get_sector_name_subquery('sector'),
-            services=get_string_agg_subquery(Order, 'service_types__name'),
+            services=get_string_agg_subquery(Order, Cast('service_types__name', CharField())),
         ).values(
             'cancellation_reason__name',
             'cancelled_on',

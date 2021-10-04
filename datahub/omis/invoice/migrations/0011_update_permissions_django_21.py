@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-invoice', '0010_populate_order_ref'),
+        ('omis_invoice', '0010_populate_order_ref'),
         ('core', '0003_rename_read_permissions'),
     ]
 

@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from freezegun import freeze_time
 from rest_framework import status
@@ -24,17 +26,20 @@ def test_interaction_activity(api_client):
     Get a list of interactions and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    interaction = CompanyInteractionFactory()
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start) as frozen_datetime:
+        interaction = CompanyInteractionFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/interaction',
-        'partOf': 'http://testserver/v3/activity-stream/interaction',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/interaction'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(interaction.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInteraction:{interaction.id}:Announce',
@@ -101,18 +106,21 @@ def test_interaction_investment_project_activity(api_client):
     Get a list of interactions and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    interaction = InvestmentProjectInteractionFactory()
-    project = interaction.investment_project
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start) as frozen_datetime:
+        interaction = InvestmentProjectInteractionFactory()
+        project = interaction.investment_project
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/interaction',
-        'partOf': 'http://testserver/v3/activity-stream/interaction',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/interaction'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(interaction.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInteraction:{interaction.id}:Announce',
@@ -187,17 +195,20 @@ def test_service_delivery_activity(api_client):
     Get a list of interactions and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    interaction = ServiceDeliveryFactory()
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start) as frozen_datetime:
+        interaction = ServiceDeliveryFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/interaction',
-        'partOf': 'http://testserver/v3/activity-stream/interaction',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/interaction'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(interaction.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInteraction:{interaction.id}:Announce',
@@ -263,18 +274,21 @@ def test_service_delivery_event_activity(api_client):
     Get a list of interactions and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    interaction = EventServiceDeliveryFactory()
-    event = interaction.event
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start) as frozen_datetime:
+        interaction = EventServiceDeliveryFactory()
+        event = interaction.event
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/interaction',
-        'partOf': 'http://testserver/v3/activity-stream/interaction',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/interaction'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(interaction.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInteraction:{interaction.id}:Announce',
@@ -366,11 +380,15 @@ def test_interaction_ordering(api_client):
     """
     interactions = []
 
-    # We create 2 interactions with the same modified_on time
-    with freeze_time():
+    with freeze_time() as frozen_datetime:
         interactions += CompanyInteractionFactory.create_batch(2)
-    interactions += CompanyInteractionFactory.create_batch(8)
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
+
+        frozen_datetime.tick(datetime.timedelta(microseconds=1))
+        interactions += CompanyInteractionFactory.create_batch(8)
+
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
+
     assert response.status_code == status.HTTP_200_OK
 
     sorted_interaction_ids = [
@@ -389,9 +407,13 @@ def test_contacts_ordering(api_client):
     """
     Test that contacts are ordered by `pk`
     """
-    contacts = ContactFactory.create_batch(5)
-    CompanyInteractionFactory(contacts=contacts)
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
+    with freeze_time() as frozen_datetime:
+        contacts = ContactFactory.create_batch(5)
+        CompanyInteractionFactory(contacts=contacts)
+
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
+
     assert response.status_code == status.HTTP_200_OK
 
     sorted_contact_ids = [
@@ -412,9 +434,13 @@ def test_dit_participant_ordering(api_client):
     """
     Test that dit_participants are ordered by `pk`
     """
-    interaction = CompanyInteractionFactory(dit_participants=[])
-    InteractionDITParticipantFactory.create_batch(5, interaction=interaction)
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
+    with freeze_time() as frozen_datetime:
+        interaction = CompanyInteractionFactory(dit_participants=[])
+        InteractionDITParticipantFactory.create_batch(5, interaction=interaction)
+
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
+
     assert response.status_code == status.HTTP_200_OK
 
     sorted_participant_ids = [
@@ -435,13 +461,16 @@ def test_null_adviser(api_client):
     """
     Test that we can handle dit_participant.adviser being None
     """
-    interaction = CompanyInteractionFactory(dit_participants=[])
-    InteractionDITParticipantFactory(
-        interaction=interaction,
-        adviser=None,
-        team=TeamFactory(),
-    )
-    response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
+    with freeze_time() as frozen_datetime:
+        interaction = CompanyInteractionFactory(dit_participants=[])
+        InteractionDITParticipantFactory(
+            interaction=interaction,
+            adviser=None,
+            team=TeamFactory(),
+        )
+
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
     assert response.status_code == status.HTTP_200_OK
 
 

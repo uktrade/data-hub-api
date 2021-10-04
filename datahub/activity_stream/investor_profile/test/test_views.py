@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from freezegun import freeze_time
 from rest_framework import status
@@ -17,20 +19,22 @@ def test_large_capital_investor_profile_activity(api_client):
     Get a list of large capital investor profiles and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    investor_profile = LargeCapitalInvestorProfileFactory()
-    response = hawk.get(
-        api_client, get_url('api-v3:activity-stream:large-capital-investor-profiles'),
-    )
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start) as frozen_datetime:
+        investor_profile = LargeCapitalInvestorProfileFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(
+            api_client, get_url('api-v3:activity-stream:large-capital-investor-profiles'),
+        )
+
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Large Capital Investor Profile Activities',
         'type': 'OrderedCollectionPage',
-        'id':
-            'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles',
-        'partOf':
-            'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(investor_profile.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubLargeCapitalInvestorProfile:{investor_profile.id}:Announce',
@@ -66,10 +70,13 @@ def test_complete_large_capital_investor_profile_activity(api_client):
     is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    investor_profile = CompleteLargeCapitalInvestorProfileFactory()
-    response = hawk.get(
-        api_client, get_url('api-v3:activity-stream:large-capital-investor-profiles'),
-    )
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start) as frozen_datetime:
+        investor_profile = CompleteLargeCapitalInvestorProfileFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(
+            api_client, get_url('api-v3:activity-stream:large-capital-investor-profiles'),
+        )
 
     def get_multiple_names(values):
         return [{'name': value.name} for value in values]
@@ -79,10 +86,9 @@ def test_complete_large_capital_investor_profile_activity(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Large Capital Investor Profile Activities',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles',
-        'partOf':
-            'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(investor_profile.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubLargeCapitalInvestorProfile:{investor_profile.id}:Announce',
@@ -204,13 +210,17 @@ def test_investor_profiles_ordering(api_client):
     """
     investor_profiles = []
 
-    # We create 2 profiles with the same modified_on time
-    with freeze_time():
+    with freeze_time() as frozen_datetime:
         investor_profiles += LargeCapitalInvestorProfileFactory.create_batch(2)
-    investor_profiles += LargeCapitalInvestorProfileFactory.create_batch(8)
-    response = hawk.get(
-        api_client, get_url('api-v3:activity-stream:large-capital-investor-profiles'),
-    )
+
+        frozen_datetime.tick(datetime.timedelta(microseconds=1))
+        investor_profiles += LargeCapitalInvestorProfileFactory.create_batch(8)
+
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(
+            api_client, get_url('api-v3:activity-stream:large-capital-investor-profiles'),
+        )
+
     assert response.status_code == status.HTTP_200_OK
 
     sorted_investor_profile_ids = [

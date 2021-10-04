@@ -6,7 +6,7 @@ import factory
 import pytest
 from django.conf import settings
 from django.db.models import CharField, F, Max, Q, Value
-from django.db.models.functions import Left
+from django.db.models.functions import Cast, Left
 
 from datahub.core.query_utils import (
     get_aggregate_subquery,
@@ -76,7 +76,11 @@ class TestGetStringAggSubquery:
         )
         BookFactory(authors=authors)
         queryset = Book.objects.annotate(
-            author_names=get_string_agg_subquery(Book, 'authors__first_name', distinct=distinct),
+            author_names=get_string_agg_subquery(
+                Book,
+                Cast('authors__first_name', CharField()),
+                distinct=distinct,
+            ),
         )
         actual_author_names = queryset.first().author_names
         assert actual_author_names == expected_result

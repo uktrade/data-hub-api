@@ -7,12 +7,8 @@ from datahub.company_referral.models import CompanyReferral
 class CompanyReferralCursorPagination(ActivityCursorPagination):
     """
     Cursor pagination for Company Referral.
-
-    `modified_on` is mutable. Most recently updated company referrals would be consumed first,
-    so they get a chance to appear in the Activity Feed quicker.
     """
 
-    ordering = ('modified_on', 'id')
     summary = 'Company Referral Activities'
 
 

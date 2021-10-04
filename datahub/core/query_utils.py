@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg, StringAgg
 from django.contrib.postgres.fields import JSONField
 from django.db.models import Case, CharField, F, Func, OuterRef, Subquery, Value, When
-from django.db.models.functions import Coalesce, Concat, NullIf
+from django.db.models.functions import Cast, Coalesce, Concat, NullIf
 
 
 class ConcatWS(Func):
@@ -57,7 +57,7 @@ class JSONBBuildObject(Func):
         args = [
             expression
             for key, expression in kwargs.items()
-            for expression in [Value(key), expression]
+            for expression in [Value(key, output_field=CharField()), expression]
         ]
         super().__init__(*args)
 
@@ -310,18 +310,18 @@ def get_bracketed_concat_expression(*expressions, expression_to_bracket=None):
         )
     """
     parts = [
-        NullIf(field, Value('')) for field in expressions
+        NullIf(field, Value('', output_field=CharField())) for field in expressions
     ]
 
     if expression_to_bracket:
         bracketed_expression = PreferNullConcat(
             Value('('),
-            NullIf(expression_to_bracket, Value('')),
+            NullIf(expression_to_bracket, Value('', output_field=CharField())),
             Value(')'),
         )
         parts.append(bracketed_expression)
 
-    return ConcatWS(Value(' '), *parts, output_field=CharField())
+    return ConcatWS(Value(' ', output_field=CharField()), *parts, output_field=CharField())
 
 
 def get_front_end_url_expression(model_name, pk_expression, url_suffix=''):
@@ -333,9 +333,9 @@ def get_front_end_url_expression(model_name, pk_expression, url_suffix=''):
     :param url_suffix:      Optional: string appended to the end of the url
     """
     return Concat(
-        Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[model_name]}/'),
-        pk_expression,
-        Value(url_suffix),
+        Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[model_name]}/', output_field=CharField()),
+        Cast(pk_expression, CharField()),
+        Value(url_suffix, output_field=CharField()),
     )
 
 
@@ -359,4 +359,4 @@ def get_queryset_object(queryset, **filters):
 
 def get_empty_string_if_null_expression(field):
     """Get empty string if field is None."""
-    return Coalesce(field, Value(''))
+    return Coalesce(field, Value('', output_field=CharField()))

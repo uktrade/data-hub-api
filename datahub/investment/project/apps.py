@@ -11,6 +11,7 @@ class InvestmentConfig(AppConfig):
 
     name = 'datahub.investment.project'
     label = 'investment'
+    default_auto_field = 'django.db.models.AutoField'
 
     def ready(self):
         """Registers the signals for this app.
