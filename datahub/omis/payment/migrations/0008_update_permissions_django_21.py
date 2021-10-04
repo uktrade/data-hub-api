@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-payment', '0007_update_refund_amount_fields'),
+        ('omis_payment', '0007_update_refund_amount_fields'),
         ('core', '0003_rename_read_permissions'),
     ]
 

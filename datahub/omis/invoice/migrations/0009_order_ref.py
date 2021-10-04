@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-invoice', '0008_populate_pricing_fields'),
+        ('omis_invoice', '0008_populate_pricing_fields'),
     ]
 
     operations = [

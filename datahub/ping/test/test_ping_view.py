@@ -12,4 +12,4 @@ def test_all_good(client):
     response = client.get(url)
     assert response.status_code == status.HTTP_200_OK
     assert '<status>OK</status>' in str(response.content)
-    assert response._headers['content-type'] == ('Content-Type', 'text/xml')
+    assert response.headers['content-type'] == 'text/xml'

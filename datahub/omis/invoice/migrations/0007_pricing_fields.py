@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-invoice', '0006_invoice_contact_email'),
+        ('omis_invoice', '0006_invoice_contact_email'),
     ]
 
     operations = [

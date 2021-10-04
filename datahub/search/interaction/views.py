@@ -1,4 +1,5 @@
 from django.db.models import CharField, OuterRef, Prefetch, Value
+from django.db.models.functions import Cast
 
 from datahub.company.models import Contact
 from datahub.core.query_utils import (
@@ -108,11 +109,11 @@ class SearchInteractionExportAPIView(SearchInteractionAPIViewMixin, SearchExport
         kind_name=get_choices_as_case_expression(DBInteraction, 'kind'),
         policy_issue_type_names=get_string_agg_subquery(
             DBInteraction,
-            'policy_issue_types__name',
+            Cast('policy_issue_types__name', CharField()),
         ),
         policy_area_names=get_string_agg_subquery(
             DBInteraction,
-            'policy_areas__name',
+            Cast('policy_areas__name', CharField()),
             # Some policy areas contain commas, so we use a semicolon to delimit multiple values
             delimiter='; ',
         ),
@@ -193,21 +194,21 @@ class SearchInteractionPolicyFeedbackExportAPIView(
         ),
         team_names=get_string_agg_subquery(
             DBInteraction,
-            'dit_participants__team__name',
+            Cast('dit_participants__team__name', CharField()),
         ),
         team_countries=get_string_agg_subquery(
             DBInteraction,
-            'dit_participants__team__country__name',
+            Cast('dit_participants__team__country__name', CharField()),
         ),
         link=get_front_end_url_expression('interaction', 'pk'),
         kind_name=get_choices_as_case_expression(DBInteraction, 'kind'),
         policy_issue_type_names=get_string_agg_subquery(
             DBInteraction,
-            'policy_issue_types__name',
+            Cast('policy_issue_types__name', CharField()),
         ),
         policy_area_names=get_string_agg_subquery(
             DBInteraction,
-            'policy_areas__name',
+            Cast('policy_areas__name', CharField()),
             # Some policy areas contain commas, so we use a semicolon to delimit multiple values
             delimiter='; ',
         ),

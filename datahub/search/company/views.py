@@ -193,7 +193,7 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
             Case(
                 When(
                     export_countries__status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-                    then='export_countries__country__name',
+                    then=Cast('export_countries__country__name', CharField()),
                 ),
             ),
         ),
@@ -202,7 +202,7 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
             Case(
                 When(
                     export_countries__status=CompanyExportCountry.Status.FUTURE_INTEREST,
-                    then='export_countries__country__name',
+                    then=Cast('export_countries__country__name', CharField()),
                 ),
             ),
         ),

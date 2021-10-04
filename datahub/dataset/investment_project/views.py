@@ -1,5 +1,6 @@
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import OuterRef, Subquery
+from django.db.models import CharField, OuterRef, Subquery
+from django.db.models.functions import Cast
 
 from datahub.core.constants import InvestmentProjectStage as Stage
 from datahub.core.query_utils import (
@@ -58,7 +59,7 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
             ),
             investor_company_sector=get_sector_name_subquery('investor_company__sector'),
             level_of_involvement_name=get_empty_string_if_null_expression(
-                'level_of_involvement__name',
+                Cast('level_of_involvement__name', CharField()),
             ),
             project_first_moved_to_won=Subquery(
                 InvestmentProjectStageLog.objects.filter(

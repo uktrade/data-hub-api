@@ -1,4 +1,4 @@
-- model: omis-quote.termsandconditions
+- model: omis_quote.termsandconditions
   pk: c5920488-88dc-49f3-86c0-32e9b80bae82
   fields: {
     created_on: '2017-11-07T11:00:00.000000Z',

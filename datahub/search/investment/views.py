@@ -1,6 +1,8 @@
 import datetime
 
 from django.db.models import Case, Max, When
+from django.db.models import CharField
+from django.db.models.functions import Cast
 from elasticsearch_dsl.query import (
     Bool,
     Exists,
@@ -214,15 +216,15 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
         ),
         delivery_partner_names=get_string_agg_subquery(
             DBInvestmentProject,
-            'delivery_partners__name',
+            Cast('delivery_partners__name', CharField()),
         ),
         uk_region_location_names=get_string_agg_subquery(
             DBInvestmentProject,
-            'uk_region_locations__name',
+            Cast('uk_region_locations__name', CharField()),
         ),
         actual_uk_region_names=get_string_agg_subquery(
             DBInvestmentProject,
-            'actual_uk_regions__name',
+            Cast('actual_uk_regions__name', CharField()),
         ),
         investor_company_global_account_manager=Case(
             When(

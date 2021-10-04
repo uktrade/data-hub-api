@@ -21,7 +21,7 @@ class PaymentFactory(factory.django.DjangoModelFactory):
     received_on = factory.Faker('date_object')
 
     class Meta:
-        model = 'omis-payment.Payment'
+        model = 'omis_payment.Payment'
 
 
 class PaymentGatewaySessionFactory(factory.django.DjangoModelFactory):
@@ -32,7 +32,7 @@ class PaymentGatewaySessionFactory(factory.django.DjangoModelFactory):
     govuk_payment_id = factory.Faker('pystr', min_chars=27, max_chars=27)
 
     class Meta:
-        model = 'omis-payment.PaymentGatewaySession'
+        model = 'omis_payment.PaymentGatewaySession'
 
 
 class RequestedRefundFactory(factory.django.DjangoModelFactory):
@@ -51,7 +51,7 @@ class RequestedRefundFactory(factory.django.DjangoModelFactory):
     )
 
     class Meta:
-        model = 'omis-payment.Refund'
+        model = 'omis_payment.Refund'
 
 
 class ApprovedRefundFactory(RequestedRefundFactory):

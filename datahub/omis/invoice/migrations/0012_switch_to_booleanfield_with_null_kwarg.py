@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-invoice', '0011_update_permissions_django_21'),
+        ('omis_invoice', '0011_update_permissions_django_21'),
     ]
 
     operations = [
