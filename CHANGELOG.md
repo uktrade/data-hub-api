@@ -1,3 +1,34 @@
+# Data Hub API 38.7.0 (2021-10-04)
+## Features
+
+- **Companies** The `company_referral` Activity Stream endpoint goes one page further to an empty page.
+- **Companies** Unused keys `id` and `partOf` in the `company_referral` Activity Stream endpoint have been removed.
+- **Interactions** The `interaction` Activity Stream endpoint goes one page further to an empty page.
+- **Interactions** Unused keys `id` and `partOf` in the `interaction` Activity Stream endpoint have been removed.
+- **Investment** Land date financial year filters can now be applied to the search investments endpoint.
+
+  `POST /v3/search/investment_project { "land_date_financial_year_start": [<years>] }`
+
+  For example, to get investment projects from financial years 2017-18 and 2020-21, you can call:
+  `POST /v3/search/investment_project { "land_date_financial_year_start": ["2017", "2020"] }`
+
+  Unlike the `financial_year_start` filter, there is no special behaviour for projects in the "Prospect" stage. All projects use their actual land date, falling back to estimated land date if that has not been set.
+- **Investment** The `investment/project-added` Activity Stream endpoint goes one page further to an empty page.
+- **Investment** The `investment/large-capital-investor-profiles` Activity Stream endpoint goes one page further to an empty page.
+- **Investment** The `investment/large-capital-opportunity` Activty Stream endpoint goes one page further to an empty page.
+- **Investment** The `opportunity` Activity Stream endpoint goes one page further to an empty page.
+- **Investment** Unused keys `id` and `partOf` in the `investment/project-added` Activity Stream endpoint have been removed.
+- **Investment** Unused keys `id` and `partOf` in the `investment/large-capital-investor-profiles` Activity Stream endpoint have been removed.
+- **Investment** Unused keys `id` and `partOf` in the `investment/large-capital-opportunity` Activity Stream endpoint have been removed.
+- **Investment** Unused keys `id` and `partOf` in the `opportunity` Activity Stream endpoint have been removed.
+- **OMIS** The `omis/order-added` Activity Stream endpoint goes one page further to an empty page.
+- **OMIS** Unused keys `id` and `partOf` in the `omis/order-added` Activity Stream endpoint have been removed.
+
+## Internal changes
+
+- Django has been upgraded to version 3.2.7.
+
+
 # Data Hub API 38.6.0 (2021-09-28)
 ## Internal changes
 
