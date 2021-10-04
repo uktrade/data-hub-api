@@ -3,7 +3,7 @@ from django.urls import path
 
 from datahub.oauth.admin.views import add_access_token_view
 
-app_name = 'admin-oauth'
+app_name = 'admin_oauth'
 
 urlpatterns = [
     path(

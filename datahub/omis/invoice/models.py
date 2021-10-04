@@ -88,6 +88,9 @@ class Invoice(BaseModel):
 
     objects = InvoiceManager()
 
+    class Meta:
+        db_table = 'omis-invoice_invoice'
+
     def __str__(self):
         """Human-readable representation"""
         return self.invoice_number

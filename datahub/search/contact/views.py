@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.db.models import Case, Max, Value, When
-from django.db.models.functions import NullIf
+from django.db.models import Case, CharField, Max, Value, When
+from django.db.models.functions import Cast, NullIf
 
 from datahub.company import consent
 from datahub.company.models import Contact as DBContact
@@ -122,7 +122,11 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
         ),
         teams_of_latest_interaction=get_top_related_expression_subquery(
             DBInteraction.contacts.field,
-            get_string_agg_subquery(DBInteraction, 'dit_participants__team__name', distinct=True),
+            get_string_agg_subquery(
+                DBInteraction,
+                Cast('dit_participants__team__name', CharField()),
+                distinct=True,
+            ),
             ('-date',),
         ),
     )

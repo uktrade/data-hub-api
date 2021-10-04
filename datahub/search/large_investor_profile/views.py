@@ -1,3 +1,6 @@
+from django.db.models import CharField
+from django.db.models.functions import Cast
+
 from datahub.core.query_utils import (
     get_front_end_url_expression,
     get_full_name_expression,
@@ -117,39 +120,39 @@ class SearchLargeInvestorProfileExportAPIView(
         ),
         deal_ticket_sizes_names=get_string_agg_subquery(
             DBLargeCapitalInvestorProfile,
-            'deal_ticket_sizes__name',
+            Cast('deal_ticket_sizes__name', CharField()),
         ),
         asset_classes_of_interest_names=get_string_agg_subquery(
             DBLargeCapitalInvestorProfile,
-            'asset_classes_of_interest__name',
+            Cast('asset_classes_of_interest__name', CharField()),
         ),
         investment_types_names=get_string_agg_subquery(
             DBLargeCapitalInvestorProfile,
-            'investment_types__name',
+            Cast('investment_types__name', CharField()),
         ),
         time_horizons_names=get_string_agg_subquery(
             DBLargeCapitalInvestorProfile,
-            'time_horizons__name',
+            Cast('time_horizons__name', CharField()),
         ),
         restrictions_names=get_string_agg_subquery(
             DBLargeCapitalInvestorProfile,
-            'restrictions__name',
+            Cast('restrictions__name', CharField()),
         ),
         construction_risks_names=get_string_agg_subquery(
             DBLargeCapitalInvestorProfile,
-            'construction_risks__name',
+            Cast('construction_risks__name', CharField()),
         ),
         desired_deal_roles_names=get_string_agg_subquery(
             DBLargeCapitalInvestorProfile,
-            'desired_deal_roles__name',
+            Cast('desired_deal_roles__name', CharField()),
         ),
         uk_region_locations_names=get_string_agg_subquery(
             DBLargeCapitalInvestorProfile,
-            'uk_region_locations__name',
+            Cast('uk_region_locations__name', CharField()),
         ),
         other_countries_being_considered_names=get_string_agg_subquery(
             DBLargeCapitalInvestorProfile,
-            'other_countries_being_considered__name',
+            Cast('other_countries_being_considered__name', CharField()),
         ),
         link=get_front_end_url_expression(
             'company',

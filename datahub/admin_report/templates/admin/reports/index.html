@@ -17,7 +17,7 @@
     {% for model, reports in reports_by_model.items %}
         <h2>{{ model|capfirst }}</h2>
         {% for report in reports %}
-            <a href="{% url 'admin-report:download-report' report_id=report.id %}">{{ report.name }}</a>
+            <a href="{% url 'admin_report:download-report' report_id=report.id %}">{{ report.name }}</a>
         {% endfor %}
     {% endfor %}
 {% endblock %}

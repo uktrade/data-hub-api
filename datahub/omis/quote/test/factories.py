@@ -16,7 +16,7 @@ class QuoteFactory(factory.django.DjangoModelFactory):
     terms_and_conditions = factory.LazyFunction(TermsAndConditions.objects.first)
 
     class Meta:
-        model = 'omis-quote.Quote'
+        model = 'omis_quote.Quote'
 
 
 class CancelledQuoteFactory(QuoteFactory):

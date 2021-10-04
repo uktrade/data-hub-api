@@ -552,9 +552,9 @@ MAPPING = {
             'order.Order_service_types',
             'order.OrderAssignee',
             'order.OrderSubscriber',
-            'omis-payment.Payment',
-            'omis-payment.Refund',
-            'omis-payment.PaymentGatewaySession',
+            'omis_payment.Payment',
+            'omis_payment.Refund',
+            'omis_payment.PaymentGatewaySession',
         },
         'expired_objects_kwargs': [
             {

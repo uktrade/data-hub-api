@@ -7,22 +7,26 @@ from config.api_docs_urls import api_docs_urls
 from datahub.ping.views import ping
 from datahub.user.views import who_am_i
 
-unversioned_urls = [
-    path('admin/', admin.site.urls),
-    path('', include('datahub.admin_report.urls')),
-    path('', include('datahub.investment.project.report.urls')),
-    path('', include('datahub.oauth.admin.urls')),
-    path('ping.xml', ping, name='ping'),
-    path('whoami/', who_am_i, name='who_am_i'),
-]
-
 
 if settings.ADMIN_OAUTH2_ENABLED:
     from datahub.oauth.admin_sso.views import callback as admin_oauth_callback
-    unversioned_urls += [
+    admin_oauth2_urls = [
         # This endpoint is used for Django Admin OAuth2 authentication
         path('admin/oauth/callback', admin_oauth_callback, name='admin_oauth_callback'),
     ]
+else:
+    admin_oauth2_urls = []
+
+
+unversioned_urls = [
+    path('', include('datahub.admin_report.urls')),
+    path('', include('datahub.investment.project.report.urls')),
+    path('', include('datahub.oauth.admin.urls')),
+    *admin_oauth2_urls,
+    path('admin/', admin.site.urls),
+    path('ping.xml', ping, name='ping'),
+    path('whoami/', who_am_i, name='who_am_i'),
+]
 
 
 if settings.DEBUG:

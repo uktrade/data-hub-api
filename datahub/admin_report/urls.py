@@ -3,7 +3,7 @@ from django.urls import path
 
 from datahub.admin_report.views import download_report, list_reports
 
-app_name = 'admin-report'
+app_name = 'admin_report'
 
 urlpatterns = [
     path(

@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-payment', '0002_auto_20171011_1541'),
+        ('omis_payment', '0002_auto_20171011_1541'),
     ]
 
     operations = [

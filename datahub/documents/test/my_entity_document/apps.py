@@ -6,4 +6,4 @@ class DocumentsTestConfig(AppConfig):
     Django App Config for the Documents test app.
     """
 
-    name = 'my-entity-document-test'
+    name = 'datahub.documents.test.my_entity_document'

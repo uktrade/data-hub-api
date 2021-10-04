@@ -15,5 +15,6 @@ class Market(DisableableModel):
     manager_email = models.EmailField(blank=True)
 
     class Meta:
+        db_table = 'omis-market_market'
         verbose_name = 'OMIS Market'
         verbose_name_plural = 'OMIS Markets'

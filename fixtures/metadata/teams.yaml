@@ -130,22 +130,22 @@
       - company
       - contact
     - - view_invoice
-      - omis-invoice
+      - omis_invoice
       - invoice
     - - add_payment
-      - omis-payment
+      - omis_payment
       - payment
     - - view_payment
-      - omis-payment
+      - omis_payment
       - payment
     - - add_quote
-      - omis-quote
+      - omis_quote
       - quote
     - - change_quote
-      - omis-quote
+      - omis_quote
       - quote
     - - view_quote
-      - omis-quote
+      - omis_quote
       - quote
     - - add_order
       - order
@@ -434,22 +434,22 @@
       - investment
       - investmentprojectcode
     - - view_invoice
-      - omis-invoice
+      - omis_invoice
       - invoice
     - - add_payment
-      - omis-payment
+      - omis_payment
       - payment
     - - view_payment
-      - omis-payment
+      - omis_payment
       - payment
     - - add_quote
-      - omis-quote
+      - omis_quote
       - quote
     - - change_quote
-      - omis-quote
+      - omis_quote
       - quote
     - - view_quote
-      - omis-quote
+      - omis_quote
       - quote
     - - add_order
       - order

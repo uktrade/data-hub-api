@@ -209,7 +209,7 @@ class TestOneListLink(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         one_list_url = reverse(
-            'admin-report:download-report',
+            'admin_report:download-report',
             kwargs={'report_id': OneListReport.id},
         )
         assert one_list_url in response.rendered_content
