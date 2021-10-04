@@ -14,7 +14,7 @@ def update_order_reference(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-invoice', '0009_order_ref'),
+        ('omis_invoice', '0009_order_ref'),
         ('order', '0001_squashed_0030_cancellation'),
     ]
 

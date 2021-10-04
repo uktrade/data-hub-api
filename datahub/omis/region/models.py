@@ -24,5 +24,6 @@ class UKRegionalSettings(models.Model):
         return f'OMIS settings for {self.uk_region}'
 
     class Meta:
+        db_table = 'omis-region_ukregionalsettings'
         verbose_name = 'OMIS UK regional settings'
         verbose_name_plural = 'OMIS UK regional settings'

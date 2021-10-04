@@ -1,4 +1,4 @@
-from django.db.models import F, Func, OuterRef, Subquery, TextField, Value
+from django.db.models import CharField, F, Func, OuterRef, Subquery, Value
 
 from datahub.metadata.models import Sector, Service
 
@@ -35,7 +35,7 @@ def _get_name_from_mptt_model(model, relation_name=None):
         tree_id=OuterRef(f'{outer_ref_prefix}tree_id'),
     ).order_by().values('name')
 
-    return Subquery(subquery, output_field=TextField())
+    return Subquery(subquery, output_field=CharField())
 
 
 def get_sector_name_subquery(relation_name=None):

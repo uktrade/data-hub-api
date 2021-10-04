@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('order', '0007_populate_uk_region'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('omis-payment', '0005_adding_read_permissions'),
+        ('omis_payment', '0005_adding_read_permissions'),
     ]
 
     operations = [

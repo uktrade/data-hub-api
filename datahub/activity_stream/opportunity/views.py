@@ -9,11 +9,8 @@ from datahub.investment.opportunity.models import LargeCapitalOpportunity
 class LargeCapitalOpportunityPagination(ActivityCursorPagination):
     """
     Cursor pagination for Large Capital Opportunity.
-    `modified_on` is mutable. Most recently updated opportunities would be consumed first,
-    so they get a chance to appear in the Activity Feed quicker.
     """
 
-    ordering = ('modified_on', 'id')
     summary = 'Large Capital Opportunity Activities Added'
 
 

@@ -7,13 +7,8 @@ from datahub.interaction.queryset import get_base_interaction_queryset
 class InteractionCursorPagination(ActivityCursorPagination):
     """
     Cursor pagination for interaction.
-
-    `modified_on` is no unchanging but we have decided to use it because the benefits of being
-    able to generate the last page of interactions in under 10s far outweigh the fact that
-    sometimes the last page will not contain all the updates.
     """
 
-    ordering = ('modified_on', 'id')
     summary = 'Interaction Activities'
 
 

@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('omis-quote', '0001_initial'),
+        ('omis_quote', '0001_initial'),
     ]
 
     operations = [

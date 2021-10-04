@@ -34,6 +34,7 @@ class TermsAndConditions(models.Model):
     )
 
     class Meta:
+        db_table = 'omis-quote_termsandconditions'
         ordering = ('-created_on', )
         verbose_name_plural = 'terms and conditions'
 
@@ -74,6 +75,9 @@ class Quote(BaseModel):
     expires_on = models.DateField()
 
     objects = QuoteManager()
+
+    class Meta:
+        db_table = 'omis-quote_quote'
 
     def cancel(self, by):
         """

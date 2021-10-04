@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-invoice', '0002_invoice_payment_due_date'),
+        ('omis_invoice', '0002_invoice_payment_due_date'),
     ]
 
     operations = [

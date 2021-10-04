@@ -1,6 +1,8 @@
 import datetime
 
 from django.db.models import Case, Max, When
+from django.db.models import CharField
+from django.db.models.functions import Cast
 from elasticsearch_dsl.query import (
     Bool,
     Exists,
@@ -89,7 +91,9 @@ class SearchInvestmentProjectAPIViewMixin:
 
     def get_extra_filters(self, validated_data):
         """Apply financial year filter."""
-        return Bool(should=[
+        # TODO: remove financial year start filter once land date filter has been
+        # implemented and tested on frontend
+        financial_year_start_filter = Bool(should=[
             Bool(should=[
                 # Non-prospects use actual land date, falling back to estimated land date
                 Bool(
@@ -118,6 +122,25 @@ class SearchInvestmentProjectAPIViewMixin:
             ])
             for financial_year_start in validated_data.get('financial_year_start', [])
         ])
+        land_date_filter = Bool(should=[
+            Bool(
+                should=[
+                    Bool(
+                        must=Range(estimated_land_date={
+                            'gte': datetime.date(year=financial_year_start, month=4, day=1),
+                            'lt': datetime.date(year=financial_year_start + 1, month=4, day=1),
+                        }),
+                        must_not=Exists(field='actual_land_date'),
+                    ),
+                    Range(actual_land_date={
+                        'gte': datetime.date(year=financial_year_start, month=4, day=1),
+                        'lt': datetime.date(year=financial_year_start + 1, month=4, day=1),
+                    }),
+                ],
+            )
+            for financial_year_start in validated_data.get('land_date_financial_year_start', [])
+        ])
+        return Bool(must=[financial_year_start_filter, land_date_filter])
 
 
 @register_v3_view()
@@ -193,15 +216,15 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
         ),
         delivery_partner_names=get_string_agg_subquery(
             DBInvestmentProject,
-            'delivery_partners__name',
+            Cast('delivery_partners__name', CharField()),
         ),
         uk_region_location_names=get_string_agg_subquery(
             DBInvestmentProject,
-            'uk_region_locations__name',
+            Cast('uk_region_locations__name', CharField()),
         ),
         actual_uk_region_names=get_string_agg_subquery(
             DBInvestmentProject,
-            'actual_uk_regions__name',
+            Cast('actual_uk_regions__name', CharField()),
         ),
         investor_company_global_account_manager=Case(
             When(

@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-invoice', '0003_adding_read_permissions'),
+        ('omis_invoice', '0003_adding_read_permissions'),
     ]
 
     operations = [

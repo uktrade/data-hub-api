@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-quote', '0004_accepted'),
+        ('omis_quote', '0004_accepted'),
     ]
 
     operations = [

@@ -1,4 +1,7 @@
+import datetime
+
 import pytest
+from freezegun import freeze_time
 from rest_framework import status
 
 from datahub.activity_stream.test import hawk
@@ -16,20 +19,23 @@ def test_large_capital_opportunity_activity(api_client):
     Get a list of large capital opportunities and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    opportunity = LargeCapitalOpportunityFactory()
-    response = hawk.get(
-        api_client,
-        get_url('api-v3:activity-stream:large-capital-opportunity'),
-    )
-    assert response.status_code == status.HTTP_200_OK
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start) as frozen_datetime:
+        opportunity = LargeCapitalOpportunityFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(
+            api_client,
+            get_url('api-v3:activity-stream:large-capital-opportunity'),
+        )
 
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Large Capital Opportunity Activities Added',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity',
-        'partOf': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(opportunity.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubLargeCapitalOpportunity:{opportunity.id}:Announce',
@@ -68,11 +74,14 @@ def test_complete_large_capital_opportunity_activity(api_client):
     Get a list of large capital opportunities and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
-    opportunity = CompleteLargeCapitalOpportunityFactory()
-    response = hawk.get(
-        api_client,
-        get_url('api-v3:activity-stream:large-capital-opportunity'),
-    )
+    start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+    with freeze_time(start) as frozen_datetime:
+        opportunity = CompleteLargeCapitalOpportunityFactory()
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(
+            api_client,
+            get_url('api-v3:activity-stream:large-capital-opportunity'),
+        )
 
     def get_multiple_names(values):
         return [{'name': value.name} for value in values]
@@ -82,9 +91,9 @@ def test_complete_large_capital_opportunity_activity(api_client):
         '@context': 'https://www.w3.org/ns/activitystreams',
         'summary': 'Large Capital Opportunity Activities Added',
         'type': 'OrderedCollectionPage',
-        'id': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity',
-        'partOf': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity',
-        'next': None,
+        'next': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity'
+                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+                + f'&cursor={str(opportunity.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubLargeCapitalOpportunity:{opportunity.id}:Announce',

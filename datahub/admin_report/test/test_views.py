@@ -16,8 +16,8 @@ class TestReportAdmin(AdminTestMixin):
     @pytest.mark.parametrize(
         'url',
         (
-            reverse('admin-report:index'),
-            reverse('admin-report:download-report', kwargs={'report_id': 'test-report'}),
+            reverse('admin_report:index'),
+            reverse('admin_report:download-report', kwargs={'report_id': 'test-report'}),
         ),
     )
     def test_redirects_to_login_page_if_not_logged_in(self, url):
@@ -32,8 +32,8 @@ class TestReportAdmin(AdminTestMixin):
     @pytest.mark.parametrize(
         'url',
         (
-            reverse('admin-report:index'),
-            reverse('admin-report:download-report', kwargs={'report_id': 'test-report'}),
+            reverse('admin_report:index'),
+            reverse('admin_report:download-report', kwargs={'report_id': 'test-report'}),
         ),
     )
     def test_redirects_to_login_page_if_not_staff(self, url):
@@ -48,7 +48,7 @@ class TestReportAdmin(AdminTestMixin):
 
     def test_200_if_staff(self):
         """Test that the view returns a 200 response if the user is an admin user."""
-        url = reverse('admin-report:index')
+        url = reverse('admin_report:index')
         user = create_test_user(is_staff=True, password=self.PASSWORD)
 
         client = self.create_client(user=user)
@@ -60,7 +60,7 @@ class TestReportAdmin(AdminTestMixin):
         Test that the view returns a 404 response if the report ID does not refer to a
         registered report.
         """
-        url = reverse('admin-report:download-report', kwargs={'report_id': 'non-existent-report'})
+        url = reverse('admin_report:download-report', kwargs={'report_id': 'non-existent-report'})
         user = create_test_user(is_staff=True, password=self.PASSWORD)
 
         client = self.create_client(user=user)
@@ -72,7 +72,7 @@ class TestReportAdmin(AdminTestMixin):
         Test that the view returns a 403 response if the staff user does not have the
         correct permissions.
         """
-        url = reverse('admin-report:download-report', kwargs={'report_id': 'test-report'})
+        url = reverse('admin_report:download-report', kwargs={'report_id': 'test-report'})
         user = create_test_user(permission_codenames=(), is_staff=True, password=self.PASSWORD)
 
         client = self.create_client(user=user)
@@ -83,7 +83,7 @@ class TestReportAdmin(AdminTestMixin):
     def test_report_download(self):
         """Test the download of a report."""
         obj = MetadataModelFactory()
-        url = reverse('admin-report:download-report', kwargs={'report_id': 'test-report'})
+        url = reverse('admin_report:download-report', kwargs={'report_id': 'test-report'})
 
         user = create_test_user(
             permission_codenames=('change_metadatamodel',),

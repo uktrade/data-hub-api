@@ -20,7 +20,7 @@ def update_pricing_fields(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('omis-invoice', '0007_pricing_fields'),
+        ('omis_invoice', '0007_pricing_fields'),
         ('order', '0001_squashed_0030_cancellation'),
     ]
 

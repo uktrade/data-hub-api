@@ -1018,6 +1018,80 @@ class TestSearchFinancialYearFilter(APITestMixin):
         assert len(results) == num_results
 
 
+class TestSearchLandDateFilter(APITestMixin):
+    """Tests the land date financial year filter on the search endpoint."""
+
+    @pytest.mark.parametrize('stage', ('verify_win', 'prospect'))
+    @pytest.mark.parametrize(
+        'query,num_results',
+        (
+            ({'land_date_financial_year_start': ['2015']}, 0),
+            ({'land_date_financial_year_start': ['2016']}, 0),
+            ({'land_date_financial_year_start': ['2017']}, 1),
+            ({'land_date_financial_year_start': ['2018']}, 0),
+            ({'land_date_financial_year_start': ['2017', '2018']}, 1),
+        ),
+    )
+    def test_actual_land_date(
+        self,
+        es_with_collector,
+        stage,
+        query,
+        num_results,
+    ):
+        """Actual land date should be used when present."""
+        InvestmentProjectFactory(
+            estimated_land_date=datetime.date(2017, 3, 31),
+            actual_land_date=datetime.date(2017, 4, 1),
+            stage_id=getattr(constants.InvestmentProjectStage, stage).value.id,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, query)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == num_results
+        results = response.data['results']
+        assert len(results) == num_results
+
+    @pytest.mark.parametrize('stage', ('active', 'prospect'))
+    @pytest.mark.parametrize(
+        'query,num_results',
+        (
+            ({'land_date_financial_year_start': ['2015']}, 0),
+            ({'land_date_financial_year_start': ['2016']}, 1),
+            ({'land_date_financial_year_start': ['2017']}, 0),
+            ({'land_date_financial_year_start': ['2018']}, 0),
+            ({'land_date_financial_year_start': ['2016', '2017']}, 1),
+        ),
+    )
+    def test_fall_back_to_estimated_land_date(
+        self,
+        es_with_collector,
+        stage,
+        query,
+        num_results,
+    ):
+        """Estimated land date should be used when actual land date is not set."""
+        InvestmentProjectFactory(
+            estimated_land_date=datetime.date(2017, 3, 31),
+            actual_land_date=None,
+            stage_id=getattr(constants.InvestmentProjectStage, stage).value.id,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, query)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == num_results
+        results = response.data['results']
+        assert len(results) == num_results
+
+
 class TestSearchPermissions(APITestMixin):
     """Tests search view permissions."""
 
