@@ -4,15 +4,6 @@
 
 set  -xe
 
-# Django 3.2 upgrade commands
-
-./manage.py rename_apps || true
-./manage.py distributed_migrate omis_region 0002_alter_ukregionalsettings_table --fake
-./manage.py distributed_migrate omis_payment 0009_auto_20210816_1601 --fake
-./manage.py distributed_migrate omis_market 0002_alter_market_table --fake
-./manage.py distributed_migrate omis_invoice 0013_alter_invoice_table --fake
-./manage.py distributed_migrate omis_quote 0009_auto_20210816_1601 --fake
-
 ./manage.py distributed_migrate --noinput
 
 # This command schedules asynchronous Celery tasks, so this checks the app instance index to
