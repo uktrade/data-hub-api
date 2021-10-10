@@ -52,7 +52,7 @@ kombu==4.6.11  # Not used directly, but pinned as it has been a source of breaka
 # Testing and dev
 pytest==6.2.5
 pytest-django==4.4.0
-pytest-cov==2.12.1
+pytest-cov==3.0.0
 pytest-xdist==2.4.0
 ipython==7.28.0
 factory-boy==3.2.0
