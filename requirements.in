@@ -42,7 +42,7 @@ elasticsearch==7.13.4
 elasticsearch-dsl==7.4.0
 
 # ES APM
-elastic-apm==6.4.0
+elastic-apm==6.5.0
 
 # Celery
 celery[redis]==4.4.7
