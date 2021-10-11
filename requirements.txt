@@ -27,9 +27,9 @@ billiard==3.6.4.0
     # via
     #   -r requirements.in
     #   celery
-boto3==1.18.53
+boto3==1.18.58
     # via -r requirements.in
-botocore==1.21.53
+botocore==1.21.58
     # via
     #   boto3
     #   s3transfer
@@ -102,7 +102,7 @@ djangorestframework==3.12.4
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
-elastic-apm==6.4.0
+elastic-apm==6.5.0
     # via -r requirements.in
 elasticsearch==7.13.4
     # via
@@ -156,7 +156,7 @@ greenlet==1.1.1
     # via gevent
 gunicorn==20.1.0
     # via -r requirements.in
-icalendar==4.0.7
+icalendar==4.0.8
     # via -r requirements.in
 identify==2.2.15
     # via pre-commit
@@ -357,7 +357,7 @@ traitlets==5.1.0
     #   matplotlib-inline
 typing-extensions==3.10.0.2
     # via aiohttp
-uritemplate==3.0.1
+uritemplate==4.0.0
     # via -r requirements.in
 urllib3==1.26.7
     # via
@@ -376,7 +376,7 @@ watchdog[watchmedo]==2.1.6
     # via -r requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
-werkzeug==2.0.1
+werkzeug==2.0.2
     # via -r requirements.in
 wheel==0.37.0
     # via pip-tools
