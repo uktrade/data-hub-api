@@ -8,7 +8,7 @@ django-filter==21.1
 django-mptt==0.13.4
 django-pglocks==1.0.4
 django-reversion==4.0.0
-uritemplate==3.0.1  # required for DRF schema features
+uritemplate==4.0.0  # required for DRF schema features
 whitenoise==5.3.0
 
 chardet==4.0.0
@@ -19,7 +19,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.1
 psycogreen==1.0.2
 
-boto3==1.18.53
+boto3==1.18.58
 
 notifications-python-client==6.2.1
 
@@ -28,7 +28,7 @@ statsd==3.3.0
 
 # Email
 mail-parser==3.15.0
-icalendar==4.0.7
+icalendar==4.0.8
 
 # Slack
 slackclient==2.9.3
@@ -42,7 +42,7 @@ elasticsearch==7.13.4
 elasticsearch-dsl==7.4.0
 
 # ES APM
-elastic-apm==6.4.0
+elastic-apm==6.5.0
 
 # Celery
 celery[redis]==4.4.7
@@ -52,15 +52,15 @@ kombu==4.6.11  # Not used directly, but pinned as it has been a source of breaka
 # Testing and dev
 pytest==6.2.5
 pytest-django==4.4.0
-pytest-cov==2.12.1
+pytest-cov==3.0.0
 pytest-xdist==2.4.0
 ipython==7.28.0
 factory-boy==3.2.0
 freezegun==1.1.0
 requests-mock==1.9.3
 django-debug-toolbar==3.2.2
-werkzeug==2.0.1  # Required by runserver_plus - useful for local dev
-pip-tools==6.3.0
+werkzeug==2.0.2  # Required by runserver_plus - useful for local dev
+pip-tools==6.3.1
 piprot==0.9.11
 semantic_version==2.8.5
 towncrier==21.3.0
