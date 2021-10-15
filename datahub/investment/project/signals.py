@@ -110,8 +110,7 @@ def update_country_investment_originates_from(sender, **kwargs):
         investment_projects = InvestmentProject.objects.filter(
             investor_company_id=instance.pk,
         ).exclude(
-            Q(stage_id=InvestmentProjectStage.won.value.id)
-            | Q(country_investment_originates_from_id=instance.address_country_id),
+            stage_id=InvestmentProjectStage.won.value.id,
         )
 
         for investment_project in investment_projects:
