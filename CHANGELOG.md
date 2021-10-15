@@ -1,3 +1,13 @@
+# Data Hub API 39.0.0 (2021-10-15)
+## Removals
+
+- **Investment** The investment summary endpoint has been removed (`GET /v4/adviser/<adviser_id>/investment-summary`) as it is no longer used.
+
+## Features
+
+- **Interactions** Adds `Global Investment Summit (2021)` as as a Service option in the context of `Event`, `Investment project interaction` and `Investment interaction`.
+
+
 # Data Hub API 38.7.0 (2021-10-04)
 ## Features
 
