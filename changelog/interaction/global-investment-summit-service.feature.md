@@ -1,1 +1,0 @@
-Adds `Global Investment Summit (2021)` as as a Service option in the context of `Event`, `Investment project interaction` and `Investment interaction`.
