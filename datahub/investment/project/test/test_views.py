@@ -19,7 +19,6 @@ from reversion.models import Version
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.core.audit_utils import diff_versions
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
     APITestMixin,
@@ -2374,29 +2373,6 @@ class TestInvestmentProjectVersioning(APITestMixin):
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert Version.objects.count() == 0
-
-    def test_empty_update_doesnt_show_changes(self):
-        """Test that an empty update doesn't show changes."""
-        assert Version.objects.count() == 0
-
-        with reversion.create_revision():
-            project = InvestmentProjectFactory()
-            reversion.set_comment('Initial')
-
-        assert Version.objects.get_for_object(project).count() == 1
-
-        response = self.api_client.patch(
-            reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk}),
-        )
-        assert response.status_code == status.HTTP_200_OK
-
-        versions = Version.objects.get_for_object(project)
-        assert len(versions) == 2
-
-        changes = diff_versions(
-            InvestmentProject._meta, versions[0].field_dict, versions[1].field_dict,
-        )
-        assert changes == {}
 
     def test_update_creates_a_new_version(self):
         """Test that updating an investment project creates a new version."""
