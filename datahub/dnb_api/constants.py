@@ -1,5 +1,3 @@
-FEATURE_FLAG_DNB_COMPANY_UPDATES = 'dnb-company-updates'
-
 ALL_DNB_UPDATED_SERIALIZER_FIELDS = (
     'name',
     'trading_names',
