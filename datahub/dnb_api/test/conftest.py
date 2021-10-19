@@ -5,19 +5,7 @@ from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.company.test.factories import CompanyFactory
-from datahub.dnb_api.constants import (
-    FEATURE_FLAG_DNB_COMPANY_UPDATES,
-)
-from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
-
-
-@pytest.fixture()
-def dnb_company_updates_feature_flag():
-    """
-    Creates the DNB company updates feature flag.
-    """
-    yield FeatureFlagFactory(code=FEATURE_FLAG_DNB_COMPANY_UPDATES)
 
 
 @pytest.fixture
