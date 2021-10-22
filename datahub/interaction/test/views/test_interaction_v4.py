@@ -350,13 +350,10 @@ class TestAddInteraction(APITestMixin):
             },
         ),
     )
-    def test_add_with_export_countries_feature_flag_active(
+    def test_add_new_interaction(
         self, extra_data, permissions,
     ):
-        """
-        Test add a new interaction with export countries
-        when feature flag is active.
-        """
+        """Test add a new interaction."""
         adviser = create_test_user(
             permission_codenames=permissions,
             dit_team=TeamFactory(),

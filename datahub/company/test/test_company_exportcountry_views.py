@@ -495,7 +495,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         company.refresh_from_db()
         assert len(company.export_countries.all()) == 2
 
-    def test_get_company_with_export_countries_feature_flag_on(
+    def test_get_company(
         self,
     ):
         """Test get company details after updating export countries."""
