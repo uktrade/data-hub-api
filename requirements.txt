@@ -118,7 +118,7 @@ faker==8.14.0
     # via factory-boy
 filelock==3.1.0
     # via virtualenv
-flake8==3.9.2
+flake8==4.0.1
     # via
     #   -r requirements.in
     #   flake8-bugbear
@@ -234,7 +234,7 @@ py==1.10.0
     # via
     #   pytest
     #   pytest-forked
-pycodestyle==2.7.0
+pycodestyle==2.8.0
     # via
     #   flake8
     #   flake8-debugger
@@ -246,7 +246,7 @@ pydocstyle==6.1.1
     # via
     #   -r requirements.in
     #   flake8-docstrings
-pyflakes==2.3.1
+pyflakes==2.4.0
     # via flake8
 pygments==2.10.0
     # via ipython
