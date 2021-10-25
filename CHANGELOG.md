@@ -1,3 +1,14 @@
+# Data Hub API 39.1.0 (2021-10-25)
+## Removals
+
+- The `capital-investments-filters` feature flag has been removed.
+- The `companies-advisers` feature flag has been removed.
+- The `dnb-company-updates` feature flag has been removed.
+- The `export-countries-switch` feature flag has been removed.
+- The `notify-dnb-investigations` feature flag has been removed.
+- The `update-consent-service` feature flag has been removed.
+
+
 # Data Hub API 39.0.0 (2021-10-15)
 ## Removals
 
