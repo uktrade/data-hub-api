@@ -1,0 +1,1 @@
+FUZZY_SEARCH_FEATURE_FLAG = 'fuzzy-search'
