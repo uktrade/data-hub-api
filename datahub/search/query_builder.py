@@ -13,7 +13,9 @@ from elasticsearch_dsl.query import (
     Term,
 )
 
+from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.search.apps import EXCLUDE_ALL, get_global_search_apps_as_mapping
+from datahub.search.constants import FUZZY_SEARCH_FEATURE_FLAG
 
 MAX_RESULTS = 10000
 
@@ -22,6 +24,12 @@ class MatchNone(Query):
     """match_none query. This isn't defined in the Elasticsearch DSL library."""
 
     name = 'match_none'
+
+
+class CombinedFields(Query):
+    """combined_fields query."""
+
+    name = 'combined_fields'
 
 
 def get_basic_search_query(
@@ -221,6 +229,22 @@ def _build_entity_permission_query(permission_filters):
 
 
 def _build_term_query(term, fields=None):
+    """
+    Builds a term query depending on the active feature flags.
+
+    If the `fuzzy_search` flag is active then we use fuzzy matching,
+    otherwise uses the old matching method.
+
+    TODO: once the new search has been trialled and accepted, remove
+    the feature flag and use fuzzy matching.
+    """
+    if is_feature_flag_active(FUZZY_SEARCH_FEATURE_FLAG):
+        return _build_fuzzy_term_query(term, fields)
+    else:
+        return _build_basic_term_query(term, fields)
+
+
+def _build_basic_term_query(term, fields=None):
     """Builds a term query."""
     if term == '':
         return MatchAll()
@@ -234,6 +258,42 @@ def _build_term_query(term, fields=None):
             fields=fields,
             type='cross_fields',
             operator='and',
+        ),
+    ]
+
+    return Bool(should=should_query)
+
+
+def _build_fuzzy_term_query(term, fields=None):
+    """Builds a fuzzy term query that matches with minor spelling errors etc."""
+    if term == '':
+        return MatchAll()
+
+    if fields is None:
+        fields = []
+
+    trigram_fields = [field for field in fields if field.endswith('.trigram')]
+    non_trigram_fields = list(set(fields) - set(trigram_fields))
+
+    should_query = [
+        # Promote exact name match
+        Match(**{'name.keyword': {'query': term, 'boost': 2}}),
+        Match(**{'name.trigram': {'query': term, 'boost': 1.5, 'minimum_should_match': '60%'}}),
+        # Cross match fields
+        # Non-trigram fields do not fuzzy match
+        MultiMatch(
+            query=term,
+            fields=non_trigram_fields,
+            type='cross_fields',
+            operator='and',
+        ),
+        # Combined fields fuzzy matches on multiple fields, but only supported in es>=7.13
+        # Trigram fields use fuzzy matching and must use the 'or' operator
+        CombinedFields(
+            query=term,
+            fields=trigram_fields,
+            operator='or',
+            minimum_should_match='90%',
         ),
     ]
 
