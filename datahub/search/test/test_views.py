@@ -175,6 +175,7 @@ class TestBasicSearch(APITestMixin):
         SimpleModel.objects.create(name='The Advisory Group')
         SimpleModel.objects.create(name='The Advisory')
         SimpleModel.objects.create(name='The Advisories')
+        SimpleModel.objects.create(name='The Group')
 
         es_with_collector.flush_and_refresh()
 
@@ -200,6 +201,103 @@ class TestBasicSearch(APITestMixin):
             'The Advisory Group',
             'The Risk Advisory Group',
         ] == [result['name'] for result in response.data['results']]
+
+    def test_fuzzy_quality(
+        self,
+        fuzzy_search_feature,
+        es_with_collector,
+        search_support_user,
+    ):
+        """
+        Tests quality of results for fuzzy matching.
+
+        This should not only hit on exact matches, but also close matches.
+        """
+        SimpleModel.objects.create(name='The Risk Advisory Group')
+        SimpleModel.objects.create(name='The Advisory Group')
+        SimpleModel.objects.create(name='The Advisory')
+        SimpleModel.objects.create(name='The Adivsory')
+        SimpleModel.objects.create(name='The Advisories')
+        SimpleModel.objects.create(name='The Group')
+
+        es_with_collector.flush_and_refresh()
+
+        term = 'The Advisory'
+
+        url = reverse('api-v3:search:basic')
+        api_client = self.create_api_client(user=search_support_user)
+
+        response = api_client.get(
+            url,
+            data={
+                'term': term,
+                'entity': 'simplemodel',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 5
+
+        # results are in order of relevance
+        assert [
+            'The Advisory',
+            'The Advisory Group',
+            'The Risk Advisory Group',
+            'The Advisories',
+            'The Adivsory',
+        ] == [result['name'] for result in response.data['results']]
+
+    def test_fuzzy_quality_cross_fields(
+        self,
+        fuzzy_search_feature,
+        es_with_collector,
+        search_support_user,
+    ):
+        """
+        Tests quality of results for fuzzy matching across multiple fields.
+
+        Unfortunately we require "combined_fields" matching (introduced in Elasticsearch
+        v 7.13) to do fuzzy matching across multiple fields, but we should still be
+        able to search for exact terms that can be divided across multiple fields.
+        """
+        SimpleModel.objects.create(name='The Risk Advisory Group', country='Canada')
+        SimpleModel.objects.create(name='The Advisory', country='Canada')
+        SimpleModel.objects.create(name='The Advisory Group', country='Canada')
+        SimpleModel.objects.create(name='The Group', country='Canada')
+
+        SimpleModel.objects.create(name='The Risk Advisory Group', country='France')
+        SimpleModel.objects.create(name='The Advisory', country='France')
+        SimpleModel.objects.create(name='The Advisory Group', country='France')
+        SimpleModel.objects.create(name='The Group', country='France')
+
+        es_with_collector.flush_and_refresh()
+
+        term = 'The Advisory Canada'
+
+        url = reverse('api-v3:search:basic')
+        api_client = self.create_api_client(user=search_support_user)
+
+        response = api_client.get(
+            url,
+            data={
+                'term': term,
+                'entity': 'simplemodel',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data['count'] == 6
+
+        # results are in order of relevance
+        assert [
+            ('The Advisory', 'Canada'),
+            ('The Advisory Group', 'Canada'),
+            ('The Risk Advisory Group', 'Canada'),
+            ('The Advisory', 'France'),
+            ('The Advisory Group', 'France'),
+            ('The Risk Advisory Group', 'France'),
+        ] == [(result['name'], result['country']) for result in response.data['results']]
 
     def test_partial_match(self, es_with_collector, search_support_user):
         """Tests partial matching."""

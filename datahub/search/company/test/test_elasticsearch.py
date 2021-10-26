@@ -334,6 +334,7 @@ def test_mapping(es):
     }
 
 
+@pytest.mark.django_db
 def test_get_basic_search_query():
     """Tests basic search query."""
     query = get_basic_search_query(ESCompany, 'test', offset=5, limit=5)
@@ -366,6 +367,8 @@ def test_get_basic_search_query():
                                 'contact.name.trigram',
                                 'contacts.name',
                                 'contacts.name.trigram',
+                                'country',
+                                'country.trigram',
                                 'dit_participants.adviser.name',
                                 'dit_participants.adviser.name.trigram',
                                 'dit_participants.team.name',
@@ -435,6 +438,7 @@ def test_get_basic_search_query():
     }
 
 
+@pytest.mark.django_db
 def test_limited_get_search_by_entity_query():
     """Tests search by entity."""
     expected_query = {
