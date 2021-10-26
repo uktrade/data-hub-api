@@ -26,12 +26,6 @@ class MatchNone(Query):
     name = 'match_none'
 
 
-class CombinedFields(Query):
-    """combined_fields query."""
-
-    name = 'combined_fields'
-
-
 def get_basic_search_query(
         entity,
         term,
@@ -265,7 +259,14 @@ def _build_basic_term_query(term, fields=None):
 
 
 def _build_fuzzy_term_query(term, fields=None):
-    """Builds a fuzzy term query that matches with minor spelling errors etc."""
+    """
+    Builds a fuzzy term query that matches with minor spelling errors etc.
+
+    Since the elasticsearch version on cloudfoundry is only 7.9.3 we are unable
+    to use the 'combined_fields' query which was introduced in version 7.13. This
+    would allow us to do fuzzy matching across different fields. Instead, this
+    does fuzzy matching on each of the trigram fields individually.
+    """
     if term == '':
         return MatchAll()
 
@@ -273,27 +274,22 @@ def _build_fuzzy_term_query(term, fields=None):
         fields = []
 
     trigram_fields = [field for field in fields if field.endswith('.trigram')]
-    non_trigram_fields = list(set(fields) - set(trigram_fields))
 
+    trigram_queries = [
+        Match(**{field: {'query': term, 'minimum_should_match': '50%'}})
+        for field in trigram_fields
+    ]
     should_query = [
         # Promote exact name match
         Match(**{'name.keyword': {'query': term, 'boost': 2}}),
-        Match(**{'name.trigram': {'query': term, 'boost': 1.5, 'minimum_should_match': '60%'}}),
+        *trigram_queries,
         # Cross match fields
         # Non-trigram fields do not fuzzy match
         MultiMatch(
             query=term,
-            fields=non_trigram_fields,
+            fields=fields,
             type='cross_fields',
             operator='and',
-        ),
-        # Combined fields fuzzy matches on multiple fields, but only supported in es>=7.13
-        # Trigram fields use fuzzy matching and must use the 'or' operator
-        CombinedFields(
-            query=term,
-            fields=trigram_fields,
-            operator='or',
-            minimum_should_match='90%',
         ),
     ]
 
