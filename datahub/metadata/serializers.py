@@ -31,6 +31,13 @@ class AdministrativeAreaSerializer(ConstantModelSerializer):
     area_code = serializers.ReadOnlyField()
 
 
+class ExchangeRateSerializer(ConstantModelSerializer):
+    """Exchange rate serializer."""
+
+    name = serializers.ReadOnlyField()
+    exchange_rate = serializers.ReadOnlyField()
+
+
 class CountrySerializer(ConstantModelSerializer):
     """Country serializer."""
 
