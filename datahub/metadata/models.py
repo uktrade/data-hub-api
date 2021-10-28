@@ -115,6 +115,10 @@ class TradeAgreement(BaseConstantModel):
     """Trade agreements for events"""
 
 
+class ExchangeRate(BaseConstantModel):
+    """Exchange rates"""
+
+
 class AdministrativeArea(BaseConstantModel):
     """
     States, provinces etc. within a country.

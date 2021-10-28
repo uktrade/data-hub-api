@@ -104,6 +104,13 @@ class AdministrativeAreaAdmin(ViewOnlyAdmin):
     list_filter = (DisabledOnFilter, 'country')
 
 
+@admin.register(models.ExchangeRate)
+class ExchangeRateAdmin(ViewOnlyAdmin):
+    """View-only admin for exchange rates."""
+
+    fields = ('pk', 'name', 'exchange_rate')
+
+
 @admin.register(models.Country)
 class CountryAdmin(ViewOnlyAdmin):
     """View-only admin for countries."""
