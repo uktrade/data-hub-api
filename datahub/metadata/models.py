@@ -118,6 +118,8 @@ class TradeAgreement(BaseConstantModel):
 class ExchangeRate(BaseConstantModel):
     """Exchange rates"""
 
+    exchange_rate = models.FloatField(blank=False)
+
 
 class AdministrativeArea(BaseConstantModel):
     """

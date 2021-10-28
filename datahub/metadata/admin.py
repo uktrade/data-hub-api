@@ -108,7 +108,9 @@ class AdministrativeAreaAdmin(ViewOnlyAdmin):
 class ExchangeRateAdmin(ViewOnlyAdmin):
     """View-only admin for exchange rates."""
 
-    fields = ('pk', 'name', 'exchange_rate')
+    fields = ('pk', 'name', 'disabled_on', 'exchange_rate')
+    list_display = ('name', 'exchange_rate')
+    search_fields = ('name', 'pk')
 
 
 @admin.register(models.Country)
