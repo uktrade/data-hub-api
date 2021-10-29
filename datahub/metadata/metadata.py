@@ -4,11 +4,11 @@ from datahub.metadata.registry import registry
 from datahub.metadata.serializers import (
     AdministrativeAreaSerializer,
     CountrySerializer,
+    ExchangeRateSerializer,
     InvestmentProjectStageSerializer,
     SectorSerializer,
     ServiceSerializer,
     TeamSerializer,
-    ExchangeRateSerializer,
 )
 
 registry.register(
