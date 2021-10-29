@@ -11,7 +11,9 @@ from mptt.models import MPTTModel, TreeForeignKey
 from datahub.core import reversion
 from datahub.core.exceptions import DataHubError
 from datahub.core.fields import MultipleChoiceField
-from datahub.core.models import BaseConstantModel, BaseOrderedConstantModel, DisableableModel
+from datahub.core.models import (
+    BaseConstantModel, BaseModel, BaseOrderedConstantModel, DisableableModel,
+)
 from datahub.core.utils import join_truthy_strings
 
 
@@ -115,9 +117,11 @@ class TradeAgreement(BaseConstantModel):
     """Trade agreements for events"""
 
 
-class ExchangeRate(BaseConstantModel):
+class ExchangeRate(BaseModel):
     """Exchange rates"""
 
+    from_currency_code = models.CharField(blank=False, max_length=3)
+    to_currency_code = models.CharField(blank=False, max_length=3)
     exchange_rate = models.FloatField(blank=False)
 
 
