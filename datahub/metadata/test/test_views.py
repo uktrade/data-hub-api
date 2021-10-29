@@ -264,7 +264,6 @@ def test_exchange_rate_view(metadata_client):
     exchange_rate = ExchangeRate.objects.first()
     response = metadata_client.get(url)
     assert response.json() == [{
-        'id': str(exchange_rate.pk),
         'from_currency_code': exchange_rate.from_currency_code,
         'to_currency_code': exchange_rate.to_currency_code,
         'exchange_rate': exchange_rate.exchange_rate,
