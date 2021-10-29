@@ -34,7 +34,8 @@ class AdministrativeAreaSerializer(ConstantModelSerializer):
 class ExchangeRateSerializer(ConstantModelSerializer):
     """Exchange rate serializer."""
 
-    name = serializers.ReadOnlyField()
+    from_currency_code = serializers.ReadOnlyField()
+    to_currency_code = serializers.ReadOnlyField()
     exchange_rate = serializers.ReadOnlyField()
 
 
