@@ -37,6 +37,7 @@ class ExchangeRateSerializer(ConstantModelSerializer):
     from_currency_code = serializers.ReadOnlyField()
     to_currency_code = serializers.ReadOnlyField()
     exchange_rate = serializers.ReadOnlyField()
+    created_on = serializers.ReadOnlyField()
 
 
 class CountrySerializer(ConstantModelSerializer):
