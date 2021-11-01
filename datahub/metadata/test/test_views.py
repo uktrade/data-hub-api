@@ -258,7 +258,7 @@ def test_team_view(metadata_client):
 
 def test_exchange_rate_view(metadata_client):
     """
-    Test that exchange rate returns from_currency_code, to_currency_code, exchange_rate and created_on
+    Tests exchange rate returns from_currency_code, to_currency_code, exchange_rate & created_on
     """
     url = reverse(viewname='api-v4:metadata:exchange-rate')
     exchange_rate = ExchangeRate.objects.first()
