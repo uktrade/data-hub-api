@@ -6,7 +6,7 @@ from rest_framework import serializers
 from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from datahub.interaction.models import ServiceAnswerOption, ServiceQuestion
 from datahub.metadata.models import (
-    Country, ExchangeRate, OverseasRegion, Service, TeamRole, UKRegion
+    Country, ExchangeRate, OverseasRegion, Service, TeamRole, UKRegion,
 )
 
 
@@ -45,7 +45,6 @@ class ExchangeRateSerializer(serializers.ModelSerializer):
             'created_on',
         )
         read_only_fields = fields
-
 
 
 class CountrySerializer(ConstantModelSerializer):
