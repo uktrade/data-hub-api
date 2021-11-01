@@ -120,9 +120,9 @@ class TradeAgreement(BaseConstantModel):
 class ExchangeRate(BaseModel):
     """Exchange rates"""
 
-    from_currency_code = models.CharField(blank=False, max_length=3)
-    to_currency_code = models.CharField(blank=False, max_length=3)
-    exchange_rate = models.FloatField(blank=False)
+    from_currency_code = models.CharField(max_length=3)
+    to_currency_code = models.CharField(max_length=3)
+    exchange_rate = models.FloatField()
 
 
 class AdministrativeArea(BaseConstantModel):
