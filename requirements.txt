@@ -27,9 +27,9 @@ billiard==3.6.4.0
     # via
     #   -r requirements.in
     #   celery
-boto3==1.19.2
+boto3==1.19.7
     # via -r requirements.in
-botocore==1.22.2
+botocore==1.22.7
     # via
     #   boto3
     #   s3transfer
@@ -112,7 +112,7 @@ elasticsearch-dsl==7.4.0
     # via -r requirements.in
 execnet==1.9.0
     # via pytest-xdist
-factory-boy==3.2.0
+factory-boy==3.2.1
     # via -r requirements.in
 faker==8.14.0
     # via factory-boy
@@ -168,7 +168,7 @@ incremental==21.3.0
     # via towncrier
 iniconfig==1.1.1
     # via pytest
-ipython==7.28.0
+ipython==7.29.0
     # via -r requirements.in
 jedi==0.18.0
     # via ipython
