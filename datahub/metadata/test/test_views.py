@@ -10,7 +10,7 @@ from rest_framework.reverse import reverse
 from datahub.core.test_utils import format_date_or_datetime
 from datahub.interaction.models import ServiceAnswerOption
 from datahub.metadata import urls
-from datahub.metadata.models import AdministrativeArea, Country, Sector, Service
+from datahub.metadata.models import AdministrativeArea, Country, ExchangeRate, Sector, Service
 from datahub.metadata.registry import registry
 from datahub.metadata.test.factories import ServiceFactory
 
@@ -254,6 +254,21 @@ def test_team_view(metadata_client):
         },
         'disabled_on': '2013-03-31T16:21:07Z',
     }
+
+
+def test_exchange_rate_view(metadata_client):
+    """
+    Tests exchange rate returns from_currency_code, to_currency_code, exchange_rate & created_on
+    """
+    url = reverse(viewname='api-v4:metadata:exchange-rate')
+    exchange_rate = ExchangeRate.objects.first()
+    response = metadata_client.get(url)
+    assert response.json() == [{
+        'from_currency_code': exchange_rate.from_currency_code,
+        'to_currency_code': exchange_rate.to_currency_code,
+        'exchange_rate': exchange_rate.exchange_rate,
+        'created_on': format_date_or_datetime(exchange_rate.created_on),
+    }]
 
 
 def test_autocomplete_teams_view(metadata_client):
