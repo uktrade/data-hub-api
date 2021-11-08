@@ -85,7 +85,11 @@ def get_expected_data_from_company(company):
         'vat_number': company.vat_number,
         'website': company.website,
     }
-    #TODO
+    if data['turnover']:
+        data['turnover_gbp'] = convert_usd_to_gbp(data['turnover'])
+    else:
+        data['turnover_gbp'] = None
+
     return data
 
 
@@ -118,11 +122,18 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
         expected_result = get_expected_data_from_company(company)
         assert result == expected_result
 
+    @pytest.mark.parametrize(
+        'company_factory', (
+            CompanyWithAreaFactory,
+            ArchivedCompanyFactory,
+        ),
+    )
     def test_turnover_null(self, data_flow_api_client, company_factory):
-        # Setup
+        """Test that endpoint returns with expected data for a null turnover value"""
         company = company_factory()
         company.created_by = None
         company.created_on = None
+        company.turnover = None
         company.save()
 
         response = data_flow_api_client.get(self.view_url)
