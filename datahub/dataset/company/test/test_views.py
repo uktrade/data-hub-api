@@ -11,6 +11,7 @@ from datahub.company.test.factories import (
 )
 from datahub.core.test_utils import format_date_or_datetime, get_attr_or_none
 from datahub.dataset.core.test import BaseDatasetViewTest
+from datahub.metadata.utils import convert_usd_to_gbp
 
 
 def get_expected_data_from_company(company):
@@ -80,6 +81,7 @@ def get_expected_data_from_company(company):
         'export_sub_segment': company.export_sub_segment,
         'trading_names': company.trading_names,
         'turnover': company.turnover,
+        'turnover_gbp': convert_usd_to_gbp(company.turnover),
         'uk_region__name': get_attr_or_none(company, 'uk_region.name'),
         'vat_number': company.vat_number,
         'website': company.website,
