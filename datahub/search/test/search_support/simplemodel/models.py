@@ -14,9 +14,17 @@ class ESSimpleModel(BaseESModel):
             'trigram': fields.TrigramText(),
         },
     )
+    country = Text(
+        fields={
+            'keyword': fields.NormalizedKeyword(),
+            'trigram': fields.TrigramText(),
+        },
+    )
     date = Date()
 
     SEARCH_FIELDS = (
         'name',
         'name.trigram',
+        'country',
+        'country.trigram',
     )

@@ -7,5 +7,6 @@ class SearchSimpleModelSerializer(EntitySearchQuerySerializer):
     """Serialiser used to validate simple model search POST bodies."""
 
     name = serializers.CharField(required=False)
+    country = serializers.CharField(required=False)
 
     SORT_BY_FIELDS = ('date', 'name')
