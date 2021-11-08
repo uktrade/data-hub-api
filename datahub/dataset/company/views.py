@@ -67,4 +67,6 @@ class CompaniesDatasetView(BaseDatasetView):
         for data in dataset:
             if data.get('turnover'):
                 data['turnover_gbp'] = convert_usd_to_gbp(data['turnover'])
+            else:
+                data['turnover_gbp'] = None
         return super()._enrich_data(dataset)

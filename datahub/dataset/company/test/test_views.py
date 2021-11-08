@@ -16,7 +16,7 @@ from datahub.metadata.utils import convert_usd_to_gbp
 
 def get_expected_data_from_company(company):
     """Returns company data as a dictionary"""
-    return {
+    data = {
         'address_1': company.address_1,
         'address_2': company.address_2,
         'address_county': company.address_county,
@@ -81,11 +81,12 @@ def get_expected_data_from_company(company):
         'export_sub_segment': company.export_sub_segment,
         'trading_names': company.trading_names,
         'turnover': company.turnover,
-        'turnover_gbp': convert_usd_to_gbp(company.turnover),
         'uk_region__name': get_attr_or_none(company, 'uk_region.name'),
         'vat_number': company.vat_number,
         'website': company.website,
     }
+    #TODO
+    return data
 
 
 @pytest.mark.django_db
@@ -112,6 +113,23 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
+        assert len(response_results) == 1
+        result = response_results[0]
+        expected_result = get_expected_data_from_company(company)
+        assert result == expected_result
+
+    def test_turnover_null(self, data_flow_api_client, company_factory):
+        # Setup
+        company = company_factory()
+        company.created_by = None
+        company.created_on = None
+        company.save()
+
+        response = data_flow_api_client.get(self.view_url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_results = response.json()['results']
+
         assert len(response_results) == 1
         result = response_results[0]
         expected_result = get_expected_data_from_company(company)
