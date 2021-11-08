@@ -13,7 +13,9 @@ from elasticsearch_dsl.query import (
     Term,
 )
 
+from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.search.apps import EXCLUDE_ALL, get_global_search_apps_as_mapping
+from datahub.search.constants import FUZZY_SEARCH_FEATURE_FLAG
 
 MAX_RESULTS = 10000
 
@@ -221,6 +223,22 @@ def _build_entity_permission_query(permission_filters):
 
 
 def _build_term_query(term, fields=None):
+    """
+    Builds a term query depending on the active feature flags.
+
+    If the `fuzzy_search` flag is active then we use fuzzy matching,
+    otherwise uses the old matching method.
+
+    TODO: once the new search has been trialled and accepted, remove
+    the feature flag and use fuzzy matching.
+    """
+    if is_feature_flag_active(FUZZY_SEARCH_FEATURE_FLAG):
+        return _build_fuzzy_term_query(term, fields)
+    else:
+        return _build_basic_term_query(term, fields)
+
+
+def _build_basic_term_query(term, fields=None):
     """Builds a term query."""
     if term == '':
         return MatchAll()
@@ -229,6 +247,44 @@ def _build_term_query(term, fields=None):
         # Promote exact name match
         Match(**{'name.keyword': {'query': term, 'boost': 2}}),
         # Cross match fields
+        MultiMatch(
+            query=term,
+            fields=fields,
+            type='cross_fields',
+            operator='and',
+        ),
+    ]
+
+    return Bool(should=should_query)
+
+
+def _build_fuzzy_term_query(term, fields=None):
+    """
+    Builds a fuzzy term query that matches with minor spelling errors etc.
+
+    Since the elasticsearch version on cloudfoundry is only 7.9.3 we are unable
+    to use the 'combined_fields' query which was introduced in version 7.13. This
+    would allow us to do fuzzy matching across different fields. Instead, this
+    does fuzzy matching on each of the trigram fields individually.
+    """
+    if term == '':
+        return MatchAll()
+
+    if fields is None:
+        fields = []
+
+    trigram_fields = [field for field in fields if field.endswith('.trigram')]
+
+    trigram_queries = [
+        Match(**{field: {'query': term, 'minimum_should_match': '50%'}})
+        for field in trigram_fields
+    ]
+    should_query = [
+        # Promote exact name match
+        Match(**{'name.keyword': {'query': term, 'boost': 2}}),
+        *trigram_queries,
+        # Cross match fields
+        # Non-trigram fields do not fuzzy match
         MultiMatch(
             query=term,
             fields=fields,
