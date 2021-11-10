@@ -13,3 +13,12 @@ When searching, for example via `/v3/search?term=<term>`, the term will now matc
 - registered_address.line_2.trigram
 - registered_address.town.trigram
 - registered_address.county.trigram
+
+**Contacts**
+
+- name_with_title
+- job_title
+- job_title.trigram
+- full_telephone_number (telephone number with country code)
+- telephone_number
+- telephone_alternative
