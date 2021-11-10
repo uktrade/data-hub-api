@@ -529,8 +529,10 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         """
         :returns: Turnover value in GBP if turnover is not None, otherwise return None
         """
-        if obj.turnover:
+        if obj.turnover is not None:
             return convert_usd_to_gbp(obj.turnover)
+        else:
+            return None
 
     def create(self, validated_data):
         """
