@@ -11,11 +11,12 @@ from datahub.company.test.factories import (
 )
 from datahub.core.test_utils import format_date_or_datetime, get_attr_or_none
 from datahub.dataset.core.test import BaseDatasetViewTest
+from datahub.metadata.utils import convert_usd_to_gbp
 
 
 def get_expected_data_from_company(company):
     """Returns company data as a dictionary"""
-    return {
+    data = {
         'address_1': company.address_1,
         'address_2': company.address_2,
         'address_county': company.address_county,
@@ -84,6 +85,12 @@ def get_expected_data_from_company(company):
         'vat_number': company.vat_number,
         'website': company.website,
     }
+    if data['turnover'] is not None:
+        data['turnover_gbp'] = convert_usd_to_gbp(data['turnover'])
+    else:
+        data['turnover_gbp'] = None
+
+    return data
 
 
 @pytest.mark.django_db
@@ -110,6 +117,30 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
+        assert len(response_results) == 1
+        result = response_results[0]
+        expected_result = get_expected_data_from_company(company)
+        assert result == expected_result
+
+    @pytest.mark.parametrize(
+        'company_factory', (
+            CompanyWithAreaFactory,
+            ArchivedCompanyFactory,
+        ),
+    )
+    def test_turnover_null(self, data_flow_api_client, company_factory):
+        """Test that endpoint returns with expected data for a null turnover value"""
+        company = company_factory()
+        company.created_by = None
+        company.created_on = None
+        company.turnover = None
+        company.save()
+
+        response = data_flow_api_client.get(self.view_url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_results = response.json()['results']
+
         assert len(response_results) == 1
         result = response_results[0]
         expected_result = get_expected_data_from_company(company)
