@@ -434,7 +434,6 @@ class TestGetCompany(APITestMixin):
 
         Checks that the endpoint returns 200
         """
-        FeatureFlagFactory(code='address-area-company-required-field')
         company = CompanyFactory(
             address_country_id=country_id,
             address_area_id=None,
@@ -1184,7 +1183,6 @@ class TestUpdateCompany(APITestMixin):
     )
     def test_validation_error(self, data, expected_error):
         """Test validation scenarios."""
-        FeatureFlagFactory(code='address-area-company-required-field')
         company = CompanyFactory(
             registered_address_1='',
             registered_address_2='',
@@ -1846,7 +1844,7 @@ class TestAddCompany(APITestMixin):
                         ],
                     },
                 },
-                ['address-area-company-required-field'],
+                [],
             ),
             # for US company postcode is required
             (

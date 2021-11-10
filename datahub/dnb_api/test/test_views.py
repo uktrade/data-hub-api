@@ -2110,7 +2110,6 @@ class TestCompanyInvestigationView(APITestMixin):
         The endpoint should return 200 as well as a valid response when it is hit with a valid
         payload of full investigation details.
         """
-        FeatureFlagFactory(code='company-area-investigation-request')
 
         company = CompanyFactory(
             address_area_id=constants.AdministrativeArea.new_york.value.id,

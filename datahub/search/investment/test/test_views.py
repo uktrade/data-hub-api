@@ -1397,7 +1397,6 @@ class TestInvestmentProjectExportView(APITestMixin):
         """Test export of investment project search results."""
         url = reverse('api-v3:search:investment_project-export')
 
-        FeatureFlagFactory(code='address-area-company-search')
         InvestmentProjectFactory()
         InvestmentProjectFactory(cdms_project_code='cdms-code')
         VerifyWinInvestmentProjectFactory()
