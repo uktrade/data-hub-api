@@ -1,6 +1,7 @@
 from collections import Counter
 from functools import partial
 from operator import not_
+from typing import Optional
 from uuid import UUID
 
 from django.conf import settings
@@ -54,6 +55,7 @@ from datahub.core.validators import (
 )
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import TeamWithGeographyField
+from datahub.metadata.utils import convert_usd_to_gbp
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -402,6 +404,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     turnover_range = NestedRelatedField(
         meta_models.TurnoverRange, required=False, allow_null=True,
     )
+    turnover_gbp = serializers.SerializerMethodField()
     uk_region = NestedRelatedField(
         meta_models.UKRegion, required=False, allow_null=True,
     )
@@ -522,6 +525,15 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         field = NestedAdviserWithEmailAndTeamGeographyField()
         return field.to_representation(global_account_manager)
 
+    def get_turnover_gbp(self, obj) -> Optional[float]:
+        """
+        :returns: Turnover value in GBP if turnover is not None, otherwise return None
+        """
+        if obj.turnover is not None:
+            return convert_usd_to_gbp(obj.turnover)
+        else:
+            return None
+
     def create(self, validated_data):
         """
         Override create method to ensure that all Company objects created through this serializer
@@ -570,6 +582,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'sector',
             'turnover_range',
             'turnover',
+            'turnover_gbp',
             'is_turnover_estimated',
             'uk_region',
             'export_experience_category',
@@ -594,6 +607,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'transfer_reason',
             'duns_number',
             'turnover',
+            'turnover_gbp',
             'is_turnover_estimated',
             'number_of_employees',
             'is_number_of_employees_estimated',
@@ -1001,6 +1015,7 @@ class PublicCompanySerializer(CompanySerializer):
             'transferred_on',
             'transferred_to',
             'turnover',
+            'turnover_gbp',
             'turnover_range',
             'uk_based',
             'uk_region',

@@ -1,3 +1,17 @@
+# Data Hub API 39.2.0 (2021-11-10)
+## Features
+
+- The search endpoints now utilise fuzzy search when the "fuzzy-search" feature flag is active.
+
+  This gets matches even when spellings are a little different.
+
+## API
+
+- **Companies** Add `turnover_gbp` field to GET responses for `/v4/company` and `/v4/company/{id}`, which represents the turnover (stored and returned by API in USD) converted to Great British Pounds (GBP) using the latest exchange rate stored in Data Hub API
+- **Companies** Add `turnover_gbp` field to GET responses for `/v4/dataset/companies-dataset` which represents the turnover (stored and returned by API in USD) converted to Great British Pounds (GBP) using the latest exchange rate stored in Data Hub API
+- DataHub API now stores and serves exchange rate data
+
+
 # Data Hub API 39.1.0 (2021-10-25)
 ## Removals
 

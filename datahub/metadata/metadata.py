@@ -4,6 +4,7 @@ from datahub.metadata.registry import registry
 from datahub.metadata.serializers import (
     AdministrativeAreaSerializer,
     CountrySerializer,
+    ExchangeRateSerializer,
     InvestmentProjectStageSerializer,
     SectorSerializer,
     ServiceSerializer,
@@ -13,6 +14,12 @@ from datahub.metadata.serializers import (
 registry.register(
     metadata_id='trade-agreement',
     model=models.TradeAgreement,
+)
+
+registry.register(
+    metadata_id='exchange-rate',
+    model=models.ExchangeRate,
+    serializer=ExchangeRateSerializer,
 )
 
 registry.register(

@@ -1,3 +1,4 @@
+import pytest
 from elasticsearch_dsl import Mapping
 
 from datahub.search.contact import ContactSearchApp
@@ -261,6 +262,7 @@ def test_mapping(es):
     }
 
 
+@pytest.mark.django_db
 def test_get_basic_search_query():
     """Tests basic search query."""
     expected_query = {
@@ -291,6 +293,8 @@ def test_get_basic_search_query():
                                 'contact.name.trigram',
                                 'contacts.name',
                                 'contacts.name.trigram',
+                                'country',
+                                'country.trigram',
                                 'dit_participants.adviser.name',
                                 'dit_participants.adviser.name.trigram',
                                 'dit_participants.team.name',
@@ -364,6 +368,7 @@ def test_get_basic_search_query():
     assert query.to_dict() == expected_query
 
 
+@pytest.mark.django_db
 def test_get_limited_search_by_entity_query():
     """Tests search by entity."""
     date = '2017-06-13T09:44:31.062870'
