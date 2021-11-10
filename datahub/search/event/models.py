@@ -17,7 +17,7 @@ class Event(BaseESModel):
     created_on = Date()
     disabled_on = Date()
     end_date = Date()
-    event_type = fields.id_name_field()
+    event_type = fields.id_name_partial_field()
     lead_team = fields.id_name_field()
     location_type = fields.id_name_field()
     modified_on = Date()
@@ -61,4 +61,6 @@ class Event(BaseESModel):
         'teams.name.trigram',
         'related_programmes.name',
         'related_programmes.name.trigram',
+        'event_type.name',
+        'event_type.name.trigram',
     )

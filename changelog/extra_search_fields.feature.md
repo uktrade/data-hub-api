@@ -22,3 +22,8 @@ When searching, for example via `/v3/search?term=<term>`, the term will now matc
 - full_telephone_number (telephone number with country code)
 - telephone_number
 - telephone_alternative
+
+**Events**
+
+- event_type
+- event_type.trigram
