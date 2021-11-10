@@ -1,6 +1,7 @@
 from datahub.company.models import Company
 from datahub.dataset.core.views import BaseDatasetView
 from datahub.metadata.query_utils import get_sector_name_subquery
+from datahub.metadata.utils import convert_usd_to_gbp
 
 
 class CompaniesDatasetView(BaseDatasetView):
@@ -61,3 +62,11 @@ class CompaniesDatasetView(BaseDatasetView):
             'vat_number',
             'website',
         )
+
+    def _enrich_data(self, dataset):
+        for data in dataset:
+            if data.get('turnover') is not None:
+                data['turnover_gbp'] = convert_usd_to_gbp(data['turnover'])
+            else:
+                data['turnover_gbp'] = None
+        return super()._enrich_data(dataset)

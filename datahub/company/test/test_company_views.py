@@ -36,6 +36,7 @@ from datahub.core.test_utils import (
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
+from datahub.metadata.utils import convert_usd_to_gbp
 
 
 class TestListCompanies(APITestMixin):
@@ -357,6 +358,7 @@ class TestGetCompany(APITestMixin):
                 'name': company.turnover_range.name,
             },
             'turnover': company.turnover,
+            'turnover_gbp': convert_usd_to_gbp(company.turnover),
             'is_turnover_estimated': company.is_turnover_estimated,
             'website': company.website,
             'global_headquarters': {
