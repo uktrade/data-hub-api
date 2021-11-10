@@ -1,0 +1,1 @@
+Add `turnover_gbp` field to GET responses for `/v4/company` and `/v4/company/{id}`, which represents the turnover (stored and returned by API in USD) converted to Great British Pounds (GBP) using the latest exchange rate stored in Data Hub API
