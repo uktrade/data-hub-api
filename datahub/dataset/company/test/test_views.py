@@ -85,7 +85,7 @@ def get_expected_data_from_company(company):
         'vat_number': company.vat_number,
         'website': company.website,
     }
-    if data['turnover']:
+    if data['turnover'] is not None:
         data['turnover_gbp'] = convert_usd_to_gbp(data['turnover'])
     else:
         data['turnover_gbp'] = None
