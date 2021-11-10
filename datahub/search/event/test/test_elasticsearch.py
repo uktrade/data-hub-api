@@ -60,8 +60,17 @@ def test_mapping(es):
                 'properties': {
                     'id': {'type': 'keyword'},
                     'name': {
-                        'normalizer': 'lowercase_asciifolding_normalizer',
-                        'type': 'keyword',
+                        'type': 'text',
+                        'fields': {
+                            'keyword': {
+                                'normalizer': 'lowercase_asciifolding_normalizer',
+                                'type': 'keyword',
+                            },
+                            'trigram': {
+                                'analyzer': 'trigram_analyzer',
+                                'type': 'text',
+                            },
+                        },
                     },
                 },
                 'type': 'object',
