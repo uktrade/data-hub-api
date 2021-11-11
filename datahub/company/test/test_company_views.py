@@ -1502,7 +1502,7 @@ class TestAddCompany(APITestMixin):
                     },
                     'registered_address': None,
                 },
-                ['address-postcode-company-required-field'],
+                [],
             ),
             # Canadian company
             (
@@ -1537,7 +1537,7 @@ class TestAddCompany(APITestMixin):
                     },
                     'registered_address': None,
                 },
-                ['address-postcode-company-required-field'],
+                [],
             ),
             # promote a CH company
             (
@@ -1856,7 +1856,9 @@ class TestAddCompany(APITestMixin):
                         'country': {
                             'id': Country.united_states.value.id,
                         },
-                        'address_area': AdministrativeArea.alabama.value.id,
+                        'area': {
+                            'id': AdministrativeArea.alabama.value.id,
+                        }
                     },
                 },
                 {
@@ -1866,7 +1868,7 @@ class TestAddCompany(APITestMixin):
                         ],
                     },
                 },
-                ['address-postcode-company-required-field'],
+                [],
             ),
             # for Canadian company postcode is required
             (
@@ -1878,7 +1880,10 @@ class TestAddCompany(APITestMixin):
                         'country': {
                             'id': Country.canada.value.id,
                         },
-                        'address_area': AdministrativeArea.quebec.value.id,
+                        'area': {
+                            'id':AdministrativeArea.quebec.value.id,
+                        }
+
                     },
                 },
                 {
@@ -1888,7 +1893,7 @@ class TestAddCompany(APITestMixin):
                         ],
                     },
                 },
-                ['address-postcode-company-required-field'],
+                [],
             ),
         ),
     )

@@ -431,14 +431,11 @@ class AddressSerializer(serializers.ModelSerializer):
         """
         validators = super().get_validators()
 
-        if (
-            self.postcode_can_be_required
-            and is_feature_flag_active('address-postcode-company-required-field')
-        ):
-            self.add_postcode_validator(validators)
-
         if self.area_can_be_required:
             self.add_area_validator(validators)
+
+        if self.postcode_can_be_required:
+            self.add_postcode_validator(validators)
 
         return validators
 
