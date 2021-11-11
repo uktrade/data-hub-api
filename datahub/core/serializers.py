@@ -12,7 +12,6 @@ from rest_framework.fields import ReadOnlyField, UUIDField
 from datahub.core.constants import Country as CountryEnum
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import InRule, OperatorRule, RulesBasedValidator, ValidationRule
-from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata.models import AdministrativeArea, Country
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH

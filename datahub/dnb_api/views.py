@@ -37,7 +37,6 @@ from datahub.dnb_api.utils import (
     request_changes,
     search_dnb,
 )
-from datahub.feature_flag.utils import is_feature_flag_active
 
 
 logger = logging.getLogger(__name__)

@@ -18,7 +18,6 @@ from datahub.core.query_utils import (
     get_full_name_expression,
     get_string_agg_subquery,
 )
-from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.investment.project.models import InvestmentProject as DBInvestmentProject
 from datahub.investment.project.query_utils import get_project_code_expression
 from datahub.metadata.query_utils import get_sector_name_subquery

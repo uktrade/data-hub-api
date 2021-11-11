@@ -17,7 +17,6 @@ from datahub.dnb_api.constants import (
     ALL_DNB_UPDATED_SERIALIZER_FIELDS,
 )
 from datahub.dnb_api.serializers import DNBCompanySerializer
-from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata.models import AdministrativeArea, Country
 
 logger = logging.getLogger(__name__)

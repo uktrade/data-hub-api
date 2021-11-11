@@ -1081,7 +1081,6 @@ class TestCompanyExportView(APITestMixin):
         orm_ordering,
     ):
         """Test export of company search results."""
-
         companies_1 = CompanyFactory.create_batch(
             3,
             turnover=None,

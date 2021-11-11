@@ -26,7 +26,6 @@ from datahub.dnb_api.utils import (
     DNBServiceTimeoutError,
     format_dnb_company,
 )
-from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.models import InteractionPermission
 from datahub.metadata.models import Country
 
@@ -2110,7 +2109,6 @@ class TestCompanyInvestigationView(APITestMixin):
         The endpoint should return 200 as well as a valid response when it is hit with a valid
         payload of full investigation details.
         """
-
         company = CompanyFactory(
             address_area_id=constants.AdministrativeArea.new_york.value.id,
         )

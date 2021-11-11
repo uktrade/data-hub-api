@@ -1858,7 +1858,7 @@ class TestAddCompany(APITestMixin):
                         },
                         'area': {
                             'id': AdministrativeArea.alabama.value.id,
-                        }
+                        },
                     },
                 },
                 {
@@ -1881,9 +1881,8 @@ class TestAddCompany(APITestMixin):
                             'id': Country.canada.value.id,
                         },
                         'area': {
-                            'id':AdministrativeArea.quebec.value.id,
-                        }
-
+                            'id': AdministrativeArea.quebec.value.id,
+                        },
                     },
                 },
                 {
