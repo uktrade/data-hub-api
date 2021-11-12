@@ -9,6 +9,7 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.company.test.utils import address_area_or_none
 from datahub.core.constants import Country
 from datahub.core.test_utils import format_date_or_datetime
+from datahub.metadata.utils import convert_usd_to_gbp
 
 
 @pytest.fixture
@@ -178,6 +179,7 @@ class TestPublicCompanyViewSet:
                 'name': company.turnover_range.name,
             },
             'turnover': company.turnover,
+            'turnover_gbp': convert_usd_to_gbp(company.turnover),
             'website': company.website,
         }
 
