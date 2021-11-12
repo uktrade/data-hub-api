@@ -13,7 +13,7 @@ from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import AdminTestMixin, create_test_user
 
 
-DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
+DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/search/')
 
 
 class TestUpdateFromDNB(AdminTestMixin):
@@ -40,7 +40,7 @@ class TestUpdateFromDNB(AdminTestMixin):
         """
         change_url, update_url = self._create_company(duns_number='123456789')
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json=dnb_response,
         )
         response = self.client.get(change_url)
@@ -86,7 +86,7 @@ class TestUpdateFromDNB(AdminTestMixin):
             pending_dnb_investigation=True,
         )
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json=dnb_response,
         )
         response = self.client.post(update_url)
@@ -128,7 +128,7 @@ class TestUpdateFromDNB(AdminTestMixin):
         """
         _, update_url = self._create_company(duns_number='123456789')
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             status_code=dnb_response_code,
         )
         response = self.client.post(update_url)
@@ -167,7 +167,7 @@ class TestUpdateFromDNB(AdminTestMixin):
         """
         _, update_url = self._create_company(duns_number='123456789')
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json={'results': search_results},
         )
         response = self.client.post(update_url)
@@ -190,7 +190,7 @@ class TestUpdateFromDNB(AdminTestMixin):
         _, update_url = self._create_company(duns_number='123456789')
         dnb_response['results'][0]['primary_name'] = None
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json=dnb_response,
         )
         response = self.client.post(update_url)
