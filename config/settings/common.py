@@ -238,6 +238,9 @@ else:
     MIDDLEWARE.extend(['axes.middleware.AxesMiddleware'])
     AUTHENTICATION_BACKENDS.extend(['axes.backends.AxesBackend'])
 
+# Set the session cookie in admin, defaults to 20 minutes
+SESSION_COOKIE_AGE = env('SESSION_COOKIE_AGE', default=20 * 60)
+
 # Staff SSO integration settings
 
 SSO_ENABLED = env.bool('SSO_ENABLED')
