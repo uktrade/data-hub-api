@@ -27,3 +27,20 @@ When searching, for example via `/v3/search?term=<term>`, the term will now matc
 
 - event_type
 - event_type.trigram
+
+
+**Interactions**
+
+- companies.name
+- companies.name.trigram
+- service.name
+- service.name.trigram
+
+**Investment Projects**
+
+- sector.name
+
+**Orders**
+
+- sector.name
+- uk_region.name
