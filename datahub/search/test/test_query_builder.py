@@ -227,6 +227,7 @@ def test_build_term_query(term, expected):
                                 'name.trigram': {
                                     'query': 'hello',
                                     'minimum_should_match': '50%',
+                                    'boost': 1.5,
                                 },
                             },
                         },
@@ -234,7 +235,8 @@ def test_build_term_query(term, expected):
                             'match': {
                                 'country.trigram': {
                                     'query': 'hello',
-                                    'minimum_should_match': '50%',
+                                    'minimum_should_match': '70%',
+                                    'boost': 1,
                                 },
                             },
                         },

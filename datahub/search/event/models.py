@@ -54,7 +54,7 @@ class Event(BaseESModel):
         'name',
         'name.trigram',
         'address_country.name.trigram',
-        'address_postcode.trigram',
+        'address_postcode',
         'uk_region.name.trigram',
         'organiser.name.trigram',
         'teams.name',
