@@ -108,9 +108,9 @@ class Company(BaseESModel):
         'reference_code',
 
         'address.country.name.trigram',
-        'address.postcode.trigram',
+        'address.postcode',
         'address.area.name.trigram',
         'registered_address.country.name.trigram',
-        'registered_address.postcode.trigram',
+        'registered_address.postcode',
         'registered_address.area.name.trigram',
     )
