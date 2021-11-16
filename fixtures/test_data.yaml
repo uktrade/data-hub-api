@@ -150,9 +150,12 @@
     registered_address_postcode: NE28 5JB
     registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
-    description: This is a dummy company for testing
+    description: This is a dummy company for testing with all the fields for data-flow
     created_on: '2016-06-05T12:00:00Z'
     modified_on: '2016-07-05T12:00:00Z'
+    export_experience_category: b9b88464-6ffb-47e7-bb60-b1fc376bf949
+    website: https://iamawebsite.com
+    created_by: 7bad8082-4978-4fe8-a018-740257f01637
 
 - model: company.company
   pk: 0f5216e0-849f-11e6-ae22-56b6b6499611

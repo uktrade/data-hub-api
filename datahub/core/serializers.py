@@ -12,7 +12,6 @@ from rest_framework.fields import ReadOnlyField, UUIDField
 from datahub.core.constants import Country as CountryEnum
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import InRule, OperatorRule, RulesBasedValidator, ValidationRule
-from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata.models import AdministrativeArea, Country
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -430,17 +429,13 @@ class AddressSerializer(serializers.ModelSerializer):
         safe to require is CompanySerializer
         """
         validators = super().get_validators()
-        if (
-            self.area_can_be_required
-            and is_feature_flag_active('address-area-company-required-field')
-        ):
+
+        if self.area_can_be_required:
             self.add_area_validator(validators)
 
-        if (
-            self.postcode_can_be_required
-            and is_feature_flag_active('address-postcode-company-required-field')
-        ):
+        if self.postcode_can_be_required:
             self.add_postcode_validator(validators)
+
         return validators
 
     def run_validation(self, data=serializers.empty):

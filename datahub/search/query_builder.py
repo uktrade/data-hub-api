@@ -276,7 +276,13 @@ def _build_fuzzy_term_query(term, fields=None):
     trigram_fields = [field for field in fields if field.endswith('.trigram')]
 
     trigram_queries = [
-        Match(**{field: {'query': term, 'minimum_should_match': '50%'}})
+        Match(**{
+            field: {
+                'query': term,
+                'minimum_should_match': '50%' if field == 'name.trigram' else '70%',
+                'boost': 1.5 if field == 'name.trigram' else 1,
+            },
+        })
         for field in trigram_fields
     ]
     should_query = [

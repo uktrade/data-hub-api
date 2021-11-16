@@ -26,11 +26,10 @@ from datahub.dnb_api.utils import (
     DNBServiceTimeoutError,
     format_dnb_company,
 )
-from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.models import InteractionPermission
-from datahub.metadata.models import Country
+from datahub.metadata.models import AdministrativeArea, Country
 
-DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
+DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/search/')
 DNB_CHANGE_REQUEST_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'change-request/')
 DNB_INVESTIGATION_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'investigation/')
 
@@ -62,7 +61,7 @@ class TestDNBAPICommon(APITestMixin):
         """
         Ensure that a non-authenticated request gets a 401.
         """
-        requests_mock.post(DNB_SEARCH_URL)
+        requests_mock.post(DNB_V2_SEARCH_URL)
 
         unauthorised_api_client = self.create_api_client()
         unauthorised_api_client.credentials(HTTP_AUTHORIZATION='foo')
@@ -111,7 +110,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         Test that 406 is returned if Content Type is not application/json.
         """
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             status_code=status.HTTP_200_OK,
             json=dnb_response_non_uk,
         )
@@ -198,7 +197,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         Test for POST proxy.
         """
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             status_code=response_status_code,
             content=upstream_response_content,
             headers={'content-type': 'application/json'},
@@ -296,7 +295,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         Test for POST proxy permissions.
         """
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             status_code=response_status_code,
             content=upstream_response_content,
         )
@@ -334,7 +333,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         statsd_mock = Mock()
         monkeypatch.setattr('datahub.dnb_api.utils.statsd', statsd_mock)
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             status_code=response_status_code,
             json={},
         )
@@ -359,6 +358,11 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         country = Country.objects.filter(
             iso_alpha2_code=dnb_company['address_country'],
         ).first()
+
+        area = AdministrativeArea.objects.filter(
+            area_code=dnb_company['address_area_abbrev_name'],
+        ).first() if dnb_company.get('address_area_abbrev_name') else None
+
         registered_country = Country.objects.filter(
             iso_alpha2_code=dnb_company['registered_address_country'],
         ).first() if dnb_company.get('registered_address_country') else None
@@ -390,7 +394,10 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             'name': dnb_company['primary_name'],
             'trading_names': dnb_company['trading_names'],
             'address': {
-                'area': None,
+                'area': {
+                    'id': str(area.id),
+                    'name': area.name,
+                } if area is not None else None,
                 'country': {
                     'id': str(country.id),
                     'name': country.name,
@@ -470,7 +477,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         Test create-company endpoint for a non-uk company.
         """
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json=dnb_response_non_uk,
         )
 
@@ -504,7 +511,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         Test create-company endpoint for a UK company.
         """
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json=dnb_response_uk,
         )
 
@@ -586,7 +593,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
 
         """
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json={'results': results},
         )
 
@@ -623,7 +630,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         """
         dnb_response_uk['results'][0].pop(missing_required_field)
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json=dnb_response_uk,
         )
 
@@ -670,7 +677,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         """
         dnb_response_uk['results'][0].update(field_overrides)
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json=dnb_response_uk,
         )
 
@@ -727,7 +734,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         """
         dnb_response_uk['results'][0]['address_country'] = 'FOO'
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json=dnb_response_uk,
         )
 
@@ -760,7 +767,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         """
         dnb_response_uk['results'][0]['global_ultimate_duns_number'] = global_ultimate_override
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json=dnb_response_uk,
         )
 
@@ -795,7 +802,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         that does not exist in DataHub.
         """
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             status_code=status_code,
         )
 
@@ -817,7 +824,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         that does not exist in DataHub.
         """
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             exc=ConnectionError('An error occurred'),
         )
 
@@ -849,7 +856,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         have the necessary permissions.
         """
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json=dnb_response_uk,
         )
 
@@ -887,7 +894,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         statsd_mock = Mock()
         monkeypatch.setattr('datahub.dnb_api.utils.statsd', statsd_mock)
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             status_code=response_status_code,
             json={},
         )
@@ -914,7 +921,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         statsd_mock = Mock()
         monkeypatch.setattr('datahub.dnb_api.views.statsd', statsd_mock)
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             status_code=status.HTTP_200_OK,
             json=dnb_response_uk,
         )
@@ -1033,7 +1040,7 @@ class TestCompanyLinkView(APITestMixin):
         """
         company = CompanyFactory()
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             status_code=status_code,
         )
 
@@ -1094,7 +1101,7 @@ class TestCompanyLinkView(APITestMixin):
         """
         company = CompanyFactory()
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             status_code=status.HTTP_200_OK,
             json={'results': []},
         )
@@ -1120,7 +1127,7 @@ class TestCompanyLinkView(APITestMixin):
         """
         company = CompanyFactory()
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             status_code=status.HTTP_200_OK,
             json=dnb_response_uk,
         )
@@ -2110,8 +2117,6 @@ class TestCompanyInvestigationView(APITestMixin):
         The endpoint should return 200 as well as a valid response when it is hit with a valid
         payload of full investigation details.
         """
-        FeatureFlagFactory(code='company-area-investigation-request')
-
         company = CompanyFactory(
             address_area_id=constants.AdministrativeArea.new_york.value.id,
         )
