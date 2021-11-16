@@ -298,11 +298,12 @@ class ChangeRequestSerializer(serializers.Serializer):
     trading_names = serializers.ListField(required=False)
     number_of_employees = serializers.IntegerField(source='employee_number', required=False)
 
-    #the turnover field is deprecated, in favor of the turnover_gbp field which will handle the currency conversion here instead of delegating it to the frontend
+    # the turnover field is deprecated, in favor of the turnover_gbp field which
+    # will handle the currency conversion here instead of delegating it to the frontend
     turnover = serializers.IntegerField(source='annual_sales', required=False)
     turnover_gbp = serializers.IntegerField(source='annual_sales', required=False)
 
-    def validate_turnover_gbp(self, value):
+    def _validate_turnover_gbp(self, value):
         return convert_gbp_to_usd(value)
 
     address = AddressRequestSerializer(required=False)
@@ -313,6 +314,7 @@ class ChangeRequestSerializer(serializers.Serializer):
         Change website to domain.
         """
         return urlparse(website).netloc
+
 
 class DNBCompanyChangeRequestSerializer(serializers.Serializer):
     """

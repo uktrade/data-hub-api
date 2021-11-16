@@ -3,9 +3,9 @@ import pytest
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.dnb_api.serializers import (
+    ChangeRequestSerializer,
     DNBCompanySerializer,
     SerializerNotPartialError,
-    ChangeRequestSerializer
 )
 
 
@@ -43,16 +43,16 @@ def test_dnb_company_serializer_partial_save(db):
     assert dh_company.duns_number == '123456789'
     assert dh_company.modified_on == original_company.modified_on
 
+
 def test_dnb_change_request_serializer(db):
     """
     Test that dnb change requests serialize correctly
     """
-
-    dh_company = CompanyFactory()
-    change_request = ChangeRequestSerializer(data = {'turnover_gbp': 200})
+    change_request = ChangeRequestSerializer(data={'turnover_gbp': 200})
     change_request.is_valid()
 
-    assert dict(change_request.validated_data) == {'annual_sales': 275.898685477954} #that floating point precision might be a problem...
+    assert dict(change_request.validated_data) == {'annual_sales': 275.898685477954}
+
 
 def test_dnb_company_serializer_partial_save_serializer_not_partial(db):
     """
