@@ -1,3 +1,21 @@
+# Data Hub API 39.3.0 (2021-11-16)
+## Removals
+
+- Removes the following feature flags and their legacy behaviours: address-postcode-company-required-field, dnb-search-v2, address-area-company-required-field, company-area-investigation-request, address-area-company-search
+
+## Features
+
+- The default session cookie for the admin interface was set to 20 minutes.
+
+## Bug fixes
+
+- Postcodes have been removed from fuzzy search so that only exact matches are listed.
+- Project code was removed from fuzzy search so that only exact matches are listed.
+
+  By doing this we should avoid a problem where thousands of results were showing on project code searches.
+- Fuzzy search now requires a closer match for fields other than name- this should reduce the number of spurious results.
+
+
 # Data Hub API 39.2.0 (2021-11-10)
 ## Features
 
