@@ -216,7 +216,7 @@ class TestBasicSearch(APITestMixin):
         SimpleModel.objects.create(name='The Risk Advisory Group')
         SimpleModel.objects.create(name='The Advisory Group')
         SimpleModel.objects.create(name='The Advisory')
-        SimpleModel.objects.create(name='The Adivsory')
+        SimpleModel.objects.create(name='The Advasory')
         SimpleModel.objects.create(name='The Advisories')
         SimpleModel.objects.create(name='The Group')
 
@@ -244,7 +244,7 @@ class TestBasicSearch(APITestMixin):
             'The Advisory Group',
             'The Risk Advisory Group',
             'The Advisories',
-            'The Adivsory',
+            'The Advasory',
         ] == [result['name'] for result in response.data['results']]
 
     def test_fuzzy_quality_cross_fields(
