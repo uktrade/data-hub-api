@@ -1,1 +1,0 @@
-The default session cookie for the admin interface was set to 20 minutes.

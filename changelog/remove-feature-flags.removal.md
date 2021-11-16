@@ -1,1 +1,0 @@
-Removes the following feature flags and their legacy behaviours: address-postcode-company-required-field, dnb-search-v2, address-area-company-required-field, company-area-investigation-request, address-area-company-search
