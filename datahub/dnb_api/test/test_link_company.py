@@ -15,7 +15,7 @@ from datahub.metadata.models import Country
 pytestmark = pytest.mark.django_db
 
 
-DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
+DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/search/')
 
 
 @freeze_time('2019-01-01 11:12:13')
@@ -28,7 +28,7 @@ def test_link_company_with_dnb_success(
     Test the link_company_with_dnb utility.
     """
     requests_mock.post(
-        DNB_SEARCH_URL,
+        DNB_V2_SEARCH_URL,
         json=dnb_response_uk,
     )
     company = CompanyFactory()
@@ -94,7 +94,7 @@ def test_link_company_with_dnb_sync_task_failure(
     malformed_response = dnb_response_uk.copy()
     del malformed_response['results']
     requests_mock.post(
-        DNB_SEARCH_URL,
+        DNB_V2_SEARCH_URL,
         json=malformed_response,
     )
     company = CompanyFactory()

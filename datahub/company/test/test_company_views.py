@@ -434,7 +434,6 @@ class TestGetCompany(APITestMixin):
 
         Checks that the endpoint returns 200
         """
-        FeatureFlagFactory(code='address-area-company-required-field')
         company = CompanyFactory(
             address_country_id=country_id,
             address_area_id=None,
@@ -1184,7 +1183,6 @@ class TestUpdateCompany(APITestMixin):
     )
     def test_validation_error(self, data, expected_error):
         """Test validation scenarios."""
-        FeatureFlagFactory(code='address-area-company-required-field')
         company = CompanyFactory(
             registered_address_1='',
             registered_address_2='',
@@ -1504,7 +1502,7 @@ class TestAddCompany(APITestMixin):
                     },
                     'registered_address': None,
                 },
-                ['address-postcode-company-required-field'],
+                [],
             ),
             # Canadian company
             (
@@ -1539,7 +1537,7 @@ class TestAddCompany(APITestMixin):
                     },
                     'registered_address': None,
                 },
-                ['address-postcode-company-required-field'],
+                [],
             ),
             # promote a CH company
             (
@@ -1846,7 +1844,7 @@ class TestAddCompany(APITestMixin):
                         ],
                     },
                 },
-                ['address-area-company-required-field'],
+                [],
             ),
             # for US company postcode is required
             (
@@ -1858,7 +1856,9 @@ class TestAddCompany(APITestMixin):
                         'country': {
                             'id': Country.united_states.value.id,
                         },
-                        'address_area': AdministrativeArea.alabama.value.id,
+                        'area': {
+                            'id': AdministrativeArea.alabama.value.id,
+                        },
                     },
                 },
                 {
@@ -1868,7 +1868,7 @@ class TestAddCompany(APITestMixin):
                         ],
                     },
                 },
-                ['address-postcode-company-required-field'],
+                [],
             ),
             # for Canadian company postcode is required
             (
@@ -1880,7 +1880,9 @@ class TestAddCompany(APITestMixin):
                         'country': {
                             'id': Country.canada.value.id,
                         },
-                        'address_area': AdministrativeArea.quebec.value.id,
+                        'area': {
+                            'id': AdministrativeArea.quebec.value.id,
+                        },
                     },
                 },
                 {
@@ -1890,7 +1892,7 @@ class TestAddCompany(APITestMixin):
                         ],
                     },
                 },
-                ['address-postcode-company-required-field'],
+                [],
             ),
         ),
     )

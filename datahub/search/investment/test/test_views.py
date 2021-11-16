@@ -27,7 +27,6 @@ from datahub.core.test_utils import (
     join_attr_values,
     random_obj_for_queryset,
 )
-from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.investment.project.constants import Involvement, LikelihoodToLand
 from datahub.investment.project.models import InvestmentProject, InvestmentProjectPermission
 from datahub.investment.project.test.factories import (
@@ -1397,7 +1396,6 @@ class TestInvestmentProjectExportView(APITestMixin):
         """Test export of investment project search results."""
         url = reverse('api-v3:search:investment_project-export')
 
-        FeatureFlagFactory(code='address-area-company-search')
         InvestmentProjectFactory()
         InvestmentProjectFactory(cdms_project_code='cdms-code')
         VerifyWinInvestmentProjectFactory()
