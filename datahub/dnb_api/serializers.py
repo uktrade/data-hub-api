@@ -298,7 +298,9 @@ class ChangeRequestSerializer(serializers.Serializer):
     number_of_employees = serializers.IntegerField(source='employee_number', required=False)
 
     #this 'turnover' field is now obsoleted by turnover_gbp since the frontend is no longer converting to usd, we're doing it here ourselves instead
-    #turnover = serializers.SerializerMethodField()
+    #we'll leave this here for now for the sake of backwards compatibility
+    turnover = serializers.IntegerField(source='annual_sales', required=False)
+    # Does it matter if 'turnover_gbp' is wrong after you set it? Or does only the internal representation matter?
     turnover_gbp = serializers.IntegerField(source='annual_sales', required=False)
 
     #this code should convert from gbp to usd for us because dnb expects annual_sales to be in usd
