@@ -23,5 +23,6 @@ def convert_gbp_to_usd(gbp):
     exchange_rate = ExchangeRate.objects.filter(
         from_currency_code='GBP',
         to_currency_code='USD',
-    ).order_by('-created_on').first()
-    return 1 / exchange_rate.exchange_rate
+    ).order_by('-created_on').first().exchange_rate
+
+    return gbp * exchange_rate

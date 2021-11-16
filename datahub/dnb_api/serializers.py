@@ -18,7 +18,8 @@ from datahub.core.serializers import (
 )
 from datahub.core.validators import EqualsRule, OperatorRule, RulesBasedValidator, ValidationRule
 from datahub.interaction.models import InteractionPermission
-from datahub.metadata.models import AdministrativeArea, ExchangeRate, Country as CountryModel
+from datahub.metadata.models import AdministrativeArea, Country as CountryModel
+from datahub.metadata.utils import convert_gbp_to_usd
 
 
 class SerializerNotPartialError(Exception):
@@ -297,18 +298,12 @@ class ChangeRequestSerializer(serializers.Serializer):
     trading_names = serializers.ListField(required=False)
     number_of_employees = serializers.IntegerField(source='employee_number', required=False)
 
-    #this 'turnover' field is now obsoleted by turnover_gbp since the frontend is no longer converting to usd, we're doing it here ourselves instead
-    #we'll leave this here for now for the sake of backwards compatibility
+    #the turnover field is deprecated, in favor of the turnover_gbp field which will handle the currency conversion here instead of delegating it to the frontend
     turnover = serializers.IntegerField(source='annual_sales', required=False)
-    # Does it matter if 'turnover_gbp' is wrong after you set it? Or does only the internal representation matter?
     turnover_gbp = serializers.IntegerField(source='annual_sales', required=False)
 
-    #this code should convert from gbp to usd for us because dnb expects annual_sales to be in usd
-    #it shouldn't be saving the result as turnover_gbp, but it should be saved to the source 'annual_sales' so dnb has the right value
     def validate_turnover_gbp(self, value):
-        #ideally we should just store the inverse but this is simpler for now
-        inverse_currency_exchange = 1/ExchangeRate.objects.filter(from_currency_code= "USD", to_currency_code="GBP").first().exchange_rate
-        return value*inverse_currency_exchange
+        return convert_gbp_to_usd(value)
 
     address = AddressRequestSerializer(required=False)
     website = RelaxedURLField(source='domain', required=False)

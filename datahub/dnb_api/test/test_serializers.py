@@ -51,12 +51,8 @@ def test_dnb_change_request_serializer(db):
     dh_company = CompanyFactory()
     change_request = ChangeRequestSerializer(data = {'turnover_gbp': 200})
     change_request.is_valid()
-    #import pdb; pdb.set_trace()
-    #ideally 'turnover_gbp' itself wouldn't be modified, it'd only modify the internal 'annual_sales' value
-    #although .initial_data still shows the data that was put in before validation or whatnot so it might not be so bad?
-    #how do we get the annual_sales data in order to check that the conversion is happening
-    #apparently the data we want to assert against is in:
-    assert change_request.validated_data == {'annual_sales': 275.8986854779541} #that floating point precision might be a problem...
+
+    assert dict(change_request.validated_data) == {'annual_sales': 275.898685477954} #that floating point precision might be a problem...
 
 def test_dnb_company_serializer_partial_save_serializer_not_partial(db):
     """
