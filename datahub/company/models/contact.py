@@ -115,12 +115,22 @@ class Contact(ArchivableModel, BaseModel):
             models.Index(fields=('created_on', 'id')),
         ]
 
+    def __str__(self):
+        """Admin displayed human readable name."""
+        company_desc = f'({self.company})' if self.company and self.company.name else ''
+        return join_truthy_strings(self.name or '(no name)', company_desc)
+
     @property
     def name(self):
         """Full name."""
         return join_truthy_strings(self.first_name, self.last_name)
 
-    def __str__(self):
-        """Admin displayed human readable name."""
-        company_desc = f'({self.company})' if self.company and self.company.name else ''
-        return join_truthy_strings(self.name or '(no name)', company_desc)
+    @property
+    def name_with_title(self):
+        """Full name with title."""
+        return join_truthy_strings(getattr(self.title, 'name', None), self.name)
+
+    @property
+    def full_telephone_number(self):
+        """Full telephone number with country code."""
+        return join_truthy_strings(self.telephone_countrycode, self.telephone_number)
