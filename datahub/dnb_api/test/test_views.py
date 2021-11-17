@@ -1533,6 +1533,46 @@ class TestCompanyChangeRequestView(APITestMixin):
                 # Address Area id (of initial Company)
                 constants.AdministrativeArea.texas.value.id,
             ),
+
+            # Test turnover_gbp converted correctly
+            (
+                # change_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'turnover_gbp': 725,
+                    },
+                },
+                # dnb_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'annual_sales': 1000.1327348575835,
+                    },
+                },
+                # dnb_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'annual_sales': 1000.1327348575835,
+                    },
+                },
+                # datahub_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'annual_sales': 1000,
+                    },
+                },
+                # Address Area id (of initial Company)
+                None,
+            ),
         ),
     )
     def test_valid(
