@@ -1,5 +1,5 @@
 import json
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from urllib.parse import urljoin
 from uuid import UUID
 
@@ -1599,10 +1599,11 @@ class TestCompanyChangeRequestView(APITestMixin):
             json=dnb_response,
         )
 
-        response = self.api_client.post(
-            reverse('api-v4:dnb-api:company-change-request'),
-            data=change_request,
-        )
+        with patch('datahub.metadata.utils.get_latest_exchange_rate', return_value=0.72490378):
+            response = self.api_client.post(
+                reverse('api-v4:dnb-api:company-change-request'),
+                data=change_request,
+            )
 
         assert requests_mock.last_request.json() == dnb_request
         assert response.status_code == status.HTTP_200_OK
