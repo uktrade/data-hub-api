@@ -304,6 +304,9 @@ class ChangeRequestSerializer(serializers.Serializer):
     turnover_gbp = serializers.IntegerField(source='annual_sales', required=False)
 
     def validate_turnover_gbp(self, value):
+        """
+        Convert turnover from GBP to USD
+        """
         return convert_gbp_to_usd(value)
 
     address = AddressRequestSerializer(required=False)
