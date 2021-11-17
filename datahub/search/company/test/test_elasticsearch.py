@@ -157,10 +157,42 @@ def test_mapping(es):
             'address': {
                 'type': 'object',
                 'properties': {
-                    'line_1': {'index': False, 'type': 'text'},
-                    'line_2': {'index': False, 'type': 'text'},
-                    'town': {'index': False, 'type': 'text'},
-                    'county': {'index': False, 'type': 'text'},
+                    'line_1': {
+                        'type': 'text',
+                        'fields': {
+                            'trigram': {
+                                'type': 'text',
+                                'analyzer': 'trigram_analyzer',
+                            },
+                        },
+                    },
+                    'line_2': {
+                        'type': 'text',
+                        'fields': {
+                            'trigram': {
+                                'type': 'text',
+                                'analyzer': 'trigram_analyzer',
+                            },
+                        },
+                    },
+                    'town': {
+                        'type': 'text',
+                        'fields': {
+                            'trigram': {
+                                'type': 'text',
+                                'analyzer': 'trigram_analyzer',
+                            },
+                        },
+                    },
+                    'county': {
+                        'type': 'text',
+                        'fields': {
+                            'trigram': {
+                                'type': 'text',
+                                'analyzer': 'trigram_analyzer',
+                            },
+                        },
+                    },
                     'postcode': {
                         'type': 'text',
                         'fields': {
@@ -205,10 +237,42 @@ def test_mapping(es):
             'registered_address': {
                 'type': 'object',
                 'properties': {
-                    'line_1': {'index': False, 'type': 'text'},
-                    'line_2': {'index': False, 'type': 'text'},
-                    'town': {'index': False, 'type': 'text'},
-                    'county': {'index': False, 'type': 'text'},
+                    'line_1': {
+                        'type': 'text',
+                        'fields': {
+                            'trigram': {
+                                'type': 'text',
+                                'analyzer': 'trigram_analyzer',
+                            },
+                        },
+                    },
+                    'line_2': {
+                        'type': 'text',
+                        'fields': {
+                            'trigram': {
+                                'type': 'text',
+                                'analyzer': 'trigram_analyzer',
+                            },
+                        },
+                    },
+                    'town': {
+                        'type': 'text',
+                        'fields': {
+                            'trigram': {
+                                'type': 'text',
+                                'analyzer': 'trigram_analyzer',
+                            },
+                        },
+                    },
+                    'county': {
+                        'type': 'text',
+                        'fields': {
+                            'trigram': {
+                                'type': 'text',
+                                'analyzer': 'trigram_analyzer',
+                            },
+                        },
+                    },
                     'postcode': {
                         'type': 'text',
                         'fields': {
@@ -357,9 +421,15 @@ def test_get_basic_search_query():
                             'fields': [
                                 'address.area.name.trigram',
                                 'address.country.name.trigram',
+                                'address.county.trigram',
+                                'address.line_1.trigram',
+                                'address.line_2.trigram',
                                 'address.postcode',
+                                'address.town.trigram',
                                 'address_country.name.trigram',
                                 'address_postcode',
+                                'companies.name',
+                                'companies.name.trigram',
                                 'company.name',
                                 'company.name.trigram',
                                 'company_number',
@@ -377,30 +447,47 @@ def test_get_basic_search_query():
                                 'email_alternative',
                                 'event.name',
                                 'event.name.trigram',
+                                'event_type.name',
+                                'event_type.name.trigram',
+                                'full_telephone_number',
                                 'id',
                                 'investor_company.name',
                                 'investor_company.name.trigram',
+                                'job_title',
+                                'job_title.trigram',
                                 'name',
                                 'name.trigram',
+                                'name_with_title',
+                                'name_with_title.trigram',
                                 'organiser.name.trigram',
                                 'project_code',
                                 'reference.trigram',
                                 'reference_code',
                                 'registered_address.area.name.trigram',
                                 'registered_address.country.name.trigram',
+                                'registered_address.county.trigram',
+                                'registered_address.line_1.trigram',
+                                'registered_address.line_2.trigram',
                                 'registered_address.postcode',
+                                'registered_address.town.trigram',
                                 'related_programmes.name',
                                 'related_programmes.name.trigram',
+                                'sector.name',
+                                'service.name',
+                                'service.name.trigram',
                                 'simpleton.name',
                                 'subject.english',
                                 'subtotal_cost.keyword',
                                 'teams.name',
                                 'teams.name.trigram',
+                                'telephone_alternative',
+                                'telephone_number',
                                 'total_cost.keyword',
                                 'trading_names',
                                 'trading_names.trigram',
                                 'uk_company.name',
                                 'uk_company.name.trigram',
+                                'uk_region.name',
                                 'uk_region.name.trigram',
                             ],
                             'type': 'cross_fields',
@@ -466,12 +553,21 @@ def test_limited_get_search_by_entity_query():
                                             'trading_names',
                                             'trading_names.trigram',
                                             'reference_code',
-                                            'address.country.name.trigram',
-                                            'address.postcode',
+                                            'sector.name',
+                                            'address.line_1.trigram',
+                                            'address.line_2.trigram',
+                                            'address.town.trigram',
+                                            'address.county.trigram',
                                             'address.area.name.trigram',
-                                            'registered_address.country.name.trigram',
-                                            'registered_address.postcode',
+                                            'address.postcode',
+                                            'address.country.name.trigram',
+                                            'registered_address.line_1.trigram',
+                                            'registered_address.line_2.trigram',
+                                            'registered_address.town.trigram',
+                                            'registered_address.county.trigram',
                                             'registered_address.area.name.trigram',
+                                            'registered_address.postcode',
+                                            'registered_address.country.name.trigram',
                                         ),
                                         'type': 'cross_fields',
                                         'operator': 'and',

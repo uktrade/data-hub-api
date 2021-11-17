@@ -35,7 +35,12 @@ class Contact(BaseESModel):
             'keyword': fields.NormalizedKeyword(),
         },
     )
-    job_title = fields.NormalizedKeyword()
+    job_title = Text(
+        fields={
+            'keyword': fields.NormalizedKeyword(),
+            'trigram': fields.TrigramText(),
+        },
+    )
     last_name = Text(
         fields={
             'keyword': fields.NormalizedKeyword(),
@@ -48,11 +53,18 @@ class Contact(BaseESModel):
             'trigram': fields.TrigramText(),
         },
     )
+    name_with_title = Text(
+        fields={
+            'keyword': fields.NormalizedKeyword(),
+            'trigram': fields.TrigramText(),
+        },
+    )
     notes = fields.EnglishText()
     primary = Boolean()
-    telephone_alternative = Text()
+    telephone_alternative = Keyword()
     telephone_countrycode = Keyword()
     telephone_number = Keyword()
+    full_telephone_number = Keyword()
     title = fields.id_name_field()
 
     MAPPINGS = {
@@ -79,8 +91,15 @@ class Contact(BaseESModel):
         'id',
         'name',
         'name.trigram',
+        'name_with_title',
+        'name_with_title.trigram',
         'email',
         'email_alternative',
         'company.name',
         'company.name.trigram',
+        'job_title',
+        'job_title.trigram',
+        'full_telephone_number',
+        'telephone_number',
+        'telephone_alternative',
     )
