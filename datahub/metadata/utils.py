@@ -21,8 +21,8 @@ def convert_gbp_to_usd(gbp):
     :returns: A numeric value in USD
     """
     exchange_rate = ExchangeRate.objects.filter(
-        from_currency_code='GBP',
-        to_currency_code='USD',
+        from_currency_code='USD',
+        to_currency_code='GBP',
     ).order_by('-created_on').first().exchange_rate
 
-    return gbp * exchange_rate
+    return gbp * (1 / exchange_rate)

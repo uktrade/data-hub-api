@@ -1,6 +1,0 @@
-- model: metadata.exchangerate
-  pk: e7927ac0-41c0-41b1-99b9-5de3497ac73b
-  fields:
-    from_currency_code: 'GBP'
-    to_currency_code: 'USD'
-    exchange_rate: 1.3794934273897703
