@@ -226,7 +226,7 @@ def test_build_term_query(term, expected):
                             'match': {
                                 'name.trigram': {
                                     'query': 'hello',
-                                    'minimum_should_match': '50%',
+                                    'minimum_should_match': '70%',
                                     'boost': 1.5,
                                 },
                             },

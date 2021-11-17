@@ -14,9 +14,11 @@ from datahub.core.constants import AdministrativeArea
 from datahub.core.test_utils import HawkAPITestClient
 from datahub.dnb_api.utils import format_dnb_company
 from datahub.documents.utils import get_s3_client_for_bucket
+from datahub.feature_flag.models import FeatureFlag
 from datahub.metadata.test.factories import SectorFactory
 from datahub.search.apps import get_search_app_by_model, get_search_apps
 from datahub.search.bulk_sync import sync_objects
+from datahub.search.constants import FUZZY_SEARCH_FEATURE_FLAG
 from datahub.search.elasticsearch import (
     alias_exists,
     create_index,
@@ -468,6 +470,15 @@ def formatted_dnb_company_area(dnb_response_uk):
         address_area_abbrev_name=AdministrativeArea.texas.value.area_code,
     )
     return format_dnb_company(dnb_response_area)
+
+
+@pytest.fixture
+def fuzzy_search_feature():
+    """Enable the fuzzy search feature flag"""
+    return FeatureFlag.objects.update_or_create(
+        code=FUZZY_SEARCH_FEATURE_FLAG,
+        defaults={'is_active': True},
+    )
 
 
 def pytest_addoption(parser):

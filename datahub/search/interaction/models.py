@@ -94,7 +94,7 @@ class Interaction(BaseESModel):
     notes = fields.Text(index=False)
     policy_areas = fields.id_unindexed_name_field()
     policy_issue_types = fields.id_unindexed_name_field()
-    service = fields.id_unindexed_name_field()
+    service = fields.id_name_partial_field()
     service_delivery_status = fields.id_unindexed_name_field()
     subject = fields.NormalizedKeyword(
         fields={
@@ -135,10 +135,14 @@ class Interaction(BaseESModel):
         'id',
         'company.name',
         'company.name.trigram',
+        'companies.name',
+        'companies.name.trigram',
         'contacts.name',  # to find 2-letter words
         'contacts.name.trigram',
         'event.name',
         'event.name.trigram',
+        'service.name',
+        'service.name.trigram',
         'subject.english',
         'dit_participants.adviser.name',
         'dit_participants.adviser.name.trigram',
