@@ -1567,7 +1567,7 @@ class TestCompanyChangeRequestView(APITestMixin):
                     'status': 'pending',
                     'created_on': '2020-01-05T11:00:00',
                     'changes': {
-                        'annual_sales': 1000,
+                        'annual_sales': 1000.1327348575835,
                     },
                 },
                 # Address Area id (of initial Company)
