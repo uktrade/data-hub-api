@@ -86,10 +86,14 @@ django-extensions==3.1.5
     # via -r requirements.in
 django-filter==21.1
     # via -r requirements.in
-django-ipware==4.0.0
-    # via django-axes
+django-ipware==3.0.7
+    # via
+    #   django-axes
+    #   django-log-formatter-ecs
 django-js-asset==1.2.2
     # via django-mptt
+django-log-formatter-ecs==0.0.5
+    # via -r requirements.in
 django-mptt==0.13.4
     # via -r requirements.in
 django-pglocks==1.0.4
