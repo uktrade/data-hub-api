@@ -202,27 +202,35 @@ class TestBasicSearch(APITestMixin):
             'The Risk Advisory Group',
         ] == [result['name'] for result in response.data['results']]
 
+    @pytest.mark.me
+    @pytest.mark.parametrize(
+        'name,search_term,should_match',
+        (
+            ('The Risk Advisory Group', 'The Advisory', True),
+            ('The Advisory Group', 'The Advisory', True),
+            ('The Advisory', 'The Advisory', True),
+            ('The Advisory', 'The Advasory', True),
+            ('The Advisory', 'The Adivsory', True),
+            ('The Advisories', 'The Advisory', True),
+            ('The Group', 'The Advisory', False),
+        ),
+    )
     def test_fuzzy_quality(
         self,
         fuzzy_search_feature,
         es_with_collector,
         search_support_user,
+        name,
+        search_term,
+        should_match,
     ):
         """
         Tests quality of results for fuzzy matching.
 
         This should not only hit on exact matches, but also close matches.
         """
-        SimpleModel.objects.create(name='The Risk Advisory Group')
-        SimpleModel.objects.create(name='The Advisory Group')
-        SimpleModel.objects.create(name='The Advisory')
-        SimpleModel.objects.create(name='The Advasory')
-        SimpleModel.objects.create(name='The Advisories')
-        SimpleModel.objects.create(name='The Group')
-
+        SimpleModel.objects.create(name=name)
         es_with_collector.flush_and_refresh()
-
-        term = 'The Advisory'
 
         url = reverse('api-v3:search:basic')
         api_client = self.create_api_client(user=search_support_user)
@@ -230,22 +238,18 @@ class TestBasicSearch(APITestMixin):
         response = api_client.get(
             url,
             data={
-                'term': term,
+                'term': search_term,
                 'entity': 'simplemodel',
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 5
 
-        # results are in order of relevance
-        assert [
-            'The Advisory',
-            'The Advisory Group',
-            'The Risk Advisory Group',
-            'The Advisories',
-            'The Advasory',
-        ] == [result['name'] for result in response.data['results']]
+        if should_match:
+            assert response.data['count'] == 1
+            assert response.data['results'][0]['name'] == name
+        else:
+            assert response.data['count'] == 0
 
     def test_fuzzy_quality_cross_fields(
         self,
@@ -287,16 +291,13 @@ class TestBasicSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
 
-        assert response.data['count'] == 6
+        assert response.data['count'] == 3
 
         # results are in order of relevance
         assert [
             ('The Advisory', 'Canada'),
             ('The Advisory Group', 'Canada'),
             ('The Risk Advisory Group', 'Canada'),
-            ('The Advisory', 'France'),
-            ('The Advisory Group', 'France'),
-            ('The Risk Advisory Group', 'France'),
         ] == [(result['name'], result['country']) for result in response.data['results']]
 
     def test_partial_match(self, es_with_collector, search_support_user):
