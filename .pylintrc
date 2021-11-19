@@ -1,0 +1,15 @@
+[MASTER]
+max-line-length=99
+; C0103: Module name <foo> doesn't conform to snake_case naming style (invalid-name)
+; C0114: Missing module docstring (missing-module-docstring)
+; C0115: Missing class docstring (missing-class-docstring)
+; F6401: pylint-pytest plugin cannot enumerate and collect pytest fixtures.
+; R0801: Similar lines in 2 files
+; W0511: TODO: <todo> (fixme)
+disable=C0103,C0114,C0115,F6401,R0801,W0511
+max-parents=10
+min-public-methods=0
+load-plugins=pylint_django,pylint_django.checkers.migrations,pylint_pytest
+django-settings-module=config.settings.local
+
+# vim: ft=dosini
