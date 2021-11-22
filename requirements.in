@@ -5,6 +5,7 @@ django-axes==5.27.0
 django-environ==0.8.1
 django-extensions==3.1.5
 django-filter==21.1
+django-log-formatter-ecs==0.0.5
 django-mptt==0.13.4
 django-pglocks==1.0.4
 django-reversion==4.0.1
@@ -16,10 +17,10 @@ pyyaml==6.0
 python-dateutil==2.8.2
 
 # Persistency layer
-psycopg2==2.9.1
+psycopg2==2.9.2
 psycogreen==1.0.2
 
-boto3==1.19.12
+boto3==1.20.10
 
 notifications-python-client==6.3.0
 
@@ -35,14 +36,14 @@ slackclient==2.9.3
 
 # REDIS
 django-redis==5.0.0
-redis==3.5.3
+redis==4.0.1
 
 # ES
 elasticsearch==7.13.4
 elasticsearch-dsl==7.4.0
 
 # ES APM
-elastic-apm==6.6.1
+elastic-apm==6.7.0
 
 # Celery
 celery[redis]==4.4.7
@@ -67,7 +68,6 @@ towncrier==21.3.0
 watchdog[watchmedo]==2.1.6
 pre-commit==2.15.0
 
-
 # Code static analysis
 flake8==4.0.1
 flake8-bugbear==21.9.2
@@ -80,11 +80,14 @@ flake8-quotes==3.3.1
 flake8-string-format==0.3.0
 pep8-naming==0.12.1
 pydocstyle==6.1.1
+pylint==2.11.1
+pylint-django==2.4.4
+pylint-pytest==1.1.2
 
 gunicorn==20.1.0
 gevent==21.8.0
 mohawk==1.1.0
 requests==2.26.0
 requests_toolbelt==0.9.1
-sentry_sdk==1.4.3
+sentry_sdk==1.5.0
 simple_salesforce==1.11.4

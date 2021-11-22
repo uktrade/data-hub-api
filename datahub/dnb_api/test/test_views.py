@@ -1,5 +1,5 @@
 import json
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from urllib.parse import urljoin
 from uuid import UUID
 
@@ -1533,6 +1533,46 @@ class TestCompanyChangeRequestView(APITestMixin):
                 # Address Area id (of initial Company)
                 constants.AdministrativeArea.texas.value.id,
             ),
+
+            # Test turnover_gbp converted correctly
+            (
+                # change_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'turnover_gbp': 725,
+                    },
+                },
+                # dnb_request
+                {
+                    'duns_number': '123456789',
+                    'changes': {
+                        'annual_sales': 1000.1327348575835,
+                    },
+                },
+                # dnb_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'annual_sales': 1000.1327348575835,
+                    },
+                },
+                # datahub_response
+                {
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'annual_sales': 1000.1327348575835,
+                    },
+                },
+                # Address Area id (of initial Company)
+                None,
+            ),
         ),
     )
     def test_valid(
@@ -1559,10 +1599,11 @@ class TestCompanyChangeRequestView(APITestMixin):
             json=dnb_response,
         )
 
-        response = self.api_client.post(
-            reverse('api-v4:dnb-api:company-change-request'),
-            data=change_request,
-        )
+        with patch('datahub.metadata.utils.get_latest_exchange_rate', return_value=0.72490378):
+            response = self.api_client.post(
+                reverse('api-v4:dnb-api:company-change-request'),
+                data=change_request,
+            )
 
         assert requests_mock.last_request.json() == dnb_request
         assert response.status_code == status.HTTP_200_OK
