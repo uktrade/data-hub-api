@@ -192,3 +192,26 @@ class TestBasicSearch(APITestMixin):
         response = self.api_client.get(url, {})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_similar_postcode_search(self, es_with_collector):
+        """Companies with similar postcodes should not be shown in results."""
+        company = CompanyFactory(
+            address_postcode='AB1 2CD',
+        )
+        CompanyFactory(
+            address_postcode='AB1 2CE',
+        )
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(
+            url,
+            data={
+                'term': company.address_postcode,
+                'entity': 'company',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['results'][0]['address']['postcode'] == company.address_postcode

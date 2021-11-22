@@ -102,4 +102,6 @@ class Order(BaseESModel):
         'contact.name.trigram',
         'total_cost.keyword',
         'subtotal_cost.keyword',
+        'sector.name',
+        'uk_region.name',
     )

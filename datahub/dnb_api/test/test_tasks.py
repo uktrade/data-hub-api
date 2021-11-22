@@ -32,7 +32,7 @@ from datahub.metadata.models import Country
 pytestmark = pytest.mark.django_db
 
 
-DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
+DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/search/')
 
 
 @pytest.mark.parametrize(
@@ -53,7 +53,7 @@ def test_sync_company_with_dnb_all_fields(
     Test the sync_company_with_dnb task when all fields should be synced.
     """
     requests_mock.post(
-        DNB_SEARCH_URL,
+        DNB_V2_SEARCH_URL,
         json=dnb_response_uk,
     )
     company = CompanyFactory(duns_number='123456789')
@@ -116,7 +116,7 @@ def test_sync_company_with_dnb_partial_fields(
     Test the sync_company_with_dnb task when only a subset of fields should be synced.
     """
     requests_mock.post(
-        DNB_SEARCH_URL,
+        DNB_V2_SEARCH_URL,
         json=dnb_response_uk,
     )
     company = CompanyFactory(duns_number='123456789')
@@ -792,7 +792,7 @@ def test_sync_outdated_companies_with_dnb_all_fields(
     if callable(existing_company_dnb_modified_on):
         existing_company_dnb_modified_on = existing_company_dnb_modified_on()
     requests_mock.post(
-        DNB_SEARCH_URL,
+        DNB_V2_SEARCH_URL,
         json=dnb_response_uk,
     )
     company = CompanyFactory(
@@ -865,7 +865,7 @@ def test_sync_outdated_companies_with_dnb_partial_fields(
     if callable(existing_company_dnb_modified_on):
         existing_company_dnb_modified_on = existing_company_dnb_modified_on()
     requests_mock.post(
-        DNB_SEARCH_URL,
+        DNB_V2_SEARCH_URL,
         json=dnb_response_uk,
     )
     company = CompanyFactory(
@@ -936,7 +936,7 @@ def test_sync_outdated_companies_limit_least_recently_synced_is_updated(
     the least recently synced company.
     """
     requests_mock.post(
-        DNB_SEARCH_URL,
+        DNB_V2_SEARCH_URL,
         json=dnb_response_uk,
     )
     company_1 = CompanyFactory(
@@ -977,7 +977,7 @@ def test_sync_outdated_companies_limit_most_recently_interacted_updated(
     the most recently interacted company.
     """
     requests_mock.post(
-        DNB_SEARCH_URL,
+        DNB_V2_SEARCH_URL,
         json=dnb_response_uk,
     )
 

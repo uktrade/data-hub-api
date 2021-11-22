@@ -27,7 +27,7 @@ from datahub.core.test_utils import (
     join_attr_values,
     random_obj_for_queryset,
 )
-from datahub.feature_flag.test.factories import FeatureFlagFactory
+from datahub.feature_flag.models import FeatureFlag
 from datahub.investment.project.constants import Involvement, LikelihoodToLand
 from datahub.investment.project.models import InvestmentProject, InvestmentProjectPermission
 from datahub.investment.project.test.factories import (
@@ -39,6 +39,7 @@ from datahub.investment.project.test.factories import (
 )
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.constants import FUZZY_SEARCH_FEATURE_FLAG
 from datahub.search.investment import InvestmentSearchApp
 from datahub.search.investment.views import SearchInvestmentExportAPIView
 
@@ -1397,7 +1398,6 @@ class TestInvestmentProjectExportView(APITestMixin):
         """Test export of investment project search results."""
         url = reverse('api-v3:search:investment_project-export')
 
-        FeatureFlagFactory(code='address-area-company-search')
         InvestmentProjectFactory()
         InvestmentProjectFactory(cdms_project_code='cdms-code')
         VerifyWinInvestmentProjectFactory()
@@ -1538,6 +1538,57 @@ class TestBasicSearch(APITestMixin):
     def test_project_code_search(self, setup_data):
         """Tests basic search query for project code."""
         investment_project = setup_data[0]
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(
+            url,
+            data={
+                'term': investment_project.project_code,
+                'entity': 'investment_project',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['results'][0]['project_code'] == investment_project.project_code
+
+    def test_similar_project_code_search(self, es_with_collector, fuzzy_search_feature):
+        """Projects with similar project codes should not be shown in results."""
+        FeatureFlag.objects.update_or_create(
+            code=FUZZY_SEARCH_FEATURE_FLAG,
+            defaults={'is_active': True},
+        )
+        investment_project = InvestmentProjectFactory(
+            cdms_project_code='TEST-00001234',
+        )
+        InvestmentProjectFactory(
+            cdms_project_code='TEST-00001235',
+        )
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(
+            url,
+            data={
+                'term': investment_project.project_code,
+                'entity': 'investment_project',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['results'][0]['project_code'] == investment_project.project_code
+
+    def test_similar_project_name_to_code_search(self, es_with_collector, fuzzy_search_feature):
+        """Projects with numeric names should not match on project codes."""
+        investment_project = InvestmentProjectFactory(
+            cdms_project_code='DHP-00000048',
+        )
+        InvestmentProjectFactory(
+            name='Project 0007',
+            cdms_project_code='DHP-00000069',
+        )
+        es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(

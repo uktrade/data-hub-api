@@ -1,3 +1,76 @@
+# Data Hub API 39.4.0 (2021-11-17)
+## Features
+
+- Extra search fields have been added to each of the search entities.
+
+  When searching, for example via `/v3/search?term=<term>`, the term will now match on the following fields:
+
+  **Companies**
+
+  - sector.name
+  - address.line_1.trigram
+  - address.line_2.trigram
+  - address.town.trigram
+  - address.county.trigram
+  - registered_address.line_1.trigram
+  - registered_address.line_2.trigram
+  - registered_address.town.trigram
+  - registered_address.county.trigram
+
+  **Contacts**
+
+  - name_with_title
+  - job_title
+  - job_title.trigram
+  - full_telephone_number (telephone number with country code)
+  - telephone_number
+  - telephone_alternative
+
+  **Events**
+
+  - event_type
+  - event_type.trigram
+
+
+  **Interactions**
+
+  - companies.name
+  - companies.name.trigram
+  - service.name
+  - service.name.trigram
+
+  **Investment Projects**
+
+  - sector.name
+
+  **Orders**
+
+  - sector.name
+  - uk_region.name
+
+## Bug fixes
+
+- Tweaks fuzzy search matching to require at least a 70% match on name (previously 50%)
+
+
+# Data Hub API 39.3.0 (2021-11-16)
+## Removals
+
+- Removes the following feature flags and their legacy behaviours: address-postcode-company-required-field, dnb-search-v2, address-area-company-required-field, company-area-investigation-request, address-area-company-search
+
+## Features
+
+- The default session cookie for the admin interface was set to 20 minutes.
+
+## Bug fixes
+
+- Postcodes have been removed from fuzzy search so that only exact matches are listed.
+- Project code was removed from fuzzy search so that only exact matches are listed.
+
+  By doing this we should avoid a problem where thousands of results were showing on project code searches.
+- Fuzzy search now requires a closer match for fields other than name- this should reduce the number of spurious results.
+
+
 # Data Hub API 39.2.0 (2021-11-10)
 ## Features
 

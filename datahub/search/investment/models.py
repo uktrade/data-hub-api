@@ -181,5 +181,6 @@ class InvestmentProject(BaseESModel):
         'uk_company.name.trigram',
         'investor_company.name',
         'investor_company.name.trigram',
-        'project_code.trigram',
+        'project_code',
+        'sector.name',
     )
