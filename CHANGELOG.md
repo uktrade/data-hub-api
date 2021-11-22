@@ -1,3 +1,13 @@
+# Data Hub API 39.5.0 (2021-11-22)
+## Features
+
+- Currency conversion for change requests to D&B can now be done in the API instead of the frontend.
+
+## Bug fixes
+
+- Fuzzy search now implements "AUTO" fuzzy matching for better search matches.
+
+
 # Data Hub API 39.4.0 (2021-11-17)
 ## Features
 
