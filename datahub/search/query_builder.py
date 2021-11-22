@@ -279,7 +279,9 @@ def _build_fuzzy_term_query(term, fields=None):
         Match(**{
             field: {
                 'query': term,
-                'minimum_should_match': '70%',
+                'fuzziness': 'AUTO',
+                'operator': 'AND',
+                'minimum_should_match': '80%',
                 'boost': 1.5 if field == 'name.trigram' else 1,
             },
         })
