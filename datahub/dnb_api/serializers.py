@@ -298,8 +298,9 @@ class ChangeRequestSerializer(serializers.Serializer):
     trading_names = serializers.ListField(required=False)
     number_of_employees = serializers.IntegerField(source='employee_number', required=False)
 
-    # the turnover field is deprecated, in favor of the turnover_gbp field which
-    # will handle the currency conversion here instead of delegating it to the frontend
+    # the turnover field is no longer used in the frontend, in favour of the turnover_gbp
+    # field which will handle the currency conversion here instead of delegating it to the
+    # frontend
     turnover = serializers.IntegerField(source='annual_sales', required=False)
     turnover_gbp = serializers.IntegerField(source='annual_sales', required=False)
 
