@@ -141,9 +141,9 @@ There is now a `make` command to bring up the three environments on a single doc
 Dependencies:
 
 -   Python 3.8.x
--   PostgreSQL 10
+-   PostgreSQL 12
 -   redis 3.2
--   Elasticsearch 6.8
+-   Elasticsearch 7.10
 
 1.  Clone the repository:
 
