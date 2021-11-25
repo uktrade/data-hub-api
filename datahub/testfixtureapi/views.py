@@ -20,6 +20,8 @@ from datahub.company_referral.models import CompanyReferral
 from datahub.event.models import Event
 from datahub.feature_flag.models import FeatureFlag
 from datahub.interaction.models import Interaction, InteractionDITParticipant
+from datahub.investment.investor_profile.models import LargeCapitalInvestorProfile
+from datahub.investment.opportunity.models import LargeCapitalOpportunity
 from datahub.investment.project.models import (
     InvestmentProject,
     InvestmentProjectStageLog,
@@ -56,6 +58,8 @@ def reset_fixtures(request):
         raise Http404
 
     with transaction.atomic():
+        LargeCapitalInvestorProfile.objects.all().delete()
+        LargeCapitalOpportunity.objects.all().delete()
         InvestmentProject.objects.all().delete()
         InvestmentProjectStageLog.objects.all().delete()
         InvestmentProjectTeamMember.objects.all().delete()
