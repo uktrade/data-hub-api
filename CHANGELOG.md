@@ -380,7 +380,6 @@
 # Data Hub API 36.22.0 (2021-06-11)
 ## Features
 
-- It's now possible to interact with BED and Salesforce using the BED salesforce API.
 - Requesting address areas for company investigations is now tested
 
 ## Bug fixes
