@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   postgres:
-    image: postgres:10
+    image: postgres:12
     restart: always
     environment:
       - POSTGRES_MULTIPLE_DATABASES=datahub,mi

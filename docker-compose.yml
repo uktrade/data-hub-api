@@ -29,7 +29,7 @@ services:
     command: watchmedo auto-restart -d . -R -p '*.py' -- celery worker -A config -l info -Q celery -B
 
   postgres:
-    image: postgres:10
+    image: postgres:12
     restart: always
     environment:
       - POSTGRES_DB=datahub
