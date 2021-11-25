@@ -20,15 +20,15 @@ from datahub.company_referral.models import CompanyReferral
 from datahub.event.models import Event
 from datahub.feature_flag.models import FeatureFlag
 from datahub.interaction.models import Interaction, InteractionDITParticipant
+from datahub.investment.investor_profile.models import LargeCapitalInvestorProfile
+from datahub.investment.opportunity.models import LargeCapitalOpportunity
 from datahub.investment.project.models import (
     InvestmentProject,
     InvestmentProjectStageLog,
     InvestmentProjectTeamMember,
 )
 from datahub.investment.project.proposition.models import Proposition
-from datahub.investment.investor_profile.models import LargeCapitalInvestorProfile
 from datahub.oauth.cache import add_token_data_to_cache
-from datahub.investment.opportunity.models import LargeCapitalOpportunity
 
 logger = logging.getLogger(__name__)
 
