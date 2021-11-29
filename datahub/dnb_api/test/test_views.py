@@ -1775,10 +1775,6 @@ class TestCompanyChangeRequestView(APITestMixin):
             },
         }
 
-    """
-    Test GET `/dnb/company-change-request` endpoint.
-    """
-
     @pytest.mark.parametrize(
         'request_exception, expected_exception, expected_message',
         (
