@@ -20,7 +20,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.2
 psycogreen==1.0.2
 
-boto3==1.20.10
+boto3==1.20.14
 
 notifications-python-client==6.3.0
 
@@ -36,7 +36,7 @@ slackclient==2.9.3
 
 # REDIS
 django-redis==5.0.0
-redis==4.0.1
+redis==4.0.2
 
 # ES
 elasticsearch==7.13.4
@@ -55,7 +55,7 @@ pytest==6.2.5
 pytest-django==4.4.0
 pytest-cov==3.0.0
 pytest-xdist==2.4.0
-ipython==7.29.0
+ipython==7.30.0
 factory-boy==3.2.1
 freezegun==1.1.0
 requests-mock==1.9.3
@@ -70,7 +70,7 @@ pre-commit==2.15.0
 
 # Code static analysis
 flake8==4.0.1
-flake8-bugbear==21.9.2
+flake8-bugbear==21.11.28
 flake8-commas==2.1.0
 flake8-debugger==4.0.0
 flake8-import-order==0.18.1
@@ -80,7 +80,7 @@ flake8-quotes==3.3.1
 flake8-string-format==0.3.0
 pep8-naming==0.12.1
 pydocstyle==6.1.1
-pylint==2.11.1
+pylint==2.12.1
 pylint-django==2.4.4
 pylint-pytest==1.1.2
 
