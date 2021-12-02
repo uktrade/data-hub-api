@@ -368,6 +368,11 @@ class Company(ArchivableModel, BaseModel):
         help_text='Sub-Segmentation of export',
         choices=ExportSubSegment.choices,
     )
+    dynamic = models.JSONField(
+        blank=True,
+        help_text='Dynamic fields that can be used to store custom data.',
+        null=True,
+    )
 
     def __str__(self):
         """Admin displayed human readable name."""
