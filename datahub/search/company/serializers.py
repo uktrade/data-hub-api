@@ -1,3 +1,4 @@
+from typing_extensions import Required
 from rest_framework import serializers
 
 from datahub.core.serializers import RelaxedDateField
@@ -32,6 +33,7 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
     latest_interaction_date_before = RelaxedDateField(required=False)
     uk_postcode = SingleOrListField(child=serializers.CharField(), required=False)
     area = SingleOrListField(child=StringUUIDField(), required=False)
+    dynamic = serializers.JSONField(required=False)
 
     SORT_BY_FIELDS = (
         'modified_on',

@@ -121,4 +121,5 @@ class Company(BaseESModel):
         'registered_address.area.name.trigram',
         'registered_address.postcode',
         'registered_address.country.name.trigram',
+        'dynamic.test.trigram',
     )
