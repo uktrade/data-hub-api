@@ -119,6 +119,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'dnb_investigation_id',
                     'export_segment',
                     'export_sub_segment',
+                    'dynamic',
                 ),
             },
         ),

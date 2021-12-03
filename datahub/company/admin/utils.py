@@ -105,6 +105,10 @@ def format_company_diff(dh_company, dnb_company):
             dh_company.global_ultimate_duns_number,
             dnb_company.get('global_ultimate_duns_number'),
         ),
+        get_field('dynamic'): (
+            dh_company.dynamic,
+            dnb_company.get('dynamic'),
+        ),
     }
 
 
