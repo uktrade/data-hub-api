@@ -62,6 +62,7 @@ class Company(BaseESModel):
     latest_interaction_date = Date()
     export_segment = Text()
     export_sub_segment = Text()
+    dynamic = fields.dynamic_field()
 
     COMPUTED_MAPPINGS = {
         'address': partial(dict_utils.address_dict, prefix='address'),
@@ -121,5 +122,8 @@ class Company(BaseESModel):
         'registered_address.area.name.trigram',
         'registered_address.postcode',
         'registered_address.country.name.trigram',
+        'dynamic',
+        'dynamic.trigram',
+        'dynamic.test',
         'dynamic.test.trigram',
     )

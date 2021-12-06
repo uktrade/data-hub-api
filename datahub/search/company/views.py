@@ -144,6 +144,7 @@ class PublicSearchCompanyAPIView(HawkResponseSigningMixin, SearchAPIView):
         'website',
         'export_segment',
         'export_sub_segment',
+        'dynamic',
     )
 
     FILTER_FIELDS = (
