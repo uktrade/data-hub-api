@@ -59,6 +59,11 @@ def id_name_field():
     )
 
 
+def dynamic_field():
+    """Dynamic field."""
+    return Object()
+
+
 def id_unindexed_name_field():
     """Object field with id and unindexed name sub-fields."""
     return Object(
