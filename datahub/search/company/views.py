@@ -55,6 +55,7 @@ class SearchCompanyAPIViewMixin:
         'latest_interaction_date_after',
         'latest_interaction_date_before',
         'uk_postcode',
+        'dynamic',
     )
 
     REMAP_FIELDS = {
@@ -144,6 +145,7 @@ class PublicSearchCompanyAPIView(HawkResponseSigningMixin, SearchAPIView):
         'website',
         'export_segment',
         'export_sub_segment',
+        'dynamic',
     )
 
     FILTER_FIELDS = (

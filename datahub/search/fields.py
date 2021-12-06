@@ -169,3 +169,9 @@ def interaction_field():
             'date': Date(),
         },
     )
+
+
+def dynamic_field():
+    """Dynamic field"""
+    return Object(
+    )
