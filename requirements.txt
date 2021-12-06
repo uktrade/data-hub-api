@@ -176,7 +176,7 @@ incremental==21.3.0
     # via towncrier
 iniconfig==1.1.1
     # via pytest
-ipython==7.30.0
+ipython==7.30.1
     # via -r requirements.in
 isort==5.10.1
     # via pylint
