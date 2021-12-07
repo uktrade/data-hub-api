@@ -171,7 +171,7 @@ def interaction_field():
     )
 
 
-def dynamic_field():
-    """Dynamic field"""
-    return Object(
-    )
+# def dynamic_field():
+#     """Dynamic field"""
+#     return Object(
+#     )
