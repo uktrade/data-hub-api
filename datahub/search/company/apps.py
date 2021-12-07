@@ -31,7 +31,6 @@ class CompanySearchApp(SearchApp):
         'uk_region',
         'address_area',
         'registered_address_area',
-        # 'dynamic',
     ).prefetch_related(
         'export_countries__country',
     ).annotate(

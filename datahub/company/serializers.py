@@ -598,6 +598,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'export_countries',
             'export_segment',
             'export_sub_segment',
+            'dynamic',
         )
         read_only_fields = (
             'archived',
