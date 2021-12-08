@@ -97,6 +97,10 @@ class OverseasRegion(BaseConstantModel):
     """DIT regions for overseas countries."""
 
 
+class Dynamic(BaseConstantModel):
+    """Dynamic field."""
+
+
 class Country(BaseConstantModel):
     """Country."""
 

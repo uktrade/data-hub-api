@@ -426,7 +426,10 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         postcode_can_be_required=True,
     )
     export_countries = CompanyExportCountrySerializer(many=True, read_only=True)
-    dynamic = serializers.SerializerMethodField()
+    # dynamic = serializers.SerializerMethodField()
+    dynamic = NestedRelatedField(
+        meta_models.Dynamic, required=False, allow_null=True,
+    )
 
     # Use our RelaxedURLField instead to automatically fix URLs without a scheme
     serializer_field_mapping = {
