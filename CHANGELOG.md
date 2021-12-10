@@ -1,3 +1,14 @@
+# Data Hub API 39.6.0 (2021-12-09)
+## Features
+
+- **Interactions** New service types have been added to Investment Interaction - Enquiry received:
+  - Commonwealth Games 2022 – BATP Programme
+  - Commonwealth Games 2022 – GEP Programme
+- **Investment** New referral source activities have been added:
+  - Commonwealth Games 2022 – BATP Programme
+  - Commonwealth Games 2022 – GEP Programme
+
+
 # Data Hub API 39.5.0 (2021-11-22)
 ## Features
 
