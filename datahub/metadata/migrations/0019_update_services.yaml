@@ -1,0 +1,24 @@
+- model: metadata.service
+  pk: ed487b52-4675-4338-a904-2c27e95ee195
+  fields:
+    disabled_on:
+    order: 229.0
+    segment: Commonwealth Games 2022 – BATP Programme
+    parent: dfc1577f-217c-49a7-987d-a6f8a1c61698
+    contexts: ["investment_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+- model: metadata.service
+  pk: fc569da6-7341-4785-9a42-b4fb2114351d
+  fields:
+    disabled_on:
+    order: 230.0
+    segment: Commonwealth Games 2022 – GEP Programme
+    parent: dfc1577f-217c-49a7-987d-a6f8a1c61698
+    contexts: ["investment_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0

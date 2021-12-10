@@ -141,9 +141,9 @@ There is now a `make` command to bring up the three environments on a single doc
 Dependencies:
 
 -   Python 3.8.x
--   PostgreSQL 10
+-   PostgreSQL 12
 -   redis 3.2
--   Elasticsearch 6.8
+-   Elasticsearch 7.10
 
 1.  Clone the repository:
 
@@ -365,10 +365,6 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `AWS_ACCESS_KEY_ID` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
 | `AWS_DEFAULT_REGION` | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration) |
 | `AWS_SECRET_ACCESS_KEY` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
-| `BED_USERNAME` | Yes | Business Engagement Database setup of Salesforce email account  with [bed configuration](https://loginhub--november.lightning.force.com/). |
-| `BED_PASSWORD` | Yes | Business Engagement Database unencrypted login password. |
-| `BED_TOKEN` | Yes | Business Engagement Database generated security token created with [reset security token](https://loginhub--november.lightning.force.com/lightning/settings/personal/ResetApiToken/home). |
-| `BED_IS_SANDBOX` | Yes | True if this is the sandbox test account. |
 | `CELERY_TASK_ALWAYS_EAGER` | No | Can be set to True when running the app locally to run Celery tasks started from the web process synchronously. Not for use in production. |
 | `CELERY_TASK_SEND_SENT_EVENT` | No | Whether Celery workers send the `task-sent` event (default=True). |
 | `CELERY_WORKER_TASK_EVENTS` | No | Whether Celery workers send task events (by default) for use by monitoring tools such as Flower (default=True). |
