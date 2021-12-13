@@ -85,7 +85,7 @@ pylint-django==2.4.4
 pylint-pytest==1.1.2
 
 gunicorn==20.1.0
-gevent==21.8.0
+gevent==21.12.0
 mohawk==1.1.0
 requests==2.26.0
 requests_toolbelt==0.9.1
