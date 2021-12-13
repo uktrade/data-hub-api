@@ -158,7 +158,7 @@ flake8-string-format==0.3.0
     # via -r requirements.in
 freezegun==1.1.0
     # via -r requirements.in
-gevent==21.8.0
+gevent==21.12.0
     # via -r requirements.in
 greenlet==1.1.1
     # via gevent
