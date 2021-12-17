@@ -1,0 +1,3 @@
+- model: interaction.policyarea
+  pk: 2ffd1879-5ddb-4751-93ef-a46419bcfa1f
+  fields: {disabled_on: null, name: 'Free Trade Agreements: Gulf Cooperation Council', order: 2410.0}
