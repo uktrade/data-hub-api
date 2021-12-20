@@ -1,7 +1,7 @@
 # Django and django related
 django==3.2.7
 djangorestframework==3.13.1
-django-axes==5.27.0
+django-axes==5.28.0
 django-environ==0.8.1
 django-extensions==3.1.5
 django-filter==21.1
@@ -20,7 +20,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.2
 psycogreen==1.0.2
 
-boto3==1.20.23
+boto3==1.20.24
 
 notifications-python-client==6.3.0
 
@@ -59,7 +59,7 @@ ipython==7.30.1
 factory-boy==3.2.1
 freezegun==1.1.0
 requests-mock==1.9.3
-django-debug-toolbar==3.2.3
+django-debug-toolbar==3.2.4
 werkzeug==2.0.2  # Required by runserver_plus - useful for local dev
 pip-tools==6.4.0
 piprot==0.9.11
@@ -89,5 +89,5 @@ gevent==21.12.0
 mohawk==1.1.0
 requests==2.26.0
 requests_toolbelt==0.9.1
-sentry_sdk==1.5.0
+sentry_sdk==1.5.1
 simple_salesforce==1.11.4
