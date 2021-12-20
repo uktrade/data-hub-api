@@ -1,3 +1,10 @@
+# Data Hub API 39.7.0 (2021-12-20)
+## Features
+
+- **Interactions** New service 'Proposition Development' added for 'other' interactions.
+- Added a number of new policy areas
+
+
 # Data Hub API 39.6.0 (2021-12-09)
 ## Features
 
