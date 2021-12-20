@@ -82,7 +82,7 @@ django==3.2.7
     #   djangorestframework
 django-axes==5.28.0
     # via -r requirements.in
-django-debug-toolbar==3.2.3
+django-debug-toolbar==3.2.4
     # via -r requirements.in
 django-environ==0.8.1
     # via -r requirements.in
