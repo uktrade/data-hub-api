@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: 329353bb-a152-49bf-b4fc-fc0f5f4a0f6a
+  fields:
+    disabled_on:
+    order: 440.0
+    segment: Proposition Development
+    parent:
+    contexts: ["other_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
