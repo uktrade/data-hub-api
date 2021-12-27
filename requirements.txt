@@ -8,8 +8,6 @@ aiohttp==3.7.4.post0
     # via slackclient
 amqp==2.6.1
     # via kombu
-appnope==0.1.2
-    # via ipython
 asgiref==3.4.1
     # via django
 astroid==2.9.0
@@ -104,7 +102,7 @@ django-mptt==0.13.4
     # via -r requirements.in
 django-pglocks==1.0.4
     # via -r requirements.in
-django-redis==5.0.0
+django-redis==5.2.0
     # via -r requirements.in
 django-reversion==4.0.1
     # via -r requirements.in
