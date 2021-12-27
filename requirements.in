@@ -35,7 +35,7 @@ icalendar==4.0.9
 slackclient==2.9.3
 
 # REDIS
-django-redis==5.0.0
+django-redis==5.2.0
 redis==4.1.0
 
 # ES
