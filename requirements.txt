@@ -8,8 +8,6 @@ aiohttp==3.7.4.post0
     # via slackclient
 amqp==2.6.1
     # via kombu
-appnope==0.1.2
-    # via ipython
 asgiref==3.4.1
     # via django
 astroid==2.9.0
@@ -248,7 +246,7 @@ prompt-toolkit==3.0.20
     # via ipython
 psycogreen==1.0.2
     # via -r requirements.in
-psycopg2==2.9.2
+psycopg2==2.9.3
     # via -r requirements.in
 ptyprocess==0.7.0
     # via pexpect
