@@ -8,8 +8,6 @@ aiohttp==3.7.4.post0
     # via slackclient
 amqp==2.6.1
     # via kombu
-appnope==0.1.2
-    # via ipython
 asgiref==3.4.1
     # via django
 astroid==2.9.0
@@ -31,9 +29,9 @@ billiard==3.6.4.0
     # via
     #   -r requirements.in
     #   celery
-boto3==1.20.24
+boto3==1.20.26
     # via -r requirements.in
-botocore==1.23.24
+botocore==1.23.26
     # via
     #   boto3
     #   s3transfer
@@ -104,7 +102,7 @@ django-mptt==0.13.4
     # via -r requirements.in
 django-pglocks==1.0.4
     # via -r requirements.in
-django-redis==5.0.0
+django-redis==5.2.0
     # via -r requirements.in
 django-reversion==4.0.1
     # via -r requirements.in
@@ -220,8 +218,10 @@ nodeenv==1.6.0
     # via pre-commit
 notifications-python-client==6.3.0
     # via -r requirements.in
-packaging==21.0
-    # via pytest
+packaging==21.3
+    # via
+    #   pytest
+    #   redis
 parso==0.8.2
     # via jedi
 pep517==0.11.0
@@ -248,7 +248,7 @@ prompt-toolkit==3.0.20
     # via ipython
 psycogreen==1.0.2
     # via -r requirements.in
-psycopg2==2.9.2
+psycopg2==2.9.3
     # via -r requirements.in
 ptyprocess==0.7.0
     # via pexpect
@@ -280,9 +280,9 @@ pylint==2.12.2
     #   pylint-django
     #   pylint-plugin-utils
     #   pylint-pytest
-pylint-django==2.4.4
+pylint-django==2.5.0
     # via -r requirements.in
-pylint-plugin-utils==0.6
+pylint-plugin-utils==0.7
     # via pylint-django
 pylint-pytest==1.1.2
     # via -r requirements.in
@@ -323,7 +323,7 @@ pyyaml==6.0
     #   -r requirements.in
     #   pre-commit
     #   watchdog
-redis==4.0.2
+redis==4.1.0
     # via
     #   -r requirements.in
     #   celery

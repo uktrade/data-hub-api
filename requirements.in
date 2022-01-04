@@ -17,10 +17,10 @@ pyyaml==6.0
 python-dateutil==2.8.2
 
 # Persistency layer
-psycopg2==2.9.2
+psycopg2==2.9.3
 psycogreen==1.0.2
 
-boto3==1.20.24
+boto3==1.20.26
 
 notifications-python-client==6.3.0
 
@@ -35,8 +35,8 @@ icalendar==4.0.9
 slackclient==2.9.3
 
 # REDIS
-django-redis==5.0.0
-redis==4.0.2
+django-redis==5.2.0
+redis==4.1.0
 
 # ES
 elasticsearch==7.13.4
@@ -81,7 +81,7 @@ flake8-string-format==0.3.0
 pep8-naming==0.12.1
 pydocstyle==6.1.1
 pylint==2.12.2
-pylint-django==2.4.4
+pylint-django==2.5.0
 pylint-pytest==1.1.2
 
 gunicorn==20.1.0
