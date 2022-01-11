@@ -1,0 +1,1 @@
+Three new trade agreements were added to trade agreements metadata.
