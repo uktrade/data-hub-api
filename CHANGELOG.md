@@ -1,3 +1,9 @@
+# Data Hub API 39.8.0 (2022-01-11)
+## Features
+
+- Three new trade agreements were added to trade agreements metadata.
+
+
 # Data Hub API 39.7.0 (2021-12-20)
 ## Features
 
