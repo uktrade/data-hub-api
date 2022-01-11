@@ -1,0 +1,11 @@
+- model: metadata.tradeagreement
+  pk: aec42ee7-520a-4a17-af3f-da390a016841
+  fields: {disabled_on: null, name: 'Free Trade Agreements: Gulf Cooperation Council (GCC)'}
+
+- model: metadata.tradeagreement
+  pk: 21b4f851-6adc-49b1-815e-db87cba71953
+  fields: {disabled_on: null, name: 'UK-Singapore Digital Economy Agreement'}
+
+- model: metadata.tradeagreement
+  pk: ce32d8de-719c-4d7c-b125-5e03e82951d0
+  fields: {disabled_on: null, name: 'UK-Iceland, Liechtenstein and Norway Free Trade Agreement'}
