@@ -1,3 +1,11 @@
+# Data Hub API 39.8.1 (2022-01-13)
+## Internal changes
+
+- Celery was upgraded to version 5.2.2.
+
+  Redis, billiard and kombu packages were updated to compatible versions, and code updated in-line with version 5 breaking changes.
+
+
 # Data Hub API 39.8.0 (2022-01-11)
 ## Features
 
