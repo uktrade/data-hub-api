@@ -45,7 +45,7 @@ elasticsearch-dsl==7.4.0
 elastic-apm==6.7.2
 
 # Celery
-celery[redis]==5.2.2
+celery[redis]==5.2.3
 
 # Testing and dev
 pytest==6.2.5
