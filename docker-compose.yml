@@ -26,7 +26,7 @@ services:
     env_file: .env
     depends_on:
       - api
-    command: watchmedo auto-restart -d . -R -p '*.py' -- celery worker -A config -l info -Q celery -B
+    command: watchmedo auto-restart -d . -R -p '*.py' -- celery -A config worker -l info -Q celery -B
 
   postgres:
     image: postgres:12
