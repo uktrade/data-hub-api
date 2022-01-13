@@ -1,13 +1,13 @@
 from datetime import timedelta
 
-from celery.task import task
+from celery import shared_task
 from django.db import transaction
 from django.utils.timezone import now
 
 from datahub.omis.payment.models import PaymentGatewaySession
 
 
-@task(ignore_result=True)
+@shared_task(ignore_result=True)
 def refresh_payment_gateway_session(session_id):
     """
     Celery task that refreshes the session with id `session_id`.
@@ -25,7 +25,7 @@ def refresh_payment_gateway_session(session_id):
         session.refresh_from_govuk_payment()
 
 
-@task(ignore_result=True)
+@shared_task(ignore_result=True)
 def refresh_pending_payment_gateway_sessions(age_check=60, refresh_rate=0.5):
     """
     Celery task that refreshes old ongoing payments in case something
