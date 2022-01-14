@@ -1,3 +1,9 @@
+# Data Hub API 39.8.3 (2022-01-14)
+## Bug fixes
+
+- **Technology** Use the correct celerybeat command in procfile for Celery 5, instead of Celery 4.
+
+
 # Data Hub API 39.8.2 (2022-01-14)
 ## Bug fixes
 
