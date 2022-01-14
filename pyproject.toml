@@ -54,6 +54,10 @@
         name = "Contacts"
 
     [[tool.towncrier.section]]
+        path = "technology"
+        name = "Technology"
+
+    [[tool.towncrier.section]]
         path = "event"
         name = "Events"
 
