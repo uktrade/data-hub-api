@@ -1,0 +1,19 @@
+- model: interaction.policyarea
+  pk: 2ffd1879-5ddb-4751-93ef-a46419bcfa1f
+  fields: {disabled_on: '2022-01-15T00:00:00', name: 'Free Trade Agreements: Gulf Cooperation Council (GCC)', order: 2410.0}
+
+- model: interaction.policyarea
+  pk: 2ffd29d9-10d4-4057-8b1b-1ec5fe15a926
+  fields: {disabled_on: '2022-01-15T00:00:00', name: 'UK-Singapore Digital Economy Agreement', order: 2410.0}
+
+- model: interaction.policyarea
+  pk: 87f6ba45-5a55-4acb-969e-aef50cde2186
+  fields: {disabled_on: '2022-01-15T00:00:00', name: 'UK-Canada Trade Continuity Agreement', order: 2410.0}
+
+- model: interaction.policyarea
+  pk: fb4dbede-20ec-4a51-8f2f-1f37d5be2a27
+  fields: {disabled_on: '2022-01-15T00:00:00', name: 'UK-Mexico Trade Continuity Agreement', order: 2410.0}
+
+- model: interaction.policyarea
+  pk: cb7e4179-c794-44c1-9b87-2336497af952
+  fields: {disabled_on: '2022-01-15T00:00:00', name: 'UK-Iceland, Liechtenstein and Norway Free Trade Agreement', order: 2410.0}
