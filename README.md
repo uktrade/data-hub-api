@@ -237,7 +237,7 @@ Dependencies:
 14. Start celery:
 
     ```shell
-    celery worker -A config -l info -Q celery,long-running -B
+    celery -A config worker -l info -Q celery,long-running -B
     ```
 
     Note that in production the long-running queue is run in a separate worker with the
