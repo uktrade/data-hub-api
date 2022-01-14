@@ -1,3 +1,11 @@
+# Data Hub API 39.8.2 (2022-01-14)
+## Bug fixes
+
+- **Interactions** Trade agreement related policy areas disabled.
+
+  Trade agreements mistakenly added to the policy areas metadata table were disabled.
+
+
 # Data Hub API 39.8.1 (2022-01-13)
 ## Internal changes
 
