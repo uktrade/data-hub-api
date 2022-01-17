@@ -1,3 +1,25 @@
+# Data Hub API 39.8.3 (2022-01-14)
+## Bug fixes
+
+- **Technology** Use the correct celerybeat command in procfile for Celery 5, instead of Celery 4.
+
+
+# Data Hub API 39.8.2 (2022-01-14)
+## Bug fixes
+
+- **Interactions** Trade agreement related policy areas disabled.
+
+  Trade agreements mistakenly added to the policy areas metadata table were disabled.
+
+
+# Data Hub API 39.8.1 (2022-01-13)
+## Internal changes
+
+- Celery was upgraded to version 5.2.2.
+
+  Redis, billiard and kombu packages were updated to compatible versions, and code updated in-line with version 5 breaking changes.
+
+
 # Data Hub API 39.8.0 (2022-01-11)
 ## Features
 
