@@ -1,3 +1,9 @@
+# Data Hub API 39.8.5 (2022-01-20)
+## Internal changes
+
+- Upgrade python 3.8.8 to 3.10.1
+
+
 # Data Hub API 39.8.3 (2022-01-14)
 ## Bug fixes
 
