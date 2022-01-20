@@ -170,6 +170,20 @@ Dependencies:
     brew install libpq
     ```
 
+4. Install *postgres*, if not done already, as this is required by **psycopg2** in the requirements below
+
+    On Ubuntu:
+
+    ```shell
+    sudo apt install postgresql postgresql-contrib
+    ```
+
+    On macOS:
+
+    ```shell
+    brew install postgresql
+    ```
+
 4.  Create and activate the virtualenv:
 
     ```shell
