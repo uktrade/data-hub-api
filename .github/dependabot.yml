@@ -8,6 +8,12 @@ updates:
     timezone: Europe/London
   open-pull-requests-limit: 10
   ignore:
+  - dependency-name: billiard
+    versions:
+    - "> 3.5.0.4, < 3.5.1"
+  - dependency-name: kombu
+    versions:
+    - ">= 4.6.1.a, < 4.6.2"
   - dependency-name: pip-tools
     versions:
     - ">= 5.a, < 6"
