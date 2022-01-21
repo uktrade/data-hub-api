@@ -1,0 +1,1 @@
+Celery was reverted back to version 4.4.7 from version 5.
