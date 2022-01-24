@@ -27,7 +27,6 @@ from datahub.core.test_utils import (
     join_attr_values,
     random_obj_for_queryset,
 )
-from datahub.feature_flag.models import FeatureFlag
 from datahub.investment.project.constants import Involvement, LikelihoodToLand
 from datahub.investment.project.models import InvestmentProject, InvestmentProjectPermission
 from datahub.investment.project.test.factories import (
@@ -39,7 +38,6 @@ from datahub.investment.project.test.factories import (
 )
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
-from datahub.search.constants import FUZZY_SEARCH_FEATURE_FLAG
 from datahub.search.investment import InvestmentSearchApp
 from datahub.search.investment.views import SearchInvestmentExportAPIView
 
@@ -1552,12 +1550,8 @@ class TestBasicSearch(APITestMixin):
         assert response.data['count'] == 1
         assert response.data['results'][0]['project_code'] == investment_project.project_code
 
-    def test_similar_project_code_search(self, es_with_collector, fuzzy_search_feature):
+    def test_similar_project_code_search(self, es_with_collector):
         """Projects with similar project codes should not be shown in results."""
-        FeatureFlag.objects.update_or_create(
-            code=FUZZY_SEARCH_FEATURE_FLAG,
-            defaults={'is_active': True},
-        )
         investment_project = InvestmentProjectFactory(
             cdms_project_code='TEST-00001234',
         )
@@ -1579,7 +1573,7 @@ class TestBasicSearch(APITestMixin):
         assert response.data['count'] == 1
         assert response.data['results'][0]['project_code'] == investment_project.project_code
 
-    def test_similar_project_name_to_code_search(self, es_with_collector, fuzzy_search_feature):
+    def test_similar_project_name_to_code_search(self, es_with_collector):
         """Projects with numeric names should not match on project codes."""
         investment_project = InvestmentProjectFactory(
             cdms_project_code='DHP-00000048',
