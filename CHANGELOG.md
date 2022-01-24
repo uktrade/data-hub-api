@@ -1,3 +1,9 @@
+# Data Hub API 39.8.7 (2022-01-24)
+## Internal changes
+
+- **Technology** Use the latest decorator on celery task
+
+
 # Data Hub API 39.8.6 (2022-01-21)
 ## Internal changes
 
