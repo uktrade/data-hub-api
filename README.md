@@ -140,7 +140,7 @@ There is now a `make` command to bring up the three environments on a single doc
 
 Dependencies:
 
--   Python 3.8.x
+-   Python 3.10.x
 -   PostgreSQL 12
 -   redis 3.2
 -   Elasticsearch 7.10
@@ -152,7 +152,7 @@ Dependencies:
     cd data-hub-api
     ```
 
-2.  Install Python 3.8.
+2.  Install Python 3.10.
 
     [See this guide](https://docs.python-guide.org/starting/installation/) for detailed instructions for different platforms.
 
@@ -161,7 +161,7 @@ Dependencies:
     On Ubuntu:
 
     ```shell
-    sudo apt install build-essential libpq-dev python3.8-dev python3.8-venv
+    sudo apt install build-essential libpq-dev python3.10-dev python3.10-venv
     ```
 
     On macOS:
@@ -170,37 +170,51 @@ Dependencies:
     brew install libpq
     ```
 
-4.  Create and activate the virtualenv:
+4. Install *postgres*, if not done already, as this is required by **psycopg2** in the requirements below
+
+    On Ubuntu:
 
     ```shell
-    python3.8 -m venv env
+    sudo apt install postgresql postgresql-contrib
+    ```
+
+    On macOS:
+
+    ```shell
+    brew install postgresql
+    ```
+
+5.  Create and activate the virtualenv:
+
+    ```shell
+    python3.10 -m venv env
     source env/bin/activate
     pip install -U pip
     ```
 
-5.  Install the dependencies:
+6.  Install the dependencies:
 
     ```shell
     pip install -r requirements.txt
     ```
 
-6.  Create an `.env` settings file (it’s gitignored by default):
+7.  Create an `.env` settings file (it’s gitignored by default):
 
     ```shell
     cp config/settings/sample.env config/settings/.env
     ```
 
-7.  Set `DOCKER_DEV=False` in `.env`
+8.  Set `DOCKER_DEV=False` in `.env`
 
-8. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
+9. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
 
     ```shell
     docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:6.8.2
     ```
 
-9. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
+10. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
 
-10. Populate the databases and initialise Elasticsearch:
+11. Populate the databases and initialise Elasticsearch:
 
     ```shell
     ./manage.py migrate
@@ -210,7 +224,7 @@ Dependencies:
     ./manage.py createinitialrevisions
     ```
 
-11. Optionally, you can load some test data:
+12. Optionally, you can load some test data:
 
     ```shell
     ./manage.py loaddata fixtures/test_data.yaml
@@ -220,7 +234,7 @@ Dependencies:
     and hence the loaded records won‘t be returned by search endpoints until Celery is
     started and the queued tasks have run.
 
-12. Create a superuser:
+13. Create a superuser:
 
     ```shell
     ./manage.py createsuperuser
@@ -228,13 +242,13 @@ Dependencies:
 
     (You can enter any valid email address as the username and SSO email user ID.)
 
-13. Start the server:
+14. Start the server:
 
     ```shell
     ./manage.py runserver
     ```
 
-14. Start celery:
+15. Start celery:
 
     ```shell
     celery -A config worker -l info -Q celery,long-running -B
