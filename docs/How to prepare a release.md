@@ -38,7 +38,7 @@ If the command succeeds, it will open your web browser ready to create a PR to m
 
 Check the changelog preview is as expected, add at least two developers as reviewers and click 'Create pull request'.
 
-When ready, merge `changelog/<version>` into `develop` and delete the merged branch.
+When ready, merge `changelog/<version>` into `develop`.
 
 ## Create the release PR
 
