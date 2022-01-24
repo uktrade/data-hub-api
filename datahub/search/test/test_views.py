@@ -202,7 +202,6 @@ class TestBasicSearch(APITestMixin):
             'The Risk Advisory Group',
         ] == [result['name'] for result in response.data['results']]
 
-    @pytest.mark.me
     @pytest.mark.parametrize(
         'name,search_term,should_match',
         (
@@ -217,9 +216,8 @@ class TestBasicSearch(APITestMixin):
     )
     def test_fuzzy_quality(
         self,
-        fuzzy_search_feature,
         es_with_collector,
-        search_support_user,
+        fuzzy_search_user,
         name,
         search_term,
         should_match,
@@ -233,7 +231,7 @@ class TestBasicSearch(APITestMixin):
         es_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
-        api_client = self.create_api_client(user=search_support_user)
+        api_client = self.create_api_client(user=fuzzy_search_user)
 
         response = api_client.get(
             url,
@@ -253,9 +251,8 @@ class TestBasicSearch(APITestMixin):
 
     def test_fuzzy_quality_cross_fields(
         self,
-        fuzzy_search_feature,
         es_with_collector,
-        search_support_user,
+        fuzzy_search_user,
     ):
         """
         Tests quality of results for fuzzy matching across multiple fields.
@@ -279,7 +276,7 @@ class TestBasicSearch(APITestMixin):
         term = 'The Advisory Canada'
 
         url = reverse('api-v3:search:basic')
-        api_client = self.create_api_client(user=search_support_user)
+        api_client = self.create_api_client(user=fuzzy_search_user)
 
         response = api_client.get(
             url,
