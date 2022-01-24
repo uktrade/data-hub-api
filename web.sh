@@ -13,4 +13,4 @@ if [ -z "$SKIP_ES_MAPPING_MIGRATIONS" ] && [ "${CF_INSTANCE_INDEX:-0}" == "0" ];
   ./manage.py migrate_es
 fi
 
-gunicorn config.wsgi --config config/gunicorn.py
+python app.py
