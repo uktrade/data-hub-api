@@ -1,6 +1,6 @@
 import tempfile
 
-from celery.task import task
+from celery import shared_task
 from django.utils.timezone import now
 
 from datahub.documents.utils import get_bucket_name, get_s3_client_for_bucket
@@ -14,7 +14,7 @@ def _get_report_key():
     return key
 
 
-@task(acks_late=True)
+@shared_task(acks_late=True)
 def generate_spi_report():
     """Celery task that generates SPI report."""
     with tempfile.TemporaryFile(mode='wb+') as file:
