@@ -58,4 +58,4 @@ python /app/manage.py add_access_token --skip-checks --hours 24 --token lepStaff
 python /app/manage.py loaddata --ignorenonexistent /app/fixtures/test_data.yaml
 python /app/manage.py createinitialrevisions
 python /app/manage.py collectstatic --noinput
-DEBUG=False gunicorn config.wsgi --config config/gunicorn.py -b 0.0.0.0
+DEBUG=False python app.py
