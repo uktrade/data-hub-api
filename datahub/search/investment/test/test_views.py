@@ -1550,8 +1550,10 @@ class TestBasicSearch(APITestMixin):
         assert response.data['count'] == 1
         assert response.data['results'][0]['project_code'] == investment_project.project_code
 
-    def test_similar_project_code_search(self, es_with_collector):
+    def test_similar_project_code_search(self, es_with_collector, fuzzy_search_user):
         """Projects with similar project codes should not be shown in results."""
+        fuzzy_search_user.is_superuser = True
+        fuzzy_search_user.save()
         investment_project = InvestmentProjectFactory(
             cdms_project_code='TEST-00001234',
         )
@@ -1560,21 +1562,23 @@ class TestBasicSearch(APITestMixin):
         )
         es_with_collector.flush_and_refresh()
 
+        api_client = self.create_api_client(user=fuzzy_search_user)
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
+        response = api_client.get(
             url,
             data={
                 'term': investment_project.project_code,
                 'entity': 'investment_project',
             },
         )
-
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert response.data['results'][0]['project_code'] == investment_project.project_code
 
-    def test_similar_project_name_to_code_search(self, es_with_collector):
+    def test_similar_project_name_to_code_search(self, es_with_collector, fuzzy_search_user):
         """Projects with numeric names should not match on project codes."""
+        fuzzy_search_user.is_superuser = True
+        fuzzy_search_user.save()
         investment_project = InvestmentProjectFactory(
             cdms_project_code='DHP-00000048',
         )
@@ -1584,8 +1588,9 @@ class TestBasicSearch(APITestMixin):
         )
         es_with_collector.flush_and_refresh()
 
+        api_client = self.create_api_client(user=fuzzy_search_user)
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(
+        response = api_client.get(
             url,
             data={
                 'term': investment_project.project_code,
