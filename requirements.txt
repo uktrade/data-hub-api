@@ -33,9 +33,9 @@ billiard==3.6.4.0
     #   celery
 black==21.12b0
     # via ipython
-boto3==1.20.37
+boto3==1.20.42
     # via -r requirements.in
-botocore==1.23.41
+botocore==1.23.42
     # via
     #   boto3
     #   s3transfer
