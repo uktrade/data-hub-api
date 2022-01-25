@@ -339,7 +339,7 @@ pyyaml==6.0
     #   -r requirements.in
     #   pre-commit
     #   watchdog
-redis==4.1.0
+redis==4.1.1
     # via
     #   -r requirements.in
     #   celery
