@@ -45,6 +45,7 @@ class CompaniesDatasetView(BaseDatasetView):
             'number_of_employees',
             'one_list_account_owner_id',
             'one_list_tier__name',
+            'one_list_core_team_members__adviser',
             'reference_code',
             'registered_address_1',
             'registered_address_2',
