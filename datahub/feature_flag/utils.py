@@ -14,6 +14,15 @@ def is_feature_flag_active(code):
     return FeatureFlag.objects.filter(code=code, is_active=True).exists()
 
 
+def is_user_feature_flag_active(code, user):
+    """
+    Tells if given user feature flag is active for the specified user.
+
+    If user feature flag doesn't exist, it returns False.
+    """
+    return user.features.filter(code=code, is_active=True).exists()
+
+
 def feature_flagged_view(code):
     """
     Decorator to put a view behind a feature flag.
