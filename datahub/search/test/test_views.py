@@ -212,6 +212,11 @@ class TestBasicSearch(APITestMixin):
             ('The Advisory', 'The Adivsory', True),
             ('The Advisories', 'The Advisory', True),
             ('The Group', 'The Advisory', False),
+            ('Smarterlight Ltd', 'Smarterlight Ltd', True),
+            ('Smarterlight Ltd', 'Smarterlight', True),
+            ('Smarterlight Ltd', 'Smatterlight', True),
+            ('Smarterlight Ltd', 'Smaxtec', False),
+            ('Smarterlight Ltd', 'Omarterlight', False),
         ),
     )
     def test_fuzzy_quality(
