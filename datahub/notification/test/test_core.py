@@ -10,6 +10,7 @@ from datahub.notification.constants import DEFAULT_SERVICE_NAME, NotifyServiceNa
         (None, None),
         ({'foo': 'bar'}, None),
         ({'foo': 'bar'}, NotifyServiceName.omis),
+        ({'foo': 'bar'}, NotifyServiceName.investment),
     ),
 )
 def test_send_email_notification(context, service_name):
