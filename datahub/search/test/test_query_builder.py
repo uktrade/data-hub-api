@@ -226,10 +226,10 @@ def test_build_term_query(term, expected):
                             'match': {
                                 'name.trigram': {
                                     'query': 'hello',
-                                    'fuzziness': 'AUTO',
+                                    'fuzziness': 'AUTO:0,2',
                                     'operator': 'AND',
-                                    'minimum_should_match': '80%',
-                                    'boost': 1.5,
+                                    'prefix_length': '1',
+                                    'minimum_should_match': '60%',
                                 },
                             },
                         },
@@ -237,10 +237,10 @@ def test_build_term_query(term, expected):
                             'match': {
                                 'country.trigram': {
                                     'query': 'hello',
-                                    'fuzziness': 'AUTO',
+                                    'fuzziness': 'AUTO:0,2',
                                     'operator': 'AND',
-                                    'minimum_should_match': '80%',
-                                    'boost': 1,
+                                    'prefix_length': '1',
+                                    'minimum_should_match': '60%',
                                 },
                             },
                         },
