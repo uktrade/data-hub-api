@@ -45,7 +45,8 @@ elasticsearch-dsl==7.4.0
 elastic-apm==6.7.2
 
 # Celery
-celery[redis]==5.2.3
+git+https://github.com/uktrade/celery@v5.0.5p1#egg=celery[redis]
+# celery[redis]==5.0.5
 
 # Testing and dev
 pytest==6.2.5
