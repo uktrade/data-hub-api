@@ -1,3 +1,15 @@
+# Data Hub API 39.9.0 (2022-01-28)
+## Features
+
+- A user feature flag has been added, so that users with this flag can access the fuzzy search functionality on the search endpoints.
+- Fuzzy search is now stricter and should get higher quality matches with fewer spurious results.
+
+## Internal changes
+
+- **Technology** Use a patched version of Celery 5.0.5.
+- **Technology** WSGIServer replaced gunicorn.
+
+
 # Data Hub API 39.8.7 (2022-01-24)
 ## Internal changes
 
