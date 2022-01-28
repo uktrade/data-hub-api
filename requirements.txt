@@ -31,7 +31,7 @@ billiard==3.6.4.0
     # via celery
 black==21.12b0
     # via ipython
-boto3==1.20.42
+boto3==1.20.45
     # via -r requirements.in
 botocore==1.23.45
     # via
@@ -422,10 +422,7 @@ traitlets==5.1.1
     #   ipython
     #   matplotlib-inline
 typing-extensions==4.0.1
-    # via
-    #   astroid
-    #   black
-    #   pylint
+    # via black
 uritemplate==4.1.1
     # via -r requirements.in
 urllib3==1.26.8
