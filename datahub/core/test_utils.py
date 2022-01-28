@@ -277,6 +277,13 @@ def get_attr_or_none(obj, attr):
         return None
 
 
+def get_attr_or_default(obj, attr, default=None):
+    try:
+        return attrgetter(attr)(obj)
+    except AttributeError:
+        return default
+
+
 class MockQuerySet:
     """Mock version of QuerySet that represents a fixed set of items."""
 
