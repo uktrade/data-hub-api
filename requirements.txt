@@ -37,7 +37,7 @@ botocore==1.23.45
     # via
     #   boto3
     #   s3transfer
-celery[redis]==5.2.3
+celery @ git+https://github.com/uktrade/celery@v5.0.5p1
     # via -r requirements.in
 certifi==2021.10.8
     # via
@@ -55,7 +55,7 @@ charset-normalizer==2.0.10
     # via
     #   aiohttp
     #   requests
-click==8.0.3
+click==7.1.2
     # via
     #   black
     #   celery
