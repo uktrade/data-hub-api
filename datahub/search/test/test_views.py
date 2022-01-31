@@ -209,17 +209,22 @@ class TestBasicSearch(APITestMixin):
             ('The Advisory Group', 'The Advisory', True),
             ('The Advisory', 'The Advisory', True),
             ('The Advisory', 'The Advasory', True),
-            ('The Advisory', 'The Adivsory', True),
-            ('The Advisories', 'The Advisory', True),
+            ('The Advisory', 'The Adviosry', True),
+            ('The Advisory', 'The Adviosrys', True),
+            ('The Advisories', 'The Advisory', False),
             ('The Group', 'The Advisory', False),
             ('Smarterlight Ltd', 'Smarterlight Ltd', True),
             ('Smarterlight Ltd', 'Smarterlight', True),
-            ('Smarterlight Ltd', 'Smatterlight', True),
+            ('Smarterlight', 'Smatterlight', True),
             ('Smarterlight Ltd', 'Smaxtec', False),
             ('Smarterlight Ltd', 'Omarterlight', False),
+            ('Smarterlight Ltd', 'Sparterlight', False),
+            ('Smarterlight Ltd', 'Smarterlight Inc', False),
+            ('Charterhouse', 'Hotel', False),
+            ('Block C, The Courtyard, 55 Charterhouse Street', 'Hotel', False),
         ),
     )
-    def test_fuzzy_quality(
+    def test_fuzzy_quality_single_field(
         self,
         es_with_collector,
         fuzzy_search_user,
@@ -251,6 +256,53 @@ class TestBasicSearch(APITestMixin):
         if should_match:
             assert response.data['count'] == 1
             assert response.data['results'][0]['name'] == name
+        else:
+            assert response.data['count'] == 0
+
+    @pytest.mark.parametrize(
+        'name,address,search_term,should_match',
+        (
+            ('Charterhouse', 'Block C, The Courtyard, 55 Charterhouse Street', 'Hotel', False),
+            ('Charterhouse', 'Overlook Hotel, Courtyard, 55 Charterhouse', 'Hotel', True),
+            ('Charterhouse', 'Overlook Hotel, Courtyard, 55 Charterhouse', 'Hotal', True),
+            ('Charterhouse', 'Overlook Hotel, Courtyard, 55 Charterhouse', 'Hartleyhouse', False),
+            ('Charterhouse', 'Overlook Hotel, Courtyard, 55 London Road', 'Chatterhouse', True),
+        ),
+    )
+    def test_fuzzy_quality_multi_field(
+        self,
+        es_with_collector,
+        fuzzy_search_user,
+        name,
+        address,
+        search_term,
+        should_match,
+    ):
+        """
+        Tests quality of results for fuzzy matching multiple fields.
+
+        This should not only hit on exact matches, but also close matches.
+        """
+        SimpleModel.objects.create(name=name, address=address)
+        es_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:basic')
+        api_client = self.create_api_client(user=fuzzy_search_user)
+
+        response = api_client.get(
+            url,
+            data={
+                'term': search_term,
+                'entity': 'simplemodel',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        if should_match:
+            assert response.data['count'] == 1
+            assert response.data['results'][0]['name'] == name
+            assert response.data['results'][0]['address'] == address
         else:
             assert response.data['count'] == 0
 
