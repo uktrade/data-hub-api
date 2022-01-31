@@ -261,6 +261,12 @@ def _build_fuzzy_term_query(term, fields=None):
     """
     Builds a fuzzy term query that matches with minor spelling errors etc.
 
+    We use trigram fields as they are suitable indicator for fields that can be fuzzy
+    matched.
+
+    Note that we are not actually using the trigram analyzer here and using standard
+    Levensthein distances from 'fuzziness' in the match query.
+
     Since the elasticsearch version on cloudfoundry is only 7.9.3 we are unable
     to use the 'combined_fields' query which was introduced in version 7.13. This
     would allow us to do fuzzy matching across different fields. Instead, this
@@ -274,14 +280,15 @@ def _build_fuzzy_term_query(term, fields=None):
 
     trigram_fields = [field for field in fields if field.endswith('.trigram')]
 
-    trigram_queries = [
+    fuzzy_queries = [
         Match(**{
-            field: {
+            # Drop '.trigram' from field to get predictable fuzzy matching
+            field.replace('.trigram', ''): {
                 'query': term,
-                'fuzziness': 'AUTO:0,2',
+                'fuzziness': 'AUTO',
                 'operator': 'AND',
-                'prefix_length': '1',
-                'minimum_should_match': '60%',
+                'prefix_length': '2',
+                'minimum_should_match': '80%',
             },
         })
         for field in trigram_fields
@@ -290,7 +297,7 @@ def _build_fuzzy_term_query(term, fields=None):
         # Promote exact name match
         Match(**{'name.keyword': {'query': term, 'boost': 2}}),
         # Add in trigram (fuzzy) fields
-        *trigram_queries,
+        *fuzzy_queries,
         # Cross match fields
         MultiMatch(
             query=term,
