@@ -117,7 +117,7 @@ django-pglocks==1.0.4
     # via -r requirements.in
 django-redis==5.2.0
     # via -r requirements.in
-django-reversion==4.0.1
+django-reversion==4.0.2
     # via -r requirements.in
 djangorestframework==3.13.1
     # via -r requirements.in
@@ -422,10 +422,7 @@ traitlets==5.1.1
     #   ipython
     #   matplotlib-inline
 typing-extensions==4.0.1
-    # via
-    #   astroid
-    #   black
-    #   pylint
+    # via black
 uritemplate==4.1.1
     # via -r requirements.in
 urllib3==1.26.8
