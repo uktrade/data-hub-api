@@ -137,8 +137,6 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
     def test_core_team_member(self, data_flow_api_client, company_factory):
         """Test that endpoint returns with advisers on the core team"""
         company = company_factory()
-        company.created_by = None
-        company.created_on = None
         company.one_list_core_team_advisers = [
             str(o.adviser.id) for o in OneListCoreTeamMemberFactory.create_batch(
                 3,
