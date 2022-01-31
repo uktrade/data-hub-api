@@ -1,8 +1,9 @@
+from django.contrib.postgres.aggregates import ArrayAgg
+
 from datahub.company.models import Company
 from datahub.dataset.core.views import BaseDatasetView
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.metadata.utils import convert_usd_to_gbp
-from django.contrib.postgres.aggregates import ArrayAgg
 
 
 class CompaniesDatasetView(BaseDatasetView):
