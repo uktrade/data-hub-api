@@ -278,6 +278,15 @@ def get_attr_or_none(obj, attr):
 
 
 def get_attr_or_default(obj, attr, default=None):
+    """
+    Gets an attribute of an object, or returns a default value if the attribute does not exist.
+
+    Dotted paths to attributes can be provided to specify nested attributes.
+
+    Usage example:
+        # Returns company.contact.name or [None] if contact is None
+        get_attr_or_default(company, 'contact.name', [None])
+    """
     try:
         return attrgetter(attr)(obj)
     except AttributeError:
