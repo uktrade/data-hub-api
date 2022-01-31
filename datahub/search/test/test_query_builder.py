@@ -224,30 +224,46 @@ def test_build_term_query(term, expected):
                         },
                         {
                             'match': {
-                                'name.trigram': {
+                                'name': {
                                     'query': 'hello',
-                                    'fuzziness': 'AUTO:0,2',
+                                    'fuzziness': 'AUTO',
                                     'operator': 'AND',
-                                    'prefix_length': '1',
-                                    'minimum_should_match': '60%',
+                                    'prefix_length': '2',
+                                    'minimum_should_match': '80%',
                                 },
                             },
                         },
                         {
                             'match': {
-                                'country.trigram': {
+                                'address': {
                                     'query': 'hello',
-                                    'fuzziness': 'AUTO:0,2',
+                                    'fuzziness': 'AUTO',
                                     'operator': 'AND',
-                                    'prefix_length': '1',
-                                    'minimum_should_match': '60%',
+                                    'prefix_length': '2',
+                                    'minimum_should_match': '80%',
+                                },
+                            },
+                        },
+                        {
+                            'match': {
+                                'country': {
+                                    'query': 'hello',
+                                    'fuzziness': 'AUTO',
+                                    'operator': 'AND',
+                                    'prefix_length': '2',
+                                    'minimum_should_match': '80%',
                                 },
                             },
                         },
                         {
                             'multi_match': {
                                 'query': 'hello',
-                                'fields': ('name', 'name.trigram', 'country', 'country.trigram'),
+                                'fields': (
+                                    'name',
+                                    'name.trigram',
+                                    'address.trigram',
+                                    'country.trigram',
+                                ),
                                 'type': 'cross_fields',
                                 'operator': 'and',
                             },
@@ -268,7 +284,7 @@ def test_build_fuzzy_term_query(term, expected):
     """Tests search term query."""
     query = _build_fuzzy_term_query(
         term,
-        fields=('name', 'name.trigram', 'country', 'country.trigram'),
+        fields=('name', 'name.trigram', 'address.trigram', 'country.trigram'),
     )
     assert query.to_dict() == expected
 
@@ -436,8 +452,8 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                                                 'fields': (
                                                     'name',
                                                     'name.trigram',
-                                                    'country',
                                                     'country.trigram',
+                                                    'address.trigram',
                                                 ),
                                                 'type': 'cross_fields',
                                                 'operator': 'and',
@@ -496,8 +512,8 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                                                 'fields': (
                                                     'name',
                                                     'name.trigram',
-                                                    'country',
                                                     'country.trigram',
+                                                    'address.trigram',
                                                 ),
                                                 'type': 'cross_fields',
                                                 'operator': 'and',
@@ -636,8 +652,8 @@ def test_get_search_by_multiple_entities_query():
                                         'fields': (
                                             'name',
                                             'name.trigram',
-                                            'country',
                                             'country.trigram',
+                                            'address.trigram',
                                         ),
                                         'operator': 'and',
                                         'query': None,
@@ -718,7 +734,12 @@ def test_get_basic_search_query(mocked_get_global_search_apps_as_mapping):
                     {
                         'multi_match': {
                             'query': 'test',
-                            'fields': ['country', 'country.trigram', 'name', 'name.trigram'],
+                            'fields': [
+                                'address.trigram',
+                                'country.trigram',
+                                'name',
+                                'name.trigram',
+                            ],
                             'type': 'cross_fields',
                             'operator': 'and',
                         },
