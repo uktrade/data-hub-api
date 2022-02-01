@@ -10,5 +10,3 @@ so the front end can check that status of each flag.
 
 They're also sometimes checked in the back end, but this is less common.
 """
-
-default_app_config = 'datahub.feature_flag.apps.FeatureFlagConfig'
