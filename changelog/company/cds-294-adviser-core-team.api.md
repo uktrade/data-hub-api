@@ -1,1 +1,0 @@
-Add `one_list_core_team_advisers` field to GET responses for `/v4/dataset/companies-dataset` which represents an array of the Advisers on core team. 

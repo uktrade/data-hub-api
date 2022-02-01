@@ -1,3 +1,17 @@
+# Data Hub API 39.10.0 (2022-02-01)
+## Features
+
+- The quality of fuzzy search matches has been improved by enforcing stricter matching
+
+## Internal changes
+
+- **Investment** An Investment Notify profile support has been added.
+
+## API
+
+- **Companies** Add `one_list_core_team_advisers` field to GET responses for `/v4/dataset/companies-dataset` which represents an array of the Advisers on core team.
+
+
 # Data Hub API 39.9.0 (2022-01-28)
 ## Features
 
