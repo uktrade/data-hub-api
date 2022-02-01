@@ -15,7 +15,7 @@ class TestBaseESModel:
     @pytest.mark.parametrize('include_source', (False, True))
     def test_es_document(self, include_index, include_source):
         """Test that es_document() creates a dict with the expected keys and values."""
-        obj = SimpleModel(id=5, name='test-name', country='uk')
+        obj = SimpleModel(id=5, name='test-name', address='123 Fake Street', country='uk')
         doc = ESSimpleModel.es_document(
             obj,
             include_index=include_index,
@@ -25,6 +25,7 @@ class TestBaseESModel:
             '_document_type': 'simplemodel',
             'id': obj.pk,
             'name': 'test-name',
+            'address': '123 Fake Street',
             'country': 'uk',
             'date': None,
         }

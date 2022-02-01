@@ -20,11 +20,16 @@ class ESSimpleModel(BaseESModel):
             'trigram': fields.TrigramText(),
         },
     )
+    address = Text(
+        fields={
+            'trigram': fields.TrigramText(),
+        },
+    )
     date = Date()
 
     SEARCH_FIELDS = (
         'name',
         'name.trigram',
-        'country',
         'country.trigram',
+        'address.trigram',
     )
