@@ -72,6 +72,7 @@ CELERY_TASK_ALWAYS_EAGER = True
 # Stop WhiteNoise emitting warnings when running tests without running collectstatic first
 WHITENOISE_AUTOREFRESH = True
 WHITENOISE_USE_FINDERS = True
+STATICFILES_STORAGE = None
 
 PAAS_IP_WHITELIST = ['1.2.3.4']
 
