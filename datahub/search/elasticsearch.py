@@ -19,7 +19,7 @@ lowercase_asciifolding_normalizer = analysis.normalizer(
 # Trigram tokenizer enables us to support partial matching
 trigram = analysis.tokenizer(
     'trigram',
-    'nGram',
+    'ngram',
     min_gram=3,
     max_gram=3,
     token_chars=('letter', 'digit'),

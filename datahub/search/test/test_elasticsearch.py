@@ -92,7 +92,7 @@ def test_creates_index(monkeypatch, mock_connection_for_create_index):
                             'min_gram': 3,
                             'max_gram': 3,
                             'token_chars': ('letter', 'digit'),
-                            'type': 'nGram',
+                            'type': 'ngram',
                         },
                     },
                     'char_filter': {
