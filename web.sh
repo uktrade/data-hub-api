@@ -13,4 +13,5 @@ if [ -z "$SKIP_ES_MAPPING_MIGRATIONS" ] && [ "${CF_INSTANCE_INDEX:-0}" == "0" ];
   ./manage.py migrate_es
 fi
 
+python manage.py collectstatic
 python app.py
