@@ -1,3 +1,9 @@
+# Data Hub API 39.11.0 (2022-02-02)
+## Internal changes
+
+- whitenoise support enabled on all our environments
+
+
 # Data Hub API 39.10.0 (2022-02-01)
 ## Features
 
