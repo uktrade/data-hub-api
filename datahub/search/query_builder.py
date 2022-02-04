@@ -1,8 +1,8 @@
 from collections import defaultdict
 from itertools import chain
 
-from elasticsearch_dsl import Search
-from elasticsearch_dsl.query import (
+from opensearch_dsl import Search
+from opensearch_dsl.query import (
     Bool,
     Exists,
     Match,

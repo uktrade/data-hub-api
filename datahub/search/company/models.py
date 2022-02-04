@@ -1,6 +1,6 @@
 from functools import partial
 
-from elasticsearch_dsl import Boolean, Date, Keyword, Object, Text
+from opensearch_dsl import Boolean, Date, Keyword, Object, Text
 
 from datahub.company.models import CompanyExportCountry
 from datahub.search import dict_utils, fields
