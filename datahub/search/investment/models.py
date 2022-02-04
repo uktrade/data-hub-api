@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Object, Text
+from opensearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Object, Text
 
 from datahub.search import dict_utils
 from datahub.search import fields

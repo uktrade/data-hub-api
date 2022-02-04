@@ -1,5 +1,5 @@
 import pytest
-from elasticsearch.exceptions import NotFoundError
+from opensearchpy.exceptions import NotFoundError
 
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
