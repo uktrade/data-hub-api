@@ -333,6 +333,11 @@ if 'elasticsearch' in VCAP_SERVICES:
 else:
     ES_URL = env('ES5_URL')
 
+if 'opensearch' in VCAP_SERVICES:
+    OPENSEARCH_URL = VCAP_SERVICES['opensearch'][0]['credentials']['uri']
+else:
+    OPENSEARCH_URL = env('OPENSEARCH_URL') or '<invalid-configuration>'
+
 ES_VERIFY_CERTS = env.bool('ES_VERIFY_CERTS', True)
 ES_INDEX_PREFIX = env('ES_INDEX_PREFIX')
 ES_INDEX_SETTINGS = {}

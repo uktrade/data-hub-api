@@ -1,5 +1,5 @@
 import pytest
-from elasticsearch_dsl import Mapping
+from opensearch_dsl import Mapping
 
 from datahub.search.investment.models import InvestmentProject as ESInvestmentProject
 from datahub.search.query_builder import (
@@ -11,7 +11,7 @@ from datahub.search.query_builder import (
 
 def test_mapping(es):
     """Test the ES mapping for an investment project."""
-    mapping = Mapping.from_es(
+    mapping = Mapping.from_opensearch(
         ESInvestmentProject.get_write_index(),
     )
 
