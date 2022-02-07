@@ -312,7 +312,7 @@ pylint-pytest==1.1.2
     # via -r requirements.in
 pyparsing==3.0.7
     # via packaging
-pytest==6.2.5
+pytest==7.0.0
     # via
     #   -r requirements.in
     #   pylint-pytest
@@ -408,13 +408,13 @@ toml==0.10.2
     # via
     #   pre-commit
     #   pylint
-    #   pytest
     #   towncrier
 tomli==1.2.3
     # via
     #   black
     #   coverage
     #   pep517
+    #   pytest
 towncrier==21.3.0
     # via -r requirements.in
 traitlets==5.1.1
