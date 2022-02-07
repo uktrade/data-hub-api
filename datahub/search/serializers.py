@@ -138,6 +138,8 @@ class BasicSearchQuerySerializer(BaseSearchQuerySerializer):
 
     entity = _ESModelChoiceField(default='company')
     term = serializers.CharField(required=True, allow_blank=True)
+    show_archived = serializers.BooleanField(default=True)
+
 
 
 class EntitySearchQuerySerializer(BaseSearchQuerySerializer):
