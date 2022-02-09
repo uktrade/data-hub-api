@@ -1,6 +1,6 @@
 from operator import attrgetter
 
-from elasticsearch_dsl import Boolean, Date, Double, InnerDoc, Keyword, Object, Text
+from opensearch_dsl import Boolean, Date, Double, InnerDoc, Keyword, Object, Text
 
 from datahub.search import dict_utils, fields
 from datahub.search.fields import TrigramText

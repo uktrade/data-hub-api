@@ -1,5 +1,5 @@
 import pytest
-from elasticsearch_dsl import Mapping
+from opensearch_dsl import Mapping
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.search.company import CompanySearchApp
@@ -14,7 +14,7 @@ from datahub.search.sync_object import sync_object
 
 def test_mapping(es):
     """Test the ES mapping for a company."""
-    mapping = Mapping.from_es(
+    mapping = Mapping.from_opensearch(
         CompanySearchApp.es_model.get_write_index(),
     )
     assert mapping.to_dict() == {
