@@ -1,6 +1,6 @@
 import freezegun
 import pytest
-from elasticsearch_dsl import Mapping
+from opensearch_dsl import Mapping
 
 from datahub.investment.opportunity.test.constants import (
     OpportunityStatus as OpportunityStatusConstant,
@@ -18,7 +18,7 @@ pytestmark = pytest.mark.django_db
 
 def test_mapping(es):
     """Test the ES mapping for a large capital opportunity."""
-    mapping = Mapping.from_es(
+    mapping = Mapping.from_opensearch(
         LargeCapitalOpportunitySearchApp.es_model.get_write_index(),
     )
     assert mapping.to_dict() == {

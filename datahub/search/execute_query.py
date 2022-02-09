@@ -2,7 +2,7 @@ from logging import getLogger
 from urllib.parse import urlparse
 
 from django.conf import settings
-from elasticsearch.exceptions import ConnectionError
+from opensearchpy.exceptions import ConnectionError
 
 from datahub.core.exceptions import APIBadGatewayException
 from datahub.core.utils import log_to_sentry
@@ -20,7 +20,7 @@ def execute_search_query(query):
         response = query.params(request_timeout=settings.ES_SEARCH_REQUEST_TIMEOUT).execute()
     except ConnectionError:
         raise APIBadGatewayException(
-            f'Upstream service unavailable: {urlparse(settings.ES_URL).netloc}',
+            f'Upstream service unavailable: {urlparse(settings.OPENSEARCH_URL).netloc}',
         )
 
     if response.took >= settings.ES_SEARCH_REQUEST_WARNING_THRESHOLD * 1000:

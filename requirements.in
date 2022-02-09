@@ -37,9 +37,9 @@ slackclient==2.9.3
 # REDIS
 django-redis==5.2.0
 
-# ES
-elasticsearch==7.13.4
-elasticsearch-dsl==7.4.0
+# OpenSearch
+opensearch-py==1.0.0
+opensearch-dsl==1.0.0
 
 # ES APM
 elastic-apm==6.7.2
