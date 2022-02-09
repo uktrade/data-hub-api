@@ -139,6 +139,7 @@ class SearchBasicAPIView(APIView):
             limit=validated_params['limit'],
             fields_to_exclude=fields_to_exclude,
             fuzzy=fuzzy_search_enabled,
+            show_archived=validated_params['show_archived'],
         )
 
         results = execute_search_query(query)
