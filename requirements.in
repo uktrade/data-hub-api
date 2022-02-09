@@ -37,9 +37,9 @@ slackclient==2.9.3
 # REDIS
 django-redis==5.2.0
 
-# ES
-elasticsearch==7.13.4
-elasticsearch-dsl==7.4.0
+# OpenSearch
+opensearch-py==1.0.0
+opensearch-dsl==1.0.0
 
 # ES APM
 elastic-apm==6.7.2
@@ -58,7 +58,7 @@ factory-boy==3.2.1
 freezegun==1.1.0
 requests-mock==1.9.3
 django-debug-toolbar==3.2.4
-werkzeug==2.0.2  # Required by runserver_plus - useful for local dev
+werkzeug==2.0.3  # Required by runserver_plus - useful for local dev
 pip-tools==6.5.0
 piprot==0.9.11
 semantic_version==2.9.0
