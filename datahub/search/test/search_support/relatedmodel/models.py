@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Keyword
+from opensearch_dsl import Keyword
 
 from datahub.search import dict_utils
 from datahub.search import fields
