@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Date, Keyword, Text
+from opensearch_dsl import Date, Keyword, Text
 
 from datahub.search import fields
 from datahub.search.models import BaseESModel

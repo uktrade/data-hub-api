@@ -1,6 +1,6 @@
 import freezegun
 import pytest
-from elasticsearch_dsl import Mapping
+from opensearch_dsl import Mapping
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
@@ -15,7 +15,7 @@ pytestmark = pytest.mark.django_db
 
 def test_mapping(es):
     """Test the ES mapping for a large capital investor profile."""
-    mapping = Mapping.from_es(
+    mapping = Mapping.from_opensearch(
         LargeInvestorProfileSearchApp.es_model.get_write_index(),
     )
     assert mapping.to_dict() == {
