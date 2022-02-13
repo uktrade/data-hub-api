@@ -413,6 +413,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW` | No | Whether to enable the add access token page for superusers in the admin site (default=True). |
 | `ENABLE_DAILY_OPENSEARCH_SYNC` | No | Whether to enable the daily OpenSearch sync (default=False). |
 | `ENABLE_EMAIL_INGESTION` | No | True or False.  Whether or not to activate the celery beat task for ingesting emails |
+  `ENABLE_INVESTMENT_NOTIFICATION` | No | True or False. Whether or not to activate the celery beat task for sending investment notifications |
 | `ENABLE_MAILBOX_PROCESSING` | No | True or False.  Whether or not to activate the celery beat task for mailbox processing |
 | `ENABLE_SLACK_MESSAGING` | No | If present and truthy, enable the transmission of messages to Slack. Necessitates the specification of the other env vars `SLACK_API_TOKEN` and `SLACK_MESSAGE_CHANNEL` |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
@@ -440,6 +441,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `INVESTMENT_DOCUMENT_BUCKET` | No | S3 bucket for investment project documents storage. |
 | `INVESTMENT_NOTIFICATION_ADMIN_EMAIL`  | Yes | |
 | `INVESTMENT_NOTIFICATION_API_KEY`  | Yes | |
+  `INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID` | Yes | An ID of Notify Template for Estimated Land Date notifications |
 | `MAILBOX_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for mailbox. |
 | `MAILBOX_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for mailbox. |
 | `MAILBOX_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for mailbox. |
