@@ -55,7 +55,7 @@ def test_contact_dbmodel_to_dict(es):
 
 
 def test_contact_dbmodels_to_es_documents(es):
-    """Tests conversion of db models to Elasticsearch documents."""
+    """Tests conversion of db models to OpenSearch documents."""
     contacts = ContactFactory.create_batch(2)
 
     result = ESContact.db_objects_to_es_documents(contacts)
@@ -65,7 +65,7 @@ def test_contact_dbmodels_to_es_documents(es):
 
 def test_contact_dbmodels_to_es_documents_without_country(es):
     """
-    Tests conversion of db models to Elasticsearch documents when
+    Tests conversion of db models to OpenSearch documents when
     country is None.
     """
     # We want to bypass any validation

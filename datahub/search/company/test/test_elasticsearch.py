@@ -13,7 +13,7 @@ from datahub.search.sync_object import sync_object
 
 
 def test_mapping(es):
-    """Test the ES mapping for a company."""
+    """Test the OpenSearch mapping for a company."""
     mapping = Mapping.from_opensearch(
         CompanySearchApp.es_model.get_write_index(),
     )
@@ -650,7 +650,7 @@ def test_limited_get_search_by_entity_query():
 
 @pytest.mark.django_db
 def test_indexed_doc(es):
-    """Test the ES data of an indexed company."""
+    """Test the OpenSearch data of an indexed company."""
     company = CompanyFactory(
         trading_names=['a', 'b'],
     )
