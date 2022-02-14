@@ -24,9 +24,8 @@ app.autodiscover_tasks()
 
 @after_setup_logger.connect
 def after_setup_logger_handler(**kwargs):
-    """As the Elasticsearch module is noisy, set its log level to WARNING for Celery workers."""
-    es_logger = logging.getLogger('elasticsearch')
-    es_logger.setLevel(logging.WARNING)
+    """As the OpenSearch module is noisy, set its log level to WARNING for Celery workers."""
+    logging.getLogger('opensearch').setLevel(logging.WARNING)
 
 
 @inspect_command(

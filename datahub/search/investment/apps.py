@@ -20,8 +20,8 @@ class InvestmentSearchApp(SearchApp):
     es_model = InvestmentProject
     # Investment project documents are very large, so the bulk_batch_size is set to a lower value
     # to keep bulk requests below 10 MB.
-    # (In some environments, the maximum ES request size is 10 MB. This is dependent on the AWS
-    # EC2 instance type.)
+    # (In some environments, the maximum OpenSearch request size is 10 MB. This is dependent on
+    # the AWS EC2 instance type.)
     bulk_batch_size = 1000
     view_permissions = (
         f'investment.{InvestmentProjectPermission.view_all}',

@@ -8,8 +8,8 @@ from datahub.search.large_investor_profile.models import (
 pytestmark = pytest.mark.django_db
 
 
-class TestLargeInvestorProfileElasticModel:
-    """Test for the large investor profile elasticsearch model"""
+class TestLargeInvestorProfileOpenSearchModel:
+    """Test for the large investor profile OpenSearch model"""
 
     def test_large_investor_profile_dbmodel_to_dict(self, es):
         """Tests conversion of db model to dict."""
@@ -45,7 +45,7 @@ class TestLargeInvestorProfileElasticModel:
         assert set(result.keys()) == keys
 
     def test_investment_project_dbmodels_to_es_documents(self, es):
-        """Tests conversion of db models to Elasticsearch documents."""
+        """Tests conversion of db models to OpenSearch documents."""
         large_profiles = LargeCapitalInvestorProfileFactory.create_batch(2)
 
         result = ESLargeInvestorProfile.db_objects_to_es_documents(large_profiles)

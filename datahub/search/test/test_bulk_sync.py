@@ -12,7 +12,7 @@ from datahub.search.test.utils import create_mock_search_app
 
 
 def test_sync_app_with_default_batch_size(monkeypatch):
-    """Tests syncing an app to Elasticsearch with the default batch size."""
+    """Tests syncing an app to OpenSearch with the default batch size."""
     bulk_mock = Mock()
     monkeypatch.setattr('datahub.search.bulk_sync.bulk', bulk_mock)
 
@@ -25,7 +25,7 @@ def test_sync_app_with_default_batch_size(monkeypatch):
 
 
 def test_sync_app_with_overridden_batch_size(monkeypatch):
-    """Tests syncing an app to Elasticsearch with an overridden batch size."""
+    """Tests syncing an app to OpenSearch with an overridden batch size."""
     bulk_mock = Mock()
     monkeypatch.setattr('datahub.search.bulk_sync.bulk', bulk_mock)
 
@@ -38,7 +38,7 @@ def test_sync_app_with_overridden_batch_size(monkeypatch):
 
 
 def test_sync_app_logic(monkeypatch):
-    """Tests syncing an app to Elasticsearch during a mapping migration."""
+    """Tests syncing an app to OpenSearch during a mapping migration."""
     bulk_mock = Mock()
     monkeypatch.setattr('datahub.search.bulk_sync.bulk', bulk_mock)
     search_app = create_mock_search_app(

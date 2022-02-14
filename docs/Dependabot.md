@@ -11,4 +11,4 @@ This is the process we have identified for dealing with Dependabot PRs that save
 7. Rebase the dependency branch against `develop` to remove all the merge commits, then push the changes and open a PR (you don't need to make a news fragment).
 8. If you are satisfied that everything is in order and all the tests have passed, request reviews as normal.
 
-If the Elasticsearch version has been updated, the version used in [the frontend e2e tests](https://github.com/uktrade/data-hub-frontend/blob/master/docker-compose.e2e.yml#L82) needs to be updated to match.
+If the OpenSearch version has been updated, the version used in [the frontend e2e tests](https://github.com/uktrade/data-hub-frontend/blob/master/docker-compose.e2e.yml#L82) needs to be updated to match.

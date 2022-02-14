@@ -20,7 +20,7 @@ from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
 
 @mock.patch('datahub.search.elasticsearch.es_bulk')
 def test_delete_documents(es_bulk, mock_es_client):
-    """Test that delete_documents calls ES bulk to delete all documents."""
+    """Test that delete_documents calls OpenSearch bulk to delete all documents."""
     es_bulk.return_value = (None, [])
 
     index = 'test-index'
@@ -50,7 +50,7 @@ def test_delete_documents(es_bulk, mock_es_client):
 
 @mock.patch('datahub.search.elasticsearch.es_bulk')
 def test_delete_documents_with_errors(es_bulk, mock_es_client):
-    """Test that if ES returns a non-404 error, DataHubError is raised."""
+    """Test that if OpenSearch returns a non-404 error, DataHubError is raised."""
     es_bulk.return_value = (
         None,
         [
@@ -67,8 +67,7 @@ def test_delete_documents_with_errors(es_bulk, mock_es_client):
 
     assert excinfo.value.args == (
         (
-            'One or more errors during an Elasticsearch bulk deletion '
-            "operation: [{'delete': {'status': 500}}]"
+            "Errors during an OpenSearch bulk deletion operation: [{'delete': {'status': 500}}]"
         ),
     )
 

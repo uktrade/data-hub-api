@@ -42,10 +42,10 @@ def search_investment_project_by_id(pk):
 
 def assert_project_search_latest_interaction(has_interaction=True, name=''):
     """
-    Assert that a project on elastic search has or does not have a latest interaction.
+    Assert that a project on OpenSearch has or does not have a latest interaction.
 
     :param has_interaction: whether to expect the latest interaction to exist or not
-    :param term: search term for elastic search
+    :param term: search term for OpenSearch
     """
     filter_data = {'name': name} if name else {}
     results = get_search_by_entities_query(
@@ -62,7 +62,7 @@ def assert_project_search_latest_interaction(has_interaction=True, name=''):
 
 
 def test_investment_project_auto_sync_to_es(es_with_signals):
-    """Tests if investment project gets synced to Elasticsearch."""
+    """Tests if investment project gets synced to OpenSearch."""
     test_name = 'very_hard_to_find_project'
     InvestmentProjectFactory(
         name=test_name,
@@ -79,7 +79,7 @@ def test_investment_project_auto_sync_to_es(es_with_signals):
 
 
 def test_investment_project_auto_updates_to_es(es_with_signals):
-    """Tests if investment project gets synced to Elasticsearch."""
+    """Tests if investment project gets synced to OpenSearch."""
     project = InvestmentProjectFactory()
     new_test_name = 'even_harder_to_find_investment_project'
     project.name = new_test_name
@@ -102,7 +102,7 @@ def team_member():
 
 
 def test_investment_project_team_member_added_sync_to_es(es_with_signals, team_member):
-    """Tests if investment project gets synced to Elasticsearch when a team member is added."""
+    """Tests if investment project gets synced to OpenSearch when a team member is added."""
     es_with_signals.indices.refresh()
 
     results = get_search_by_entities_query(
@@ -119,7 +119,7 @@ def test_investment_project_team_member_added_sync_to_es(es_with_signals, team_m
 
 
 def test_investment_project_team_member_updated_sync_to_es(es_with_signals, team_member):
-    """Tests if investment project gets synced to Elasticsearch when a team member is updated."""
+    """Tests if investment project gets synced to OpenSearch when a team member is updated."""
     new_adviser = AdviserFactory()
     team_member.adviser = new_adviser
     team_member.save()
@@ -139,7 +139,7 @@ def test_investment_project_team_member_updated_sync_to_es(es_with_signals, team
 
 
 def test_investment_project_team_member_deleted_sync_to_es(es_with_signals, team_member):
-    """Tests if investment project gets synced to Elasticsearch when a team member is deleted."""
+    """Tests if investment project gets synced to OpenSearch when a team member is deleted."""
     team_member.delete()
     es_with_signals.indices.refresh()
 
@@ -204,7 +204,7 @@ def test_investment_project_syncs_when_team_member_adviser_changes(es_with_signa
 
 
 def test_investment_project_interaction_updated_sync_to_es(es_with_signals):
-    """Test investment project gets synced to Elasticsearch when an interaction is updated."""
+    """Test investment project gets synced to OpenSearch when an interaction is updated."""
     investment_project = InvestmentProjectFactory()
     interaction_date = '2018-05-05T00:00:00+00:00'
     interaction_subject = 'Did something interactive'
@@ -234,7 +234,7 @@ def test_investment_project_interaction_updated_sync_to_es(es_with_signals):
 
 
 def test_investment_project_interaction_deleted_sync_to_es(es_with_signals):
-    """Test investment project gets synced to Elasticsearch when an interaction is deleted."""
+    """Test investment project gets synced to OpenSearch when an interaction is deleted."""
     investment_project = InvestmentProjectFactory()
     interaction = InvestmentProjectInteractionFactory(
         investment_project=investment_project,
@@ -251,10 +251,10 @@ def test_investment_project_interaction_deleted_sync_to_es(es_with_signals):
 
 def test_investment_project_interaction_changed_sync_to_es(es_with_signals):
     """
-    Test projects get synced to Elasticsearch when an interaction's project is changed.
+    Test projects get synced to OpenSearch when an interaction's project is changed.
 
     When an interaction's project is switched to another project, both the old
-    and new project should be updated in Elasticsearch.
+    and new project should be updated in OpenSearch.
     """
     investment_project_a = InvestmentProjectFactory(name='alpha')
     investment_project_b = InvestmentProjectFactory(name='beta')
@@ -294,7 +294,7 @@ def test_investment_project_synched_only_if_interaction_linked(
 
     When an interaction without an investment project attached to it is saved, the
     investment_project_sync_es_interaction_change signal should return without attempting to
-    sync an investment project to elastic search.
+    sync an investment project to OpenSearch.
     """
     interaction = CompanyInteractionFactory()
     interaction.investment_project = None

@@ -7,7 +7,7 @@ from datahub.search.models import BaseESModel
 
 
 class Contact(BaseESModel):
-    """Elasticsearch representation of Contact model."""
+    """OpenSearch representation of Contact model."""
 
     id = Keyword()
     address_1 = Text()
