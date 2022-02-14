@@ -170,6 +170,7 @@ class Command(BaseCleanupCommand):
                 InvestmentProject._meta.get_field('stage_log'),
                 InvestmentProject._meta.get_field('investmentprojectcode'),
                 InvestmentProject._meta.get_field('activities'),
+                InvestmentProject._meta.get_field('notifications'),
             ),
         ),
         # There are no orders in the live system with a modified-on date before
