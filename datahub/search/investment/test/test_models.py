@@ -153,7 +153,7 @@ def test_investment_project_to_dict(es):
 
 
 def test_investment_project_dbmodels_to_es_documents(es):
-    """Tests conversion of db models to Elasticsearch documents."""
+    """Tests conversion of db models to OpenSearch documents."""
     projects = InvestmentProjectFactory.create_batch(2)
 
     result = ESInvestmentProject.db_objects_to_es_documents(projects)
@@ -168,7 +168,7 @@ def test_max_values_of_doubles_gross_value_added_and_foreign_equity_investment(
     """
     Tests the max value of gross value added and foreign equity investment.
 
-    Both gross_value_added and foreign_equity_investment are decimal fields but the elasticsearch
+    Both gross_value_added and foreign_equity_investment are decimal fields but the OpenSearch
     library casts them to floats so are treated as floats.
 
     The test highlights a known inaccuracy when dealing with large floating point numbers.
@@ -192,7 +192,7 @@ def test_max_values_of_doubles_gross_value_added_and_foreign_equity_investment(
     assert result['foreign_equity_investment'] == foreign_equity_investment_value
     assert result['gross_value_added'] == expected_gross_value_added_value
 
-    # Re-fetch the project from elasticsearch and
+    # Re-fetch the project from OpenSearch and
     # re-check the values against the less accurate values.
     project_in_es = ESInvestmentProject.get(
         id=project.pk,

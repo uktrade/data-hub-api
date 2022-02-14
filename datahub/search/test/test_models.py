@@ -57,7 +57,7 @@ def test_validate_model_fields(search_app):
 
 
 def test_validate_model_mapping_fields(search_app):
-    """Test that all fields defined in MAPPINGS exist on the ES model."""
+    """Test that all fields defined in MAPPINGS exist on the OpenSearch model."""
     es_model = search_app.es_model
     valid_fields = get_model_field_names(es_model)
     fields = es_model.MAPPINGS.keys()
@@ -67,7 +67,7 @@ def test_validate_model_mapping_fields(search_app):
 
 
 def test_validate_model_computed_mapping_fields(search_app):
-    """Test that all fields defined in COMPUTED_MAPPINGS exist on the ES model."""
+    """Test that all fields defined in COMPUTED_MAPPINGS exist on the OpenSearch model."""
     es_model = search_app.es_model
     valid_fields = get_model_field_names(es_model)
     fields = es_model.COMPUTED_MAPPINGS.keys()
@@ -77,7 +77,7 @@ def test_validate_model_computed_mapping_fields(search_app):
 
 
 def test_validate_model_no_mapping_and_computed_intersection(search_app):
-    """Test that MAPPINGS and COMPUTED_MAPPINGS on ES models don't overlap."""
+    """Test that MAPPINGS and COMPUTED_MAPPINGS on OpenSearch models don't overlap."""
     es_model = search_app.es_model
     intersection = es_model.MAPPINGS.keys() & es_model.COMPUTED_MAPPINGS.keys()
 
@@ -85,7 +85,7 @@ def test_validate_model_no_mapping_and_computed_intersection(search_app):
 
 
 def test_validate_model_search_fields(search_app):
-    """Test that all field paths in SEARCH_FIELDS exist on the ES model."""
+    """Test that all field paths in SEARCH_FIELDS exist on the OpenSearch model."""
     es_model = search_app.es_model
     mapping = es_model._doc_type.mapping
     invalid_fields = {

@@ -14,7 +14,4 @@ updates:
   - dependency-name: pytest
     versions:
     - ">= 4.6.1.a, < 4.6.2"
-  - dependency-name: elasticsearch
-    versions:
-    - ">= 7.14.0"
   rebase-strategy: disabled
