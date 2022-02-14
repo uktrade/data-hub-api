@@ -17,7 +17,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_mapping(es):
-    """Test the ES mapping for a large capital opportunity."""
+    """Test the OpenSearch mapping for a large capital opportunity."""
     mapping = Mapping.from_opensearch(
         LargeCapitalOpportunitySearchApp.es_model.get_write_index(),
     )
@@ -350,7 +350,7 @@ def test_mapping(es):
 
 @freezegun.freeze_time('2019-01-01')
 def test_indexed_doc(es):
-    """Test the ES data of a large capital opportunity."""
+    """Test the OpenSearch data of a large capital opportunity."""
     opportunity = LargeCapitalOpportunityFactory(
         lead_dit_relationship_manager=None,
     )
