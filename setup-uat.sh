@@ -8,7 +8,7 @@ es_amp=""
 if [ "$ES_APM_ENABLED" = 'True' ] ; then
    es_amp="-wait tcp://es-apm:8200"
 fi
-dockerize -wait  tcp://postgres:5432 -wait tcp://es:9200  -wait tcp://redis:6379 $es_amp
+dockerize -wait  tcp://postgres:5432 -wait tcp:/opensearch:9200  -wait tcp://redis:6379 $es_amp
 
 python /app/manage.py migrate
 python /app/manage.py migrate_es
