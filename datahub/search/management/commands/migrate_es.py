@@ -11,12 +11,12 @@ logger = getLogger(__name__)
 
 class Command(BaseCommand):
     """
-    Command for migrating an Elasticsearch index.
+    Command for migrating an OpenSearch index.
 
-    This will also create Elasticsearch indices the first time it is run.
+    This will also create OpenSearch indices the first time it is run.
     """
 
-    help = """Migrate modified mapping types for Elasticsearch indices.
+    help = """Migrate modified mapping types for OpenSearch indices.
 
 For new indices, the command creates each index and schedules a Celery task to synchronise
 data to the new index.
@@ -25,7 +25,7 @@ For existing indices, the command creates new indices for modified search models
 and schedules Celery tasks to synchronises data to the new indices and then delete the old
 indices.
 
-See docs/Elasticsearch migrations.md for further details."""
+See docs/OpenSearch migrations.md for further details."""
 
     def add_arguments(self, parser):
         """Handle arguments."""

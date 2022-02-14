@@ -10,7 +10,7 @@ BULK_INDEX_TIMEOUT_SECS = 300
 
 
 def sync_app(search_app, batch_size=None, post_batch_callback=None):
-    """Syncs objects for an app to ElasticSearch in batches of batch_size."""
+    """Syncs objects for an app to OpenSearch in batches of batch_size."""
     model_name = search_app.es_model.__name__
     batch_size = batch_size or search_app.bulk_batch_size
     logger.info(f'Processing {model_name} records, using batch size {batch_size}')
@@ -57,7 +57,7 @@ def sync_app(search_app, batch_size=None, post_batch_callback=None):
 
 
 def sync_objects(es_model, model_objects, read_indices, write_index, post_batch_callback=None):
-    """Syncs an iterable of model instances to Elasticsearch."""
+    """Syncs an iterable of model instances to OpenSearch."""
     actions = list(
         es_model.db_objects_to_es_documents(model_objects, index=write_index),
     )

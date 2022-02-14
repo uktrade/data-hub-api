@@ -15,14 +15,14 @@ from datahub.search.sync_object import sync_object_async, sync_related_objects_a
 
 
 def sync_interaction_to_es(instance):
-    """Sync interaction to the Elasticsearch."""
+    """Sync interaction to the OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(InteractionSearchApp, instance.pk),
     )
 
 
 def sync_participant_to_es(dit_participant):
-    """Sync a DIT participant's interaction to Elasticsearch."""
+    """Sync a DIT participant's interaction to OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(InteractionSearchApp, dit_participant.interaction_id),
     )
