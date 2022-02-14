@@ -425,14 +425,14 @@ toml==0.10.2
     # via
     #   pre-commit
     #   pylint
-    #   towncrier
 tomli==1.2.3
     # via
     #   black
     #   coverage
     #   pep517
     #   pytest
-towncrier==21.3.0
+    #   towncrier
+towncrier==21.9.0
     # via -r requirements.in
 traitlets==5.1.1
     # via
