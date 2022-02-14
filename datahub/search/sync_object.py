@@ -9,7 +9,7 @@ logger = getLogger(__name__)
 
 def sync_object(search_app, pk):
     """
-    Syncs a single object to Elasticsearch.
+    Syncs a single object to OpenSearch.
 
     This function is migration-safe – if a migration is in progress, the object is added to the
     new index and then deleted from the old index.
@@ -29,10 +29,10 @@ def sync_object(search_app, pk):
 
 def sync_object_async(search_app, pk):
     """
-    Syncs a single object to Elasticsearch asynchronously (by scheduling a Celery task).
+    Syncs a single object to OpenSearch asynchronously (by scheduling a Celery task).
 
     This function is normally used by signal receivers to copy new or updated objects to
-    Elasticsearch.
+    OpenSearch.
 
     Syncing an object is migration-safe – if a migration is in progress, the object is
     added to the new index and then deleted from the old index.
@@ -54,7 +54,7 @@ def sync_related_objects_async(related_obj, related_obj_field_name, related_obj_
         related_obj_field_name='interactions'
 
     This function is normally used by signal receivers to copy new or updated related objects to
-    Elasticsearch.
+    OpenSearch.
     """
     kwargs = {'related_obj_filter': related_obj_filter} if related_obj_filter else {}
 

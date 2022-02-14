@@ -71,7 +71,7 @@ class _DITParticipant(InnerDoc):
 
 
 class Interaction(BaseESModel):
-    """Elasticsearch representation of Interaction model."""
+    """OpenSearch representation of Interaction model."""
 
     id = Keyword()
     company = fields.company_field()

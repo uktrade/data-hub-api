@@ -928,7 +928,7 @@ def test_only_print_queries(model_name, config, monkeypatch, caplog):
 @pytest.mark.django_db
 def test_with_es_exception(mocked_bulk):
     """
-    Test that if ES returns a 5xx error, the command completes but it also
+    Test that if OpenSearch returns a 5xx error, the command completes but it also
     raises a DataHubError with details of the error.
     """
     mocked_bulk.return_value = (None, [{'delete': {'status': 500}}])

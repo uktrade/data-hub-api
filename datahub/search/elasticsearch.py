@@ -165,7 +165,7 @@ def create_index(index_name, mapping, alias_names=()):
     index.settings(**settings.ES_INDEX_SETTINGS)
     index.mapping(mapping)
 
-    # ES allows you to specify filter criteria for aliases but we don't make use of that –
+    # OpenSearch allows you to specify filter criteria for aliases but we don't make use of that –
     # hence the empty dict for each alias
     alias_mapping = {alias_name: {} for alias_name in alias_names}
     index.aliases(**alias_mapping)

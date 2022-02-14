@@ -314,7 +314,7 @@ class TestBasicSearch(APITestMixin):
         """
         Tests quality of results for fuzzy matching across multiple fields.
 
-        Unfortunately we require "combined_fields" matching (introduced in Elasticsearch
+        Unfortunately we require "combined_fields" matching (introduced in OpenSearch
         v 7.13) to do fuzzy matching across multiple fields, but we should still be
         able to search for exact terms that can be divided across multiple fields.
         """

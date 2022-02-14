@@ -9,14 +9,14 @@ from datahub.search.sync_object import sync_object_async, sync_related_objects_a
 
 
 def company_sync_es(instance):
-    """Sync company to the Elasticsearch."""
+    """Sync company to the OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(CompanySearchApp, instance.pk),
     )
 
 
 def company_subsidiaries_sync_es(instance):
-    """Sync company subsidiaries to the Elasticsearch."""
+    """Sync company subsidiaries to the OpenSearch."""
     transaction.on_commit(
         lambda: sync_related_objects_async(instance, 'subsidiaries'),
     )
