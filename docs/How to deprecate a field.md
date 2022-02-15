@@ -42,13 +42,13 @@ If you are removing a model field you might want to start [removing it from djan
 
 See [example](https://github.com/uktrade/data-hub-api/pull/1107/files).
 
-### Migrate elasticsearch
+### Migrate OpenSearch
 
-If the field was included in the search, you need to migrate the ES mapping as well.
+If the field was included in the search, you need to migrate the OpenSearch mapping as well.
 
 **Please ask other developers first as this is a newish process.**
 
-Instructions on how to do this can be found in the [elasticsearch mapping migration guide](./Elasticsearch&#32;migrations.md).
+Instructions on how to do this can be found in the [OpenSearch mapping migration guide](./OpenSearch&#32;migrations.md).
 
 ## <a name="how-to-remove-column"></a>How to remove a column from the database
 

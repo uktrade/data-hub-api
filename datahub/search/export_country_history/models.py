@@ -5,7 +5,7 @@ from datahub.search.models import BaseESModel
 
 
 class ExportCountryHistory(BaseESModel):
-    """Elasticsearch representation of CompanyExportCountryHistory model."""
+    """OpenSearch representation of CompanyExportCountryHistory model."""
 
     id = Keyword()
     history_date = Date(index=False)

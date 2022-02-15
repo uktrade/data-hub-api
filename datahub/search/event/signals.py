@@ -8,7 +8,7 @@ from datahub.search.sync_object import sync_object_async
 
 
 def sync_event_to_es(instance):
-    """Sync event to the Elasticsearch."""
+    """Sync event to the OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(EventSearchApp, instance.pk),
     )

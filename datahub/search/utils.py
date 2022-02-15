@@ -25,12 +25,12 @@ class SearchOrdering(NamedTuple):
 
 
 def get_model_fields(es_model):
-    """Gets the field objects for an ES model."""
+    """Gets the field objects for an OpenSearch model."""
     return es_model._doc_type.mapping.properties._params['properties']
 
 
 def get_model_field_names(es_model):
-    """Gets the field names for an ES model."""
+    """Gets the field names for an OpenSearch model."""
     return get_model_fields(es_model).keys()
 
 

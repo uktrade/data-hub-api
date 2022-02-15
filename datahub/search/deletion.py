@@ -35,8 +35,7 @@ def delete_documents(index, es_docs):
     non_404_errors = [error for error in errors if error['delete']['status'] != 404]
     if non_404_errors:
         raise DataHubError(
-            f'One or more errors during an Elasticsearch bulk deletion operation: '
-            f'{non_404_errors!r}',
+            f'Errors during an OpenSearch bulk deletion operation: {non_404_errors!r}',
         )
 
 
@@ -69,7 +68,7 @@ class Collector:
     WARNING: this temporarily disable existing post_delete and pre_delete signal
     receivers defined in all the SearchApps to avoid side effects.
     Also, be careful when starting a transaction (e.g. with `transaction.atomic()`) and
-    catching any exception in it. ES deletions would still happen because the
+    catching any exception in it. OpenSearch deletions would still happen because the
     collector would not be aware of any caught error.
     """
 
@@ -135,12 +134,13 @@ def update_es_after_deletions():
     It can be used as a decorator as well.
 
     This works by listening to the `post_delete` django signal, collecting all the deleted
-    django objects and deleting all of them from ES in bulk when exiting from the context manager.
+    django objects and deleting all of them from OpenSearch in bulk when exiting from the
+    context manager.
 
     WARNING: this temporarily disable existing post_delete and pre_delete signal
     receivers defined in all the SearchApps to avoid side effects.
     Also, be careful when starting a transaction (e.g. with `transaction.atomic()`) and
-    catching any exception in it. ES deletions would still happen because the
+    catching any exception in it. OpenSearch deletions would still happen because the
     context manager would not be aware of any caught error.
     """
     collector = Collector()

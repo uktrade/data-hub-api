@@ -62,7 +62,7 @@ def test_deleted_interaction_deleted_from_es(es_with_signals):
 
 
 def test_interaction_synced_when_dit_participant_added(es_with_signals):
-    """Test that interactions are synced to ES if their DIT participants change."""
+    """Test that interactions are synced to OpenSearch if their DIT participants change."""
     interaction = CompanyInteractionFactory(dit_participants=[])
     es_with_signals.indices.refresh()
 
