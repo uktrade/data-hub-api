@@ -7,8 +7,8 @@ from datahub.search.company.models import Company as ESCompany
 pytestmark = pytest.mark.django_db
 
 
-class TestCompanyElasticModel:
-    """Test for the company elasticsearch model"""
+class TestCompanyOpenSearchModel:
+    """Test for the company OpenSearch model"""
 
     def test_company_dbmodel_to_dict(self, es):
         """Tests conversion of db model to dict."""
@@ -62,7 +62,7 @@ class TestCompanyElasticModel:
         assert set(result.keys()) == keys
 
     def test_company_dbmodels_to_es_documents(self, es):
-        """Tests conversion of db models to Elasticsearch documents."""
+        """Tests conversion of db models to OpenSearch documents."""
         companies = CompanyFactory.create_batch(2)
         app = get_search_app('company')
         companies_qs = app.queryset.all()

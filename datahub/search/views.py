@@ -211,7 +211,7 @@ class SearchAPIView(APIView):
         return serializer.validated_data
 
     def get_base_query(self, request, validated_data):
-        """Gets a filtered Elasticsearch query for the provided search parameters."""
+        """Gets a filtered OpenSearch query for the provided search parameters."""
         filter_data = self._get_filter_data(validated_data)
         entities = self.get_entities()
         permission_filters = self.search_app.get_permission_filters(request)
@@ -318,7 +318,7 @@ class SearchExportAPIView(SearchAPIView):
 
     def _get_ids(self, es_query):
         """
-        Gets the document IDs from an Elasticsearch query using the scroll API.
+        Gets the document IDs from an OpenSearch query using the scroll API.
 
         The number of IDs returned is limited by settings.SEARCH_EXPORT_MAX_RESULTS.
         """
@@ -326,7 +326,7 @@ class SearchExportAPIView(SearchAPIView):
             yield hit.meta.id
 
     def _get_es_query(self, request, validated_data):
-        """Gets a scannable Elasticsearch query for the current request."""
+        """Gets a scannable OpenSearch query for the current request."""
         return self.get_base_query(
             request,
             validated_data,

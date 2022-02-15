@@ -163,7 +163,7 @@ def hierarchical_sectors():
 @pytest.fixture(scope='session')
 def _es_client(worker_id):
     """
-    Makes the ES test helper client available.
+    Makes the OpenSearch test helper client available.
 
     Also patches settings.ES_INDEX_PREFIX using the xdist worker ID so that each process
     gets unique indices when running tests using multiple processes using pytest -n.

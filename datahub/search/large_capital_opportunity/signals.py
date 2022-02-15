@@ -15,14 +15,14 @@ from datahub.search.sync_object import sync_object_async, sync_related_objects_a
 
 
 def large_capital_opportunity_sync_es(instance):
-    """Sync large capital opportunity to Elasticsearch."""
+    """Sync large capital opportunity to OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(LargeCapitalOpportunitySearchApp, instance.pk),
     )
 
 
 def related_large_capital_opportunity_sync_es(instance):
-    """Sync related large capital opportunity Promoters to Elasticsearch."""
+    """Sync related large capital opportunity Promoters to OpenSearch."""
     transaction.on_commit(
         lambda: sync_related_objects_async(
             instance,

@@ -8,7 +8,7 @@ from datahub.search.sync_object import sync_object_async
 
 
 def export_country_history_sync_es(instance):
-    """Sync export country history to the Elasticsearch."""
+    """Sync export country history to the OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(ExportCountryHistoryApp, instance.pk),
     )

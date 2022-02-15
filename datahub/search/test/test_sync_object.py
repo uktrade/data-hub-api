@@ -9,7 +9,7 @@ from datahub.search.test.utils import doc_exists
 
 @pytest.mark.django_db
 def test_sync_object_task_syncs_using_celery(es):
-    """Test that an object can be synced to Elasticsearch using Celery."""
+    """Test that an object can be synced to OpenSearch using Celery."""
     obj = SimpleModel.objects.create()
     sync_object_async(SimpleModelSearchApp, obj.pk)
     es.indices.refresh()
@@ -19,7 +19,7 @@ def test_sync_object_task_syncs_using_celery(es):
 
 @pytest.mark.django_db
 def test_sync_related_objects_syncs_using_celery(es):
-    """Test that related objects can be synced to Elasticsearch using Celery."""
+    """Test that related objects can be synced to OpenSearch using Celery."""
     simpleton = SimpleModel.objects.create()
     relation_1 = RelatedModel.objects.create(simpleton=simpleton)
     relation_2 = RelatedModel.objects.create(simpleton=simpleton)

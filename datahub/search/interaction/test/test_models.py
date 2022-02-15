@@ -232,7 +232,7 @@ def test_service_delivery_to_dict(es):
 
 
 def test_interactions_to_es_documents(es):
-    """Test converting 2 orders to Elasticsearch documents."""
+    """Test converting 2 orders to OpenSearch documents."""
     interactions = CompanyInteractionFactory.create_batch(2)
 
     result = Interaction.db_objects_to_es_documents(interactions)

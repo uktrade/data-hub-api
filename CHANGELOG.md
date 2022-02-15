@@ -1,3 +1,21 @@
+# Data Hub API 39.14.0 (2022-02-15)
+## Features
+
+- **Investment** New endpoints have been added: `GET, POST /v3/investment/<project_pk>/notification` that manage email notifications subcription preferences.
+
+  An endpoint returns and accepts the following body:
+
+  ```
+  {
+      "estimated_land_date": ["30", "60"]
+  }
+  ```
+
+## Internal changes
+
+- Missing slash in uat setup has been fixed to ensure CI works.
+
+
 # Data Hub API 39.13.0 (2022-02-11)
 ## Internal changes
 
