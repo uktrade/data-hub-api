@@ -9,11 +9,11 @@ logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """Command for deleting all Elasticsearch indexes matching the configured index name prefix."""
+    """Command for deleting all OpenSearch indexes matching the configured index name prefix."""
 
-    help = """Irrevocably deletes all Elasticsearch indices under the configured index name prefix.
+    help = """Irrevocably deletes all OpenSearch indices under the configured index name prefix.
 
-This is intended for use on GOV.UK PaaS as GOV.UK PaaS Elasticsearch does not allow deletions
+This is intended for use on GOV.UK PaaS as GOV.UK PaaS OpenSearch does not allow deletions
 using wildcards.
 
 Don't use this unless you really mean to delete all of the app's indices!
@@ -42,15 +42,15 @@ Are you sure you want to do this?
         indices = sorted(item['index'] for item in index_statistics)
 
         if not indices:
-            logger.info('No matching Elasticsearch indices to delete!')
+            logger.info('No matching OpenSearch indices to delete!')
             return
 
         formatted_index_list = '\n'.join(indices)
-        logger.info(f'Deleting the following Elasticsearch indices:\n{formatted_index_list}')
+        logger.info(f'Deleting the following OpenSearch indices:\n{formatted_index_list}')
 
         confirmed = not interactive or (input(self.confirm_msg) == 'yes')
         if confirmed:
             client.indices.delete(','.join(indices))
-            logger.info('Elasticsearch indices deleted')
+            logger.info('OpenSearch indices deleted')
         else:
             logger.info('Command cancelled')
