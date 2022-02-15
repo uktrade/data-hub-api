@@ -15,14 +15,14 @@ from datahub.search.sync_object import sync_object_async, sync_related_objects_a
 
 
 def investor_profile_sync_es(instance):
-    """Sync investor profile to Elasticsearch."""
+    """Sync investor profile to OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(LargeInvestorProfileSearchApp, instance.pk),
     )
 
 
 def related_investor_profiles_sync_es(instance):
-    """Sync related Company investor profiles to Elasticsearch."""
+    """Sync related Company investor profiles to OpenSearch."""
     transaction.on_commit(
         lambda: sync_related_objects_async(
             instance,

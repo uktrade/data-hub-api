@@ -13,7 +13,7 @@ def _get_many_to_many_list(col):
 
 
 class LargeInvestorProfile(BaseESModel):
-    """Elasticsearch representation of LargeInvestorProfile."""
+    """OpenSearch representation of LargeInvestorProfile."""
 
     id = Keyword()
 

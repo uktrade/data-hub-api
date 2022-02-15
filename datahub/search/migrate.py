@@ -50,7 +50,7 @@ def _perform_migration(search_app):
 
     if current_write_index not in current_read_indices:
         raise DataHubError(
-            'Cannot migrate Elasticsearch index with a read alias referencing '
+            'Cannot migrate OpenSearch index with a read alias referencing '
             'a different index to the write alias',
         )
 

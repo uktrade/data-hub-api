@@ -14,7 +14,7 @@ logger = get_task_logger(__name__)
 @shared_task(acks_late=True, priority=9)
 def sync_all_models():
     """
-    Task that starts sub-tasks to sync all models to Elasticsearch.
+    Task that starts sub-tasks to sync all models to OpenSearch.
 
     acks_late is set to True so that the task restarts if interrupted.
 
@@ -29,7 +29,7 @@ def sync_all_models():
 @shared_task(acks_late=True, priority=9, queue='long-running')
 def sync_model(search_app_name):
     """
-    Task that syncs a single model to Elasticsearch.
+    Task that syncs a single model to OpenSearch.
 
     acks_late is set to True so that the task restarts if interrupted.
 
@@ -42,7 +42,7 @@ def sync_model(search_app_name):
 @shared_task(acks_late=True, max_retries=15, autoretry_for=(Exception,), retry_backoff=1)
 def sync_object_task(search_app_name, pk):
     """
-    Syncs a single object to Elasticsearch.
+    Syncs a single object to OpenSearch.
 
     If an error occurs, the task will be automatically retried with an exponential back-off.
     The wait between attempts is approximately 2 ** attempt_num seconds (with some jitter
