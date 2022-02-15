@@ -6,7 +6,7 @@ from datahub.search.models import BaseESModel
 
 
 class ESRelatedModel(BaseESModel):
-    """Elasticsearch representation of SimpleModel model."""
+    """OpenSearch representation of SimpleModel model."""
 
     id = Keyword()
     simpleton = fields.id_name_field()

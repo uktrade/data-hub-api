@@ -1,15 +1,15 @@
-# Elasticsearch mapping migrations
+# OpenSearch mapping migrations
 
-When certain changes to a field in the mapping for an Elasticsearch model (also 
+When certain changes to a field in the mapping for an OpenSearch model (also
 known as a mapping or document type) are made, the mapping needs to be _migrated_.
 
 This document describes how the migration process works (as implemented in this app).
 
 ## Indexes and aliases during normal operation
 
-During normal operation, Elasticsearch the following indexes and aliases exist:
+During normal operation, OpenSearch the following indexes and aliases exist:
 
-- There is one index per Elasticsearch model. Index 
+- There is one index per OpenSearch model. Index
 names follow the following pattern: `<prefix>-<model name>-<mapping hash>`.
 - There are two aliases per model:
   - `<prefix>-<model name>-read` (used for searches)
@@ -21,8 +21,8 @@ When run for the first time, the `./manage.py migrate_es` command creates indexe
 and aliases in this pattern.
 
 The mapping hash is calculated by hashing the mapping as defined in the code base
-(rather than the mapping as returned by the Elasticsearch server). This is because
-there are subtle differences between the mapping as given to Elasticsearch and the
+(rather than the mapping as returned by the OpenSearch server). This is because
+there are subtle differences between the mapping as given to OpenSearch and the
 mapping it returns.
 
 ## Operation during a migration
@@ -80,7 +80,7 @@ field at the same time (but only do this if you are sure that it is safe):
 2. If the field was used in a filter, use a composite filter (using the 
 `COMPOSITE_FILTERS` attribute on the view) that looks at both the old and new fields.
 3. If the field was used in global search, put both the old and new fields in the
-search fields for the model (the `SEARCH_FIELDS` attribute on the Elasticsearch model).
+search fields for the model (the `SEARCH_FIELDS` attribute on the OpenSearch model).
 
    (Note: It’s important that both fields don’t exist on the same document at the same time, 
 as this will affect scores calculated during searches.)

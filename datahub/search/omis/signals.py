@@ -13,14 +13,14 @@ from datahub.search.sync_object import sync_object_async, sync_related_objects_a
 
 
 def order_sync_es(instance):
-    """Sync an order to the Elasticsearch."""
+    """Sync an order to the OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(OrderSearchApp, instance.pk),
     )
 
 
 def related_order_sync_es(instance):
-    """Sync an order linked from the instance to the Elasticsearch."""
+    """Sync an order linked from the instance to the OpenSearch."""
     order_sync_es(instance.order)
 
 

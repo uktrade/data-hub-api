@@ -15,7 +15,7 @@ def _related_investment_project_field():
 
 
 class InvestmentProject(BaseESModel):
-    """Elasticsearch representation of InvestmentProject."""
+    """OpenSearch representation of InvestmentProject."""
 
     id = Keyword()
     actual_land_date = Date()

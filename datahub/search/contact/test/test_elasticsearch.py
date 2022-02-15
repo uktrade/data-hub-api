@@ -11,7 +11,7 @@ from datahub.search.query_builder import (
 
 
 def test_mapping(es):
-    """Test the ES mapping for a contact."""
+    """Test the OpenSearch mapping for a contact."""
     mapping = Mapping.from_opensearch(
         ContactSearchApp.es_model.get_write_index(),
     )

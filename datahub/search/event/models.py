@@ -5,7 +5,7 @@ from datahub.search.models import BaseESModel
 
 
 class Event(BaseESModel):
-    """Elasticsearch representation of Event model."""
+    """OpenSearch representation of Event model."""
 
     id = Keyword()
     address_1 = Text()

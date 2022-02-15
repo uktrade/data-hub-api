@@ -12,7 +12,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_company_auto_sync_to_es(es_with_signals):
-    """Tests if company gets synced to Elasticsearch."""
+    """Tests if company gets synced to OpenSearch."""
     test_name = 'very_hard_to_find_company'
     CompanyFactory(
         name=test_name,
@@ -25,7 +25,7 @@ def test_company_auto_sync_to_es(es_with_signals):
 
 
 def test_company_auto_updates_to_es(es_with_signals):
-    """Tests if company gets updated in Elasticsearch."""
+    """Tests if company gets updated in OpenSearch."""
     test_name = 'very_hard_to_find_company_international'
     company = CompanyFactory(
         name=test_name,
@@ -42,7 +42,7 @@ def test_company_auto_updates_to_es(es_with_signals):
 
 
 def test_company_subsidiaries_auto_update_to_es(es_with_signals):
-    """Tests if company subsidiaries get updated in Elasticsearch."""
+    """Tests if company subsidiaries get updated in OpenSearch."""
     account_owner = AdviserFactory()
     global_headquarters = CompanyFactory(one_list_account_owner=account_owner)
     subsidiaries = CompanyFactory.create_batch(2, global_headquarters=global_headquarters)
