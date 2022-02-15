@@ -218,7 +218,7 @@ def test_build_term_query(term, expected):
                             'match': {
                                 'name.keyword': {
                                     'query': 'hello',
-                                    'boost': 2,
+                                    'boost': 10,
                                 },
                             },
                         },
@@ -264,6 +264,7 @@ def test_build_term_query(term, expected):
                                     'address.trigram',
                                     'country.trigram',
                                 ),
+                                'boost': 4,
                                 'type': 'cross_fields',
                                 'operator': 'and',
                             },
@@ -299,7 +300,7 @@ def test_build_fuzzy_term_query_no_fields():
                     'match': {
                         'name.keyword': {
                             'query': 'hello',
-                            'boost': 2,
+                            'boost': 10,
                         },
                     },
                 },
@@ -309,6 +310,7 @@ def test_build_fuzzy_term_query_no_fields():
                         'fields': [],
                         'type': 'cross_fields',
                         'operator': 'and',
+                        'boost': 4,
                     },
                 },
             ],

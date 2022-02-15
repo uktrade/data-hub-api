@@ -1,5 +1,5 @@
 import pytest
-from elasticsearch_dsl import Mapping
+from opensearch_dsl import Mapping
 
 from datahub.omis.order.test.factories import (
     OrderCancelledFactory,
@@ -16,8 +16,8 @@ pytestmark = pytest.mark.django_db
 
 
 def test_mapping(es):
-    """Test the ES mapping for an order."""
-    mapping = Mapping.from_es(OrderSearchApp.es_model.get_write_index())
+    """Test the OpenSearch mapping for an order."""
+    mapping = Mapping.from_opensearch(OrderSearchApp.es_model.get_write_index())
 
     assert mapping.to_dict() == {
         'dynamic': 'false',
@@ -494,7 +494,7 @@ def test_mapping(es):
     ),
 )
 def test_indexed_doc(order_factory, es):
-    """Test the ES data of an indexed order."""
+    """Test the OpenSearch data of an indexed order."""
     order = order_factory()
     invoice = order.invoice
 

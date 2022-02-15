@@ -1,3 +1,15 @@
+# Data Hub API 39.13.0 (2022-02-11)
+## Internal changes
+
+- Search functionality was migrated from using ElasticSearch to OpenSearch.
+
+
+# Data Hub API 39.12.0 (2022-02-08)
+## Features
+
+- Fuzzy search has been fine-tuned with a boost on the importance of the name field in generic searches.
+
+
 # Data Hub API 39.11.0 (2022-02-02)
 ## Internal changes
 

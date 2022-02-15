@@ -1,8 +1,8 @@
 from collections import defaultdict
 from itertools import chain
 
-from elasticsearch_dsl import Search
-from elasticsearch_dsl.query import (
+from opensearch_dsl import Search
+from opensearch_dsl.query import (
     Bool,
     Exists,
     Match,
@@ -295,7 +295,7 @@ def _build_fuzzy_term_query(term, fields=None):
     ]
     should_query = [
         # Promote exact name match
-        Match(**{'name.keyword': {'query': term, 'boost': 2}}),
+        Match(**{'name.keyword': {'query': term, 'boost': 10}}),
         # Add in trigram (fuzzy) fields
         *fuzzy_queries,
         # Cross match fields
@@ -304,6 +304,7 @@ def _build_fuzzy_term_query(term, fields=None):
             fields=fields,
             type='cross_fields',
             operator='and',
+            boost=4,
         ),
     ]
 

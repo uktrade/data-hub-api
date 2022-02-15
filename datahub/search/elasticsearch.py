@@ -2,13 +2,11 @@ from contextlib import contextmanager
 from logging import getLogger
 
 from django.conf import settings
-from elasticsearch.helpers import bulk as es_bulk
-from elasticsearch_dsl import analysis, Index
-from elasticsearch_dsl.connections import connections
-
+from opensearch_dsl import analysis, Index
+from opensearch_dsl.connections import connections
+from opensearchpy.helpers import bulk as es_bulk
 
 logger = getLogger(__name__)
-
 
 # Normalises values to improve sorting (by keeping e, E, è, ê etc. together)
 lowercase_asciifolding_normalizer = analysis.normalizer(
@@ -84,7 +82,6 @@ normalise_postcode_filter = analysis.token_filter(
     replacement=r'${area}${district} ${sector}${unit}',
 )
 
-
 postcode_analyzer = analysis.CustomAnalyzer(
     'postcode_analyzer_v2',
     type='custom',
@@ -92,14 +89,12 @@ postcode_analyzer = analysis.CustomAnalyzer(
     filter=(space_remover, 'lowercase', normalise_postcode_filter, postcode_filter),
 )
 
-
 postcode_search_analyzer = analysis.CustomAnalyzer(
     'postcode_search_analyzer_v2',
     type='custom',
     tokenizer='keyword',
     filter=('lowercase', normalise_postcode_filter),
 )
-
 
 english_possessive_stemmer = analysis.token_filter(
     'english_possessive_stemmer',
@@ -130,7 +125,6 @@ english_analyzer = analysis.CustomAnalyzer(
     ],
 )
 
-
 ANALYZERS = (
     trigram_analyzer,
     english_analyzer,
@@ -140,7 +134,7 @@ ANALYZERS = (
 def configure_connection():
     """Configure Elasticsearch default connection."""
     connections_default = {
-        'hosts': [settings.ES_URL],
+        'hosts': [settings.OPENSEARCH_URL],
         'verify_certs': settings.ES_VERIFY_CERTS,
     }
     connections.configure(default=connections_default)
@@ -171,7 +165,7 @@ def create_index(index_name, mapping, alias_names=()):
     index.settings(**settings.ES_INDEX_SETTINGS)
     index.mapping(mapping)
 
-    # ES allows you to specify filter criteria for aliases but we don't make use of that –
+    # OpenSearch allows you to specify filter criteria for aliases but we don't make use of that –
     # hence the empty dict for each alias
     alias_mapping = {alias_name: {} for alias_name in alias_names}
     index.aliases(**alias_mapping)

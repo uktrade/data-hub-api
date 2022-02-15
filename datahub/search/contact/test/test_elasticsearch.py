@@ -1,5 +1,5 @@
 import pytest
-from elasticsearch_dsl import Mapping
+from opensearch_dsl import Mapping
 
 from datahub.search.contact import ContactSearchApp
 from datahub.search.contact.models import Contact as ESContact
@@ -11,8 +11,8 @@ from datahub.search.query_builder import (
 
 
 def test_mapping(es):
-    """Test the ES mapping for a contact."""
-    mapping = Mapping.from_es(
+    """Test the OpenSearch mapping for a contact."""
+    mapping = Mapping.from_opensearch(
         ContactSearchApp.es_model.get_write_index(),
     )
 

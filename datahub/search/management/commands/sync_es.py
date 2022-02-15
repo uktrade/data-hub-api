@@ -9,7 +9,7 @@ logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """Elasticsearch sync command."""
+    """OpenSearch sync command."""
 
     def add_arguments(self, parser):
         """Handle arguments."""
@@ -30,8 +30,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Handle."""
-        es_logger = getLogger('elasticsearch')
-        es_logger.setLevel(WARNING)
+        getLogger('opensearch').setLevel(WARNING)
 
         apps = get_search_apps_by_name(options['model'])
 
@@ -48,4 +47,4 @@ class Command(BaseCommand):
             else:
                 sync_model.apply_async(args=task_args)
 
-        logger.info('Elasticsearch sync complete!')
+        logger.info('OpenSearch sync complete!')
