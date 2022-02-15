@@ -6,7 +6,7 @@ from datahub.search.models import BaseESModel
 
 
 class Order(BaseESModel):
-    """Elasticsearch representation of Order model."""
+    """OpenSearch representation of Order model."""
 
     id = Keyword()
     reference = fields.NormalizedKeyword(

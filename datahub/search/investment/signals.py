@@ -15,7 +15,7 @@ from datahub.search.sync_object import sync_object_async
 
 
 def investment_project_sync_es(instance):
-    """Sync investment project to the Elasticsearch."""
+    """Sync investment project to the OpenSearch."""
     def sync_es_wrapper():
         if isinstance(instance, InvestmentProjectTeamMember):
             pk = instance.investment_project.pk
@@ -29,9 +29,9 @@ def investment_project_sync_es(instance):
 
 def investment_project_sync_es_interaction_change(instance):
     """
-    Sync investment projects in elastic search when related interactions change.
+    Sync investment projects in OpenSearch when related interactions change.
 
-    When an interaction changes, the elastic search index is also updated for
+    When an interaction changes, the OpenSearch index is also updated for
     the related investment project. The previous version also needs to be
     checked to make sure that if the investment project changes, the old
     investment project is also updated in the index.
@@ -82,7 +82,7 @@ def investment_project_sync_es_adviser_change(instance):
 
 def investment_project_sync_m2m_es(instance, action, reverse, pk_set, **kwargs):
     """
-    Sync elastic search when m2m fields change on the investment project.
+    Sync opensearch when m2m fields change on the investment project.
     """
     if action not in ('post_add', 'post_remove', 'post_clear'):
         return

@@ -18,7 +18,7 @@ from datahub.search.test.utils import create_mock_search_app, doc_exists
 
 
 def test_sync_model(monkeypatch):
-    """Test that the sync_model task starts an ES sync for that model."""
+    """Test that the sync_model task starts an OpenSearch sync for that model."""
     get_search_app_mock = Mock()
     monkeypatch.setattr('datahub.search.tasks.get_search_app', get_search_app_mock)
 
@@ -44,7 +44,7 @@ def test_sync_all_models(monkeypatch):
 
 @pytest.mark.django_db
 def test_sync_object_task_syncs(es):
-    """Test that the object task syncs an object to Elasticsearch."""
+    """Test that the object task syncs an object to OpenSearch."""
     obj = SimpleModel.objects.create()
     sync_object_task.apply(args=(SimpleModelSearchApp.name, str(obj.pk)))
     es.indices.refresh()
@@ -71,7 +71,7 @@ def test_sync_object_task_retries_on_error(monkeypatch, es):
 )
 @pytest.mark.django_db
 def test_sync_related_objects_task_syncs(related_obj_filter, monkeypatch):
-    """Test that related objects are synced to Elasticsearch."""
+    """Test that related objects are synced to OpenSearch."""
     sync_object_task_mock = Mock()
     monkeypatch.setattr('datahub.search.tasks.sync_object_task', sync_object_task_mock)
 

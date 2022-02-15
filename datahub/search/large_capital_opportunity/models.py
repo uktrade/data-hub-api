@@ -21,7 +21,7 @@ def _get_investment_project_list(col):
 
 
 class LargeCapitalOpportunity(BaseESModel):
-    """Elasticsearch representation of LargeCapitalOpportunity."""
+    """OpenSearch representation of LargeCapitalOpportunity."""
 
     id = Keyword()
 
