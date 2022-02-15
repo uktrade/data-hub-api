@@ -42,7 +42,7 @@ def test_event_dbmodel_to_dict(es):
 
 
 def test_event_dbmodels_to_es_documents(es):
-    """Tests conversion of db models to Elasticsearch documents."""
+    """Tests conversion of db models to OpenSearch documents."""
     events = EventFactory.create_batch(2)
 
     result = ESEvent.db_objects_to_es_documents(events)

@@ -1,11 +1,11 @@
-from elasticsearch_dsl import Date, Keyword
+from opensearch_dsl import Date, Keyword
 
 from datahub.search import dict_utils, fields
 from datahub.search.models import BaseESModel
 
 
 class ExportCountryHistory(BaseESModel):
-    """Elasticsearch representation of CompanyExportCountryHistory model."""
+    """OpenSearch representation of CompanyExportCountryHistory model."""
 
     id = Keyword()
     history_date = Date(index=False)

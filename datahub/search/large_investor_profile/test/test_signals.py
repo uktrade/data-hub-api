@@ -1,7 +1,7 @@
 from unittest import mock
 
 import pytest
-from elasticsearch.exceptions import NotFoundError
+from opensearchpy.exceptions import NotFoundError
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory

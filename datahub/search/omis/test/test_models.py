@@ -164,7 +164,7 @@ def test_order_to_dict(order_factory):
 
 
 def test_orders_to_es_documents():
-    """Test converting 2 orders to Elasticsearch documents."""
+    """Test converting 2 orders to OpenSearch documents."""
     orders = OrderFactory.create_batch(2)
 
     result = ESOrder.db_objects_to_es_documents(orders)

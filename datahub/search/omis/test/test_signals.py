@@ -40,7 +40,7 @@ def test_updating_order_updates_es(es_with_signals):
 def test_accepting_quote_updates_es(es_with_signals):
     """
     Test that when a quote is accepted and the invoice created, the payment_due_date field
-    in ES gets updated.
+    in OpenSearch gets updated.
     """
     order = OrderWithOpenQuoteFactory()
     es_with_signals.indices.refresh()
