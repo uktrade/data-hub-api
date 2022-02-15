@@ -11,6 +11,10 @@
   }
   ```
 
+## Internal changes
+
+- Missing slash in uat setup has been fixed to ensure CI works.
+
 
 # Data Hub API 39.13.0 (2022-02-11)
 ## Internal changes
