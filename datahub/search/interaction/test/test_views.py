@@ -57,12 +57,12 @@ from datahub.search.interaction.views import (
 pytestmark = [
     pytest.mark.django_db,
     # Index objects for this search app only
-    pytest.mark.es_collector_apps.with_args(InteractionSearchApp),
+    pytest.mark.opensearch_collector_apps.with_args(InteractionSearchApp),
 ]
 
 
 @pytest.fixture
-def interactions(es_with_collector):
+def interactions(opensearch_with_collector):
     """Sets up data for the tests."""
     data = []
     with freeze_time('2017-01-01 13:00:00'):
@@ -123,7 +123,7 @@ def interactions(es_with_collector):
             ),
         ])
 
-    es_with_collector.flush_and_refresh()
+    opensearch_with_collector.flush_and_refresh()
 
     yield data
 
@@ -179,7 +179,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         response_data = response.json()
         assert len(response_data['results']) == 4
 
-    def test_default_sort(self, es_with_collector):
+    def test_default_sort(self, opensearch_with_collector):
         """Tests default sorting of results by date (descending)."""
         url = reverse('api-v3:search:interaction')
 
@@ -194,7 +194,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             len(dates),
             date=factory.Iterator(dates),
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(url, {})
 
@@ -245,7 +245,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             ('gyratory:asc', '"gyratory" is not a valid choice for the sort field.'),
         ),
     )
-    def test_sort_by_invalid_field(self, es_with_collector, sortby, error):
+    def test_sort_by_invalid_field(self, opensearch_with_collector, sortby, error):
         """Tests attempting to sort by an invalid field and direction."""
         url = reverse('api-v3:search:interaction')
 
@@ -373,12 +373,12 @@ class TestInteractionEntitySearchView(APITestMixin):
             'modified_on': interaction.modified_on.isoformat(),
         }]
 
-    def test_filter_by_kind(self, es_with_collector):
+    def test_filter_by_kind(self, opensearch_with_collector):
         """Tests filtering interaction by kind."""
         CompanyInteractionFactory.create_batch(10)
         service_deliveries = ServiceDeliveryFactory.create_batch(10)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
@@ -396,14 +396,14 @@ class TestInteractionEntitySearchView(APITestMixin):
         service_delivery_ids = {str(interaction.id) for interaction in service_deliveries}
         assert {result['id'] for result in results} == service_delivery_ids
 
-    def test_filter_by_company_id(self, es_with_collector):
+    def test_filter_by_company_id(self, opensearch_with_collector):
         """Tests filtering interaction by company id."""
         companies = CompanyFactory.create_batch(10)
         CompanyInteractionFactory.create_batch(
             len(companies),
             company=factory.Iterator(companies),
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
@@ -447,7 +447,9 @@ class TestInteractionEntitySearchView(APITestMixin):
             ('moine', None),
         ),
     )
-    def test_filter_by_company_name(self, es_with_collector, name_term, matched_company_name):
+    def test_filter_by_company_name(
+        self, opensearch_with_collector, name_term, matched_company_name,
+    ):
         """Tests filtering interaction by company name."""
         matching_company1 = CompanyFactory(
             name='whiskers and tabby',
@@ -465,7 +467,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         CompanyInteractionFactory(company=matching_company2)
         CompanyInteractionFactory(company=non_matching_company)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:interaction')
 
@@ -489,7 +491,7 @@ class TestInteractionEntitySearchView(APITestMixin):
 
     def test_filter_by_one_list_tier_group(
         self,
-        es_with_collector,
+        opensearch_with_collector,
     ):
         """
         Test that we can filter by one list tier group.
@@ -512,7 +514,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             company=company_2,
         )
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:interaction')
 
@@ -536,7 +538,7 @@ class TestInteractionEntitySearchView(APITestMixin):
 
     def test_filter_by_multiple_one_list_tier_groups(
         self,
-        es_with_collector,
+        opensearch_with_collector,
     ):
         """
         Test that we can filter by multiple one list tier groups.
@@ -558,7 +560,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             subject='Other Company chat',
             company=company_2,
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:interaction')
 
@@ -584,7 +586,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         'created_on_exists',
         (True, False),
     )
-    def test_filter_by_created_on_exists(self, es_with_collector, created_on_exists):
+    def test_filter_by_created_on_exists(self, opensearch_with_collector, created_on_exists):
         """Tests filtering interaction by created_on exists."""
         CompanyInteractionFactory.create_batch(3)
         no_created_on = CompanyInteractionFactory.create_batch(3)
@@ -592,7 +594,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             interaction.created_on = None
             interaction.save()
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
@@ -611,13 +613,13 @@ class TestInteractionEntitySearchView(APITestMixin):
         )
 
     @pytest.mark.parametrize('dit_participant_field', ('adviser', 'team'))
-    def test_filter_by_dit_participant(self, es_with_collector, dit_participant_field):
+    def test_filter_by_dit_participant(self, opensearch_with_collector, dit_participant_field):
         """Test filtering interaction by DIT participant adviser and team IDs."""
         interactions = CompanyInteractionFactory.create_batch(10, dit_participants=[])
         for interaction in interactions:
             InteractionDITParticipantFactory.create_batch(2, interaction=interaction)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         interaction = choice(interactions)
         dit_participant = interaction.dit_participants.order_by('?').first()
@@ -637,7 +639,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         assert len(results) == 1
         assert results[0]['id'] == str(interaction.pk)
 
-    def test_filter_by_communication_channel(self, es_with_collector):
+    def test_filter_by_communication_channel(self, opensearch_with_collector):
         """Tests filtering interaction by interaction type."""
         communication_channels = list(CommunicationChannel.objects.order_by('?')[:2])
         CompanyInteractionFactory.create_batch(
@@ -648,7 +650,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             5,
             communication_channel=communication_channels[1],
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
@@ -674,7 +676,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             ('policy_issue_types', PolicyIssueType),
         ),
     )
-    def test_filter_by_policy_fields(self, es_with_collector, field, field_model):
+    def test_filter_by_policy_fields(self, opensearch_with_collector, field, field_model):
         """
         Tests filtering interactions by:
         - policy area
@@ -704,7 +706,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         )
         CompanyInteractionFactory.create_batch(6)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
@@ -730,7 +732,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         }
         assert {result['id'] for result in results} == expected_ids
 
-    def test_filter_by_service(self, es_with_collector):
+    def test_filter_by_service(self, opensearch_with_collector):
         """Tests filtering interaction by service."""
         CompanyInteractionFactory.create_batch(
             5,
@@ -741,7 +743,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             5,
             service_id=service_id,
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
@@ -762,7 +764,7 @@ class TestInteractionEntitySearchView(APITestMixin):
     @pytest.mark.parametrize('was_policy_feedback_provided', (False, True))
     def test_filter_by_was_policy_feedback_provided(
         self,
-        es_with_collector,
+        opensearch_with_collector,
         was_policy_feedback_provided,
     ):
         """Test filtering interactions by was_policy_feedback_provided."""
@@ -771,7 +773,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             CompanyInteractionFactoryWithPolicyFeedback.create_batch(5)
         )
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
@@ -840,7 +842,7 @@ class TestInteractionEntitySearchView(APITestMixin):
     def test_sector_descends_filter_for_company_interaction(
             self,
             hierarchical_sectors,
-            es_with_collector,
+            opensearch_with_collector,
             sector_level,
     ):
         """Test the sector_descends filter with company interactions."""
@@ -867,7 +869,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             company=factory.Iterator(other_companies),
         )
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:interaction')
         body = {
@@ -890,7 +892,7 @@ class TestInteractionEntitySearchView(APITestMixin):
     def test_sector_descends_filter_for_investment_project_interaction(
             self,
             hierarchical_sectors,
-            es_with_collector,
+            opensearch_with_collector,
             sector_level,
     ):
         """Test the sector_descends filter with investment project interactions."""
@@ -917,7 +919,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             investment_project=factory.Iterator(other_projects),
         )
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:interaction')
         body = {
@@ -947,7 +949,7 @@ class TestInteractionExportView(APITestMixin):
             (InteractionPermission.export,),
         ),
     )
-    def test_user_without_permission_cannot_export(self, es_with_collector, permissions):
+    def test_user_without_permission_cannot_export(self, opensearch_with_collector, permissions):
         """Test that a user without the correct permissions cannot export data."""
         user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -966,7 +968,7 @@ class TestInteractionExportView(APITestMixin):
     )
     def test_interaction_export(
         self,
-        es_with_collector,
+        opensearch_with_collector,
         request_sortby,
         orm_ordering,
     ):
@@ -1020,7 +1022,7 @@ class TestInteractionExportView(APITestMixin):
             policy_issue_types=PolicyIssueType.objects.order_by('?')[:2],
         )
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         data = {}
         if request_sortby:
@@ -1100,7 +1102,7 @@ class TestInteractionExportView(APITestMixin):
     )
     def test_policy_feedback_export(
         self,
-        es_with_collector,
+        opensearch_with_collector,
         request_sortby,
         orm_ordering,
     ):
@@ -1152,7 +1154,7 @@ class TestInteractionExportView(APITestMixin):
             policy_issue_types=PolicyIssueType.objects.order_by('?')[:2],
         )
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         data = {}
         if request_sortby:

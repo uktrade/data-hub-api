@@ -459,7 +459,7 @@ if REDIS_BASE_URL:
         }
 
     if env.bool('ENABLE_DAILY_ES_SYNC', False):
-        CELERY_BEAT_SCHEDULE['sync_es'] = {
+        CELERY_BEAT_SCHEDULE['sync_search'] = {
             'task': 'datahub.search.tasks.sync_all_models',
             'schedule': crontab(minute=0, hour=1),
         }

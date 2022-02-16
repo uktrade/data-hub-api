@@ -2,7 +2,7 @@ from functools import partial
 
 from opensearch_dsl import Date, Keyword, Object, Text
 
-from datahub.search.elasticsearch import (
+from datahub.search.opensearch import (
     lowercase_asciifolding_normalizer,
     postcode_analyzer,
     postcode_search_analyzer,

@@ -14,7 +14,7 @@ class InteractionSearchApp(SearchApp):
     """SearchApp for interactions."""
 
     name = 'interaction'
-    es_model = Interaction
+    search_model = Interaction
     view_permissions = (f'interaction.{InteractionPermission.view_all}',)
     export_permission = f'interaction.{InteractionPermission.export}'
     queryset = DBInteraction.objects.select_related(

@@ -40,5 +40,5 @@ See docs/OpenSearch migrations.md for further details."""
         """Executes the command."""
         apps = get_search_apps_by_name(options['model'])
 
-        with advisory_lock('leeloo_migrate_es'):
+        with advisory_lock('migrate-opensearch-lock-id'):
             migrate_apps(apps)

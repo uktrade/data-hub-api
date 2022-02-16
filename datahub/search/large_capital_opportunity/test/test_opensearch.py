@@ -7,19 +7,19 @@ from datahub.investment.opportunity.test.constants import (
     OpportunityType as OpportunityTypeConstant,
 )
 from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
-from datahub.search import elasticsearch
+from datahub.search import opensearch as opensearch_client
 from datahub.search.large_capital_opportunity import LargeCapitalOpportunitySearchApp
 from datahub.search.large_capital_opportunity.models import (
-    LargeCapitalOpportunity as ESLargeCapitalOpportunity,
+    LargeCapitalOpportunity as SearchLargeCapitalOpportunity,
 )
 
 pytestmark = pytest.mark.django_db
 
 
-def test_mapping(es):
+def test_mapping(opensearch):
     """Test the OpenSearch mapping for a large capital opportunity."""
     mapping = Mapping.from_opensearch(
-        LargeCapitalOpportunitySearchApp.es_model.get_write_index(),
+        LargeCapitalOpportunitySearchApp.search_model.get_write_index(),
     )
     assert mapping.to_dict() == {
         'properties': {
@@ -349,19 +349,19 @@ def test_mapping(es):
 
 
 @freezegun.freeze_time('2019-01-01')
-def test_indexed_doc(es):
+def test_indexed_doc(opensearch):
     """Test the OpenSearch data of a large capital opportunity."""
     opportunity = LargeCapitalOpportunityFactory(
         lead_dit_relationship_manager=None,
     )
 
-    doc = ESLargeCapitalOpportunity.es_document(opportunity)
-    elasticsearch.bulk(actions=(doc, ), chunk_size=1)
+    doc = SearchLargeCapitalOpportunity.to_document(opportunity)
+    opensearch_client.bulk(actions=(doc, ), chunk_size=1)
 
-    es.indices.refresh()
+    opensearch.indices.refresh()
 
-    indexed_large_capital_opportunity = es.get(
-        index=ESLargeCapitalOpportunity.get_write_index(),
+    indexed_large_capital_opportunity = opensearch.get(
+        index=SearchLargeCapitalOpportunity.get_write_index(),
         id=opportunity.pk,
     )
 

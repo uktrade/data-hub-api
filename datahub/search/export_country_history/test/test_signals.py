@@ -7,29 +7,29 @@ from datahub.search.export_country_history.apps import ExportCountryHistoryApp
 pytestmark = pytest.mark.django_db
 
 
-def test_new_export_country_history_synced(es_with_signals):
-    """Test that new export country history is synced to ES."""
+def test_new_export_country_history_synced(opensearch_with_signals):
+    """Test that new export country history is synced to OpenSearch."""
     company_export_country_history = CompanyExportCountryHistoryFactory()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
-    assert es_with_signals.get(
-        index=ExportCountryHistoryApp.es_model.get_write_index(),
+    assert opensearch_with_signals.get(
+        index=ExportCountryHistoryApp.search_model.get_write_index(),
         id=company_export_country_history.pk,
     )
 
 
-def test_updated_interaction_synced(es_with_signals):
-    """Test that when export country history is updated, it is synced to ES."""
+def test_updated_interaction_synced(opensearch_with_signals):
+    """Test that when export country history is updated, it is synced to OpenSearch."""
     export_country_history = CompanyExportCountryHistoryFactory(
         history_type=CompanyExportCountryHistory.HistoryType.INSERT,
     )
     history_type = CompanyExportCountryHistory.HistoryType.UPDATE
     export_country_history.history_type = history_type
     export_country_history.save()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
-    result = es_with_signals.get(
-        index=ExportCountryHistoryApp.es_model.get_write_index(),
+    result = opensearch_with_signals.get(
+        index=ExportCountryHistoryApp.search_model.get_write_index(),
         id=export_country_history.pk,
     )
 

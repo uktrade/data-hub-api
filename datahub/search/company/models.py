@@ -4,7 +4,7 @@ from opensearch_dsl import Boolean, Date, Keyword, Object, Text
 
 from datahub.company.models import CompanyExportCountry
 from datahub.search import dict_utils, fields
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
 def _adviser_field_with_indexed_id():
@@ -18,7 +18,7 @@ def _adviser_field_with_indexed_id():
     )
 
 
-class Company(BaseESModel):
+class Company(BaseSearchModel):
     """
     OpenSearch representation of Company model.
     """
