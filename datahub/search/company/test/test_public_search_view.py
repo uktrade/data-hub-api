@@ -14,11 +14,11 @@ from datahub.search.company import CompanySearchApp
 from datahub.search.company.test.utils import get_address_area_or_none
 
 # Index objects for this search app only
-pytestmark = pytest.mark.es_collector_apps.with_args(CompanySearchApp)
+pytestmark = pytest.mark.opensearch_collector_apps.with_args(CompanySearchApp)
 
 
 @pytest.fixture
-def setup_data(es_with_collector):
+def setup_data(opensearch_with_collector):
     """Sets up data for the tests."""
     country_uk = constants.Country.united_kingdom.value.id
     country_us = constants.Country.united_states.value.id
@@ -50,7 +50,7 @@ def setup_data(es_with_collector):
         registered_address_country_id=country_anguilla,
         archived=True,
     )
-    es_with_collector.flush_and_refresh()
+    opensearch_with_collector.flush_and_refresh()
 
 
 @pytest.fixture
@@ -93,7 +93,7 @@ class TestPublicCompanySearch:
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_response_body(self, es_with_collector, public_company_api_client):
+    def test_response_body(self, opensearch_with_collector, public_company_api_client):
         """Tests the response body of a search query."""
         company = CompanyFactory(
             company_number='123',
@@ -102,7 +102,7 @@ class TestPublicCompanySearch:
             one_list_tier=None,
             one_list_account_owner=None,
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v4:search:public-company')
         response = public_company_api_client.post(url, {})
@@ -193,7 +193,7 @@ class TestPublicCompanySearch:
             ],
         }
 
-    def test_response_is_signed(self, es, public_company_api_client):
+    def test_response_is_signed(self, opensearch, public_company_api_client):
         """Test that responses are signed."""
         url = reverse('api-v4:search:public-company')
         response = public_company_api_client.post(url, {})
@@ -268,7 +268,7 @@ class TestPublicCompanySearch:
     def test_composite_name_filter(
         self,
         public_company_api_client,
-        es_with_collector,
+        opensearch_with_collector,
         name_term,
         matched_company_name,
     ):
@@ -281,7 +281,7 @@ class TestPublicCompanySearch:
             name='1a',
             trading_names=['3a', '4a'],
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v4:search:public-company')
         request_data = {
@@ -299,7 +299,7 @@ class TestPublicCompanySearch:
             assert response.data['count'] == 0
             assert len(response.data['results']) == 0
 
-    def test_pagination(self, public_company_api_client, es_with_collector):
+    def test_pagination(self, public_company_api_client, opensearch_with_collector):
         """Test result pagination."""
         total_records = 9
         page_size = 2
@@ -313,7 +313,7 @@ class TestPublicCompanySearch:
             trading_names=[],
         )
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v4:search:public-company')
 

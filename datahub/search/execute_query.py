@@ -12,7 +12,7 @@ logger = getLogger(__name__)
 
 def execute_search_query(query):
     """
-    Executes an Elasticsearch query using the globally configured request timeout.
+    Executes an OpenSearch query using the globally configured request timeout.
 
     (A warning is also logged if the query takes longer than a set threshold.)
     """
@@ -24,13 +24,13 @@ def execute_search_query(query):
         )
 
     if response.took >= settings.ES_SEARCH_REQUEST_WARNING_THRESHOLD * 1000:
-        logger.warning(f'Elasticsearch query took a long time ({response.took / 1000:.2f}s)')
+        logger.warning(f'OpenSearch query took a long time ({response.took / 1000:.2f}s)')
 
         log_data = {
             'query': query.to_dict(),
             'took': response.took,
             'timed_out': response.timed_out,
         }
-        log_to_sentry('Elasticsearch query took a long time', extra=log_data)
+        log_to_sentry('OpenSearch query took a long time', extra=log_data)
 
     return response

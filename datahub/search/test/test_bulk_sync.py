@@ -66,7 +66,7 @@ def test_sync_app_logic(monkeypatch):
 
 @pytest.mark.django_db
 @disable_search_signal_receivers(Company)
-def test_sync_app_uses_latest_data(monkeypatch, es):
+def test_sync_app_uses_latest_data(monkeypatch, opensearch):
     """Test that sync_app() picks up updates made to records between batches."""
     CompanyFactory.create_batch(2, name='old name')
 
@@ -84,11 +84,11 @@ def test_sync_app_uses_latest_data(monkeypatch, es):
     monkeypatch.setattr('datahub.search.bulk_sync.sync_objects', mock_sync_objects)
     sync_app(CompanySearchApp, batch_size=1)
 
-    es.indices.refresh()
+    opensearch.indices.refresh()
 
     company = mock_sync_objects.call_args_list[1][0][1][0]
-    fetched_company = es.get(
-        index=CompanySearchApp.es_model.get_read_alias(),
+    fetched_company = opensearch.get(
+        index=CompanySearchApp.search_model.get_read_alias(),
         id=company.pk,
     )
     assert fetched_company['_source']['name'] == 'new name'

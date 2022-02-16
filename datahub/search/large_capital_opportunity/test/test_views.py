@@ -44,12 +44,12 @@ from datahub.search.large_capital_opportunity.views import (
 pytestmark = [
     pytest.mark.django_db,
     # Index objects for this search app only
-    pytest.mark.es_collector_apps.with_args(LargeCapitalOpportunitySearchApp),
+    pytest.mark.opensearch_collector_apps.with_args(LargeCapitalOpportunitySearchApp),
 ]
 
 
 @pytest.fixture
-def setup_data(es_with_collector):
+def setup_data(opensearch_with_collector):
     """Sets up data for the tests."""
     promoter = CompanyFactory(name='promoter')
     capital_expenditure = OpportunityValueTypeConstant.capital_expenditure.value.id
@@ -164,7 +164,7 @@ def setup_data(es_with_collector):
             north_project,
             south_project,
         ]
-    es_with_collector.flush_and_refresh()
+    opensearch_with_collector.flush_and_refresh()
 
     yield opportunities
 
@@ -478,7 +478,7 @@ class TestLargeCapitalOpportunityExportView(APITestMixin):
         ),
     )
     def test_user_with_correct_permissions_can_export_data(
-        self, es, permissions, expected_status_code,
+        self, opensearch, permissions, expected_status_code,
     ):
         """Test that only a user with correct permissions can export data."""
         user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
@@ -496,7 +496,7 @@ class TestLargeCapitalOpportunityExportView(APITestMixin):
             ('name', 'name'),
         ),
     )
-    def test_export(self, es_with_collector, request_sortby, orm_ordering):
+    def test_export(self, opensearch_with_collector, request_sortby, orm_ordering):
         """Test export large capital opportunity search results."""
         url = reverse('api-v4:search:large-capital-opportunity-export')
 
@@ -504,7 +504,7 @@ class TestLargeCapitalOpportunityExportView(APITestMixin):
         with freeze_time('2018-01-01 11:12:13'):
             LargeCapitalOpportunityFactory()
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         data = {}
         if request_sortby:

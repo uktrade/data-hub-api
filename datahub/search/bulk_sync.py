@@ -1,7 +1,7 @@
 from logging import getLogger
 
 from datahub.core.utils import slice_iterable_into_chunks
-from datahub.search.elasticsearch import bulk
+from datahub.search.opensearch import bulk
 
 logger = getLogger(__name__)
 
@@ -11,11 +11,11 @@ BULK_INDEX_TIMEOUT_SECS = 300
 
 def sync_app(search_app, batch_size=None, post_batch_callback=None):
     """Syncs objects for an app to OpenSearch in batches of batch_size."""
-    model_name = search_app.es_model.__name__
+    model_name = search_app.search_model.__name__
     batch_size = batch_size or search_app.bulk_batch_size
     logger.info(f'Processing {model_name} records, using batch size {batch_size}')
 
-    read_indices, write_index = search_app.es_model.get_read_and_write_indices()
+    read_indices, write_index = search_app.search_model.get_read_and_write_indices()
 
     num_source_rows_processed = 0
     num_objects_synced = 0
@@ -26,7 +26,7 @@ def sync_app(search_app, batch_size=None, post_batch_callback=None):
         objs = search_app.queryset.filter(pk__in=batch)
 
         num_actions = sync_objects(
-            search_app.es_model,
+            search_app.search_model,
             objs,
             read_indices,
             write_index,
@@ -56,10 +56,10 @@ def sync_app(search_app, batch_size=None, post_batch_callback=None):
         )
 
 
-def sync_objects(es_model, model_objects, read_indices, write_index, post_batch_callback=None):
+def sync_objects(search_model, model_objects, read_indices, write_index, post_batch_callback=None):
     """Syncs an iterable of model instances to OpenSearch."""
     actions = list(
-        es_model.db_objects_to_es_documents(model_objects, index=write_index),
+        search_model.db_objects_to_documents(model_objects, index=write_index),
     )
     num_actions = len(actions)
     bulk(

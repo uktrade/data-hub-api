@@ -3,7 +3,7 @@ from opensearch_dsl import Mapping
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.search.company import CompanySearchApp
-from datahub.search.company.models import Company as ESCompany
+from datahub.search.company.models import Company as SearchCompany
 from datahub.search.query_builder import (
     get_basic_search_query,
     get_search_by_entities_query,
@@ -12,10 +12,10 @@ from datahub.search.query_builder import (
 from datahub.search.sync_object import sync_object
 
 
-def test_mapping(es):
+def test_mapping(opensearch):
     """Test the OpenSearch mapping for a company."""
     mapping = Mapping.from_opensearch(
-        CompanySearchApp.es_model.get_write_index(),
+        CompanySearchApp.search_model.get_write_index(),
     )
     assert mapping.to_dict() == {
         'dynamic': 'false',
@@ -401,7 +401,7 @@ def test_mapping(es):
 @pytest.mark.django_db
 def test_get_basic_search_query():
     """Tests basic search query."""
-    query = get_basic_search_query(ESCompany, 'test', offset=5, limit=5)
+    query = get_basic_search_query(SearchCompany, 'test', offset=5, limit=5)
 
     assert query.to_dict() == {
         'query': {
@@ -635,7 +635,7 @@ def test_limited_get_search_by_entity_query():
         'archived_after': date,
     }
     query = get_search_by_entities_query(
-        [ESCompany],
+        [SearchCompany],
         term='test',
         filter_data=filter_data,
     )
@@ -649,17 +649,17 @@ def test_limited_get_search_by_entity_query():
 
 
 @pytest.mark.django_db
-def test_indexed_doc(es):
+def test_indexed_doc(opensearch):
     """Test the OpenSearch data of an indexed company."""
     company = CompanyFactory(
         trading_names=['a', 'b'],
     )
     sync_object(CompanySearchApp, company.pk)
 
-    es.indices.refresh()
+    opensearch.indices.refresh()
 
-    indexed_company = es.get(
-        index=CompanySearchApp.es_model.get_write_index(),
+    indexed_company = opensearch.get(
+        index=CompanySearchApp.search_model.get_write_index(),
         id=company.pk,
     )
 

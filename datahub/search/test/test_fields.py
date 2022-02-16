@@ -12,7 +12,7 @@ from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
 class TestNormalizedField(APITestMixin):
     """Tests the behaviour of NormalizedKeyword."""
 
-    def test_sorting(self, es):
+    def test_sorting(self, opensearch):
         """Test to demonstrate how NormalizedKeyword sorts."""
         names = [
             'Alice',
@@ -28,7 +28,7 @@ class TestNormalizedField(APITestMixin):
             obj.save()
             sync_object(SimpleModelSearchApp, obj.pk)
 
-        es.indices.refresh()
+        opensearch.indices.refresh()
 
         user = create_test_user(permission_codenames=['view_simplemodel'])
         api_client = self.create_api_client(user=user)

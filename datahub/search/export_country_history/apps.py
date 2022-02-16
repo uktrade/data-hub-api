@@ -9,7 +9,7 @@ class ExportCountryHistoryApp(SearchApp):
     """SearchApp for export countries history timeline"""
 
     name = 'export-country-history'
-    es_model = ExportCountryHistory
+    search_model = ExportCountryHistory
     exclude_from_global_search = True
     queryset = DBCompanyExportCountryHistory.objects.select_related(
         'history_user',

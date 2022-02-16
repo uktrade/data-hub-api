@@ -1,6 +1,6 @@
 #!/bin/bash -xe
 python /app/manage.py migrate --noinput
-python /app/manage.py migrate_es
+python /app/manage.py migrate_search
 # Load initial metadata - ignore errors as we may have already loaded it in to
 # this DB
 python /app/manage.py loadinitialmetadata --force

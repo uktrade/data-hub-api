@@ -6,7 +6,7 @@ from django.conf import settings
 from datahub.core.exceptions import DataHubError
 from datahub.search.apps import _load_search_apps, get_search_apps, SearchApp
 from datahub.search.migrate import migrate_app, migrate_apps
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 from datahub.search.test.utils import create_mock_search_app
 
 SAMPLE_APP_NAME = 'sample'
@@ -16,7 +16,7 @@ class SampleSearchApp(SearchApp):
     """Sample (dummy) search app."""
 
     name = SAMPLE_APP_NAME
-    es_model = BaseESModel
+    search_model = BaseSearchModel
 
 
 @pytest.fixture
@@ -69,14 +69,14 @@ def test_migrate_app_with_uninitialised_app(
     ]
 
 
-def test_migrate_app_with_app_needing_migration(monkeypatch, mock_es_client):
+def test_migrate_app_with_app_needing_migration(monkeypatch, mock_opensearch_client):
     """Test that migrate_app() migrates an app needing migration."""
     migrate_model_task_mock = Mock()
     monkeypatch.setattr('datahub.search.migrate.complete_model_migration', migrate_model_task_mock)
     create_index_mock = Mock()
     monkeypatch.setattr('datahub.search.migrate.create_index', create_index_mock)
 
-    mock_client = mock_es_client.return_value
+    mock_client = mock_opensearch_client.return_value
     old_index = 'test-index'
     new_index = 'test-index-target-hash'
     current_hash = 'current-hash'
@@ -89,7 +89,7 @@ def test_migrate_app_with_app_needing_migration(monkeypatch, mock_es_client):
 
     migrate_app(mock_app)
 
-    create_index_mock.assert_called_once_with(new_index, mock_app.es_model._doc_type.mapping)
+    create_index_mock.assert_called_once_with(new_index, mock_app.search_model._doc_type.mapping)
 
     mock_client.indices.update_aliases.assert_called_once_with(
         body={
@@ -121,12 +121,12 @@ def test_migrate_app_with_app_needing_migration(monkeypatch, mock_es_client):
     )
 
 
-def test_migrate_app_with_app_not_needing_migration(monkeypatch, mock_es_client):
+def test_migrate_app_with_app_not_needing_migration(monkeypatch, mock_opensearch_client):
     """Test that migrate_app() migrates an app needing migration."""
     migrate_model_task_mock = Mock()
     monkeypatch.setattr('datahub.search.migrate.complete_model_migration', migrate_model_task_mock)
 
-    mock_client = mock_es_client.return_value
+    mock_client = mock_opensearch_client.return_value
     old_index = 'test-index-current-hash'
     current_hash = 'current-hash'
     target_hash = 'current-hash'
@@ -138,12 +138,12 @@ def test_migrate_app_with_app_not_needing_migration(monkeypatch, mock_es_client)
 
     migrate_app(mock_app)
 
-    mock_app.es_model.create_index.assert_not_called()
+    mock_app.search_model.create_index.assert_not_called()
     mock_client.indices.update_aliases.assert_not_called()
     migrate_model_task_mock.apply_async.assert_not_called()
 
 
-def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_es_client):
+def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_opensearch_client):
     """
     Test that migrate_app() resyncs an app in an inconsistent state.
 
@@ -154,7 +154,7 @@ def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_es_client)
     migrate_model_task_mock = Mock()
     monkeypatch.setattr('datahub.search.migrate.complete_model_migration', migrate_model_task_mock)
 
-    mock_client = mock_es_client.return_value
+    mock_client = mock_opensearch_client.return_value
     old_index = 'test-index-current-hash'
     read_indices = ('test-index-current-hash', 'another-index')
     current_hash = 'current-hash'
@@ -168,7 +168,7 @@ def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_es_client)
 
     migrate_app(mock_app)
 
-    mock_app.es_model.create_index.assert_not_called()
+    mock_app.search_model.create_index.assert_not_called()
     mock_client.indices.update_aliases.assert_not_called()
 
     migrate_model_task_mock.apply_async.assert_called_once_with(
@@ -176,7 +176,7 @@ def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_es_client)
     )
 
 
-def test_migrate_app_with_app_in_invalid_state(monkeypatch, mock_es_client):
+def test_migrate_app_with_app_in_invalid_state(monkeypatch, mock_opensearch_client):
     """
     Test that migrate_app() raises an exception for apps in an invalid state.
 

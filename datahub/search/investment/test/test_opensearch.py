@@ -1,7 +1,7 @@
 import pytest
 from opensearch_dsl import Mapping
 
-from datahub.search.investment.models import InvestmentProject as ESInvestmentProject
+from datahub.search.investment.models import InvestmentProject as SearchInvestmentProject
 from datahub.search.query_builder import (
     get_basic_search_query,
     get_search_by_entities_query,
@@ -9,10 +9,10 @@ from datahub.search.query_builder import (
 )
 
 
-def test_mapping(es):
+def test_mapping(opensearch):
     """Test the OpenSearch mapping for an investment project."""
     mapping = Mapping.from_opensearch(
-        ESInvestmentProject.get_write_index(),
+        SearchInvestmentProject.get_write_index(),
     )
 
     assert mapping.to_dict() == {
@@ -805,7 +805,7 @@ def test_get_basic_search_query():
     }
 
     query = get_basic_search_query(
-        ESInvestmentProject,
+        SearchInvestmentProject,
         'test',
         offset=5,
         limit=5,
@@ -824,7 +824,7 @@ def test_limited_get_search_by_entity_query():
         'estimated_land_date_before': date,
     }
     query = get_search_by_entities_query(
-        [ESInvestmentProject],
+        [SearchInvestmentProject],
         term='test',
         filter_data=filter_data,
     )

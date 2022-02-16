@@ -10,7 +10,7 @@ class CompanySearchApp(SearchApp):
     """SearchApp for company."""
 
     name = 'company'
-    es_model = Company
+    search_model = Company
     view_permissions = (f'company.{CompanyPermission.view_company}',)
     export_permission = f'company.{CompanyPermission.export_company}'
     queryset = DBCompany.objects.select_related(
