@@ -5,7 +5,7 @@ from opensearch_dsl import Boolean, Date, Double, InnerDoc, Keyword, Object, Tex
 from datahub.search import dict_utils, fields
 from datahub.search.fields import TrigramText
 from datahub.search.inner_docs import IDNameTrigram, Person
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
 def _contact_field():
@@ -70,7 +70,7 @@ class _DITParticipant(InnerDoc):
     team = Object(IDNameTrigram)
 
 
-class Interaction(BaseESModel):
+class Interaction(BaseSearchModel):
     """OpenSearch representation of Interaction model."""
 
     id = Keyword()

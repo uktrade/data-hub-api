@@ -13,7 +13,7 @@ from datahub.investment.project.test.factories import (
     GVAMultiplierFactory,
     InvestmentProjectFactory,
 )
-from datahub.search.investment.models import InvestmentProject as ESInvestmentProject
+from datahub.search.investment.models import InvestmentProject as SearchInvestmentProject
 
 pytestmark = pytest.mark.django_db
 
@@ -52,10 +52,10 @@ def project_with_max_gross_value_added():
         )
 
 
-def test_investment_project_to_dict(es):
+def test_investment_project_to_dict(opensearch):
     """Tests conversion of db model to dict."""
     project = InvestmentProjectFactory()
-    result = ESInvestmentProject.db_object_to_dict(project)
+    result = SearchInvestmentProject.db_object_to_dict(project)
 
     keys = {
         '_document_type',
@@ -152,17 +152,17 @@ def test_investment_project_to_dict(es):
     assert set(result.keys()) == keys
 
 
-def test_investment_project_dbmodels_to_es_documents(es):
+def test_investment_project_dbmodels_to_documents(opensearch):
     """Tests conversion of db models to OpenSearch documents."""
     projects = InvestmentProjectFactory.create_batch(2)
 
-    result = ESInvestmentProject.db_objects_to_es_documents(projects)
+    result = SearchInvestmentProject.db_objects_to_documents(projects)
 
     assert len(list(result)) == len(projects)
 
 
 def test_max_values_of_doubles_gross_value_added_and_foreign_equity_investment(
-    es_with_signals,
+    opensearch_with_signals,
     project_with_max_gross_value_added,
 ):
     """
@@ -188,19 +188,19 @@ def test_max_values_of_doubles_gross_value_added_and_foreign_equity_investment(
     project = project_with_max_gross_value_added
     assert project.gross_value_added == expected_gross_value_added_value
 
-    result = ESInvestmentProject.db_object_to_dict(project)
+    result = SearchInvestmentProject.db_object_to_dict(project)
     assert result['foreign_equity_investment'] == foreign_equity_investment_value
     assert result['gross_value_added'] == expected_gross_value_added_value
 
     # Re-fetch the project from OpenSearch and
     # re-check the values against the less accurate values.
-    project_in_es = ESInvestmentProject.get(
+    project_in_opensearch = SearchInvestmentProject.get(
         id=project.pk,
-        index=ESInvestmentProject.get_read_alias(),
+        index=SearchInvestmentProject.get_read_alias(),
     )
 
     assert (
-        project_in_es['foreign_equity_investment']
+        project_in_opensearch['foreign_equity_investment']
         == less_accurate_expected_foreign_equity_investment_value
     )
-    assert project_in_es['gross_value_added'] == less_accurate_expected_gross_value_added
+    assert project_in_opensearch['gross_value_added'] == less_accurate_expected_gross_value_added

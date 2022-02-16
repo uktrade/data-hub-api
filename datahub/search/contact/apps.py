@@ -7,7 +7,7 @@ class ContactSearchApp(SearchApp):
     """SearchApp for contacts"""
 
     name = 'contact'
-    es_model = Contact
+    search_model = Contact
     view_permissions = (f'company.{ContactPermission.view_contact}',)
     export_permission = f'company.{ContactPermission.export_contact}'
     queryset = DBContact.objects.select_related(
