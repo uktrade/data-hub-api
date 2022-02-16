@@ -9,33 +9,33 @@ from datahub.interaction.models import (
 from datahub.investment.project.models import InvestmentProject as DBInvestmentProject
 from datahub.search.deletion import delete_document
 from datahub.search.interaction import InteractionSearchApp
-from datahub.search.interaction.models import Interaction as ESInteraction
+from datahub.search.interaction.models import Interaction as SearchInteraction
 from datahub.search.signals import SignalReceiver
 from datahub.search.sync_object import sync_object_async, sync_related_objects_async
 
 
-def sync_interaction_to_es(instance):
+def sync_interaction_to_opensearch(instance):
     """Sync interaction to the OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(InteractionSearchApp, instance.pk),
     )
 
 
-def sync_participant_to_es(dit_participant):
+def sync_participant_to_opensearch(dit_participant):
     """Sync a DIT participant's interaction to OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(InteractionSearchApp, dit_participant.interaction_id),
     )
 
 
-def remove_interaction_from_es(instance):
+def remove_interaction_from_opensearch(instance):
     """Remove interaction from es."""
     transaction.on_commit(
-        lambda pk=instance.pk: delete_document(ESInteraction, pk),
+        lambda pk=instance.pk: delete_document(SearchInteraction, pk),
     )
 
 
-def sync_related_interactions_to_es(instance):
+def sync_related_interactions_to_opensearch(instance):
     """Sync related interactions."""
     transaction.on_commit(
         lambda: sync_related_objects_async(instance, 'interactions'),
@@ -43,10 +43,10 @@ def sync_related_interactions_to_es(instance):
 
 
 receivers = (
-    SignalReceiver(post_save, DBInteraction, sync_interaction_to_es),
-    SignalReceiver(post_save, DBInteractionDITParticipant, sync_participant_to_es),
-    SignalReceiver(post_save, DBCompany, sync_related_interactions_to_es),
-    SignalReceiver(post_save, DBContact, sync_related_interactions_to_es),
-    SignalReceiver(post_save, DBInvestmentProject, sync_related_interactions_to_es),
-    SignalReceiver(post_delete, DBInteraction, remove_interaction_from_es),
+    SignalReceiver(post_save, DBInteraction, sync_interaction_to_opensearch),
+    SignalReceiver(post_save, DBInteractionDITParticipant, sync_participant_to_opensearch),
+    SignalReceiver(post_save, DBCompany, sync_related_interactions_to_opensearch),
+    SignalReceiver(post_save, DBContact, sync_related_interactions_to_opensearch),
+    SignalReceiver(post_save, DBInvestmentProject, sync_related_interactions_to_opensearch),
+    SignalReceiver(post_delete, DBInteraction, remove_interaction_from_opensearch),
 )

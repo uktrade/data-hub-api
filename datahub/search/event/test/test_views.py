@@ -23,7 +23,7 @@ def setup_data():
 pytestmark = [
     pytest.mark.django_db,
     # Index objects for this search app only
-    pytest.mark.es_collector_apps.with_args(EventSearchApp),
+    pytest.mark.opensearch_collector_apps.with_args(EventSearchApp),
 ]
 
 
@@ -38,13 +38,13 @@ class TestSearch(APITestMixin):
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_search_event(self, es_with_collector, setup_data):
+    def test_search_event(self, opensearch_with_collector, setup_data):
         """Tests detailed event search."""
         event_name = '012345catsinspace'
         EventFactory(
             name=event_name,
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:event')
 
@@ -60,9 +60,9 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == event_name
 
-    def test_event_search_paging(self, es_with_collector, setup_data):
+    def test_event_search_paging(self, opensearch_with_collector, setup_data):
         """Tests pagination of results."""
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:event')
         response = self.api_client.post(
@@ -77,9 +77,9 @@ class TestSearch(APITestMixin):
         assert response.data['count'] > 1
         assert len(response.data['results']) == 1
 
-    def test_search_event_no_filters(self, es_with_collector, setup_data):
+    def test_search_event_no_filters(self, opensearch_with_collector, setup_data):
         """Tests case where there is no filters provided."""
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:event')
         response = self.api_client.post(url, {})
@@ -87,13 +87,13 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data['results']) > 0
 
-    def test_search_event_name(self, es_with_collector, setup_data):
+    def test_search_event_name(self, opensearch_with_collector, setup_data):
         """Tests event_name filter."""
         event_name = '0000000000'
         EventFactory(
             name=event_name,
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:event')
 
@@ -109,13 +109,13 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == event_name
 
-    def test_search_event_organiser(self, es_with_collector, setup_data):
+    def test_search_event_organiser(self, opensearch_with_collector, setup_data):
         """Tests organiser filter."""
         organiser = AdviserFactory()
         EventFactory(
             organiser=organiser,
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:event')
 
@@ -131,7 +131,7 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['organiser']['id'] == str(organiser.id)
 
-    def test_search_event_organiser_name(self, es_with_collector, setup_data):
+    def test_search_event_organiser_name(self, opensearch_with_collector, setup_data):
         """Tests organiser_name filter."""
         organiser_name = '00000000 000000000'
         EventFactory(
@@ -140,7 +140,7 @@ class TestSearch(APITestMixin):
                 last_name=organiser_name.split(' ', maxsplit=1)[1],
             ),
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:event')
 
@@ -156,13 +156,13 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['organiser']['name'] == organiser_name
 
-    def test_search_event_address_country(self, es_with_collector, setup_data):
+    def test_search_event_address_country(self, opensearch_with_collector, setup_data):
         """Tests address_country filter."""
         country_id = constants.Country.united_states.value.id
         EventFactory(
             address_country_id=country_id,
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:event')
 
@@ -178,14 +178,14 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['address_country']['id'] == country_id
 
-    def test_search_event_lead_team(self, es_with_collector):
+    def test_search_event_lead_team(self, opensearch_with_collector):
         """Tests lead_team filter."""
         url = reverse('api-v3:search:event')
 
         team = TeamFactory()
         EventFactory.create_batch(5)
         EventFactory.create_batch(5, lead_team_id=team.id)
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             url,
@@ -202,7 +202,7 @@ class TestSearch(APITestMixin):
 
         assert all(team_id == str(team.id) for team_id in team_ids)
 
-    def test_search_event_teams(self, es_with_collector):
+    def test_search_event_teams(self, opensearch_with_collector):
         """Tests teams filter."""
         url = reverse('api-v3:search:event')
 
@@ -213,7 +213,7 @@ class TestSearch(APITestMixin):
         EventFactory.create_batch(5, teams=(team_a, team_b))
         EventFactory.create_batch(5, teams=(team_b,))
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             url,
@@ -231,7 +231,7 @@ class TestSearch(APITestMixin):
             team_ids = {team['id'] for team in teams}
             assert len(team_ids.intersection({str(team_a.id), str(team_c.id)})) > 0
 
-    def test_search_event_nested_disabled_on_after_or_none(self, es_with_collector):
+    def test_search_event_nested_disabled_on_after_or_none(self, opensearch_with_collector):
         """Tests nested disabled_on filter."""
         url = reverse('api-v3:search:event')
 
@@ -241,7 +241,7 @@ class TestSearch(APITestMixin):
         EventFactory.create_batch(3, disabled_on=old_datetime)
         EventFactory.create_batch(5, disabled_on=current_datetime)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             url,
@@ -263,7 +263,7 @@ class TestSearch(APITestMixin):
             for disabled_on in disabled_ons
         )
 
-    def test_search_event_disabled_on_doesnt_exist(self, es_with_collector):
+    def test_search_event_disabled_on_doesnt_exist(self, opensearch_with_collector):
         """Tests disabled_on is null filter."""
         url = reverse('api-v3:search:event')
 
@@ -271,7 +271,7 @@ class TestSearch(APITestMixin):
         EventFactory.create_batch(5)
         EventFactory.create_batch(5, disabled_on=current_datetime)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             url,
@@ -287,7 +287,7 @@ class TestSearch(APITestMixin):
         disabled_ons = (result['disabled_on'] for result in response.data['results'])
         assert all(disabled_on is None for disabled_on in disabled_ons)
 
-    def test_search_event_disabled_on_exists(self, es_with_collector):
+    def test_search_event_disabled_on_exists(self, opensearch_with_collector):
         """Tests disabled_on is null filter."""
         url = reverse('api-v3:search:event')
 
@@ -295,7 +295,7 @@ class TestSearch(APITestMixin):
         EventFactory.create_batch(5)
         EventFactory.create_batch(5, disabled_on=current_datetime)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             url,
@@ -312,7 +312,7 @@ class TestSearch(APITestMixin):
         disabled_ons = (result['disabled_on'] for result in response.data['results'])
         assert all(disabled_on is not None for disabled_on in disabled_ons)
 
-    def test_search_event_uk_region(self, es_with_collector):
+    def test_search_event_uk_region(self, opensearch_with_collector):
         """Tests uk_region filter."""
         country_id = constants.Country.united_kingdom.value.id
         uk_region_id = constants.UKRegion.jersey.value.id
@@ -320,7 +320,7 @@ class TestSearch(APITestMixin):
             address_country_id=country_id,
             uk_region_id=uk_region_id,
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:event')
 
@@ -337,13 +337,13 @@ class TestSearch(APITestMixin):
         assert response.data['results'][0]['address_country']['id'] == country_id
         assert response.data['results'][0]['uk_region']['id'] == uk_region_id
 
-    def test_search_event_date(self, es_with_collector, setup_data):
+    def test_search_event_date(self, opensearch_with_collector, setup_data):
         """Tests start_date filter."""
         start_date = datetime.date(2017, 7, 2)
         event = EventFactory(
             start_date=start_date,
         )
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:event')
 
@@ -361,13 +361,13 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['id'] == str(event.id)
 
-    def test_search_event_sortby_start_date(self, es_with_collector, setup_data):
+    def test_search_event_sortby_start_date(self, opensearch_with_collector, setup_data):
         """Tests sort by start_date desc."""
         start_date_a = datetime.date(2011, 9, 29)
         start_date_b = datetime.date(2011, 9, 30)
         EventFactory(start_date=start_date_a)
         EventFactory(start_date=start_date_b)
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:event')
 
@@ -386,14 +386,14 @@ class TestSearch(APITestMixin):
         assert response.data['results'][0]['start_date'] == start_date_b.isoformat()
         assert response.data['results'][1]['start_date'] == start_date_a.isoformat()
 
-    def test_search_event_sortby_end_date(self, es_with_collector, setup_data):
+    def test_search_event_sortby_end_date(self, opensearch_with_collector, setup_data):
         """Tests sort by end_date desc."""
         start_date = datetime.date(2000, 9, 29)
         end_date_a = datetime.date(2014, 9, 29)
         end_date_b = datetime.date(2015, 9, 29)
         EventFactory(start_date=start_date, end_date=end_date_a)
         EventFactory(start_date=start_date, end_date=end_date_b)
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:event')
 
@@ -413,7 +413,7 @@ class TestSearch(APITestMixin):
         assert response.data['results'][0]['end_date'] == end_date_b.isoformat()
         assert response.data['results'][1]['end_date'] == end_date_a.isoformat()
 
-    def test_search_event_sortby_modified_on(self, es_with_collector, setup_data):
+    def test_search_event_sortby_modified_on(self, opensearch_with_collector, setup_data):
         """Tests sort by modified_on desc."""
         start_date = datetime.date(2001, 9, 29)
 
@@ -423,7 +423,7 @@ class TestSearch(APITestMixin):
         with freeze_time('2016-01-02 11:00:00'):
             event_b = EventFactory(start_date=start_date)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:event')
 
@@ -446,9 +446,9 @@ class TestSearch(APITestMixin):
 class TestBasicSearch(APITestMixin):
     """Tests basic search view."""
 
-    def test_all_events(self, es_with_collector, setup_data):
+    def test_all_events(self, opensearch_with_collector, setup_data):
         """Tests basic aggregate all events query."""
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         term = ''
 
@@ -464,11 +464,11 @@ class TestBasicSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] > 0
 
-    def test_aggregations(self, es_with_collector, setup_data):
+    def test_aggregations(self, opensearch_with_collector, setup_data):
         """Tests basic aggregate events query."""
         EventFactory(name='abcdefghijkl')
         EventFactory(name='abcdefghijkm')
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(
@@ -484,9 +484,9 @@ class TestBasicSearch(APITestMixin):
         assert response.data['results'][0]['name'].startswith('abcdefg')
         assert [{'count': 2, 'entity': 'event'}] == response.data['aggregations']
 
-    def test_no_results(self, es_with_collector, setup_data):
+    def test_no_results(self, opensearch_with_collector, setup_data):
         """Tests case where there should be no results."""
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         term = 'there-should-be-no-match'
 

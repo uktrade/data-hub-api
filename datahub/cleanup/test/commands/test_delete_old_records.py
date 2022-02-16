@@ -752,8 +752,8 @@ def test_run(
     relation_factory_kwargs,
     is_expired,
     track_return_values,
-    es_with_signals,
-    es_collector_context_manager,
+    opensearch_with_signals,
+    opensearch_collector_context_manager,
 ):
     """Tests the delete_old_records commands for various cases specified by MAPPING above."""
     # Set up the state before running the command
@@ -765,7 +765,7 @@ def test_run(
 
     delete_return_value_tracker = track_return_values(QuerySet, 'delete')
 
-    with es_collector_context_manager as collector:
+    with opensearch_collector_context_manager as collector:
         obj = _create_model_obj(model_factory, **factory_kwargs)
         total_model_records = 1
 
@@ -788,20 +788,20 @@ def test_run(
 
     if has_search_app:
         search_app = get_search_app_by_model(model)
-        read_alias = search_app.es_model.get_read_alias()
-        assert es_with_signals.count(index=read_alias)['count'] == total_model_records
+        read_alias = search_app.search_model.get_read_alias()
+        assert opensearch_with_signals.count(index=read_alias)['count'] == total_model_records
 
     assert model.objects.count() == total_model_records
 
     # Run the command
     management.call_command(command, model_label)
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     # Check if the object has been deleted
     assert model.objects.count() == total_model_records - num_expired_records
 
     if has_search_app:
-        assert es_with_signals.count(index=read_alias)['count'] == (
+        assert opensearch_with_signals.count(index=read_alias)['count'] == (
             total_model_records
             - num_expired_records
         )
@@ -831,8 +831,8 @@ def test_simulate(
     model_name,
     config,
     track_return_values,
-    es_with_signals,
-    es_collector_context_manager,
+    opensearch_with_signals,
+    opensearch_collector_context_manager,
 ):
     """
     Test that if --simulate is passed in, the command only simulates the action
@@ -846,7 +846,7 @@ def test_simulate(
     model_factory = mapping['factory']
     has_search_app = not mapping.get('has_no_search_app')
 
-    with es_collector_context_manager as collector:
+    with opensearch_collector_context_manager as collector:
         for _ in range(3):
             _create_model_obj(model_factory, **mapping['expired_objects_kwargs'][0])
 
@@ -856,14 +856,14 @@ def test_simulate(
 
     if has_search_app:
         search_app = get_search_app_by_model(model)
-        read_alias = search_app.es_model.get_read_alias()
-        assert es_with_signals.count(index=read_alias)['count'] == 3
+        read_alias = search_app.search_model.get_read_alias()
+        assert opensearch_with_signals.count(index=read_alias)['count'] == 3
 
     assert model.objects.count() == 3
 
     # Run the command
     management.call_command(command, model_name, simulate=True)
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     # Check which models were deleted prior to the rollback
     return_values = delete_return_value_tracker.return_values
@@ -882,7 +882,7 @@ def test_simulate(
     assert model.objects.count() == 3
 
     if has_search_app:
-        assert es_with_signals.count(index=read_alias)['count'] == 3
+        assert opensearch_with_signals.count(index=read_alias)['count'] == 3
 
 
 @freeze_time(FROZEN_TIME)
@@ -926,7 +926,7 @@ def test_only_print_queries(model_name, config, monkeypatch, caplog):
 @mock.patch('datahub.search.deletion.bulk')
 @pytest.mark.usefixtures('synchronous_on_commit')
 @pytest.mark.django_db
-def test_with_es_exception(mocked_bulk):
+def test_with_opensearch_exception(mocked_bulk):
     """
     Test that if OpenSearch returns a 5xx error, the command completes but it also
     raises a DataHubError with details of the error.

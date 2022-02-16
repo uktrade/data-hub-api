@@ -67,7 +67,7 @@ class ExportCountryHistoryView(SearchAPIView):
         """
         Overriding to provide multiple entities
         """
-        return [self.search_app.es_model, Interaction]
+        return [self.search_app.search_model, Interaction]
 
     def get_base_query(self, request, validated_data):
         """

@@ -14,7 +14,7 @@ class OrderSearchApp(SearchApp):
     """SearchApp for order"""
 
     name = 'order'
-    es_model = Order
+    search_model = Order
     view_permissions = (f'order.{OrderPermission.view}',)
     export_permission = f'order.{OrderPermission.export}'
     queryset = DBOrder.objects.select_related(

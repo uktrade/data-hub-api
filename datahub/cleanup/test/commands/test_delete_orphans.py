@@ -206,8 +206,8 @@ def test_run(
     dep_factory,
     dep_field_name,
     track_return_values,
-    es_with_signals,
-    es_collector_context_manager,
+    opensearch_with_signals,
+    opensearch_collector_context_manager,
 ):
     """
     Test that:
@@ -226,7 +226,7 @@ def test_run(
     datetime_within_threshold = filter_config.cut_off_date
     datetime_older_than_threshold = filter_config.cut_off_date - relativedelta(days=1)
 
-    with es_collector_context_manager as collector:
+    with opensearch_collector_context_manager as collector:
         # this orphan should NOT get deleted because not old enough
         create_orphanable_model(model_factory, filter_config, datetime_within_threshold)
 
@@ -251,18 +251,18 @@ def test_run(
 
     model = apps.get_model(model_name)
     search_app = get_search_app_by_model(model)
-    read_alias = search_app.es_model.get_read_alias()
+    read_alias = search_app.search_model.get_read_alias()
 
     assert model.objects.count() == total_model_records
-    assert es_with_signals.count(index=read_alias)['count'] == total_model_records
+    assert opensearch_with_signals.count(index=read_alias)['count'] == total_model_records
 
     # Run the command
     management.call_command(command, model_name)
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     # Check that the records have been deleted
     assert model.objects.count() == total_model_records - 1
-    assert es_with_signals.count(index=read_alias)['count'] == total_model_records - 1
+    assert opensearch_with_signals.count(index=read_alias)['count'] == total_model_records - 1
 
     # Check which models were actually deleted
     return_values = delete_return_value_tracker.return_values
@@ -284,8 +284,8 @@ def test_run(
 def test_simulate(
     cleanup_configs,
     track_return_values,
-    es_with_signals,
-    es_collector_context_manager,
+    opensearch_with_signals,
+    opensearch_collector_context_manager,
 ):
     """
     Test that if --simulate is passed in, the command only simulates the action
@@ -300,7 +300,7 @@ def test_simulate(
     model_factory = mapping['factory']
     datetime_older_than_threshold = filter_config.cut_off_date - relativedelta(days=1)
 
-    with es_collector_context_manager as collector:
+    with opensearch_collector_context_manager as collector:
         for _ in range(3):
             create_orphanable_model(model_factory, filter_config, datetime_older_than_threshold)
 
@@ -308,14 +308,14 @@ def test_simulate(
 
     model = apps.get_model(model_name)
     search_app = get_search_app_by_model(model)
-    read_alias = search_app.es_model.get_read_alias()
+    read_alias = search_app.search_model.get_read_alias()
 
     assert model.objects.count() == 3
-    assert es_with_signals.count(index=read_alias)['count'] == 3
+    assert opensearch_with_signals.count(index=read_alias)['count'] == 3
 
     # Run the command
     management.call_command(command, model_name, simulate=True)
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     # Check which models were actually deleted
     return_values = delete_return_value_tracker.return_values
@@ -332,7 +332,7 @@ def test_simulate(
 
     # Check that nothing has actually been deleted
     assert model.objects.count() == 3
-    assert es_with_signals.count(index=read_alias)['count'] == 3
+    assert opensearch_with_signals.count(index=read_alias)['count'] == 3
 
 
 @freeze_time(FROZEN_TIME)
@@ -379,7 +379,7 @@ def test_only_print_queries(cleanup_configs, monkeypatch, caplog):
 @mock.patch('datahub.search.deletion.bulk')
 @pytest.mark.usefixtures('synchronous_on_commit')
 @pytest.mark.django_db
-def test_with_es_exception(mocked_bulk):
+def test_with_opensearch_exception(mocked_bulk):
     """
     Test that if OpenSearch returns a 5xx error, the command completes but it also
     raises a DataHubError with details of the error.

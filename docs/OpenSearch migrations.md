@@ -17,7 +17,7 @@ names follow the following pattern: `<prefix>-<model name>-<mapping hash>`.
 
 (The prefix is defined by the `ES_INDEX_PREFIX` setting.)
 
-When run for the first time, the `./manage.py migrate_es` command creates indexes
+When run for the first time, the `./manage.py migrate_search` command creates indexes
 and aliases in this pattern.
 
 The mapping hash is calculated by hashing the mapping as defined in the code base
@@ -27,7 +27,7 @@ mapping it returns.
 
 ## Operation during a migration
 
-A migration is triggered by running `./manage.py migrate_es`. (This 
+A migration is triggered by running `./manage.py migrate_search`. (This
 is automatically run during deployment.)
 
 When an index already exists, this command:
@@ -69,7 +69,7 @@ complex logic relating to the field:
 
 1. Add the new field, keeping the old field in place and existing query logic unchanged.
 2. Add a news fragment deprecating the old field.
-3. Release this, and populate the new field with data by running `./manage.py migrate_es`.
+3. Release this, and populate the new field with data by running `./manage.py migrate_search`.
 4. Update query logic (global search fields, filters, sort-by options etc.) to use the new 
 field, and remove the old field once the deprecation period has expired.
 
@@ -86,6 +86,6 @@ search fields for the model (the `SEARCH_FIELDS` attribute on the OpenSearch mod
 as this will affect scores calculated during searches.)
 4. Add the old field to `PREVIOUS_MAPPING_FIELDS` on the model (otherwise tests will 
 fail as they will assume it’s a non-existent field).
-5. Release this, and run `./manage.py migrate_es`.
+5. Release this, and run `./manage.py migrate_search`.
 6. Remove references to the old field from the attributes mentioned in previous steps 
 (and return composite filters to normal filters if applicable).

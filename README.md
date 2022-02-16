@@ -45,10 +45,10 @@ This project uses Docker compose to setup and run all the necessary components. 
     ```
 
     * It will take time for the API container to come up - it will run
-      migrations on both DBs, load initial data, sync elasticsearch etc. Watch
+      migrations on both DBs, load initial data, sync opensearch etc. Watch
       along in the api container's logs.
     * **NOTE:**
-      If you are using a linux system, the elasticsearch container may not
+      If you are using a linux system, the opensearch container may not
       come up successfully (`data-hub-api_es_1`) - it might be perpetually
       restarting.
       If the logs for that container mention something like
@@ -66,7 +66,7 @@ This project uses Docker compose to setup and run all the necessary components. 
       vm.max_map_count=262144
       ```
 
-      For more information, [see the elasticsearch docs on vm.max_map_count](https://www.elastic.co/guide/en/elasticsearch/reference/6.6/vm-max-map-count.html).
+      For more information, [see the opensearch docs on vm.max_map_count](https://opensearch.org/docs/latest/opensearch/install/important-settings/).
 
 4.  Optionally, you may want to run a local copy of the data hub frontend.
     By default, you can run both the API and the frontend under one docker-compose
@@ -107,10 +107,10 @@ There is now a `make` command to bring up the three environments on a single doc
     ```
 
     * It will take time for the API container to come up - it will run
-      migrations on both DBs, load initial data, sync elasticsearch etc. Watch
+      migrations on both DBs, load initial data, sync opensearch etc. Watch
       along in the api container's logs.
     * **NOTE:**
-      If you are using a linux system, the elasticsearch container may not
+      If you are using a linux system, the opensearch container may not
       come up successfully (`data-hub-api_es_1`) - it might be perpetually
       restarting.
       If the logs for that container mention something like
@@ -128,7 +128,7 @@ There is now a `make` command to bring up the three environments on a single doc
       vm.max_map_count=262144
       ```
 
-      For more information, [see the elasticsearch docs on vm.max_map_count](https://www.elastic.co/guide/en/elasticsearch/reference/6.6/vm-max-map-count.html).
+      For more information, [see the opensearch docs on vm.max_map_count](https://opensearch.org/docs/latest/opensearch/install/important-settings/).
 
 4. If you want to stop all the services, run the following make command
 
@@ -143,7 +143,7 @@ Dependencies:
 -   Python 3.10.x
 -   PostgreSQL 12
 -   redis 3.2
--   Elasticsearch 7.10
+-   OpenSearch 1.x
 
 1.  Clone the repository:
 
@@ -206,19 +206,19 @@ Dependencies:
 
 8.  Set `DOCKER_DEV=False` in `.env`
 
-9. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
+9. Make sure you have OpenSearch running locally. If you don't, you can run one in Docker:
 
     ```shell
-    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:6.8.2
+    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" opensearchproject/opensearch:1.2.4
     ```
 
 10. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
 
-11. Populate the databases and initialise Elasticsearch:
+11. Populate the databases and initialise OpenSearch:
 
     ```shell
     ./manage.py migrate
-    ./manage.py migrate_es
+    ./manage.py migrate_search
 
     ./manage.py loadinitialmetadata
     ./manage.py createinitialrevisions
@@ -230,7 +230,7 @@ Dependencies:
     ./manage.py loaddata fixtures/test_data.yaml
     ```
 
-    Note that this will queue Celery tasks to index the created records in Elasticsearch,
+    Note that this will queue Celery tasks to index the created records in OpenSearch,
     and hence the loaded records won‘t be returned by search endpoints until Celery is
     started and the queued tasks have run.
 
@@ -479,7 +479,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `STATSD_HOST` | No | StatsD host url. |
 | `STATSD_PORT` | No | StatsD port number. |
 | `STATSD_PREFIX` | No | Prefix for metrics being pushed to StatsD. |
-| `VCAP_SERVICES` | No | Set by GOV.UK PaaS when using their backing services. Contains connection details for Elasticsearch and Redis. |
+| `VCAP_SERVICES` | No | Set by GOV.UK PaaS when using their backing services. Contains connection details for OpenSearch and Redis. |
 | `WEB_CONCURRENCY` | No | Number of Gunicorn workers (set automatically by Heroku, otherwise defaults to 1). |
 
 
@@ -515,44 +515,44 @@ These commands are generally only intended to be used on a blank database.
 ```
 
 
-### Elasticsearch
+### OpenSearch
 
 #### Update indexes and mapping types
 
-To create missing Elasticsearch indexes and migrate modified mapping types:
+To create missing OpenSearch indexes and migrate modified mapping types:
 
 ```shell
-./manage.py migrate_es
+./manage.py migrate_search
 ```
 
 This will also resync data (using Celery) for any newly-created indexes.
 
-See [docs/Elasticsearch migrations.md](docs/Elasticsearch&#32;migrations.md) for more detail about how the command works.
+See [docs/OpenSearch migrations.md](docs/OpenSearch&#32;migrations.md) for more detail about how the command works.
 
-#### Resync all Elasticsearch records
+#### Resync all OpenSearch records
 
 To resync all records using Celery:
 
 ```shell
-./manage.py sync_es
+./manage.py sync_search
 ```
 
 To resync all records synchronously (without Celery running):
 
 ```shell
-./manage.py sync_es --foreground
+./manage.py sync_search --foreground
 ```
 
 You can resync only specific models by using the `--model=` argument.
 
 ```shell
-./manage.py sync_es --model=company --model=contact
+./manage.py sync_search --model=company --model=contact
 ```
 
 For more details including all the available choices:
 
 ```shell
-./manage.py sync_es --help
+./manage.py sync_search --help
 ```
 
 ## Dependencies
