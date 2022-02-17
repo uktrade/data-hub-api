@@ -2,7 +2,7 @@ import pytest
 from opensearch_dsl import Mapping
 
 from datahub.search.contact import ContactSearchApp
-from datahub.search.contact.models import Contact as ESContact
+from datahub.search.contact.models import Contact as SearchContact
 from datahub.search.query_builder import (
     get_basic_search_query,
     get_search_by_entities_query,
@@ -10,10 +10,10 @@ from datahub.search.query_builder import (
 )
 
 
-def test_mapping(es):
+def test_mapping(opensearch):
     """Test the OpenSearch mapping for a contact."""
     mapping = Mapping.from_opensearch(
-        ContactSearchApp.es_model.get_write_index(),
+        ContactSearchApp.search_model.get_write_index(),
     )
 
     assert mapping.to_dict() == {
@@ -409,7 +409,7 @@ def test_get_basic_search_query():
         'track_total_hits': True,
     }
 
-    query = get_basic_search_query(ESContact, 'test', offset=5, limit=5)
+    query = get_basic_search_query(SearchContact, 'test', offset=5, limit=5)
 
     assert query.to_dict() == expected_query
 
@@ -425,7 +425,7 @@ def test_get_limited_search_by_entity_query():
         'archived_after': date,
     }
     query = get_search_by_entities_query(
-        [ESContact],
+        [SearchContact],
         term='test',
         filter_data=filter_data,
     )

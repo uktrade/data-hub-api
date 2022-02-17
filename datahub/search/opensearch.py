@@ -4,7 +4,7 @@ from logging import getLogger
 from django.conf import settings
 from opensearch_dsl import analysis, Index
 from opensearch_dsl.connections import connections
-from opensearchpy.helpers import bulk as es_bulk
+from opensearchpy.helpers import bulk as opensearch_bulk
 
 logger = getLogger(__name__)
 
@@ -132,7 +132,7 @@ ANALYZERS = (
 
 
 def configure_connection():
-    """Configure Elasticsearch default connection."""
+    """Configure OpenSearch default connection."""
     connections_default = {
         'hosts': [settings.OPENSEARCH_URL],
         'verify_certs': settings.ES_VERIFY_CERTS,
@@ -141,7 +141,7 @@ def configure_connection():
 
 
 def get_client():
-    """Gets an instance of the Elasticsearch client from the connection cache."""
+    """Gets an instance of the OpenSearch client from the connection cache."""
     return connections.get_connection()
 
 
@@ -287,8 +287,8 @@ def bulk(
     max_chunk_bytes=settings.ES_BULK_MAX_CHUNK_BYTES,
     **kwargs,
 ):
-    """Send data in bulk to Elasticsearch."""
-    return es_bulk(
+    """Send data in bulk to OpenSearch."""
+    return opensearch_bulk(
         get_client(),
         actions=actions,
         chunk_size=chunk_size,

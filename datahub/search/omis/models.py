@@ -2,10 +2,10 @@ from opensearch_dsl import Boolean, Date, Integer, Keyword, Text
 
 from datahub.search import dict_utils
 from datahub.search import fields
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
-class Order(BaseESModel):
+class Order(BaseSearchModel):
     """OpenSearch representation of Order model."""
 
     id = Keyword()

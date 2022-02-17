@@ -1,10 +1,10 @@
 from opensearch_dsl import Date, Keyword, Text
 
 from datahub.search import fields
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
-class ESSimpleModel(BaseESModel):
+class SearchSimpleModel(BaseSearchModel):
     """OpenSearch representation of SimpleModel model."""
 
     id = Keyword()

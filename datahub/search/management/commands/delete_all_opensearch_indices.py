@@ -3,7 +3,7 @@ from logging import getLogger
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from datahub.search.elasticsearch import get_client
+from datahub.search.opensearch import get_client
 
 logger = getLogger(__name__)
 

@@ -6,7 +6,7 @@ from opensearch_dsl import Document, Keyword, MetaField
 
 from datahub.core.exceptions import DataHubError
 from datahub.search.apps import get_search_app_by_search_model
-from datahub.search.elasticsearch import (
+from datahub.search.opensearch import (
     alias_exists,
     associate_index_with_alias,
     create_index,
@@ -18,12 +18,11 @@ from datahub.search.utils import get_model_non_mapped_field_names, serialise_map
 logger = getLogger(__name__)
 
 
-class BaseESModel(Document):
+class BaseSearchModel(Document):
     """Helps convert Django models to dictionaries."""
 
     # This is a replacement for the _type (mapping type name) field which is deprecated in
-    # Elasticsearch.
-    # It’s required for the aggregations used in global search.
+    # OpenSearch. It’s required for the aggregations used in global search.
     _document_type = Keyword()
 
     MAPPINGS = {}
@@ -138,9 +137,9 @@ class BaseESModel(Document):
         return False
 
     @classmethod
-    def es_document(cls, db_object, index=None, include_index=True, include_source=True):
+    def to_document(cls, db_object, index=None, include_index=True, include_source=True):
         """
-        Creates a dict representation an Elasticsearch document.
+        Creates a dict representation an OpenSearch document.
 
         include_index and include_source can be set to False when the _index and/or _source keys
         aren't required (e.g. when using `datahub.search.deletion.delete_documents()`).
@@ -159,7 +158,7 @@ class BaseESModel(Document):
 
     @classmethod
     def db_object_to_dict(cls, db_object):
-        """Converts a DB model object to a dictionary suitable for Elasticsearch."""
+        """Converts a DB model object to a dictionary suitable for OpenSearch."""
         mapped_values = (
             (col, fn, getattr(db_object, col)) for col, fn in cls.MAPPINGS.items()
         )
@@ -175,10 +174,10 @@ class BaseESModel(Document):
         return result
 
     @classmethod
-    def db_objects_to_es_documents(cls, db_objects, index=None):
-        """Converts DB model objects to Elasticsearch documents."""
+    def db_objects_to_documents(cls, db_objects, index=None):
+        """Converts DB model objects to OpenSearch documents."""
         for db_object in db_objects:
-            yield cls.es_document(db_object, index=index)
+            yield cls.to_document(db_object, index=index)
 
 
 def _get_write_index(indices):

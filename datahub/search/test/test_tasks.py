@@ -43,16 +43,16 @@ def test_sync_all_models(monkeypatch):
 
 
 @pytest.mark.django_db
-def test_sync_object_task_syncs(es):
+def test_sync_object_task_syncs(opensearch):
     """Test that the object task syncs an object to OpenSearch."""
     obj = SimpleModel.objects.create()
     sync_object_task.apply(args=(SimpleModelSearchApp.name, str(obj.pk)))
-    es.indices.refresh()
+    opensearch.indices.refresh()
 
-    assert doc_exists(es, SimpleModelSearchApp, obj.pk)
+    assert doc_exists(opensearch, SimpleModelSearchApp, obj.pk)
 
 
-def test_sync_object_task_retries_on_error(monkeypatch, es):
+def test_sync_object_task_retries_on_error(monkeypatch, opensearch):
     """Test that the object task retries on error."""
     sync_object_mock = Mock(side_effect=[Exception, None])
     monkeypatch.setattr('datahub.search.sync_object.sync_object', sync_object_mock)

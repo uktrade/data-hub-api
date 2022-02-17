@@ -50,12 +50,12 @@ from datahub.search.omis.views import SearchOrderExportAPIView
 pytestmark = [
     pytest.mark.django_db,
     # Index objects for this search app only
-    pytest.mark.es_collector_apps.with_args(OrderSearchApp),
+    pytest.mark.opensearch_collector_apps.with_args(OrderSearchApp),
 ]
 
 
 @pytest.fixture
-def setup_data(es_with_collector):
+def setup_data(opensearch_with_collector):
     """Sets up data for the tests."""
     with freeze_time('2017-01-01 13:00:00'):
         company = CompanyFactory(
@@ -115,11 +115,11 @@ def setup_data(es_with_collector):
             estimated_time=120,
         )
 
-    es_with_collector.flush_and_refresh()
+    opensearch_with_collector.flush_and_refresh()
 
 
 @pytest.fixture
-def setup_subtotal_cost_data(es_with_collector):
+def setup_subtotal_cost_data(opensearch_with_collector):
     """
     Setup Order data for total subtotal cost test.
 
@@ -141,7 +141,7 @@ def setup_subtotal_cost_data(es_with_collector):
             estimated_time=subtotal_cost * 60 // order.hourly_rate.rate_value,
         )
 
-    es_with_collector.flush_and_refresh()
+    opensearch_with_collector.flush_and_refresh()
 
 
 class TestSearchOrder(APITestMixin):
@@ -453,7 +453,9 @@ class TestSearchOrder(APITestMixin):
         'sector_level',
         (0, 1, 2),
     )
-    def test_sector_descends_filter(self, hierarchical_sectors, es_with_collector, sector_level):
+    def test_sector_descends_filter(
+        self, hierarchical_sectors, opensearch_with_collector, sector_level,
+    ):
         """Test the sector_descends filter."""
         num_sectors = len(hierarchical_sectors)
         sectors_ids = [sector.pk for sector in hierarchical_sectors]
@@ -469,7 +471,7 @@ class TestSearchOrder(APITestMixin):
             )),
         )
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:order')
         body = {
@@ -530,7 +532,7 @@ class TestOrderExportView(APITestMixin):
             (f'order.{OrderPermission.export}',),
         ),
     )
-    def test_user_without_permission_cannot_export(self, es, permissions):
+    def test_user_without_permission_cannot_export(self, opensearch, permissions):
         """Test that a user without the correct permissions cannot export data."""
         user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -552,7 +554,7 @@ class TestOrderExportView(APITestMixin):
     )
     def test_export(
         self,
-        es_with_collector,
+        opensearch_with_collector,
         request_sortby,
         orm_ordering,
     ):
@@ -589,7 +591,7 @@ class TestOrderExportView(APITestMixin):
         for factory_ in factories:
             factory_()
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         data = {}
         if request_sortby:
