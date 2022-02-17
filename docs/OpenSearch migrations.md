@@ -15,7 +15,7 @@ names follow the following pattern: `<prefix>-<model name>-<mapping hash>`.
   - `<prefix>-<model name>-read` (used for searches)
   - `<prefix>-<model name>-write` (used for document updates and creations)
 
-(The prefix is defined by the `ES_INDEX_PREFIX` setting.)
+(The prefix is defined by the `OPENSEARCH_INDEX_PREFIX` setting.)
 
 When run for the first time, the `./manage.py migrate_search` command creates indexes
 and aliases in this pattern.
