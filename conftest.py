@@ -170,7 +170,7 @@ def _opensearch_client(worker_id):
     """
     # pytest's monkeypatch does not work in session fixtures, but there is no need to restore
     # the value so we just overwrite it normally
-    settings.ES_INDEX_PREFIX = f'test_{worker_id}'
+    settings.OPENSEARCH_INDEX_PREFIX = f'test_{worker_id}'
 
     from opensearch_dsl.connections import connections
     client = get_test_client(nowait=False)

@@ -50,12 +50,12 @@ class BaseSearchModel(Document):
     @classmethod
     def get_read_alias(cls):
         """Gets the alias to be used for read operations."""
-        return f'{settings.ES_INDEX_PREFIX}-{cls.get_app_name()}-read'
+        return f'{settings.OPENSEARCH_INDEX_PREFIX}-{cls.get_app_name()}-read'
 
     @classmethod
     def get_write_alias(cls):
         """Gets the alias to be used for write operations."""
-        return f'{settings.ES_INDEX_PREFIX}-{cls.get_app_name()}-write'
+        return f'{settings.OPENSEARCH_INDEX_PREFIX}-{cls.get_app_name()}-write'
 
     @classmethod
     def get_write_index(cls):
@@ -74,7 +74,7 @@ class BaseSearchModel(Document):
     @classmethod
     def get_index_prefix(cls):
         """Gets the prefix used for indices and aliases."""
-        return f'{settings.ES_INDEX_PREFIX}-{cls.get_app_name()}-'
+        return f'{settings.OPENSEARCH_INDEX_PREFIX}-{cls.get_app_name()}-'
 
     @classmethod
     def get_target_mapping_hash(cls):

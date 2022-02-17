@@ -22,10 +22,10 @@ CAT_INDICES_MOCK_DATA = [
 ]
 
 
-@override_settings(ES_INDEX_PREFIX='test-datahub')
+@override_settings(OPENSEARCH_INDEX_PREFIX='test-datahub')
 @pytest.mark.parametrize('interactive', (True, False))
 def test_deletes_matching_indices(mock_opensearch_client, interactive, monkeypatch):
-    """Test that indices matching the ES_INDEX_PREFIX prefix are deleted."""
+    """Test that indices matching the OPENSEARCH_INDEX_PREFIX prefix are deleted."""
     mocked_input = Mock(return_value='yes')
     monkeypatch.setattr('builtins.input', mocked_input)
     mock_opensearch_client.return_value.cat.indices.return_value = CAT_INDICES_MOCK_DATA
@@ -45,7 +45,7 @@ def test_deletes_matching_indices(mock_opensearch_client, interactive, monkeypat
     assert mocked_input.call_count == (1 if interactive else 0)
 
 
-@override_settings(ES_INDEX_PREFIX='test-datahub')
+@override_settings(OPENSEARCH_INDEX_PREFIX='test-datahub')
 def test_skips_deleting_if_no_matching_indices(mock_opensearch_client):
     """Test that if no indices match, no attempt to delete indices is made."""
     mock_opensearch_client.return_value.cat.indices.return_value = []

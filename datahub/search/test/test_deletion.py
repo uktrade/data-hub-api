@@ -43,7 +43,7 @@ def test_delete_documents(opensearch_bulk, mock_opensearch_client):
         ],
         'chunk_size': BULK_CHUNK_SIZE,
         'request_timeout': BULK_DELETION_TIMEOUT_SECS,
-        'max_chunk_bytes': settings.ES_BULK_MAX_CHUNK_BYTES,
+        'max_chunk_bytes': settings.OPENSEARCH_BULK_MAX_CHUNK_BYTES,
         'raise_on_error': False,
     }
 
