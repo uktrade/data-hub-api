@@ -17,13 +17,15 @@ def execute_search_query(query):
     (A warning is also logged if the query takes longer than a set threshold.)
     """
     try:
-        response = query.params(request_timeout=settings.ES_SEARCH_REQUEST_TIMEOUT).execute()
+        response = query.params(
+            request_timeout=settings.OPENSEARCH_SEARCH_REQUEST_TIMEOUT,
+        ).execute()
     except ConnectionError:
         raise APIBadGatewayException(
             f'Upstream service unavailable: {urlparse(settings.OPENSEARCH_URL).netloc}',
         )
 
-    if response.took >= settings.ES_SEARCH_REQUEST_WARNING_THRESHOLD * 1000:
+    if response.took >= settings.OPENSEARCH_SEARCH_REQUEST_WARNING_THRESHOLD * 1000:
         logger.warning(f'OpenSearch query took a long time ({response.took / 1000:.2f}s)')
 
         log_data = {

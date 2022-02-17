@@ -411,22 +411,17 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `DEFAULT_BUCKET`  | Yes | S3 bucket for object storage. |
 | `DISABLE_PAAS_IP_CHECK` | No | Disable PaaS IP check for Hawk endpoints (default=False). |
 | `ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW` | No | Whether to enable the add access token page for superusers in the admin site (default=True). |
-| `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily OpenSearch sync (default=False). |
+| `ENABLE_DAILY_OPENSEARCH_SYNC` | No | Whether to enable the daily OpenSearch sync (default=False). |
 | `ENABLE_EMAIL_INGESTION` | No | True or False.  Whether or not to activate the celery beat task for ingesting emails |
 | `ENABLE_MAILBOX_PROCESSING` | No | True or False.  Whether or not to activate the celery beat task for mailbox processing |
 | `ENABLE_SLACK_MESSAGING` | No | If present and truthy, enable the transmission of messages to Slack. Necessitates the specification of the other env vars `SLACK_API_TOKEN` and `SLACK_MESSAGE_CHANNEL` |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
-| `ES_INDEX_PREFIX`  | Yes | Prefix to use for indices and aliases |
-| `ES_SEARCH_REQUEST_TIMEOUT` | No | Timeout (in seconds) for searches (default=20). |
-| `ES_SEARCH_REQUEST_WARNING_THRESHOLD` | No | Threshold (in seconds) for emitting warnings about slow searches (default=10). |
-| `ES_VERIFY_CERTS`  | No | |
 | `ES_APM_ENABLED` | Yes | Enables Elasticsearch APM agent when is True. |
 | `ES_APM_SERVICE_NAME` | Yes, if ES_APM_ENABLED | A name of the running service. Must match following regexp: ^[a-zA-Z0-9 _-]+$. |
 | `ES_APM_SECRET_TOKEN` | Yes, if ES_APM_ENABLED | A secret token used to authorise requests to the APM server. |
 | `ES_APM_SERVER_TIMEOUT` | No | A timeout for requests to the Elasticsearch APM server in duration format (default=20s). |
 | `ES_APM_SERVER_URL` | Yes, if ES_APM_ENABLED | The URL of the Elasticsearch APM server. |
 | `ES_APM_ENVIRONMENT`| Yes, if ES_APM_ENABLED | A name of the environment the service is running, for example: `develop`. |
-| `ES5_URL`  | No | Required if not using GOV.UK PaaS-supplied Elasticsearch. |
 | `EXPORT_WINS_SERVICE_BASE_URL` | No | The base url of the Export Wins API (default=None). |
 | `EXPORT_WINS_HAWK_ID` | No | The hawk id to use when making a request to the Export Wins API (default=None). |
 | `EXPORT_WINS_HAWK_KEY` | No | The hawk key to use when making a request to the Export Wins API (default=None). |
@@ -460,6 +455,10 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`  | No | |
 | `OMIS_PUBLIC_BASE_URL`  | Yes | |
 | `OMIS_PUBLIC_SECRET_ACCESS_KEY` | If `OMIS_PUBLIC_ACCESS_KEY_ID` is set | A secret key, corresponding to `OMIS_PUBLIC_ACCESS_KEY_ID`. The holder of this key can access the OMIS public endpoints by Hawk authentication. |
+| `OPENSEARCH_INDEX_PREFIX`  | Yes | Prefix to use for indices and aliases |
+| `OPENSEARCH_SEARCH_REQUEST_TIMEOUT` | No | Timeout (in seconds) for searches (default=20). |
+| `OPENSEARCH_SEARCH_REQUEST_WARNING_THRESHOLD` | No | Threshold (in seconds) for emitting warnings about slow searches (default=10). |
+| `OPENSEARCH_VERIFY_CERTS`  | No | |
 | `PAAS_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints. |
 | `REDIS_BASE_URL`  | No | redis base URL without the db |
 | `REDIS_CACHE_DB`  | No | redis db for django cache (default 0) |
@@ -469,7 +468,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `REPORT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for reports. |
 | `REPORT_BUCKET` | No | S3 bucket for report storage. |
 | `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
-| `SKIP_ES_MAPPING_MIGRATIONS` | No | If non-empty, skip applying Elasticsearch mapping type migrations on deployment. |
+| `SKIP_OPENSEARCH_MAPPING_MIGRATIONS` | No | If non-empty, skip applying OpenSearch mapping type migrations on deployment. |
 | `SLACK_API_TOKEN` | No | (Required if `ENABLE_SLACK_MESSAGING` is truthy) Auth token for connection to Slack API for purposes of sending messages through the datahub.core.realtime_messaging module |
 | `SLACK_MESSAGE_CHANNEL` | No | (Required if `ENABLE_SLACK_MESSAGING` is truthy) Name (or preferably ID) of the channel into which datahub.core.realtime_messaging should send messages |
 | `SSO_ENABLED` | Yes | Whether single sign-on via RFC 7662 token introspection is enabled |

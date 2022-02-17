@@ -38,7 +38,9 @@ Are you sure you want to do this?
         interactive = options['interactive']
 
         client = get_client()
-        index_statistics = client.cat.indices(index=f'{settings.ES_INDEX_PREFIX}-*', format='json')
+        index_statistics = client.cat.indices(
+            index=f'{settings.OPENSEARCH_INDEX_PREFIX}-*', format='json',
+        )
         indices = sorted(item['index'] for item in index_statistics)
 
         if not indices:
