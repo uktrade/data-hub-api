@@ -24,9 +24,9 @@ SEARCH_APPS += [
 
 # Note that the prefix used for indexes created during tests is set dynamically in
 # datahub/search/conftest.py (so that tests can be parallelised).
-ES_INDEX_PREFIX = 'example-prefix'
-ES_INDEX_SETTINGS = {
-    **ES_INDEX_SETTINGS,
+OPENSEARCH_INDEX_PREFIX = 'example-prefix'
+OPENSEARCH_INDEX_SETTINGS = {
+    **OPENSEARCH_INDEX_SETTINGS,
     'number_of_shards': 1,
     'number_of_replicas': 0,
     'refresh_interval': -1,  # Disables automatic index refreshing to avoid test flakiness
