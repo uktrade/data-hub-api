@@ -14,12 +14,12 @@ def sync_object(search_app, pk):
     This function is migration-safe – if a migration is in progress, the object is added to the
     new index and then deleted from the old index.
     """
-    es_model = search_app.es_model
-    read_indices, write_index = es_model.get_read_and_write_indices()
+    search_model = search_app.search_model
+    read_indices, write_index = search_model.get_read_and_write_indices()
 
     obj = search_app.queryset.get(pk=pk)
     sync_objects(
-        es_model,
+        search_model,
         [obj],
         read_indices,
         write_index,

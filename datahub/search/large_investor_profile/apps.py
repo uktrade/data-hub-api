@@ -10,7 +10,7 @@ class LargeInvestorProfileSearchApp(SearchApp):
     """SearchApp for large investor profile."""
 
     name = 'large-investor-profile'
-    es_model = LargeInvestorProfile
+    search_model = LargeInvestorProfile
     view_permissions = (f'investor_profile.{InvestorProfilePermission.view_investor_profile}',)
     export_permission = f'investor_profile.{InvestorProfilePermission.export}'
     exclude_from_global_search = True

@@ -10,7 +10,7 @@ class LargeCapitalOpportunitySearchApp(SearchApp):
     """SearchApp for large capital opportunity."""
 
     name = 'large-capital-opportunity'
-    es_model = LargeCapitalOpportunity
+    search_model = LargeCapitalOpportunity
     view_permissions = (
         f'opportunity.{LargeCapitalOpportunityPermission.view_large_capital_opportunity}',
     )

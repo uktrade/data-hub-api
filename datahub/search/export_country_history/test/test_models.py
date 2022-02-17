@@ -7,7 +7,7 @@ from datahub.search.export_country_history.models import ExportCountryHistory
 pytestmark = pytest.mark.django_db
 
 
-def test_export_country_history_to_dict(es):
+def test_export_country_history_to_dict(opensearch):
     """Test for export country history search model"""
     export_country_history = CompanyExportCountryHistoryFactory()
     result = ExportCountryHistory.db_object_to_dict(export_country_history)

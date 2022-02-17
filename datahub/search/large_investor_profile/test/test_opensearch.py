@@ -4,19 +4,19 @@ from opensearch_dsl import Mapping
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
-from datahub.search import elasticsearch
+from datahub.search import opensearch as opensearch_client
 from datahub.search.large_investor_profile import LargeInvestorProfileSearchApp
 from datahub.search.large_investor_profile.models import (
-    LargeInvestorProfile as ESLargeInvestorProfile,
+    LargeInvestorProfile as SearchLargeInvestorProfile,
 )
 
 pytestmark = pytest.mark.django_db
 
 
-def test_mapping(es):
+def test_mapping(opensearch):
     """Test the OpenSearch mapping for a large capital investor profile."""
     mapping = Mapping.from_opensearch(
-        LargeInvestorProfileSearchApp.es_model.get_write_index(),
+        LargeInvestorProfileSearchApp.search_model.get_write_index(),
     )
     assert mapping.to_dict() == {
         'properties': {
@@ -301,7 +301,7 @@ def test_mapping(es):
 
 
 @freezegun.freeze_time('2019-01-01')
-def test_indexed_doc(es):
+def test_indexed_doc(opensearch):
     """Test the OpenSearch data of an Large investor profile."""
     investor_company = CompanyFactory()
 
@@ -309,13 +309,13 @@ def test_indexed_doc(es):
         investor_company=investor_company,
     )
 
-    doc = ESLargeInvestorProfile.es_document(large_investor_profile)
-    elasticsearch.bulk(actions=(doc, ), chunk_size=1)
+    doc = SearchLargeInvestorProfile.to_document(large_investor_profile)
+    opensearch_client.bulk(actions=(doc, ), chunk_size=1)
 
-    es.indices.refresh()
+    opensearch.indices.refresh()
 
-    indexed_large_investor_profile = es.get(
-        index=ESLargeInvestorProfile.get_write_index(),
+    indexed_large_investor_profile = opensearch.get(
+        index=SearchLargeInvestorProfile.get_write_index(),
         id=large_investor_profile.pk,
     )
 

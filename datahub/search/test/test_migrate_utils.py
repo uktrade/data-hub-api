@@ -14,7 +14,7 @@ from datahub.search.test.utils import create_mock_search_app
 class TestResyncAfterMigrate:
     """Tests for resync_after_migrate()"""
 
-    def test_normal_resync(self, monkeypatch, mock_es_client):
+    def test_normal_resync(self, monkeypatch, mock_opensearch_client):
         """
         Test that resync_after_migrate() resyncs the app, updates the read alias and deletes the
         old index.
@@ -30,7 +30,7 @@ class TestResyncAfterMigrate:
             get_aliases_for_index_mock,
         )
 
-        mock_client = mock_es_client.return_value
+        mock_client = mock_opensearch_client.return_value
         read_indices = {'index1', 'index2'}
         write_index = 'index1'
         mock_app = create_mock_search_app(
@@ -92,7 +92,7 @@ class TestResyncAfterMigrate:
         assert mock_client.indices.delete.call_count == 1
         mock_client.indices.delete.assert_any_call('index2')
 
-    def test_resync_with_deletion_error(self, monkeypatch, mock_es_client):
+    def test_resync_with_deletion_error(self, monkeypatch, mock_opensearch_client):
         """
         Test that resync_after_migrate() raises an exception when there is an error deleting
         documents.
@@ -119,7 +119,7 @@ class TestResyncAfterMigrate:
         with pytest.raises(DataHubError):
             resync_after_migrate(mock_app)
 
-    def test_resync_with_old_index_referenced(self, monkeypatch, mock_es_client):
+    def test_resync_with_old_index_referenced(self, monkeypatch, mock_opensearch_client):
         """
         Test that if the old index is still referenced, resync_after_migrate() does not delete it.
         """
@@ -132,7 +132,7 @@ class TestResyncAfterMigrate:
             get_aliases_for_index_mock,
         )
 
-        mock_client = mock_es_client.return_value
+        mock_client = mock_opensearch_client.return_value
         read_indices = {'index1', 'index2'}
         write_index = 'index1'
         mock_app = create_mock_search_app(
@@ -162,7 +162,7 @@ class TestResyncAfterMigrate:
 
         mock_client.indices.delete.assert_not_called()
 
-    def test_resync_with_single_read_index(self, monkeypatch, mock_es_client):
+    def test_resync_with_single_read_index(self, monkeypatch, mock_opensearch_client):
         """
         Test that the function aborts if the there is only a single read index.
         """
@@ -175,7 +175,7 @@ class TestResyncAfterMigrate:
             get_aliases_for_index_mock,
         )
 
-        mock_client = mock_es_client.return_value
+        mock_client = mock_opensearch_client.return_value
         read_indices = {'index1'}
         write_index = 'index1'
         mock_app = create_mock_search_app(
@@ -190,7 +190,7 @@ class TestResyncAfterMigrate:
         mock_client.indices.update_aliases.assert_not_called()
         mock_client.indices.delete.assert_not_called()
 
-    def test_resync_in_invalid_state(self, monkeypatch, mock_es_client):
+    def test_resync_in_invalid_state(self, monkeypatch, mock_opensearch_client):
         """
         Test that if the there is only a single read index, no aliases are updated and no indices
         are deleted.

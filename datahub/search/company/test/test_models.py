@@ -2,21 +2,21 @@ import pytest
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.search.apps import get_search_app
-from datahub.search.company.models import Company as ESCompany
+from datahub.search.company.models import Company as SearchCompany
 
 pytestmark = pytest.mark.django_db
 
 
-class TestCompanyOpenSearchModel:
+class TestCompanySearchModel:
     """Test for the company OpenSearch model"""
 
-    def test_company_dbmodel_to_dict(self, es):
+    def test_company_dbmodel_to_dict(self, opensearch):
         """Tests conversion of db model to dict."""
         company = CompanyFactory()
         app = get_search_app('company')
         company_qs = app.queryset.get(pk=company.pk)
 
-        result = ESCompany.db_object_to_dict(company_qs)
+        result = SearchCompany.db_object_to_dict(company_qs)
 
         keys = {
             '_document_type',
@@ -61,12 +61,12 @@ class TestCompanyOpenSearchModel:
 
         assert set(result.keys()) == keys
 
-    def test_company_dbmodels_to_es_documents(self, es):
+    def test_company_dbmodels_to_documents(self, opensearch):
         """Tests conversion of db models to OpenSearch documents."""
         companies = CompanyFactory.create_batch(2)
         app = get_search_app('company')
         companies_qs = app.queryset.all()
 
-        result = ESCompany.db_objects_to_es_documents(companies_qs)
+        result = SearchCompany.db_objects_to_documents(companies_qs)
 
         assert len(list(result)) == len(companies)

@@ -8,16 +8,16 @@ from datahub.omis.order.test.factories import (
     OrderPaidFactory,
     OrderWithAcceptedQuoteFactory,
 )
-from datahub.search import elasticsearch
+from datahub.search import opensearch as opensearch_client
 from datahub.search.omis import OrderSearchApp
-from datahub.search.omis.models import Order as ESOrder
+from datahub.search.omis.models import Order as SearchOrder
 
 pytestmark = pytest.mark.django_db
 
 
-def test_mapping(es):
+def test_mapping(opensearch):
     """Test the OpenSearch mapping for an order."""
-    mapping = Mapping.from_opensearch(OrderSearchApp.es_model.get_write_index())
+    mapping = Mapping.from_opensearch(OrderSearchApp.search_model.get_write_index())
 
     assert mapping.to_dict() == {
         'dynamic': 'false',
@@ -493,18 +493,18 @@ def test_mapping(es):
         OrderPaidFactory,
     ),
 )
-def test_indexed_doc(order_factory, es):
+def test_indexed_doc(order_factory, opensearch):
     """Test the OpenSearch data of an indexed order."""
     order = order_factory()
     invoice = order.invoice
 
-    doc = ESOrder.es_document(order)
-    elasticsearch.bulk(actions=(doc, ), chunk_size=1)
+    doc = SearchOrder.to_document(order)
+    opensearch_client.bulk(actions=(doc, ), chunk_size=1)
 
-    es.indices.refresh()
+    opensearch.indices.refresh()
 
-    indexed_order = es.get(
-        index=OrderSearchApp.es_model.get_write_index(),
+    indexed_order = opensearch.get(
+        index=OrderSearchApp.search_model.get_write_index(),
         id=order.pk,
     )
 

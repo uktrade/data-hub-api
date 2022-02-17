@@ -11,7 +11,7 @@ from django.template.defaultfilters import capfirst
 
 from datahub.cleanup.query_utils import get_relations_to_delete, get_unreferenced_objects_query
 from datahub.core.exceptions import SimulationRollbackError
-from datahub.search.deletion import update_es_after_deletions
+from datahub.search.deletion import update_opensearch_after_deletions
 
 logger = getLogger(__name__)
 
@@ -65,7 +65,7 @@ class BaseCleanupCommand(BaseCommand):
         try:
             with ExitStack() as stack:
                 if not is_simulation:
-                    stack.enter_context(update_es_after_deletions())
+                    stack.enter_context(update_opensearch_after_deletions())
 
                 stack.enter_context(atomic())
                 total_deleted, deletions_by_model = qs.delete()

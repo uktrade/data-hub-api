@@ -600,7 +600,7 @@ def test_get_search_by_entities_query(
 ):
     """Tests for the get_search_by_entities_query function."""
     query = get_search_by_entities_query(
-        [SimpleModelSearchApp.es_model],
+        [SimpleModelSearchApp.search_model],
         term=term,
         filter_data=filter_data,
         composite_field_mapping=composite_field_mapping,
@@ -610,7 +610,7 @@ def test_get_search_by_entities_query(
         fields_to_exclude=fields_to_exclude,
     )
     assert query.to_dict() == expected_query
-    assert query._index == [SimpleModelSearchApp.es_model.get_read_alias()]
+    assert query._index == [SimpleModelSearchApp.search_model.get_read_alias()]
 
 
 @pytest.mark.django_db
@@ -618,8 +618,8 @@ def test_get_search_by_multiple_entities_query():
     """Tests for the get_search_by_entities_query function."""
     query = get_search_by_entities_query(
         [
-            SimpleModelSearchApp.es_model,
-            RelatedModelSearchApp.es_model,
+            SimpleModelSearchApp.search_model,
+            RelatedModelSearchApp.search_model,
         ],
         term=None,
         filter_data=None,
@@ -697,8 +697,8 @@ def test_get_search_by_multiple_entities_query():
     }
     assert query.to_dict() == expected_query
     assert query._index == [
-        SimpleModelSearchApp.es_model.get_read_alias(),
-        RelatedModelSearchApp.es_model.get_read_alias(),
+        SimpleModelSearchApp.search_model.get_read_alias(),
+        RelatedModelSearchApp.search_model.get_read_alias(),
     ]
 
 
@@ -712,7 +712,7 @@ def test_get_basic_search_query(mocked_get_global_search_apps_as_mapping):
     }
 
     query = get_basic_search_query(
-        search_app.es_model,
+        search_app.search_model,
         'test',
         permission_filters_by_entity={
             search_app.name: [('name', 'perm')],

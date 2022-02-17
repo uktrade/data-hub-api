@@ -13,7 +13,7 @@ def create_mock_search_app(
     mock = Mock()
     mock.configure_mock(
         name='test-app',
-        es_model=_create_mock_es_model(
+        search_model=_create_mock_search_model(
             current_mapping_hash,
             target_mapping_hash,
             read_indices,
@@ -28,24 +28,24 @@ def create_mock_search_app(
 def doc_exists(es_client, search_app, id_):
     """Checks if a document exists for a specified search app."""
     return es_client.exists(
-        index=search_app.es_model.get_read_alias(),
+        index=search_app.search_model.get_read_alias(),
         id=id_,
     )
 
 
 def doc_count(es_client, search_app):
     """Return a document count for a specified search app."""
-    response = es_client.count(index=search_app.es_model.get_read_alias())
+    response = es_client.count(index=search_app.search_model.get_read_alias())
     return response['count']
 
 
-def _create_mock_es_model(
+def _create_mock_search_model(
         current_mapping_hash,
         target_mapping_hash,
         read_indices,
         write_index,
 ):
-    def db_objects_to_es_documents(db_objects, index=None):
+    def db_objects_to_documents(db_objects, index=None):
         for obj in db_objects:
             yield {
                 '_index': index or write_index,
@@ -56,7 +56,7 @@ def _create_mock_es_model(
     return Mock(
         __name__='es-model',
         create_index=Mock(),
-        db_objects_to_es_documents=Mock(side_effect=db_objects_to_es_documents),
+        db_objects_to_documents=Mock(side_effect=db_objects_to_documents),
         is_migration_needed=Mock(return_value=current_mapping_hash != target_mapping_hash),
         was_migration_started=Mock(return_value=len(read_indices) > 1),
         get_current_mapping_hash=Mock(return_value=current_mapping_hash),
@@ -73,7 +73,7 @@ def _create_mock_es_model(
 def get_documents_by_ids(es_client, app, ids):
     """Get given search app documents by supplied ids."""
     return es_client.mget(
-        index=app.es_model.get_read_alias(),
+        index=app.search_model.get_read_alias(),
         body={
             'ids': ids,
         },
