@@ -8,7 +8,7 @@ This page contains a non-exhaustive list of documents related to specific develo
 * [Managing dependencies](./Managing&#32;dependencies.md)
 * [Maintaining the API documentation](./Maintaining&#32;the&#32;API&#32;documentation.md)
 * [Document upload architectural design](./Document&#32;upload.md)
-* [How elasticsearch mapping migration works and how to use it](./Elasticsearch&#32;migrations.md)
+* [How OpenSearch mapping migration works and how to use it](./OpenSearch&#32;migrations.md)
 * [How to prepare a release](./How&#32;to&#32;prepare&#32;a&#32;release.md)
 * [How to deprecate, remove or rename a field](./How&#32;to&#32;deprecate&#32;a&#32;field.md)
 * [How to change the type of a field](./How&#32;to&#32;change&#32;the&#32;type&#32;of&#32;a&#32;field.md)

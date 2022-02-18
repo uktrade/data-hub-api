@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 from django.conf import settings
-from elasticsearch_dsl import Keyword, Mapping
+from opensearch_dsl import Keyword, Mapping
 
 from datahub.search import elasticsearch
 
@@ -38,13 +38,13 @@ def test_index_exists(mock_es_client, expected):
 @mock.patch('datahub.search.elasticsearch.connections')
 def test_configure_connection(connections, settings):
     """Test configuration of the connection."""
-    settings.ES_URL = 'https://login:password@test:1234'
+    settings.OPENSEARCH_URL = 'https://login:password@test:1234'
     connections.configure.return_value = {}
 
     elasticsearch.configure_connection()
 
     connections.configure.assert_called_with(default={
-        'hosts': [settings.ES_URL],
+        'hosts': [settings.OPENSEARCH_URL],
         'verify_certs': settings.ES_VERIFY_CERTS,
     })
 

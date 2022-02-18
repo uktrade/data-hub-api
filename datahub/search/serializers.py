@@ -29,7 +29,7 @@ class StringUUIDField(serializers.UUIDField):
     """
     String UUID field.
 
-    We can't use UUID in ES queries, that's why we need to convert them back to string.
+    We can't use UUID in OpenSearch queries, that's why we need to convert them back to string.
     """
 
     def to_internal_value(self, data):
@@ -107,7 +107,7 @@ class BaseSearchQuerySerializer(serializers.Serializer):
 
 
 class _ESModelChoiceField(serializers.Field):
-    """Serialiser field for selecting an ES model by name."""
+    """Serialiser field for selecting an OpenSearch model by name."""
 
     default_error_messages = {
         'invalid_choice': gettext_lazy('"{input}" is not a valid choice.'),
@@ -139,7 +139,6 @@ class BasicSearchQuerySerializer(BaseSearchQuerySerializer):
     entity = _ESModelChoiceField(default='company')
     term = serializers.CharField(required=True, allow_blank=True)
     show_archived = serializers.BooleanField(default=True)
-
 
 
 class EntitySearchQuerySerializer(BaseSearchQuerySerializer):

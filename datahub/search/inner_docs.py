@@ -1,4 +1,4 @@
-from elasticsearch_dsl import InnerDoc, Keyword, Text
+from opensearch_dsl import InnerDoc, Keyword, Text
 
 from datahub.search.fields import TextWithTrigram
 

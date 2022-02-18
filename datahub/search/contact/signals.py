@@ -8,7 +8,7 @@ from datahub.search.sync_object import sync_object_async, sync_related_objects_a
 
 
 def contact_sync_es(instance):
-    """Sync contact to the Elasticsearch."""
+    """Sync contact to the OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(ContactSearchApp, instance.pk),
     )

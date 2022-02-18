@@ -2,7 +2,7 @@ from hashlib import blake2b
 from logging import getLogger
 
 from django.conf import settings
-from elasticsearch_dsl import Document, Keyword, MetaField
+from opensearch_dsl import Document, Keyword, MetaField
 
 from datahub.core.exceptions import DataHubError
 from datahub.search.apps import get_search_app_by_search_model

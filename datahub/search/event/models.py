@@ -1,11 +1,11 @@
-from elasticsearch_dsl import Date, Keyword, Text
+from opensearch_dsl import Date, Keyword, Text
 
 from datahub.search import dict_utils, fields
 from datahub.search.models import BaseESModel
 
 
 class Event(BaseESModel):
-    """Elasticsearch representation of Event model."""
+    """OpenSearch representation of Event model."""
 
     id = Keyword()
     address_1 = Text()

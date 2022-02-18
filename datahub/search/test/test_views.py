@@ -256,6 +256,7 @@ class TestBasicSearch(APITestMixin):
         if should_match:
             assert response.data['count'] == 1
             assert response.data['results'][0]['name'] == name
+            assert response.data['results'][0]['address'] == address
         else:
             assert response.data['count'] == 0
 
@@ -314,7 +315,7 @@ class TestBasicSearch(APITestMixin):
         """
         Tests quality of results for fuzzy matching across multiple fields.
 
-        Unfortunately we require "combined_fields" matching (introduced in Elasticsearch
+        Unfortunately we require "combined_fields" matching (introduced in OpenSearch
         v 7.13) to do fuzzy matching across multiple fields, but we should still be
         able to search for exact terms that can be divided across multiple fields.
         """
@@ -353,6 +354,45 @@ class TestBasicSearch(APITestMixin):
             ('The Advisory Group', 'Canada'),
             ('The Risk Advisory Group', 'Canada'),
         ] == [(result['name'], result['country']) for result in response.data['results']]
+
+    def test_fuzzy_quality_cross_fields_address_below_name(
+        self,
+        es_with_collector,
+        fuzzy_search_user,
+    ):
+        """
+        Tests that name is more important than other fields in cross field matches.
+        """
+        SimpleModel.objects.create(name='Smaxtec Limited', address='')
+        SimpleModel.objects.create(name='Newsmax Media (HQ Florida)', address='')
+        SimpleModel.objects.create(name='Smart Notebooks', address='Maxet House')
+        SimpleModel.objects.create(name='Other Notebooks', address='Maxet House')
+
+        es_with_collector.flush_and_refresh()
+
+        term = 'Smax'
+
+        url = reverse('api-v3:search:basic')
+        api_client = self.create_api_client(user=fuzzy_search_user)
+
+        response = api_client.get(
+            url,
+            data={
+                'term': term,
+                'entity': 'simplemodel',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data['count'] == 3
+
+        # results are in order of relevance
+        assert [
+            'Smaxtec Limited',
+            'Newsmax Media (HQ Florida)',
+            'Smart Notebooks',
+        ] == [result['name'] for result in response.data['results']]
 
     def test_partial_match(self, es_with_collector, search_support_user):
         """Tests partial matching."""

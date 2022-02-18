@@ -3,7 +3,7 @@ import datetime
 from django.db.models import Case, Max, When
 from django.db.models import CharField
 from django.db.models.functions import Cast
-from elasticsearch_dsl.query import (
+from opensearch_dsl.query import (
     Bool,
     Exists,
     Range,

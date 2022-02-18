@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.management import call_command
 from django.db.models.signals import post_save
-from elasticsearch.helpers.test import get_test_client
+from opensearchpy.helpers.test import get_test_client
 from pytest_django.lazy_django import skip_if_no_django
 
 from datahub.core.constants import AdministrativeArea
@@ -163,7 +163,7 @@ def hierarchical_sectors():
 @pytest.fixture(scope='session')
 def _es_client(worker_id):
     """
-    Makes the ES test helper client available.
+    Makes the OpenSearch test helper client available.
 
     Also patches settings.ES_INDEX_PREFIX using the xdist worker ID so that each process
     gets unique indices when running tests using multiple processes using pytest -n.
@@ -172,7 +172,7 @@ def _es_client(worker_id):
     # the value so we just overwrite it normally
     settings.ES_INDEX_PREFIX = f'test_{worker_id}'
 
-    from elasticsearch_dsl.connections import connections
+    from opensearch_dsl.connections import connections
     client = get_test_client(nowait=False)
     connections.add_connection('default', client)
     yield client
@@ -373,7 +373,7 @@ def es_with_collector(es_collector_context_manager):
 def mock_es_client(monkeypatch):
     """Patches the Elasticsearch library so that a mock client is used."""
     mock_client = Mock()
-    monkeypatch.setattr('elasticsearch_dsl.connections.connections.get_connection', mock_client)
+    monkeypatch.setattr('opensearch_dsl.connections.connections.get_connection', mock_client)
     yield mock_client
 
 
@@ -381,8 +381,8 @@ def mock_es_client(monkeypatch):
 def mock_connection_for_create_index(monkeypatch):
     """Patches the Elasticsearch library so that a mock client is used."""
     mock_client = Mock()
-    monkeypatch.setattr('elasticsearch_dsl.connections.connections.get_connection', mock_client)
-    monkeypatch.setattr('elasticsearch_dsl.index.get_connection', mock_client)
+    monkeypatch.setattr('opensearch_dsl.connections.connections.get_connection', mock_client)
+    monkeypatch.setattr('opensearch_dsl.index.get_connection', mock_client)
     yield mock_client
 
 

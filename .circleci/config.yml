@@ -8,9 +8,6 @@ job_defaults: &job_defaults
     es_image:
       type: string
 
-    es_apm_image:
-      type: string
-
     postgres_image:
       type: string
 
@@ -35,8 +32,7 @@ job_defaults: &job_defaults
     DJANGO_SETTINGS_MODULE: config.settings.local
     ES_INDEX_PREFIX: test_index
     ES5_URL: http://localhost:9200
-    # This has been readded to allow tests utilizing elasticsearch to be unskipped
-    ELASTICSEARCH_URL: http://localhost:9200
+    OPENSEARCH_URL: http://localhost:9200
     PAAS_IP_WHITELIST: 1.2.3.4
     AWS_DEFAULT_REGION: eu-west-2
     AWS_ACCESS_KEY_ID: foo
@@ -48,7 +44,7 @@ job_defaults: &job_defaults
     DIT_EMAIL_DOMAINS: trade.gov.uk,digital.trade.gov.uk
     DATA_HUB_FRONTEND_ACCESS_KEY_ID: frontend-key-id
     DATA_HUB_FRONTEND_SECRET_ACCESS_KEY: frontend-key
-    ES_APM_ENABLED: 'True'
+    ES_APM_ENABLED: 'False'
     ES_APM_SERVICE_NAME: datahub
     ES_APM_SECRET_TOKEN:
     ES_APM_SERVER_URL: http://localhost:8200
@@ -62,10 +58,8 @@ job_defaults: &job_defaults
     - image: <<parameters.es_image>>
       environment:
         discovery.type: single-node
+        plugins.security.disabled: 'true'
         http.port: 9200
-
-    - image: <<parameters.es_apm_image>>
-      command: ["apm-server", "-e", "-E", "output.elasticsearch.hosts=[\"localhost:9200\"]"]
 
     - image: <<parameters.postgres_image>>
       name: postgres
@@ -125,5 +119,4 @@ workflows:
           publish_coverage: true
           python_image: python:3.10.1
           postgres_image: postgres:12
-          es_image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
-          es_apm_image: docker.elastic.co/apm/apm-server:7.7.1
+          es_image: opensearchproject/opensearch:1.2.4

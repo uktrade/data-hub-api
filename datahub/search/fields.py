@@ -1,6 +1,6 @@
 from functools import partial
 
-from elasticsearch_dsl import Date, Keyword, Object, Text
+from opensearch_dsl import Date, Keyword, Object, Text
 
 from datahub.search.elasticsearch import (
     lowercase_asciifolding_normalizer,

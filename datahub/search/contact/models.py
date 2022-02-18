@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Boolean, Date, Keyword, Text
+from opensearch_dsl import Boolean, Date, Keyword, Text
 
 from datahub.search import dict_utils
 from datahub.search import fields
@@ -7,7 +7,7 @@ from datahub.search.models import BaseESModel
 
 
 class Contact(BaseESModel):
-    """Elasticsearch representation of Contact model."""
+    """OpenSearch representation of Contact model."""
 
     id = Keyword()
     address_1 = Text()

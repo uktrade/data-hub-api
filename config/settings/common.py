@@ -103,6 +103,7 @@ LOCAL_APPS = [
     'datahub.investment.project.evidence',
     'datahub.investment.project.proposition',
     'datahub.investment.project.report',
+    'datahub.investment.project.notification',
     'datahub.investment.investor_profile',
     'datahub.investment.opportunity',
     'datahub.metadata',
@@ -304,7 +305,7 @@ SWAGGER_UI_JS = {
 
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 APPEND_SLASH = False
 
@@ -332,6 +333,11 @@ if 'elasticsearch' in VCAP_SERVICES:
     ES_URL = VCAP_SERVICES['elasticsearch'][0]['credentials']['uri']
 else:
     ES_URL = env('ES5_URL')
+
+if 'opensearch' in VCAP_SERVICES:
+    OPENSEARCH_URL = VCAP_SERVICES['opensearch'][0]['credentials']['uri']
+else:
+    OPENSEARCH_URL = env('OPENSEARCH_URL') or '<invalid-configuration>'
 
 ES_VERIFY_CERTS = env.bool('ES_VERIFY_CERTS', True)
 ES_INDEX_PREFIX = env('ES_INDEX_PREFIX')

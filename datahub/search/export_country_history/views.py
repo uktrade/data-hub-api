@@ -1,4 +1,4 @@
-from elasticsearch_dsl.query import Term
+from opensearch_dsl.query import Term
 
 from datahub.core.permissions import HasPermissions
 from datahub.interaction.models import InteractionPermission

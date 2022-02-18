@@ -4,4 +4,3 @@ networks:
   default:
     external:
       name: data-infrastructure-shared-network
-

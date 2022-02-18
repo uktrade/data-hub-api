@@ -1,6 +1,6 @@
 from operator import attrgetter
 
-from elasticsearch_dsl import Boolean, Date, Double, InnerDoc, Keyword, Object, Text
+from opensearch_dsl import Boolean, Date, Double, InnerDoc, Keyword, Object, Text
 
 from datahub.search import dict_utils, fields
 from datahub.search.fields import TrigramText
@@ -71,7 +71,7 @@ class _DITParticipant(InnerDoc):
 
 
 class Interaction(BaseESModel):
-    """Elasticsearch representation of Interaction model."""
+    """OpenSearch representation of Interaction model."""
 
     id = Keyword()
     company = fields.company_field()

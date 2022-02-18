@@ -10,7 +10,7 @@ EXCLUDE_ALL = object()
 
 
 class SearchApp:
-    """Used to configure ES search modules to be used within Data Hub."""
+    """Used to configure OpenSearch search modules to be used within Data Hub."""
 
     name = None
     es_model = None
@@ -37,7 +37,7 @@ class SearchApp:
     @classmethod
     def connect_signals(cls):
         """
-        Connects all signal handlers so DB models can be synced with Elasticsearch on save.
+        Connects all signal handlers so DB models can be synced with OpenSearch on save.
         """
         for receiver in cls.get_signal_receivers():
             receiver.connect()
@@ -149,14 +149,14 @@ def _load_search_app(cls_path):
 
 
 class SearchConfig(AppConfig):
-    """Configures Elasticsearch connection when ready."""
+    """Configures OpenSearch connection when ready."""
 
     name = 'datahub.search'
     verbose_name = 'Search'
 
     def ready(self):
         """
-        Configures the default Elasticsearch connection, connects signal receivers and
+        Configures the default OpenSearch connection, connects signal receivers and
         registers views.
         """
         # The automatic connection configuration is disabled during tests because the connection

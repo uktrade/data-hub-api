@@ -8,7 +8,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_contact_auto_sync_to_es(es_with_signals):
-    """Tests if contact gets synced to Elasticsearch."""
+    """Tests if contact gets synced to OpenSearch."""
     test_name = 'very_hard_to_find_contact'
     ContactFactory(
         first_name=test_name,
@@ -21,7 +21,7 @@ def test_contact_auto_sync_to_es(es_with_signals):
 
 
 def test_contact_auto_updates_to_es(es_with_signals):
-    """Tests if contact gets updated in Elasticsearch."""
+    """Tests if contact gets updated in OpenSearch."""
     test_name = 'very_hard_to_find_contact_ii'
     contact = ContactFactory(
         first_name=test_name,
