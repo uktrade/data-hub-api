@@ -32,6 +32,7 @@ def get_basic_search_query(
         limit=100,
         fields_to_exclude=None,
         fuzzy=False,
+        show_archived=False,
 ):
     """
     Performs basic search for the given term in the given entity using the SEARCH_FIELDS.
@@ -52,7 +53,7 @@ def get_basic_search_query(
     # and the same query is always generated with the same inputs
     fields = sorted(fields)
 
-    query = _build_term_query(term, fields=fields, fuzzy=fuzzy)
+    query = _build_term_query(term, fields=fields, fuzzy=fuzzy, show_archived=show_archived)
     search = Search(index=indices).query(query)
 
     permission_query = _build_global_permission_query(permission_filters_by_entity)
@@ -221,7 +222,7 @@ def _build_entity_permission_query(permission_filters):
     return MatchNone()
 
 
-def _build_term_query(term, fields=None, fuzzy=False):
+def _build_term_query(term, fields=None, fuzzy=False, show_archived=False):
     """
     Builds a term query depending on the active feature flags.
 
@@ -234,11 +235,12 @@ def _build_term_query(term, fields=None, fuzzy=False):
     if fuzzy:
         return _build_fuzzy_term_query(term, fields)
     else:
-        return _build_basic_term_query(term, fields)
+        return _build_basic_term_query(term, fields, show_archived)
 
 
-def _build_basic_term_query(term, fields=None):
+def _build_basic_term_query(term, fields=None, show_archived=False):
     """Builds a term query."""
+    # TODO: query based on show_archived param
     if term == '':
         return MatchAll()
 
