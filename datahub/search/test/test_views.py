@@ -115,6 +115,29 @@ class TestValidateExportViewAttributes:
 class TestBasicSearch(APITestMixin):
     """Tests for SearchBasicAPIView."""
 
+    def test_hide_archived(self, opensearch_with_collector, search_support_user):
+        """Tests the show/hide archived option."""
+
+        # TODO: set up objects in db, with mix of archived/not archived values 
+
+        opensearch_with_collector.flush_and_refresh()
+
+        api_client = self.create_api_client(user=search_support_user)
+
+        url = reverse('api-v3:search:basic')
+
+        response = api_client.get(
+                        url,
+                        data={
+                            'term': '',
+                            'show_archived': True,
+                            'entity': 'simplemodel',
+                        },
+                    )
+
+        ## TODO: test results do not contain archived models
+        assert response.status_code == status.HTTP_200_OK
+
     def test_pagination(self, opensearch_with_collector, search_support_user):
         """Tests the pagination."""
         total_records = 9
