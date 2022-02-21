@@ -18,7 +18,7 @@ def test_bulk(opensearch_bulk, mock_opensearch_client):
         mock_opensearch_client.return_value,
         actions=actions,
         chunk_size=chunk_size,
-        max_chunk_bytes=settings.ES_BULK_MAX_CHUNK_BYTES,
+        max_chunk_bytes=settings.OPENSEARCH_BULK_MAX_CHUNK_BYTES,
     )
 
 
@@ -45,14 +45,14 @@ def test_configure_connection(connections, settings):
 
     connections.configure.assert_called_with(default={
         'hosts': [settings.OPENSEARCH_URL],
-        'verify_certs': settings.ES_VERIFY_CERTS,
+        'verify_certs': settings.OPENSEARCH_VERIFY_CERTS,
     })
 
 
 def test_creates_index(monkeypatch, mock_connection_for_create_index):
     """Test creates_index()."""
     monkeypatch.setattr(
-        'django.conf.settings.ES_INDEX_SETTINGS',
+        'django.conf.settings.OPENSEARCH_INDEX_SETTINGS',
         {
             'testsetting1': 'testval1',
         },
