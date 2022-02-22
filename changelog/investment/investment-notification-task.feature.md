@@ -1,1 +1,0 @@
-An investment estimated land date notification sending task has been added. It runs every morning and sends notification to project managers about estimated land date due in 30 or 60 days if they have notification subscription enabled.
