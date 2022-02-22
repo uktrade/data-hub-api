@@ -1,3 +1,13 @@
+# Data Hub API 39.15.0 (2022-02-22)
+## Features
+
+- **Investment** An investment estimated land date notification sending task has been added. It runs every morning and sends notification to project managers about estimated land date due in 30 or 60 days if they have notification subscription enabled.
+
+## Internal changes
+
+- ElasticSearch configuration has been migrated to OpenSearch
+
+
 # Data Hub API 39.14.0 (2022-02-15)
 ## Features
 
