@@ -329,23 +329,18 @@ SEARCH_APPS = [
 
 VCAP_SERVICES = env.json('VCAP_SERVICES', default={})
 
-if 'elasticsearch' in VCAP_SERVICES:
-    ES_URL = VCAP_SERVICES['elasticsearch'][0]['credentials']['uri']
-else:
-    ES_URL = env('ES5_URL')
-
 if 'opensearch' in VCAP_SERVICES:
     OPENSEARCH_URL = VCAP_SERVICES['opensearch'][0]['credentials']['uri']
 else:
     OPENSEARCH_URL = env('OPENSEARCH_URL') or '<invalid-configuration>'
 
-ES_VERIFY_CERTS = env.bool('ES_VERIFY_CERTS', True)
-ES_INDEX_PREFIX = env('ES_INDEX_PREFIX')
-ES_INDEX_SETTINGS = {}
-ES_BULK_MAX_CHUNK_BYTES = 10 * 1024 * 1024  # 10MB
-ES_SEARCH_REQUEST_TIMEOUT = env.int('ES_SEARCH_REQUEST_TIMEOUT', default=20)  # seconds
-ES_SEARCH_REQUEST_WARNING_THRESHOLD = env.int(
-    'ES_SEARCH_REQUEST_WARNING_THRESHOLD',
+OPENSEARCH_VERIFY_CERTS = env.bool('OPENSEARCH_VERIFY_CERTS', True)
+OPENSEARCH_INDEX_PREFIX = env('OPENSEARCH_INDEX_PREFIX')
+OPENSEARCH_INDEX_SETTINGS = {}
+OPENSEARCH_BULK_MAX_CHUNK_BYTES = 10 * 1024 * 1024  # 10MB
+OPENSEARCH_SEARCH_REQUEST_TIMEOUT = env.int('OPENSEARCH_SEARCH_REQUEST_TIMEOUT', default=20)  # seconds
+OPENSEARCH_SEARCH_REQUEST_WARNING_THRESHOLD = env.int(
+    'OPENSEARCH_SEARCH_REQUEST_WARNING_THRESHOLD',
     default=10,  # seconds
 )
 SEARCH_EXPORT_MAX_RESULTS = 5000
@@ -458,8 +453,8 @@ if REDIS_BASE_URL:
             },
         }
 
-    if env.bool('ENABLE_DAILY_ES_SYNC', False):
-        CELERY_BEAT_SCHEDULE['sync_es'] = {
+    if env.bool('ENABLE_DAILY_OPENSEARCH_SYNC', False):
+        CELERY_BEAT_SCHEDULE['sync_search'] = {
             'task': 'datahub.search.tasks.sync_all_models',
             'schedule': crontab(minute=0, hour=1),
         }
@@ -479,6 +474,12 @@ if REDIS_BASE_URL:
         CELERY_BEAT_SCHEDULE['process_mailbox_emails'] = {
             'task': 'datahub.email_ingestion.tasks.process_mailbox_emails',
             'schedule': 30.0,  # Every 30 seconds
+        }
+
+    if env.bool('ENABLE_INVESTMENT_NOTIFICATION', False):
+        CELERY_BEAT_SCHEDULE['send_estimated_land_date_task'] = {
+            'task': 'datahub.investment.project.notification.tasks.send_estimated_land_date_task',
+            'schedule': crontab(minute=0, hour=8),
         }
 
     CELERY_WORKER_LOG_FORMAT = (
@@ -531,6 +532,10 @@ OMIS_PUBLIC_ORDER_URL = f'{OMIS_PUBLIC_BASE_URL}/{{public_token}}'
 
 INVESTMENT_NOTIFICATION_ADMIN_EMAIL = env('INVESTMENT_NOTIFICATION_ADMIN_EMAIL', default='')
 INVESTMENT_NOTIFICATION_API_KEY = env('INVESTMENT_NOTIFICATION_API_KEY', default='')
+INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID = env(
+    'INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID',
+    default='',
+)
 
 # GOV.UK PAY
 GOVUK_PAY_URL = env('GOVUK_PAY_URL', default='')

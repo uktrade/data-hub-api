@@ -36,7 +36,7 @@ class Command(BaseCommand):
 
         if not are_apps_initialised(apps):
             raise CommandError(
-                'Index and mapping not initialised, please run `migrate_es` first.',
+                'Index and mapping not initialised, please run `migrate_search` first.',
             )
 
         for app in apps:

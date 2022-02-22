@@ -17,7 +17,7 @@ class InvestmentSearchApp(SearchApp):
     """SearchApp for investment"""
 
     name = 'investment_project'
-    es_model = InvestmentProject
+    search_model = InvestmentProject
     # Investment project documents are very large, so the bulk_batch_size is set to a lower value
     # to keep bulk requests below 10 MB.
     # (In some environments, the maximum OpenSearch request size is 10 MB. This is dependent on

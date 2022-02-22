@@ -8,7 +8,7 @@ from datahub.search.apps import (
     get_search_app_by_search_model,
 )
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
-from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
+from datahub.search.test.search_support.simplemodel.models import SearchSimpleModel
 
 
 @mock.patch('datahub.search.apps._load_search_apps')
@@ -74,7 +74,7 @@ class TestGetSearchAppBySearchModel:
 
     def test_found(self):
         """Test that the expected app is returned for a registered search model."""
-        assert get_search_app_by_search_model(ESSimpleModel) is SimpleModelSearchApp
+        assert get_search_app_by_search_model(SearchSimpleModel) is SimpleModelSearchApp
 
     def test_not_found(self):
         """

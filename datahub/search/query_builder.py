@@ -19,7 +19,7 @@ MAX_RESULTS = 10000
 
 
 class MatchNone(Query):
-    """match_none query. This isn't defined in the Elasticsearch DSL library."""
+    """match_none query. This isn't defined in the OpenSearch DSL library."""
 
     name = 'match_none'
 
@@ -45,8 +45,8 @@ def get_basic_search_query(
     limit = _clip_limit(offset, limit)
 
     search_apps = tuple(get_global_search_apps_as_mapping().values())
-    indices = [app.es_model.get_read_alias() for app in search_apps]
-    fields = set(chain.from_iterable(app.es_model.SEARCH_FIELDS for app in search_apps))
+    indices = [app.search_model.get_read_alias() for app in search_apps]
+    fields = set(chain.from_iterable(app.search_model.SEARCH_FIELDS for app in search_apps))
 
     # Sort the fields so that this function is deterministic
     # and the same query is always generated with the same inputs
@@ -267,7 +267,7 @@ def _build_fuzzy_term_query(term, fields=None):
     Note that we are not actually using the trigram analyzer here and using standard
     Levensthein distances from 'fuzziness' in the match query.
 
-    Since the elasticsearch version on cloudfoundry is only 7.9.3 we are unable
+    Since the OpenSearch version on cloudfoundry is only 7.9.3 we are unable
     to use the 'combined_fields' query which was introduced in version 7.13. This
     would allow us to do fuzzy matching across different fields. Instead, this
     does fuzzy matching on each of the trigram fields individually.

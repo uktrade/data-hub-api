@@ -1,10 +1,10 @@
 from opensearch_dsl import Date, Keyword, Text
 
 from datahub.search import dict_utils, fields
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
-class Event(BaseESModel):
+class Event(BaseSearchModel):
     """OpenSearch representation of Event model."""
 
     id = Keyword()

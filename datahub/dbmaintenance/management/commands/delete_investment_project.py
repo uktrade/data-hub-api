@@ -6,7 +6,7 @@ from django.db.transaction import atomic
 from datahub.core.exceptions import SimulationRollbackError
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.investment.project.models import InvestmentProject
-from datahub.search.deletion import update_es_after_deletions
+from datahub.search.deletion import update_opensearch_after_deletions
 
 logger = getLogger(__name__)
 
@@ -22,7 +22,7 @@ class Command(CSVBaseCommand):
         try:
             with ExitStack() as stack:
                 if not simulate:
-                    stack.enter_context(update_es_after_deletions())
+                    stack.enter_context(update_opensearch_after_deletions())
 
                 stack.enter_context(atomic())
                 total_deleted, deletions_by_model = investment_project.delete()

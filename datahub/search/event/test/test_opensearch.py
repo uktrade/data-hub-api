@@ -3,10 +3,10 @@ from opensearch_dsl import Mapping
 from datahub.search.event import EventSearchApp
 
 
-def test_mapping(es):
+def test_mapping(opensearch):
     """Test the OpenSearch mapping for an event."""
     mapping = Mapping.from_opensearch(
-        EventSearchApp.es_model.get_write_index(),
+        EventSearchApp.search_model.get_write_index(),
     )
 
     assert mapping.to_dict() == {

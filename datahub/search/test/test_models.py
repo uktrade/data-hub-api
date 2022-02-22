@@ -4,19 +4,19 @@ import pytest
 from django.utils.functional import cached_property
 
 from datahub.search.test.search_support.models import SimpleModel
-from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
+from datahub.search.test.search_support.simplemodel.models import SearchSimpleModel
 from datahub.search.utils import get_model_field_names
 
 
-class TestBaseESModel:
-    """Tests for BaseESModel."""
+class TestBaseSearchModel:
+    """Tests for BaseSearchModel."""
 
     @pytest.mark.parametrize('include_index', (False, True))
     @pytest.mark.parametrize('include_source', (False, True))
-    def test_es_document(self, include_index, include_source):
-        """Test that es_document() creates a dict with the expected keys and values."""
+    def test_to_document(self, include_index, include_source):
+        """Test that to_document() creates a dict with the expected keys and values."""
         obj = SimpleModel(id=5, name='test-name', address='123 Fake Street', country='uk')
-        doc = ESSimpleModel.es_document(
+        doc = SearchSimpleModel.to_document(
             obj,
             include_index=include_index,
             include_source=include_source,
@@ -32,7 +32,7 @@ class TestBaseESModel:
 
         expected_doc = {
             '_id': obj.pk,
-            **({'_index': ESSimpleModel.get_write_alias()} if include_index else {}),
+            **({'_index': SearchSimpleModel.get_write_alias()} if include_index else {}),
             **({'_source': source} if include_source else {}),
         }
 
@@ -41,12 +41,12 @@ class TestBaseESModel:
 
 def test_validate_model_fields(search_app):
     """Test that all top-level fields defined in search models are valid."""
-    es_model = search_app.es_model
+    search_model = search_app.search_model
     db_model = search_app.queryset.model
 
-    fields = get_model_field_names(es_model)
+    fields = get_model_field_names(search_model)
 
-    computed_fields = es_model.COMPUTED_MAPPINGS.keys()
+    computed_fields = search_model.COMPUTED_MAPPINGS.keys()
     db_model_properties = _get_object_properties(db_model)
     db_model_fields = _get_db_model_fields(db_model)
 
@@ -58,9 +58,9 @@ def test_validate_model_fields(search_app):
 
 def test_validate_model_mapping_fields(search_app):
     """Test that all fields defined in MAPPINGS exist on the OpenSearch model."""
-    es_model = search_app.es_model
-    valid_fields = get_model_field_names(es_model)
-    fields = es_model.MAPPINGS.keys()
+    search_model = search_app.search_model
+    valid_fields = get_model_field_names(search_model)
+    fields = search_model.MAPPINGS.keys()
     invalid_fields = fields - valid_fields
 
     assert not invalid_fields
@@ -68,9 +68,9 @@ def test_validate_model_mapping_fields(search_app):
 
 def test_validate_model_computed_mapping_fields(search_app):
     """Test that all fields defined in COMPUTED_MAPPINGS exist on the OpenSearch model."""
-    es_model = search_app.es_model
-    valid_fields = get_model_field_names(es_model)
-    fields = es_model.COMPUTED_MAPPINGS.keys()
+    search_model = search_app.search_model
+    valid_fields = get_model_field_names(search_model)
+    fields = search_model.COMPUTED_MAPPINGS.keys()
     invalid_fields = fields - valid_fields
 
     assert not invalid_fields
@@ -78,23 +78,23 @@ def test_validate_model_computed_mapping_fields(search_app):
 
 def test_validate_model_no_mapping_and_computed_intersection(search_app):
     """Test that MAPPINGS and COMPUTED_MAPPINGS on OpenSearch models don't overlap."""
-    es_model = search_app.es_model
-    intersection = es_model.MAPPINGS.keys() & es_model.COMPUTED_MAPPINGS.keys()
+    search_model = search_app.search_model
+    intersection = search_model.MAPPINGS.keys() & search_model.COMPUTED_MAPPINGS.keys()
 
     assert not intersection
 
 
 def test_validate_model_search_fields(search_app):
     """Test that all field paths in SEARCH_FIELDS exist on the OpenSearch model."""
-    es_model = search_app.es_model
-    mapping = es_model._doc_type.mapping
+    search_model = search_app.search_model
+    mapping = search_model._doc_type.mapping
     invalid_fields = {
-        field for field in es_model.SEARCH_FIELDS
+        field for field in search_model.SEARCH_FIELDS
         if not mapping.resolve_field(field)
     }
 
     assert not invalid_fields, (
-        f'Invalid search fields {invalid_fields} detected on {es_model.__name__} search model'
+        f'Invalid search fields {invalid_fields} detected on {search_model.__name__} search model'
     )
 
 
