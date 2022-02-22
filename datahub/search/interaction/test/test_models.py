@@ -24,7 +24,7 @@ pytestmark = pytest.mark.django_db
         ExportCountriesInteractionFactory,
     ),
 )
-def test_interaction_to_dict(es, factory_cls):
+def test_interaction_to_dict(opensearch, factory_cls):
     """Test converting an interaction to a dict."""
     interaction = factory_cls()
 
@@ -143,7 +143,7 @@ def test_interaction_to_dict(es, factory_cls):
     }
 
 
-def test_service_delivery_to_dict(es):
+def test_service_delivery_to_dict(opensearch):
     """Test converting an interaction to a dict."""
     interaction = ServiceDeliveryFactory()
 
@@ -231,10 +231,10 @@ def test_service_delivery_to_dict(es):
     }
 
 
-def test_interactions_to_es_documents(es):
+def test_interactions_to_documents(opensearch):
     """Test converting 2 orders to OpenSearch documents."""
     interactions = CompanyInteractionFactory.create_batch(2)
 
-    result = Interaction.db_objects_to_es_documents(interactions)
+    result = Interaction.db_objects_to_documents(interactions)
 
     assert {item['_id'] for item in result} == {item.pk for item in interactions}

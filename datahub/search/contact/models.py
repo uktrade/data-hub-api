@@ -3,10 +3,10 @@ from opensearch_dsl import Boolean, Date, Keyword, Text
 from datahub.search import dict_utils
 from datahub.search import fields
 from datahub.search.contact import dict_utils as contact_dict_utils
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
-class Contact(BaseESModel):
+class Contact(BaseSearchModel):
     """OpenSearch representation of Contact model."""
 
     id = Keyword()

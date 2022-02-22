@@ -10,48 +10,48 @@ from datahub.search.deletion import (
     BULK_DELETION_TIMEOUT_SECS,
     Collector,
     delete_documents,
-    update_es_after_deletions,
+    update_opensearch_after_deletions,
 )
 from datahub.search.sync_object import sync_object
 from datahub.search.test.search_support.models import SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
-from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
+from datahub.search.test.search_support.simplemodel.models import SearchSimpleModel
 
 
-@mock.patch('datahub.search.elasticsearch.es_bulk')
-def test_delete_documents(es_bulk, mock_es_client):
+@mock.patch('datahub.search.opensearch.opensearch_bulk')
+def test_delete_documents(opensearch_bulk, mock_opensearch_client):
     """Test that delete_documents calls OpenSearch bulk to delete all documents."""
-    es_bulk.return_value = (None, [])
+    opensearch_bulk.return_value = (None, [])
 
     index = 'test-index'
-    es_docs = [
+    docs = [
         {'_id': 1},
         {'_id': 2},
         {'_id': 3},
     ]
-    delete_documents(index, es_docs)
+    delete_documents(index, docs)
 
-    assert es_bulk.call_count == 1
+    assert opensearch_bulk.call_count == 1
 
-    call_args, call_kwargs = es_bulk.call_args_list[0]
+    call_args, call_kwargs = opensearch_bulk.call_args_list[0]
     call_kwargs['actions'] = list(call_kwargs['actions'])  # from generator to list
-    assert call_args == (mock_es_client.return_value,)
+    assert call_args == (mock_opensearch_client.return_value,)
     assert call_kwargs == {
         'actions': [
-            {'_op_type': 'delete', '_index': index, **es_doc}
-            for es_doc in es_docs
+            {'_op_type': 'delete', '_index': index, **doc}
+            for doc in docs
         ],
         'chunk_size': BULK_CHUNK_SIZE,
         'request_timeout': BULK_DELETION_TIMEOUT_SECS,
-        'max_chunk_bytes': settings.ES_BULK_MAX_CHUNK_BYTES,
+        'max_chunk_bytes': settings.OPENSEARCH_BULK_MAX_CHUNK_BYTES,
         'raise_on_error': False,
     }
 
 
-@mock.patch('datahub.search.elasticsearch.es_bulk')
-def test_delete_documents_with_errors(es_bulk, mock_es_client):
+@mock.patch('datahub.search.opensearch.opensearch_bulk')
+def test_delete_documents_with_errors(opensearch_bulk, mock_opensearch_client):
     """Test that if OpenSearch returns a non-404 error, DataHubError is raised."""
-    es_bulk.return_value = (
+    opensearch_bulk.return_value = (
         None,
         [
             {'delete': {'status': 404}},
@@ -60,10 +60,10 @@ def test_delete_documents_with_errors(es_bulk, mock_es_client):
     )
 
     index = 'test-index'
-    es_docs = [{'_id': 1}]
+    docs = [{'_id': 1}]
 
     with pytest.raises(DataHubError) as excinfo:
-        delete_documents(index, es_docs)
+        delete_documents(index, docs)
 
     assert excinfo.value.args == (
         (
@@ -74,15 +74,15 @@ def test_delete_documents_with_errors(es_bulk, mock_es_client):
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures('synchronous_thread_pool')
-def test_collector(monkeypatch, es_with_signals):
+def test_collector(monkeypatch, opensearch_with_signals):
     """
     Test that the collector collects and deletes all the django objects deleted.
     """
     obj = SimpleModel.objects.create()
     sync_object(SimpleModelSearchApp, str(obj.pk))
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
-    es_doc = ESSimpleModel.es_document(obj, include_index=False, include_source=False)
+    doc = SearchSimpleModel.to_document(obj, include_index=False, include_source=False)
 
     assert SimpleModel.objects.count() == 1
 
@@ -119,39 +119,39 @@ def test_collector(monkeypatch, es_with_signals):
         assert receiver.enable.called
 
     assert collector.deletions == {
-        SimpleModel: [es_doc],
+        SimpleModel: [doc],
     }
 
-    read_alias = ESSimpleModel.get_read_alias()
+    read_alias = SearchSimpleModel.get_read_alias()
 
     assert SimpleModel.objects.count() == 0
-    assert es_with_signals.count(index=read_alias)['count'] == 1
+    assert opensearch_with_signals.count(index=read_alias)['count'] == 1
 
-    collector.delete_from_es()
+    collector.delete_from_opensearch()
 
-    es_with_signals.indices.refresh()
-    assert es_with_signals.count(index=read_alias)['count'] == 0
+    opensearch_with_signals.indices.refresh()
+    assert opensearch_with_signals.count(index=read_alias)['count'] == 0
 
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures('synchronous_thread_pool')
-def test_update_es_after_deletions(es_with_signals):
+def test_update_opensearch_after_deletions(opensearch_with_signals):
     """
-    Test that the context manager update_es_after_deletions collects and deletes
+    Test that the context manager update_opensearch_after_deletions collects and deletes
     all the django objects deleted.
     """
     assert SimpleModel.objects.count() == 0
 
     obj = SimpleModel.objects.create()
     sync_object(SimpleModelSearchApp, str(obj.pk))
-    es_with_signals.indices.refresh()
-    read_alias = ESSimpleModel.get_read_alias()
+    opensearch_with_signals.indices.refresh()
+    read_alias = SearchSimpleModel.get_read_alias()
 
     assert SimpleModel.objects.count() == 1
-    assert es_with_signals.count(index=read_alias)['count'] == 1
+    assert opensearch_with_signals.count(index=read_alias)['count'] == 1
 
-    with update_es_after_deletions():
+    with update_opensearch_after_deletions():
         obj.delete()
 
-    es_with_signals.indices.refresh()
-    assert es_with_signals.count(index=read_alias)['count'] == 0
+    opensearch_with_signals.indices.refresh()
+    assert opensearch_with_signals.count(index=read_alias)['count'] == 0

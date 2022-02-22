@@ -45,7 +45,7 @@ def assert_project_search_latest_interaction(has_interaction=True, name=''):
     Assert that a project on OpenSearch has or does not have a latest interaction.
 
     :param has_interaction: whether to expect the latest interaction to exist or not
-    :param term: search term for OpenSearch
+    :param name: search term for OpenSearch
     """
     filter_data = {'name': name} if name else {}
     results = get_search_by_entities_query(
@@ -61,13 +61,13 @@ def assert_project_search_latest_interaction(has_interaction=True, name=''):
         assert result['latest_interaction'] is None
 
 
-def test_investment_project_auto_sync_to_es(es_with_signals):
+def test_investment_project_auto_sync_to_opensearch(opensearch_with_signals):
     """Tests if investment project gets synced to OpenSearch."""
     test_name = 'very_hard_to_find_project'
     InvestmentProjectFactory(
         name=test_name,
     )
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     result = get_search_by_entities_query(
         [InvestmentProject],
@@ -78,13 +78,13 @@ def test_investment_project_auto_sync_to_es(es_with_signals):
     assert result.hits.total.value == 1
 
 
-def test_investment_project_auto_updates_to_es(es_with_signals):
+def test_investment_project_auto_updates_to_opensearch(opensearch_with_signals):
     """Tests if investment project gets synced to OpenSearch."""
     project = InvestmentProjectFactory()
     new_test_name = 'even_harder_to_find_investment_project'
     project.name = new_test_name
     project.save()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     result = get_search_by_entities_query(
         [InvestmentProject],
@@ -101,9 +101,11 @@ def team_member():
     yield InvestmentProjectTeamMemberFactory(role='Co-ordinator')
 
 
-def test_investment_project_team_member_added_sync_to_es(es_with_signals, team_member):
+def test_investment_project_team_member_added_sync_to_opensearch(
+    opensearch_with_signals, team_member,
+):
     """Tests if investment project gets synced to OpenSearch when a team member is added."""
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     results = get_search_by_entities_query(
         [InvestmentProject],
@@ -118,12 +120,14 @@ def test_investment_project_team_member_added_sync_to_es(es_with_signals, team_m
     assert result['team_members'][0]['id'] == str(team_member.adviser.id)
 
 
-def test_investment_project_team_member_updated_sync_to_es(es_with_signals, team_member):
+def test_investment_project_team_member_updated_sync_to_opensearch(
+    opensearch_with_signals, team_member,
+):
     """Tests if investment project gets synced to OpenSearch when a team member is updated."""
     new_adviser = AdviserFactory()
     team_member.adviser = new_adviser
     team_member.save()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     results = get_search_by_entities_query(
         [InvestmentProject],
@@ -138,10 +142,12 @@ def test_investment_project_team_member_updated_sync_to_es(es_with_signals, team
     assert result['team_members'][0]['id'] == str(new_adviser.id)
 
 
-def test_investment_project_team_member_deleted_sync_to_es(es_with_signals, team_member):
+def test_investment_project_team_member_deleted_sync_to_opensearch(
+    opensearch_with_signals, team_member,
+):
     """Tests if investment project gets synced to OpenSearch when a team member is deleted."""
     team_member.delete()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     results = get_search_by_entities_query(
         [InvestmentProject],
@@ -164,7 +170,7 @@ def test_investment_project_team_member_deleted_sync_to_es(es_with_signals, team
         'project_assurance_adviser',
     ),
 )
-def test_investment_project_syncs_when_adviser_changes(es_with_signals, field):
+def test_investment_project_syncs_when_adviser_changes(opensearch_with_signals, field):
     """
     Tests that when an adviser is updated, investment projects related to that adviser are
     resynced.
@@ -175,7 +181,7 @@ def test_investment_project_syncs_when_adviser_changes(es_with_signals, field):
     adviser.dit_team = TeamFactory()
     adviser.save()
 
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     result = search_investment_project_by_id(project.pk)
 
@@ -184,7 +190,9 @@ def test_investment_project_syncs_when_adviser_changes(es_with_signals, field):
     assert result.hits[0][field]['dit_team']['name'] == adviser.dit_team.name
 
 
-def test_investment_project_syncs_when_team_member_adviser_changes(es_with_signals, team_member):
+def test_investment_project_syncs_when_team_member_adviser_changes(
+    opensearch_with_signals, team_member,
+):
     """
     Tests that when an adviser that is a team member of an investment project is updated,
     the related investment project is resynced.
@@ -194,7 +202,7 @@ def test_investment_project_syncs_when_team_member_adviser_changes(es_with_signa
     adviser.dit_team = TeamFactory()
     adviser.save()
 
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     result = search_investment_project_by_id(team_member.investment_project.pk)
 
@@ -203,7 +211,7 @@ def test_investment_project_syncs_when_team_member_adviser_changes(es_with_signa
     assert result.hits[0]['team_members'][0]['dit_team']['name'] == adviser.dit_team.name
 
 
-def test_investment_project_interaction_updated_sync_to_es(es_with_signals):
+def test_investment_project_interaction_updated_sync_to_opensearch(opensearch_with_signals):
     """Test investment project gets synced to OpenSearch when an interaction is updated."""
     investment_project = InvestmentProjectFactory()
     interaction_date = '2018-05-05T00:00:00+00:00'
@@ -213,7 +221,7 @@ def test_investment_project_interaction_updated_sync_to_es(es_with_signals):
         date=datetime.fromisoformat(interaction_date),
         subject=interaction_subject,
     )
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     assert_project_search_latest_interaction(has_interaction=True)
 
@@ -233,23 +241,23 @@ def test_investment_project_interaction_updated_sync_to_es(es_with_signals):
     }
 
 
-def test_investment_project_interaction_deleted_sync_to_es(es_with_signals):
+def test_investment_project_interaction_deleted_sync_to_opensearch(opensearch_with_signals):
     """Test investment project gets synced to OpenSearch when an interaction is deleted."""
     investment_project = InvestmentProjectFactory()
     interaction = InvestmentProjectInteractionFactory(
         investment_project=investment_project,
     )
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     assert_project_search_latest_interaction(has_interaction=True)
 
     interaction.delete()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     assert_project_search_latest_interaction(has_interaction=False)
 
 
-def test_investment_project_interaction_changed_sync_to_es(es_with_signals):
+def test_investment_project_interaction_changed_sync_to_opensearch(opensearch_with_signals):
     """
     Test projects get synced to OpenSearch when an interaction's project is changed.
 
@@ -264,7 +272,7 @@ def test_investment_project_interaction_changed_sync_to_es(es_with_signals):
             investment_project=investment_project_a,
         )
 
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     for project_name, has_interaction in [('alpha', True), ('beta', False)]:
         assert_project_search_latest_interaction(
@@ -276,7 +284,7 @@ def test_investment_project_interaction_changed_sync_to_es(es_with_signals):
     with reversion.create_revision():
         interaction.save()
 
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     for project_name, has_interaction in [('alpha', False), ('beta', True)]:
         assert_project_search_latest_interaction(
@@ -287,13 +295,13 @@ def test_investment_project_interaction_changed_sync_to_es(es_with_signals):
 
 @mock.patch('datahub.search.investment.signals.sync_object_async')
 def test_investment_project_synched_only_if_interaction_linked(
-    mocked_sync_object, es_with_signals,
+    mocked_sync_object, opensearch_with_signals,
 ):
     """
     Test sync_object_async not called if no investment project related to an interaction.
 
     When an interaction without an investment project attached to it is saved, the
-    investment_project_sync_es_interaction_change signal should return without attempting to
+    investment_project_sync_search_interaction_change signal should return without attempting to
     sync an investment project to OpenSearch.
     """
     interaction = CompanyInteractionFactory()
@@ -307,14 +315,14 @@ def test_investment_project_synched_only_if_interaction_linked(
     assert mocked_sync_object.call_count == 5
 
 
-def test_incomplete_fields_syncs_when_project_changes(es_with_signals):
+def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
     """
     When project fields change, the incomplete fields should update accordingly.
     """
     project = InvestmentProjectFactory(stage_id=InvestmentProjectStage.won.value.id)
     adviser = AdviserFactory()
 
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
     result = search_investment_project_by_id(project.pk)
 
     assert result.hits.total.value == 1
@@ -366,7 +374,7 @@ def test_incomplete_fields_syncs_when_project_changes(es_with_signals):
 
     project.save()
 
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
     result = search_investment_project_by_id(project.pk)
 
     assert result.hits[0]['incomplete_fields'] == [
@@ -390,7 +398,9 @@ def test_incomplete_fields_syncs_when_project_changes(es_with_signals):
         ('strategic_drivers', lambda: InvestmentStrategicDriver.objects.all()[:1]),
     ),
 )
-def test_incomplete_fields_syncs_when_m2m_changes(es_with_signals, field, get_field_values):
+def test_incomplete_fields_syncs_when_m2m_changes(
+    opensearch_with_signals, field, get_field_values,
+):
     """
     When an m2m field is updated, the incomplete fields should be updated accordingly.
     """
@@ -399,7 +409,7 @@ def test_incomplete_fields_syncs_when_m2m_changes(es_with_signals, field, get_fi
         client_considering_other_countries=True,
     )
 
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
     result = search_investment_project_by_id(project.pk)
 
     assert result.hits.total.value == 1
@@ -409,7 +419,7 @@ def test_incomplete_fields_syncs_when_m2m_changes(es_with_signals, field, get_fi
 
     getattr(project, field).add(*get_field_values())
 
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
     result = search_investment_project_by_id(project.pk)
 
     assert result.hits.total.value == 1
@@ -418,7 +428,7 @@ def test_incomplete_fields_syncs_when_m2m_changes(es_with_signals, field, get_fi
     assert field not in incomplete_fields
 
 
-def test_incomplete_fields_syncs_when_business_activities_changes(es_with_signals):
+def test_incomplete_fields_syncs_when_business_activities_changes(opensearch_with_signals):
     """
     When business activities are updated the incomplete fields should be updated accordingly.
 
@@ -428,7 +438,7 @@ def test_incomplete_fields_syncs_when_business_activities_changes(es_with_signal
     project = InvestmentProjectFactory(stage_id=InvestmentProjectStage.won.value.id)
     conditional_field = 'other_business_activity'
 
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
     result = search_investment_project_by_id(project.pk)
 
     assert result.hits.total.value == 1
@@ -437,7 +447,7 @@ def test_incomplete_fields_syncs_when_business_activities_changes(es_with_signal
     business_activities = InvestmentBusinessActivity.objects.all()
     project.business_activities.add(*business_activities)
 
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
     result = search_investment_project_by_id(project.pk)
 
     assert result.hits.total.value == 1

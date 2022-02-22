@@ -7,7 +7,7 @@ class EventSearchApp(SearchApp):
     """SearchApp for events."""
 
     name = 'event'
-    es_model = Event
+    search_model = Event
     view_permissions = ('event.view_event',)
     queryset = DBEvent.objects.select_related(
         'address_country',

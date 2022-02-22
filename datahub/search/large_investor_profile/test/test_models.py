@@ -2,20 +2,20 @@ import pytest
 
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 from datahub.search.large_investor_profile.models import (
-    LargeInvestorProfile as ESLargeInvestorProfile,
+    LargeInvestorProfile as SearchLargeInvestorProfile,
 )
 
 pytestmark = pytest.mark.django_db
 
 
-class TestLargeInvestorProfileOpenSearchModel:
+class TestLargeInvestorProfileSearchModel:
     """Test for the large investor profile OpenSearch model"""
 
-    def test_large_investor_profile_dbmodel_to_dict(self, es):
+    def test_large_investor_profile_dbmodel_to_dict(self, opensearch):
         """Tests conversion of db model to dict."""
         large_investor_profile = LargeCapitalInvestorProfileFactory()
 
-        result = ESLargeInvestorProfile.db_object_to_dict(large_investor_profile)
+        result = SearchLargeInvestorProfile.db_object_to_dict(large_investor_profile)
         keys = {
             '_document_type',
             'asset_classes_of_interest',
@@ -44,10 +44,10 @@ class TestLargeInvestorProfileOpenSearchModel:
         }
         assert set(result.keys()) == keys
 
-    def test_investment_project_dbmodels_to_es_documents(self, es):
+    def test_investment_project_dbmodels_to_documents(self, opensearch):
         """Tests conversion of db models to OpenSearch documents."""
         large_profiles = LargeCapitalInvestorProfileFactory.create_batch(2)
 
-        result = ESLargeInvestorProfile.db_objects_to_es_documents(large_profiles)
+        result = SearchLargeInvestorProfile.db_objects_to_documents(large_profiles)
 
         assert len(list(result)) == len(large_profiles)

@@ -3,7 +3,7 @@ from logging import getLogger
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from datahub.search.elasticsearch import get_client
+from datahub.search.opensearch import get_client
 
 logger = getLogger(__name__)
 
@@ -38,7 +38,9 @@ Are you sure you want to do this?
         interactive = options['interactive']
 
         client = get_client()
-        index_statistics = client.cat.indices(index=f'{settings.ES_INDEX_PREFIX}-*', format='json')
+        index_statistics = client.cat.indices(
+            index=f'{settings.OPENSEARCH_INDEX_PREFIX}-*', format='json',
+        )
         indices = sorted(item['index'] for item in index_statistics)
 
         if not indices:

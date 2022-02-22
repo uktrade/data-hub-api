@@ -1,16 +1,16 @@
 import pytest
 
 from datahub.event.test.factories import EventFactory
-from datahub.search.event.models import Event as ESEvent
+from datahub.search.event.models import Event as SearchEvent
 
 pytestmark = pytest.mark.django_db
 
 
-def test_event_dbmodel_to_dict(es):
+def test_event_dbmodel_to_dict(opensearch):
     """Tests conversion of db model to dict."""
     event = EventFactory()
 
-    result = ESEvent.db_object_to_dict(event)
+    result = SearchEvent.db_object_to_dict(event)
 
     keys = {
         '_document_type',
@@ -41,10 +41,10 @@ def test_event_dbmodel_to_dict(es):
     assert result.keys() == keys
 
 
-def test_event_dbmodels_to_es_documents(es):
+def test_event_dbmodels_to_documents(opensearch):
     """Tests conversion of db models to OpenSearch documents."""
     events = EventFactory.create_batch(2)
 
-    result = ESEvent.db_objects_to_es_documents(events)
+    result = SearchEvent.db_objects_to_documents(events)
 
     assert len(list(result)) == len(events)

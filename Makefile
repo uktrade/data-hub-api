@@ -38,8 +38,8 @@ run-shell:
 run-test-reuse-db:
 	docker-compose run api pytest --reuse-db -vv <Add Test File Path>
 
-reindex-es:
-	docker-compose run api python manage.py sync_es
+reindex-opensearch:
+	docker-compose run api python manage.py sync_search
 
 fix-us-areas:
 	docker-compose run api python manage.py fix_us_company_address

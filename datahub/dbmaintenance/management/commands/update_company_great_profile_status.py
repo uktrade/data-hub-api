@@ -19,7 +19,7 @@ class Command(CSVBaseCommand):
         """
         Disables search signal receivers for companies.
         Avoid queuing huge number of Celery tasks for syncing companies to OpenSearch.
-        (Syncing can be manually performed afterwards using sync_es if required.)
+        (Syncing can be manually performed afterwards using sync_search if required.)
         """
         return super()._handle(*args, **options)
 
