@@ -33,6 +33,8 @@ class ActivityFeedView(APIView):
     @method_decorator(enforce_request_content_type('application/json'))
     def get(self, request):
         """Proxy for GET requests."""
+        
+
         content_type = request.content_type or ''
         # if the user doesn't have permissions on all activity models, return an empty list
         # TODO: instead of returning an empty list, we need to filter out the
@@ -49,7 +51,11 @@ class ActivityFeedView(APIView):
                 content_type=content_type,
             )
 
-        upstream_response = self._get_upstream_response(request)
+        print("###### request here")
+        print(request.body)
+        upstream_response = self._get_upstream_response(request)    
+        print("### upstream response")
+        print(upstream_response.content)
         return HttpResponse(
             upstream_response.text,
             status=upstream_response.status_code,
@@ -70,6 +76,7 @@ class ActivityFeedView(APIView):
             raise_for_status=False,
             default_timeout=settings.DEFAULT_SERVICE_TIMEOUT,
         )
+    
         return api_client.request(
             request.method,
             '',
