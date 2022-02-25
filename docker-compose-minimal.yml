@@ -4,7 +4,5 @@ services:
     image: postgres:12
     restart: always
     environment:
-      - POSTGRES_MULTIPLE_DATABASES=datahub,mi
-      - POSTGRES_PASSWORD=pw
-    volumes:
-      - ${PWD}/scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+      - POSTGRES_DB=datahub
+      - POSTGRES_PASSWORD=datahub
