@@ -134,6 +134,108 @@ class TestListEventView(APITestMixin):
 class TestCreateEventView(APITestMixin):
     """Create event view tests."""
 
+    def transform_aventri_event_to_event(_, aventri_event): 
+        from pprint import pprint
+        organiser = AdviserFactory()
+        team = random_obj_for_model(TeamModel)
+
+        return {
+            'name': aventri_event['name'],
+            # TODO how does eventtype on Aventri map to our one?
+            'event_type': EventType.seminar.value.id, 
+            'address_1': aventri_event['location']['address1'],
+            'address_town': aventri_event['location']['city'],
+            # TODO: mapping country string to id?
+            'address_country': Country.united_states.value.id, 
+            # TODO: what does Service map to?
+            'service': Service.inbound_referral.value.id,
+            'start_date': aventri_event['startdate'],
+            'end_date': aventri_event['enddate'],
+            # TODO: what is this?
+            'organiser': organiser.pk,
+            # TODO: what is this?
+            'lead_team': team.pk,
+            # TODO: what is this?
+            'teams': [team.pk],
+            # TODO: do we need to add these?
+            'has_related_trade_agreements': False,
+            'related_trade_agreements': [],
+        }
+
+    def test_create_aventri_event(self):
+        aventri_event = {
+            "eventid": "1",
+            "accountid": "1",
+            "name": "Environmental Studies Meeting",
+            "code": "1000",
+            "city": "Litchfield Park",
+            "startdate": "2013-06-28",
+            "enddate": "2013-06-30",
+            "timezoneid": "8",
+            "dateformat": "j F, Y",
+            "timeformat": "H:i",
+            "currency_dec_point": ".",
+            "currency_thousands_sep": ",",
+            "status": "Live",
+            "languages": {
+                "eng": "English",
+                "por": "Portuguese",
+                "rus": "Russian",
+                "spa": "Spanish"
+            },
+            "defaultlanguage": "eng",
+            "createdby": "2",
+            "deleted": "0",
+            "eMobile": "1",
+            "eReg": "1",
+            "eSocial": "1",
+            "calendar_country": "United States",
+            "country": "United States",
+            "modifiedby": "testuser",
+            "locationname": "Hilton Resort",
+            "state": "Arizona",
+            "eSelect": "2",
+            "ipreoid": "0",
+            "url": "https://www.eiseverywhere.com/[eventid]",
+            "max_reg": "5000",
+            "location": {
+                "name": "Hilton Resort",
+                "address1": "300 East Hilton Blvd.",
+                "city": "Litchfield Park",
+                "state": "Arizona",
+                "postcode": "85340",
+                "country": "United States",
+                "phone": "623.555.1212"
+            },
+            "starttime": "12:00:00",
+            "endtime": "14:00:00",
+            "closedate": "0000-00-00",
+            "closetime": "18:00:00",
+            "homepage": "http://www.etouches.com/[eventid]",
+            "contactinfo": {
+                "eng": "<div>Test Contact</div> <div><a href=&#34;mailto:testcontact@example.com&#34;>testcontact@example.com</a> </div>"
+            },
+            "standardcurrency": "USD",
+            "line_item_tax": "1",
+            "foldername": "Desktop",
+            "eventclosemessage": "Sorry, registration is closed",
+            "timezone": "[GMT-07:00] Mountain Time (US & Canada)",
+            "createddatetime": "2014-03-19 11:30:26",
+            "modifieddatetime": "2014-10-15 11:29:20",
+            "eventtype": "Conference"
+        }
+
+        transformed_event = self.transform_aventri_event_to_event(aventri_event)
+
+        url = reverse('api-v4:event:collection')
+
+        response = self.api_client.post(url, data=transformed_event)
+        response_data = response.json()
+        from pprint import pprint
+        pprint(response_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+
     def test_create_minimal_success(self):
         """Tests successfully creating an event with only the required fields."""
         organiser = AdviserFactory()
