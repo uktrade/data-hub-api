@@ -1,6 +1,7 @@
 from datetime import date
 from functools import partial
 from itertools import chain
+from multiprocessing import Event
 from operator import itemgetter
 
 import pytest
@@ -57,6 +58,86 @@ from datahub.metadata.test.factories import TeamFactory
 class TestAddInteraction(APITestMixin):
     """Tests for the add interaction view."""
 
+    def convert_aventri_attendee(_, adviser):
+        aventri_attendee =  {
+            "dit:application": "aventri",
+            "id": "dit:aventri:Event:1111:Attendee:1111:Create",
+            "published": "2022-02-24T11:28:57",
+            "type": "dit:aventri:Attendee",
+            "object": {
+                "id": "dit:aventri:Attendee:1234",
+                "attributedTo": {
+                    "id": "dit:aventri:Event:1111",
+                    "type": "dit:aventri:Event"
+                },
+                "type": [
+                    "dit:aventri:Attendee"
+                ],
+                "published": '2022-02-24T11:28:57',
+                "dit:aventri:companyname": None,
+                "dit:aventri:firstname": "Firstname1",
+                "dit:aventri:lastname": "Lastname1",
+                "dit:aventri:email": "firstname1.lastname1@example.host",
+                "dit:aventri:language": "eng",
+                "dit:aventri:category": None,
+                "dit:aventri:approvalstatus": "",
+                "dit:aventri:registrationstatus": "Confirmed",
+                "dit:aventri:lastmodified": "2022-01-24T11:12:13",
+                "dit:aventri:createdby": "attendee",
+                "dit:aventri:modifiedby": "attendee",
+            }
+        }
+
+        event = EventFactory()
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        communication_channel = random_obj_for_model(CommunicationChannel)
+   
+        return {
+            'kind': Interaction.Kind.SERVICE_DELIVERY,
+            ## TODO: this is made from event
+            'subject': "Attended {event.name}",
+            ## TODO: start date from the event
+            'date': event.start_date,
+            ## TODO: should be event id
+            'event': event.pk,
+            'is_event': True,
+            ## TODO: should be name of person adding attendee?
+            'dit_participants': [
+                {'adviser': adviser.pk},
+            ],
+            ## TODO: lookup/match company on dh from aventri info
+            'company': company.pk,
+            ## TODO: lookup/match contact on dh from aventri info
+            'contacts': [contact.pk],
+            ## TODO: service is on the Event
+            'service': event.service_id,
+            'was_policy_feedback_provided': False,
+            'has_related_trade_agreements': False,
+            'related_trade_agreements': [],
+        }
+    
+    @freeze_time('2017-04-18 13:25:30.986208')
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
+    def test_add_aventri_attendee(self, permissions):
+        """Test add a new interaction."""
+
+        adviser = create_test_user(
+            permission_codenames=permissions,
+            dit_team=TeamFactory(),
+        )
+        url = reverse('api-v4:interaction:collection')
+        request_data = self.convert_aventri_attendee(adviser)
+
+        api_client = self.create_api_client(user=adviser)
+        response = api_client.post(url, request_data)
+
+        response_data = response.json()
+        print('############')
+        print(response_data)
+        assert response.status_code == status.HTTP_201_CREATED
+
+
     @freeze_time('2017-04-18 13:25:30.986208')
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
     @pytest.mark.parametrize(
@@ -99,7 +180,7 @@ class TestAddInteraction(APITestMixin):
                 'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
             },
         ),
-    )
+    )          
     def test_add(self, extra_data, permissions):
         """Test add a new interaction."""
         adviser = create_test_user(
