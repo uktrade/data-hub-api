@@ -1,0 +1,3 @@
+- model: metadata.investmentbusinessactivity
+  pk: 3ad715e8-dd41-4250-a736-51ea3e8a125f
+  fields: {disabled_on: null, name: 'Clean growth'}
