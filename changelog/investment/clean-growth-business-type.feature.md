@@ -1,1 +1,0 @@
-A new investment business activity metadata type was added called 'Clean growth'.
