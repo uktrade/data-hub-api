@@ -1,3 +1,9 @@
+# Data Hub API 39.16.0 (2022-03-02)
+## Features
+
+- **Investment** A new investment business activity metadata type was added called 'Clean growth'.
+
+
 # Data Hub API 39.15.0 (2022-02-22)
 ## Features
 
