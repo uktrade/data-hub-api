@@ -223,13 +223,11 @@ def _build_entity_permission_query(permission_filters):
 
 def _build_term_query(term, fields=None, fuzzy=False):
     """
-    Builds a term query depending on the active feature flags.
+    Builds a term query depending on the value of the fuzzy arg.
 
-    If the `fuzzy_search` flag is active then we use fuzzy matching,
+    If the fuzzy argument is true, then we use fuzzy matching,
     otherwise uses the old matching method.
 
-    TODO: once the new search has been trialled and accepted, remove
-    the feature flag and use fuzzy matching.
     """
     if fuzzy:
         return _build_fuzzy_term_query(term, fields)

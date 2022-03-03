@@ -12,9 +12,7 @@ from rest_framework.schemas.openapi import AutoSchema
 from rest_framework.views import APIView
 
 from datahub.core.csv import create_csv_response
-from datahub.feature_flag.utils import is_user_feature_flag_active
 from datahub.search.apps import get_global_search_apps_as_mapping
-from datahub.search.constants import FUZZY_SEARCH_USER_FEATURE_FLAG
 from datahub.search.execute_query import execute_search_query
 from datahub.search.permissions import (
     has_permissions_for_app,
@@ -127,10 +125,6 @@ class SearchBasicAPIView(APIView):
             *(self.fields_to_exclude or ()),
         )
 
-        fuzzy_search_enabled = is_user_feature_flag_active(
-            user=request.user,
-            code=FUZZY_SEARCH_USER_FEATURE_FLAG,
-        )
         query = get_basic_search_query(
             entity=validated_params['entity'],
             term=validated_params['term'],
@@ -138,7 +132,7 @@ class SearchBasicAPIView(APIView):
             offset=validated_params['offset'],
             limit=validated_params['limit'],
             fields_to_exclude=fields_to_exclude,
-            fuzzy=fuzzy_search_enabled,
+            fuzzy=True,
         )
 
         results = execute_search_query(query)
