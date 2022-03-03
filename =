@@ -1,0 +1,3 @@
+Collecting psycopg2-binary
+  Downloading https://files.pythonhosted.org/packages/f7/96/4a14ba6336e21616483ef77c6d1dab5176016eb7242d9123b2151668f317/psycopg2_binary-2.9.3-cp38-cp38-macosx_10_14_x86_64.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl (2.2MB)
+Collecting 2.8.6
