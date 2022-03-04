@@ -364,7 +364,7 @@ class TestBasicSearch(APITestMixin):
         """
         SimpleModel.objects.create(name='Smaxtec Limited', address='')
         SimpleModel.objects.create(name='Newsmax Media (HQ Florida)', address='')
-        SimpleModel.objects.create(name='Smart Notebooks', address='Maxet House')
+        SimpleModel.objects.create(name='Smooth Notebooks', address='Smaxet House')
         SimpleModel.objects.create(name='Other Notebooks', address='Maxet House')
 
         opensearch_with_collector.flush_and_refresh()
@@ -390,7 +390,7 @@ class TestBasicSearch(APITestMixin):
         assert [
             'Smaxtec Limited',
             'Newsmax Media (HQ Florida)',
-            'Smart Notebooks',
+            'Smooth Notebooks',
         ] == [result['name'] for result in response.data['results']]
 
     def test_partial_match(self, opensearch_with_collector, search_support_user):
