@@ -14,11 +14,9 @@ from datahub.core.constants import AdministrativeArea
 from datahub.core.test_utils import create_test_user, HawkAPITestClient
 from datahub.dnb_api.utils import format_dnb_company
 from datahub.documents.utils import get_s3_client_for_bucket
-from datahub.feature_flag.models import UserFeatureFlag
 from datahub.metadata.test.factories import SectorFactory
 from datahub.search.apps import get_search_app_by_model, get_search_apps
 from datahub.search.bulk_sync import sync_objects
-from datahub.search.constants import FUZZY_SEARCH_USER_FEATURE_FLAG
 from datahub.search.opensearch import (
     alias_exists,
     create_index,
@@ -475,25 +473,9 @@ def formatted_dnb_company_area(dnb_response_uk):
 
 
 @pytest.fixture
-def fuzzy_search_user_feature():
-    """Enable the fuzzy search user feature flag"""
-    return UserFeatureFlag.objects.update_or_create(
-        code=FUZZY_SEARCH_USER_FEATURE_FLAG,
-        defaults={'is_active': True},
-    )[0]
-
-
-@pytest.fixture
 def search_support_user():
     """A user with permissions for search_support views."""
     return create_test_user(permission_codenames=['view_simplemodel', 'view_relatedmodel'])
-
-
-@pytest.fixture
-def fuzzy_search_user(search_support_user, fuzzy_search_user_feature):
-    """A search support user with Fuzzy search permissions."""
-    search_support_user.features.add(fuzzy_search_user_feature)
-    return search_support_user
 
 
 def pytest_addoption(parser):
