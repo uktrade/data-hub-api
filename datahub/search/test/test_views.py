@@ -227,7 +227,7 @@ class TestBasicSearch(APITestMixin):
     def test_fuzzy_quality_single_field(
         self,
         opensearch_with_collector,
-        fuzzy_search_user,
+        search_support_user,
         name,
         search_term,
         should_match,
@@ -241,7 +241,7 @@ class TestBasicSearch(APITestMixin):
         opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
-        api_client = self.create_api_client(user=fuzzy_search_user)
+        api_client = self.create_api_client(user=search_support_user)
 
         response = api_client.get(
             url,
@@ -272,7 +272,7 @@ class TestBasicSearch(APITestMixin):
     def test_fuzzy_quality_multi_field(
         self,
         opensearch_with_collector,
-        fuzzy_search_user,
+        search_support_user,
         name,
         address,
         search_term,
@@ -287,7 +287,7 @@ class TestBasicSearch(APITestMixin):
         opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
-        api_client = self.create_api_client(user=fuzzy_search_user)
+        api_client = self.create_api_client(user=search_support_user)
 
         response = api_client.get(
             url,
@@ -309,7 +309,7 @@ class TestBasicSearch(APITestMixin):
     def test_fuzzy_quality_cross_fields(
         self,
         opensearch_with_collector,
-        fuzzy_search_user,
+        search_support_user,
     ):
         """
         Tests quality of results for fuzzy matching across multiple fields.
@@ -333,7 +333,7 @@ class TestBasicSearch(APITestMixin):
         term = 'The Advisory Canada'
 
         url = reverse('api-v3:search:basic')
-        api_client = self.create_api_client(user=fuzzy_search_user)
+        api_client = self.create_api_client(user=search_support_user)
 
         response = api_client.get(
             url,
@@ -357,14 +357,14 @@ class TestBasicSearch(APITestMixin):
     def test_fuzzy_quality_cross_fields_address_below_name(
         self,
         opensearch_with_collector,
-        fuzzy_search_user,
+        search_support_user,
     ):
         """
         Tests that name is more important than other fields in cross field matches.
         """
         SimpleModel.objects.create(name='Smaxtec Limited', address='')
         SimpleModel.objects.create(name='Newsmax Media (HQ Florida)', address='')
-        SimpleModel.objects.create(name='Smart Notebooks', address='Maxet House')
+        SimpleModel.objects.create(name='Smooth Notebooks', address='Smaxet House')
         SimpleModel.objects.create(name='Other Notebooks', address='Maxet House')
 
         opensearch_with_collector.flush_and_refresh()
@@ -372,7 +372,7 @@ class TestBasicSearch(APITestMixin):
         term = 'Smax'
 
         url = reverse('api-v3:search:basic')
-        api_client = self.create_api_client(user=fuzzy_search_user)
+        api_client = self.create_api_client(user=search_support_user)
 
         response = api_client.get(
             url,
@@ -390,7 +390,7 @@ class TestBasicSearch(APITestMixin):
         assert [
             'Smaxtec Limited',
             'Newsmax Media (HQ Florida)',
-            'Smart Notebooks',
+            'Smooth Notebooks',
         ] == [result['name'] for result in response.data['results']]
 
     def test_partial_match(self, opensearch_with_collector, search_support_user):
