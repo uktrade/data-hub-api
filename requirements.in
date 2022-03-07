@@ -88,4 +88,4 @@ mohawk==1.1.0
 requests==2.27.1
 requests_toolbelt==0.9.1
 sentry_sdk==1.5.7
-simple_salesforce==1.11.5
+simple_salesforce==1.11.6
