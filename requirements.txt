@@ -30,8 +30,6 @@ backcall==0.2.0
     # via ipython
 billiard==3.6.4.0
     # via celery
-black==22.1.0
-    # via ipython
 boto3==1.21.8
     # via -r requirements.in
 botocore==1.24.8
@@ -190,7 +188,7 @@ incremental==21.3.0
     # via towncrier
 iniconfig==1.1.1
     # via pytest
-ipython==8.1.0
+ipython==8.1.1
     # via -r requirements.in
 isodate==0.6.1
     # via zeep
