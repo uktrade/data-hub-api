@@ -1,3 +1,13 @@
+# Data Hub API 39.17.0 (2022-03-11)
+
+
+## Removals
+
+- Fuzzy search will now be available to all users, as the user feature flag has been removed.
+
+  A switch remains in the code to move back to the old strict way of searching should we need to.
+
+
 # Data Hub API 39.16.0 (2022-03-02)
 ## Features
 
