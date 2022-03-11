@@ -75,7 +75,7 @@ def prepare_release(release_type):
         raise CommandError('There are no news fragments.')
 
     subprocess.run(['git', 'checkout', '-b', branch, f'{remote}/develop'], check=True)
-    subprocess.run(['towncrier', '--version', str(new_version), '--yes'], check=True)
+    subprocess.run(['towncrier', 'build', '--version', str(new_version), '--yes'], check=True)
 
     remaining_news_fragment_paths = list_news_fragments()
     if remaining_news_fragment_paths:
