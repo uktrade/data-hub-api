@@ -2,7 +2,7 @@
     package_dir = "datahub"
     filename = "CHANGELOG.md"
     directory = "changelog/"
-    title_format = "# Data Hub API {version} ({project_date})"
+    title_format = false
     underlines = [""]
     template = "changelog/_template.md.jinja2"
 
