@@ -65,11 +65,28 @@ class Contact(ArchivableModel, BaseModel):
         on_delete=models.SET_NULL,
     )
     primary = models.BooleanField()
+
+    # DEPRECATED
+    # telephone_countrycode and telephone_number are deprecated in favour of
+    # full_telephone_number - these should be deleted once the data has been
+    # succesfully migrated and the api consumers updated
     telephone_countrycode = models.CharField(
         max_length=MAX_LENGTH,
         validators=[TelephoneCountryCodeValidator()],
+        blank=True,
     )
-    telephone_number = models.CharField(validators=[TelephoneValidator()], max_length=MAX_LENGTH)
+    telephone_number = models.CharField(
+        validators=[TelephoneValidator()],
+        max_length=MAX_LENGTH,
+        blank=True,
+    )
+    # ---------
+
+    full_telephone_number = models.CharField(
+        validators=[InternationalTelephoneValidator()],
+        max_length=MAX_LENGTH,
+        blank=True,
+    )
     email = models.EmailField()
     address_same_as_company = models.BooleanField(default=False)
     address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -130,7 +147,12 @@ class Contact(ArchivableModel, BaseModel):
         """Full name with title."""
         return join_truthy_strings(getattr(self.title, 'name', None), self.name)
 
-    @property
-    def full_telephone_number(self):
+    def get_full_telephone_number(self):
         """Full telephone number with country code."""
         return join_truthy_strings(self.telephone_countrycode, self.telephone_number)
+
+    def save(self, *args, **kwargs):
+        """Save contact and keep phone number in sync"""
+        if not self.full_telephone_number:
+            self.full_telephone_number = self.get_full_telephone_number()
+        super().save(*args, **kwargs)
