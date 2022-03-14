@@ -42,7 +42,7 @@ opensearch-py==1.0.0
 opensearch-dsl==1.0.0
 
 # ES APM
-elastic-apm==6.7.2
+elastic-apm==6.8.1
 
 # Celery
 git+https://github.com/uktrade/celery@v5.0.5p2#egg=celery[redis]
