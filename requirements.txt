@@ -30,8 +30,6 @@ backcall==0.2.0
     # via ipython
 billiard==3.6.4.0
     # via celery
-black==22.1.0
-    # via ipython
 boto3==1.21.8
     # via -r requirements.in
 botocore==1.24.8
@@ -380,7 +378,7 @@ s3transfer==0.5.1
     # via boto3
 semantic-version==2.9.0
     # via -r requirements.in
-sentry-sdk==1.5.6
+sentry-sdk==1.5.7
     # via -r requirements.in
 simple-salesforce==1.11.5
     # via -r requirements.in
