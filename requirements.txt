@@ -30,8 +30,6 @@ backcall==0.2.0
     # via ipython
 billiard==3.6.4.0
     # via celery
-black==22.1.0
-    # via ipython
 boto3==1.21.8
     # via -r requirements.in
 botocore==1.24.8
@@ -315,7 +313,7 @@ pylint-pytest==1.1.2
     # via -r requirements.in
 pyparsing==3.0.7
     # via packaging
-pytest==7.0.1
+pytest==7.1.0
     # via
     #   -r requirements.in
     #   pylint-pytest
