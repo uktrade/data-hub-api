@@ -124,7 +124,7 @@ djangorestframework==3.13.1
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
-elastic-apm==6.7.2
+elastic-apm==6.8.1
     # via -r requirements.in
 execnet==1.9.0
     # via pytest-xdist
@@ -166,7 +166,7 @@ flake8-quotes==3.3.1
     # via -r requirements.in
 flake8-string-format==0.3.0
     # via -r requirements.in
-freezegun==1.1.0
+freezegun==1.2.0
     # via -r requirements.in
 frozenlist==1.3.0
     # via
@@ -188,7 +188,7 @@ incremental==21.3.0
     # via towncrier
 iniconfig==1.1.1
     # via pytest
-ipython==8.1.0
+ipython==8.1.1
     # via -r requirements.in
 isodate==0.6.1
     # via zeep
@@ -313,7 +313,7 @@ pylint-pytest==1.1.2
     # via -r requirements.in
 pyparsing==3.0.7
     # via packaging
-pytest==7.0.1
+pytest==7.1.0
     # via
     #   -r requirements.in
     #   pylint-pytest
@@ -380,7 +380,7 @@ semantic-version==2.9.0
     # via -r requirements.in
 sentry-sdk==1.5.7
     # via -r requirements.in
-simple-salesforce==1.11.5
+simple-salesforce==1.11.6
     # via -r requirements.in
 simplejson==3.17.6
     # via mail-parser

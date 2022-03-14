@@ -42,20 +42,20 @@ opensearch-py==1.0.0
 opensearch-dsl==1.0.0
 
 # ES APM
-elastic-apm==6.7.2
+elastic-apm==6.8.1
 
 # Celery
 git+https://github.com/uktrade/celery@v5.0.5p2#egg=celery[redis]
 # celery[redis]==5.0.5
 
 # Testing and dev
-pytest==7.0.1
+pytest==7.1.0
 pytest-django==4.5.2
 pytest-cov==3.0.0
 pytest-xdist==2.5.0
-ipython==8.1.0
+ipython==8.1.1
 factory-boy==3.2.1
-freezegun==1.1.0
+freezegun==1.2.0
 requests-mock==1.9.3
 django-debug-toolbar==3.2.4
 werkzeug==2.0.3  # Required by runserver_plus - useful for local dev
@@ -88,4 +88,4 @@ mohawk==1.1.0
 requests==2.27.1
 requests_toolbelt==0.9.1
 sentry_sdk==1.5.7
-simple_salesforce==1.11.5
+simple_salesforce==1.11.6
