@@ -1,12 +1,11 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.db.models import Case, CharField, Max, Value, When
-from django.db.models.functions import Cast, NullIf
+from django.db.models import Case, CharField, Max, When
+from django.db.models.functions import Cast
 
 from datahub.company import consent
 from datahub.company.models import Contact as DBContact
 from datahub.core.query_utils import (
-    ConcatWS,
     get_aggregate_subquery,
     get_front_end_url_expression,
     get_full_name_expression,
@@ -110,11 +109,6 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
         computed_postcode=Case(
             When(address_same_as_company=True, then='company__address_postcode'),
             default='address_postcode',
-        ),
-        full_telephone_number=ConcatWS(
-            Value(' '),
-            NullIf('telephone_countrycode', Value('')),
-            NullIf('telephone_number', Value('')),
         ),
         date_of_latest_interaction=get_aggregate_subquery(
             DBContact,
