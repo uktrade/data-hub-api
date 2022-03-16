@@ -1,3 +1,11 @@
+# Data Hub API 39.19.0 (2022-03-16)
+
+
+## Bug fixes
+
+- **Contacts** The data migration to populate full telephone numbers has been updated to stop the process running out of memory.
+
+
 # Data Hub API 39.18.0 (2022-03-15)
 
 
