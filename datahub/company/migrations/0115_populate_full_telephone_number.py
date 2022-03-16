@@ -8,7 +8,7 @@ from datahub.core.utils import join_truthy_strings
 def combine_phone_number(apps, schema_editor):
     """Combine phone number fields into a single field"""
     Contact = apps.get_model('company', 'Contact')
-    for contact in Contact.objects.all():
+    for contact in Contact.objects.all().iterator(chunk_size=2000):
         contact.full_telephone_number = join_truthy_strings(
             contact.telephone_countrycode, contact.telephone_number
         )
