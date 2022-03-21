@@ -171,7 +171,7 @@ Dependencies:
     brew install libpq
     ```
 
-4.  Install _postgres_, if not done already, as this is required by **psycopg2** in the requirements below
+4. Install _postgres_, if not done already, as this is required by **psycopg2** in the requirements below
 
     On Ubuntu:
 
@@ -207,7 +207,7 @@ Dependencies:
 
 8.  Set `DOCKER_DEV=False` in `.env`
 
-9.  Make sure you have OpenSearch running locally. If you don't, you can run one in Docker:
+9. Make sure you have OpenSearch running locally. If you don't, you can run one in Docker:
 
     ```shell
     docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" opensearchproject/opensearch:1.2.4
