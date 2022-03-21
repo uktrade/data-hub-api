@@ -174,6 +174,7 @@ class ContactFactory(factory.django.DjangoModelFactory):
     primary = True
     telephone_countrycode = '+44'
     telephone_number = '123456789'
+    full_telephone_number = '+44 123456789'
     address_same_as_company = True
     created_on = now()
     archived_documents_url_path = factory.Faker('uri_path')
