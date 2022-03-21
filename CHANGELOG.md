@@ -1,3 +1,11 @@
+# Data Hub API 39.20.0 (2022-03-21)
+
+
+## Bug fixes
+
+- **Contacts** The full telephone number data migration has been sped up by using an sql update instead of iterating in python.
+
+
 # Data Hub API 39.19.0 (2022-03-16)
 
 
