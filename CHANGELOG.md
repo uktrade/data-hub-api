@@ -1,3 +1,11 @@
+# Data Hub API 39.20.1 (2022-03-23)
+
+
+## Internal changes
+
+- Several dependencies have been updated to get latest changes.
+
+
 # Data Hub API 39.20.0 (2022-03-21)
 
 
