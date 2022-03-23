@@ -164,9 +164,10 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         fields = (
             'id',
             'title',
-            'first_name',
-            'last_name',
-            'name',
+            'first_name',   # deprecated
+            'last_name',    # deprecated
+            'full_name',
+            'name',         # deprecated
             'job_title',
             'company',
             'adviser',

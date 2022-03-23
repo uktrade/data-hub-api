@@ -53,8 +53,14 @@ class Contact(ArchivableModel, BaseModel):
     title = models.ForeignKey(
         metadata_models.Title, blank=True, null=True, on_delete=models.SET_NULL,
     )
-    first_name = models.CharField(max_length=MAX_LENGTH)
-    last_name = models.CharField(max_length=MAX_LENGTH)
+    # DEPRECATED
+    # first_name and last_name are deprecated in favour of
+    # full_name - these should be deleted once the data has been
+    # succesfully migrated and the api consumers updated
+    first_name = models.CharField(max_length=MAX_LENGTH, blank=True,)
+    last_name = models.CharField(max_length=MAX_LENGTH, blank=True,)
+    # ---------
+    full_name = models.CharField(max_length=MAX_LENGTH, blank=True,)
     job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     company = models.ForeignKey(
         'Company', related_name='contacts', null=True, blank=True,
@@ -137,10 +143,12 @@ class Contact(ArchivableModel, BaseModel):
         company_desc = f'({self.company})' if self.company and self.company.name else ''
         return join_truthy_strings(self.name or '(no name)', company_desc)
 
+    # Deprecated.
     @property
     def name(self):
         """Full name."""
         return join_truthy_strings(self.first_name, self.last_name)
+    # ------------
 
     @property
     def name_with_title(self):
