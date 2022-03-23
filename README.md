@@ -45,10 +45,10 @@ This project uses Docker compose to setup and run all the necessary components. 
     make start-dev
     ```
 
-    - It will take time for the API container to come up - it will run
+    * It will take time for the API container to come up - it will run
       migrations on both DBs, load initial data, sync opensearch etc. Watch
       along in the api container's logs.
-    - **NOTE:**
+    * **NOTE:**
       If you are using a linux system, the opensearch container may not
       come up successfully (`data-hub-api_es_1`) - it might be perpetually
       restarting.
@@ -107,16 +107,16 @@ There is now a `make` command to bring up the three environments on a single doc
    make start-frontend-api-dnb
    ```
 
-   - It will take time for the API container to come up - it will run
-     migrations on both DBs, load initial data, sync opensearch etc. Watch
-     along in the api container's logs.
-   - **NOTE:**
-     If you are using a linux system, the opensearch container may not
-     come up successfully (`data-hub-api_es_1`) - it might be perpetually
-     restarting.
-     If the logs for that container mention something like
-     `max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`,
-     you will need to run the following on your host machine:
+    * It will take time for the API container to come up - it will run
+      migrations on both DBs, load initial data, sync opensearch etc. Watch
+      along in the api container's logs.
+    * **NOTE:**
+      If you are using a linux system, the opensearch container may not
+      come up successfully (`data-hub-api_es_1`) - it might be perpetually
+      restarting.
+      If the logs for that container mention something like
+      `max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`,
+      you will need to run the following on your host machine:
 
      ```shell
      sudo sysctl -w vm.max_map_count=262144
@@ -252,7 +252,7 @@ Dependencies:
 15. Start celery:
 
     ```shell
-    celery -A config worker -l info -Q celery,long-running -B
+    celery worker -A config -l info -Q celery,long-running -B
     ```
 
     Note that in production the long-running queue is run in a separate worker with the
@@ -361,127 +361,127 @@ These scopes define which views each client can access.
 
 Data Hub API can run on any Heroku-style platform. Configuration is performed via the following environment variables:
 
-| Variable name                                             | Required                                    | Description                                                                                                                                                                         |
-| --------------------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ACTIVITY_STREAM_ACCESS_KEY_ID`                           | No                                          | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_SECRET_ACCESS_KEY`. The holder of the secret key can access the activity stream endpoint by Hawk authentication.      |
-| `ACTIVITY_STREAM_SECRET_ACCESS_KEY`                       | If `ACTIVITY_STREAM_ACCESS_KEY_ID` is set   | A secret key, corresponding to `ACTIVITY_STREAM_ACCESS_KEY_ID`. The holder of this key can access the activity stream endpoint by Hawk authentication.                              |
-| `ACTIVITY_STREAM_OUTGOING_URL`                            | No                                          | The URL used to read from activity stream                                                                                                                                           |
-| `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID`                  | No                                          | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY`. This is used when reading from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`.    |
-| `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY`              | No                                          | A secret key, corresponding to `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID`. This is used when reading from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`.                      |
-| `ADMIN_OAUTH2_ENABLED`                                    | Yes                                         | Enables Django Admin SSO login when is True.                                                                                                                                        |
-| `ADMIN_OAUTH2_BASE_URL`                                   | If `ADMIN_OAUTH2_ENABLED` is set            | A base URL of OAuth provider.                                                                                                                                                       |
-| `ADMIN_OAUTH2_TOKEN_FETCH_PATH`                           | If `ADMIN_OAUTH2_ENABLED` is set            | OAuth fetch token path for Django Admin SSO login.                                                                                                                                  |
-| `ADMIN_OAUTH2_USER_PROFILE_PATH`                          | If `ADMIN_OAUTH2_ENABLED` is set            | OAuth user profile path for Django Admin SSO login.                                                                                                                                 |
-| `ADMIN_OAUTH2_AUTH_PATH`                                  | If `ADMIN_OAUTH2_ENABLED` is set            | OAuth auth path for Django Admin SSO login.                                                                                                                                         |
-| `ADMIN_OAUTH2_CLIENT_ID`                                  | If `ADMIN_OAUTH2_ENABLED` is set            | OAuth client ID for Django Admin SSO login.                                                                                                                                         |
-| `ADMIN_OAUTH2_CLIENT_SECRET`                              | If `ADMIN_OAUTH2_ENABLED` is set            | OAuth client secret for Django Admin SSO login.                                                                                                                                     |
-| `AV_V2_SERVICE_URL`                                       | Yes                                         | URL for ClamAV V2 service. If not configured, virus scanning will fail.                                                                                                             |
-| `AWS_ACCESS_KEY_ID`                                       | No                                          | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials).                                                 |
-| `AWS_DEFAULT_REGION`                                      | No                                          | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration)                                                  |
-| `AWS_SECRET_ACCESS_KEY`                                   | No                                          | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials).                                                 |
-| `CELERY_TASK_ALWAYS_EAGER`                                | No                                          | Can be set to True when running the app locally to run Celery tasks started from the web process synchronously. Not for use in production.                                          |
-| `CELERY_TASK_SEND_SENT_EVENT`                             | No                                          | Whether Celery workers send the `task-sent` event (default=True).                                                                                                                   |
-| `CELERY_WORKER_TASK_EVENTS`                               | No                                          | Whether Celery workers send task events (by default) for use by monitoring tools such as Flower (default=True).                                                                     |
-| `COMPANY_MATCHING_SERVICE_BASE_URL`                       | No                                          | The base url of the company matching service (default=None).                                                                                                                        |
-| `COMPANY_MATCHING_HAWK_ID`                                | No                                          | The hawk id to use when making a request to the company matching service (default=None).                                                                                            |
-| `COMPANY_MATCHING_HAWK_KEY`                               | No                                          | The hawk key to use when making a request to the company matching service (default=None).                                                                                           |
-| `CONSENT_SERVICE_BASE_URL`                                | No                                          | The base url of the consent service, to post email consent preferences to (default=None).                                                                                           |
-| `CONSENT_SERVICE_HAWK_ID`                                 | No                                          | The hawk id to use when making a request to the consent service (default=None).                                                                                                     |
-| `CONSENT_SERVICE_HAWK_KEY`                                | No                                          | The hawk key to use when making a request to the consent service (default=None).                                                                                                    |
-| `CSRF_COOKIE_HTTPONLY`                                    | No                                          | Whether to use HttpOnly flag on the CSRF cookie (default=False).                                                                                                                    |
-| `CSRF_COOKIE_SECURE`                                      | No                                          | Whether to use a secure cookie for the CSRF cookie (default=False).                                                                                                                 |
-| `DATA_FLOW_API_ACCESS_KEY_ID`                             | No                                          | A non-secret access key ID, corresponding to `DATA_FLOW_API_SECRET_ACCESS_KEY`. The holder of the secret key can access the omis-dataset endpoint by Hawk authentication.           |
-| `DATA_FLOW_API_SECRET_ACCESS_KEY`                         | If `DATA_FLOW_API_ACCESS_KEY_ID` is set     | A secret key, corresponding to `DATA_FLOW_API_ACCESS_KEY_ID`. The holder of this key can access the omis-dataset endpoint by Hawk authentication.                                   |
-| `DATABASE_CONN_MAX_AGE`                                   | No                                          | [Maximum database connection age (in seconds).](https://docs.djangoproject.com/en/2.0/ref/databases/)                                                                               |
-| `DATABASE_URL`                                            | Yes                                         | PostgreSQL server URL (with embedded credentials).                                                                                                                                  |
-| `DATAHUB_FRONTEND_BASE_URL`                               | Yes                                         |                                                                                                                                                                                     |
-| `DATAHUB_NOTIFICATION_API_KEY`                            | No                                          | The GOVUK notify API key to use for the `datahub.notification` django app.                                                                                                          |
-| `DATAHUB_SUPPORT_EMAIL_ADDRESS`                           | No                                          | Email address for DataHub support team.                                                                                                                                             |
-| `DATA_HUB_FRONTEND_ACCESS_KEY_ID`                         | No                                          | A non-secret access key ID, corresponding to `DATA_HUB_FRONTEND_SECRET_ACCESS_KEY`. The holder of the secret key can access the metadata endpoints by Hawk authentication.          |
-| `DATA_HUB_FRONTEND_SECRET_ACCESS_KEY`                     | If `DATA_HUB_FRONTEND_ACCESS_KEY_ID` is set | A secret key, corresponding to `METADATA_ACCESS_KEY_ID`. The holder of this key can access the metadata endpoints by Hawk authentication.                                           |
-| `DEBUG`                                                   | Yes                                         | Whether Django's debug mode should be enabled.                                                                                                                                      |
-| `DIT_EMAIL_DOMAIN_*`                                      | No                                          | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
-| `DIT_EMAIL_INGEST_BLACKLIST`                              | No                                          | A list of emails for which email ingestion is prohibited.                                                                                                                           |
-| `DJANGO_SECRET_KEY`                                       | Yes                                         |                                                                                                                                                                                     |
-| `DJANGO_SENTRY_DSN`                                       | Yes                                         |                                                                                                                                                                                     |
-| `DJANGO_SETTINGS_MODULE`                                  | Yes                                         |                                                                                                                                                                                     |
-| `DNB_AUTOMATIC_UPDATE_LIMIT`                              | No                                          | Integer of the maximum number of updates the DNB automatic update task should ingest before exiting. This is unlimited if this setting is not set.                                  |
-| `DNB_SERVICE_BASE_URL`                                    | No                                          | The base URL of the DNB service.                                                                                                                                                    |
-| `DNB_SERVICE_TOKEN`                                       | No                                          | The shared access token for calling the DNB service.                                                                                                                                |
-| `DEFAULT_BUCKET`                                          | Yes                                         | S3 bucket for object storage.                                                                                                                                                       |
-| `DISABLE_PAAS_IP_CHECK`                                   | No                                          | Disable PaaS IP check for Hawk endpoints (default=False).                                                                                                                           |
-| `ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW`                      | No                                          | Whether to enable the add access token page for superusers in the admin site (default=True).                                                                                        |
-| `ENABLE_DAILY_OPENSEARCH_SYNC`                            | No                                          | Whether to enable the daily OpenSearch sync (default=False).                                                                                                                        |
-| `ENABLE_EMAIL_INGESTION`                                  | No                                          | True or False. Whether or not to activate the celery beat task for ingesting emails                                                                                                 |
-| `ENABLE_INVESTMENT_NOTIFICATION`                          | No                                          | True or False. Whether or not to activate the celery beat task for sending investment notifications                                                                                 |
-| `ENABLE_MAILBOX_PROCESSING`                               | No                                          | True or False. Whether or not to activate the celery beat task for mailbox processing                                                                                               |
-| `ENABLE_SLACK_MESSAGING`                                  | No                                          | If present and truthy, enable the transmission of messages to Slack. Necessitates the specification of the other env vars `SLACK_API_TOKEN` and `SLACK_MESSAGE_CHANNEL`             |
-| `ENABLE_SPI_REPORT_GENERATION`                            | No                                          | Whether to enable daily SPI report (default=False).                                                                                                                                 |
-| `ES_APM_ENABLED`                                          | Yes                                         | Enables Elasticsearch APM agent when is True.                                                                                                                                       |
-| `ES_APM_SERVICE_NAME`                                     | Yes, if ES_APM_ENABLED                      | A name of the running service. Must match following regexp: ^[a-zA-Z0-9 _-]+$.                                                                                                      |
-| `ES_APM_SECRET_TOKEN`                                     | Yes, if ES_APM_ENABLED                      | A secret token used to authorise requests to the APM server.                                                                                                                        |
-| `ES_APM_SERVER_TIMEOUT`                                   | No                                          | A timeout for requests to the Elasticsearch APM server in duration format (default=20s).                                                                                            |
-| `ES_APM_SERVER_URL`                                       | Yes, if ES_APM_ENABLED                      | The URL of the Elasticsearch APM server.                                                                                                                                            |
-| `ES_APM_ENVIRONMENT`                                      | Yes, if ES_APM_ENABLED                      | A name of the environment the service is running, for example: `develop`.                                                                                                           |
-| `EXPORT_WINS_SERVICE_BASE_URL`                            | No                                          | The base url of the Export Wins API (default=None).                                                                                                                                 |
-| `EXPORT_WINS_HAWK_ID`                                     | No                                          | The hawk id to use when making a request to the Export Wins API (default=None).                                                                                                     |
-| `EXPORT_WINS_HAWK_KEY`                                    | No                                          | The hawk key to use when making a request to the Export Wins API (default=None).                                                                                                    |
-| `EXTRA_DJANGO_APPS`                                       | Yes                                         | Additional Django apps to load (comma-separated). Can be used to reverse the migrations of a removed third-party app (see comment in config/settings/common.py for more detail).    |
-| `GUNICORN_ACCESSLOG`                                      | No                                          | File to direct Gunicorn logs to (default=stdout).                                                                                                                                   |
-| `GUNICORN_ACCESS_LOG_FORMAT`                              | No                                          |                                                                                                                                                                                     |
-| `GUNICORN_ENABLE_ASYNC_PSYCOPG2`                          | No                                          | Whether to enable asynchronous psycopg2 when the worker class is 'gevent' (default=True).                                                                                           |
-| `GUNICORN_ENABLE_STATSD`                                  | No                                          | Whether to enable Gunicorn StatD instrumentation (default=False).                                                                                                                   |
-| `GUNICORN_PATCH_ASGIREF`                                  | No                                          | Whether to enable a workaround for https://github.com/django/asgiref/issues/144 when the worker class is 'gevent' (default=False).                                                  |
-| `GUNICORN_WORKER_CLASS`                                   | No                                          | [Type of Gunicorn worker.](http://docs.gunicorn.org/en/stable/settings.html#worker-class) Uses async workers via gevent by default.                                                 |
-| `GUNICORN_WORKER_CONNECTIONS`                             | No                                          | Maximum no. of connections for async workers (default=10).                                                                                                                          |
-| `INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE`                   | No                                          | Maximum file size in bytes for interaction admin CSV uploads (default=2MB).                                                                                                         |
-| `INVESTMENT_DOCUMENT_AWS_ACCESS_KEY_ID`                   | No                                          | Same use as AWS_ACCESS_KEY_ID, but for investment project documents.                                                                                                                |
-| `INVESTMENT_DOCUMENT_AWS_SECRET_ACCESS_KEY`               | No                                          | Same use as AWS_SECRET_ACCESS_KEY, but for investment project documents.                                                                                                            |
-| `INVESTMENT_DOCUMENT_AWS_REGION`                          | No                                          | Same use as AWS_DEFAULT_REGION, but for investment project documents.                                                                                                               |
-| `INVESTMENT_DOCUMENT_BUCKET`                              | No                                          | S3 bucket for investment project documents storage.                                                                                                                                 |
-| `INVESTMENT_NOTIFICATION_ADMIN_EMAIL`                     | Yes                                         |                                                                                                                                                                                     |
-| `INVESTMENT_NOTIFICATION_API_KEY`                         | Yes                                         |                                                                                                                                                                                     |
-| `INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID` | Yes                                         | An ID of Notify Template for Estimated Land Date notifications                                                                                                                      |
-| `MAILBOX_AWS_ACCESS_KEY_ID`                               | No                                          | Same use as AWS_ACCESS_KEY_ID, but for mailbox.                                                                                                                                     |
-| `MAILBOX_AWS_SECRET_ACCESS_KEY`                           | No                                          | Same use as AWS_SECRET_ACCESS_KEY, but for mailbox.                                                                                                                                 |
-| `MAILBOX_AWS_REGION`                                      | No                                          | Same use as AWS_DEFAULT_REGION, but for mailbox.                                                                                                                                    |
-| `MAILBOX_BUCKET`                                          | No                                          | S3 bucket for mailbox storage.                                                                                                                                                      |
-| `MAILBOX_MEETINGS_USERNAME`                               | No                                          | Username of the inbox for ingesting meeting invites via IMAP (likely to be the same as the email for the mailbox)                                                                   |
-| `MAILBOX_MEETINGS_PASSWORD`                               | No                                          | Password for the inbox for ingesting meeting invites via IMAP                                                                                                                       |
-| `MAILBOX_MEETINGS_IMAP_DOMAIN`                            | No                                          | IMAP domain for the inbox for ingesting meeting invites via IMAP                                                                                                                    |
-| `MARKET_ACCESS_ACCESS_KEY_ID`                             | No                                          | A non-secret access key ID used by the Market Access service to access Hawk-authenticated public company endpoints.                                                                 |
-| `MARKET_ACCESS_SECRET_ACCESS_KEY`                         | If `MARKET_ACCESS_ACCESS_KEY_ID` is set     | A secret key used by the Market Access service to access Hawk-authenticated public company endpoints.                                                                               |
-| `OMIS_PUBLIC_ACCESS_KEY_ID`                               | No                                          | A non-secret access key ID, corresponding to `OMIS_PUBLIC_SECRET_ACCESS_KEY`. The holder of the secret key can access the OMIS public endpoints by Hawk authentication.             |
-| `OMIS_NOTIFICATION_ADMIN_EMAIL`                           | Yes                                         |                                                                                                                                                                                     |
-| `OMIS_NOTIFICATION_API_KEY`                               | Yes                                         |                                                                                                                                                                                     |
-| `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`              | No                                          |                                                                                                                                                                                     |
-| `OMIS_PUBLIC_BASE_URL`                                    | Yes                                         |                                                                                                                                                                                     |
-| `OMIS_PUBLIC_SECRET_ACCESS_KEY`                           | If `OMIS_PUBLIC_ACCESS_KEY_ID` is set       | A secret key, corresponding to `OMIS_PUBLIC_ACCESS_KEY_ID`. The holder of this key can access the OMIS public endpoints by Hawk authentication.                                     |
-| `OPENSEARCH_INDEX_PREFIX`                                 | Yes                                         | Prefix to use for indices and aliases                                                                                                                                               |
-| `OPENSEARCH_SEARCH_REQUEST_TIMEOUT`                       | No                                          | Timeout (in seconds) for searches (default=20).                                                                                                                                     |
-| `OPENSEARCH_SEARCH_REQUEST_WARNING_THRESHOLD`             | No                                          | Threshold (in seconds) for emitting warnings about slow searches (default=10).                                                                                                      |
-| `OPENSEARCH_VERIFY_CERTS`                                 | No                                          |                                                                                                                                                                                     |
-| `PAAS_IP_WHITELIST`                                       | No                                          | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints.                                                                                                    |
-| `REDIS_BASE_URL`                                          | No                                          | redis base URL without the db                                                                                                                                                       |
-| `REDIS_CACHE_DB`                                          | No                                          | redis db for django cache (default 0)                                                                                                                                               |
-| `REDIS_CELERY_DB`                                         | No                                          | redis db for celery (default 1)                                                                                                                                                     |
-| `REPORT_AWS_ACCESS_KEY_ID`                                | No                                          | Same use as AWS_ACCESS_KEY_ID, but for reports.                                                                                                                                     |
-| `REPORT_AWS_SECRET_ACCESS_KEY`                            | No                                          | Same use as AWS_SECRET_ACCESS_KEY, but for reports.                                                                                                                                 |
-| `REPORT_AWS_REGION`                                       | No                                          | Same use as AWS_DEFAULT_REGION, but for reports.                                                                                                                                    |
-| `REPORT_BUCKET`                                           | No                                          | S3 bucket for report storage.                                                                                                                                                       |
-| `SENTRY_ENVIRONMENT`                                      | Yes                                         | Value for the environment tag in Sentry.                                                                                                                                            |
-| `SKIP_OPENSEARCH_MAPPING_MIGRATIONS`                      | No                                          | If non-empty, skip applying OpenSearch mapping type migrations on deployment.                                                                                                       |
-| `SLACK_API_TOKEN`                                         | No                                          | (Required if `ENABLE_SLACK_MESSAGING` is truthy) Auth token for connection to Slack API for purposes of sending messages through the datahub.core.realtime_messaging module         |
-| `SLACK_MESSAGE_CHANNEL`                                   | No                                          | (Required if `ENABLE_SLACK_MESSAGING` is truthy) Name (or preferably ID) of the channel into which datahub.core.realtime_messaging should send messages                             |
-| `SSO_ENABLED`                                             | Yes                                         | Whether single sign-on via RFC 7662 token introspection is enabled                                                                                                                  |
-| `STAFF_SSO_AUTH_TOKEN`                                    | If SSO enabled                              | Access token for the Staff SSO API.                                                                                                                                                 |
-| `STAFF_SSO_BASE_URL`                                      | If SSO enabled                              | The base URL for the Staff SSO API.                                                                                                                                                 |
-| `STAFF_SSO_REQUEST_TIMEOUT`                               | No                                          | Staff SSO API request timeout in seconds (default=5).                                                                                                                               |
-| `STATSD_HOST`                                             | No                                          | StatsD host url.                                                                                                                                                                    |
-| `STATSD_PORT`                                             | No                                          | StatsD port number.                                                                                                                                                                 |
-| `STATSD_PREFIX`                                           | No                                          | Prefix for metrics being pushed to StatsD.                                                                                                                                          |
-| `VCAP_SERVICES`                                           | No                                          | Set by GOV.UK PaaS when using their backing services. Contains connection details for OpenSearch and Redis.                                                                         |
-| `WEB_CONCURRENCY`                                         | No                                          | Number of Gunicorn workers (set automatically by Heroku, otherwise defaults to 1).                                                                                                  |
+| Variable name | Required | Description |
+| ------------- | ------------- | ------------- |
+| `ACTIVITY_STREAM_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_SECRET_ACCESS_KEY`. The holder of the secret key can access the activity stream endpoint by Hawk authentication. |
+| `ACTIVITY_STREAM_SECRET_ACCESS_KEY` | If `ACTIVITY_STREAM_ACCESS_KEY_ID` is set | A secret key, corresponding to `ACTIVITY_STREAM_ACCESS_KEY_ID`. The holder of this key can access the activity stream endpoint by Hawk authentication. |
+| `ACTIVITY_STREAM_OUTGOING_URL` | No | The URL used to read from activity stream |
+| `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY`. This is used when reading from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`. |
+| `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY` | No | A secret key, corresponding to `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID`. This is used when reading from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`. |
+| `ADMIN_OAUTH2_ENABLED` | Yes | Enables Django Admin SSO login when is True. |
+| `ADMIN_OAUTH2_BASE_URL` | If `ADMIN_OAUTH2_ENABLED` is set | A base URL of OAuth provider. |
+| `ADMIN_OAUTH2_TOKEN_FETCH_PATH` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth fetch token path for Django Admin SSO login. |
+| `ADMIN_OAUTH2_USER_PROFILE_PATH` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth user profile path for Django Admin SSO login. |
+| `ADMIN_OAUTH2_AUTH_PATH` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth auth path for Django Admin SSO login. |
+| `ADMIN_OAUTH2_CLIENT_ID` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth client ID for Django Admin SSO login. |
+| `ADMIN_OAUTH2_CLIENT_SECRET` | If `ADMIN_OAUTH2_ENABLED` is set | OAuth client secret for Django Admin SSO login. |
+| `AV_V2_SERVICE_URL` | Yes | URL for ClamAV V2 service. If not configured, virus scanning will fail. |
+| `AWS_ACCESS_KEY_ID` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
+| `AWS_DEFAULT_REGION` | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration) |
+| `AWS_SECRET_ACCESS_KEY` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
+| `CELERY_TASK_ALWAYS_EAGER` | No | Can be set to True when running the app locally to run Celery tasks started from the web process synchronously. Not for use in production. |
+| `CELERY_TASK_SEND_SENT_EVENT` | No | Whether Celery workers send the `task-sent` event (default=True). |
+| `CELERY_WORKER_TASK_EVENTS` | No | Whether Celery workers send task events (by default) for use by monitoring tools such as Flower (default=True). |
+| `COMPANY_MATCHING_SERVICE_BASE_URL` | No | The base url of the company matching service (default=None). |
+| `COMPANY_MATCHING_HAWK_ID` | No | The hawk id to use when making a request to the company matching service (default=None). |
+| `COMPANY_MATCHING_HAWK_KEY` | No | The hawk key to use when making a request to the company matching service (default=None). |
+| `CONSENT_SERVICE_BASE_URL` | No | The base url of the consent service, to post email consent preferences to (default=None). |
+| `CONSENT_SERVICE_HAWK_ID` | No | The hawk id to use when making a request to the consent service (default=None). |
+| `CONSENT_SERVICE_HAWK_KEY` | No | The hawk key to use when making a request to the consent service (default=None). |
+| `CSRF_COOKIE_HTTPONLY` | No | Whether to use HttpOnly flag on the CSRF cookie (default=False). |
+| `CSRF_COOKIE_SECURE` | No | Whether to use a secure cookie for the CSRF cookie (default=False). |
+| `DATA_FLOW_API_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `DATA_FLOW_API_SECRET_ACCESS_KEY`. The holder of the secret key can access the omis-dataset endpoint by Hawk authentication. |
+| `DATA_FLOW_API_SECRET_ACCESS_KEY` | If `DATA_FLOW_API_ACCESS_KEY_ID` is set | A secret key, corresponding to `DATA_FLOW_API_ACCESS_KEY_ID`. The holder of this key can access the omis-dataset endpoint by Hawk authentication. |
+| `DATABASE_CONN_MAX_AGE` | No | [Maximum database connection age (in seconds).](https://docs.djangoproject.com/en/2.0/ref/databases/) |
+| `DATABASE_URL` | Yes | PostgreSQL server URL (with embedded credentials). |
+| `DATAHUB_FRONTEND_BASE_URL` | Yes | |
+| `DATAHUB_NOTIFICATION_API_KEY` | No | The GOVUK notify API key to use for the `datahub.notification` django app. |
+| `DATAHUB_SUPPORT_EMAIL_ADDRESS` | No | Email address for DataHub support team. |
+| `DATA_HUB_FRONTEND_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `DATA_HUB_FRONTEND_SECRET_ACCESS_KEY`. The holder of the secret key can access the metadata endpoints by Hawk authentication. |
+| `DATA_HUB_FRONTEND_SECRET_ACCESS_KEY` | If `DATA_HUB_FRONTEND_ACCESS_KEY_ID` is set | A secret key, corresponding to `METADATA_ACCESS_KEY_ID`. The holder of this key can access the metadata endpoints by Hawk authentication. |
+| `DEBUG` | Yes | Whether Django's debug mode should be enabled. |
+| `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
+| `DIT_EMAIL_INGEST_BLACKLIST` | No | A list of emails for which email ingestion is prohibited. |
+| `DJANGO_SECRET_KEY` | Yes | |
+| `DJANGO_SENTRY_DSN` | Yes | |
+| `DJANGO_SETTINGS_MODULE` | Yes | |
+| `DNB_AUTOMATIC_UPDATE_LIMIT` | No | Integer of the maximum number of updates the DNB automatic update task should ingest before exiting. This is unlimited if this setting is not set. |
+| `DNB_SERVICE_BASE_URL` | No | The base URL of the DNB service. |
+| `DNB_SERVICE_TOKEN` | No | The shared access token for calling the DNB service. |
+| `DEFAULT_BUCKET` | Yes | S3 bucket for object storage. |
+| `DISABLE_PAAS_IP_CHECK` | No | Disable PaaS IP check for Hawk endpoints (default=False). |
+| `ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW` | No | Whether to enable the add access token page for superusers in the admin site (default=True). |
+| `ENABLE_DAILY_OPENSEARCH_SYNC` | No | Whether to enable the daily OpenSearch sync (default=False). |
+| `ENABLE_EMAIL_INGESTION` | No | True or False. Whether or not to activate the celery beat task for ingesting emails |
+| `ENABLE_INVESTMENT_NOTIFICATION` | No | True or False. Whether or not to activate the celery beat task for sending investment notifications |
+| `ENABLE_MAILBOX_PROCESSING` | No | True or False. Whether or not to activate the celery beat task for mailbox processing |
+| `ENABLE_SLACK_MESSAGING` | No | If present and truthy, enable the transmission of messages to Slack. Necessitates the specification of the other env vars `SLACK_API_TOKEN` and `SLACK_MESSAGE_CHANNEL` |
+| `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
+| `ES_APM_ENABLED` | Yes | Enables Elasticsearch APM agent when is True. |
+| `ES_APM_SERVICE_NAME` | Yes, if ES_APM_ENABLED | A name of the running service. Must match following regexp: ^[a-zA-Z0-9 _-]+$. |
+| `ES_APM_SECRET_TOKEN` | Yes, if ES_APM_ENABLED | A secret token used to authorise requests to the APM server. |
+| `ES_APM_SERVER_TIMEOUT` | No | A timeout for requests to the Elasticsearch APM server in duration format (default=20s). |
+| `ES_APM_SERVER_URL` | Yes, if ES_APM_ENABLED | The URL of the Elasticsearch APM server. |
+| `ES_APM_ENVIRONMENT` | Yes, if ES_APM_ENABLED | A name of the environment the service is running, for example: `develop`. |
+| `EXPORT_WINS_SERVICE_BASE_URL` | No | The base url of the Export Wins API (default=None). |
+| `EXPORT_WINS_HAWK_ID` | No | The hawk id to use when making a request to the Export Wins API (default=None). |
+| `EXPORT_WINS_HAWK_KEY` | No | The hawk key to use when making a request to the Export Wins API (default=None). |
+| `EXTRA_DJANGO_APPS` | Yes | Additional Django apps to load (comma-separated). Can be used to reverse the migrations of a removed third-party app (see comment in config/settings/common.py for more detail). |
+| `GUNICORN_ACCESSLOG` | No | File to direct Gunicorn logs to (default=stdout). |
+| `GUNICORN_ACCESS_LOG_FORMAT` | No | |
+| `GUNICORN_ENABLE_ASYNC_PSYCOPG2` | No | Whether to enable asynchronous psycopg2 when the worker class is 'gevent' (default=True). |
+| `GUNICORN_ENABLE_STATSD` | No | Whether to enable Gunicorn StatD instrumentation (default=False). |
+| `GUNICORN_PATCH_ASGIREF` | No | Whether to enable a workaround for https://github.com/django/asgiref/issues/144 when the worker class is 'gevent' (default=False). |
+| `GUNICORN_WORKER_CLASS` | No | [Type of Gunicorn worker.](http://docs.gunicorn.org/en/stable/settings.html#worker-class) Uses async workers via gevent by default. |
+| `GUNICORN_WORKER_CONNECTIONS` | No | Maximum no. of connections for async workers (default=10). |
+| `INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE` | No | Maximum file size in bytes for interaction admin CSV uploads (default=2MB). |
+| `INVESTMENT_DOCUMENT_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for investment project documents. |
+| `INVESTMENT_DOCUMENT_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for investment project documents. |
+| `INVESTMENT_DOCUMENT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for investment project documents. |
+| `INVESTMENT_DOCUMENT_BUCKET` | No | S3 bucket for investment project documents storage. |
+| `INVESTMENT_NOTIFICATION_ADMIN_EMAIL` | Yes | |
+| `INVESTMENT_NOTIFICATION_API_KEY` | Yes | |
+| `INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID` | Yes | An ID of Notify Template for Estimated Land Date notifications |
+| `MAILBOX_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for mailbox. |
+| `MAILBOX_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for mailbox. |
+| `MAILBOX_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for mailbox. |
+| `MAILBOX_BUCKET` | No | S3 bucket for mailbox storage. |
+| `MAILBOX_MEETINGS_USERNAME` | No | Username of the inbox for ingesting meeting invites via IMAP (likely to be the same as the email for the mailbox) |
+| `MAILBOX_MEETINGS_PASSWORD` | No | Password for the inbox for ingesting meeting invites via IMAP |
+| `MAILBOX_MEETINGS_IMAP_DOMAIN` | No | IMAP domain for the inbox for ingesting meeting invites via IMAP |
+| `MARKET_ACCESS_ACCESS_KEY_ID` | No | A non-secret access key ID used by the Market Access service to access Hawk-authenticated public company endpoints. |
+| `MARKET_ACCESS_SECRET_ACCESS_KEY` | If `MARKET_ACCESS_ACCESS_KEY_ID` is set | A secret key used by the Market Access service to access Hawk-authenticated public company endpoints. |
+| `OMIS_PUBLIC_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `OMIS_PUBLIC_SECRET_ACCESS_KEY`. The holder of the secret key can access the OMIS public endpoints by Hawk authentication. |
+| `OMIS_NOTIFICATION_ADMIN_EMAIL` | Yes | |
+| `OMIS_NOTIFICATION_API_KEY` | Yes | |
+| `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL` | No | |
+| `OMIS_PUBLIC_BASE_URL` | Yes | |
+| `OMIS_PUBLIC_SECRET_ACCESS_KEY` | If `OMIS_PUBLIC_ACCESS_KEY_ID` is set | A secret key, corresponding to `OMIS_PUBLIC_ACCESS_KEY_ID`. The holder of this key can access the OMIS public endpoints by Hawk authentication. |
+| `OPENSEARCH_INDEX_PREFIX` | Yes | Prefix to use for indices and aliases |
+| `OPENSEARCH_SEARCH_REQUEST_TIMEOUT` | No | Timeout (in seconds) for searches (default=20). |
+| `OPENSEARCH_SEARCH_REQUEST_WARNING_THRESHOLD` | No | Threshold (in seconds) for emitting warnings about slow searches (default=10). |
+| `OPENSEARCH_VERIFY_CERTS` | No | |
+| `PAAS_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints. |
+| `REDIS_BASE_URL` | No | redis base URL without the db |
+| `REDIS_CACHE_DB` | No | redis db for django cache (default 0) |
+| `REDIS_CELERY_DB` | No | redis db for celery (default 1) |
+| `REPORT_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for reports. |
+| `REPORT_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for reports. |
+| `REPORT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for reports. |
+| `REPORT_BUCKET` | No | S3 bucket for report storage. |
+| `SENTRY_ENVIRONMENT` | Yes | Value for the environment tag in Sentry. |
+| `SKIP_OPENSEARCH_MAPPING_MIGRATIONS` | No | If non-empty, skip applying OpenSearch mapping type migrations on deployment. |
+| `SLACK_API_TOKEN` | No | (Required if `ENABLE_SLACK_MESSAGING` is truthy) Auth token for connection to Slack API for purposes of sending messages through the datahub.core.realtime_messaging module |
+| `SLACK_MESSAGE_CHANNEL` | No | (Required if `ENABLE_SLACK_MESSAGING` is truthy) Name (or preferably ID) of the channel into which datahub.core.realtime_messaging should send messages |
+| `SSO_ENABLED` | Yes | Whether single sign-on via RFC 7662 token introspection is enabled |
+| `STAFF_SSO_AUTH_TOKEN` | If SSO enabled | Access token for the Staff SSO API. |
+| `STAFF_SSO_BASE_URL` | If SSO enabled | The base URL for the Staff SSO API. |
+| `STAFF_SSO_REQUEST_TIMEOUT` | No | Staff SSO API request timeout in seconds (default=5). |
+| `STATSD_HOST` | No | StatsD host url. |
+| `STATSD_PORT` | No | StatsD port number. |
+| `STATSD_PREFIX` | No | Prefix for metrics being pushed to StatsD. |
+| `VCAP_SERVICES` | No | Set by GOV.UK PaaS when using their backing services. Contains connection details for OpenSearch and Redis. |
+| `WEB_CONCURRENCY` | No | Number of Gunicorn workers (set automatically by Heroku, otherwise defaults to 1). |
 
 ## Management commands
 
@@ -525,7 +525,7 @@ To create missing OpenSearch indexes and migrate modified mapping types:
 
 This will also resync data (using Celery) for any newly-created indexes.
 
-See [docs/OpenSearch migrations.md](<docs/OpenSearch migrations.md>) for more detail about how the command works.
+See [docs/OpenSearch migrations.md](docs/OpenSearch&#32;migrations.md) for more detail about how the command works.
 
 #### Resync all OpenSearch records
 
