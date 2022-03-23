@@ -38,6 +38,7 @@ This project uses Docker compose to setup and run all the necessary components. 
     ```shell
     docker-compose up
     ```
+
     or
 
     ```shell
@@ -70,7 +71,7 @@ This project uses Docker compose to setup and run all the necessary components. 
 
 4.  Optionally, you may want to run a local copy of the data hub frontend.
     By default, you can run both the API and the frontend under one docker-compose
-    project.  [See the instructions in the frontend readme to set it up](https://github.com/uktrade/data-hub-frontend/#running-project-within-docker).
+    project. [See the instructions in the frontend readme to set it up](https://github.com/uktrade/data-hub-frontend/#running-project-within-docker).
     Alternatively use the `make` command documented below if you also want to bring up `dnb-service`
 
 ### Installation with docker of data-hub-api, data-hub-frontend and dnb-service on same network
@@ -79,32 +80,32 @@ There is now a `make` command to bring up the three environments on a single doc
 
 1. Clone the repositories
 
-    ```shell
-    git clone https://github.com/uktrade/data-hub-api
-    git clone https://github.com/uktrade/data-hub-frontend
-    git clone https://github.com/uktrade/dnb-service
-    cd data-hub-api
-    ```
+   ```shell
+   git clone https://github.com/uktrade/data-hub-api
+   git clone https://github.com/uktrade/data-hub-frontend
+   git clone https://github.com/uktrade/dnb-service
+   cd data-hub-api
+   ```
 
-2.  Create `.env` files from `sample.env`
+2. Create `.env` files from `sample.env`
 
-    ```shell
-    cp sample.env .env
-    cp config/settings/sample.env config/settings/.env
-    ```
+   ```shell
+   cp sample.env .env
+   cp config/settings/sample.env config/settings/.env
+   ```
 
-    Ensure `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID` is the same as `MOCK_SSO_EMAIL_USER_ID`
-    in mock-sso environment definition in [data-hub-frontend/docker-compose.frontend.yml](https://github.com/uktrade/data-hub-frontend/blob/master/docker-compose.frontend.yml)
-    and `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID` the same as `DJANGO_SUPERUSER_EMAIL` in
-    data-hub-api .env file otherwise the user may not exist
+   Ensure `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID` is the same as `MOCK_SSO_EMAIL_USER_ID`
+   in mock-sso environment definition in [data-hub-frontend/docker-compose.frontend.yml](https://github.com/uktrade/data-hub-frontend/blob/master/docker-compose.frontend.yml)
+   and `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID` the same as `DJANGO_SUPERUSER_EMAIL` in
+   data-hub-api .env file otherwise the user may not exist
 
-    You will also need to add `DNB_SERVICE_BASE_URL` and `DNB_SERVICE_TOKEN` to dnb-service/.env in order to use DnB functionality. These credentials can be found in Vault
+   You will also need to add `DNB_SERVICE_BASE_URL` and `DNB_SERVICE_TOKEN` to dnb-service/.env in order to use DnB functionality. These credentials can be found in Vault
 
 3. Run make command
 
-    ```shell
-    make start-frontend-api-dnb
-    ```
+   ```shell
+   make start-frontend-api-dnb
+   ```
 
     * It will take time for the API container to come up - it will run
       migrations on both DBs, load initial data, sync opensearch etc. Watch
@@ -117,33 +118,33 @@ There is now a `make` command to bring up the three environments on a single doc
       `max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`,
       you will need to run the following on your host machine:
 
-      ```shell
-      sudo sysctl -w vm.max_map_count=262144
-      ```
+     ```shell
+     sudo sysctl -w vm.max_map_count=262144
+     ```
 
-      and append/modify the `vm.max_map_count` setting in `/etc/sysctl.conf` (so
-      that this setting persists after restart):
+     and append/modify the `vm.max_map_count` setting in `/etc/sysctl.conf` (so
+     that this setting persists after restart):
 
-      ```shell
-      vm.max_map_count=262144
-      ```
+     ```shell
+     vm.max_map_count=262144
+     ```
 
-      For more information, [see the opensearch docs on vm.max_map_count](https://opensearch.org/docs/latest/opensearch/install/important-settings/).
+     For more information, [see the opensearch docs on vm.max_map_count](https://opensearch.org/docs/latest/opensearch/install/important-settings/).
 
 4. If you want to stop all the services, run the following make command
 
-    ```shell
-    make stop-frontend-api-dnb
-    ```
+   ```shell
+   make stop-frontend-api-dnb
+   ```
 
 ## Native installation (without Docker)
 
 Dependencies:
 
--   Python 3.10.x
--   PostgreSQL 12
--   redis 3.2
--   OpenSearch 1.x
+- Python 3.10.x
+- PostgreSQL 12
+- redis 3.2
+- OpenSearch 1.x
 
 1.  Clone the repository:
 
@@ -170,7 +171,7 @@ Dependencies:
     brew install libpq
     ```
 
-4. Install *postgres*, if not done already, as this is required by **psycopg2** in the requirements below
+4. Install _postgres_, if not done already, as this is required by **psycopg2** in the requirements below
 
     On Ubuntu:
 
@@ -274,12 +275,11 @@ To run the tests:
 
 To run the tests in parallel, pass `-n <number of processes>` to `./tests.sh`. For example, for four processes:
 
-
 ```shell
 ./tests.sh -n 4
 ```
 
-By default all tests are executed. To skip tests that should not run under certain conditions ie. are dependent on external services, use a marker `excluded` or a marker that start with `excluded_`. 
+By default all tests are executed. To skip tests that should not run under certain conditions ie. are dependent on external services, use a marker `excluded` or a marker that start with `excluded_`.
 
 ```python
 import pytest
@@ -306,6 +306,7 @@ pytest -m excluded_dependent_on_redis
 pytest -m "excluded_x or excluded_y"
 pytest -m "not (excluded_x or excluded_y)"
 ```
+
 **NOTE:** When testing, using the `--reuse-db` can speed up test runs by excluding migrations
 
 To run the linter:
@@ -325,26 +326,26 @@ make setup-flake8-hook
 You can obtain an access token for local development work in one of two ways:
 
 - by running `./manage.py add_access_token <SSO email user ID>` with the SSO
-  email user ID of an existing adviser (run 
+  email user ID of an existing adviser (run
   `./manage.py add_access_token --help` for a list of options)
 - using the form on `http://localhost:8000/admin/add-access-token/`
 
-(If you’re using Docker, an access token will be created automatically if 
+(If you’re using Docker, an access token will be created automatically if
 certain environment variables are set. See `sample.env` for more details.)
 
-This access token can be used with most endpoints by setting an 
-`Authorization` header value of `Bearer <access token>`. 
+This access token can be used with most endpoints by setting an
+`Authorization` header value of `Bearer <access token>`.
 
-Note that machine-to-machine endpoints (such as those under `/v4/metadata/`) 
+Note that machine-to-machine endpoints (such as those under `/v4/metadata/`)
 instead use Hawk authentication and request signing.
 
 ## Granting access to the front end
 
 The [internal front end](https://github.com/uktrade/data-hub-frontend) uses single sign-on. You should configure the API as follows to use with the front end:
 
-* `SSO_ENABLED`: `True`
-* `STAFF_SSO_BASE_URL`: URL of a [Staff SSO](https://github.com/uktrade/staff-sso) or [Mock SSO](https://github.com/uktrade/mock-sso) instance. This should be the same server the front end is configured to use.
-* `STAFF_SSO_AUTH_TOKEN`: Access token for Staff SSO.
+- `SSO_ENABLED`: `True`
+- `STAFF_SSO_BASE_URL`: URL of a [Staff SSO](https://github.com/uktrade/staff-sso) or [Mock SSO](https://github.com/uktrade/mock-sso) instance. This should be the same server the front end is configured to use.
+- `STAFF_SSO_AUTH_TOKEN`: Access token for Staff SSO.
 
 ## Granting access to machine-to-machine clients
 
@@ -354,12 +355,11 @@ There are separate views for such clients as these views don’t expect `request
 
 Hawk credentials for each client are defined in settings below and each client is assigned scopes in `config/settings/common.py`.
 
-These scopes define which views each client can access.  
+These scopes define which views each client can access.
 
 ## Deployment
 
 Data Hub API can run on any Heroku-style platform. Configuration is performed via the following environment variables:
-
 
 | Variable name | Required | Description |
 | ------------- | ------------- | ------------- |
@@ -385,36 +385,36 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `COMPANY_MATCHING_SERVICE_BASE_URL` | No | The base url of the company matching service (default=None). |
 | `COMPANY_MATCHING_HAWK_ID` | No | The hawk id to use when making a request to the company matching service (default=None). |
 | `COMPANY_MATCHING_HAWK_KEY` | No | The hawk key to use when making a request to the company matching service (default=None). |
-| `CONSENT_SERVICE_BASE_URL` | No | The base url of the consent service, to post email consent preferences to  (default=None). |
+| `CONSENT_SERVICE_BASE_URL` | No | The base url of the consent service, to post email consent preferences to (default=None). |
 | `CONSENT_SERVICE_HAWK_ID` | No | The hawk id to use when making a request to the consent service (default=None). |
 | `CONSENT_SERVICE_HAWK_KEY` | No | The hawk key to use when making a request to the consent service (default=None). |
 | `CSRF_COOKIE_HTTPONLY` | No | Whether to use HttpOnly flag on the CSRF cookie (default=False). |
 | `CSRF_COOKIE_SECURE` | No | Whether to use a secure cookie for the CSRF cookie (default=False). |
 | `DATA_FLOW_API_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `DATA_FLOW_API_SECRET_ACCESS_KEY`. The holder of the secret key can access the omis-dataset endpoint by Hawk authentication. |
 | `DATA_FLOW_API_SECRET_ACCESS_KEY` | If `DATA_FLOW_API_ACCESS_KEY_ID` is set | A secret key, corresponding to `DATA_FLOW_API_ACCESS_KEY_ID`. The holder of this key can access the omis-dataset endpoint by Hawk authentication. |
-| `DATABASE_CONN_MAX_AGE`  | No | [Maximum database connection age (in seconds).](https://docs.djangoproject.com/en/2.0/ref/databases/) |
-| `DATABASE_URL`  | Yes | PostgreSQL server URL (with embedded credentials). |
-| `DATAHUB_FRONTEND_BASE_URL`  | Yes | |
+| `DATABASE_CONN_MAX_AGE` | No | [Maximum database connection age (in seconds).](https://docs.djangoproject.com/en/2.0/ref/databases/) |
+| `DATABASE_URL` | Yes | PostgreSQL server URL (with embedded credentials). |
+| `DATAHUB_FRONTEND_BASE_URL` | Yes | |
 | `DATAHUB_NOTIFICATION_API_KEY` | No | The GOVUK notify API key to use for the `datahub.notification` django app. |
 | `DATAHUB_SUPPORT_EMAIL_ADDRESS` | No | Email address for DataHub support team. |
 | `DATA_HUB_FRONTEND_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `DATA_HUB_FRONTEND_SECRET_ACCESS_KEY`. The holder of the secret key can access the metadata endpoints by Hawk authentication. |
 | `DATA_HUB_FRONTEND_SECRET_ACCESS_KEY` | If `DATA_HUB_FRONTEND_ACCESS_KEY_ID` is set | A secret key, corresponding to `METADATA_ACCESS_KEY_ID`. The holder of this key can access the metadata endpoints by Hawk authentication. |
-| `DEBUG`  | Yes | Whether Django's debug mode should be enabled. |
+| `DEBUG` | Yes | Whether Django's debug mode should be enabled. |
 | `DIT_EMAIL_DOMAIN_*` | No | An allowable DIT email domain for email ingestion along with it's allowed email authentication methods. Django-environ dict format e.g. example.com=dmarc:pass\|spf:pass\|dkim:pass |
 | `DIT_EMAIL_INGEST_BLACKLIST` | No | A list of emails for which email ingestion is prohibited. |
-| `DJANGO_SECRET_KEY`  | Yes | |
-| `DJANGO_SENTRY_DSN`  | Yes | |
-| `DJANGO_SETTINGS_MODULE`  | Yes | |
+| `DJANGO_SECRET_KEY` | Yes | |
+| `DJANGO_SENTRY_DSN` | Yes | |
+| `DJANGO_SETTINGS_MODULE` | Yes | |
 | `DNB_AUTOMATIC_UPDATE_LIMIT` | No | Integer of the maximum number of updates the DNB automatic update task should ingest before exiting. This is unlimited if this setting is not set. |
 | `DNB_SERVICE_BASE_URL` | No | The base URL of the DNB service. |
 | `DNB_SERVICE_TOKEN` | No | The shared access token for calling the DNB service. |
-| `DEFAULT_BUCKET`  | Yes | S3 bucket for object storage. |
+| `DEFAULT_BUCKET` | Yes | S3 bucket for object storage. |
 | `DISABLE_PAAS_IP_CHECK` | No | Disable PaaS IP check for Hawk endpoints (default=False). |
 | `ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW` | No | Whether to enable the add access token page for superusers in the admin site (default=True). |
 | `ENABLE_DAILY_OPENSEARCH_SYNC` | No | Whether to enable the daily OpenSearch sync (default=False). |
-| `ENABLE_EMAIL_INGESTION` | No | True or False.  Whether or not to activate the celery beat task for ingesting emails |
-  `ENABLE_INVESTMENT_NOTIFICATION` | No | True or False. Whether or not to activate the celery beat task for sending investment notifications |
-| `ENABLE_MAILBOX_PROCESSING` | No | True or False.  Whether or not to activate the celery beat task for mailbox processing |
+| `ENABLE_EMAIL_INGESTION` | No | True or False. Whether or not to activate the celery beat task for ingesting emails |
+| `ENABLE_INVESTMENT_NOTIFICATION` | No | True or False. Whether or not to activate the celery beat task for sending investment notifications |
+| `ENABLE_MAILBOX_PROCESSING` | No | True or False. Whether or not to activate the celery beat task for mailbox processing |
 | `ENABLE_SLACK_MESSAGING` | No | If present and truthy, enable the transmission of messages to Slack. Necessitates the specification of the other env vars `SLACK_API_TOKEN` and `SLACK_MESSAGE_CHANNEL` |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
 | `ES_APM_ENABLED` | Yes | Enables Elasticsearch APM agent when is True. |
@@ -422,26 +422,26 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `ES_APM_SECRET_TOKEN` | Yes, if ES_APM_ENABLED | A secret token used to authorise requests to the APM server. |
 | `ES_APM_SERVER_TIMEOUT` | No | A timeout for requests to the Elasticsearch APM server in duration format (default=20s). |
 | `ES_APM_SERVER_URL` | Yes, if ES_APM_ENABLED | The URL of the Elasticsearch APM server. |
-| `ES_APM_ENVIRONMENT`| Yes, if ES_APM_ENABLED | A name of the environment the service is running, for example: `develop`. |
+| `ES_APM_ENVIRONMENT` | Yes, if ES_APM_ENABLED | A name of the environment the service is running, for example: `develop`. |
 | `EXPORT_WINS_SERVICE_BASE_URL` | No | The base url of the Export Wins API (default=None). |
 | `EXPORT_WINS_HAWK_ID` | No | The hawk id to use when making a request to the Export Wins API (default=None). |
 | `EXPORT_WINS_HAWK_KEY` | No | The hawk key to use when making a request to the Export Wins API (default=None). |
-| `EXTRA_DJANGO_APPS`  | Yes | Additional Django apps to load (comma-separated). Can be used to reverse the migrations of a removed third-party app (see comment in config/settings/common.py for more detail). |
-| `GUNICORN_ACCESSLOG`  | No | File to direct Gunicorn logs to (default=stdout). |
-| `GUNICORN_ACCESS_LOG_FORMAT`  | No |  |
+| `EXTRA_DJANGO_APPS` | Yes | Additional Django apps to load (comma-separated). Can be used to reverse the migrations of a removed third-party app (see comment in config/settings/common.py for more detail). |
+| `GUNICORN_ACCESSLOG` | No | File to direct Gunicorn logs to (default=stdout). |
+| `GUNICORN_ACCESS_LOG_FORMAT` | No | |
 | `GUNICORN_ENABLE_ASYNC_PSYCOPG2` | No | Whether to enable asynchronous psycopg2 when the worker class is 'gevent' (default=True). |
 | `GUNICORN_ENABLE_STATSD` | No | Whether to enable Gunicorn StatD instrumentation (default=False). |
 | `GUNICORN_PATCH_ASGIREF` | No | Whether to enable a workaround for https://github.com/django/asgiref/issues/144 when the worker class is 'gevent' (default=False). |
-| `GUNICORN_WORKER_CLASS`  | No | [Type of Gunicorn worker.](http://docs.gunicorn.org/en/stable/settings.html#worker-class) Uses async workers via gevent by default. |
-| `GUNICORN_WORKER_CONNECTIONS`  | No | Maximum no. of connections for async workers (default=10). |
+| `GUNICORN_WORKER_CLASS` | No | [Type of Gunicorn worker.](http://docs.gunicorn.org/en/stable/settings.html#worker-class) Uses async workers via gevent by default. |
+| `GUNICORN_WORKER_CONNECTIONS` | No | Maximum no. of connections for async workers (default=10). |
 | `INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE` | No | Maximum file size in bytes for interaction admin CSV uploads (default=2MB). |
 | `INVESTMENT_DOCUMENT_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for investment project documents. |
 | `INVESTMENT_DOCUMENT_BUCKET` | No | S3 bucket for investment project documents storage. |
-| `INVESTMENT_NOTIFICATION_ADMIN_EMAIL`  | Yes | |
-| `INVESTMENT_NOTIFICATION_API_KEY`  | Yes | |
-  `INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID` | Yes | An ID of Notify Template for Estimated Land Date notifications |
+| `INVESTMENT_NOTIFICATION_ADMIN_EMAIL` | Yes | |
+| `INVESTMENT_NOTIFICATION_API_KEY` | Yes | |
+| `INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID` | Yes | An ID of Notify Template for Estimated Land Date notifications |
 | `MAILBOX_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for mailbox. |
 | `MAILBOX_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for mailbox. |
 | `MAILBOX_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for mailbox. |
@@ -452,24 +452,24 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `MARKET_ACCESS_ACCESS_KEY_ID` | No | A non-secret access key ID used by the Market Access service to access Hawk-authenticated public company endpoints. |
 | `MARKET_ACCESS_SECRET_ACCESS_KEY` | If `MARKET_ACCESS_ACCESS_KEY_ID` is set | A secret key used by the Market Access service to access Hawk-authenticated public company endpoints. |
 | `OMIS_PUBLIC_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `OMIS_PUBLIC_SECRET_ACCESS_KEY`. The holder of the secret key can access the OMIS public endpoints by Hawk authentication. |
-| `OMIS_NOTIFICATION_ADMIN_EMAIL`  | Yes | |
-| `OMIS_NOTIFICATION_API_KEY`  | Yes | |
-| `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`  | No | |
-| `OMIS_PUBLIC_BASE_URL`  | Yes | |
+| `OMIS_NOTIFICATION_ADMIN_EMAIL` | Yes | |
+| `OMIS_NOTIFICATION_API_KEY` | Yes | |
+| `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL` | No | |
+| `OMIS_PUBLIC_BASE_URL` | Yes | |
 | `OMIS_PUBLIC_SECRET_ACCESS_KEY` | If `OMIS_PUBLIC_ACCESS_KEY_ID` is set | A secret key, corresponding to `OMIS_PUBLIC_ACCESS_KEY_ID`. The holder of this key can access the OMIS public endpoints by Hawk authentication. |
-| `OPENSEARCH_INDEX_PREFIX`  | Yes | Prefix to use for indices and aliases |
+| `OPENSEARCH_INDEX_PREFIX` | Yes | Prefix to use for indices and aliases |
 | `OPENSEARCH_SEARCH_REQUEST_TIMEOUT` | No | Timeout (in seconds) for searches (default=20). |
 | `OPENSEARCH_SEARCH_REQUEST_WARNING_THRESHOLD` | No | Threshold (in seconds) for emitting warnings about slow searches (default=10). |
-| `OPENSEARCH_VERIFY_CERTS`  | No | |
+| `OPENSEARCH_VERIFY_CERTS` | No | |
 | `PAAS_IP_WHITELIST` | No | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints. |
-| `REDIS_BASE_URL`  | No | redis base URL without the db |
-| `REDIS_CACHE_DB`  | No | redis db for django cache (default 0) |
-| `REDIS_CELERY_DB`  | No | redis db for celery (default 1) |
+| `REDIS_BASE_URL` | No | redis base URL without the db |
+| `REDIS_CACHE_DB` | No | redis db for django cache (default 0) |
+| `REDIS_CELERY_DB` | No | redis db for celery (default 1) |
 | `REPORT_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for reports. |
 | `REPORT_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for reports. |
 | `REPORT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for reports. |
 | `REPORT_BUCKET` | No | S3 bucket for report storage. |
-| `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
+| `SENTRY_ENVIRONMENT` | Yes | Value for the environment tag in Sentry. |
 | `SKIP_OPENSEARCH_MAPPING_MIGRATIONS` | No | If non-empty, skip applying OpenSearch mapping type migrations on deployment. |
 | `SLACK_API_TOKEN` | No | (Required if `ENABLE_SLACK_MESSAGING` is truthy) Auth token for connection to Slack API for purposes of sending messages through the datahub.core.realtime_messaging module |
 | `SLACK_MESSAGE_CHANNEL` | No | (Required if `ENABLE_SLACK_MESSAGING` is truthy) Name (or preferably ID) of the channel into which datahub.core.realtime_messaging should send messages |
@@ -483,13 +483,11 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `VCAP_SERVICES` | No | Set by GOV.UK PaaS when using their backing services. Contains connection details for OpenSearch and Redis. |
 | `WEB_CONCURRENCY` | No | Number of Gunicorn workers (set automatically by Heroku, otherwise defaults to 1). |
 
-
 ## Management commands
 
 If using Docker, remember to run these commands inside your container by prefixing them with `docker-compose run api`.
 
 ### Database
-
 
 #### Apply migrations
 
@@ -514,7 +512,6 @@ These commands are generally only intended to be used on a blank database.
 ```shell
 ./manage.py loadinitialmetadata
 ```
-
 
 ### OpenSearch
 
@@ -558,24 +555,22 @@ For more details including all the available choices:
 
 ## Dependencies
 
-See [Managing dependencies](docs/Managing&#32;dependencies.md) for information about installing,
+See [Managing dependencies](<docs/Managing dependencies.md>) for information about installing,
 adding and upgrading dependencies.
 
 ## Activity Stream
 
 The `/v3/activity-stream/*` endpoints are protected by two mechanisms:
 
-* IP address whitelisting via the `X-Forwarded-For` header, with a comma separated list of whitelisted IPs in the environment variable `PAAS_IP_WHITELIST`.
+- IP address whitelisting via the `X-Forwarded-For` header, with a comma separated list of whitelisted IPs in the environment variable `PAAS_IP_WHITELIST`.
 
-* Hawk authentication via the `Authorization` header, with the credentials in the environment variables `ACTIVITY_STREAM_ACCESS_KEY_ID` and `ACTIVITY_STREAM_SECRET_ACCESS_KEY`.
-
+- Hawk authentication via the `Authorization` header, with the credentials in the environment variables `ACTIVITY_STREAM_ACCESS_KEY_ID` and `ACTIVITY_STREAM_SECRET_ACCESS_KEY`.
 
 ### IP address whitelisting
 
 The authentication blocks requests that do not have a whitelisted IP in the second-from-the-end IP in `X-Forwarded-For` header. In general, this cannot be trusted. However, in PaaS, this can be, and this is the only production environment. Ideally, this would be done at a lower level than HTTP, but this is not possible with the current architecture.
 
 If making requests to this endpoint locally, you must manually add this header or disable the check using `DISABLE_PAAS_IP_CHECK` environment variable.
-
 
 ### Hawk authentication
 
