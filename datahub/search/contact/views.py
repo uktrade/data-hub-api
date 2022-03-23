@@ -93,7 +93,6 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
         'address_area.name': 'computed_area_name',
     }
     queryset = DBContact.objects.annotate(
-        # name=get_full_name_expression(),
         link=get_front_end_url_expression('contact', 'pk'),
         company_sector_name=get_sector_name_subquery('company__sector'),
         company_link=get_front_end_url_expression('company', 'company__pk'),

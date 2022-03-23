@@ -142,20 +142,3 @@ class Contact(ArchivableModel, BaseModel):
     def name_with_title(self):
         """Full name with title."""
         return join_truthy_strings(getattr(self.title, 'name', None), self.name)
-
-    def save(self, *args, **kwargs):
-        """Save contact and keep phone number, and name in sync"""
-        if not self.full_telephone_number:
-            self.full_telephone_number = self.get_full_telephone_number()
-
-        if not self.name:
-            self.full_telephone_number = self.get_name()
-        super().save(*args, **kwargs)
-
-    def get_full_telephone_number(self):
-        """Full telephone number with country code."""
-        return join_truthy_strings(self.telephone_countrycode, self.telephone_number)
-
-    def get_name(self):
-        """Full name."""
-        return join_truthy_strings(self.first_name, self.last_name)
