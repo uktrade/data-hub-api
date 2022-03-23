@@ -40,6 +40,7 @@ from datahub.core.serializers import (
     PermittedFieldsModelSerializer,
     RelaxedURLField,
 )
+from datahub.core.utils import join_truthy_strings
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import (
     AddressValidator,
@@ -218,6 +219,49 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         permissions = {
             f'company.{ContactPermission.view_contact_document}': 'archived_documents_url_path',
         }
+    
+    # def create(self, validated_data):
+    #     return Comment(**validated_data)
+
+    def update(self, instance, validated_data):
+         """Save contact and keep phone number, and name in sync"""
+        if (
+            not validated_data.get("full_telephone_number") and 
+            validated_data.get("telephone_number") and 
+            validated_data.get("telephone_countrycode")
+        ):
+            instance.full_telephone_number = join_truthy_strings(
+                validated_data.get('telephone_countrycode', instance.telephone_countrycode),
+                validated_data.get('telephone_number', instance.telephone_number)
+            )
+
+        if not self.name:
+            self.full_telephone_number = self.get_name()
+        super().save(*args, **kwargs)
+
+         # return super().update(instance, validated_data)
+        instance.name = validated_data.get('name', instance.name)
+        instance.full_telephone_number = validated_data.get('full_telephone_number', instance.full_telephone_number)
+        return instance
+
+    # def save(self, *args, **kwargs):
+    #     """Save contact and keep phone number, and name in sync"""
+    #     if not self.full_telephone_number:
+    #         self.full_telephone_number = self.get_full_telephone_number()
+
+    #     if not self.name:
+    #         self.full_telephone_number = self.get_name()
+    #     super().save(*args, **kwargs)
+
+    def get_full_telephone_number(self):
+        """Full telephone number with country code."""
+        return join_truthy_strings(self.telephone_countrycode, self.telephone_number)
+    
+    def get_name(self):
+        """Full name."""
+        return join_truthy_strings(self.first_name, self.last_name)
+
+
 
 
 class ContactV4Serializer(ContactSerializer):
