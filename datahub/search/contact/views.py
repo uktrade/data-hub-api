@@ -8,7 +8,6 @@ from datahub.company.models import Contact as DBContact
 from datahub.core.query_utils import (
     get_aggregate_subquery,
     get_front_end_url_expression,
-    get_full_name_expression,
     get_string_agg_subquery,
     get_top_related_expression_subquery,
 )
@@ -94,7 +93,7 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
         'address_area.name': 'computed_area_name',
     }
     queryset = DBContact.objects.annotate(
-        name=get_full_name_expression(),
+        # name=get_full_name_expression(),
         link=get_front_end_url_expression('contact', 'pk'),
         company_sector_name=get_sector_name_subquery('company__sector'),
         company_link=get_front_end_url_expression('company', 'company__pk'),
