@@ -6,7 +6,7 @@ from django.db.models.functions import Concat
 
 
 def combine_names(apps, schema_editor):
-    """Combine phone number fields into a single field"""
+    """Combine name fields into a single field"""
     Contact = apps.get_model('company', 'Contact')
     Contact.objects.filter(
         name='',

@@ -53,8 +53,14 @@ class Contact(ArchivableModel, BaseModel):
     title = models.ForeignKey(
         metadata_models.Title, blank=True, null=True, on_delete=models.SET_NULL,
     )
+    # DEPRECATED
+    # first_name and last_name are deprecated in favour of
+    # name - these should be deleted once the data has been
+    # succesfully migrated and the api consumers updated
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
+
+    # ---------
     name = models.CharField(max_length=MAX_LENGTH, blank=True)
     job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     company = models.ForeignKey(
