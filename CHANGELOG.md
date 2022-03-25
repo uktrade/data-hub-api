@@ -1,3 +1,12 @@
+# Data Hub API 39.20.2 (2022-03-25)
+
+
+## Features
+
+- **Contacts** Alternative email and alternative telephone number are now appended to the end of the Contact notes.
+- **Events** It's now possible to add levelling up as a programme event.
+
+
 # Data Hub API 39.20.1 (2022-03-23)
 
 
