@@ -165,13 +165,19 @@ class ContactFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     title_id = constants.Title.wing_commander.value.id
-    first_name = factory.Faker('first_name')
-    last_name = factory.Faker('last_name')
+    # First and last name fields are being deprecated for a single name field.
+    # This factory will be amended when the fields are deleted.
+    first_name = 'Barry'
+    last_name = 'Beeson'
+    name = 'Barry Beeson'
     company = factory.SubFactory(CompanyFactory)
     address_area_id = None
     email = 'foo@bar.com'
     job_title = factory.Faker('job')
     primary = True
+    # telephone_countrycode and telephone_number fields are being deprecated
+    # for a single full_telephone_number field.This factory will be
+    # amended when the fields are deleted.
     telephone_countrycode = '+44'
     telephone_number = '123456789'
     full_telephone_number = '+44 123456789'
