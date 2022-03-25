@@ -178,8 +178,3 @@ if ADMIN_OAUTH2_ENABLED:
         MIDDLEWARE.remove('axes.middleware.AxesMiddleware')
     if 'axes.backends.AxesBackend' in AUTHENTICATION_BACKENDS:
         AUTHENTICATION_BACKENDS.remove('axes.backends.AxesBackend')
-
-BED_USERNAME = 'test-user@digital.trade.gov.uk'
-BED_PASSWORD = 'test-password'
-BED_TOKEN = 'test-token'
-BED_IS_SANDBOX = True
