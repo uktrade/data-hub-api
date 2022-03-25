@@ -79,6 +79,7 @@ class AddContactBase(APITestMixin):
                 },
                 'first_name': 'Oratio',
                 'last_name': 'Nelson',
+                'name': 'Oratio Nelson',
                 'job_title': 'Head of Sales',
                 'company': {
                     'id': str(company.pk),
@@ -152,31 +153,31 @@ class AddContactBase(APITestMixin):
             'modified_on': '2017-04-18T13:25:30.986208Z',
         }
 
-    @freeze_time('2017-04-18 13:25:30.986208')
-    def test_build_full_telephone_number(self):
-        """A full telephone number should be added based on country code and phone number"""
-        url = reverse(f'{self.endpoint_namespace}:contact:list')
-        response = self.api_client.post(
-            url,
-            data={
-                'first_name': 'Oratio',
-                'last_name': 'Nelson',
-                'company': {
-                    'id': CompanyFactory().pk,
-                },
-                'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
-                'address_same_as_company': True,
-                'primary': True,
-            },
-        )
+    # @freeze_time('2017-04-18 13:25:30.986208')
+    # def test_build_full_telephone_number(self):
+    #     """A full telephone number should be added based on country code and phone number"""
+    #     url = reverse(f'{self.endpoint_namespace}:contact:list')
+    #     response = self.api_client.post(
+    #         url,
+    #         data={
+    #             'first_name': 'Oratio',
+    #             'last_name': 'Nelson',
+    #             'company': {
+    #                 'id': CompanyFactory().pk,
+    #             },
+    #             'email': 'foo@bar.com',
+    #             'telephone_countrycode': '+44',
+    #             'telephone_number': '123456789',
+    #             'address_same_as_company': True,
+    #             'primary': True,
+    #         },
+    #     )
 
-        assert response.status_code == status.HTTP_201_CREATED
-        response_data = response.json()
-        assert response_data['full_telephone_number'] == '+44 123456789'
-        assert response_data['telephone_number'] == '123456789'
-        assert response_data['telephone_countrycode'] == '+44'
+    #     assert response.status_code == status.HTTP_201_CREATED
+    #     response_data = response.json()
+    #     assert response_data['full_telephone_number'] == '+44 123456789'
+    #     assert response_data['telephone_number'] == '123456789'
+    #     assert response_data['telephone_countrycode'] == '+44'
 
     def test_with_address_same_as_company(self):
         """Test add new contact with same address as company."""
@@ -374,6 +375,7 @@ class TestAddContactV4(AddContactBase):
                 },
                 'first_name': 'Oratio',
                 'last_name': 'Nelson',
+                'name': 'Oratio Nelson',
                 'job_title': 'Head of Sales',
                 'company': {
                     'id': str(company.pk),
@@ -502,6 +504,7 @@ class EditContactBase(APITestMixin):
                 title_id=constants.Title.admiral_of_the_fleet.value.id,
                 first_name='Oratio',
                 last_name='Nelson',
+                name='Oratio Nelson',
                 job_title='Head of Sales',
                 company=company,
                 email='foo@bar.com',
@@ -523,11 +526,14 @@ class EditContactBase(APITestMixin):
             )
 
         url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
+        # First name and last name fields will be deprecated.
+        # Amending the first_name does not change the name through the property any more.
+        # this test will be amended when the fields are deleted.
         with freeze_time('2017-04-19 13:25:30.986208'):
             response = self.api_client.patch(
                 url,
                 data={
-                    'first_name': 'New Oratio',
+                    'name': 'New Oratio Nelson',
                 },
             )
 
@@ -538,7 +544,7 @@ class EditContactBase(APITestMixin):
                 'id': constants.Title.admiral_of_the_fleet.value.id,
                 'name': constants.Title.admiral_of_the_fleet.value.name,
             },
-            'first_name': 'New Oratio',
+            'first_name': 'Oratio',
             'last_name': 'Nelson',
             'name': 'New Oratio Nelson',
             'job_title': 'Head of Sales',
@@ -636,6 +642,7 @@ class TestEditContactV4(EditContactBase):
                 title_id=constants.Title.admiral_of_the_fleet.value.id,
                 first_name='Oratio',
                 last_name='Nelson',
+                name='Oratio Nelson',
                 job_title='Head of Sales',
                 company=company,
                 email='foo@bar.com',
@@ -843,6 +850,7 @@ class ViewContactBase(APITestMixin):
             title_id=constants.Title.admiral_of_the_fleet.value.id,
             first_name='Oratio',
             last_name='Nelson',
+            name='Oratio Nelson',
             job_title='Head of Sales',
             company=company,
             email='foo@bar.com',
@@ -1077,6 +1085,7 @@ class ContactListBase(APITestMixin):
             title_id=constants.Title.admiral_of_the_fleet.value.id,
             first_name='Oratio',
             last_name='Nelson',
+            name='Oratio Nelson',
             job_title='Head of Sales',
             company=company,
             email='foo@bar.com',
