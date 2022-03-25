@@ -1,0 +1,3 @@
+- model: event.programme
+  pk: 96b29620-599e-4c46-ae98-08b1aae3604d
+  fields: { disabled_on: null, name: Levelling Up }
