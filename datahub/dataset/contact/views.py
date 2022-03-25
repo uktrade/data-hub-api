@@ -1,5 +1,4 @@
 from datahub.company.models.contact import Contact
-from datahub.core.query_utils import get_full_name_expression
 from datahub.dataset.core.views import BaseDatasetView
 
 
@@ -14,9 +13,7 @@ class ContactsDatasetView(BaseDatasetView):
 
     def get_dataset(self):
         """Returns list of Contacts Dataset records"""
-        return Contact.objects.annotate(
-            name=get_full_name_expression(),
-        ).values(
+        return Contact.objects.values(
             'address_1',
             'address_2',
             'address_country__name',
@@ -32,9 +29,9 @@ class ContactsDatasetView(BaseDatasetView):
             'email',
             'email_alternative',
             'id',
+            'name',
             'job_title',
             'modified_on',
-            'name',
             'notes',
             'primary',
             'telephone_alternative',
