@@ -218,22 +218,19 @@ class TestContact:
         )
 
     @pytest.mark.parametrize(
-        'first_name,last_name,company_factory,expected_output',
+        'name,company_factory,expected_output',
         (
-            ('First', 'Last', lambda: CompanyFactory(name='Company'), 'First Last (Company)'),
-            ('', 'Last', lambda: CompanyFactory(name='Company'), 'Last (Company)'),
-            ('First', '', lambda: CompanyFactory(name='Company'), 'First (Company)'),
-            ('First', 'Last', lambda: None, 'First Last'),
-            ('First', 'Last', lambda: CompanyFactory(name=''), 'First Last'),
-            ('', '', lambda: CompanyFactory(name='Company'), '(no name) (Company)'),
-            ('', '', lambda: None, '(no name)'),
+            ('Name', lambda: CompanyFactory(name='Company'), 'Name (Company)'),
+            ('Name', lambda: None, 'Name'),
+            ('Name', lambda: CompanyFactory(name=''), 'Name'),
+            ('', lambda: CompanyFactory(name='Company'), '(no name) (Company)'),
+            ('', lambda: None, '(no name)'),
         ),
     )
-    def test_str(self, first_name, last_name, company_factory, expected_output):
+    def test_str(self, name, company_factory, expected_output):
         """Test the human-friendly string representation of a Contact object."""
         contact = ContactFactory.build(
-            first_name=first_name,
-            last_name=last_name,
+            name=name,
             company=company_factory(),
         )
         assert str(contact) == expected_output
