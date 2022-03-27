@@ -79,7 +79,7 @@ flake8-string-format==0.3.0
 pep8-naming==0.12.1
 pydocstyle==6.1.1
 pylint==2.12.2
-pylint-django==2.5.2
+pylint-django==2.5.3
 pylint-pytest==1.1.2
 
 WSGIserver==1.3
