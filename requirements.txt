@@ -305,7 +305,7 @@ pylint==2.12.2
     #   pylint-django
     #   pylint-plugin-utils
     #   pylint-pytest
-pylint-django==2.5.2
+pylint-django==2.5.3
     # via -r requirements.in
 pylint-plugin-utils==0.7
     # via pylint-django
