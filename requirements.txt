@@ -12,7 +12,7 @@ amqp==5.0.9
     # via kombu
 asgiref==3.5.0
     # via django
-astroid==2.9.3
+astroid==2.11.2
     # via pylint
 asttokens==2.0.5
     # via stack-data
@@ -30,9 +30,9 @@ backcall==0.2.0
     # via ipython
 billiard==3.6.4.0
     # via celery
-boto3==1.21.22
+boto3==1.21.27
     # via -r requirements.in
-botocore==1.24.22
+botocore==1.24.27
     # via
     #   boto3
     #   s3transfer
@@ -81,6 +81,8 @@ decorator==5.1.1
     # via ipython
 deprecated==1.2.13
     # via redis
+dill==0.3.4
+    # via pylint
 distlib==0.3.4
     # via virtualenv
 django==3.2.12
@@ -188,7 +190,7 @@ incremental==21.3.0
     # via towncrier
 iniconfig==1.1.1
     # via pytest
-ipython==8.1.1
+ipython==8.2.0
     # via -r requirements.in
 isodate==0.6.1
     # via zeep
@@ -234,7 +236,7 @@ notifications-python-client==6.3.0
     # via -r requirements.in
 opensearch-dsl==1.0.0
     # via -r requirements.in
-opensearch-py==1.0.0
+opensearch-py==1.1.0
     # via
     #   -r requirements.in
     #   opensearch-dsl
@@ -299,13 +301,13 @@ pygments==2.11.2
     # via ipython
 pyjwt==2.3.0
     # via notifications-python-client
-pylint==2.12.2
+pylint==2.13.2
     # via
     #   -r requirements.in
     #   pylint-django
     #   pylint-plugin-utils
     #   pylint-pytest
-pylint-django==2.5.2
+pylint-django==2.5.3
     # via -r requirements.in
 pylint-plugin-utils==0.7
     # via pylint-django
@@ -413,13 +415,12 @@ stack-data==0.2.0
 statsd==3.3.0
     # via -r requirements.in
 toml==0.10.2
-    # via
-    #   pre-commit
-    #   pylint
+    # via pre-commit
 tomli==2.0.1
     # via
     #   coverage
     #   pep517
+    #   pylint
     #   pytest
     #   towncrier
 towncrier==21.9.0
@@ -444,7 +445,7 @@ vine==5.0.0
     #   kombu
 virtualenv==20.13.1
     # via pre-commit
-watchdog[watchmedo]==2.1.6
+watchdog[watchmedo]==2.1.7
     # via -r requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
