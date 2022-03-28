@@ -11,7 +11,7 @@ def test_contact_auto_sync_to_opensearch(opensearch_with_signals):
     """Tests if contact gets synced to OpenSearch."""
     test_name = 'very_hard_to_find_contact'
     ContactFactory(
-        first_name=test_name,
+        name=test_name,
     )
     opensearch_with_signals.indices.refresh()
 
@@ -24,13 +24,14 @@ def test_contact_auto_updates_to_opensearch(opensearch_with_signals):
     """Tests if contact gets updated in OpenSearch."""
     test_name = 'very_hard_to_find_contact_ii'
     contact = ContactFactory(
-        first_name=test_name,
+        name=test_name,
     )
     contact.save()
 
     new_test_name = 'very_hard_to_find_contact_v'
-    contact.first_name = new_test_name
+    contact.name = new_test_name
     contact.save()
+    print(contact.first_name)
     opensearch_with_signals.indices.refresh()
 
     result = get_basic_search_query(Contact, new_test_name).execute()
