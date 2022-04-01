@@ -8,8 +8,6 @@ from datahub.core.models import ArchivableModel, BaseModel
 from datahub.core.utils import get_front_end_url, join_truthy_strings, StrEnum
 from datahub.core.validators import (
     InternationalTelephoneValidator,
-    TelephoneCountryCodeValidator,
-    TelephoneValidator,
 )
 from datahub.metadata import models as metadata_models
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -65,22 +63,6 @@ class Contact(ArchivableModel, BaseModel):
         on_delete=models.SET_NULL,
     )
     primary = models.BooleanField()
-
-    # DEPRECATED
-    # telephone_countrycode and telephone_number are deprecated in favour of
-    # full_telephone_number - these should be deleted once the data has been
-    # succesfully migrated and the api consumers updated
-    telephone_countrycode = models.CharField(
-        max_length=MAX_LENGTH,
-        validators=[TelephoneCountryCodeValidator()],
-        blank=True,
-    )
-    telephone_number = models.CharField(
-        validators=[TelephoneValidator()],
-        max_length=MAX_LENGTH,
-        blank=True,
-    )
-    # ---------
 
     full_telephone_number = models.CharField(
         validators=[InternationalTelephoneValidator()],
@@ -146,13 +128,3 @@ class Contact(ArchivableModel, BaseModel):
     def name_with_title(self):
         """Full name with title."""
         return join_truthy_strings(getattr(self.title, 'name', None), self.name)
-
-    def save(self, *args, **kwargs):
-        """Save contact and keep phone number in sync"""
-        if not self.full_telephone_number:
-            self.full_telephone_number = self.get_full_telephone_number()
-        super().save(*args, **kwargs)
-
-    def get_full_telephone_number(self):
-        """Full telephone number with country code."""
-        return join_truthy_strings(self.telephone_countrycode, self.telephone_number)

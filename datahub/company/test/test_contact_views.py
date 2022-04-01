@@ -126,8 +126,6 @@ class AddContactBase(APITestMixin):
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
             'primary': True,
-            'telephone_countrycode': '',
-            'telephone_number': '',
             'full_telephone_number': '+44 123456789',
             'telephone_alternative': '987654321',
             'address_same_as_company': False,
@@ -152,32 +150,6 @@ class AddContactBase(APITestMixin):
             'modified_on': '2017-04-18T13:25:30.986208Z',
         }
 
-    @freeze_time('2017-04-18 13:25:30.986208')
-    def test_build_full_telephone_number(self):
-        """A full telephone number should be added based on country code and phone number"""
-        url = reverse(f'{self.endpoint_namespace}:contact:list')
-        response = self.api_client.post(
-            url,
-            data={
-                'first_name': 'Oratio',
-                'last_name': 'Nelson',
-                'company': {
-                    'id': CompanyFactory().pk,
-                },
-                'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
-                'address_same_as_company': True,
-                'primary': True,
-            },
-        )
-
-        assert response.status_code == status.HTTP_201_CREATED
-        response_data = response.json()
-        assert response_data['full_telephone_number'] == '+44 123456789'
-        assert response_data['telephone_number'] == '123456789'
-        assert response_data['telephone_countrycode'] == '+44'
-
     def test_with_address_same_as_company(self):
         """Test add new contact with same address as company."""
         url = reverse(f'{self.endpoint_namespace}:contact:list')
@@ -190,8 +162,6 @@ class AddContactBase(APITestMixin):
                     'id': CompanyFactory().pk,
                 },
                 'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'address_same_as_company': True,
                 'primary': True,
             },
@@ -220,8 +190,6 @@ class AddContactBase(APITestMixin):
                     'id': CompanyFactory().pk,
                 },
                 'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'address_same_as_company': True,
                 'primary': True,
             },
@@ -254,8 +222,6 @@ class AddContactBase(APITestMixin):
                     'id': CompanyFactory().pk,
                 },
                 'email': 'invalid dot com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'address_same_as_company': True,
                 'primary': True,
             },
@@ -278,8 +244,6 @@ class AddContactBase(APITestMixin):
                     'id': CompanyFactory().pk,
                 },
                 'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'primary': True,
             },
         )
@@ -303,8 +267,6 @@ class AddContactBase(APITestMixin):
                     'id': CompanyFactory().pk,
                 },
                 'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'address_1': 'test',
                 'primary': True,
             },
@@ -328,8 +290,6 @@ class AddContactBase(APITestMixin):
                     'id': CompanyFactory().pk,
                 },
                 'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'address_same_as_company': True,
             },
         )
@@ -479,8 +439,6 @@ class TestAddContactV4(AddContactBase):
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
             'primary': True,
-            'telephone_countrycode': '',
-            'telephone_number': '',
             'full_telephone_number': '+44 123456789',
             'telephone_alternative': '987654321',
             'address_same_as_company': False,
@@ -561,8 +519,6 @@ class EditContactBase(APITestMixin):
                 email_alternative='foo2@bar.com',
                 primary=True,
                 adviser=self.user,
-                telephone_countrycode='+44',
-                telephone_number='123456789',
                 full_telephone_number='+44 123456789',
                 telephone_alternative='987654321',
                 address_same_as_company=False,
@@ -608,8 +564,6 @@ class EditContactBase(APITestMixin):
                 'last_name': self.user.last_name,
                 'name': self.user.name,
             },
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
             'full_telephone_number': '+44 123456789',
             'telephone_alternative': '987654321',
             'address_same_as_company': False,
@@ -758,8 +712,6 @@ class TestEditContactV4(EditContactBase):
                 email_alternative='foo2@bar.com',
                 primary=True,
                 adviser=self.user,
-                telephone_countrycode='+44',
-                telephone_number='123456789',
                 full_telephone_number='+44 123456789',
                 telephone_alternative='987654321',
                 address_same_as_company=False,
@@ -808,8 +760,6 @@ class TestEditContactV4(EditContactBase):
                 'last_name': self.user.last_name,
                 'name': self.user.name,
             },
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
             'full_telephone_number': '+44 123456789',
             'telephone_alternative': '987654321',
             'address_same_as_company': False,
@@ -852,8 +802,6 @@ class TestEditContactV4(EditContactBase):
                 email_alternative='foo2@bar.com',
                 primary=True,
                 adviser=self.user,
-                telephone_countrycode='+44',
-                telephone_number='123456789',
                 telephone_alternative='987654321',
                 address_same_as_company=False,
                 address_1='Foo st.',
@@ -965,8 +913,6 @@ class ViewContactBase(APITestMixin):
             email_alternative='foo2@bar.com',
             primary=True,
             adviser=self.user,
-            telephone_countrycode='+1',
-            telephone_number='123456789',
             full_telephone_number='+1 123456789',
             telephone_alternative='987654321',
             address_same_as_company=False,
@@ -1006,8 +952,6 @@ class ViewContactBase(APITestMixin):
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
             'primary': True,
-            'telephone_countrycode': '+1',
-            'telephone_number': '123456789',
             'full_telephone_number': '+1 123456789',
             'telephone_alternative': '987654321',
             'address_same_as_company': False,
@@ -1199,8 +1143,7 @@ class ContactListBase(APITestMixin):
             email_alternative='foo2@bar.com',
             primary=True,
             adviser=self.user,
-            telephone_countrycode='+44',
-            telephone_number='123456789',
+            full_telephone_number='+44 123456789',
             telephone_alternative='987654321',
             address_same_as_company=False,
             address_1='Foo st.',
@@ -1259,8 +1202,6 @@ class ContactListBase(APITestMixin):
                     'notes': 'lorem ipsum',
                     'primary': True,
                     'telephone_alternative': '987654321',
-                    'telephone_countrycode': '+44',
-                    'telephone_number': '123456789',
                     'full_telephone_number': '+44 123456789',
                     'id': str(contact.pk),
                     'title': {
@@ -1415,8 +1356,6 @@ class ContactVersioningBase(APITestMixin):
                 'last_name': 'Nelson',
                 'company': {'id': CompanyFactory().pk},
                 'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'address_same_as_company': True,
                 'primary': True,
             },
