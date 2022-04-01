@@ -761,7 +761,6 @@ def test_get_basic_search_query():
                                 'teams.name',
                                 'teams.name.trigram',
                                 'telephone_alternative',
-                                'telephone_number',
                                 'total_cost.keyword',
                                 'trading_names',
                                 'trading_names.trigram',

@@ -4,7 +4,7 @@
     email: Sarah.Gates@example.com
     first_name: Sarah
     last_name: Gates
-    dit_team: 162a3959-9798-e211-a939-e4115bead28a  # International Trade Team
+    dit_team: 162a3959-9798-e211-a939-e4115bead28a # International Trade Team
 
 - model: company.advisor
   pk: 453a608e-84a4-11e6-ea22-56b6b6499622
@@ -12,7 +12,7 @@
     email: Harold.Jones@example.com
     first_name: Harold
     last_name: Jones
-    dit_team: 162a3959-9798-e211-a939-e4115bead28a  # International Trade Team
+    dit_team: 162a3959-9798-e211-a939-e4115bead28a # International Trade Team
 
 - model: company.advisor
   pk: 95a99736-5402-11eb-ae93-0242ac130002
@@ -21,7 +21,7 @@
     first_name: Ava
     last_name: Walsh
     is_active: false
-    dit_team: 162a3959-9798-e211-a939-e4115bead28a  # International Trade Team
+    dit_team: 162a3959-9798-e211-a939-e4115bead28a # International Trade Team
 
 - model: company.advisor
   pk: e83a608e-84a4-11e6-ae22-56b6b6499611
@@ -29,7 +29,7 @@
     email: Puck.Head@example.com
     first_name: Puck
     last_name: Head
-    dit_team: 602b971d-5df6-e511-888e-e4115bead28a  # CBBC North EAST
+    dit_team: 602b971d-5df6-e511-888e-e4115bead28a # CBBC North EAST
 
 - model: company.advisor
   pk: 7bad8082-4978-4fe8-a018-740257f01637
@@ -37,7 +37,7 @@
     email: John.Rogers@example.com
     first_name: John
     last_name: Rogers
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a  # Marketing - Marketing Team
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a # Marketing - Marketing Team
 
 - model: company.advisor
   pk: d7493b4e-5d7b-4834-98d9-28b78a74052a
@@ -45,7 +45,7 @@
     email: michael.wining@example.com
     first_name: Michael
     last_name: Wining
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a  # Marketing - Marketing Team
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a # Marketing - Marketing Team
 
 - model: company.advisor
   pk: 5a644146-5298-4741-91f3-d5d7558adf47
@@ -53,7 +53,7 @@
     email: paula.churing@example.com
     first_name: Paula
     last_name: Churing
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a  # Marketing - Marketing Team
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a # Marketing - Marketing Team
 
 - model: company.advisor
   pk: a80ff5fd-8904-4940-bf96-fe8047e34be5
@@ -61,7 +61,7 @@
     email: barry.oling@example.com
     first_name: Barry
     last_name: Oling
-    dit_team: a4f924aa-9698-e211-a939-e4115bead28a  # Isle of Wight Chamber of Commerce
+    dit_team: a4f924aa-9698-e211-a939-e4115bead28a # Isle of Wight Chamber of Commerce
 
 - model: company.advisor
   pk: f1eb4363-0a37-4344-bd96-e90abeaf483e
@@ -69,7 +69,7 @@
     email: jenny.carey@example.com
     first_name: Jenny
     last_name: Carey
-    dit_team: c833d869-2f50-e311-a56a-e4115bead28a  # IG - Specialists - Knowledge Intensive Industry
+    dit_team: c833d869-2f50-e311-a56a-e4115bead28a # IG - Specialists - Knowledge Intensive Industry
 
 - model: company.advisor
   pk: 379f390a-e083-4a2c-9cea-e3b9a08606a7
@@ -77,7 +77,7 @@
     email: holly.collins@example.com
     first_name: Holly
     last_name: Collins
-    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a  # Heart of the South West LEP
+    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a # Heart of the South West LEP
 
 - model: company.advisor
   pk: a6f39399-5bf4-46cb-a686-826f73e9f0ca
@@ -85,7 +85,7 @@
     email: dennis.kennedy@example.com
     first_name: Dennis
     last_name: Kennedy
-    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a  # Heart of the South West LEP
+    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a # Heart of the South West LEP
 
 - model: company.advisor
   pk: b4848b30-f532-4cfc-a063-b064d8435b65
@@ -93,7 +93,7 @@
     email: jacob.webster@example.com
     first_name: Jacob
     last_name: Webster
-    dit_team: 1e68d89b-8225-e511-b6bc-e4115bead28a  # South East Midlands LEP
+    dit_team: 1e68d89b-8225-e511-b6bc-e4115bead28a # South East Midlands LEP
 
 - model: company.advisor
   pk: 4b4e1553-4ed3-46b4-b52a-a1f07fea5352
@@ -101,7 +101,7 @@
     email: jodie.matthews@example.com
     first_name: Jodie
     last_name: Matthews
-    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a  # Welsh Government (Investment)
+    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a # Welsh Government (Investment)
 
 - model: company.advisor
   pk: 8dcd2bb8-dc73-4a42-8655-4ae42d4d3c5a
@@ -109,7 +109,7 @@
     email: bernard.harris-patel@example.com
     first_name: Bernard
     last_name: Harris-Patel
-    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a  # Welsh Government (Investment)
+    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a # Welsh Government (Investment)
 
 - model: company.advisor
   pk: b4ce0b40-25f0-4532-b78f-1e0345934a6d
@@ -117,7 +117,7 @@
     email: kathryn.nicholls@example.com
     first_name: Kathryn
     last_name: Nicholls
-    dit_team: e53ade1c-9798-e211-a939-e4115bead28a  # Invest Northern Ireland
+    dit_team: e53ade1c-9798-e211-a939-e4115bead28a # Invest Northern Ireland
 
 - model: company.advisor
   pk: 8eefe6b4-2816-4e47-94b5-a13409dcef70
@@ -125,34 +125,34 @@
     email: travis.greene@example.com
     first_name: Travis
     last_name: Greene
-    dit_team: fc3a6667-cfe9-e511-8ffa-e4115bead28a  # IST - Sector Advisory Services
+    dit_team: fc3a6667-cfe9-e511-8ffa-e4115bead28a # IST - Sector Advisory Services
 
 - model: company.company
   pk: a73efeba-8499-11e6-ae22-56b6b6499611
   fields:
     company_number: 99919
     name: Mercury Ltd
-    business_type: 6f75408b-03e7-e611-bca1-e4115bead28a  # Private Limited Company
+    business_type: 6f75408b-03e7-e611-bca1-e4115bead28a # Private Limited Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
-    - 35afd8d0-5d95-e211-a939-e4115bead28a
-    - 36afd8d0-5d95-e211-a939-e4115bead28a
+      - 35afd8d0-5d95-e211-a939-e4115bead28a
+      - 36afd8d0-5d95-e211-a939-e4115bead28a
     future_interest_countries:
-    - 37afd8d0-5d95-e211-a939-e4115bead28a
+      - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
     address_1: 82 Ramsgate Rd
     address_town: Willington
     address_postcode: NE28 5JB
-    address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a # UK
     registered_address_1: 82 Ramsgate Rd
     registered_address_town: Willington
     registered_address_postcode: NE28 5JB
-    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
+    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a # UK
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
     description: This is a dummy company for testing with all the fields for data-flow
-    created_on: '2016-06-05T12:00:00Z'
-    modified_on: '2016-07-05T12:00:00Z'
+    created_on: "2016-06-05T12:00:00Z"
+    modified_on: "2016-07-05T12:00:00Z"
     export_experience_category: b9b88464-6ffb-47e7-bb60-b1fc376bf949
     website: https://iamawebsite.com
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
@@ -161,29 +161,29 @@
   pk: 0f5216e0-849f-11e6-ae22-56b6b6499611
   fields:
     name: Venus Ltd
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
     address_1: 66 Marcham Road
     address_town: Bordley
     address_postcode: BD23 8RZ
-    address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a # UK
     registered_address_1: 66 Marcham Road
     registered_address_town: Bordley
     registered_address_postcode: BD23 8RZ
-    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
+    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a # UK
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
     description: This is a dummy company for testing
     reference_code: ORG-10096257
-    archived_documents_url_path: '/documents/123'
-    created_on: '2016-06-15T10:00:00Z'
-    modified_on: '2016-07-15T10:00:00Z'
+    archived_documents_url_path: "/documents/123"
+    created_on: "2016-06-15T10:00:00Z"
+    modified_on: "2016-07-15T10:00:00Z"
     global_headquarters: 346f78a5-1d23-4213-b4c2-bf48246a13c3
 
 - model: company.company
   pk: 731bdcc1-f685-4c8e-bd66-b356b2c16995
   fields:
     name: Mars Components Ltd
-    business_type: 9ad14e94-5d95-e211-a939-e4115bead28a  # Partnership
+    business_type: 9ad14e94-5d95-e211-a939-e4115bead28a # Partnership
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
@@ -197,22 +197,22 @@
     address_1: 12 Alpha Street
     address_town: Volcanus
     address_postcode: NE28 5AQ
-    address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a # UK
     registered_address_1: 12 Alpha Street
     registered_address_town: Volcanus
     registered_address_postcode: NE28 5AQ
-    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
+    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a # UK
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
     description: This is a dummy company for testing
-    created_on: '2016-09-16T11:00:00Z'
-    modified_on: '2017-10-16T11:00:00Z'
+    created_on: "2016-09-16T11:00:00Z"
+    modified_on: "2017-10-16T11:00:00Z"
 
 - model: company.company
   pk: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
   fields:
     name: Mars Exports Ltd
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
-    duns_number: '000345679'
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
+    duns_number: "000345679"
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
@@ -227,22 +227,22 @@
     address_town: Virginia City
     address_postcode: 73301
     address_area: c35c119a-bc4d-4e48-9ace-167dbe8cb695
-    address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
+    address_country: 81756b9a-5d95-e211-a939-e4115bead28a # US
     registered_address_1: 12 First Street
     registered_address_town: Virginia City
     registered_address_postcode: 73301-1234
     registered_address_area: c35c119a-bc4d-4e48-9ace-167dbe8cb695
-    registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
+    registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a # US
     description: This is a dummy company for testing
-    created_on: '2017-10-16T11:00:00Z'
-    modified_on: '2017-11-16T11:00:00Z'
+    created_on: "2017-10-16T11:00:00Z"
+    modified_on: "2017-11-16T11:00:00Z"
 
 - model: company.company
   pk: 008ba003-b528-4e79-b209-49fcfcceb371
   fields:
     name: Motorleaf
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
-    duns_number: '012345678'
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
+    duns_number: "012345678"
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
@@ -257,16 +257,16 @@
     address_town: Montréal
     address_postcode: H4E 1A8
     address_area: 5fc4ea61-75fe-415d-8ff0-2a2034ff6c86
-    address_country: 5daf72a6-5d95-e211-a939-e4115bead28a  # CA
+    address_country: 5daf72a6-5d95-e211-a939-e4115bead28a # CA
     description: Canadian company for testing
-    created_on: '2020-10-16T11:00:00Z'
-    modified_on: '2020-11-16T11:00:00Z'
+    created_on: "2020-10-16T11:00:00Z"
+    modified_on: "2020-11-16T11:00:00Z"
 
 - model: company.company
   pk: 0fb3379c-341c-4da4-b825-bf8d47b26baa
   fields:
     name: Lambda plc
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
@@ -280,47 +280,47 @@
     address_1: 12 St George's Road
     address_town: Paris
     address_postcode: 75001
-    address_country: 82756b9a-5d95-e211-a939-e4115bead28a  # France
+    address_country: 82756b9a-5d95-e211-a939-e4115bead28a # France
     registered_address_1: 12 St George's Road
     registered_address_town: Paris
     registered_address_postcode: 75001
-    registered_address_country: 82756b9a-5d95-e211-a939-e4115bead28a  # France
+    registered_address_country: 82756b9a-5d95-e211-a939-e4115bead28a # France
     description: This is a dummy company for testing
-    created_on: '2015-10-26T11:00:00Z'
-    modified_on: '2017-11-26T11:00:00Z'
+    created_on: "2015-10-26T11:00:00Z"
+    modified_on: "2017-11-26T11:00:00Z"
 
 - model: company.company
   pk: 375094ac-f79a-43e5-9c88-059a7caa17f0
   fields:
     name: One List Corp
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
     address_1: 12 St George's Road
     address_town: Paris
     address_postcode: 75001
-    address_country: 82756b9a-5d95-e211-a939-e4115bead28a  # France
+    address_country: 82756b9a-5d95-e211-a939-e4115bead28a # France
     registered_address_1: 12 St George's Road
     registered_address_town: Paris
     registered_address_postcode: 75001
-    registered_address_country: 82756b9a-5d95-e211-a939-e4115bead28a  # France
+    registered_address_country: 82756b9a-5d95-e211-a939-e4115bead28a # France
     description: This is a dummy company for testing the One List
-    headquarter_type: 43281c5e-92a4-4794-867b-b4d5f801e6f3  # GHQ
-    one_list_tier: b91bf800-8d53-e311-aef3-441ea13961e2  # Tier A
-    duns_number: '123456789'
+    headquarter_type: 43281c5e-92a4-4794-867b-b4d5f801e6f3 # GHQ
+    one_list_tier: b91bf800-8d53-e311-aef3-441ea13961e2 # Tier A
+    duns_number: "123456789"
     one_list_account_owner: 8eefe6b4-2816-4e47-94b5-a13409dcef70
-    created_on: '2015-10-26T11:00:00Z'
-    modified_on: '2017-11-26T11:00:00Z'
+    created_on: "2015-10-26T11:00:00Z"
+    modified_on: "2017-11-26T11:00:00Z"
 
 - model: company.company
   pk: cc7e2f19-7251-4a41-a27a-f98437720531
   fields:
     name: DnB Corp
     trading_names:
-        - DnB
-        - D&B
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+      - DnB
+      - D&B
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     turnover: 1000000
@@ -333,44 +333,44 @@
     address_1: 1 Main Road
     address_town: Rome
     address_postcode: 10443
-    address_country: 84756b9a-5d95-e211-a939-e4115bead28a  # Italy
+    address_country: 84756b9a-5d95-e211-a939-e4115bead28a # Italy
     registered_address_1: 1 Main Road
     registered_address_town: Rome
     registered_address_postcode: 10644
-    registered_address_country: 84756b9a-5d95-e211-a939-e4115bead28a  # Italy
+    registered_address_country: 84756b9a-5d95-e211-a939-e4115bead28a # Italy
     description: This is a dummy company for testing companies with DnB data
-    duns_number: '000000001'
-    created_on: '2015-10-26T11:00:00Z'
-    modified_on: '2017-11-26T11:00:00Z'
+    duns_number: "000000001"
+    created_on: "2015-10-26T11:00:00Z"
+    modified_on: "2017-11-26T11:00:00Z"
 
 - model: company.company
   pk: 960e1fa9-cc25-478c-a548-a2e2047319bb
   fields:
     name: One List Subsidiary Ltd
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
     sector: 7ebb9fc6-5f95-e211-a939-e4115bead28a
     export_segment: hep
     export_sub_segment: challenge
     address_1: 100 Fordham Rd
     address_town: Hainault
     address_postcode: IG6 7SQ
-    address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a # UK
     registered_address_1: 100 Fordham Rd
     registered_address_town: Hainault
     registered_address_postcode: IG6 7SQ
-    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
+    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a # UK
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
     description: This is a dummy company for testing subsidiaries of One List GHQ
-    archived_documents_url_path: '/documents/123'
-    created_on: '2017-07-23T10:00:00Z'
-    modified_on: '2017-04-07T10:00:00Z'
+    archived_documents_url_path: "/documents/123"
+    created_on: "2017-07-23T10:00:00Z"
+    modified_on: "2017-04-07T10:00:00Z"
     global_headquarters: 375094ac-f79a-43e5-9c88-059a7caa17f0 # One List Corp
 
 - model: company.company
   pk: 346f78a5-1d23-4213-b4c2-bf48246a13c3
   fields:
     name: Archived Ltd
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
@@ -379,35 +379,35 @@
     address_1: 16 Getabergsvagen
     address_town: Geta
     address_postcode: 22340
-    address_country: 0850bdb8-5d95-e211-a939-e4115bead28a  # Malta
+    address_country: 0850bdb8-5d95-e211-a939-e4115bead28a # Malta
     registered_address_1: 16 Getabergsvagen
     registered_address_town: Geta
     registered_address_postcode: 22340
-    registered_address_country: 0850bdb8-5d95-e211-a939-e4115bead28a  # Malta
+    registered_address_country: 0850bdb8-5d95-e211-a939-e4115bead28a # Malta
     description: This is a dummy company for testing archived features
-    headquarter_type: 43281c5e-92a4-4794-867b-b4d5f801e6f3  # GHQ
-    one_list_tier: b91bf800-8d53-e311-aef3-441ea13961e2  # Tier A
+    headquarter_type: 43281c5e-92a4-4794-867b-b4d5f801e6f3 # GHQ
+    one_list_tier: b91bf800-8d53-e311-aef3-441ea13961e2 # Tier A
     one_list_account_owner: 8eefe6b4-2816-4e47-94b5-a13409dcef70
-    created_on: '2014-11-11T09:00:00Z'
-    modified_on: '2017-07-16T10:00:00Z'
+    created_on: "2014-11-11T09:00:00Z"
+    modified_on: "2017-07-16T10:00:00Z"
     archived: true
-    archived_on: '2018-07-06T10:44:56Z'
+    archived_on: "2018-07-06T10:44:56Z"
     archived_by: 7bad8082-4978-4fe8-a018-740257f01637
-    archived_reason: 'Company is dissolved'
+    archived_reason: "Company is dissolved"
 
 - model: company.company
   pk: ca141e78-e19b-4551-9234-66de570d43a6
   fields:
     name: Mars Transferred Limited
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
     transfer_reason: duplicate
-    transferred_on: '2018-07-06T15:44:56Z'
+    transferred_on: "2018-07-06T15:44:56Z"
     transferred_by: 7bad8082-4978-4fe8-a018-740257f01637
     transferred_to: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
     archived: true
-    archived_on: '2018-07-06T15:44:56Z'
+    archived_on: "2018-07-06T15:44:56Z"
     archived_by: 7bad8082-4978-4fe8-a018-740257f01637
-    archived_reason: 'This record is no longer in use and its data has been transferred to Mars Export Ltd for the following reason: Duplicate record.'
+    archived_reason: "This record is no longer in use and its data has been transferred to Mars Export Ltd for the following reason: Duplicate record."
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
@@ -422,42 +422,42 @@
     address_town: New York
     address_postcode: 10001
     address_area: aa65b701-244a-41fc-bd31-0a546303106a
-    address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
+    address_country: 81756b9a-5d95-e211-a939-e4115bead28a # US
     registered_address_1: 12 First Street
     registered_address_town: New York
     registered_address_postcode: 10101
     registered_address_area: aa65b701-244a-41fc-bd31-0a546303106a
-    registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
+    registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a # US
     description: This is a dummy duplicate company for testing
-    created_on: '2017-03-05T12:00:00Z'
-    modified_on: '2018-07-06T15:44:56Z'
+    created_on: "2017-03-05T12:00:00Z"
+    modified_on: "2018-07-06T15:44:56Z"
 
 - model: company.company
   pk: 3cb006bb-c8bd-4062-bc8c-c086273b84e1
   fields:
     company_number: 88818
     name: Empty UK Region Ltd
-    business_type: 6f75408b-03e7-e611-bca1-e4115bead28a  # Private Limited Company
+    business_type: 6f75408b-03e7-e611-bca1-e4115bead28a # Private Limited Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
-    - 35afd8d0-5d95-e211-a939-e4115bead28a
-    - 36afd8d0-5d95-e211-a939-e4115bead28a
+      - 35afd8d0-5d95-e211-a939-e4115bead28a
+      - 36afd8d0-5d95-e211-a939-e4115bead28a
     future_interest_countries:
-    - 37afd8d0-5d95-e211-a939-e4115bead28a
+      - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
     address_1: 82 Stafford Rd
     address_town: Madrid
     address_postcode: SE28 5KB
-    address_country: 86756b9a-5d95-e211-a939-e4115bead28a  # Spain
+    address_country: 86756b9a-5d95-e211-a939-e4115bead28a # Spain
     registered_address_1: 82 Stafford Rd
     registered_address_town: Madrid
     registered_address_postcode: SE28 5KB
-    registered_address_country: 86756b9a-5d95-e211-a939-e4115bead28a  # Spain
+    registered_address_country: 86756b9a-5d95-e211-a939-e4115bead28a # Spain
     uk_region: null
     description: This is a dummy company for testing empty uk region
-    created_on: '2020-05-05T12:00:00Z'
-    modified_on: '2020-05-05T12:00:00Z'
+    created_on: "2020-05-05T12:00:00Z"
+    modified_on: "2020-05-05T12:00:00Z"
 
 - model: company.onelistcoreteammember
   pk: 58fb3504-3e39-4f76-8662-2f4ef2387bbb
@@ -476,10 +476,8 @@
   fields:
     first_name: Johnny
     last_name: Cakeman
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611  # Venus Ltd
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611 # Venus Ltd
     primary: false
-    telephone_countrycode: +44
-    telephone_number: 67890123432
     full_telephone_number: +44 67890123432
     email: johnny@cakeman.com
     address_1: 82 Ramsgate Rd
@@ -487,51 +485,45 @@
     address_postcode: NE28 5JB
     address_country: 80756b9a-5d95-e211-a939-e4115bead28a
     notes: This is a dummy contact for testing
-    created_on: '2017-02-28T15:00:00Z'
-    modified_on: '2017-06-05T00:00:00Z'
-    archived_documents_url_path: '/documents/123'
+    created_on: "2017-02-28T15:00:00Z"
+    modified_on: "2017-06-05T00:00:00Z"
+    archived_documents_url_path: "/documents/123"
 
 - model: company.contact
   pk: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
   fields:
     first_name: Jenny
     last_name: Cakeman
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611  # Venus Ltd
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611 # Venus Ltd
     primary: true
-    telephone_countrycode: +44
-    telephone_number: 67890123432
     full_telephone_number: +44 67890123432
     email: jenny@cakeman.com
     address_same_as_company: true
     notes: This is a dummy contact for testing
-    created_on: '2017-02-28T15:00:00Z'
-    modified_on: '2017-06-05T00:00:00Z'
+    created_on: "2017-02-28T15:00:00Z"
+    modified_on: "2017-06-05T00:00:00Z"
 
 - model: company.contact
   pk: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
   fields:
     first_name: Dean
     last_name: Cox
-    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa # Lambda plc
     primary: true
-    telephone_countrycode: +33
-    telephone_number: 6 39 15 95 29
     full_telephone_number: +33 6 39 15 95 29
     email: dean@cox.com
     address_same_as_company: true
     notes: This is a dummy contact for testing
-    created_on: '2017-02-28T15:00:00Z'
-    modified_on: '2017-06-08T00:00:00Z'
+    created_on: "2017-02-28T15:00:00Z"
+    modified_on: "2017-06-08T00:00:00Z"
 
 - model: company.contact
   pk: 048f2edc-e7ed-4881-b1cc-29142a80238a
   fields:
     first_name: Georgina
     last_name: Clark
-    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa # Lambda plc
     primary: false
-    telephone_countrycode: +33
-    telephone_number: 6 72 83 69 66
     full_telephone_number: +33 6 72 83 69 66
     email: georgina@clark.com
     address_1: 7 chemin
@@ -539,18 +531,16 @@
     address_postcode: 15404
     address_country: 82756b9a-5d95-e211-a939-e4115bead28a
     notes: This is a dummy contact for testing
-    created_on: '2017-02-28T15:00:00Z'
-    modified_on: '2017-04-05T00:00:00Z'
+    created_on: "2017-02-28T15:00:00Z"
+    modified_on: "2017-04-05T00:00:00Z"
 
 - model: company.contact
   pk: 6791d583-7a52-418f-a0d3-d8d527f20d43
   fields:
     first_name: Benjamina
     last_name: Clarksoon
-    company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd  # Mars Exports Ltd
+    company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd # Mars Exports Ltd
     primary: false
-    telephone_countrycode: +1
-    telephone_number: 5551212
     full_telephone_number: +1 5551212
     email: benjamina@clarksoon.com
     address_1: 7 usa drive
@@ -559,18 +549,16 @@
     address_country: 81756b9a-5d95-e211-a939-e4115bead28a
     address_area: ad6db3f6-52f7-4d7f-b989-ed559f6922df
     notes: This is a dummy contact for testing
-    created_on: '2017-04-28T15:00:00Z'
-    modified_on: '2016-04-05T00:00:00Z'
+    created_on: "2017-04-28T15:00:00Z"
+    modified_on: "2016-04-05T00:00:00Z"
 
 - model: company.contact
   pk: 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
   fields:
     first_name: Mark
     last_name: Halomi
-    company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd  # Mars Exports Ltd
+    company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd # Mars Exports Ltd
     primary: false
-    telephone_countrycode: +1
-    telephone_number: 45457676
     full_telephone_number: +1 45457676
     email: mark@halomi.com
     address_1: 24 sunny beach place
@@ -579,18 +567,16 @@
     address_area_id: a88512e0-62d4-4808-95dc-d3beab05d0e9
     address_country: 81756b9a-5d95-e211-a939-e4115bead28a
     notes: This is a dummy contact for testing
-    created_on: '2017-04-28T15:00:00Z'
-    modified_on: '2017-06-05T00:00:00Z'
+    created_on: "2017-04-28T15:00:00Z"
+    modified_on: "2017-06-05T00:00:00Z"
 
 - model: company.contact
   pk: 435f9fa1-2e54-4205-8500-f23de614620e
   fields:
     first_name: Archie
     last_name: Arakelian
-    company: 346f78a5-1d23-4213-b4c2-bf48246a13c3  # Archived Ltd
+    company: 346f78a5-1d23-4213-b4c2-bf48246a13c3 # Archived Ltd
     primary: false
-    telephone_countrycode: +44
-    telephone_number: 78801234322
     full_telephone_number: +44 78801234322
     email: archie@arakelian.com
     address_1: 94 Great North Road
@@ -598,19 +584,17 @@
     address_postcode: IP31 2RH
     address_country: 80756b9a-5d95-e211-a939-e4115bead28a
     notes: This is a dummy contact for testing
-    created_on: '2018-02-28T15:00:00Z'
-    modified_on: '2018-06-05T00:00:00Z'
-    archived_documents_url_path: '/documents/123'
+    created_on: "2018-02-28T15:00:00Z"
+    modified_on: "2018-06-05T00:00:00Z"
+    archived_documents_url_path: "/documents/123"
 
 - model: company.contact
   pk: 1430e18a-52ac-4185-b71d-b2be5a771fd0
   fields:
     first_name: Fred
     last_name: Peterson
-    company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd  # Mars Exports Ltd
+    company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd # Mars Exports Ltd
     primary: false
-    telephone_countrycode: +44
-    telephone_number: 78801234322
     full_telephone_number: +44 78801234322
     email: fred.peterson@example.com
     address_1: 123 Fake Street
@@ -618,41 +602,41 @@
     address_postcode: BN2 9QB
     address_country: 80756b9a-5d95-e211-a939-e4115bead28a
     notes: This is a dummy contact for testing
-    created_on: '2018-02-28T15:00:00Z'
-    modified_on: '2018-06-05T00:00:00Z'
+    created_on: "2018-02-28T15:00:00Z"
+    modified_on: "2018-06-05T00:00:00Z"
 
 - model: company_referral.companyreferral
   pk: 02e4cce0-caf5-4eb8-8d6d-ebdd69a6545b
   fields:
-    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa # Lambda plc
     contact: null
     recipient: e83a608e-84a4-11e6-ae22-56b6b6499611
     status: outstanding
     subject: Wants to export to the US
     notes: Example oustanding referral
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
-    created_on: '2019-06-15T10:00:00Z'
+    created_on: "2019-06-15T10:00:00Z"
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
-    modified_on: '2019-06-15T10:00:00Z'
+    modified_on: "2019-06-15T10:00:00Z"
 
 - model: company_referral.companyreferral
   pk: 92d8c757-9fa6-4a00-93d4-e0fee40b953b
   fields:
-    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa # Lambda plc
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     recipient: d7493b4e-5d7b-4834-98d9-28b78a74052a
     status: outstanding
     subject: Wants to export graphene
     notes: Example oustanding referral with a contact
     created_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
-    created_on: '2019-07-20T10:00:00Z'
+    created_on: "2019-07-20T10:00:00Z"
     modified_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
-    modified_on: '2019-07-20T10:00:00Z'
+    modified_on: "2019-07-20T10:00:00Z"
 
 - model: company_referral.companyreferral
   pk: 3d4b1d90-eeb2-4823-a3a2-459f61483e2f
   fields:
-    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa # Lambda plc
     contact: 048f2edc-e7ed-4881-b1cc-29142a80238a
     recipient: f1eb4363-0a37-4344-bd96-e90abeaf483e
     interaction: 04e8c0cb-3a52-46b1-a465-76f206d0fd37
@@ -660,11 +644,11 @@
     subject: Wants to export saxophones
     notes: Example complete referral
     completed_by: f1eb4363-0a37-4344-bd96-e90abeaf483e
-    completed_on: '2020-02-01T10:00:00Z'
+    completed_on: "2020-02-01T10:00:00Z"
     created_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
-    created_on: '2020-01-02T10:00:00Z'
+    created_on: "2020-01-02T10:00:00Z"
     modified_by: f1eb4363-0a37-4344-bd96-e90abeaf483e
-    modified_on: '2020-02-01T10:00:00Z'
+    modified_on: "2020-02-01T10:00:00Z"
 
 - model: interaction.interaction
   pk: 236b656c-ae26-43ca-bb51-c72d553383f3
@@ -672,7 +656,7 @@
     theme: other
     kind: interaction
     subject: Provided alpha service
-    date: '2017-06-01T00:00:00Z'
+    date: "2017-06-01T00:00:00Z"
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -683,8 +667,8 @@
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
-    created_on: '2017-06-01T00:00:00Z'
-    modified_on: '2017-06-01T00:00:00Z'
+    created_on: "2017-06-01T00:00:00Z"
+    modified_on: "2017-06-01T00:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 1
@@ -699,7 +683,7 @@
     theme: export
     kind: interaction
     subject: Discussed exports event
-    date: '2017-06-03T00:00:00Z'
+    date: "2017-06-03T00:00:00Z"
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -710,8 +694,8 @@
     notes: This is a dummy interaction for testing
     communication_channel: a5d71fdd-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
-    created_on: '2017-06-03T00:00:00Z'
-    modified_on: '2017-06-03T00:00:00Z'
+    created_on: "2017-06-03T00:00:00Z"
+    modified_on: "2017-06-03T00:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 2
@@ -726,7 +710,7 @@
     theme: export
     kind: service_delivery
     subject: Provided beta service
-    date: '2017-06-05T00:00:00Z'
+    date: "2017-06-05T00:00:00Z"
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -740,9 +724,9 @@
     investment_project: ~
     was_policy_feedback_provided: false
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
-    created_on: '2017-06-05T00:00:00Z'
+    created_on: "2017-06-05T00:00:00Z"
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
-    modified_on: '2017-06-05T00:00:00Z'
+    modified_on: "2017-06-05T00:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 3
@@ -757,7 +741,7 @@
     theme: export
     kind: interaction
     subject: Want to export to the USA
-    date: '2018-04-06T00:00:00Z'
+    date: "2018-04-06T00:00:00Z"
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -776,9 +760,9 @@
       - fa35595d-780d-4faa-b575-35f1c319bfee
     was_policy_feedback_provided: true
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
-    created_on: '2018-04-08T14:00:00Z'
+    created_on: "2018-04-08T14:00:00Z"
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
-    modified_on: '2018-04-08T14:00:00Z'
+    modified_on: "2018-04-08T14:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 4
@@ -793,7 +777,7 @@
     theme: export
     kind: service_delivery
     subject: Exported to Canada
-    date: '2018-06-06T00:00:00Z'
+    date: "2018-06-06T00:00:00Z"
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -812,9 +796,9 @@
       - fa35595d-780d-4faa-b575-35f1c319bfee
     was_policy_feedback_provided: true
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
-    created_on: '2018-04-08T14:00:00Z'
+    created_on: "2018-04-08T14:00:00Z"
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
-    modified_on: '2018-04-08T14:00:00Z'
+    modified_on: "2018-04-08T14:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 5
@@ -829,7 +813,7 @@
     theme: export
     kind: service_delivery
     subject: Attended gamma event
-    date: '2017-09-05T00:00:00Z'
+    date: "2017-09-05T00:00:00Z"
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contacts:
       - 9b1138ab-ec7b-497f-b8c3-27fed21694ef
@@ -843,10 +827,10 @@
     investment_project: ~
     was_policy_feedback_provided: false
     created_by: e83a608e-84a4-11e6-ae22-56b6b6499611
-    created_on: '2017-06-05T00:00:00Z'
+    created_on: "2017-06-05T00:00:00Z"
     modified_by: e83a608e-84a4-11e6-ae22-56b6b6499611
-    modified_on: '2017-06-05T00:00:00Z'
-    archived_documents_url_path: '/documents/123'
+    modified_on: "2017-06-05T00:00:00Z"
+    archived_documents_url_path: "/documents/123"
 
 - model: interaction.interactionditparticipant
   pk: 6
@@ -861,23 +845,23 @@
     theme: export
     kind: service_delivery
     subject: TAP grant
-    date: '2017-09-15T00:00:00Z'
+    date: "2017-09-15T00:00:00Z"
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     event: ~
     service: 380bba2b-3499-e211-a939-e4115bead28a
     service_delivery_status: 45329c18-6095-e211-a939-e4115bead28a
-    grant_amount_offered: '2500.00'
-    net_company_receipt: '2000.12'
+    grant_amount_offered: "2500.00"
+    net_company_receipt: "2000.12"
     notes: This is a dummy service delivery for testing
     communication_channel: ~
     investment_project: ~
     was_policy_feedback_provided: false
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
-    created_on: '2017-09-16T00:00:00Z'
+    created_on: "2017-09-16T00:00:00Z"
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
-    modified_on: '2017-09-16T00:00:00Z'
+    modified_on: "2017-09-16T00:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 7
@@ -899,7 +883,7 @@
     theme: export
     kind: interaction
     subject: Conversation about exporting saxophones
-    date: '2020-02-01T00:00:00Z'
+    date: "2020-02-01T00:00:00Z"
     company: 0fb3379c-341c-4da4-b825-bf8d47b26baa
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -911,9 +895,9 @@
     was_policy_feedback_provided: false
     were_countries_discussed: false
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
-    created_on: '2020-02-01T10:00:00Z'
+    created_on: "2020-02-01T10:00:00Z"
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
-    modified_on: '2020-02-01T10:00:00Z'
+    modified_on: "2020-02-01T10:00:00Z"
     related_trade_agreements:
       - 20e08a38-95a8-4250-bd5b-9d7f0dfc9387
 
@@ -929,10 +913,10 @@
   fields:
     name: New hotel (FDI)
     description: This is a dummy investment project for testing
-    stage: c9864359-fb1a-4646-a4c1-97d10189fc03  # Assign PM
+    stage: c9864359-fb1a-4646-a4c1-97d10189fc03 # Assign PM
     status: ongoing
     estimated_land_date: 2020-01-01
-    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -956,18 +940,18 @@
     client_requirements: Anywhere
     strategic_drivers:
       - 382aa6d1-a362-4166-a09d-f579d9f3be75
-    created_on: '2017-03-17T15:12:00Z'
-    modified_on: '2017-06-05T10:00:00Z'
+    created_on: "2017-03-17T15:12:00Z"
+    modified_on: "2017-06-05T10:00:00Z"
 
 - model: investment.investmentproject
   pk: c4c0f5c2-42f1-4c2d-9dfa-bdbb99a0aea1
   fields:
     name: New hotel (Non-FDI)
     description: This is a dummy investment project for testing
-    stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced  # Prospect
+    stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced # Prospect
     status: ongoing
     estimated_land_date: 2020-01-01
-    investment_type: 9c364e64-2b28-401b-b2df-50e08b0bca44  # Non-FDI
+    investment_type: 9c364e64-2b28-401b-b2df-50e08b0bca44 # Non-FDI
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -977,18 +961,18 @@
     sector: 034be3be-5329-e511-b6bc-e4115bead28a
     business_activities:
       - a2dbd807-ae52-421c-8d1d-88adfc7a506b
-    created_on: '2017-07-05T10:00:00Z'
-    modified_on: '2017-07-05T10:00:00Z'
+    created_on: "2017-07-05T10:00:00Z"
+    modified_on: "2017-07-05T10:00:00Z"
 
 - model: investment.investmentproject
   pk: fb5b5006-56af-40e0-8615-7aba53e0e4bf
   fields:
     name: New hotel (commitment to invest)
     description: This is a dummy investment project for testing
-    stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced  # Prospect
+    stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced # Prospect
     status: ongoing
     estimated_land_date: 2020-01-01
-    investment_type: 031269ab-b7ec-40e9-8a4e-7371404f0622  # Commitment to invest
+    investment_type: 031269ab-b7ec-40e9-8a4e-7371404f0622 # Commitment to invest
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -999,19 +983,19 @@
     sector: 034be3be-5329-e511-b6bc-e4115bead28a
     business_activities:
       - a2dbd807-ae52-421c-8d1d-88adfc7a506b
-    archived_documents_url_path: '/documents/123'
-    created_on: '2017-06-07T10:00:00Z'
-    modified_on: '2017-06-07T10:00:00Z'
+    archived_documents_url_path: "/documents/123"
+    created_on: "2017-06-07T10:00:00Z"
+    modified_on: "2017-06-07T10:00:00Z"
 
 - model: investment.investmentproject
   pk: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
   fields:
     name: New restaurant
     description: This is a dummy investment project for testing
-    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
+    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8 # Active
     status: ongoing
     estimated_land_date: 2020-01-01
-    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -1038,19 +1022,19 @@
       - 382aa6d1-a362-4166-a09d-f579d9f3be75
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
-    project_arrived_in_triage_on: '2017-05-20'
-    proposal_deadline: '2017-08-31'
-    created_on: '2017-06-15T10:00:00Z'
-    modified_on: '2017-06-15T15:30:00Z'
+    project_arrived_in_triage_on: "2017-05-20"
+    proposal_deadline: "2017-08-31"
+    created_on: "2017-06-15T10:00:00Z"
+    modified_on: "2017-06-15T15:30:00Z"
 
 - model: investment.investmentproject
   pk: b30dee70-b2d6-48cf-9ce4-b9264854470c
   fields:
     name: Fancy dress manufacturing
     description: This is a dummy investment project for testing
-    stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced  # Prospect
+    stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced # Prospect
     status: ongoing
-    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
     investor_company: 375094ac-f79a-43e5-9c88-059a7caa17f0
     client_contacts:
       - 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
@@ -1074,8 +1058,8 @@
     client_requirements: Anywhere
     strategic_drivers:
       - 382aa6d1-a362-4166-a09d-f579d9f3be75
-    created_on: '2017-03-17T15:12:00Z'
-    modified_on: '2017-06-05T10:00:00Z'
+    created_on: "2017-03-17T15:12:00Z"
+    modified_on: "2017-06-05T10:00:00Z"
 
 - model: proposition.proposition
   pk: 74a7eafa-4582-4304-8027-022a75df4948
@@ -1085,11 +1069,11 @@
     deadline: 2020-10-01
     adviser: 5a644146-5298-4741-91f3-d5d7558adf47
     created_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
-    created_on: '2017-06-15T12:00:00Z'
+    created_on: "2017-06-15T12:00:00Z"
     investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
     status: ongoing
     modified_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
-    modified_on: '2017-06-15T12:00:00Z'
+    modified_on: "2017-06-15T12:00:00Z"
 
 - model: proposition.proposition
   pk: 45eef900-bd85-4679-824b-a74369cb6f18
@@ -1099,12 +1083,12 @@
     deadline: 2020-10-01
     adviser: 5a644146-5298-4741-91f3-d5d7558adf47
     created_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
-    created_on: '2017-06-15T14:00:00Z'
+    created_on: "2017-06-15T14:00:00Z"
     investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
     status: abandoned
     details: Initial scope was wrong.
     modified_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
-    modified_on: '2017-06-15T14:30:00Z'
+    modified_on: "2017-06-15T14:30:00Z"
 
 - model: proposition.proposition
   pk: 3322750d-a645-4460-b584-8f9254459246
@@ -1114,12 +1098,12 @@
     deadline: 2020-10-01
     adviser: 5a644146-5298-4741-91f3-d5d7558adf47
     created_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
-    created_on: '2017-06-15T15:00:00Z'
+    created_on: "2017-06-15T15:00:00Z"
     investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
     status: completed
     details: Provided all materials.
     modified_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
-    modified_on: '2017-06-15T16:00:00Z'
+    modified_on: "2017-06-15T16:00:00Z"
 
 - model: investment.investmentprojectteammember
   pk: 1
@@ -1139,33 +1123,33 @@
   pk: 1
   fields:
     investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
-    stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced  # Prospect
-    created_on: '2017-06-15T12:00:00Z'
+    stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced # Prospect
+    created_on: "2017-06-15T12:00:00Z"
 
 - model: investment.investmentprojectstagelog
   pk: 2
   fields:
     investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
-    stage: c9864359-fb1a-4646-a4c1-97d10189fc03  # Assign PM
-    created_on: '2017-06-15T14:00:00Z'
+    stage: c9864359-fb1a-4646-a4c1-97d10189fc03 # Assign PM
+    created_on: "2017-06-15T14:00:00Z"
 
 - model: investment.investmentprojectstagelog
   pk: 3
   fields:
     investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
     stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8 # Active
-    created_on: '2017-06-15T15:30:00Z'
+    created_on: "2017-06-15T15:30:00Z"
 
 - model: investment.investmentproject
   pk: 0e686ea4-b8a2-4337-aec4-114d92ad4588
   fields:
     name: New rollercoaster
     description: This is a dummy investment project for testing
-    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
+    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8 # Active
     status: delayed
     reason_delayed: Waiting on materials.
     estimated_land_date: 2020-01-01
-    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -1192,20 +1176,20 @@
       - 382aa6d1-a362-4166-a09d-f579d9f3be75
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
-    created_on: '2017-08-05T10:00:00Z'
-    modified_on: '2017-08-05T10:00:00Z'
+    created_on: "2017-08-05T10:00:00Z"
+    modified_on: "2017-08-05T10:00:00Z"
 
 - model: investment.investmentproject
   pk: addca042-5a00-412c-9d7c-acc04552756c
   fields:
     name: Green tea plantation
     description: This is a dummy investment project for testing
-    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
+    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8 # Active
     status: abandoned
     reason_abandoned: Not economically viable
     date_abandoned: 2018-01-01
     estimated_land_date: 2020-01-01
-    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -1232,21 +1216,21 @@
       - 382aa6d1-a362-4166-a09d-f579d9f3be75
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
-    created_on: '2017-10-08T10:00:00Z'
-    modified_on: '2017-11-08T10:00:00Z'
+    created_on: "2017-10-08T10:00:00Z"
+    modified_on: "2017-11-08T10:00:00Z"
 
 - model: investment.investmentproject
   pk: 3520b973-0e77-46cf-be75-3585f2f6691e
   fields:
     name: Wig factory
     description: This is a dummy investment project for testing
-    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
+    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8 # Active
     status: lost
     date_lost: 2018-01-01
     reason_lost: Low demand.
     country_lost_to: 0950bdb8-5d95-e211-a939-e4115bead28a
     estimated_land_date: 2020-01-01
-    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -1273,18 +1257,18 @@
       - 382aa6d1-a362-4166-a09d-f579d9f3be75
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
-    created_on: '2017-03-05T12:00:00Z'
-    modified_on: '2017-05-05T10:00:00Z'
+    created_on: "2017-03-05T12:00:00Z"
+    modified_on: "2017-05-05T10:00:00Z"
 
 - model: investment.investmentproject
   pk: ea3a03ba-b239-4956-b2fb-f35c91109674
   fields:
     name: New fruit machine
     description: This is a dummy investment project for testing
-    stage: 49b8f6f3-0c50-4150-a965-2c974f3149e3  # Verify win
+    stage: 49b8f6f3-0c50-4150-a965-2c974f3149e3 # Verify win
     status: ongoing
     estimated_land_date: 2020-01-01
-    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -1325,20 +1309,19 @@
     delivery_partners:
       - 6e85b4e3-0df1-e511-8ffa-e4115bead28a
       - cdcc392e-0bf1-e511-8ffa-e4115bead28a
-    created_on: '2017-03-05T12:00:00Z'
-    modified_on: '2017-03-05T15:00:00Z'
-
+    created_on: "2017-03-05T12:00:00Z"
+    modified_on: "2017-03-05T15:00:00Z"
 
 - model: investment.investmentproject
   pk: 5d341b34-1fc8-4638-b4b1-a0922ebf401e
   fields:
     name: New airport
     description: This is a dummy investment project for testing
-    stage: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6  # Won
+    stage: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6 # Won
     status: ongoing
     estimated_land_date: 2020-01-01
     actual_land_date: 2018-01-01
-    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -1379,21 +1362,20 @@
     delivery_partners:
       - 6e85b4e3-0df1-e511-8ffa-e4115bead28a
       - cdcc392e-0bf1-e511-8ffa-e4115bead28a
-    created_on: '2018-01-02T10:00:00Z'
-    modified_on: '2018-01-02T10:00:00Z'
-
+    created_on: "2018-01-02T10:00:00Z"
+    modified_on: "2018-01-02T10:00:00Z"
 
 - model: investment.investmentproject
   pk: 5d341b34-1fc8-4638-b4b1-a0922ebf401e
   fields:
     name: New metro system (legacy project)
     description: This is a dummy investment project for testing
-    stage: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6  # Won
+    stage: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6 # Won
     status: ongoing
     estimated_land_date: ~
     allow_blank_estimated_land_date: true
     actual_land_date: 2018-01-01
-    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -1434,19 +1416,18 @@
     delivery_partners:
       - 6e85b4e3-0df1-e511-8ffa-e4115bead28a
       - cdcc392e-0bf1-e511-8ffa-e4115bead28a
-    created_on: '2016-01-05T15:00:00Z'
-    modified_on: '2016-01-05T19:00:00Z'
-
+    created_on: "2016-01-05T15:00:00Z"
+    modified_on: "2016-01-05T19:00:00Z"
 
 - model: investment.investmentproject
   pk: ba1f0b14-5fe4-4c36-bf6a-ddf115272977
   fields:
     name: New zoo (LEP)
     description: This is a dummy investment project for testing
-    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
+    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8 # Active
     status: ongoing
     estimated_land_date: 2020-02-01
-    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
     investor_company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
     client_contacts:
       - 6791d583-7a52-418f-a0d3-d8d527f20d43
@@ -1473,9 +1454,9 @@
       - 7cc42486-30bb-46d5-813d-6ad1c918ef08
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 7bad8082-4978-4fe8-a018-740257f01637
-    created_on: '2017-08-16T10:00:00Z'
+    created_on: "2017-08-16T10:00:00Z"
     created_by: 5a644146-5298-4741-91f3-d5d7558adf47
-    modified_on: '2017-09-18T13:00:00Z'
+    modified_on: "2017-09-18T13:00:00Z"
     modified_by: 5a644146-5298-4741-91f3-d5d7558adf47
 
 - model: investment.investmentprojectteammember
@@ -1497,10 +1478,10 @@
   fields:
     name: New golf course (DA)
     description: This is a dummy investment project for testing
-    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
+    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8 # Active
     status: ongoing
     estimated_land_date: 2020-03-01
-    investment_type: 9c364e64-2b28-401b-b2df-50e08b0bca44  # Non-FDI
+    investment_type: 9c364e64-2b28-401b-b2df-50e08b0bca44 # Non-FDI
     investor_company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
     client_contacts:
       - 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
@@ -1527,9 +1508,9 @@
       - 7cc42486-30bb-46d5-813d-6ad1c918ef08
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 7bad8082-4978-4fe8-a018-740257f01637
-    created_on: '2017-08-16T10:00:00Z'
+    created_on: "2017-08-16T10:00:00Z"
     created_by: 5a644146-5298-4741-91f3-d5d7558adf47
-    modified_on: '2017-09-18T13:00:00Z'
+    modified_on: "2017-09-18T13:00:00Z"
     modified_by: 5a644146-5298-4741-91f3-d5d7558adf47
 
 - model: investment.investmentprojectteammember
@@ -1551,7 +1532,7 @@
   fields:
     theme: investment
     kind: interaction
-    date: '2017-06-03T00:00:00Z'
+    date: "2017-06-03T00:00:00Z"
     investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contacts:
@@ -1561,8 +1542,8 @@
     notes: This is a dummy interaction for testing
     communication_channel: 72c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
-    created_on: '2017-06-03T00:00:00Z'
-    modified_on: '2017-06-03T00:00:00Z'
+    created_on: "2017-06-03T00:00:00Z"
+    modified_on: "2017-06-03T00:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 9
@@ -1576,7 +1557,7 @@
   fields:
     theme: investment
     kind: interaction
-    date: '2017-06-05T00:00:00Z'
+    date: "2017-06-05T00:00:00Z"
     investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contacts:
@@ -1586,8 +1567,8 @@
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
-    created_on: '2017-06-05T00:00:00Z'
-    modified_on: '2017-06-05T00:00:00Z'
+    created_on: "2017-06-05T00:00:00Z"
+    modified_on: "2017-06-05T00:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 10
@@ -1601,7 +1582,7 @@
   fields:
     theme: investment
     kind: interaction
-    date: '2018-01-02T00:00:00Z'
+    date: "2018-01-02T00:00:00Z"
     investment_project: ba1f0b14-5fe4-4c36-bf6a-ddf115272977
     company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
     contacts:
@@ -1611,8 +1592,8 @@
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
-    created_on: '2018-01-16T00:00:00Z'
-    modified_on: '2018-01-16T00:00:00Z'
+    created_on: "2018-01-16T00:00:00Z"
+    modified_on: "2018-01-16T00:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 11
@@ -1626,7 +1607,7 @@
   fields:
     theme: investment
     kind: interaction
-    date: '2018-01-10T00:00:00Z'
+    date: "2018-01-10T00:00:00Z"
     investment_project: ba1f0b14-5fe4-4c36-bf6a-ddf115272977
     company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
     contacts:
@@ -1636,8 +1617,8 @@
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
-    created_on: '2018-01-16T00:00:00Z'
-    modified_on: '2018-01-16T00:00:00Z'
+    created_on: "2018-01-16T00:00:00Z"
+    modified_on: "2018-01-16T00:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 12
@@ -1651,7 +1632,7 @@
   fields:
     theme: investment
     kind: interaction
-    date: '2018-01-05T00:00:00Z'
+    date: "2018-01-05T00:00:00Z"
     investment_project: e32b3c33-80ac-4589-a8c4-dda305d726ba
     company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
     contacts:
@@ -1661,8 +1642,8 @@
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
-    created_on: '2018-01-16T00:00:00Z'
-    modified_on: '2018-01-16T00:00:00Z'
+    created_on: "2018-01-16T00:00:00Z"
+    modified_on: "2018-01-16T00:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 13
@@ -1676,7 +1657,7 @@
   fields:
     theme: investment
     kind: interaction
-    date: '2018-01-02T00:00:00Z'
+    date: "2018-01-02T00:00:00Z"
     investment_project: e32b3c33-80ac-4589-a8c4-dda305d726ba
     company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
     contacts:
@@ -1686,8 +1667,8 @@
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
     was_policy_feedback_provided: false
-    created_on: '2018-01-16T00:00:00Z'
-    modified_on: '2018-01-16T00:00:00Z'
+    created_on: "2018-01-16T00:00:00Z"
+    modified_on: "2018-01-16T00:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 14
@@ -1702,15 +1683,15 @@
     theme: other
     kind: interaction
     status: draft
-    date: '2030-06-05T00:00:00Z'
+    date: "2030-06-05T00:00:00Z"
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     subject: Sample upcoming interaction
     notes: This is a dummy interaction for testing
     was_policy_feedback_provided: false
-    created_on: '2017-06-05T00:00:00Z'
-    modified_on: '2017-06-05T00:00:00Z'
+    created_on: "2017-06-05T00:00:00Z"
+    modified_on: "2017-06-05T00:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 15
@@ -1725,15 +1706,15 @@
     theme: other
     kind: interaction
     status: draft
-    date: '2019-06-05T00:00:00Z'
+    date: "2019-06-05T00:00:00Z"
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     subject: Sample incomplete interaction
     notes: This is a dummy interaction for testing
     was_policy_feedback_provided: false
-    created_on: '2017-06-05T00:00:00Z'
-    modified_on: '2017-06-05T00:00:00Z'
+    created_on: "2017-06-05T00:00:00Z"
+    modified_on: "2017-06-05T00:00:00Z"
 
 - model: interaction.interactionditparticipant
   pk: 16
@@ -1748,17 +1729,17 @@
     theme: other
     kind: interaction
     status: draft
-    date: '2030-06-05T00:00:00Z'
+    date: "2030-06-05T00:00:00Z"
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     subject: Sample cancelled interaction
     notes: This is a dummy interaction for testing
     was_policy_feedback_provided: false
-    created_on: '2017-06-05T00:00:00Z'
-    modified_on: '2017-06-05T00:00:00Z'
-    archived_on: '2019-06-05T00:00:00Z'
-    archived_reason: 'Client cancelled'
+    created_on: "2017-06-05T00:00:00Z"
+    modified_on: "2017-06-05T00:00:00Z"
+    archived_on: "2019-06-05T00:00:00Z"
+    archived_reason: "Client cancelled"
 
 - model: interaction.interactionditparticipant
   pk: 17
@@ -1790,9 +1771,9 @@
     related_programmes:
       - 1abe5563-6482-41d8-b566-6a9ee9e37c5f
     uk_region: 864cd12a-6095-e211-a939-e4115bead28a
-    service: 9584b82b-3499-e211-a939-e4115bead28a  # Events - UK based
-    created_on: '2017-01-05T00:00:00Z'
-    modified_on: '2017-01-05T00:00:00Z'
+    service: 9584b82b-3499-e211-a939-e4115bead28a # Events - UK based
+    created_on: "2017-01-05T00:00:00Z"
+    modified_on: "2017-01-05T00:00:00Z"
 
 - model: event.event
   pk: b93d4273-36fe-4008-ac40-fbc197910791
@@ -1806,7 +1787,7 @@
     address_1: Day Court Exhibition Centre
     address_2: Day Court Lane
     address_town: China
-    address_county: ''
+    address_county: ""
     address_postcode: SW9 9AB
     address_country: 63af72a6-5d95-e211-a939-e4115bead28a
     organiser: 7bad8082-4978-4fe8-a018-740257f01637
@@ -1816,10 +1797,10 @@
       - 4e4d24c2-9698-e211-a939-e4115bead28a
     related_programmes:
       - d352a68f-aaf4-4c43-b39d-9bca67a8322e
-    service: 9584b82b-3499-e211-a939-e4115bead28a  # Events - UK based
-    archived_documents_url_path: '/documents/123'
-    created_on: '2017-01-25T00:00:00Z'
-    modified_on: '2017-01-25T00:00:00Z'
+    service: 9584b82b-3499-e211-a939-e4115bead28a # Events - UK based
+    archived_documents_url_path: "/documents/123"
+    created_on: "2017-01-25T00:00:00Z"
+    modified_on: "2017-01-25T00:00:00Z"
 
 - model: event.event
   pk: b93d4274-36fe-4008-ac40-fbc197910791
@@ -1833,7 +1814,7 @@
     address_1: Day Court Exhibition Centre
     address_2: Day Court Lane
     address_town: China
-    address_county: ''
+    address_county: ""
     address_postcode: SW9 9AB
     address_country: 63af72a6-5d95-e211-a939-e4115bead28a
     organiser: 7bad8082-4978-4fe8-a018-740257f01637
@@ -1843,49 +1824,49 @@
       - 4e4d24c2-9698-e211-a939-e4115bead28a
     related_programmes:
       - d352a68f-aaf4-4c43-b39d-9bca67a8322e
-    service: 9584b82b-3499-e211-a939-e4115bead28a  # Events - UK based
-    archived_documents_url_path: '/documents/123'
-    created_on: '2017-01-25T00:00:00Z'
-    modified_on: '2017-01-25T00:00:00Z'
-    disabled_on: '2017-09-05T00:00:00Z'
+    service: 9584b82b-3499-e211-a939-e4115bead28a # Events - UK based
+    archived_documents_url_path: "/documents/123"
+    created_on: "2017-01-25T00:00:00Z"
+    modified_on: "2017-01-25T00:00:00Z"
+    disabled_on: "2017-09-05T00:00:00Z"
 
 - model: investor_profile.largecapitalinvestorprofile
   pk: 04d9215f-f9f9-4183-af85-326e7cf5482b
   fields:
     asset_classes_of_interest:
-    - 66507830-595d-432e-8521-9daf11785265
-    - f2b6c1a7-4d4f-4fd9-884b-5e1f5b3525be
-    - 1536f225-f755-44d1-8bdd-e89a1964966b
-    - 38c8d05c-2899-4433-a15c-6598d76dd69b
+      - 66507830-595d-432e-8521-9daf11785265
+      - f2b6c1a7-4d4f-4fd9-884b-5e1f5b3525be
+      - 1536f225-f755-44d1-8bdd-e89a1964966b
+      - 38c8d05c-2899-4433-a15c-6598d76dd69b
     construction_risks:
-    - 79cc3963-9376-4771-9cba-c1b3cc0ade33
+      - 79cc3963-9376-4771-9cba-c1b3cc0ade33
     created_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
-    created_on: '2021-01-14T11:23:23.125307+00:00'
+    created_on: "2021-01-14T11:23:23.125307+00:00"
     deal_ticket_sizes:
-    - 56492c50-aa12-404d-a14e-1eaae24ac6ee
+      - 56492c50-aa12-404d-a14e-1eaae24ac6ee
     desired_deal_roles:
-    - 29d930e6-de2f-403d-87dc-764bc418d33a
+      - 29d930e6-de2f-403d-87dc-764bc418d33a
     global_assets_under_management: 12000000000
     investable_capital: 6000000000
     investment_types:
-    - 24826b7c-e3df-4a76-80d4-4fe2661b838e
-    - ef615dde-49d8-41dd-9ddd-a00c78004135
+      - 24826b7c-e3df-4a76-80d4-4fe2661b838e
+      - ef615dde-49d8-41dd-9ddd-a00c78004135
     investor_company: 0fb3379c-341c-4da4-b825-bf8d47b26baa
     investor_description: Here is the investor description.
     investor_type: 113d864c-1657-4e01-b215-2fe8797cdf12
     minimum_equity_percentage: f7b72f8b-399e-43b2-b7ef-f42a154ef916
     minimum_return_rate: 6fec56ba-0be9-4931-bd76-16e11924ec55
     modified_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
-    modified_on: '2021-01-14T11:25:04.805742+00:00'
-    notes_on_locations: ''
+    modified_on: "2021-01-14T11:25:04.805742+00:00"
+    notes_on_locations: ""
     other_countries_being_considered: []
     required_checks_conducted: 02d6fc9b-fbb9-4621-b247-d86f2487898e
     required_checks_conducted_by: 453a608e-84a4-11e6-ea22-56b6b6499622
     restrictions:
-    - 5b4f5dc5-c836-4572-afd2-013776ed00c5
+      - 5b4f5dc5-c836-4572-afd2-013776ed00c5
     time_horizons:
-    - d2d1bdbb-c42a-459c-adaa-fce45ce08cc9
-    - d186343f-ed66-47e4-9ab0-258f583ff3cb
+      - d2d1bdbb-c42a-459c-adaa-fce45ce08cc9
+      - d186343f-ed66-47e4-9ab0-258f583ff3cb
     uk_region_locations: []
 
 - model: investor_profile.largecapitalinvestorprofile
@@ -1894,7 +1875,7 @@
     asset_classes_of_interest: []
     construction_risks: []
     created_by: a80ff5fd-8904-4940-bf96-fe8047e34be5
-    created_on: '2021-01-01T11:25:29.711322+00:00'
+    created_on: "2021-01-01T11:25:29.711322+00:00"
     deal_ticket_sizes: []
     desired_deal_roles: []
     global_assets_under_management: 3000000
@@ -1906,8 +1887,8 @@
     minimum_equity_percentage: null
     minimum_return_rate: null
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
-    modified_on: '2021-01-10T11:26:03.680015+00:00'
-    notes_on_locations: ''
+    modified_on: "2021-01-10T11:26:03.680015+00:00"
+    notes_on_locations: ""
     other_countries_being_considered: []
     required_checks_conducted: 9beab8fc-1094-49b4-97d0-37bc7a9de631
     required_checks_conducted_by: 453a608e-84a4-11e6-ea22-56b6b6499622
@@ -1919,128 +1900,125 @@
   pk: e93a5088-cb72-42e7-b0c6-e84699b56a0e
   fields:
     asset_classes_of_interest:
-    - 096772cb-bd14-4bdf-bd5a-5b430e651048
-    - b4516edf-c151-47d6-9c12-1c2185cacff0
-    - 38c8d05c-2899-4433-a15c-6598d76dd69b
+      - 096772cb-bd14-4bdf-bd5a-5b430e651048
+      - b4516edf-c151-47d6-9c12-1c2185cacff0
+      - 38c8d05c-2899-4433-a15c-6598d76dd69b
     construction_risks:
-    - 884deaf6-cb0c-4036-b78c-efd92cb10098
+      - 884deaf6-cb0c-4036-b78c-efd92cb10098
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
-    created_on: '2020-12-03T11:26:22.243842+00:00'
+    created_on: "2020-12-03T11:26:22.243842+00:00"
     deal_ticket_sizes:
-    - 359f4183-5617-47a9-a2ac-39e2c60d5088
-    - e5ae2715-aa2c-4aa2-b047-f247625322a3
+      - 359f4183-5617-47a9-a2ac-39e2c60d5088
+      - e5ae2715-aa2c-4aa2-b047-f247625322a3
     desired_deal_roles:
-    - 29d930e6-de2f-403d-87dc-764bc418d33a
+      - 29d930e6-de2f-403d-87dc-764bc418d33a
     global_assets_under_management: 1000000000000
     investable_capital: 1000000
     investment_types:
-    - 4170d99a-02fc-46ee-8fd4-3fe786717708
+      - 4170d99a-02fc-46ee-8fd4-3fe786717708
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     investor_description: Some information
     investor_type: ac294431-94ba-4318-9b27-75f0ada99c0d
     minimum_equity_percentage: ec061f70-b287-41cf-aaf4-620aec79616b
     minimum_return_rate: 65c9bc7a-af68-4549-a9c9-70cd73109617
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
-    modified_on: '2021-01-01T11:27:48.064811+00:00'
+    modified_on: "2021-01-01T11:27:48.064811+00:00"
     notes_on_locations: Here are some notes
     other_countries_being_considered:
-    - 955f66a0-5d95-e211-a939-e4115bead28a
-    - a75f66a0-5d95-e211-a939-e4115bead28a
+      - 955f66a0-5d95-e211-a939-e4115bead28a
+      - a75f66a0-5d95-e211-a939-e4115bead28a
     required_checks_conducted: 81fafe5a-ed32-4f46-bdc5-2cafedf828e8
     restrictions:
-    - daa293d4-e18e-44af-b139-bd1b4c4a9067
-    - 7dad0891-9174-437d-bb30-b610ac1ecd0a
+      - daa293d4-e18e-44af-b139-bd1b4c4a9067
+      - 7dad0891-9174-437d-bb30-b610ac1ecd0a
     time_horizons:
-    - 29a0a8e9-1c21-432a-bb4f-b9363b46a6aa
+      - 29a0a8e9-1c21-432a-bb4f-b9363b46a6aa
     uk_region_locations:
-    - 844cd12a-6095-e211-a939-e4115bead28a
-    - 8e4cd12a-6095-e211-a939-e4115bead28a
-
+      - 844cd12a-6095-e211-a939-e4115bead28a
+      - 8e4cd12a-6095-e211-a939-e4115bead28a
 
 - model: opportunity.largecapitalopportunity
   pk: c064e66a-a6bc-4ad6-9a88-68502d15499c
   fields:
     asset_classes:
-    - 096772cb-bd14-4bdf-bd5a-5b430e651048
-    - b4516edf-c151-47d6-9c12-1c2185cacff0
-    - 38c8d05c-2899-4433-a15c-6598d76dd69b
+      - 096772cb-bd14-4bdf-bd5a-5b430e651048
+      - b4516edf-c151-47d6-9c12-1c2185cacff0
+      - 38c8d05c-2899-4433-a15c-6598d76dd69b
     construction_risks:
-    - 884deaf6-cb0c-4036-b78c-efd92cb10098
+      - 884deaf6-cb0c-4036-b78c-efd92cb10098
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
-    created_on: '2020-12-03T11:26:22.243842+00:00'
+    created_on: "2020-12-03T11:26:22.243842+00:00"
     description: Some information
     dit_support_provided: True
     estimated_return_rate: 65c9bc7a-af68-4549-a9c9-70cd73109617
     investment_types:
-    - 4170d99a-02fc-46ee-8fd4-3fe786717708
+      - 4170d99a-02fc-46ee-8fd4-3fe786717708
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
-    modified_on: '2021-01-01T11:27:48.064811+00:00'
+    modified_on: "2021-01-01T11:27:48.064811+00:00"
     name: Project Zephyr
     promoters:
-    - 0f5216e0-849f-11e6-ae22-56b6b6499611
+      - 0f5216e0-849f-11e6-ae22-56b6b6499611
     required_checks_conducted: 81fafe5a-ed32-4f46-bdc5-2cafedf828e8
     status: 1386d4f4-732d-44b9-af8e-dffe7dd07d7b
     time_horizons:
-    - 29a0a8e9-1c21-432a-bb4f-b9363b46a6aa
+      - 29a0a8e9-1c21-432a-bb4f-b9363b46a6aa
     type: c064e66a-a6bc-4ad6-9a88-0bdd69519f55
     uk_region_locations:
-    - 844cd12a-6095-e211-a939-e4115bead28a
-
+      - 844cd12a-6095-e211-a939-e4115bead28a
 
 - model: opportunity.largecapitalopportunity
   pk: 744cd12a-6095-e211-a939-e4115bead28a
   fields:
     asset_classes:
-    - 38c8d05c-2899-4433-a15c-6598d76dd69b
+      - 38c8d05c-2899-4433-a15c-6598d76dd69b
     construction_risks:
-    - 884deaf6-cb0c-4036-b78c-efd92cb10098
+      - 884deaf6-cb0c-4036-b78c-efd92cb10098
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
-    created_on: '2020-12-03T11:26:22.243842+00:00'
+    created_on: "2020-12-03T11:26:22.243842+00:00"
     current_investment_secured: 250000
     description: New housing and retail developments in a historical setting.
     dit_support_provided: True
     estimated_return_rate: 65c9bc7a-af68-4549-a9c9-70cd73109617
     investment_projects:
-    - 721e2a04-21c3-4172-a321-4368463a4b2d
+      - 721e2a04-21c3-4172-a321-4368463a4b2d
     investment_types:
-    - 4170d99a-02fc-46ee-8fd4-3fe786717708
+      - 4170d99a-02fc-46ee-8fd4-3fe786717708
     lead_dit_relationship_manager: 7bad8082-4978-4fe8-a018-740257f01637
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
-    modified_on: '2021-01-01T11:27:48.064811+00:00'
+    modified_on: "2021-01-01T11:27:48.064811+00:00"
     name: Camelot Regeneration Scheme
     promoters:
-    - 0f5216e0-849f-11e6-ae22-56b6b6499611
-    - a73efeba-8499-11e6-ae22-56b6b6499611
+      - 0f5216e0-849f-11e6-ae22-56b6b6499611
+      - a73efeba-8499-11e6-ae22-56b6b6499611
     opportunity_value: 1000000000
     opportunity_value_type: edeff484-2bd1-40e6-94ca-0437d6115886
     other_dit_contacts:
-    - a80ff5fd-8904-4940-bf96-fe8047e34be5
-    - 379f390a-e083-4a2c-9cea-e3b9a08606a7
+      - a80ff5fd-8904-4940-bf96-fe8047e34be5
+      - 379f390a-e083-4a2c-9cea-e3b9a08606a7
     reasons_for_abandonment:
-    - 3a38ccff-69c5-40b0-af54-3426ad94e2cb
+      - 3a38ccff-69c5-40b0-af54-3426ad94e2cb
     required_checks_conducted: 81fafe5a-ed32-4f46-bdc5-2cafedf828e8
     required_checks_conducted_by: 7bad8082-4978-4fe8-a018-740257f01637
-    required_checks_conducted_on: '2021-01-01'
+    required_checks_conducted_on: "2021-01-01"
     sources_of_funding:
-    - 92e533b0-4274-4253-9eea-f7ac6c9ae966
+      - 92e533b0-4274-4253-9eea-f7ac6c9ae966
     status: c14547fb-a8ee-410b-a144-06c882167a41
     time_horizons:
-    - 29a0a8e9-1c21-432a-bb4f-b9363b46a6aa
+      - 29a0a8e9-1c21-432a-bb4f-b9363b46a6aa
     total_investment_sought: 50000000000
     type: c064e66a-a6bc-4ad6-9a88-0bdd69519f55
     uk_region_locations:
-    - 844cd12a-6095-e211-a939-e4115bead28a
-
+      - 844cd12a-6095-e211-a939-e4115bead28a
 
 - model: opportunity.largecapitalopportunity
   pk: 50a0fa2e-a9b8-4d4b-a209-d6dd6a175aaf
   fields:
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
-    created_on: '2020-12-03T11:26:22.243842+00:00'
+    created_on: "2020-12-03T11:26:22.243842+00:00"
     description: Developing new server infrastructure for high-load cloud computing
     dit_support_provided: True
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
-    modified_on: '2021-01-01T11:27:48.064811+00:00'
+    modified_on: "2021-01-01T11:27:48.064811+00:00"
     name: Ada Network
     status: 1386d4f4-732d-44b9-af8e-dffe7dd07d7b
     type: c064e66a-a6bc-4ad6-9a88-0bdd69519f55
