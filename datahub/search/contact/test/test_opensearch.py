@@ -268,8 +268,6 @@ def test_mapping(opensearch):
             },
             'primary': {'type': 'boolean'},
             'telephone_alternative': {'type': 'keyword'},
-            'telephone_countrycode': {'type': 'keyword'},
-            'telephone_number': {'type': 'keyword'},
             'title': {
                 'properties': {
                     'id': {'type': 'keyword'},
@@ -366,7 +364,6 @@ def test_get_basic_search_query():
                                 'teams.name',
                                 'teams.name.trigram',
                                 'telephone_alternative',
-                                'telephone_number',
                                 'total_cost.keyword',
                                 'trading_names',
                                 'trading_names.trigram',
@@ -465,7 +462,6 @@ def test_get_limited_search_by_entity_query():
                                             'job_title',
                                             'job_title.trigram',
                                             'full_telephone_number',
-                                            'telephone_number',
                                             'telephone_alternative',
                                         ),
                                         'type': 'cross_fields',
