@@ -339,6 +339,59 @@ class AddContactBase(APITestMixin):
             'primary': ['This field is required.'],
         }
 
+    def test_duplicate_emails_ok_for_different_company(self):
+        """It should be ok to save a non unique email if the company is different."""
+        company_1 = CompanyFactory(name='Company ABC')
+        company_2 = CompanyFactory(name='Company XYZ')
+        email = 'foo@bar.com'
+        ContactFactory(company=company_1, email=email)
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
+        response = self.api_client.post(
+            url,
+            data={
+                'primary': False,
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'company': {
+                    'id': company_2.pk,
+                },
+                'email': email,
+                'address_same_as_company': True,
+            },
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data['first_name'] == 'Oratio'
+        assert response_data['last_name'] == 'Nelson'
+        assert response_data['company']['id'] == str(company_2.id)
+
+    def test_no_duplicate_emails_for_company(self):
+        """Validation error should occur when the email address is not unique at the company."""
+        company_name = 'Test House'
+        company = CompanyFactory(name=company_name)
+        email = 'foo@bar.com'
+        ContactFactory(company=company, email=email)
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
+        response = self.api_client.post(
+            url,
+            data={
+                'primary': False,
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'company': {
+                    'id': company.pk,
+                },
+                'email': email,
+                'address_same_as_company': True,
+            },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'email': [f'A contact with this email already exists at {company_name}.'],
+        }
+
 
 class TestAddContactV3(AddContactBase):
     """Test v3 of the contact adding endpoint"""
@@ -614,6 +667,69 @@ class EditContactBase(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
+
+    def test_unchanged_email_ok(self):
+        """If the email has not changed, it should not raise a validation error."""
+        company_name = 'Test House'
+        company = CompanyFactory(name=company_name)
+        email = 'foo@bar.com'
+        contact = ContactFactory(company=company, email=email)
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'company': {
+                    'id': company.pk,
+                },
+                'email': email,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_duplicate_email_at_company_from_payload(self):
+        """Error if another contact at the company specified in payload has the email."""
+        company_name = 'Test House'
+        company = CompanyFactory(name=company_name)
+        email = 'contact1@example.com'
+        ContactFactory(company=company, email=email)
+        contact = ContactFactory(company=company, email='contact2@example.com')
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'company': {
+                    'id': company.pk,
+                },
+                'email': email,
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'email': [f'A contact with this email already exists at {company_name}.'],
+        }
+
+    def test_duplicate_email_at_company_from_database(self):
+        """Error if another contact at the company in the db has the same email."""
+        company_name = 'Test House'
+        company = CompanyFactory(name=company_name)
+        email = 'contact1@example.com'
+        ContactFactory(company=company, email=email)
+        contact = ContactFactory(company=company, email='contact2@example.com')
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'email': email,
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'email': [f'A contact with this email already exists at {company_name}.'],
+        }
 
 
 class TestEditContactV3(EditContactBase):

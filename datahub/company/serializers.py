@@ -159,6 +159,28 @@ class ContactSerializer(PermittedFieldsModelSerializer):
     archived_by = NestedAdviserField(read_only=True)
     primary = serializers.BooleanField()
 
+    def validate_email(self, value):
+        """
+        Validate that email is unique at this company.
+
+        If a valid company id is provided, check that this email is unique there, otherwise
+        validate that this email is unique for the company stored in the database.
+        """
+        company_id = self.initial_data.get('company', {}).get('id')
+        if company_id:
+            company = Company.objects.filter(id=company_id).first()
+        else:
+            company = getattr(self.instance, 'company', None)
+        if (
+            getattr(self.instance, 'email', None) != value
+            and company
+            and Contact.objects.filter(email=value, company=company).exists()
+        ):
+            raise serializers.ValidationError(
+                gettext_lazy(f'A contact with this email already exists at {company.name}.'),
+            )
+        return value
+
     class Meta:
         model = Contact
         fields = (
