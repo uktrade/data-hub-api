@@ -259,6 +259,8 @@ Dependencies:
     `-O fair --prefetch-multiplier 1` arguments for better fairness when long-running tasks
     are running or pending execution.
 
+16. Start RQ (Redis Queue): `python rq-worker.py`
+
 ## API documentation
 
 Automatically-generated API documentation is served at `/docs` (requires admin site credentials).
