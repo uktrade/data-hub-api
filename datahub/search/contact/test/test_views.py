@@ -627,8 +627,7 @@ class TestContactExportView(APITestMixin):
                     contact.company.address_postcode
                     if contact.address_same_as_company
                     else contact.address_postcode,
-                'Phone number':
-                    ' '.join((contact.telephone_countrycode, contact.telephone_number)),
+                'Phone number': contact.full_telephone_number,
                 'Email address': contact.email,
                 'Accepts DIT email marketing': accepts_dit_email_marketing,
                 'Date of latest interaction':
