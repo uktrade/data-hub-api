@@ -1,3 +1,11 @@
+# Data Hub API 39.21.0 (2022-04-04)
+
+
+## Features
+
+- **Contacts** The Contacts API is now validated to ensure that it is not possible to save duplicate email addresses at the same company.
+
+
 # Data Hub API 39.20.2 (2022-03-25)
 
 
