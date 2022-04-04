@@ -20,7 +20,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.3
 psycogreen==1.0.2
 
-boto3==1.21.22
+boto3==1.21.27
 
 notifications-python-client==6.3.0
 
@@ -38,7 +38,7 @@ slackclient==2.9.3
 django-redis==5.2.0
 
 # OpenSearch
-opensearch-py==1.0.0
+opensearch-py==1.1.0
 opensearch-dsl==1.0.0
 
 # ES APM
@@ -53,7 +53,7 @@ pytest==7.1.1
 pytest-django==4.5.2
 pytest-cov==3.0.0
 pytest-xdist==2.5.0
-ipython==8.1.1
+ipython==8.2.0
 factory-boy==3.2.1
 freezegun==1.2.1
 requests-mock==1.9.3
@@ -63,7 +63,7 @@ pip-tools==6.5.1
 piprot==0.9.11
 semantic_version==2.9.0
 towncrier==21.9.0
-watchdog[watchmedo]==2.1.6
+watchdog[watchmedo]==2.1.7
 pre-commit==2.17.0
 
 # Code static analysis
@@ -78,8 +78,8 @@ flake8-quotes==3.3.1
 flake8-string-format==0.3.0
 pep8-naming==0.12.1
 pydocstyle==6.1.1
-pylint==2.12.2
-pylint-django==2.5.2
+pylint==2.13.2
+pylint-django==2.5.3
 pylint-pytest==1.1.2
 
 WSGIserver==1.3
