@@ -50,6 +50,7 @@ job_defaults: &job_defaults
     ES_APM_SECRET_TOKEN:
     ES_APM_SERVER_URL: http://localhost:8200
     ES_APM_ENVIRONMENT: 'circleci'
+    REDIS_BASE_URL: 'redis://localhost:6379'
 
   working_directory: ~/app
 
@@ -68,6 +69,7 @@ job_defaults: &job_defaults
         POSTGRES_DB: datahub
         POSTGRES_PASSWORD: datahub
 
+    - image: circleci/redis:3.2-alpine
   steps:
     - checkout
 
@@ -87,6 +89,7 @@ job_defaults: &job_defaults
         key: v2-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
         paths:
           - ~/cache/pip
+
     - run:
         name: Run Flake8
         command: python -m flake8
@@ -101,11 +104,11 @@ job_defaults: &job_defaults
     - when:
         condition: <<parameters.publish_coverage>>
         steps:
-        - run:
-            name: Publish coverage
-            command: |
-              wget -O codecov.sh https://codecov.io/bash
-              bash ./codecov.sh -t ${COV_TOKEN}
+          - run:
+              name: Publish coverage
+              command: |
+                wget -O codecov.sh https://codecov.io/bash
+                bash ./codecov.sh -t ${COV_TOKEN}
 
 jobs:
   build:
