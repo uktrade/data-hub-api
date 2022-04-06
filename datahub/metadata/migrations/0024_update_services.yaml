@@ -1,0 +1,120 @@
+- model: metadata.service
+  pk: 42c71892-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on:
+    order: 830.0
+    segment: IST Visit
+    parent: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+    contexts: ['investment_project_interaction']
+    lft: 2
+    rght: 3
+    tree_id: 54
+    level: 1
+- model: metadata.service
+  pk: 44d42ae2-9a0a-4236-826f-e9110da29870
+  fields:
+    disabled_on:
+    order: 835.0
+    segment: High Value Reassignment (ERU Use)
+    parent: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+    contexts: ['investment_project_interaction']
+    lft: 2
+    rght: 3
+    tree_id: 54
+    level: 1
+- model: metadata.service
+  pk: a0cf6892-1a98-4baf-be22-ebe82baa70f1
+  fields:
+    disabled_on:
+    order: 840.0
+    segment: Low Value Reassignment (ERU Use)
+    parent: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+    contexts: ['investment_project_interaction']
+    lft: 2
+    rght: 3
+    tree_id: 54
+    level: 1
+- model: metadata.service
+  pk: 2e764833-56f1-4b33-b9e8-5c034ec788c0
+  fields:
+    disabled_on:
+    order: 845.0
+    segment: Introductory Pack Sent (ERU Use)
+    parent: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+    contexts: ['investment_project_interaction']
+    lft: 2
+    rght: 3
+    tree_id: 54
+    level: 1
+- model: metadata.service
+  pk: 599aa075-b9c4-4f18-bd37-eead2bb0fb77
+  fields:
+    disabled_on:
+    order: 850.0
+    segment: Further Information Sent (ERU Use)
+    parent: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+    contexts: ['investment_project_interaction']
+    lft: 2
+    rght: 3
+    tree_id: 54
+    level: 1
+- model: metadata.service
+  pk: 127410b1-12b5-47ba-9519-937216ee9b0f
+  fields:
+    disabled_on:
+    order: 855.0
+    segment: ELD Notification (ERU Use)
+    parent: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+    contexts: ['investment_project_interaction']
+    lft: 2
+    rght: 3
+    tree_id: 54
+    level: 1
+- model: metadata.service
+  pk: 4f59998a-1928-4405-8424-da3d24358128
+  fields:
+    disabled_on:
+    order: 860.0
+    segment: Commercial Partner Referral (ERU Use)
+    parent: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+    contexts: ['investment_project_interaction']
+    lft: 2
+    rght: 3
+    tree_id: 54
+    level: 1
+- model: metadata.service
+  pk: f26b708d-c165-4a07-a54a-9aa651a64804
+  fields:
+    disabled_on:
+    order: 870.0
+    segment: Evidence Request / Notify VT (ERU Use)
+    parent: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+    contexts: ['investment_project_interaction']
+    lft: 2
+    rght: 3
+    tree_id: 54
+    level: 1
+- model: metadata.service
+  pk: 6340148a-0f36-4417-87e5-2283358a8f41
+  fields:
+    disabled_on:
+    order: 875.0
+    segment: Follow Up Email - No Investor Response (ERU Use)
+    parent: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+    contexts: ['investment_project_interaction']
+    lft: 2
+    rght: 3
+    tree_id: 54
+    level: 1
+- model: metadata.service
+  pk: 2a30db0d-a6a9-4d68-8605-cb9781830d73
+  fields:
+    disabled_on:
+    order: 880.0
+    segment: Abandoned - No Investor Response (ERU Use)
+    parent: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+    contexts: ['investment_project_interaction']
+    lft: 2
+    rght: 3
+    tree_id: 54
+    level: 1
