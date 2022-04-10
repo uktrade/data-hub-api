@@ -97,7 +97,7 @@ django==3.2.12
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==5.31.0
+django-axes==5.32.0
     # via -r requirements.in
 django-debug-toolbar==3.2.4
     # via -r requirements.in
