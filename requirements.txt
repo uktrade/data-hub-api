@@ -10,8 +10,6 @@ aiosignal==1.2.0
     # via aiohttp
 amqp==5.0.9
     # via kombu
-appnope==0.1.3
-    # via ipython
 asgiref==3.5.0
     # via django
 astroid==2.11.2
@@ -257,7 +255,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==6.5.1
+pip-tools==6.6.0
     # via -r requirements.in
 piprot==0.9.11
     # via -r requirements.in
