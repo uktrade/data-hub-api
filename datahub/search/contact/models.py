@@ -62,8 +62,6 @@ class Contact(BaseSearchModel):
     notes = fields.EnglishText()
     primary = Boolean()
     telephone_alternative = Keyword()
-    telephone_countrycode = Keyword()
-    telephone_number = Keyword()
     full_telephone_number = Keyword()
     title = fields.id_name_field()
 
@@ -100,6 +98,5 @@ class Contact(BaseSearchModel):
         'job_title',
         'job_title.trigram',
         'full_telephone_number',
-        'telephone_number',
         'telephone_alternative',
     )
