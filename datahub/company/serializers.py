@@ -193,8 +193,6 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             'company',
             'adviser',
             'primary',
-            'telephone_countrycode',    # deprecated
-            'telephone_number',         # deprecated
             'full_telephone_number',
             'email',
             'address_same_as_company',

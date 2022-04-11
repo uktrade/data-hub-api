@@ -1,7 +1,7 @@
 # Django and django related
 django==3.2.12
 djangorestframework==3.13.1
-django-axes==5.31.0
+django-axes==5.32.0
 django-environ==0.8.1
 django-extensions==3.1.5
 django-filter==21.1
@@ -20,7 +20,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.3
 psycogreen==1.0.2
 
-boto3==1.21.27
+boto3==1.21.37
 
 notifications-python-client==6.3.0
 
@@ -42,7 +42,7 @@ opensearch-py==1.1.0
 opensearch-dsl==1.0.0
 
 # ES APM
-elastic-apm==6.8.1
+elastic-apm==6.9.1
 
 # Celery
 git+https://github.com/uktrade/celery@v5.0.5p2#egg=celery[redis]
@@ -58,13 +58,13 @@ factory-boy==3.2.1
 freezegun==1.2.1
 requests-mock==1.9.3
 django-debug-toolbar==3.2.4
-werkzeug==2.0.3  # Required by runserver_plus - useful for local dev
-pip-tools==6.5.1
+werkzeug==2.1.1  # Required by runserver_plus - useful for local dev
+pip-tools==6.6.0
 piprot==0.9.11
 semantic_version==2.9.0
 towncrier==21.9.0
 watchdog[watchmedo]==2.1.7
-pre-commit==2.17.0
+pre-commit==2.18.1
 
 # Code static analysis
 flake8==4.0.1
@@ -78,7 +78,7 @@ flake8-quotes==3.3.1
 flake8-string-format==0.3.0
 pep8-naming==0.12.1
 pydocstyle==6.1.1
-pylint==2.13.2
+pylint==2.13.5
 pylint-django==2.5.3
 pylint-pytest==1.1.2
 
@@ -89,3 +89,4 @@ requests==2.27.1
 requests_toolbelt==0.9.1
 sentry_sdk==1.5.8
 simple_salesforce==1.11.6
+rq==1.10.1

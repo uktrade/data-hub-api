@@ -30,9 +30,9 @@ backcall==0.2.0
     # via ipython
 billiard==3.6.4.0
     # via celery
-boto3==1.21.27
+boto3==1.21.37
     # via -r requirements.in
-botocore==1.24.27
+botocore==1.24.37
     # via
     #   boto3
     #   s3transfer
@@ -64,6 +64,7 @@ click==8.0.4
     #   click-plugins
     #   click-repl
     #   pip-tools
+    #   rq
     #   towncrier
 click-default-group==1.2.2
     # via towncrier
@@ -96,7 +97,7 @@ django==3.2.12
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==5.31.0
+django-axes==5.32.0
     # via -r requirements.in
 django-debug-toolbar==3.2.4
     # via -r requirements.in
@@ -126,7 +127,7 @@ djangorestframework==3.13.1
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
-elastic-apm==6.8.1
+elastic-apm==6.9.1
     # via -r requirements.in
 execnet==1.9.0
     # via pytest-xdist
@@ -254,7 +255,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==6.5.1
+pip-tools==6.6.0
     # via -r requirements.in
 piprot==0.9.11
     # via -r requirements.in
@@ -265,7 +266,7 @@ platformdirs==2.5.1
     #   zeep
 pluggy==1.0.0
     # via pytest
-pre-commit==2.17.0
+pre-commit==2.18.1
     # via -r requirements.in
 prompt-toolkit==3.0.28
     # via
@@ -301,7 +302,7 @@ pygments==2.11.2
     # via ipython
 pyjwt==2.3.0
     # via notifications-python-client
-pylint==2.13.2
+pylint==2.13.5
     # via
     #   -r requirements.in
     #   pylint-django
@@ -355,6 +356,7 @@ redis==4.1.4
     # via
     #   celery
     #   django-redis
+    #   rq
 requests==2.27.1
     # via
     #   -r requirements.in
@@ -376,6 +378,8 @@ requests-toolbelt==0.9.1
     # via
     #   -r requirements.in
     #   zeep
+rq==1.10.1
+    # via -r requirements.in
 s3transfer==0.5.1
     # via boto3
 semantic-version==2.9.0
@@ -449,7 +453,7 @@ watchdog[watchmedo]==2.1.7
     # via -r requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
-werkzeug==2.0.3
+werkzeug==2.1.1
     # via -r requirements.in
 wheel==0.37.1
     # via pip-tools
