@@ -1,3 +1,15 @@
+# Data Hub API 39.22.0 (2022-04-11)
+
+
+## Removals
+
+- **Contacts** The `telephone_countrycode` and `telelphone_number` fields have been removed following their deprecation a couple of weeks prior. The `full_telephone_number` field replaces their functionality.
+
+## Features
+
+- **Interactions** It's now possible to get more IST Specific Services by restricted context to investment_project_interaction only.
+
+
 # Data Hub API 39.21.0 (2022-04-04)
 
 
