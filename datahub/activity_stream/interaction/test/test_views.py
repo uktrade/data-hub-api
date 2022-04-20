@@ -55,6 +55,8 @@ def test_interaction_activity(api_client):
                     'dit:communicationChannel': {'name': interaction.communication_channel.name},
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
+                    'dit:notes': interaction.notes,
+                    'dit:theme': interaction.theme,
                     'attributedTo': [
                         *[
                             {
@@ -136,6 +138,8 @@ def test_interaction_investment_project_activity(api_client):
                     'dit:communicationChannel': {'name': interaction.communication_channel.name},
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
+                    'dit:notes': interaction.notes,
+                    'dit:theme': interaction.theme,
                     'attributedTo': [
                         *[
                             {
@@ -223,6 +227,8 @@ def test_service_delivery_activity(api_client):
                     'dit:archived': interaction.archived,
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
+                    'dit:notes': interaction.notes,
+                    'dit:theme': interaction.theme,
                     'attributedTo': [
                         *[
                             {
@@ -303,6 +309,8 @@ def test_service_delivery_event_activity(api_client):
                     'dit:archived': interaction.archived,
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
+                    'dit:notes': interaction.notes,
+                    'dit:theme': interaction.theme,
                     'attributedTo': [
                         *[
                             {
