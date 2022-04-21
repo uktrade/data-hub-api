@@ -124,7 +124,7 @@ LOCAL_APPS = [
     'datahub.omis.invoice',
     'datahub.omis.payment',
     'datahub.activity_stream.apps.ActivityStreamConfig',
-    'datahub.user_event_log',
+    'datahub.user_event_log2',
     'datahub.activity_feed',
     'datahub.dataset',
     'datahub.testfixtureapi',
