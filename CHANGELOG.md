@@ -1,3 +1,11 @@
+# Data Hub API 39.22.1 (2022-04-21)
+
+
+## Bug fixes
+
+- **Investment** The contexts of `IST Visit` service have been reverted to original state.
+
+
 # Data Hub API 39.22.0 (2022-04-11)
 
 
