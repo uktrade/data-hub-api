@@ -62,7 +62,11 @@ class InteractionActivitySerializer(ActivitySerializer):
             'generator': self._get_generator(),
             'object': {
                 'id': interaction_id,
-                'type': ['dit:Event', f'dit:{self.KINDS_JSON[instance.kind]}', f'dit:{instance.theme}',],
+                'type': [
+                    'dit:Event',
+                    f'dit:{self.KINDS_JSON[instance.kind]}',
+                    f'dit:{instance.theme}',
+                ],
                 'startTime': instance.date,
                 'dit:status': instance.status,
                 'dit:archived': instance.archived,
