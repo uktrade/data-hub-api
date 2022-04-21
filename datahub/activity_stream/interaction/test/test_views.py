@@ -48,14 +48,14 @@ def test_interaction_activity(api_client):
                 'generator': {'name': 'dit:dataHub', 'type': 'Application'},
                 'object': {
                     'id': f'dit:DataHubInteraction:{interaction.id}',
-                    'type': ['dit:Event', 'dit:Interaction', f'dit:{interaction.theme}'],
+                    'type': ['dit:Event', 'dit:Interaction', f'dit:datahub:theme:{interaction.theme}'],
+                    'content': interaction.notes,
                     'startTime': format_date_or_datetime(interaction.date),
                     'dit:status': interaction.status,
                     'dit:archived': interaction.archived,
                     'dit:communicationChannel': {'name': interaction.communication_channel.name},
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
-                    'dit:content': interaction.notes,
                     'attributedTo': [
                         *[
                             {
@@ -130,14 +130,14 @@ def test_interaction_investment_project_activity(api_client):
                 'generator': {'name': 'dit:dataHub', 'type': 'Application'},
                 'object': {
                     'id': f'dit:DataHubInteraction:{interaction.id}',
-                    'type': ['dit:Event', 'dit:Interaction', f'dit:{interaction.theme}'],
+                    'type': ['dit:Event', 'dit:Interaction', f'dit:datahub:theme:{interaction.theme}'],
+                    'content': interaction.notes,
                     'startTime': format_date_or_datetime(interaction.date),
                     'dit:status': interaction.status,
                     'dit:archived': interaction.archived,
                     'dit:communicationChannel': {'name': interaction.communication_channel.name},
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
-                    'dit:content': interaction.notes,
                     'attributedTo': [
                         *[
                             {
@@ -219,13 +219,13 @@ def test_service_delivery_activity(api_client):
                 'generator': {'name': 'dit:dataHub', 'type': 'Application'},
                 'object': {
                     'id': f'dit:DataHubInteraction:{interaction.id}',
-                    'type': ['dit:Event', 'dit:ServiceDelivery', f'dit:{interaction.theme}'],
+                    'type': ['dit:Event', 'dit:ServiceDelivery', f'dit:datahub:theme:{interaction.theme}'],
+                    'content': interaction.notes,
                     'startTime': format_date_or_datetime(interaction.date),
                     'dit:status': interaction.status,
                     'dit:archived': interaction.archived,
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
-                    'dit:content': interaction.notes,
                     'attributedTo': [
                         *[
                             {
@@ -300,13 +300,13 @@ def test_service_delivery_event_activity(api_client):
                 'generator': {'name': 'dit:dataHub', 'type': 'Application'},
                 'object': {
                     'id': f'dit:DataHubInteraction:{interaction.id}',
-                    'type': ['dit:Event', 'dit:ServiceDelivery', f'dit:{interaction.theme}'],
+                    'type': ['dit:Event', 'dit:ServiceDelivery', f'dit:datahub:theme:{interaction.theme}'],
+                    'content': interaction.notes,
                     'startTime': format_date_or_datetime(interaction.date),
                     'dit:status': interaction.status,
                     'dit:archived': interaction.archived,
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
-                    'dit:content': interaction.notes,
                     'attributedTo': [
                         *[
                             {

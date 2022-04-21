@@ -65,13 +65,13 @@ class InteractionActivitySerializer(ActivitySerializer):
                 'type': [
                     'dit:Event',
                     f'dit:{self.KINDS_JSON[instance.kind]}',
-                    f'dit:{instance.theme}',
+                    f'dit:datahub:theme:{instance.theme}',
                 ],
+                'content': instance.notes,
                 'startTime': instance.date,
                 'dit:status': instance.status,
                 'dit:archived': instance.archived,
                 'dit:subject': instance.subject,
-                'dit:content': instance.notes,
                 'attributedTo': [
                     *self._get_companies(instance.companies),
                     *self._get_dit_participants(instance.dit_participants),
