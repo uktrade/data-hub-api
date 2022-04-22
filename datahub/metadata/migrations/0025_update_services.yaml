@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: 42c71892-f9f7-e511-888e-e4115bead28a
+  fields:
+    disabled_on:
+    order: 830.0
+    segment: IST Visit
+    parent: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+    contexts: ["investment_interaction", "investment_project_interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 54
+    level: 1
