@@ -70,5 +70,5 @@ urlpatterns = [
         'user-events-dataset',
         UserEventsView.as_view(),
         name='user-events-dataset',
-    )
+    ),
 ]

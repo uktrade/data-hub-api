@@ -2,8 +2,8 @@ from django.contrib.postgres.aggregates import ArrayAgg
 
 from datahub.core.query_utils import get_aggregate_subquery
 from datahub.dataset.core.views import BaseDatasetView
-from datahub.user_event_log.models import UserEvent
 from datahub.metadata.query_utils import get_service_name_subquery
+from datahub.user_event_log.models import UserEvent
 
 
 class UserEventsView(BaseDatasetView):
@@ -25,5 +25,5 @@ class UserEventsView(BaseDatasetView):
             'timestamp',
             'adviser',
             'type',
-            'api_url_path'
+            'api_url_path',
         )
