@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user_event_log2', '0002_update_type'),
+        ('user_event_log', '0002_update_type'),
     ]
 
     operations = [

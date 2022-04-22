@@ -7,7 +7,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user_event_log2', '0004_add_introspection_event_type'),
+        ('user_event_log', '0004_add_introspection_event_type'),
     ]
 
     operations = [

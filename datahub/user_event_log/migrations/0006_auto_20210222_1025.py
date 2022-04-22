@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user_event_log2', '0005_make_timestamp_overridable_url_path_optional'),
+        ('user_event_log', '0005_make_timestamp_overridable_url_path_optional'),
     ]
 
     operations = [
