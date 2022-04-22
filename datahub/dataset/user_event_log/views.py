@@ -23,7 +23,7 @@ class UserEventsView(BaseDatasetView):
             ),
         ).values(
             'timestamp',
-            'adviser',
+            'adviser__id',
             'type',
             'api_url_path',
         )
