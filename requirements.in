@@ -32,7 +32,7 @@ mail-parser==3.15.0
 icalendar==4.0.9
 
 # Slack
-slackclient==2.9.3
+slackclient==2.9.4
 
 # REDIS
 django-redis==5.2.0
