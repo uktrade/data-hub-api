@@ -316,7 +316,7 @@ pylint-pytest==1.1.2
     # via -r requirements.in
 pyparsing==3.0.7
     # via packaging
-pytest==7.1.1
+pytest==7.1.2
     # via
     #   -r requirements.in
     #   pylint-pytest
