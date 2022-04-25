@@ -406,7 +406,7 @@ six==1.16.0
     #   requests-file
     #   requests-mock
     #   virtualenv
-slackclient==2.9.3
+slackclient==2.9.4
     # via -r requirements.in
 snowballstemmer==2.2.0
     # via pydocstyle
