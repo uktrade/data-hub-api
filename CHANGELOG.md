@@ -1,3 +1,15 @@
+# Data Hub API 39.24.0 (2022-04-25)
+
+
+## Features
+
+- We added a new API endpoint which allows data-flow to ingest user event log data. This data will be available via Data Workspace
+
+## Internal changes
+
+- Now running on the latest releases for several utilised libraries.
+
+
 # Data Hub API 39.23.0 (2022-04-22)
 
 
