@@ -20,6 +20,7 @@ from datahub.dataset.investment_project.views import (
 )
 from datahub.dataset.order.views import OMISDatasetView
 from datahub.dataset.team.views import TeamsDatasetView
+from datahub.dataset.user_event_log.views import UserEventsView
 
 
 urlpatterns = [
@@ -64,5 +65,10 @@ urlpatterns = [
         'pipeline-items-dataset',
         PipelineItemsDatasetView.as_view(),
         name='pipeline-items-dataset',
+    ),
+    path(
+        'user-events-dataset',
+        UserEventsView.as_view(),
+        name='user-events-dataset',
     ),
 ]
