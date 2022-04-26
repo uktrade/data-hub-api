@@ -54,4 +54,5 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
         'estimated_land_date',
         'name',
         'stage.name',
+        'modified_on',
     )
