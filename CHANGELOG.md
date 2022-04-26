@@ -1,3 +1,11 @@
+# Data Hub API 39.24.1 (2022-04-26)
+
+
+## Bug fixes
+
+- **Investment** Investment projects at Verify Win or Won stage are now excluded from Estimated Land Date notifications.
+
+
 # Data Hub API 39.24.0 (2022-04-25)
 
 
