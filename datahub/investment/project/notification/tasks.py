@@ -9,6 +9,7 @@ from django.utils.timezone import now
 from django_pglocks import advisory_lock
 
 from datahub.core import statsd
+from datahub.core.constants import InvestmentProjectStage
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.investment.project import (
     INVESTMENT_ESTIMATED_LAND_DATE_NOTIFICATION_FEATURE_FLAG_NAME,
@@ -67,6 +68,11 @@ def get_subscriptions_for_estimated_land_date(notification_type: str):
         investment_project__estimated_land_date__year=future_estimated_land_date.year,
         investment_project__estimated_land_date__month=future_estimated_land_date.month,
         investment_project__estimated_land_date__day=future_estimated_land_date.day,
+    ).exclude(
+        investment_project__stage_id__in=(
+            InvestmentProjectStage.verify_win.value.id,
+            InvestmentProjectStage.won.value.id,
+        ),
     )
     return subscriptions
 
