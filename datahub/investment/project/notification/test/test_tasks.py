@@ -1,12 +1,14 @@
 from unittest import mock
 from uuid import uuid4
 
+import factory
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.test.utils import override_settings
 from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory
+from datahub.core.constants import InvestmentProjectStage
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.investment.project import (
     INVESTMENT_ESTIMATED_LAND_DATE_NOTIFICATION_FEATURE_FLAG_NAME,
@@ -82,29 +84,75 @@ class TestInvestmentNotificationSubscriptionTasks:
         """Tests that query returns correct subscriptions."""
         adviser = AdviserFactory()
         future_estimated_land_date = now() + relativedelta(days=int(notification_type))
-        project = InvestmentProjectFactory(
-            project_manager=adviser,
-            estimated_land_date=future_estimated_land_date,
-        )
-        InvestmentProjectFactory(
-            project_manager=adviser,
-            estimated_land_date=future_estimated_land_date - relativedelta(days=1),
-        )
-        InvestmentProjectFactory(
-            project_manager=adviser,
-            estimated_land_date=future_estimated_land_date + relativedelta(days=1),
-        )
-        InvestmentNotificationSubscriptionFactory(
-            investment_project=project,
+        projects = [
+            InvestmentProjectFactory(
+                project_manager=adviser,
+                estimated_land_date=future_estimated_land_date,
+            ),
+            InvestmentProjectFactory(
+                project_manager=adviser,
+                estimated_land_date=future_estimated_land_date - relativedelta(days=1),
+            ),
+            InvestmentProjectFactory(
+                project_manager=adviser,
+                estimated_land_date=future_estimated_land_date + relativedelta(days=1),
+            ),
+        ]
+        InvestmentNotificationSubscriptionFactory.create_batch(
+            len(projects),
+            investment_project=factory.Iterator(projects),
             adviser=adviser,
             estimated_land_date=[notification_type],
         )
-        InvestmentNotificationSubscriptionFactory.create_batch(2, adviser=adviser)
 
         subscriptions = get_subscriptions_for_estimated_land_date(notification_type)
         assert subscriptions.count() == 1
         assert subscriptions[0].adviser == adviser
-        assert subscriptions[0].investment_project == project
+        assert subscriptions[0].investment_project == projects[0]
+        assert notification_type in subscriptions[0].estimated_land_date
+
+    @pytest.mark.parametrize(
+        'notification_type',
+        (
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value
+            ),
+        ),
+    )
+    def test_subscriptions_dont_include_verify_win_and_won_projects(self, notification_type):
+        """Tests that query returns subscriptions excluding verify win and won projects."""
+        adviser = AdviserFactory()
+        future_estimated_land_date = now() + relativedelta(days=int(notification_type))
+        projects = [
+            InvestmentProjectFactory(
+                project_manager=adviser,
+                estimated_land_date=future_estimated_land_date,
+            ),
+            InvestmentProjectFactory(
+                project_manager=adviser,
+                estimated_land_date=future_estimated_land_date,
+                stage_id=InvestmentProjectStage.verify_win.value.id,
+            ),
+            InvestmentProjectFactory(
+                project_manager=adviser,
+                estimated_land_date=future_estimated_land_date,
+                stage_id=InvestmentProjectStage.won.value.id,
+            ),
+        ]
+        InvestmentNotificationSubscriptionFactory.create_batch(
+            len(projects),
+            investment_project=factory.Iterator(projects),
+            adviser=adviser,
+            estimated_land_date=[notification_type],
+        )
+
+        subscriptions = get_subscriptions_for_estimated_land_date(notification_type)
+        assert subscriptions.count() == 1
+        assert subscriptions[0].adviser == adviser
+        assert subscriptions[0].investment_project == projects[0]
         assert notification_type in subscriptions[0].estimated_land_date
 
     @pytest.mark.parametrize(
