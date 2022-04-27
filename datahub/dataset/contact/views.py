@@ -30,13 +30,11 @@ class ContactsDatasetView(BaseDatasetView):
             'created_by_id',
             'created_on',
             'email',
-            'email_alternative',
             'id',
             'job_title',
             'modified_on',
             'name',
             'notes',
             'primary',
-            'telephone_alternative',
             'full_telephone_number',
         )
