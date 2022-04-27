@@ -29,7 +29,6 @@ class Contact(BaseSearchModel):
     created_by = fields.contact_or_adviser_field(include_dit_team=True)
     created_on = Date()
     email = fields.NormalizedKeyword()
-    email_alternative = Text()
     first_name = Text(
         fields={
             'keyword': fields.NormalizedKeyword(),
@@ -61,7 +60,6 @@ class Contact(BaseSearchModel):
     )
     notes = fields.EnglishText()
     primary = Boolean()
-    telephone_alternative = Keyword()
     full_telephone_number = Keyword()
     title = fields.id_name_field()
 
@@ -92,11 +90,9 @@ class Contact(BaseSearchModel):
         'name_with_title',
         'name_with_title.trigram',
         'email',
-        'email_alternative',
         'company.name',
         'company.name.trigram',
         'job_title',
         'job_title.trigram',
         'full_telephone_number',
-        'telephone_alternative',
     )

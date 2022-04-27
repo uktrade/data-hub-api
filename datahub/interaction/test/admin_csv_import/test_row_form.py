@@ -37,19 +37,15 @@ from datahub.metadata.test.factories import ChildServiceFactory, ServiceFactory,
 EMAIL_MATCHING_CONTACT_TEST_DATA = [
     {
         'email': 'unique1@primary.com',
-        'email_alternative': '',
     },
     {
         'email': 'unique2@primary.com',
-        'email_alternative': 'unique2@alternative.com',
     },
     {
         'email': 'duplicate@primary.com',
-        'email_alternative': '',
     },
     {
         'email': 'duplicate@primary.com',
-        'email_alternative': '',
     },
 ]
 
@@ -1007,19 +1003,17 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         assert form.cleaned_data['subject'] == service.name
 
     @pytest.mark.parametrize(
-        'input_email,matching_status,match_on_alternative',
+        'input_email,matching_status',
         (
             # unique match of a contact on primary email
-            ('unique1@primary.com', ContactMatchingStatus.matched, False),
-            # unique match of a contact on alternative email
-            ('unique2@alternative.com', ContactMatchingStatus.matched, True),
+            ('unique1@primary.com', ContactMatchingStatus.matched),
             # no match of a contact
-            ('UNIQUE@COMPANY.IO', ContactMatchingStatus.unmatched, False),
+            ('UNIQUE@COMPANY.IO', ContactMatchingStatus.unmatched),
             # multiple matches of a contact
-            ('duplicate@primary.com', ContactMatchingStatus.multiple_matches, None),
+            ('duplicate@primary.com', ContactMatchingStatus.multiple_matches),
         ),
     )
-    def test_contact_lookup(self, input_email, matching_status, match_on_alternative):
+    def test_contact_lookup(self, input_email, matching_status):
         """
         Test that various contact matching scenarios.
 
@@ -1053,8 +1047,7 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
 
         if matching_status == ContactMatchingStatus.matched:
             assert contact
-            actual_email = contact.email_alternative if match_on_alternative else contact.email
-            assert actual_email.lower() == input_email.lower()
+            assert contact.email.lower() == input_email.lower()
         else:
             assert not contact
 
