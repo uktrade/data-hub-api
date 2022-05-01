@@ -103,7 +103,7 @@ def main():
 
 If anything is wrong, edit the release on GitHub.
 """
-    print(msg)  # noqa: T001
+    print(msg)  # noqa: T001 T201
 
 
 if __name__ == '__main__':
