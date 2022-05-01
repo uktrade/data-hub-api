@@ -165,7 +165,7 @@ flake8-import-order==0.18.1
     # via -r requirements.in
 flake8-polyfill==1.0.2
     # via pep8-naming
-flake8-print==4.0.0
+flake8-print==5.0.0
     # via -r requirements.in
 flake8-quotes==3.3.1
     # via -r requirements.in
@@ -397,7 +397,7 @@ six==1.16.0
     #   asttokens
     #   click-repl
     #   django-pglocks
-    #   flake8-print
+    #   flake8-debugger
     #   isodate
     #   mail-parser
     #   mohawk
