@@ -155,7 +155,7 @@ flake8-bugbear==22.1.11
     # via -r requirements.in
 flake8-commas==2.1.0
     # via -r requirements.in
-flake8-debugger==4.0.0
+flake8-debugger==4.1.2
     # via -r requirements.in
 flake8-docstrings==1.6.0
     # via -r requirements.in
@@ -395,7 +395,6 @@ six==1.16.0
     #   asttokens
     #   click-repl
     #   django-pglocks
-    #   flake8-debugger
     #   flake8-print
     #   isodate
     #   mail-parser
