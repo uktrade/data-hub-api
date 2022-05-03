@@ -201,7 +201,6 @@ def test_mapping(opensearch):
                 'normalizer': 'lowercase_asciifolding_normalizer',
                 'type': 'keyword',
             },
-            'email_alternative': {'type': 'text'},
             'first_name': {
                 'type': 'text',
                 'fields': {
@@ -267,7 +266,6 @@ def test_mapping(opensearch):
                 'type': 'text',
             },
             'primary': {'type': 'boolean'},
-            'telephone_alternative': {'type': 'keyword'},
             'title': {
                 'properties': {
                     'id': {'type': 'keyword'},
@@ -327,7 +325,6 @@ def test_get_basic_search_query():
                                 'dit_participants.team.name',
                                 'dit_participants.team.name.trigram',
                                 'email',
-                                'email_alternative',
                                 'event.name',
                                 'event.name.trigram',
                                 'event_type.name',
@@ -363,7 +360,6 @@ def test_get_basic_search_query():
                                 'subtotal_cost.keyword',
                                 'teams.name',
                                 'teams.name.trigram',
-                                'telephone_alternative',
                                 'total_cost.keyword',
                                 'trading_names',
                                 'trading_names.trigram',
@@ -456,13 +452,11 @@ def test_get_limited_search_by_entity_query():
                                             'name_with_title',
                                             'name_with_title.trigram',
                                             'email',
-                                            'email_alternative',
                                             'company.name',
                                             'company.name.trigram',
                                             'job_title',
                                             'job_title.trigram',
                                             'full_telephone_number',
-                                            'telephone_alternative',
                                         ),
                                         'type': 'cross_fields',
                                         'operator': 'and',
