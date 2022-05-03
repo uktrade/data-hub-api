@@ -1,3 +1,19 @@
+# Data Hub API 40.0.0 (2022-05-03)
+
+
+## Removals
+
+- **Contacts** The alternative_email and alternative_telephone fields have been removed. These should be added to the notes field instead.
+
+## Features
+
+- The `modified_on` field has been added to the `SORT_BY_FIELDS` tuple.
+
+## Bug fixes
+
+- **Contacts** A bug that stopped the search app being migrated to the latest schema has been fixed.
+
+
 # Data Hub API 39.24.1 (2022-04-26)
 
 
