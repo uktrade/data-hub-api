@@ -90,3 +90,4 @@ requests_toolbelt==0.9.1
 sentry_sdk==1.5.11
 simple_salesforce==1.11.6
 rq==1.10.1
+rq-dashboard==0.6.1
