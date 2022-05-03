@@ -5,7 +5,7 @@ def computed_address_field(field):
     """Gets Contact address from Company if address_same_as_company."""
     def get_field(contact):
         obj = contact.company if contact.address_same_as_company else contact
-        value = getattr(obj, field)
+        value = getattr(obj, field, None)
 
         if field == 'address_country' or field == 'address_area':
             return dict_utils.id_name_dict(value)

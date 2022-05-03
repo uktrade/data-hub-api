@@ -202,8 +202,6 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             'address_county',
             'address_country',
             'address_postcode',
-            'telephone_alternative',
-            'email_alternative',
             'notes',
             'archived',
             'archived_documents_url_path',

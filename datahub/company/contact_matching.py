@@ -104,23 +104,14 @@ def find_active_contact_by_email_address(
 
     The following the logic is used:
     - if a unique match is found using Contact.email, this is used
-    - otherwise, if there is a unique match on Contact.email_alternative, this is used
     - matching using one of these fields is delegated to the specified `match_strategy` -
       or a default strategy if this is unspecified.
       The match strategy will determine whether a contact is found according to
       certain situations - the ContactMatchingStatus returned will be set by
       the match strategy.
     """
-    contact, matching_status = _find_active_contact_using_field(
+    return _find_active_contact_using_field(
         email,
         'email',
         match_strategy_func,
     )
-    if matching_status == ContactMatchingStatus.unmatched:
-        contact, matching_status = _find_active_contact_using_field(
-            email,
-            'email_alternative',
-            match_strategy_func,
-        )
-
-    return contact, matching_status

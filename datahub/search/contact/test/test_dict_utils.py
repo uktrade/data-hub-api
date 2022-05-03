@@ -46,6 +46,17 @@ from datahub.search.contact import dict_utils
             '3',
         ),
 
+        # address_same_as_company = True and company is None
+        (
+            construct_mock(
+                address_same_as_company=True,
+                address_1='2',
+                company=None,
+            ),
+            'address_1',
+            None,
+        ),
+
         # address_same_as_company = True and nested field
         (
             construct_mock(
