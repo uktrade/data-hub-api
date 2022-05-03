@@ -42,8 +42,6 @@ def test_contact_dbmodel_to_dict(opensearch):
         'address_county',
         'address_country',
         'address_postcode',
-        'telephone_alternative',
-        'email_alternative',
         'notes',
         'company_sector',
         'company_uk_region',
