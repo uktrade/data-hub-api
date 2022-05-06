@@ -44,6 +44,8 @@ services:
     environment:
       - POSTGRES_DB=datahub
       - POSTGRES_PASSWORD=datahub
+    ports:
+      - '5432:5432'
 
   opensearch:
     image: opensearchproject/opensearch:1.2.4

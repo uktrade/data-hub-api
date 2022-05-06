@@ -54,3 +54,10 @@ start-frontend-api-dnb:
 stop-frontend-api-dnb:
 	$(MAKE) -C ../dnb-service stop-dnb-for-data-hub-api
 	$(MAKE) -C ../data-hub-frontend stop-dev
+
+rq-monitor:
+	docker-compose run api rq-dashboard
+
+rq-c:
+	docker-compose run api rq worker test-long-running dead-letter 111 222 default test-short-running --url redis://redis:6379
+
