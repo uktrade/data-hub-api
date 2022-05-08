@@ -64,7 +64,7 @@ piprot==0.9.11
 semantic_version==2.9.0
 towncrier==21.9.0
 watchdog[watchmedo]==2.1.7
-pre-commit==2.18.1
+pre-commit==2.19.0
 
 # Code static analysis
 flake8==4.0.1
