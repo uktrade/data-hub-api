@@ -19,4 +19,4 @@ def print_error(exc):
         response_data = exc.response.json()
         messages.append(f'Response: {response_data}')
 
-    print(*messages, sep='\n')  # noqa: T001
+    print(*messages, sep='\n')  # noqa: T001 T201
