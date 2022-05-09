@@ -452,7 +452,7 @@ watchdog[watchmedo]==2.1.7
     # via -r requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
-werkzeug==2.1.1
+werkzeug==2.1.2
     # via -r requirements.in
 wheel==0.37.1
     # via pip-tools
