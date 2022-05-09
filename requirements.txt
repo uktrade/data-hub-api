@@ -266,7 +266,7 @@ platformdirs==2.5.1
     #   zeep
 pluggy==1.0.0
     # via pytest
-pre-commit==2.18.1
+pre-commit==2.19.0
     # via -r requirements.in
 prompt-toolkit==3.0.28
     # via
