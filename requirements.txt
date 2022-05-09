@@ -30,9 +30,9 @@ backcall==0.2.0
     # via ipython
 billiard==3.6.4.0
     # via celery
-boto3==1.21.46
+boto3==1.22.9
     # via -r requirements.in
-botocore==1.24.46
+botocore==1.25.9
     # via
     #   boto3
     #   s3transfer
@@ -99,7 +99,7 @@ django==3.2.13
     #   djangorestframework
 django-axes==5.32.0
     # via -r requirements.in
-django-debug-toolbar==3.2.4
+django-debug-toolbar==3.4.0
     # via -r requirements.in
 django-environ==0.8.1
     # via -r requirements.in
@@ -155,7 +155,7 @@ flake8-bugbear==22.1.11
     # via -r requirements.in
 flake8-commas==2.1.0
     # via -r requirements.in
-flake8-debugger==4.0.0
+flake8-debugger==4.1.2
     # via -r requirements.in
 flake8-docstrings==1.6.0
     # via -r requirements.in
@@ -191,7 +191,7 @@ incremental==21.3.0
     # via towncrier
 iniconfig==1.1.1
     # via pytest
-ipython==8.2.0
+ipython==8.3.0
     # via -r requirements.in
 isodate==0.6.1
     # via zeep
@@ -266,7 +266,7 @@ platformdirs==2.5.1
     #   zeep
 pluggy==1.0.0
     # via pytest
-pre-commit==2.18.1
+pre-commit==2.19.0
     # via -r requirements.in
 prompt-toolkit==3.0.28
     # via
@@ -302,7 +302,7 @@ pygments==2.11.2
     # via ipython
 pyjwt==2.3.0
     # via notifications-python-client
-pylint==2.13.7
+pylint==2.13.8
     # via
     #   -r requirements.in
     #   pylint-django
@@ -384,7 +384,7 @@ s3transfer==0.5.1
     # via boto3
 semantic-version==2.9.0
     # via -r requirements.in
-sentry-sdk==1.5.10
+sentry-sdk==1.5.11
     # via -r requirements.in
 simple-salesforce==1.11.6
     # via -r requirements.in
@@ -396,6 +396,7 @@ six==1.16.0
     #   click-repl
     #   django-pglocks
     #   flake8-debugger
+    #   flake8-print
     #   isodate
     #   mail-parser
     #   mohawk
@@ -452,7 +453,7 @@ watchdog[watchmedo]==2.1.7
     # via -r requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
-werkzeug==2.1.1
+werkzeug==2.1.2
     # via -r requirements.in
 wheel==0.37.1
     # via pip-tools

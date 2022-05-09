@@ -25,16 +25,6 @@ class ContactPermission(StrEnum):
 class Contact(ArchivableModel, BaseModel):
     """
     Contact (a person at a company that DIT has had contact with).
-
-    Additional indexes created via migrations:
-
-        Name: company_contact_upper_email_244368
-        Definition: UPPER(email)
-        Comments: For when filtering by email__iexact
-
-        Name: company_contact_upper_email_alternative_eb17a977
-        Definition: UPPER(email_alternative)
-        Comments: For when filtering by email_alternative__iexact
     """
 
     ADDRESS_VALIDATION_MAPPING = {
@@ -87,13 +77,6 @@ class Contact(ArchivableModel, BaseModel):
         on_delete=models.SET_NULL,
     )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    telephone_alternative = models.CharField(
-        validators=[InternationalTelephoneValidator()],
-        max_length=MAX_LENGTH,
-        blank=True,
-        null=True,
-    )
-    email_alternative = models.EmailField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH, blank=True,
