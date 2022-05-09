@@ -14,4 +14,7 @@ updates:
   - dependency-name: pytest
     versions:
     - ">= 4.6.1.a, < 4.6.2"
+  - dependency-name: werkzeug
+    versions:
+    - "> 2.0.3"
   rebase-strategy: disabled
