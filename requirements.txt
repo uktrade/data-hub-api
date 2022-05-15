@@ -30,9 +30,9 @@ backcall==0.2.0
     # via ipython
 billiard==3.6.4.0
     # via celery
-boto3==1.22.9
+boto3==1.23.0
     # via -r requirements.in
-botocore==1.25.9
+botocore==1.26.0
     # via
     #   boto3
     #   s3transfer
@@ -431,10 +431,6 @@ traitlets==5.1.1
     # via
     #   ipython
     #   matplotlib-inline
-typing-extensions==4.2.0
-    # via
-    #   astroid
-    #   pylint
 uritemplate==4.1.1
     # via -r requirements.in
 urllib3==1.26.8
