@@ -63,7 +63,7 @@ pip-tools==6.6.1
 piprot==0.9.11
 semantic_version==2.9.0
 towncrier==21.9.0
-watchdog[watchmedo]==2.1.7
+watchdog[watchmedo]==2.1.8
 pre-commit==2.19.0
 
 # Code static analysis
