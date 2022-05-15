@@ -431,10 +431,6 @@ traitlets==5.1.1
     # via
     #   ipython
     #   matplotlib-inline
-typing-extensions==4.2.0
-    # via
-    #   astroid
-    #   pylint
 uritemplate==4.1.1
     # via -r requirements.in
 urllib3==1.26.8
@@ -451,7 +447,7 @@ vine==5.0.0
     #   kombu
 virtualenv==20.13.1
     # via pre-commit
-watchdog[watchmedo]==2.1.7
+watchdog[watchmedo]==2.1.8
     # via -r requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
