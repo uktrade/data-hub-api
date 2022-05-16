@@ -1,0 +1,57 @@
+version: '2'
+
+services:
+  dashboard:
+    image: eoranged/rq-dashboard
+    command: -u redis://redis:6379/0
+    ports:
+      - target: 9181
+        published: 9181
+        protocol: tcp
+        mode: host
+
+  prometheus:
+    image: prom/prometheus:v2.17.2
+    ports:
+      - target: 9090
+        published: 9090
+        protocol: tcp
+        mode: host
+    volumes:
+      - type: bind
+        source: ./grafana/prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:6.7.3
+    ports:
+      - target: 3000
+        published: 3000
+        protocol: tcp
+        mode: host
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      # Grafana datasources
+      # https://grafana.com/docs/grafana/latest/administration/provisioning/#datasources
+      - type: bind
+        source: ./grafana/grafana-datasources.yml
+        target: /etc/grafana/provisioning/datasources/datasources.yaml
+      # Grafana dashboards config
+      # https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
+      - type: bind
+        source: ./grafana/grafana-dashboards.yml
+        target: /etc/grafana/provisioning/dashboards/dashboards.yaml
+      # # RQ dashboard
+      - type: bind
+        source: ./grafana/rq-dashboard.json
+        target: /etc/grafana/dashboards/rq-dashboard.json
+      # Grafana data
+      - type: volume
+        source: grafana_data
+        target: /var/lib/grafana
+
+volumes:
+  grafana_data:
+    driver: local
