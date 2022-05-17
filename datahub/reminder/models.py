@@ -9,19 +9,29 @@ class BaseSubscription(models.Model):
     """
     Base model for reminder subscriptions.
     """
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     adviser = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='+',
     )
-    notification_days = ArrayField(models.PositiveSmallIntegerField(), size=5)
+    reminder_days = ArrayField(
+        models.PositiveSmallIntegerField(),
+        size=5,
+        blank=True,
+        default=list,
+    )
+    email_reminders_enabled = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
 
+    def __str__(self):
+        return f'Subscription: {self.adviser}'
 
-class NoRecentInteractionSubscription(BaseSubscription):
+
+class NoRecentInvestmentInteractionSubscription(BaseSubscription):
     """
     Subscription to get reminders about projects with no recent interactions.
     """
