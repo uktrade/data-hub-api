@@ -20,6 +20,7 @@ from datahub.investment.project import urls as investment_urls
 from datahub.investment.project.proposition import urls as proposition_urls
 from datahub.metadata import urls as metadata_urls
 from datahub.omis import urls as omis_urls
+from datahub.reminder import urls as reminder_urls
 from datahub.search import urls as search_urls
 from datahub.user.company_list import urls as company_list_urls
 
@@ -90,4 +91,5 @@ v4_urls = [
     path('metadata/', include((metadata_urls, 'metadata'), namespace='metadata')),
     path('', include((event_urls.urls_v4, 'event'), namespace='event')),
     path('', include((interaction_urls.urls_v4, 'interaction'), namespace='interaction')),
+    path('', include((reminder_urls, 'reminder'), namespace='reminder')),
 ]
