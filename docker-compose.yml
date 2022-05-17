@@ -1,11 +1,11 @@
 version: '2'
-services:
 
+services:
   api:
     build:
       context: .
     ports:
-      - "8000:8000"
+      - '8000:8000'
     volumes:
       - .:/app
     entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://opensearch:9200 -wait tcp://redis:6379 -timeout 120s
@@ -58,4 +58,16 @@ services:
     image: redis:3.2
     restart: always
     ports:
-      - "6379:6379"
+      - '6379:6379'
+
+  rq_exporter:
+    image: mdawar/rq-exporter:latest
+    ports:
+      - target: 9726
+        published: 9726
+        protocol: tcp
+        mode: host
+    environment:
+      RQ_REDIS_HOST: 'redis'
+    depends_on:
+      - redis

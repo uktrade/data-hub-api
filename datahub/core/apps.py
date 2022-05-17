@@ -14,6 +14,6 @@ class CoreConfig(AppConfig):
         """Registers an atexit handler to (cleanly) shut down the thread pool.
 
         I haven't found a better way to do this; this won't get called when using runserver_plus,
-        but will be when using gunicorn.
+        but will be when using WSGIserver.
         """
         atexit.register(shut_down_thread_pool)

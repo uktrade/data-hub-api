@@ -1,3 +1,12 @@
+# Data Hub API 40.1.0 (2022-05-17)
+
+
+## Internal changes
+
+- The old Gunicorn config has been removed.
+- It's now possible to do RQ monitoring.
+
+
 # Data Hub API 40.0.0 (2022-05-03)
 
 
