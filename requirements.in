@@ -10,7 +10,7 @@ django-mptt==0.13.4
 django-pglocks==1.0.4
 django-reversion==5.0.0
 uritemplate==4.1.1  # required for DRF schema features
-whitenoise==6.0.0
+whitenoise==6.1.0
 
 chardet==4.0.0
 pyyaml==6.0
@@ -20,7 +20,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.3
 psycogreen==1.0.2
 
-boto3==1.22.9
+boto3==1.23.0
 
 notifications-python-client==6.3.0
 
@@ -59,11 +59,11 @@ freezegun==1.2.1
 requests-mock==1.9.3
 django-debug-toolbar==3.4.0
 werkzeug==2.0.3  # Required by runserver_plus - useful for local dev
-pip-tools==6.6.0
+pip-tools==6.6.1
 piprot==0.9.11
 semantic_version==2.9.0
 towncrier==21.9.0
-watchdog[watchmedo]==2.1.7
+watchdog[watchmedo]==2.1.8
 pre-commit==2.19.0
 
 # Code static analysis
@@ -78,7 +78,7 @@ flake8-quotes==3.3.1
 flake8-string-format==0.3.0
 pep8-naming==0.12.1
 pydocstyle==6.1.1
-pylint==2.13.8
+pylint==2.13.9
 pylint-django==2.5.3
 pylint-pytest==1.1.2
 
@@ -87,6 +87,6 @@ gevent==21.12.0
 mohawk==1.1.0
 requests==2.27.1
 requests_toolbelt==0.9.1
-sentry_sdk==1.5.11
+sentry_sdk==1.5.12
 simple_salesforce==1.11.6
 rq==1.10.1
