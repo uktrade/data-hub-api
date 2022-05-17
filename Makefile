@@ -5,6 +5,12 @@ start-dev:
 stop-dev:
 	docker-compose -f docker-compose.yml -f docker-compose.single-network.yml down
 
+start-rq-mon:
+	docker-compose -f docker-compose.yml -f docker-compose-rq-monitor.yml up &
+
+stop-rq-mon:
+	docker-compose -f docker-compose.yml -f docker-compose-rq-monitor.yml down
+
 tests:
 	docker-compose build
 	docker-compose run api bash tests.sh
@@ -36,7 +42,7 @@ run-shell:
 	docker-compose run api bash
 
 run-test-reuse-db:
-	docker-compose run api pytest --reuse-db -vv <Add Test File Path>
+	docker-compose run api pytest --reuse-db -vv datahub/core/test/test_queue.py
 
 reindex-opensearch:
 	docker-compose run api python manage.py sync_search

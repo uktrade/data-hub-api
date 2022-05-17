@@ -119,7 +119,7 @@ def main():
         print_error(exc)
         return
 
-    print(  # noqa: T001
+    print(  # noqa: T001 T201
         f'Branch {branch_name} was created, pushed and opened in your web browser.',
     )
 

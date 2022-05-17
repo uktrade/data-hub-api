@@ -114,7 +114,7 @@ def main():
         print_error(exc)
         return
 
-    print(  # noqa: T001
+    print(  # noqa: T001 T201
         f'Branch {branch_name} was created, pushed and opened in your web browser. If anything '
         f'is wrong, edit your local branch manually and use git push --force-with-lease.',
     )
