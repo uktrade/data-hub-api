@@ -212,6 +212,8 @@ class TestInvestmentNotificationSubscriptionTasks:
                     'investor_company_name': project.investor_company.name,
                     'project_name': project.name,
                     'project_code': project.project_code,
+                    'project_status': project.status.capitalize(),
+                    'project_stage': project.stage.name,
                     'estimated_land_date': project.estimated_land_date.strftime('%-d %B %Y'),
                 },
                 NotifyServiceName.investment,
