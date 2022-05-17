@@ -63,7 +63,7 @@ class TestDisableSignalsForModel:
         """
         Test that signal receivers are not disabled for other threads.
 
-        This is important when using gevent (e.g. via Gunicorn).
+        This is important when using gevent (e.g. via WSGIServer).
 
         Note that as this test uses another thread, the usual test transaction and clean-up
         logic does not kick in. Hence, cleaning up has to be manually handled.
