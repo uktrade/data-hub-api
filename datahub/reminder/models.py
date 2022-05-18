@@ -41,3 +41,48 @@ class UpcomingEstimatedLandDateSubscription(BaseSubscription):
     """
     Subscription to get reminders about upcoming estimated land dates.
     """
+
+
+class BaseReminder(models.Model):
+    """
+    Base model for reminders.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    adviser = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='+',
+    )
+    created_on = models.DateTimeField(auto_now_add=True)
+    event = models.CharField(max_length=255)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.event
+
+
+class NoRecentInvestmentInteractionReminder(BaseReminder):
+    """
+    No recent investment interaction reminders.
+    """
+
+    project = models.ForeignKey(
+        'investment.InvestmentProject',
+        on_delete=models.CASCADE,
+        related_name='no_recent_investment_interaction_reminders',
+    )
+
+
+class UpcomingEstimatedLandDateReminder(BaseReminder):
+    """
+    Upcoming estimated land date reminders.
+    """
+
+    project = models.ForeignKey(
+        'investment.InvestmentProject',
+        on_delete=models.CASCADE,
+        related_name='upcoming_estimated_land_date_reminders',
+    )
