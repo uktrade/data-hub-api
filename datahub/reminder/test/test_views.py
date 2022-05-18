@@ -3,9 +3,9 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from datahub.core.test_utils import APITestMixin
-from datahub.reminder.models import (
-    NoRecentInvestmentInteractionSubscription,
-    UpcomingEstimatedLandDateSubscription,
+from datahub.reminder.test.factories import (
+    NoRecentInvestmentInteractionSubscriptionFactory,
+    UpcomingEstimatedLandDateSubscriptionFactory,
 )
 
 
@@ -33,7 +33,7 @@ class TestNoRecentInvestmentInteractionSubscriptionViewset(APITestMixin):
 
     def test_get_subscription(self):
         """Given an existing subscription, those details should be returned"""
-        NoRecentInvestmentInteractionSubscription.objects.create(
+        NoRecentInvestmentInteractionSubscriptionFactory(
             adviser=self.user,
             reminder_days=[10, 20, 40],
             email_reminders_enabled=True,
@@ -71,7 +71,7 @@ class TestUpcomingEstimatedLandDateSubscriptionViewset(APITestMixin):
 
     def test_get_subscription(self):
         """Given an existing subscription, those details should be returned"""
-        UpcomingEstimatedLandDateSubscription.objects.create(
+        UpcomingEstimatedLandDateSubscriptionFactory(
             adviser=self.user,
             reminder_days=[10, 20, 40],
             email_reminders_enabled=True,
