@@ -70,6 +70,10 @@
         name = "Investment"
 
     [[tool.towncrier.section]]
+        path = "reminder"
+        name = "Reminders"
+
+    [[tool.towncrier.section]]
         path = "omis"
         name = "OMIS"
 
