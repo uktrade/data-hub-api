@@ -1,3 +1,15 @@
+# Data Hub API 40.2.0 (2022-05-19)
+
+
+## Features
+
+- **Investment** The `project_stage` and `project_status` variables have been added to Estimated Land Date notification template.
+- **Reminders** API now provides reminder subscriptions for the current user:
+
+  GET /v4/reminder/subscription/estimated-land-date
+  GET /v4/reminder/subscription/no-recent-investment-interaction
+
+
 # Data Hub API 40.1.0 (2022-05-17)
 
 
