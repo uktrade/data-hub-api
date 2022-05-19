@@ -127,6 +127,7 @@ LOCAL_APPS = [
     'datahub.user_event_log',
     'datahub.activity_feed',
     'datahub.dataset',
+    'datahub.reminder',
     'datahub.testfixtureapi',
 ]
 
