@@ -40,6 +40,8 @@ def send_investment_notification(project, adviser, notification_type):
             'investor_company_name': project.investor_company.name,
             'project_name': project.name,
             'project_code': project.project_code,
+            'project_status': project.status.capitalize(),
+            'project_stage': project.stage.name,
             # '%-d %B %Y' formats date to 1 January 2022
             'estimated_land_date': project.estimated_land_date.strftime('%-d %B %Y'),
         },
