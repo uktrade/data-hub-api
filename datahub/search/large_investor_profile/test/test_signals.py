@@ -4,6 +4,7 @@ import pytest
 from opensearchpy.exceptions import NotFoundError
 
 from datahub.company.test.factories import CompanyFactory
+from datahub.core.queue import DataHubQueue
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 from datahub.search.large_investor_profile.apps import LargeInvestorProfileSearchApp
 
@@ -17,14 +18,20 @@ def _get_documents(setup_opensearch, pk):
     )
 
 
-def test_new_large_investor_profile_synced(opensearch_with_signals):
+def test_new_large_investor_profile_synced(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """Test that new large capital profiles are synced to OpenSearch."""
     investor_profile = LargeCapitalInvestorProfileFactory()
     opensearch_with_signals.indices.refresh()
     assert _get_documents(opensearch_with_signals, investor_profile.pk)
 
 
-def test_updated_large_investor_profile_synced(opensearch_with_signals):
+def test_updated_large_investor_profile_synced(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """Test that when an large investor profile is updated it is synced to OpenSearch."""
     large_investor_profile = LargeCapitalInvestorProfileFactory()
     large_investor_profile.investable_capital = 12345
@@ -39,7 +46,11 @@ def test_updated_large_investor_profile_synced(opensearch_with_signals):
     ),
 )
 def test_delete_from_opensearch(
-    investor_profile_factory, expected_in_index, expected_to_call_delete, opensearch_with_signals,
+    investor_profile_factory,
+    expected_in_index,
+    expected_to_call_delete,
+    opensearch_with_signals,
+    queue: DataHubQueue,
 ):
     """
     Test that when an large investor profile is deleted from db it is also
@@ -62,7 +73,10 @@ def test_delete_from_opensearch(
         assert mock_delete_document.called == expected_in_index
 
 
-def test_edit_company_syncs_large_investor_profile_in_opensearch(opensearch_with_signals):
+def test_edit_company_syncs_large_investor_profile_in_opensearch(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """Tests that updating company details also updated the relevant investor profiles."""
     new_company_name = 'SYNC TEST'
     investor_company = CompanyFactory()

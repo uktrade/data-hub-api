@@ -103,7 +103,7 @@ def get_search_by_entities_query(
     # document must match all filters in the list (and)
     must_filter = _build_must_queries(filters, ranges, composite_field_mapping)
 
-    s = Search(
+    search = Search(
         index=[
             entity.get_read_alias()
             for entity in entities
@@ -116,12 +116,12 @@ def get_search_by_entities_query(
 
     permission_query = _build_entity_permission_query(permission_filters)
     if permission_query:
-        s = s.filter(permission_query)
+        search = search.filter(permission_query)
 
-    s = s.filter(Bool(must=must_filter))
-    s = _apply_sorting_to_query(s, ordering)
+    search = search.filter(Bool(must=must_filter))
+    search = _apply_sorting_to_query(search, ordering)
     return _apply_source_filtering_to_query(
-        s,
+        search,
         fields_to_include=fields_to_include,
         fields_to_exclude=fields_to_exclude,
     )

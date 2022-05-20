@@ -1,4 +1,5 @@
 import pytest
+from django.conf import settings
 
 from datahub.search.sync_object import sync_object_async, sync_related_objects_async
 from datahub.search.test.search_support.models import RelatedModel, SimpleModel
@@ -8,8 +9,8 @@ from datahub.search.test.utils import doc_exists
 
 
 @pytest.mark.django_db
-def test_sync_object_task_syncs_using_celery(opensearch):
-    """Test that an object can be synced to OpenSearch using Celery."""
+def test_sync_object_task_syncs_using_rq(opensearch):
+    """Test that an object can be synced to OpenSearch using RQ."""
     obj = SimpleModel.objects.create()
     sync_object_async(SimpleModelSearchApp, obj.pk)
     opensearch.indices.refresh()
@@ -18,8 +19,8 @@ def test_sync_object_task_syncs_using_celery(opensearch):
 
 
 @pytest.mark.django_db
-def test_sync_related_objects_syncs_using_celery(opensearch):
-    """Test that related objects can be synced to OpenSearch using Celery."""
+def test_sync_related_objects_syncs_using_rq(opensearch):
+    """Test that related objects can be synced to OpenSearch using datahub queue."""
     simpleton = SimpleModel.objects.create()
     relation_1 = RelatedModel.objects.create(simpleton=simpleton)
     relation_2 = RelatedModel.objects.create(simpleton=simpleton)
@@ -31,3 +32,7 @@ def test_sync_related_objects_syncs_using_celery(opensearch):
     assert doc_exists(opensearch, RelatedModelSearchApp, relation_1.pk)
     assert doc_exists(opensearch, RelatedModelSearchApp, relation_2.pk)
     assert not doc_exists(opensearch, RelatedModelSearchApp, unrelated_obj.pk)
+
+
+def test_should_be_in_the_testing_environment():
+    assert settings.IS_TEST is True

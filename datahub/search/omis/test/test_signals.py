@@ -1,5 +1,6 @@
 import pytest
 
+from datahub.core.queue import DataHubQueue
 from datahub.omis.order.test.factories import (
     OrderAssigneeFactory,
     OrderFactory,
@@ -11,7 +12,7 @@ from datahub.search.omis import OrderSearchApp
 pytestmark = pytest.mark.django_db
 
 
-def test_creating_order_syncs_to_opensearch(opensearch_with_signals):
+def test_creating_order_syncs_to_opensearch(opensearch_with_signals, queue: DataHubQueue):
     """Test that when I create an order, it gets synced to ES."""
     order = OrderFactory()
     opensearch_with_signals.indices.refresh()
@@ -22,7 +23,7 @@ def test_creating_order_syncs_to_opensearch(opensearch_with_signals):
     )
 
 
-def test_updating_order_updates_opensearch(opensearch_with_signals):
+def test_updating_order_updates_opensearch(opensearch_with_signals, queue: DataHubQueue):
     """Test that when I update an order, the updated version gets synced to ES."""
     order = OrderFactory()
     new_description = 'lorem'
@@ -37,7 +38,7 @@ def test_updating_order_updates_opensearch(opensearch_with_signals):
     assert result['_source']['description'] == new_description
 
 
-def test_accepting_quote_updates_opensearch(opensearch_with_signals):
+def test_accepting_quote_updates_opensearch(opensearch_with_signals, queue: DataHubQueue):
     """
     Test that when a quote is accepted and the invoice created, the payment_due_date field
     in OpenSearch gets updated.
@@ -61,7 +62,10 @@ def test_accepting_quote_updates_opensearch(opensearch_with_signals):
     assert result['_source']['payment_due_date'] == order.invoice.payment_due_date.isoformat()
 
 
-def test_adding_subscribers_syncs_order_to_opensearch(opensearch_with_signals):
+def test_adding_subscribers_syncs_order_to_opensearch(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """
     Test that when a subscriber is added to an order,
     the linked order gets synced to OpenSearch.
@@ -81,7 +85,10 @@ def test_adding_subscribers_syncs_order_to_opensearch(opensearch_with_signals):
     assert len(indexed) == 2
 
 
-def test_removing_subscribers_syncs_order_to_opensearch(opensearch_with_signals):
+def test_removing_subscribers_syncs_order_to_opensearch(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """
     Test that when a subscriber is removed from an order,
     the linked order gets synced to OpenSearch.
@@ -102,7 +109,7 @@ def test_removing_subscribers_syncs_order_to_opensearch(opensearch_with_signals)
     assert len(indexed) == 1
 
 
-def test_adding_assignees_syncs_order_to_opensearch(opensearch_with_signals):
+def test_adding_assignees_syncs_order_to_opensearch(opensearch_with_signals, queue: DataHubQueue):
     """
     Test that when an assignee is added to an order,
     the linked order gets synced to OpenSearch.
@@ -122,7 +129,10 @@ def test_adding_assignees_syncs_order_to_opensearch(opensearch_with_signals):
     assert len(indexed) == 2
 
 
-def test_removing_assignees_syncs_order_to_opensearch(opensearch_with_signals):
+def test_removing_assignees_syncs_order_to_opensearch(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """
     Test that when an assignee is removed from an order,
     the linked order gets synced to OpenSearch.
@@ -143,7 +153,7 @@ def test_removing_assignees_syncs_order_to_opensearch(opensearch_with_signals):
     assert len(indexed) == 1
 
 
-def test_updating_company_name_updates_orders(opensearch_with_signals):
+def test_updating_company_name_updates_orders(opensearch_with_signals, queue: DataHubQueue):
     """Test that when a company name is updated, the company's orders are synced to OpenSearch."""
     order = OrderFactory()
     new_company_name = 'exogenous'
@@ -158,7 +168,7 @@ def test_updating_company_name_updates_orders(opensearch_with_signals):
     assert result['_source']['company']['name'] == new_company_name
 
 
-def test_updating_contact_name_updates_orders(opensearch_with_signals):
+def test_updating_contact_name_updates_orders(opensearch_with_signals, queue: DataHubQueue):
     """
     Test that when a contact's name is updated, the contact's orders are synced to OpenSearch.
     """

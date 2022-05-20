@@ -36,7 +36,7 @@ services:
     env_file: .env
     depends_on:
       - api
-    command: watchmedo auto-restart -d . -R -p '*.py' -- python short-running-worker.py long-running-worker.py
+    command: python short-running-worker.py long-running-worker.py
 
   postgres:
     image: postgres:12
@@ -44,6 +44,8 @@ services:
     environment:
       - POSTGRES_DB=datahub
       - POSTGRES_PASSWORD=datahub
+    ports:
+      - '5432:5432'
 
   opensearch:
     image: opensearchproject/opensearch:1.2.4
