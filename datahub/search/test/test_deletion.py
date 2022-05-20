@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db.models.signals import post_delete, pre_delete
 
 from datahub.core.exceptions import DataHubError
+from datahub.core.queue import DataHubQueue
 from datahub.search.deletion import (
     BULK_CHUNK_SIZE,
     BULK_DELETION_TIMEOUT_SECS,
@@ -135,7 +136,10 @@ def test_collector(monkeypatch, opensearch_with_signals):
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures('synchronous_thread_pool')
-def test_update_opensearch_after_deletions(opensearch_with_signals):
+def test_update_opensearch_after_deletions(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """
     Test that the context manager update_opensearch_after_deletions collects and deletes
     all the django objects deleted.

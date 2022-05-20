@@ -2,12 +2,13 @@ import pytest
 
 from datahub.company.models import CompanyExportCountryHistory
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory
+from datahub.core.queue import DataHubQueue
 from datahub.search.export_country_history.apps import ExportCountryHistoryApp
 
 pytestmark = pytest.mark.django_db
 
 
-def test_new_export_country_history_synced(opensearch_with_signals):
+def test_new_export_country_history_synced(opensearch_with_signals, queue: DataHubQueue):
     """Test that new export country history is synced to OpenSearch."""
     company_export_country_history = CompanyExportCountryHistoryFactory()
     opensearch_with_signals.indices.refresh()
@@ -18,7 +19,7 @@ def test_new_export_country_history_synced(opensearch_with_signals):
     )
 
 
-def test_updated_interaction_synced(opensearch_with_signals):
+def test_updated_interaction_synced(opensearch_with_signals, queue: DataHubQueue):
     """Test that when export country history is updated, it is synced to OpenSearch."""
     export_country_history = CompanyExportCountryHistoryFactory(
         history_type=CompanyExportCountryHistory.HistoryType.INSERT,

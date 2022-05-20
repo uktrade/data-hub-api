@@ -4,6 +4,7 @@ from unittest.mock import Mock
 import pytest
 from django.db import close_old_connections, transaction
 
+from datahub.core.queue import DataHubQueue
 from datahub.search.apps import get_search_apps
 from datahub.search.signals import disable_search_signal_receivers
 from datahub.search.test.search_support.models import RelatedModel, SimpleModel
@@ -13,7 +14,12 @@ from datahub.search.test.search_support.models import RelatedModel, SimpleModel
 class TestDisableSignalsForModel:
     """Tests for disable_search_signal_receivers()."""
 
-    def test_signal_receivers_are_not_disabled(self, opensearch_with_signals, monkeypatch):
+    def test_signal_receivers_are_not_disabled(
+        self,
+        opensearch_with_signals,
+        monkeypatch,
+        queue: DataHubQueue,
+    ):
         """
         Test that signal receivers are active without the context manager being active.
         """
@@ -27,7 +33,12 @@ class TestDisableSignalsForModel:
 
         callback_mock.assert_called_once()
 
-    def test_signal_receivers_disabled_for_model(self, opensearch_with_signals, monkeypatch):
+    def test_signal_receivers_disabled_for_model(
+        self,
+        opensearch_with_signals,
+        monkeypatch,
+        queue: DataHubQueue,
+    ):
         """
         Test that signal receivers are disabled for the specified model.
 
@@ -46,7 +57,12 @@ class TestDisableSignalsForModel:
 
         callback_mock.assert_not_called()
 
-    def test_does_not_affect_other_models(self, opensearch_with_signals, monkeypatch):
+    def test_does_not_affect_other_models(
+        self,
+        opensearch_with_signals,
+        monkeypatch,
+        queue: DataHubQueue,
+    ):
         """Test that signal receivers are not disabled for other models."""
         callback_mock = Mock()
         monkeypatch.setattr(
@@ -59,7 +75,12 @@ class TestDisableSignalsForModel:
 
         callback_mock.assert_called_once()
 
-    def test_does_not_affect_other_threads(self, opensearch_with_signals, monkeypatch):
+    def test_does_not_affect_other_threads(
+        self,
+        opensearch_with_signals,
+        monkeypatch,
+        queue: DataHubQueue,
+    ):
         """
         Test that signal receivers are not disabled for other threads.
 

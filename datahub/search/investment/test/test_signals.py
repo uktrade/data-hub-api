@@ -7,6 +7,7 @@ import reversion
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import InvestmentProjectStage
+from datahub.core.queue import DataHubQueue
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     InvestmentProjectInteractionFactory,
@@ -61,7 +62,10 @@ def assert_project_search_latest_interaction(has_interaction=True, name=''):
         assert result['latest_interaction'] is None
 
 
-def test_investment_project_auto_sync_to_opensearch(opensearch_with_signals):
+def test_investment_project_auto_sync_to_opensearch(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """Tests if investment project gets synced to OpenSearch."""
     test_name = 'very_hard_to_find_project'
     InvestmentProjectFactory(
@@ -78,7 +82,10 @@ def test_investment_project_auto_sync_to_opensearch(opensearch_with_signals):
     assert result.hits.total.value == 1
 
 
-def test_investment_project_auto_updates_to_opensearch(opensearch_with_signals):
+def test_investment_project_auto_updates_to_opensearch(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """Tests if investment project gets synced to OpenSearch."""
     project = InvestmentProjectFactory()
     new_test_name = 'even_harder_to_find_investment_project'
@@ -102,7 +109,9 @@ def team_member():
 
 
 def test_investment_project_team_member_added_sync_to_opensearch(
-    opensearch_with_signals, team_member,
+    opensearch_with_signals,
+    team_member,
+    queue: DataHubQueue,
 ):
     """Tests if investment project gets synced to OpenSearch when a team member is added."""
     opensearch_with_signals.indices.refresh()
@@ -121,7 +130,9 @@ def test_investment_project_team_member_added_sync_to_opensearch(
 
 
 def test_investment_project_team_member_updated_sync_to_opensearch(
-    opensearch_with_signals, team_member,
+    opensearch_with_signals,
+    team_member,
+    queue: DataHubQueue,
 ):
     """Tests if investment project gets synced to OpenSearch when a team member is updated."""
     new_adviser = AdviserFactory()
@@ -143,7 +154,9 @@ def test_investment_project_team_member_updated_sync_to_opensearch(
 
 
 def test_investment_project_team_member_deleted_sync_to_opensearch(
-    opensearch_with_signals, team_member,
+    opensearch_with_signals,
+    team_member,
+    queue: DataHubQueue,
 ):
     """Tests if investment project gets synced to OpenSearch when a team member is deleted."""
     team_member.delete()
@@ -170,7 +183,11 @@ def test_investment_project_team_member_deleted_sync_to_opensearch(
         'project_assurance_adviser',
     ),
 )
-def test_investment_project_syncs_when_adviser_changes(opensearch_with_signals, field):
+def test_investment_project_syncs_when_adviser_changes(
+    opensearch_with_signals,
+    field,
+    queue: DataHubQueue,
+):
     """
     Tests that when an adviser is updated, investment projects related to that adviser are
     resynced.
@@ -191,7 +208,9 @@ def test_investment_project_syncs_when_adviser_changes(opensearch_with_signals, 
 
 
 def test_investment_project_syncs_when_team_member_adviser_changes(
-    opensearch_with_signals, team_member,
+    opensearch_with_signals,
+    team_member,
+    queue: DataHubQueue,
 ):
     """
     Tests that when an adviser that is a team member of an investment project is updated,
@@ -211,7 +230,10 @@ def test_investment_project_syncs_when_team_member_adviser_changes(
     assert result.hits[0]['team_members'][0]['dit_team']['name'] == adviser.dit_team.name
 
 
-def test_investment_project_interaction_updated_sync_to_opensearch(opensearch_with_signals):
+def test_investment_project_interaction_updated_sync_to_opensearch(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """Test investment project gets synced to OpenSearch when an interaction is updated."""
     investment_project = InvestmentProjectFactory()
     interaction_date = '2018-05-05T00:00:00+00:00'
@@ -241,7 +263,10 @@ def test_investment_project_interaction_updated_sync_to_opensearch(opensearch_wi
     }
 
 
-def test_investment_project_interaction_deleted_sync_to_opensearch(opensearch_with_signals):
+def test_investment_project_interaction_deleted_sync_to_opensearch(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """Test investment project gets synced to OpenSearch when an interaction is deleted."""
     investment_project = InvestmentProjectFactory()
     interaction = InvestmentProjectInteractionFactory(
@@ -257,7 +282,10 @@ def test_investment_project_interaction_deleted_sync_to_opensearch(opensearch_wi
     assert_project_search_latest_interaction(has_interaction=False)
 
 
-def test_investment_project_interaction_changed_sync_to_opensearch(opensearch_with_signals):
+def test_investment_project_interaction_changed_sync_to_opensearch(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """
     Test projects get synced to OpenSearch when an interaction's project is changed.
 
@@ -295,7 +323,9 @@ def test_investment_project_interaction_changed_sync_to_opensearch(opensearch_wi
 
 @mock.patch('datahub.search.investment.signals.sync_object_async')
 def test_investment_project_synched_only_if_interaction_linked(
-    mocked_sync_object, opensearch_with_signals,
+    mocked_sync_object,
+    opensearch_with_signals,
+    queue: DataHubQueue,
 ):
     """
     Test sync_object_async not called if no investment project related to an interaction.
@@ -315,7 +345,10 @@ def test_investment_project_synched_only_if_interaction_linked(
     assert mocked_sync_object.call_count == 5
 
 
-def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
+def test_incomplete_fields_syncs_when_project_changes(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """
     When project fields change, the incomplete fields should update accordingly.
     """
@@ -399,7 +432,10 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
     ),
 )
 def test_incomplete_fields_syncs_when_m2m_changes(
-    opensearch_with_signals, field, get_field_values,
+    opensearch_with_signals,
+    field,
+    get_field_values,
+    queue: DataHubQueue,
 ):
     """
     When an m2m field is updated, the incomplete fields should be updated accordingly.
@@ -428,7 +464,10 @@ def test_incomplete_fields_syncs_when_m2m_changes(
     assert field not in incomplete_fields
 
 
-def test_incomplete_fields_syncs_when_business_activities_changes(opensearch_with_signals):
+def test_incomplete_fields_syncs_when_business_activities_changes(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """
     When business activities are updated the incomplete fields should be updated accordingly.
 

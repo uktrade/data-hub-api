@@ -1,6 +1,7 @@
 import pytest
 from opensearchpy.exceptions import NotFoundError
 
+from datahub.core.queue import DataHubQueue
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     InteractionDITParticipantFactory,
@@ -11,7 +12,7 @@ from datahub.search.interaction.apps import InteractionSearchApp
 pytestmark = pytest.mark.django_db
 
 
-def test_new_interaction_synced(opensearch_with_signals):
+def test_new_interaction_synced(opensearch_with_signals, queue: DataHubQueue):
     """Test that new interactions are synced to OpenSearch."""
     interaction = CompanyInteractionFactory()
     opensearch_with_signals.indices.refresh()
@@ -22,7 +23,7 @@ def test_new_interaction_synced(opensearch_with_signals):
     )
 
 
-def test_updated_interaction_synced(opensearch_with_signals):
+def test_updated_interaction_synced(opensearch_with_signals, queue: DataHubQueue):
     """Test that when an interaction is updated it is synced to OpenSearch."""
     interaction = CompanyInteractionFactory()
     new_subject = 'pluto'
@@ -37,7 +38,7 @@ def test_updated_interaction_synced(opensearch_with_signals):
     assert result['_source']['subject'] == new_subject
 
 
-def test_deleted_interaction_deleted_from_opensearch(opensearch_with_signals):
+def test_deleted_interaction_deleted_from_opensearch(opensearch_with_signals, queue: DataHubQueue):
     """
     Test that when an interaction is deleted from db it is also
     deleted from OpenSearch.
@@ -61,7 +62,10 @@ def test_deleted_interaction_deleted_from_opensearch(opensearch_with_signals):
         ) is None
 
 
-def test_interaction_synced_when_dit_participant_added(opensearch_with_signals):
+def test_interaction_synced_when_dit_participant_added(
+    opensearch_with_signals,
+    queue: DataHubQueue,
+):
     """Test that interactions are synced to OpenSearch if their DIT participants change."""
     interaction = CompanyInteractionFactory(dit_participants=[])
     opensearch_with_signals.indices.refresh()
@@ -85,7 +89,7 @@ def test_interaction_synced_when_dit_participant_added(opensearch_with_signals):
     assert actual_dit_participants[0]['team']['id'] == str(dit_participant.team.pk)
 
 
-def test_updating_company_name_updates_interaction(opensearch_with_signals):
+def test_updating_company_name_updates_interaction(opensearch_with_signals, queue: DataHubQueue):
     """
     Test that when a company name is updated, the company's interactions are synced to OpenSearch.
     """
@@ -102,7 +106,7 @@ def test_updating_company_name_updates_interaction(opensearch_with_signals):
     assert result['_source']['company']['name'] == new_company_name
 
 
-def test_updating_contact_name_updates_interaction(opensearch_with_signals):
+def test_updating_contact_name_updates_interaction(opensearch_with_signals, queue: DataHubQueue):
     """
     Test that when a contact's name is updated, the contact's interactions are
     synced to OpenSearch.
@@ -128,7 +132,7 @@ def test_updating_contact_name_updates_interaction(opensearch_with_signals):
     }
 
 
-def test_updating_project_name_updates_interaction(opensearch_with_signals):
+def test_updating_project_name_updates_interaction(opensearch_with_signals, queue: DataHubQueue):
     """
     Test that when an investment project's name is updated, the project's interactions are
     synced to OpenSearch.
