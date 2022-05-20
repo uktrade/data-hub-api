@@ -8,7 +8,6 @@ from rq import Queue as RqQueue, SimpleWorker, Worker
 logger = getLogger(__name__)
 
 SHORT_RUNNING_QUEUE = 'short-running'
-BEAT_RUNNING_QUEUE = 'beat-running'
 LONG_RUNNING_QUEUE = 'long-running'
 
 
