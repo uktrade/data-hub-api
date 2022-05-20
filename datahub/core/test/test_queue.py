@@ -7,18 +7,21 @@ class Spy:
     called = False
     times = 0
     params = []
+    keywords = []
 
     @staticmethod
     def reset():
         Spy.called = False
         Spy.times = 0
         Spy.params = []
+        Spy.keywords = []
 
     @staticmethod
-    def queue_handler(*args):
+    def queue_handler(*args, **kwargs):
         Spy.called = True
         Spy.times += 1
         Spy.params.append(args)
+        Spy.keywords.append(kwargs)
 
 
 @pytest.fixture(autouse=True)
@@ -43,10 +46,11 @@ def test_can_queue_one_thing(queue: DataHubQueue):
 
 
 def test_can_queue_one_thing_with_arguments(queue: DataHubQueue):
-    queue.enqueue('test-short-running', Spy.queue_handler, 'arg1', 'arg2')
+    queue.enqueue('test-short-running', Spy.queue_handler, 'arg1', 'arg2', test=True)
     queue.work('test-short-running')
     assert Spy.called
     assert Spy.params[0] == ('arg1', 'arg2')
+    assert Spy.keywords[0] == {'test': True}
 
 
 def test_does_not_process_for_different_queue(queue: DataHubQueue):

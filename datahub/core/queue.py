@@ -1,9 +1,14 @@
+from logging import getLogger
 from urllib.parse import urlparse
 
 from django.conf import settings
 from redis import Redis
 from rq import Queue as RqQueue, SimpleWorker, Worker
-from rq.serializers import JSONSerializer
+
+logger = getLogger(__name__)
+
+SHORT_RUNNING_QUEUE = 'short-running'
+LONG_RUNNING_QUEUE = 'long-running'
 
 
 class WorkerStrategy:
@@ -23,7 +28,7 @@ class BurstNoFork(WorkerStrategy):
 
 class Fork(WorkerStrategy):
     def process_queues(self, queues):
-        Worker(queues, connection=self._connection, serializer=JSONSerializer).work()
+        Worker(queues, connection=self._connection).work()
 
 
 class DataHubQueue:
@@ -43,13 +48,13 @@ class DataHubQueue:
             'burst-no-fork': BurstNoFork(self._connection),
         }[strategy]
 
-    def enqueue(self, queue_name: str, function, *args):
+    def enqueue(self, queue_name: str, function, *args, **kwargs):
         queue = RqQueue(queue_name, connection=self._connection)
         self._queues.append(queue)
-        queue.enqueue(function, *args)
+        return queue.enqueue(function, *args, **kwargs)
 
     def work(self, *queues: str):
-        self._worker_strategy.process_queues(queues)
+        return self._worker_strategy.process_queues(queues)
 
     def clear(self):
         for queue in self._queues:

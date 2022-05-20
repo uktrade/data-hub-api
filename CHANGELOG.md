@@ -1,3 +1,12 @@
+# Data Hub API 40.3.0 (2022-05-20)
+
+
+## Internal changes
+
+- ‘Enhanced International Support Services’ metadata value has been renamed to ‘Export Support Service – International Markets'
+- It's now possible to configure rq workers on every environment.
+
+
 # Data Hub API 40.2.0 (2022-05-19)
 
 
