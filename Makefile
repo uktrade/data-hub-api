@@ -11,6 +11,9 @@ start-rq-mon:
 stop-rq-mon:
 	docker-compose -f docker-compose.yml -f docker-compose-rq-monitor.yml down
 
+run-queue-exporter:
+	docker-compose run api python ./queue-exporter.py
+
 tests:
 	docker-compose build
 	docker-compose run api bash tests.sh
