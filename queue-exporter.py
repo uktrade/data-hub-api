@@ -1,4 +1,5 @@
 import os
+import subprocess
 from logging import getLogger
 
 import django
@@ -15,4 +16,10 @@ REMARKS: This space is for overriding the default environment variables by
 """
 run_rq_exporter_command = 'rq-exporter'
 logger.info(run_rq_exporter_command)
-os.system(run_rq_exporter_command)
+process = subprocess.Popen(
+    [run_rq_exporter_command],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+)
+stdout, stderr = process.communicate()
+stdout, stderr
