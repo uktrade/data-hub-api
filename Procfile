@@ -4,3 +4,4 @@ celerylongrunning: celery -A config worker -l info -O fair --prefetch-multiplier
 celerybeat: celery -A config beat -l info
 short-running-worker: python short-running-worker.py
 long-running-worker: python long-running-worker.py
+rq-exporter: python queue-exporter.py
