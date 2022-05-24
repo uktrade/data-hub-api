@@ -483,6 +483,12 @@ if REDIS_BASE_URL:
             'schedule': crontab(minute=0, hour=8),
         }
 
+    if env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS', False):
+        CELERY_BEAT_SCHEDULE['generate_estimated_land_date_reminders'] = {
+            'task': 'datahub.reminder.tasks.generate_estimated_land_date_reminders',
+            'schedule': crontab(minute=30, hour=8),
+        }
+
     CELERY_WORKER_LOG_FORMAT = (
         "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
     )

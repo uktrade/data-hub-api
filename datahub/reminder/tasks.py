@@ -1,0 +1,93 @@
+from logging import getLogger
+
+from celery import shared_task
+from dateutil.relativedelta import relativedelta
+from django.utils.timezone import now
+from django_pglocks import advisory_lock
+
+from datahub.core.constants import InvestmentProjectStage
+from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.notification.emails import send_estimated_land_date_reminder
+from datahub.reminder import ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME
+from datahub.reminder.models import (
+    UpcomingEstimatedLandDateReminder,
+    UpcomingEstimatedLandDateSubscription,
+)
+
+
+logger = getLogger(__name__)
+
+
+@shared_task(
+    autoretry_for=(Exception,),
+    queue='long-running',
+    max_retries=5,
+    retry_backoff=30,
+)
+def generate_estimated_land_date_reminders():
+    """
+    Generates Estimated Land Date Reminders according to each adviser's Subscriptions
+    """
+    with advisory_lock('generate_estimated_land_date_reminders', wait=False) as acquired:
+        if not acquired:
+            logger.info(
+                'Reminders for approaching estimated land dates are already being '
+                'processed by another worker.',
+            )
+            return
+        for subscription in UpcomingEstimatedLandDateSubscription.objects.all().iterator():
+            generate_estimated_land_date_reminders_for_subscription(subscription)
+
+
+@shared_task(
+    autoretry_for=(Exception,),
+    queue='long-running',
+    max_retries=5,
+    retry_backoff=30,
+)
+def generate_estimated_land_date_reminders_for_subscription(subscription):
+    """
+    Generates the estimated land date reminders for a given subscription.
+    """
+    user_features = subscription.adviser.features.filter(
+        is_active=True,
+    ).values_list('code', flat=True)
+    if ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME not in user_features:
+        logger.info(
+            f'Feature flag "{ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME}"'
+            'is not active for this user, exiting.',
+        )
+        return
+    for days_left in subscription.reminder_days:
+        for project in InvestmentProject.objects.filter(
+            project_manager=subscription.adviser,
+            estimated_land_date=now() + relativedelta(days=days_left),
+        ).exclude(
+            stage__in=[
+                InvestmentProjectStage.verify_win.value.id,
+                InvestmentProjectStage.won.value.id,
+            ],
+        ):
+            create_reminder(
+                project=project,
+                adviser=subscription.adviser,
+                days_left=days_left,
+                send_email=subscription.email_reminders_enabled,
+            )
+
+
+def create_reminder(project, adviser, days_left, send_email):
+    """
+    Creates a reminder and sends an email if required.
+    """
+    reminder, created = UpcomingEstimatedLandDateReminder.objects.get_or_create(
+        adviser=adviser,
+        event=f'{days_left} days left to estimated land date',
+        project=project,
+    )
+    if created and send_email:
+        send_estimated_land_date_reminder(
+            project=project,
+            adviser=adviser,
+            days_left=days_left,
+        )

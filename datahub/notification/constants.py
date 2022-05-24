@@ -8,6 +8,7 @@ class NotifyServiceName(StrEnum):
     omis = 'omis'
     dnb_investigation = 'dnb_investigation'
     investment = 'investment'
+    reminder = 'reminder'
 
 
 DEFAULT_SERVICE_NAME = NotifyServiceName.datahub
