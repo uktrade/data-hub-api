@@ -30,9 +30,9 @@ backcall==0.2.0
     # via ipython
 billiard==3.6.4.0
     # via celery
-boto3==1.23.0
+boto3==1.23.7
     # via -r requirements.in
-botocore==1.26.0
+botocore==1.26.7
     # via
     #   boto3
     #   s3transfer
@@ -97,7 +97,7 @@ django==3.2.13
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==5.32.0
+django-axes==5.33.0
     # via -r requirements.in
 django-debug-toolbar==3.4.0
     # via -r requirements.in
@@ -255,7 +255,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==6.6.1
+pip-tools==6.6.2
     # via -r requirements.in
 piprot==0.9.11
     # via -r requirements.in
