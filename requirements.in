@@ -59,7 +59,7 @@ freezegun==1.2.1
 requests-mock==1.9.3
 django-debug-toolbar==3.4.0
 werkzeug==2.0.3  # Required by runserver_plus - useful for local dev
-pip-tools==6.6.1
+pip-tools==6.6.2
 piprot==0.9.11
 semantic_version==2.9.0
 towncrier==21.9.0
