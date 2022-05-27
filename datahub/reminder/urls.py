@@ -3,10 +3,10 @@ from django.urls import path
 from datahub.reminder.views import (
     NoRecentInvestmentInteractionReminderViewset,
     NoRecentInvestmentInteractionSubscriptionViewset,
+    reminder_summary_view,
     UpcomingEstimatedLandDateReminderViewset,
     UpcomingEstimatedLandDateSubscriptionViewset,
 )
-
 
 urlpatterns = [
     path(
@@ -37,5 +37,10 @@ urlpatterns = [
             'get': 'list',
         }),
         name='estimated-land-date-reminder',
+    ),
+    path(
+        'reminder/summary',
+        reminder_summary_view,
+        name='summary',
     ),
 ]
