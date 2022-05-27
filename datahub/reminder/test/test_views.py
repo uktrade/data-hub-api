@@ -4,6 +4,8 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from datahub.core.test_utils import APITestMixin
+from datahub.investment.project.proposition.models import PropositionStatus
+from datahub.investment.project.proposition.test.factories import PropositionFactory
 from datahub.reminder.test.factories import (
     NoRecentInvestmentInteractionReminderFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
@@ -202,3 +204,63 @@ class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data.get('count') == reminder_count
+
+
+class TestGetReminderSummaryView(APITestMixin):
+    """
+    Tests for the reminder summary view.
+    """
+
+    url_name = 'api-v4:reminder:summary'
+
+    def test_not_authed(self):
+        """Should return Unauthorised"""
+        url = reverse(self.url_name)
+        api_client = APIClient()
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_get_summary_of_reminders(self):
+        """Should return a summary of reminders."""
+        reminder_count = 3
+        UpcomingEstimatedLandDateReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
+        UpcomingEstimatedLandDateReminderFactory.create_batch(2)
+        NoRecentInvestmentInteractionReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
+        NoRecentInvestmentInteractionReminderFactory.create_batch(2)
+        PropositionFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+            status=PropositionStatus.ONGOING,
+        )
+        PropositionFactory(
+            adviser=self.user,
+            status=PropositionStatus.ABANDONED,
+        )
+        PropositionFactory.create_batch(2)
+        url = reverse(self.url_name)
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data == {
+            'estimated_land_date': reminder_count,
+            'no_recent_investment_interaction': reminder_count,
+            'outstanding_propositions': reminder_count,
+        }
+
+    def test_get_zeroes_if_no_reminders(self):
+        """Should return zeroes if user does not have any reminders."""
+        url = reverse(self.url_name)
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data == {
+            'estimated_land_date': 0,
+            'no_recent_investment_interaction': 0,
+            'outstanding_propositions': 0,
+        }
