@@ -1,3 +1,17 @@
+# Data Hub API 40.4.0 (2022-05-30)
+
+
+## Features
+
+- **Reminders** API now provides reminders for the current user:
+
+  GET /v4/reminder/estimated-land-date
+  GET /v4/reminder/no-recent-investment-interaction
+- **Reminders** API now provides a summary of reminders for the current user:
+
+  GET /v4/reminder/summary
+
+
 # Data Hub API 40.3.0 (2022-05-20)
 
 
