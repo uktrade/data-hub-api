@@ -97,7 +97,7 @@ django==3.2.13
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==5.33.0
+django-axes==5.34.0
     # via -r requirements.in
 django-debug-toolbar==3.4.0
     # via -r requirements.in
@@ -191,7 +191,7 @@ incremental==21.3.0
     # via towncrier
 iniconfig==1.1.1
     # via pytest
-ipython==8.3.0
+ipython==8.4.0
     # via -r requirements.in
 isodate==0.6.1
     # via zeep
@@ -382,7 +382,7 @@ rq==1.10.1
     # via -r requirements.in
 s3transfer==0.5.1
     # via boto3
-semantic-version==2.9.0
+semantic-version==2.10.0
     # via -r requirements.in
 sentry-sdk==1.5.12
     # via -r requirements.in
