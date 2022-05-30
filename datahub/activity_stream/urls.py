@@ -2,6 +2,7 @@ from django.urls import path
 
 from datahub.activity_stream.company_referral.views import CompanyReferralActivityViewSet
 from datahub.activity_stream.interaction.views import InteractionActivityViewSet
+from datahub.activity_stream.event.views import EventActivityViewSet
 from datahub.activity_stream.investment.views import IProjectCreatedViewSet
 from datahub.activity_stream.investor_profile.views import (
     LargeCapitalInvestorProfileActivityViewSet,
@@ -25,6 +26,11 @@ activity_stream_urls = [
         'activity-stream/interaction',
         InteractionActivityViewSet.as_view({'get': 'list'}),
         name='interactions',
+    ),
+    path(
+        'activity-stream/events',
+        EventActivityViewSet.as_view({'get': 'list'}),
+        name='events',
     ),
     path(
         'activity-stream/investment/project-added',
