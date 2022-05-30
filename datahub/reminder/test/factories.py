@@ -1,8 +1,11 @@
 import factory
 
 from datahub.company.test.factories import AdviserFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.reminder.models import (
+    NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
+    UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
 )
 
@@ -19,3 +22,22 @@ class NoRecentInvestmentInteractionSubscriptionFactory(BaseSubscriptionFactory):
 class UpcomingEstimatedLandDateSubscriptionFactory(BaseSubscriptionFactory):
     class Meta:
         model = UpcomingEstimatedLandDateSubscription
+
+
+class BaseReminderFactory(factory.django.DjangoModelFactory):
+    adviser = factory.SubFactory(AdviserFactory)
+    event = factory.Faker('sentence')
+
+
+class NoRecentInvestmentInteractionReminderFactory(BaseReminderFactory):
+    project = factory.SubFactory(InvestmentProjectFactory)
+
+    class Meta:
+        model = NoRecentInvestmentInteractionReminder
+
+
+class UpcomingEstimatedLandDateReminderFactory(BaseReminderFactory):
+    project = factory.SubFactory(InvestmentProjectFactory)
+
+    class Meta:
+        model = UpcomingEstimatedLandDateReminder
