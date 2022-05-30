@@ -32,7 +32,7 @@ backcall==0.2.0
     # via ipython
 billiard==3.6.4.0
     # via celery
-boto3==1.23.7
+boto3==1.23.0
     # via -r requirements.in
 botocore==1.26.7
     # via
