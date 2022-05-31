@@ -36,8 +36,12 @@ def generate_estimated_land_date_reminders():
                 'processed by another worker.',
             )
             return
+        current_date = now().date()
         for subscription in UpcomingEstimatedLandDateSubscription.objects.all().iterator():
-            generate_estimated_land_date_reminders_for_subscription(subscription)
+            generate_estimated_land_date_reminders_for_subscription(
+                subscription=subscription,
+                current_date=current_date,
+            )
 
 
 @shared_task(
@@ -46,7 +50,7 @@ def generate_estimated_land_date_reminders():
     max_retries=5,
     retry_backoff=30,
 )
-def generate_estimated_land_date_reminders_for_subscription(subscription):
+def generate_estimated_land_date_reminders_for_subscription(subscription, current_date):
     """
     Generates the estimated land date reminders for a given subscription.
     """
@@ -65,7 +69,7 @@ def generate_estimated_land_date_reminders_for_subscription(subscription):
             | Q(project_assurance_adviser=subscription.adviser)
             | Q(client_relationship_manager=subscription.adviser)
             | Q(referral_source_adviser=subscription.adviser),
-            estimated_land_date=now() + relativedelta(days=days_left),
+            estimated_land_date=current_date + relativedelta(days=days_left),
         ).exclude(
             stage__in=[
                 InvestmentProjectStage.verify_win.value.id,
@@ -77,10 +81,11 @@ def generate_estimated_land_date_reminders_for_subscription(subscription):
                 adviser=subscription.adviser,
                 days_left=days_left,
                 send_email=subscription.email_reminders_enabled,
+                current_date=current_date,
             )
 
 
-def create_reminder(project, adviser, days_left, send_email):
+def create_reminder(project, adviser, days_left, send_email, current_date):
     """
     Creates a reminder and sends an email if required.
 
@@ -90,7 +95,7 @@ def create_reminder(project, adviser, days_left, send_email):
         adviser=adviser,
         event=f'{days_left} days left to estimated land date',
         project=project,
-        created_on__date=now().date(),
+        created_on__date=current_date,
     ).exists()
 
     if has_existing:

@@ -1,9 +1,9 @@
+import datetime
 from unittest import mock
 from unittest.mock import call
 
 import pytest
 from dateutil.relativedelta import relativedelta
-from django.utils.timezone import now
 from freezegun import freeze_time
 
 from datahub.company.test.factories import AdviserFactory
@@ -76,7 +76,10 @@ def mock_generate_estimated_land_date_reminders_for_subscription(monkeypatch):
 
 
 @pytest.mark.django_db
+@freeze_time('2022-07-12T10:00:00')
 class TestCreateReminder:
+    current_date = datetime.date(year=2022, month=7, day=12)
+
     def test_create_reminder_email(
         self,
         mock_send_estimated_land_date_reminder,
@@ -86,7 +89,7 @@ class TestCreateReminder:
         Create reminder should create a model instance and send an email.
         """
         days_left = 30
-        future_estimated_land_date = now() + relativedelta(days=days_left)
+        future_estimated_land_date = self.current_date + relativedelta(days=days_left)
         project = InvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
@@ -97,6 +100,7 @@ class TestCreateReminder:
             adviser=adviser,
             days_left=days_left,
             send_email=True,
+            current_date=self.current_date,
         )
         reminders = UpcomingEstimatedLandDateReminder.objects.filter(
             adviser=adviser,
@@ -119,7 +123,7 @@ class TestCreateReminder:
         Create reminder should create a model instance and not send an email.
         """
         days_left = 30
-        future_estimated_land_date = now() + relativedelta(days=days_left)
+        future_estimated_land_date = self.current_date + relativedelta(days=days_left)
         project = InvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
@@ -130,6 +134,7 @@ class TestCreateReminder:
             adviser=adviser,
             days_left=days_left,
             send_email=False,
+            current_date=self.current_date,
         )
         reminders = UpcomingEstimatedLandDateReminder.objects.filter(
             adviser=adviser,
@@ -147,24 +152,62 @@ class TestCreateReminder:
         If a reminder was already made today then do not send an email.
         """
         days_left = 30
-        future_estimated_land_date = now() + relativedelta(days=days_left)
+        future_estimated_land_date = self.current_date + relativedelta(days=days_left)
         project = InvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
         )
-        with freeze_time('2020-07-12T10:00:00'):
+        with freeze_time('2022-07-12T10:00:00'):
             UpcomingEstimatedLandDateReminder.objects.create(
                 adviser=adviser,
                 project=project,
                 event=f'{days_left} days left to estimated land date',
             )
 
-        with freeze_time('2020-07-12T19:00:00'):
+        with freeze_time('2022-07-12T16:00:00'):
             create_reminder(
                 project=project,
                 adviser=adviser,
                 days_left=days_left,
                 send_email=True,
+                current_date=self.current_date,
+            )
+        reminders = UpcomingEstimatedLandDateReminder.objects.filter(
+            adviser=adviser,
+            project=project,
+        )
+        assert reminders.count() == 1
+        assert mock_send_estimated_land_date_reminder.call_count == 0
+
+    def test_create_existing_reminder_slow_queue(
+        self,
+        mock_send_estimated_land_date_reminder,
+        adviser,
+    ):
+        """
+        If the queue is still processing tasks from yesterday and a reminder
+        was already sent, do not send another one.
+        """
+        days_left = 30
+        future_estimated_land_date = self.current_date + relativedelta(days=days_left)
+        project = InvestmentProjectFactory(
+            project_manager=adviser,
+            estimated_land_date=future_estimated_land_date,
+        )
+        with freeze_time('2022-07-12T10:00:00'):
+            UpcomingEstimatedLandDateReminder.objects.create(
+                adviser=adviser,
+                project=project,
+                event=f'{days_left} days left to estimated land date',
+            )
+
+        with freeze_time('2022-07-13T10:00:00'):
+            create_reminder(
+                project=project,
+                adviser=adviser,
+                days_left=days_left,
+                send_email=True,
+                current_date=self.current_date,
             )
         reminders = UpcomingEstimatedLandDateReminder.objects.filter(
             adviser=adviser,
@@ -183,7 +226,7 @@ class TestCreateReminder:
         a new reminder should be created and a new email sent.
         """
         days_left = 30
-        future_estimated_land_date = now() + relativedelta(days=days_left)
+        future_estimated_land_date = self.current_date + relativedelta(days=days_left)
         project = InvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
@@ -201,6 +244,7 @@ class TestCreateReminder:
             adviser=adviser,
             days_left=days_left,
             send_email=True,
+            current_date=self.current_date,
         )
         reminders = UpcomingEstimatedLandDateReminder.objects.filter(
             adviser=adviser,
@@ -211,7 +255,10 @@ class TestCreateReminder:
 
 
 @pytest.mark.django_db
+@freeze_time('2022-07-12T10:00:00')
 class TestGenerateEstimatedLandDateReminderTask:
+    current_date = datetime.date(year=2022, month=7, day=12)
+
     def test_generate_estimated_land_date_reminders(
         self,
         mock_generate_estimated_land_date_reminders_for_subscription,
@@ -225,7 +272,10 @@ class TestGenerateEstimatedLandDateReminderTask:
         )
         generate_estimated_land_date_reminders()
         mock_generate_estimated_land_date_reminders_for_subscription.assert_has_calls(
-            [call(subscription) for subscription in subscriptions],
+            [
+                call(subscription=subscription, current_date=self.current_date)
+                for subscription in subscriptions
+            ],
         )
 
     @pytest.mark.parametrize(
@@ -262,11 +312,9 @@ class TestGenerateEstimatedLandDateReminderTask:
             reminder_days=[days],
             email_reminders_enabled=email_reminders_enabled,
         )
-        future_estimated_land_date = now() + relativedelta(days=days)
+        future_estimated_land_date = self.current_date + relativedelta(days=days)
 
-        role_field = {
-            role: adviser,
-        }
+        role_field = {role: adviser}
         project = InvestmentProjectFactory(
             **role_field,
             estimated_land_date=future_estimated_land_date,
@@ -280,12 +328,16 @@ class TestGenerateEstimatedLandDateReminderTask:
             estimated_land_date=future_estimated_land_date + relativedelta(days=120),
         )
 
-        generate_estimated_land_date_reminders_for_subscription(subscription)
+        generate_estimated_land_date_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
         mock_create_reminder.assert_called_once_with(
             project=project,
             adviser=adviser,
             days_left=days,
             send_email=email_reminders_enabled,
+            current_date=self.current_date,
         )
 
     def test_does_not_include_verify_win_and_won_projects(self, adviser, mock_create_reminder):
@@ -298,7 +350,7 @@ class TestGenerateEstimatedLandDateReminderTask:
             reminder_days=[days],
             email_reminders_enabled=True,
         )
-        future_estimated_land_date = now() + relativedelta(days=days)
+        future_estimated_land_date = self.current_date + relativedelta(days=days)
 
         project = InvestmentProjectFactory(
             project_manager=adviser,
@@ -315,12 +367,16 @@ class TestGenerateEstimatedLandDateReminderTask:
             stage_id=InvestmentProjectStage.won.value.id,
         )
 
-        generate_estimated_land_date_reminders_for_subscription(subscription)
+        generate_estimated_land_date_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
         mock_create_reminder.assert_called_once_with(
             project=project,
             adviser=adviser,
             days_left=days,
             send_email=True,
+            current_date=self.current_date,
         )
 
     def test_no_user_feature_flag(
@@ -338,12 +394,15 @@ class TestGenerateEstimatedLandDateReminderTask:
             reminder_days=[days],
             email_reminders_enabled=True,
         )
-        future_estimated_land_date = now() + relativedelta(days=days)
+        future_estimated_land_date = self.current_date + relativedelta(days=days)
         InvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
         )
-        generate_estimated_land_date_reminders_for_subscription(subscription)
+        generate_estimated_land_date_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
         assert mock_create_reminder.call_count == 0
 
     def test_inactive_user_feature_flag(
@@ -365,12 +424,15 @@ class TestGenerateEstimatedLandDateReminderTask:
             reminder_days=[days],
             email_reminders_enabled=True,
         )
-        future_estimated_land_date = now() + relativedelta(days=days)
+        future_estimated_land_date = self.current_date + relativedelta(days=days)
         InvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
         )
-        generate_estimated_land_date_reminders_for_subscription(subscription)
+        generate_estimated_land_date_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
         assert mock_create_reminder.call_count == 0
 
     def test_does_not_send_multiple(
@@ -385,7 +447,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         should be created and one email sent.
         """
         days = 30
-        future_estimated_land_date = now() + relativedelta(days=days)
+        future_estimated_land_date = self.current_date + relativedelta(days=days)
         UpcomingEstimatedLandDateSubscriptionFactory(
             adviser=adviser,
             reminder_days=[days],
