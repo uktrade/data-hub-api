@@ -2,9 +2,9 @@ from unittest import mock
 from unittest.mock import call
 
 import pytest
-from freezegun import freeze_time
 from dateutil.relativedelta import relativedelta
 from django.utils.timezone import now
+from freezegun import freeze_time
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import InvestmentProjectStage
@@ -229,6 +229,15 @@ class TestGenerateEstimatedLandDateReminderTask:
         )
 
     @pytest.mark.parametrize(
+        'role',
+        (
+            'project_manager',
+            'project_assurance_adviser',
+            'client_relationship_manager',
+            'referral_source_adviser',
+        ),
+    )
+    @pytest.mark.parametrize(
         'days,email_reminders_enabled',
         (
             (30, True),
@@ -243,6 +252,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         mock_create_reminder,
         days,
         email_reminders_enabled,
+        role,
     ):
         """
         Estimated Land Date reminders should be created for relevant subscriptions.
@@ -254,16 +264,19 @@ class TestGenerateEstimatedLandDateReminderTask:
         )
         future_estimated_land_date = now() + relativedelta(days=days)
 
+        role_field = {
+            role: adviser,
+        }
         project = InvestmentProjectFactory(
-            project_manager=adviser,
+            **role_field,
             estimated_land_date=future_estimated_land_date,
         )
         InvestmentProjectFactory(
-            project_manager=adviser,
+            **role_field,
             estimated_land_date=future_estimated_land_date - relativedelta(days=120),
         )
         InvestmentProjectFactory(
-            project_manager=adviser,
+            **role_field,
             estimated_land_date=future_estimated_land_date + relativedelta(days=120),
         )
 

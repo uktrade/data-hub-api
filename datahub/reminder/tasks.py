@@ -2,6 +2,7 @@ from logging import getLogger
 
 from celery import shared_task
 from dateutil.relativedelta import relativedelta
+from django.db.models import Q
 from django.utils.timezone import now
 from django_pglocks import advisory_lock
 
@@ -60,7 +61,10 @@ def generate_estimated_land_date_reminders_for_subscription(subscription):
         return
     for days_left in subscription.reminder_days:
         for project in InvestmentProject.objects.filter(
-            project_manager=subscription.adviser,
+            Q(project_manager=subscription.adviser)
+            | Q(project_assurance_adviser=subscription.adviser)
+            | Q(client_relationship_manager=subscription.adviser)
+            | Q(referral_source_adviser=subscription.adviser),
             estimated_land_date=now() + relativedelta(days=days_left),
         ).exclude(
             stage__in=[
