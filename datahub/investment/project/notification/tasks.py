@@ -4,7 +4,7 @@ from celery import shared_task
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.cache import cache
-from django.db.models import F
+from django.db.models import F, Q
 from django.utils.timezone import now
 from django_pglocks import advisory_lock
 
@@ -55,7 +55,8 @@ def get_subscriptions_for_estimated_land_date(notification_type: str):
 
     The notification type is defined as either '30' or '60' days.
 
-    The subscriptions are only returned for advisers who are project managers.
+    The subscriptions are only returned for advisers who are project managers,
+    client relationship managers, project assurance advisers and referral source advisers.
     """
     days = int(notification_type)
     future_estimated_land_date = now() + relativedelta(days=days)
@@ -65,7 +66,11 @@ def get_subscriptions_for_estimated_land_date(notification_type: str):
         'adviser',
     ).filter(
         # the estimated land date subscriptions are only valid for project managers
-        adviser_id=F('investment_project__project_manager_id'),
+        # client relationship managers, project assurance advisers and referral source advisers.
+        Q(adviser_id=F('investment_project__project_manager_id'))
+        | Q(adviser_id=F('investment_project__client_relationship_manager_id'))
+        | Q(adviser_id=F('investment_project__project_assurance_adviser_id'))
+        | Q(adviser_id=F('investment_project__referral_source_adviser_id')),
         estimated_land_date__contains=[notification_type],
         investment_project__estimated_land_date__year=future_estimated_land_date.year,
         investment_project__estimated_land_date__month=future_estimated_land_date.month,
