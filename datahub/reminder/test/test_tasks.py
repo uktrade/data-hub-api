@@ -2,6 +2,7 @@ from unittest import mock
 from unittest.mock import call
 
 import pytest
+from freezegun import freeze_time
 from dateutil.relativedelta import relativedelta
 from django.utils.timezone import now
 
@@ -143,7 +144,7 @@ class TestCreateReminder:
         adviser,
     ):
         """
-        If a reminder already exists then do not send an email.
+        If a reminder was already made today then do not send an email.
         """
         days_left = 30
         future_estimated_land_date = now() + relativedelta(days=days_left)
@@ -151,11 +152,49 @@ class TestCreateReminder:
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
         )
-        UpcomingEstimatedLandDateReminder.objects.create(
+        with freeze_time('2020-07-12T10:00:00'):
+            UpcomingEstimatedLandDateReminder.objects.create(
+                adviser=adviser,
+                project=project,
+                event=f'{days_left} days left to estimated land date',
+            )
+
+        with freeze_time('2020-07-12T19:00:00'):
+            create_reminder(
+                project=project,
+                adviser=adviser,
+                days_left=days_left,
+                send_email=True,
+            )
+        reminders = UpcomingEstimatedLandDateReminder.objects.filter(
             adviser=adviser,
             project=project,
-            event=f'{days_left} days left to estimated land date',
         )
+        assert reminders.count() == 1
+        assert mock_send_estimated_land_date_reminder.call_count == 0
+
+    def test_create_another_reminder_after_estimated_land_date_change(
+        self,
+        mock_send_estimated_land_date_reminder,
+        adviser,
+    ):
+        """
+        If the estimated land date is changed and a reminder has already been sent out,
+        a new reminder should be created and a new email sent.
+        """
+        days_left = 30
+        future_estimated_land_date = now() + relativedelta(days=days_left)
+        project = InvestmentProjectFactory(
+            project_manager=adviser,
+            estimated_land_date=future_estimated_land_date,
+        )
+
+        with freeze_time('2010-07-12T10:00:00'):
+            UpcomingEstimatedLandDateReminder.objects.create(
+                adviser=adviser,
+                project=project,
+                event=f'{days_left} days left to estimated land date',
+            )
 
         create_reminder(
             project=project,
@@ -167,8 +206,8 @@ class TestCreateReminder:
             adviser=adviser,
             project=project,
         )
-        assert reminders.count() == 1
-        assert mock_send_estimated_land_date_reminder.call_count == 0
+        assert reminders.count() == 2
+        assert mock_send_estimated_land_date_reminder.call_count == 1
 
 
 @pytest.mark.django_db
