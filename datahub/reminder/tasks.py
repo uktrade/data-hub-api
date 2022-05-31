@@ -79,13 +79,26 @@ def generate_estimated_land_date_reminders_for_subscription(subscription):
 def create_reminder(project, adviser, days_left, send_email):
     """
     Creates a reminder and sends an email if required.
+
+    If a reminder has already been sent on the same day, then do nothing.
     """
-    reminder, created = UpcomingEstimatedLandDateReminder.objects.get_or_create(
+    has_existing = UpcomingEstimatedLandDateReminder.objects.filter(
+        adviser=adviser,
+        event=f'{days_left} days left to estimated land date',
+        project=project,
+        created_on__date=now().date(),
+    ).exists()
+
+    if has_existing:
+        return
+
+    UpcomingEstimatedLandDateReminder.objects.create(
         adviser=adviser,
         event=f'{days_left} days left to estimated land date',
         project=project,
     )
-    if created and send_email:
+
+    if send_email:
         send_estimated_land_date_reminder(
             project=project,
             adviser=adviser,
