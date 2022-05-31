@@ -156,38 +156,65 @@ class TestInvestmentNotificationSubscriptionTasks:
         assert notification_type in subscriptions[0].estimated_land_date
 
     @pytest.mark.parametrize(
-        'notification_type',
+        'notification_type,user_type',
         (
             (
-                estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value,
+                'project_manager',
             ),
             (
-                estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value,
+                'project_manager',
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value,
+                'client_relationship_manager',
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value,
+                'client_relationship_manager',
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value,
+                'project_assurance_adviser',
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value,
+                'project_assurance_adviser',
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value,
+                'referral_source_adviser',
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value,
+                'referral_source_adviser',
             ),
         ),
     )
     def test_sends_investment_notification_with_feature_flag(
         self,
         notification_type,
+        user_type,
         investment_estimated_land_date_notification_feature_flag,
         mock_notify_adviser_by_email,
         mock_statsd,
     ):
         """
-        Test that a notification will be sent for each notification type.
+        Test that a notification will be sent for each notification type and user.
         """
         adviser = AdviserFactory()
         future_estimated_land_date = now() + relativedelta(days=int(notification_type))
         project = InvestmentProjectFactory(
-            project_manager=adviser,
+            **{user_type: adviser},
             estimated_land_date=future_estimated_land_date,
         )
         InvestmentProjectFactory(
-            project_manager=adviser,
+            **{user_type: adviser},
             estimated_land_date=future_estimated_land_date - relativedelta(days=1),
         )
         InvestmentProjectFactory(
-            project_manager=adviser,
+            **{user_type: adviser},
             estimated_land_date=future_estimated_land_date + relativedelta(days=1),
         )
         InvestmentNotificationSubscriptionFactory(
