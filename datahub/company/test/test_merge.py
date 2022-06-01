@@ -423,7 +423,10 @@ class TestDuplicateCompanyMerger:
         assert all(getattr(investment_project, field) != target_company for field in other_fields)
         assert all(getattr(investment_project, field) != source_company for field in other_fields)
 
-        assert investment_project.modified_on == creation_time
+        # Only check that the modified field is updated if the investment project
+        # is linked to the source company
+        if fields:
+            assert investment_project.modified_on == merge_time
 
         source_company.refresh_from_db()
 
