@@ -232,11 +232,11 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             obj.refresh_from_db()
 
         assert all(obj.company == target_company for obj in source_non_project_related_objects)
-        assert all(obj.modified_on == creation_time for obj in source_non_project_related_objects)
+        assert all(obj.modified_on == merge_time for obj in source_non_project_related_objects)
 
         for field, investment_projects in source_investment_projects_by_field.items():
             assert all(getattr(obj, field) == target_company for obj in investment_projects)
-            assert all(obj.modified_on == creation_time for obj in investment_projects)
+            assert all(obj.modified_on == merge_time for obj in investment_projects)
 
         source_company.refresh_from_db()
 
