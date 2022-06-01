@@ -8,11 +8,6 @@ class EventActivitySerializer(ActivitySerializer):
     class Meta:
         model = Event
 
-    def get_event_context(self, event):
-        return {} if event is None else {
-            id: f'dit:DataHubEvent:{event.pk}'
-        }
-
     def to_representation(self, instance):
         event_id = f'dit:DataHubEvent:{instance.pk}'
         event = {
@@ -22,27 +17,38 @@ class EventActivitySerializer(ActivitySerializer):
             'generator': self._get_generator(),
             'object': {
                 'id': event_id,
-                'type': instance.event_type,
+                'name': instance.name,
+                'dit:eventType': {'name': instance.event_type.name},
                 'content': instance.notes,
                 'startTime': instance.start_date,
+                'endTime': instance.end_date,
                 'url': instance.get_absolute_url(),
-                'dit:locationType': instance.location_type,
+                'dit:locationType': {'name': instance.location_type.name},
                 'dit:address_1': instance.address_1,
                 'dit:address_2': instance.address_2,
                 'dit:address_town': instance.address_town,
                 'dit:address_county': instance.address_county,
                 'dit:address_postcode': instance.address_postcode,
-                'dit:address_country': instance.address_country,
-                'dit:ukRegion': instance.uk_region,
-                'dit:leadTeam': instance.lead_team,
-                'dit:organiser': instance.organiser,
-                'dit:teams': instance.teams,
-                'dit:relatedProgrammes': instance.related_programmes,  # TODO: these might be arrays?
-                'dit:relatedTradeAgreements': instance.related_trade_agreements,
-                'dit:service': instance.service,
+                'dit:address_country': {'name': instance.address_country.name},
+                'dit:leadTeam': {'name': instance.lead_team.name},
+                'dit:organiser': {'name': instance.organiser.name},
+                'dit:disabledOn': instance.disabled_on,
+                'dit:service': {'name': instance.service.name},
                 'dit:archivedDocumentsUrlPath': instance.archived_documents_url_path,
-                'dit:disabledOn': instance.disabled_on
+
+
+                # ManyToMany
+
+                # 'dit:relatedProgrammes': instance.related_programmes,
+                # 'dit:relatedTradeAgreements': instance.related_trade_agreements,
+                # 'dit:teams': instance.teams,
+
             },
+
         }
+        if instance.uk_region is not None:
+            event['object']['dit:ukRegion'] = {
+                'name': instance.uk_region.name,
+            }
 
         return event
