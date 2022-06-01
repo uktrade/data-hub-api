@@ -343,7 +343,7 @@ class TestDuplicateCompanyMerger:
             obj.refresh_from_db()
 
         assert all(obj.company == target_company for obj in source_related_objects)
-        assert all(obj.modified_on == creation_time for obj in source_related_objects)
+        assert all(obj.modified_on == merge_time for obj in source_related_objects)
 
         source_company.refresh_from_db()
 
