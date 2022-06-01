@@ -28,7 +28,7 @@ activity_stream_urls = [
         name='interactions',
     ),
     path(
-        'activity-stream/events',
+        'activity-stream/event',
         EventActivityViewSet.as_view({'get': 'list'}),
         name='events',
     ),
