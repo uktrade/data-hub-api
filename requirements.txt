@@ -302,7 +302,7 @@ pygments==2.11.2
     # via ipython
 pyjwt==2.4.0
     # via notifications-python-client
-pylint==2.13.9
+pylint==2.14.0
     # via
     #   -r requirements.in
     #   pylint-django
@@ -425,6 +425,8 @@ tomli==2.0.1
     #   pylint
     #   pytest
     #   towncrier
+tomlkit==0.11.0
+    # via pylint
 towncrier==21.9.0
     # via -r requirements.in
 traitlets==5.1.1
