@@ -30,9 +30,9 @@ backcall==0.2.0
     # via ipython
 billiard==3.6.4.0
     # via celery
-boto3==1.23.0
+boto3==1.24.2
     # via -r requirements.in
-botocore==1.26.0
+botocore==1.27.2
     # via
     #   boto3
     #   s3transfer
@@ -380,7 +380,7 @@ requests-toolbelt==0.9.1
     #   zeep
 rq==1.10.1
     # via -r requirements.in
-s3transfer==0.5.1
+s3transfer==0.6.0
     # via boto3
 semantic-version==2.10.0
     # via -r requirements.in
