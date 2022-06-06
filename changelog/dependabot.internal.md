@@ -1,0 +1,1 @@
+Dependabot upgrades to the latest versions of pylint, pep8-naming, django-axes and opensearch-py.
