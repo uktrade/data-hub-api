@@ -146,7 +146,6 @@ flake8==4.0.1
     #   flake8-commas
     #   flake8-debugger
     #   flake8-docstrings
-    #   flake8-polyfill
     #   flake8-print
     #   flake8-quotes
     #   flake8-string-format
@@ -161,8 +160,6 @@ flake8-docstrings==1.6.0
     # via -r requirements.in
 flake8-import-order==0.18.1
     # via -r requirements.in
-flake8-polyfill==1.0.2
-    # via pep8-naming
 flake8-print==5.0.0
     # via -r requirements.in
 flake8-quotes==3.3.1
@@ -249,7 +246,7 @@ parso==0.8.3
     # via jedi
 pep517==0.12.0
     # via pip-tools
-pep8-naming==0.12.1
+pep8-naming==0.13.0
     # via -r requirements.in
 pexpect==4.8.0
     # via ipython
