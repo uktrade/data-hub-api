@@ -74,7 +74,7 @@ def _default_object_updater(obj, field, target_company, source_company):
         return
 
     setattr(obj, field, target_company)
-    obj.save(update_fields=(field,))
+    obj.save(update_fields=(field, 'modified_on'))
 
 
 def _company_list_item_updater(list_item, field, target_company, source_company):

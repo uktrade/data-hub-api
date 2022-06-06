@@ -38,7 +38,7 @@ def mock_notify_adviser_by_email(monkeypatch):
     """
     mock_notify_adviser_by_email = mock.Mock()
     monkeypatch.setattr(
-        'datahub.investment.project.notification.tasks.notify_adviser_by_email',
+        'datahub.investment.project.notification.emails.notify_adviser_by_email',
         mock_notify_adviser_by_email,
     )
     return mock_notify_adviser_by_email
@@ -51,7 +51,7 @@ def mock_statsd(monkeypatch):
     """
     mock_statsd = mock.Mock()
     monkeypatch.setattr(
-        'datahub.investment.project.notification.tasks.statsd',
+        'datahub.investment.project.notification.emails.statsd',
         mock_statsd,
     )
     return mock_statsd
