@@ -17,6 +17,7 @@ class EventActivitySerializer(ActivitySerializer):
             'generator': self._get_generator(),
             'object': {
                 'id': event_id,
+                'type': 'dit:Event',
                 'name': instance.name,
                 'dit:eventType': {'name': instance.event_type.name},
                 'content': instance.notes,
@@ -34,14 +35,7 @@ class EventActivitySerializer(ActivitySerializer):
                 'dit:organiser': {'name': instance.organiser.name},
                 'dit:disabledOn': instance.disabled_on,
                 'dit:service': {'name': instance.service.name},
-                'dit:archivedDocumentsUrlPath': instance.archived_documents_url_path,
-
-
-                # ManyToMany
-
-                # 'dit:relatedProgrammes': instance.related_programmes,
-                # 'dit:relatedTradeAgreements': instance.related_trade_agreements,
-                # 'dit:teams': instance.teams,
+                'dit:archivedDocumentsUrlPath': instance.archived_documents_url_path,              
 
             },
 
