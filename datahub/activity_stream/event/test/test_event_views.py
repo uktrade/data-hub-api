@@ -1,17 +1,13 @@
 import datetime
-import pytest
 
+import pytest
 from freezegun import freeze_time
 from rest_framework import status
-from datahub.activity_stream.event.serializers import EventActivitySerializer
+
 from datahub.activity_stream.test import hawk
 from datahub.activity_stream.test.utils import get_url
 from datahub.core.test_utils import format_date_or_datetime
-
-from datahub.event.models import Event
-from datahub.event.test.factories import (
-    EventFactory
-)
+from datahub.event.test.factories import EventFactory
 
 
 @pytest.mark.django_db
@@ -19,7 +15,6 @@ def test_event_activity(api_client):
     """
     Get a list of Events and test the returned JSON is valid
     """
-
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
     with freeze_time(start) as frozen_datetime:
         event = EventFactory()

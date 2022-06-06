@@ -35,8 +35,7 @@ class EventActivitySerializer(ActivitySerializer):
                 'dit:organiser': {'name': instance.organiser.name},
                 'dit:disabledOn': instance.disabled_on,
                 'dit:service': {'name': instance.service.name},
-                'dit:archivedDocumentsUrlPath': instance.archived_documents_url_path,              
-
+                'dit:archivedDocumentsUrlPath': instance.archived_documents_url_path,
             },
 
         }
