@@ -14,5 +14,5 @@ def get_base_event_queryset():
         'uk_region',
         'organiser',
         'lead_team',
-        'service'
+        'service',
     )

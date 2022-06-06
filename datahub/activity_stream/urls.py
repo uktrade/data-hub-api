@@ -1,8 +1,8 @@
 from django.urls import path
 
 from datahub.activity_stream.company_referral.views import CompanyReferralActivityViewSet
-from datahub.activity_stream.interaction.views import InteractionActivityViewSet
 from datahub.activity_stream.event.views import EventActivityViewSet
+from datahub.activity_stream.interaction.views import InteractionActivityViewSet
 from datahub.activity_stream.investment.views import IProjectCreatedViewSet
 from datahub.activity_stream.investor_profile.views import (
     LargeCapitalInvestorProfileActivityViewSet,
