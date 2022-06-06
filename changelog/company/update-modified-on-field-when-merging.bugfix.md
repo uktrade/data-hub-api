@@ -1,0 +1,1 @@
+When merging two companies, the modified_on field of the objects related to the source company (e.g. interactions or contacts) will now be updated when they are moved over to the target company.

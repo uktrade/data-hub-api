@@ -416,6 +416,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `ENABLE_DAILY_OPENSEARCH_SYNC` | No | Whether to enable the daily OpenSearch sync (default=False). |
 | `ENABLE_EMAIL_INGESTION` | No | True or False. Whether or not to activate the celery beat task for ingesting emails |
 | `ENABLE_INVESTMENT_NOTIFICATION` | No | True or False. Whether or not to activate the celery beat task for sending investment notifications |
+| `ENABLE_ESTIMATED_LAND_DATE_REMINDERS` | No | True or False. Whether or not to activate the celery beat task for sending investment notifications |
 | `ENABLE_MAILBOX_PROCESSING` | No | True or False. Whether or not to activate the celery beat task for mailbox processing |
 | `ENABLE_SLACK_MESSAGING` | No | If present and truthy, enable the transmission of messages to Slack. Necessitates the specification of the other env vars `SLACK_API_TOKEN` and `SLACK_MESSAGE_CHANNEL` |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
