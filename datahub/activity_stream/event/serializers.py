@@ -32,8 +32,8 @@ class EventActivitySerializer(ActivitySerializer):
                 'dit:address_postcode': instance.address_postcode,
                 'dit:address_country': {'name': instance.address_country.name},
                 'dit:disabledOn': instance.disabled_on,
+                'dit:service': {'name': instance.service.name},
                 'dit:archivedDocumentsUrlPath': instance.archived_documents_url_path,
-                'dit:eventType': {'name': instance.event_type.name},
             },
 
         }
