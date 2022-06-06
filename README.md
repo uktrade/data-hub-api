@@ -210,7 +210,7 @@ Dependencies:
 9. Make sure you have OpenSearch running locally. If you don't, you can run one in Docker:
 
     ```shell
-    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" opensearchproject/opensearch:1.2.4
+    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" opensearchproject/opensearch:2.0.0
     ```
 
 10. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.

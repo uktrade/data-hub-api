@@ -46,7 +46,7 @@ services:
       - POSTGRES_PASSWORD=datahub
 
   opensearch:
-    image: opensearchproject/opensearch:1.2.4
+    image: opensearchproject/opensearch:2.0.0
     environment:
       - plugins.security.disabled=true
       - cluster.name=cluster-001

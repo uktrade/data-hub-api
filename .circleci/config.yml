@@ -123,4 +123,4 @@ workflows:
           publish_coverage: true
           python_image: python:3.10.1
           postgres_image: postgres:12
-          es_image: opensearchproject/opensearch:1.2.4
+          es_image: opensearchproject/opensearch:2.0.0
