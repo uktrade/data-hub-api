@@ -126,6 +126,7 @@ class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin):
         results = data.get('results', [])
         assert len(results) == 2
         assert results[0] == {
+            'id': str(reminders[0].id),
             'created_on': '2022-05-05T17:00:00Z',
             'event': reminders[0].event,
             'project': {
@@ -182,6 +183,7 @@ class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin):
         results = data.get('results', [])
         assert len(results) == 2
         assert results[0] == {
+            'id': str(reminders[0].id),
             'created_on': '2022-05-05T17:00:00Z',
             'event': reminders[0].event,
             'project': {
