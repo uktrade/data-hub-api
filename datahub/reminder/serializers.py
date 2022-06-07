@@ -40,7 +40,7 @@ class UpcomingEstimatedLandDateReminderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UpcomingEstimatedLandDateReminder
-        fields = ('created_on', 'event', 'project')
+        fields = ('id', 'created_on', 'event', 'project')
 
 
 class NoRecentInvestmentInteractionReminderSerializer(serializers.ModelSerializer):
@@ -50,4 +50,4 @@ class NoRecentInvestmentInteractionReminderSerializer(serializers.ModelSerialize
 
     class Meta:
         model = NoRecentInvestmentInteractionReminder
-        fields = ('created_on', 'event', 'project')
+        fields = ('id', 'created_on', 'event', 'project')
