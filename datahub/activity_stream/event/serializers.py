@@ -17,7 +17,9 @@ class EventActivitySerializer(ActivitySerializer):
             'generator': self._get_generator(),
             'object': {
                 'id': event_id,
-                'type': 'dit:Event',
+                'type': [
+                    'dit:Event',
+                ],
                 'name': instance.name,
                 'dit:eventType': {'name': instance.event_type.name},
                 'content': instance.notes,

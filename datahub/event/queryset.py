@@ -3,7 +3,7 @@ from datahub.event.models import Event
 
 def get_base_event_queryset():
     """
-    Gets the base eveb queryset.
+    Gets the base event queryset.
     """
     return Event.objects.select_related(
         'created_by',
