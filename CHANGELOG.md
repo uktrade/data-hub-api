@@ -1,3 +1,17 @@
+# Data Hub API 40.5.0 (2022-06-07)
+
+
+## Features
+
+- **Investment** Now Project Assurance Advisers, Client Relationship Managers and Referral Source Advisers can also receive Estimated Land Date notifications.
+- **Reminders** Ids have now been added to the estimated land date and no recent interaction reminder endpoints.
+- **Reminders** Estimated Land Date reminders are now automatically created according to each adviser's subscriptions.
+
+## Bug fixes
+
+- **Companies** When merging two companies, the modified_on field of the objects related to the source company (e.g. interactions or contacts) will now be updated when they are moved over to the target company.
+
+
 # Data Hub API 40.4.0 (2022-05-30)
 
 
