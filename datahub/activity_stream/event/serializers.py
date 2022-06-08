@@ -18,7 +18,7 @@ class EventActivitySerializer(ActivitySerializer):
             'object': {
                 'id': event_id,
                 'type': [
-                    'dit:Event',
+                    'dit:dataHub:Event',
                 ],
                 'name': instance.name,
                 'dit:eventType': {'name': instance.event_type.name},

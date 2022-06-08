@@ -37,7 +37,7 @@ def test_event_activity(api_client):
                     'generator': {'name': 'dit:dataHub', 'type': 'Application'},
                     'object': {
                         'id': f'dit:DataHubEvent:{event.id}',
-                        'type': ['dit:Event',
+                        'type': ['dit:dataHub:Event',
                                  ],
                         'name': event.name,
                         'dit:eventType': {'name': event.event_type.name},
