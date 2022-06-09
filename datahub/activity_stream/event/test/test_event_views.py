@@ -114,3 +114,16 @@ def test_null_event_location_type(api_client):
         response = hawk.get(api_client, get_url('api-v3:activity-stream:events'))
 
         assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_null_event_service(api_client):
+    """
+    Test that we can handle event service being None
+    """
+    with freeze_time() as frozen_datetime:
+        EventFactory(service_id=None)
+        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
+        response = hawk.get(api_client, get_url('api-v3:activity-stream:events'))
+
+        assert response.status_code == status.HTTP_200_OK
