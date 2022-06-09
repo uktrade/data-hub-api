@@ -30,9 +30,11 @@ class EventActivitySerializer(ActivitySerializer):
                 'dit:address_town': instance.address_town,
                 'dit:address_county': instance.address_county,
                 'dit:address_postcode': instance.address_postcode,
+                'dit:address_country': {'name': instance.address_country.name},
                 'dit:disabledOn': instance.disabled_on,
                 'dit:service': {'name': instance.service.name},
                 'dit:archivedDocumentsUrlPath': instance.archived_documents_url_path,
+                'dit:eventType': {'name': instance.event_type.name},
             },
 
         }
@@ -48,17 +50,9 @@ class EventActivitySerializer(ActivitySerializer):
             event['object']['dit:leadTeam'] = {
                 'name': instance.lead_team.name,
             }
-        if instance.address_country is not None:
-            event['object']['dit:address_country'] = {
-                'name': instance.address_country.name,
-            }
         if instance.location_type is not None:
             event['object']['dit:locationType'] = {
                 'name': instance.location_type.name,
-            }
-        if instance.event_type is not None:
-            event['object']['dit:eventType'] = {
-                'name': instance.event_type.name,
             }
 
         return event
