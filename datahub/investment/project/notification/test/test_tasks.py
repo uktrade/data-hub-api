@@ -1,3 +1,5 @@
+import datetime
+from operator import attrgetter
 from unittest import mock
 from uuid import uuid4
 
@@ -5,7 +7,7 @@ import factory
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.test.utils import override_settings
-from django.utils.timezone import now
+from freezegun import freeze_time
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import InvestmentProjectStage
@@ -14,6 +16,7 @@ from datahub.investment.project import (
     INVESTMENT_ESTIMATED_LAND_DATE_NOTIFICATION_FEATURE_FLAG_NAME,
 )
 from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.notification.emails import get_projects_summary_list
 from datahub.investment.project.notification.models import InvestmentNotificationSubscription
 from datahub.investment.project.notification.tasks import (
     get_subscriptions_for_estimated_land_date,
@@ -70,37 +73,52 @@ def investment_estimated_land_date_notification_feature_flag():
 class TestInvestmentNotificationSubscriptionTasks:
     """Test investment notification subscription tasks."""
 
+    current_date = datetime.date(year=2022, month=7, day=1)
+    notification_type_to_months = {
+        estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value: 1,
+        estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value: 2,
+    }
+
     @pytest.mark.parametrize(
-        'notification_type',
+        'notification_types,expected',
         (
             (
-                estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value
+                [estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value],
+                [1],
             ),
             (
-                estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value
+                [estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value],
+                [2],
+            ),
+            (
+                [
+                    estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value,
+                    estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value,
+                ],
+                [1, 2],
             ),
         ),
     )
-    def test_get_subscriptions_for_estimated_land_date(self, notification_type):
+    def test_get_subscriptions_for_estimated_land_date(self, notification_types, expected):
         """Tests that query returns correct subscriptions."""
         adviser = AdviserFactory()
-        future_estimated_land_date = now() + relativedelta(days=int(notification_type))
+
         projects = [
             InvestmentProjectFactory(
                 project_manager=adviser,
-                estimated_land_date=future_estimated_land_date,
+                estimated_land_date=self.current_date,
                 stage_id=InvestmentProjectStage.active.value.id,
                 status=InvestmentProject.Status.ONGOING,
             ),
             InvestmentProjectFactory(
                 project_manager=adviser,
-                estimated_land_date=future_estimated_land_date - relativedelta(days=1),
+                estimated_land_date=self.current_date + relativedelta(months=1),
                 stage_id=InvestmentProjectStage.active.value.id,
                 status=InvestmentProject.Status.ONGOING,
             ),
             InvestmentProjectFactory(
                 project_manager=adviser,
-                estimated_land_date=future_estimated_land_date + relativedelta(days=1),
+                estimated_land_date=self.current_date + relativedelta(months=2),
                 stage_id=InvestmentProjectStage.active.value.id,
                 status=InvestmentProject.Status.ONGOING,
             ),
@@ -109,14 +127,18 @@ class TestInvestmentNotificationSubscriptionTasks:
             len(projects),
             investment_project=factory.Iterator(projects),
             adviser=adviser,
-            estimated_land_date=[notification_type],
+            estimated_land_date=notification_types,
         )
 
-        subscriptions = get_subscriptions_for_estimated_land_date(notification_type)
-        assert subscriptions.count() == 1
-        assert subscriptions[0].adviser == adviser
-        assert subscriptions[0].investment_project == projects[0]
-        assert notification_type in subscriptions[0].estimated_land_date
+        subscriptions = get_subscriptions_for_estimated_land_date(adviser, self.current_date)
+        result = set(
+            subscription.investment_project for subscription in subscriptions
+            if subscription.adviser == adviser
+            and notification_types == subscription.estimated_land_date
+        )
+        expected_projects = set(projects[index] for index in expected)
+
+        assert result == expected_projects
 
     @pytest.mark.parametrize(
         'notification_type',
@@ -135,29 +157,31 @@ class TestInvestmentNotificationSubscriptionTasks:
     ):
         """Tests that query returns subscriptions with active ongoing and delayed projects only."""
         adviser = AdviserFactory()
-        future_estimated_land_date = now() + relativedelta(days=int(notification_type))
+        estimated_land_date = self.current_date + relativedelta(
+            months=self.notification_type_to_months[notification_type],
+        )
         projects = [
             InvestmentProjectFactory(
                 project_manager=adviser,
-                estimated_land_date=future_estimated_land_date,
+                estimated_land_date=estimated_land_date,
                 stage_id=InvestmentProjectStage.active.value.id,
                 status=InvestmentProject.Status.ONGOING,
             ),
             InvestmentProjectFactory(
                 project_manager=adviser,
-                estimated_land_date=future_estimated_land_date,
+                estimated_land_date=estimated_land_date,
                 stage_id=InvestmentProjectStage.active.value.id,
                 status=InvestmentProject.Status.DELAYED,
             ),
             InvestmentProjectFactory(
                 project_manager=adviser,
-                estimated_land_date=future_estimated_land_date,
+                estimated_land_date=estimated_land_date,
                 stage_id=InvestmentProjectStage.verify_win.value.id,
                 status=InvestmentProject.Status.ONGOING,
             ),
             InvestmentProjectFactory(
                 project_manager=adviser,
-                estimated_land_date=future_estimated_land_date,
+                estimated_land_date=estimated_land_date,
                 stage_id=InvestmentProjectStage.won.value.id,
                 status=InvestmentProject.Status.DELAYED,
             ),
@@ -169,7 +193,7 @@ class TestInvestmentNotificationSubscriptionTasks:
             estimated_land_date=[notification_type],
         )
 
-        subscriptions = get_subscriptions_for_estimated_land_date(notification_type)
+        subscriptions = get_subscriptions_for_estimated_land_date(adviser, self.current_date)
         result = set(
             subscription.investment_project for subscription in subscriptions
             if subscription.adviser == adviser
@@ -227,20 +251,22 @@ class TestInvestmentNotificationSubscriptionTasks:
         Test that a notification will be sent for each notification type and user.
         """
         adviser = AdviserFactory()
-        future_estimated_land_date = now() + relativedelta(days=int(notification_type))
+        estimated_land_date = self.current_date + relativedelta(
+            months=self.notification_type_to_months[notification_type],
+        )
         project = InvestmentProjectFactory(
             **{user_type: adviser},
-            estimated_land_date=future_estimated_land_date,
+            estimated_land_date=estimated_land_date,
             stage_id=InvestmentProjectStage.active.value.id,
             status=InvestmentProject.Status.ONGOING,
         )
         InvestmentProjectFactory(
             **{user_type: adviser},
-            estimated_land_date=future_estimated_land_date - relativedelta(days=1),
+            estimated_land_date=estimated_land_date - relativedelta(months=1),
         )
         InvestmentProjectFactory(
             **{user_type: adviser},
-            estimated_land_date=future_estimated_land_date + relativedelta(days=1),
+            estimated_land_date=estimated_land_date + relativedelta(months=1),
         )
         InvestmentNotificationSubscriptionFactory(
             investment_project=project,
@@ -251,7 +277,7 @@ class TestInvestmentNotificationSubscriptionTasks:
         template_id = str(uuid4())
         with override_settings(
             INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID=template_id,
-        ):
+        ), freeze_time(self.current_date):
             send_estimated_land_date_task()
 
             mock_notify_adviser_by_email.assert_called_once_with(
@@ -274,6 +300,100 @@ class TestInvestmentNotificationSubscriptionTasks:
                 f'send_investment_notification.{notification_type}',
             )
 
+    @pytest.mark.parametrize(
+        'notification_type,user_type',
+        (
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value,
+                'project_manager',
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value,
+                'project_manager',
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value,
+                'client_relationship_manager',
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value,
+                'client_relationship_manager',
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value,
+                'project_assurance_adviser',
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value,
+                'project_assurance_adviser',
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value,
+                'referral_source_adviser',
+            ),
+            (
+                estimated_land_date_notification.ESTIMATED_LAND_DATE_60.value,
+                'referral_source_adviser',
+            ),
+        ),
+    )
+    def test_sends_investment_summary_notification_with_feature_flag(
+        self,
+        notification_type,
+        user_type,
+        investment_estimated_land_date_notification_feature_flag,
+        mock_notify_adviser_by_email,
+        mock_statsd,
+    ):
+        """
+        Test that a notification will be sent for each notification type and user.
+        """
+        adviser = AdviserFactory()
+        estimated_land_date = self.current_date + relativedelta(
+            months=self.notification_type_to_months[notification_type],
+        )
+        projects = InvestmentProjectFactory.create_batch(
+            6,
+            **{user_type: adviser},
+            estimated_land_date=estimated_land_date,
+            stage_id=InvestmentProjectStage.active.value.id,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        InvestmentProjectFactory(
+            **{user_type: adviser},
+            estimated_land_date=estimated_land_date - relativedelta(months=1),
+        )
+        InvestmentProjectFactory(
+            **{user_type: adviser},
+            estimated_land_date=estimated_land_date + relativedelta(months=1),
+        )
+        InvestmentNotificationSubscriptionFactory.create_batch(
+            len(projects),
+            investment_project=factory.Iterator(projects),
+            adviser=adviser,
+            estimated_land_date=[notification_type],
+        )
+
+        template_id = str(uuid4())
+        with override_settings(
+            INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_SUMMARY_TEMPLATE_ID=template_id,
+        ), freeze_time(self.current_date):
+            send_estimated_land_date_task()
+
+            projects.sort(key=attrgetter('pk'))
+
+            mock_notify_adviser_by_email.assert_called_once_with(
+                adviser,
+                template_id,
+                {
+                    'month': 'July',
+                    'reminders_number': len(projects),
+                    'summary': ''.join(get_projects_summary_list(projects)),
+                },
+                NotifyServiceName.investment,
+            )
+            mock_statsd.incr.assert_called_once_with('send_estimated_land_date_summary')
+
     def test_doesnt_send_investment_notification_without_feature_flag(
         self,
         mock_notify_adviser_by_email,
@@ -283,10 +403,12 @@ class TestInvestmentNotificationSubscriptionTasks:
         """
         notification_type = estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value
         adviser = AdviserFactory()
-        future_estimated_land_date = now() + relativedelta(days=int(notification_type))
+        estimated_land_date = self.current_date + relativedelta(
+            months=self.notification_type_to_months[notification_type],
+        )
         project = InvestmentProjectFactory(
             project_manager=adviser,
-            estimated_land_date=future_estimated_land_date,
+            estimated_land_date=estimated_land_date,
             stage_id=InvestmentProjectStage.active.value.id,
             status=InvestmentProject.Status.ONGOING,
         )
@@ -299,7 +421,7 @@ class TestInvestmentNotificationSubscriptionTasks:
         template_id = str(uuid4())
         with override_settings(
             INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID=template_id,
-        ):
+        ), freeze_time(self.current_date):
             send_estimated_land_date_task()
 
             mock_notify_adviser_by_email.assert_not_called()
@@ -315,10 +437,12 @@ class TestInvestmentNotificationSubscriptionTasks:
         """
         notification_type = estimated_land_date_notification.ESTIMATED_LAND_DATE_30.value
         adviser = AdviserFactory()
-        future_estimated_land_date = now() + relativedelta(days=int(notification_type))
+        estimated_land_date = self.current_date + relativedelta(
+            months=self.notification_type_to_months[notification_type],
+        )
         project = InvestmentProjectFactory(
             project_manager=adviser,
-            estimated_land_date=future_estimated_land_date,
+            estimated_land_date=estimated_land_date,
             stage_id=InvestmentProjectStage.active.value.id,
             status=InvestmentProject.Status.ONGOING,
         )
@@ -331,7 +455,7 @@ class TestInvestmentNotificationSubscriptionTasks:
         template_id = str(uuid4())
         with override_settings(
             INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID=template_id,
-        ):
+        ), freeze_time(self.current_date):
             send_estimated_land_date_task()
             send_estimated_land_date_task()
             send_estimated_land_date_task()
