@@ -1,0 +1,15 @@
+- model: notification.notificationinnertemplate
+  pk: d940699d-2e14-435b-8c75-565739ab6350
+  fields:
+    notification_type: upcoming_estimated_land_date
+    content: |
+      Reminder ((number))
+      The estimated land date deadline for [((project_name))](((project_details_url))) is ((estimated_land_date)).
+
+      Project code: ((project_code))
+      Project stage: ((project_stage))
+      Project status: ((project_status))
+      Client: ((investor_company_name))
+
+      ---
+    created_on: '2022-06-14T12:00:00Z'
