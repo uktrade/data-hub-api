@@ -357,7 +357,7 @@ redis==4.1.4
     #   celery
     #   django-redis
     #   rq
-requests==2.27.1
+requests==2.28.0
     # via
     #   -r requirements.in
     #   notifications-python-client
