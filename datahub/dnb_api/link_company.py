@@ -30,7 +30,7 @@ def link_company_with_dnb(
     company.duns_number = duns_number
     company.modified_by = modified_by
     company.save()
-    sync_company_with_dnb.apply(
+    sync_company_with_dnb.apply_async(
         args=(company.id,),
         kwargs={
             'update_descriptor': update_descriptor,

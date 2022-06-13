@@ -41,7 +41,7 @@ def test_update_all_fields(mock_get_company_updates):
         'update_companies_from_dnb_service',
         datetime,
     )
-    mock_get_company_updates.apply.assert_called_with(kwargs={
+    mock_get_company_updates.apply_async.assert_called_with(kwargs={
         'last_updated_after': datetime,
         'fields_to_update': None,
     })
@@ -59,7 +59,7 @@ def test_update_partial_fields(mock_get_company_updates):
         datetime,
         fields=fields,
     )
-    mock_get_company_updates.apply.assert_called_with(kwargs={
+    mock_get_company_updates.apply_async.assert_called_with(kwargs={
         'last_updated_after': datetime,
         'fields_to_update': fields,
     })
