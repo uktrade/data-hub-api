@@ -1,3 +1,13 @@
+# Data Hub API 40.6.0 (2022-06-13)
+
+
+## Features
+
+- **Events** - It is now possible to get a list of events in activity-stream [format.](https://www.w3.org/TR/activitystreams-core/)
+
+      The URL for this is:    `/v3/activity-stream/event`
+
+
 # Data Hub API 40.5.0 (2022-06-07)
 
 
