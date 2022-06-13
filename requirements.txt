@@ -97,7 +97,7 @@ django==3.2.13
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==5.34.0
+django-axes==5.35.0
     # via -r requirements.in
 django-debug-toolbar==3.4.0
     # via -r requirements.in
@@ -146,7 +146,6 @@ flake8==4.0.1
     #   flake8-commas
     #   flake8-debugger
     #   flake8-docstrings
-    #   flake8-polyfill
     #   flake8-print
     #   flake8-quotes
     #   flake8-string-format
@@ -161,8 +160,6 @@ flake8-docstrings==1.6.0
     # via -r requirements.in
 flake8-import-order==0.18.1
     # via -r requirements.in
-flake8-polyfill==1.0.2
-    # via pep8-naming
 flake8-print==5.0.0
     # via -r requirements.in
 flake8-quotes==3.3.1
@@ -237,7 +234,7 @@ notifications-python-client==6.3.0
     # via -r requirements.in
 opensearch-dsl==1.0.0
     # via -r requirements.in
-opensearch-py==1.1.0
+opensearch-py==2.0.0
     # via
     #   -r requirements.in
     #   opensearch-dsl
@@ -249,7 +246,7 @@ parso==0.8.3
     # via jedi
 pep517==0.12.0
     # via pip-tools
-pep8-naming==0.12.1
+pep8-naming==0.13.0
     # via -r requirements.in
 pexpect==4.8.0
     # via ipython
@@ -302,7 +299,7 @@ pygments==2.11.2
     # via ipython
 pyjwt==2.4.0
     # via notifications-python-client
-pylint==2.13.9
+pylint==2.14.1
     # via
     #   -r requirements.in
     #   pylint-django
@@ -357,10 +354,11 @@ redis==4.1.4
     #   celery
     #   django-redis
     #   rq
-requests==2.27.1
+requests==2.28.0
     # via
     #   -r requirements.in
     #   notifications-python-client
+    #   opensearch-py
     #   piprot
     #   requests-file
     #   requests-futures
@@ -425,6 +423,8 @@ tomli==2.0.1
     #   pylint
     #   pytest
     #   towncrier
+tomlkit==0.11.0
+    # via pylint
 towncrier==21.9.0
     # via -r requirements.in
 traitlets==5.1.1
@@ -447,7 +447,7 @@ vine==5.0.0
     #   kombu
 virtualenv==20.13.1
     # via pre-commit
-watchdog[watchmedo]==2.1.8
+watchdog[watchmedo]==2.1.9
     # via -r requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
@@ -455,7 +455,7 @@ werkzeug==2.0.3
     # via -r requirements.in
 wheel==0.37.1
     # via pip-tools
-whitenoise==6.1.0
+whitenoise==6.2.0
     # via -r requirements.in
 wrapt==1.13.3
     # via
