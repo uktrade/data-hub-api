@@ -454,7 +454,7 @@ werkzeug==2.0.3
     # via -r requirements.in
 wheel==0.37.1
     # via pip-tools
-whitenoise==6.1.0
+whitenoise==6.2.0
     # via -r requirements.in
 wrapt==1.13.3
     # via
