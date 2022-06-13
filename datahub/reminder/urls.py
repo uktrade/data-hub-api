@@ -13,6 +13,7 @@ urlpatterns = [
         'reminder/subscription/no-recent-investment-interaction',
         NoRecentInvestmentInteractionSubscriptionViewset.as_view({
             'get': 'retrieve',
+            'patch': 'partial_update',
         }),
         name='no-recent-investment-interaction-subscription',
     ),
@@ -20,6 +21,7 @@ urlpatterns = [
         'reminder/subscription/estimated-land-date',
         UpcomingEstimatedLandDateSubscriptionViewset.as_view({
             'get': 'retrieve',
+            'patch': 'partial_update',
         }),
         name='estimated-land-date-subscription',
     ),

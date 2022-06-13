@@ -53,6 +53,33 @@ class TestNoRecentInvestmentInteractionSubscriptionViewset(APITestMixin):
             'email_reminders_enabled': True,
         }
 
+    def test_patch_existing_subscription(self):
+        """Patching the subscription will update an existing subscription"""
+        NoRecentInvestmentInteractionSubscriptionFactory(
+            adviser=self.user,
+            reminder_days=[10, 20, 40],
+            email_reminders_enabled=True,
+        )
+        url = reverse(self.url_name)
+        data = {'reminder_days': [15, 30], 'email_reminders_enabled': False}
+        response = self.api_client.patch(url, data)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'reminder_days': [15, 30],
+            'email_reminders_enabled': False,
+        }
+
+    def test_patch_subscription_no_existing(self):
+        """Patching the subscription will create one if it didn't exist already"""
+        url = reverse(self.url_name)
+        data = {'reminder_days': [15]}
+        response = self.api_client.patch(url, data)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'reminder_days': [15],
+            'email_reminders_enabled': False,
+        }
+
 
 class TestUpcomingEstimatedLandDateSubscriptionViewset(APITestMixin):
     """
@@ -91,6 +118,33 @@ class TestUpcomingEstimatedLandDateSubscriptionViewset(APITestMixin):
         assert response.json() == {
             'reminder_days': [10, 20, 40],
             'email_reminders_enabled': True,
+        }
+
+    def test_patch_existing_subscription(self):
+        """Patching the subscription will update an existing subscription"""
+        UpcomingEstimatedLandDateSubscriptionFactory(
+            adviser=self.user,
+            reminder_days=[10, 20, 40],
+            email_reminders_enabled=True,
+        )
+        url = reverse(self.url_name)
+        data = {'reminder_days': [15, 30], 'email_reminders_enabled': False}
+        response = self.api_client.patch(url, data)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'reminder_days': [15, 30],
+            'email_reminders_enabled': False,
+        }
+
+    def test_patch_subscription_no_existing(self):
+        """Patching the subscription will create one if it didn't exist already"""
+        url = reverse(self.url_name)
+        data = {'reminder_days': [15]}
+        response = self.api_client.patch(url, data)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'reminder_days': [15],
+            'email_reminders_enabled': False,
         }
 
 
