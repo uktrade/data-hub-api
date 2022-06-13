@@ -43,7 +43,7 @@ class Command(BaseCommand):
         """
         Run the celery task.
         """
-        get_company_updates.apply(
+        get_company_updates.apply_async(
             kwargs={
                 'last_updated_after': options['last_updated_after'],
                 'fields_to_update': options['fields'],

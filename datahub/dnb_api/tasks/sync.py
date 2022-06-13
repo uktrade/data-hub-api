@@ -97,7 +97,7 @@ def sync_company_with_dnb_rate_limited(
         return
 
     try:
-        sync_company_with_dnb.apply(
+        sync_company_with_dnb.apply_async(
             kwargs={
                 'company_id': company_id,
                 'fields_to_update': fields_to_update,
