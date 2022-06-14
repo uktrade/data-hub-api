@@ -64,66 +64,39 @@ def test_event_activity(api_client):
         }
 
 
-@pytest.mark.django_db
-def test_null_event_region(api_client):
-    """
-    Test that we can handle event region  being None
-    """
+def run_none_type_tests(api_client):
     with freeze_time() as frozen_datetime:
-        EventFactory(uk_region_id=None)
         frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:events'))
 
         assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_null_event_region(api_client):
+    EventFactory(uk_region_id=None)
+    run_none_type_tests(api_client)
 
 
 @pytest.mark.django_db
 def test_null_event_organiser(api_client):
-    """
-    Test that we can handle event Organiser  being None
-    """
-    with freeze_time() as frozen_datetime:
-        EventFactory(organiser=None)
-        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
-        response = hawk.get(api_client, get_url('api-v3:activity-stream:events'))
-
-        assert response.status_code == status.HTTP_200_OK
+    EventFactory(organiser=None)
+    run_none_type_tests(api_client)
 
 
 @pytest.mark.django_db
 def test_null_event_lead_team(api_client):
-    """
-    Test that we can handle event Lead Team being None
-    """
-    with freeze_time() as frozen_datetime:
-        EventFactory(lead_team_id=None)
-        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
-        response = hawk.get(api_client, get_url('api-v3:activity-stream:events'))
-
-        assert response.status_code == status.HTTP_200_OK
+    EventFactory(lead_team_id=None)
+    run_none_type_tests(api_client)
 
 
 @pytest.mark.django_db
 def test_null_event_location_type(api_client):
-    """
-    Test that we can handle event location Type  being None
-    """
-    with freeze_time() as frozen_datetime:
-        EventFactory(location_type_id=None)
-        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
-        response = hawk.get(api_client, get_url('api-v3:activity-stream:events'))
-
-        assert response.status_code == status.HTTP_200_OK
+    EventFactory(location_type_id=None)
+    run_none_type_tests(api_client)
 
 
 @pytest.mark.django_db
 def test_null_event_service(api_client):
-    """
-    Test that we can handle event service being None
-    """
-    with freeze_time() as frozen_datetime:
-        EventFactory(service_id=None)
-        frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
-        response = hawk.get(api_client, get_url('api-v3:activity-stream:events'))
-
-        assert response.status_code == status.HTTP_200_OK
+    EventFactory(service_id=None)
+    run_none_type_tests(api_client)
