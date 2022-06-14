@@ -9,7 +9,9 @@ from freezegun import freeze_time
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import InvestmentProjectStage
 from datahub.feature_flag.test.factories import UserFeatureFlagFactory
+from datahub.investment.project.models import InvestmentProject
 from datahub.investment.project.test.factories import (
+    ActiveInvestmentProjectFactory,
     InvestmentProjectFactory,
 )
 from datahub.reminder import ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME
@@ -90,9 +92,10 @@ class TestCreateReminder:
         """
         days_left = 30
         future_estimated_land_date = self.current_date + relativedelta(days=days_left)
-        project = InvestmentProjectFactory(
+        project = ActiveInvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
         )
 
         create_reminder(
@@ -124,9 +127,10 @@ class TestCreateReminder:
         """
         days_left = 30
         future_estimated_land_date = self.current_date + relativedelta(days=days_left)
-        project = InvestmentProjectFactory(
+        project = ActiveInvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
         )
 
         create_reminder(
@@ -153,9 +157,10 @@ class TestCreateReminder:
         """
         days_left = 30
         future_estimated_land_date = self.current_date + relativedelta(days=days_left)
-        project = InvestmentProjectFactory(
+        project = ActiveInvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
         )
         with freeze_time('2022-07-12T10:00:00'):
             UpcomingEstimatedLandDateReminder.objects.create(
@@ -190,9 +195,10 @@ class TestCreateReminder:
         """
         days_left = 30
         future_estimated_land_date = self.current_date + relativedelta(days=days_left)
-        project = InvestmentProjectFactory(
+        project = ActiveInvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
         )
         with freeze_time('2022-07-12T10:00:00'):
             UpcomingEstimatedLandDateReminder.objects.create(
@@ -227,9 +233,10 @@ class TestCreateReminder:
         """
         days_left = 30
         future_estimated_land_date = self.current_date + relativedelta(days=days_left)
-        project = InvestmentProjectFactory(
+        project = ActiveInvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
         )
 
         with freeze_time('2010-07-12T10:00:00'):
@@ -315,17 +322,20 @@ class TestGenerateEstimatedLandDateReminderTask:
         future_estimated_land_date = self.current_date + relativedelta(days=days)
 
         role_field = {role: adviser}
-        project = InvestmentProjectFactory(
+        project = ActiveInvestmentProjectFactory(
             **role_field,
             estimated_land_date=future_estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
         )
-        InvestmentProjectFactory(
+        ActiveInvestmentProjectFactory(
             **role_field,
             estimated_land_date=future_estimated_land_date - relativedelta(days=120),
+            status=InvestmentProject.Status.ONGOING,
         )
-        InvestmentProjectFactory(
+        ActiveInvestmentProjectFactory(
             **role_field,
             estimated_land_date=future_estimated_land_date + relativedelta(days=120),
+            status=InvestmentProject.Status.ONGOING,
         )
 
         generate_estimated_land_date_reminders_for_subscription(
@@ -340,9 +350,9 @@ class TestGenerateEstimatedLandDateReminderTask:
             current_date=self.current_date,
         )
 
-    def test_does_not_include_verify_win_and_won_projects(self, adviser, mock_create_reminder):
+    def test_active_ongoing_or_delayed_projects_only(self, adviser, mock_create_reminder):
         """
-        A reminder should not be sent for verify win and won projects.
+        A reminder should only be sent for active ongoing or active delayed projects.
         """
         days = 30
         subscription = UpcomingEstimatedLandDateSubscriptionFactory(
@@ -352,32 +362,48 @@ class TestGenerateEstimatedLandDateReminderTask:
         )
         future_estimated_land_date = self.current_date + relativedelta(days=days)
 
-        project = InvestmentProjectFactory(
+        active_ongoing_project = ActiveInvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        active_delayed_project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            estimated_land_date=future_estimated_land_date,
+            status=InvestmentProject.Status.DELAYED,
         )
         InvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
             stage_id=InvestmentProjectStage.verify_win.value.id,
+            status=InvestmentProject.Status.ONGOING,
         )
         InvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
             stage_id=InvestmentProjectStage.won.value.id,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            estimated_land_date=future_estimated_land_date,
+            status=InvestmentProject.Status.ABANDONED,
         )
 
         generate_estimated_land_date_reminders_for_subscription(
             subscription=subscription,
             current_date=self.current_date,
         )
-        mock_create_reminder.assert_called_once_with(
-            project=project,
-            adviser=adviser,
-            days_left=days,
-            send_email=True,
-            current_date=self.current_date,
-        )
+        mock_create_reminder.assert_has_calls([
+            call(
+                project=project,
+                adviser=adviser,
+                days_left=days,
+                send_email=True,
+                current_date=self.current_date,
+            )
+            for project in [active_ongoing_project, active_delayed_project]
+        ], any_order=True)
 
     def test_no_user_feature_flag(
         self,
@@ -395,9 +421,10 @@ class TestGenerateEstimatedLandDateReminderTask:
             email_reminders_enabled=True,
         )
         future_estimated_land_date = self.current_date + relativedelta(days=days)
-        InvestmentProjectFactory(
+        ActiveInvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
         )
         generate_estimated_land_date_reminders_for_subscription(
             subscription=subscription,
@@ -425,9 +452,10 @@ class TestGenerateEstimatedLandDateReminderTask:
             email_reminders_enabled=True,
         )
         future_estimated_land_date = self.current_date + relativedelta(days=days)
-        InvestmentProjectFactory(
+        ActiveInvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
         )
         generate_estimated_land_date_reminders_for_subscription(
             subscription=subscription,
@@ -453,9 +481,10 @@ class TestGenerateEstimatedLandDateReminderTask:
             reminder_days=[days],
             email_reminders_enabled=True,
         )
-        project = InvestmentProjectFactory(
+        project = ActiveInvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
         )
         generate_estimated_land_date_reminders()
         generate_estimated_land_date_reminders()
