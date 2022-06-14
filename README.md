@@ -199,7 +199,7 @@ Dependencies:
 6.  Install the dependencies:
 
     ```shell
-    pip install -r requirements.txt
+    pip install -r requirements-dev.txt
     ```
 
 7.  Create an `.env` settings file (it’s gitignored by default):
