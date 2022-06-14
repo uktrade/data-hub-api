@@ -232,7 +232,7 @@ nodeenv==1.6.0
     # via pre-commit
 notifications-python-client==6.3.0
     # via -r requirements.in
-opensearch-dsl==1.0.0
+opensearch-dsl==2.0.1
     # via -r requirements.in
 opensearch-py==2.0.0
     # via
