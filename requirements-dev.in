@@ -1,0 +1,35 @@
+-r requirements.in
+
+# Testing and dev
+pytest==7.1.2
+pytest-django==4.5.2
+pytest-cov==3.0.0
+pytest-xdist==2.5.0
+ipython==8.4.0
+factory-boy==3.2.1
+freezegun==1.2.1
+requests-mock==1.9.3
+django-debug-toolbar==3.4.0
+werkzeug==2.0.3  # Required by runserver_plus - useful for local dev
+pip-tools==6.6.2
+piprot==0.9.11
+semantic_version==2.10.0
+towncrier==21.9.0
+watchdog[watchmedo]==2.1.9
+pre-commit==2.19.0
+
+# Code static analysis
+flake8==4.0.1
+flake8-bugbear==22.1.11
+flake8-commas==2.1.0
+flake8-debugger==4.1.2
+flake8-import-order==0.18.1
+flake8-docstrings==1.6.0
+flake8-print==5.0.0
+flake8-quotes==3.3.1
+flake8-string-format==0.3.0
+pep8-naming==0.13.0
+pydocstyle==6.1.1
+pylint==2.14.1
+pylint-django==2.5.3
+pylint-pytest==1.1.2
