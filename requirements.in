@@ -2,6 +2,7 @@
 django==3.2.13
 djangorestframework==3.13.1
 django-axes==5.35.0
+django-debug-toolbar==3.4.0
 django-environ==0.8.1
 django-extensions==3.1.5
 django-filter==21.1
@@ -10,6 +11,7 @@ django-mptt==0.13.4
 django-pglocks==1.0.4
 django-reversion==5.0.0
 uritemplate==4.1.1  # required for DRF schema features
+werkzeug==2.0.3  # Required by runserver_plus - useful for local dev
 whitenoise==6.2.0
 
 chardet==4.0.0
