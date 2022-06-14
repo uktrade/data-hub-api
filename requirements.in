@@ -39,7 +39,7 @@ django-redis==5.2.0
 
 # OpenSearch
 opensearch-py==2.0.0
-opensearch-dsl==1.0.0
+opensearch-dsl==2.0.1
 
 # ES APM
 elastic-apm==6.9.1
