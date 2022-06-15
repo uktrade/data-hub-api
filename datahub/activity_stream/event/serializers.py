@@ -8,6 +8,24 @@ class EventActivitySerializer(ActivitySerializer):
     class Meta:
         model = Event
 
+    def _get_related_programme(self, programme):
+        return {
+            'id': f'dit:DataHubEventProgramme:{programme.pk}',
+            'name': programme.name,
+        }
+
+    def _get_related_programmes(self, programmes):
+        return [
+            self._get_related_programme(programme)
+            for programme in programmes.order_by('pk')
+        ]
+
+    def _get_teams(self, teams):
+        return [
+            self._get_team(team)
+            for team in teams.order_by('pk')
+        ]
+
     def to_representation(self, instance):
         event_id = f'dit:DataHubEvent:{instance.pk}'
         event = {
@@ -34,9 +52,21 @@ class EventActivitySerializer(ActivitySerializer):
                 'dit:disabledOn': instance.disabled_on,
                 'dit:archivedDocumentsUrlPath': instance.archived_documents_url_path,
                 'dit:eventType': {'name': instance.event_type.name},
+                'did:hasRelatedTradeAgreements': instance.has_related_trade_agreements,
+                'dit:relatedProgrammes': [
+                    *self._get_related_programmes(instance.related_programmes),
+                ],
+                'dit:Teams': [
+                    *self._get_teams(instance.teams),
+                ],
             },
-
         }
+
+        if instance.has_related_trade_agreements:
+            event['object']['dit:relatedTradeAgreements'] = [
+                *self._get_trade_agreements(instance.related_trade_agreements),
+            ]
+
         if instance.uk_region is not None:
             event['object']['dit:ukRegion'] = {
                 'name': instance.uk_region.name,
