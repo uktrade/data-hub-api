@@ -95,12 +95,16 @@ def test_event_activity(api_client):
         }
 
 
-def run_none_type_tests(api_client):
+def _get_response(api_client):
     with freeze_time() as frozen_datetime:
         frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:events'))
+    return response
 
-        assert response.status_code == status.HTTP_200_OK
+
+def run_none_type_tests(api_client):
+    response = _get_response(api_client)
+    assert response.status_code == status.HTTP_200_OK
 
 
 @pytest.mark.django_db
@@ -131,3 +135,12 @@ def test_null_event_location_type(api_client):
 def test_null_event_service(api_client):
     EventFactory(service_id=None)
     run_none_type_tests(api_client)
+
+
+@pytest.mark.django_db
+def test_trade_agreements_only_shown_if_they_exist(api_client):
+    EventFactory(has_related_trade_agreements=True)
+    response = _get_response(api_client)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert 'dit:relatedTradeAgreements' in response.json()['orderedItems'][0]['object']
