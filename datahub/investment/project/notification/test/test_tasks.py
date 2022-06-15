@@ -13,6 +13,7 @@ from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.investment.project import (
     INVESTMENT_ESTIMATED_LAND_DATE_NOTIFICATION_FEATURE_FLAG_NAME,
 )
+from datahub.investment.project.models import InvestmentProject
 from datahub.investment.project.notification.models import InvestmentNotificationSubscription
 from datahub.investment.project.notification.tasks import (
     get_subscriptions_for_estimated_land_date,
@@ -88,14 +89,20 @@ class TestInvestmentNotificationSubscriptionTasks:
             InvestmentProjectFactory(
                 project_manager=adviser,
                 estimated_land_date=future_estimated_land_date,
+                stage_id=InvestmentProjectStage.active.value.id,
+                status=InvestmentProject.Status.ONGOING,
             ),
             InvestmentProjectFactory(
                 project_manager=adviser,
                 estimated_land_date=future_estimated_land_date - relativedelta(days=1),
+                stage_id=InvestmentProjectStage.active.value.id,
+                status=InvestmentProject.Status.ONGOING,
             ),
             InvestmentProjectFactory(
                 project_manager=adviser,
                 estimated_land_date=future_estimated_land_date + relativedelta(days=1),
+                stage_id=InvestmentProjectStage.active.value.id,
+                status=InvestmentProject.Status.ONGOING,
             ),
         ]
         InvestmentNotificationSubscriptionFactory.create_batch(
@@ -122,24 +129,37 @@ class TestInvestmentNotificationSubscriptionTasks:
             ),
         ),
     )
-    def test_subscriptions_dont_include_verify_win_and_won_projects(self, notification_type):
-        """Tests that query returns subscriptions excluding verify win and won projects."""
+    def test_subscriptions_only_include_active_ongoing_and_delayed_projects(
+        self,
+        notification_type,
+    ):
+        """Tests that query returns subscriptions with active ongoing and delayed projects only."""
         adviser = AdviserFactory()
         future_estimated_land_date = now() + relativedelta(days=int(notification_type))
         projects = [
             InvestmentProjectFactory(
                 project_manager=adviser,
                 estimated_land_date=future_estimated_land_date,
+                stage_id=InvestmentProjectStage.active.value.id,
+                status=InvestmentProject.Status.ONGOING,
+            ),
+            InvestmentProjectFactory(
+                project_manager=adviser,
+                estimated_land_date=future_estimated_land_date,
+                stage_id=InvestmentProjectStage.active.value.id,
+                status=InvestmentProject.Status.DELAYED,
             ),
             InvestmentProjectFactory(
                 project_manager=adviser,
                 estimated_land_date=future_estimated_land_date,
                 stage_id=InvestmentProjectStage.verify_win.value.id,
+                status=InvestmentProject.Status.ONGOING,
             ),
             InvestmentProjectFactory(
                 project_manager=adviser,
                 estimated_land_date=future_estimated_land_date,
                 stage_id=InvestmentProjectStage.won.value.id,
+                status=InvestmentProject.Status.DELAYED,
             ),
         ]
         InvestmentNotificationSubscriptionFactory.create_batch(
@@ -150,10 +170,13 @@ class TestInvestmentNotificationSubscriptionTasks:
         )
 
         subscriptions = get_subscriptions_for_estimated_land_date(notification_type)
-        assert subscriptions.count() == 1
-        assert subscriptions[0].adviser == adviser
-        assert subscriptions[0].investment_project == projects[0]
-        assert notification_type in subscriptions[0].estimated_land_date
+        result = set(
+            subscription.investment_project for subscription in subscriptions
+            if subscription.adviser == adviser
+            and notification_type in subscription.estimated_land_date
+        )
+        assert subscriptions.count() == 2
+        assert result == set(projects[0:2])
 
     @pytest.mark.parametrize(
         'notification_type,user_type',
@@ -208,6 +231,8 @@ class TestInvestmentNotificationSubscriptionTasks:
         project = InvestmentProjectFactory(
             **{user_type: adviser},
             estimated_land_date=future_estimated_land_date,
+            stage_id=InvestmentProjectStage.active.value.id,
+            status=InvestmentProject.Status.ONGOING,
         )
         InvestmentProjectFactory(
             **{user_type: adviser},
@@ -262,6 +287,8 @@ class TestInvestmentNotificationSubscriptionTasks:
         project = InvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
+            stage_id=InvestmentProjectStage.active.value.id,
+            status=InvestmentProject.Status.ONGOING,
         )
         InvestmentNotificationSubscriptionFactory(
             investment_project=project,
@@ -292,6 +319,8 @@ class TestInvestmentNotificationSubscriptionTasks:
         project = InvestmentProjectFactory(
             project_manager=adviser,
             estimated_land_date=future_estimated_land_date,
+            stage_id=InvestmentProjectStage.active.value.id,
+            status=InvestmentProject.Status.ONGOING,
         )
         InvestmentNotificationSubscriptionFactory(
             investment_project=project,
