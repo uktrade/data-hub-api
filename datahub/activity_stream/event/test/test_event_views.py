@@ -58,6 +58,37 @@ def test_event_activity(api_client):
                         'dit:service': {'name': event.service.name},
                         'dit:archivedDocumentsUrlPath': event.archived_documents_url_path,
                         'dit:ukRegion': {'name': event.uk_region.name},
+                        'dit:teams': [
+                            *[
+                                {
+                                    'id': f'dit:DataHubTeam:{team.pk}',
+                                    'type': ['Group', 'dit:Team'],
+                                    'name': team.name,
+                                }
+                                for team in event.teams.order_by('pk')
+                            ],
+                        ],
+                        'dit:relatedProgrammes': [
+                            *[
+                                {
+                                    'id': f'dit:DataHubEventProgramme:{programme.pk}',
+                                    'name': programme.name
+                                }
+                                for programme in event.related_programmes.order_by('pk')
+                            ],
+                        ],
+                        'dit:hasRelatedTradeAgreements': event.has_related_trade_agreements,
+                        'dit:relatedTradeAgreements':
+                        [
+                            *[
+                                {
+                                    'id': f'dit:DataHubTradeAgreement:{trade_agreement.pk}',
+                                    'name': trade_agreement.name,
+                                }
+                                for trade_agreement in
+                                event.related_trade_agreements.order_by('pk')
+                            ],
+                        ],
                     },
                 },
             ],

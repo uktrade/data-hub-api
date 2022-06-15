@@ -52,11 +52,11 @@ class EventActivitySerializer(ActivitySerializer):
                 'dit:disabledOn': instance.disabled_on,
                 'dit:archivedDocumentsUrlPath': instance.archived_documents_url_path,
                 'dit:eventType': {'name': instance.event_type.name},
-                'did:hasRelatedTradeAgreements': instance.has_related_trade_agreements,
+                'dit:hasRelatedTradeAgreements': instance.has_related_trade_agreements,
                 'dit:relatedProgrammes': [
                     *self._get_related_programmes(instance.related_programmes),
                 ],
-                'dit:Teams': [
+                'dit:teams': [
                     *self._get_teams(instance.teams),
                 ],
             },
