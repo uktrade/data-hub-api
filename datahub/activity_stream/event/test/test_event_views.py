@@ -144,3 +144,12 @@ def test_trade_agreements_only_shown_if_they_exist(api_client):
 
     assert response.status_code == status.HTTP_200_OK
     assert 'dit:relatedTradeAgreements' in response.json()['orderedItems'][0]['object']
+
+
+@pytest.mark.django_db
+def test_trade_agreements_do_not_show_if_they_do_not_exist(api_client):
+    EventFactory(has_related_trade_agreements=False)
+    response = _get_response(api_client)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert 'dit:relatedTradeAgreements' not in response.json()['orderedItems'][0]['object']
