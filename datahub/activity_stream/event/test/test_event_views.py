@@ -72,7 +72,7 @@ def test_event_activity(api_client):
                             *[
                                 {
                                     'id': f'dit:DataHubEventProgramme:{programme.pk}',
-                                    'name': programme.name
+                                    'name': programme.name,
                                 }
                                 for programme in event.related_programmes.order_by('pk')
                             ],
