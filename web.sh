@@ -13,5 +13,5 @@ if [ -z "$SKIP_OPENSEARCH_MAPPING_MIGRATIONS" ] && [ "${CF_INSTANCE_INDEX:-0}" =
   ./manage.py migrate_search
 fi
 
-python manage.py collectstatic
+python manage.py collectstatic  --noinput
 python app.py

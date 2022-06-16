@@ -1,4 +1,4 @@
-FROM python:3.10.1
+FROM python:3.10.5
 
 # libyaml-dev is required for watchdog (celery auto-reloader)
 RUN apt-get update && apt-get install -y wget libyaml-dev
