@@ -1,0 +1,3 @@
+- model: metadata.tradeagreement
+  pk: aa39c532-ed75-11ec-8ea0-0242ac120002
+  fields: { disabled_on: null, name: "UK-Lebanon Association Agreement" }
