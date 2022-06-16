@@ -1,3 +1,5 @@
+from django.db.models import Prefetch
+
 from datahub.event.models import Event
 
 
@@ -15,4 +17,10 @@ def get_base_event_queryset():
         'organiser',
         'lead_team',
         'service',
+    ).prefetch_related(
+        Prefetch(
+            'related_programmes',
+            'related_trade_agreements',
+            'teams',
+        ),
     )

@@ -89,3 +89,15 @@ class ActivitySerializer(serializers.Serializer):
             'name': 'dit:dataHub',
             'type': 'Application',
         }
+
+    def _get_trade_agreement(self, trade_agreement):
+        return {
+            'id': f'dit:DataHubTradeAgreement:{trade_agreement.pk}',
+            'name': trade_agreement.name,
+        }
+
+    def _get_trade_agreements(self, trade_agreements):
+        return [
+            self._get_trade_agreement(trade_agreement)
+            for trade_agreement in trade_agreements.order_by('pk')
+        ]

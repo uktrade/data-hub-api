@@ -58,18 +58,53 @@ def test_event_activity(api_client):
                         'dit:service': {'name': event.service.name},
                         'dit:archivedDocumentsUrlPath': event.archived_documents_url_path,
                         'dit:ukRegion': {'name': event.uk_region.name},
+                        'dit:teams': [
+                            *[
+                                {
+                                    'id': f'dit:DataHubTeam:{team.pk}',
+                                    'type': ['Group', 'dit:Team'],
+                                    'name': team.name,
+                                }
+                                for team in event.teams.order_by('pk')
+                            ],
+                        ],
+                        'dit:relatedProgrammes': [
+                            *[
+                                {
+                                    'id': f'dit:DataHubEventProgramme:{programme.pk}',
+                                    'name': programme.name,
+                                }
+                                for programme in event.related_programmes.order_by('pk')
+                            ],
+                        ],
+                        'dit:hasRelatedTradeAgreements': event.has_related_trade_agreements,
+                        'dit:relatedTradeAgreements':
+                        [
+                            *[
+                                {
+                                    'id': f'dit:DataHubTradeAgreement:{trade_agreement.pk}',
+                                    'name': trade_agreement.name,
+                                }
+                                for trade_agreement in
+                                event.related_trade_agreements.order_by('pk')
+                            ],
+                        ],
                     },
                 },
             ],
         }
 
 
-def run_none_type_tests(api_client):
+def _get_response(api_client):
     with freeze_time() as frozen_datetime:
         frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:events'))
+    return response
 
-        assert response.status_code == status.HTTP_200_OK
+
+def run_none_type_tests(api_client):
+    response = _get_response(api_client)
+    assert response.status_code == status.HTTP_200_OK
 
 
 @pytest.mark.django_db
@@ -100,3 +135,21 @@ def test_null_event_location_type(api_client):
 def test_null_event_service(api_client):
     EventFactory(service_id=None)
     run_none_type_tests(api_client)
+
+
+@pytest.mark.django_db
+def test_trade_agreements_only_shown_if_they_exist(api_client):
+    EventFactory(has_related_trade_agreements=True)
+    response = _get_response(api_client)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert 'dit:relatedTradeAgreements' in response.json()['orderedItems'][0]['object']
+
+
+@pytest.mark.django_db
+def test_trade_agreements_do_not_show_if_they_do_not_exist(api_client):
+    EventFactory(has_related_trade_agreements=False)
+    response = _get_response(api_client)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert 'dit:relatedTradeAgreements' not in response.json()['orderedItems'][0]['object']
