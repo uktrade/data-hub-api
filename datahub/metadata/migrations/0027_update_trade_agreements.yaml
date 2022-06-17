@@ -1,0 +1,3 @@
+- model: metadata.tradeagreement
+  pk: 9e2f9e44-ecbf-11ec-8ea0-0242ac120002
+  fields: { disabled_on: null, name: "UK-Jordan Association Agreement" }
