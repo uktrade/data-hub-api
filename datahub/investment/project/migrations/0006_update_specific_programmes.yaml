@@ -1,3 +1,3 @@
 - model: investment.specificprogramme
   pk: e986629a-f07c-11ec-8ea0-0242ac120002
-  fields: { disabled_on: null, name: "Enquiry Response Unit support" }
+  fields: { disabled_on: null, name: "Enquiry Response Unit Support" }
