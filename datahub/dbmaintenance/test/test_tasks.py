@@ -265,7 +265,7 @@ class TestCopyForeignKeyToM2MField:
         advisory_lock_mock = MagicMock()
         advisory_lock_mock.return_value.__enter__.return_value = False
         monkeypatch.setattr('datahub.dbmaintenance.tasks.advisory_lock', advisory_lock_mock)
-        copy_foreign_key_to_m2m_field_mock.apply(args=('label', 'old-field', 'new-field'))
+        copy_foreign_key_to_m2m_field_mock.apply_async(args=('label', 'old-field', 'new-field'))
 
         # The task should not have been scheduled again as the task should've exited instead
         copy_foreign_key_to_m2m_field_mock.apply_async.assert_not_called()
@@ -526,7 +526,7 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
         advisory_lock_mock = MagicMock()
         advisory_lock_mock.return_value.__enter__.return_value = False
         monkeypatch.setattr('datahub.dbmaintenance.tasks.advisory_lock', advisory_lock_mock)
-        copy_export_countries_to_company_export_country_model_mock.apply(
+        copy_export_countries_to_company_export_country_model_mock.apply_async(
             args=('label', 'old-field', 'new-field'),
         )
 
