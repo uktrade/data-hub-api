@@ -62,7 +62,7 @@ def test_sync_synchronously(sync_model_mock):
     app = get_search_apps()[0]
     management.call_command(sync_search.Command(), model=[app.name], foreground=True)
 
-    assert sync_model_mock.apply_async.call_count == 1
+    assert sync_model_mock.apply.call_count == 1
     assert not sync_model_mock.apply_async.called
 
 
