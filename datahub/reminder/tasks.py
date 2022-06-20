@@ -70,11 +70,11 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
             | Q(client_relationship_manager=subscription.adviser)
             | Q(referral_source_adviser=subscription.adviser),
             estimated_land_date=current_date + relativedelta(days=days_left),
-        ).exclude(
-            stage__in=[
-                InvestmentProjectStage.verify_win.value.id,
-                InvestmentProjectStage.won.value.id,
+            status__in=[
+                InvestmentProject.Status.ONGOING,
+                InvestmentProject.Status.DELAYED,
             ],
+            stage_id=InvestmentProjectStage.active.value.id,
         ):
             create_reminder(
                 project=project,
