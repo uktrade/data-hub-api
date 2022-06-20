@@ -1,3 +1,11 @@
+# Data Hub API 40.8.0 (2022-06-20)
+
+
+## Features
+
+- **Investment** Its now possible to view Enquiry Response Unit support in Specific investment programme
+
+
 # Data Hub API 40.7.0 (2022-06-20)
 
 
