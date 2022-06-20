@@ -1,7 +1,7 @@
 from django.db import transaction
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.mixins import ListModelMixin
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -20,18 +20,21 @@ from datahub.reminder.serializers import (
 )
 
 
-class BaseSubscriptionViewset(viewsets.GenericViewSet):
+class BaseSubscriptionViewset(
+    viewsets.GenericViewSet,
+    RetrieveModelMixin,
+    UpdateModelMixin,
+):
     permission_classes = ()
 
-    def retrieve(self, request, pk=None):
+    def get_object(self):
         """
-        Gets subscription settings for current user.
+        Gets subscription settings instance for current user.
 
         If settings have not been created yet, add them.
         """
-        obj, created = self.queryset.get_or_create(adviser=request.user)
-        serializer = self.serializer_class(obj)
-        return Response(serializer.data)
+        obj, created = self.queryset.get_or_create(adviser=self.request.user)
+        return obj
 
 
 class NoRecentInvestmentInteractionSubscriptionViewset(BaseSubscriptionViewset):
