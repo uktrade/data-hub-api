@@ -1,3 +1,24 @@
+# Data Hub API 40.7.0 (2022-06-20)
+
+
+## Features
+
+- **Events** - It is now possible to get a list of events in activity-stream [format.](https://www.w3.org/TR/activitystreams-core/)
+
+      The URL for this is:    `/v3/activity-stream/event`
+- **Interactions** Its now possible to view Free Trade Agreement: Switzerland and UK-Lebanon Association Agreement
+- **Investment** Estimated land date reminders are only generated for active ongoing and active delayed projects
+- **Investment** Reminder subscriptions can be updated with the PATCH method:
+
+  PATCH /reminder/subscription/no-recent-investment-interaction
+  PATCH /reminder/subscription/estimated-land-date
+
+## Internal changes
+
+- **Investment** Notifications for Estimated Land Date are now being sent only for active ongoing and delayed investment projects.
+- Upgrade python version from python:3.10.1 to python 3.10.5
+
+
 # Data Hub API 40.6.0 (2022-06-13)
 
 
