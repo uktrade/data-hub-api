@@ -71,7 +71,6 @@ def sync_company_with_dnb(
 
 
 @shared_task(
-    bind=True,
     acks_late=True,
     priority=9,
     max_retries=3,
@@ -79,7 +78,6 @@ def sync_company_with_dnb(
     queue='long-running',
 )
 def sync_company_with_dnb_rate_limited(
-    self,
     company_id,
     fields_to_update=None,
     update_descriptor=None,
