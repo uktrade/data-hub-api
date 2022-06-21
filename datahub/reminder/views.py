@@ -1,6 +1,7 @@
 from django.db import transaction
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.filters import OrderingFilter
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -49,6 +50,9 @@ class UpcomingEstimatedLandDateSubscriptionViewset(BaseSubscriptionViewset):
 
 class BaseReminderViewset(viewsets.GenericViewSet, ListModelMixin):
     permission_classes = ()
+    filter_backends = (OrderingFilter,)
+    ordering_fields = ('created_on',)
+    ordering = ('-created_on',)
 
     def get_queryset(self):
         return self.model_class.objects.filter(adviser=self.request.user)
