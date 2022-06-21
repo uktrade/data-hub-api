@@ -1,5 +1,4 @@
 from logging import getLogger
-from urllib.parse import urlparse
 
 from django.conf import settings
 from redis import Redis
@@ -38,10 +37,7 @@ class DataHubQueue:
     """
 
     def __init__(self, strategy='fork'):
-        url = urlparse(settings.REDIS_BASE_URL)
-        self._connection = Redis(
-            host=url.hostname, port=url.port, db=0, password=url.password,
-        )
+        self._connection = Redis.from_url(settings.REDIS_BASE_URL)
         self._queues = []
         self._worker_strategy = {
             'fork': Fork(self._connection),
