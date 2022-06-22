@@ -95,14 +95,11 @@ def sync_company_with_dnb_rate_limited(
         return
 
     try:
-        sync_company_with_dnb.apply_async(
-            kwargs={
-                'company_id': company_id,
-                'fields_to_update': fields_to_update,
-                'update_descriptor': update_descriptor,
-                'retry_failures': retry_failures,
-            },
-            throw=True,
+        sync_company_with_dnb(
+            company_id=company_id,
+            fields_to_update=fields_to_update,
+            update_descriptor=update_descriptor,
+            retry_failures=retry_failures,
         )
     except Exception:
         logger.warning(f'{message} Failed')
