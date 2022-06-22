@@ -2,7 +2,12 @@ from django.db import transaction
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import OrderingFilter
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.mixins import (
+    DestroyModelMixin,
+    ListModelMixin,
+    RetrieveModelMixin,
+    UpdateModelMixin,
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -48,7 +53,7 @@ class UpcomingEstimatedLandDateSubscriptionViewset(BaseSubscriptionViewset):
     queryset = UpcomingEstimatedLandDateSubscription.objects.all()
 
 
-class BaseReminderViewset(viewsets.GenericViewSet, ListModelMixin):
+class BaseReminderViewset(viewsets.GenericViewSet, ListModelMixin, DestroyModelMixin):
     permission_classes = ()
     filter_backends = (OrderingFilter,)
     ordering_fields = ('created_on',)
