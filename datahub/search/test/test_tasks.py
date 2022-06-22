@@ -26,7 +26,7 @@ def test_sync_model(monkeypatch):
     monkeypatch.setattr('datahub.search.tasks.sync_app', sync_app_mock)
 
     search_app = next(iter(get_search_apps()))
-    sync_model.apply(args=(search_app.name,))
+    sync_model.apply_async(args=(search_app.name,))
 
     get_search_app_mock.assert_called_once_with(search_app.name)
     sync_app_mock.assert_called_once_with(get_search_app_mock.return_value)
@@ -37,7 +37,7 @@ def test_sync_all_models(monkeypatch):
     sync_model_mock = Mock()
     monkeypatch.setattr('datahub.search.tasks.sync_model', sync_model_mock)
 
-    sync_all_models.apply()
+    sync_all_models.apply_async()
     tasks_created = {call[1]['args'][0] for call in sync_model_mock.apply_async.call_args_list}
     assert tasks_created == {app.name for app in get_search_apps()}
 
@@ -46,7 +46,7 @@ def test_sync_all_models(monkeypatch):
 def test_sync_object_task_syncs(opensearch):
     """Test that the object task syncs an object to OpenSearch."""
     obj = SimpleModel.objects.create()
-    sync_object_task.apply(args=(SimpleModelSearchApp.name, str(obj.pk)))
+    sync_object_task.apply_async(args=(SimpleModelSearchApp.name, str(obj.pk)))
     opensearch.indices.refresh()
 
     assert doc_exists(opensearch, SimpleModelSearchApp, obj.pk)
@@ -57,7 +57,7 @@ def test_sync_object_task_retries_on_error(monkeypatch, opensearch):
     sync_object_mock = Mock(side_effect=[Exception, None])
     monkeypatch.setattr('datahub.search.sync_object.sync_object', sync_object_mock)
 
-    sync_object_task.apply(args=(SimpleModelSearchApp.name, str(uuid4())))
+    sync_object_task.apply_async(args=(SimpleModelSearchApp.name, str(uuid4())))
 
     assert sync_object_mock.call_count == 2
 
@@ -80,7 +80,7 @@ def test_sync_related_objects_task_syncs(related_obj_filter, monkeypatch):
     relation_2 = RelatedModel.objects.create(simpleton=simpleton)
     RelatedModel.objects.create()  # Unrelated object, should not get synced
 
-    sync_related_objects_task.apply(
+    sync_related_objects_task.apply_async(
         args=(
             SimpleModel._meta.label,
             str(simpleton.pk),
@@ -107,7 +107,7 @@ def test_complete_model_migration(monkeypatch):
     get_search_app_mock = Mock(return_value=mock_app)
     monkeypatch.setattr('datahub.search.tasks.get_search_app', get_search_app_mock)
 
-    complete_model_migration.apply(args=('test-app', 'target-hash'))
+    complete_model_migration.apply_async(args=('test-app', 'target-hash'))
     resync_after_migrate_mock.assert_called_once_with(mock_app)
 
 
@@ -131,7 +131,7 @@ def test_complete_model_migration_aborts_when_already_in_progress(monkeypatch):
     advisory_lock_mock = MagicMock()
     advisory_lock_mock.return_value.__enter__.return_value = False
     monkeypatch.setattr('datahub.search.tasks.advisory_lock', advisory_lock_mock)
-    complete_model_migration.apply(args=('test-app', 'target-hash'))
+    complete_model_migration.apply_async(args=('test-app', 'target-hash'))
 
     # resync_after_migrate_mock should not have been called as the task should've exited instead
     resync_after_migrate_mock.assert_not_called()
@@ -161,7 +161,7 @@ def test_complete_model_migration_with_mapping_hash_mismatch(monkeypatch):
     retry_mock = Mock(side_effect=MockRetryError())
     monkeypatch.setattr(complete_model_migration, 'retry', retry_mock)
 
-    res = complete_model_migration.apply(args=('test-app', 'another-hash'))
+    res = complete_model_migration.apply_async(args=('test-app', 'another-hash'))
 
     with pytest.raises(MockRetryError):
         res.get()
