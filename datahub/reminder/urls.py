@@ -34,11 +34,25 @@ urlpatterns = [
         name='no-recent-investment-interaction-reminder',
     ),
     path(
+        'reminder/no-recent-investment-interaction/<uuid:pk>',
+        NoRecentInvestmentInteractionReminderViewset.as_view({
+            'delete': 'destroy',
+        }),
+        name='no-recent-investment-interaction-reminder-detail',
+    ),
+    path(
         'reminder/estimated-land-date',
         UpcomingEstimatedLandDateReminderViewset.as_view({
             'get': 'list',
         }),
         name='estimated-land-date-reminder',
+    ),
+    path(
+        'reminder/estimated-land-date/<uuid:pk>',
+        UpcomingEstimatedLandDateReminderViewset.as_view({
+            'delete': 'destroy',
+        }),
+        name='estimated-land-date-reminder-detail',
     ),
     path(
         'reminder/summary',
