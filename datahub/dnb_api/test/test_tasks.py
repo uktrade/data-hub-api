@@ -364,7 +364,9 @@ class TestGetCompanyUpdates:
             'datahub.dnb_api.tasks.update.update_company_from_dnb_data',
             mock_update_company,
         )
-        task_result = get_company_updates.apply(kwargs={'fields_to_update': fields_to_update})
+        task_result = get_company_updates.apply_async(
+            kwargs={'fields_to_update': fields_to_update},
+        )
 
         assert mock_get_company_update_page.call_count == 2
         mock_get_company_update_page.assert_any_call(
@@ -480,7 +482,7 @@ class TestGetCompanyUpdates:
             'datahub.dnb_api.tasks.update.update_company_from_dnb_data',
             mock_update_company,
         )
-        task_result = get_company_updates.apply()
+        task_result = get_company_updates.apply_async()
 
         assert mock_update_company.apply_async.call_count == 2
         expected_kwargs = {
@@ -564,7 +566,7 @@ class TestGetCompanyUpdates:
             'datahub.dnb_api.tasks.update.get_company_update_page',
             mock_get_company_update_page,
         )
-        task_result = get_company_updates.apply(kwargs={'fields_to_update': ['name']})
+        task_result = get_company_updates.apply_async(kwargs={'fields_to_update': ['name']})
 
         company.refresh_from_db()
         dnb_company = dnb_company_updates_response_uk['results'][0]
@@ -1084,7 +1086,7 @@ def test_sync_outdated_companies_sync_task_failure_logs_error(caplog, monkeypatc
     )
     mocked_sync_company_with_dnb = mock.Mock(side_effect=Exception())
     monkeypatch.setattr(
-        'datahub.dnb_api.tasks.sync_company_with_dnb.apply',
+        'datahub.dnb_api.tasks.sync_company_with_dnb.apply_async',
         mocked_sync_company_with_dnb,
     )
 

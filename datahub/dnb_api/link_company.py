@@ -30,13 +30,10 @@ def link_company_with_dnb(
     company.duns_number = duns_number
     company.modified_by = modified_by
     company.save()
-    sync_company_with_dnb.apply(
-        args=(company.id,),
-        kwargs={
-            'update_descriptor': update_descriptor,
-            'retry_failures': False,
-        },
-        throw=True,
+    sync_company_with_dnb(
+        company.id,
+        update_descriptor=update_descriptor,
+        retry_failures=False,
     )
     company.refresh_from_db()
     return company
