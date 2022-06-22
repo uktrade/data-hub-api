@@ -6,6 +6,10 @@ from rest_framework.test import APIClient
 from datahub.core.test_utils import APITestMixin
 from datahub.investment.project.proposition.models import PropositionStatus
 from datahub.investment.project.proposition.test.factories import PropositionFactory
+from datahub.reminder.models import (
+    NoRecentInvestmentInteractionReminder,
+    UpcomingEstimatedLandDateReminder,
+)
 from datahub.reminder.test.factories import (
     NoRecentInvestmentInteractionReminderFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
@@ -155,6 +159,7 @@ class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin):
     """
 
     url_name = 'api-v4:reminder:no-recent-investment-interaction-reminder'
+    detail_url_name = 'api-v4:reminder:no-recent-investment-interaction-reminder-detail'
 
     def create_reminders(self):
         """Creates some mock reminders"""
@@ -252,6 +257,20 @@ class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin):
         assert results[0]['id'] == str(reminder_2.id)
         assert results[1]['id'] == str(reminder_1.id)
 
+    def test_delete(self):
+        """Deleting should remove the model instance"""
+        reminder_count = 3
+        reminder = NoRecentInvestmentInteractionReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )[0]
+        url = reverse(self.detail_url_name, kwargs={'pk': str(reminder.id)})
+        response = self.api_client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert NoRecentInvestmentInteractionReminder.objects.filter(
+            adviser=self.user,
+        ).count() == reminder_count - 1
+
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin):
@@ -260,6 +279,7 @@ class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin):
     """
 
     url_name = 'api-v4:reminder:estimated-land-date-reminder'
+    detail_url_name = 'api-v4:reminder:estimated-land-date-reminder-detail'
 
     def create_reminders(self):
         """Creates some mock reminders"""
@@ -356,6 +376,20 @@ class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin):
         results = data.get('results', [])
         assert results[0]['id'] == str(reminder_2.id)
         assert results[1]['id'] == str(reminder_1.id)
+
+    def test_delete(self):
+        """Deleting should remove the model instance"""
+        reminder_count = 3
+        reminder = UpcomingEstimatedLandDateReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )[0]
+        url = reverse(self.detail_url_name, kwargs={'pk': str(reminder.id)})
+        response = self.api_client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert UpcomingEstimatedLandDateReminder.objects.filter(
+            adviser=self.user,
+        ).count() == reminder_count - 1
 
 
 class TestGetReminderSummaryView(APITestMixin):
