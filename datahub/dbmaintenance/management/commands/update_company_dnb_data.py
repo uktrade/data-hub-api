@@ -96,7 +96,7 @@ class Command(CSVBaseCommand):
 
         self._limit_call_rate()
 
-        sync_company_with_dnb.apply(
+        sync_company_with_dnb.apply_async(
             args=(pk, fields, self.update_descriptor),
             throw=True,
         )

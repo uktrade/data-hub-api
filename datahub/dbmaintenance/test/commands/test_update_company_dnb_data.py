@@ -48,12 +48,12 @@ def mock_time(monkeypatch):
 @pytest.fixture
 def mock_sync_company_with_dnb(monkeypatch):
     """
-    Mock sync_company_with_dnb.apply().
+    Mock sync_company_with_dnb.apply_async().
     """
     mocked_sync_company_with_dnb = mock.Mock()
     monkeypatch.setattr(
         'datahub.dbmaintenance.management.commands.update_company_dnb_data.'
-        'sync_company_with_dnb.apply',
+        'sync_company_with_dnb.apply_async',
         mocked_sync_company_with_dnb,
     )
     return mocked_sync_company_with_dnb

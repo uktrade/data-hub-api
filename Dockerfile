@@ -13,8 +13,8 @@ EXPOSE 8000
 RUN mkdir -p /app
 WORKDIR /app
 
-ADD requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+ADD requirements-dev.txt .
+RUN pip install --no-cache-dir -r requirements-dev.txt
 
 ADD . /app/
 
