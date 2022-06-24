@@ -1,3 +1,26 @@
+# Data Hub API 40.9.0 (2022-06-24)
+
+
+## Features
+
+- **Reminders** Reminders can be deleted with the API
+
+  DELETE /api/v4/reminder/estimated-land-date/<uuid>
+  DELETE /api/v4/reminder/no-recent-investment-interaction/<uuid>
+- **Reminders** Reminders can now be sorted by created_on with the sort by parameter:
+
+  ?sortby=created_on
+  ?sortby=-created_on
+
+## Bug fixes
+
+- Several potential celery tasks can now be run asyncronously without blocking
+
+## Internal changes
+
+- It's now possble to deploy only production pips to a production environment, reducing the size of release.
+
+
 # Data Hub API 40.8.0 (2022-06-20)
 
 
