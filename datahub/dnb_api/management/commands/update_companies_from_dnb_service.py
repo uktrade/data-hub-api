@@ -3,7 +3,7 @@ from logging import getLogger
 from django.core.management.base import BaseCommand
 
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_SERIALIZER_FIELDS
-from datahub.dnb_api.tasks import get_company_updates
+from datahub.dnb_api.tasks.update import get_company_updates
 
 logger = getLogger(__name__)
 
@@ -43,9 +43,7 @@ class Command(BaseCommand):
         """
         Run the celery task.
         """
-        get_company_updates.apply(
-            kwargs={
-                'last_updated_after': options['last_updated_after'],
-                'fields_to_update': options['fields'],
-            },
+        get_company_updates(
+            last_updated_after=options['last_updated_after'],
+            fields_to_update=options['fields'],
         )

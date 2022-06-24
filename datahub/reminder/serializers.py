@@ -44,7 +44,7 @@ class UpcomingEstimatedLandDateReminderSerializer(serializers.ModelSerializer):
 
 
 class NoRecentInvestmentInteractionReminderSerializer(serializers.ModelSerializer):
-    """Serializer for Upcoming Estimated Land Date Reminder."""
+    """Serializer for No Recent Investment Interaction Reminder."""
 
     project = NestedInvestmentProjectSerializer(many=False, read_only=True)
 
