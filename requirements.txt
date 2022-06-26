@@ -32,7 +32,11 @@ certifi==2021.10.8
     #   opensearch-py
     #   requests
     #   sentry-sdk
-chardet==4.0.0
+cffi==1.15.0
+    # via cryptography
+cfgv==3.3.1
+    # via pre-commit
+chardet==5.0.0
     # via -r requirements.in
 charset-normalizer==2.0.12
     # via
