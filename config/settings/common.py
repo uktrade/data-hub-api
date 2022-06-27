@@ -477,12 +477,6 @@ if REDIS_BASE_URL:
             'schedule': 30.0,  # Every 30 seconds
         }
 
-    if env.bool('ENABLE_INVESTMENT_NOTIFICATION', False):
-        CELERY_BEAT_SCHEDULE['send_estimated_land_date_task'] = {
-            'task': 'datahub.investment.project.notification.tasks.send_estimated_land_date_task',
-            'schedule': crontab(minute=0, hour=8, day_of_month=1),
-        }
-
     if env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS', False):
         CELERY_BEAT_SCHEDULE['generate_estimated_land_date_reminders'] = {
             'task': 'datahub.reminder.tasks.generate_estimated_land_date_reminders',

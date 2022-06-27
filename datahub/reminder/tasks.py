@@ -69,8 +69,8 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
         )
         return
 
-    fd = now().date().replace(day=1)  # first day of the month
-    eld_filter = reminder_days_to_date_filter(fd, subscription.reminder_days)
+    first_day_of_the_month = now().date().replace(day=1)
+    eld_filter = reminder_days_to_date_filter(first_day_of_the_month, subscription.reminder_days)
 
     projects = InvestmentProject.objects.filter(
         Q(project_manager=subscription.adviser)
@@ -100,7 +100,7 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
             project=project,
             adviser=subscription.adviser,
             days_left=days_left,
-            # don't sent emails for each project is summary notification threshold has been reached
+            # don't send emails for each project if summary notification threshold has been reached
             send_email=(subscription.email_reminders_enabled and not summary_threshold),
             current_date=current_date,
         )
