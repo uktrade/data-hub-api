@@ -51,7 +51,7 @@ def test_dnb_change_request_serializer(db):
     change_request = ChangeRequestSerializer(data={'turnover_gbp': 200})
     change_request.is_valid()
 
-    assert dict(change_request.validated_data) == {'annual_sales': 275.8986854779541}
+    assert dict(change_request.validated_data) == {'annual_sales': 245.94621911242905}
 
 
 def test_dnb_company_serializer_partial_save_serializer_not_partial(db):
