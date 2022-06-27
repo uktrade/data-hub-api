@@ -2,7 +2,16 @@
 
 from django.db import migrations, models
 
+from datahub.core.migration_utils import load_yaml_data_in_migration
+from pathlib import PurePath
 
+
+def load_exchange_rate(apps, schema_editor):
+    load_yaml_data_in_migration(
+        apps,
+        PurePath(__file__).parent / '0030_update_exchangerate.yaml'
+    )
+    
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -14,4 +23,5 @@ class Migration(migrations.Migration):
             model_name='exchangerate',
             constraint=models.UniqueConstraint(fields=('from_currency_code', 'to_currency_code'), name='unique_from_currency_code_to_currency_code'),
         ),
+        migrations.RunPython(load_exchange_rate, migrations.RunPython.noop),
     ]
