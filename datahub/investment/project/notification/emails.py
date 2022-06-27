@@ -49,12 +49,8 @@ def send_estimated_land_date_summary(projects, adviser, current_date):
 
 @lru_cache()
 def get_inner_template_content(notification_type):
-    inner_template = NotificationInnerTemplate.objects.filter(
-        notification_type=notification_type,
-    ).first()
-    if inner_template:
-        return inner_template.content
-    return None
+    inner_template = NotificationInnerTemplate.objects.get(notification_type=notification_type)
+    return inner_template.content
 
 
 def get_project_item(project):
@@ -77,10 +73,9 @@ def get_projects_summary_list(projects):
     """Gets formatted projects summary list."""
     notifications = []
 
-    reminder = 1
-    for project in projects:
+    for index, project in enumerate(projects):
         data = {
-            'number': reminder,
+            'number': index + 1,
             **get_project_item(project),
         }
 
@@ -91,5 +86,4 @@ def get_projects_summary_list(projects):
             notification = notification.replace(f'(({key}))', str(value))
         notifications.append(notification)
 
-        reminder += 1
     return notifications
