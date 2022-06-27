@@ -120,9 +120,18 @@ class TradeAgreement(BaseConstantModel):
 class ExchangeRate(BaseModel):
     """Exchange rates"""
 
+    id = models.UUIDField(primary_key=True, default=uuid4)
     from_currency_code = models.CharField(max_length=3)
     to_currency_code = models.CharField(max_length=3)
     exchange_rate = models.FloatField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['from_currency_code', 'to_currency_code'],
+                name='unique_from_currency_code_to_currency_code',
+            ),
+        ]
 
 
 class AdministrativeArea(BaseConstantModel):
