@@ -1,3 +1,11 @@
+# Data Hub API 40.10.0 (2022-06-28)
+
+
+## Internal changes
+
+- Updated the exchange rate for USD to GBP at 1.00 US Dollar = 0.81272151 British Pounds
+
+
 # Data Hub API 40.9.0 (2022-06-24)
 
 
