@@ -45,8 +45,8 @@ opensearch-dsl==2.0.1
 elastic-apm==6.10.1
 
 # Celery
-git+https://github.com/uktrade/celery@v5.0.5p2#egg=celery[redis]
-# celery[redis]==5.0.5
+# git+https://github.com/uktrade/celery@v5.0.5p2#egg=celery[redis]
+celery[redis]==5.2.7
 
 # Testing and dev
 django-debug-toolbar==3.5.0

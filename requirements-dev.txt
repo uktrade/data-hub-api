@@ -10,6 +10,8 @@ aiosignal==1.2.0
     # via aiohttp
 amqp==5.0.9
     # via kombu
+appnope==0.1.3
+    # via ipython
 asgiref==3.5.0
     # via django
 astroid==2.11.6
@@ -35,7 +37,8 @@ botocore==1.27.22
     #   s3transfer
 build==0.8.0
     # via pip-tools
-celery @ git+https://github.com/uktrade/celery@v5.0.5p2
+# celery @ git+https://github.com/uktrade/celery@v5.0.5p2
+celery[redis]==5.2.7
     # via -r requirements.in
 certifi==2021.10.8
     # via
