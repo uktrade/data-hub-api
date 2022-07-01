@@ -477,16 +477,10 @@ if REDIS_BASE_URL:
             'schedule': 30.0,  # Every 30 seconds
         }
 
-    if env.bool('ENABLE_INVESTMENT_NOTIFICATION', False):
-        CELERY_BEAT_SCHEDULE['send_estimated_land_date_task'] = {
-            'task': 'datahub.investment.project.notification.tasks.send_estimated_land_date_task',
-            'schedule': crontab(minute=0, hour=8),
-        }
-
     if env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS', False):
         CELERY_BEAT_SCHEDULE['generate_estimated_land_date_reminders'] = {
             'task': 'datahub.reminder.tasks.generate_estimated_land_date_reminders',
-            'schedule': crontab(minute=30, hour=8),
+            'schedule': crontab(minute=30, hour=8, day_of_month=1),
         }
 
     CELERY_WORKER_LOG_FORMAT = (
@@ -521,6 +515,8 @@ DATAHUB_FRONTEND_URL_PREFIXES = {
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
 }
 
+DATAHUB_FRONTEND_REMINDER_SETTINGS_URL = f'{DATAHUB_FRONTEND_BASE_URL}/reminders/settings'
+
 # OMIS
 
 # given to clients and generally available
@@ -542,6 +538,14 @@ INVESTMENT_NOTIFICATION_API_KEY = env('INVESTMENT_NOTIFICATION_API_KEY', default
 INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID = env(
     'INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID',
     default='',
+)
+INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_SUMMARY_TEMPLATE_ID = env(
+    'INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_SUMMARY_TEMPLATE_ID',
+    default='',
+)
+NOTIFICATION_SUMMARY_THRESHOLD = env.int(
+    'NOTIFICATION_SUMMARY_THRESHOLD',
+    default=5,
 )
 
 # GOV.UK PAY

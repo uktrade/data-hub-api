@@ -1,7 +1,10 @@
 from django.contrib import admin
 
 from datahub.core.admin import BaseModelAdminMixin
-from datahub.investment.project.notification.models import InvestmentNotificationSubscription
+from datahub.investment.project.notification.models import (
+    InvestmentNotificationSubscription,
+    NotificationInnerTemplate,
+)
 
 
 @admin.register(InvestmentNotificationSubscription)
@@ -12,3 +15,10 @@ class InvestmentNotificationSubscriptionAdmin(BaseModelAdminMixin, admin.ModelAd
         'adviser__first_name', 'adviser__last_name', 'investment_project__name',
     )
     list_display = ('investment_project', 'adviser', 'estimated_land_date')
+
+
+@admin.register(NotificationInnerTemplate)
+class NotificationInnerTemplateAdmin(BaseModelAdminMixin, admin.ModelAdmin):
+    """Notification inner template Admin."""
+
+    list_display = ('notification_type', )

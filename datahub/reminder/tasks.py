@@ -1,20 +1,25 @@
 from logging import getLogger
 
 from celery import shared_task
-from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.db.models import Q
 from django.utils.timezone import now
 from django_pglocks import advisory_lock
 
 from datahub.core.constants import InvestmentProjectStage
 from datahub.investment.project.models import InvestmentProject
-from datahub.investment.project.notification.emails import send_estimated_land_date_reminder
+from datahub.investment.project.notification.emails import (
+    send_estimated_land_date_reminder,
+    send_estimated_land_date_summary,
+)
 from datahub.reminder import ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
 )
+from datahub.reminder.utils import reminder_days_to_date_filter
 
+NOTIFICATION_SUMMARY_THRESHOLD = settings.NOTIFICATION_SUMMARY_THRESHOLD
 
 logger = getLogger(__name__)
 
@@ -63,26 +68,42 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
             'is not active for this user, exiting.',
         )
         return
-    for days_left in subscription.reminder_days:
-        for project in InvestmentProject.objects.filter(
-            Q(project_manager=subscription.adviser)
-            | Q(project_assurance_adviser=subscription.adviser)
-            | Q(client_relationship_manager=subscription.adviser)
-            | Q(referral_source_adviser=subscription.adviser),
-            estimated_land_date=current_date + relativedelta(days=days_left),
-            status__in=[
-                InvestmentProject.Status.ONGOING,
-                InvestmentProject.Status.DELAYED,
-            ],
-            stage_id=InvestmentProjectStage.active.value.id,
-        ):
-            create_reminder(
-                project=project,
-                adviser=subscription.adviser,
-                days_left=days_left,
-                send_email=subscription.email_reminders_enabled,
-                current_date=current_date,
-            )
+
+    first_day_of_the_month = now().date().replace(day=1)
+    eld_filter = reminder_days_to_date_filter(first_day_of_the_month, subscription.reminder_days)
+
+    projects = InvestmentProject.objects.filter(
+        Q(project_manager=subscription.adviser)
+        | Q(project_assurance_adviser=subscription.adviser)
+        | Q(client_relationship_manager=subscription.adviser)
+        | Q(referral_source_adviser=subscription.adviser),
+        estimated_land_date__in=eld_filter,
+        status__in=[
+            InvestmentProject.Status.ONGOING,
+            InvestmentProject.Status.DELAYED,
+        ],
+        stage_id=InvestmentProjectStage.active.value.id,
+    ).order_by('pk')
+
+    summary_threshold = projects.count() > NOTIFICATION_SUMMARY_THRESHOLD
+    if summary_threshold and subscription.email_reminders_enabled:
+        send_estimated_land_date_summary(
+            projects=list(projects),
+            adviser=subscription.adviser,
+            current_date=current_date,
+        )
+
+    for project in projects:
+        day_diff = (project.estimated_land_date - current_date).days
+        days_left = 30 if day_diff < 32 else 60
+        create_reminder(
+            project=project,
+            adviser=subscription.adviser,
+            days_left=days_left,
+            # don't send emails for each project if summary notification threshold has been reached
+            send_email=(subscription.email_reminders_enabled and not summary_threshold),
+            current_date=current_date,
+        )
 
 
 def create_reminder(project, adviser, days_left, send_email, current_date):
