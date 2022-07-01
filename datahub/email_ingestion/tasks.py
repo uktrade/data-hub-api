@@ -1,7 +1,7 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from django_pglocks import advisory_lock
 
+from datahub.core.cache import skip_if_running
 from datahub.email_ingestion import emails, mailbox_handler
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.interaction import (
@@ -13,6 +13,7 @@ logger = get_task_logger(__name__)
 
 
 @shared_task(acks_late=True, priority=9)
+@skip_if_running(busy_message='Emails are already being ingested by another worker')
 def ingest_emails():
     """
     Ingest and process new emails for all mailboxes in the application - i.e.
@@ -26,19 +27,12 @@ def ingest_emails():
             'exiting.',
         )
         return
-    # Acquire a processing lock for the duration of the current DB session -
-    # this will ensure that multiple ingestion workers do not run at the same
-    # time and therefore prevent the chance of messages being processed more
-    # than once
-    with advisory_lock('ingest_emails', wait=False) as acquired:
-        if not acquired:
-            logger.info('Emails are already being ingested by another worker')
-            return
-        for mailbox in mailbox_handler.get_all_mailboxes():
-            mailbox.process_new_mail()
+    for mailbox in mailbox_handler.get_all_mailboxes():
+        mailbox.process_new_mail()
 
 
 @shared_task(acks_late=True, priority=9)
+@skip_if_running(busy_message='Emails are already being processed by another worker')
 def process_mailbox_emails():
     """
     Process new emails for S3 mailboxes.
@@ -50,13 +44,5 @@ def process_mailbox_emails():
             f'Feature flag "{MAILBOX_INGESTION_FEATURE_FLAG_NAME}" is not active, '
             'exiting.',
         )
-        return
-    # Acquire a processing lock for the duration of the current DB session -
-    # this will ensure that multiple ingestion workers do not run at the same
-    # time and therefore prevent the chance of messages being processed more
-    # than once
-    with advisory_lock('process_mailbox_emails', wait=False) as acquired:
-        if not acquired:
-            logger.info('Emails are already being processed by another worker')
-            return
+        logger.info('Processing ingestion emails')
         emails.process_ingestion_emails()

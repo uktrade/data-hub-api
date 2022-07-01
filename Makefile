@@ -42,7 +42,7 @@ run-shell:
 	docker-compose run api bash
 
 run-test-reuse-db:
-	docker-compose run api pytest --reuse-db -vv datahub/core/test/test_queue.py
+	docker-compose run api pytest --reuse-db -vv datahub/core/test/test_cache.py datahub/email_ingestion/test/test_tasks.py
 
 reindex-opensearch:
 	docker-compose run api python manage.py sync_search

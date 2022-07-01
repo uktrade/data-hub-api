@@ -50,26 +50,6 @@ class TestIngestEmails:
         assert process_new_mail_patch.call_count == 2
 
     @override_settings(MAILBOXES=MAILBOXES_SETTING)
-    def test_ingest_emails_lock_not_acquired(self, monkeypatch):
-        """
-        Test that our mailboxes are not processed when the lock cannot be acquired successfully.
-        """
-        process_new_mail_patch = mock.Mock()
-        # ensure that the process_new_mail method is a mock so we can interrogate later
-        monkeypatch.setattr(
-            'datahub.email_ingestion.mailbox.Mailbox.process_new_mail',
-            process_new_mail_patch,
-        )
-        # Have to mock rather than acquire the lock as locks are per connection (if the lock is
-        # already held by the current connection, the current connection can still re-acquire it).
-        advisory_lock_mock = mock.MagicMock()
-        advisory_lock_mock.return_value.__enter__.return_value = False
-        monkeypatch.setattr('datahub.email_ingestion.tasks.advisory_lock', advisory_lock_mock)
-
-        ingest_emails()
-        assert process_new_mail_patch.called is False
-
-    @override_settings(MAILBOXES=MAILBOXES_SETTING)
     def test_ingest_feature_flag_inactive(self, monkeypatch):
         """
         Test that our mailboxes are not processed when the feature flag is not active.
