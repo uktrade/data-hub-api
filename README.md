@@ -441,6 +441,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `INVESTMENT_NOTIFICATION_ADMIN_EMAIL` | Yes | |
 | `INVESTMENT_NOTIFICATION_API_KEY` | Yes | |
 | `INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID` | Yes | An ID of Notify Template for Estimated Land Date notifications |
+| `INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_SUMMARY_TEMPLATE_ID` | Yes | An ID of Notify Template for Estimated Land Date summary notifications |
 | `MAILBOX_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for mailbox. |
 | `MAILBOX_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for mailbox. |
 | `MAILBOX_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for mailbox. |
@@ -450,6 +451,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `MAILBOX_MEETINGS_IMAP_DOMAIN` | No | IMAP domain for the inbox for ingesting meeting invites via IMAP |
 | `MARKET_ACCESS_ACCESS_KEY_ID` | No | A non-secret access key ID used by the Market Access service to access Hawk-authenticated public company endpoints. |
 | `MARKET_ACCESS_SECRET_ACCESS_KEY` | If `MARKET_ACCESS_ACCESS_KEY_ID` is set | A secret key used by the Market Access service to access Hawk-authenticated public company endpoints. |
+| `NOTIFICATION_SUMMARY_THRESHOLD` | No | Number of notification items that trigger sending a summary email. (default=5) |
 | `OMIS_PUBLIC_ACCESS_KEY_ID` | No | A non-secret access key ID, corresponding to `OMIS_PUBLIC_SECRET_ACCESS_KEY`. The holder of the secret key can access the OMIS public endpoints by Hawk authentication. |
 | `OMIS_NOTIFICATION_ADMIN_EMAIL` | Yes | |
 | `OMIS_NOTIFICATION_API_KEY` | Yes | |
