@@ -118,7 +118,7 @@ djangorestframework==3.13.1
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
-elastic-apm==6.10.0
+elastic-apm==6.10.1
     # via -r requirements.in
 execnet==1.9.0
     # via pytest-xdist
