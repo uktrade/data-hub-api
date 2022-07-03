@@ -18,9 +18,9 @@ attrs==21.4.0
     # via aiohttp
 billiard==3.6.4.0
     # via celery
-boto3==1.24.12
+boto3==1.24.22
     # via -r requirements.in
-botocore==1.27.12
+botocore==1.27.22
     # via
     #   boto3
     #   s3transfer
@@ -32,10 +32,6 @@ certifi==2021.10.8
     #   opensearch-py
     #   requests
     #   sentry-sdk
-cffi==1.15.0
-    # via cryptography
-cfgv==3.3.1
-    # via pre-commit
 chardet==5.0.0
     # via -r requirements.in
 charset-normalizer==2.0.12
