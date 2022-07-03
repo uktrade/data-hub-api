@@ -33,6 +33,8 @@ botocore==1.27.17
     # via
     #   boto3
     #   s3transfer
+build==0.8.0
+    # via pip-tools
 celery @ git+https://github.com/uktrade/celery@v5.0.5p2
     # via -r requirements.in
 certifi==2021.10.8
@@ -227,19 +229,20 @@ opensearch-py==2.0.0
     #   opensearch-dsl
 packaging==21.3
     # via
+    #   build
     #   pytest
     #   redis
 parso==0.8.3
     # via jedi
 pep517==0.12.0
-    # via pip-tools
+    # via build
 pep8-naming==0.13.0
     # via -r requirements-dev.in
 pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==6.6.2
+pip-tools==6.8.0
     # via -r requirements-dev.in
 piprot==0.9.11
     # via -r requirements-dev.in
@@ -390,6 +393,7 @@ toml==0.10.2
     # via pre-commit
 tomli==2.0.1
     # via
+    #   build
     #   coverage
     #   pep517
     #   pylint
