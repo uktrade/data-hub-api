@@ -1,3 +1,12 @@
+# Data Hub API 40.11.0 (2022-07-05)
+
+
+## Features
+
+- **Reminders** Estimated land date reminders are now being sent on the first day of the month.
+  If number of reminders reaches a threshold and a user has enabled email reminders, then a summary email will be sent instead of individual emails.
+
+
 # Data Hub API 40.10.0 (2022-06-28)
 
 
