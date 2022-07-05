@@ -45,6 +45,7 @@ def test_event_activity(api_client):
                         'startTime': format_date_or_datetime(event.start_date),
                         'endTime': format_date_or_datetime(event.end_date),
                         'url': event.get_absolute_url(),
+                        'updated': format_date_or_datetime(event.modified_on),
                         'dit:locationType': {'name': event.location_type.name},
                         'dit:address_1': event.address_1,
                         'dit:address_2': event.address_2,
