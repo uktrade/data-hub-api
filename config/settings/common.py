@@ -469,12 +469,12 @@ if REDIS_BASE_URL:
     if env.bool('ENABLE_EMAIL_INGESTION', False):
         CELERY_BEAT_SCHEDULE['email_ingestion'] = {
             'task': 'datahub.email_ingestion.tasks.ingest_emails',
-            'schedule': 30.0,  # Every 30 seconds
+            'schedule': crontab(minute=10),
         }
     if env.bool('ENABLE_MAILBOX_PROCESSING', False):
         CELERY_BEAT_SCHEDULE['process_mailbox_emails'] = {
             'task': 'datahub.email_ingestion.tasks.process_mailbox_emails',
-            'schedule': 30.0,  # Every 30 seconds
+            'schedule':  crontab(minute=10),
         }
 
     if env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS', False):
