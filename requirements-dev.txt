@@ -27,12 +27,14 @@ backcall==0.2.0
     # via ipython
 billiard==3.6.4.0
     # via celery
-boto3==1.24.12
+boto3==1.24.22
     # via -r requirements.in
-botocore==1.27.17
+botocore==1.27.22
     # via
     #   boto3
     #   s3transfer
+build==0.8.0
+    # via pip-tools
 celery @ git+https://github.com/uktrade/celery@v5.0.5p2
     # via -r requirements.in
 certifi==2021.10.8
@@ -118,7 +120,7 @@ djangorestframework==3.13.1
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
-elastic-apm==6.10.0
+elastic-apm==6.10.1
     # via -r requirements.in
 execnet==1.9.0
     # via pytest-xdist
@@ -227,19 +229,20 @@ opensearch-py==2.0.0
     #   opensearch-dsl
 packaging==21.3
     # via
+    #   build
     #   pytest
     #   redis
 parso==0.8.3
     # via jedi
 pep517==0.12.0
-    # via pip-tools
+    # via build
 pep8-naming==0.13.0
     # via -r requirements-dev.in
 pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==6.6.2
+pip-tools==6.8.0
     # via -r requirements-dev.in
 piprot==0.9.11
     # via -r requirements-dev.in
@@ -283,7 +286,7 @@ pygments==2.11.2
     # via ipython
 pyjwt==2.4.0
     # via notifications-python-client
-pylint==2.14.3
+pylint==2.14.4
     # via
     #   -r requirements-dev.in
     #   pylint-django
@@ -337,7 +340,7 @@ redis==4.1.4
     #   celery
     #   django-redis
     #   rq
-requests==2.28.0
+requests==2.28.1
     # via
     #   -r requirements.in
     #   notifications-python-client
@@ -390,6 +393,7 @@ toml==0.10.2
     # via pre-commit
 tomli==2.0.1
     # via
+    #   build
     #   coverage
     #   pep517
     #   pylint
