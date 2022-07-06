@@ -1,5 +1,5 @@
 # Django and django related
-django==3.2.13
+django==3.2.14
 djangorestframework==3.13.1
 django-axes==5.35.0
 django-environ==0.9.0
