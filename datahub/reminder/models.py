@@ -5,6 +5,9 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 
+MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
 class BaseSubscription(models.Model):
     """
     Base model for reminder subscriptions.
