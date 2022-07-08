@@ -135,7 +135,7 @@ def job_scheduler(
         f"retry intervals '{retry_intervals}'",
     )
     with DataHubQueue('burst-no-fork' if is_burst else 'fork') as queue:
-        queue.enqueue(
+        job = queue.enqueue(
             queue_name=queue_name,
             function=function,
             args=function_args,
@@ -145,8 +145,10 @@ def job_scheduler(
                 interval=retry_intervals,
             ),
         )
+        logger.info(f'Generated job id "{job.id}" with "{job.__dict__}"')
         if settings.IS_TEST:
             queue.work(queue_name)
+        return job
 
 
 def calculate_retry_intervals(

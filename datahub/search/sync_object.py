@@ -79,7 +79,7 @@ def sync_related_objects_async(related_obj, related_obj_field_name, related_obj_
         retry_backoff=True,
     )
     logger.info(
-        f'Task sync_related_objects_async scheduled to '
+        'Task sync_related_objects_async scheduled to '
         f' synchronise {related_obj_field_name} for object'
         f' {related_obj.pk}',
     )
