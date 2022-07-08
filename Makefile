@@ -45,7 +45,7 @@ run-shell:
 	docker-compose run api bash
 
 run-test-reuse-db:
-	docker-compose run api pytest --reuse-db -vv datahub/core/test/test_queue.py
+	docker-compose run api pytest --reuse-db -vv <File(s)::test(s)>
 
 test:
 	docker-compose run api pytest <File(s)::test(s)>

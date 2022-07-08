@@ -26,4 +26,4 @@ def test_rq_health_check_is_called(monkeypatch):
     call_command('test_rq')
 
     assert mock.called is True
-    assert mock.times == 1
+    assert mock.times == 3
