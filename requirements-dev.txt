@@ -252,7 +252,7 @@ platformdirs==2.5.1
     #   virtualenv
 pluggy==1.0.0
     # via pytest
-pre-commit==2.19.0
+pre-commit==2.20.0
     # via -r requirements-dev.in
 prompt-toolkit==3.0.28
     # via
