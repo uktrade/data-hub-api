@@ -27,9 +27,9 @@ backcall==0.2.0
     # via ipython
 billiard==3.6.4.0
     # via celery
-boto3==1.24.22
+boto3==1.24.26
     # via -r requirements.in
-botocore==1.27.22
+botocore==1.27.26
     # via
     #   boto3
     #   s3transfer
@@ -96,7 +96,7 @@ django-debug-toolbar==3.5.0
     # via -r requirements.in
 django-environ==0.9.0
     # via -r requirements.in
-django-extensions==3.1.5
+django-extensions==3.2.0
     # via -r requirements.in
 django-filter==22.1
     # via -r requirements.in
@@ -252,7 +252,7 @@ platformdirs==2.5.1
     #   virtualenv
 pluggy==1.0.0
     # via pytest
-pre-commit==2.19.0
+pre-commit==2.20.0
     # via -r requirements-dev.in
 prompt-toolkit==3.0.28
     # via
