@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from datahub.core.queue import job_scheduler
+from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.search.bulk_sync import sync_objects
 from datahub.search.migrate_utils import delete_from_secondary_indices_callback
 from datahub.search.tasks import sync_object_task, sync_related_objects_task
@@ -38,7 +38,7 @@ def sync_object_async(search_app, pk):
     Syncing an object is migration-safe – if a migration is in progress, the object is
     added to the new index and then deleted from the old index.
     """
-    job_scheduler(
+    job = job_scheduler(
         function=sync_object_task,
         function_args=(
             search_app.name,
@@ -48,7 +48,7 @@ def sync_object_async(search_app, pk):
         retry_backoff=True,
     )
     logger.info(
-        f'Task sync_object_task {search_app.name} '
+        f'Task {job.id} sync_object_task {search_app.name} '
         f'scheduled to synchronise object {pk} '
         f'for search app {search_app.name}',
     )
@@ -67,7 +67,7 @@ def sync_related_objects_async(related_obj, related_obj_field_name, related_obj_
     OpenSearch.
     """
     kwargs = {'related_obj_filter': related_obj_filter} if related_obj_filter else {}
-    job_scheduler(
+    job = job_scheduler(
         function=sync_related_objects_task,
         function_args=(
             related_obj._meta.label,
@@ -79,7 +79,7 @@ def sync_related_objects_async(related_obj, related_obj_field_name, related_obj_
         retry_backoff=True,
     )
     logger.info(
-        'Task sync_related_objects_async scheduled to '
+        f'Task {job.id} sync_related_objects_async scheduled to '
         f' synchronise {related_obj_field_name} for object'
         f' {related_obj.pk}',
     )

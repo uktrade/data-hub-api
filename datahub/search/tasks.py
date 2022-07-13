@@ -4,10 +4,7 @@ from celery import shared_task
 from django.apps import apps
 from django_pglocks import advisory_lock
 
-
-from datahub.core.queue import (
-    job_scheduler,
-)
+from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.search.apps import get_search_app, get_search_app_by_model, get_search_apps
 from datahub.search.bulk_sync import sync_app
 from datahub.search.migrate_utils import resync_after_migrate

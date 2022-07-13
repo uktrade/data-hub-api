@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
-from datahub.core.queue import DataHubQueue
+from datahub.core.queues.queue import DataHubQueue
 from datahub.search.apps import get_search_apps
 from datahub.search.sync_object import sync_object_async, sync_related_objects_async
 from datahub.search.tasks import (

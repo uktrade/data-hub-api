@@ -7,7 +7,7 @@ import reversion
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import InvestmentProjectStage
-from datahub.core.queue import DataHubQueue
+from datahub.core.queues.queue import DataHubQueue
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     InvestmentProjectInteractionFactory,

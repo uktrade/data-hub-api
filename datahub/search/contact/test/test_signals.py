@@ -1,7 +1,7 @@
 import pytest
 
 from datahub.company.test.factories import ContactFactory
-from datahub.core.queue import DataHubQueue
+from datahub.core.queues.queue import DataHubQueue
 from datahub.search.contact.models import Contact
 from datahub.search.query_builder import get_basic_search_query
 

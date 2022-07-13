@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db.models.signals import post_delete, pre_delete
 
 from datahub.core.exceptions import DataHubError
-from datahub.core.queue import DataHubQueue
+from datahub.core.queues.queue import DataHubQueue
 from datahub.search.deletion import (
     BULK_CHUNK_SIZE,
     BULK_DELETION_TIMEOUT_SECS,

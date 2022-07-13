@@ -4,7 +4,7 @@ from unittest.mock import Mock
 import pytest
 from django.db import close_old_connections, transaction
 
-from datahub.core.queue import DataHubQueue
+from datahub.core.queues.queue import DataHubQueue
 from datahub.search.apps import get_search_apps
 from datahub.search.signals import disable_search_signal_receivers
 from datahub.search.test.search_support.models import RelatedModel, SimpleModel

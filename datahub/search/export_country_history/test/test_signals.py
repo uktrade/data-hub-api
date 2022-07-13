@@ -2,7 +2,7 @@ import pytest
 
 from datahub.company.models import CompanyExportCountryHistory
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory
-from datahub.core.queue import DataHubQueue
+from datahub.core.queues.queue import DataHubQueue
 from datahub.search.export_country_history.apps import ExportCountryHistoryApp
 
 pytestmark = pytest.mark.django_db

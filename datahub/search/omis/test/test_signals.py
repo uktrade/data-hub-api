@@ -1,6 +1,6 @@
 import pytest
 
-from datahub.core.queue import DataHubQueue
+from datahub.core.queues.queue import DataHubQueue
 from datahub.omis.order.test.factories import (
     OrderAssigneeFactory,
     OrderFactory,

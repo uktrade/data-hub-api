@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 
 from datahub.company.test.factories import CompanyFactory
-from datahub.core.queue import DataHubQueue
+from datahub.core.queues.queue import DataHubQueue
 from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.search.large_capital_opportunity.apps import LargeCapitalOpportunitySearchApp
 

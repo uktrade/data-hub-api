@@ -1,7 +1,7 @@
 import pytest
 from opensearchpy.exceptions import NotFoundError
 
-from datahub.core.queue import DataHubQueue
+from datahub.core.queues.queue import DataHubQueue
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     InteractionDITParticipantFactory,
