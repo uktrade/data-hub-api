@@ -2,7 +2,7 @@ import pytest
 from dateutil.parser import parse as dateutil_parse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
-from datahub.core.queue import DataHubQueue
+from datahub.core.queues.queue import DataHubQueue
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.search.company.apps import CompanySearchApp
 from datahub.search.company.models import Company

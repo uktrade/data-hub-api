@@ -3,7 +3,12 @@ from logging import getLogger
 
 from django.core.management.base import BaseCommand
 
-from datahub.core.queue import DataHubQueue, job_scheduler, LONG_RUNNING_QUEUE, SHORT_RUNNING_QUEUE
+from datahub.core.queues.job_scheduler import job_scheduler
+from datahub.core.queues.queue import (
+    DataHubQueue,
+    LONG_RUNNING_QUEUE,
+    SHORT_RUNNING_QUEUE,
+)
 
 logger = getLogger(__name__)
 

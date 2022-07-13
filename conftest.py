@@ -11,7 +11,7 @@ from opensearchpy.helpers.test import get_test_client
 from pytest_django.lazy_django import skip_if_no_django
 
 from datahub.core.constants import AdministrativeArea
-from datahub.core.queue import DataHubQueue
+from datahub.core.queues.queue import DataHubQueue
 from datahub.core.test_utils import create_test_user, HawkAPITestClient
 from datahub.dnb_api.utils import format_dnb_company
 from datahub.documents.utils import get_s3_client_for_bucket

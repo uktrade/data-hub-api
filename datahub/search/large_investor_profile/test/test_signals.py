@@ -4,7 +4,7 @@ import pytest
 from opensearchpy.exceptions import NotFoundError
 
 from datahub.company.test.factories import CompanyFactory
-from datahub.core.queue import DataHubQueue
+from datahub.core.queues.queue import DataHubQueue
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 from datahub.search.large_investor_profile.apps import LargeInvestorProfileSearchApp
 

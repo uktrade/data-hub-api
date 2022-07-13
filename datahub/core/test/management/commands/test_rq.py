@@ -16,7 +16,7 @@ class PickleableMock:
         PickleableMock.times += 1
 
 
-def test_rq_health_check_is_called(monkeypatch):
+def test_rq_health_check_is_called_for_all_queues_setup(monkeypatch):
     mock = PickleableMock()
     monkeypatch.setattr(
         'datahub.core.management.commands.test_rq.queue_health_check',
