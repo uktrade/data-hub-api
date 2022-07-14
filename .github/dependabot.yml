@@ -11,7 +11,7 @@ updates:
   - dependency-name: werkzeug
     versions:
     - "> 2.0.3"
-  - dependency-name: boto
+  - dependency-name: flake8-bugbear # TET-129
     versions:
-    - "> 1.23.0"
+    - "> 22.1.11"
   rebase-strategy: disabled

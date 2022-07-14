@@ -42,6 +42,7 @@ class EventActivitySerializer(ActivitySerializer):
                 'content': instance.notes,
                 'startTime': instance.start_date,
                 'endTime': instance.end_date,
+                'updated': instance.modified_on,
                 'url': instance.get_absolute_url(),
                 'dit:address_1': instance.address_1,
                 'dit:address_2': instance.address_2,
