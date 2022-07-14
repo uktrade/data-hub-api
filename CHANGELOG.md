@@ -1,3 +1,11 @@
+# Data Hub API 40.12.0 (2022-07-14)
+
+
+## API
+
+- **Events** Events serialized for Activity Stream now have the field `object.updated` to show when they were last modified.
+
+
 # Data Hub API 40.11.0 (2022-07-05)
 
 

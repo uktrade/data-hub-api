@@ -1,9 +1,9 @@
 # Django and django related
-django==3.2.13
+django==3.2.14
 djangorestframework==3.13.1
 django-axes==5.35.0
 django-environ==0.9.0
-django-extensions==3.1.5
+django-extensions==3.2.0
 django-filter==22.1
 django-log-formatter-ecs==0.0.5
 django-mptt==0.13.4
@@ -20,7 +20,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.3
 psycogreen==1.0.2
 
-boto3==1.24.22
+boto3==1.24.26
 
 notifications-python-client==6.3.0
 
