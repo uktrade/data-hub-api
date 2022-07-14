@@ -1,1 +1,0 @@
-Events serialized for Activity Stream now have the field `object.updated` to show when they were last modified.
