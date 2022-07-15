@@ -1,4 +1,5 @@
 import pytest
+from django.conf import settings
 from rq import Retry
 
 from datahub.core.queues.queue import DataHubQueue
@@ -110,3 +111,7 @@ def test_job_retry_with_errors_will_reschedule_with_three_tries(async_queue: Dat
     assert job.is_scheduled is True
     assert job.retries_left == 3
     assert job.retry_intervals == [1, 4, 16]
+
+
+def test_should_be_in_the_testing_environment():
+    assert settings.IS_TEST is True
