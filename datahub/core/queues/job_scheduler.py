@@ -1,9 +1,9 @@
 from logging import getLogger
+from typing import Literal
 
-from django.conf import settings
 from rq import Retry
 
-from datahub.core.queues.queue import DataHubQueue, SHORT_RUNNING_QUEUE, TEST_PREFIX
+from datahub.core.queues.queue import DataHubQueue, SHORT_RUNNING_QUEUE
 
 logger = getLogger(__name__)
 
@@ -17,8 +17,9 @@ def job_scheduler(
     is_burst=False,
     retry_backoff=False,
     retry_intervals=0,
+    is_async=True,
 ):
-    """Job Scheduler for setting up Jobs that run tasks
+    """Job scheduler for setting up Jobs that run tasks
 
     Args:
         function (function): Any function or task definition that can be executed
@@ -30,7 +31,7 @@ def job_scheduler(
         SHORT_RUNNING_QUEUE.
         is_burst (bool, optional): If True, will use a burst worker queue strategy.
             If False, will use the default queue strategy running a fetch-fork-execute loop.
-            Defaults to False.
+            Defaults to False unless this is a Test.
         retry_backoff (bool or int, optional): If True, will create an exponential backoff list of
             intervals based on the amount of max_retries configured starting from the first second.
             If False, will leave the retry intervals at the defaulted 0.
@@ -43,22 +44,20 @@ def job_scheduler(
             retry amount.
             Defaults to 0.
     """
-    if settings.IS_TEST:
-        queue_name = TEST_PREFIX + queue_name
-        is_burst = True
-
-    retry_intervals = calculate_retry_intervals(
-        max_retries,
-        retry_intervals,
-        retry_backoff,
-    )
+    is_backoff_an_int = isinstance(retry_backoff, int) and retry_backoff > 1
+    if retry_backoff is True or is_backoff_an_int:
+        retry_intervals = retry_backoff_intervals(max_retries, retry_backoff, is_backoff_an_int)
+    else:
+        retry_intervals = retry_intervals
 
     logger.info(
         f"Configuring RQ with function '{function}' function args/kwargs '{function_args}' "
         f"'{function_kwargs}' retries '{max_retries}' with queue '{queue_name}' "
         f"retry intervals '{retry_intervals}'",
     )
-    with DataHubQueue('burst-no-fork' if is_burst else 'fork') as queue:
+    with DataHubQueue(
+        strategy='burst-no-fork' if is_burst else 'fork',
+    ) as queue:
         job = queue.enqueue(
             queue_name=queue_name,
             function=function,
@@ -70,25 +69,25 @@ def job_scheduler(
             ),
         )
         logger.info(f'Generated job id "{job.id}" with "{job.__dict__}"')
-        if settings.IS_TEST:
-            queue.work(queue_name)
         return job
 
 
-def calculate_retry_intervals(
+def retry_backoff_intervals(
     max_retries: int,
-    retry_intervals: list | int,
     retry_backoff: bool | int,
-):
-    is_retry_backoff_value_valid = isinstance(retry_backoff, int) and retry_backoff > 1
-    if (retry_backoff is True or is_retry_backoff_value_valid) and max_retries > 0:
-        exponential_intervals = []
-        start = 1
-        if is_retry_backoff_value_valid:
-            exponential_intervals.append(int(retry_backoff))
-            start = int(retry_backoff) + 1
-        shift_range_by_start = max_retries + start
-        for interval in range(start, shift_range_by_start):
-            exponential_intervals.append(interval ** 2)
-        return exponential_intervals[0:max_retries]
-    return retry_intervals
+    is_backoff_an_int: bool,
+) -> (list | Literal[0]):
+    if retry_backoff is True or is_backoff_an_int:
+        start = 1 if not is_backoff_an_int else int(retry_backoff)
+        return exponential_backoff_intervals(max_retries, start)
+    return 0
+
+
+def exponential_backoff_intervals(
+    max_retries: int,
+    start: int,
+) -> list:
+    result = [start]
+    for interval in range(start + 1, start + max_retries):
+        result.append(interval ** 2)
+    return result

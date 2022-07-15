@@ -1,5 +1,4 @@
 import pytest
-from django.conf import settings
 
 from datahub.search.sync_object import sync_object_async, sync_related_objects_async
 from datahub.search.test.search_support.models import RelatedModel, SimpleModel
@@ -32,7 +31,3 @@ def test_sync_related_objects_syncs_using_rq(opensearch):
     assert doc_exists(opensearch, RelatedModelSearchApp, relation_1.pk)
     assert doc_exists(opensearch, RelatedModelSearchApp, relation_2.pk)
     assert not doc_exists(opensearch, RelatedModelSearchApp, unrelated_obj.pk)
-
-
-def test_should_be_in_the_testing_environment():
-    assert settings.IS_TEST is True

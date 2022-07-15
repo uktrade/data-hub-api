@@ -12,9 +12,6 @@ logger = getLogger(__name__)
 
 SHORT_RUNNING_QUEUE = 'short-running'
 LONG_RUNNING_QUEUE = 'long-running'
-TEST_PREFIX = 'test-'
-TEST_SHORT_RUNNING_QUEUE = TEST_PREFIX + SHORT_RUNNING_QUEUE
-TEST_LONG_RUNNING_QUEUE = TEST_PREFIX + LONG_RUNNING_QUEUE
 
 
 class WorkerStrategy:
@@ -58,7 +55,7 @@ class DataHubQueue:
 
     def enqueue(self, queue_name: str, function, *args, **kwargs):
         queue = RqQueue(
-            queue_name,
+            name=queue_name,
             is_async=self.is_async,
             connection=self._connection,
         )
