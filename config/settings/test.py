@@ -178,3 +178,5 @@ if ADMIN_OAUTH2_ENABLED:
         MIDDLEWARE.remove('axes.middleware.AxesMiddleware')
     if 'axes.backends.AxesBackend' in AUTHENTICATION_BACKENDS:
         AUTHENTICATION_BACKENDS.remove('axes.backends.AxesBackend')
+
+IS_TEST = True

@@ -24,7 +24,9 @@ def test_new_large_investor_profile_synced(opensearch_with_signals):
     assert _get_documents(opensearch_with_signals, investor_profile.pk)
 
 
-def test_updated_large_investor_profile_synced(opensearch_with_signals):
+def test_updated_large_investor_profile_synced(
+    opensearch_with_signals,
+):
     """Test that when an large investor profile is updated it is synced to OpenSearch."""
     large_investor_profile = LargeCapitalInvestorProfileFactory()
     large_investor_profile.investable_capital = 12345
@@ -39,7 +41,10 @@ def test_updated_large_investor_profile_synced(opensearch_with_signals):
     ),
 )
 def test_delete_from_opensearch(
-    investor_profile_factory, expected_in_index, expected_to_call_delete, opensearch_with_signals,
+    investor_profile_factory,
+    expected_in_index,
+    expected_to_call_delete,
+    opensearch_with_signals,
 ):
     """
     Test that when an large investor profile is deleted from db it is also
