@@ -11,8 +11,11 @@ start-rq-mon:
 stop-rq-mon:
 	docker-compose -f docker-compose.yml -f docker-compose-rq-monitor.yml down
 
-tests:
+build-tests:
 	docker-compose build
+	docker-compose run api bash tests.sh
+
+tests:
 	docker-compose run api bash tests.sh
 
 flake8:
@@ -42,13 +45,19 @@ run-shell:
 	docker-compose run api bash
 
 run-test-reuse-db:
-	docker-compose run api pytest --reuse-db -vv datahub/core/test/test_queue.py
+	docker-compose run api pytest --reuse-db -vv <File(s)::test(s)>
+
+test:
+	docker-compose run api pytest <File(s)::test(s)>
 
 reindex-opensearch:
 	docker-compose run api python manage.py sync_search
 
 fix-us-areas:
 	docker-compose run api python manage.py fix_us_company_address
+
+test-rq:
+	docker-compose run api python manage.py test_rq
 
 fix-ca-areas:
 	docker-compose run api python manage.py fix_ca_company_address
