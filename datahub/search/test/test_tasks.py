@@ -2,7 +2,6 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
-from datahub.core.queues.queue import DataHubQueue
 from datahub.search.apps import get_search_apps
 from datahub.search.sync_object import sync_object_async, sync_related_objects_async
 from datahub.search.tasks import (
@@ -59,7 +58,7 @@ def test_sync_object_task_syncs(opensearch):
     ),
 )
 @pytest.mark.django_db
-def test_sync_related_objects_task_syncs(related_obj_filter, opensearch, queue: DataHubQueue):
+def test_sync_related_objects_task_syncs(related_obj_filter, opensearch):
     """Test that related objects are synced to OpenSearch."""
     simpleton = SimpleModel.objects.create(name='hello')
     relation_1 = RelatedModel.objects.create(simpleton=simpleton)

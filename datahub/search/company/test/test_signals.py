@@ -2,7 +2,6 @@ import pytest
 from dateutil.parser import parse as dateutil_parse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
-from datahub.core.queues.queue import DataHubQueue
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.search.company.apps import CompanySearchApp
 from datahub.search.company.models import Company
@@ -12,7 +11,7 @@ from datahub.search.test.utils import get_documents_by_ids
 pytestmark = pytest.mark.django_db
 
 
-def test_company_auto_sync_to_opensearch(opensearch_with_signals, queue: DataHubQueue):
+def test_company_auto_sync_to_opensearch(opensearch_with_signals):
     """Tests if company gets synced to OpenSearch."""
     test_name = 'very_hard_to_find_company'
     CompanyFactory(
@@ -25,7 +24,7 @@ def test_company_auto_sync_to_opensearch(opensearch_with_signals, queue: DataHub
     assert result.hits.total.value == 1
 
 
-def test_company_auto_updates_to_opensearch(opensearch_with_signals, queue: DataHubQueue):
+def test_company_auto_updates_to_opensearch(opensearch_with_signals):
     """Tests if company gets updated in OpenSearch."""
     test_name = 'very_hard_to_find_company_international'
     company = CompanyFactory(
@@ -42,10 +41,7 @@ def test_company_auto_updates_to_opensearch(opensearch_with_signals, queue: Data
     assert result.hits[0].id == str(company.id)
 
 
-def test_company_subsidiaries_auto_update_to_opensearch(
-    opensearch_with_signals,
-    queue: DataHubQueue,
-):
+def test_company_subsidiaries_auto_update_to_opensearch(opensearch_with_signals):
     """Tests if company subsidiaries get updated in OpenSearch."""
     account_owner = AdviserFactory()
     global_headquarters = CompanyFactory(one_list_account_owner=account_owner)
@@ -95,7 +91,7 @@ def test_company_subsidiaries_auto_update_to_opensearch(
     assert new_search_results == new_expected_results
 
 
-def test_adding_interaction_updates_company(opensearch_with_signals, queue: DataHubQueue):
+def test_adding_interaction_updates_company(opensearch_with_signals):
     """Test that when an interaction is added, the company is synced to OpenSearch."""
     test_name = 'very_hard_to_find_company'
     company = CompanyFactory(
