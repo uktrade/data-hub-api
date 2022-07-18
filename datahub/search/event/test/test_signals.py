@@ -1,13 +1,12 @@
 import pytest
 
-from datahub.core.queues.queue import DataHubQueue
 from datahub.event.test.factories import EventFactory
 from datahub.search.event.apps import EventSearchApp
 
 pytestmark = pytest.mark.django_db
 
 
-def test_new_event_synced(opensearch_with_signals, queue: DataHubQueue):
+def test_new_event_synced(opensearch_with_signals):
     """Test that new events are synced to OpenSearch."""
     event = EventFactory()
     opensearch_with_signals.indices.refresh()
@@ -18,7 +17,7 @@ def test_new_event_synced(opensearch_with_signals, queue: DataHubQueue):
     )
 
 
-def test_updated_event_synced(opensearch_with_signals, queue: DataHubQueue):
+def test_updated_event_synced(opensearch_with_signals):
     """Test that when an event is updated it is synced to OpenSearch."""
     event = EventFactory()
     new_name = 'cat'
