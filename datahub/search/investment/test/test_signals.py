@@ -102,7 +102,8 @@ def team_member():
 
 
 def test_investment_project_team_member_added_sync_to_opensearch(
-    opensearch_with_signals, team_member,
+    opensearch_with_signals,
+    team_member,
 ):
     """Tests if investment project gets synced to OpenSearch when a team member is added."""
     opensearch_with_signals.indices.refresh()
@@ -121,7 +122,8 @@ def test_investment_project_team_member_added_sync_to_opensearch(
 
 
 def test_investment_project_team_member_updated_sync_to_opensearch(
-    opensearch_with_signals, team_member,
+    opensearch_with_signals,
+    team_member,
 ):
     """Tests if investment project gets synced to OpenSearch when a team member is updated."""
     new_adviser = AdviserFactory()
@@ -143,7 +145,8 @@ def test_investment_project_team_member_updated_sync_to_opensearch(
 
 
 def test_investment_project_team_member_deleted_sync_to_opensearch(
-    opensearch_with_signals, team_member,
+    opensearch_with_signals,
+    team_member,
 ):
     """Tests if investment project gets synced to OpenSearch when a team member is deleted."""
     team_member.delete()
@@ -170,7 +173,10 @@ def test_investment_project_team_member_deleted_sync_to_opensearch(
         'project_assurance_adviser',
     ),
 )
-def test_investment_project_syncs_when_adviser_changes(opensearch_with_signals, field):
+def test_investment_project_syncs_when_adviser_changes(
+    opensearch_with_signals,
+    field,
+):
     """
     Tests that when an adviser is updated, investment projects related to that adviser are
     resynced.
@@ -191,7 +197,8 @@ def test_investment_project_syncs_when_adviser_changes(opensearch_with_signals, 
 
 
 def test_investment_project_syncs_when_team_member_adviser_changes(
-    opensearch_with_signals, team_member,
+    opensearch_with_signals,
+    team_member,
 ):
     """
     Tests that when an adviser that is a team member of an investment project is updated,
@@ -295,7 +302,8 @@ def test_investment_project_interaction_changed_sync_to_opensearch(opensearch_wi
 
 @mock.patch('datahub.search.investment.signals.sync_object_async')
 def test_investment_project_synched_only_if_interaction_linked(
-    mocked_sync_object, opensearch_with_signals,
+    mocked_sync_object,
+    opensearch_with_signals,
 ):
     """
     Test sync_object_async not called if no investment project related to an interaction.
@@ -399,7 +407,9 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
     ),
 )
 def test_incomplete_fields_syncs_when_m2m_changes(
-    opensearch_with_signals, field, get_field_values,
+    opensearch_with_signals,
+    field,
+    get_field_values,
 ):
     """
     When an m2m field is updated, the incomplete fields should be updated accordingly.

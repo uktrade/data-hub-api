@@ -2,7 +2,11 @@ from logging import getLogger
 
 from django.conf import settings
 from redis import Redis
-from rq import Queue as RqQueue, SimpleWorker, Worker
+from rq import (
+    Queue as RqQueue,
+    SimpleWorker,
+    Worker,
+)
 
 logger = getLogger(__name__)
 
@@ -36,18 +40,31 @@ class DataHubQueue:
     for processing work using Redis as the underlying PUB SUB durability layer
     """
 
-    def __init__(self, strategy='fork'):
+    def __init__(
+        self,
+        strategy='fork',
+        is_async=not settings.IS_TEST,
+    ):
         self._connection = Redis.from_url(settings.REDIS_BASE_URL)
         self._queues = []
+        self.is_async = is_async
         self._worker_strategy = {
             'fork': Fork(self._connection),
             'burst-no-fork': BurstNoFork(self._connection),
         }[strategy]
 
     def enqueue(self, queue_name: str, function, *args, **kwargs):
-        queue = RqQueue(queue_name, connection=self._connection)
+        queue = RqQueue(
+            name=queue_name,
+            is_async=self.is_async,
+            connection=self._connection,
+        )
         self._queues.append(queue)
-        return queue.enqueue(function, *args, **kwargs)
+        return queue.enqueue(
+            function,
+            *args,
+            **kwargs,
+        )
 
     def work(self, *queues: str):
         return self._worker_strategy.process_queues(queues)

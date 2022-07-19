@@ -1,3 +1,11 @@
+# Data Hub API 40.12.1 (2022-07-19)
+
+
+## Internal changes
+
+- RQ is now supported, replacing Celery
+
+
 # Data Hub API 40.12.0 (2022-07-14)
 
 

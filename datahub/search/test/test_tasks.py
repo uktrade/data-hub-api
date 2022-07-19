@@ -1,15 +1,13 @@
-from unittest.mock import call, MagicMock, Mock
-from uuid import uuid4
+from unittest.mock import MagicMock, Mock
 
 import pytest
 
 from datahub.search.apps import get_search_apps
+from datahub.search.sync_object import sync_object_async, sync_related_objects_async
 from datahub.search.tasks import (
     complete_model_migration,
     sync_all_models,
     sync_model,
-    sync_object_task,
-    sync_related_objects_task,
 )
 from datahub.search.test.search_support.models import RelatedModel, SimpleModel
 from datahub.search.test.search_support.relatedmodel import RelatedModelSearchApp
@@ -46,20 +44,10 @@ def test_sync_all_models(monkeypatch):
 def test_sync_object_task_syncs(opensearch):
     """Test that the object task syncs an object to OpenSearch."""
     obj = SimpleModel.objects.create()
-    sync_object_task.apply_async(args=(SimpleModelSearchApp.name, str(obj.pk)))
+    sync_object_async(SimpleModelSearchApp, obj.pk)
     opensearch.indices.refresh()
 
     assert doc_exists(opensearch, SimpleModelSearchApp, obj.pk)
-
-
-def test_sync_object_task_retries_on_error(monkeypatch, opensearch):
-    """Test that the object task retries on error."""
-    sync_object_mock = Mock(side_effect=[Exception, None])
-    monkeypatch.setattr('datahub.search.sync_object.sync_object', sync_object_mock)
-
-    sync_object_task.apply_async(args=(SimpleModelSearchApp.name, str(uuid4())))
-
-    assert sync_object_mock.call_count == 2
 
 
 @pytest.mark.parametrize(
@@ -70,29 +58,23 @@ def test_sync_object_task_retries_on_error(monkeypatch, opensearch):
     ),
 )
 @pytest.mark.django_db
-def test_sync_related_objects_task_syncs(related_obj_filter, monkeypatch):
+def test_sync_related_objects_task_syncs(related_obj_filter, opensearch):
     """Test that related objects are synced to OpenSearch."""
-    sync_object_task_mock = Mock()
-    monkeypatch.setattr('datahub.search.tasks.sync_object_task', sync_object_task_mock)
-
     simpleton = SimpleModel.objects.create(name='hello')
     relation_1 = RelatedModel.objects.create(simpleton=simpleton)
     relation_2 = RelatedModel.objects.create(simpleton=simpleton)
-    RelatedModel.objects.create()  # Unrelated object, should not get synced
+    unrelated_obj = RelatedModel.objects.create()
 
-    sync_related_objects_task.apply_async(
-        args=(
-            SimpleModel._meta.label,
-            str(simpleton.pk),
-            'relatedmodel_set',
-            related_obj_filter,
-        ),
+    sync_related_objects_async(
+        simpleton,
+        'relatedmodel_set',
+        related_obj_filter,
     )
+    opensearch.indices.refresh()
 
-    assert sync_object_task_mock.apply_async.call_args_list == [
-        call(args=(RelatedModelSearchApp.name, relation_1.pk), priority=6),
-        call(args=(RelatedModelSearchApp.name, relation_2.pk), priority=6),
-    ]
+    assert doc_exists(opensearch, RelatedModelSearchApp, relation_1.pk)
+    assert doc_exists(opensearch, RelatedModelSearchApp, relation_2.pk)
+    assert not doc_exists(opensearch, RelatedModelSearchApp, unrelated_obj.pk)
 
 
 @pytest.mark.django_db

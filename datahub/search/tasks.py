@@ -1,14 +1,16 @@
+from logging import getLogger
+
 from celery import shared_task
-from celery.utils.log import get_task_logger
 from django.apps import apps
 from django_pglocks import advisory_lock
 
+from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.search.apps import get_search_app, get_search_app_by_model, get_search_apps
 from datahub.search.bulk_sync import sync_app
 from datahub.search.migrate_utils import resync_after_migrate
 
 
-logger = get_task_logger(__name__)
+logger = getLogger(__name__)
 
 
 @shared_task(acks_late=True, priority=9)
@@ -39,7 +41,6 @@ def sync_model(search_app_name):
     sync_app(search_app)
 
 
-@shared_task(acks_late=True, max_retries=15, autoretry_for=(Exception,), retry_backoff=1)
 def sync_object_task(search_app_name, pk):
     """
     Syncs a single object to OpenSearch.
@@ -51,21 +52,12 @@ def sync_object_task(search_app_name, pk):
     This task is named sync_object_task to avoid a conflict with sync_object.
     """
     from datahub.search.sync_object import sync_object
-
+    logger.info(f"Running sync_object_task search_app_name '{search_app_name}' pk '{str(pk)}'")
     search_app = get_search_app(search_app_name)
     sync_object(search_app, pk)
 
 
-@shared_task(
-    bind=True,
-    acks_late=True,
-    max_retries=15,
-    priority=6,
-    autoretry_for=(Exception,),
-    retry_backoff=1,
-)
 def sync_related_objects_task(
-    self,
     related_model_label,
     related_obj_pk,
     related_obj_field_name,
@@ -87,6 +79,10 @@ def sync_related_objects_task(
     The wait between attempts is approximately 2 ** attempt_num seconds (with some jitter
     added).
     """
+    logger.info(
+        f"Running sync_related_objects_task '{related_model_label}' "
+        f"'{related_obj_pk}' '{related_obj_field_name}' '{related_obj_filter}",
+    )
     related_model = apps.get_model(related_model_label)
     related_obj = related_model.objects.get(pk=related_obj_pk)
     manager = getattr(related_obj, related_obj_field_name)
@@ -96,7 +92,14 @@ def sync_related_objects_task(
     search_app = get_search_app_by_model(manager.model)
 
     for pk in queryset:
-        sync_object_task.apply_async(args=(search_app.name, pk), priority=self.priority)
+        job_scheduler(
+            function=sync_object_task,
+            function_args=(
+                search_app.name,
+                pk,
+            ),
+            max_retries=15,
+        )
 
 
 @shared_task(
