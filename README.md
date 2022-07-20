@@ -442,6 +442,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `INVESTMENT_NOTIFICATION_API_KEY` | Yes | |
 | `INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID` | Yes | An ID of Notify Template for Estimated Land Date notifications |
 | `INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_SUMMARY_TEMPLATE_ID` | Yes | An ID of Notify Template for Estimated Land Date summary notifications |
+| `INVESTMENT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID` | Yes | An ID of Notify Template for No Recent Investment Interaction notifications |
 | `MAILBOX_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for mailbox. |
 | `MAILBOX_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for mailbox. |
 | `MAILBOX_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for mailbox. |
