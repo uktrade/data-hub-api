@@ -7,5 +7,5 @@ REMINDER_DAYS_MAPPING = {
 }
 
 
-def reminder_days_to_date_filter(current_date, reminder_days):
+def reminder_days_to_estimated_land_date_filter(current_date, reminder_days):
     return [REMINDER_DAYS_MAPPING[days_left](current_date) for days_left in reminder_days]
