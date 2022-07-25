@@ -3,6 +3,7 @@ from operator import attrgetter
 from unittest import mock
 from unittest.mock import call
 
+import factory
 import pytest
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
@@ -10,19 +11,30 @@ from freezegun import freeze_time
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import InvestmentProjectStage
 from datahub.feature_flag.test.factories import UserFeatureFlagFactory
+from datahub.interaction.test.factories import InvestmentProjectInteractionFactory
 from datahub.investment.project.models import InvestmentProject
 from datahub.investment.project.test.factories import (
     ActiveInvestmentProjectFactory,
     InvestmentProjectFactory,
 )
-from datahub.reminder import ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME
-from datahub.reminder.models import UpcomingEstimatedLandDateReminder
+from datahub.reminder import (
+    ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
+    NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
+)
+from datahub.reminder.models import (
+    NoRecentInvestmentInteractionReminder,
+    UpcomingEstimatedLandDateReminder,
+)
 from datahub.reminder.tasks import (
-    create_reminder,
+    create_estimated_land_date_reminder,
+    create_no_recent_interaction_reminder,
     generate_estimated_land_date_reminders,
     generate_estimated_land_date_reminders_for_subscription,
+    generate_no_recent_interaction_reminders,
+    generate_no_recent_interaction_reminders_for_subscription,
 )
 from datahub.reminder.test.factories import (
+    NoRecentInvestmentInteractionSubscriptionFactory,
     UpcomingEstimatedLandDateSubscriptionFactory,
 )
 
@@ -39,23 +51,42 @@ def estimated_land_date_reminders_user_feature_flag():
 
 
 @pytest.fixture()
-def adviser(estimated_land_date_reminders_user_feature_flag):
+def no_recent_interaction_reminders_user_feature_flag():
+    """
+    Creates the no recent interaction reminders user feature flag.
+    """
+    yield UserFeatureFlagFactory(
+        code=NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
+        is_active=True,
+    )
+
+
+@pytest.fixture()
+def adviser(
+    no_recent_interaction_reminders_user_feature_flag,
+    estimated_land_date_reminders_user_feature_flag,
+):
     """
     An adviser with the relevant feature flags enabled
     """
     adviser = AdviserFactory()
-    adviser.features.set([estimated_land_date_reminders_user_feature_flag])
+    adviser.features.set(
+        [
+            estimated_land_date_reminders_user_feature_flag,
+            no_recent_interaction_reminders_user_feature_flag,
+        ],
+    )
     return adviser
 
 
 @pytest.fixture()
-def mock_create_reminder(monkeypatch):
-    mock_create_reminder = mock.Mock()
+def mock_create_estimated_land_date_reminder(monkeypatch):
+    mock_create_estimated_land_date_reminder = mock.Mock()
     monkeypatch.setattr(
-        'datahub.reminder.tasks.create_reminder',
-        mock_create_reminder,
+        'datahub.reminder.tasks.create_estimated_land_date_reminder',
+        mock_create_estimated_land_date_reminder,
     )
-    return mock_create_reminder
+    return mock_create_estimated_land_date_reminder
 
 
 @pytest.fixture()
@@ -88,9 +119,39 @@ def mock_generate_estimated_land_date_reminders_for_subscription(monkeypatch):
     return mock_generate_estimated_land_date_reminders_for_subscription
 
 
+@pytest.fixture()
+def mock_create_no_recent_interaction_reminder(monkeypatch):
+    mock_create_no_recent_interaction_reminder = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.reminder.tasks.create_no_recent_interaction_reminder',
+        mock_create_no_recent_interaction_reminder,
+    )
+    return mock_create_no_recent_interaction_reminder
+
+
+@pytest.fixture()
+def mock_send_no_recent_interaction_reminder(monkeypatch):
+    mock_send_no_recent_interaction_reminder = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.reminder.tasks.send_no_recent_interaction_reminder',
+        mock_send_no_recent_interaction_reminder,
+    )
+    return mock_send_no_recent_interaction_reminder
+
+
+@pytest.fixture()
+def mock_generate_no_recent_interaction_reminders_for_subscription(monkeypatch):
+    mock_generate_no_recent_interaction_reminders_for_subscription = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.reminder.tasks.generate_no_recent_interaction_reminders_for_subscription',
+        mock_generate_no_recent_interaction_reminders_for_subscription,
+    )
+    return mock_generate_no_recent_interaction_reminders_for_subscription
+
+
 @pytest.mark.django_db
 @freeze_time('2022-07-01T10:00:00')
-class TestCreateReminder:
+class TestCreateEstimatedLandDateReminder:
     current_date = datetime.date(year=2022, month=7, day=1)
 
     def test_create_reminder_email(
@@ -109,7 +170,7 @@ class TestCreateReminder:
             status=InvestmentProject.Status.ONGOING,
         )
 
-        create_reminder(
+        create_estimated_land_date_reminder(
             project=project,
             adviser=adviser,
             days_left=days_left,
@@ -144,7 +205,7 @@ class TestCreateReminder:
             status=InvestmentProject.Status.ONGOING,
         )
 
-        create_reminder(
+        create_estimated_land_date_reminder(
             project=project,
             adviser=adviser,
             days_left=days_left,
@@ -181,7 +242,7 @@ class TestCreateReminder:
             )
 
         with freeze_time('2022-07-01T16:00:00'):
-            create_reminder(
+            create_estimated_land_date_reminder(
                 project=project,
                 adviser=adviser,
                 days_left=days_left,
@@ -219,7 +280,7 @@ class TestCreateReminder:
             )
 
         with freeze_time('2022-07-02T10:00:00'):
-            create_reminder(
+            create_estimated_land_date_reminder(
                 project=project,
                 adviser=adviser,
                 days_left=days_left,
@@ -257,7 +318,7 @@ class TestCreateReminder:
                 event=f'{days_left} days left to estimated land date',
             )
 
-        create_reminder(
+        create_estimated_land_date_reminder(
             project=project,
             adviser=adviser,
             days_left=days_left,
@@ -317,7 +378,7 @@ class TestGenerateEstimatedLandDateReminderTask:
     def test_generate_estimated_land_date_reminders_for_subscription(
         self,
         adviser,
-        mock_create_reminder,
+        mock_create_estimated_land_date_reminder,
         days,
         email_reminders_enabled,
         role,
@@ -355,7 +416,7 @@ class TestGenerateEstimatedLandDateReminderTask:
             subscription=subscription,
             current_date=self.current_date,
         )
-        mock_create_reminder.assert_called_once_with(
+        mock_create_estimated_land_date_reminder.assert_called_once_with(
             project=project,
             adviser=adviser,
             days_left=days,
@@ -384,7 +445,7 @@ class TestGenerateEstimatedLandDateReminderTask:
     def test_sends_estimated_land_date_summary_notification_for_subscription(
         self,
         adviser,
-        mock_create_reminder,
+        mock_create_estimated_land_date_reminder,
         mock_send_estimated_land_date_summary,
         days,
         email_reminders_enabled,
@@ -426,7 +487,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         else:
             mock_send_estimated_land_date_summary.assert_not_called()
 
-        mock_create_reminder.assert_has_calls([
+        mock_create_estimated_land_date_reminder.assert_has_calls([
             call(
                 project=project,
                 adviser=adviser,
@@ -437,7 +498,11 @@ class TestGenerateEstimatedLandDateReminderTask:
             for project in projects
         ], any_order=True)
 
-    def test_active_ongoing_or_delayed_projects_only(self, adviser, mock_create_reminder):
+    def test_active_ongoing_or_delayed_projects_only(
+        self,
+        adviser,
+        mock_create_estimated_land_date_reminder,
+    ):
         """
         A reminder should only be sent for active ongoing or active delayed projects.
         """
@@ -481,7 +546,7 @@ class TestGenerateEstimatedLandDateReminderTask:
             subscription=subscription,
             current_date=self.current_date,
         )
-        mock_create_reminder.assert_has_calls([
+        mock_create_estimated_land_date_reminder.assert_has_calls([
             call(
                 project=project,
                 adviser=adviser,
@@ -494,7 +559,7 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     def test_no_user_feature_flag(
         self,
-        mock_create_reminder,
+        mock_create_estimated_land_date_reminder,
         estimated_land_date_reminders_user_feature_flag,
     ):
         """
@@ -517,11 +582,11 @@ class TestGenerateEstimatedLandDateReminderTask:
             subscription=subscription,
             current_date=self.current_date,
         )
-        assert mock_create_reminder.call_count == 0
+        assert mock_create_estimated_land_date_reminder.call_count == 0
 
     def test_inactive_user_feature_flag(
         self,
-        mock_create_reminder,
+        mock_create_estimated_land_date_reminder,
     ):
         """
         Reminders should not be created if the user feature flag is inactive.
@@ -548,7 +613,7 @@ class TestGenerateEstimatedLandDateReminderTask:
             subscription=subscription,
             current_date=self.current_date,
         )
-        assert mock_create_reminder.call_count == 0
+        assert mock_create_estimated_land_date_reminder.call_count == 0
 
     def test_does_not_send_multiple(
         self,
@@ -583,4 +648,429 @@ class TestGenerateEstimatedLandDateReminderTask:
             project=project,
             adviser=adviser,
             days_left=days,
+        )
+
+
+@pytest.mark.django_db
+@freeze_time('2022-07-17T10:00:00')
+class TestCreateNoRecentInteractionReminder:
+    current_date = datetime.date(year=2022, month=7, day=17)
+
+    def test_create_reminder_email(
+        self,
+        mock_send_no_recent_interaction_reminder,
+        adviser,
+    ):
+        """
+        Create reminder should create a model instance and send an email.
+        """
+        reminder_days = 5
+        project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            status=InvestmentProject.Status.ONGOING,
+        )
+
+        create_no_recent_interaction_reminder(
+            project=project,
+            adviser=adviser,
+            reminder_days=reminder_days,
+            send_email=True,
+            current_date=self.current_date,
+        )
+        reminders = NoRecentInvestmentInteractionReminder.objects.filter(
+            adviser=adviser,
+            project=project,
+        )
+        expected_event = f'No recent interaction with {project.name} in {reminder_days}\xa0days'
+        assert reminders.count() == 1
+        assert reminders[0].event == expected_event
+        mock_send_no_recent_interaction_reminder.assert_called_with(
+            project=project,
+            adviser=adviser,
+            reminder_days=reminder_days,
+            current_date=self.current_date,
+        )
+
+    def test_create_reminder_no_email(
+        self,
+        mock_send_no_recent_interaction_reminder,
+        adviser,
+    ):
+        """
+        Create reminder should create a model instance and not send an email.
+        """
+        reminder_days = 5
+        project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            status=InvestmentProject.Status.ONGOING,
+        )
+
+        create_no_recent_interaction_reminder(
+            project=project,
+            adviser=adviser,
+            reminder_days=reminder_days,
+            send_email=False,
+            current_date=self.current_date,
+        )
+        reminders = NoRecentInvestmentInteractionReminder.objects.filter(
+            adviser=adviser,
+            project=project,
+        )
+        assert reminders.count() == 1
+        assert mock_send_no_recent_interaction_reminder.call_count == 0
+
+    def test_create_existing_reminder(
+        self,
+        mock_send_no_recent_interaction_reminder,
+        adviser,
+    ):
+        """
+        If a reminder was already made today then do not send an email.
+        """
+        reminder_days = 5
+        project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        event = f'No recent interaction with {project.name} in {reminder_days}\xa0days'
+        with freeze_time('2022-07-17T10:00:00'):
+            NoRecentInvestmentInteractionReminder.objects.create(
+                adviser=adviser,
+                project=project,
+                event=event,
+            )
+
+        with freeze_time('2022-07-17T16:00:00'):
+            create_no_recent_interaction_reminder(
+                project=project,
+                adviser=adviser,
+                reminder_days=reminder_days,
+                send_email=True,
+                current_date=self.current_date,
+            )
+        reminders = NoRecentInvestmentInteractionReminder.objects.filter(
+            adviser=adviser,
+            project=project,
+        )
+        assert reminders.count() == 1
+        assert mock_send_no_recent_interaction_reminder.call_count == 0
+
+    def test_create_existing_reminder_slow_queue(
+        self,
+        mock_send_no_recent_interaction_reminder,
+        adviser,
+    ):
+        """
+        If the queue is still processing tasks from yesterday and a reminder
+        was already sent, do not send another one.
+        """
+        reminder_days = 5
+        project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        event = f'No recent interaction with {project.name} in {reminder_days}\xa0days'
+        with freeze_time('2022-07-17T10:00:00'):
+            NoRecentInvestmentInteractionReminder.objects.create(
+                adviser=adviser,
+                project=project,
+                event=event,
+            )
+
+        with freeze_time('2022-07-18T10:00:00'):
+            create_no_recent_interaction_reminder(
+                project=project,
+                adviser=adviser,
+                reminder_days=reminder_days,
+                send_email=True,
+                current_date=self.current_date,
+            )
+        reminders = NoRecentInvestmentInteractionReminder.objects.filter(
+            adviser=adviser,
+            project=project,
+        )
+        assert reminders.count() == 1
+        assert mock_send_no_recent_interaction_reminder.call_count == 0
+
+
+@pytest.mark.django_db
+@freeze_time('2022-07-17T10:00:00')
+class TestGenerateNoRecentInteractionReminderTask:
+    current_date = datetime.date(year=2022, month=7, day=17)
+
+    def test_generate_no_recent_interaction_reminders(
+        self,
+        mock_generate_no_recent_interaction_reminders_for_subscription,
+    ):
+        """
+        Reminders should be generated for all subscriptions.
+        """
+        subscription_count = 2
+        subscriptions = NoRecentInvestmentInteractionSubscriptionFactory.create_batch(
+            subscription_count,
+        )
+        generate_no_recent_interaction_reminders()
+        mock_generate_no_recent_interaction_reminders_for_subscription.assert_has_calls(
+            [
+                call(subscription=subscription, current_date=self.current_date)
+                for subscription in subscriptions
+            ],
+        )
+
+    @pytest.mark.parametrize(
+        'role',
+        (
+            'project_manager',
+            'project_assurance_adviser',
+            'client_relationship_manager',
+            'referral_source_adviser',
+        ),
+    )
+    @pytest.mark.parametrize(
+        'days,email_reminders_enabled',
+        (
+            (5, True),
+            (10, True),
+            (3, False),
+            (15, False),
+        ),
+    )
+    def test_generate_estimated_land_date_reminders_for_subscription(
+        self,
+        adviser,
+        mock_create_no_recent_interaction_reminder,
+        days,
+        email_reminders_enabled,
+        role,
+    ):
+        """
+        No Recent Interaction reminders should be created for relevant subscriptions.
+        """
+        subscription = NoRecentInvestmentInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[days],
+            email_reminders_enabled=email_reminders_enabled,
+        )
+        interaction_date = self.current_date - relativedelta(days=days)
+
+        role_field = {role: adviser}
+        project = ActiveInvestmentProjectFactory(
+            **role_field,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        with freeze_time(interaction_date):
+            InvestmentProjectInteractionFactory(investment_project=project)
+
+        generate_no_recent_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        mock_create_no_recent_interaction_reminder.assert_called_once_with(
+            project=project,
+            adviser=adviser,
+            reminder_days=days,
+            send_email=email_reminders_enabled,
+            current_date=self.current_date,
+        )
+
+    def test_active_ongoing_or_delayed_projects_only(
+        self,
+        adviser,
+        mock_create_no_recent_interaction_reminder,
+    ):
+        """
+        A reminder should only be sent for active ongoing or active delayed projects.
+        """
+        day = 15
+        subscription = NoRecentInvestmentInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[day],
+            email_reminders_enabled=True,
+        )
+        interaction_date = self.current_date - relativedelta(days=day)
+
+        active_ongoing_project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        active_delayed_project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            status=InvestmentProject.Status.DELAYED,
+        )
+
+        verify_win_ongoing_project = InvestmentProjectFactory(
+            project_manager=adviser,
+            stage_id=InvestmentProjectStage.verify_win.value.id,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        won_ongoing_project = InvestmentProjectFactory(
+            project_manager=adviser,
+            stage_id=InvestmentProjectStage.won.value.id,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        abandoned_project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            status=InvestmentProject.Status.ABANDONED,
+        )
+        with freeze_time(interaction_date):
+            projects = [
+                active_ongoing_project,
+                active_delayed_project,
+                verify_win_ongoing_project,
+                won_ongoing_project,
+                abandoned_project,
+            ]
+            InvestmentProjectInteractionFactory.create_batch(
+                len(projects),
+                investment_project=factory.Iterator(projects),
+            )
+
+        generate_no_recent_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        mock_create_no_recent_interaction_reminder.assert_has_calls([
+            call(
+                project=project,
+                adviser=adviser,
+                reminder_days=day,
+                send_email=True,
+                current_date=self.current_date,
+            )
+            for project in [active_ongoing_project, active_delayed_project]
+        ], any_order=True)
+
+    def test_dont_send_reminder_if_recent_interaction_exists(
+        self,
+        adviser,
+        mock_create_no_recent_interaction_reminder,
+    ):
+        """
+        A reminder should only be sent if there is no recent interaction.
+        """
+        day = 15
+        subscription = NoRecentInvestmentInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[day],
+            email_reminders_enabled=True,
+        )
+        interaction_date = self.current_date - relativedelta(days=day)
+
+        project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            status=InvestmentProject.Status.ONGOING,
+        )
+
+        with freeze_time(interaction_date):
+            InvestmentProjectInteractionFactory(investment_project=project)
+
+        recent_interaction_date = self.current_date - relativedelta(days=5)
+        with freeze_time(recent_interaction_date):
+            InvestmentProjectInteractionFactory(investment_project=project)
+
+        generate_no_recent_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        mock_create_no_recent_interaction_reminder.assert_not_called()
+
+    def test_no_user_feature_flag(
+        self,
+        mock_create_no_recent_interaction_reminder,
+        no_recent_interaction_reminders_user_feature_flag,
+    ):
+        """
+        Reminders should not be created if the user does not have the feature flag enabled.
+        """
+        days = 15
+        adviser = AdviserFactory()
+        subscription = NoRecentInvestmentInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[days],
+            email_reminders_enabled=True,
+        )
+
+        project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        interaction_date = self.current_date - relativedelta(days=days)
+        with freeze_time(interaction_date):
+            InvestmentProjectInteractionFactory(investment_project=project)
+
+        generate_no_recent_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        assert mock_create_no_recent_interaction_reminder.call_count == 0
+
+    def test_inactive_user_feature_flag(
+        self,
+        mock_create_no_recent_interaction_reminder,
+    ):
+        """
+        Reminders should not be created if the user feature flag is inactive.
+        """
+        feature_flag = UserFeatureFlagFactory(
+            code=NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
+            is_active=False,
+        )
+        days = 15
+        adviser = AdviserFactory()
+        adviser.features.set([feature_flag])
+        subscription = NoRecentInvestmentInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[days],
+            email_reminders_enabled=True,
+        )
+        project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        interaction_date = self.current_date - relativedelta(days=days)
+        with freeze_time(interaction_date):
+            InvestmentProjectInteractionFactory(investment_project=project)
+
+        generate_no_recent_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        assert mock_create_no_recent_interaction_reminder.call_count == 0
+
+    def test_does_not_send_multiple(
+        self,
+        mock_send_no_recent_interaction_reminder,
+        adviser,
+    ):
+        """
+        Only one reminder should be created.
+
+        Even after calling the generate function multiple times, only one reminder
+        should be created and one email sent.
+        """
+        days = 5
+        NoRecentInvestmentInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[days],
+            email_reminders_enabled=True,
+        )
+        project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        interaction_date = self.current_date - relativedelta(days=days)
+        with freeze_time(interaction_date):
+            InvestmentProjectInteractionFactory(investment_project=project)
+
+        generate_no_recent_interaction_reminders()
+        generate_no_recent_interaction_reminders()
+        assert NoRecentInvestmentInteractionReminder.objects.filter(
+            project=project,
+            adviser=adviser,
+        ).count() == 1
+        mock_send_no_recent_interaction_reminder.assert_called_once_with(
+            project=project,
+            adviser=adviser,
+            reminder_days=days,
+            current_date=self.current_date,
         )
