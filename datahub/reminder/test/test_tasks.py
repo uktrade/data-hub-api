@@ -940,10 +940,53 @@ class TestGenerateNoRecentInteractionReminderTask:
             for project in [active_ongoing_project, active_delayed_project]
         ], any_order=True)
 
+    def test_send_reminder_if_no_interactions_at_all_in_given_timeframe(
+        self,
+        adviser,
+        mock_create_no_recent_interaction_reminder,
+    ):
+        """
+        A reminder should be sent if no interactions at all in given timeframe
+        """
+        day = 15
+        subscription = NoRecentInvestmentInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[day],
+            email_reminders_enabled=True,
+        )
+        interaction_date = self.current_date - relativedelta(days=day)
+
+        with freeze_time(interaction_date):
+            project = ActiveInvestmentProjectFactory(
+                project_manager=adviser,
+                status=InvestmentProject.Status.ONGOING,
+            )
+
+        generate_no_recent_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        mock_create_no_recent_interaction_reminder.assert_called_once_with(
+            project=project,
+            adviser=adviser,
+            reminder_days=day,
+            send_email=True,
+            current_date=self.current_date,
+        )
+        mock_create_no_recent_interaction_reminder.reset_mock()
+        next_day = self.current_date + relativedelta(days=1)
+        generate_no_recent_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=next_day,
+        )
+        mock_create_no_recent_interaction_reminder.assert_not_called()
+
+    @pytest.mark.parametrize('day_offset', (0, 1))
     def test_dont_send_reminder_if_recent_interaction_exists(
         self,
         adviser,
         mock_create_no_recent_interaction_reminder,
+        day_offset,
     ):
         """
         A reminder should only be sent if there is no recent interaction.
@@ -961,7 +1004,7 @@ class TestGenerateNoRecentInteractionReminderTask:
             status=InvestmentProject.Status.ONGOING,
         )
 
-        with freeze_time(interaction_date):
+        with freeze_time(interaction_date + relativedelta(days=day_offset)):
             InvestmentProjectInteractionFactory(investment_project=project)
 
         recent_interaction_date = self.current_date - relativedelta(days=5)
