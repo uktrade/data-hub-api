@@ -3,7 +3,7 @@ from logging import getLogger
 from celery import shared_task
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django_pglocks import advisory_lock
@@ -86,17 +86,10 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
         subscription.reminder_days,
     )
 
-    projects = InvestmentProject.objects.filter(
-        Q(project_manager=subscription.adviser)
-        | Q(project_assurance_adviser=subscription.adviser)
-        | Q(client_relationship_manager=subscription.adviser)
-        | Q(referral_source_adviser=subscription.adviser),
+    projects = _get_active_projects(
+        subscription.adviser,
+    ).filter(
         estimated_land_date__in=eld_filter,
-        status__in=[
-            InvestmentProject.Status.ONGOING,
-            InvestmentProject.Status.DELAYED,
-        ],
-        stage_id=InvestmentProjectStage.active.value.id,
     ).order_by('pk')
 
     summary_threshold = projects.count() > NOTIFICATION_SUMMARY_THRESHOLD
@@ -167,33 +160,26 @@ def generate_no_recent_interaction_reminders_for_subscription(subscription, curr
 
     for reminder_day in subscription.reminder_days:
         threshold = current_date - relativedelta(days=reminder_day)
-        projects = Interaction.objects.filter(
-            Q(investment_project__project_manager=subscription.adviser)
-            | Q(investment_project__project_assurance_adviser=subscription.adviser)
-            | Q(investment_project__client_relationship_manager=subscription.adviser)
-            | Q(investment_project__referral_source_adviser=subscription.adviser),
-            created_on__date__gte=threshold,
-            investment_project__status__in=[
-                InvestmentProject.Status.ONGOING,
-                InvestmentProject.Status.DELAYED,
-            ],
-            investment_project__stage_id=InvestmentProjectStage.active.value.id,
-        ).values('investment_project_id').annotate(total=Count('investment_project_id'))
 
-        for project_data in projects:
-            # if total is greater than 1, it means there are more recent interactions, so
-            # we should skip
-            if project_data['total'] > 1:
-                continue
+        for project in _get_active_projects(subscription.adviser).iterator():
+            qs = Interaction.objects.filter(investment_project_id=project.id)
+            has_interactions = qs.exists()
+            if has_interactions:
+                exists = qs.filter(created_on__date=threshold).exists()
+                if not exists:
+                    continue
+                send_reminder = not qs.filter(created_on__date__gt=threshold).exists()
+            else:
+                send_reminder = project.created_on.date() == threshold
 
-            project = InvestmentProject.objects.get(id=project_data['investment_project_id'])
-            create_no_recent_interaction_reminder(
-                project=project,
-                adviser=subscription.adviser,
-                reminder_days=reminder_day,
-                send_email=subscription.email_reminders_enabled,
-                current_date=current_date,
-            )
+            if send_reminder:
+                create_no_recent_interaction_reminder(
+                    project=project,
+                    adviser=subscription.adviser,
+                    reminder_days=reminder_day,
+                    send_email=subscription.email_reminders_enabled,
+                    current_date=current_date,
+                )
 
 
 def create_estimated_land_date_reminder(project, adviser, days_left, send_email, current_date):
@@ -263,3 +249,18 @@ def create_no_recent_interaction_reminder(
             reminder_days=reminder_days,
             current_date=current_date,
         )
+
+
+def _get_active_projects(adviser):
+    """Get active projects for given adviser."""
+    return InvestmentProject.objects.filter(
+        Q(project_manager=adviser)
+        | Q(project_assurance_adviser=adviser)
+        | Q(client_relationship_manager=adviser)
+        | Q(referral_source_adviser=adviser),
+        status__in=[
+            InvestmentProject.Status.ONGOING,
+            InvestmentProject.Status.DELAYED,
+        ],
+        stage_id=InvestmentProjectStage.active.value.id,
+    )
