@@ -1,3 +1,11 @@
+# Data Hub API 40.13.0 (2022-07-29)
+
+
+## Features
+
+- **Reminders** No recent investment interaction reminders are now automatically created according to each adviser's subscriptions.
+
+
 # Data Hub API 40.12.1 (2022-07-19)
 
 
