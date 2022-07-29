@@ -483,6 +483,12 @@ if REDIS_BASE_URL:
             'schedule': crontab(minute=30, hour=8, day_of_month=1),
         }
 
+    if env.bool('ENABLE_NO_RECENT_INTERACTION_REMINDERS', False):
+        CELERY_BEAT_SCHEDULE['generate_no_recent_interaction_reminders'] = {
+            'task': 'datahub.reminder.tasks.generate_no_recent_interaction_reminders',
+            'schedule': crontab(minute=00, hour=8),
+        }
+
     CELERY_WORKER_LOG_FORMAT = (
         "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
     )
@@ -541,6 +547,10 @@ INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID = env(
 )
 INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_SUMMARY_TEMPLATE_ID = env(
     'INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_SUMMARY_TEMPLATE_ID',
+    default='',
+)
+INVESTMENT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID = env(
+    'INVESTMENT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID',
     default='',
 )
 NOTIFICATION_SUMMARY_THRESHOLD = env.int(
