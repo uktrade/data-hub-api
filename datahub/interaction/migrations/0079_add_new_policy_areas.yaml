@@ -1,0 +1,3 @@
+- model: interaction.policyarea
+  pk: ac27ee57-7290-4e15-82f3-6400b6e2b6fe
+  fields: {disabled_on: null, name: 'Free Trade Agreements: Switzerland', order: 2410.0}
