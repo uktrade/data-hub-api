@@ -1,3 +1,11 @@
+# Data Hub API 40.13.1 (2022-08-03)
+
+
+## Features
+
+- **Events** It's now possible to add event types for "Meet The Buyer".
+
+
 # Data Hub API 40.13.0 (2022-07-29)
 
 
