@@ -10,6 +10,7 @@ import signal
 import gevent
 from gevent.pywsgi import WSGIServer
 from django.core.wsgi import get_wsgi_application
+import spannerInTheImport
 
 server = WSGIServer(('0.0.0.0', int(os.environ.get('PORT', '8000'))), get_wsgi_application())
 gevent.signal_handler(signal.SIGTERM, server.stop)
