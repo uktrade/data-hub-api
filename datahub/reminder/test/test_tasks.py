@@ -80,6 +80,24 @@ def adviser(
 
 
 @pytest.fixture()
+def inactive_adviser(
+    no_recent_interaction_reminders_user_feature_flag,
+    estimated_land_date_reminders_user_feature_flag,
+):
+    """
+    An inactive adviser with the relevant feature flags enabled
+    """
+    inactive_adviser = AdviserFactory(is_active=False)
+    inactive_adviser.features.set(
+        [
+            estimated_land_date_reminders_user_feature_flag,
+            no_recent_interaction_reminders_user_feature_flag,
+        ],
+    )
+    return inactive_adviser
+
+
+@pytest.fixture()
 def mock_create_estimated_land_date_reminder(monkeypatch):
     mock_create_estimated_land_date_reminder = mock.Mock()
     monkeypatch.setattr(
@@ -355,6 +373,7 @@ class TestGenerateEstimatedLandDateReminderTask:
                 call(subscription=subscription, current_date=self.current_date)
                 for subscription in subscriptions
             ],
+            any_order=True,
         )
 
     @pytest.mark.parametrize(
@@ -615,6 +634,29 @@ class TestGenerateEstimatedLandDateReminderTask:
         )
         assert mock_create_estimated_land_date_reminder.call_count == 0
 
+    def test_inactive_user(
+        self,
+        inactive_adviser,
+        mock_create_estimated_land_date_reminder,
+    ):
+        """
+        Reminders should not be created if the user is inactive.
+        """
+        days = 30
+        UpcomingEstimatedLandDateSubscriptionFactory(
+            adviser=inactive_adviser,
+            reminder_days=[days],
+            email_reminders_enabled=True,
+        )
+        estimated_land_date = self.current_date + relativedelta(months=1)
+        ActiveInvestmentProjectFactory(
+            project_manager=inactive_adviser,
+            estimated_land_date=estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        generate_estimated_land_date_reminders()
+        assert mock_create_estimated_land_date_reminder.call_count == 0
+
     def test_does_not_send_multiple(
         self,
         mock_send_estimated_land_date_reminder,
@@ -815,6 +857,7 @@ class TestGenerateNoRecentInteractionReminderTask:
                 call(subscription=subscription, current_date=self.current_date)
                 for subscription in subscriptions
             ],
+            any_order=True,
         )
 
     @pytest.mark.parametrize(
@@ -835,7 +878,7 @@ class TestGenerateNoRecentInteractionReminderTask:
             (15, False),
         ),
     )
-    def test_generate_estimated_land_date_reminders_for_subscription(
+    def test_generate_no_recent_interaction_reminders_for_subscription(
         self,
         adviser,
         mock_create_no_recent_interaction_reminder,
@@ -1078,6 +1121,31 @@ class TestGenerateNoRecentInteractionReminderTask:
             subscription=subscription,
             current_date=self.current_date,
         )
+        assert mock_create_no_recent_interaction_reminder.call_count == 0
+
+    def test_inactive_user(
+        self,
+        mock_create_no_recent_interaction_reminder,
+        inactive_adviser,
+    ):
+        """
+        Reminders should not be created if the user is inactive.
+        """
+        days = 15
+        NoRecentInvestmentInteractionSubscriptionFactory(
+            adviser=inactive_adviser,
+            reminder_days=[days],
+            email_reminders_enabled=True,
+        )
+        project = ActiveInvestmentProjectFactory(
+            project_manager=inactive_adviser,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        interaction_date = self.current_date - relativedelta(days=days)
+        with freeze_time(interaction_date):
+            InvestmentProjectInteractionFactory(investment_project=project)
+
+        generate_no_recent_interaction_reminders()
         assert mock_create_no_recent_interaction_reminder.call_count == 0
 
     def test_does_not_send_multiple(
