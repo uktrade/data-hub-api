@@ -79,7 +79,7 @@ dill==0.3.4
     # via pylint
 distlib==0.3.4
     # via virtualenv
-django==3.2.14
+django==3.2.15
     # via
     #   -r requirements.in
     #   django-axes
@@ -114,13 +114,13 @@ django-pglocks==1.0.4
     # via -r requirements.in
 django-redis==5.2.0
     # via -r requirements.in
-django-reversion==5.0.1
+django-reversion==5.0.2
     # via -r requirements.in
 djangorestframework==3.13.1
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
-elastic-apm==6.10.1
+elastic-apm==6.10.2
     # via -r requirements.in
 execnet==1.9.0
     # via pytest-xdist
@@ -355,7 +355,7 @@ requests-mock==1.9.3
     # via -r requirements-dev.in
 requests-toolbelt==0.9.1
     # via -r requirements.in
-rq==1.10.1
+rq==1.11.0
     # via -r requirements.in
 s3transfer==0.6.0
     # via boto3
