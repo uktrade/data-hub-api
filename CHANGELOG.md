@@ -1,3 +1,15 @@
+# Data Hub API 40.13.2 (2022-08-05)
+
+
+## Features
+
+- **Reminders** Reminders are now only generated for active users.
+
+## Bug fixes
+
+- **Reminders** Notify template no longer links to deprecated individual notification settings.
+
+
 # Data Hub API 40.13.1 (2022-08-03)
 
 
@@ -67,7 +79,7 @@
 
 ## Internal changes
 
-- It's now possble to deploy only production pips to a production environment, reducing the size of release.
+- It's now possible to deploy only production pips to a production environment, reducing the size of release.
 
 
 # Data Hub API 40.8.0 (2022-06-20)
@@ -86,7 +98,7 @@
 - **Events** - It is now possible to get a list of events in activity-stream [format.](https://www.w3.org/TR/activitystreams-core/)
 
       The URL for this is:    `/v3/activity-stream/event`
-- **Interactions** Its now possible to view Free Trade Agreement: Switzerland and UK-Lebanon Association Agreement
+- **Interactions** It's now possible to view Free Trade Agreement: Switzerland and UK-Lebanon Association Agreement
 - **Investment** Estimated land date reminders are only generated for active ongoing and active delayed projects
 - **Investment** Reminder subscriptions can be updated with the PATCH method:
 

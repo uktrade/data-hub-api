@@ -53,7 +53,9 @@ def generate_estimated_land_date_reminders():
             )
             return
         current_date = now().date()
-        for subscription in UpcomingEstimatedLandDateSubscription.objects.all().iterator():
+        for subscription in UpcomingEstimatedLandDateSubscription.objects.select_related(
+            'adviser',
+        ).filter(adviser__is_active=True).iterator():
             generate_estimated_land_date_reminders_for_subscription(
                 subscription=subscription,
                 current_date=current_date,
@@ -131,7 +133,9 @@ def generate_no_recent_interaction_reminders():
             )
             return
         current_date = now().date()
-        for subscription in NoRecentInvestmentInteractionSubscription.objects.all().iterator():
+        for subscription in NoRecentInvestmentInteractionSubscription.objects.select_related(
+            'adviser',
+        ).filter(adviser__is_active=True).iterator():
             generate_no_recent_interaction_reminders_for_subscription(
                 subscription=subscription,
                 current_date=current_date,
