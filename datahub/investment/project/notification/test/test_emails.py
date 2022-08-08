@@ -76,8 +76,7 @@ class TestEmailFunctions:
                 template_id,
                 {
                     'project_details_url': f'{project.get_absolute_url()}/details',
-                    'project_subscription_url': f'{project.get_absolute_url()}/notifications/'
-                                                'estimated-land-date',
+                    'settings_url': settings.DATAHUB_FRONTEND_REMINDER_SETTINGS_URL,
                     'investor_company_name': project.investor_company.name,
                     'project_name': project.name,
                     'project_code': project.project_code,
@@ -153,8 +152,7 @@ class TestEmailFunctions:
                 template_id,
                 {
                     'project_details_url': f'{project.get_absolute_url()}/details',
-                    'project_subscription_url': f'{project.get_absolute_url()}/notifications/'
-                                                'estimated-land-date',
+                    'settings_url': settings.DATAHUB_FRONTEND_REMINDER_SETTINGS_URL,
                     'investor_company_name': project.investor_company.name,
                     'project_name': project.name,
                     'project_code': project.project_code,
