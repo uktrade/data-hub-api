@@ -1,3 +1,15 @@
+# Data Hub API 40.13.2 (2022-08-05)
+
+
+## Features
+
+- **Reminders** Reminders are now only generated for active users.
+
+## Bug fixes
+
+- **Reminders** Notify template no longer links to deprecated individual notification settings.
+
+
 # Data Hub API 40.13.1 (2022-08-03)
 
 
