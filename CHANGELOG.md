@@ -1,3 +1,11 @@
+# Data Hub API 40.13.3 (2022-08-09)
+
+
+## Features
+
+- **Events** It's now possible to select Sector Specialist event types.
+
+
 # Data Hub API 40.13.2 (2022-08-05)
 
 
