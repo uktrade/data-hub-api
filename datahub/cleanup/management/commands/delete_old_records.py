@@ -170,7 +170,6 @@ class Command(BaseCleanupCommand):
                 InvestmentProject._meta.get_field('stage_log'),
                 InvestmentProject._meta.get_field('investmentprojectcode'),
                 InvestmentProject._meta.get_field('activities'),
-                InvestmentProject._meta.get_field('notifications'),
                 InvestmentProject._meta.get_field('no_recent_investment_interaction_reminders'),
                 InvestmentProject._meta.get_field('upcoming_estimated_land_date_reminders'),
             ),
