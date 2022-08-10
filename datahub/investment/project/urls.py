@@ -3,7 +3,6 @@
 from django.urls import include, path
 
 from datahub.investment.project.evidence.urls import urlpatterns as evidence_urlpatterns
-from datahub.investment.project.notification.urls import urlpatterns as notification_urlpatterns
 from datahub.investment.project.proposition.urls import urls_v3 as proposition_urlpatterns
 from datahub.investment.project.views import (
     IProjectAuditViewSet,
@@ -97,13 +96,6 @@ urlpatterns = [
         include(
             (evidence_urlpatterns, 'evidence-document'),
             namespace='evidence-document',
-        ),
-    ),
-    path(
-        'investment/<uuid:project_pk>/',
-        include(
-            (notification_urlpatterns, 'notification'),
-            namespace='notification',
         ),
     ),
 ]
