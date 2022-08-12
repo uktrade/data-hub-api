@@ -95,7 +95,15 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
     ).order_by('pk')
 
     summary_threshold = projects.count() > NOTIFICATION_SUMMARY_THRESHOLD
-    if summary_threshold and subscription.email_reminders_enabled:
+    if (
+        summary_threshold
+        and subscription.email_reminders_enabled
+        and not _has_existing_estimated_land_date_reminder(
+            projects[0],
+            subscription.adviser,
+            current_date,
+        )
+    ):
         send_estimated_land_date_summary(
             projects=list(projects),
             adviser=subscription.adviser,
@@ -103,12 +111,9 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
         )
 
     for project in projects:
-        day_diff = (project.estimated_land_date - current_date).days
-        days_left = 30 if day_diff < 32 else 60
         create_estimated_land_date_reminder(
             project=project,
             adviser=subscription.adviser,
-            days_left=days_left,
             # don't send emails for each project if summary notification threshold has been reached
             send_email=(subscription.email_reminders_enabled and not summary_threshold),
             current_date=current_date,
@@ -186,21 +191,17 @@ def generate_no_recent_interaction_reminders_for_subscription(subscription, curr
                 )
 
 
-def create_estimated_land_date_reminder(project, adviser, days_left, send_email, current_date):
+def create_estimated_land_date_reminder(project, adviser, send_email, current_date):
     """
     Creates a reminder and sends an email if required.
 
     If a reminder has already been sent on the same day, then do nothing.
     """
-    has_existing = UpcomingEstimatedLandDateReminder.objects.filter(
-        adviser=adviser,
-        event=f'{days_left} days left to estimated land date',
-        project=project,
-        created_on__date=current_date,
-    ).exists()
-
-    if has_existing:
+    if _has_existing_estimated_land_date_reminder(project, adviser, current_date):
         return
+
+    day_diff = (project.estimated_land_date - current_date).days
+    days_left = 30 if day_diff < 32 else 60
 
     UpcomingEstimatedLandDateReminder.objects.create(
         adviser=adviser,
@@ -214,6 +215,15 @@ def create_estimated_land_date_reminder(project, adviser, days_left, send_email,
             adviser=adviser,
             days_left=days_left,
         )
+
+
+def _has_existing_estimated_land_date_reminder(project, adviser, current_date):
+    return UpcomingEstimatedLandDateReminder.objects.filter(
+        adviser=adviser,
+        project=project,
+        created_on__month=current_date.month,
+        created_on__year=current_date.year,
+    ).exists()
 
 
 def create_no_recent_interaction_reminder(

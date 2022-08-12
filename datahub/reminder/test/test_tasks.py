@@ -191,7 +191,6 @@ class TestCreateEstimatedLandDateReminder:
         create_estimated_land_date_reminder(
             project=project,
             adviser=adviser,
-            days_left=days_left,
             send_email=True,
             current_date=self.current_date,
         )
@@ -215,7 +214,6 @@ class TestCreateEstimatedLandDateReminder:
         """
         Create reminder should create a model instance and not send an email.
         """
-        days_left = 30
         estimated_land_date = self.current_date + relativedelta(months=1)
         project = ActiveInvestmentProjectFactory(
             project_manager=adviser,
@@ -226,7 +224,6 @@ class TestCreateEstimatedLandDateReminder:
         create_estimated_land_date_reminder(
             project=project,
             adviser=adviser,
-            days_left=days_left,
             send_email=False,
             current_date=self.current_date,
         )
@@ -263,7 +260,6 @@ class TestCreateEstimatedLandDateReminder:
             create_estimated_land_date_reminder(
                 project=project,
                 adviser=adviser,
-                days_left=days_left,
                 send_email=True,
                 current_date=self.current_date,
             )
@@ -301,7 +297,6 @@ class TestCreateEstimatedLandDateReminder:
             create_estimated_land_date_reminder(
                 project=project,
                 adviser=adviser,
-                days_left=days_left,
                 send_email=True,
                 current_date=self.current_date,
             )
@@ -339,7 +334,6 @@ class TestCreateEstimatedLandDateReminder:
         create_estimated_land_date_reminder(
             project=project,
             adviser=adviser,
-            days_left=days_left,
             send_email=True,
             current_date=self.current_date,
         )
@@ -438,7 +432,6 @@ class TestGenerateEstimatedLandDateReminderTask:
         mock_create_estimated_land_date_reminder.assert_called_once_with(
             project=project,
             adviser=adviser,
-            days_left=days,
             send_email=email_reminders_enabled,
             current_date=self.current_date,
         )
@@ -510,7 +503,6 @@ class TestGenerateEstimatedLandDateReminderTask:
             call(
                 project=project,
                 adviser=adviser,
-                days_left=days,
                 send_email=False,
                 current_date=self.current_date,
             )
@@ -569,7 +561,6 @@ class TestGenerateEstimatedLandDateReminderTask:
             call(
                 project=project,
                 adviser=adviser,
-                days_left=days,
                 send_email=True,
                 current_date=self.current_date,
             )
@@ -690,6 +681,41 @@ class TestGenerateEstimatedLandDateReminderTask:
             project=project,
             adviser=adviser,
             days_left=days,
+        )
+
+    def test_does_not_send_multiple_summary(
+        self,
+        mock_send_estimated_land_date_summary,
+        adviser,
+    ):
+        """
+        Even after calling the generate function multiple times, only one summary email
+        should be sent.
+        """
+        days = 30
+        estimated_land_date = self.current_date + relativedelta(months=1)
+        UpcomingEstimatedLandDateSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[days],
+            email_reminders_enabled=True,
+        )
+        projects = ActiveInvestmentProjectFactory.create_batch(
+            6,
+            project_manager=adviser,
+            estimated_land_date=estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        projects.sort(key=attrgetter('pk'))
+        generate_estimated_land_date_reminders()
+        generate_estimated_land_date_reminders()
+        assert UpcomingEstimatedLandDateReminder.objects.filter(
+            project__in=(project.pk for project in projects),
+            adviser=adviser,
+        ).count() == 6
+        mock_send_estimated_land_date_summary.assert_called_once_with(
+            projects=projects,
+            adviser=adviser,
+            current_date=self.current_date,
         )
 
 
