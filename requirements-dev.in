@@ -7,7 +7,7 @@ pytest-cov==3.0.0
 pytest-xdist==2.5.0
 ipython==8.4.0
 factory-boy==3.2.1
-freezegun==1.2.1
+freezegun==1.2.2
 requests-mock==1.9.3
 pip-tools==6.8.0
 piprot==0.9.11
