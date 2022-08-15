@@ -1,3 +1,7 @@
+This file is no longer updated and has been kept for reference purposes.
+
+Please see the [release notes](https://github.com/uktrade/data-hub-api/releases) for up-to-date change information.
+
 # Data Hub API 40.13.3 (2022-08-09)
 
 
