@@ -58,10 +58,7 @@ lock file, such as removed dependencies or packages manually installed using pip
    `pip install -r requirements.txt`, but that may leave behind redundant packages that
    have been removed which can cause problems.)
 
-5. Commit the changes to a new branch, along with a brief [news fragment](../changelog/README.md)
-   (unless something significant was updated, this can just say 'Various dependencies were updated').
-
-6. Create a PR. Include links to the change logs for dependencies in `requirements.in` that
+5. Create a PR. Include links to the change logs for dependencies in `requirements.in` that
    were updated to make it easier for other developers to have a look at them.
 
    [Example of such a PR.](https://github.com/uktrade/data-hub-api/pull/1171)
