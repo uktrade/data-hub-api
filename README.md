@@ -1,7 +1,7 @@
 # Data Hub API
 
 [![CircleCI](https://circleci.com/gh/uktrade/data-hub-api.svg?style=svg)](https://circleci.com/gh/uktrade/data-hub-api)
-[![codecov](https://codecov.io/gh/uktrade/data-hub-api/branch/develop/graph/badge.svg)](https://codecov.io/gh/uktrade/data-hub-api)
+[![codecov](https://codecov.io/gh/uktrade/data-hub-api/branch/master/graph/badge.svg)](https://codecov.io/gh/uktrade/data-hub-api)
 
 Data Hub API provides an API into Data Hub for Data Hub clients. Using Data Hub API you can search for entities and manage companies, contacts and interactions.
 

@@ -7,18 +7,7 @@ Include any context that will help reviewers understand the reason for these cha
 
 ### Checklist
 
-* [ ] If this is a releasable change, has a news fragment been added?
-
-  <details>
-  <summary>Explanation</summary>
-  
-  A news fragment is required for any releasable change (i.e. code that runs in or affects production) so that a corresponding changelog entry is added when releasing.
-  
-  Check [changelog/README.md](https://github.com/uktrade/data-hub-api/blob/master/changelog/README.md) for instructions.
-  
-  </details>
-  
-* [ ] Has this branch been rebased on top of the current `develop` branch?
+* [ ] Has this branch been rebased on top of the current `master` branch?
 
   <details>
   <summary>Explanation</summary>
@@ -41,4 +30,4 @@ Include any context that will help reviewers understand the reason for these cha
 
 </details>
 
-See [docs/CONTRIBUTING.md](https://github.com/uktrade/data-hub-api/blob/develop/docs/CONTRIBUTING.md) for more guidelines.
+See [docs/CONTRIBUTING.md](https://github.com/uktrade/data-hub-api/blob/master/docs/CONTRIBUTING.md) for more guidelines.
