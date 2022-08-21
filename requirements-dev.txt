@@ -10,8 +10,6 @@ aiosignal==1.2.0
     # via aiohttp
 amqp==5.0.9
     # via kombu
-appnope==0.1.3
-    # via ipython
 asgiref==3.5.0
     # via django
 astroid==2.11.6
@@ -90,7 +88,7 @@ django==3.2.15
     #   djangorestframework
 django-axes==5.36.0
     # via -r requirements.in
-django-debug-toolbar==3.5.0
+django-debug-toolbar==3.6.0
     # via -r requirements.in
 django-environ==0.9.0
     # via -r requirements.in
