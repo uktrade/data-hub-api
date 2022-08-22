@@ -1,7 +1,7 @@
 # Data Hub API
 
 [![CircleCI](https://circleci.com/gh/uktrade/data-hub-api.svg?style=svg)](https://circleci.com/gh/uktrade/data-hub-api)
-[![codecov](https://codecov.io/gh/uktrade/data-hub-api/branch/master/graph/badge.svg)](https://codecov.io/gh/uktrade/data-hub-api)
+[![codecov](https://codecov.io/gh/uktrade/data-hub-api/branch/main/graph/badge.svg)](https://codecov.io/gh/uktrade/data-hub-api)
 
 Data Hub API provides an API into Data Hub for Data Hub clients. Using Data Hub API you can search for entities and manage companies, contacts and interactions.
 
@@ -95,7 +95,7 @@ There is now a `make` command to bring up the three environments on a single doc
    ```
 
    Ensure `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID` is the same as `MOCK_SSO_EMAIL_USER_ID`
-   in mock-sso environment definition in [data-hub-frontend/docker-compose.frontend.yml](https://github.com/uktrade/data-hub-frontend/blob/master/docker-compose.frontend.yml)
+   in mock-sso environment definition in [data-hub-frontend/docker-compose.frontend.yml](https://github.com/uktrade/data-hub-frontend/blob/main/docker-compose.frontend.yml)
    and `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID` the same as `DJANGO_SUPERUSER_EMAIL` in
    data-hub-api .env file otherwise the user may not exist
 
