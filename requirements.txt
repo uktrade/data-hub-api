@@ -232,3 +232,4 @@ zope-interface==5.4.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+setuptools==65.1.1
