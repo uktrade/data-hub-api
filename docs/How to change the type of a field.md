@@ -24,7 +24,7 @@ Each release remains compatible with the previous release, so that rolling (blue
 
 1. Release these changes and ensure the release is deployed to production.
 
-1. If there is a significant amount of data to copy, run the [`dbmaintenance.tasks.copy_foreign_key_to_m2m_field` Celery task](https://github.com/uktrade/data-hub-api/blob/master/datahub/dbmaintenance/tasks.py) manually in staging and production to copy historical data to the new field in small batches.
+1. If there is a significant amount of data to copy, run the [`dbmaintenance.tasks.copy_foreign_key_to_m2m_field` Celery task](https://github.com/uktrade/data-hub-api/blob/main/datahub/dbmaintenance/tasks.py) manually in staging and production to copy historical data to the new field in small batches.
 
     (This is in order to avoid a long-running migration, as these tend to be problematic during deployments.)
 
