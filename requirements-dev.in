@@ -29,3 +29,6 @@ pydocstyle==6.1.1
 pylint==2.14.5
 pylint-django==2.5.3
 pylint-pytest==1.1.2
+
+# temporary fix to allow deployments until https://github.com/cloudfoundry/python-buildpack/issues/574 is fixed.
+setuptools==65.1.1
