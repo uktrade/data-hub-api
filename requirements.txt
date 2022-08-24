@@ -232,4 +232,5 @@ zope-interface==5.4.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+# temporary fix to allow deployments until https://github.com/cloudfoundry/python-buildpack/issues/574 is fixed.
 setuptools==65.1.1
