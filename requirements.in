@@ -61,5 +61,5 @@ sentry_sdk==1.9.0
 rq==1.11.0
 
 # temporary fix to allow deployments until https://github.com/cloudfoundry/python-buildpack/issues/574 is fixed.
-setuptools==65.1.1
+setuptools==65.3.0
 
