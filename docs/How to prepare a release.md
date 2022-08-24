@@ -1,13 +1,13 @@
 # How to prepare a release
 
-Commits to `master` are automatically deployed to dev and staging environments.
+Commits to `main` are automatically deployed to dev and staging environments.
 
 Deployments to production are done manually through Jenkins where a Git tag can be used.
 
 ## Deploying to production
 1. Post a message into the #data-hub-core-dev channel saying that you want to do a Data Hub API release and ask if there are any objections. If no objections, proceed with the following steps.
 
-2. Create a GIT tag `git tag v<MAJOR>.<MINOR>.<PATCH>`, e.g. `v5.1.2` pointing to the latest `master`.
+2. Create a GIT tag `git tag v<MAJOR>.<MINOR>.<PATCH>`, e.g. `v5.1.2` pointing to the latest `main`.
 
    | Release type      | When to increase                                                                         |
    | ----------------- | ---------------------------------------------------------------------------------------- |
@@ -19,7 +19,7 @@ You can use the [GitHub comparison tool](https://github.com/uktrade/data-hub-api
 
 3. Push the tag to the remote - `git push origin v<VERSION_NUMBER>`.
 
-4. Check that the tag worked by using the [GitHub comparison tool](https://github.com/uktrade/data-hub-api/compare) again to compare master to the new tag. If done correctly, there should be no difference. 
+4. Check that the tag worked by using the [GitHub comparison tool](https://github.com/uktrade/data-hub-api/compare) again to compare main to the new tag. If done correctly, there should be no difference. 
 
 5. Go to Jenkins and click on `Build with Parameters`.
 

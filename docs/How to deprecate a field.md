@@ -19,7 +19,7 @@ We currently use blue-green deployments with zero downtime but with a single dat
     * the fixtures (`test_data`)
     * any other place
 * Check that the [frontend](https://github.com/uktrade/data-hub-frontend) doesn't have any references to it.
-* Open a PR and merge it into master after it's been approved.
+* Open a PR and merge it into main after it's been approved.
 * Wait for the next release; your changes will appear in the release notes.
 
 If you are removing a model field you might want to start [removing it from django](#how-to-remove-column) at the same time.
@@ -59,7 +59,7 @@ To do this:
     * Add a `migrations.SeparateDatabaseAndState` operation following [this example](https://github.com/uktrade/data-hub-api/blob/d4b7d447cb992f71427ac56b219d4a63c73fbb2b/datahub/company/migrations/0034_remove-account-manager-from-django.py).
     * `./manage.py migrate`.
 * Remove the field from any other part of the code including factories, admin and tests.
-* Open a PR and merge it into master after it's been approved.
+* Open a PR and merge it into main after it's been approved.
 * Wait for the next release; your changes will appear in the release notes.
 
 See [example](https://github.com/uktrade/data-hub-api/pull/1107/files).
@@ -71,7 +71,7 @@ See [example](https://github.com/uktrade/data-hub-api/pull/1107/files).
     * Create an empty migration `./manage.py makemigrations <app> --empty --name=remove_<field>_from_database`.
     * Add the field copying the definition from a previous migration file and then immediately after remove it completely. See [example](https://github.com/uktrade/data-hub-api/blob/70eb77d76f5189f9476601ca1a5f118c9b7cbe5f/datahub/company/migrations/0035_remove_account_manager_column.py).
     * `./manage.py migrate`.
-* Open a PR and merge it into master after it's been approved.
+* Open a PR and merge it into main after it's been approved.
 * Wait for the next release; your changes will appear in the release notes.
 
 ## How to rename a field

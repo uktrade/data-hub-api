@@ -7,7 +7,7 @@ Include any context that will help reviewers understand the reason for these cha
 
 ### Checklist
 
-* [ ] Has this branch been rebased on top of the current `master` branch?
+* [ ] Has this branch been rebased on top of the current `main` branch?
 
   <details>
   <summary>Explanation</summary>
@@ -30,4 +30,4 @@ Include any context that will help reviewers understand the reason for these cha
 
 </details>
 
-See [docs/CONTRIBUTING.md](https://github.com/uktrade/data-hub-api/blob/master/docs/CONTRIBUTING.md) for more guidelines.
+See [docs/CONTRIBUTING.md](https://github.com/uktrade/data-hub-api/blob/main/docs/CONTRIBUTING.md) for more guidelines.
