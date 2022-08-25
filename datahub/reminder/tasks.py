@@ -8,17 +8,19 @@ from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django_pglocks import advisory_lock
 
+from datahub.core import statsd
 from datahub.core.constants import InvestmentProjectStage
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
-from datahub.investment.project.notification.emails import (
-    send_estimated_land_date_reminder,
-    send_estimated_land_date_summary,
-    send_no_recent_interaction_reminder,
-)
+from datahub.notification.constants import NotifyServiceName
+from datahub.notification.tasks import send_email_notification
 from datahub.reminder import (
     ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
     NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
+)
+from datahub.reminder.emails import (
+    get_project_item,
+    get_projects_summary_list,
 )
 from datahub.reminder.models import (
     NoRecentInvestmentInteractionReminder,
@@ -33,6 +35,88 @@ from datahub.reminder.utils import (
 NOTIFICATION_SUMMARY_THRESHOLD = settings.NOTIFICATION_SUMMARY_THRESHOLD
 
 logger = getLogger(__name__)
+
+
+def send_estimated_land_date_reminder(project, adviser, days_left, reminders):
+    """
+    Sends approaching estimated land date reminder by email.
+    """
+    statsd.incr(f'send_investment_notification.{days_left}')
+
+    notify_adviser_by_email(
+        adviser,
+        settings.INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID,
+        get_project_item(project),
+        reminders,
+    )
+
+
+def send_estimated_land_date_summary(projects, adviser, current_date, reminders):
+    """
+    Sends approaching estimated land date summary reminder by email.
+    """
+    statsd.incr('send_estimated_land_date_summary')
+
+    notifications = get_projects_summary_list(projects)
+
+    notify_adviser_by_email(
+        adviser,
+        settings.INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_SUMMARY_TEMPLATE_ID,
+        {
+            'month': current_date.strftime('%B'),
+            'reminders_number': len(notifications),
+            'summary': ''.join(notifications),
+            'settings_url': settings.DATAHUB_FRONTEND_REMINDER_SETTINGS_URL,
+        },
+        reminders,
+    )
+
+
+def send_no_recent_interaction_reminder(project, adviser, reminder_days, current_date, reminders):
+    """
+    Sends no recent interaction reminder by email.
+    """
+    statsd.incr(f'send_no_recent_interaction_notification.{reminder_days}')
+
+    item = get_project_item(project)
+    last_interaction_date = current_date - relativedelta(days=reminder_days)
+
+    notify_adviser_by_email(
+        adviser,
+        settings.INVESTMENT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID,
+        {
+            **item,
+            'time_period': timesince(last_interaction_date, now=current_date).split(',')[0],
+            'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
+        },
+        reminders,
+    )
+
+
+@shared_task(
+    autoretry_for=(Exception,),
+    queue='long-running',
+    max_retries=5,
+    retry_backoff=30,
+)
+def update_estimated_land_date_reminder_email_status(email_notification_id, reminder_ids):
+    reminders = UpcomingEstimatedLandDateReminder.all_objects.filter(id__in=reminder_ids)
+    for reminder in reminders:
+        reminder.email_notification_id = email_notification_id
+        reminder.save()
+
+
+@shared_task(
+    autoretry_for=(Exception,),
+    queue='long-running',
+    max_retries=5,
+    retry_backoff=30,
+)
+def update_no_recent_interaction_reminder_email_status(email_notification_id, reminder_ids):
+    reminders = NoRecentInvestmentInteractionReminder.all_objects.filter(id__in=reminder_ids)
+    for reminder in reminders:
+        reminder.email_notification_id = email_notification_id
+        reminder.save()
 
 
 @shared_task(
@@ -94,29 +178,32 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
         estimated_land_date__in=eld_filter,
     ).order_by('pk')
 
-    summary_threshold = projects.count() > NOTIFICATION_SUMMARY_THRESHOLD
-    if (
-        summary_threshold
-        and subscription.email_reminders_enabled
-        and not _has_existing_estimated_land_date_reminder(
-            projects[0],
-            subscription.adviser,
-            current_date,
-        )
+    if _has_existing_estimated_land_date_reminder(
+        projects[0],
+        subscription.adviser,
+        current_date,
     ):
+        return
+
+    summary_threshold = projects.count() > NOTIFICATION_SUMMARY_THRESHOLD
+
+    reminders = [
+        create_estimated_land_date_reminder(
+            project=project,
+            adviser=subscription.adviser,
+            # don't send emails for each project if summary notification threshold has been
+            # reached
+            send_email=(subscription.email_reminders_enabled and not summary_threshold),
+            current_date=current_date,
+        ) for project in projects
+    ]
+
+    if summary_threshold and subscription.email_reminders_enabled:
         send_estimated_land_date_summary(
             projects=list(projects),
             adviser=subscription.adviser,
             current_date=current_date,
-        )
-
-    for project in projects:
-        create_estimated_land_date_reminder(
-            project=project,
-            adviser=subscription.adviser,
-            # don't send emails for each project if summary notification threshold has been reached
-            send_email=(subscription.email_reminders_enabled and not summary_threshold),
-            current_date=current_date,
+            reminders=reminders,
         )
 
 
@@ -203,7 +290,7 @@ def create_estimated_land_date_reminder(project, adviser, send_email, current_da
     day_diff = (project.estimated_land_date - current_date).days
     days_left = 30 if day_diff < 32 else 60
 
-    UpcomingEstimatedLandDateReminder.objects.create(
+    reminder = UpcomingEstimatedLandDateReminder.objects.create(
         adviser=adviser,
         event=f'{days_left} days left to estimated land date',
         project=project,
@@ -214,7 +301,10 @@ def create_estimated_land_date_reminder(project, adviser, send_email, current_da
             project=project,
             adviser=adviser,
             days_left=days_left,
+            reminders=[reminder],
         )
+
+    return reminder
 
 
 def _has_existing_estimated_land_date_reminder(project, adviser, current_date):
@@ -250,7 +340,7 @@ def create_no_recent_interaction_reminder(
     if has_existing:
         return
 
-    NoRecentInvestmentInteractionReminder.objects.create(
+    reminder = NoRecentInvestmentInteractionReminder.objects.create(
         adviser=adviser,
         event=f'No recent interaction with {project.name} in {days_text}',
         project=project,
@@ -262,7 +352,38 @@ def create_no_recent_interaction_reminder(
             adviser=adviser,
             reminder_days=reminder_days,
             current_date=current_date,
+            reminders=[reminder],
         )
+
+
+def notify_adviser_by_email(adviser, template_identifier, context, reminders=None):
+    """
+    Notify an adviser, using a GOVUK notify template and some template context.
+
+    Link a separate task to store notification_id, so it is possible to track the
+    status of email delivery.
+    """
+    status_update_task = {
+        'UpcomingEstimatedLandDateReminder': update_estimated_land_date_reminder_email_status,
+        'NoRecentInvestmentInteractionReminder':
+            update_no_recent_interaction_reminder_email_status,
+    }
+    link_task = {}
+    if reminders and len(reminders) > 0:
+        class_name = reminders[0].__class__.__name__
+        link_task['link'] = status_update_task[class_name].s(
+            [reminder.id for reminder in reminders],
+        )
+
+    email_address = adviser.get_current_email()
+    send_email_notification.apply_async(
+        args=(email_address, template_identifier),
+        kwargs={
+            'context': context,
+            'notify_service_name': NotifyServiceName.investment,
+        },
+        **link_task,
+    )
 
 
 def _get_active_projects(adviser):

@@ -15,6 +15,7 @@ from datahub.investment.project.proposition.models import Proposition, Propositi
 from datahub.reminder.models import (
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
+    ReminderStatus,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
 )
@@ -58,6 +59,11 @@ class BaseReminderViewset(viewsets.GenericViewSet, ListModelMixin, DestroyModelM
     filter_backends = (OrderingFilter,)
     ordering_fields = ('created_on',)
     ordering = ('-created_on', 'pk')
+
+    def perform_destroy(self, instance):
+        """Reminder soft delete event."""
+        instance.status = ReminderStatus.DISMISSED
+        instance.save()
 
     def get_queryset(self):
         return self.model_class.objects.filter(adviser=self.request.user)
