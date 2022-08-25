@@ -9,16 +9,13 @@ from django.utils.timesince import timesince
 from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.investment.project.notification.emails import (
-    get_projects_summary_list,
+from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.reminder.emails import get_projects_summary_list
+from datahub.reminder.tasks import (
     send_estimated_land_date_reminder,
     send_estimated_land_date_summary,
     send_no_recent_interaction_reminder,
 )
-from datahub.investment.project.test.factories import (
-    InvestmentProjectFactory,
-)
-from datahub.notification.constants import NotifyServiceName
 
 pytestmark = pytest.mark.django_db
 
@@ -30,7 +27,7 @@ def mock_notify_adviser_by_email(monkeypatch):
     """
     mock_notify_adviser_by_email = mock.Mock()
     monkeypatch.setattr(
-        'datahub.investment.project.notification.emails.notify_adviser_by_email',
+        'datahub.reminder.tasks.notify_adviser_by_email',
         mock_notify_adviser_by_email,
     )
     return mock_notify_adviser_by_email
@@ -43,7 +40,7 @@ def mock_statsd(monkeypatch):
     """
     mock_statsd = mock.Mock()
     monkeypatch.setattr(
-        'datahub.investment.project.notification.emails.statsd',
+        'datahub.reminder.tasks.statsd',
         mock_statsd,
     )
     return mock_statsd
@@ -69,6 +66,7 @@ class TestEmailFunctions:
                 project=project,
                 adviser=adviser,
                 days_left=30,
+                reminders=None,
             )
 
             mock_notify_adviser_by_email.assert_called_once_with(
@@ -84,7 +82,7 @@ class TestEmailFunctions:
                     'project_stage': project.stage.name,
                     'estimated_land_date': project.estimated_land_date.strftime('%-d %B %Y'),
                 },
-                NotifyServiceName.investment,
+                None,
             )
             mock_statsd.incr.assert_called_once_with('send_investment_notification.30')
 
@@ -109,6 +107,7 @@ class TestEmailFunctions:
                 projects=projects,
                 adviser=adviser,
                 current_date=current_date,
+                reminders=None,
             )
 
             mock_notify_adviser_by_email.assert_called_once_with(
@@ -120,7 +119,7 @@ class TestEmailFunctions:
                     'summary': ''.join(notifications),
                     'settings_url': settings.DATAHUB_FRONTEND_REMINDER_SETTINGS_URL,
                 },
-                NotifyServiceName.investment,
+                None,
             )
             mock_statsd.incr.assert_called_once_with('send_estimated_land_date_summary')
 
@@ -145,6 +144,7 @@ class TestEmailFunctions:
                 adviser=adviser,
                 reminder_days=5,
                 current_date=current_date,
+                reminders=None,
             )
 
             mock_notify_adviser_by_email.assert_called_once_with(
@@ -165,6 +165,6 @@ class TestEmailFunctions:
                     ).split(',')[0],
                     'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
                 },
-                NotifyServiceName.investment,
+                None,
             )
             mock_statsd.incr.assert_called_once_with('send_no_recent_interaction_notification.5')

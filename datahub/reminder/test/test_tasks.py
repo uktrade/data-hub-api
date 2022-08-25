@@ -1,7 +1,8 @@
 import datetime
+import uuid
 from operator import attrgetter
 from unittest import mock
-from unittest.mock import call
+from unittest.mock import ANY, call
 
 import factory
 import pytest
@@ -22,6 +23,7 @@ from datahub.reminder import (
     NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
 )
 from datahub.reminder.models import (
+    EmailDeliveryStatus,
     NoRecentInvestmentInteractionReminder,
     UpcomingEstimatedLandDateReminder,
 )
@@ -167,6 +169,16 @@ def mock_generate_no_recent_interaction_reminders_for_subscription(monkeypatch):
     return mock_generate_no_recent_interaction_reminders_for_subscription
 
 
+@pytest.fixture()
+def mock_notify_gateway(monkeypatch):
+    mock_notify_gateway = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.notification.tasks.notify_gateway',
+        mock_notify_gateway,
+    )
+    return mock_notify_gateway
+
+
 @pytest.mark.django_db
 @freeze_time('2022-07-01T10:00:00')
 class TestCreateEstimatedLandDateReminder:
@@ -204,6 +216,7 @@ class TestCreateEstimatedLandDateReminder:
             project=project,
             adviser=adviser,
             days_left=days_left,
+            reminders=[reminders[0]],
         )
 
     def test_create_reminder_no_email(
@@ -495,6 +508,7 @@ class TestGenerateEstimatedLandDateReminderTask:
                 projects=projects,
                 adviser=adviser,
                 current_date=self.current_date,
+                reminders=ANY,
             )
         else:
             mock_send_estimated_land_date_summary.assert_not_called()
@@ -677,10 +691,80 @@ class TestGenerateEstimatedLandDateReminderTask:
             project=project,
             adviser=adviser,
         ).count() == 1
+        reminder = UpcomingEstimatedLandDateReminder.objects.get(project=project, adviser=adviser)
         mock_send_estimated_land_date_reminder.assert_called_once_with(
             project=project,
             adviser=adviser,
             days_left=days,
+            reminders=[reminder],
+        )
+
+    def test_stores_notification_id(
+        self,
+        mock_notify_gateway,
+        adviser,
+    ):
+        """
+        Test if a notification id is being stored against the reminder.
+        """
+        notification_id = uuid.uuid4()
+        mock_notify_gateway.send_email_notification = mock.Mock(
+            return_value={'id': notification_id},
+        )
+
+        days = 30
+        estimated_land_date = self.current_date + relativedelta(months=1)
+        UpcomingEstimatedLandDateSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[days],
+            email_reminders_enabled=True,
+        )
+        project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            estimated_land_date=estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        generate_estimated_land_date_reminders()
+
+        reminder = UpcomingEstimatedLandDateReminder.objects.get(project=project, adviser=adviser)
+        assert reminder.email_notification_id == notification_id
+        assert reminder.email_delivery_status == EmailDeliveryStatus.UNKNOWN
+
+    def test_stores_notification_id_for_summary_email(
+        self,
+        mock_notify_gateway,
+        adviser,
+    ):
+        """
+        Test if a notification id is being stored against the reminders from summary email.
+        """
+        notification_id = uuid.uuid4()
+        mock_notify_gateway.send_email_notification = mock.Mock(
+            return_value={'id': notification_id},
+        )
+
+        days = 30
+        estimated_land_date = self.current_date + relativedelta(months=1)
+        UpcomingEstimatedLandDateSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[days],
+            email_reminders_enabled=True,
+        )
+        projects = ActiveInvestmentProjectFactory.create_batch(
+            6,
+            project_manager=adviser,
+            estimated_land_date=estimated_land_date,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        generate_estimated_land_date_reminders()
+
+        reminders = UpcomingEstimatedLandDateReminder.objects.filter(
+            project__in=projects,
+            adviser=adviser,
+        )
+        assert all(reminder.email_notification_id == notification_id for reminder in reminders)
+        assert all(
+            reminder.email_delivery_status == EmailDeliveryStatus.UNKNOWN for reminder in reminders
         )
 
     def test_does_not_send_multiple_summary(
@@ -708,14 +792,16 @@ class TestGenerateEstimatedLandDateReminderTask:
         projects.sort(key=attrgetter('pk'))
         generate_estimated_land_date_reminders()
         generate_estimated_land_date_reminders()
-        assert UpcomingEstimatedLandDateReminder.objects.filter(
+        reminders = UpcomingEstimatedLandDateReminder.objects.filter(
             project__in=(project.pk for project in projects),
             adviser=adviser,
-        ).count() == 6
+        )
+        assert reminders.count() == 6
         mock_send_estimated_land_date_summary.assert_called_once_with(
             projects=projects,
             adviser=adviser,
             current_date=self.current_date,
+            reminders=list(reminders),
         )
 
 
@@ -757,6 +843,7 @@ class TestCreateNoRecentInteractionReminder:
             adviser=adviser,
             reminder_days=reminder_days,
             current_date=self.current_date,
+            reminders=[reminders[0]],
         )
 
     def test_create_reminder_no_email(
@@ -1174,6 +1261,41 @@ class TestGenerateNoRecentInteractionReminderTask:
         generate_no_recent_interaction_reminders()
         assert mock_create_no_recent_interaction_reminder.call_count == 0
 
+    def test_stores_notification_id(
+        self,
+        mock_notify_gateway,
+        adviser,
+    ):
+        """
+        Test if a notification id is being stored against the reminder.
+        """
+        notification_id = uuid.uuid4()
+        mock_notify_gateway.send_email_notification = mock.Mock(
+            return_value={'id': notification_id},
+        )
+
+        days = 5
+        NoRecentInvestmentInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[days],
+            email_reminders_enabled=True,
+        )
+        project = ActiveInvestmentProjectFactory(
+            project_manager=adviser,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        interaction_date = self.current_date - relativedelta(days=days)
+        with freeze_time(interaction_date):
+            InvestmentProjectInteractionFactory(investment_project=project)
+        generate_no_recent_interaction_reminders()
+
+        reminder = NoRecentInvestmentInteractionReminder.objects.get(
+            project=project,
+            adviser=adviser,
+        )
+        assert reminder.email_notification_id == notification_id
+        assert reminder.email_delivery_status == EmailDeliveryStatus.UNKNOWN
+
     def test_does_not_send_multiple(
         self,
         mock_send_no_recent_interaction_reminder,
@@ -1201,13 +1323,15 @@ class TestGenerateNoRecentInteractionReminderTask:
 
         generate_no_recent_interaction_reminders()
         generate_no_recent_interaction_reminders()
-        assert NoRecentInvestmentInteractionReminder.objects.filter(
+        reminders = NoRecentInvestmentInteractionReminder.objects.filter(
             project=project,
             adviser=adviser,
-        ).count() == 1
+        )
+        assert reminders.count() == 1
         mock_send_no_recent_interaction_reminder.assert_called_once_with(
             project=project,
             adviser=adviser,
             reminder_days=days,
             current_date=self.current_date,
+            reminders=[reminders[0]],
         )
