@@ -46,6 +46,32 @@ class UpcomingEstimatedLandDateSubscription(BaseSubscription):
     """
 
 
+class EmailDeliveryStatus(models.TextChoices):
+    SENDING = ('sending', 'Sending')
+    DELIVERED = ('delivered', 'Delivered')
+    PERMANENT_FAILURE = ('permanent-failure', 'Permanent failure')
+    TEMPORARY_FAILURE = ('temporary-failure', 'Temporary failure')
+    TECHNICAL_FAILURE = ('technical-failure', 'Technical failure')
+
+    UNKNOWN = ('unknown', 'Unknown')
+
+
+class ReminderStatus(models.TextChoices):
+    LIVE = ('live', 'Live')
+    DISMISSED = ('dismissed', 'Dismissed')
+
+
+class BaseReminderManager(models.Manager):
+    """
+    Base reminder manager that filters out dismissed reminders
+    """
+
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            models.Q(status=ReminderStatus.LIVE) | models.Q(status=''),
+        )
+
+
 class BaseReminder(models.Model):
     """
     Base model for reminders.
@@ -58,7 +84,26 @@ class BaseReminder(models.Model):
         related_name='+',
     )
     created_on = models.DateTimeField(auto_now_add=True)
+    modified_on = models.DateTimeField(null=True, blank=True, auto_now=True)
     event = models.CharField(max_length=255)
+    status = models.CharField(
+        max_length=MAX_LENGTH,
+        blank=True,
+        choices=ReminderStatus.choices,
+        default=ReminderStatus.LIVE,
+    )
+
+    email_notification_id = models.UUIDField(null=True, blank=True)
+    email_delivery_status = models.CharField(
+        max_length=MAX_LENGTH,
+        blank=True,
+        choices=EmailDeliveryStatus.choices,
+        help_text='Email delivery status',
+        default=EmailDeliveryStatus.UNKNOWN,
+    )
+
+    objects = BaseReminderManager()
+    all_objects = models.Manager()
 
     class Meta:
         abstract = True
