@@ -581,6 +581,26 @@ class TestGenerateEstimatedLandDateReminderTask:
             for project in [active_ongoing_project, active_delayed_project]
         ], any_order=True)
 
+    def test_wont_send_notifications_if_no_projects(
+        self,
+        adviser,
+        mock_create_estimated_land_date_reminder,
+    ):
+        """
+        A reminder should not be sent if adviser has no projects.
+        """
+        days = 30
+        subscription = UpcomingEstimatedLandDateSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[days],
+            email_reminders_enabled=True,
+        )
+        generate_estimated_land_date_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        mock_create_estimated_land_date_reminder.assert_not_called()
+
     def test_no_user_feature_flag(
         self,
         mock_create_estimated_land_date_reminder,
