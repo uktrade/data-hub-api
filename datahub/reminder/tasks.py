@@ -178,7 +178,7 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
         estimated_land_date__in=eld_filter,
     ).order_by('pk')
 
-    if _has_existing_estimated_land_date_reminder(
+    if not projects.exists() or _has_existing_estimated_land_date_reminder(
         projects[0],
         subscription.adviser,
         current_date,
