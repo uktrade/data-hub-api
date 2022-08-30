@@ -196,6 +196,7 @@ class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin):
         assert 'previous' in data
         results = data.get('results', [])
         assert len(results) == 2
+        reminders = sorted(reminders, key=lambda x: x.pk)
         assert results[0] == {
             'id': str(reminders[0].id),
             'created_on': '2022-05-05T17:00:00Z',
@@ -316,6 +317,7 @@ class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin):
         assert 'previous' in data
         results = data.get('results', [])
         assert len(results) == 2
+        reminders = sorted(reminders, key=lambda x: x.pk)
         assert results[0] == {
             'id': str(reminders[0].id),
             'created_on': '2022-05-05T17:00:00Z',

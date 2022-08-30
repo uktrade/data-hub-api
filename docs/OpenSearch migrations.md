@@ -68,9 +68,8 @@ If the field is returned in search responses, is a sort-by option, or there is m
 complex logic relating to the field:
 
 1. Add the new field, keeping the old field in place and existing query logic unchanged.
-2. Add a news fragment deprecating the old field.
-3. Release this, and populate the new field with data by running `./manage.py migrate_search`.
-4. Update query logic (global search fields, filters, sort-by options etc.) to use the new 
+2. Release this, and populate the new field with data by running `./manage.py migrate_search`.
+3. Update query logic (global search fields, filters, sort-by options etc.) to use the new 
 field, and remove the old field once the deprecation period has expired.
 
 In simpler cases, you can avoid the intermediate release by adding and removing the 

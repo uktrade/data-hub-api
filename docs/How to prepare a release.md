@@ -1,106 +1,43 @@
 # How to prepare a release
 
+Commits to `master` are automatically deployed to dev and staging environments.
 
-## Decide on the release type
+Deployments to production are done manually through Jenkins where a Git tag can be used.
 
-You'll need to decide if the release is a major, minor or patch release.
+## Deploying to production
+1. Post a message into the #data-hub-core-dev channel saying that you want to do a Data Hub API release and ask if there are any objections. If no objections, proceed with the following steps.
 
-As a general guide:
+2. Create a GIT tag `git tag v<MAJOR>.<MINOR>.<PATCH>`, e.g. `v5.1.2` pointing to the latest `master`.
 
-* if the new version contains _only_ non-breaking bug fixes, then it's a patch version
-* if it contains breaking API changes, then it's a major version
-* anything else is a minor version 
+   | Release type      | When to increase                                                                         |
+   | ----------------- | ---------------------------------------------------------------------------------------- |
+   | Major (**1**.0.0) | When a change requires modifications to the infrastructure, e.g. NodeJS version upgrade. |
+   | Minor (0.**1**.0) | When a release contains at least one new feature.                                        |
+   | Patch (0.0.**1**) | When a release contains only fixes.                                                      |
 
-You can run `towncrier build --draft --version draft` to generate a draft changelog, or [look at the difference between develop and master](https://github.com/uktrade/data-hub-api/compare/master...develop), to help you decide.
+You can use the [GitHub comparison tool](https://github.com/uktrade/data-hub-api/compare) to figure out what changes have been made since the last release. You can find out the latest release tag number from [here](https://github.com/uktrade/data-hub-api/releases).
 
-## Bump the version and update the changelog
+3. Push the tag to the remote - `git push origin v<VERSION_NUMBER>`.
 
-Once you've reviewed the draft changelog and decided on the release type, you can create the changelog by running:
+4. Check that the tag worked by using the [GitHub comparison tool](https://github.com/uktrade/data-hub-api/compare) again to compare master to the new tag. If done correctly, there should be no difference. 
 
-```shell
-scripts/prepare_release.py <major|minor|patch>
-```
+5. Go to Jenkins and click on `Build with Parameters`.
 
-<details>
-<summary>What the command does</summary>
-The command will:
+6. Select `production` for the environment.
 
-- determine the new version number
-- create a branch named `changelog/<version>`
-- bump the version and update the changelog
-- commit the changes
-- push the branch
-- open your browser window ready to create a PR
-</details>
+7. Type the `v<VERSION_NUMBER>` created in step `2` into the `Git_Commit` text field.
 
-If the command succeeds, it will open your web browser ready to create a PR to merge `changelog/<version>` into 
-`develop`.
+8. Press the `Build` button.
 
-Check the changelog preview is as expected, add at least two developers as reviewers and click 'Create pull request'.
+9. Create a GH release by clicking `Draft a new release` on the [releases page](https://github.com/uktrade/data-hub-api/releases).
 
-When ready, merge `changelog/<version>` into `develop`.
+The release title should be `v<VERSION_NUMBER>` and release notes can be created by clicking the `Auto-generate release notes` button.
 
-## Create the release PR
+10. After the Jenkins build has finished, publish the GH release.
 
-Create and push a release branch from develop by running:
-
-```shell
-scripts/create_release_pr.py
-```
-
-<details>
-<summary>What the command does</summary>
-The command will:
-
-- run `git fetch`
-- create a branch `release/<version>` based on `origin/develop`
-- push this branch
-- open a web browser window to the create PR page for the pushed branch (with `master` as the base branch)
-</details>
-
-If the command succeeds, it will open your web browser ready to create a PR to merge `release/<version>` into `master`. 
-
-Double-check that the details are correct and that the base branch is set to `master`.
-
-Add at least two developers as reviewers and click 'Create pull request'.
-
-After the PR has been reviewed, merge it into `master` and delete the merged branch.
-
-## Deploy to staging
-
-Following the merge of the release PR, the release will be automatically 
-deployed to staging via Jenkins.
-
-Check that everything looks fine before proceeding.
-
-## Tag and publish the release on GitHub
-
-The merging of the release PR will also trigger a GitHub Actions workflow
-that will automatically publish the release on GitHub.
-
-You can [check the status of the job on the Actions tab on GitHub](https://github.com/uktrade/data-hub-api/actions).
-
-Once the job is complete, the release should appear [on the releases tab](https://github.com/uktrade/data-hub-api/releases).
-
-(If something goes wrong, it’s also possible to run `scripts/publish_release.py` locally.
-To do that you, you’ll need to [generate a GitHub personal access token](https://github.com/settings/tokens) with the `public_repo` scope.)
-
-## Deploy to production
-Deployment to production happens manually but after the release has been announced on Slack.
-
-Post in the `#data-hub` slack channel the following (replacing `<version>` with the version number):
+11. Post the following message on the #data-hub slack channel, making sure to put the actual version number and link the release notes:
 
 ```
-@here Data Hub API version <version> is ready to be deployed to production. Have a look at the release notes to see how this will affect you: https://github.com/uktrade/data-hub-api/blob/master/CHANGELOG.md.
-Will deploy in 30 minutes or so if no objections.
+@here Data Hub API v<VERSION_NUMBER> is now live!
+For more information see the release notes.
 ```
-
-If no objections are received, the release can be deployed to production.
-
-In Jenkins, go to the _datahub_ tab, the _datahub-api_ project and click on _Build with Parameters_.
-
-Type the following:
-* **environment**: `production`
-* **git commit**: `master`
-
-Click on `build`, follow the deployment and check that everything looks fine after it finishes.
