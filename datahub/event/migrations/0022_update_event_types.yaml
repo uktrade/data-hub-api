@@ -1,0 +1,3 @@
+- model: event.eventtype
+  pk: e304e55d-b19e-41dc-9b9c-c2ce2569d972
+  fields: { disabled_on: null, name: 'Sector Specialist' }

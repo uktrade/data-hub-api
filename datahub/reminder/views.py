@@ -57,7 +57,7 @@ class BaseReminderViewset(viewsets.GenericViewSet, ListModelMixin, DestroyModelM
     permission_classes = ()
     filter_backends = (OrderingFilter,)
     ordering_fields = ('created_on',)
-    ordering = ('-created_on',)
+    ordering = ('-created_on', 'pk')
 
     def get_queryset(self):
         return self.model_class.objects.filter(adviser=self.request.user)

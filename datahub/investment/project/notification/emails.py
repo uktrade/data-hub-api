@@ -1,13 +1,14 @@
 from functools import lru_cache
 from logging import getLogger
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.utils.timesince import timesince
 
 from datahub.core import statsd
 from datahub.investment.project.notification.models import NotificationInnerTemplate
 from datahub.notification.constants import NotifyServiceName
 from datahub.notification.notify import notify_adviser_by_email
-
 
 logger = getLogger(__name__)
 
@@ -47,6 +48,27 @@ def send_estimated_land_date_summary(projects, adviser, current_date):
     )
 
 
+def send_no_recent_interaction_reminder(project, adviser, reminder_days, current_date):
+    """
+    Sends no recent interaction reminder by email.
+    """
+    statsd.incr(f'send_no_recent_interaction_notification.{reminder_days}')
+
+    item = get_project_item(project)
+    last_interaction_date = current_date - relativedelta(days=reminder_days)
+
+    notify_adviser_by_email(
+        adviser,
+        settings.INVESTMENT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID,
+        {
+            **item,
+            'time_period': timesince(last_interaction_date, now=current_date).split(',')[0],
+            'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
+        },
+        NotifyServiceName.investment,
+    )
+
+
 @lru_cache()
 def get_inner_template_content(notification_type):
     inner_template = NotificationInnerTemplate.objects.get(notification_type=notification_type)
@@ -57,8 +79,7 @@ def get_project_item(project):
     """Get project item."""
     return {
         'project_details_url': f'{project.get_absolute_url()}/details',
-        'project_subscription_url': f'{project.get_absolute_url()}/notifications/'
-                                    'estimated-land-date',
+        'settings_url': settings.DATAHUB_FRONTEND_REMINDER_SETTINGS_URL,
         'investor_company_name': project.investor_company.name,
         'project_name': project.name,
         'project_code': project.project_code,
