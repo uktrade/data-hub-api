@@ -10,12 +10,16 @@ from django_pglocks import advisory_lock
 
 from datahub.core import statsd
 from datahub.core.constants import InvestmentProjectStage
+from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 from datahub.notification.constants import NotifyServiceName
+from datahub.notification.core import notify_gateway
 from datahub.notification.tasks import send_email_notification
 from datahub.reminder import (
+    ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME,
     ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
+    NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
     NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
 )
 from datahub.reminder.emails import (
@@ -23,6 +27,7 @@ from datahub.reminder.emails import (
     get_projects_summary_list,
 )
 from datahub.reminder.models import (
+    EmailDeliveryStatus,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
     UpcomingEstimatedLandDateReminder,
@@ -384,6 +389,88 @@ def notify_adviser_by_email(adviser, template_identifier, context, reminders=Non
         },
         **link_task,
     )
+
+
+@shared_task(
+    autoretry_for=(Exception,),
+    queue='long-running',
+    max_retries=5,
+    retry_backoff=30,
+)
+def update_notify_email_delivery_status_for_estimated_land_date():
+    if not is_feature_flag_active(ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME):
+        logger.info(
+            f'Feature flag "{ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME}"'
+            ' is not active, exiting.',
+        )
+        return
+
+    with advisory_lock('update_estimated_land_date_email_delivery', wait=False) as acquired:
+        if not acquired:
+            logger.info(
+                'Email status checks for approaching estimated land dates are already being '
+                'processed by another worker.',
+            )
+            return
+        current_date = now()
+        date_threshold = current_date - relativedelta(days=4)
+
+        notification_ids = UpcomingEstimatedLandDateReminder.all_objects.filter(
+            Q(email_delivery_status=EmailDeliveryStatus.UNKNOWN)
+            | Q(email_delivery_status=EmailDeliveryStatus.SENDING),
+            created_on__gte=date_threshold,
+            email_notification_id__isnull=False,
+        ).values_list('email_notification_id', flat=True).distinct()
+        for notification_id in notification_ids:
+            result = notify_gateway.get_notification_by_id(
+                notification_id,
+                notify_service_name=NotifyServiceName.investment,
+            )
+            if 'status' in result:
+                UpcomingEstimatedLandDateReminder.all_objects.filter(
+                    email_notification_id=notification_id,
+                ).update(email_delivery_status=result['status'], modified_on=now())
+
+
+@shared_task(
+    autoretry_for=(Exception,),
+    queue='long-running',
+    max_retries=5,
+    retry_backoff=30,
+)
+def update_notify_email_delivery_status_for_no_recent_interaction():
+    if not is_feature_flag_active(NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME):
+        logger.info(
+            f'Feature flag "{NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}"'
+            ' is not active, exiting.',
+        )
+        return
+
+    with advisory_lock('update_no_recent_interaction_email_delivery', wait=False) as acquired:
+        if not acquired:
+            logger.info(
+                'Email status checks for approaching no recent interaction are already being '
+                'processed by another worker.',
+            )
+            return
+        current_date = now()
+        date_threshold = current_date - relativedelta(days=4)
+
+        notification_ids = NoRecentInvestmentInteractionReminder.all_objects.filter(
+            Q(email_delivery_status=EmailDeliveryStatus.UNKNOWN)
+            | Q(email_delivery_status=EmailDeliveryStatus.SENDING),
+            created_on__gte=date_threshold,
+            email_notification_id__isnull=False,
+        ).values_list('email_notification_id', flat=True).distinct()
+        for notification_id in notification_ids:
+            result = notify_gateway.get_notification_by_id(
+                notification_id,
+                notify_service_name=NotifyServiceName.investment,
+            )
+            if 'status' in result:
+                NoRecentInvestmentInteractionReminder.all_objects.filter(
+                    email_notification_id=notification_id,
+                ).update(email_delivery_status=result['status'], modified_on=now())
 
 
 def _get_active_projects(adviser):
