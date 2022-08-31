@@ -1,4 +1,5 @@
 import datetime
+import logging
 import uuid
 from operator import attrgetter
 from unittest import mock
@@ -7,19 +8,23 @@ from unittest.mock import ANY, call
 import factory
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import InvestmentProjectStage
-from datahub.feature_flag.test.factories import UserFeatureFlagFactory
+from datahub.feature_flag.test.factories import FeatureFlagFactory, UserFeatureFlagFactory
 from datahub.interaction.test.factories import InvestmentProjectInteractionFactory
 from datahub.investment.project.models import InvestmentProject
 from datahub.investment.project.test.factories import (
     ActiveInvestmentProjectFactory,
     InvestmentProjectFactory,
 )
+from datahub.notification.constants import NotifyServiceName
 from datahub.reminder import (
+    ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME,
     ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
+    NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
     NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
 )
 from datahub.reminder.models import (
@@ -34,9 +39,13 @@ from datahub.reminder.tasks import (
     generate_estimated_land_date_reminders_for_subscription,
     generate_no_recent_interaction_reminders,
     generate_no_recent_interaction_reminders_for_subscription,
+    update_notify_email_delivery_status_for_estimated_land_date,
+    update_notify_email_delivery_status_for_no_recent_interaction,
 )
 from datahub.reminder.test.factories import (
+    NoRecentInvestmentInteractionReminderFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
+    UpcomingEstimatedLandDateReminderFactory,
     UpcomingEstimatedLandDateSubscriptionFactory,
 )
 
@@ -170,13 +179,39 @@ def mock_generate_no_recent_interaction_reminders_for_subscription(monkeypatch):
 
 
 @pytest.fixture()
-def mock_notify_gateway(monkeypatch):
+def mock_notification_tasks_notify_gateway(monkeypatch):
     mock_notify_gateway = mock.Mock()
     monkeypatch.setattr(
         'datahub.notification.tasks.notify_gateway',
         mock_notify_gateway,
     )
     return mock_notify_gateway
+
+
+@pytest.fixture()
+def mock_reminder_tasks_notify_gateway(monkeypatch):
+    mock_notify_gateway = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.reminder.tasks.notify_gateway',
+        mock_notify_gateway,
+    )
+    return mock_notify_gateway
+
+
+@pytest.fixture()
+def estimated_land_date_email_status_feature_flag():
+    """
+    Creates the automatic company archive feature flag.
+    """
+    yield FeatureFlagFactory(code=ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME)
+
+
+@pytest.fixture()
+def no_recent_interaction_email_status_feature_flag():
+    """
+    Creates the automatic company archive feature flag.
+    """
+    yield FeatureFlagFactory(code=NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME)
 
 
 @pytest.mark.django_db
@@ -721,14 +756,14 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     def test_stores_notification_id(
         self,
-        mock_notify_gateway,
+        mock_notification_tasks_notify_gateway,
         adviser,
     ):
         """
         Test if a notification id is being stored against the reminder.
         """
         notification_id = uuid.uuid4()
-        mock_notify_gateway.send_email_notification = mock.Mock(
+        mock_notification_tasks_notify_gateway.send_email_notification = mock.Mock(
             return_value={'id': notification_id},
         )
 
@@ -752,14 +787,14 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     def test_stores_notification_id_for_summary_email(
         self,
-        mock_notify_gateway,
+        mock_notification_tasks_notify_gateway,
         adviser,
     ):
         """
         Test if a notification id is being stored against the reminders from summary email.
         """
         notification_id = uuid.uuid4()
-        mock_notify_gateway.send_email_notification = mock.Mock(
+        mock_notification_tasks_notify_gateway.send_email_notification = mock.Mock(
             return_value={'id': notification_id},
         )
 
@@ -1283,14 +1318,14 @@ class TestGenerateNoRecentInteractionReminderTask:
 
     def test_stores_notification_id(
         self,
-        mock_notify_gateway,
+        mock_notification_tasks_notify_gateway,
         adviser,
     ):
         """
         Test if a notification id is being stored against the reminder.
         """
         notification_id = uuid.uuid4()
-        mock_notify_gateway.send_email_notification = mock.Mock(
+        mock_notification_tasks_notify_gateway.send_email_notification = mock.Mock(
             return_value={'id': notification_id},
         )
 
@@ -1354,4 +1389,134 @@ class TestGenerateNoRecentInteractionReminderTask:
             reminder_days=days,
             current_date=self.current_date,
             reminders=[reminders[0]],
+        )
+
+
+@pytest.mark.django_db
+@freeze_time('2022-07-01T10:00:00')
+class TestUpdateEmailDeliveryStatusTask:
+    current_date = datetime.date(year=2022, month=7, day=17)
+
+    def test_doesnt_update_estimated_land_date_status_without_feature_flag(self, caplog):
+        """
+        Test that if the feature flag is not enabled, the
+        task will not run.
+        """
+        caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
+        update_notify_email_delivery_status_for_estimated_land_date()
+        assert caplog.messages == [
+            f'Feature flag "{ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME}" is not active,'
+            ' exiting.',
+        ]
+
+    def test_updates_email_delivery_status_for_estimated_land_date(
+        self,
+        estimated_land_date_email_status_feature_flag,
+        mock_reminder_tasks_notify_gateway,
+        adviser,
+    ):
+        """
+        Test if email delivery status is being updated.
+        """
+        mock_reminder_tasks_notify_gateway.get_notification_by_id = mock.Mock(
+            return_value={'status': 'delivered'},
+        )
+
+        with freeze_time(self.current_date - relativedelta(days=6)):
+            reminder_too_old = UpcomingEstimatedLandDateReminderFactory(
+                adviser=adviser,
+                email_notification_id=uuid.uuid4(),
+            )
+
+        with freeze_time(self.current_date - relativedelta(days=3)):
+            reminders_to_update = UpcomingEstimatedLandDateReminderFactory.create_batch(
+                2,
+                adviser=adviser,
+                email_notification_id=uuid.uuid4(),
+            )
+
+        status_updated_on = self.current_date - relativedelta(days=1)
+        with freeze_time(status_updated_on):
+            update_notify_email_delivery_status_for_estimated_land_date()
+
+        with freeze_time(self.current_date):
+            update_notify_email_delivery_status_for_estimated_land_date()
+
+        reminder_too_old.refresh_from_db()
+        [reminder_to_update.refresh_from_db() for reminder_to_update in reminders_to_update]
+
+        assert reminder_too_old.email_delivery_status == EmailDeliveryStatus.UNKNOWN
+        assert all(
+            reminder_to_update.email_delivery_status == EmailDeliveryStatus.DELIVERED
+            for reminder_to_update in reminders_to_update
+        )
+        assert all(
+            reminder_to_update.modified_on == datetime.datetime.combine(
+                status_updated_on,
+                datetime.datetime.min.time(),
+                tzinfo=utc,
+            ) for reminder_to_update in reminders_to_update
+        )
+        mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once_with(
+            reminders_to_update[0].email_notification_id,
+            notify_service_name=NotifyServiceName.investment,
+        )
+
+    def test_doesnt_update_no_recent_interaction_status_without_feature_flag(self, caplog):
+        """
+        Test that if the feature flag is not enabled, the
+        task will not run.
+        """
+        caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
+        update_notify_email_delivery_status_for_no_recent_interaction()
+        assert caplog.messages == [
+            f'Feature flag "{NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}" is'
+            ' not active, exiting.',
+        ]
+
+    def test_updates_email_delivery_status_for_no_recent_interaction(
+        self,
+        no_recent_interaction_email_status_feature_flag,
+        mock_reminder_tasks_notify_gateway,
+        adviser,
+    ):
+        """
+        Test if email delivery status is being updated.
+        """
+        mock_reminder_tasks_notify_gateway.get_notification_by_id = mock.Mock(
+            return_value={'status': 'delivered'},
+        )
+
+        with freeze_time(self.current_date - relativedelta(days=6)):
+            reminder_too_old = NoRecentInvestmentInteractionReminderFactory(
+                adviser=adviser,
+                email_notification_id=uuid.uuid4(),
+            )
+
+        with freeze_time(self.current_date - relativedelta(days=3)):
+            reminder_to_update = NoRecentInvestmentInteractionReminderFactory(
+                adviser=adviser,
+                email_notification_id=uuid.uuid4(),
+            )
+
+        status_updated_on = self.current_date - relativedelta(days=1)
+        with freeze_time(status_updated_on):
+            update_notify_email_delivery_status_for_no_recent_interaction()
+
+        with freeze_time(self.current_date):
+            update_notify_email_delivery_status_for_no_recent_interaction()
+
+        reminder_too_old.refresh_from_db()
+        reminder_to_update.refresh_from_db()
+
+        assert reminder_too_old.email_delivery_status == EmailDeliveryStatus.UNKNOWN
+        assert reminder_to_update.email_delivery_status == EmailDeliveryStatus.DELIVERED
+        assert reminder_to_update.modified_on == datetime.datetime.combine(
+            status_updated_on,
+            datetime.datetime.min.time(),
+            tzinfo=utc,
+        )
+        mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once_with(
+            reminder_to_update.email_notification_id,
+            notify_service_name=NotifyServiceName.investment,
         )
