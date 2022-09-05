@@ -18,6 +18,6 @@ The **test coverage** is measured on Pull requests using https://app.codecov.io/
 
 ![App.codecov.io](../docs/code-coverage.png)
 
-The tests, as well as code linters and code quality checks, are done through a micture of [**circleci**](https://app.circleci.com/pipelines/github/uktrade/data-hub-api) steps and *git actions* where failures and output details can be seen in detail. 
+The tests, as well as code linters and code quality checks, are done through a mixture of [**circleci**](https://app.circleci.com/pipelines/github/uktrade/data-hub-api) steps and *git actions* where failures and output details can be seen in detail. 
 
 ![CircleCI](../docs/circleci.png)
