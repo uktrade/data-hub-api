@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  jira: circleci/jira@1.0.5 
+
 job_defaults: &job_defaults
   parameters:
     python_image:
@@ -124,3 +127,5 @@ workflows:
           python_image: python:3.10.5
           postgres_image: postgres:12
           es_image: opensearchproject/opensearch:1.2.4
+          post-steps:
+            - jira/notify
