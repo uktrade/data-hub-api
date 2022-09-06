@@ -4,6 +4,7 @@ import pytest
 from django.conf import settings
 
 from datahub.core.exceptions import DataHubError
+from datahub.core.test.queues.test_scheduler import PickleableMock
 from datahub.search.apps import _load_search_apps, get_search_apps, SearchApp
 from datahub.search.migrate import migrate_app, migrate_apps
 from datahub.search.models import BaseSearchModel
@@ -46,8 +47,8 @@ def test_migrate_app_with_uninitialised_app(
     Test that migrate_app() creates an index and schedules an initial sync for an
     uninitialised search app.
     """
-    sync_model_task_mock = Mock()
-    monkeypatch.setattr('datahub.search.migrate.sync_model', sync_model_task_mock)
+    sync_model_task_mock = PickleableMock()
+    monkeypatch.setattr('datahub.search.migrate.sync_model', sync_model_task_mock.queue_handler)
     mock_client = mock_connection_for_create_index.return_value
     mock_client.indices.exists_alias.side_effect = [
         # No alias at first attempt
@@ -64,15 +65,18 @@ def test_migrate_app_with_uninitialised_app(
     assert mock_client.indices.create.call_args_list == [
         call(index=expected_index_name, body=ANY),
     ]
-    assert sync_model_task_mock.apply_async.call_args_list == [
-        call(args=(sample_search_app.name,)),
+    assert sync_model_task_mock.params == [
+        (sample_search_app.name,),
     ]
 
 
 def test_migrate_app_with_app_needing_migration(monkeypatch, mock_opensearch_client):
     """Test that migrate_app() migrates an app needing migration."""
-    migrate_model_task_mock = Mock()
-    monkeypatch.setattr('datahub.search.migrate.complete_model_migration', migrate_model_task_mock)
+    migrate_model_task_mock = PickleableMock()
+    monkeypatch.setattr(
+        'datahub.search.migrate.complete_model_migration',
+        migrate_model_task_mock.queue_handler,
+    )
     create_index_mock = Mock()
     monkeypatch.setattr('datahub.search.migrate.create_index', create_index_mock)
 
@@ -116,9 +120,9 @@ def test_migrate_app_with_app_needing_migration(monkeypatch, mock_opensearch_cli
         },
     )
 
-    migrate_model_task_mock.apply_async.assert_called_once_with(
-        args=(mock_app.name, target_hash),
-    )
+    assert migrate_model_task_mock.params == [
+        (mock_app.name, target_hash),
+    ]
 
 
 def test_migrate_app_with_app_not_needing_migration(monkeypatch, mock_opensearch_client):
@@ -151,8 +155,11 @@ def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_opensearch
 
     In this case, a resync should be scheduled to attempt to complete the migration.
     """
-    migrate_model_task_mock = Mock()
-    monkeypatch.setattr('datahub.search.migrate.complete_model_migration', migrate_model_task_mock)
+    migrate_model_task_mock = PickleableMock()
+    monkeypatch.setattr(
+        'datahub.search.migrate.complete_model_migration',
+        migrate_model_task_mock.queue_handler,
+    )
 
     mock_client = mock_opensearch_client.return_value
     old_index = 'test-index-current-hash'
@@ -170,10 +177,9 @@ def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_opensearch
 
     mock_app.search_model.create_index.assert_not_called()
     mock_client.indices.update_aliases.assert_not_called()
-
-    migrate_model_task_mock.apply_async.assert_called_once_with(
-        args=(mock_app.name, target_hash),
-    )
+    migrate_model_task_mock.params = [
+        (mock_app.name, target_hash),
+    ]
 
 
 def test_migrate_app_with_app_in_invalid_state(monkeypatch, mock_opensearch_client):

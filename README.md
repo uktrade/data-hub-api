@@ -262,7 +262,7 @@ Dependencies:
     `-O fair --prefetch-multiplier 1` arguments for better fairness when long-running tasks
     are running or pending execution.
 
-16. Start RQ (Redis Queue): `python rq-worker.py`
+16. Start RQ (Redis Queue): `python rq/rq-worker.py`
 
 ## API documentation
 

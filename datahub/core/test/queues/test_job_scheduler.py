@@ -1,11 +1,12 @@
 from unittest.mock import Mock
 
+from datahub.core.queues.cron_constants import EVERY_MINUTE
 from datahub.core.queues.job_scheduler import job_scheduler, retry_backoff_intervals
-from datahub.core.queues.queue import DataHubQueue
-from datahub.core.test.queues.test_queue import PickleableMock
+from datahub.core.queues.scheduler import DataHubScheduler
+from datahub.core.test.queues.test_scheduler import PickleableMock
 
 
-def test_job_scheduler_generates_job(queue: DataHubQueue):
+def test_job_scheduler_generates_job(queue: DataHubScheduler):
     job = job_scheduler(
         function=PickleableMock.queue_handler,
         function_args=('arg1', 'arg2'),
@@ -23,7 +24,8 @@ def test_job_scheduler_generates_job(queue: DataHubQueue):
     assert job.retry_intervals == [1, 2]
 
 
-def test_job_scheduler_configures_queues(queue: DataHubQueue):
+def test_job_scheduler_configures_queues(queue: DataHubScheduler):
+    PickleableMock.reset()
     job_scheduler(
         function=PickleableMock.queue_handler,
         function_args=('arg1', 'arg2'),
@@ -42,7 +44,7 @@ def test_job_scheduler_configures_queues(queue: DataHubQueue):
 
 def test_datahub_enque_is_configured_with_correct_default_number_of_retries_and_intervals(
     monkeypatch,
-    queue: DataHubQueue,
+    queue: DataHubScheduler,
 ):
     datahub_queue_mock = queue_setup(monkeypatch)
     job_scheduler(
@@ -69,7 +71,7 @@ def test_datahub_enque_is_configured_with_correct_default_number_of_retries_and_
 
 def test_datahub_enque_is_configured_with_retry_backoff_for_two_retries(
     monkeypatch,
-    queue: DataHubQueue,
+    queue: DataHubScheduler,
 ):
     datahub_queue_mock = queue_setup(monkeypatch)
     job_scheduler(
@@ -97,7 +99,7 @@ def test_datahub_enque_is_configured_with_retry_backoff_for_two_retries(
 
 def test_datahub_enque_is_configured_with_retry_backoff_as_number(
     monkeypatch,
-    queue: DataHubQueue,
+    queue: DataHubScheduler,
 ):
     datahub_queue_mock = queue_setup(monkeypatch)
 
@@ -134,9 +136,27 @@ def test_retry_backoff_returns_zero_when_turned_off():
     assert actual == 0
 
 
+def test_job_scheduler_creates_cron_jobs(queue: DataHubScheduler):
+    existing_job_count = len(list(queue.get_scheduled_jobs()))
+    actual_job = job_scheduler(
+        function=PickleableMock.queue_handler,
+        function_args=('arg1', 'arg2'),
+        function_kwargs={'test': True},
+        is_burst=True,
+        cron=EVERY_MINUTE,
+    )
+
+    assert actual_job in queue.get_scheduled_jobs()
+    assert len(list(queue.get_scheduled_jobs())) == existing_job_count + 1
+    assert actual_job.meta['cron_string'] == EVERY_MINUTE
+
+
 def queue_setup(monkeypatch):
     datahub_queue_mock = Mock()
-    monkeypatch.setattr('datahub.core.queues.queue.DataHubQueue.enqueue', datahub_queue_mock)
+    monkeypatch.setattr(
+        'datahub.core.queues.scheduler.DataHubScheduler.enqueue',
+        datahub_queue_mock,
+    )
     return datahub_queue_mock
 
 

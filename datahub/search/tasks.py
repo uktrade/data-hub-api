@@ -1,10 +1,11 @@
 from logging import getLogger
 
-from celery import shared_task
 from django.apps import apps
 from django_pglocks import advisory_lock
 
+from datahub.core.queues.errors import RetryError
 from datahub.core.queues.job_scheduler import job_scheduler
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.search.apps import get_search_app, get_search_app_by_model, get_search_apps
 from datahub.search.bulk_sync import sync_app
 from datahub.search.migrate_utils import resync_after_migrate
@@ -13,29 +14,28 @@ from datahub.search.migrate_utils import resync_after_migrate
 logger = getLogger(__name__)
 
 
-@shared_task(acks_late=True, priority=9)
 def sync_all_models():
     """
     Task that starts sub-tasks to sync all models to OpenSearch.
-
-    acks_late is set to True so that the task restarts if interrupted.
-
-    priority is set to the lowest priority (for Redis, 0 is the highest priority).
     """
     for search_app in get_search_apps():
-        sync_model.apply_async(
-            args=(search_app.name,),
-        )
+        schedule_model_sync(search_app)
 
 
-@shared_task(acks_late=True, priority=9, queue='long-running')
+def schedule_model_sync(search_app):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=sync_model,
+        function_args=(search_app.name,),
+    )
+    logger.info(
+        f'Task {job.id} sync_model scheduled for {search_app.name}',
+    )
+
+
 def sync_model(search_app_name):
     """
     Task that syncs a single model to OpenSearch.
-
-    acks_late is set to True so that the task restarts if interrupted.
-
-    priority is set to the lowest priority (for Redis, 0 is the highest priority).
     """
     search_app = get_search_app(search_app_name)
     sync_app(search_app)
@@ -102,15 +102,7 @@ def sync_related_objects_task(
         )
 
 
-@shared_task(
-    bind=True,
-    acks_late=True,
-    priority=7,
-    max_retries=5,
-    default_retry_delay=60,
-    queue='long-running',
-)
-def complete_model_migration(self, search_app_name, new_mapping_hash):
+def complete_model_migration(search_app_name, new_mapping_hash):
     """
     Completes a migration by performing a full resync, updating aliases and removing old indices.
     """
@@ -123,7 +115,7 @@ deployment where a new app instance creates the task and it's picked up by an ol
 Rescheduling the {search_app_name} search app migration to attempt to resolve the conflict...
 """
         logger.warning(warning_message)
-        raise self.retry()
+        raise RetryError(warning_message)
 
     with advisory_lock(f'leeloo-resync_after_migrate-{search_app_name}', wait=False) as lock_held:
         if not lock_held:

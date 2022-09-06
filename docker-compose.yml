@@ -27,7 +27,7 @@ services:
       - api
     command: watchmedo auto-restart -d . -R -p '*.py' -- celery -A config worker -l info -Q celery -B
 
-  rq:
+  rq_short:
     build:
       context: .
     volumes:
@@ -36,7 +36,29 @@ services:
     env_file: .env
     depends_on:
       - api
-    command: python short-running-worker.py long-running-worker.py
+    command: python short-running-worker.py
+
+  rq_long:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://opensearch:9200 -wait tcp://redis:6379 -wait tcp://api:8000 -timeout 300s
+    env_file: .env
+    depends_on:
+      - api
+    command: python long-running-worker.py
+
+  rq_sched:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://opensearch:9200 -wait tcp://redis:6379 -wait tcp://api:8000 -timeout 300s
+    env_file: .env
+    depends_on:
+      - api
+    command: python cron-scheduler.py
 
   postgres:
     image: postgres:12

@@ -22,7 +22,7 @@ def test_fails_if_index_doesnt_exist():
     'search_model',
     (app.name for app in get_search_apps()),
 )
-@mock.patch('datahub.search.management.commands.sync_search.sync_model')
+@mock.patch('datahub.search.management.commands.sync_search.schedule_model_sync')
 @mock.patch(
     'datahub.search.apps.index_exists',
     mock.Mock(return_value=True),
@@ -33,10 +33,10 @@ def test_sync_one_model(sync_model_mock, search_model):
     """
     management.call_command(sync_search.Command(), model=[search_model])
 
-    assert sync_model_mock.apply_async.call_count == 1
+    assert sync_model_mock.call_count == 1
 
 
-@mock.patch('datahub.search.management.commands.sync_search.sync_model')
+@mock.patch('datahub.search.management.commands.sync_search.schedule_model_sync')
 @mock.patch(
     'datahub.search.apps.index_exists',
     mock.Mock(return_value=True),
@@ -47,26 +47,10 @@ def test_sync_all_models(sync_model_mock):
     """
     management.call_command(sync_search.Command())
 
-    assert sync_model_mock.apply_async.call_count == len(get_search_apps())
+    assert sync_model_mock.call_count == len(get_search_apps())
 
 
-@mock.patch('datahub.search.management.commands.sync_search.sync_model')
-@mock.patch(
-    'datahub.search.apps.index_exists',
-    mock.Mock(return_value=True),
-)
-def test_sync_synchronously(sync_model_mock):
-    """
-    Test that --foreground can be used to run the command in a synchronous (blocking) fashion.
-    """
-    app = get_search_apps()[0]
-    management.call_command(sync_search.Command(), model=[app.name], foreground=True)
-
-    assert sync_model_mock.apply.call_count == 1
-    assert not sync_model_mock.apply_async.called
-
-
-@mock.patch('datahub.search.management.commands.sync_search.sync_model')
+@mock.patch('datahub.search.management.commands.sync_search.schedule_model_sync')
 @mock.patch(
     'datahub.search.apps.index_exists',
     mock.Mock(return_value=True),
@@ -77,4 +61,4 @@ def test_sync_invalid_model(sync_model_mock):
     """
     management.call_command(sync_search.Command(), model='invalid')
 
-    assert sync_model_mock.apply_async.call_count == 0
+    assert sync_model_mock.call_count == 0
