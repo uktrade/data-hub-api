@@ -3,7 +3,7 @@ from logging import getLogger, WARNING
 from django.core.management.base import BaseCommand, CommandError
 
 from datahub.search.apps import are_apps_initialised, get_search_apps, get_search_apps_by_name
-from datahub.search.tasks import sync_model
+from datahub.search.tasks import schedule_model_sync
 
 logger = getLogger(__name__)
 
@@ -42,9 +42,6 @@ class Command(BaseCommand):
         for app in apps:
             task_args = (app.name,)
 
-            if options['foreground']:
-                sync_model.apply(args=task_args, throw=True)
-            else:
-                sync_model.apply_async(args=task_args)
+            schedule_model_sync(task_args)
 
         logger.info('OpenSearch sync complete!')

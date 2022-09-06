@@ -2,6 +2,8 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
+from datahub.core.queues.errors import RetryError
+from datahub.core.test.queues.test_scheduler import PickleableMock
 from datahub.search.apps import get_search_apps
 from datahub.search.sync_object import sync_object_async, sync_related_objects_async
 from datahub.search.tasks import (
@@ -24,7 +26,7 @@ def test_sync_model(monkeypatch):
     monkeypatch.setattr('datahub.search.tasks.sync_app', sync_app_mock)
 
     search_app = next(iter(get_search_apps()))
-    sync_model.apply_async(args=(search_app.name,))
+    sync_model(search_app.name)
 
     get_search_app_mock.assert_called_once_with(search_app.name)
     sync_app_mock.assert_called_once_with(get_search_app_mock.return_value)
@@ -32,12 +34,13 @@ def test_sync_model(monkeypatch):
 
 def test_sync_all_models(monkeypatch):
     """Test that the sync_all_models task starts sub-tasks to sync all models."""
-    sync_model_mock = Mock()
-    monkeypatch.setattr('datahub.search.tasks.sync_model', sync_model_mock)
+    sync_model_mock = PickleableMock()
+    monkeypatch.setattr('datahub.search.tasks.sync_model', sync_model_mock.queue_handler)
 
-    sync_all_models.apply_async()
-    tasks_created = {call[1]['args'][0] for call in sync_model_mock.apply_async.call_args_list}
-    assert tasks_created == {app.name for app in get_search_apps()}
+    sync_all_models()
+
+    assert sync_model_mock.called is True
+    assert sync_model_mock.times == len(get_search_apps())
 
 
 @pytest.mark.django_db
@@ -89,7 +92,7 @@ def test_complete_model_migration(monkeypatch):
     get_search_app_mock = Mock(return_value=mock_app)
     monkeypatch.setattr('datahub.search.tasks.get_search_app', get_search_app_mock)
 
-    complete_model_migration.apply_async(args=('test-app', 'target-hash'))
+    complete_model_migration(search_app_name='test-app', new_mapping_hash='target-hash')
     resync_after_migrate_mock.assert_called_once_with(mock_app)
 
 
@@ -113,7 +116,7 @@ def test_complete_model_migration_aborts_when_already_in_progress(monkeypatch):
     advisory_lock_mock = MagicMock()
     advisory_lock_mock.return_value.__enter__.return_value = False
     monkeypatch.setattr('datahub.search.tasks.advisory_lock', advisory_lock_mock)
-    complete_model_migration.apply_async(args=('test-app', 'target-hash'))
+    complete_model_migration(search_app_name='test-app', new_mapping_hash='target-hash')
 
     # resync_after_migrate_mock should not have been called as the task should've exited instead
     resync_after_migrate_mock.assert_not_called()
@@ -140,14 +143,8 @@ def test_complete_model_migration_with_mapping_hash_mismatch(monkeypatch):
     )
     get_search_app_mock = Mock(return_value=mock_app)
     monkeypatch.setattr('datahub.search.tasks.get_search_app', get_search_app_mock)
-    retry_mock = Mock(side_effect=MockRetryError())
-    monkeypatch.setattr(complete_model_migration, 'retry', retry_mock)
 
-    res = complete_model_migration.apply_async(args=('test-app', 'another-hash'))
-
-    with pytest.raises(MockRetryError):
-        res.get()
-
-    retry_mock.assert_called_once()
+    with pytest.raises(RetryError):
+        complete_model_migration(search_app_name='test-app', new_mapping_hash='another-hash')
 
     resync_after_migrate_mock.assert_not_called()
