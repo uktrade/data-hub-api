@@ -1,4 +1,5 @@
 from logging import getLogger
+from pprint import pprint
 
 from django.conf import settings
 from redis import Redis
@@ -7,12 +8,13 @@ from rq import (
     SimpleWorker,
     Worker,
 )
+from rq_scheduler import Scheduler
 
 logger = getLogger(__name__)
 
 SHORT_RUNNING_QUEUE = 'short-running'
 LONG_RUNNING_QUEUE = 'long-running'
-
+CRON_QUEUE = 'cron-running'
 
 class WorkerStrategy:
     """
@@ -52,8 +54,18 @@ class DataHubQueue:
             'fork': Fork(self._connection),
             'burst-no-fork': BurstNoFork(self._connection),
         }[strategy]
+    
 
     def enqueue(self, queue_name: str, function, *args, **kwargs):
+        def cron_test_function():
+            pprint('######################')
+            pprint('testing cron successful')
+
+        pprint('en here ###############')
+        # test_queue = RqQueue(name=CRON_QUEUE, is_async=self.is_async, connection=Redis())
+        
+        scheduler = Scheduler(CRON_QUEUE, connection=Redis.from_url(settings.REDIS_BASE_URL))
+        scheduler.cron('* * * * *', cron_test_function, repeat=10)
         queue = RqQueue(
             name=queue_name,
             is_async=self.is_async,

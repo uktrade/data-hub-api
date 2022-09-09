@@ -19,6 +19,7 @@ if [[ -n "${DJANGO_SUPERUSER_SSO_EMAIL_USER_ID}" && -n "${SUPERUSER_ACCESS_TOKEN
     python manage.py add_access_token --skip-checks --token "${SUPERUSER_ACCESS_TOKEN}" --hours 999 "${DJANGO_SUPERUSER_SSO_EMAIL_USER_ID}"
 fi
 
+
 # Run runserver in a while loop as the whole docker container will otherwise die
 # when there is bad syntax
 while true; do
