@@ -92,7 +92,7 @@ django-debug-toolbar==3.6.0
     # via -r requirements.in
 django-environ==0.9.0
     # via -r requirements.in
-django-extensions==3.2.0
+django-extensions==3.2.1
     # via -r requirements.in
 django-filter==22.1
     # via -r requirements.in
@@ -116,7 +116,7 @@ djangorestframework==3.13.1
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
-elastic-apm==6.11.0
+elastic-apm==6.12.0
     # via -r requirements.in
 execnet==1.9.0
     # via pytest-xdist
@@ -175,7 +175,7 @@ idna==3.3
     #   yarl
 iniconfig==1.1.1
     # via pytest
-ipython==8.4.0
+ipython==8.5.0
     # via -r requirements-dev.in
 isort==5.10.1
     # via pylint
