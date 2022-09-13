@@ -8,7 +8,9 @@ Accepted
 
 ## Context
 
-Celery upgrades have been escalated by various security patches requiring later versions for resolving the relevent issues. The result of this has brought about an issue that has not been rectified, not for a lack of effort from several developers, even though the decision to delay doing this until almost everything that can be done to solve the Celery issue had been exhausted. There seemed to be a few obvious resolutions that were explored, but they turned out to be fruitless. The security fork has mitigated any security risks, but we are now stuck between a fork and a hard place, with no possibility to upgrade Celery.
+Celery upgrades have been escalated by various security patches requiring later versions for resolving the relevent issues. The result of this has brought about an issue that caused an issue where database connections would spike, which resulted in Data Hub either running very slowly or going completely offline for a few minutes. As a temporary workaround, a [fork of the last working Celery version](https://github.com/uktrade/celery) was created that only contains patches for the identified vulnerabilities.
+
+This issue has not been rectified, not for a lack of effort from several developers, even though the decision to delay doing this until almost everything that can be done to solve the Celery issue had been exhausted. There seemed to be a few obvious resolutions that were explored, but they turned out to be fruitless. The security fork has mitigated any security risks, but we are now stuck between a fork and a hard place, with no possibility to upgrade Celery.
 
 ## Decision
 
