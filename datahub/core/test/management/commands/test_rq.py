@@ -1,5 +1,4 @@
 import logging
-import os
 from unittest import mock
 
 from django.core.management import call_command
@@ -42,7 +41,13 @@ def test_rq_runs_logger_to_sentry(monkeypatch):
 
 
 def test_rq_writes_a_log_file_when_in_debug(monkeypatch):
+    log_health_mock = mock.Mock
     monkeypatch.setenv('DEBUG', True)
+    monkeypatch.setattr(
+        'datahub.core.queues.health_check.log_health',
+        log_health_mock,
+    )
+
     call_command('test_rq')
 
-    assert os.path.exists('/tmp/test_rq.log')
+    assert log_health_mock.called

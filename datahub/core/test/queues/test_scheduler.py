@@ -1,3 +1,5 @@
+from unittest.mock import call, MagicMock
+
 import pytest
 from django.conf import settings
 from rq import Retry
@@ -126,3 +128,15 @@ def test_can_schedule_a_cron_job_every_minute(queue: DataHubScheduler):
 
     assert job.meta['cron_string'] == every_minute
     assert job.meta['use_local_timezone'] is False
+
+
+def test_fork_queue_worker_is_called_with_work_arguments(
+    monkeypatch,
+    fork_queue: DataHubScheduler,
+):
+    mock_worker = MagicMock()
+    monkeypatch.setattr('datahub.core.queues.scheduler.Worker', mock_worker)
+
+    fork_queue.work('one-running', with_scheduler=False)
+    mock_worker.assert_called_with(('one-running',), connection=fork_queue._connection)
+    assert call().work(with_scheduler=False) in mock_worker.mock_calls
