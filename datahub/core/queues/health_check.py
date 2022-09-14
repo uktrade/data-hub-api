@@ -13,5 +13,9 @@ def queue_health_check():
         log,
     )
     if settings.DEBUG:
-        with open('/tmp/test_rq.log', 'a') as health_log:
-            health_log.write(log + os.linesep)
+        log_health(log)
+
+
+def log_health(log):
+    with open('/tmp/test_rq.log', 'a', encoding='utf_8') as health_log:
+        health_log.write(log + os.linesep)

@@ -517,3 +517,13 @@ def async_queue():
             yield queue
         finally:
             queue.clear()
+
+
+@pytest.fixture()
+def fork_queue():
+    """Don't use this if you are going to do work as this will block any tests running"""
+    with DataHubScheduler('fork') as queue:
+        try:
+            yield queue
+        finally:
+            queue.clear()
