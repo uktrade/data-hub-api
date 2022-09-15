@@ -38,16 +38,3 @@ def test_rq_runs_logger_to_sentry(monkeypatch):
         call_command('test_rq')
 
         assert mock_info.assert_called
-
-
-def test_rq_writes_a_log_file_when_in_debug(monkeypatch):
-    log_health_mock = mock.Mock
-    monkeypatch.setenv('DEBUG', True)
-    monkeypatch.setattr(
-        'datahub.core.queues.health_check.log_health',
-        log_health_mock,
-    )
-
-    call_command('test_rq')
-
-    assert log_health_mock.called
