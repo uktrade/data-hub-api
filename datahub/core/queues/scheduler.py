@@ -7,6 +7,7 @@ from rq import (
     SimpleWorker,
     Worker,
 )
+from rq_scheduler import Scheduler
 
 logger = getLogger(__name__)
 
@@ -25,16 +26,19 @@ class WorkerStrategy:
 
 
 class BurstNoFork(WorkerStrategy):
-    def process_queues(self, queues):
-        SimpleWorker(queues, connection=self._connection).work(burst=True)
+    def process_queues(self, queues, with_scheduler):
+        SimpleWorker(queues, connection=self._connection).work(
+            burst=True,
+            with_scheduler=with_scheduler,
+        )
 
 
 class Fork(WorkerStrategy):
-    def process_queues(self, queues):
-        Worker(queues, connection=self._connection).work()
+    def process_queues(self, queues, with_scheduler):
+        Worker(queues, connection=self._connection).work(with_scheduler=with_scheduler)
 
 
-class DataHubQueue:
+class DataHubScheduler:
     """
     Datahub Queue utilising RQ to instantiate different types of Queues
     for processing work using Redis as the underlying PUB SUB durability layer
@@ -46,6 +50,7 @@ class DataHubQueue:
         is_async=not settings.IS_TEST,
     ):
         self._connection = Redis.from_url(settings.REDIS_BASE_URL)
+        self._scheduler = Scheduler(connection=self._connection)
         self._queues = []
         self.is_async = is_async
         self._worker_strategy = {
@@ -66,8 +71,21 @@ class DataHubQueue:
             **kwargs,
         )
 
-    def work(self, *queues: str):
-        return self._worker_strategy.process_queues(queues)
+    def cron(self, queue_name: str, cron: str, function, *args, **kwargs):
+        job = self._scheduler.cron(
+            cron,
+            function,
+            *args,
+            **kwargs,
+            queue_name=queue_name,
+        )
+        return job
+
+    def get_scheduled_jobs(self):
+        return self._scheduler.get_jobs()
+
+    def work(self, *queues: str, with_scheduler: bool = False):
+        return self._worker_strategy.process_queues(queues, with_scheduler)
 
     def clear(self):
         for queue in self._queues:

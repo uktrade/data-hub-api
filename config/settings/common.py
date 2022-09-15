@@ -454,12 +454,6 @@ if REDIS_BASE_URL:
             },
         }
 
-    if env.bool('ENABLE_DAILY_OPENSEARCH_SYNC', False):
-        CELERY_BEAT_SCHEDULE['sync_search'] = {
-            'task': 'datahub.search.tasks.sync_all_models',
-            'schedule': crontab(minute=0, hour=1),
-        }
-
     if env.bool('ENABLE_SPI_REPORT_GENERATION', False):
         CELERY_BEAT_SCHEDULE['spi_report'] = {
             'task': 'datahub.investment.project.report.tasks.generate_spi_report',
@@ -511,6 +505,7 @@ if REDIS_BASE_URL:
 CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER', False)
 CELERY_TASK_SEND_SENT_EVENT = env.bool('CELERY_TASK_SEND_SENT_EVENT', True)
 CELERY_WORKER_TASK_EVENTS = env.bool('CELERY_WORKER_TASK_EVENTS', True)
+ENABLE_DAILY_OPENSEARCH_SYNC = env.bool('ENABLE_DAILY_OPENSEARCH_SYNC', False)
 
 # ADMIN CSV IMPORT
 

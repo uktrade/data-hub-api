@@ -3,7 +3,7 @@ from typing import Literal
 
 from rq import Retry
 
-from datahub.core.queues.queue import DataHubQueue, SHORT_RUNNING_QUEUE
+from datahub.core.queues.scheduler import DataHubScheduler, SHORT_RUNNING_QUEUE
 
 logger = getLogger(__name__)
 
@@ -17,7 +17,7 @@ def job_scheduler(
     is_burst=False,
     retry_backoff=False,
     retry_intervals=0,
-    is_async=True,
+    cron=None,
 ):
     """Job scheduler for setting up Jobs that run tasks
 
@@ -43,6 +43,8 @@ def job_scheduler(
             You can also assign a single valued integer, that will be repeated for the
             retry amount.
             Defaults to 0.
+        cron (str, optional): Add a schedule using the cron format, see https://crontab.cronhub.io/
+            for generating a cron string
     """
     is_backoff_an_int = isinstance(retry_backoff, int) and retry_backoff > 1
     if retry_backoff is True or is_backoff_an_int:
@@ -55,19 +57,28 @@ def job_scheduler(
         f"'{function_kwargs}' retries '{max_retries}' with queue '{queue_name}' "
         f"retry intervals '{retry_intervals}'",
     )
-    with DataHubQueue(
+    with DataHubScheduler(
         strategy='burst-no-fork' if is_burst else 'fork',
-    ) as queue:
-        job = queue.enqueue(
-            queue_name=queue_name,
-            function=function,
-            args=function_args,
-            kwargs=function_kwargs,
-            retry=Retry(
-                max=max_retries,
-                interval=retry_intervals,
-            ),
-        )
+    ) as scheduler:
+        if cron is not None:
+            job = scheduler.cron(
+                queue_name=queue_name,
+                cron=cron,
+                function=function,
+                args=function_args,
+                kwargs=function_kwargs,
+            )
+        else:
+            job = scheduler.enqueue(
+                queue_name=queue_name,
+                function=function,
+                args=function_args,
+                kwargs=function_kwargs,
+                retry=Retry(
+                    max=max_retries,
+                    interval=retry_intervals,
+                ),
+            )
         logger.info(f'Generated job id "{job.id}" with "{job.__dict__}"')
         return job
 

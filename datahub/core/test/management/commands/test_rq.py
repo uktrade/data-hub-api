@@ -1,3 +1,6 @@
+import logging
+from unittest import mock
+
 from django.core.management import call_command
 
 
@@ -19,7 +22,7 @@ class PickleableMock:
 def test_rq_health_check_is_called_for_all_queues_setup(monkeypatch):
     mock = PickleableMock()
     monkeypatch.setattr(
-        'datahub.core.management.commands.test_rq.queue_health_check',
+        'datahub.core.queues.health_check.queue_health_check',
         mock.handler,
     )
 
@@ -27,3 +30,11 @@ def test_rq_health_check_is_called_for_all_queues_setup(monkeypatch):
 
     assert mock.called is True
     assert mock.times == 3
+
+
+def test_rq_runs_logger_to_sentry(monkeypatch):
+    logger = logging.getLogger('datahub.core.queues.health_check')
+    with mock.patch.object(logger, 'info') as mock_info:
+        call_command('test_rq')
+
+        assert mock_info.assert_called
