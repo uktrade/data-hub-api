@@ -63,10 +63,10 @@ def test_datahub_enque_is_configured_with_correct_default_number_of_retries_and_
     datahub_queue_mock.assert_called_with(
         queue_name='234',
         function=PickleableMock.queue_handler,
+        timeout=180,
         args=('arg1', 'arg2'),
         kwargs={'test': True},
         retry=retry_arg,
-        timeout=180,
     )
 
 
@@ -92,10 +92,10 @@ def test_datahub_enque_is_configured_with_retry_backoff_for_two_retries(
     datahub_queue_mock.assert_called_with(
         queue_name='234',
         function=PickleableMock.queue_handler,
+        timeout=180,
         args=('arg1', 'arg2'),
         kwargs={'test': True},
         retry=retry_arg,
-        timeout=180,
     )
 
 
@@ -122,10 +122,10 @@ def test_datahub_enque_is_configured_with_retry_backoff_as_number(
     datahub_queue_mock.assert_called_with(
         queue_name='234',
         function=PickleableMock.queue_handler,
+        timeout=180,
         args=('arg1', 'arg2'),
         kwargs={'test': True},
         retry=retry_arg,
-        timeout=180,
     )
 
 
