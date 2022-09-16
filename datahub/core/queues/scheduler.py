@@ -58,7 +58,7 @@ class DataHubScheduler:
             'burst-no-fork': BurstNoFork(self._connection),
         }[strategy]
 
-    def enqueue(self, queue_name: str, function, *args, **kwargs):
+    def enqueue(self, queue_name: str, function, retry, timeout: int, *args, **kwargs):
         queue = RqQueue(
             name=queue_name,
             is_async=self.is_async,
@@ -67,6 +67,8 @@ class DataHubScheduler:
         self._queues.append(queue)
         return queue.enqueue(
             function,
+            retry=retry,
+            timeout=timeout,
             *args,
             **kwargs,
         )

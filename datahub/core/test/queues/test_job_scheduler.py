@@ -1,4 +1,5 @@
-from unittest.mock import Mock
+from pprint import pprint
+from unittest.mock import call, MagicMock, Mock
 
 from datahub.core.queues.cron_constants import EVERY_MINUTE
 from datahub.core.queues.job_scheduler import job_scheduler, retry_backoff_intervals
@@ -46,7 +47,8 @@ def test_datahub_enque_is_configured_with_correct_default_number_of_retries_and_
     monkeypatch,
     queue: DataHubScheduler,
 ):
-    datahub_queue_mock = queue_setup(monkeypatch)
+    rq_queue_mock = queue_setup(monkeypatch)
+    retry_mock = retry_setup(monkeypatch)
     job_scheduler(
         function=PickleableMock.queue_handler,
         function_args=('arg1', 'arg2'),
@@ -57,24 +59,22 @@ def test_datahub_enque_is_configured_with_correct_default_number_of_retries_and_
 
     queue.work('234')
 
-    retry_arg = get_retry(datahub_queue_mock)
-    assert retry_arg.max == 3
-    assert retry_arg.intervals == [0]
-    datahub_queue_mock.assert_called_with(
-        queue_name='234',
-        function=PickleableMock.queue_handler,
+    retry_mock.called_with(max=2, interval=[3,0])
+    assert call().enqueue(
+        PickleableMock.queue_handler,
+        retry='retrymock',
+        timeout=180,
         args=('arg1', 'arg2'),
         kwargs={'test': True},
-        retry=retry_arg,
-        timeout=180,
-    )
+    ) in rq_queue_mock.mock_calls
 
 
 def test_datahub_enque_is_configured_with_retry_backoff_for_two_retries(
     monkeypatch,
     queue: DataHubScheduler,
 ):
-    datahub_queue_mock = queue_setup(monkeypatch)
+    rq_queue_mock = queue_setup(monkeypatch)
+    retry_mock = retry_setup(monkeypatch)
     job_scheduler(
         function=PickleableMock.queue_handler,
         function_args=('arg1', 'arg2'),
@@ -86,24 +86,22 @@ def test_datahub_enque_is_configured_with_retry_backoff_for_two_retries(
 
     queue.work('234')
 
-    retry_arg = get_retry(datahub_queue_mock)
-    assert retry_arg.max == 2
-    assert retry_arg.intervals == [1, 4]
-    datahub_queue_mock.assert_called_with(
-        queue_name='234',
-        function=PickleableMock.queue_handler,
+    retry_mock.called_with(max=2, interval=[1,4])
+    assert rq_queue_mock.mock_calls[1] == call().enqueue(
+        PickleableMock.queue_handler,
+        retry='retrymock',
+        timeout=180,
         args=('arg1', 'arg2'),
         kwargs={'test': True},
-        retry=retry_arg,
-        timeout=180,
     )
 
-
+######
 def test_datahub_enque_is_configured_with_retry_backoff_as_number(
     monkeypatch,
     queue: DataHubScheduler,
 ):
-    datahub_queue_mock = queue_setup(monkeypatch)
+    rq_queue_mock = queue_setup(monkeypatch)
+    retry_mock = retry_setup(monkeypatch)
 
     job_scheduler(
         function=PickleableMock.queue_handler,
@@ -116,16 +114,13 @@ def test_datahub_enque_is_configured_with_retry_backoff_as_number(
 
     queue.work('234')
 
-    retry_arg = get_retry(datahub_queue_mock)
-    assert retry_arg.max == 3
-    assert retry_arg.intervals == [30, 961, 1024]
-    datahub_queue_mock.assert_called_with(
-        queue_name='234',
-        function=PickleableMock.queue_handler,
+    retry_mock.called_with(max=3, interval=[1,4])   
+    assert rq_queue_mock.mock_calls[1] == call().enqueue(
+        PickleableMock.queue_handler,
+        retry='retrymock',
+        timeout=180,
         args=('arg1', 'arg2'),
         kwargs={'test': True},
-        retry=retry_arg,
-        timeout=180,
     )
 
 
@@ -155,13 +150,19 @@ def test_job_scheduler_creates_cron_jobs(queue: DataHubScheduler):
 
 
 def queue_setup(monkeypatch):
-    datahub_queue_mock = Mock()
+    rq_queue_mock = MagicMock()
     monkeypatch.setattr(
-        'datahub.core.queues.scheduler.DataHubScheduler.enqueue',
-        datahub_queue_mock,
+        'datahub.core.queues.scheduler.RqQueue',
+        rq_queue_mock,
     )
-    return datahub_queue_mock
+    return rq_queue_mock
 
 
-def get_retry(datahub_queue_mock):
-    return datahub_queue_mock.call_args_list[-1][-1]['retry']
+def retry_setup(monkeypatch):
+    retry_mock = MagicMock(return_value='retrymock')
+    monkeypatch.setattr(
+        'datahub.core.queues.job_scheduler.Retry',
+        retry_mock
+    )
+    
+    return retry_mock

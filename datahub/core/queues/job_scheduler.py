@@ -74,13 +74,13 @@ def job_scheduler(
             job = scheduler.enqueue(
                 queue_name=queue_name,
                 function=function,
-                args=function_args,
-                kwargs=function_kwargs,
                 retry=Retry(
                     max=max_retries,
                     interval=retry_intervals,
                 ),
                 timeout=timeout,
+                args=function_args,
+                kwargs=function_kwargs,
             )
         logger.info(f'Generated job id "{job.id}" with "{job.__dict__}"')
         return job
