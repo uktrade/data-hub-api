@@ -66,6 +66,7 @@ def test_datahub_enque_is_configured_with_correct_default_number_of_retries_and_
         args=('arg1', 'arg2'),
         kwargs={'test': True},
         retry=retry_arg,
+        timeout=180,
     )
 
 
@@ -94,6 +95,7 @@ def test_datahub_enque_is_configured_with_retry_backoff_for_two_retries(
         args=('arg1', 'arg2'),
         kwargs={'test': True},
         retry=retry_arg,
+        timeout=180,
     )
 
 
@@ -123,6 +125,7 @@ def test_datahub_enque_is_configured_with_retry_backoff_as_number(
         args=('arg1', 'arg2'),
         kwargs={'test': True},
         retry=retry_arg,
+        timeout=180,
     )
 
 

@@ -69,3 +69,6 @@ start-frontend-api-dnb:
 stop-frontend-api-dnb:
 	$(MAKE) -C ../dnb-service stop-dnb-for-data-hub-api
 	$(MAKE) -C ../data-hub-frontend stop-dev
+
+migrate_search:
+	docker-compose run api python manage.py migrate_search

@@ -27,6 +27,7 @@ def schedule_model_sync(search_app):
         queue_name=LONG_RUNNING_QUEUE,
         function=sync_model,
         function_args=(search_app.name,),
+        timeout=1800,
     )
     logger.info(
         f'Task {job.id} sync_model scheduled for {search_app.name}',

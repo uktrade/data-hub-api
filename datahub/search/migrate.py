@@ -76,6 +76,7 @@ def _schedule_resync(search_app):
         function_args=(search_app.name, search_app.search_model.get_target_mapping_hash()),
         max_retries=5,
         retry_intervals=60,
+        timeout=1800,
     )
     logger.info(
         f'Task {job.id} complete model migration is scheduled for {search_app.name}',
@@ -88,5 +89,6 @@ def _schedule_initial_sync(search_app):
         queue_name=LONG_RUNNING_QUEUE,
         function=sync_model,
         function_args=(search_app.name,),
+        timeout=600,
     )
     logger.info(f'Scheduling with {job.id} for initial sync for the {search_app.name} search app')
