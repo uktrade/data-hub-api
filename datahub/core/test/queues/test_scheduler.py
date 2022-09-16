@@ -1,3 +1,4 @@
+from pprint import pprint
 from unittest.mock import call, MagicMock
 
 import pytest
@@ -51,9 +52,8 @@ def test_can_queue_one_thing_with_arguments(async_queue: DataHubScheduler):
     async_queue.enqueue(
         'running-with-args',
         PickleableMock.queue_handler,
-        'arg1',
-        'arg2',
-        test=True,
+        args=('arg1', 'arg2'),
+        kwargs={'test': True},
     )
     async_queue.work('running-with-args', with_scheduler=True)
     assert PickleableMock.called
@@ -79,9 +79,9 @@ def test_can_clear_all_queues(async_queue: DataHubScheduler):
 
 
 def test_can_process_multiple_queues_in_correct_priority_order(async_queue: DataHubScheduler):
-    async_queue.enqueue('queue1', PickleableMock.queue_handler, 1)
-    async_queue.enqueue('queue2', PickleableMock.queue_handler, True)
-    async_queue.enqueue('queue3', PickleableMock.queue_handler, False)
+    async_queue.enqueue('queue1', PickleableMock.queue_handler, args=(1,))
+    async_queue.enqueue('queue2', PickleableMock.queue_handler, args=(True,))
+    async_queue.enqueue('queue3', PickleableMock.queue_handler, args=(False,))
     async_queue.work('queue2', 'queue3', 'queue1')
     assert PickleableMock.times == 3
     assert PickleableMock.params[0] == (True,)
@@ -140,3 +140,22 @@ def test_fork_queue_worker_is_called_with_work_arguments(
     fork_queue.work('one-running', with_scheduler=False)
     mock_worker.assert_called_with(('one-running',), connection=fork_queue._connection)
     assert call().work(with_scheduler=False) in mock_worker.mock_calls
+
+
+def test_job_generates_a_default_timeout_of_180(queue: DataHubScheduler):
+    job = queue.enqueue('123', PickleableMock.queue_handler)
+
+    queue.work('123')
+
+    assert job is not None
+    assert job.timeout == 180
+
+
+def test_job_generates_a_custom_timeout_of_100(queue: DataHubScheduler):
+    job = queue.enqueue(queue_name='123', function=PickleableMock.queue_handler, timeout=100)
+
+    queue.work('123')
+
+    pprint(job.__dict__)
+    assert job is not None
+    assert job.timeout == 100

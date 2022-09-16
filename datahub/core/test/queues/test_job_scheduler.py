@@ -1,5 +1,4 @@
-from pprint import pprint
-from unittest.mock import call, MagicMock, Mock
+from unittest.mock import call, MagicMock
 
 from datahub.core.queues.cron_constants import EVERY_MINUTE
 from datahub.core.queues.job_scheduler import job_scheduler, retry_backoff_intervals
@@ -59,13 +58,13 @@ def test_datahub_enque_is_configured_with_correct_default_number_of_retries_and_
 
     queue.work('234')
 
-    retry_mock.called_with(max=2, interval=[3,0])
+    retry_mock.called_with(max=2, interval=[3, 0])
     assert call().enqueue(
         PickleableMock.queue_handler,
-        retry='retrymock',
-        timeout=180,
         args=('arg1', 'arg2'),
         kwargs={'test': True},
+        retry='retrymock',
+        job_timeout=180,
     ) in rq_queue_mock.mock_calls
 
 
@@ -86,16 +85,16 @@ def test_datahub_enque_is_configured_with_retry_backoff_for_two_retries(
 
     queue.work('234')
 
-    retry_mock.called_with(max=2, interval=[1,4])
+    retry_mock.called_with(max=2, interval=[1, 4])
     assert rq_queue_mock.mock_calls[1] == call().enqueue(
         PickleableMock.queue_handler,
-        retry='retrymock',
-        timeout=180,
         args=('arg1', 'arg2'),
         kwargs={'test': True},
+        retry='retrymock',
+        job_timeout=180,
     )
 
-######
+
 def test_datahub_enque_is_configured_with_retry_backoff_as_number(
     monkeypatch,
     queue: DataHubScheduler,
@@ -110,17 +109,18 @@ def test_datahub_enque_is_configured_with_retry_backoff_as_number(
         queue_name='234',
         max_retries=3,
         retry_backoff=30,
+        timeout=100,
     )
 
     queue.work('234')
 
-    retry_mock.called_with(max=3, interval=[1,4])   
+    retry_mock.called_with(max=3, interval=[1, 4])
     assert rq_queue_mock.mock_calls[1] == call().enqueue(
         PickleableMock.queue_handler,
-        retry='retrymock',
-        timeout=180,
         args=('arg1', 'arg2'),
         kwargs={'test': True},
+        retry='retrymock',
+        job_timeout=100,
     )
 
 
@@ -162,7 +162,7 @@ def retry_setup(monkeypatch):
     retry_mock = MagicMock(return_value='retrymock')
     monkeypatch.setattr(
         'datahub.core.queues.job_scheduler.Retry',
-        retry_mock
+        retry_mock,
     )
-    
+
     return retry_mock

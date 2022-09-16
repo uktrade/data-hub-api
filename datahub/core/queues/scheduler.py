@@ -1,4 +1,5 @@
 from logging import getLogger
+from types import FunctionType
 
 from django.conf import settings
 from redis import Redis
@@ -58,7 +59,15 @@ class DataHubScheduler:
             'burst-no-fork': BurstNoFork(self._connection),
         }[strategy]
 
-    def enqueue(self, queue_name: str, function, retry, timeout: int, *args, **kwargs):
+    def enqueue(
+        self,
+        queue_name: str,
+        function: FunctionType,
+        retry=None,
+        timeout=180,
+        *args,
+        **kwargs,
+    ):
         queue = RqQueue(
             name=queue_name,
             is_async=self.is_async,
@@ -67,10 +76,10 @@ class DataHubScheduler:
         self._queues.append(queue)
         return queue.enqueue(
             function,
-            retry=retry,
-            timeout=timeout,
             *args,
             **kwargs,
+            retry=retry,
+            job_timeout=timeout,
         )
 
     def cron(self, queue_name: str, cron: str, function, *args, **kwargs):
