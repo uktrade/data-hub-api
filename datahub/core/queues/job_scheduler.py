@@ -18,7 +18,7 @@ def job_scheduler(
     retry_backoff=False,
     retry_intervals=0,
     cron=None,
-    timeout=180,
+    job_timeout=180,
 ):
     """Job scheduler for setting up Jobs that run tasks
 
@@ -29,7 +29,7 @@ def job_scheduler(
         max_retries (int, optional): Maximum number of retries before giving up.
             Defaults to 3 based on the RQ default.
         queue_name (string, optional): Name of a queue to schedule work with. Defaults to
-        SHORT_RUNNING_QUEUE.
+            SHORT_RUNNING_QUEUE.
         is_burst (bool, optional): If True, will use a burst worker queue strategy.
             If False, will use the default queue strategy running a fetch-fork-execute loop.
             Defaults to False unless this is a Test.
@@ -46,7 +46,7 @@ def job_scheduler(
             Defaults to 0.
         cron (str, optional): Add a schedule using the cron format, see https://crontab.cronhub.io/
             for generating a cron string
-        timeout (int, optional): Default timeout is 180 seconds
+        job_timeout (int, optional): Default timeout is 180 seconds
     """
     is_backoff_an_int = isinstance(retry_backoff, int) and retry_backoff > 1
     if retry_backoff is True or is_backoff_an_int:
@@ -80,7 +80,7 @@ def job_scheduler(
                     max=max_retries,
                     interval=retry_intervals,
                 ),
-                timeout=timeout,
+                job_timeout=job_timeout,
             )
         logger.info(f'Generated job id "{job.id}" with "{job.__dict__}"')
         return job
