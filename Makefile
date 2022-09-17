@@ -70,5 +70,9 @@ stop-frontend-api-dnb:
 	$(MAKE) -C ../dnb-service stop-dnb-for-data-hub-api
 	$(MAKE) -C ../data-hub-frontend stop-dev
 
-migrate_search:
+migrate-search:
 	docker-compose run api python manage.py migrate_search
+
+purge-queue:
+	echo "purge queue by queue state"
+	docker-compose run api python manage.py purge_queue long-running --queue_state queued

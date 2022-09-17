@@ -1,6 +1,7 @@
 from logging import getLogger
 
 from datahub.core.exceptions import DataHubError
+from datahub.core.queues.constants import ONE_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.search.opensearch import create_index, start_alias_transaction
@@ -76,7 +77,7 @@ def _schedule_resync(search_app):
         function_args=(search_app.name, search_app.search_model.get_target_mapping_hash()),
         max_retries=5,
         retry_intervals=60,
-        job_timeout=1800,
+        job_timeout=ONE_DAY_IN_SECONDS,
     )
     logger.info(
         f'Task {job.id} complete model migration is scheduled for {search_app.name}',
@@ -89,6 +90,6 @@ def _schedule_initial_sync(search_app):
         queue_name=LONG_RUNNING_QUEUE,
         function=sync_model,
         function_args=(search_app.name,),
-        job_timeout=600,
+        job_timeout=ONE_DAY_IN_SECONDS,
     )
     logger.info(f'Scheduling with {job.id} for initial sync for the {search_app.name} search app')

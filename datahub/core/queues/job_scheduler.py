@@ -3,6 +3,7 @@ from typing import Literal
 
 from rq import Retry
 
+from datahub.core.queues.constants import THREE_MINUTES_IN_SECONDS
 from datahub.core.queues.scheduler import DataHubScheduler, SHORT_RUNNING_QUEUE
 
 logger = getLogger(__name__)
@@ -18,7 +19,7 @@ def job_scheduler(
     retry_backoff=False,
     retry_intervals=0,
     cron=None,
-    job_timeout=180,
+    job_timeout=THREE_MINUTES_IN_SECONDS,
 ):
     """Job scheduler for setting up Jobs that run tasks
 
