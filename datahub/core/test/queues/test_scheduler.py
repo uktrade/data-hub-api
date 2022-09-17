@@ -140,3 +140,15 @@ def test_fork_queue_worker_is_called_with_work_arguments(
     fork_queue.work('one-running', with_scheduler=False)
     mock_worker.assert_called_with(('one-running',), connection=fork_queue._connection)
     assert call().work(with_scheduler=False) in mock_worker.mock_calls
+
+
+def test_job_timeout_is_generated_on_job(queue: DataHubScheduler):
+    job = queue.enqueue(
+        queue_name='123',
+        function=PickleableMock.queue_handler,
+        job_timeout=600,
+    )
+
+    queue.work('123')
+
+    assert job.timeout == 600
