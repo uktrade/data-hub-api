@@ -9,7 +9,7 @@ django.setup()
 
 from django.conf import settings
 
-from datahub.core.queues.constants import EVERY_HOUR, EVERY_TEN_MINUTES
+from datahub.core.queues.constants import EVERY_ONE_AM, EVERY_TEN_MINUTES
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.search.tasks import sync_all_models
@@ -26,7 +26,7 @@ def schedule_jobs():
     if settings.ENABLE_DAILY_OPENSEARCH_SYNC:
         job_scheduler(
             function=sync_all_models,
-            cron=EVERY_HOUR,
+            cron=EVERY_ONE_AM,
         )
 
 
