@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: 96d7c219-cbe0-4028-a029-14a8bb5da6e5
+  fields:
+    disabled_on:
+    order: 514.0
+    segment: Scoping e-mail sent (ERU Use)
+    parent: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+    contexts: ["investment_project_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
