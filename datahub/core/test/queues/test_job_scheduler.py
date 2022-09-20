@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from datahub.core.queues.cron_constants import EVERY_MINUTE
+from datahub.core.queues.constants import EVERY_MINUTE
 from datahub.core.queues.job_scheduler import job_scheduler, retry_backoff_intervals
 from datahub.core.queues.scheduler import DataHubScheduler
 from datahub.core.test.queues.test_scheduler import PickleableMock

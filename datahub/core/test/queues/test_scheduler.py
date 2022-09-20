@@ -152,3 +152,32 @@ def test_job_timeout_is_generated_on_job(queue: DataHubScheduler):
     queue.work('123')
 
     assert job.timeout == 600
+
+
+def test_purging_queue(async_queue: DataHubScheduler):
+    async_queue.enqueue(
+        queue_name='purge-test',
+        function=PickleableMock.queue_handler,
+    )
+    assert async_queue.get_queued_count('purge-test') == 1
+    async_queue.work('purge-test')
+
+    async_queue.purge('purge-test')
+
+    assert async_queue.get_queued_count('purge-test') == 0
+
+
+def test_purging_fails(
+    async_queue: DataHubScheduler,
+):
+    async_queue.enqueue(
+        queue_name='will_fail',
+        function=PickleableMock.queue_handler_with_error,
+        retry=Retry(max=1),
+    )
+    async_queue.work('will_fail')
+
+    assert async_queue.get_failed_count('will_fail') == 1
+    async_queue.purge('will_fail', 'failed')
+
+    assert async_queue.get_failed_count('will_fail') == 0
