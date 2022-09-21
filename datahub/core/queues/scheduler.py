@@ -83,10 +83,10 @@ class DataHubScheduler:
         )
         return job
 
-    def get_scheduled_jobs(self):
+    def scheduled_jobs(self):
         return self._scheduler.get_jobs()
 
-    def get_queued_count(
+    def queued_count(
         self,
         queue_name: str,
     ):
@@ -97,7 +97,7 @@ class DataHubScheduler:
         )
         return queue.count
 
-    def get_failed_count(
+    def failed_count(
         self,
         queue_name: str,
     ):
@@ -108,7 +108,23 @@ class DataHubScheduler:
         )
         return queue.failed_job_registry.count
 
-    def purge(self, queue_name: str, queue_state: str = 'queued'):
+    def cron_job_count(self):
+        return self._scheduler.count()
+
+    def cancel_cron_jobs(self):
+        jobs = self._scheduler.get_jobs()
+        for job in jobs:
+            logger.info(f'Cancelling job {job} ...')
+            result = self._scheduler.cancel(job)
+            logger.info(f'Cancelled {job} {result}')
+        return self.cron_job_count()
+
+    def purge(
+        self,
+        queue_name: str,
+        queue_state: str = 'queued',
+    ):
+
         queue = RqQueue(
             name=queue_name,
             is_async=self.is_async,
@@ -119,13 +135,9 @@ class DataHubScheduler:
             return queue.count
         if queue_state == 'failed':
             registry = queue.failed_job_registry
-            return self.__delete_jobs(registry)
-        # TODO: When scheduling
-        # if queue_state == 'scheduled':
-        #     registry = queue.scheduled_job_registry
-        #     return self.__delete_jobs(registry)
+            return self._delete_jobs(registry)
 
-    def __delete_jobs(self, registry: BaseRegistry):
+    def _delete_jobs(self, registry: BaseRegistry):
         jobs = registry.get_job_ids()
         for job in jobs:
             logger.info(f'Deleting job {job} ...')
