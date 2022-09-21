@@ -4,6 +4,7 @@ import pytest
 from django.conf import settings
 from rq import Retry
 
+from datahub.core.queues.constants import EVERY_MINUTE
 from datahub.core.queues.scheduler import DataHubScheduler
 
 
@@ -123,10 +124,9 @@ def test_should_be_in_the_testing_environment():
 
 
 def test_can_schedule_a_cron_job_every_minute(queue: DataHubScheduler):
-    every_minute = '* * * * *'
-    job = queue.cron('cron-schedule', every_minute, PickleableMock.queue_handler)
+    job = queue.cron('cron-schedule', EVERY_MINUTE, PickleableMock.queue_handler)
 
-    assert job.meta['cron_string'] == every_minute
+    assert job.meta['cron_string'] == EVERY_MINUTE
     assert job.meta['use_local_timezone'] is False
 
 
@@ -159,12 +159,12 @@ def test_purging_queue(async_queue: DataHubScheduler):
         queue_name='purge-test',
         function=PickleableMock.queue_handler,
     )
-    assert async_queue.get_queued_count('purge-test') == 1
+    assert async_queue.queued_count('purge-test') == 1
     async_queue.work('purge-test')
 
     async_queue.purge('purge-test')
 
-    assert async_queue.get_queued_count('purge-test') == 0
+    assert async_queue.queued_count('purge-test') == 0
 
 
 def test_purging_fails(
@@ -177,7 +177,23 @@ def test_purging_fails(
     )
     async_queue.work('will_fail')
 
-    assert async_queue.get_failed_count('will_fail') == 1
+    assert async_queue.failed_count('will_fail') == 1
     async_queue.purge('will_fail', 'failed')
 
-    assert async_queue.get_failed_count('will_fail') == 0
+    assert async_queue.failed_count('will_fail') == 0
+
+
+def test_purging_cron_scheduled(
+    async_queue: DataHubScheduler,
+):
+    initial_cron_scheduled_count = async_queue.cron_job_count()
+    async_queue.cron(
+        queue_name='purge-cron',
+        cron=EVERY_MINUTE,
+        function=PickleableMock.queue_handler,
+    )
+    assert async_queue.cron_job_count() == initial_cron_scheduled_count + 1
+
+    async_queue.cancel_cron_jobs()
+
+    assert async_queue.failed_count('will_fail') == 0

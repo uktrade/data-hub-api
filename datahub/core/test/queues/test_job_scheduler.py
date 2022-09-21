@@ -141,7 +141,7 @@ def test_retry_backoff_returns_zero_when_turned_off():
 
 
 def test_job_scheduler_creates_cron_jobs(queue: DataHubScheduler):
-    existing_job_count = len(list(queue.get_scheduled_jobs()))
+    existing_job_count = len(list(queue.scheduled_jobs()))
     actual_job = job_scheduler(
         function=PickleableMock.queue_handler,
         function_args=('arg1', 'arg2'),
@@ -150,8 +150,8 @@ def test_job_scheduler_creates_cron_jobs(queue: DataHubScheduler):
         cron=EVERY_MINUTE,
     )
 
-    assert actual_job in queue.get_scheduled_jobs()
-    assert len(list(queue.get_scheduled_jobs())) == existing_job_count + 1
+    assert actual_job in queue.scheduled_jobs()
+    assert len(list(queue.scheduled_jobs())) == existing_job_count + 1
     assert actual_job.meta['cron_string'] == EVERY_MINUTE
 
 

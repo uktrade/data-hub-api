@@ -12,11 +12,13 @@ from django.conf import settings
 from datahub.core.queues.constants import EVERY_ONE_AM, EVERY_TEN_MINUTES
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
+from datahub.core.queues.scheduler import DataHubScheduler
 from datahub.search.tasks import sync_all_models
 logger = getLogger(__name__)
 
 
 def schedule_jobs():
+    cancel_existing_cron_jobs()
     logger.info('Scheduling jobs that run on a cron')
     job_scheduler(
         function=queue_health_check,
@@ -28,6 +30,12 @@ def schedule_jobs():
             function=sync_all_models,
             cron=EVERY_ONE_AM,
         )
+
+
+def cancel_existing_cron_jobs():
+    logger.info('Cancel any existing rq scheduled cron jobs')
+    with DataHubScheduler() as scheduler:
+        scheduler.cancel_cron_jobs()
 
 
 def create_rqscheduler_command():
