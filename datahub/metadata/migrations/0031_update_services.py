@@ -14,11 +14,11 @@ def load_services(apps, _):
 
 
 def rebuild_tree(apps, _):
-    service = apps.get_model('metadata', 'Service')
+    Service = apps.get_model('metadata', 'Service')
     manager = mptt.managers.TreeManager()
-    manager.model = service
-    mptt.register(service, order_insertion_by=['segment'])
-    manager.contribute_to_class(service, 'objects')
+    manager.model = Service
+    mptt.register(Service, order_insertion_by=['segment'])
+    manager.contribute_to_class(Service, 'objects')
     manager.rebuild()
 
 
