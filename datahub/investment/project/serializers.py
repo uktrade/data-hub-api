@@ -10,7 +10,7 @@ from rest_framework import serializers
 
 import datahub.metadata.models as meta_models
 from datahub.company.models import Company, Contact
-from datahub.company.serializers import NestedAdviserField
+from datahub.company.serializers import NestedAdviserField, NestedAdviserWithEmailAndTeamField
 from datahub.core.constants import InvestmentProjectStage
 from datahub.core.serializers import NestedRelatedField, PermittedFieldsModelSerializer
 from datahub.core.validate_utils import DataCombiner
@@ -85,6 +85,7 @@ CORE_FIELDS = (
     'archived_on',
     'archived_reason',
     'archived_by',
+    'created_by',
     'created_on',
     'modified_on',
     'comments',
@@ -344,6 +345,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         allow_null=False, allow_empty=False,
     )
     archived_by = NestedAdviserField(read_only=True)
+    created_by = NestedAdviserWithEmailAndTeamField(read_only=True)
 
     project_manager_request_status = NestedRelatedField(
         ProjectManagerRequestStatus, required=False, allow_null=True,
