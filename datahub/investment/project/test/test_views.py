@@ -130,6 +130,7 @@ class TestListView(APITestMixin):
             'archived_reason',
             'archived_by',
             'archived_documents_url_path',
+            'created_by',
             'created_on',
             'modified_on',
             'fdi_value',
@@ -680,6 +681,15 @@ class TestRetrieveView(APITestMixin):
         )
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == expected_client_contact_ids
+        assert response_data['created_by'] == {
+            'contact_email': project.created_by.contact_email,
+            'dit_team': {
+                'id': str(project.created_by.dit_team.id),
+                'name': project.created_by.dit_team.name,
+            },
+            'id': str(project.created_by.id),
+            'name': project.created_by.name,
+        }
 
     def test_get_project_no_investor_and_crm(self):
         """
