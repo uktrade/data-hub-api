@@ -9,7 +9,13 @@ django.setup()
 
 from django.conf import settings
 
-from datahub.core.queues.constants import EVERY_ONE_AM, EVERY_TEN_MINUTES
+from datahub.company.tasks.company import schedule_automatic_company_archive
+from datahub.core.queues.constants import (
+    EVERY_EIGHT_PM_ON_SATURDAY,
+    EVERY_ONE_AM,
+    EVERY_SEVEN_PM,
+    EVERY_TEN_MINUTES,
+)
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import DataHubScheduler
@@ -23,6 +29,26 @@ def schedule_jobs():
     job_scheduler(
         function=queue_health_check,
         cron=EVERY_TEN_MINUTES,
+    )
+    job_scheduler(
+        function=schedule_automatic_company_archive,
+        function_kwargs={
+            'limit': 20000,
+            'simulate': False,
+        },
+        cron=EVERY_EIGHT_PM_ON_SATURDAY,
+        description='Automatic Company Archive',
+    )
+    # The purpose of the following is to keep us posted on the backlog of
+    # companies that are eligible for automatic archiving
+    job_scheduler(
+        function=schedule_automatic_company_archive,
+        function_kwargs={
+            'limit': 20000,
+            'simulate': True,
+        },
+        cron=EVERY_SEVEN_PM,
+        description='Simulate Automatic Company Archive',
     )
 
     if settings.ENABLE_DAILY_OPENSEARCH_SYNC:
