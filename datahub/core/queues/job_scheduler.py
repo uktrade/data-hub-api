@@ -20,6 +20,7 @@ def job_scheduler(
     retry_intervals=0,
     cron=None,
     job_timeout=THREE_MINUTES_IN_SECONDS,
+    description=None,
 ):
     """Job scheduler for setting up Jobs that run tasks
 
@@ -48,6 +49,8 @@ def job_scheduler(
         cron (str, optional): Add a schedule using the cron format, see https://crontab.cronhub.io/
             for generating a cron string
         job_timeout (int, optional): Default timeout is 180 seconds
+        description (str, opional): Cron scheduling allows a description to be assigned making it
+            easier for debugging and tracing cron jobs, and is only applicable to jobs with crons
     """
     is_backoff_an_int = isinstance(retry_backoff, int) and retry_backoff > 1
     if retry_backoff is True or is_backoff_an_int:
@@ -70,6 +73,7 @@ def job_scheduler(
                 function=function,
                 args=function_args,
                 kwargs=function_kwargs,
+                description=description,
             )
         else:
             job = scheduler.enqueue(
