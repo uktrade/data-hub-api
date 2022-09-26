@@ -148,11 +148,13 @@ def test_job_scheduler_creates_cron_jobs(queue: DataHubScheduler):
         function_kwargs={'test': True},
         is_burst=True,
         cron=EVERY_MINUTE,
+        description='Test cron',
     )
 
     assert actual_job in queue.scheduled_jobs()
     assert len(list(queue.scheduled_jobs())) == existing_job_count + 1
     assert actual_job.meta['cron_string'] == EVERY_MINUTE
+    assert actual_job.description == 'Test cron'
 
 
 def queue_setup(monkeypatch):

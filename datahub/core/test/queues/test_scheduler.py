@@ -124,10 +124,16 @@ def test_should_be_in_the_testing_environment():
 
 
 def test_can_schedule_a_cron_job_every_minute(queue: DataHubScheduler):
-    job = queue.cron('cron-schedule', EVERY_MINUTE, PickleableMock.queue_handler)
+    job = queue.cron(
+        'cron-schedule',
+        EVERY_MINUTE,
+        PickleableMock.queue_handler,
+        description='Test cron every minute',
+    )
 
     assert job.meta['cron_string'] == EVERY_MINUTE
     assert job.meta['use_local_timezone'] is False
+    assert job.description == 'Test cron every minute'
 
 
 def test_fork_queue_worker_is_called_with_work_arguments(
