@@ -184,17 +184,17 @@ class TestAutomaticCompanyArchive:
             (
                 relativedelta(),
                 1,
-                'automatic_company_archive archived: 0',
+                'datahub.company.tasks.automatic_company_archive archived: 0',
             ),
             (
                 relativedelta(months=3, days=1),
                 1,
-                'automatic_company_archive archived: 1',
+                'datahub.company.tasks.automatic_company_archive archived: 1',
             ),
             (
                 relativedelta(months=3, days=1),
                 3,
-                'automatic_company_archive archived: 3',
+                'datahub.company.tasks.automatic_company_archive archived: 3',
             ),
         ),
     )

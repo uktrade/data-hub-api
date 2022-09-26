@@ -100,7 +100,9 @@ def automatic_company_archive(limit=1000, simulate=True):
             return
 
         archive_count = _automatic_company_archive(limit, simulate)
-        realtime_message = f'automatic_company_archive archived: {archive_count}'
+        realtime_message = (
+            f'datahub.company.tasks.automatic_company_archive archived: {archive_count}'
+        )
         if simulate:
             realtime_message = f'[SIMULATE] {realtime_message}'
         send_realtime_message(realtime_message)
