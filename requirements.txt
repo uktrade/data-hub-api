@@ -243,7 +243,7 @@ zope-interface==5.4.0
     # via gevent
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==65.1.1
+setuptools==65.4.0
     # via
     #   -r requirements.in
     #   django-axes
