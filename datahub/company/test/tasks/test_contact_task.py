@@ -3,10 +3,8 @@ from unittest import mock
 from unittest.mock import patch
 
 import pytest
-from celery.exceptions import Retry
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.test import override_settings
 from django.utils import timezone
 from freezegun import freeze_time
@@ -15,6 +13,7 @@ from rest_framework import status
 
 from datahub.company.tasks import automatic_contact_archive, update_contact_consent
 from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.core.queues.errors import RetryError
 from datahub.core.test_utils import HawkMockJSONResponse
 
 
@@ -42,10 +41,10 @@ class TestConsentServiceTask:
     ):
         """
         Test that if feature flag is enabled, but environment variables are not set
-        then task will throw exception
+        then task will throw a caught exception and no retries or updates will occur
         """
-        with pytest.raises(ImproperlyConfigured):
-            update_contact_consent('example@example.com', True)
+        update_succeeds = update_contact_consent('example@example.com', True)
+        assert update_succeeds is False
 
     @pytest.mark.parametrize(
         'email_address, accepts_dit_email_marketing, modified_at',
@@ -92,55 +91,74 @@ class TestConsentServiceTask:
             (status.HTTP_500_INTERNAL_SERVER_ERROR),
         ),
     )
-    @patch('datahub.company.tasks.contact.update_contact_consent.retry', side_effect=Retry)
     def test_task_retries_on_request_exceptions(
             self,
-            mock_retry,
             requests_mock,
             status_code,
     ):
         """
-        Test to ensure that celery retries on request exceptions like 5xx, 404
+        Test to ensure that rq receives exceptions like 5xx, 404 and then will retry based on
+        job_scheduler configuration
         """
         matcher = requests_mock.post(
             '/api/v1/person/',
             text=generate_hawk_response({}),
             status_code=status_code,
         )
-        with pytest.raises(Retry):
+        with pytest.raises(RetryError):
             update_contact_consent('example@example.com', True)
         assert matcher.called_once
-        assert mock_retry.call_args.kwargs['exc'].response.status_code == status_code
 
-    @patch('datahub.company.tasks.contact.update_contact_consent.retry', side_effect=Retry)
     @patch('datahub.company.consent.APIClient.request', side_effect=ConnectTimeout)
     def test_task_retries_on_connect_timeout(
             self,
             mock_post,
-            mock_retry,
     ):
         """
-        Test to ensure that celery retries on connect timeout
+        Test to ensure that RQ retries on connect timeout by virtue of the exception forcing
+        a retry within RQ and configured settings
         """
-        with pytest.raises(Retry):
+        with pytest.raises(RetryError):
             update_contact_consent('example@example.com', True)
         assert mock_post.called
-        assert isinstance(mock_retry.call_args.kwargs['exc'], ConnectTimeout)
 
-    @patch('datahub.company.tasks.contact.update_contact_consent.retry', side_effect=Retry)
     @patch('datahub.company.consent.APIClient.request', side_effect=Exception)
     def test_task_doesnt_retry_on_other_exception(
             self,
             mock_post,
-            mock_retry,
     ):
         """
-        Test to ensure that celery raises on non-requests exception
+        Test to ensure that RQ raises on non-requests exception
         """
-        with pytest.raises(Exception):
-            update_contact_consent('example@example.com', True)
+        update_succeeds = update_contact_consent('example@example.com', True)
         assert mock_post.called
-        assert not mock_retry.called
+        assert update_succeeds is False
+
+    @pytest.mark.parametrize(
+        'status_code',
+        (
+            (status.HTTP_200_OK),
+            (status.HTTP_201_CREATED),
+        ),
+    )
+    def test_update_succeeds(
+            self,
+            requests_mock,
+            status_code,
+    ):
+        """
+        Test success occurs when update succeeds
+        """
+        matcher = requests_mock.post(
+            '/api/v1/person/',
+            text=generate_hawk_response({}),
+            status_code=status_code,
+        )
+
+        update_success = update_contact_consent('example@example.com', True)
+
+        assert matcher.called_once
+        assert update_success is True
 
 
 @pytest.mark.django_db
