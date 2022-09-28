@@ -1,5 +1,4 @@
 import requests
-from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
@@ -10,6 +9,7 @@ from datahub.company.models import Contact
 from datahub.core.exceptions import APIBadGatewayException
 from datahub.core.queues.errors import RetryError
 from datahub.core.queues.job_scheduler import job_scheduler
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.core.realtime_messaging import send_realtime_message
 
 logger = get_task_logger(__name__)
@@ -61,13 +61,14 @@ def schedule_update_contact_consent(
     logger.info(
         f'Task {job.id} update_contact_consent {email_address}',
     )
+    return job
 
 
 def update_contact_consent(
     email_address,
     accepts_dit_email_marketing,
     modified_at=None,
-    **kwargs
+    **kwargs,
 ) -> bool:
     """
     Update consent preferences.
@@ -92,16 +93,23 @@ def update_contact_consent(
         return False
 
 
-@shared_task(
-    bind=True,
-    acks_late=True,
-    priority=9,
-    max_retries=3,
-    queue='long-running',
-    # name set explicitly to maintain backwards compatibility
-    name='datahub.company.tasks.automatic_contact_archive',
-)
-def automatic_contact_archive(self, limit=1000, simulate=False):
+def schedule_automatic_contact_archive(limit=1000, simulate=False):
+    job = job_scheduler(
+        function=automatic_contact_archive,
+        function_args=(
+            limit,
+            simulate,
+        ),
+        max_retries=3,
+        queue_name=LONG_RUNNING_QUEUE,
+    )
+    logger.info(
+        f'Task {job.id} automatic_contact_archive',
+    )
+    return job
+
+
+def automatic_contact_archive(limit=1000, simulate=False):
     """
     Archive inactive contacts.
     """
@@ -112,5 +120,7 @@ def automatic_contact_archive(self, limit=1000, simulate=False):
             return
 
         archive_count = _automatic_contact_archive(limit=limit, simulate=simulate)
-        realtime_message = f'{self.name} archived: {archive_count}'
+        realtime_message = (
+            f'datahub.company.tasks.automatic_contact_archive archived: {archive_count}'
+        )
         send_realtime_message(realtime_message)
