@@ -59,7 +59,7 @@ def schedule_update_contact_consent(
         retry_backoff=30,
     )
     logger.info(
-        f'Task {job.id} update_contact_consent {email_address}',
+        f'Task {job.id} update_contact_consent',
     )
     return job
 
@@ -82,11 +82,11 @@ def update_contact_consent(
         )
         return True
     except requests.exceptions.RequestException as request_error:
-        logger.warning(f'Retrying updating contact consent for {email_address}')
+        logger.warning('Retrying updating contact consent')
         raise RetryError(request_error)
     except (APIBadGatewayException, ImproperlyConfigured, Exception) as exec_info:
         logger.warning(
-            f'Unable to update contact consent for {email_address}',
+            'Unable to update contact consent',
             exc_info=exec_info,
             stack_info=True,
         )
