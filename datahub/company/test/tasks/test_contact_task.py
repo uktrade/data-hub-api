@@ -167,6 +167,30 @@ class TestConsentServiceTask:
         assert matcher.called_once
         assert update_success is True
 
+    @pytest.mark.parametrize(
+        'bad_email',
+        (
+            None,
+            '',
+            '  ',
+        ),
+    )
+    def test_none_or_empty_email_assigned_fails(
+        self,
+        requests_mock,
+        bad_email,
+    ):
+        matcher = requests_mock.post(
+            '/api/v1/person/',
+            text=generate_hawk_response({}),
+            status_code=status.HTTP_201_CREATED,
+        )
+
+        update_success = update_contact_consent(bad_email, False)
+
+        assert not matcher.called_once
+        assert update_success is False
+
     def test_job_schedules_with_correct_update_contact_consent_details(self):
         actual_job = schedule_update_contact_consent('example@example.com', True)
 
