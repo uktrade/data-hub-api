@@ -43,7 +43,7 @@ def test_event_activity(api_client):
                         'name': event.name,
                         'dit:eventType': {
                             'name': event.event_type.name,
-                            'id': event.event_type.pk,
+                            'id': str(event.event_type.id),
                         },
                         'content': event.notes,
                         'startTime': format_date_or_datetime(event.start_date),
@@ -58,19 +58,19 @@ def test_event_activity(api_client):
                         'dit:address_postcode': event.address_postcode,
                         'dit:address_country': {
                             'name': event.address_country.name,
-                            'id': event.address_country.pk,
+                            'id': str(event.address_country.id),
                         },
                         'dit:leadTeam': {'name': event.lead_team.name},
                         'dit:organiser': {
                             'name': event.organiser.name,
-                            'id': event.organiser.pk,
+                            'id': str(event.organiser.id),
                         },
                         'dit:disabledOn': event.disabled_on,
                         'dit:service': {'name': event.service.name},
                         'dit:archivedDocumentsUrlPath': event.archived_documents_url_path,
                         'dit:ukRegion': {
                             'name': event.uk_region.name,
-                            'id': event.uk_region.pk,
+                            'id': str(event.uk_region.id),
                         },
                         'dit:teams': [
                             *[
