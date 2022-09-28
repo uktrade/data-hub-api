@@ -49,10 +49,16 @@ class EventActivitySerializer(ActivitySerializer):
                 'dit:address_town': instance.address_town,
                 'dit:address_county': instance.address_county,
                 'dit:address_postcode': instance.address_postcode,
-                'dit:address_country': {'name': instance.address_country.name},
+                'dit:address_country': {
+                    'name': instance.address_country.name,
+                    'id': instance.address_country.id,
+                },
                 'dit:disabledOn': instance.disabled_on,
                 'dit:archivedDocumentsUrlPath': instance.archived_documents_url_path,
-                'dit:eventType': {'name': instance.event_type.name},
+                'dit:eventType': {
+                    'name': instance.event_type.name,
+                    'id': instance.event_type.id,
+                },
                 'dit:hasRelatedTradeAgreements': instance.has_related_trade_agreements,
                 'dit:relatedProgrammes': [
                     *self._get_related_programmes(instance.related_programmes),
@@ -71,10 +77,12 @@ class EventActivitySerializer(ActivitySerializer):
         if instance.uk_region is not None:
             event['object']['dit:ukRegion'] = {
                 'name': instance.uk_region.name,
+                'id': instance.uk_region.id,
             }
         if instance.organiser is not None:
             event['object']['dit:organiser'] = {
                 'name': instance.organiser.name,
+                'id': instance.organiser.id,
             }
         if instance.lead_team is not None:
             event['object']['dit:leadTeam'] = {
