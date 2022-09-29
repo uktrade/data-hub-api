@@ -37,10 +37,14 @@ def test_event_activity(api_client):
                     'generator': {'name': 'dit:dataHub', 'type': 'Application'},
                     'object': {
                         'id': f'dit:DataHubEvent:{event.id}',
-                        'type': ['dit:dataHub:Event',
-                                 ],
+                        'type': [
+                            'dit:dataHub:Event',
+                        ],
                         'name': event.name,
-                        'dit:eventType': {'name': event.event_type.name},
+                        'dit:eventType': {
+                            'name': event.event_type.name,
+                            'id': str(event.event_type.id),
+                        },
                         'content': event.notes,
                         'startTime': format_date_or_datetime(event.start_date),
                         'endTime': format_date_or_datetime(event.end_date),
@@ -52,13 +56,22 @@ def test_event_activity(api_client):
                         'dit:address_town': event.address_town,
                         'dit:address_county': event.address_county,
                         'dit:address_postcode': event.address_postcode,
-                        'dit:address_country': {'name': event.address_country.name},
+                        'dit:address_country': {
+                            'name': event.address_country.name,
+                            'id': str(event.address_country.id),
+                        },
                         'dit:leadTeam': {'name': event.lead_team.name},
-                        'dit:organiser': {'name': event.organiser.name},
+                        'dit:organiser': {
+                            'name': event.organiser.name,
+                            'id': str(event.organiser.id),
+                        },
                         'dit:disabledOn': event.disabled_on,
                         'dit:service': {'name': event.service.name},
                         'dit:archivedDocumentsUrlPath': event.archived_documents_url_path,
-                        'dit:ukRegion': {'name': event.uk_region.name},
+                        'dit:ukRegion': {
+                            'name': event.uk_region.name,
+                            'id': str(event.uk_region.id),
+                        },
                         'dit:teams': [
                             *[
                                 {
