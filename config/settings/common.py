@@ -410,14 +410,6 @@ if REDIS_BASE_URL:
             'task': 'datahub.dnb_api.tasks.update.get_company_updates',
             'schedule': crontab(minute=0, hour=0),
         },
-        'simulate_automatic_contact_archive': {
-            'task': 'datahub.company.tasks.automatic_contact_archive',
-            'schedule': crontab(minute=0, hour=21, day_of_week='SAT'),
-            'kwargs': {
-                'limit': 20000,
-                'simulate': True,
-            }
-        },
     }
 
     if env.bool('ENABLE_DAILY_HIERARCHY_ROLLOUT', False):
