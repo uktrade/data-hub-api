@@ -58,8 +58,17 @@ def schedule_jobs():
             'limit': 20000,
             'simulate': True,
         },
-        cron=EVERY_NINE_PM_ON_SATURDAY,
+        cron=EVERY_SEVEN_PM,
         description='Simulate Automatic Contact Archive',
+    )
+    job_scheduler(
+        function=schedule_automatic_contact_archive,
+        function_kwargs={
+            'limit': 20000,
+            'simulate': False,
+        },
+        cron=EVERY_NINE_PM_ON_SATURDAY,
+        description='Automatic Contact Archive',
     )
 
     if settings.ENABLE_DAILY_OPENSEARCH_SYNC:
