@@ -123,4 +123,6 @@ def automatic_contact_archive(limit=1000, simulate=False):
         realtime_message = (
             f'datahub.company.tasks.automatic_contact_archive archived: {archive_count}'
         )
+        if simulate:
+            realtime_message = f'[SIMULATE] {realtime_message}'
         send_realtime_message(realtime_message)
