@@ -289,7 +289,7 @@ class NoteAwareModelSerializer(serializers.ModelSerializer):
         If activity_type is not set then the default type of change is set.
         """
         activity = InvestmentActivitySerializer(data=value)
-        activity.is_valid(True)
+        activity.is_valid(raise_exception=True)
         return activity.validated_data
 
 
