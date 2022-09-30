@@ -3,7 +3,7 @@ from logging import getLogger
 from django.apps import apps
 from django_pglocks import advisory_lock
 
-from datahub.core.queues.constants import ONE_DAY_IN_SECONDS
+from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.errors import RetryError
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
@@ -28,7 +28,7 @@ def schedule_model_sync(search_app):
         queue_name=LONG_RUNNING_QUEUE,
         function=sync_model,
         function_args=(search_app.name,),
-        job_timeout=ONE_DAY_IN_SECONDS,
+        job_timeout=HALF_DAY_IN_SECONDS,
     )
     logger.info(
         f'Task {job.id} sync_model scheduled for {search_app.name}',
