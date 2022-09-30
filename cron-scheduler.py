@@ -12,8 +12,6 @@ from django.conf import settings
 from datahub.company.tasks.company import schedule_automatic_company_archive
 from datahub.company.tasks.contact import schedule_automatic_contact_archive
 from datahub.core.queues.constants import (
-    EVERY_EIGHT_PM_ON_SATURDAY,
-    EVERY_NINE_PM_ON_SATURDAY,
     EVERY_ONE_AM,
     EVERY_SEVEN_PM,
     EVERY_TEN_MINUTES,
@@ -38,28 +36,8 @@ def schedule_jobs():
             'limit': 20000,
             'simulate': False,
         },
-        cron=EVERY_EIGHT_PM_ON_SATURDAY,
+        cron=EVERY_SEVEN_PM,
         description='Automatic Company Archive',
-    )
-    # The purpose of the following is to keep us posted on the backlog of
-    # companies that are eligible for automatic archiving
-    job_scheduler(
-        function=schedule_automatic_company_archive,
-        function_kwargs={
-            'limit': 20000,
-            'simulate': True,
-        },
-        cron=EVERY_SEVEN_PM,
-        description='Simulate Automatic Company Archive',
-    )
-    job_scheduler(
-        function=schedule_automatic_contact_archive,
-        function_kwargs={
-            'limit': 20000,
-            'simulate': True,
-        },
-        cron=EVERY_SEVEN_PM,
-        description='Simulate Automatic Contact Archive',
     )
     job_scheduler(
         function=schedule_automatic_contact_archive,
@@ -67,7 +45,7 @@ def schedule_jobs():
             'limit': 20000,
             'simulate': False,
         },
-        cron=EVERY_NINE_PM_ON_SATURDAY,
+        cron=EVERY_SEVEN_PM,
         description='Automatic Contact Archive',
     )
 
