@@ -8,7 +8,7 @@ from freezegun import freeze_time
 
 from datahub.company.constants import AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG
 from datahub.company.models import Company
-from datahub.company.tasks.company import automatic_company_archive
+from datahub.company.tasks.company import schedule_automatic_company_archive
 from datahub.company.test.factories import CompanyFactory
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -41,9 +41,11 @@ class TestAutomaticCompanyArchive:
         task will not run.
         """
         caplog.set_level(logging.INFO, logger='datahub.company.tasks.company')
-        automatic_company_archive.apply_async(kwargs={'simulate': False})
+        job = schedule_automatic_company_archive(simulate=False)
         assert caplog.messages == [
-            f'Feature flag "{AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG}" is not active, exiting.',
+            'Feature flag "automatic-company-archive" is not active, exiting.',
+            f'Task {job.id} automatic_company_archive '
+            'scheduled limited to 1000 and simulate set to False',
         ]
 
     @pytest.mark.parametrize(
@@ -75,7 +77,7 @@ class TestAutomaticCompanyArchive:
             'datahub.company.tasks.company._automatic_company_archive',
             mock_automatic_company_archive,
         )
-        automatic_company_archive()
+        schedule_automatic_company_archive()
         assert mock_automatic_company_archive.call_count == call_count
 
     @pytest.mark.parametrize(
@@ -100,19 +102,20 @@ class TestAutomaticCompanyArchive:
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
         with freeze_time(gt_3m_ago):
             company = CompanyFactory()
-        task_result = automatic_company_archive.apply_async(
-            kwargs={'simulate': simulate},
-        )
+        job = schedule_automatic_company_archive(simulate=simulate)
         company.refresh_from_db()
         if simulate:
             assert caplog.messages == [
                 f'[SIMULATION] Automatically archived company: {company.id}',
+                f'Task {job.id} automatic_company_archive '
+                'scheduled limited to 1000 and simulate set to True',
             ]
         else:
-            assert task_result.successful()
             assert company.archived
             assert caplog.messages == [
                 f'Automatically archived company: {company.id}',
+                f'Task {job.id} automatic_company_archive '
+                'scheduled limited to 1000 and simulate set to False',
             ]
 
     @pytest.mark.parametrize(
@@ -141,10 +144,7 @@ class TestAutomaticCompanyArchive:
             company=company,
             date=timezone.now() - interaction_date_delta,
         )
-        task_result = automatic_company_archive.apply_async(
-            kwargs={'simulate': False},
-        )
-        assert task_result.successful()
+        schedule_automatic_company_archive(simulate=False)
         company.refresh_from_db()
         assert company.archived == expected_archived
 
@@ -174,8 +174,7 @@ class TestAutomaticCompanyArchive:
             company=company,
             date=timezone.now() - relativedelta(years=8, days=1),
         )
-        task_result = automatic_company_archive.apply_async(kwargs={'simulate': False})
-        assert task_result.successful()
+        schedule_automatic_company_archive(simulate=False)
         company.refresh_from_db()
         assert company.archived == expected_archived
 
@@ -225,7 +224,9 @@ class TestAutomaticCompanyArchive:
             'datahub.company.tasks.company.send_realtime_message',
             mock_send_realtime_message,
         )
-        automatic_company_archive.apply_async(kwargs={'simulate': False})
+
+        schedule_automatic_company_archive(simulate=False)
+
         mock_send_realtime_message.assert_called_once_with(expected_message)
 
     @pytest.mark.parametrize(
@@ -256,8 +257,9 @@ class TestAutomaticCompanyArchive:
         )
         with freeze_time(timezone.now() - modified_on_delta):
             company.save()
-        task_result = automatic_company_archive.apply_async(kwargs={'simulate': False})
-        assert task_result.successful()
+
+        schedule_automatic_company_archive(simulate=False)
+
         archived_company = Company.objects.get(pk=company.id)
         assert archived_company.archived == expected_archived
         assert archived_company.modified_on == company.modified_on
@@ -274,8 +276,7 @@ class TestAutomaticCompanyArchive:
         with freeze_time(gt_3m_ago):
             company = CompanyFactory()
         OrderFactory(company=company)
-        task_result = automatic_company_archive.apply_async(kwargs={'simulate': False})
-        assert task_result.successful()
+        schedule_automatic_company_archive(simulate=False)
         company.refresh_from_db()
         assert not company.archived
 
@@ -291,13 +292,10 @@ class TestAutomaticCompanyArchive:
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
         with freeze_time(gt_3m_ago):
             companies = CompanyFactory.create_batch(3)
-        task_result = automatic_company_archive.apply_async(
-            kwargs={
-                'simulate': False,
-                'limit': 2,
-            },
+        schedule_automatic_company_archive(
+            simulate=False,
+            limit=2,
         )
-        assert task_result.successful()
 
         archived_companies_count = 0
         for company in companies:
@@ -319,8 +317,7 @@ class TestAutomaticCompanyArchive:
         with freeze_time(gt_3m_ago):
             companies = CompanyFactory.create_batch(2)
         LargeCapitalInvestorProfileFactory(investor_company=companies[0])
-        task_result = automatic_company_archive.apply_async(kwargs={'simulate': False})
-        assert task_result.successful()
+        schedule_automatic_company_archive(simulate=False)
 
         archived_companies_count = 0
         for company in companies:
@@ -367,7 +364,8 @@ class TestAutomaticCompanyArchive:
             company = CompanyFactory()
         for status in investment_projects_status:
             InvestmentProjectFactory(investor_company=company, status=status)
-        task_result = automatic_company_archive.apply_async(kwargs={'simulate': False})
-        assert task_result.successful()
+
+        schedule_automatic_company_archive(simulate=False)
+
         company.refresh_from_db()
         assert company.archived == expected_archived

@@ -26,7 +26,7 @@ from datahub.company.models import (
     OneListCoreTeamMember,
     OneListTier,
 )
-from datahub.company.tasks import update_contact_consent
+from datahub.company.tasks.contact import schedule_update_contact_consent
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
     has_uk_establishment_number_prefix,
@@ -308,11 +308,9 @@ class ContactDetailSerializer(ContactSerializer):
         combiner = DataCombiner(self.instance, validated_data)
         request = self.context.get('request', None)
         transaction.on_commit(
-            lambda: update_contact_consent.apply_async(
-                args=(
-                    combiner.get_value('email'),
-                    accepts_dit_email_marketing,
-                ),
+            lambda: schedule_update_contact_consent(
+                combiner.get_value('email'),
+                accepts_dit_email_marketing,
                 kwargs={
                     'modified_at': now().isoformat(),
                     'zipkin_headers': get_zipkin_headers(request),
