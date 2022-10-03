@@ -7,7 +7,7 @@ from django_pglocks import advisory_lock
 from datahub.company import consent
 from datahub.company.models import Contact
 from datahub.core.exceptions import APIBadGatewayException
-from datahub.core.queues.constants import ONE_DAY_IN_SECONDS
+from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.errors import RetryError
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
@@ -103,7 +103,7 @@ def schedule_automatic_contact_archive(limit=1000, simulate=False):
         ),
         max_retries=3,
         queue_name=LONG_RUNNING_QUEUE,
-        job_timeout=ONE_DAY_IN_SECONDS,
+        job_timeout=HALF_DAY_IN_SECONDS,
     )
     logger.info(
         f'Task {job.id} automatic_contact_archive',

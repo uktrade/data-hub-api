@@ -33,7 +33,8 @@ def job_scheduler(
         queue_name (string, optional): Name of a queue to schedule work with. Defaults to
             SHORT_RUNNING_QUEUE.
         is_burst (bool, optional): If True, will use a burst worker queue strategy.
-            If False, will use the default queue strategy running a fetch-fork-execute loop.
+            If False, will use the default queue strategy running a fetch-fork-execute loop
+            or a blocking worker process that will run and block until terminated.
             Defaults to False unless this is a Test.
         retry_backoff (bool or int, optional): If True, will create an exponential backoff list of
             intervals based on the amount of max_retries configured starting from the first second.

@@ -7,6 +7,7 @@ from django.db.models import Q
 
 from datahub.company.models import CompanyExportCountry
 from datahub.company.test.factories import CompanyExportCountryFactory, CompanyFactory
+from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.test.support.factories import ForeignAndM2MModelFactory, MetadataModelFactory
 from datahub.core.test.support.models import NullableWithDefaultModel
 from datahub.dbmaintenance.tasks import (
@@ -33,33 +34,23 @@ class TestReplaceNullWithDefault:
     )
     def test_replaces_null_with_default(
             self,
-            monkeypatch,
             num_objects,
             batch_size,
             expected_batches,
     ):
         """Test that null values are replaced with the default value for the model field."""
-        replace_null_with_default_mock = Mock(
-            side_effect=replace_null_with_default,
-            wraps=replace_null_with_default,
-        )
-        monkeypatch.setattr(
-            'datahub.dbmaintenance.tasks.replace_null_with_default',
-            replace_null_with_default_mock,
-        )
-
         objs = (
             [NullableWithDefaultModel(nullable_with_default=None)] * num_objects
             + [NullableWithDefaultModel(nullable_with_default=False)] * 10
         )
         NullableWithDefaultModel.objects.bulk_create(objs)
 
-        replace_null_with_default_mock.apply_async(
-            args=('support.NullableWithDefaultModel', 'nullable_with_default'),
-            kwargs={'batch_size': batch_size},
+        replace_null_with_default(
+            'support.NullableWithDefaultModel',
+            'nullable_with_default',
+            batch_size=batch_size,
         )
 
-        assert replace_null_with_default_mock.apply_async.call_count == expected_batches
         assert NullableWithDefaultModel.objects.filter(
             nullable_with_default__isnull=True,
         ).count() == 0
@@ -77,33 +68,24 @@ class TestReplaceNullWithDefault:
     )
     def test_replaces_null_with_given_default(
             self,
-            monkeypatch,
             num_objects,
             batch_size,
             expected_batches,
     ):
         """Test that null values are replaced with the default value explicitly specified."""
-        replace_null_with_default_mock = Mock(
-            side_effect=replace_null_with_default,
-            wraps=replace_null_with_default,
-        )
-        monkeypatch.setattr(
-            'datahub.dbmaintenance.tasks.replace_null_with_default',
-            replace_null_with_default_mock,
-        )
-
         objs = (
             [NullableWithDefaultModel(nullable_without_default=None)] * num_objects
             + [NullableWithDefaultModel(nullable_without_default=False)] * 10
         )
         NullableWithDefaultModel.objects.bulk_create(objs)
 
-        replace_null_with_default_mock.apply_async(
-            args=('support.NullableWithDefaultModel', 'nullable_without_default'),
-            kwargs={'default': True, 'batch_size': batch_size},
+        replace_null_with_default(
+            'support.NullableWithDefaultModel',
+            'nullable_without_default',
+            default=True,
+            batch_size=batch_size,
         )
 
-        assert replace_null_with_default_mock.apply_async.call_count == expected_batches
         assert NullableWithDefaultModel.objects.filter(
             nullable_without_default__isnull=True,
         ).count() == 0
@@ -136,7 +118,7 @@ class TestReplaceNullWithDefault:
             ),
         ),
     )
-    def test_raises_error_on_invalid_field(self, monkeypatch, field, default, expected_error_msg):
+    def test_raises_error_on_invalid_field(self, field, default, expected_error_msg):
         """
         Test that an error is raised if the task is called with:
          - a model field without a default
@@ -144,12 +126,12 @@ class TestReplaceNullWithDefault:
          - a non-nullable field
          - a non-nullable field and an explicit default
         """
-        res = replace_null_with_default.apply_async(
-            args=('support.NullableWithDefaultModel', field),
-            kwargs={'default': default},
-        )
         with pytest.raises(ValueError) as excinfo:
-            assert res.get()
+            replace_null_with_default(
+                'support.NullableWithDefaultModel',
+                field,
+                default=default,
+            )
         assert str(excinfo.value) == expected_error_msg
 
 
@@ -160,11 +142,11 @@ class TestCopyForeignKeyToM2MField:
     @pytest.mark.parametrize(
         'num_objects,batch_size,expected_batches',
         (
-            (10, 4, 3),
-            (10, 5, 3),
-            (11, 6, 2),
-            (11, 12, 1),
-            (0, 5, 1),
+            (10, 4, 2),
+            (10, 5, 2),
+            (11, 6, 1),
+            (11, 12, 0),
+            (0, 5, 0),
         ),
     )
     def test_successfully_copies_data(
@@ -175,12 +157,11 @@ class TestCopyForeignKeyToM2MField:
             expected_batches,
     ):
         """Test that the task copies data for various batch sizes."""
-        copy_foreign_key_to_m2m_field_mock = Mock(wraps=copy_foreign_key_to_m2m_field)
+        job_scheduler_mock = Mock(wraps=job_scheduler)
         monkeypatch.setattr(
-            'datahub.dbmaintenance.tasks.copy_foreign_key_to_m2m_field',
-            copy_foreign_key_to_m2m_field_mock,
+            'datahub.dbmaintenance.tasks.job_scheduler',
+            job_scheduler_mock,
         )
-
         objects_to_update = ForeignAndM2MModelFactory.create_batch(num_objects, values=[])
         objects_already_with_m2m_values = ForeignAndM2MModelFactory.create_batch(
             5,
@@ -188,13 +169,14 @@ class TestCopyForeignKeyToM2MField:
         )
         objects_with_null_value = ForeignAndM2MModelFactory.create_batch(10, value=None)
 
-        result = copy_foreign_key_to_m2m_field_mock.apply_async(
-            args=('support.ForeignAndM2MModel', 'value', 'values'),
-            kwargs={'batch_size': batch_size},
+        copy_foreign_key_to_m2m_field(
+            'support.ForeignAndM2MModel',
+            'value',
+            'values',
+            batch_size=batch_size,
         )
 
-        assert result.successful()
-        assert copy_foreign_key_to_m2m_field_mock.apply_async.call_count == expected_batches
+        assert job_scheduler_mock.call_count == expected_batches
 
         for obj in chain(
             objects_to_update,
@@ -219,10 +201,10 @@ class TestCopyForeignKeyToM2MField:
 
     def test_rolls_back_on_error(self, monkeypatch):
         """Test that the task rolld back when an error is raised."""
-        copy_foreign_key_to_m2m_field_mock = Mock(wraps=copy_foreign_key_to_m2m_field)
+        job_scheduler_mock = Mock(wraps=job_scheduler)
         monkeypatch.setattr(
-            'datahub.dbmaintenance.tasks.copy_foreign_key_to_m2m_field',
-            copy_foreign_key_to_m2m_field_mock,
+            'datahub.dbmaintenance.tasks.job_scheduler',
+            job_scheduler_mock,
         )
 
         monkeypatch.setattr(
@@ -233,15 +215,13 @@ class TestCopyForeignKeyToM2MField:
         num_objects = 10
         objects_to_update = ForeignAndM2MModelFactory.create_batch(num_objects, values=[])
 
-        result = copy_foreign_key_to_m2m_field_mock.apply_async(
-            args=('support.ForeignAndM2MModel', 'value', 'values'),
-            kwargs={'batch_size': num_objects},
-        )
-
         with pytest.raises(ValueError):
-            result.get()
-
-        assert copy_foreign_key_to_m2m_field_mock.apply_async.call_count == 1
+            copy_foreign_key_to_m2m_field(
+                'support.ForeignAndM2MModel',
+                'value',
+                'values',
+                batch_size=num_objects,
+            )
 
         for obj in objects_to_update:
             obj.refresh_from_db()
@@ -250,13 +230,14 @@ class TestCopyForeignKeyToM2MField:
         # more useful information in assertion failures
         # These objects should not have been modified due to the roll back
         assert all([obj.values.count() == 0 for obj in objects_to_update])
+        job_scheduler_mock.assert_not_called
 
     def test_aborts_when_already_in_progress(self, monkeypatch):
         """Test that the task aborts when a task for the same field is already in progress."""
-        copy_foreign_key_to_m2m_field_mock = Mock(wraps=copy_foreign_key_to_m2m_field)
+        job_scheduler_mock = Mock()
         monkeypatch.setattr(
-            'datahub.dbmaintenance.tasks.copy_foreign_key_to_m2m_field',
-            copy_foreign_key_to_m2m_field_mock,
+            'datahub.dbmaintenance.tasks.job_scheduler',
+            job_scheduler_mock,
         )
 
         # Have to mock rather than acquire the lock as locks are per connection (if the lock is
@@ -265,10 +246,10 @@ class TestCopyForeignKeyToM2MField:
         advisory_lock_mock = MagicMock()
         advisory_lock_mock.return_value.__enter__.return_value = False
         monkeypatch.setattr('datahub.dbmaintenance.tasks.advisory_lock', advisory_lock_mock)
-        copy_foreign_key_to_m2m_field_mock.apply(args=('label', 'old-field', 'new-field'))
+        copy_foreign_key_to_m2m_field('label', 'old-field', 'new-field')
 
         # The task should not have been scheduled again as the task should've exited instead
-        copy_foreign_key_to_m2m_field_mock.apply_async.assert_not_called()
+        job_scheduler_mock.assert_not_called()
 
 
 @pytest.mark.django_db
@@ -280,10 +261,10 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
     @pytest.mark.parametrize(
         'num_objects,batch_size,expected_batches',
         (
-            (10, 4, 3),
-            (10, 5, 3),
-            (11, 6, 2),
-            (11, 12, 1),
+            (10, 4, 2),
+            (10, 5, 2),
+            (11, 6, 1),
+            (11, 12, 0),
         ),
     )
     def test_successfully_copies_from_company_model_future_interest(
@@ -294,12 +275,10 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             expected_batches,
     ):
         """Test that the task copies data for various batch sizes."""
-        task_mock = Mock(
-            wraps=copy_export_countries_to_company_export_country_model,
-        )
+        job_scheduler_mock = Mock(wraps=job_scheduler)
         monkeypatch.setattr(
-            'datahub.dbmaintenance.tasks.copy_export_countries_to_company_export_country_model',
-            task_mock,
+            'datahub.dbmaintenance.tasks.job_scheduler',
+            job_scheduler_mock,
         )
 
         countries = list(Country.objects.order_by('?')[:12])
@@ -318,15 +297,12 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             status='future_interest',
         )
 
-        result_future_interest = task_mock.apply_async(
-            kwargs={
-                'batch_size': batch_size,
-                'status': 'future_interest',
-            },
+        copy_export_countries_to_company_export_country_model(
+            batch_size=batch_size,
+            status='future_interest',
         )
 
-        assert result_future_interest.successful()
-        assert task_mock.apply_async.call_count == expected_batches
+        assert job_scheduler_mock.call_count == expected_batches
 
         updated_countries = CompanyExportCountry.objects.filter(company__in=companies_to_update)
 
@@ -355,10 +331,10 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
     @pytest.mark.parametrize(
         'num_objects,batch_size,expected_batches',
         (
-            (10, 4, 3),
-            (10, 5, 3),
-            (11, 6, 2),
-            (11, 12, 1),
+            (10, 4, 2),
+            (10, 5, 2),
+            (11, 6, 1),
+            (11, 12, 0),
         ),
     )
     def test_successfully_copies_from_company_model_currently_exporting(
@@ -369,12 +345,10 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             expected_batches,
     ):
         """Test that the task copies data for various batch sizes."""
-        task_mock = Mock(
-            wraps=copy_export_countries_to_company_export_country_model,
-        )
+        job_scheduler_mock = Mock(wraps=job_scheduler)
         monkeypatch.setattr(
-            'datahub.dbmaintenance.tasks.copy_export_countries_to_company_export_country_model',
-            task_mock,
+            'datahub.dbmaintenance.tasks.job_scheduler',
+            job_scheduler_mock,
         )
 
         countries = list(Country.objects.order_by('?')[:12])
@@ -393,15 +367,12 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             status='currently_exporting',
         )
 
-        result_currently_exporting = task_mock.apply_async(
-            kwargs={
-                'batch_size': batch_size,
-                'status': 'currently_exporting',
-            },
+        copy_export_countries_to_company_export_country_model(
+            batch_size=batch_size,
+            status='currently_exporting',
         )
 
-        assert result_currently_exporting.successful()
-        assert task_mock.apply_async.call_count == expected_batches
+        assert job_scheduler_mock.call_count == expected_batches
 
         updated_countries = CompanyExportCountry.objects.filter(company__in=companies_to_update)
 
@@ -429,11 +400,11 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
     @pytest.mark.parametrize(
         'num_objects,batch_size,expected_batches',
         (
-            (10, 4, 3),
-            (10, 5, 3),
-            (11, 6, 2),
-            (11, 12, 1),
-            (0, 5, 1),
+            (10, 4, 2),
+            (10, 5, 2),
+            (11, 6, 1),
+            (11, 12, 0),
+            (0, 5, 0),
         ),
     )
     def test_successfully_copies_from_company_model_when_duplicates_involved(
@@ -444,17 +415,15 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             expected_batches,
     ):
         """Test that the task copies data for various batch sizes."""
+        job_scheduler_mock = Mock(wraps=job_scheduler)
+        monkeypatch.setattr(
+            'datahub.dbmaintenance.tasks.job_scheduler',
+            job_scheduler_mock,
+        )
+
         new_countries = list(Country.objects.order_by('?')[:7])
         new_export_to_countries = new_countries[:3]
         new_future_interest_countries = new_countries[:5]
-
-        task_mock = Mock(
-            wraps=copy_export_countries_to_company_export_country_model,
-        )
-        monkeypatch.setattr(
-            'datahub.dbmaintenance.tasks.copy_export_countries_to_company_export_country_model',
-            task_mock,
-        )
 
         companies_to_update = CompanyFactory.create_batch(
             num_objects,
@@ -472,15 +441,12 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
                     status='future_interest',
                 )
 
-        result_currently_exporting = task_mock.apply_async(
-            kwargs={
-                'batch_size': batch_size,
-                'status': 'currently_exporting',
-            },
+        copy_export_countries_to_company_export_country_model(
+            batch_size=batch_size,
+            status='currently_exporting',
         )
 
-        assert result_currently_exporting.successful()
-        assert task_mock.apply_async.call_count == expected_batches
+        assert job_scheduler_mock.call_count == expected_batches
 
         updated_countries = CompanyExportCountry.objects.filter(company__in=companies_to_update)
 
@@ -509,26 +475,3 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
             ]
             for export_country in updated_countries.filter(status='currently_exporting')
         ])
-
-    def test_aborts_when_already_in_progress(self, monkeypatch):
-        """Test that the task aborts when a task for the same field is already in progress."""
-        copy_export_countries_to_company_export_country_model_mock = Mock(
-            wraps=copy_export_countries_to_company_export_country_model,
-        )
-        monkeypatch.setattr(
-            'datahub.dbmaintenance.tasks.copy_export_countries_to_company_export_country_model',
-            copy_export_countries_to_company_export_country_model_mock,
-        )
-
-        # Have to mock rather than acquire the lock as locks are per connection (if the lock is
-        # already held by the current connection, the current connection can still acquire it
-        # again).
-        advisory_lock_mock = MagicMock()
-        advisory_lock_mock.return_value.__enter__.return_value = False
-        monkeypatch.setattr('datahub.dbmaintenance.tasks.advisory_lock', advisory_lock_mock)
-        copy_export_countries_to_company_export_country_model_mock.apply(
-            args=('label', 'old-field', 'new-field'),
-        )
-
-        # The task should not have been scheduled again as the task should've exited instead
-        copy_export_countries_to_company_export_country_model_mock.apply_async.assert_not_called()

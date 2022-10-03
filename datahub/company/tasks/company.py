@@ -6,7 +6,7 @@ from django_pglocks import advisory_lock
 
 from datahub.company.constants import AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG
 from datahub.company.models import Company
-from datahub.core.queues.constants import ONE_DAY_IN_SECONDS
+from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.core.realtime_messaging import send_realtime_message
@@ -73,7 +73,7 @@ def schedule_automatic_company_archive(limit=1000, simulate=True):
             'limit': limit,
             'simulate': simulate,
         },
-        job_timeout=ONE_DAY_IN_SECONDS,
+        job_timeout=HALF_DAY_IN_SECONDS,
         max_retries=3,
     )
     logger.info(
