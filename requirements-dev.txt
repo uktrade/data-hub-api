@@ -112,7 +112,7 @@ django-pglocks==1.0.4
     # via -r requirements.in
 django-redis==5.2.0
     # via -r requirements.in
-django-reversion==5.0.2
+django-reversion==5.0.3
     # via -r requirements.in
 djangorestframework==3.14.0
     # via -r requirements.in
