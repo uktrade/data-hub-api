@@ -3,6 +3,9 @@ from celery.utils.log import get_task_logger
 from django.db.models import F, Max, Q
 
 from datahub.company.models import Company
+from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
+from datahub.core.queues.job_scheduler import job_scheduler
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.dnb_api.utils import (
     get_company,
     update_company_from_dnb,
@@ -46,18 +49,36 @@ def sync_company_with_dnb(
     _sync_company_with_dnb(company_id, fields_to_update, update_descriptor)
 
 
-@shared_task(
-    acks_late=True,
-    priority=9,
-    max_retries=3,
-    rate_limit=1,  # Run this task at most once per worker per second
-    queue='long-running',
-)
+def schedule_sync_company_with_dnb_rate_limited(
+    company_id,
+    fields_to_update=None,
+    update_descriptor=None,
+    simulate=False,
+):
+    # rate_limit=1,  # Run this task at most one per worker per second
+    job = job_scheduler(
+        function=sync_company_with_dnb_rate_limited,
+        function_args=(
+            company_id,
+            fields_to_update,
+            update_descriptor,
+            simulate,
+        ),
+        max_retries=3,
+        queue_name=LONG_RUNNING_QUEUE,
+        job_timeout=HALF_DAY_IN_SECONDS,
+        retry_backoff=60,
+    )
+    logger.info(
+        f'Task {job.id} sync_company_with_dnb_rate_limited',
+    )
+    return job
+
+
 def sync_company_with_dnb_rate_limited(
     company_id,
     fields_to_update=None,
     update_descriptor=None,
-    retry_failures=True,
     simulate=False,
 ):
     """
@@ -113,12 +134,9 @@ def sync_outdated_companies_with_dnb(
     ).values_list('id', flat=True)[:limit]
 
     for company_id in company_ids:
-        sync_company_with_dnb_rate_limited.apply_async(
-            kwargs={
-                'company_id': company_id,
-                'fields_to_update': fields_to_update,
-                'update_descriptor': 'celery:sync_outdated_companies_with_dnb:{self.request.id}',
-                'simulate': simulate,
-                'retry_failures': False,
-            },
+        schedule_sync_company_with_dnb_rate_limited(
+            company_id=company_id,
+            fields_to_update=fields_to_update,
+            update_descriptor=f'rq:sync_outdated_companies_with_dnb:{self.request.id}',
+            simulate=simulate,
         )

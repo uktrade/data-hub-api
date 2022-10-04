@@ -406,10 +406,6 @@ if REDIS_BASE_URL:
             ),
             'schedule': crontab(minute=0, hour=3, day_of_month=21)
         },
-        'update_companies_from_dnb_service': {
-            'task': 'datahub.dnb_api.tasks.update.get_company_updates',
-            'schedule': crontab(minute=0, hour=0),
-        },
     }
 
     if env.bool('ENABLE_DAILY_HIERARCHY_ROLLOUT', False):

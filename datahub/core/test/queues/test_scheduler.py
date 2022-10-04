@@ -114,7 +114,7 @@ def test_job_retry_with_errors_will_reschedule_with_three_tries(async_queue: Dat
     async_queue.work('will_fail')
 
     assert job is not None
-    assert job.is_scheduled is True
+    assert async_queue.job_status(job.id) == 'scheduled'
     assert job.retries_left == 3
     assert job.retry_intervals == [1, 4, 16]
 
@@ -176,7 +176,7 @@ def test_purging_queue(async_queue: DataHubScheduler):
 def test_purging_fails(
     async_queue: DataHubScheduler,
 ):
-    async_queue.enqueue(
+    job = async_queue.enqueue(
         queue_name='will_fail',
         function=PickleableMock.queue_handler_with_error,
         retry=Retry(max=1),
@@ -184,6 +184,7 @@ def test_purging_fails(
     async_queue.work('will_fail')
 
     assert async_queue.failed_count('will_fail') == 1
+    assert async_queue.job_status(job.id) == 'failed'
     async_queue.purge('will_fail', 'failed')
 
     assert async_queue.failed_count('will_fail') == 0
