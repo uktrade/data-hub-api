@@ -58,11 +58,12 @@ def test_sync_company_with_dnb_all_fields(
     )
     company = CompanyFactory(duns_number='123456789')
     original_company = Company.objects.get(id=company.id)
-    task_result = sync_company_with_dnb.apply_async(
-        args=[company.id],
-        kwargs={'update_descriptor': update_descriptor},
+
+    sync_company_with_dnb(
+        company.id,
+        update_descriptor=update_descriptor,
     )
-    assert task_result.successful()
+
     company.refresh_from_db()
     uk_country = Country.objects.get(iso_alpha2_code='GB')
     assert model_to_dict_company(company) == {
@@ -99,7 +100,7 @@ def test_sync_company_with_dnb_all_fields(
     versions = list(Version.objects.get_for_object(company))
     assert len(versions) == 1
     version = versions[0]
-    expected_update_descriptor = f'celery:sync_company_with_dnb:{task_result.id}'
+    expected_update_descriptor = f'rq:sync_company_with_dnb:{company.id}'
     if update_descriptor:
         expected_update_descriptor = update_descriptor
     assert version.revision.comment == f'Updated from D&B [{expected_update_descriptor}]'
@@ -121,11 +122,10 @@ def test_sync_company_with_dnb_partial_fields(
     )
     company = CompanyFactory(duns_number='123456789')
     original_company = Company.objects.get(id=company.id)
-    task_result = sync_company_with_dnb.apply_async(
-        args=[company.id],
-        kwargs={'fields_to_update': ['global_ultimate_duns_number']},
+    sync_company_with_dnb(
+        company.id,
+        fields_to_update=['global_ultimate_duns_number'],
     )
-    assert task_result.successful()
     company.refresh_from_db()
     assert model_to_dict(company) == {
         **base_company_dict,
@@ -169,54 +169,19 @@ def test_sync_company_with_dnb_partial_fields(
 
 
 @pytest.mark.parametrize(
-    'error,expect_retry',
-    (
-        (DNBServiceError('An error occurred', status_code=504), True),
-        (DNBServiceError('An error occurred', status_code=503), True),
-        (DNBServiceError('An error occurred', status_code=502), True),
-        (DNBServiceError('An error occurred', status_code=500), True),
-        (DNBServiceError('An error occurred', status_code=403), False),
-        (DNBServiceError('An error occurred', status_code=400), False),
-        (DNBServiceConnectionError('An error occurred'), True),
-        (DNBServiceTimeoutError('An error occurred'), True),
-    ),
-)
-def test_sync_company_with_dnb_retries_errors(monkeypatch, error, expect_retry):
-    """
-    Test the sync_company_with_dnb task retries server errors.
-    """
-    company = CompanyFactory(duns_number='123456789')
-
-    # Set up a DNBServiceError with the parametrized status code
-    mocked_get_company = mock.Mock()
-    mocked_get_company.side_effect = error
-    monkeypatch.setattr('datahub.dnb_api.tasks.sync.get_company', mocked_get_company)
-
-    # Mock the task's retry method
-    retry_mock = mock.Mock(side_effect=Retry(exc=error))
-    monkeypatch.setattr('datahub.dnb_api.tasks.sync_company_with_dnb.retry', retry_mock)
-
-    if expect_retry:
-        expected_exception_class = Retry
-    else:
-        expected_exception_class = DNBServiceError
-
-    with pytest.raises(expected_exception_class):
-        sync_company_with_dnb(company.id)
-
-
-@pytest.mark.parametrize(
     'error',
     (
         DNBServiceError('An error occurred', status_code=504),
         DNBServiceError('An error occurred', status_code=503),
         DNBServiceError('An error occurred', status_code=502),
         DNBServiceError('An error occurred', status_code=500),
+        DNBServiceError('An error occurred', status_code=403),
+        DNBServiceError('An error occurred', status_code=400),
         DNBServiceConnectionError('An error occurred'),
         DNBServiceTimeoutError('An error occurred'),
     ),
 )
-def test_sync_company_with_dnb_respects_retry_failures_flag(monkeypatch, error):
+def test_sync_company_with_dnb_bubbles_up_errors(monkeypatch, error):
     """
     Test the sync_company_with_dnb task retries server errors.
     """
@@ -227,8 +192,8 @@ def test_sync_company_with_dnb_respects_retry_failures_flag(monkeypatch, error):
     mocked_get_company.side_effect = error
     monkeypatch.setattr('datahub.dnb_api.tasks.sync.get_company', mocked_get_company)
 
-    with pytest.raises(error.__class__):
-        sync_company_with_dnb(company.id, retry_failures=False)
+    with pytest.raises(type(error)):
+        sync_company_with_dnb(company.id)
 
 
 class TestGetCompanyUpdates:
@@ -1086,7 +1051,7 @@ def test_sync_outdated_companies_sync_task_failure_logs_error(caplog, monkeypatc
     )
     mocked_sync_company_with_dnb = mock.Mock(side_effect=Exception())
     monkeypatch.setattr(
-        'datahub.dnb_api.tasks.sync_company_with_dnb.apply_async',
+        'datahub.dnb_api.tasks.sync_company_with_dnb',
         mocked_sync_company_with_dnb,
     )
 

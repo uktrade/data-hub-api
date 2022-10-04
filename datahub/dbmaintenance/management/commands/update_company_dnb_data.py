@@ -4,6 +4,7 @@ import time
 from django.utils.timezone import now
 
 from datahub.company.models import Company
+from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.utils import log_to_sentry
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
@@ -96,9 +97,16 @@ class Command(CSVBaseCommand):
 
         self._limit_call_rate()
 
-        sync_company_with_dnb.apply_async(
-            args=(pk, fields, self.update_descriptor),
-            throw=True,
+        job = job_scheduler(
+            function=sync_company_with_dnb,
+            function_args=(
+                pk,
+                fields,
+                self.update_descriptor,
+            ),
+            retry_intervals=[60, 60, 60],
         )
+        logger.info(f'Task {job.id} sync_company_with_dnb')
+
         self.processed_ids.append(pk)
         self.success_count += 1
