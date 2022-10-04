@@ -114,7 +114,9 @@ def test_job_retry_with_errors_will_reschedule_with_three_tries(async_queue: Dat
     async_queue.work('will_fail')
 
     assert job is not None
-    assert job.is_scheduled is True
+    retrieved_job = async_queue.job(job.id)
+    assert retrieved_job is not None
+    assert retrieved_job.is_scheduled is True
     assert job.retries_left == 3
     assert job.retry_intervals == [1, 4, 16]
 
@@ -176,7 +178,7 @@ def test_purging_queue(async_queue: DataHubScheduler):
 def test_purging_fails(
     async_queue: DataHubScheduler,
 ):
-    async_queue.enqueue(
+    job = async_queue.enqueue(
         queue_name='will_fail',
         function=PickleableMock.queue_handler_with_error,
         retry=Retry(max=1),
@@ -184,9 +186,34 @@ def test_purging_fails(
     async_queue.work('will_fail')
 
     assert async_queue.failed_count('will_fail') == 1
+    retrieved_job = async_queue.job(job.id)
+    assert retrieved_job is not None
+    assert retrieved_job.is_failed is True
     async_queue.purge('will_fail', 'failed')
 
     assert async_queue.failed_count('will_fail') == 0
+
+
+def test_purging_scheduled(
+    async_queue: DataHubScheduler,
+):
+    job = async_queue.enqueue(
+        queue_name='will_fail',
+        function=PickleableMock.queue_handler_with_error,
+        retry=Retry(
+            max=1,
+            interval=[60],
+        ),
+    )
+    async_queue.work('will_fail')
+    assert async_queue.scheduled_count('will_fail') >= 1
+    retrieved_job = async_queue.job(job.id)
+    assert retrieved_job is not None
+    assert retrieved_job.is_scheduled is True
+
+    async_queue.purge('will_fail', 'scheduled')
+
+    assert async_queue.scheduled_count('will_fail') == 0
 
 
 def test_purging_cron_scheduled(
@@ -203,3 +230,14 @@ def test_purging_cron_scheduled(
     async_queue.cancel_cron_jobs()
 
     assert async_queue.failed_count('will_fail') == 0
+
+
+def test_job_enqued_is_fetched_in_the_same_state(queue: DataHubScheduler):
+    actual_job = queue.enqueue(
+        queue_name='job-test',
+        function=PickleableMock.queue_handler,
+    )
+
+    fetched_job = queue.job(actual_job.id)
+
+    assert fetched_job == actual_job

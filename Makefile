@@ -57,7 +57,7 @@ fix-us-areas:
 	docker-compose run api python manage.py fix_us_company_address
 
 test-rq:
-	docker-compose run api python manage.py test_rq
+	docker-compose run api python manage.py test_rq --generated_jobs 1000
 
 fix-ca-areas:
 	docker-compose run api python manage.py fix_ca_company_address
