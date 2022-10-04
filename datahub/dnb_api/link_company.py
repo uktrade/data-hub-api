@@ -33,7 +33,6 @@ def link_company_with_dnb(
     sync_company_with_dnb(
         company.id,
         update_descriptor=update_descriptor,
-        retry_failures=False,
     )
     company.refresh_from_db()
     return company
