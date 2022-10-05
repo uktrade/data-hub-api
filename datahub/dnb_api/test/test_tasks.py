@@ -3,7 +3,6 @@ from unittest import mock
 from urllib.parse import urljoin
 
 import pytest
-from celery.exceptions import Retry
 from django.conf import settings
 from django.forms.models import model_to_dict
 from django.test.utils import override_settings
@@ -14,12 +13,14 @@ from reversion.models import Version
 
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
+from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.dnb_api.tasks import (
     get_company_updates,
     sync_company_with_dnb,
     sync_outdated_companies_with_dnb,
     update_company_from_dnb_data,
 )
+from datahub.dnb_api.tasks.update import record_audit
 from datahub.dnb_api.test.utils import model_to_dict_company
 from datahub.dnb_api.utils import (
     DNBServiceConnectionError,
@@ -197,72 +198,46 @@ def test_sync_company_with_dnb_bubbles_up_errors(monkeypatch, error):
 
 
 class TestGetCompanyUpdates:
-    """
-    Tests for the get_company_updates task and the associated _get_company_updates function.
-    """
 
     @pytest.mark.parametrize(
-        'error, expect_retry',
+        'error',
         (
-            (
-                DNBServiceError(
-                    'An error occurred',
-                    status_code=status.HTTP_504_GATEWAY_TIMEOUT,
-                ),
-                True,
+            DNBServiceError(
+                'An error occurred',
+                status_code=status.HTTP_504_GATEWAY_TIMEOUT,
             ),
-            (
-                DNBServiceError(
-                    'An error occurred',
-                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                ),
-                True,
+
+            DNBServiceError(
+                'An error occurred',
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             ),
-            (
-                DNBServiceError(
-                    'An error occurred',
-                    status_code=status.HTTP_502_BAD_GATEWAY,
-                ),
-                True,
+            DNBServiceError(
+                'An error occurred',
+                status_code=status.HTTP_502_BAD_GATEWAY,
             ),
-            (
-                DNBServiceError(
-                    'An error occurred',
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                ),
-                True,
+            DNBServiceError(
+                'An error occurred',
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             ),
-            (
-                DNBServiceError(
-                    'An error occurred',
-                    status_code=403,
-                ),
-                False,
+            DNBServiceError(
+                'An error occurred',
+                status_code=403,
             ),
-            (
-                DNBServiceError(
-                    'An error occurred',
-                    status_code=400,
-                ),
-                False,
+            DNBServiceError(
+                'An error occurred',
+                status_code=400,
             ),
-            (
-                DNBServiceConnectionError(
-                    'An error occurred',
-                ),
-                True,
+            DNBServiceConnectionError(
+                'An error occurred',
             ),
-            (
-                DNBServiceTimeoutError(
-                    'An error occurred',
-                ),
-                True,
+            DNBServiceTimeoutError(
+                'An error occurred',
             ),
         ),
     )
-    def test_errors(self, monkeypatch, error, expect_retry):
+    def test_errors(self, monkeypatch, error):
         """
-        Test the get_company_updates task retries server errors.
+        Test the schedule_get_company_updates task retries server errors.
         """
         mocked_get_company_update_page = mock.Mock(side_effect=error)
         monkeypatch.setattr(
@@ -270,14 +245,7 @@ class TestGetCompanyUpdates:
             mocked_get_company_update_page,
         )
 
-        mock_retry = mock.Mock(side_effect=Retry(exc=error))
-        monkeypatch.setattr(
-            'datahub.dnb_api.tasks.get_company_updates.retry',
-            mock_retry,
-        )
-
-        expected_exception_class = Retry if expect_retry else DNBServiceError
-        with pytest.raises(expected_exception_class):
+        with pytest.raises(type(error)):
             get_company_updates()
 
     @pytest.mark.parametrize(
@@ -324,13 +292,14 @@ class TestGetCompanyUpdates:
             'datahub.dnb_api.tasks.update.get_company_update_page',
             mock_get_company_update_page,
         )
-        mock_update_company = mock.Mock()
+        job_scheduler_mock = mock.Mock(wraps=job_scheduler)
         monkeypatch.setattr(
-            'datahub.dnb_api.tasks.update.update_company_from_dnb_data',
-            mock_update_company,
+            'datahub.dnb_api.tasks.update.job_scheduler',
+            job_scheduler_mock,
         )
-        task_result = get_company_updates.apply_async(
-            kwargs={'fields_to_update': fields_to_update},
+
+        get_company_updates(
+            fields_to_update=fields_to_update,
         )
 
         assert mock_get_company_update_page.call_count == 2
@@ -343,23 +312,9 @@ class TestGetCompanyUpdates:
             'http://foo.bar/companies?cursor=page2',
         )
 
-        assert mock_update_company.apply_async.call_count == 3
-        expected_kwargs = {
-            'fields_to_update': fields_to_update,
-            'update_descriptor': f'celery:get_company_updates:{task_result.id}',
-        }
-        mock_update_company.apply_async.assert_any_call(
-            args=({'foo': 1},),
-            kwargs=expected_kwargs,
-        )
-        mock_update_company.apply_async.assert_any_call(
-            args=({'bar': 2},),
-            kwargs=expected_kwargs,
-        )
-        mock_update_company.apply_async.assert_any_call(
-            args=({'baz': 3},),
-            kwargs=expected_kwargs,
-        )
+        assert job_scheduler_mock.call_count == 4
+        assert str(update_company_from_dnb_data) in str(job_scheduler_mock.call_args_list)
+        assert str(record_audit) in str(job_scheduler_mock.call_args_list)
 
     @pytest.mark.parametrize(
         'lock_acquired, call_count',
@@ -442,26 +397,17 @@ class TestGetCompanyUpdates:
             'datahub.dnb_api.tasks.update.get_company_update_page',
             mock_get_company_update_page,
         )
-        mock_update_company = mock.Mock()
+        job_scheduler_mock = mock.Mock(wraps=job_scheduler)
         monkeypatch.setattr(
-            'datahub.dnb_api.tasks.update.update_company_from_dnb_data',
-            mock_update_company,
+            'datahub.dnb_api.tasks.update.job_scheduler',
+            job_scheduler_mock,
         )
-        task_result = get_company_updates.apply_async()
 
-        assert mock_update_company.apply_async.call_count == 2
-        expected_kwargs = {
-            'fields_to_update': None,
-            'update_descriptor': f'celery:get_company_updates:{task_result.id}',
-        }
-        mock_update_company.apply_async.assert_any_call(
-            args=({'foo': 1},),
-            kwargs=expected_kwargs,
-        )
-        mock_update_company.apply_async.assert_any_call(
-            args=({'bar': 2},),
-            kwargs=expected_kwargs,
-        )
+        get_company_updates()
+
+        assert job_scheduler_mock.call_count == 3
+        assert str(update_company_from_dnb_data) in str(job_scheduler_mock.call_args_list)
+        assert str(record_audit) in str(job_scheduler_mock.call_args_list)
 
     @mock.patch('datahub.dnb_api.tasks.update.send_realtime_message')
     @mock.patch('datahub.dnb_api.tasks.update.log_to_sentry')
@@ -485,7 +431,7 @@ class TestGetCompanyUpdates:
             'datahub.dnb_api.tasks.update.get_company_update_page',
             mock_get_company_update_page,
         )
-        task_result = get_company_updates.apply_async()
+        get_company_updates()
 
         company.refresh_from_db()
         dnb_company = dnb_company_updates_response_uk['results'][0]
@@ -497,8 +443,11 @@ class TestGetCompanyUpdates:
             extra={
                 'success_count': 1,
                 'failure_count': 0,
-                'updated_company_ids': [str(company.pk)],
-                'producer_task_id': task_result.id,
+                'description': (
+                    'datahub.dnb_api.tasks.update.update_company_from_dnb_data('
+                    "{'address_country': 'GB', 'address_county': '', 'address_line_1'"
+                    ": 'Unit 10,..., None, 'rq:get_company_updates:2019-01-02 02:00:00+00:00')"
+                ),
                 'start_time': '2019-01-02T02:00:00+00:00',
                 'end_time': '2019-01-02T02:00:00+00:00',
             },
@@ -531,7 +480,8 @@ class TestGetCompanyUpdates:
             'datahub.dnb_api.tasks.update.get_company_update_page',
             mock_get_company_update_page,
         )
-        task_result = get_company_updates.apply_async(kwargs={'fields_to_update': ['name']})
+
+        get_company_updates(fields_to_update=['name'])
 
         company.refresh_from_db()
         dnb_company = dnb_company_updates_response_uk['results'][0]
@@ -543,11 +493,13 @@ class TestGetCompanyUpdates:
             extra={
                 'success_count': 1,
                 'failure_count': 0,
-                'updated_company_ids': [str(company.pk)],
-                'producer_task_id': task_result.id,
+                'description': (
+                    'datahub.dnb_api.tasks.update.update_company_from_dnb_data'
+                    "({'address_country': 'GB', 'address_county': '', 'address_line_1'"
+                    ": 'Unit 10,..., ['name'], 'rq:get_company_updates:2019-01-02 02:00:00+00:00')"
+                ),
                 'start_time': '2019-01-02T02:00:00+00:00',
-                'end_time': '2019-01-02T02:00:00+00:00',
-            },
+                'end_time': '2019-01-02T02:00:00+00:00'},
         )
         expected_message = (
             'datahub.dnb_api.tasks.update.get_company_updates '
@@ -583,7 +535,7 @@ class TestGetCompanyUpdates:
             'datahub.dnb_api.tasks.update.get_company_update_page',
             mock_get_company_update_page,
         )
-        task_result = get_company_updates.apply()
+        get_company_updates()
 
         company.refresh_from_db()
         dnb_company = dnb_company_updates_response_uk['results'][0]
@@ -595,8 +547,11 @@ class TestGetCompanyUpdates:
             extra={
                 'success_count': 1,
                 'failure_count': 1,
-                'updated_company_ids': [str(company.pk)],
-                'producer_task_id': task_result.id,
+                'description': (
+                    'datahub.dnb_api.tasks.update.update_company_from_dnb_data'
+                    "({'address_country': 'GB', 'address_county': '', 'address_line_1': "
+                    "'Unit 10,..., None, 'rq:get_company_updates:2019-01-02 02:00:00+00:00')"
+                ),
                 'start_time': '2019-01-02T02:00:00+00:00',
                 'end_time': '2019-01-02T02:00:00+00:00',
             },
@@ -616,11 +571,10 @@ def test_update_company_from_dnb_data(dnb_response_uk, base_company_dict):
     company = CompanyFactory(duns_number='123456789')
     original_company = Company.objects.get(id=company.id)
     update_descriptor = 'foobar'
-    task_result = update_company_from_dnb_data.apply_async(
-        args=[dnb_response_uk['results'][0]],
-        kwargs={'update_descriptor': update_descriptor},
+    update_company_from_dnb_data(
+        dnb_response_uk['results'][0],
+        update_descriptor=update_descriptor,
     )
-    assert task_result.successful()
     company.refresh_from_db()
     uk_country = Country.objects.get(iso_alpha2_code='GB')
     assert model_to_dict_company(company) == {
@@ -667,11 +621,11 @@ def test_update_company_from_dnb_data_partial_fields(dnb_response_uk, base_compa
     """
     company = CompanyFactory(duns_number='123456789')
     original_company = Company.objects.get(id=company.id)
-    task_result = update_company_from_dnb_data.apply_async(
-        args=[dnb_response_uk['results'][0]],
-        kwargs={'fields_to_update': ['global_ultimate_duns_number']},
+
+    update_company_from_dnb_data(
+        dnb_response_uk['results'][0],
+        fields_to_update=['global_ultimate_duns_number'],
     )
-    assert task_result.successful()
     company.refresh_from_db()
     assert model_to_dict(company) == {
         **base_company_dict,
@@ -719,8 +673,7 @@ def test_update_company_from_dnb_data_does_not_exist(dnb_response_uk, caplog):
     """
     Test the update_company_from_dnb_data command when the company does not exist in Data Hub.
     """
-    task_result = update_company_from_dnb_data.apply_async(args=[dnb_response_uk['results'][0]])
-    assert not task_result.successful()
+    update_company_from_dnb_data(dnb_response_uk['results'][0])
     assert 'Company matching duns_number was not found' in caplog.text
 
 
@@ -732,8 +685,9 @@ def test_update_company_from_dnb_data_fails_validation(dnb_response_uk, caplog):
     """
     CompanyFactory(duns_number='123456789')
     dnb_response_uk['results'][0]['primary_name'] = 'a' * 9999
-    task_result = update_company_from_dnb_data.apply_async(args=[dnb_response_uk['results'][0]])
-    assert not task_result.successful()
+
+    update_company_from_dnb_data(dnb_response_uk['results'][0])
+
     assert 'Data from D&B did not pass the Data Hub validation checks.' in caplog.text
 
 
