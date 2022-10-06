@@ -1,13 +1,9 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.db.models import F, Max, Q
-from rest_framework.status import is_server_error
 
 from datahub.company.models import Company
 from datahub.dnb_api.utils import (
-    DNBServiceConnectionError,
-    DNBServiceError,
-    DNBServiceTimeoutError,
     get_company,
     update_company_from_dnb,
 )
@@ -18,22 +14,10 @@ logger = get_task_logger(__name__)
 def _sync_company_with_dnb(
     company_id,
     fields_to_update,
-    task,
     update_descriptor,
-    retry_failures=True,
 ):
     dh_company = Company.objects.get(id=company_id)
-
-    try:
-        dnb_company = get_company(dh_company.duns_number)
-    except DNBServiceError as exc:
-        if is_server_error(exc.status_code) and retry_failures:
-            raise task.retry(exc=exc, countdown=60)
-        raise
-    except (DNBServiceConnectionError, DNBServiceTimeoutError) as exc:
-        if retry_failures:
-            raise task.retry(exc=exc, countdown=60)
-        raise
+    dnb_company = get_company(dh_company.duns_number)
 
     update_company_from_dnb(
         dh_company,
@@ -43,18 +27,10 @@ def _sync_company_with_dnb(
     )
 
 
-@shared_task(
-    bind=True,
-    acks_late=True,
-    priority=9,
-    max_retries=3,
-)
 def sync_company_with_dnb(
-    self,
     company_id,
     fields_to_update=None,
     update_descriptor=None,
-    retry_failures=True,
 ):
     """
     Sync a company record with data sourced from DNB. This task will interact with dnb-service to
@@ -66,8 +42,8 @@ def sync_company_with_dnb(
     the new company version.
     """
     if not update_descriptor:
-        update_descriptor = f'celery:sync_company_with_dnb:{self.request.id}'
-    _sync_company_with_dnb(company_id, fields_to_update, self, update_descriptor, retry_failures)
+        update_descriptor = f'rq:sync_company_with_dnb:{company_id}'
+    _sync_company_with_dnb(company_id, fields_to_update, update_descriptor)
 
 
 @shared_task(
@@ -99,7 +75,6 @@ def sync_company_with_dnb_rate_limited(
             company_id=company_id,
             fields_to_update=fields_to_update,
             update_descriptor=update_descriptor,
-            retry_failures=retry_failures,
         )
     except Exception:
         logger.warning(f'{message} Failed')
