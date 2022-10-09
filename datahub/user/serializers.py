@@ -15,6 +15,7 @@ class WhoAmISerializer(serializers.ModelSerializer):
         model = Advisor
         fields = (
             'id',
+            'sso_user_id',
             'name',
             'last_login',
             'first_name',

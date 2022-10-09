@@ -95,6 +95,13 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         verbose_name='SSO email user ID',
         help_text='This is the `Email user ID` that is shown for this user in Staff SSO.',
     )
+    sso_user_id = models.UUIDField(
+        blank=True,
+        unique=True,
+        null=True,
+        verbose_name='SSO user ID',
+        help_text='This is the `User ID` that is shown for this user in Staff SSO.',
+    )
 
     features = models.ManyToManyField(
         'feature_flag.UserFeatureFlag',

@@ -25,6 +25,7 @@ SSO_ADVISER_FIELD_MAPPING = {
     'first_name': 'first_name',
     'last_name': 'last_name',
     'sso_email_user_id': 'email_user_id',
+    'sso_user_id': 'user_id',
     'email': 'email',
     'contact_email': 'contact_email',
 }
