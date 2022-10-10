@@ -148,24 +148,6 @@ class DataHubScheduler:
     def work(self, *queues: str, with_scheduler: bool = False):
         return self._worker_strategy.process_queues(queues, with_scheduler)
 
-    def job_status(self, job_id) -> str:
-        """
-            Returns
-                None
-                'queued'
-                'finished'
-                'failed'
-                'started'
-                'deferred'
-                'scheduled'
-                'stopped'
-                'canceled'
-        """
-        job = self.job(job_id)
-        if job is not None:
-            return job.get_status(True)
-        return None
-
     def job(self, job_id) -> Job:
         job = Job.fetch(job_id, self._connection)
         return job

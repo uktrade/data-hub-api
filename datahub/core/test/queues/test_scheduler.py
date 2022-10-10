@@ -114,7 +114,7 @@ def test_job_retry_with_errors_will_reschedule_with_three_tries(async_queue: Dat
     async_queue.work('will_fail')
 
     assert job is not None
-    assert async_queue.job_status(job.id) == 'scheduled'
+    assert async_queue.job(job.id).is_scheduled
     assert job.retries_left == 3
     assert job.retry_intervals == [1, 4, 16]
 
@@ -184,7 +184,7 @@ def test_purging_fails(
     async_queue.work('will_fail')
 
     assert async_queue.failed_count('will_fail') == 1
-    assert async_queue.job_status(job.id) == 'failed'
+    assert async_queue.job(job.id).is_failed is True
     async_queue.purge('will_fail', 'failed')
 
     assert async_queue.failed_count('will_fail') == 0
