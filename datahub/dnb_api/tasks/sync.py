@@ -1,6 +1,11 @@
+import socket
+
 from celery import shared_task
 from celery.utils.log import get_task_logger
+from django.conf import settings
 from django.db.models import F, Max, Q
+from redis import Redis
+from redis_rate_limit import RateLimit
 
 from datahub.company.models import Company
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
@@ -92,11 +97,19 @@ def sync_company_with_dnb_rate_limited(
         return
 
     try:
-        sync_company_with_dnb(
-            company_id=company_id,
-            fields_to_update=fields_to_update,
-            update_descriptor=update_descriptor,
-        )
+        # TODO: See what this should be s I am not able to find the documentation
+        with RateLimit(
+            resource='sync_company_with_dnb_rate_limited',
+            client=socket.gethostbyaddr(socket.gethostname()),
+            max_requests=4,
+            expire=1,
+            redis_pool=Redis.from_url(settings.REDIS_BASE_URL),
+        ):
+            sync_company_with_dnb(
+                company_id=company_id,
+                fields_to_update=fields_to_update,
+                update_descriptor=update_descriptor,
+            )
     except Exception:
         logger.warning(f'{message} Failed')
         raise
