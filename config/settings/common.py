@@ -7,19 +7,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
 
-import base64
-import os
-import stat
-from datetime import datetime, timedelta
+from datetime import timedelta
 from urllib.parse import urlencode
 
 import environ
 from celery.schedules import crontab
 from django.core.exceptions import ImproperlyConfigured
-from pytz import utc  # Note: importing django.utils.timezone.utc would cause a circular import
 
 from config.settings.types import HawkScope
-from datahub.core.constants import InvestmentProjectStage
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
@@ -408,21 +403,7 @@ if REDIS_BASE_URL:
         },
     }
 
-    if env.bool('ENABLE_DAILY_HIERARCHY_ROLLOUT', False):
-        CELERY_BEAT_SCHEDULE['dnb_heirarchies_backfill'] = {
-            'task': 'datahub.dnb_api.tasks.sync.sync_outdated_companies_with_dnb',
-            'schedule': crontab(minute=0, hour=1, ),
-            'kwargs': {
-                # Backfill companies which were last updated before 25 October 2019 -
-                # this is when we started recording the `global_ultimate_duns_number` field
-                'dnb_modified_on_before': datetime(
-                    year=2019, month=10, day=24, hour=23, minute=59, second=59, tzinfo=utc,
-                ),
-                'fields_to_update': ['global_ultimate_duns_number', ],
-                'limit': env.int('DAILY_HIERARCHY_ROLLOUT_LIMIT', 10),
-                'simulate': False,
-            },
-        }
+    ENABLE_DAILY_HIERARCHY_ROLLOUT = env.bool('ENABLE_DAILY_HIERARCHY_ROLLOUT', False)
 
     if env.bool('ENABLE_SPI_REPORT_GENERATION', False):
         CELERY_BEAT_SCHEDULE['spi_report'] = {

@@ -1,13 +1,15 @@
+import datetime
 import os
-
 from logging import getLogger
 
 import django
+import environ
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
 django.setup()
 
 from django.conf import settings
+from pytz import utc
 
 from datahub.company.tasks.company import schedule_automatic_company_archive
 from datahub.company.tasks.contact import schedule_automatic_contact_archive
@@ -20,8 +22,10 @@ from datahub.core.queues.constants import (
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import DataHubScheduler
+from datahub.dnb_api.tasks.sync import schedule_sync_outdated_companies_with_dnb
 from datahub.dnb_api.tasks.update import get_company_updates
 from datahub.search.tasks import sync_all_models
+env = environ.Env()
 logger = getLogger(__name__)
 
 
@@ -60,6 +64,21 @@ def schedule_jobs():
         job_scheduler(
             function=sync_all_models,
             cron=EVERY_ONE_AM,
+        )
+
+    if settings.ENABLE_DAILY_HIERARCHY_ROLLOUT:
+        job_scheduler(
+            function=schedule_sync_outdated_companies_with_dnb,
+            function_kwargs={
+                'dnb_modified_on_before': datetime(
+                    year=2019, month=10, day=24, hour=23, minute=59, second=59, tzinfo=utc,
+                ),
+                'fields_to_update': ['global_ultimate_duns_number'],
+                'limit': env.int('DAILY_HIERARCHY_ROLLOUT_LIMIT', 10),
+                'simulate': False,
+            },
+            cron=EVERY_ONE_AM,
+            description='dnb hierarchies backfill',
         )
 
 

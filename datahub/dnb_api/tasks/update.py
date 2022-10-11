@@ -69,11 +69,6 @@ def record_audit(job_ids, start_time):
     send_realtime_message(realtime_message)
 
 
-# TODO: Remove this function for underlying call
-def _get_company_updates_from_api(last_updated_after, next_page):
-    return get_company_update_page(last_updated_after, next_page)
-
-
 def _get_company_updates(last_updated_after, fields_to_update):
     yesterday = now() - timedelta(days=1)
     midnight_yesterday = datetime.combine(yesterday, time.min)
@@ -87,7 +82,7 @@ def _get_company_updates(last_updated_after, fields_to_update):
 
     while True:
 
-        response = _get_company_updates_from_api(last_updated_after, next_page)
+        response = get_company_update_page(last_updated_after, next_page)
         dnb_company_updates = response.get('results', [])
 
         dnb_company_updates = dnb_company_updates[:updates_remaining]
@@ -119,7 +114,6 @@ def schedule_get_company_updates(
     last_updated_after=None,
     fields_to_update=None,
 ):
-    # rate_limit=1,  # Run this task at most one per worker per second
     job = job_scheduler(
         function=schedule_get_company_updates,
         function_args=(

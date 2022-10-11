@@ -1,6 +1,5 @@
 import socket
 
-from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.db.models import F, Max, Q
@@ -59,8 +58,8 @@ def schedule_sync_company_with_dnb_rate_limited(
     fields_to_update=None,
     update_descriptor=None,
     simulate=False,
+    max_requests=5,
 ):
-    # rate_limit=1,  # Run this task at most one per worker per second
     job = job_scheduler(
         function=sync_company_with_dnb_rate_limited,
         function_args=(
@@ -68,6 +67,7 @@ def schedule_sync_company_with_dnb_rate_limited(
             fields_to_update,
             update_descriptor,
             simulate,
+            max_requests,
         ),
         max_retries=3,
         queue_name=LONG_RUNNING_QUEUE,
@@ -85,6 +85,7 @@ def sync_company_with_dnb_rate_limited(
     fields_to_update=None,
     update_descriptor=None,
     simulate=False,
+    max_requests=5,
 ):
     """
     A rate limited wrapper around the sync_company_with_dnb task. This task
@@ -97,38 +98,63 @@ def sync_company_with_dnb_rate_limited(
         return
 
     try:
-        # TODO: See what this should be s I am not able to find the documentation
+        client = socket.gethostbyaddr(socket.gethostname())
+        expire_in_seconds = 1
+        logger.info(
+            f'Rate limiting client {client} for company id {company_id} '
+            f'every {expire_in_seconds} second(s) for max {max_requests} requests',
+        )
         with RateLimit(
             resource='sync_company_with_dnb_rate_limited',
-            client=socket.gethostbyaddr(socket.gethostname()),
-            max_requests=4,
-            expire=1,
-            redis_pool=Redis.from_url(settings.REDIS_BASE_URL),
+            client=client,
+            max_requests=max_requests,
+            expire=expire_in_seconds,
+            redis_pool=Redis.from_url(settings.REDIS_BASE_URL).connection_pool,
         ):
             sync_company_with_dnb(
                 company_id=company_id,
                 fields_to_update=fields_to_update,
                 update_descriptor=update_descriptor,
             )
-    except Exception:
-        logger.warning(f'{message} Failed')
+    except Exception as exc_info:
+        logger.warning(f'{message} Failed', exc_info=exc_info)
         raise
 
     logger.info(f'{message} Succeeded')
 
 
-@shared_task(
-    bind=True,
-    acks_late=True,
-    priority=9,
-    queue='long-running',
-)
-def sync_outdated_companies_with_dnb(
-    self,
+def schedule_sync_outdated_companies_with_dnb(
     dnb_modified_on_before,
     fields_to_update=None,
     limit=100,
     simulate=True,
+    max_requests=5,
+):
+    job = job_scheduler(
+        function=sync_outdated_companies_with_dnb,
+        function_args=(
+            dnb_modified_on_before,
+            fields_to_update,
+            limit,
+            simulate,
+            max_requests,
+        ),
+        max_retries=3,
+        queue_name=LONG_RUNNING_QUEUE,
+        job_timeout=HALF_DAY_IN_SECONDS,
+    )
+    logger.info(
+        f'Task {job.id} sync_outdated_companies_with_dnb',
+    )
+    return job
+
+
+def sync_outdated_companies_with_dnb(
+    dnb_modified_on_before,
+    fields_to_update=None,
+    limit=100,
+    simulate=True,
+    max_requests=5,
 ):
     """
     Sync company records with data sourced from DNB which are determined as outdated.
@@ -150,6 +176,7 @@ def sync_outdated_companies_with_dnb(
         schedule_sync_company_with_dnb_rate_limited(
             company_id=company_id,
             fields_to_update=fields_to_update,
-            update_descriptor=f'rq:sync_outdated_companies_with_dnb:{self.request.id}',
+            update_descriptor='rq:sync_outdated_companies_with_dnb:{company_id}',
             simulate=simulate,
+            max_requests=max_requests,
         )

@@ -13,6 +13,7 @@ from reversion.models import Version
 
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
+from datahub.core import serializers
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.dnb_api.tasks import (
     get_company_updates,
@@ -673,7 +674,8 @@ def test_update_company_from_dnb_data_does_not_exist(dnb_response_uk, caplog):
     """
     Test the update_company_from_dnb_data command when the company does not exist in Data Hub.
     """
-    update_company_from_dnb_data(dnb_response_uk['results'][0])
+    with pytest.raises(Company.DoesNotExist):
+        update_company_from_dnb_data(dnb_response_uk['results'][0])
     assert 'Company matching duns_number was not found' in caplog.text
 
 
@@ -686,8 +688,8 @@ def test_update_company_from_dnb_data_fails_validation(dnb_response_uk, caplog):
     CompanyFactory(duns_number='123456789')
     dnb_response_uk['results'][0]['primary_name'] = 'a' * 9999
 
-    update_company_from_dnb_data(dnb_response_uk['results'][0])
-
+    with pytest.raises(serializers.ValidationError):
+        update_company_from_dnb_data(dnb_response_uk['results'][0])
     assert 'Data from D&B did not pass the Data Hub validation checks.' in caplog.text
 
 
@@ -721,13 +723,12 @@ def test_sync_outdated_companies_with_dnb_all_fields(
         dnb_modified_on=existing_company_dnb_modified_on,
     )
     original_company = Company.objects.get(id=company.id)
-    task_result = sync_outdated_companies_with_dnb.apply_async(
-        kwargs={
-            'dnb_modified_on_before': now() + timedelta(days=1),
-            'simulate': False,
-        },
+    sync_outdated_companies_with_dnb(
+        dnb_modified_on_before=now() + timedelta(days=1),
+        simulate=False,
     )
-    assert task_result.successful()
+    expected_message = f'Syncing dnb-linked company "{company.id}" Succeeded'
+    assert expected_message in caplog.text
     company.refresh_from_db()
     uk_country = Country.objects.get(iso_alpha2_code='GB')
     assert model_to_dict_company(company) == {
@@ -760,8 +761,6 @@ def test_sync_outdated_companies_with_dnb_all_fields(
         'uk_region': original_company.uk_region_id,
         'dnb_modified_on': now(),
     }
-    expected_message = f'Syncing dnb-linked company "{company.id}" Succeeded'
-    assert expected_message in caplog.text
 
 
 @pytest.mark.parametrize(
@@ -794,14 +793,11 @@ def test_sync_outdated_companies_with_dnb_partial_fields(
         dnb_modified_on=existing_company_dnb_modified_on,
     )
     original_company = Company.objects.get(id=company.id)
-    task_result = sync_outdated_companies_with_dnb.apply_async(
-        kwargs={
-            'fields_to_update': ['global_ultimate_duns_number'],
-            'dnb_modified_on_before': now() + timedelta(days=1),
-            'simulate': False,
-        },
+    sync_outdated_companies_with_dnb(
+        fields_to_update=['global_ultimate_duns_number'],
+        dnb_modified_on_before=now() + timedelta(days=1),
+        simulate=False,
     )
-    assert task_result.successful()
     company.refresh_from_db()
     assert model_to_dict(company) == {
         **base_company_dict,
@@ -870,16 +866,13 @@ def test_sync_outdated_companies_limit_least_recently_synced_is_updated(
         dnb_modified_on=now() - timedelta(days=2),
     )
 
-    task_result = sync_outdated_companies_with_dnb.apply_async(
-        kwargs={
-            'fields_to_update': ['global_ultimate_duns_number'],
-            'dnb_modified_on_before': now() + timedelta(days=1),
-            'simulate': False,
-            'limit': 1,
-        },
+    sync_outdated_companies_with_dnb(
+        fields_to_update=['global_ultimate_duns_number'],
+        dnb_modified_on_before=now() + timedelta(days=1),
+        simulate=False,
+        limit=1,
     )
 
-    assert task_result.successful()
     company_1.refresh_from_db()
     company_2.refresh_from_db()
     # We expect company_1 to be unmodified
@@ -917,18 +910,16 @@ def test_sync_outdated_companies_limit_most_recently_interacted_updated(
         date=now() - timedelta(days=1),
     )
 
-    task_result = sync_outdated_companies_with_dnb.apply_async(
-        kwargs={
-            'fields_to_update': ['global_ultimate_duns_number'],
-            'dnb_modified_on_before': now() + timedelta(days=1),
-            'simulate': False,
-            'limit': 1,
-        },
+    sync_outdated_companies_with_dnb(
+        fields_to_update=['global_ultimate_duns_number'],
+        dnb_modified_on_before=now() + timedelta(days=1),
+        simulate=False,
+        limit=1,
+        max_requests=10,
     )
 
     company_least_recent_interaction.refresh_from_db()
     company_most_recent_interaction.refresh_from_db()
-    assert task_result.successful()
     # We expect the least recently interacted company to be unmodified
     assert company_least_recent_interaction.dnb_modified_on == now() - timedelta(days=1)
     # We expect most recently interacted company to be modified
@@ -950,16 +941,13 @@ def test_sync_outdated_companies_nothing_to_update(
     )
     original_company = Company.objects.get(id=company.id)
 
-    task_result = sync_outdated_companies_with_dnb.apply_async(
-        kwargs={
-            'fields_to_update': ['global_ultimate_duns_number'],
-            'dnb_modified_on_before': now() - timedelta(days=1),
-            'simulate': False,
-            'limit': 1,
-        },
+    sync_outdated_companies_with_dnb(
+        fields_to_update=['global_ultimate_duns_number'],
+        dnb_modified_on_before=now() - timedelta(days=1),
+        simulate=False,
+        limit=1,
     )
 
-    assert task_result.successful()
     company.refresh_from_db()
     # We expect the company to be unmodified
     assert company.dnb_modified_on == original_company.dnb_modified_on
@@ -977,14 +965,11 @@ def test_sync_outdated_companies_simulation(caplog):
     )
     original_company = Company.objects.get(id=company.id)
 
-    task_result = sync_outdated_companies_with_dnb.apply_async(
-        kwargs={
-            'fields_to_update': ['global_ultimate_duns_number'],
-            'dnb_modified_on_before': now() - timedelta(days=1),
-        },
+    sync_outdated_companies_with_dnb(
+        fields_to_update=['global_ultimate_duns_number'],
+        dnb_modified_on_before=now() - timedelta(days=1),
     )
 
-    assert task_result.successful()
     company.refresh_from_db()
     # We expect the company to be unmodified
     assert company.dnb_modified_on == original_company.dnb_modified_on
@@ -1009,14 +994,11 @@ def test_sync_outdated_companies_sync_task_failure_logs_error(caplog, monkeypatc
         mocked_sync_company_with_dnb,
     )
 
-    task_result = sync_outdated_companies_with_dnb.apply_async(
-        kwargs={
-            'fields_to_update': ['global_ultimate_duns_number'],
-            'dnb_modified_on_before': now() - timedelta(days=1),
-            'simulate': False,
-        },
+    sync_outdated_companies_with_dnb(
+        fields_to_update=['global_ultimate_duns_number'],
+        dnb_modified_on_before=now() - timedelta(days=1),
+        simulate=False,
     )
 
-    assert task_result.successful()
     expected_message = f'Syncing dnb-linked company "{company.id}" Failed'
     assert expected_message in caplog.text
