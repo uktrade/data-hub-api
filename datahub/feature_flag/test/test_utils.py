@@ -4,7 +4,11 @@ import pytest
 from django.http import Http404
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.feature_flag.test.factories import FeatureFlagFactory, UserFeatureFlagFactory
+from datahub.feature_flag.test.factories import (
+    FeatureFlagFactory,
+    UserFeatureFlagFactory,
+    UserFeatureFlagGroupFactory,
+)
 from datahub.feature_flag.utils import (
     feature_flagged_view,
     is_feature_flag_active,
@@ -62,28 +66,50 @@ class TestFeatureFlaggedView:
 
 
 @pytest.mark.parametrize(
-    'code,user,is_active,lookup,expected',
+    'code,assigned,is_active,lookup,expected',
     (
-        ('test_user_flag', 'flagged_user', True, 'test_user_flag', True),
-        ('test_user_flag', 'unflagged_user', True, 'test_user_flag', False),
-        ('test_user_flag', 'flagged_user', False, 'test_user_flag', False),
-        ('test_user_flag', 'unflagged_user', False, 'test_user_flag', False),
-        ('', 'unflagged_user', None, 'test_user_flag', False),
-        ('test_user_flag', 'flagged_user', True, 'test', False),
-        ('test_user_flag', 'unflagged_user', True, 'test', False),
+        ('test_user_flag', True, True, 'test_user_flag', True),
+        ('test_user_flag', False, True, 'test_user_flag', False),
+        ('test_user_flag', True, False, 'test_user_flag', False),
+        ('test_user_flag', False, False, 'test_user_flag', False),
+        ('other', False, None, 'test_user_flag', False),
+        ('test_user_flag', True, True, 'test', False),
+        ('test_user_flag', False, True, 'test', False),
     ),
 )
-def test_is_user_feature_flag(code, user, is_active, lookup, expected):
-    """Tests if is_user_feature_flag returns correct state of feature flag."""
-    if code != '':
-        flag = UserFeatureFlagFactory(code=code, is_active=is_active)
+def test_is_user_feature_flag(code, assigned, is_active, lookup, expected):
+    """Tests if is_user_feature_flag_active returns correct state of feature flag."""
+    advisor = AdviserFactory()
 
-    if user == 'flagged_user':
-        advisor = AdviserFactory()
+    if assigned:
+        flag = UserFeatureFlagFactory(code=code, is_active=is_active)
         advisor.features.set([flag])
 
-    if user == 'unflagged_user':
-        advisor = AdviserFactory()
+    result = is_user_feature_flag_active(lookup, advisor)
+    assert result is expected
+
+
+@pytest.mark.parametrize(
+    'code,assigned,is_active,lookup,expected',
+    (
+        ('test_user_flag', True, True, 'test_user_flag', True),
+        ('test_user_flag', False, True, 'test_user_flag', False),
+        ('test_user_flag', True, False, 'test_user_flag', False),
+        ('test_user_flag', False, False, 'test_user_flag', False),
+        ('other', False, None, 'test_user_flag', False),
+        ('test_user_flag', True, True, 'test', False),
+        ('test_user_flag', False, True, 'test', False),
+    ),
+)
+def test_is_user_feature_flag_group(code, assigned, is_active, lookup, expected):
+    """Tests if is_user_feature_flag_active returns correct state of feature flag group."""
+    advisor = AdviserFactory()
+
+    if assigned:
+        flag = UserFeatureFlagFactory(code=code, is_active=True)
+        group = UserFeatureFlagGroupFactory(code='group', is_active=is_active)
+        group.features.set([flag])
+        advisor.feature_groups.set([group])
 
     result = is_user_feature_flag_active(lookup, advisor)
     assert result is expected
