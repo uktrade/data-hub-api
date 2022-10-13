@@ -59,6 +59,7 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
             'OTHER',
             {
                 'fields': (
+                    'feature_groups',
                     'features',
                 ),
             },
@@ -83,7 +84,7 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
         '=dit_team__pk',
         'dit_team__name',
     )
-    filter_horizontal = ('features',)
+    filter_horizontal = ('feature_groups', 'features')
     ordering = ('email',)
 
     def get_urls(self):

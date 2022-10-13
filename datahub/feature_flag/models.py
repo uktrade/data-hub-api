@@ -48,3 +48,20 @@ class UserFeatureFlag(BaseModel):
     def __str__(self):
         """Human readable representation."""
         return f'{self.code} ({"active" if self.is_active else "inactive"})'
+
+
+class UserFeatureFlagGroup(BaseModel):
+    code = models.CharField(unique=True, max_length=MAX_LENGTH)
+    features = models.ManyToManyField(
+        UserFeatureFlag,
+        blank=True,
+    )
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('code',)
+
+    def __str__(self):
+        """Human readable representation."""
+        return f'{self.code} ({"active" if self.is_active else "inactive"})'

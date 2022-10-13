@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 
 from datahub.core.test.factories import GroupFactory, PermissionFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
-from datahub.feature_flag.test.factories import UserFeatureFlagFactory
+from datahub.feature_flag.test.factories import UserFeatureFlagFactory, UserFeatureFlagGroupFactory
 from datahub.metadata.test.factories import TeamFactory, TeamRoleFactory
 
 
@@ -87,10 +87,36 @@ class TestUserView(APITestMixin):
         """Active features should include the user's selected active features."""
         feature_flag = UserFeatureFlagFactory(code='test-feature', is_active=True)
         inactive_feature_flag = UserFeatureFlagFactory(code='inactive-feature', is_active=False)
+
+        active_feature_flag_group = UserFeatureFlagGroupFactory(code='test-group', is_active=True)
+
+        active_group_feature_flag = UserFeatureFlagFactory(
+            code='active-group-feature',
+            is_active=True,
+        )
+        inactive_group_feature_flag = UserFeatureFlagFactory(
+            code='inactive-group-feature',
+            is_active=False,
+        )
+        active_feature_flag_group.features.add(
+            active_group_feature_flag,
+            inactive_group_feature_flag,
+        )
+        inactive_feature_flag_group = UserFeatureFlagGroupFactory(
+            code='test-inactive-group',
+            is_active=False,
+        )
+        inactive_feature_flag_group.features.add(
+            UserFeatureFlagFactory(
+                code='irrelevant', is_active=True,
+            ),
+        )
+
         UserFeatureFlagFactory(code='another-feature', is_active=True)
 
         user = create_test_user()
         user.features.add(feature_flag, inactive_feature_flag)
+        user.feature_groups.add(active_feature_flag_group, inactive_feature_flag_group)
 
         api_client = self.create_api_client(user=user)
 
@@ -102,4 +128,4 @@ class TestUserView(APITestMixin):
         response_data = response.json()
 
         assert 'active_features' in response_data
-        assert response_data['active_features'] == ['test-feature']
+        assert set(response_data['active_features']) == {'test-feature', 'active-group-feature'}

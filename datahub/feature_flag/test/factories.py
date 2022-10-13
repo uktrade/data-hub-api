@@ -28,3 +28,10 @@ class UserFeatureFlagFactory(BaseFeatureFlagFactory):
 
     class Meta:
         model = 'feature_flag.UserFeatureFlag'
+
+
+class UserFeatureFlagGroupFactory(BaseFeatureFlagFactory):
+    """Factory for creating a user feature flag group."""
+
+    class Meta:
+        model = 'feature_flag.UserFeatureFlagGroup'
