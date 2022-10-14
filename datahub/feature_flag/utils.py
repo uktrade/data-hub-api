@@ -20,7 +20,18 @@ def is_user_feature_flag_active(code, user):
 
     If user feature flag doesn't exist, it returns False.
     """
-    return user.features.filter(code=code, is_active=True).exists()
+    params = {
+        'code': code,
+        'is_active': True,
+    }
+
+    return any([
+        *[
+            feature_group.features.filter(**params).exists()
+            for feature_group in user.feature_groups.filter(is_active=True)
+        ],
+        user.features.filter(**params).exists(),
+    ])
 
 
 def feature_flagged_view(code):
