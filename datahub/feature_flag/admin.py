@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from datahub.core.admin import BaseModelAdminMixin
-from datahub.feature_flag.models import FeatureFlag, UserFeatureFlag
+from datahub.feature_flag.models import FeatureFlag, UserFeatureFlag, UserFeatureFlagGroup
 
 
 class BaseFeatureFlagAdmin(BaseModelAdminMixin, admin.ModelAdmin):
@@ -30,3 +30,10 @@ class FeatureFlagAdmin(BaseFeatureFlagAdmin):
 @admin.register(UserFeatureFlag)
 class UserFeatureFlagAdmin(BaseFeatureFlagAdmin):
     """User feature flag admin."""
+
+
+@admin.register(UserFeatureFlagGroup)
+class UserFeatureFlagGroupAdmin(BaseFeatureFlagAdmin):
+    """User feature flag group admin."""
+
+    filter_horizontal = ('features',)

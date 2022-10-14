@@ -104,6 +104,14 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
             "User's feature flags. Note that the feature flag also needs to be set to active."
         ),
     )
+    feature_groups = models.ManyToManyField(
+        'feature_flag.UserFeatureFlagGroup',
+        related_name='advisers',
+        blank=True,
+        help_text=(
+            "User's feature flag groups. Note that the group also needs to be set to active."
+        ),
+    )
 
     objects = AdviserManager()
 
@@ -162,4 +170,10 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         """
         :returns: Features that are currently active.
         """
-        return self.features.filter(is_active=True).values_list('code', flat=True)
+        features = []
+        for feature_group in self.feature_groups.filter(is_active=True):
+            features += feature_group.features.filter(is_active=True).values_list(
+                'code', flat=True,
+            )
+        features += self.features.filter(is_active=True).values_list('code', flat=True)
+        return list(set(features))
