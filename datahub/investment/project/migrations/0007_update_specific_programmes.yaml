@@ -1,0 +1,6 @@
+- model: investment.specificprogramme
+  pk: 2331896c-f030-4d2e-b898-e0c1cc9bc638
+  fields: { disabled_on: null, name: Sovereign Investment Partnership Capital }
+- model: investment.specificprogramme
+  pk: d1ec420e-9cd9-4a6b-a8c1-179257f7ffd8
+  fields: { disabled_on: null, name: Investment Large Capital }
