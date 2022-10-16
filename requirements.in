@@ -64,4 +64,4 @@ rq==1.11.1
 rq-scheduler==0.11.0
 
 # temporary fix to allow deployments until https://github.com/cloudfoundry/python-buildpack/issues/574 is fixed.
-setuptools==65.4.1
+setuptools==65.5.0
