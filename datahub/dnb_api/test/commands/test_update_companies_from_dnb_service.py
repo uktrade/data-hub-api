@@ -13,7 +13,7 @@ def mock_get_company_updates(monkeypatch):
     mocked_get_company_updates = mock.Mock()
     monkeypatch.setattr(
         'datahub.dnb_api.management.commands.update_companies_from_dnb_service'
-        '.get_company_updates',
+        '.schedule_get_company_updates',
         mocked_get_company_updates,
     )
     return mocked_get_company_updates
