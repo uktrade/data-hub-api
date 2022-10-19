@@ -7,6 +7,7 @@ from rq import (
     SimpleWorker,
     Worker,
 )
+from rq.job import Job
 from rq.registry import BaseRegistry
 from rq_scheduler import Scheduler
 
@@ -90,26 +91,34 @@ class DataHubScheduler:
         self,
         queue_name: str,
     ):
-        queue = RqQueue(
-            name=queue_name,
-            is_async=self.is_async,
-            connection=self._connection,
-        )
+        queue = self.get_queue(queue_name)
         return queue.count
 
     def failed_count(
         self,
         queue_name: str,
     ):
+        queue = self.get_queue(queue_name)
+        return queue.failed_job_registry.count
+
+    def scheduled_count(
+        self,
+        queue_name: str,
+    ):
+        queue = self.get_queue(queue_name)
+        return queue.scheduled_job_registry.count
+
+    def cron_job_count(self):
+        return self._scheduler.count()
+
+    def get_queue(self, queue_name):
         queue = RqQueue(
             name=queue_name,
             is_async=self.is_async,
             connection=self._connection,
         )
-        return queue.failed_job_registry.count
 
-    def cron_job_count(self):
-        return self._scheduler.count()
+        return queue
 
     def cancel_cron_jobs(self):
         jobs = self._scheduler.get_jobs()
@@ -124,7 +133,6 @@ class DataHubScheduler:
         queue_name: str,
         queue_state: str = 'queued',
     ):
-
         queue = RqQueue(
             name=queue_name,
             is_async=self.is_async,
@@ -135,6 +143,9 @@ class DataHubScheduler:
             return queue.count
         if queue_state == 'failed':
             registry = queue.failed_job_registry
+            return self._delete_jobs(registry)
+        if queue_state == 'scheduled':
+            registry = queue.scheduled_job_registry
             return self._delete_jobs(registry)
 
     def _delete_jobs(self, registry: BaseRegistry):
@@ -147,6 +158,10 @@ class DataHubScheduler:
 
     def work(self, *queues: str, with_scheduler: bool = False):
         return self._worker_strategy.process_queues(queues, with_scheduler)
+
+    def job(self, job_id) -> Job:
+        job = Job.fetch(job_id, self._connection)
+        return job
 
     def clear(self):
         for queue in self._queues:

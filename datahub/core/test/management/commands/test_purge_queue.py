@@ -37,7 +37,7 @@ class TestPurgeQueueCommandShould:
 
         assert str(excinfo.value) == (
             "Error: argument --queue_state: invalid choice: 'finished' "
-            "(choose from 'queued', 'failed')"
+            "(choose from 'queued', 'failed', 'scheduled')"
         )
 
     def test_purging_queued_queues_succeeds(self, monkeypatch):

@@ -7,7 +7,7 @@ from datahub.core.queues.scheduler import DataHubScheduler
 logger = getLogger(__name__)
 
 SUPPORTED_QUEUE_NAMES = ['long-running', 'short-running', 'test-rq-health']
-SUPPORTED_QUEUE_STATES = ['queued', 'failed']
+SUPPORTED_QUEUE_STATES = ['queued', 'failed', 'scheduled']
 
 
 class Command(BaseCommand):
