@@ -18,6 +18,7 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
                 'fields': (
                     'email',
                     'sso_email_user_id',
+                    'sso_user_id',
                     'password',
                 ),
             },
@@ -81,6 +82,7 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
         'last_name',
         'email',
         'sso_email_user_id',
+        'sso_user_id',
         '=dit_team__pk',
         'dit_team__name',
     )
