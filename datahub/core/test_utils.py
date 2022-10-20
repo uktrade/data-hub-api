@@ -1,5 +1,6 @@
 import json
 import os
+import uuid
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 from operator import attrgetter
@@ -131,6 +132,7 @@ def create_test_user(permission_codenames=(), password=None, **user_attrs):
         'last_name': faker.last_name(),
         'email': faker.email(),
         'sso_email_user_id': faker.email(domain='id.test'),
+        'sso_user_id': uuid.uuid4(),
         'date_joined': now(),
     }
     user_defaults.update(user_attrs)

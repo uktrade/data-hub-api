@@ -55,6 +55,7 @@ class TestUserView(APITestMixin):
 
         assert response_data == {
             'id': str(user_test.id),
+            'sso_user_id': str(user_test.sso_user_id),
             'name': user_test.name,
             'last_login': None,
             'first_name': user_test.first_name,
