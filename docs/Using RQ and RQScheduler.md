@@ -21,6 +21,9 @@ From the rq docs:
     - This is the main interface to enqueue jobs. Based on the arguments it will either call DataHubScheduler’s `enqueue` or `cron` functions. 
 - [DataHubScheduler](https://github.com/uktrade/data-hub-api/blob/main/datahub/core/queues/scheduler.py)
     - This is the class to ensure that we start workers and enqueue or schedule jobs in a consistent way.
+- Rate Limit Library
+    - [Python redis rate limit library](https://github.com/EvoluxBR/python-redis-rate-limit) to helping to enforce a set rate to help with reducing or throttling the load, especially for usage with 3rd party API's that enforce this.
+
 
 ## How to schedule a job
 
@@ -51,14 +54,50 @@ The core service for facilitating RQ exported information is [RQ exporter](https
 
 ## Troubleshooting
 
-Troubleshooting
 1. Jobs are being queued but not started
 
     Means the service to work those queues has not been started or the started queue is blocking that from being started.
 
 1. Jobs are failing
-    ???
+    These will stay failed for a long duration for the purposes of flagging issues, potentially writing code to requeue failed jobs and realign jobs that can pass under different circumstances and jobs that will never pass.
 
 1. Scheduled jobs are being repeated/run too many times
 
-    Cron jobs need to be canceled or they will run forever even if the app has restarted/been redeployed. Hence the `cancel_existing_cron_jobs` in the `cron-scheduler`. 
+    Cron jobs need to be canceled or they will run forever even if the app has restarted/been redeployed. Hence the `cancel_existing_cron_jobs` in the `cron-scheduler`. NOTE: this boot up file is also used to configure all the cron jobs that need configuration.
+
+1. Check services are running 
+
+    Check docker dashboard to make sure all services are runnign as expected when jobs are set, and make sure if you have any jobs in environment variables, that you enable the variables  to make sure the job gets scheduled.
+
+## Utilities
+
+### Monitoring
+
+1. **Grafana**, locally on localhost:4000, under **RQ Dashboard**, can help with logging queues and statistics that get run or scheduled by RQ. Queus that get run will either pass or fail. NOTE: time to live expires data on redis so sometimes the statistics seem off over longer periods but fails persist for a long duration.
+
+    ![Grafana](./grafana.png)
+
+1. **RQ Monitoring** is a dashboard, locally on http://localhost:9181/, helps with seeing the same details on a more granual level, including the functionality to purge, depending on the queue. Navigate to jobs for clearing and visualising the data that is transmitted. Navigate to workers to see worker information. Note: schedule information is not available and cron sheduler data is not visible either, can only be seen in redis.
+
+    ![image-20221020083607636](./rq-monitor.png)
+
+1. Dev tools like checking queues and rate limiting, can be done through a command tool, see help for more details.
+
+    ```
+    
+    ```
+
+    
+
+### Purging queues
+
+Sometimes this is necessary when developing jobs, when you realise that something is wrong or not intentional, and you have a job generating many jobs that will always fail. Above is the RQ monitoring tool for doing it locally. For production, there is a python django command tool for purging queues, see purge_queue help for more details.
+
+```bash
+python manage.py purge_queue long-running --queue_state queued
+```
+
+### Tracing issues
+
+**Elk** is the esasiest way to trace and monitor problems, by correlation ids or job ids, so be sure to add logging for traceability. NOTE: when logging a large stream of data, sometimes data gets lost based on the stream restriction, so don't be alarmed if your data is missing, just look at the result of what you were processing based on a summary of expectations logged.
+
