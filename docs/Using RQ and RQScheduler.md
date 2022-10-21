@@ -7,37 +7,41 @@ From the rq docs:
 > A job is a Python object, representing a function that is invoked asynchronously in a worker (background) process. Any Python function can be invoked asynchronously, by simply pushing a reference to the function and its arguments onto a queue. This is called enqueueing.
 
 ### Generic concepts to understand:
+
 - Workers
-    - These are services (when running on GovPaaS) or containers (when running locally on Docker). They loop through their assigned queues looking for jobs to process. They are started from the scripts `long-running-worker.py` and `short-running-worker.py`.
+  - These are services (when running on GovPaaS) or containers (when running locally on Docker). They loop through their assigned queues looking for jobs to process. They are started from the scripts `long-running-worker.py` and `short-running-worker.py`.
 - Queues
-    - These are just like real life queues, identified by unique strings (e.g. ‘long-running’). Jobs can be ‘enqueued’  on them, to be run asynchronously in order.
+  - These are just like real life queues, identified by unique strings (e.g. ‘long-running’). Jobs can be ‘enqueued’ on them, to be run asynchronously in order.
 - Jobs
-    - A job represents a function to be called by the worker.
+  - A job represents a function to be called by the worker.
 
 ### Datahub specific code:
+
 ![job scheduler sequence diagram](jobSchedulerSequence.png)
 
 - [Job_scheduler](https://github.com/uktrade/data-hub-api/blob/main/datahub/core/queues/job_scheduler.py)
-    - This is the main interface to enqueue jobs. Based on the arguments it will either call DataHubScheduler’s `enqueue` or `cron` functions. 
+  - This is the main interface to enqueue jobs. Based on the arguments it will either call DataHubScheduler’s `enqueue` or `cron` functions.
 - [DataHubScheduler](https://github.com/uktrade/data-hub-api/blob/main/datahub/core/queues/scheduler.py)
-    - This is the class to ensure that we start workers and enqueue or schedule jobs in a consistent way.
+  - This is the class to ensure that we start workers and enqueue or schedule jobs in a consistent way.
 - Rate Limit Library
-    - [Python redis rate limit library](https://github.com/EvoluxBR/python-redis-rate-limit) to helping to enforce a set rate to help with reducing or throttling the load, especially for usage with 3rd party API's that enforce this.
-
+  - [Python redis rate limit library](https://github.com/EvoluxBR/python-redis-rate-limit) to helping to enforce a set rate to help with reducing or throttling the load, especially for usage with 3rd party API's that enforce this.
 
 ## How to schedule a job
 
 First decide if it's a one off job, or you want to it to repeat regularly.
 
-### enqueue 
+### enqueue
+
 (schedule to run when it reaches the front of a queue)
+
 1. Call `job_scheduler()` with the function you want to get called, e.g. `job_scheduler(hello_world)` some more [examples are in the tests](https://github.com/uktrade/data-hub-api/blob/main/datahub/core/test/queues/test_job_scheduler.py)
-1. You can configure args and kwargs for the function, and override the default queue, set intervals etc. 
+1. You can configure args and kwargs for the function, and override the default queue, set intervals etc.
 
 ### cron
-(repeat job at set intervals/times)
-1. The same as step 1 above, but pass in a `cron` value and it will repeat accordingly. There are [constants for some often used cron values.](https://github.com/uktrade/data-hub-api/blob/main/datahub/core/queues/cron_constants.py)
 
+(repeat job at set intervals/times)
+
+1. The same as step 1 above, but pass in a `cron` value and it will repeat accordingly. There are [constants for some often used cron values.](https://github.com/uktrade/data-hub-api/blob/main/datahub/core/queues/cron_constants.py)
 
 ## Monitoring RQ locally
 
@@ -56,18 +60,18 @@ The core service for facilitating RQ exported information is [RQ exporter](https
 
 1. Jobs are being queued but not started
 
-    Means the service to work those queues has not been started or the started queue is blocking that from being started.
+   Means the service to work those queues has not been started or the started queue is blocking that from being started.
 
 1. Jobs are failing
-    These will stay failed for a long duration for the purposes of flagging issues, potentially writing code to requeue failed jobs and realign jobs that can pass under different circumstances and jobs that will never pass.
+   These will stay failed for a long duration for the purposes of flagging issues, potentially writing code to requeue failed jobs and realign jobs that can pass under different circumstances and jobs that will never pass.
 
 1. Scheduled jobs are being repeated/run too many times
 
-    Cron jobs need to be canceled or they will run forever even if the app has restarted/been redeployed. Hence the `cancel_existing_cron_jobs` in the `cron-scheduler`. NOTE: this boot up file is also used to configure all the cron jobs that need configuration.
+   Cron jobs need to be canceled or they will run forever even if the app has restarted/been redeployed. Hence the `cancel_existing_cron_jobs` in the `cron-scheduler`. NOTE: this boot up file is also used to configure all the cron jobs that need configuration.
 
-1. Check services are running 
+1. Check services are running
 
-    Check docker dashboard to make sure all services are runnign as expected when jobs are set, and make sure if you have any jobs in environment variables, that you enable the variables  to make sure the job gets scheduled.
+   Check docker dashboard to make sure all services are runnign as expected when jobs are set, and make sure if you have any jobs in environment variables, that you enable the variables to make sure the job gets scheduled.
 
 ## Utilities
 
@@ -75,19 +79,17 @@ The core service for facilitating RQ exported information is [RQ exporter](https
 
 1. **Grafana**, locally on localhost:4000, under **RQ Dashboard**, can help with logging queues and statistics that get run or scheduled by RQ. Queus that get run will either pass or fail. NOTE: time to live expires data on redis so sometimes the statistics seem off over longer periods but fails persist for a long duration.
 
-    ![Grafana](./grafana.png)
+   ![Grafana](./grafana.png)
 
 1. **RQ Monitoring** is a dashboard, locally on http://localhost:9181/, helps with seeing the same details on a more granual level, including the functionality to purge, depending on the queue. Navigate to jobs for clearing and visualising the data that is transmitted. Navigate to workers to see worker information. Note: schedule information is not available and cron sheduler data is not visible either, can only be seen in redis.
 
-    ![image-20221020083607636](./rq-monitor.png)
+   ![image-20221020083607636](./rq-monitor.png)
 
 1. Dev tools like checking queues and rate limiting, can be done through a command tool, see help for more details.
 
-    ```
-    
-    ```
-
-    
+   ```bash
+   python manage.py test_rq --generated_jobs 100000
+   ```
 
 ### Purging queues
 
@@ -101,3 +103,14 @@ python manage.py purge_queue long-running --queue_state queued
 
 **Elk** is the esasiest way to trace and monitor problems, by correlation ids or job ids, so be sure to add logging for traceability. NOTE: when logging a large stream of data, sometimes data gets lost based on the stream restriction, so don't be alarmed if your data is missing, just look at the result of what you were processing based on a summary of expectations logged.
 
+### Exponential backoff calculator
+
+Sometimes you need to calculate intervals for setting specific values at irregular times. There are several functional ways of doing this, can configure the **job_scheduler** with _retry_backoff=True or 60_. There is an exponential_backoff function to help do that by function and finally there is a website, [exponentialbackoffcalculator.com](https://exponentialbackoffcalculator.com/) that can help configure this by different exponentail values, and then you can simply configure the _retry_intervals_ on job_scheduler.
+
+![Exponential backoff calculator](./exponential_backoff-calculator.png)
+
+### Cron settings
+
+The cron expression is made of five fields. Each field can have the following values. [crontab.cronhub.io](https://crontab.cronhub.io/) is a great way to visualise the settings created.
+
+![image-20221021064804187](./cronhub.png)
