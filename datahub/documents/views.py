@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet
 from datahub.documents.exceptions import TemporarilyUnavailableException
-from datahub.documents.tasks import delete_document
+from datahub.documents.tasks import schedule_delete_document
 
 
 class BaseEntityDocumentModelViewSet(CoreViewSet):
@@ -54,4 +54,4 @@ class BaseEntityDocumentModelViewSet(CoreViewSet):
         """
         instance.document.mark_deletion_pending()
 
-        delete_document.apply_async(args=(instance.document.pk,))
+        schedule_delete_document(instance.document.pk)

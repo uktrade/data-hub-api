@@ -4,13 +4,21 @@ from celery import shared_task
 from django.db import transaction
 from django_pglocks import advisory_lock
 
+from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.documents.av_scan import perform_virus_scan
 from datahub.documents.utils import get_document_by_pk, perform_delete_document
 
 logger = getLogger(__name__)
 
 
-@shared_task
+def schedule_delete_document(document_pk):
+    job = job_scheduler(
+        function=delete_document,
+        function_args=(document_pk),
+    )
+    logger.info(f'Task {job.id} schedule_delete_document')
+
+
 @transaction.atomic
 def delete_document(document_pk):
     """Handle document delete."""
