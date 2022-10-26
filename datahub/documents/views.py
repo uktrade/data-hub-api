@@ -47,7 +47,7 @@ class BaseEntityDocumentModelViewSet(CoreViewSet):
 
     def perform_destroy(self, instance):
         """
-        Marks document with pending_delete status and schedules Celery task that
+        Marks document with pending_delete status and schedules an RQ job that
         performs deletion of corresponding s3 file, document and entity_document.
 
         Deletion of document will cascade to entity document.

@@ -14,9 +14,12 @@ logger = getLogger(__name__)
 def schedule_delete_document(document_pk):
     job = job_scheduler(
         function=delete_document,
-        function_args=(document_pk),
+        function_args=(document_pk,),
     )
+    import pprint
+    pprint.pprint(f'Task {job.id} schedule_delete_document')
     logger.info(f'Task {job.id} schedule_delete_document')
+    return job
 
 
 @transaction.atomic
