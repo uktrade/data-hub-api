@@ -1,6 +1,5 @@
 from logging import getLogger
 
-from celery import shared_task
 from django.db import transaction
 from django_pglocks import advisory_lock
 
@@ -34,7 +33,17 @@ def delete_document(document_pk):
         raise
 
 
-@shared_task
+def schedule_virus_scan_document(document_pk: str):
+    job = job_scheduler(
+        function=virus_scan_document,
+        function_args=(document_pk,),
+    )
+    import pprint
+    pprint.pprint(f'Task {job.id} schedule_virus_scan_document')
+    logger.info(f'Task {job.id} schedule_virus_scan_document')
+    return job
+
+
 def virus_scan_document(document_pk: str):
     """Virus scans an uploaded document.
 

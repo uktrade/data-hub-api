@@ -1,6 +1,6 @@
 import datetime
 from operator import attrgetter, itemgetter
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 from uuid import uuid4
 
 import pytest
@@ -516,10 +516,9 @@ class TestEvidenceDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_503_SERVICE_UNAVAILABLE
 
     @pytest.mark.parametrize('permissions,associated,allowed', CHANGE_PERMISSIONS)
-    @patch('datahub.documents.tasks.virus_scan_document.apply_async')
     def test_document_upload_schedule_virus_scan(
         self,
-        virus_scan_document_apply_async,
+        monkeypatch,
         permissions,
         associated,
         allowed,
@@ -529,6 +528,14 @@ class TestEvidenceDocumentViews(APITestMixin):
         Checks that a virus scan of the document was scheduled. Virus scanning is
         tested separately in the documents app.
         """
+
+        """Tests schedule of document deletion."""
+        mock_schedule_virus_scan_document = Mock()
+        monkeypatch.setattr(
+            'datahub.documents.tasks.schedule_virus_scan_document',
+            mock_schedule_virus_scan_document,
+        )
+
         user = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
         entity_document = create_evidence_document(user, associated=associated)
 
@@ -582,13 +589,19 @@ class TestEvidenceDocumentViews(APITestMixin):
             'modified_on': format_date_or_datetime(entity_document.modified_on),
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
-        virus_scan_document_apply_async.assert_called_once_with(
-            args=(str(entity_document.document.pk), ),
+        mock_schedule_virus_scan_document.assert_called_once_with(
+            str(entity_document.document.pk)
         )
 
     @pytest.mark.parametrize('permissions,associated,allowed', DELETE_PERMISSIONS)
-    @patch('datahub.documents.tasks.delete_document.apply_async')
-    def test_document_delete(self, delete_document, permissions, associated, allowed):
+    def test_document_delete(self, monkeypatch, permissions, associated, allowed):
+        """Tests schedule of document deletion."""
+        mock_schedule_delete_document = Mock()
+        monkeypatch.setattr(
+            'datahub.documents.views.schedule_delete_document',
+            mock_schedule_delete_document,
+        )
+
         """Tests document deletion."""
         user = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
         entity_document = create_evidence_document(user, associated=associated)
@@ -617,10 +630,16 @@ class TestEvidenceDocumentViews(APITestMixin):
             return
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        delete_document.assert_called_once_with(args=(document_pk, ))
+        mock_schedule_delete_document.assert_called_once_with(document_pk)
 
-    @patch('datahub.documents.tasks.delete_document.apply_async')
-    def test_document_delete_without_permission(self, delete_document):
+    def test_document_delete_without_permission(self, monkeypatch):
+        """Tests schedule of document deletion."""
+        mock_schedule_delete_document = Mock()
+        monkeypatch.setattr(
+            'datahub.documents.views.schedule_delete_document',
+            mock_schedule_delete_document,
+        )
+
         """Tests user can't delete document without permissions."""
         entity_document = create_evidence_document()
         entity_document.document.mark_scan_scheduled()
@@ -637,17 +656,23 @@ class TestEvidenceDocumentViews(APITestMixin):
         api_client = self.create_api_client(user=user)
         response = api_client.delete(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        assert delete_document.called is False
+        assert mock_schedule_delete_document.called is False
 
     @pytest.mark.parametrize('permissions,associated,allowed', DELETE_PERMISSIONS)
-    @patch('datahub.documents.tasks.delete_document.apply_async')
     def test_document_delete_creates_user_event_log(
         self,
-        delete_document,
+        monkeypatch,
         permissions,
         associated,
         allowed,
     ):
+        """Tests schedule of document deletion."""
+        mock_schedule_delete_document = Mock()
+        monkeypatch.setattr(
+            'datahub.documents.views.schedule_delete_document',
+            mock_schedule_delete_document,
+        )
+
         """Tests document deletion creates user event log."""
         user = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
         entity_document = create_evidence_document(user, associated=associated)
@@ -707,7 +732,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             return
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        delete_document.assert_called_once_with(args=(document_pk, ))
+        mock_schedule_delete_document.assert_called_once_with(document_pk)
 
         assert UserEvent.objects.count() == 1
 
