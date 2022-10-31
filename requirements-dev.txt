@@ -261,7 +261,7 @@ ptyprocess==0.7.0
 pure-eval==0.2.2
     # via stack-data
 py==1.11.0
-    # via pytest-forked
+    # via pytest
 pycodestyle==2.8.0
     # via
     #   flake8
@@ -298,15 +298,12 @@ pytest==7.2.0
     #   pylint-pytest
     #   pytest-cov
     #   pytest-django
-    #   pytest-forked
     #   pytest-xdist
 pytest-cov==4.0.0
     # via -r requirements-dev.in
 pytest-django==4.5.2
     # via -r requirements-dev.in
-pytest-forked==1.4.0
-    # via pytest-xdist
-pytest-xdist==2.5.0
+pytest-xdist==3.0.2
     # via -r requirements-dev.in
 python-dateutil==2.8.2
     # via
