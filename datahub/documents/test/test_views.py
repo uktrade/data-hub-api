@@ -1,6 +1,6 @@
 """Tests for generic document views."""
 
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 from django.test.utils import override_settings
@@ -150,8 +150,7 @@ class TestDocumentViews(APITestMixin):
             args=(str(entity_document.document.pk),),
         )
 
-    def test_document_delete(self, monkeypatch, test_urls):
-        """Tests document deletion."""
+    def mock_document_upload(self):
         entity_document = MyEntityDocument.objects.create(
             original_filename='test.txt',
             my_field='cats can recognise human voices',
@@ -160,7 +159,26 @@ class TestDocumentViews(APITestMixin):
         url = reverse('test-document-item', kwargs={'entity_document_pk': entity_document.pk})
         response = self.api_client.delete(url)
 
+        return response, entity_document
+
+    def test_document_delete(self, monkeypatch, test_urls):
+        """Tests document deletion."""
+        response, entity_document = self.mock_document_upload()
+
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
         with pytest.raises(Document.DoesNotExist):
             entity_document.document.refresh_from_db()
+
+    def test_schedule_document_delete(self, monkeypatch, test_urls):
+        """Tests schedule of document deletion."""
+        mock_schedule_delete_document = Mock()
+        monkeypatch.setattr(
+            'datahub.documents.views.schedule_delete_document',
+            mock_schedule_delete_document,
+        )
+
+        response, entity_document = self.mock_document_upload()
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        mock_schedule_delete_document.assert_called_once_with(entity_document.document.pk)
