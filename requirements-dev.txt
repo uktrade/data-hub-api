@@ -350,7 +350,7 @@ requests-futures==1.0.0
     # via piprot
 requests-mock==1.10.0
     # via -r requirements-dev.in
-requests-toolbelt==0.10.0
+requests-toolbelt==0.10.1
     # via -r requirements.in
 rq==1.11.1
     # via
