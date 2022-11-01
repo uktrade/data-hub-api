@@ -1,5 +1,5 @@
 """Tests for generic document views."""
-
+import logging
 from unittest.mock import Mock, patch
 
 import pytest
@@ -128,13 +128,23 @@ class TestDocumentViews(APITestMixin):
         monkeypatch,
         test_urls,
     ):
+        """Tests that a virus scan of the document is called."""
         mock_schedule_virus_scan_document = Mock()
         monkeypatch.setattr(
             'datahub.documents.models.schedule_virus_scan_document',
             mock_schedule_virus_scan_document,
         )
 
-        """Tests that a virus scan of the document is scheduled."""
+        response, entity_document = self.mock_document_item()
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['status'] == 'virus_scanning_scheduled'
+        mock_schedule_virus_scan_document.assert_called_once_with(
+            str(entity_document.document.pk),
+        )
+
+    def mock_document_item(self):
         entity_document = MyEntityDocument.objects.create(
             original_filename='test.txt',
             my_field='cats use whiskers to navigate in the dark',
@@ -148,12 +158,20 @@ class TestDocumentViews(APITestMixin):
         )
 
         response = self.api_client.post(url)
+        return response, entity_document
+
+    def test_schedule_virus_scan_document(
+        self,
+        caplog,
+        monkeypatch,
+        test_urls,
+    ):
+        """Tests that a virus scan of the document is scheduled."""
+        caplog.set_level(logging.INFO)
+        response, entity_document = self.mock_document_item()
+
         assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['status'] == 'virus_scanning_scheduled'
-        mock_schedule_virus_scan_document.assert_called_once_with(
-            str(entity_document.document.pk),
-        )
+        assert any("schedule_virus_scan_document" in message for message in caplog.messages)
 
     def mock_document_upload(self):
         entity_document = MyEntityDocument.objects.create(
@@ -166,11 +184,15 @@ class TestDocumentViews(APITestMixin):
 
         return response, entity_document
 
-    def test_document_delete(self, monkeypatch, test_urls):
+    def test_document_delete(self, caplog, monkeypatch, test_urls):
         """Tests document deletion."""
+        caplog.set_level(logging.INFO, "datahub.documents.tasks")
+
         response, entity_document = self.mock_document_upload()
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        assert any("schedule_delete_document" in message for message in caplog.messages)
 
         with pytest.raises(Document.DoesNotExist):
             entity_document.document.refresh_from_db()
