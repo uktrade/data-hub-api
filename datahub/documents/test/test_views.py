@@ -123,12 +123,17 @@ class TestDocumentViews(APITestMixin):
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    @patch('datahub.documents.tasks.virus_scan_document.apply_async')
     def test_document_schedule_virus_scan(
         self,
-        virus_scan_document,
+        monkeypatch,
         test_urls,
     ):
+        mock_schedule_virus_scan_document = Mock()
+        monkeypatch.setattr(
+            'datahub.documents.models.schedule_virus_scan_document',
+            mock_schedule_virus_scan_document,
+        )
+
         """Tests that a virus scan of the document is scheduled."""
         entity_document = MyEntityDocument.objects.create(
             original_filename='test.txt',
@@ -146,8 +151,8 @@ class TestDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['status'] == 'virus_scanning_scheduled'
-        virus_scan_document.assert_called_once_with(
-            args=(str(entity_document.document.pk),),
+        mock_schedule_virus_scan_document.assert_called_once_with(
+            str(entity_document.document.pk)
         )
 
     def mock_document_upload(self):

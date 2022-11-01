@@ -532,7 +532,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         """Tests schedule of document deletion."""
         mock_schedule_virus_scan_document = Mock()
         monkeypatch.setattr(
-            'datahub.documents.tasks.schedule_virus_scan_document',
+            'datahub.documents.models.schedule_virus_scan_document',
             mock_schedule_virus_scan_document,
         )
 

@@ -1976,7 +1976,7 @@ class TestPropositionDocumentViews(APITestMixin):
         """
         mock_schedule_virus_scan_document = Mock()
         monkeypatch.setattr(
-            'datahub.documents.tasks.schedule_virus_scan_document',
+            'datahub.documents.models.schedule_virus_scan_document',
             mock_schedule_virus_scan_document,
         )
 
@@ -2032,7 +2032,7 @@ class TestPropositionDocumentViews(APITestMixin):
         """
         mock_schedule_virus_scan_document = Mock()
         monkeypatch.setattr(
-            'datahub.documents.tasks.schedule_virus_scan_document',
+            'datahub.documents.models.schedule_virus_scan_document',
             mock_schedule_virus_scan_document,
         )
 
@@ -2084,7 +2084,7 @@ class TestPropositionDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
         mock_schedule_virus_scan_document.assert_called_once_with(
-            args=(str(entity_document.document.pk), ),
+            str(entity_document.document.pk)
         )
 
     def test_restricted_user_cannot_schedule_virus_scan_for_non_associated_document(self):
