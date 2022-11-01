@@ -15,8 +15,6 @@ def schedule_delete_document(document_pk):
         function=delete_document,
         function_args=(document_pk,),
     )
-    import pprint
-    pprint.pprint(f'Task {job.id} schedule_delete_document')
     logger.info(f'Task {job.id} schedule_delete_document')
     return job
 
@@ -38,8 +36,6 @@ def schedule_virus_scan_document(document_pk: str):
         function=virus_scan_document,
         function_args=(document_pk,),
     )
-    import pprint
-    pprint.pprint(f'Task {job.id} schedule_virus_scan_document')
     logger.info(f'Task {job.id} schedule_virus_scan_document')
     return job
 
