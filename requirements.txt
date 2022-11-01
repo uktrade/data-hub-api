@@ -148,7 +148,7 @@ prompt-toolkit==3.0.30
     # via click-repl
 psycogreen==1.0.2
     # via -r requirements.in
-psycopg2==2.9.4
+psycopg2==2.9.5
     # via -r requirements.in
 pyjwt==2.4.0
     # via notifications-python-client
@@ -184,7 +184,7 @@ requests==2.28.1
     #   notifications-python-client
     #   opensearch-py
     #   requests-toolbelt
-requests-toolbelt==0.10.0
+requests-toolbelt==0.10.1
     # via -r requirements.in
 rq==1.11.1
     # via
