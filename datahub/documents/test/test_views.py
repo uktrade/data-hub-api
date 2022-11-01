@@ -171,7 +171,7 @@ class TestDocumentViews(APITestMixin):
         response, entity_document = self.mock_document_item()
 
         assert response.status_code == status.HTTP_200_OK
-        assert any("schedule_virus_scan_document" in message for message in caplog.messages)
+        assert any('schedule_virus_scan_document' in message for message in caplog.messages)
 
     def mock_document_upload(self):
         entity_document = MyEntityDocument.objects.create(
@@ -186,13 +186,13 @@ class TestDocumentViews(APITestMixin):
 
     def test_document_delete(self, caplog, monkeypatch, test_urls):
         """Tests document deletion."""
-        caplog.set_level(logging.INFO, "datahub.documents.tasks")
+        caplog.set_level(logging.INFO, 'datahub.documents.tasks')
 
         response, entity_document = self.mock_document_upload()
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
-        assert any("schedule_delete_document" in message for message in caplog.messages)
+        assert any('schedule_delete_document' in message for message in caplog.messages)
 
         with pytest.raises(Document.DoesNotExist):
             entity_document.document.refresh_from_db()
