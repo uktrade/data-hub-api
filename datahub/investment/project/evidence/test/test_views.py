@@ -1,6 +1,6 @@
 import datetime
 from operator import attrgetter, itemgetter
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 from uuid import uuid4
 
 import pytest
@@ -528,8 +528,6 @@ class TestEvidenceDocumentViews(APITestMixin):
         Checks that a virus scan of the document was scheduled. Virus scanning is
         tested separately in the documents app.
         """
-
-        """Tests schedule of document deletion."""
         mock_schedule_virus_scan_document = Mock()
         monkeypatch.setattr(
             'datahub.documents.models.schedule_virus_scan_document',
@@ -590,7 +588,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
         mock_schedule_virus_scan_document.assert_called_once_with(
-            str(entity_document.document.pk)
+            str(entity_document.document.pk),
         )
 
     @pytest.mark.parametrize('permissions,associated,allowed', DELETE_PERMISSIONS)

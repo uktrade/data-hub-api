@@ -152,7 +152,7 @@ class TestDocumentViews(APITestMixin):
         response_data = response.json()
         assert response_data['status'] == 'virus_scanning_scheduled'
         mock_schedule_virus_scan_document.assert_called_once_with(
-            str(entity_document.document.pk)
+            str(entity_document.document.pk),
         )
 
     def mock_document_upload(self):

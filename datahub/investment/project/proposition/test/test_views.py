@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 import factory
 import pytest
@@ -2020,7 +2020,7 @@ class TestPropositionDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
         mock_schedule_virus_scan_document.assert_called_once_with(
-            str(entity_document.document.pk)
+            str(entity_document.document.pk),
         )
 
     def test_restricted_user_can_schedule_virus_scan_for_associated_document(
@@ -2084,7 +2084,7 @@ class TestPropositionDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
         mock_schedule_virus_scan_document.assert_called_once_with(
-            str(entity_document.document.pk)
+            str(entity_document.document.pk),
         )
 
     def test_restricted_user_cannot_schedule_virus_scan_for_non_associated_document(self):
@@ -2205,7 +2205,6 @@ class TestPropositionDocumentViews(APITestMixin):
 
     def test_restricted_user_cannot_delete_non_associated_document(self, monkeypatch):
         """Test that restricted user cannot delete non associated document."""
-
         mock_schedule_delete_document = Mock()
         monkeypatch.setattr(
             'datahub.documents.views.schedule_delete_document',
