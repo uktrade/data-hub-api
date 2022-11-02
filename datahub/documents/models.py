@@ -6,7 +6,7 @@ from django.db import models, transaction
 from django.utils.timezone import now
 
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.documents.tasks import virus_scan_document
+from datahub.documents.tasks import schedule_virus_scan_document
 from datahub.documents.utils import sign_s3_url
 
 logger = getLogger(__name__)
@@ -80,7 +80,7 @@ class Document(BaseModel, ArchivableModel):
         if not self.scan_initiated_on:
             self.mark_scan_scheduled()
 
-            virus_scan_document.apply_async(args=(str(self.pk),))
+            schedule_virus_scan_document(str(self.pk))
 
         return self.status
 

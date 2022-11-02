@@ -32,7 +32,7 @@ def test_delete_document(s3_stubber):
         },
     )
 
-    result = delete_document.apply(args=(document.pk, )).get()
+    result = delete_document(document.pk)
     assert result is None
 
     with pytest.raises(MyEntityDocument.DoesNotExist):
@@ -63,7 +63,7 @@ def test_delete_document_s3_failure(s3_stubber):
     )
 
     with pytest.raises(Exception):
-        delete_document.apply(args=(document.pk, )).get()
+        delete_document(document.pk).get()
 
     qs = MyEntityDocument.objects.include_objects_deletion_pending()
     assert qs.filter(pk=entity_document.pk).exists() is True
