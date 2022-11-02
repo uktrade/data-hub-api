@@ -8,17 +8,36 @@ from datahub.core.constants import (
     InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
     InvestmentType as InvestmentTypeConstant,
 )
+from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
+from datahub.core.queues.job_scheduler import job_scheduler
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.investment.project.models import GVAMultiplier, InvestmentProject
 
 logger = getLogger(__name__)
 
 
-@shared_task(
-    autoretry_for=(Exception,),
-    queue='long-running',
-    max_retries=5,
-    retry_backoff=30,
-)
+def schedule_update_investment_projects_for_gva_multiplier_task(gva_multiplier_id):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=update_investment_projects_for_gva_multiplier_task,
+        function_args=(gva_multiplier_id,),
+        job_timeout=HALF_DAY_IN_SECONDS,
+        max_retries=5,
+        retry_backoff=True,
+        retry_intervals=30,
+    )
+    logger.info(
+        f'Task {job.id} update_investment_projects_for_gva_multiplier_task',
+    )
+    return job
+
+
+# @shared_task(
+#     autoretry_for=(Exception,),
+#     queue='long-running',
+#     max_retries=5,
+#     retry_backoff=30,
+# )
 def update_investment_projects_for_gva_multiplier_task(gva_multiplier_id):
     """
     Updates the normalised gross_value_added for all investment projects
