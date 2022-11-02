@@ -36,7 +36,7 @@ def test_virus_scan_document_clean(get_signed_url_mock, requests_mock):
         },
     )
 
-    virus_scan_document.apply(args=(str(document.id), )).get()
+    virus_scan_document(str(document.id))
     document.refresh_from_db()
     assert document.av_clean is True
 
@@ -63,7 +63,7 @@ def test_virus_scan_document_infected(get_signed_url_mock, requests_mock):
         },
     )
 
-    virus_scan_document.apply(args=(str(document.id), )).get()
+    virus_scan_document(str(document.id))
     document.refresh_from_db()
     assert document.av_clean is False
 
@@ -97,7 +97,7 @@ def test_virus_scan_document_bad_response_body(get_signed_url_mock, requests_moc
         VirusScanException,
         match=error_message,
     ):
-        virus_scan_document.apply(args=(str(document.id), )).get()
+        virus_scan_document(str(document.id))
 
     document.refresh_from_db()
     assert document.av_clean is None
@@ -119,7 +119,7 @@ def test_virus_scan_document_file_not_found(get_signed_url_mock, requests_mock):
         match=rf'Unable to download the document with ID {document.pk} '
               rf'for scanning \(status_code\=404\).',
     ):
-        virus_scan_document.apply(args=(str(document.id), )).get()
+        virus_scan_document(str(document.id))
     document.refresh_from_db()
     assert document.av_clean is None
 
@@ -143,7 +143,7 @@ def test_virus_scan_document_bad_response_status(get_signed_url_mock, requests_m
     )
 
     with pytest.raises(HTTPError) as excinfo:
-        virus_scan_document.apply(args=(str(document.id), )).get()
+        virus_scan_document(str(document.id))
     document.refresh_from_db()
     assert document.av_clean is None
     assert str(excinfo.value) == '400 Client Error: None for url: http://av-service/'
