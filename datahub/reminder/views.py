@@ -13,6 +13,7 @@ from rest_framework.response import Response
 
 from datahub.investment.project.proposition.models import Proposition, PropositionStatus
 from datahub.reminder.models import (
+    NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
     ReminderStatus,
@@ -20,6 +21,7 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateSubscription,
 )
 from datahub.reminder.serializers import (
+    NoRecentExportInteractionSubscriptionSerializer,
     NoRecentInvestmentInteractionReminderSerializer,
     NoRecentInvestmentInteractionSubscriptionSerializer,
     UpcomingEstimatedLandDateReminderSerializer,
@@ -42,6 +44,11 @@ class BaseSubscriptionViewset(
         """
         obj, created = self.queryset.get_or_create(adviser=self.request.user)
         return obj
+
+
+class NoRecentExportInteractionSubscriptionViewset(BaseSubscriptionViewset):
+    serializer_class = NoRecentExportInteractionSubscriptionSerializer
+    queryset = NoRecentExportInteractionSubscription.objects.all()
 
 
 class NoRecentInvestmentInteractionSubscriptionViewset(BaseSubscriptionViewset):

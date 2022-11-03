@@ -4,11 +4,30 @@ from rest_framework import serializers
 
 from datahub.investment.project.models import InvestmentProject
 from datahub.reminder.models import (
+    NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
 )
+
+
+class NoRecentExportInteractionSubscriptionSerializer(serializers.ModelSerializer):
+    """Serializer for No Recent Export Interaction Subscription."""
+
+    def validate_reminder_days(self, reminder_days):
+        duplicate_days = [
+            day for day, count in collections.Counter(reminder_days).items() if count > 1
+        ]
+        if len(duplicate_days) > 0:
+            raise serializers.ValidationError(
+                f'Duplicate reminder days are not allowed {duplicate_days}'
+            )
+        return reminder_days
+
+    class Meta:
+        model = NoRecentExportInteractionSubscription
+        fields = ('reminder_days', 'email_reminders_enabled')
 
 
 class NoRecentInvestmentInteractionSubscriptionSerializer(serializers.ModelSerializer):

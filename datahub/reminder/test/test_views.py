@@ -11,6 +11,7 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateReminder,
 )
 from datahub.reminder.test.factories import (
+    NoRecentExportInteractionSubscriptionFactory,
     NoRecentInvestmentInteractionReminderFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
     UpcomingEstimatedLandDateReminderFactory,
@@ -154,6 +155,73 @@ class TestUpcomingEstimatedLandDateSubscriptionViewset(APITestMixin):
     def test_patch_existing_subscription(self):
         """Patching the subscription will update an existing subscription"""
         UpcomingEstimatedLandDateSubscriptionFactory(
+            adviser=self.user,
+            reminder_days=[10, 20, 40],
+            email_reminders_enabled=True,
+        )
+        url = reverse(self.url_name)
+        data = {'reminder_days': [15, 30], 'email_reminders_enabled': False}
+        response = self.api_client.patch(url, data)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'reminder_days': [15, 30],
+            'email_reminders_enabled': False,
+        }
+
+    def test_patch_subscription_no_existing(self):
+        """Patching the subscription will create one if it didn't exist already"""
+        url = reverse(self.url_name)
+        data = {'reminder_days': [15]}
+        response = self.api_client.patch(url, data)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'reminder_days': [15],
+            'email_reminders_enabled': False,
+        }
+
+
+class TestNoRecentExportInteractionSubscriptionViewset(APITestMixin):
+    """
+    Tests for the no recent export interaction subscription view.
+    """
+
+    url_name = 'api-v4:reminder:no-recent-export-interaction-subscription'
+
+    def test_not_authed(self):
+        """Should return Unauthorised"""
+        url = reverse(self.url_name)
+        api_client = APIClient()
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_get_subscription_not_present(self):
+        """Given the current user does not have a subscription, make an empty one"""
+        url = reverse(self.url_name)
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'reminder_days': [],
+            'email_reminders_enabled': False,
+        }
+
+    def test_get_subscription(self):
+        """Given an existing subscription, those details should be returned"""
+        NoRecentExportInteractionSubscriptionFactory(
+            adviser=self.user,
+            reminder_days=[10, 20, 40],
+            email_reminders_enabled=True,
+        )
+        url = reverse(self.url_name)
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'reminder_days': [10, 20, 40],
+            'email_reminders_enabled': True,
+        }
+
+    def test_patch_existing_subscription(self):
+        """Patching the subscription will update an existing subscription"""
+        NoRecentExportInteractionSubscriptionFactory(
             adviser=self.user,
             reminder_days=[10, 20, 40],
             email_reminders_enabled=True,
