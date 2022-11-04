@@ -61,6 +61,7 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
             {
                 'fields': (
                     'feature_groups',
+                    'features_info',
                     'features',
                 ),
             },
@@ -76,6 +77,7 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
         ),
     )
     list_display = ('email', 'first_name', 'last_name', 'dit_team', 'is_active', 'is_staff')
+    readonly_fields = ('features_info',)
     search_fields = (
         '=pk',
         'first_name',
@@ -88,6 +90,26 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
     )
     filter_horizontal = ('feature_groups', 'features')
     ordering = ('email',)
+
+    def features_info(self, obj):
+        """
+        Shows if any individual user feature flag already exists in user feature flag group
+        assigned to the adviser.
+        """
+        info = []
+        features = set(obj.features.values_list('code', flat=True))
+
+        for feature in obj.feature_groups.all():
+            grouped = feature.features.values_list('code', flat=True)
+            common = features.intersection(grouped)
+            if len(common):
+                info.append(
+                    f'"{feature.code}" feature group already contains following'
+                    f' feature flags: {", ".join(sorted(common))}',
+                )
+        if len(info) == 0:
+            info = ['No problems detected.']
+        return '\n'.join(info)
 
     def get_urls(self):
         """
