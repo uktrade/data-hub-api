@@ -4,6 +4,7 @@ from datahub.reminder.views import (
     NoRecentExportInteractionSubscriptionViewset,
     NoRecentInvestmentInteractionReminderViewset,
     NoRecentInvestmentInteractionSubscriptionViewset,
+    reminder_subscription_summary_view,
     reminder_summary_view,
     UpcomingEstimatedLandDateReminderViewset,
     UpcomingEstimatedLandDateSubscriptionViewset,
@@ -33,6 +34,11 @@ urlpatterns = [
             'patch': 'partial_update',
         }),
         name='estimated-land-date-subscription',
+    ),
+    path(
+        'reminder/subscription/summary',
+        reminder_subscription_summary_view,
+        name='subscription-summary',
     ),
 
     path(

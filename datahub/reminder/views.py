@@ -61,6 +61,28 @@ class UpcomingEstimatedLandDateSubscriptionViewset(BaseSubscriptionViewset):
     queryset = UpcomingEstimatedLandDateSubscription.objects.all()
 
 
+@transaction.non_atomic_requests
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def reminder_subscription_summary_view(request):
+    """Returns the reminder subscription summary."""
+    estimated_land_date = UpcomingEstimatedLandDateSubscriptionSerializer(
+        UpcomingEstimatedLandDateSubscription.objects.get(adviser=request.user),
+    ).data
+    no_recent_investment_interaction = NoRecentInvestmentInteractionSubscriptionSerializer(
+        NoRecentInvestmentInteractionSubscription.objects.get(adviser=request.user),
+    ).data
+    no_recent_export_interaction = NoRecentExportInteractionSubscriptionSerializer(
+        NoRecentExportInteractionSubscription.objects.get(adviser=request.user),
+    ).data
+
+    return Response({
+        'estimated_land_date': estimated_land_date,
+        'no_recent_investment_interaction': no_recent_investment_interaction,
+        'no_recent_export_interaction': no_recent_export_interaction,
+    })
+
+
 class BaseReminderViewset(viewsets.GenericViewSet, ListModelMixin, DestroyModelMixin):
     permission_classes = ()
     filter_backends = (OrderingFilter,)

@@ -21,7 +21,7 @@ class NoRecentExportInteractionSubscriptionSerializer(serializers.ModelSerialize
         ]
         if len(duplicate_days) > 0:
             raise serializers.ValidationError(
-                f'Duplicate reminder days are not allowed {duplicate_days}'
+                f'Duplicate reminder days are not allowed {duplicate_days}',
             )
         return reminder_days
 
