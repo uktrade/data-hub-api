@@ -247,6 +247,58 @@ class TestNoRecentExportInteractionSubscriptionViewset(APITestMixin):
         }
 
 
+class TestGetReminderSubscriptionSummaryView(APITestMixin):
+    """
+    Tests for the reminder subscription summary view.
+    """
+
+    url_name = 'api-v4:reminder:subscription-summary'
+
+    def test_not_authed(self):
+        """Should return Unauthorised"""
+        url = reverse(self.url_name)
+        api_client = APIClient()
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_get_summary_of_reminders(self):
+        """Should return a summary of reminders"""
+        reminder_days = [10, 20, 40]
+        email_reminders_enabled = True
+
+        NoRecentExportInteractionSubscriptionFactory(
+            adviser=self.user,
+            reminder_days=reminder_days,
+            email_reminders_enabled=email_reminders_enabled,
+        )
+        NoRecentInvestmentInteractionSubscriptionFactory(
+            adviser=self.user,
+            reminder_days=reminder_days,
+            email_reminders_enabled=email_reminders_enabled,
+        )
+        UpcomingEstimatedLandDateSubscriptionFactory(
+            adviser=self.user,
+            reminder_days=reminder_days,
+            email_reminders_enabled=email_reminders_enabled,
+        )
+
+        url = reverse(self.url_name)
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data == {
+            'estimated_land_date': {
+                'email_reminders_enabled': True, 'reminder_days': [10, 20, 40],
+            },
+            'no_recent_investment_interaction': {
+                'email_reminders_enabled': True, 'reminder_days': [10, 20, 40],
+            },
+            'no_recent_export_interaction': {
+                'email_reminders_enabled': True, 'reminder_days': [10, 20, 40],
+            },
+        }
+
+
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin):
     """
