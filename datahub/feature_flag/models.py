@@ -64,4 +64,5 @@ class UserFeatureFlagGroup(BaseModel):
 
     def __str__(self):
         """Human readable representation."""
-        return f'{self.code} ({"active" if self.is_active else "inactive"})'
+        features = ', '.join([str(feature) for feature in self.features.all().order_by('code')])
+        return f'{self.code} ({"active" if self.is_active else "inactive"}): {features}'
