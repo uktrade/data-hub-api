@@ -29,7 +29,7 @@ statsd==3.3.0
 
 # Email
 mail-parser==3.15.0
-icalendar==5.0.1
+icalendar==5.0.2
 
 # Slack
 slackclient==2.9.4
