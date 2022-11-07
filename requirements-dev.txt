@@ -169,7 +169,7 @@ gevent==21.12.0
     # via -r requirements.in
 greenlet==1.1.2
     # via gevent
-icalendar==5.0.1
+icalendar==5.0.2
     # via -r requirements.in
 identify==2.4.11
     # via pre-commit
@@ -179,7 +179,7 @@ idna==3.3
     #   yarl
 iniconfig==1.1.1
     # via pytest
-ipython==8.6.0
+ipython==8.5.0
     # via -r requirements-dev.in
 isort==5.10.1
     # via pylint
@@ -260,8 +260,6 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.2
     # via stack-data
-py==1.11.0
-    # via pytest
 pycodestyle==2.8.0
     # via
     #   flake8
@@ -383,7 +381,7 @@ sqlparse==0.4.2
     #   django-debug-toolbar
 stack-data==0.2.0
     # via ipython
-statsd==3.3.0
+statsd==4.0.1
     # via -r requirements.in
 toml==0.10.2
     # via pre-commit
