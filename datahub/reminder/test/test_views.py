@@ -235,6 +235,21 @@ class TestNoRecentExportInteractionSubscriptionViewset(APITestMixin):
             'email_reminders_enabled': False,
         }
 
+    def test_400_patch_existing_subscription_duplicate_days(self):
+        """Patching the subscription will update an existing subscription"""
+        NoRecentExportInteractionSubscriptionFactory(
+            adviser=self.user,
+            reminder_days=[10, 20, 40],
+            email_reminders_enabled=True,
+        )
+        url = reverse(self.url_name)
+        data = {'reminder_days': [15, 15], 'email_reminders_enabled': False}
+        response = self.api_client.patch(url, data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'reminder_days': ['Duplicate reminder days are not allowed [15]'],
+        }
+
     def test_patch_subscription_no_existing(self):
         """Patching the subscription will create one if it didn't exist already"""
         url = reverse(self.url_name)
