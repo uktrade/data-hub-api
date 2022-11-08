@@ -118,6 +118,24 @@ class BaseReminder(models.Model):
         return self.event
 
 
+class NoRecentExportInteractionReminder(BaseReminder):
+    """
+    No recent export interaction reminders.
+    """
+
+    company = models.ForeignKey(
+        'company.Company',
+        on_delete=models.CASCADE,
+        related_name='no_recent_export_interaction_reminders',
+    )
+
+    interaction = models.ForeignKey(
+        'interaction.Interaction',
+        on_delete=models.CASCADE,
+        related_name='no_recent_export_interaction_reminders'
+    )
+
+
 class NoRecentInvestmentInteractionReminder(BaseReminder):
     """
     No recent investment interaction reminders.
