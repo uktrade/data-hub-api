@@ -8,8 +8,8 @@ from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import BaseInteractionSerializer
 from datahub.investment.project.models import InvestmentProject
 from datahub.reminder.models import (
-    NoRecentExportInteractionSubscription,
     NoRecentExportInteractionReminder,
+    NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
     UpcomingEstimatedLandDateReminder,
@@ -71,6 +71,7 @@ class NestedInvestmentProjectSerializer(serializers.ModelSerializer):
 
 class NestedInteractionSerializer(BaseInteractionSerializer):
     """Selects relevant fields from Interaction serializer to nest inside reminders."""
+
     created_by = NestedAdviserWithTeamField(read_only=True)
 
     class Meta:

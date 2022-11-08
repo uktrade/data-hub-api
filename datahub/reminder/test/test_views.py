@@ -3,8 +3,8 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from datahub.core.test_utils import APITestMixin
 from datahub.company.test.factories import CompanyFactory
+from datahub.core.test_utils import APITestMixin
 from datahub.interaction.test.factories import CompaniesInteractionFactory
 from datahub.investment.project.proposition.models import PropositionStatus
 from datahub.investment.project.proposition.test.factories import PropositionFactory
@@ -14,8 +14,8 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateReminder,
 )
 from datahub.reminder.test.factories import (
-    NoRecentExportInteractionSubscriptionFactory,
     NoRecentExportInteractionReminderFactory,
+    NoRecentExportInteractionSubscriptionFactory,
     NoRecentInvestmentInteractionReminderFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
     UpcomingEstimatedLandDateReminderFactory,
@@ -396,11 +396,11 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin):
                     'dit_team': {
                         'id': str(export_interaction.created_by.dit_team.id),
                         'name': export_interaction.created_by.dit_team.name,
-                    }
+                    },
                 },
                 'kind': str(export_interaction.kind),
                 'subject': export_interaction.subject,
-            }
+            },
         }
 
     def test_get_reminders_only_includes_current(self):
@@ -408,7 +408,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin):
         reminder_count = 3
         NoRecentExportInteractionReminderFactory.create_batch(
             reminder_count,
-            adviser=self.user
+            adviser=self.user,
         )
         NoRecentExportInteractionReminderFactory.create_batch(2)
         url = reverse(self.url_name)

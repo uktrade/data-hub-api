@@ -4,8 +4,8 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.reminder.models import (
-    NoRecentExportInteractionSubscription,
     NoRecentExportInteractionReminder,
+    NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
     UpcomingEstimatedLandDateReminder,

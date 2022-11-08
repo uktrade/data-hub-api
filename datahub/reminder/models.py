@@ -132,7 +132,7 @@ class NoRecentExportInteractionReminder(BaseReminder):
     interaction = models.ForeignKey(
         'interaction.Interaction',
         on_delete=models.CASCADE,
-        related_name='no_recent_export_interaction_reminders'
+        related_name='no_recent_export_interaction_reminders',
     )
 
 

@@ -1,8 +1,8 @@
 from django.urls import path
 
 from datahub.reminder.views import (
-    NoRecentExportInteractionSubscriptionViewset,
     NoRecentExportInteractionReminderViewset,
+    NoRecentExportInteractionSubscriptionViewset,
     NoRecentInvestmentInteractionReminderViewset,
     NoRecentInvestmentInteractionSubscriptionViewset,
     reminder_subscription_summary_view,
