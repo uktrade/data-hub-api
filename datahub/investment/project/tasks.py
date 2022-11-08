@@ -1,7 +1,6 @@
-from logging import getLogger
+import logging
 
 import reversion
-from celery import shared_task
 from django.db.models import Q
 
 from datahub.core.constants import (
@@ -16,7 +15,7 @@ from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.investment.project.models import GVAMultiplier, InvestmentProject
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def schedule_update_investment_projects_for_gva_multiplier_task(gva_multiplier_id):
@@ -67,10 +66,10 @@ def schedule_refresh_gross_value_added_value_for_fdi_investment_projects():
         queue_name=LONG_RUNNING_QUEUE,
         function=refresh_gross_value_added_value_for_fdi_investment_projects,
         cron=EVERY_THREE_AM_ON_TWENTY_FIRST_EACH_MONTH,
-        description='refresh_gross_value_added_value_for_fdi_investment_projects',
+        description='schedule_refresh_gross_value_added_value_for_fdi_investment_projects',
     )
     logger.info(
-        f'Task {job.id} refresh_gross_value_added_value_for_fdi_investment_projects',
+        f'Task {job.id} schedule_refresh_gross_value_added_value_for_fdi_investment_projects',
     )
     return job
 
@@ -87,6 +86,10 @@ def refresh_gross_value_added_value_for_fdi_investment_projects():
     investment_projects = get_investment_projects_to_refresh_gva_values()
     for project in investment_projects.iterator():
         project.save(update_fields=['gross_value_added', 'gva_multiplier'])
+
+    logger.info(
+        'Task refresh_gross_value_added_value_for_fdi_investment_projects completed',
+    )
 
 
 def get_investment_projects_to_refresh_gva_values():
@@ -118,9 +121,18 @@ def get_investment_projects_for_country_of_origin_update():
     )
 
 
-@shared_task(
-    queue='long-running',
-)
+def schedule_update_country_of_origin_for_investment_projects():
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=update_country_of_origin_for_investment_projects,
+        description='schedule_update_country_of_origin_for_investment_projects',
+    )
+    logger.info(
+        f'Task {job.id} schedule_update_country_of_origin_for_investment_projects',
+    )
+    return job
+
+
 def update_country_of_origin_for_investment_projects():
     """
     Loops over all investment projects that do not have country of origin updated and
@@ -133,3 +145,7 @@ def update_country_of_origin_for_investment_projects():
             project.save(update_fields=['country_investment_originates_from'])
 
             reversion.set_comment('Automated country of origin update.')
+
+    logger.info(
+        'Task update_country_of_origin_for_investment_projects completed',
+    )

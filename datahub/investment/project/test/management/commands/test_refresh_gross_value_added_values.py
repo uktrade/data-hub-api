@@ -166,6 +166,10 @@ class TestRefreshGrossValueAddedCommand:
             'refresh_gross_value_added_value_for_fdi_investment_projects'
             in message for message in caplog.messages
         )
+        assert any(
+            'Task refresh_gross_value_added_value_for_fdi_investment_projects completed'
+            in message for message in caplog.messages
+        )
 
     def _run_command(self):
         cmd = refresh_gross_value_added_values.Command()
