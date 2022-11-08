@@ -34,6 +34,12 @@ class BaseSubscription(models.Model):
         return f'Subscription: {self.adviser}'
 
 
+class NoRecentExportInteractionSubscription(BaseSubscription):
+    """
+    Subscription to get reminders about companies with no recent interactions.
+    """
+
+
 class NoRecentInvestmentInteractionSubscription(BaseSubscription):
     """
     Subscription to get reminders about projects with no recent interactions.
