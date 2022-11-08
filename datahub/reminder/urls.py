@@ -1,24 +1,14 @@
 from django.urls import path
 
 from datahub.reminder.views import (
-    NoRecentExportInteractionSubscriptionViewset,
     NoRecentInvestmentInteractionReminderViewset,
     NoRecentInvestmentInteractionSubscriptionViewset,
-    reminder_subscription_summary_view,
     reminder_summary_view,
     UpcomingEstimatedLandDateReminderViewset,
     UpcomingEstimatedLandDateSubscriptionViewset,
 )
 
 urlpatterns = [
-    path(
-        'reminder/subscription/no-recent-export-interaction',
-        NoRecentExportInteractionSubscriptionViewset.as_view({
-            'get': 'retrieve',
-            'patch': 'partial_update',
-        }),
-        name='no-recent-export-interaction-subscription',
-    ),
     path(
         'reminder/subscription/no-recent-investment-interaction',
         NoRecentInvestmentInteractionSubscriptionViewset.as_view({
@@ -34,11 +24,6 @@ urlpatterns = [
             'patch': 'partial_update',
         }),
         name='estimated-land-date-subscription',
-    ),
-    path(
-        'reminder/subscription/summary',
-        reminder_subscription_summary_view,
-        name='subscription-summary',
     ),
 
     path(

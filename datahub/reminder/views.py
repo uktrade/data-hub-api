@@ -13,7 +13,6 @@ from rest_framework.response import Response
 
 from datahub.investment.project.proposition.models import Proposition, PropositionStatus
 from datahub.reminder.models import (
-    NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
     ReminderStatus,
@@ -21,7 +20,6 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateSubscription,
 )
 from datahub.reminder.serializers import (
-    NoRecentExportInteractionSubscriptionSerializer,
     NoRecentInvestmentInteractionReminderSerializer,
     NoRecentInvestmentInteractionSubscriptionSerializer,
     UpcomingEstimatedLandDateReminderSerializer,
@@ -46,11 +44,6 @@ class BaseSubscriptionViewset(
         return obj
 
 
-class NoRecentExportInteractionSubscriptionViewset(BaseSubscriptionViewset):
-    serializer_class = NoRecentExportInteractionSubscriptionSerializer
-    queryset = NoRecentExportInteractionSubscription.objects.all()
-
-
 class NoRecentInvestmentInteractionSubscriptionViewset(BaseSubscriptionViewset):
     serializer_class = NoRecentInvestmentInteractionSubscriptionSerializer
     queryset = NoRecentInvestmentInteractionSubscription.objects.all()
@@ -59,28 +52,6 @@ class NoRecentInvestmentInteractionSubscriptionViewset(BaseSubscriptionViewset):
 class UpcomingEstimatedLandDateSubscriptionViewset(BaseSubscriptionViewset):
     serializer_class = UpcomingEstimatedLandDateSubscriptionSerializer
     queryset = UpcomingEstimatedLandDateSubscription.objects.all()
-
-
-@transaction.non_atomic_requests
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def reminder_subscription_summary_view(request):
-    """Returns the reminder subscription summary."""
-    estimated_land_date = UpcomingEstimatedLandDateSubscriptionSerializer(
-        UpcomingEstimatedLandDateSubscription.objects.get(adviser=request.user),
-    ).data
-    no_recent_investment_interaction = NoRecentInvestmentInteractionSubscriptionSerializer(
-        NoRecentInvestmentInteractionSubscription.objects.get(adviser=request.user),
-    ).data
-    no_recent_export_interaction = NoRecentExportInteractionSubscriptionSerializer(
-        NoRecentExportInteractionSubscription.objects.get(adviser=request.user),
-    ).data
-
-    return Response({
-        'estimated_land_date': estimated_land_date,
-        'no_recent_investment_interaction': no_recent_investment_interaction,
-        'no_recent_export_interaction': no_recent_export_interaction,
-    })
 
 
 class BaseReminderViewset(viewsets.GenericViewSet, ListModelMixin, DestroyModelMixin):
