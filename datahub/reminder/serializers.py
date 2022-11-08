@@ -2,9 +2,14 @@ import collections
 
 from rest_framework import serializers
 
+from datahub.company.models import Company
+from datahub.company.serializers import NestedAdviserWithTeamField
+from datahub.interaction.models import Interaction
+from datahub.interaction.serializers import BaseInteractionSerializer
 from datahub.investment.project.models import InvestmentProject
 from datahub.reminder.models import (
     NoRecentExportInteractionSubscription,
+    NoRecentExportInteractionReminder,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
     UpcomingEstimatedLandDateReminder,
@@ -64,6 +69,23 @@ class NestedInvestmentProjectSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'project_code')
 
 
+class NestedInteractionSerializer(BaseInteractionSerializer):
+    """Selects relevant fields from Interaction serializer to nest inside reminders."""
+    created_by = NestedAdviserWithTeamField(read_only=True)
+
+    class Meta:
+        model = Interaction
+        fields = ('created_by', 'kind', 'subject')
+
+
+class NestedExportCompanySerializer(serializers.ModelSerializer):
+    """Simple Company serializer to nest inside reminders."""
+
+    class Meta:
+        model = Company
+        fields = ('id', 'name')
+
+
 class UpcomingEstimatedLandDateReminderSerializer(serializers.ModelSerializer):
     """Serializer for Upcoming Estimated Land Date Reminder."""
 
@@ -82,3 +104,14 @@ class NoRecentInvestmentInteractionReminderSerializer(serializers.ModelSerialize
     class Meta:
         model = NoRecentInvestmentInteractionReminder
         fields = ('id', 'created_on', 'event', 'project')
+
+
+class NoRecentExportInteractionReminderSerializer(serializers.ModelSerializer):
+    """Serializer for No Recent Export Interaction Reminder."""
+
+    company = NestedExportCompanySerializer(many=False, read_only=True)
+    interaction = NestedInteractionSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = NoRecentExportInteractionReminder
+        fields = ('id', 'created_on', 'event', 'company', 'interaction')

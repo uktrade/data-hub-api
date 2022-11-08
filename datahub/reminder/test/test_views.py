@@ -4,14 +4,18 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from datahub.core.test_utils import APITestMixin
+from datahub.company.test.factories import CompanyFactory
+from datahub.interaction.test.factories import CompaniesInteractionFactory
 from datahub.investment.project.proposition.models import PropositionStatus
 from datahub.investment.project.proposition.test.factories import PropositionFactory
 from datahub.reminder.models import (
+    NoRecentExportInteractionReminder,
     NoRecentInvestmentInteractionReminder,
     UpcomingEstimatedLandDateReminder,
 )
 from datahub.reminder.test.factories import (
     NoRecentExportInteractionSubscriptionFactory,
+    NoRecentExportInteractionReminderFactory,
     NoRecentInvestmentInteractionReminderFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
     UpcomingEstimatedLandDateReminderFactory,
@@ -187,13 +191,6 @@ class TestNoRecentExportInteractionSubscriptionViewset(APITestMixin):
 
     url_name = 'api-v4:reminder:no-recent-export-interaction-subscription'
 
-    def test_not_authed(self):
-        """Should return Unauthorised"""
-        url = reverse(self.url_name)
-        api_client = APIClient()
-        response = api_client.get(url)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
     def test_get_subscription_not_present(self):
         """Given the current user does not have a subscription, make an empty one"""
         url = reverse(self.url_name)
@@ -332,10 +329,149 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
         }
 
 
+@freeze_time('2022-11-07T17:00:00.000000Z')
+class TestNoRecentExportInteractionReminderViewset(APITestMixin):
+    """
+    Tests for the no recent export interaction reminder view.
+    """
+
+    url_name = 'api-v4:reminder:no-recent-export-interaction-reminder'
+    detail_url_name = 'api-v4:reminder:no-recent-export-interaction-reminder-detail'
+
+    def create_reminders(self):
+        """Creates some mock reminders"""
+        with freeze_time('2022-11-07T17:00:00.000000Z'):
+            reminder_1 = NoRecentExportInteractionReminderFactory(
+                adviser=self.user,
+            )
+        with freeze_time('2022-11-07T18:00:00.000000Z'):
+            reminder_2 = NoRecentExportInteractionReminderFactory(
+                adviser=self.user,
+            )
+        return [reminder_1, reminder_2]
+
+    def test_not_authed(self):
+        """Should return Unauthorised"""
+        url = reverse(self.url_name)
+        api_client = APIClient()
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_get_reminders(self):
+        """Given some reminders, these should be returned"""
+        reminder_count = 3
+        export_company = CompanyFactory()
+        export_interaction = CompaniesInteractionFactory()
+        reminders = NoRecentExportInteractionReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+            company=export_company,
+            interaction=export_interaction,
+        )
+        url = reverse(self.url_name)
+        response = self.api_client.get(f'{url}?offset=0&limit=2')
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data.get('count') == reminder_count
+        assert 'next' in data
+        assert 'previous' in data
+        results = data.get('results', [])
+        assert len(results) == 2
+        reminders = sorted(reminders, key=lambda x: x.pk)
+
+        assert results[0] == {
+            'id': str(reminders[0].id),
+            'created_on': '2022-11-07T17:00:00Z',
+            'event': reminders[0].event,
+            'company': {
+                'id': str(export_company.id),
+                'name': export_company.name,
+            },
+            'interaction': {
+                'created_by': {
+                    'name': export_interaction.created_by.name,
+                    'first_name': export_interaction.created_by.first_name,
+                    'last_name': export_interaction.created_by.last_name,
+                    'id': str(export_interaction.created_by.id),
+                    'dit_team': {
+                        'id': str(export_interaction.created_by.dit_team.id),
+                        'name': export_interaction.created_by.dit_team.name,
+                    }
+                },
+                'kind': str(export_interaction.kind),
+                'subject': export_interaction.subject,
+            }
+        }
+
+    def test_get_reminders_only_includes_current(self):
+        """Only the reminders belonging to the current user should be returned"""
+        reminder_count = 3
+        NoRecentExportInteractionReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user
+        )
+        NoRecentExportInteractionReminderFactory.create_batch(2)
+        url = reverse(self.url_name)
+        response = self.api_client.get(f'{url}?offset=0&limit=2')
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data.get('count') == reminder_count
+
+    def test_default_sort_by(self):
+        """Defaut sort should be in reverse date order"""
+        reminder_1, reminder_2 = self.create_reminders()
+        url = reverse(self.url_name)
+        response = self.api_client.get(f'{url}?offset=0&limit=2')
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data.get('count') == 2
+        results = data.get('results', [])
+        assert results[0]['id'] == str(reminder_2.id)
+        assert results[1]['id'] == str(reminder_1.id)
+
+    def test_sort_by_created(self):
+        """Should sort in date order"""
+        reminder_1, reminder_2 = self.create_reminders()
+        url = reverse(self.url_name)
+        response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=created_on')
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data.get('count') == 2
+        results = data.get('results', [])
+        assert results[0]['id'] == str(reminder_1.id)
+        assert results[1]['id'] == str(reminder_2.id)
+
+    def test_sort_by_created_descending(self):
+        """Should sort in reverse date order"""
+        reminder_1, reminder_2 = self.create_reminders()
+        url = reverse(self.url_name)
+        response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=-created_on')
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data.get('count') == 2
+        results = data.get('results', [])
+        assert results[0]['id'] == str(reminder_2.id)
+        assert results[1]['id'] == str(reminder_1.id)
+
+    def test_delete(self):
+        """Deleting should remove the model instance"""
+        reminder_count = 3
+        reminder = NoRecentExportInteractionReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )[0]
+        url = reverse(self.detail_url_name, kwargs={'pk': str(reminder.id)})
+        response = self.api_client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert NoRecentExportInteractionReminder.objects.filter(
+            adviser=self.user,
+        ).count() == reminder_count - 1
+
+
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin):
     """
-    Tests for the no recent investment interation reminder view.
+    Tests for the no recent investment interaction reminder view.
     """
 
     url_name = 'api-v4:reminder:no-recent-investment-interaction-reminder'
