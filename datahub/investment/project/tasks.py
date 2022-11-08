@@ -8,7 +8,10 @@ from datahub.core.constants import (
     InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
     InvestmentType as InvestmentTypeConstant,
 )
-from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
+from datahub.core.queues.constants import (
+    EVERY_THREE_AM_ON_TWENTY_FIRST_EACH_MONTH,
+    HALF_DAY_IN_SECONDS,
+)
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.investment.project.models import GVAMultiplier, InvestmentProject
@@ -32,12 +35,6 @@ def schedule_update_investment_projects_for_gva_multiplier_task(gva_multiplier_i
     return job
 
 
-# @shared_task(
-#     autoretry_for=(Exception,),
-#     queue='long-running',
-#     max_retries=5,
-#     retry_backoff=30,
-# )
 def update_investment_projects_for_gva_multiplier_task(gva_multiplier_id):
     """
     Updates the normalised gross_value_added for all investment projects
@@ -65,9 +62,19 @@ def _update_investment_projects_for_gva_multiplier(gva_multiplier):
         investment_project.save(update_fields=['gross_value_added'])
 
 
-@shared_task(
-    queue='long-running',
-)
+def schedule_refresh_gross_value_added_value_for_fdi_investment_projects():
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=refresh_gross_value_added_value_for_fdi_investment_projects,
+        cron=EVERY_THREE_AM_ON_TWENTY_FIRST_EACH_MONTH,
+        description='refresh_gross_value_added_value_for_fdi_investment_projects',
+    )
+    logger.info(
+        f'Task {job.id} refresh_gross_value_added_value_for_fdi_investment_projects',
+    )
+    return job
+
+
 def refresh_gross_value_added_value_for_fdi_investment_projects():
     """
     Loops over all investment projects that GVA

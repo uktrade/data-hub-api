@@ -1,3 +1,4 @@
+import logging
 from decimal import Decimal
 from unittest import mock
 
@@ -9,8 +10,10 @@ from datahub.core.constants import (
     Sector as SectorConstant,
 )
 from datahub.investment.project.management.commands import refresh_gross_value_added_values
+from datahub.investment.project.tasks import (
+    refresh_gross_value_added_value_for_fdi_investment_projects,
+)
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-
 
 pytestmark = pytest.mark.django_db
 
@@ -138,7 +141,7 @@ class TestRefreshGrossValueAddedCommand:
             )
 
         assert not project.gva_multiplier
-        self._run_command()
+        refresh_gross_value_added_value_for_fdi_investment_projects()
         project.refresh_from_db()
         if not multiplier_value:
             assert not project.gva_multiplier
@@ -149,6 +152,20 @@ class TestRefreshGrossValueAddedCommand:
             assert not project.gross_value_added
         else:
             assert project.gross_value_added == Decimal(gross_value_added)
+
+    def test_schedule_refresh_gross_value_added_value_for_fdi_investment_projects(
+        self,
+        caplog,
+        monkeypatch,
+    ):
+        """Tests that refresh gross value added value for fdi investment projects is scheduled."""
+        caplog.set_level(logging.INFO)
+        self._run_command()
+
+        assert any(
+            'refresh_gross_value_added_value_for_fdi_investment_projects'
+            in message for message in caplog.messages
+        )
 
     def _run_command(self):
         cmd = refresh_gross_value_added_values.Command()
