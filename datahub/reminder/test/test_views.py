@@ -313,6 +313,24 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             },
         }
 
+    def test_no_subscriptions(self):
+        """Should return base summary cases."""
+        url = reverse(self.url_name)
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data == {
+            'estimated_land_date': {
+                'email_reminders_enabled': False, 'reminder_days': [],
+            },
+            'no_recent_investment_interaction': {
+                'email_reminders_enabled': False, 'reminder_days': [],
+            },
+            'no_recent_export_interaction': {
+                'email_reminders_enabled': False, 'reminder_days': [],
+            },
+        }
+
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin):
