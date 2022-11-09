@@ -66,14 +66,26 @@ class UpcomingEstimatedLandDateSubscriptionViewset(BaseSubscriptionViewset):
 @permission_classes([IsAuthenticated])
 def reminder_subscription_summary_view(request):
     """Returns the reminder subscription summary."""
+
+    def get_object(queryset):
+        """
+        Gets subscription settings instance for current user.
+
+        If settings have not been created yet, add them.
+        """
+        obj, created = queryset.get_or_create(
+            adviser=request.user,
+        )
+        return obj
+
     estimated_land_date = UpcomingEstimatedLandDateSubscriptionSerializer(
-        UpcomingEstimatedLandDateSubscription.objects.get(adviser=request.user),
+        get_object(UpcomingEstimatedLandDateSubscription.objects.all()),
     ).data
     no_recent_investment_interaction = NoRecentInvestmentInteractionSubscriptionSerializer(
-        NoRecentInvestmentInteractionSubscription.objects.get(adviser=request.user),
+        get_object(NoRecentInvestmentInteractionSubscription.objects.all()),
     ).data
     no_recent_export_interaction = NoRecentExportInteractionSubscriptionSerializer(
-        NoRecentExportInteractionSubscription.objects.get(adviser=request.user),
+        get_object(NoRecentExportInteractionSubscription.objects.all()),
     ).data
 
     return Response({
