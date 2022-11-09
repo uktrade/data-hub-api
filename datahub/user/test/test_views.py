@@ -82,6 +82,7 @@ class TestUserView(APITestMixin):
             },
             'permissions': expected_permissions,
             'active_features': [],
+            'active_feature_groups': [],
         }
 
     def test_who_am_i_active_features(self):
@@ -130,3 +131,39 @@ class TestUserView(APITestMixin):
 
         assert 'active_features' in response_data
         assert set(response_data['active_features']) == {'test-feature', 'active-group-feature'}
+
+    def test_who_am_i_active_feature_groups(self):
+        """Active feature groups should include the user's selected active feature groups."""
+        active_feature_flag_group1 = UserFeatureFlagGroupFactory(
+            code='test-group1',
+            is_active=True,
+        )
+        active_feature_flag_group2 = UserFeatureFlagGroupFactory(
+            code='test-group2',
+            is_active=True,
+        )
+        inactive_feature_flag_group = UserFeatureFlagGroupFactory(
+            code='test-inactive-group',
+            is_active=False,
+        )
+
+        UserFeatureFlagFactory(code='another-feature', is_active=True)
+
+        user = create_test_user()
+        user.feature_groups.add(
+            active_feature_flag_group1,
+            active_feature_flag_group2,
+            inactive_feature_flag_group,
+        )
+
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('who_am_i')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        assert 'active_features' in response_data
+        assert set(response_data['active_feature_groups']) == {'test-group1', 'test-group2'}
