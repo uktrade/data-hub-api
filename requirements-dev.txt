@@ -181,7 +181,7 @@ idna==3.3
     #   yarl
 iniconfig==1.1.1
     # via pytest
-ipython==8.6.0
+ipython==8.5.0
     # via -r requirements-dev.in
 isort==5.10.1
     # via pylint
