@@ -19,13 +19,20 @@ from datahub.core.queues.constants import (
     EVERY_EIGHT_AM,
     EVERY_SEVEN_PM,
     EVERY_TEN_MINUTES,
+    EVERY_THREE_AM_ON_TWENTY_FIRST_EACH_MONTH,
 )
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
-from datahub.core.queues.scheduler import DataHubScheduler
+from datahub.core.queues.scheduler import (
+    DataHubScheduler,
+    LONG_RUNNING_QUEUE,
+)
 from datahub.dnb_api.tasks.sync import schedule_sync_outdated_companies_with_dnb
 from datahub.dnb_api.tasks.update import schedule_get_company_updates
 from datahub.investment.project.report.tasks import schedule_generate_spi_report
+from datahub.investment.project.tasks import (
+    schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
+)
 from datahub.search.tasks import sync_all_models
 env = environ.Env()
 logger = getLogger(__name__)
@@ -60,6 +67,12 @@ def schedule_jobs():
         function=schedule_get_company_updates,
         cron=EVERY_MIDNIGHT,
         description='Update companies from dnb service',
+    )
+    job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
+        cron=EVERY_THREE_AM_ON_TWENTY_FIRST_EACH_MONTH,
+        description='schedule_refresh_gross_value_added_value_for_fdi_investment_projects',
     )
 
     if settings.ENABLE_SPI_REPORT_GENERATION:
