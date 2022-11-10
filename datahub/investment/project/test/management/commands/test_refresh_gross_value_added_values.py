@@ -121,6 +121,7 @@ class TestRefreshGrossValueAddedCommand:
     )
     def test_refresh_gross_value_added(
         self,
+        caplog,
         investment_type,
         sector,
         business_activities,
@@ -129,6 +130,8 @@ class TestRefreshGrossValueAddedCommand:
         gross_value_added,
     ):
         """Test populating Gross value added data."""
+        caplog.set_level(logging.INFO)
+
         with mock.patch(
             'datahub.investment.project.signals.set_gross_value_added_for_investment_project',
         ) as mock_update_gva:
@@ -153,6 +156,11 @@ class TestRefreshGrossValueAddedCommand:
         else:
             assert project.gross_value_added == Decimal(gross_value_added)
 
+        assert any(
+            'Task refresh_gross_value_added_value_for_fdi_investment_projects completed'
+            in message for message in caplog.messages
+        )
+
     def test_schedule_refresh_gross_value_added_value_for_fdi_investment_projects(
         self,
         caplog,
@@ -163,11 +171,7 @@ class TestRefreshGrossValueAddedCommand:
         self._run_command()
 
         assert any(
-            'refresh_gross_value_added_value_for_fdi_investment_projects'
-            in message for message in caplog.messages
-        )
-        assert any(
-            'Task refresh_gross_value_added_value_for_fdi_investment_projects completed'
+            'schedule_refresh_gross_value_added_value_for_fdi_investment_projects'
             in message for message in caplog.messages
         )
 
