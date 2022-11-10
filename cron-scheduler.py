@@ -51,7 +51,7 @@ def schedule_jobs():
             'limit': 20000,
             'simulate': False,
         },
-        cron=EVERY_EIGHT_AM,
+        cron=EVERY_SEVEN_PM,
         description='Automatic Company Archive',
     )
     job_scheduler(
@@ -78,7 +78,7 @@ def schedule_jobs():
     if settings.ENABLE_SPI_REPORT_GENERATION:
         job_scheduler(
             function=schedule_generate_spi_report,
-            cron=EVERY_ONE_AM,
+            cron=EVERY_EIGHT_AM,
             description='SPI report generation',
         )
 
