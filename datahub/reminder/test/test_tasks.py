@@ -22,10 +22,10 @@ from datahub.investment.project.test.factories import (
 )
 from datahub.notification.constants import NotifyServiceName
 from datahub.reminder import (
-    ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME,
-    ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
-    NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
-    NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
+    INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME,
+    INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
+    INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
+    INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
 )
 from datahub.reminder.models import (
     EmailDeliveryStatus,
@@ -56,7 +56,7 @@ def estimated_land_date_reminders_user_feature_flag():
     Creates the estimated land date reminders user feature flag.
     """
     yield UserFeatureFlagFactory(
-        code=ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
+        code=INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
         is_active=True,
     )
 
@@ -67,7 +67,7 @@ def no_recent_interaction_reminders_user_feature_flag():
     Creates the no recent interaction reminders user feature flag.
     """
     yield UserFeatureFlagFactory(
-        code=NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
+        code=INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
         is_active=True,
     )
 
@@ -203,7 +203,7 @@ def estimated_land_date_email_status_feature_flag():
     """
     Creates the automatic company archive feature flag.
     """
-    yield FeatureFlagFactory(code=ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME)
+    yield FeatureFlagFactory(code=INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME)
 
 
 @pytest.fixture()
@@ -211,7 +211,9 @@ def no_recent_interaction_email_status_feature_flag():
     """
     Creates the automatic company archive feature flag.
     """
-    yield FeatureFlagFactory(code=NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME)
+    yield FeatureFlagFactory(
+        code=INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
+    )
 
 
 @pytest.mark.django_db
@@ -671,7 +673,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         Reminders should not be created if the user feature flag is inactive.
         """
         feature_flag = UserFeatureFlagFactory(
-            code=ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
+            code=INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
             is_active=False,
         )
         days = 30
@@ -1266,7 +1268,7 @@ class TestGenerateNoRecentInteractionReminderTask:
         Reminders should not be created if the user feature flag is inactive.
         """
         feature_flag = UserFeatureFlagFactory(
-            code=NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
+            code=INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
             is_active=False,
         )
         days = 15
@@ -1405,8 +1407,8 @@ class TestUpdateEmailDeliveryStatusTask:
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
         update_notify_email_delivery_status_for_estimated_land_date()
         assert caplog.messages == [
-            f'Feature flag "{ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME}" is not active,'
-            ' exiting.',
+            f'Feature flag "{INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME}"'
+            ' is not active, exiting.',
         ]
 
     def test_updates_email_delivery_status_for_estimated_land_date(
@@ -1470,8 +1472,8 @@ class TestUpdateEmailDeliveryStatusTask:
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
         update_notify_email_delivery_status_for_no_recent_interaction()
         assert caplog.messages == [
-            f'Feature flag "{NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}" is'
-            ' not active, exiting.',
+            f'Feature flag "{INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}"'
+            ' is not active, exiting.',
         ]
 
     def test_updates_email_delivery_status_for_no_recent_interaction(

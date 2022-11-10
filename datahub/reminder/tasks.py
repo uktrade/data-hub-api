@@ -17,10 +17,10 @@ from datahub.notification.constants import NotifyServiceName
 from datahub.notification.core import notify_gateway
 from datahub.notification.tasks import send_email_notification
 from datahub.reminder import (
-    ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME,
-    ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
-    NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
-    NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
+    INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME,
+    INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
+    INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
+    INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
 )
 from datahub.reminder.emails import (
     get_project_item,
@@ -164,9 +164,9 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
     user_features = subscription.adviser.features.filter(
         is_active=True,
     ).values_list('code', flat=True)
-    if ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME not in user_features:
+    if INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME not in user_features:
         logger.info(
-            f'Feature flag "{ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME}"'
+            f'Feature flag "{INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME}"'
             'is not active for this user, exiting.',
         )
         return
@@ -252,9 +252,9 @@ def generate_no_recent_interaction_reminders_for_subscription(subscription, curr
     user_features = subscription.adviser.features.filter(
         is_active=True,
     ).values_list('code', flat=True)
-    if NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME not in user_features:
+    if INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME not in user_features:
         logger.info(
-            f'Feature flag "{NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME}"'
+            f'Feature flag "{INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME}"'
             'is not active for this user, exiting.',
         )
         return
@@ -398,9 +398,9 @@ def notify_adviser_by_email(adviser, template_identifier, context, reminders=Non
     retry_backoff=30,
 )
 def update_notify_email_delivery_status_for_estimated_land_date():
-    if not is_feature_flag_active(ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME):
+    if not is_feature_flag_active(INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME):
         logger.info(
-            f'Feature flag "{ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME}"'
+            f'Feature flag "{INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME}"'
             ' is not active, exiting.',
         )
         return
@@ -439,9 +439,11 @@ def update_notify_email_delivery_status_for_estimated_land_date():
     retry_backoff=30,
 )
 def update_notify_email_delivery_status_for_no_recent_interaction():
-    if not is_feature_flag_active(NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME):
+    if not is_feature_flag_active(
+        INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
+    ):
         logger.info(
-            f'Feature flag "{NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}"'
+            f'Feature flag "{INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}"'
             ' is not active, exiting.',
         )
         return

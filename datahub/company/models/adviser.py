@@ -184,3 +184,10 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
             )
         features += self.features.filter(is_active=True).values_list('code', flat=True)
         return list(set(features))
+
+    @cached_property
+    def active_feature_groups(self):
+        """
+        :returns: Feature groups that are currently active.
+        """
+        return self.feature_groups.filter(is_active=True).values_list('code', flat=True)
