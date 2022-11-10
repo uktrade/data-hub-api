@@ -397,13 +397,8 @@ if REDIS_BASE_URL:
     }
 
     ENABLE_DAILY_HIERARCHY_ROLLOUT = env.bool('ENABLE_DAILY_HIERARCHY_ROLLOUT', False)
+    ENABLE_SPI_REPORT_GENERATION = env.bool('ENABLE_SPI_REPORT_GENERATION', False)
     DAILY_HIERARCHY_ROLLOUT_LIMIT = env.int('DAILY_HIERARCHY_ROLLOUT_LIMIT', 10)
-
-    if env.bool('ENABLE_SPI_REPORT_GENERATION', False):
-        CELERY_BEAT_SCHEDULE['spi_report'] = {
-            'task': 'datahub.investment.project.report.tasks.generate_spi_report',
-            'schedule': crontab(minute=0, hour=8),
-        }
 
     if env.bool('ENABLE_EMAIL_INGESTION', False):
         CELERY_BEAT_SCHEDULE['email_ingestion'] = {

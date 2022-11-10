@@ -16,6 +16,7 @@ from datahub.company.tasks.contact import schedule_automatic_contact_archive
 from datahub.core.queues.constants import (
     EVERY_MIDNIGHT,
     EVERY_ONE_AM,
+    EVERY_EIGHT_AM,
     EVERY_SEVEN_PM,
     EVERY_TEN_MINUTES,
 )
@@ -24,6 +25,7 @@ from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import DataHubScheduler
 from datahub.dnb_api.tasks.sync import schedule_sync_outdated_companies_with_dnb
 from datahub.dnb_api.tasks.update import schedule_get_company_updates
+from datahub.investment.project.report.tasks import schedule_generate_spi_report
 from datahub.search.tasks import sync_all_models
 env = environ.Env()
 logger = getLogger(__name__)
@@ -42,7 +44,7 @@ def schedule_jobs():
             'limit': 20000,
             'simulate': False,
         },
-        cron=EVERY_SEVEN_PM,
+        cron=EVERY_EIGHT_AM,
         description='Automatic Company Archive',
     )
     job_scheduler(
@@ -60,10 +62,18 @@ def schedule_jobs():
         description='Update companies from dnb service',
     )
 
+    if settings.ENABLE_SPI_REPORT_GENERATION:
+        job_scheduler(
+            function=schedule_generate_spi_report,
+            cron=EVERY_ONE_AM,
+            description='SPI report generation',
+        )
+
     if settings.ENABLE_DAILY_OPENSEARCH_SYNC:
         job_scheduler(
             function=sync_all_models,
             cron=EVERY_ONE_AM,
+            description='Daily OpenSearch sync',
         )
 
     if settings.ENABLE_DAILY_HIERARCHY_ROLLOUT:

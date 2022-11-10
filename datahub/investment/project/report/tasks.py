@@ -1,11 +1,15 @@
+import logging
 import tempfile
 
-from celery import shared_task
 from django.utils.timezone import now
 
+from datahub.core.queues.constants import EVERY_EIGHT_AM
+from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.documents.utils import get_bucket_name, get_s3_client_for_bucket
 from datahub.investment.project.report.models import SPIReport
 from datahub.investment.project.report.spi import write_report
+
+logger = logging.getLogger(__name__)
 
 
 def _get_report_key():
@@ -14,9 +18,20 @@ def _get_report_key():
     return key
 
 
-@shared_task(acks_late=True)
+# Generated SPI Reports are no longer used. Conversion from Celery to RQ has not been tested.
+def schedule_generate_spi_report():
+    job = job_scheduler(
+        function='generate_spi_report',
+        cron=EVERY_EIGHT_AM,
+    )
+    logger.info(
+        f'Task {job.id} schedule_generate_spi_report',
+    )
+    return job
+
+
 def generate_spi_report():
-    """Celery task that generates SPI report."""
+    """Schedule RQ task that generates SPI report."""
     with tempfile.TemporaryFile(mode='wb+') as file:
         write_report(file)
 
@@ -37,3 +52,7 @@ def generate_spi_report():
             s3_key=report_key,
         )
         report.save()
+
+    logger.info(
+        'Task generate_spi_report completed',
+    )
