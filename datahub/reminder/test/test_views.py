@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test_utils import APITestMixin
 from datahub.interaction.test.factories import CompaniesInteractionFactory
 from datahub.investment.project.proposition.models import PropositionStatus
@@ -466,6 +466,22 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin):
         assert NoRecentExportInteractionReminder.objects.filter(
             adviser=self.user,
         ).count() == reminder_count - 1
+
+    def test_get_reminders_no_team(self):
+        """Should be return reminders of interactions created by users with no DIT team listed"""
+        interaction_adviser = AdviserFactory(dit_team=None)
+        export_interaction = CompaniesInteractionFactory(created_by=interaction_adviser)
+
+        NoRecentExportInteractionReminderFactory.create(
+            adviser=self.user, interaction=export_interaction
+        )
+
+        url = reverse(self.url_name)
+        response = self.api_client.get(f'{url}?offset=0&limit=2')
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        returned_reminder = data['results'][0]
+        assert returned_reminder['interaction']['created_by']['dit_team'] is None
 
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
