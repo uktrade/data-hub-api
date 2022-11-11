@@ -10,7 +10,7 @@ from django_pglocks import advisory_lock
 
 from datahub.core import statsd
 from datahub.core.constants import InvestmentProjectStage
-from datahub.feature_flag.utils import is_feature_flag_active
+from datahub.feature_flag.utils import is_feature_flag_active, is_user_feature_flag_active
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 from datahub.notification.constants import NotifyServiceName
@@ -161,10 +161,10 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
     """
     Generates the estimated land date reminders for a given subscription.
     """
-    user_features = subscription.adviser.features.filter(
-        is_active=True,
-    ).values_list('code', flat=True)
-    if INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME not in user_features:
+    if not is_user_feature_flag_active(
+        INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
+        subscription.adviser,
+    ):
         logger.info(
             f'Feature flag "{INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME}"'
             'is not active for this user, exiting.',
@@ -249,10 +249,10 @@ def generate_no_recent_interaction_reminders_for_subscription(subscription, curr
     """
     Generates the no recent interaction reminders for a given subscription.
     """
-    user_features = subscription.adviser.features.filter(
-        is_active=True,
-    ).values_list('code', flat=True)
-    if INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME not in user_features:
+    if not is_user_feature_flag_active(
+        INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
+        subscription.adviser,
+    ):
         logger.info(
             f'Feature flag "{INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME}"'
             'is not active for this user, exiting.',
