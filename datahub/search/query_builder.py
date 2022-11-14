@@ -306,7 +306,7 @@ def _build_fuzzy_term_query(term, fields=None):
         ),
     ]
 
-    return Bool(should=should_query)
+    return Bool(should=should_query, must_not=Match(archived=True))
 
 
 def _build_exists_query(field, value):
