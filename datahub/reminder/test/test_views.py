@@ -4,7 +4,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.interaction.test.factories import CompaniesInteractionFactory
 from datahub.investment.project.proposition.models import PropositionStatus
 from datahub.investment.project.proposition.test.factories import PropositionFactory
@@ -190,6 +190,13 @@ class TestNoRecentExportInteractionSubscriptionViewset(APITestMixin):
     """
 
     url_name = 'api-v4:reminder:no-recent-export-interaction-subscription'
+
+    def test_not_authed(self):
+        """Should return Unauthorised"""
+        url = reverse(self.url_name)
+        api_client = APIClient()
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_get_subscription_not_present(self):
         """Given the current user does not have a subscription, make an empty one"""
@@ -398,6 +405,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin):
                         'name': export_interaction.created_by.dit_team.name,
                     },
                 },
+                'date': format_date_or_datetime(export_interaction.date),
                 'kind': str(export_interaction.kind),
                 'subject': export_interaction.subject,
             },
@@ -473,7 +481,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin):
         export_interaction = CompaniesInteractionFactory(created_by=interaction_adviser)
 
         NoRecentExportInteractionReminderFactory.create(
-            adviser=self.user, interaction=export_interaction
+            adviser=self.user, interaction=export_interaction,
         )
 
         url = reverse(self.url_name)
