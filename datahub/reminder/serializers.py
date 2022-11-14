@@ -76,7 +76,7 @@ class NestedInteractionSerializer(BaseInteractionSerializer):
 
     class Meta:
         model = Interaction
-        fields = ('created_by', 'kind', 'subject')
+        fields = ('created_by', 'kind', 'subject', 'date')
 
 
 class NestedExportCompanySerializer(serializers.ModelSerializer):
