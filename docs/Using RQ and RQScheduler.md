@@ -41,7 +41,7 @@ First decide if it's a one off job, or you want to it to repeat regularly.
 
 (repeat job at set intervals/times)
 
-1. The same as step 1 above, but pass in a `cron` value and it will repeat accordingly. There are [constants for some often used cron values.](https://github.com/uktrade/data-hub-api/blob/main/datahub/core/queues/cron_constants.py)
+1. The same as step 1 above, but pass in a `cron` value and it will repeat accordingly. There are [constants for some often used cron values.](https://github.com/uktrade/data-hub-api/blob/main/datahub/core/queues/cron_constants.py). Cron tasks listed in `./cron-scheduler.py` are automatically scheduled when the service (re)starts. 
 
 ## Monitoring RQ locally
 
@@ -71,7 +71,7 @@ The core service for facilitating RQ exported information is [RQ exporter](https
 
 1. Check services are running
 
-   Check docker dashboard to make sure all services are runnign as expected when jobs are set, and make sure if you have any jobs in environment variables, that you enable the variables to make sure the job gets scheduled.
+   Check docker dashboard to make sure all services are running as expected when jobs are set, and make sure if you have any jobs in environment variables, that you enable the variables to make sure the job gets scheduled.
 
 ## Utilities
 
