@@ -394,23 +394,10 @@ if REDIS_BASE_URL:
                 'age_check': 60  # in minutes
             }
         },
-        'refresh_gross_value_added_values': {
-            'task': (
-                'datahub.investment.project.tasks.'
-                'refresh_gross_value_added_value_for_fdi_investment_projects'
-            ),
-            'schedule': crontab(minute=0, hour=3, day_of_month=21)
-        },
     }
 
     ENABLE_DAILY_HIERARCHY_ROLLOUT = env.bool('ENABLE_DAILY_HIERARCHY_ROLLOUT', False)
     DAILY_HIERARCHY_ROLLOUT_LIMIT = env.int('DAILY_HIERARCHY_ROLLOUT_LIMIT', 10)
-
-    if env.bool('ENABLE_SPI_REPORT_GENERATION', False):
-        CELERY_BEAT_SCHEDULE['spi_report'] = {
-            'task': 'datahub.investment.project.report.tasks.generate_spi_report',
-            'schedule': crontab(minute=0, hour=8),
-        }
 
     if env.bool('ENABLE_EMAIL_INGESTION', False):
         CELERY_BEAT_SCHEDULE['email_ingestion'] = {

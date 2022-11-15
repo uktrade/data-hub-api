@@ -10,7 +10,9 @@ from datahub.investment.project.models import (
     InvestmentProject,
     InvestmentProjectCode,
 )
-from datahub.investment.project.tasks import update_investment_projects_for_gva_multiplier_task
+from datahub.investment.project.tasks import (
+    schedule_update_investment_projects_for_gva_multiplier_task,
+)
 
 
 @receiver(
@@ -89,8 +91,8 @@ def update_investment_projects_for_gva_multiplier_post_save(sender, **kwargs):
     instance = kwargs['instance']
     created = kwargs['created']
     if not created:
-        update_investment_projects_for_gva_multiplier_task.apply_async(
-            args=(instance.pk,),
+        schedule_update_investment_projects_for_gva_multiplier_task(
+            instance.pk,
         )
 
 

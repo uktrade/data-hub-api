@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 from reversion.models import Version
 
@@ -10,8 +12,9 @@ pytestmark = pytest.mark.django_db
 class TestUpdateCountryOfOriginCommand:
     """Test update country of origin command."""
 
-    def test_update_country_of_origin(self):
+    def test_update_country_of_origin(self, caplog):
         """Test populating country of origin."""
+        caplog.set_level(logging.INFO)
         projects = InvestmentProjectFactory.create_batch(
             2,
             country_investment_originates_from=None,
@@ -53,6 +56,15 @@ class TestUpdateCountryOfOriginCommand:
         for control_project in control_projects:
             versions = Version.objects.get_for_object(control_project)
             assert versions.count() == 0
+
+        assert any(
+            'schedule_update_country_of_origin_for_investment_projects'
+            in message for message in caplog.messages
+        )
+        assert any(
+            'Task update_country_of_origin_for_investment_projects completed'
+            in message for message in caplog.messages
+        )
 
     def _run_command(self):
         cmd = update_country_of_origin.Command()
