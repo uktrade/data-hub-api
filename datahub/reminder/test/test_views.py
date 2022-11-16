@@ -336,23 +336,24 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
         }
 
 
-@freeze_time('2022-11-07T17:00:00.000000Z')
-class TestNoRecentExportInteractionReminderViewset(APITestMixin):
+class ReminderTestMixin:
     """
-    Tests for the no recent export interaction reminder view.
+    Common tests for the reminder views.
     """
 
-    url_name = 'api-v4:reminder:no-recent-export-interaction-reminder'
-    detail_url_name = 'api-v4:reminder:no-recent-export-interaction-reminder-detail'
+    @property
+    def get_response(self):
+        url = reverse(self.url_name)
+        return self.api_client.get(f'{url}?offset=0&limit=2')
 
     def create_reminders(self):
         """Creates some mock reminders"""
         with freeze_time('2022-11-07T17:00:00.000000Z'):
-            reminder_1 = NoRecentExportInteractionReminderFactory(
+            reminder_1 = self.factory(
                 adviser=self.user,
             )
         with freeze_time('2022-11-07T18:00:00.000000Z'):
-            reminder_2 = NoRecentExportInteractionReminderFactory(
+            reminder_2 = self.factory(
                 adviser=self.user,
             )
         return [reminder_1, reminder_2]
@@ -363,6 +364,80 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin):
         api_client = APIClient()
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_get_reminders_only_includes_current(self):
+        """Only the reminders belonging to the current user should be returned"""
+        reminder_count = 3
+        self.factory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
+        self.factory.create_batch(2)
+        response = self.get_response
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data.get('count') == reminder_count
+
+    def test_default_sort_by(self):
+        """Default sort should be in reverse date order"""
+        reminder_1, reminder_2 = self.create_reminders()
+        response = self.get_response
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data.get('count') == 2
+        results = data.get('results', [])
+        assert results[0]['id'] == str(reminder_2.id)
+        assert results[1]['id'] == str(reminder_1.id)
+
+    def test_sort_by_created(self):
+        """Should sort in date order"""
+        reminder_1, reminder_2 = self.create_reminders()
+        url = reverse(self.url_name)
+        response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=created_on')
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data.get('count') == 2
+        results = data.get('results', [])
+        assert results[0]['id'] == str(reminder_1.id)
+        assert results[1]['id'] == str(reminder_2.id)
+
+    def test_sort_by_created_descending(self):
+        """Should sort in reverse date order"""
+        reminder_1, reminder_2 = self.create_reminders()
+        url = reverse(self.url_name)
+        response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=-created_on')
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data.get('count') == 2
+        results = data.get('results', [])
+        assert results[0]['id'] == str(reminder_2.id)
+        assert results[1]['id'] == str(reminder_1.id)
+
+    def test_delete(self):
+        """Deleting should remove the model instance"""
+        reminder_count = 3
+        reminder = self.factory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )[0]
+        url = reverse(self.detail_url_name, kwargs={'pk': str(reminder.id)})
+        response = self.api_client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert self.tested_model.objects.filter(
+            adviser=self.user,
+        ).count() == reminder_count - 1
+
+
+@freeze_time('2022-11-07T17:00:00.000000Z')
+class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
+    """
+    Tests for the no recent export interaction reminder view.
+    """
+
+    url_name = 'api-v4:reminder:no-recent-export-interaction-reminder'
+    detail_url_name = 'api-v4:reminder:no-recent-export-interaction-reminder-detail'
+    factory = NoRecentExportInteractionReminderFactory
+    tested_model = NoRecentExportInteractionReminder
 
     def test_get_reminders(self):
         """Given some reminders, these should be returned"""
@@ -376,104 +451,66 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin):
             interaction=export_interaction,
         )
         url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2')
+        response = self.get_response
         assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == reminder_count
-        assert 'next' in data
-        assert 'previous' in data
-        results = data.get('results', [])
-        assert len(results) == 2
-        reminders = sorted(reminders, key=lambda x: x.pk)
 
-        assert results[0] == {
-            'id': str(reminders[0].id),
-            'created_on': '2022-11-07T17:00:00Z',
-            'event': reminders[0].event,
-            'company': {
-                'id': str(export_company.id),
-                'name': export_company.name,
-            },
-            'interaction': {
-                'created_by': {
-                    'name': export_interaction.created_by.name,
-                    'first_name': export_interaction.created_by.first_name,
-                    'last_name': export_interaction.created_by.last_name,
-                    'id': str(export_interaction.created_by.id),
-                    'dit_team': {
-                        'id': str(export_interaction.created_by.dit_team.id),
-                        'name': export_interaction.created_by.dit_team.name,
+        sorted_reminders = sorted(reminders, key=lambda x: x.pk)
+        data = response.json()
+        assert data == {
+            'count': reminder_count,
+            'next': f'http://testserver{url}?limit=2&offset=2',
+            'previous': None,
+            'results': [
+                {
+                    'id': str(sorted_reminders[0].id),
+                    'created_on': '2022-11-07T17:00:00Z',
+                    'event': sorted_reminders[0].event,
+                    'company': {
+                        'id': str(export_company.id),
+                        'name': export_company.name,
+                    },
+                    'interaction': {
+                        'created_by': {
+                            'name': export_interaction.created_by.name,
+                            'first_name': export_interaction.created_by.first_name,
+                            'last_name': export_interaction.created_by.last_name,
+                            'id': str(export_interaction.created_by.id),
+                            'dit_team': {
+                                'id': str(export_interaction.created_by.dit_team.id),
+                                'name': export_interaction.created_by.dit_team.name,
+                            },
+                        },
+                        'date': format_date_or_datetime(export_interaction.date),
+                        'kind': str(export_interaction.kind),
+                        'subject': export_interaction.subject,
                     },
                 },
-                'date': format_date_or_datetime(export_interaction.date),
-                'kind': str(export_interaction.kind),
-                'subject': export_interaction.subject,
-            },
+                {
+                    'id': str(sorted_reminders[1].id),
+                    'created_on': '2022-11-07T17:00:00Z',
+                    'event': sorted_reminders[1].event,
+                    'company': {
+                        'id': str(export_company.id),
+                        'name': export_company.name,
+                    },
+                    'interaction': {
+                        'created_by': {
+                            'name': export_interaction.created_by.name,
+                            'first_name': export_interaction.created_by.first_name,
+                            'last_name': export_interaction.created_by.last_name,
+                            'id': str(export_interaction.created_by.id),
+                            'dit_team': {
+                                'id': str(export_interaction.created_by.dit_team.id),
+                                'name': export_interaction.created_by.dit_team.name,
+                            },
+                        },
+                        'date': format_date_or_datetime(export_interaction.date),
+                        'kind': str(export_interaction.kind),
+                        'subject': export_interaction.subject,
+                    },
+                },
+            ],
         }
-
-    def test_get_reminders_only_includes_current(self):
-        """Only the reminders belonging to the current user should be returned"""
-        reminder_count = 3
-        NoRecentExportInteractionReminderFactory.create_batch(
-            reminder_count,
-            adviser=self.user,
-        )
-        NoRecentExportInteractionReminderFactory.create_batch(2)
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2')
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == reminder_count
-
-    def test_default_sort_by(self):
-        """Defaut sort should be in reverse date order"""
-        reminder_1, reminder_2 = self.create_reminders()
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2')
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == 2
-        results = data.get('results', [])
-        assert results[0]['id'] == str(reminder_2.id)
-        assert results[1]['id'] == str(reminder_1.id)
-
-    def test_sort_by_created(self):
-        """Should sort in date order"""
-        reminder_1, reminder_2 = self.create_reminders()
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=created_on')
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == 2
-        results = data.get('results', [])
-        assert results[0]['id'] == str(reminder_1.id)
-        assert results[1]['id'] == str(reminder_2.id)
-
-    def test_sort_by_created_descending(self):
-        """Should sort in reverse date order"""
-        reminder_1, reminder_2 = self.create_reminders()
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=-created_on')
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == 2
-        results = data.get('results', [])
-        assert results[0]['id'] == str(reminder_2.id)
-        assert results[1]['id'] == str(reminder_1.id)
-
-    def test_delete(self):
-        """Deleting should remove the model instance"""
-        reminder_count = 3
-        reminder = NoRecentExportInteractionReminderFactory.create_batch(
-            reminder_count,
-            adviser=self.user,
-        )[0]
-        url = reverse(self.detail_url_name, kwargs={'pk': str(reminder.id)})
-        response = self.api_client.delete(url)
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert NoRecentExportInteractionReminder.objects.filter(
-            adviser=self.user,
-        ).count() == reminder_count - 1
 
     def test_get_reminders_no_team(self):
         """Should be return reminders of interactions created by users with no DIT team listed"""
@@ -484,8 +521,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin):
             adviser=self.user, interaction=export_interaction,
         )
 
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2')
+        response = self.get_response
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         returned_reminder = data['results'][0]
@@ -493,32 +529,15 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin):
 
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
-class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin):
+class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin, ReminderTestMixin):
     """
     Tests for the no recent investment interaction reminder view.
     """
 
     url_name = 'api-v4:reminder:no-recent-investment-interaction-reminder'
     detail_url_name = 'api-v4:reminder:no-recent-investment-interaction-reminder-detail'
-
-    def create_reminders(self):
-        """Creates some mock reminders"""
-        with freeze_time('2022-05-05T18:00:00.000000Z'):
-            reminder_1 = NoRecentInvestmentInteractionReminderFactory(
-                adviser=self.user,
-            )
-        with freeze_time('2022-05-05T19:00:00.000000Z'):
-            reminder_2 = NoRecentInvestmentInteractionReminderFactory(
-                adviser=self.user,
-            )
-        return [reminder_1, reminder_2]
-
-    def test_not_authed(self):
-        """Should return Unauthorised"""
-        url = reverse(self.url_name)
-        api_client = APIClient()
-        response = api_client.get(url)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    factory = NoRecentInvestmentInteractionReminderFactory
+    tested_model = NoRecentInvestmentInteractionReminder
 
     def test_get_reminders(self):
         """Given some reminders, these should be returned"""
@@ -527,8 +546,7 @@ class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2')
+        response = self.get_response
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data.get('count') == reminder_count
@@ -548,98 +566,17 @@ class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin):
             },
         }
 
-    def test_get_reminders_only_includes_current(self):
-        """Only the reminders belonging to the current user should be returned"""
-        reminder_count = 3
-        NoRecentInvestmentInteractionReminderFactory.create_batch(
-            reminder_count,
-            adviser=self.user,
-        )
-        NoRecentInvestmentInteractionReminderFactory.create_batch(2)
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2')
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == reminder_count
-
-    def test_default_sort_by(self):
-        """Default sort should be in reverse date order"""
-        reminder_1, reminder_2 = self.create_reminders()
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2')
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == 2
-        results = data.get('results', [])
-        assert results[0]['id'] == str(reminder_2.id)
-        assert results[1]['id'] == str(reminder_1.id)
-
-    def test_sort_by_created(self):
-        """Should sort in date order"""
-        reminder_1, reminder_2 = self.create_reminders()
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=created_on')
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == 2
-        results = data.get('results', [])
-        assert results[0]['id'] == str(reminder_1.id)
-        assert results[1]['id'] == str(reminder_2.id)
-
-    def test_sort_by_created_descending(self):
-        """Should sort in reverse date order"""
-        reminder_1, reminder_2 = self.create_reminders()
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=-created_on')
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == 2
-        results = data.get('results', [])
-        assert results[0]['id'] == str(reminder_2.id)
-        assert results[1]['id'] == str(reminder_1.id)
-
-    def test_delete(self):
-        """Deleting should remove the model instance"""
-        reminder_count = 3
-        reminder = NoRecentInvestmentInteractionReminderFactory.create_batch(
-            reminder_count,
-            adviser=self.user,
-        )[0]
-        url = reverse(self.detail_url_name, kwargs={'pk': str(reminder.id)})
-        response = self.api_client.delete(url)
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert NoRecentInvestmentInteractionReminder.objects.filter(
-            adviser=self.user,
-        ).count() == reminder_count - 1
-
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
-class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin):
+class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin, ReminderTestMixin):
     """
     Tests for the upcoming estimated land date reminder view.
     """
 
     url_name = 'api-v4:reminder:estimated-land-date-reminder'
     detail_url_name = 'api-v4:reminder:estimated-land-date-reminder-detail'
-
-    def create_reminders(self):
-        """Creates some mock reminders"""
-        with freeze_time('2022-05-05T18:00:00.000000Z'):
-            reminder_1 = UpcomingEstimatedLandDateReminderFactory(
-                adviser=self.user,
-            )
-        with freeze_time('2022-05-05T19:00:00.000000Z'):
-            reminder_2 = UpcomingEstimatedLandDateReminderFactory(
-                adviser=self.user,
-            )
-        return [reminder_1, reminder_2]
-
-    def test_not_authed(self):
-        """Should return Unauthorised"""
-        url = reverse(self.url_name)
-        api_client = APIClient()
-        response = api_client.get(url)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    factory = UpcomingEstimatedLandDateReminderFactory
+    tested_model = UpcomingEstimatedLandDateReminder
 
     def test_get_reminders(self):
         """Given some reminders, these should be returned"""
@@ -648,8 +585,7 @@ class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2')
+        response = self.get_response
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data.get('count') == reminder_count
@@ -668,70 +604,6 @@ class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin):
                 'project_code': reminders[0].project.project_code,
             },
         }
-
-    def test_get_reminders_only_includes_current(self):
-        """Only the reminders belonging to the current user should be returned"""
-        reminder_count = 3
-        UpcomingEstimatedLandDateReminderFactory.create_batch(
-            reminder_count,
-            adviser=self.user,
-        )
-        UpcomingEstimatedLandDateReminderFactory.create_batch(2)
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2')
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == reminder_count
-
-    def test_default_sort_by(self):
-        """Default sort should be in reverse date order"""
-        reminder_1, reminder_2 = self.create_reminders()
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2')
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == 2
-        results = data.get('results', [])
-        assert results[0]['id'] == str(reminder_2.id)
-        assert results[1]['id'] == str(reminder_1.id)
-
-    def test_sort_by_created(self):
-        """Should sort in date order"""
-        reminder_1, reminder_2 = self.create_reminders()
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=created_on')
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == 2
-        results = data.get('results', [])
-        assert results[0]['id'] == str(reminder_1.id)
-        assert results[1]['id'] == str(reminder_2.id)
-
-    def test_sort_by_created_descending(self):
-        """Should sort in reverse date order"""
-        reminder_1, reminder_2 = self.create_reminders()
-        url = reverse(self.url_name)
-        response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=-created_on')
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == 2
-        results = data.get('results', [])
-        assert results[0]['id'] == str(reminder_2.id)
-        assert results[1]['id'] == str(reminder_1.id)
-
-    def test_delete(self):
-        """Deleting should remove the model instance"""
-        reminder_count = 3
-        reminder = UpcomingEstimatedLandDateReminderFactory.create_batch(
-            reminder_count,
-            adviser=self.user,
-        )[0]
-        url = reverse(self.detail_url_name, kwargs={'pk': str(reminder.id)})
-        response = self.api_client.delete(url)
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert UpcomingEstimatedLandDateReminder.objects.filter(
-            adviser=self.user,
-        ).count() == reminder_count - 1
 
 
 class TestGetReminderSummaryView(APITestMixin):
