@@ -135,16 +135,32 @@ def reminder_summary_view(request):
     estimated_land_date = UpcomingEstimatedLandDateReminder.objects.filter(
         adviser=request.user,
     ).count()
-    no_recent_interaction = NoRecentInvestmentInteractionReminder.objects.filter(
+    no_recent_investment_interaction = NoRecentInvestmentInteractionReminder.objects.filter(
         adviser=request.user,
     ).count()
     outstanding_propositions = Proposition.objects.filter(
         adviser=request.user,
         status=PropositionStatus.ONGOING,
     ).count()
+    no_recent_export_interaction = NoRecentExportInteractionReminder.objects.filter(
+        adviser=request.user,
+    ).count()
+
+    total_count = sum([
+        estimated_land_date,
+        no_recent_investment_interaction,
+        outstanding_propositions,
+        no_recent_export_interaction,
+    ])
 
     return Response({
-        'estimated_land_date': estimated_land_date,
-        'no_recent_investment_interaction': no_recent_interaction,
-        'outstanding_propositions': outstanding_propositions,
+        'count': total_count,
+        'investment': {
+            'estimated_land_date': estimated_land_date,
+            'no_recent_interaction': no_recent_investment_interaction,
+            'outstanding_propositions': outstanding_propositions,
+        },
+        'export': {
+            'no_recent_interaction': no_recent_export_interaction,
+        },
     })

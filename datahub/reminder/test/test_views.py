@@ -623,6 +623,7 @@ class TestGetReminderSummaryView(APITestMixin):
     def test_get_summary_of_reminders(self):
         """Should return a summary of reminders."""
         reminder_count = 3
+        reminder_categories = 4  # used for finding the total number of reminders in this test
         UpcomingEstimatedLandDateReminderFactory.create_batch(
             reminder_count,
             adviser=self.user,
@@ -643,14 +644,26 @@ class TestGetReminderSummaryView(APITestMixin):
             status=PropositionStatus.ABANDONED,
         )
         PropositionFactory.create_batch(2)
+        NoRecentExportInteractionReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
+        NoRecentExportInteractionReminderFactory.create_batch(2)
+        total_reminders = reminder_count * reminder_categories
         url = reverse(self.url_name)
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data == {
-            'estimated_land_date': reminder_count,
-            'no_recent_investment_interaction': reminder_count,
-            'outstanding_propositions': reminder_count,
+            'count': total_reminders,
+            'investment': {
+                'estimated_land_date': reminder_count,
+                'no_recent_interaction': reminder_count,
+                'outstanding_propositions': reminder_count,
+            },
+            'export': {
+                'no_recent_interaction': reminder_count,
+            },
         }
 
     def test_get_zeroes_if_no_reminders(self):
@@ -660,7 +673,13 @@ class TestGetReminderSummaryView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data == {
-            'estimated_land_date': 0,
-            'no_recent_investment_interaction': 0,
-            'outstanding_propositions': 0,
+            'count': 0,
+            'investment': {
+                'estimated_land_date': 0,
+                'no_recent_interaction': 0,
+                'outstanding_propositions': 0,
+            },
+            'export': {
+                'no_recent_interaction': 0,
+            },
         }
