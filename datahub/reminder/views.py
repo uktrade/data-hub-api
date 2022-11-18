@@ -13,6 +13,7 @@ from rest_framework.response import Response
 
 from datahub.investment.project.proposition.models import Proposition, PropositionStatus
 from datahub.reminder.models import (
+    NoRecentExportInteractionReminder,
     NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
@@ -21,6 +22,7 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateSubscription,
 )
 from datahub.reminder.serializers import (
+    NoRecentExportInteractionReminderSerializer,
     NoRecentExportInteractionSubscriptionSerializer,
     NoRecentInvestmentInteractionReminderSerializer,
     NoRecentInvestmentInteractionSubscriptionSerializer,
@@ -108,6 +110,11 @@ class BaseReminderViewset(viewsets.GenericViewSet, ListModelMixin, DestroyModelM
 
     def get_queryset(self):
         return self.model_class.objects.filter(adviser=self.request.user)
+
+
+class NoRecentExportInteractionReminderViewset(BaseReminderViewset):
+    serializer_class = NoRecentExportInteractionReminderSerializer
+    model_class = NoRecentExportInteractionReminder
 
 
 class NoRecentInvestmentInteractionReminderViewset(BaseReminderViewset):

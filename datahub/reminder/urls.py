@@ -1,6 +1,7 @@
 from django.urls import path
 
 from datahub.reminder.views import (
+    NoRecentExportInteractionReminderViewset,
     NoRecentExportInteractionSubscriptionViewset,
     NoRecentInvestmentInteractionReminderViewset,
     NoRecentInvestmentInteractionSubscriptionViewset,
@@ -41,6 +42,20 @@ urlpatterns = [
         name='subscription-summary',
     ),
 
+    path(
+        'reminder/no-recent-export-interaction',
+        NoRecentExportInteractionReminderViewset.as_view({
+            'get': 'list',
+        }),
+        name='no-recent-export-interaction-reminder',
+    ),
+    path(
+        'reminder/no-recent-export-interaction/<uuid:pk>',
+        NoRecentExportInteractionReminderViewset.as_view({
+            'delete': 'destroy',
+        }),
+        name='no-recent-export-interaction-reminder-detail',
+    ),
     path(
         'reminder/no-recent-investment-interaction',
         NoRecentInvestmentInteractionReminderViewset.as_view({
