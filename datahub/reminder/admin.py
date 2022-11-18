@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from datahub.reminder.models import (
+    NoRecentExportInteractionReminder,
     NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
@@ -28,6 +29,13 @@ class UpcomingEstimatedLandDateSubscriptionAdmin(admin.ModelAdmin):
     """Upcoming Estimated Land Date Subscription admin."""
 
     raw_id_fields = ('adviser',)
+
+
+@admin.register(NoRecentExportInteractionReminder)
+class NoRecentExportInteractionReminderAdmin(admin.ModelAdmin):
+    """No Recent Export Interaction Subscription admin."""
+
+    raw_id_fields = ('adviser', 'company')
 
 
 @admin.register(NoRecentInvestmentInteractionReminder)
