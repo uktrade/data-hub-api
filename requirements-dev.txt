@@ -88,7 +88,7 @@ django==3.2.16
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==5.39.0
+django-axes==5.40.0
     # via -r requirements.in
 django-debug-toolbar==3.7.0
     # via -r requirements.in
@@ -236,7 +236,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==6.9.0
+pip-tools==6.10.0
     # via -r requirements-dev.in
 piprot==0.9.11
     # via -r requirements-dev.in
