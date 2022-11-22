@@ -63,6 +63,7 @@ def schedule_refresh_gross_value_added_value_for_fdi_investment_projects():
         queue_name=LONG_RUNNING_QUEUE,
         function=refresh_gross_value_added_value_for_fdi_investment_projects,
         description='schedule_refresh_gross_value_added_value_for_fdi_investment_projects',
+        job_timeout=HALF_DAY_IN_SECONDS,
     )
     logger.info(
         f'Task {job.id} schedule_refresh_gross_value_added_value_for_fdi_investment_projects',
