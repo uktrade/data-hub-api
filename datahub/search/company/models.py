@@ -82,6 +82,8 @@ class Company(BaseSearchModel):
         'uk_address_postcode': lambda obj: obj.address_postcode if obj.uk_based else '',
         'uk_registered_address_postcode':
             lambda obj: obj.registered_address_postcode if obj.uk_based else '',
+        'export_segment': lambda obj: obj.export_segment,
+        'export_sub_segment': lambda obj: obj.export_sub_segment,
     }
 
     MAPPINGS = {
@@ -121,4 +123,6 @@ class Company(BaseSearchModel):
         'registered_address.area.name.trigram',
         'registered_address.postcode',
         'registered_address.country.name.trigram',
+        'export_segment',
+        'export_sub_segment',
     )
