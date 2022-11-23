@@ -1,0 +1,3 @@
+- model: metadata.tradeagreement
+  pk: 1342b537-1594-45ad-a90a-6d8843cd83e8
+  fields: { disabled_on: null, name: "UK-Israel Free Trade Agreement" }
