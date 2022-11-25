@@ -133,7 +133,13 @@ class NoRecentExportInteractionReminder(BaseReminder):
         'interaction.Interaction',
         on_delete=models.CASCADE,
         related_name='no_recent_export_interaction_reminders',
+        null=True,
+        blank=True,
     )
+
+    @property
+    def last_interaction_date(self):
+        return self.interaction.date if self.interaction else self.company.created_on
 
 
 class NoRecentInvestmentInteractionReminder(BaseReminder):
