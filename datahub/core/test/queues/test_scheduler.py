@@ -121,6 +121,22 @@ def test_job_retry_with_errors_will_reschedule_with_three_tries(async_queue: Dat
     assert job.retry_intervals == [1, 4, 16]
 
 
+def test_job_not_retried_with_retry_none(async_queue: DataHubScheduler):
+    job = async_queue.enqueue(
+        queue_name='will_fail',
+        function=PickleableMock.queue_handler_with_error,
+    )
+
+    async_queue.work('will_fail')
+
+    assert job is not None
+    retrieved_job = async_queue.job(job.id)
+    assert retrieved_job is not None
+    assert retrieved_job.is_scheduled is False
+    assert job.retries_left is None
+    assert job.retry_intervals is None
+
+
 def test_should_be_in_the_testing_environment():
     assert settings.IS_TEST is True
 

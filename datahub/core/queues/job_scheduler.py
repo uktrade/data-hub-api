@@ -19,6 +19,7 @@ def job_scheduler(
     retry_backoff=False,
     retry_intervals=0,
     cron=None,
+    time_delta=None,
     job_timeout=THREE_MINUTES_IN_SECONDS,
     description=None,
 ):
@@ -29,6 +30,7 @@ def job_scheduler(
         function_args (*args, optional): Function argument values. Defaults to None.
         function_kwargs (**kwargs, optional): Function key value arguments. Defaults to None.
         max_retries (int, optional): Maximum number of retries before giving up.
+            If None, the function will not retry.
             Defaults to 3 based on the RQ default.
         queue_name (string, optional): Name of a queue to schedule work with. Defaults to
             SHORT_RUNNING_QUEUE.
@@ -48,7 +50,9 @@ def job_scheduler(
             retry amount.
             Defaults to 0.
         cron (str, optional): Add a schedule using the cron format, see https://crontab.cronhub.io/
-            for generating a cron string
+            for generating a cron string. Cannot be used if time_delta is defined.
+        time_delta (datetime.timedelta, optional): Schedules the job to run at
+            X seconds/minutes/hours/days/weeks later. Cannot be used if cron is defined.
         job_timeout (int, optional): Default timeout is 180 seconds
         description (str, opional): Cron scheduling allows a description to be assigned making it
             easier for debugging and tracing cron jobs, and is only applicable to jobs with crons
@@ -58,6 +62,9 @@ def job_scheduler(
         retry_intervals = retry_backoff_intervals(max_retries, retry_backoff, is_backoff_an_int)
     else:
         retry_intervals = retry_intervals
+
+    if cron is not None and time_delta is not None:
+        raise Exception('cron and time_delta can not both be defined.')
 
     logger.info(
         f"Configuring RQ with function '{function}' function args/kwargs '{function_args}' "
@@ -77,17 +84,31 @@ def job_scheduler(
                 description=description,
             )
         else:
-            job = scheduler.enqueue(
-                queue_name=queue_name,
-                function=function,
-                args=function_args,
-                kwargs=function_kwargs,
-                retry=Retry(
+            retry = None
+            if max_retries is not None:
+                retry = Retry(
                     max=max_retries,
                     interval=retry_intervals,
-                ),
-                job_timeout=job_timeout,
-            )
+                )
+            if time_delta is not None:
+                job = scheduler.enqueue_in(
+                    queue_name=queue_name,
+                    time_delta=time_delta,
+                    function=function,
+                    args=function_args,
+                    kwargs=function_kwargs,
+                    retry=retry,
+                    job_timeout=job_timeout,
+                )
+            else:
+                job = scheduler.enqueue(
+                    queue_name=queue_name,
+                    function=function,
+                    args=function_args,
+                    kwargs=function_kwargs,
+                    retry=retry,
+                    job_timeout=job_timeout,
+                )
         logger.info(f'Generated job id "{job.id}" with "{job.__dict__}"')
         return job
 

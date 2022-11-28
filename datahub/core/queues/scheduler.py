@@ -74,6 +74,20 @@ class DataHubScheduler:
             **kwargs,
         )
 
+    def enqueue_in(self, queue_name: str, time_delta, function, *args, **kwargs):
+        queue = RqQueue(
+            name=queue_name,
+            is_async=self.is_async,
+            connection=self._connection,
+        )
+        self._queues.append(queue)
+        return queue.enqueue_in(
+            time_delta,
+            function,
+            *args,
+            **kwargs,
+        )
+
     def cron(self, queue_name: str, cron: str, function, *args, **kwargs):
         job = self._scheduler.cron(
             cron,
