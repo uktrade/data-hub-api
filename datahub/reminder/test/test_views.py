@@ -464,6 +464,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMix
                 {
                     'id': str(sorted_reminders[0].id),
                     'created_on': '2022-11-07T17:00:00Z',
+                    'last_interaction_date': format_date_or_datetime(export_interaction.date),
                     'event': sorted_reminders[0].event,
                     'company': {
                         'id': str(export_company.id),
@@ -488,6 +489,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMix
                 {
                     'id': str(sorted_reminders[1].id),
                     'created_on': '2022-11-07T17:00:00Z',
+                    'last_interaction_date': format_date_or_datetime(export_interaction.date),
                     'event': sorted_reminders[1].event,
                     'company': {
                         'id': str(export_company.id),
@@ -512,8 +514,53 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMix
             ],
         }
 
+    def test_get_reminders_no_interaction(self):
+        """Should return reminders for companies with no interactions"""
+        reminder_count = 3
+        export_company = CompanyFactory()
+        reminders = NoRecentExportInteractionReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+            company=export_company,
+        )
+        url = reverse(self.url_name)
+        response = self.get_response
+        assert response.status_code == status.HTTP_200_OK
+
+        sorted_reminders = sorted(reminders, key=lambda x: x.pk)
+        data = response.json()
+        assert data == {
+            'count': reminder_count,
+            'next': f'http://testserver{url}?limit=2&offset=2',
+            'previous': None,
+            'results': [
+                {
+                    'id': str(sorted_reminders[0].id),
+                    'created_on': '2022-11-07T17:00:00Z',
+                    'event': sorted_reminders[0].event,
+                    'last_interaction_date': format_date_or_datetime(export_company.created_on),
+                    'company': {
+                        'id': str(export_company.id),
+                        'name': export_company.name,
+                    },
+                    'interaction': None,
+                },
+                {
+                    'id': str(sorted_reminders[1].id),
+                    'created_on': '2022-11-07T17:00:00Z',
+                    'event': sorted_reminders[1].event,
+                    'last_interaction_date': format_date_or_datetime(export_company.created_on),
+                    'company': {
+                        'id': str(export_company.id),
+                        'name': export_company.name,
+                    },
+                    'interaction': None,
+                },
+            ],
+        }
+
     def test_get_reminders_no_team(self):
-        """Should be return reminders of interactions created by users with no DIT team listed"""
+        """Should be returning reminders of interactions created by users with no DIT team"""
         interaction_adviser = AdviserFactory(dit_team=None)
         export_interaction = CompaniesInteractionFactory(created_by=interaction_adviser)
 
