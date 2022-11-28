@@ -1,7 +1,6 @@
 import factory
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
-from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.reminder.models import (
     NoRecentExportInteractionReminder,
@@ -39,7 +38,6 @@ class BaseReminderFactory(factory.django.DjangoModelFactory):
 
 class NoRecentExportInteractionReminderFactory(BaseReminderFactory):
     company = factory.SubFactory(CompanyFactory)
-    interaction = factory.SubFactory(CompanyInteractionFactory)
 
     class Meta:
         model = NoRecentExportInteractionReminder
