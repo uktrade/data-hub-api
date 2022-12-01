@@ -1,4 +1,8 @@
+from datetime import timedelta
+
 from unittest.mock import Mock
+
+import pytest
 
 from datahub.core.queues.constants import EVERY_MINUTE
 from datahub.core.queues.job_scheduler import job_scheduler, retry_backoff_intervals
@@ -155,6 +159,16 @@ def test_job_scheduler_creates_cron_jobs(queue: DataHubScheduler):
     assert len(list(queue.scheduled_jobs())) == existing_job_count + 1
     assert actual_job.meta['cron_string'] == EVERY_MINUTE
     assert actual_job.description == 'Test cron'
+
+
+def test_job_scheduler_can_not_define_cron_and_time_delta(queue: DataHubScheduler):
+    with pytest.raises(Exception):
+        job_scheduler(
+            function=PickleableMock.queue_handler,
+            queue_name='234',
+            cron=EVERY_MINUTE,
+            time_delta=(timedelta(seconds=1)),
+        )
 
 
 def queue_setup(monkeypatch):
