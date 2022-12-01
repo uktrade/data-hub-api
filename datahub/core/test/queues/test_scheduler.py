@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from unittest.mock import call, MagicMock
 
 import pytest
@@ -44,6 +46,17 @@ def reset_spy():
 def test_can_queue_one_thing(async_queue: DataHubScheduler):
     async_queue.enqueue('one-running', PickleableMock.queue_handler)
     async_queue.work('one-running', with_scheduler=False)
+    assert PickleableMock.called
+    assert PickleableMock.params[0] == ()
+
+
+def test_can_enqueue_in_using_time_delta(async_queue: DataHubScheduler):
+    async_queue.enqueue_in(
+        queue_name='one-running',
+        time_delta=(timedelta(seconds=1)),
+        function=PickleableMock.queue_handler,
+    )
+    async_queue.work('one-running', with_scheduler=True)
     assert PickleableMock.called
     assert PickleableMock.params[0] == ()
 
