@@ -194,6 +194,7 @@ def test_purging_queue(async_queue: DataHubScheduler):
 def test_purging_fails(
     async_queue: DataHubScheduler,
 ):
+    failed_count = async_queue.failed_count('will_fail')
     job = async_queue.enqueue(
         queue_name='will_fail',
         function=PickleableMock.queue_handler_with_error,
@@ -201,7 +202,7 @@ def test_purging_fails(
     )
     async_queue.work('will_fail')
 
-    assert async_queue.failed_count('will_fail') == 1
+    assert async_queue.failed_count('will_fail') == failed_count + 1
     retrieved_job = async_queue.job(job.id)
     assert retrieved_job is not None
     assert retrieved_job.is_failed is True
