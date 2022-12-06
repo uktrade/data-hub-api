@@ -14,6 +14,16 @@ def get_inner_template_content(notification_type):
     return inner_template.content
 
 
+# TODO: update me and add get_interaction_item when email template confirmed
+def get_company_item(company):
+    """Get company item."""
+    return {
+        'company_details_url': f'{company.get_absolute_url()}/details',
+        'settings_url': settings.DATAHUB_FRONTEND_REMINDER_SETTINGS_URL,
+        'company_name': company.name,
+    }
+
+
 def get_project_item(project):
     """Get project item."""
     return {
