@@ -143,7 +143,7 @@ Dependencies:
 
 - Python 3.10.x
 - PostgreSQL 12
-- redis 3.2
+- redis 6.x
 - OpenSearch 1.x
 
 1.  Clone the repository:
