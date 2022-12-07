@@ -55,9 +55,11 @@ from datahub.reminder.tasks import (
     generate_no_recent_interaction_reminders,
     generate_no_recent_interaction_reminders_for_subscription,
     update_notify_email_delivery_status_for_estimated_land_date,
+    update_notify_email_delivery_status_for_no_recent_export_interaction,
     update_notify_email_delivery_status_for_no_recent_interaction,
 )
 from datahub.reminder.test.factories import (
+    NoRecentExportInteractionReminderFactory,
     NoRecentExportInteractionSubscriptionFactory,
     NoRecentInvestmentInteractionReminderFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
@@ -979,6 +981,7 @@ class TestCreateNoRecentExportInteractionReminder:
         assert reminders[0].event == expected_event
         mock_send_no_recent_export_interaction_reminder.assert_called_with(
             company=company,
+            interaction=interaction,
             adviser=adviser,
             reminder_days=reminder_days,
             current_date=self.current_date,
@@ -1086,7 +1089,6 @@ class TestCreateNoRecentExportInteractionReminder:
         )
         assert reminders.count() == 1
         assert mock_send_no_recent_export_interaction_reminder.call_count == 0
-        # TODO: assert no sending to celery queue, but to RQ
 
 
 @pytest.mark.django_db
@@ -1337,8 +1339,6 @@ class TestGenerateNoRecentExportInteractionReminderTask:
 
         generate_no_recent_export_interaction_reminders()
         assert mock_create_no_recent_export_interaction_reminder.call_count == 0
-
-    # TODO: continue these tests here
 
 
 @pytest.mark.django_db
@@ -2000,4 +2000,61 @@ class TestUpdateEmailDeliveryStatusTask:
         mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once_with(
             reminder_to_update.email_notification_id,
             notify_service_name=NotifyServiceName.investment,
+        )
+
+    def test_doesnt_update_no_recent_export_interaction_status_without_feature_flag(self, caplog):
+        """
+        Test that if the feature flag is not enabled, the task will not run.
+        """
+        caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
+        update_notify_email_delivery_status_for_no_recent_export_interaction()
+        assert caplog.messages == [
+            f'Feature flag "{EXPORT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}"'
+            ' is not active, exiting.',
+        ]
+
+    def test_updates_email_delivery_status_for_no_recent_export_interaction(
+        self,
+        no_recent_export_interaction_email_status_feature_flag,
+        mock_reminder_tasks_notify_gateway,
+        adviser,
+    ):
+        """
+        Test if email delivery status is being updated.
+        """
+        mock_reminder_tasks_notify_gateway.get_notification_by_id = mock.Mock(
+            return_value={'status': 'delivered'},
+        )
+
+        with freeze_time(self.current_date - relativedelta(days=6)):
+            reminder_too_old = NoRecentExportInteractionReminderFactory(
+                adviser=adviser,
+                email_notification_id=uuid.uuid4(),
+            )
+
+        with freeze_time(self.current_date - relativedelta(days=3)):
+            reminder_to_update = NoRecentExportInteractionReminderFactory(
+                adviser=adviser,
+                email_notification_id=uuid.uuid4(),
+            )
+
+        status_updated_on = self.current_date - relativedelta(days=1)
+        with freeze_time(status_updated_on):
+            update_notify_email_delivery_status_for_no_recent_export_interaction()
+
+        with freeze_time(self.current_date):
+            update_notify_email_delivery_status_for_no_recent_export_interaction()
+        reminder_too_old.refresh_from_db()
+        reminder_to_update.refresh_from_db()
+
+        assert reminder_too_old.email_delivery_status == EmailDeliveryStatus.UNKNOWN
+        assert reminder_to_update.email_delivery_status == EmailDeliveryStatus.DELIVERED
+        assert reminder_to_update.modified_on == datetime.datetime.combine(
+            status_updated_on,
+            datetime.datetime.min.time(),
+            tzinfo=utc,
+        )
+        mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once_with(
+            reminder_to_update.email_notification_id,
+            notify_service_name=NotifyServiceName.reminder,
         )

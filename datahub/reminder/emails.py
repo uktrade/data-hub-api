@@ -17,7 +17,6 @@ def get_inner_template_content(notification_type):
     return inner_template.content
 
 
-# TODO: update when email template confirmed
 def get_company_item(company):
     """Get company item."""
     return {
@@ -33,7 +32,6 @@ def get_interaction_item(interaction):
         'last_interaction_created_by': interaction.created_by.name,
         'last_interaction_type': interaction.get_kind_display(),
         'last_interaction_subject': interaction.subject,
-        'last_interaction_date': interaction.date.strftime(DATE_FORMAT),  # or created_on date?
     }
 
 

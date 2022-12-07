@@ -105,7 +105,7 @@ def send_no_recent_export_interaction_reminder(
     last_interaction_date = current_date - relativedelta(days=reminder_days)
 
     if interaction:
-        interaction_item = get_interaction_item()
+        interaction_item = get_interaction_item(interaction)
         notify_adviser_by_rq_email(
             adviser,
             settings.EXPORT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID,
@@ -115,6 +115,7 @@ def send_no_recent_export_interaction_reminder(
                 'time_period': timesince(last_interaction_date, now=current_date).split(',')[0],
                 'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
             },
+            update_no_recent_export_interaction_reminder_email_status,
             reminders,
         )
     else:
@@ -126,6 +127,7 @@ def send_no_recent_export_interaction_reminder(
                 'time_period': timesince(last_interaction_date, now=current_date).split(',')[0],
                 'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
             },
+            update_no_recent_export_interaction_reminder_email_status,
             reminders,
         )
 
@@ -537,7 +539,7 @@ def create_no_recent_interaction_reminder(
         )
 
 
-def notify_adviser_by_rq_email(adviser, template_identifier, context, reminders=None):
+def notify_adviser_by_rq_email(adviser, template_identifier, context, update_task, reminders=None):
     """
     Notify an adviser, using a GOVUK notify template and some template context.
 
@@ -546,16 +548,6 @@ def notify_adviser_by_rq_email(adviser, template_identifier, context, reminders=
 
     Note: this should replace notify_adviser_by_email as we move towards using RQ.
     """
-    status_update_tasks = {
-        'NoRecentExportInteractionReminder':
-            update_no_recent_export_interaction_reminder_email_status,
-    }
-
-    status_update_task = None
-    if reminders and len(reminders) > 0:
-        class_name = reminders[0].__class__.__name__
-        status_update_task = status_update_tasks[class_name]
-
     email_address = adviser.get_current_email()
 
     job_scheduler(
@@ -563,8 +555,8 @@ def notify_adviser_by_rq_email(adviser, template_identifier, context, reminders=
         function_args=(
             email_address,
             template_identifier,
-            status_update_task,
-            [reminder.id for reminder in reminders],
+            update_task,
+            [reminder.id for reminder in reminders] if reminders else None,
             context,
             # TODO: find out if this is the right service name, or if we need a new one
             NotifyServiceName.reminder,
@@ -702,7 +694,7 @@ def update_notify_email_delivery_status_for_no_recent_export_interaction():
             | Q(email_delivery_status=EmailDeliveryStatus.SENDING),
             created_on__gte=date_threshold,
             email_notification_id__isnull=False,
-        ).values_list('email_notofication_id', flat=True).distinct()
+        ).values_list('email_notification_id', flat=True).distinct()
         for notification_id in notification_ids:
             result = notify_gateway.get_notification_by_id(
                 notification_id,
