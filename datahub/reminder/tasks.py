@@ -30,6 +30,7 @@ from datahub.reminder import (
 )
 from datahub.reminder.emails import (
     get_company_item,
+    get_interaction_item,
     get_project_item,
     get_projects_summary_list,
 )
@@ -88,6 +89,7 @@ def send_estimated_land_date_summary(projects, adviser, current_date, reminders)
 
 def send_no_recent_export_interaction_reminder(
     company,
+    interaction,
     adviser,
     reminder_days,
     current_date,
@@ -102,16 +104,30 @@ def send_no_recent_export_interaction_reminder(
     item = get_company_item(company)
     last_interaction_date = current_date - relativedelta(days=reminder_days)
 
-    notify_adviser_by_rq_email(
-        adviser,
-        settings.EXPORT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID,
-        {
-            **item,
-            'time_period': timesince(last_interaction_date, now=current_date).split(',')[0],
-            'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
-        },
-        reminders,
-    )
+    if interaction:
+        interaction_item = get_interaction_item()
+        notify_adviser_by_rq_email(
+            adviser,
+            settings.EXPORT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID,
+            {
+                **item,
+                **interaction_item,
+                'time_period': timesince(last_interaction_date, now=current_date).split(',')[0],
+                'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
+            },
+            reminders,
+        )
+    else:
+        notify_adviser_by_rq_email(
+            adviser,
+            settings.EXPORT_NOTIFICATION_NO_INTERACTION_TEMPLATE_ID,
+            {
+                **item,
+                'time_period': timesince(last_interaction_date, now=current_date).split(',')[0],
+                'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
+            },
+            reminders,
+        )
 
 
 def send_no_recent_interaction_reminder(project, adviser, reminder_days, current_date, reminders):
@@ -474,6 +490,7 @@ def create_no_recent_export_interaction_reminder(
     if send_email:
         send_no_recent_export_interaction_reminder(
             company=company,
+            interaction=interaction,
             adviser=adviser,
             reminder_days=reminder_days, current_date=current_date,
             reminders=[reminder],
