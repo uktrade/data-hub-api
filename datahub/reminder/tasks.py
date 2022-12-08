@@ -103,32 +103,26 @@ def send_no_recent_export_interaction_reminder(
     item = get_company_item(company)
     last_interaction_date = current_date - relativedelta(days=reminder_days)
 
+    params = {
+        **item,
+        'time_period': timesince(last_interaction_date, now=current_date).split(',')[0],
+        'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
+    }
+
     if interaction:
+        template_id = settings.EXPORT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID
         interaction_item = get_interaction_item(interaction)
-        notify_adviser_by_rq_email(
-            adviser,
-            settings.EXPORT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID,
-            {
-                **item,
-                **interaction_item,
-                'time_period': timesince(last_interaction_date, now=current_date).split(',')[0],
-                'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
-            },
-            update_no_recent_export_interaction_reminder_email_status,
-            reminders,
-        )
+        params.update(interaction_item)
     else:
-        notify_adviser_by_rq_email(
-            adviser,
-            settings.EXPORT_NOTIFICATION_NO_INTERACTION_TEMPLATE_ID,
-            {
-                **item,
-                'time_period': timesince(last_interaction_date, now=current_date).split(',')[0],
-                'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
-            },
-            update_no_recent_export_interaction_reminder_email_status,
-            reminders,
-        )
+        template_id = settings.EXPORT_NOTIFICATION_NO_INTERACTION_TEMPLATE_ID
+
+    notify_adviser_by_rq_email(
+        adviser,
+        template_id,
+        params,
+        update_no_recent_export_interaction_reminder_email_status,
+        reminders,
+    )
 
 
 def send_no_recent_interaction_reminder(project, adviser, reminder_days, current_date, reminders):
