@@ -98,7 +98,6 @@ def send_no_recent_export_interaction_reminder(
     """
     Sends no recent export interaction reminder by email.
     """
-    # TODO: find out if you need to register this key anywhere for statsd
     statsd.incr(f'send_no_recent_export_interaction_notification.{reminder_days}')
 
     item = get_company_item(company)
@@ -558,8 +557,7 @@ def notify_adviser_by_rq_email(adviser, template_identifier, context, update_tas
             update_task,
             [reminder.id for reminder in reminders] if reminders else None,
             context,
-            # TODO: find out if this is the right service name, or if we need a new one
-            NotifyServiceName.reminder,
+            NotifyServiceName.investment,
         ),
         retry_backoff=True,
         max_retries=5,
@@ -698,7 +696,7 @@ def update_notify_email_delivery_status_for_no_recent_export_interaction():
         for notification_id in notification_ids:
             result = notify_gateway.get_notification_by_id(
                 notification_id,
-                notify_service_name=NotifyServiceName.reminder,
+                notify_service_name=NotifyServiceName.investment,
             )
             if 'status' in result:
                 NoRecentExportInteractionReminder.all_objects.filter(

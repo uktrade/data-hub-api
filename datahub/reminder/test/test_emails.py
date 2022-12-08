@@ -343,7 +343,7 @@ class TestEmailFunctions:
                 update_no_recent_export_interaction_reminder_email_status,
                 [reminder.id for reminder in reminders],
                 context,
-                NotifyServiceName.reminder,
+                NotifyServiceName.investment,
             ),
             retry_backoff=True,
             max_retries=5,
@@ -366,7 +366,7 @@ class TestEmailFunctions:
                 update_no_recent_export_interaction_reminder_email_status,
                 None,
                 context,
-                NotifyServiceName.reminder,
+                NotifyServiceName.investment,
             ),
             retry_backoff=True,
             max_retries=5,
@@ -399,14 +399,14 @@ class TestEmailFunctions:
             update_no_recent_export_interaction_reminder_email_status,
             [reminder.id for reminder in reminders],
             context,
-            NotifyServiceName.reminder,
+            NotifyServiceName.investment,
         )
 
         mock_notify_gateway.send_email_notification.assert_called_once_with(
             adviser.get_current_email(),
             template_id,
             context,
-            NotifyServiceName.reminder,
+            NotifyServiceName.investment,
         )
 
         mock_job_scheduler.assert_called_once_with(

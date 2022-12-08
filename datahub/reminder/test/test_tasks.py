@@ -975,7 +975,6 @@ class TestCreateNoRecentExportInteractionReminder:
         reminders = NoRecentExportInteractionReminder.objects.filter(
             adviser=adviser,
         )
-        # TODO: check copy of this
         expected_event = f'No recent interaction with {company.name} in {reminder_days}\xa0days'
         assert reminders.count() == 1
         assert reminders[0].event == expected_event
@@ -2056,5 +2055,5 @@ class TestUpdateEmailDeliveryStatusTask:
         )
         mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once_with(
             reminder_to_update.email_notification_id,
-            notify_service_name=NotifyServiceName.reminder,
+            notify_service_name=NotifyServiceName.investment,
         )
