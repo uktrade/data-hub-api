@@ -37,7 +37,7 @@ build==0.8.0
     # via pip-tools
 celery @ git+https://github.com/uktrade/celery@v5.0.5p2
     # via -r requirements.in
-certifi==2021.10.8
+certifi==2022.12.7
     # via
     #   elastic-apm
     #   opensearch-py
