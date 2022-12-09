@@ -8,6 +8,7 @@ from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import BaseInteractionSerializer
 from datahub.investment.project.models import InvestmentProject
 from datahub.reminder.models import (
+    NewExportInteractionSubscription,
     NoRecentExportInteractionReminder,
     NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
@@ -32,6 +33,24 @@ class NoRecentExportInteractionSubscriptionSerializer(serializers.ModelSerialize
 
     class Meta:
         model = NoRecentExportInteractionSubscription
+        fields = ('reminder_days', 'email_reminders_enabled')
+
+
+class NewExportInteractionSubscriptionSerializer(serializers.ModelSerializer):
+    """Serializer for New Export Interaction Subscription."""
+
+    def validate_reminder_days(self, reminder_days):
+        duplicate_days = [
+            day for day, count in collections.Counter(reminder_days).items() if count > 1
+        ]
+        if len(duplicate_days) > 0:
+            raise serializers.ValidationError(
+                f'Duplicate reminder days are not allowed {duplicate_days}',
+            )
+        return reminder_days
+
+    class Meta:
+        model = NewExportInteractionSubscription
         fields = ('reminder_days', 'email_reminders_enabled')
 
 

@@ -13,6 +13,7 @@ from rest_framework.response import Response
 
 from datahub.investment.project.proposition.models import Proposition, PropositionStatus
 from datahub.reminder.models import (
+    NewExportInteractionSubscription,
     NoRecentExportInteractionReminder,
     NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
@@ -22,6 +23,7 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateSubscription,
 )
 from datahub.reminder.serializers import (
+    NewExportInteractionSubscriptionSerializer,
     NoRecentExportInteractionReminderSerializer,
     NoRecentExportInteractionSubscriptionSerializer,
     NoRecentInvestmentInteractionReminderSerializer,
@@ -51,6 +53,11 @@ class BaseSubscriptionViewset(
 class NoRecentExportInteractionSubscriptionViewset(BaseSubscriptionViewset):
     serializer_class = NoRecentExportInteractionSubscriptionSerializer
     queryset = NoRecentExportInteractionSubscription.objects.all()
+
+
+class NewExportInteractionSubscriptionViewset(BaseSubscriptionViewset):
+    serializer_class = NewExportInteractionSubscriptionSerializer
+    queryset = NewExportInteractionSubscription.objects.all()
 
 
 class NoRecentInvestmentInteractionSubscriptionViewset(BaseSubscriptionViewset):
@@ -89,11 +96,15 @@ def reminder_subscription_summary_view(request):
     no_recent_export_interaction = NoRecentExportInteractionSubscriptionSerializer(
         get_object(NoRecentExportInteractionSubscription.objects.all()),
     ).data
+    new_export_interaction = NewExportInteractionSubscriptionSerializer(
+        get_object(NewExportInteractionSubscription.objects.all()),
+    ).data
 
     return Response({
         'estimated_land_date': estimated_land_date,
         'no_recent_investment_interaction': no_recent_investment_interaction,
         'no_recent_export_interaction': no_recent_export_interaction,
+        'new_export_interaction': new_export_interaction,
     })
 
 
