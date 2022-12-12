@@ -37,7 +37,7 @@ build==0.8.0
     # via pip-tools
 celery @ git+https://github.com/uktrade/celery@v5.0.5p2
     # via -r requirements.in
-certifi==2021.10.8
+certifi==2022.12.7
     # via
     #   elastic-apm
     #   opensearch-py
@@ -45,7 +45,7 @@ certifi==2021.10.8
     #   sentry-sdk
 cfgv==3.3.1
     # via pre-commit
-chardet==5.0.0
+chardet==5.1.0
     # via -r requirements.in
 charset-normalizer==2.0.12
     # via
@@ -90,7 +90,7 @@ django==3.2.16
     #   djangorestframework
 django-axes==5.40.1
     # via -r requirements.in
-django-debug-toolbar==3.7.0
+django-debug-toolbar==3.8.1
     # via -r requirements.in
 django-environ==0.9.0
     # via -r requirements.in
@@ -217,7 +217,7 @@ notifications-python-client==6.4.1
     # via -r requirements.in
 opensearch-dsl==2.0.1
     # via -r requirements.in
-opensearch-py==2.0.0
+opensearch-py==2.0.1
     # via
     #   -r requirements.in
     #   opensearch-dsl
@@ -236,7 +236,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==6.10.0
+pip-tools==6.11.0
     # via -r requirements-dev.in
 piprot==0.9.11
     # via -r requirements-dev.in
@@ -301,7 +301,7 @@ pytest-cov==4.0.0
     # via -r requirements-dev.in
 pytest-django==4.5.2
     # via -r requirements-dev.in
-pytest-xdist==3.0.2
+pytest-xdist==3.1.0
     # via -r requirements-dev.in
 python-dateutil==2.8.2
     # via
@@ -414,7 +414,7 @@ vine==5.0.0
     #   kombu
 virtualenv==20.13.1
     # via pre-commit
-watchdog[watchmedo]==2.1.9
+watchdog[watchmedo]==2.2.0
     # via -r requirements-dev.in
 wcwidth==0.2.5
     # via prompt-toolkit
