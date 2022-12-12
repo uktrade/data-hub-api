@@ -28,13 +28,13 @@ botocore==1.27.58
     #   s3transfer
 celery @ git+https://github.com/uktrade/celery@v5.0.5p2
     # via -r requirements.in
-certifi==2022.6.15
+certifi==2022.12.7
     # via
     #   elastic-apm
     #   opensearch-py
     #   requests
     #   sentry-sdk
-chardet==5.0.0
+chardet==5.1.0
     # via -r requirements.in
 charset-normalizer==2.1.1
     # via
@@ -70,7 +70,7 @@ django==3.2.16
     #   djangorestframework
 django-axes==5.40.1
     # via -r requirements.in
-django-debug-toolbar==3.7.0
+django-debug-toolbar==3.8.1
     # via -r requirements.in
 django-environ==0.9.0
     # via -r requirements.in
@@ -136,7 +136,7 @@ notifications-python-client==6.4.1
     # via -r requirements.in
 opensearch-dsl==2.0.1
     # via -r requirements.in
-opensearch-py==2.0.0
+opensearch-py==2.0.1
     # via
     #   -r requirements.in
     #   opensearch-dsl

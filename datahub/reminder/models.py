@@ -40,6 +40,12 @@ class NoRecentExportInteractionSubscription(BaseSubscription):
     """
 
 
+class NewExportInteractionSubscription(BaseSubscription):
+    """
+    Subscription to get reminders about companies with new interactions.
+    """
+
+
 class NoRecentInvestmentInteractionSubscription(BaseSubscription):
     """
     Subscription to get reminders about projects with no recent interactions.
