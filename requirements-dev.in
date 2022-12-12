@@ -9,7 +9,7 @@ ipython==8.6.0
 factory-boy==3.2.1
 freezegun==1.2.2
 requests-mock==1.10.0
-pip-tools==6.10.0
+pip-tools==6.11.0
 piprot==0.9.11
 watchdog[watchmedo]==2.2.0
 pre-commit==2.20.0
