@@ -248,7 +248,7 @@ class TestEmailFunctions:
                 template_id,
                 {
                     'company_name': company.name,
-                    'company_details_url': f'{company.get_absolute_url()}/details',
+                    'company_url': f'{company.get_absolute_url()}/details',
                     'last_interaction_date': last_interaction_date.strftime(DATE_FORMAT),
                     'last_interaction_created_by': interaction.created_by.name,
                     'last_interaction_type': interaction.get_kind_display(),
@@ -297,7 +297,7 @@ class TestEmailFunctions:
                 template_id,
                 {
                     'company_name': company.name,
-                    'company_details_url': f'{company.get_absolute_url()}/details',
+                    'company_url': f'{company.get_absolute_url()}/details',
                     'last_interaction_date': last_interaction_date.strftime(DATE_FORMAT),
                     'settings_url': settings.DATAHUB_FRONTEND_REMINDER_SETTINGS_URL,
                     'time_period': timesince(

@@ -20,7 +20,7 @@ def get_inner_template_content(notification_type):
 def get_company_item(company):
     """Get company item."""
     return {
-        'company_details_url': f'{company.get_absolute_url()}/details',
+        'company_url': f'{company.get_absolute_url()}/details',
         'settings_url': settings.DATAHUB_FRONTEND_REMINDER_SETTINGS_URL,
         'company_name': company.name,
     }
