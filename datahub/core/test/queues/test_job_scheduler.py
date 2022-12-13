@@ -46,31 +46,6 @@ def test_job_scheduler_configures_queues(queue: DataHubScheduler):
     assert PickleableMock.keywords[0] == {'test': True}
 
 
-# def test_job_scheduler_configures_enqueue_in(async_queue: DataHubScheduler):
-#     PickleableMock.reset()
-#     existing_job_count = len(list(async_queue.scheduled_jobs()))
-#     actual_job = job_scheduler(
-#         function=PickleableMock.queue_handler,
-#         function_args=('arg1', 'arg2'),
-#         function_kwargs={'test': True},
-#         queue_name='234',
-#         time_delta=(timedelta(seconds=1)),
-#         max_retries=3,
-#         is_burst=True,
-#     )
-
-#     async_queue.work('234')
-
-#     # assert actual_job in async_queue.scheduled_jobs()
-#     assert len(list(async_queue.scheduled_jobs())) == existing_job_count + 1
-#     assert actual_job.meta['cron_string'] == EVERY_MINUTE
-#     assert actual_job.description == 'Te'
-
-#     assert PickleableMock.called
-#     assert PickleableMock.params[0] == ('arg1', 'arg2')
-#     assert PickleableMock.keywords[0] == {'test': True}
-
-
 def test_datahub_enque_is_configured_with_correct_default_number_of_retries_and_intervals(
     monkeypatch,
     queue: DataHubScheduler,
