@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from unittest.mock import call, MagicMock
+from unittest.mock import call, MagicMock, Mock
 
 import pytest
 from django.conf import settings
@@ -50,18 +50,18 @@ def test_can_queue_one_thing(async_queue: DataHubScheduler):
     assert PickleableMock.params[0] == ()
 
 
-def test_can_enqueue_in_using_time_delta(async_queue: DataHubScheduler):
+def test_can_enqueue_in_using_time_delta(monkeypatch, async_queue: DataHubScheduler):
+    datahub_enqueue_in_mock = rq_enqueue_in_mock(monkeypatch)
+    time_delta = (timedelta(seconds=10))
     job = async_queue.enqueue_in(
-        queue_name='one-running',
-        time_delta=(timedelta(seconds=1)),
+        queue_name='enqueue_in_using_time_delta',
+        time_delta=time_delta,
+        description='Test enqueue in',
         function=PickleableMock.queue_handler,
     )
 
     assert job.is_scheduled
-
-    # async_queue.work('one-running', with_scheduler=False)
-    # assert PickleableMock.called
-    # assert PickleableMock.params[0] == ()
+    datahub_enqueue_in_mock.assert_called_once()
 
 
 def test_can_queue_one_thing_with_arguments(async_queue: DataHubScheduler):
@@ -274,3 +274,12 @@ def test_job_enqued_is_fetched_in_the_same_state(queue: DataHubScheduler):
     fetched_job = queue.job(actual_job.id)
 
     assert fetched_job == actual_job
+
+
+def rq_enqueue_in_mock(monkeypatch):
+    rq_enqueue_in_mock = Mock()
+    monkeypatch.setattr(
+        'rq.queue.Queue.enqueue_in',
+        rq_enqueue_in_mock,
+    )
+    return rq_enqueue_in_mock
