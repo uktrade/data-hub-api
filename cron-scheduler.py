@@ -31,11 +31,11 @@ from datahub.dnb_api.tasks.update import schedule_get_company_updates
 from datahub.investment.project.tasks import (
     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
 )
+from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
 from datahub.reminder.tasks import (
     generate_no_recent_export_interaction_reminders,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
 )
-from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
 from datahub.search.tasks import sync_all_models
 
 env = environ.Env()
