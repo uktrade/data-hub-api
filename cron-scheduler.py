@@ -14,19 +14,25 @@ from pytz import utc
 from datahub.company.tasks.company import schedule_automatic_company_archive
 from datahub.company.tasks.contact import schedule_automatic_contact_archive
 from datahub.core.queues.constants import (
+    EVERY_EIGHT_AM,
     EVERY_MIDNIGHT,
     EVERY_ONE_AM,
     EVERY_SEVEN_PM,
+    EVERY_TEN_AM,
     EVERY_TEN_MINUTES,
     EVERY_THREE_AM_ON_TWENTY_THIRD_EACH_MONTH,
 )
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
-from datahub.core.queues.scheduler import DataHubScheduler
+from datahub.core.queues.scheduler import DataHubScheduler, LONG_RUNNING_QUEUE
 from datahub.dnb_api.tasks.sync import schedule_sync_outdated_companies_with_dnb
 from datahub.dnb_api.tasks.update import schedule_get_company_updates
 from datahub.investment.project.tasks import (
     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
+)
+from datahub.reminder.tasks import (
+    generate_no_recent_export_interaction_reminders,
+    update_notify_email_delivery_status_for_no_recent_export_interaction,
 )
 from datahub.search.tasks import sync_all_models
 
@@ -98,6 +104,28 @@ def schedule_jobs():
             },
             cron=EVERY_ONE_AM,
             description='dnb hierarchies backfill',
+        )
+
+    if settings.ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS:
+        job_scheduler(
+            function=generate_no_recent_export_interaction_reminders,
+            max_retries=5,
+            queue_name=LONG_RUNNING_QUEUE,
+            retry_backoff=True,
+            retry_intervals=30,
+            cron=EVERY_EIGHT_AM,
+            description='Daily generate no recent export interaction reminders',
+        )
+
+    if settings.ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS:
+        job_scheduler(
+            function=update_notify_email_delivery_status_for_no_recent_export_interaction,
+            max_retries=5,
+            queue_name=LONG_RUNNING_QUEUE,
+            retry_backoff=True,
+            retry_intervals=30,
+            cron=EVERY_TEN_AM,
+            description='Daily update of no recent export interaction reminder email status',
         )
 
 

@@ -5,6 +5,7 @@ EVERY_HOUR = '0 * * * *'
 
 EVERY_ONE_AM = '0 1 * * *'
 EVERY_EIGHT_AM = '0 8 * * *'
+EVERY_TEN_AM = '0 10 * * *'
 EVERY_MIDNIGHT = '0 0 * * *'
 EVERY_SEVEN_PM = '0 19 * * *'
 
