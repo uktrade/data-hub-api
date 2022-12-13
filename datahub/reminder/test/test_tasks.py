@@ -11,10 +11,19 @@ from dateutil.relativedelta import relativedelta
 from django.utils.timezone import utc
 from freezegun import freeze_time
 
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.constants import OneListTierID
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyFactory,
+    OneListCoreTeamMemberFactory,
+)
 from datahub.core.constants import InvestmentProjectStage
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.feature_flag.test.factories import FeatureFlagFactory, UserFeatureFlagFactory
-from datahub.interaction.test.factories import InvestmentProjectInteractionFactory
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory,
+    InvestmentProjectInteractionFactory,
+)
 from datahub.investment.project.models import InvestmentProject
 from datahub.investment.project.test.factories import (
     ActiveInvestmentProjectFactory,
@@ -22,6 +31,8 @@ from datahub.investment.project.test.factories import (
 )
 from datahub.notification.constants import NotifyServiceName
 from datahub.reminder import (
+    EXPORT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
+    EXPORT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
     INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME,
     INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
     INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
@@ -29,25 +40,43 @@ from datahub.reminder import (
 )
 from datahub.reminder.models import (
     EmailDeliveryStatus,
+    NoRecentExportInteractionReminder,
     NoRecentInvestmentInteractionReminder,
     UpcomingEstimatedLandDateReminder,
 )
 from datahub.reminder.tasks import (
     create_estimated_land_date_reminder,
+    create_no_recent_export_interaction_reminder,
     create_no_recent_interaction_reminder,
     generate_estimated_land_date_reminders,
     generate_estimated_land_date_reminders_for_subscription,
+    generate_no_recent_export_interaction_reminders,
+    generate_no_recent_export_interaction_reminders_for_subscription,
     generate_no_recent_interaction_reminders,
     generate_no_recent_interaction_reminders_for_subscription,
     update_notify_email_delivery_status_for_estimated_land_date,
+    update_notify_email_delivery_status_for_no_recent_export_interaction,
     update_notify_email_delivery_status_for_no_recent_interaction,
 )
 from datahub.reminder.test.factories import (
+    NoRecentExportInteractionReminderFactory,
+    NoRecentExportInteractionSubscriptionFactory,
     NoRecentInvestmentInteractionReminderFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
     UpcomingEstimatedLandDateReminderFactory,
     UpcomingEstimatedLandDateSubscriptionFactory,
 )
+
+
+@pytest.fixture()
+def no_recent_export_interaction_reminders_user_feature_flag():
+    """
+    Creates the no recent export interaction reminders user feature flag.
+    """
+    yield UserFeatureFlagFactory(
+        code=EXPORT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
+        is_active=True,
+    )
 
 
 @pytest.fixture()
@@ -74,6 +103,7 @@ def no_recent_interaction_reminders_user_feature_flag():
 
 @pytest.fixture()
 def adviser(
+    no_recent_export_interaction_reminders_user_feature_flag,
     no_recent_interaction_reminders_user_feature_flag,
     estimated_land_date_reminders_user_feature_flag,
 ):
@@ -83,6 +113,7 @@ def adviser(
     adviser = AdviserFactory()
     adviser.features.set(
         [
+            no_recent_export_interaction_reminders_user_feature_flag,
             estimated_land_date_reminders_user_feature_flag,
             no_recent_interaction_reminders_user_feature_flag,
         ],
@@ -92,6 +123,7 @@ def adviser(
 
 @pytest.fixture()
 def inactive_adviser(
+    no_recent_export_interaction_reminders_user_feature_flag,
     no_recent_interaction_reminders_user_feature_flag,
     estimated_land_date_reminders_user_feature_flag,
 ):
@@ -101,6 +133,7 @@ def inactive_adviser(
     inactive_adviser = AdviserFactory(is_active=False)
     inactive_adviser.features.set(
         [
+            no_recent_export_interaction_reminders_user_feature_flag,
             estimated_land_date_reminders_user_feature_flag,
             no_recent_interaction_reminders_user_feature_flag,
         ],
@@ -146,6 +179,36 @@ def mock_generate_estimated_land_date_reminders_for_subscription(monkeypatch):
         mock_generate_estimated_land_date_reminders_for_subscription,
     )
     return mock_generate_estimated_land_date_reminders_for_subscription
+
+
+@pytest.fixture()
+def mock_create_no_recent_export_interaction_reminder(monkeypatch):
+    mock_create_no_recent_export_interaction_reminder = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.reminder.tasks.create_no_recent_export_interaction_reminder',
+        mock_create_no_recent_export_interaction_reminder,
+    )
+    return mock_create_no_recent_export_interaction_reminder
+
+
+@pytest.fixture()
+def mock_send_no_recent_export_interaction_reminder(monkeypatch):
+    mock_send_no_recent_export_interaction_reminder = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.reminder.tasks.send_no_recent_export_interaction_reminder',
+        mock_send_no_recent_export_interaction_reminder,
+    )
+    return mock_send_no_recent_export_interaction_reminder
+
+
+@pytest.fixture()
+def mock_generate_no_recent_export_interaction_reminders_for_subscription(monkeypatch):
+    mock_generate_no_recent_export_interaction_reminders_for_subscription = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.reminder.tasks.generate_no_recent_export_interaction_reminders_for_subscription',
+        mock_generate_no_recent_export_interaction_reminders_for_subscription,
+    )
+    return mock_generate_no_recent_export_interaction_reminders_for_subscription
 
 
 @pytest.fixture()
@@ -196,6 +259,26 @@ def mock_reminder_tasks_notify_gateway(monkeypatch):
         mock_notify_gateway,
     )
     return mock_notify_gateway
+
+
+@pytest.fixture()
+def mock_job_scheduler(monkeypatch):
+    mock_notify_gateway = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.reminder.tasks.job_scheduler',
+        mock_notify_gateway,
+    )
+    return mock_notify_gateway
+
+
+@pytest.fixture()
+def no_recent_export_interaction_email_status_feature_flag():
+    """
+    Creates the automatic company archive feature flag.
+    """
+    yield FeatureFlagFactory(
+        code=EXPORT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
+    )
 
 
 @pytest.fixture()
@@ -863,6 +946,401 @@ class TestGenerateEstimatedLandDateReminderTask:
 
 
 @pytest.mark.django_db
+@freeze_time('2022-11-22T10:00:00')
+class TestCreateNoRecentExportInteractionReminder:
+    current_date = datetime.date(year=2022, month=11, day=22)
+
+    def test_create_reminder_email(
+        self,
+        mock_send_no_recent_export_interaction_reminder,
+        adviser,
+    ):
+        """
+        Create reminder should create a model instance and send an email.
+        """
+        reminder_days = 5
+        company = OneListCoreTeamMemberFactory(
+            adviser=adviser,
+        ).company
+        interaction = CompanyInteractionFactory(company=company)
+
+        create_no_recent_export_interaction_reminder(
+            company=company,
+            adviser=adviser,
+            interaction=interaction,
+            reminder_days=reminder_days,
+            send_email=True,
+            current_date=self.current_date,
+        )
+        reminders = NoRecentExportInteractionReminder.objects.filter(
+            adviser=adviser,
+        )
+        expected_event = f'No recent interaction with {company.name} in {reminder_days}\xa0days'
+        assert reminders.count() == 1
+        assert reminders[0].event == expected_event
+        mock_send_no_recent_export_interaction_reminder.assert_called_with(
+            company=company,
+            interaction=interaction,
+            adviser=adviser,
+            reminder_days=reminder_days,
+            current_date=self.current_date,
+            reminders=[reminders[0]],
+        )
+
+    def test_create_reminder_no_email(
+        self,
+        mock_send_no_recent_export_interaction_reminder,
+        adviser,
+    ):
+        """Create reminder should create a model instance and not send an email."""
+        reminder_days = 5
+        company = OneListCoreTeamMemberFactory(
+            adviser=adviser,
+        ).company
+        interaction = CompanyInteractionFactory(company=company)
+
+        create_no_recent_export_interaction_reminder(
+            company=company,
+            adviser=adviser,
+            interaction=interaction,
+            reminder_days=reminder_days,
+            send_email=False,
+            current_date=self.current_date,
+        )
+        reminders = NoRecentExportInteractionReminder.objects.filter(adviser=adviser)
+        assert reminders.count() == 1
+        assert mock_send_no_recent_export_interaction_reminder.call_count == 0
+
+    def test_create_existing_reminder(
+        self,
+        mock_send_no_recent_export_interaction_reminder,
+        adviser,
+    ):
+        """
+        If a reminder was already made today then do not send an email.
+        """
+        reminder_days = 5
+        company = OneListCoreTeamMemberFactory(
+            adviser=adviser,
+        ).company
+        interaction = CompanyInteractionFactory(company=company)
+        event = f'No recent interaction with {company.name} in {reminder_days}\xa0days'
+        with freeze_time('2022-11-22T10:00:00'):
+            NoRecentExportInteractionReminder.objects.create(
+                adviser=adviser,
+                company=company,
+                interaction=interaction,
+                event=event,
+            )
+        with freeze_time('2022-11-22T16:00:00'):
+            create_no_recent_export_interaction_reminder(
+                company=company,
+                adviser=adviser,
+                interaction=interaction,
+                reminder_days=reminder_days,
+                send_email=True,
+                current_date=self.current_date,
+            )
+        reminders = NoRecentExportInteractionReminder.objects.filter(
+            adviser=adviser,
+            company=company,
+            interaction=interaction,
+        )
+        assert reminders.count() == 1
+        assert mock_send_no_recent_export_interaction_reminder.call_count == 0
+
+    def test_create_existing_reminder_slow_queue(
+        self,
+        mock_send_no_recent_export_interaction_reminder,
+        adviser,
+    ):
+        """
+        If the queue is still processing tasks from yesterday and a reminder
+        was already sent, do not send another one.
+        """
+        reminder_days = 5
+        company = OneListCoreTeamMemberFactory(
+            adviser=adviser,
+        ).company
+        interaction = CompanyInteractionFactory(company=company)
+        event = f'No recent interaction with {company.name} in {reminder_days}\xa0days'
+        with freeze_time('2022-11-22T10:00:00'):
+            NoRecentExportInteractionReminder.objects.create(
+                adviser=adviser,
+                company=company,
+                interaction=interaction,
+                event=event,
+            )
+
+        with freeze_time('2022-11-23T16:00:00'):
+            create_no_recent_export_interaction_reminder(
+                company=company,
+                adviser=adviser,
+                interaction=interaction,
+                reminder_days=reminder_days,
+                send_email=True,
+                current_date=self.current_date,
+            )
+        reminders = NoRecentExportInteractionReminder.objects.filter(
+            adviser=adviser,
+            company=company,
+            interaction=interaction,
+        )
+        assert reminders.count() == 1
+        assert mock_send_no_recent_export_interaction_reminder.call_count == 0
+
+
+@pytest.mark.django_db
+@freeze_time('2022-11-22T10:00:00')
+class TestGenerateNoRecentExportInteractionReminderTask:
+    current_date = datetime.date(year=2022, month=11, day=22)
+
+    def test_generate_no_recent_export_interaction_reminders(
+        self,
+        mock_job_scheduler,
+    ):
+        """
+        Reminders should be gerenated for all subscriptions.
+        """
+        subscription_count = 2
+        subscriptions = NoRecentExportInteractionSubscriptionFactory.create_batch(
+            subscription_count,
+        )
+        generate_no_recent_export_interaction_reminders()
+        mock_job_scheduler.assert_has_calls(
+            [
+                call(
+                    queue_name=LONG_RUNNING_QUEUE,
+                    function=generate_no_recent_export_interaction_reminders_for_subscription,
+                    function_kwargs={
+                        'subscription': subscription,
+                        'current_date': self.current_date,
+                    },
+                    max_retries=5,
+                    retry_backoff=True,
+                    retry_intervals=30,
+                ) for subscription in subscriptions
+            ],
+            any_order=True,
+        )
+
+    @pytest.mark.parametrize(
+        'days,email_reminders_enabled',
+        (
+            (5, True),
+            (10, True),
+            (3, False),
+            (15, False),
+        ),
+    )
+    def test_generate_no_recent_export_interaction_reminders_for_subscription(
+        self,
+        adviser,
+        mock_create_no_recent_export_interaction_reminder,
+        days,
+        email_reminders_enabled,
+    ):
+        """
+        No Recent Export Interaction reminders should be created for relevant subscriptions.
+        """
+        subscription = NoRecentExportInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[days],
+            email_reminders_enabled=email_reminders_enabled,
+        )
+
+        company = CompanyFactory(
+            one_list_account_owner=adviser,
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+        )
+
+        interaction_date = self.current_date - relativedelta(days=days)
+
+        with freeze_time(interaction_date):
+            interaction = CompanyInteractionFactory(
+                company=company,
+            )
+
+        generate_no_recent_export_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        mock_create_no_recent_export_interaction_reminder.assert_called_once_with(
+            company=company,
+            adviser=adviser,
+            interaction=interaction,
+            reminder_days=days,
+            send_email=email_reminders_enabled,
+            current_date=self.current_date,
+        )
+
+    def test_send_reminder_if_no_interactions_at_all_in_given_timeframe(
+        self,
+        adviser,
+        mock_create_no_recent_export_interaction_reminder,
+    ):
+        """
+        A reminder should be sent if no interactions at all in given timeframe
+        """
+        day = 15
+        subscription = NoRecentExportInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[day],
+            email_reminders_enabled=True,
+        )
+        interaction_date = self.current_date - relativedelta(days=day)
+
+        with freeze_time(interaction_date):
+            company = CompanyFactory(
+                one_list_account_owner=adviser,
+                one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+            )
+
+        generate_no_recent_export_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        mock_create_no_recent_export_interaction_reminder.assert_called_once_with(
+            company=company,
+            adviser=adviser,
+            interaction=None,
+            reminder_days=day,
+            send_email=True,
+            current_date=self.current_date,
+        )
+        mock_create_no_recent_export_interaction_reminder.reset_mock()
+        next_day = self.current_date + relativedelta(days=1)
+        generate_no_recent_export_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=next_day,
+        )
+        mock_create_no_recent_export_interaction_reminder.assert_not_called()
+
+    @pytest.mark.parametrize('day_offset', (0, 1))
+    def test_dont_send_reminder_if_recent_interaction_exists(
+        self,
+        adviser,
+        mock_create_no_recent_export_interaction_reminder,
+        day_offset,
+    ):
+        """
+        A reminder should only be sent if there is no recent interaction.
+        """
+        day = 15
+        subscription = NoRecentExportInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[day],
+            email_reminders_enabled=True,
+        )
+        interaction_date = self.current_date - relativedelta(days=day)
+
+        company = CompanyFactory(
+            one_list_account_owner=adviser,
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+        )
+
+        with freeze_time(interaction_date + relativedelta(days=day_offset)):
+            CompanyInteractionFactory(company=company)
+        recent_interaction_date = self.current_date - relativedelta(days=5)
+        with freeze_time(recent_interaction_date):
+            CompanyInteractionFactory(company=company)
+
+        generate_no_recent_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        mock_create_no_recent_export_interaction_reminder.assert_not_called()
+
+    def test_no_user_feature_flag(
+        self,
+        mock_create_no_recent_export_interaction_reminder,
+    ):
+        """
+        Reminders should not be created if the user does not have the feature flag enabled.
+        """
+        days = 15
+        adviser = AdviserFactory()
+        subscription = NoRecentExportInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[days],
+            email_reminders_enabled=True,
+        )
+
+        company = CompanyFactory(
+            one_list_account_owner=adviser,
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+        )
+
+        interaction_date = self.current_date - relativedelta(days=days)
+        with freeze_time(interaction_date):
+            CompanyInteractionFactory(company=company)
+
+        generate_no_recent_export_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        assert mock_create_no_recent_export_interaction_reminder.call_count == 0
+
+    def test_inactive_user_feature_flag(
+        self,
+        mock_create_no_recent_export_interaction_reminder,
+    ):
+        """
+        Reminders should not be created if the user feature flag is inactive.
+        """
+        feature_flag = UserFeatureFlagFactory(
+            code=EXPORT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
+            is_active=False,
+        )
+        days = 15
+        adviser = AdviserFactory()
+        adviser.features.set([feature_flag])
+        subscription = NoRecentExportInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[days],
+            email_reminders_enabled=True,
+        )
+        company = CompanyFactory(
+            one_list_account_owner=adviser,
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+        )
+        interaction_date = self.current_date - relativedelta(days=days)
+        with freeze_time(interaction_date):
+            CompanyInteractionFactory(company=company)
+
+        generate_no_recent_export_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        assert mock_create_no_recent_export_interaction_reminder.call_count == 0
+
+    def test_inactive_user(
+        self,
+        mock_create_no_recent_export_interaction_reminder,
+        inactive_adviser,
+    ):
+        """
+        Reminders should not be created if the user is inactive.
+        """
+        days = 15
+        NoRecentExportInteractionSubscriptionFactory(
+            adviser=inactive_adviser,
+            reminder_days=[days],
+            email_reminders_enabled=True,
+        )
+        company = CompanyFactory(
+            one_list_account_owner=inactive_adviser,
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+        )
+        interaction_date = self.current_date - relativedelta(days=days)
+        with freeze_time(interaction_date):
+            CompanyInteractionFactory(company=company)
+
+        generate_no_recent_export_interaction_reminders()
+        assert mock_create_no_recent_export_interaction_reminder.call_count == 0
+
+
+@pytest.mark.django_db
 @freeze_time('2022-07-17T10:00:00')
 class TestCreateNoRecentInteractionReminder:
     current_date = datetime.date(year=2022, month=7, day=17)
@@ -1508,6 +1986,63 @@ class TestUpdateEmailDeliveryStatusTask:
         with freeze_time(self.current_date):
             update_notify_email_delivery_status_for_no_recent_interaction()
 
+        reminder_too_old.refresh_from_db()
+        reminder_to_update.refresh_from_db()
+
+        assert reminder_too_old.email_delivery_status == EmailDeliveryStatus.UNKNOWN
+        assert reminder_to_update.email_delivery_status == EmailDeliveryStatus.DELIVERED
+        assert reminder_to_update.modified_on == datetime.datetime.combine(
+            status_updated_on,
+            datetime.datetime.min.time(),
+            tzinfo=utc,
+        )
+        mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once_with(
+            reminder_to_update.email_notification_id,
+            notify_service_name=NotifyServiceName.investment,
+        )
+
+    def test_doesnt_update_no_recent_export_interaction_status_without_feature_flag(self, caplog):
+        """
+        Test that if the feature flag is not enabled, the task will not run.
+        """
+        caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
+        update_notify_email_delivery_status_for_no_recent_export_interaction()
+        assert caplog.messages == [
+            f'Feature flag "{EXPORT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}"'
+            ' is not active, exiting.',
+        ]
+
+    def test_updates_email_delivery_status_for_no_recent_export_interaction(
+        self,
+        no_recent_export_interaction_email_status_feature_flag,
+        mock_reminder_tasks_notify_gateway,
+        adviser,
+    ):
+        """
+        Test if email delivery status is being updated.
+        """
+        mock_reminder_tasks_notify_gateway.get_notification_by_id = mock.Mock(
+            return_value={'status': 'delivered'},
+        )
+
+        with freeze_time(self.current_date - relativedelta(days=6)):
+            reminder_too_old = NoRecentExportInteractionReminderFactory(
+                adviser=adviser,
+                email_notification_id=uuid.uuid4(),
+            )
+
+        with freeze_time(self.current_date - relativedelta(days=3)):
+            reminder_to_update = NoRecentExportInteractionReminderFactory(
+                adviser=adviser,
+                email_notification_id=uuid.uuid4(),
+            )
+
+        status_updated_on = self.current_date - relativedelta(days=1)
+        with freeze_time(status_updated_on):
+            update_notify_email_delivery_status_for_no_recent_export_interaction()
+
+        with freeze_time(self.current_date):
+            update_notify_email_delivery_status_for_no_recent_export_interaction()
         reminder_too_old.refresh_from_db()
         reminder_to_update.refresh_from_db()
 
