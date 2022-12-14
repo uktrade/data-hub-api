@@ -1,12 +1,16 @@
+import logging
 import re
+from unittest.mock import Mock
 
-import factory
 import pytest
 from freezegun import freeze_time
 
 from datahub.omis.payment.constants import PaymentGatewaySessionStatus
 from datahub.omis.payment.govukpay import govuk_url
-from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
+from datahub.omis.payment.tasks import (
+    refresh_payment_gateway_session,
+    refresh_pending_payment_gateway_sessions,
+)
 from datahub.omis.payment.test.factories import PaymentGatewaySessionFactory
 
 
@@ -20,12 +24,7 @@ class TestRefreshPendingPaymentGatewaySessions:
     `refresh_payment_gateway_session` tasks.
     """
 
-    def test_refresh(self, requests_mock):
-        """
-        Test that only ongoing sessions older than 60 minutes are refreshed against GOV.UK Pay.
-        Note that the value '60 minutes' is a parameter initialised in the test
-        and not part of the logic of the task.
-        """
+    def mock_sessions(self, requests_mock):
         # mock call to GOV.UK Pay
         requests_mock.register_uri(
             'GET',
@@ -54,54 +53,59 @@ class TestRefreshPendingPaymentGatewaySessions:
             with freeze_time(frozen_time):
                 sessions.append(PaymentGatewaySessionFactory(status=session_status))
 
+        return sessions
+
+    def test_schedule_refresh_payment_gateway_session(self, monkeypatch, requests_mock):
+        """
+        Test that only ongoing sessions older than 60 minutes are refreshed against GOV.UK Pay.
+        Note that the value '60 minutes' is a parameter initialised in the test
+        and not part of the logic of the task.
+        """
+        self.mock_sessions(requests_mock)
+
+        mock_schedule_refresh_payment_gateway_session = Mock()
+        monkeypatch.setattr(
+            'datahub.omis.payment.tasks.schedule_refresh_payment_gateway_session',
+            mock_schedule_refresh_payment_gateway_session,
+        )
+
         # make call
         with freeze_time('2017-04-18 20:00'):  # mocking now
             refresh_pending_payment_gateway_sessions(age_check=60)
 
         # check result
-        assert requests_mock.call_count == 3
+        assert mock_schedule_refresh_payment_gateway_session.call_count == 3
+
+    def test_job_scheduler_schedule_refresh_payment_gateway_session(
+            self, caplog, monkeypatch, requests_mock):
+        self.mock_sessions(requests_mock)
+        caplog.set_level(logging.INFO)
+
+        # make call
+        with freeze_time('2017-04-18 20:00'):  # mocking now
+            refresh_pending_payment_gateway_sessions(age_check=60)
+
+        # check result
+        assert any(
+            'schedule_refresh_payment_gateway_session'
+            in message for message in caplog.messages
+        )
+        # assert mock_payment_tasks_job_scheduler.call_count == 3
+
+    def test_refresh(self, monkeypatch, requests_mock):
+        """
+        Test that only ongoing sessions older than 60 minutes are refreshed against GOV.UK Pay.
+        Note that the value '60 minutes' is a parameter initialised in the test
+        and not part of the logic of the task.
+        """
+        sessions = self.mock_sessions(requests_mock)
+
+        # make call
+        with freeze_time('2017-04-18 20:00'):  # mocking now
+            for session in sessions:
+                refresh_payment_gateway_session(session_id=session.id)
+
+        # check result
         for session in sessions[-3:]:
             session.refresh_from_db()
             assert session.status == PaymentGatewaySessionStatus.FAILED
-
-    @freeze_time('2017-04-18 20:00')
-    def test_one_failed_refresh_doesnt_stop_others(self, requests_mock):
-        """
-        Test that if one refresh fails, the other ones are still carried on
-        and committed to the databasea.
-
-        In this example, pay-1 and pay-3 should get refreshed whilst pay-2
-        errors and shouldn't get refreshed.
-        """
-        # mock calls to GOV.UK Pay
-        govuk_payment_ids = ['pay-1', 'pay-2', 'pay-3']
-        requests_mock.get(
-            govuk_url(f'payments/{govuk_payment_ids[0]}'), status_code=200,
-            json={'state': {'status': 'failed'}},
-        )
-        requests_mock.get(
-            govuk_url(f'payments/{govuk_payment_ids[1]}'), status_code=500,
-        )
-        requests_mock.get(
-            govuk_url(f'payments/{govuk_payment_ids[2]}'), status_code=200,
-            json={'state': {'status': 'failed'}},
-        )
-
-        # populate db
-        sessions = PaymentGatewaySessionFactory.create_batch(
-            3,
-            status=PaymentGatewaySessionStatus.STARTED,
-            govuk_payment_id=factory.Iterator(govuk_payment_ids),
-        )
-
-        # make call
-        refresh_pending_payment_gateway_sessions(age_check=0)
-
-        # check result
-        for session in sessions:
-            session.refresh_from_db()
-
-        assert requests_mock.call_count == 3
-        assert sessions[0].status == PaymentGatewaySessionStatus.FAILED
-        assert sessions[1].status == PaymentGatewaySessionStatus.STARTED
-        assert sessions[2].status == PaymentGatewaySessionStatus.FAILED

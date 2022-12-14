@@ -15,6 +15,7 @@ from datahub.company.tasks.company import schedule_automatic_company_archive
 from datahub.company.tasks.contact import schedule_automatic_contact_archive
 from datahub.core.queues.constants import (
     EVERY_EIGHT_AM,
+    EVERY_HOUR,
     EVERY_MIDNIGHT,
     EVERY_ONE_AM,
     EVERY_SEVEN_PM,
@@ -30,6 +31,7 @@ from datahub.dnb_api.tasks.update import schedule_get_company_updates
 from datahub.investment.project.tasks import (
     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
 )
+from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
 from datahub.reminder.tasks import (
     generate_no_recent_export_interaction_reminders,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
@@ -46,6 +48,14 @@ def schedule_jobs():
     job_scheduler(
         function=queue_health_check,
         cron=EVERY_TEN_MINUTES,
+    )
+    job_scheduler(
+        function=refresh_pending_payment_gateway_sessions,
+        function_kwargs={
+            'age_check': 60,  # in minutes
+        },
+        cron=EVERY_HOUR,
+        description='Refresh pending payment gateway sessions :0',
     )
     job_scheduler(
         function=schedule_automatic_company_archive,
