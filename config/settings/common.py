@@ -21,6 +21,7 @@ from config.settings.types import HawkScope
 CONFIG_DIR = environ.Path(__file__) - 2
 ROOT_DIR = CONFIG_DIR - 1
 
+
 env = environ.Env()
 
 SECRET_KEY = env('DJANGO_SECRET_KEY')
@@ -334,7 +335,8 @@ OPENSEARCH_VERIFY_CERTS = env.bool('OPENSEARCH_VERIFY_CERTS', True)
 OPENSEARCH_INDEX_PREFIX = env('OPENSEARCH_INDEX_PREFIX')
 OPENSEARCH_INDEX_SETTINGS = {}
 OPENSEARCH_BULK_MAX_CHUNK_BYTES = 10 * 1024 * 1024  # 10MB
-OPENSEARCH_SEARCH_REQUEST_TIMEOUT = env.int('OPENSEARCH_SEARCH_REQUEST_TIMEOUT', default=20)  # seconds
+OPENSEARCH_SEARCH_REQUEST_TIMEOUT = env.int(
+    'OPENSEARCH_SEARCH_REQUEST_TIMEOUT', default=20)  # seconds
 OPENSEARCH_SEARCH_REQUEST_WARNING_THRESHOLD = env.int(
     'OPENSEARCH_SEARCH_REQUEST_WARNING_THRESHOLD',
     default=10,  # seconds
@@ -386,15 +388,7 @@ if REDIS_BASE_URL:
     CELERY_BROKER_TRANSPORT_OPTIONS = {
         'visibility_timeout': int(timedelta(hours=9).total_seconds())
     }
-    CELERY_BEAT_SCHEDULE = {
-        'refresh_pending_payment_gateway_sessions': {
-            'task': 'datahub.omis.payment.tasks.refresh_pending_payment_gateway_sessions',
-            'schedule': crontab(minute=0, hour='*'),
-            'kwargs': {
-                'age_check': 60  # in minutes
-            }
-        },
-    }
+    CELERY_BEAT_SCHEDULE = {}
 
     ENABLE_DAILY_HIERARCHY_ROLLOUT = env.bool('ENABLE_DAILY_HIERARCHY_ROLLOUT', False)
     DAILY_HIERARCHY_ROLLOUT_LIMIT = env.int('DAILY_HIERARCHY_ROLLOUT_LIMIT', 10)
@@ -407,7 +401,7 @@ if REDIS_BASE_URL:
     if env.bool('ENABLE_MAILBOX_PROCESSING', False):
         CELERY_BEAT_SCHEDULE['process_mailbox_emails'] = {
             'task': 'datahub.email_ingestion.tasks.process_mailbox_emails',
-            'schedule':  crontab(minute='*/10'),
+            'schedule': crontab(minute='*/10'),
         }
 
     if env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS', False):
@@ -592,8 +586,10 @@ SLACK_TIMEOUT_SECONDS = 10  # seconds
 
 # To read data from Activity Stream
 ACTIVITY_STREAM_OUTGOING_URL = env('ACTIVITY_STREAM_OUTGOING_URL', default=None)
-ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID = env('ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID', default=None)
-ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY = env('ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY', default=None)
+ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID = env(
+    'ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID', default=None)
+ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY = env(
+    'ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY', default=None)
 
 DOCUMENT_BUCKETS = {
     'default': {
@@ -633,7 +629,8 @@ MAILBOXES = {
     },
 }
 
-DIT_EMAIL_INGEST_BLACKLIST = [email.lower() for email in env.list('DIT_EMAIL_INGEST_BLACKLIST', default=[])]
+DIT_EMAIL_INGEST_BLACKLIST = [email.lower()
+                              for email in env.list('DIT_EMAIL_INGEST_BLACKLIST', default=[])]
 
 DIT_EMAIL_DOMAINS = {}
 domain_environ_names = [

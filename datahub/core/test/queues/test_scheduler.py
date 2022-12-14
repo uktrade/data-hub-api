@@ -1,4 +1,6 @@
-from unittest.mock import call, MagicMock
+from datetime import timedelta
+
+from unittest.mock import call, MagicMock, Mock
 
 import pytest
 from django.conf import settings
@@ -46,6 +48,20 @@ def test_can_queue_one_thing(async_queue: DataHubScheduler):
     async_queue.work('one-running', with_scheduler=False)
     assert PickleableMock.called
     assert PickleableMock.params[0] == ()
+
+
+def test_can_enqueue_in_using_time_delta(monkeypatch, async_queue: DataHubScheduler):
+    datahub_enqueue_in_mock = rq_enqueue_in_mock(monkeypatch)
+    time_delta = (timedelta(seconds=10))
+    job = async_queue.enqueue_in(
+        queue_name='enqueue_in_using_time_delta',
+        time_delta=time_delta,
+        description='Test enqueue in',
+        function=PickleableMock.queue_handler,
+    )
+
+    assert job.is_scheduled
+    datahub_enqueue_in_mock.assert_called_once()
 
 
 def test_can_queue_one_thing_with_arguments(async_queue: DataHubScheduler):
@@ -121,6 +137,22 @@ def test_job_retry_with_errors_will_reschedule_with_three_tries(async_queue: Dat
     assert job.retry_intervals == [1, 4, 16]
 
 
+def test_job_not_retried_with_retry_none(async_queue: DataHubScheduler):
+    job = async_queue.enqueue(
+        queue_name='will_fail',
+        function=PickleableMock.queue_handler_with_error,
+    )
+
+    async_queue.work('will_fail')
+
+    assert job is not None
+    retrieved_job = async_queue.job(job.id)
+    assert retrieved_job is not None
+    assert retrieved_job.is_scheduled is False
+    assert job.retries_left is None
+    assert job.retry_intervals is None
+
+
 def test_should_be_in_the_testing_environment():
     assert settings.IS_TEST is True
 
@@ -178,6 +210,7 @@ def test_purging_queue(async_queue: DataHubScheduler):
 def test_purging_fails(
     async_queue: DataHubScheduler,
 ):
+    failed_count = async_queue.failed_count('will_fail')
     job = async_queue.enqueue(
         queue_name='will_fail',
         function=PickleableMock.queue_handler_with_error,
@@ -185,7 +218,7 @@ def test_purging_fails(
     )
     async_queue.work('will_fail')
 
-    assert async_queue.failed_count('will_fail') == 1
+    assert async_queue.failed_count('will_fail') == failed_count + 1
     retrieved_job = async_queue.job(job.id)
     assert retrieved_job is not None
     assert retrieved_job.is_failed is True
@@ -241,3 +274,12 @@ def test_job_enqued_is_fetched_in_the_same_state(queue: DataHubScheduler):
     fetched_job = queue.job(actual_job.id)
 
     assert fetched_job == actual_job
+
+
+def rq_enqueue_in_mock(monkeypatch):
+    rq_enqueue_in_mock = Mock()
+    monkeypatch.setattr(
+        'rq.queue.Queue.enqueue_in',
+        rq_enqueue_in_mock,
+    )
+    return rq_enqueue_in_mock
