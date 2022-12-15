@@ -9,11 +9,13 @@ from datahub.interaction.test.factories import CompaniesInteractionFactory
 from datahub.investment.project.proposition.models import PropositionStatus
 from datahub.investment.project.proposition.test.factories import PropositionFactory
 from datahub.reminder.models import (
+    NewExportInteractionReminder,
     NoRecentExportInteractionReminder,
     NoRecentInvestmentInteractionReminder,
     UpcomingEstimatedLandDateReminder,
 )
 from datahub.reminder.test.factories import (
+    NewExportInteractionReminderFactory,
     NewExportInteractionSubscriptionFactory,
     NoRecentExportInteractionReminderFactory,
     NoRecentExportInteractionSubscriptionFactory,
@@ -522,6 +524,107 @@ class ReminderTestMixin:
         ).count() == reminder_count - 1
 
 
+@freeze_time('2022-12-15T17:00:00.000000Z')
+class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
+    """
+    Tests for the new export interaction reminder view.
+    """
+
+    url_name = 'api-v4:reminder:new-export-interaction-reminder'
+    detail_url_name = 'api-v4:reminder:new-export-interaction-reminder-detail'
+    factory = NewExportInteractionReminderFactory
+    tested_model = NewExportInteractionReminder
+
+    def test_get_reminders(self):
+        """Given some reminders, these should be returned"""
+        reminder_count = 3
+        export_company = CompanyFactory()
+        export_interaction = CompaniesInteractionFactory()
+        reminders = NewExportInteractionReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+            company=export_company,
+            interaction=export_interaction,
+        )
+        url = reverse(self.url_name)
+        response = self.get_response
+        assert response.status_code == status.HTTP_200_OK
+
+        sorted_reminders = sorted(reminders, key=lambda x: x.pk)
+        data = response.json()
+        assert data == {
+            'count': reminder_count,
+            'next': f'http://testserver{url}?limit=2&offset=2',
+            'previous': None,
+            'results': [
+                {
+                    'id': str(sorted_reminders[0].id),
+                    'created_on': '2022-12-15T17:00:00Z',
+                    'event': sorted_reminders[0].event,
+                    'company': {
+                        'id': str(export_company.id),
+                        'name': export_company.name,
+                    },
+                    'interaction': {
+                        'created_by': {
+                            'name': export_interaction.created_by.name,
+                            'first_name': export_interaction.created_by.first_name,
+                            'last_name': export_interaction.created_by.last_name,
+                            'id': str(export_interaction.created_by.id),
+                            'dit_team': {
+                                'id': str(export_interaction.created_by.dit_team.id),
+                                'name': export_interaction.created_by.dit_team.name,
+                            },
+                        },
+                        'date': format_date_or_datetime(export_interaction.date),
+                        'kind': str(export_interaction.kind),
+                        'subject': export_interaction.subject,
+                    },
+                },
+                {
+                    'id': str(sorted_reminders[1].id),
+                    'created_on': '2022-12-15T17:00:00Z',
+                    'event': sorted_reminders[1].event,
+                    'company': {
+                        'id': str(export_company.id),
+                        'name': export_company.name,
+                    },
+                    'interaction': {
+                        'created_by': {
+                            'name': export_interaction.created_by.name,
+                            'first_name': export_interaction.created_by.first_name,
+                            'last_name': export_interaction.created_by.last_name,
+                            'id': str(export_interaction.created_by.id),
+                            'dit_team': {
+                                'id': str(export_interaction.created_by.dit_team.id),
+                                'name': export_interaction.created_by.dit_team.name,
+                            },
+                        },
+                        'date': format_date_or_datetime(export_interaction.date),
+                        'kind': str(export_interaction.kind),
+                        'subject': export_interaction.subject,
+                    },
+                },
+            ],
+        }
+
+    def test_get_reminders_no_team(self):
+        """Should be returning reminders of interactions created by users with no DIT team"""
+        interaction_adviser = AdviserFactory(dit_team=None)
+        export_interaction = CompaniesInteractionFactory(created_by=interaction_adviser)
+
+        NewExportInteractionReminderFactory.create(
+            adviser=self.user,
+            interaction=export_interaction,
+        )
+
+        response = self.get_response
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        returned_reminder = data['results'][0]
+        assert returned_reminder['interaction']['created_by']['dit_team'] is None
+
+
 @freeze_time('2022-11-07T17:00:00.000000Z')
 class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
     """
@@ -764,7 +867,7 @@ class TestGetReminderSummaryView(APITestMixin):
     def test_get_summary_of_reminders(self):
         """Should return a summary of reminders."""
         reminder_count = 3
-        reminder_categories = 4  # used for finding the total number of reminders in this test
+        reminder_categories = 5  # used for finding the total number of reminders in this test
         UpcomingEstimatedLandDateReminderFactory.create_batch(
             reminder_count,
             adviser=self.user,
@@ -785,6 +888,11 @@ class TestGetReminderSummaryView(APITestMixin):
             status=PropositionStatus.ABANDONED,
         )
         PropositionFactory.create_batch(2)
+        NewExportInteractionReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
+        NewExportInteractionReminderFactory.create_batch(2)
         NoRecentExportInteractionReminderFactory.create_batch(
             reminder_count,
             adviser=self.user,
@@ -803,6 +911,7 @@ class TestGetReminderSummaryView(APITestMixin):
                 'outstanding_propositions': reminder_count,
             },
             'export': {
+                'new_interaction': reminder_count,
                 'no_recent_interaction': reminder_count,
             },
         }
@@ -821,6 +930,7 @@ class TestGetReminderSummaryView(APITestMixin):
                 'outstanding_propositions': 0,
             },
             'export': {
+                'new_interaction': 0,
                 'no_recent_interaction': 0,
             },
         }

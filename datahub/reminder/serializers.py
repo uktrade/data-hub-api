@@ -8,6 +8,7 @@ from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import BaseInteractionSerializer
 from datahub.investment.project.models import InvestmentProject
 from datahub.reminder.models import (
+    NewExportInteractionReminder,
     NewExportInteractionSubscription,
     NoRecentExportInteractionReminder,
     NoRecentExportInteractionSubscription,
@@ -124,6 +125,17 @@ class NoRecentInvestmentInteractionReminderSerializer(serializers.ModelSerialize
     class Meta:
         model = NoRecentInvestmentInteractionReminder
         fields = ('id', 'created_on', 'event', 'project')
+
+
+class NewExportInteractionReminderSerializer(serializers.ModelSerializer):
+    """Serializer for New Export Interaction Reminder."""
+
+    company = NestedExportCompanySerializer(many=False, read_only=True)
+    interaction = NestedInteractionSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = NewExportInteractionReminder
+        fields = ('id', 'created_on', 'event', 'company', 'interaction')
 
 
 class NoRecentExportInteractionReminderSerializer(serializers.ModelSerializer):
