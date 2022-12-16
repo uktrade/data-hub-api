@@ -73,6 +73,7 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('company_list_items'),
                 Company._meta.get_field('export_countries'),
                 Company._meta.get_field('export_countries_history'),
+                Company._meta.get_field('new_export_interaction_reminders'),
                 Company._meta.get_field('no_recent_export_interaction_reminders'),
                 Company._meta.get_field('pipeline_list_items'),
             ),
@@ -116,6 +117,7 @@ class Command(BaseCleanupCommand):
             excluded_relations=(
                 Interaction._meta.get_field('dit_participants'),
                 Interaction._meta.get_field('export_countries'),
+                Interaction._meta.get_field('new_export_interaction_reminders'),
                 Interaction._meta.get_field('no_recent_export_interaction_reminders'),
             ),
         ),

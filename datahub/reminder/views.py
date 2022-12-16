@@ -13,6 +13,7 @@ from rest_framework.response import Response
 
 from datahub.investment.project.proposition.models import Proposition, PropositionStatus
 from datahub.reminder.models import (
+    NewExportInteractionReminder,
     NewExportInteractionSubscription,
     NoRecentExportInteractionReminder,
     NoRecentExportInteractionSubscription,
@@ -23,6 +24,7 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateSubscription,
 )
 from datahub.reminder.serializers import (
+    NewExportInteractionReminderSerializer,
     NewExportInteractionSubscriptionSerializer,
     NoRecentExportInteractionReminderSerializer,
     NoRecentExportInteractionSubscriptionSerializer,
@@ -123,6 +125,11 @@ class BaseReminderViewset(viewsets.GenericViewSet, ListModelMixin, DestroyModelM
         return self.model_class.objects.filter(adviser=self.request.user)
 
 
+class NewExportInteractionReminderViewset(BaseReminderViewset):
+    serializer_class = NewExportInteractionReminderSerializer
+    model_class = NewExportInteractionReminder
+
+
 class NoRecentExportInteractionReminderViewset(BaseReminderViewset):
     serializer_class = NoRecentExportInteractionReminderSerializer
     model_class = NoRecentExportInteractionReminder
@@ -156,12 +163,16 @@ def reminder_summary_view(request):
     no_recent_export_interaction = NoRecentExportInteractionReminder.objects.filter(
         adviser=request.user,
     ).count()
+    new_export_interaction = NewExportInteractionReminder.objects.filter(
+        adviser=request.user,
+    ).count()
 
     total_count = sum([
         estimated_land_date,
         no_recent_investment_interaction,
         outstanding_propositions,
         no_recent_export_interaction,
+        new_export_interaction,
     ])
 
     return Response({
@@ -173,5 +184,6 @@ def reminder_summary_view(request):
         },
         'export': {
             'no_recent_interaction': no_recent_export_interaction,
+            'new_interaction': new_export_interaction,
         },
     })
