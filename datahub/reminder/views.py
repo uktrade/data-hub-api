@@ -11,7 +11,12 @@ from rest_framework.mixins import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from datahub.feature_flag.utils import is_user_feature_flag_group_active
 from datahub.investment.project.proposition.models import Proposition, PropositionStatus
+from datahub.reminder import (
+    EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+    INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+)
 from datahub.reminder.models import (
     NewExportInteractionReminder,
     NewExportInteractionSubscription,
@@ -150,22 +155,38 @@ class UpcomingEstimatedLandDateReminderViewset(BaseReminderViewset):
 @permission_classes([IsAuthenticated])
 def reminder_summary_view(request):
     """Returns the reminder summary."""
-    estimated_land_date = UpcomingEstimatedLandDateReminder.objects.filter(
-        adviser=request.user,
-    ).count()
-    no_recent_investment_interaction = NoRecentInvestmentInteractionReminder.objects.filter(
-        adviser=request.user,
-    ).count()
-    outstanding_propositions = Proposition.objects.filter(
-        adviser=request.user,
-        status=PropositionStatus.ONGOING,
-    ).count()
-    no_recent_export_interaction = NoRecentExportInteractionReminder.objects.filter(
-        adviser=request.user,
-    ).count()
-    new_export_interaction = NewExportInteractionReminder.objects.filter(
-        adviser=request.user,
-    ).count()
+    if is_user_feature_flag_group_active(
+        INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+        request.user,
+    ):
+        estimated_land_date = UpcomingEstimatedLandDateReminder.objects.filter(
+            adviser=request.user,
+        ).count()
+        no_recent_investment_interaction = NoRecentInvestmentInteractionReminder.objects.filter(
+            adviser=request.user,
+        ).count()
+        outstanding_propositions = Proposition.objects.filter(
+            adviser=request.user,
+            status=PropositionStatus.ONGOING,
+        ).count()
+    else:
+        estimated_land_date = 0
+        no_recent_investment_interaction = 0
+        outstanding_propositions = 0
+
+    if is_user_feature_flag_group_active(
+        EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+        request.user,
+    ):
+        no_recent_export_interaction = NoRecentExportInteractionReminder.objects.filter(
+            adviser=request.user,
+        ).count()
+        new_export_interaction = NewExportInteractionReminder.objects.filter(
+            adviser=request.user,
+        ).count()
+    else:
+        no_recent_export_interaction = 0
+        new_export_interaction = 0
 
     total_count = sum([
         estimated_land_date,
