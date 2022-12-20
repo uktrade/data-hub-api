@@ -1,3 +1,5 @@
+import pytest
+
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -5,9 +7,14 @@ from rest_framework.test import APIClient
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test_utils import APITestMixin, format_date_or_datetime
+from datahub.feature_flag.test.factories import UserFeatureFlagGroupFactory
 from datahub.interaction.test.factories import CompaniesInteractionFactory
 from datahub.investment.project.proposition.models import PropositionStatus
 from datahub.investment.project.proposition.test.factories import PropositionFactory
+from datahub.reminder import (
+    EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+    INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+)
 from datahub.reminder.models import (
     NewExportInteractionReminder,
     NoRecentExportInteractionReminder,
@@ -24,6 +31,28 @@ from datahub.reminder.test.factories import (
     UpcomingEstimatedLandDateReminderFactory,
     UpcomingEstimatedLandDateSubscriptionFactory,
 )
+
+
+@pytest.fixture()
+def investment_notifications_user_feature_group():
+    """
+    Creates the investment notifications user feature group.
+    """
+    yield UserFeatureFlagGroupFactory(
+        code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+        is_active=True,
+    )
+
+
+@pytest.fixture()
+def export_notifications_user_feature_group():
+    """
+    Creates the export notifications user feature group.
+    """
+    yield UserFeatureFlagGroupFactory(
+        code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+        is_active=True,
+    )
 
 
 class TestNoRecentInvestmentInteractionSubscriptionViewset(APITestMixin):
@@ -864,8 +893,16 @@ class TestGetReminderSummaryView(APITestMixin):
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_get_summary_of_reminders(self):
+    def test_get_summary_of_reminders(
+        self,
+        investment_notifications_user_feature_group,
+        export_notifications_user_feature_group,
+    ):
         """Should return a summary of reminders."""
+        self.user.feature_groups.set([
+            investment_notifications_user_feature_group,
+            export_notifications_user_feature_group,
+        ])
         reminder_count = 3
         reminder_categories = 5  # used for finding the total number of reminders in this test
         UpcomingEstimatedLandDateReminderFactory.create_batch(
@@ -932,5 +969,70 @@ class TestGetReminderSummaryView(APITestMixin):
             'export': {
                 'new_interaction': 0,
                 'no_recent_interaction': 0,
+            },
+        }
+
+    @pytest.mark.parametrize(
+        'investment,export',
+        (
+            (False, False),
+            (False, True),
+            (True, False),
+            (True, True),
+        ),
+    )
+    def test_get_summary_of_reminders_with_feature_groups(
+        self,
+        investment,
+        export,
+        investment_notifications_user_feature_group,
+        export_notifications_user_feature_group,
+    ):
+        """
+        Should return a summary of reminders.
+
+        It should return 0 for reminder category that does not have relevant feature group.
+        """
+        if investment:
+            self.user.feature_groups.add(investment_notifications_user_feature_group)
+        if export:
+            self.user.feature_groups.add(export_notifications_user_feature_group)
+        reminder_count = 3
+        UpcomingEstimatedLandDateReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
+        NoRecentInvestmentInteractionReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
+        PropositionFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+            status=PropositionStatus.ONGOING,
+        )
+        NewExportInteractionReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
+        NoRecentExportInteractionReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
+        total_reminders = reminder_count * (int(investment) * 3 + int(export) * 2)
+        url = reverse(self.url_name)
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data == {
+            'count': total_reminders,
+            'investment': {
+                'estimated_land_date': reminder_count if investment else 0,
+                'no_recent_interaction': reminder_count if investment else 0,
+                'outstanding_propositions': reminder_count if investment else 0,
+            },
+            'export': {
+                'new_interaction': reminder_count if export else 0,
+                'no_recent_interaction': reminder_count if export else 0,
             },
         }
