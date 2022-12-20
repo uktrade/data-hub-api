@@ -10,3 +10,5 @@ INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME = \
     'investment-estimated-land-date-reminders'
 INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME = \
     'investment-estimated-land-date-email-status'
+INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME = 'investment-notifications'
+EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME = 'export-notifications'
