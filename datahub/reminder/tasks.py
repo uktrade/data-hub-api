@@ -12,7 +12,7 @@ from datahub.company.constants import OneListTierID
 from datahub.company.models import Company
 from datahub.core import statsd
 from datahub.core.constants import InvestmentProjectStage
-from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
+# from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.feature_flag.utils import is_feature_flag_active, is_user_feature_flag_active
@@ -59,10 +59,11 @@ def send_estimated_land_date_reminder(project, adviser, days_left, reminders):
     """
     statsd.incr(f'send_investment_notification.{days_left}')
 
-    notify_adviser_by_email(
+    notify_adviser_by_rq_email(
         adviser,
         settings.INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_TEMPLATE_ID,
         get_project_item(project),
+        update_estimated_land_date_reminder_email_status,
         reminders,
     )
 
@@ -147,27 +148,6 @@ def send_no_recent_interaction_reminder(project, adviser, reminder_days, current
     )
 
 
-def schedule_update_estimated_land_date_reminder_email_status(email_notification_id, reminder_ids):
-    job = job_scheduler(
-        queue_name=LONG_RUNNING_QUEUE,
-        function=update_estimated_land_date_reminder_email_status,
-        function_args={
-            'email_notification_id': email_notification_id,
-            'reminder_ids': reminder_ids,
-        },
-        job_timeout=HALF_DAY_IN_SECONDS,
-        max_retries=5,
-        retry_backoff=30,
-
-    )
-    logger.info(
-        f'Task {job.id} schedule_update_estimated_land_date_reminder_email_status '
-        f'scheduled email_notification_id to {email_notification_id} '
-        f'and reminder_ids set to {reminder_ids}',
-    )
-    return job
-
-
 def update_estimated_land_date_reminder_email_status(email_notification_id, reminder_ids):
     reminders = UpcomingEstimatedLandDateReminder.all_objects.filter(id__in=reminder_ids)
     for reminder in reminders:
@@ -200,6 +180,20 @@ def update_no_recent_export_interaction_reminder_email_status(email_notification
         reminder.save()
 
 
+# def schedule_generate_estimated_land_date_reminders():
+#     job = job_scheduler(
+#         queue_name=LONG_RUNNING_QUEUE,
+#         function=generate_estimated_land_date_reminders,
+#         job_timeout=HALF_DAY_IN_SECONDS,
+#         max_retries=5,
+#         retry_backoff=True,
+#         retry_intervals=30,
+#     )
+#     logger.info(
+#         f'Task {job.id} update_investment_projects_for_gva_multiplier_task scheduled',
+#     )
+#     return job
+
 @shared_task(
     autoretry_for=(Exception,),
     queue='long-running',
@@ -221,6 +215,7 @@ def generate_estimated_land_date_reminders():
         for subscription in UpcomingEstimatedLandDateSubscription.objects.select_related(
             'adviser',
         ).filter(adviser__is_active=True).iterator():
+            # schedule_generate_estimated_land_date_reminders_for_subscription(
             generate_estimated_land_date_reminders_for_subscription(
                 subscription=subscription,
                 current_date=current_date,
@@ -233,6 +228,20 @@ def generate_estimated_land_date_reminders():
     max_retries=5,
     retry_backoff=30,
 )
+# def schedule_generate_estimated_land_date_reminders_for_subscription(subscription, current_date):
+#     job = job_scheduler(
+#         queue_name=LONG_RUNNING_QUEUE,
+#         function=generate_estimated_land_date_reminders_for_subscription,
+#         function_kwargs={'subscription': subscription, 'current_date': current_date},
+#         job_timeout=HALF_DAY_IN_SECONDS,
+#         max_retries=5,
+#         retry_backoff=True,
+#         retry_intervals=30,
+#     )
+#     logger.info(
+#         f'Task {job.id} generate_estimated_land_date_reminders_for_subscription scheduled',
+#     )
+#     return job
 def generate_estimated_land_date_reminders_for_subscription(subscription, current_date):
     """
     Generates the estimated land date reminders for a given subscription.
@@ -564,7 +573,7 @@ def notify_adviser_by_rq_email(adviser, template_identifier, context, update_tas
     """
     email_address = adviser.get_current_email()
 
-    job_scheduler(
+    job = job_scheduler(
         function=send_email_notification_via_rq,
         function_args=(
             email_address,
@@ -578,6 +587,8 @@ def notify_adviser_by_rq_email(adviser, template_identifier, context, update_tas
         max_retries=5,
     )
 
+    return job
+
 
 def notify_adviser_by_email(adviser, template_identifier, context, reminders=None):
     """
@@ -588,7 +599,7 @@ def notify_adviser_by_email(adviser, template_identifier, context, reminders=Non
     """
     status_update_task = {
         'UpcomingEstimatedLandDateReminder':
-            schedule_update_estimated_land_date_reminder_email_status,
+            update_estimated_land_date_reminder_email_status,
         'NoRecentInvestmentInteractionReminder':
             update_no_recent_interaction_reminder_email_status,
     }
@@ -637,6 +648,8 @@ def send_email_notification_via_rq(
         retry_backoff=True,
         retry_intervals=30,
     )
+
+    return response['id'], reminder_ids
 
 
 @shared_task(

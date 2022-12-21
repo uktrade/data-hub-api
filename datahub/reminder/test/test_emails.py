@@ -101,7 +101,8 @@ class TestEmailFunctions:
 
     def test_sends_estimated_land_date_notification(
         self,
-        mock_notify_adviser_by_email,
+        mock_notify_adviser_by_rq_email,
+        # mock_notify_adviser_by_email,
         mock_statsd,
     ):
         """Test it sends an estimated land date notification."""
@@ -119,7 +120,8 @@ class TestEmailFunctions:
                 reminders=None,
             )
 
-            mock_notify_adviser_by_email.assert_called_once_with(
+            # mock_notify_adviser_by_email.assert_called_once_with(
+            mock_notify_adviser_by_rq_email.assert_called_once_with(
                 adviser,
                 template_id,
                 {
@@ -132,6 +134,7 @@ class TestEmailFunctions:
                     'project_stage': project.stage.name,
                     'estimated_land_date': project.estimated_land_date.strftime(DATE_FORMAT),
                 },
+                # update_estimated_land_date_reminder_email_status,
                 None,
             )
             mock_statsd.incr.assert_called_once_with('send_investment_notification.30')

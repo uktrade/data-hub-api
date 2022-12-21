@@ -404,12 +404,6 @@ if REDIS_BASE_URL:
             'schedule': crontab(minute='*/10'),
         }
 
-    if env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS', False):
-        CELERY_BEAT_SCHEDULE['generate_estimated_land_date_reminders'] = {
-            'task': 'datahub.reminder.tasks.generate_estimated_land_date_reminders',
-            'schedule': crontab(minute=30, hour=8, day_of_month=1),
-        }
-
     if env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS_EMAIL_DELIVERY_STATUS', False):
         CELERY_BEAT_SCHEDULE['update_notify_email_delivery_status_for_estimated_land_date'] = {
             'task':

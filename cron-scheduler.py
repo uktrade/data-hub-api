@@ -15,6 +15,7 @@ from datahub.company.tasks.company import schedule_automatic_company_archive
 from datahub.company.tasks.contact import schedule_automatic_contact_archive
 from datahub.core.queues.constants import (
     EVERY_EIGHT_AM,
+    EVERY_EIGHT_THIRTY_AM_ON_FIRST_EACH_MONTH,
     EVERY_HOUR,
     EVERY_MIDNIGHT,
     EVERY_ONE_AM,
@@ -34,6 +35,7 @@ from datahub.investment.project.tasks import (
 from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
 from datahub.reminder.tasks import (
     generate_no_recent_export_interaction_reminders,
+    schedule_generate_estimated_land_date_reminders,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
 )
 from datahub.search.tasks import sync_all_models
@@ -80,6 +82,14 @@ def schedule_jobs():
         cron=EVERY_MIDNIGHT,
         description='Update companies from dnb service',
     )
+
+    if settings.ENABLE_ESTIMATED_LAND_DATE_REMINDERS:
+        job_scheduler(
+            function=schedule_generate_estimated_land_date_reminders,
+            cron=EVERY_EIGHT_THIRTY_AM_ON_FIRST_EACH_MONTH,
+            description='schedule_generate_estimated_land_date_reminders',
+        )
+
     job_scheduler(
         function=schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
         cron=EVERY_THREE_AM_ON_TWENTY_THIRD_EACH_MONTH,
