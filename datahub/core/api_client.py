@@ -29,6 +29,8 @@ class HawkAuth(AuthBase):
             'algorithm': self._signing_algorithm,
         }
 
+        print(f"credentials: {credentials}")
+
         sender = Sender(
             credentials,
             request.url,
@@ -40,7 +42,7 @@ class HawkAuth(AuthBase):
         request.headers['Authorization'] = sender.request_header
         if self._verify_response:
             request.register_hook('response', _make_response_verifier(sender))
-
+        logger.info(f'Hawk auth: {vars(request)}')
         return request
 
 
