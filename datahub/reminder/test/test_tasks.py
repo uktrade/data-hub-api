@@ -54,6 +54,7 @@ from datahub.reminder.tasks import (
     generate_no_recent_export_interaction_reminders_for_subscription,
     generate_no_recent_interaction_reminders,
     generate_no_recent_interaction_reminders_for_subscription,
+    schedule_generate_estimated_land_date_reminders,
     send_email_notification_via_rq,
     update_estimated_land_date_reminder_email_status,
     update_notify_email_delivery_status_for_estimated_land_date,
@@ -171,6 +172,16 @@ def mock_send_estimated_land_date_reminder(monkeypatch):
         mock_send_estimated_land_date_reminder,
     )
     return mock_send_estimated_land_date_reminder
+
+
+@pytest.fixture()
+def mock_generate_estimated_land_date_reminders(monkeypatch):
+    mock_generate_estimated_land_date_reminders = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.reminder.tasks.generate_estimated_land_date_reminders',
+        mock_generate_estimated_land_date_reminders,
+    )
+    return mock_generate_estimated_land_date_reminders
 
 
 @pytest.fixture()
@@ -531,6 +542,25 @@ class TestGenerateEstimatedLandDateReminderTask:
             email_notification_id, reminder_ids,
         )
         return reminder_ids
+
+    def test_schedule_generate_estimated_land_date_reminders(
+        self,
+        caplog,
+        mock_job_scheduler,
+    ):
+        """
+        Generate estimated land date reminders should be called from
+        scheduler.
+        """
+        caplog.set_level(logging.INFO)
+
+        job = schedule_generate_estimated_land_date_reminders()
+        mock_job_scheduler.assert_called_once()
+
+        # check result
+        assert caplog.messages[0] == (
+            f'Task {job.id} generate_estimated_land_date_reminders scheduled'
+        )
 
     def test_generate_estimated_land_date_reminders(
         self,
