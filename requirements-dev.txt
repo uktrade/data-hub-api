@@ -246,7 +246,7 @@ platformdirs==2.5.1
     #   virtualenv
 pluggy==1.0.0
     # via pytest
-pre-commit==2.20.0
+pre-commit==2.21.0
     # via -r requirements-dev.in
 prompt-toolkit==3.0.28
     # via
@@ -383,8 +383,6 @@ stack-data==0.2.0
     # via ipython
 statsd==4.0.1
     # via -r requirements.in
-toml==0.10.2
-    # via pre-commit
 tomli==2.0.1
     # via
     #   build
