@@ -12,4 +12,4 @@ This is the process we have identified for dealing with Dependabot PRs that save
 8. If you are satisfied that everything is in order and all the tests have passed, request reviews as normal.
 9. Once merged, deploy to production as soon as possible.
 
-If the OpenSearch version has been updated, the version used by [the e2e tests](https://github.com/uktrade/data-hub-frontend/blob/main/docker-compose.e2e.backend.yml#L48) needs to be updated to match.
+If the OpenSearch version has been updated, the version used by [the e2e tests](https://github.com/uktrade/data-hub-frontend/blob/main/docker-compose.e2e.backend.yml#L58) needs to be updated to match.

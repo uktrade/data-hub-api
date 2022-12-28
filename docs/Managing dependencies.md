@@ -33,7 +33,7 @@ lock file, such as removed dependencies or packages manually installed using pip
 1. Add the package to the relevant section in `requirements.in`, specifying a particular version
    (typically the latest at time of adding).
 
-2. Run `pip-compile --allow-unsafe --upgrade --output-file requirements.txt requirements.in` to regenerate
+2. Run `pip-compile --upgrade --output-file requirements.txt requirements.in` to regenerate
    `requirements.txt`. Note: This will also update indirect dependencies.
 
 3. Run `pip-sync` to install the new locked dependencies locally. (You can also use
@@ -51,7 +51,7 @@ lock file, such as removed dependencies or packages manually installed using pip
 2. Update the versions in `requirements.in` to the new desired versions. Make sure you check
    the change logs for dependencies that are being updated in case they have any breaking changes.
 
-3. Run `pip-compile --allow-unsafe --upgrade --output-file requirements.txt requirements.in` to regenerate
+3. Run `pip-compile --upgrade --output-file requirements.txt requirements.in` to regenerate
    `requirements.txt`. Note that this will also update indirect dependencies.
 
 4. Run `pip-sync` to install the new locked dependencies locally. (You can also use
