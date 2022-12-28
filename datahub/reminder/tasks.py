@@ -299,12 +299,6 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
     )
 
 
-@shared_task(
-    autoretry_for=(Exception,),
-    queue='long-running',
-    max_retries=5,
-    retry_backoff=30,
-)
 def generate_no_recent_interaction_reminders():
     """
     Generates No Recent Interaction Reminders according to each adviser's Subscriptions
@@ -320,18 +314,19 @@ def generate_no_recent_interaction_reminders():
         for subscription in NoRecentInvestmentInteractionSubscription.objects.select_related(
             'adviser',
         ).filter(adviser__is_active=True).iterator():
-            generate_no_recent_interaction_reminders_for_subscription(
-                subscription=subscription,
-                current_date=current_date,
+            job_scheduler(
+                function=generate_no_recent_interaction_reminders_for_subscription,
+                function_args=(
+                    subscription,
+                    current_date,
+                ),
+                max_retries=5,
+                queue_name=LONG_RUNNING_QUEUE,
+                retry_backoff=True,
+                retry_intervals=30,
             )
 
 
-@shared_task(
-    autoretry_for=(Exception,),
-    queue='long-running',
-    max_retries=5,
-    retry_backoff=30,
-)
 def generate_no_recent_interaction_reminders_for_subscription(subscription, current_date):
     """
     Generates the no recent interaction reminders for a given subscription.

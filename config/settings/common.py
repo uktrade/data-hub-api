@@ -412,12 +412,6 @@ if REDIS_BASE_URL:
             'schedule': crontab(minute=30, hour=9, day_of_month='1,2,3,4'),
         }
 
-    if env.bool('ENABLE_NO_RECENT_INTERACTION_REMINDERS', False):
-        CELERY_BEAT_SCHEDULE['generate_no_recent_interaction_reminders'] = {
-            'task': 'datahub.reminder.tasks.generate_no_recent_interaction_reminders',
-            'schedule': crontab(minute=00, hour=8),
-        }
-
     if env.bool('ENABLE_NO_RECENT_INTERACTION_EMAIL_DELIVERY_STATUS', False):
         CELERY_BEAT_SCHEDULE['update_notify_email_delivery_status_for_no_recent_interaction'] = {
             'task': 'datahub.reminder'

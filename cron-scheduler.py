@@ -35,6 +35,7 @@ from datahub.investment.project.tasks import (
 from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
 from datahub.reminder.tasks import (
     generate_no_recent_export_interaction_reminders,
+    generate_no_recent_interaction_reminders,
     schedule_generate_estimated_land_date_reminders,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
 )
@@ -135,6 +136,17 @@ def schedule_jobs():
             retry_intervals=30,
             cron=EVERY_EIGHT_AM,
             description='Daily generate no recent export interaction reminders',
+        )
+
+    if settings.ENABLE_NO_RECENT_INTERACTION_REMINDERS:
+        job_scheduler(
+            function=generate_no_recent_interaction_reminders,
+            max_retries=5,
+            queue_name=LONG_RUNNING_QUEUE,
+            retry_backoff=True,
+            retry_intervals=30,
+            cron=EVERY_EIGHT_AM,
+            description='Daily generate no recent interaction reminders',
         )
 
     if settings.ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS:
