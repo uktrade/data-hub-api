@@ -174,13 +174,13 @@ def mock_send_estimated_land_date_reminder(monkeypatch):
 
 
 @pytest.fixture()
-def mock_generate_estimated_land_date_reminders_for_subscription(monkeypatch):
-    mock_generate_estimated_land_date_reminders_for_subscription = mock.Mock()
+def mock_schedule_generate_estimated_land_date_reminders_for_subscription(monkeypatch):
+    mock_schedule_generate_estimated_land_date_reminders_for_subscription = mock.Mock()
     monkeypatch.setattr(
-        'datahub.reminder.tasks.generate_estimated_land_date_reminders_for_subscription',
-        mock_generate_estimated_land_date_reminders_for_subscription,
+        'datahub.reminder.tasks.schedule_generate_estimated_land_date_reminders_for_subscription',
+        mock_schedule_generate_estimated_land_date_reminders_for_subscription,
     )
-    return mock_generate_estimated_land_date_reminders_for_subscription
+    return mock_schedule_generate_estimated_land_date_reminders_for_subscription
 
 
 @pytest.fixture()
@@ -517,7 +517,7 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     def test_generate_estimated_land_date_reminders(
         self,
-        mock_generate_estimated_land_date_reminders_for_subscription,
+        mock_schedule_generate_estimated_land_date_reminders_for_subscription,
     ):
         """
         Reminders should be generated for all subscriptions.
@@ -527,7 +527,7 @@ class TestGenerateEstimatedLandDateReminderTask:
             subscription_count,
         )
         generate_estimated_land_date_reminders()
-        mock_generate_estimated_land_date_reminders_for_subscription.assert_has_calls(
+        mock_schedule_generate_estimated_land_date_reminders_for_subscription.assert_has_calls(
             [
                 call(subscription=subscription, current_date=self.current_date)
                 for subscription in subscriptions
