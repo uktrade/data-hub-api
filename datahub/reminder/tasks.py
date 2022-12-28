@@ -192,7 +192,7 @@ def schedule_generate_estimated_land_date_reminders():
         retry_intervals=30,
     )
     logger.info(
-        f'Task {job.id} update_investment_projects_for_gva_multiplier_task scheduled',
+        f'Task {job.id} generate_estimated_land_date_reminders scheduled',
     )
     return job
 
@@ -217,6 +217,10 @@ def generate_estimated_land_date_reminders():
                 subscription=subscription,
                 current_date=current_date,
             )
+
+    logger.info(
+        'Task generate_estimated_land_date_reminders completed',
+    )
 
 
 @shared_task(
