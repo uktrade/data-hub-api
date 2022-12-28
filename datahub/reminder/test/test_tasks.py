@@ -283,26 +283,6 @@ def mock_job_scheduler(monkeypatch):
     return mock_job_scheduler
 
 
-# @pytest.fixture()
-# def mock_reminder_tasks_notify_gateway(monkeypatch):
-#     mock_notify_gateway = mock.Mock()
-#     monkeypatch.setattr(
-#         'datahub.reminder.tasks.notify_gateway',
-#         mock_notify_gateway,
-#     )
-#     return mock_notify_gateway
-
-
-# @pytest.fixture()
-# def mock_job_scheduler(monkeypatch):
-#     mock_notify_gateway = mock.Mock()
-#     monkeypatch.setattr(
-#         'datahub.reminder.tasks.job_scheduler',
-#         mock_notify_gateway,
-#     )
-#     return mock_notify_gateway
-
-
 @pytest.fixture()
 def no_recent_export_interaction_email_status_feature_flag():
     """
@@ -514,6 +494,43 @@ class TestCreateEstimatedLandDateReminder:
 @freeze_time('2022-07-01T10:00:00')
 class TestGenerateEstimatedLandDateReminderTask:
     current_date = datetime.date(year=2022, month=7, day=1)
+
+    def emulate_generate_estimated_land_date_reminders(self, mock_job_scheduler):
+        # Rq scheduling and then calling of scheduled methods.
+
+        generate_estimated_land_date_reminders()
+
+        mock_job_scheduler.assert_called()
+
+        # Call actual scheduled function
+        assert mock_job_scheduler.mock_calls[0].kwargs['function'].__name__ == (
+            generate_estimated_land_date_reminders_for_subscription.__name__
+        )
+        generate_estimated_land_date_reminders_for_subscription(
+            subscription=mock_job_scheduler.mock_calls[0][2]['function_kwargs']['subscription'],
+            current_date=mock_job_scheduler.mock_calls[0][2]['function_kwargs']['current_date'],
+        )
+
+        # Call actual scheduled function
+        assert mock_job_scheduler.mock_calls[1].kwargs['function'].__name__ == (
+            send_email_notification_via_rq.__name__
+        )
+        [email_notification_id, reminder_ids] = send_email_notification_via_rq(
+            mock_job_scheduler.mock_calls[1][2]['function_args'][0],
+            mock_job_scheduler.mock_calls[1][2]['function_args'][1],
+            mock_job_scheduler.mock_calls[1][2]['function_args'][2],
+            mock_job_scheduler.mock_calls[1][2]['function_args'][3],
+            mock_job_scheduler.mock_calls[1][2]['function_args'][4],
+            mock_job_scheduler.mock_calls[1][2]['function_args'][5],
+        )
+
+        assert mock_job_scheduler.mock_calls[2].kwargs['function'].__name__ == (
+            update_estimated_land_date_reminder_email_status.__name__
+        )
+        update_estimated_land_date_reminder_email_status(
+            email_notification_id, reminder_ids,
+        )
+        return reminder_ids
 
     def test_generate_estimated_land_date_reminders(
         self,
@@ -898,29 +915,7 @@ class TestGenerateEstimatedLandDateReminderTask:
             estimated_land_date=estimated_land_date,
             status=InvestmentProject.Status.ONGOING,
         )
-        generate_estimated_land_date_reminders()
-
-        mock_job_scheduler.assert_called()
-
-        # Call actual scheduled function
-        assert mock_job_scheduler.mock_calls[0].kwargs['function'].__name__ == (
-            send_email_notification_via_rq.__name__
-        )
-        [email_notification_id, reminder_ids] = send_email_notification_via_rq(
-            mock_job_scheduler.mock_calls[0][2]['function_args'][0],
-            mock_job_scheduler.mock_calls[0][2]['function_args'][1],
-            mock_job_scheduler.mock_calls[0][2]['function_args'][2],
-            mock_job_scheduler.mock_calls[0][2]['function_args'][3],
-            mock_job_scheduler.mock_calls[0][2]['function_args'][4],
-            mock_job_scheduler.mock_calls[0][2]['function_args'][5],
-        )
-
-        assert mock_job_scheduler.mock_calls[1].kwargs['function'].__name__ == (
-            update_estimated_land_date_reminder_email_status.__name__
-        )
-        update_estimated_land_date_reminder_email_status(
-            email_notification_id, reminder_ids,
-        )
+        self.emulate_generate_estimated_land_date_reminders(mock_job_scheduler)
 
         reminder = UpcomingEstimatedLandDateReminder.objects.get(project=project, adviser=adviser)
 
@@ -955,29 +950,7 @@ class TestGenerateEstimatedLandDateReminderTask:
             estimated_land_date=estimated_land_date,
             status=InvestmentProject.Status.ONGOING,
         )
-        generate_estimated_land_date_reminders()
-
-        mock_job_scheduler.assert_called()
-
-        # Call actual scheduled function
-        assert mock_job_scheduler.mock_calls[0].kwargs['function'].__name__ == (
-            send_email_notification_via_rq.__name__
-        )
-        [email_notification_id, reminder_ids] = send_email_notification_via_rq(
-            mock_job_scheduler.mock_calls[0][2]['function_args'][0],
-            mock_job_scheduler.mock_calls[0][2]['function_args'][1],
-            mock_job_scheduler.mock_calls[0][2]['function_args'][2],
-            mock_job_scheduler.mock_calls[0][2]['function_args'][3],
-            mock_job_scheduler.mock_calls[0][2]['function_args'][4],
-            mock_job_scheduler.mock_calls[0][2]['function_args'][5],
-        )
-
-        assert mock_job_scheduler.mock_calls[1].kwargs['function'].__name__ == (
-            update_estimated_land_date_reminder_email_status.__name__
-        )
-        update_estimated_land_date_reminder_email_status(
-            email_notification_id, reminder_ids,
-        )
+        self.emulate_generate_estimated_land_date_reminders(mock_job_scheduler)
 
         reminders = UpcomingEstimatedLandDateReminder.objects.filter(
             project__in=projects,
