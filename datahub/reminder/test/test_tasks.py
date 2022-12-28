@@ -257,6 +257,16 @@ def mock_notification_tasks_notify_gateway(monkeypatch):
 def mock_notification_core_notify_gateway(monkeypatch):
     mock_notify_gateway = mock.Mock()
     monkeypatch.setattr(
+        'datahub.notification.core.notify_gateway',
+        mock_notify_gateway,
+    )
+    return mock_notify_gateway
+
+
+@pytest.fixture()
+def mock_reminder_tasks_notify_gateway(monkeypatch):
+    mock_notify_gateway = mock.Mock()
+    monkeypatch.setattr(
         'datahub.reminder.tasks.notify_gateway',
         mock_notify_gateway,
     )
@@ -273,14 +283,14 @@ def mock_job_scheduler(monkeypatch):
     return mock_job_scheduler
 
 
-@pytest.fixture()
-def mock_reminder_tasks_notify_gateway(monkeypatch):
-    mock_notify_gateway = mock.Mock()
-    monkeypatch.setattr(
-        'datahub.reminder.tasks.notify_gateway',
-        mock_notify_gateway,
-    )
-    return mock_notify_gateway
+# @pytest.fixture()
+# def mock_reminder_tasks_notify_gateway(monkeypatch):
+#     mock_notify_gateway = mock.Mock()
+#     monkeypatch.setattr(
+#         'datahub.reminder.tasks.notify_gateway',
+#         mock_notify_gateway,
+#     )
+#     return mock_notify_gateway
 
 
 # @pytest.fixture()
@@ -864,7 +874,7 @@ class TestGenerateEstimatedLandDateReminderTask:
     @pytest.mark.django_db(transaction=True)
     def test_stores_notification_id(
         self,
-        mock_notification_core_notify_gateway,
+        mock_reminder_tasks_notify_gateway,
         mock_job_scheduler,
         adviser,
     ):
@@ -872,7 +882,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         Test if a notification id is being stored against the reminder.
         """
         notification_id = uuid.uuid4()
-        mock_notification_core_notify_gateway.send_email_notification = mock.Mock(
+        mock_reminder_tasks_notify_gateway.send_email_notification = mock.Mock(
             return_value={'id': notification_id},
         )
 
@@ -920,14 +930,15 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     def test_stores_notification_id_for_summary_email(
         self,
-        mock_notification_tasks_notify_gateway,
+        mock_reminder_tasks_notify_gateway,
+        mock_job_scheduler,
         adviser,
     ):
         """
         Test if a notification id is being stored against the reminders from summary email.
         """
         notification_id = uuid.uuid4()
-        mock_notification_tasks_notify_gateway.send_email_notification = mock.Mock(
+        mock_reminder_tasks_notify_gateway.send_email_notification = mock.Mock(
             return_value={'id': notification_id},
         )
 
@@ -945,6 +956,28 @@ class TestGenerateEstimatedLandDateReminderTask:
             status=InvestmentProject.Status.ONGOING,
         )
         generate_estimated_land_date_reminders()
+
+        mock_job_scheduler.assert_called()
+
+        # Call actual scheduled function
+        assert mock_job_scheduler.mock_calls[0].kwargs['function'].__name__ == (
+            send_email_notification_via_rq.__name__
+        )
+        [email_notification_id, reminder_ids] = send_email_notification_via_rq(
+            mock_job_scheduler.mock_calls[0][2]['function_args'][0],
+            mock_job_scheduler.mock_calls[0][2]['function_args'][1],
+            mock_job_scheduler.mock_calls[0][2]['function_args'][2],
+            mock_job_scheduler.mock_calls[0][2]['function_args'][3],
+            mock_job_scheduler.mock_calls[0][2]['function_args'][4],
+            mock_job_scheduler.mock_calls[0][2]['function_args'][5],
+        )
+
+        assert mock_job_scheduler.mock_calls[1].kwargs['function'].__name__ == (
+            update_estimated_land_date_reminder_email_status.__name__
+        )
+        update_estimated_land_date_reminder_email_status(
+            email_notification_id, reminder_ids,
+        )
 
         reminders = UpcomingEstimatedLandDateReminder.objects.filter(
             project__in=projects,

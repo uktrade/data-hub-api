@@ -25,6 +25,7 @@ from datahub.reminder.tasks import (
     send_estimated_land_date_summary,
     send_no_recent_export_interaction_reminder,
     send_no_recent_interaction_reminder,
+    update_estimated_land_date_reminder_email_status,
     update_no_recent_export_interaction_reminder_email_status,
 )
 from datahub.reminder.test.factories import NoRecentExportInteractionReminderFactory
@@ -120,7 +121,6 @@ class TestEmailFunctions:
                 reminders=None,
             )
 
-            # mock_notify_adviser_by_email.assert_called_once_with(
             mock_notify_adviser_by_rq_email.assert_called_once_with(
                 adviser,
                 template_id,
@@ -134,7 +134,7 @@ class TestEmailFunctions:
                     'project_stage': project.stage.name,
                     'estimated_land_date': project.estimated_land_date.strftime(DATE_FORMAT),
                 },
-                # update_estimated_land_date_reminder_email_status,
+                update_estimated_land_date_reminder_email_status,
                 None,
             )
             mock_statsd.incr.assert_called_once_with('send_investment_notification.30')

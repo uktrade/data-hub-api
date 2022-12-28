@@ -76,7 +76,7 @@ def send_estimated_land_date_summary(projects, adviser, current_date, reminders)
 
     notifications = get_projects_summary_list(projects)
 
-    notify_adviser_by_email(
+    notify_adviser_by_rq_email(
         adviser,
         settings.INVESTMENT_NOTIFICATION_ESTIMATED_LAND_DATE_SUMMARY_TEMPLATE_ID,
         {
@@ -85,6 +85,7 @@ def send_estimated_land_date_summary(projects, adviser, current_date, reminders)
             'summary': ''.join(notifications),
             'settings_url': settings.DATAHUB_FRONTEND_REMINDER_SETTINGS_URL,
         },
+        update_estimated_land_date_reminder_email_status,
         reminders,
     )
 
