@@ -141,7 +141,7 @@ class TestEmailFunctions:
 
     def test_sends_estimated_land_date_summary_notification(
         self,
-        mock_notify_adviser_by_email,
+        mock_notify_adviser_by_rq_email,
         mock_statsd,
     ):
         """Test it sends an estimated land date summary notification."""
@@ -163,7 +163,7 @@ class TestEmailFunctions:
                 reminders=None,
             )
 
-            mock_notify_adviser_by_email.assert_called_once_with(
+            mock_notify_adviser_by_rq_email.assert_called_once_with(
                 adviser,
                 template_id,
                 {
@@ -172,6 +172,7 @@ class TestEmailFunctions:
                     'summary': ''.join(notifications),
                     'settings_url': settings.DATAHUB_FRONTEND_REMINDER_SETTINGS_URL,
                 },
+                update_estimated_land_date_reminder_email_status,
                 None,
             )
             mock_statsd.incr.assert_called_once_with('send_estimated_land_date_summary')
