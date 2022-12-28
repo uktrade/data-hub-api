@@ -155,7 +155,7 @@ flake8-import-order==0.18.2
     # via -r requirements-dev.in
 flake8-print==5.0.0
     # via -r requirements-dev.in
-flake8-quotes==3.3.1
+flake8-quotes==3.3.2
     # via -r requirements-dev.in
 flake8-string-format==0.3.0
     # via -r requirements-dev.in
