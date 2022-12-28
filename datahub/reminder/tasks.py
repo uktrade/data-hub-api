@@ -12,7 +12,7 @@ from datahub.company.constants import OneListTierID
 from datahub.company.models import Company
 from datahub.core import statsd
 from datahub.core.constants import InvestmentProjectStage
-# from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
+from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.feature_flag.utils import is_feature_flag_active, is_user_feature_flag_active
@@ -167,6 +167,7 @@ def update_estimated_land_date_reminder_email_status(email_notification_id, remi
     max_retries=5,
     retry_backoff=30,
 )
+# Called from notify_adviser_by_email only
 def update_no_recent_interaction_reminder_email_status(email_notification_id, reminder_ids):
     reminders = NoRecentInvestmentInteractionReminder.all_objects.filter(id__in=reminder_ids)
     for reminder in reminders:
@@ -181,26 +182,21 @@ def update_no_recent_export_interaction_reminder_email_status(email_notification
         reminder.save()
 
 
-# def schedule_generate_estimated_land_date_reminders():
-#     job = job_scheduler(
-#         queue_name=LONG_RUNNING_QUEUE,
-#         function=generate_estimated_land_date_reminders,
-#         job_timeout=HALF_DAY_IN_SECONDS,
-#         max_retries=5,
-#         retry_backoff=True,
-#         retry_intervals=30,
-#     )
-#     logger.info(
-#         f'Task {job.id} update_investment_projects_for_gva_multiplier_task scheduled',
-#     )
-#     return job
+def schedule_generate_estimated_land_date_reminders():
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=generate_estimated_land_date_reminders,
+        job_timeout=HALF_DAY_IN_SECONDS,
+        max_retries=5,
+        retry_backoff=True,
+        retry_intervals=30,
+    )
+    logger.info(
+        f'Task {job.id} update_investment_projects_for_gva_multiplier_task scheduled',
+    )
+    return job
 
-@shared_task(
-    autoretry_for=(Exception,),
-    queue='long-running',
-    max_retries=5,
-    retry_backoff=30,
-)
+
 def generate_estimated_land_date_reminders():
     """
     Generates Estimated Land Date Reminders according to each adviser's Subscriptions
