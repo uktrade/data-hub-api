@@ -212,8 +212,7 @@ def generate_estimated_land_date_reminders():
         for subscription in UpcomingEstimatedLandDateSubscription.objects.select_related(
             'adviser',
         ).filter(adviser__is_active=True).iterator():
-            # schedule_generate_estimated_land_date_reminders_for_subscription(
-            generate_estimated_land_date_reminders_for_subscription(
+            schedule_generate_estimated_land_date_reminders_for_subscription(
                 subscription=subscription,
                 current_date=current_date,
             )
@@ -223,26 +222,23 @@ def generate_estimated_land_date_reminders():
     )
 
 
-@shared_task(
-    autoretry_for=(Exception,),
-    queue='long-running',
-    max_retries=5,
-    retry_backoff=30,
-)
-# def schedule_generate_estimated_land_date_reminders_for_subscription(subscription, current_date):
-#     job = job_scheduler(
-#         queue_name=LONG_RUNNING_QUEUE,
-#         function=generate_estimated_land_date_reminders_for_subscription,
-#         function_kwargs={'subscription': subscription, 'current_date': current_date},
-#         job_timeout=HALF_DAY_IN_SECONDS,
-#         max_retries=5,
-#         retry_backoff=True,
-#         retry_intervals=30,
-#     )
-#     logger.info(
-#         f'Task {job.id} generate_estimated_land_date_reminders_for_subscription scheduled',
-#     )
-#     return job
+def schedule_generate_estimated_land_date_reminders_for_subscription(subscription, current_date):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=generate_estimated_land_date_reminders_for_subscription,
+        function_kwargs={'subscription': subscription, 'current_date': current_date},
+        job_timeout=HALF_DAY_IN_SECONDS,
+        max_retries=5,
+        retry_backoff=True,
+        retry_intervals=30,
+    )
+    logger.info(
+        f'Task {job.id} generate_estimated_land_date_reminders_for_subscription scheduled',
+        f'subscription set to {subscription} and current_date set to {current_date}',
+    )
+    return job
+
+
 def generate_estimated_land_date_reminders_for_subscription(subscription, current_date):
     """
     Generates the estimated land date reminders for a given subscription.
@@ -296,6 +292,11 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
             current_date=current_date,
             reminders=reminders,
         )
+
+    logger.info(
+        'Task generate_estimated_land_date_reminders_for_subscription completed',
+        f'subscription set to {subscription} and current_date set to {current_date}',
+    )
 
 
 @shared_task(
