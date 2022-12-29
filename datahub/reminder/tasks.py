@@ -649,12 +649,6 @@ def send_email_notification_via_rq(
     return response['id'], reminder_ids
 
 
-@shared_task(
-    autoretry_for=(Exception,),
-    queue='long-running',
-    max_retries=5,
-    retry_backoff=30,
-)
 def update_notify_email_delivery_status_for_estimated_land_date():
     if not is_feature_flag_active(INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME):
         logger.info(
