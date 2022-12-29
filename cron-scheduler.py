@@ -39,8 +39,8 @@ from datahub.reminder.tasks import (
     generate_no_recent_interaction_reminders,
     schedule_generate_estimated_land_date_reminders,
     update_notify_email_delivery_status_for_estimated_land_date,
-    update_notify_email_delivery_status_for_no_recent_interaction,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
+    update_notify_email_delivery_status_for_no_recent_interaction,
 )
 from datahub.search.tasks import sync_all_models
 
