@@ -39,6 +39,7 @@ from datahub.reminder.tasks import (
     generate_no_recent_interaction_reminders,
     schedule_generate_estimated_land_date_reminders,
     update_notify_email_delivery_status_for_estimated_land_date,
+    update_notify_email_delivery_status_for_no_recent_interaction,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
 )
 from datahub.search.tasks import sync_all_models
@@ -109,6 +110,17 @@ def schedule_jobs():
             cron=EVERY_NINE_THIRTY_AM_ON_FIRST_SECOND_THIRD_FOURTH_OF_EACH_MONTH,
             description='Start of month update notify email delivery status for estimated land '
             'date',
+        )
+
+    if settings.ENABLE_NO_RECENT_INTERACTION_EMAIL_DELIVERY_STATUS:
+        job_scheduler(
+            function=update_notify_email_delivery_status_for_no_recent_interaction,
+            max_retries=5,
+            queue_name=LONG_RUNNING_QUEUE,
+            retry_backoff=True,
+            retry_intervals=30,
+            cron=EVERY_TEN_AM,
+            description='Daily update notify email delivery status for no recent interaction',
         )
 
     if settings.ENABLE_DAILY_OPENSEARCH_SYNC:

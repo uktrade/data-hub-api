@@ -404,13 +404,6 @@ if REDIS_BASE_URL:
             'schedule': crontab(minute='*/10'),
         }
 
-    if env.bool('ENABLE_NO_RECENT_INTERACTION_EMAIL_DELIVERY_STATUS', False):
-        CELERY_BEAT_SCHEDULE['update_notify_email_delivery_status_for_no_recent_interaction'] = {
-            'task': 'datahub.reminder'
-            '.tasks.update_notify_email_delivery_status_for_no_recent_interaction',
-            'schedule': crontab(minute=00, hour=10),
-        }
-
     CELERY_WORKER_LOG_FORMAT = (
         "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
     )

@@ -724,12 +724,6 @@ def update_notify_email_delivery_status_for_no_recent_export_interaction():
                 ).update(email_delivery_status=result['status'], modified_on=now())
 
 
-@shared_task(
-    autoretry_for=(Exception,),
-    queue='long-running',
-    max_retries=5,
-    retry_backoff=30,
-)
 def update_notify_email_delivery_status_for_no_recent_interaction():
     if not is_feature_flag_active(
         INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
