@@ -160,12 +160,6 @@ def update_estimated_land_date_reminder_email_status(email_notification_id, remi
     )
 
 
-# @shared_task(
-#     autoretry_for=(Exception,),
-#     queue='long-running',
-#     max_retries=5,
-#     retry_backoff=30,
-# )
 def update_no_recent_interaction_reminder_email_status(email_notification_id, reminder_ids):
     reminders = NoRecentInvestmentInteractionReminder.all_objects.filter(id__in=reminder_ids)
     for reminder in reminders:
