@@ -57,6 +57,7 @@ from datahub.reminder.tasks import (
     schedule_generate_estimated_land_date_reminders,
     send_email_notification_via_rq,
     update_estimated_land_date_reminder_email_status,
+    update_no_recent_interaction_reminder_email_status,
     update_notify_email_delivery_status_for_estimated_land_date,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
     update_notify_email_delivery_status_for_no_recent_interaction,
@@ -1572,6 +1573,41 @@ class TestCreateNoRecentInteractionReminder:
 class TestGenerateNoRecentInteractionReminderTask:
     current_date = datetime.date(year=2022, month=7, day=17)
 
+    def emulate_generate_no_recent_interaction_reminders(self, mock_job_scheduler):
+        generate_no_recent_interaction_reminders()
+
+        mock_job_scheduler.assert_called()
+
+        # Call actual scheduled function
+        assert mock_job_scheduler.mock_calls[0].kwargs['function'].__name__ == (
+            generate_no_recent_interaction_reminders_for_subscription.__name__
+        )
+        generate_no_recent_interaction_reminders_for_subscription(
+            subscription=mock_job_scheduler.mock_calls[0][2]['function_args'][0],
+            current_date=mock_job_scheduler.mock_calls[0][2]['function_args'][1],
+        )
+
+        # Call actual scheduled function
+        assert mock_job_scheduler.mock_calls[1].kwargs['function'].__name__ == (
+            send_email_notification_via_rq.__name__
+        )
+        [email_notification_id, reminder_ids] = send_email_notification_via_rq(
+            mock_job_scheduler.mock_calls[1][2]['function_args'][0],
+            mock_job_scheduler.mock_calls[1][2]['function_args'][1],
+            mock_job_scheduler.mock_calls[1][2]['function_args'][2],
+            mock_job_scheduler.mock_calls[1][2]['function_args'][3],
+            mock_job_scheduler.mock_calls[1][2]['function_args'][4],
+            mock_job_scheduler.mock_calls[1][2]['function_args'][5],
+        )
+
+        assert mock_job_scheduler.mock_calls[2].kwargs['function'].__name__ == (
+            update_no_recent_interaction_reminder_email_status.__name__
+        )
+        update_no_recent_interaction_reminder_email_status(
+            email_notification_id, reminder_ids,
+        )
+        return reminder_ids
+
     def test_generate_no_recent_interaction_reminders(
         self,
         mock_job_scheduler,
@@ -1893,16 +1929,18 @@ class TestGenerateNoRecentInteractionReminderTask:
         generate_no_recent_interaction_reminders()
         assert mock_create_no_recent_interaction_reminder.call_count == 0
 
+    @pytest.mark.django_db(transaction=True)
     def test_stores_notification_id(
         self,
-        mock_notification_tasks_notify_gateway,
+        mock_job_scheduler,
+        mock_reminder_tasks_notify_gateway,
         adviser,
     ):
         """
         Test if a notification id is being stored against the reminder.
         """
         notification_id = uuid.uuid4()
-        mock_notification_tasks_notify_gateway.send_email_notification = mock.Mock(
+        mock_reminder_tasks_notify_gateway.send_email_notification = mock.Mock(
             return_value={'id': notification_id},
         )
 
@@ -1919,7 +1957,8 @@ class TestGenerateNoRecentInteractionReminderTask:
         interaction_date = self.current_date - relativedelta(days=days)
         with freeze_time(interaction_date):
             InvestmentProjectInteractionFactory(investment_project=project)
-        generate_no_recent_interaction_reminders()
+
+        self.emulate_generate_no_recent_interaction_reminders(mock_job_scheduler)
 
         reminder = NoRecentInvestmentInteractionReminder.objects.get(
             project=project,
@@ -1930,7 +1969,8 @@ class TestGenerateNoRecentInteractionReminderTask:
 
     def test_does_not_send_multiple(
         self,
-        mock_send_no_recent_interaction_reminder,
+        mock_job_scheduler,
+        mock_reminder_tasks_notify_gateway,
         adviser,
     ):
         """
@@ -1939,6 +1979,11 @@ class TestGenerateNoRecentInteractionReminderTask:
         Even after calling the generate function multiple times, only one reminder
         should be created and one email sent.
         """
+        notification_id = uuid.uuid4()
+        mock_reminder_tasks_notify_gateway.send_email_notification = mock.Mock(
+            return_value={'id': notification_id},
+        )
+
         days = 5
         NoRecentInvestmentInteractionSubscriptionFactory(
             adviser=adviser,
@@ -1953,20 +1998,33 @@ class TestGenerateNoRecentInteractionReminderTask:
         with freeze_time(interaction_date):
             InvestmentProjectInteractionFactory(investment_project=project)
 
+        self.emulate_generate_no_recent_interaction_reminders(mock_job_scheduler)
+
+        assert mock_job_scheduler.call_count == 3
+
+        # Second call shouldn't trigger send_email_notification_via_rq
         generate_no_recent_interaction_reminders()
-        generate_no_recent_interaction_reminders()
+        mock_job_scheduler.assert_called()
+        # Call actual scheduled function
+        assert mock_job_scheduler.mock_calls[0].kwargs['function'].__name__ == (
+            generate_no_recent_interaction_reminders_for_subscription.__name__
+        )
+        generate_no_recent_interaction_reminders_for_subscription(
+            subscription=mock_job_scheduler.mock_calls[0][2]['function_args'][0],
+            current_date=mock_job_scheduler.mock_calls[0][2]['function_args'][1],
+        )
         reminders = NoRecentInvestmentInteractionReminder.objects.filter(
             project=project,
             adviser=adviser,
         )
-        assert reminders.count() == 1
-        mock_send_no_recent_interaction_reminder.assert_called_once_with(
-            project=project,
-            adviser=adviser,
-            reminder_days=days,
-            current_date=self.current_date,
-            reminders=[reminders[0]],
+        count_send_email_notifications_via_rq = (
+            [mock_call for mock_call in mock_job_scheduler.mock_calls
+                if mock_call[2]['function'] == send_email_notification_via_rq]
         )
+
+        assert reminders.count() == 1
+        assert mock_job_scheduler.call_count == 4
+        assert len(count_send_email_notifications_via_rq) == 1
 
 
 @pytest.mark.django_db

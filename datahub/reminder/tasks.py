@@ -1,6 +1,5 @@
 from logging import getLogger
 
-from celery import shared_task
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db.models import Q
@@ -20,7 +19,6 @@ from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 from datahub.notification.constants import NotifyServiceName
 from datahub.notification.core import notify_gateway
-from datahub.notification.tasks import send_email_notification
 from datahub.reminder import (
     EXPORT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
     EXPORT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
@@ -137,7 +135,7 @@ def send_no_recent_interaction_reminder(project, adviser, reminder_days, current
     item = get_project_item(project)
     last_interaction_date = current_date - relativedelta(days=reminder_days)
 
-    notify_adviser_by_email(
+    notify_adviser_by_rq_email(
         adviser,
         settings.INVESTMENT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID,
         {
@@ -145,6 +143,7 @@ def send_no_recent_interaction_reminder(project, adviser, reminder_days, current
             'time_period': timesince(last_interaction_date, now=current_date).split(',')[0],
             'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
         },
+        update_no_recent_interaction_reminder_email_status,
         reminders,
     )
 
@@ -161,13 +160,12 @@ def update_estimated_land_date_reminder_email_status(email_notification_id, remi
     )
 
 
-@shared_task(
-    autoretry_for=(Exception,),
-    queue='long-running',
-    max_retries=5,
-    retry_backoff=30,
-)
-# Called from notify_adviser_by_email only
+# @shared_task(
+#     autoretry_for=(Exception,),
+#     queue='long-running',
+#     max_retries=5,
+#     retry_backoff=30,
+# )
 def update_no_recent_interaction_reminder_email_status(email_notification_id, reminder_ids):
     reminders = NoRecentInvestmentInteractionReminder.all_objects.filter(id__in=reminder_ids)
     for reminder in reminders:
@@ -585,37 +583,6 @@ def notify_adviser_by_rq_email(adviser, template_identifier, context, update_tas
     )
 
     return job
-
-
-def notify_adviser_by_email(adviser, template_identifier, context, reminders=None):
-    """
-    Notify an adviser, using a GOVUK notify template and some template context.
-
-    Link a separate task to store notification_id, so it is possible to track the
-    status of email delivery.
-    """
-    status_update_task = {
-        'UpcomingEstimatedLandDateReminder':
-            update_estimated_land_date_reminder_email_status,
-        'NoRecentInvestmentInteractionReminder':
-            update_no_recent_interaction_reminder_email_status,
-    }
-    link_task = {}
-    if reminders and len(reminders) > 0:
-        class_name = reminders[0].__class__.__name__
-        link_task['link'] = status_update_task[class_name].s(
-            [reminder.id for reminder in reminders],
-        )
-
-    email_address = adviser.get_current_email()
-    send_email_notification.apply_async(
-        args=(email_address, template_identifier),
-        kwargs={
-            'context': context,
-            'notify_service_name': NotifyServiceName.investment,
-        },
-        **link_task,
-    )
 
 
 def send_email_notification_via_rq(
