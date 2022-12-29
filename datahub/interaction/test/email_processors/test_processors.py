@@ -54,16 +54,16 @@ def base_interaction_data_fixture():
 
 
 @pytest.fixture
-def mock_notify_adviser_by_rq_email(monkeypatch):
+def mock_notify_adviser_by_email(monkeypatch):
     """
-    Mocks the notify_adviser_by_rq_email function.
+    Mocks the notify_adviser_by_email function.
     """
-    mock_notify_adviser_by_rq_email = mock.Mock()
+    mock_notify_adviser_by_email = mock.Mock()
     monkeypatch.setattr(
-        'datahub.interaction.email_processors.notify.notify_adviser_by_rq_email',
-        mock_notify_adviser_by_rq_email,
+        'datahub.interaction.email_processors.notify.notify_adviser_by_email',
+        mock_notify_adviser_by_email,
     )
-    return mock_notify_adviser_by_rq_email
+    return mock_notify_adviser_by_email
 
 
 @pytest.fixture
@@ -153,7 +153,7 @@ class TestCalendarInteractionEmailProcessor:
         expected_subject,
         calendar_data_fixture,
         base_interaction_data_fixture,
-        mock_notify_adviser_by_rq_email,
+        mock_notify_adviser_by_email,
         interaction_email_notification_feature_flag,
         mock_message,
         monkeypatch,
@@ -203,7 +203,7 @@ class TestCalendarInteractionEmailProcessor:
         sender_participant = interaction.dit_participants.get(
             adviser__email__iexact=interaction_data['sender_email'],
         )
-        mock_notify_adviser_by_rq_email.assert_called_once_with(
+        mock_notify_adviser_by_email.assert_called_once_with(
             sender_participant.adviser,
             Template.meeting_ingest_success.value,
             context={
@@ -271,7 +271,7 @@ class TestCalendarInteractionEmailProcessor:
         self,
         base_interaction_data_fixture,
         calendar_data_fixture,
-        mock_notify_adviser_by_rq_email,
+        mock_notify_adviser_by_email,
         interaction_email_notification_feature_flag,
         mock_message,
         monkeypatch,
@@ -304,7 +304,7 @@ class TestCalendarInteractionEmailProcessor:
             expected_error_message = (
                 EXCEPTION_NOTIFY_MESSAGES[invalid_invite_exception_class]
             )
-            mock_notify_adviser_by_rq_email.assert_called_once_with(
+            mock_notify_adviser_by_email.assert_called_once_with(
                 Advisor.objects.filter(
                     email=base_interaction_data_fixture['sender_email'],
                 ).first(),
@@ -316,7 +316,7 @@ class TestCalendarInteractionEmailProcessor:
                 },
             )
         else:
-            mock_notify_adviser_by_rq_email.assert_not_called()
+            mock_notify_adviser_by_email.assert_not_called()
 
     @pytest.mark.parametrize(
         'interaction_data_overrides,expected_message',
@@ -336,7 +336,7 @@ class TestCalendarInteractionEmailProcessor:
         expected_message,
         base_interaction_data_fixture,
         calendar_data_fixture,
-        mock_notify_adviser_by_rq_email,
+        mock_notify_adviser_by_email,
         interaction_email_notification_feature_flag,
         mock_message,
         monkeypatch,
@@ -351,7 +351,7 @@ class TestCalendarInteractionEmailProcessor:
         result, message = processor.process_email(mock_message)
         assert result is False
         assert message == expected_message
-        mock_notify_adviser_by_rq_email.assert_called_once_with(
+        mock_notify_adviser_by_email.assert_called_once_with(
             Advisor.objects.filter(email=base_interaction_data_fixture['sender_email']).first(),
             Template.meeting_ingest_failure.value,
             context={
