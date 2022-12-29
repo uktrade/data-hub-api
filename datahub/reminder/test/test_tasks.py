@@ -1574,7 +1574,7 @@ class TestGenerateNoRecentInteractionReminderTask:
 
     def test_generate_no_recent_interaction_reminders(
         self,
-        mock_generate_no_recent_interaction_reminders_for_subscription,
+        mock_job_scheduler,
     ):
         """
         Reminders should be generated for all subscriptions.
@@ -1584,9 +1584,22 @@ class TestGenerateNoRecentInteractionReminderTask:
             subscription_count,
         )
         generate_no_recent_interaction_reminders()
-        mock_generate_no_recent_interaction_reminders_for_subscription.assert_has_calls(
+
+        mock_job_scheduler.assert_called()
+
+        mock_job_scheduler.assert_has_calls(
             [
-                call(subscription=subscription, current_date=self.current_date)
+                call(
+                    function=generate_no_recent_interaction_reminders_for_subscription,
+                    function_args=(
+                        subscription,
+                        datetime.date(2022, 7, 17),
+                    ),
+                    max_retries=5,
+                    queue_name=LONG_RUNNING_QUEUE,
+                    retry_backoff=True,
+                    retry_intervals=30,
+                )
                 for subscription in subscriptions
             ],
             any_order=True,
