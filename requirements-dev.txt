@@ -409,7 +409,7 @@ vine==5.0.0
     #   kombu
 virtualenv==20.17.1
     # via pre-commit
-watchdog[watchmedo]==2.2.0
+watchdog[watchmedo]==2.2.1
     # via -r requirements-dev.in
 wcwidth==0.2.5
     # via prompt-toolkit
