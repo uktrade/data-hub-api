@@ -919,7 +919,7 @@ class TestGenerateEstimatedLandDateReminderTask:
             reminders=[reminder],
         )
 
-    @pytest.mark.django_db(transaction=True)
+#    @pytest.mark.django_db(transaction=True)
     def test_stores_notification_id(
         self,
         mock_reminder_tasks_notify_gateway,
