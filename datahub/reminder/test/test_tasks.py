@@ -1930,6 +1930,14 @@ class TestGenerateNoRecentInteractionReminderTask:
         assert mock_create_no_recent_interaction_reminder.call_count == 0
 
     @pytest.mark.django_db(transaction=True)
+    # TODO MK Fix ForeignKeyViolation metadata_team
+    # >               return self.cursor.execute(sql, params)
+    # E               psycopg2.errors.ForeignKeyViolation: insert or update on table
+    # "metadata_team" violates foreign key constraint
+    # "metadata_team_country_id_84fe5ab7_fk_metadata_country_id"
+    # E               DETAIL:  Key (country_id)=(82756b9a-5d95-e211-a939-e4115bead28a)
+    # is not present in table "metadata_country".
+    # https://app.circleci.com/pipelines/github/uktrade/data-hub-api/14985/workflows/6e7930e7-6b0f-422e-8567-f51171b5084f/jobs/23003/tests#failed-test-0
     def test_stores_notification_id(
         self,
         mock_job_scheduler,
