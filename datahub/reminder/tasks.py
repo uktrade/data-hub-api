@@ -166,12 +166,22 @@ def update_no_recent_interaction_reminder_email_status(email_notification_id, re
         reminder.email_notification_id = email_notification_id
         reminder.save()
 
+    logger.info(
+        f'Task update_no_recent_interaction_reminder_email_status completed'
+        f'email_notification_id to {email_notification_id} and reminder_ids set to {reminder_ids}',
+    )
+
 
 def update_no_recent_export_interaction_reminder_email_status(email_notification_id, reminder_ids):
     reminders = NoRecentExportInteractionReminder.all_objects.filter(id__in=reminder_ids)
     for reminder in reminders:
         reminder.email_notification_id = email_notification_id
         reminder.save()
+
+    logger.info(
+        f'Task update_no_recent_export_interaction_reminder_email_status completed'
+        f'email_notification_id to {email_notification_id} and reminder_ids set to {reminder_ids}',
+    )
 
 
 def schedule_generate_estimated_land_date_reminders():
@@ -605,6 +615,11 @@ def send_email_notification_via_rq(
         max_retries=5,
         retry_backoff=True,
         retry_intervals=30,
+    )
+
+    logger.info(
+        f'Task send_email_notification_via_rq completed'
+        f'email_notification_id to {response["id"]} and reminder_ids set to {reminder_ids}',
     )
 
     return response['id'], reminder_ids
