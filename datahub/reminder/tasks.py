@@ -155,7 +155,7 @@ def update_estimated_land_date_reminder_email_status(email_notification_id, remi
         reminder.save()
 
     logger.info(
-        f'Task update_estimated_land_date_reminder_email_status completed'
+        'Task update_estimated_land_date_reminder_email_status completed'
         f'email_notification_id to {email_notification_id} and reminder_ids set to {reminder_ids}',
     )
 
@@ -167,7 +167,7 @@ def update_no_recent_interaction_reminder_email_status(email_notification_id, re
         reminder.save()
 
     logger.info(
-        f'Task update_no_recent_interaction_reminder_email_status completed'
+        'Task update_no_recent_interaction_reminder_email_status completed'
         f'email_notification_id to {email_notification_id} and reminder_ids set to {reminder_ids}',
     )
 
@@ -179,7 +179,7 @@ def update_no_recent_export_interaction_reminder_email_status(email_notification
         reminder.save()
 
     logger.info(
-        f'Task update_no_recent_export_interaction_reminder_email_status completed'
+        'Task update_no_recent_export_interaction_reminder_email_status completed'
         f'email_notification_id to {email_notification_id} and reminder_ids set to {reminder_ids}',
     )
 
@@ -618,7 +618,7 @@ def send_email_notification_via_rq(
     )
 
     logger.info(
-        f'Task send_email_notification_via_rq completed'
+        'Task send_email_notification_via_rq completed'
         f'email_notification_id to {response["id"]} and reminder_ids set to {reminder_ids}',
     )
 
