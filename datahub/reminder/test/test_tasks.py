@@ -917,8 +917,8 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     def test_stores_notification_id_for_summary_email(
         self,
+        async_queue,
         mock_reminder_tasks_notify_gateway,
-        mock_job_scheduler,
         adviser,
     ):
         """
@@ -942,7 +942,7 @@ class TestGenerateEstimatedLandDateReminderTask:
             estimated_land_date=estimated_land_date,
             status=InvestmentProject.Status.ONGOING,
         )
-        self.emulate_generate_estimated_land_date_reminders(mock_job_scheduler)
+        generate_estimated_land_date_reminders()
 
         reminders = UpcomingEstimatedLandDateReminder.objects.filter(
             project__in=projects,
