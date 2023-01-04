@@ -235,7 +235,7 @@ def schedule_generate_estimated_land_date_reminders_for_subscription(subscriptio
         retry_intervals=30,
     )
     logger.info(
-        f'Task {job.id} generate_estimated_land_date_reminders_for_subscription scheduled',
+        f'Task {job.id} generate_estimated_land_date_reminders_for_subscription scheduled '
         f'subscription set to {subscription} and current_date set to {current_date}',
     )
     return job
