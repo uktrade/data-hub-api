@@ -263,16 +263,6 @@ def mock_notification_tasks_notify_gateway(monkeypatch):
 
 
 @pytest.fixture()
-def mock_notification_core_notify_gateway(monkeypatch):
-    mock_notify_gateway = mock.Mock()
-    monkeypatch.setattr(
-        'datahub.notification.core.notify_gateway',
-        mock_notify_gateway,
-    )
-    return mock_notify_gateway
-
-
-@pytest.fixture()
 def mock_reminder_tasks_notify_gateway(monkeypatch):
     mock_notify_gateway = mock.Mock()
     monkeypatch.setattr(
@@ -890,7 +880,6 @@ class TestGenerateEstimatedLandDateReminderTask:
         Test if a notification id is being stored against the reminder.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
-
         notification_id = uuid.uuid4()
         mock_reminder_tasks_notify_gateway.send_email_notification = mock.Mock(
             return_value={'id': notification_id},
@@ -911,7 +900,6 @@ class TestGenerateEstimatedLandDateReminderTask:
         generate_estimated_land_date_reminders()
 
         reminder = UpcomingEstimatedLandDateReminder.objects.get(project=project, adviser=adviser)
-
         assert reminder.email_notification_id == notification_id
         assert reminder.email_delivery_status == EmailDeliveryStatus.UNKNOWN
 
@@ -1884,13 +1872,11 @@ class TestGenerateNoRecentInteractionReminderTask:
         interaction_date = self.current_date - relativedelta(days=days)
         with freeze_time(interaction_date):
             InvestmentProjectInteractionFactory(investment_project=project)
-
         generate_no_recent_interaction_reminders()
         reminder = NoRecentInvestmentInteractionReminder.objects.get(
             project=project,
             adviser=adviser,
         )
-
         assert any(
             'Task update_no_recent_interaction_reminder_email_status completed'
             f'email_notification_id to {notification_id} and '
@@ -1917,7 +1903,6 @@ class TestGenerateNoRecentInteractionReminderTask:
         mock_reminder_tasks_notify_gateway.send_email_notification = mock.Mock(
             return_value={'id': notification_id},
         )
-
         days = 5
         NoRecentInvestmentInteractionSubscriptionFactory(
             adviser=adviser,
@@ -1934,12 +1919,10 @@ class TestGenerateNoRecentInteractionReminderTask:
 
         generate_no_recent_interaction_reminders()
         generate_no_recent_interaction_reminders()
-
         reminders = NoRecentInvestmentInteractionReminder.objects.filter(
             project=project,
             adviser=adviser,
         )
-
         assert reminders.count() == 1
         mock_send_no_recent_interaction_reminder.assert_called_once_with(
             project=project,
