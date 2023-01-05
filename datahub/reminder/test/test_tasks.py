@@ -943,6 +943,7 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     def test_does_not_send_multiple_summary(
         self,
+        async_queue,
         mock_send_estimated_land_date_summary,
         adviser,
     ):
