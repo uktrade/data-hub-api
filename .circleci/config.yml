@@ -100,6 +100,7 @@ job_defaults: &job_defaults
 
     - store_test_results:
         path: test-reports
+        destination: junit
 
     - when:
         condition: <<parameters.publish_coverage>>
