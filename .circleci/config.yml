@@ -102,7 +102,7 @@ job_defaults: &job_defaults
         path: test-reports
 
     - store_artifacts:
-        path: test-results
+        path: test-reports
         destination: junit
 
     - when:
