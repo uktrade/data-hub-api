@@ -583,3 +583,5 @@ If making requests to this endpoint locally, you must manually add this header o
 ### Hawk authentication
 
 In general, Hawk authentication hashing the HTTP payload and `Content-Type` header, and using a nonce, are both _optional_. Here, as with the Activity Stream endpoints in other DIT projects, both are _required_. `Content-Type` may be the empty string, and if there is no payload, then it should be treated as the empty string.
+
+
