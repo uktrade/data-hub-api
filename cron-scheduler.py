@@ -15,13 +15,16 @@ from datahub.company.tasks.company import schedule_automatic_company_archive
 from datahub.company.tasks.contact import schedule_automatic_contact_archive
 from datahub.core.queues.constants import (
     EVERY_EIGHT_AM,
+    EVERY_EIGHT_THIRTY_AM_ON_FIRST_EACH_MONTH,
     EVERY_HOUR,
     EVERY_MIDNIGHT,
+    EVERY_NINE_THIRTY_AM_ON_FIRST_SECOND_THIRD_FOURTH_OF_EACH_MONTH,
     EVERY_ONE_AM,
     EVERY_SEVEN_PM,
     EVERY_TEN_AM,
     EVERY_TEN_MINUTES,
     EVERY_THREE_AM_ON_TWENTY_THIRD_EACH_MONTH,
+    HALF_DAY_IN_SECONDS,
 )
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
@@ -34,7 +37,11 @@ from datahub.investment.project.tasks import (
 from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
 from datahub.reminder.tasks import (
     generate_no_recent_export_interaction_reminders,
+    generate_no_recent_interaction_reminders,
+    schedule_generate_estimated_land_date_reminders,
+    update_notify_email_delivery_status_for_estimated_land_date,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
+    update_notify_email_delivery_status_for_no_recent_interaction,
 )
 from datahub.search.tasks import sync_all_models
 
@@ -80,11 +87,44 @@ def schedule_jobs():
         cron=EVERY_MIDNIGHT,
         description='Update companies from dnb service',
     )
+
+    if settings.ENABLE_ESTIMATED_LAND_DATE_REMINDERS:
+        job_scheduler(
+            function=schedule_generate_estimated_land_date_reminders,
+            cron=EVERY_EIGHT_THIRTY_AM_ON_FIRST_EACH_MONTH,
+            description='schedule_generate_estimated_land_date_reminders',
+        )
+
     job_scheduler(
         function=schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
         cron=EVERY_THREE_AM_ON_TWENTY_THIRD_EACH_MONTH,
         description='schedule_refresh_gross_value_added_value_for_fdi_investment_projects',
     )
+
+    if settings.ENABLE_ESTIMATED_LAND_DATE_REMINDERS_EMAIL_DELIVERY_STATUS:
+        job_scheduler(
+            function=update_notify_email_delivery_status_for_estimated_land_date,
+            max_retries=5,
+            queue_name=LONG_RUNNING_QUEUE,
+            retry_backoff=True,
+            retry_intervals=30,
+            job_timeout=HALF_DAY_IN_SECONDS,
+            cron=EVERY_NINE_THIRTY_AM_ON_FIRST_SECOND_THIRD_FOURTH_OF_EACH_MONTH,
+            description='Start of month update notify email delivery status for estimated land '
+            'date',
+        )
+
+    if settings.ENABLE_NO_RECENT_INTERACTION_EMAIL_DELIVERY_STATUS:
+        job_scheduler(
+            function=update_notify_email_delivery_status_for_no_recent_interaction,
+            max_retries=5,
+            queue_name=LONG_RUNNING_QUEUE,
+            retry_backoff=True,
+            retry_intervals=30,
+            job_timeout=HALF_DAY_IN_SECONDS,
+            cron=EVERY_TEN_AM,
+            description='Daily update notify email delivery status for no recent interaction',
+        )
 
     if settings.ENABLE_DAILY_OPENSEARCH_SYNC:
         job_scheduler(
@@ -125,6 +165,18 @@ def schedule_jobs():
             retry_intervals=30,
             cron=EVERY_EIGHT_AM,
             description='Daily generate no recent export interaction reminders',
+        )
+
+    if settings.ENABLE_NO_RECENT_INTERACTION_REMINDERS:
+        job_scheduler(
+            function=generate_no_recent_interaction_reminders,
+            max_retries=5,
+            queue_name=LONG_RUNNING_QUEUE,
+            retry_backoff=True,
+            retry_intervals=30,
+            cron=EVERY_EIGHT_AM,
+            job_timeout=HALF_DAY_IN_SECONDS,
+            description='Daily generate no recent interaction reminders',
         )
 
     if settings.ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS:

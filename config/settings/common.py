@@ -404,33 +404,6 @@ if REDIS_BASE_URL:
             'schedule': crontab(minute='*/10'),
         }
 
-    if env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS', False):
-        CELERY_BEAT_SCHEDULE['generate_estimated_land_date_reminders'] = {
-            'task': 'datahub.reminder.tasks.generate_estimated_land_date_reminders',
-            'schedule': crontab(minute=30, hour=8, day_of_month=1),
-        }
-
-    if env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS_EMAIL_DELIVERY_STATUS', False):
-        CELERY_BEAT_SCHEDULE['update_notify_email_delivery_status_for_estimated_land_date'] = {
-            'task':
-                'datahub.reminder'
-                '.tasks.update_notify_email_delivery_status_for_estimated_land_date',
-            'schedule': crontab(minute=30, hour=9, day_of_month='1,2,3,4'),
-        }
-
-    if env.bool('ENABLE_NO_RECENT_INTERACTION_REMINDERS', False):
-        CELERY_BEAT_SCHEDULE['generate_no_recent_interaction_reminders'] = {
-            'task': 'datahub.reminder.tasks.generate_no_recent_interaction_reminders',
-            'schedule': crontab(minute=00, hour=8),
-        }
-
-    if env.bool('ENABLE_NO_RECENT_INTERACTION_EMAIL_DELIVERY_STATUS', False):
-        CELERY_BEAT_SCHEDULE['update_notify_email_delivery_status_for_no_recent_interaction'] = {
-            'task': 'datahub.reminder'
-            '.tasks.update_notify_email_delivery_status_for_no_recent_interaction',
-            'schedule': crontab(minute=00, hour=10),
-        }
-
     CELERY_WORKER_LOG_FORMAT = (
         "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
     )
@@ -439,9 +412,12 @@ CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER', False)
 CELERY_TASK_SEND_SENT_EVENT = env.bool('CELERY_TASK_SEND_SENT_EVENT', True)
 CELERY_WORKER_TASK_EVENTS = env.bool('CELERY_WORKER_TASK_EVENTS', True)
 ENABLE_DAILY_OPENSEARCH_SYNC = env.bool('ENABLE_DAILY_OPENSEARCH_SYNC', False)
-
+ENABLE_ESTIMATED_LAND_DATE_REMINDERS = env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS', False)
+ENABLE_ESTIMATED_LAND_DATE_REMINDERS_EMAIL_DELIVERY_STATUS = env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS_EMAIL_DELIVERY_STATUS', False)
 ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS = env.bool('ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS', False)
 ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS = env.bool('ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS', False)
+ENABLE_NO_RECENT_INTERACTION_EMAIL_DELIVERY_STATUS = env.bool('ENABLE_NO_RECENT_INTERACTION_EMAIL_DELIVERY_STATUS', False)
+ENABLE_NO_RECENT_INTERACTION_REMINDERS = env.bool('ENABLE_NO_RECENT_INTERACTION_REMINDERS', False)
 
 # ADMIN CSV IMPORT
 
