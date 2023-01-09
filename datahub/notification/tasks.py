@@ -7,21 +7,23 @@ from datahub.notification.core import notify_gateway
 
 
 def schedule_send_email_notification(
-    self,
     recipient_email,
     template_identifier,
     context=None,
     notify_service_name=None,
+    *args,
+    **kwargs,
 ):
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
         function=send_email_notification,
         function_kwargs={
-            recipient_email,
-            template_identifier,
-            context,
-            notify_service_name,
+            'recipient_email': recipient_email,
+            'template_identifier': template_identifier,
+            'context': context,
+            'notify_service_name': notify_service_name,
         },
+        function_kwargs=kwargs,
         max_retries=5,
     )
 
@@ -29,7 +31,6 @@ def schedule_send_email_notification(
 
 
 def send_email_notification(
-    self,
     recipient_email,
     template_identifier,
     context=None,
@@ -52,5 +53,5 @@ def send_email_notification(
         # a successful outcome.
         if exc.status_code in (400, 403):
             raise
-        raise self.retry(exc=exc, countdown=60)
+        # raise self.retry(exc=exc, countdown=60)
     return response['id']
