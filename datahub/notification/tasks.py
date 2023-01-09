@@ -1,15 +1,33 @@
-from celery import shared_task
 from notifications_python_client.errors import HTTPError
+
+from datahub.core.queues.constants import LONG_RUNNING_QUEUE
+from datahub.core.queues.job_scheduler import job_scheduler
 
 from datahub.notification.core import notify_gateway
 
 
-@shared_task(
-    bind=True,
-    acks_late=True,
-    priority=9,
-    max_retries=5,
-)
+def schedule_send_email_notification(
+    self,
+    recipient_email,
+    template_identifier,
+    context=None,
+    notify_service_name=None,
+):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=send_email_notification,
+        function_kwargs={
+            recipient_email,
+            template_identifier,
+            context,
+            notify_service_name,
+        },
+        max_retries=5,
+    )
+
+    return job
+
+
 def send_email_notification(
     self,
     recipient_email,
