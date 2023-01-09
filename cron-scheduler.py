@@ -24,6 +24,7 @@ from datahub.core.queues.constants import (
     EVERY_TEN_AM,
     EVERY_TEN_MINUTES,
     EVERY_THREE_AM_ON_TWENTY_THIRD_EACH_MONTH,
+    HALF_DAY_IN_SECONDS,
 )
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
@@ -107,6 +108,7 @@ def schedule_jobs():
             queue_name=LONG_RUNNING_QUEUE,
             retry_backoff=True,
             retry_intervals=30,
+            job_timeout=HALF_DAY_IN_SECONDS,
             cron=EVERY_NINE_THIRTY_AM_ON_FIRST_SECOND_THIRD_FOURTH_OF_EACH_MONTH,
             description='Start of month update notify email delivery status for estimated land '
             'date',
@@ -119,6 +121,7 @@ def schedule_jobs():
             queue_name=LONG_RUNNING_QUEUE,
             retry_backoff=True,
             retry_intervals=30,
+            job_timeout=HALF_DAY_IN_SECONDS,
             cron=EVERY_TEN_AM,
             description='Daily update notify email delivery status for no recent interaction',
         )
@@ -172,6 +175,7 @@ def schedule_jobs():
             retry_backoff=True,
             retry_intervals=30,
             cron=EVERY_EIGHT_AM,
+            job_timeout=HALF_DAY_IN_SECONDS,
             description='Daily generate no recent interaction reminders',
         )
 

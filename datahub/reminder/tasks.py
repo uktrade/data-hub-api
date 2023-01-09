@@ -229,7 +229,6 @@ def schedule_generate_estimated_land_date_reminders_for_subscription(subscriptio
         queue_name=LONG_RUNNING_QUEUE,
         function=generate_estimated_land_date_reminders_for_subscription,
         function_kwargs={'subscription': subscription, 'current_date': current_date},
-        job_timeout=HALF_DAY_IN_SECONDS,
         max_retries=5,
         retry_backoff=True,
         retry_intervals=30,
