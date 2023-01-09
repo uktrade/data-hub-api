@@ -1,7 +1,7 @@
 from notifications_python_client.errors import HTTPError
 
-from datahub.core.queues.constants import LONG_RUNNING_QUEUE
 from datahub.core.queues.job_scheduler import job_scheduler
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 
 from datahub.notification.core import notify_gateway
 
