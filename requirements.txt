@@ -226,7 +226,7 @@ wcwidth==0.2.5
     # via prompt-toolkit
 werkzeug==2.0.3
     # via -r requirements.in
-whitenoise==6.2.0
+whitenoise==6.3.0
     # via -r requirements.in
 wrapt==1.14.1
     # via elastic-apm
