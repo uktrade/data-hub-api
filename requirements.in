@@ -10,7 +10,7 @@ django-mptt==0.14.0
 django-pglocks==1.0.4
 django-reversion==5.0.4
 uritemplate==4.1.1  # required for DRF schema features
-whitenoise==6.2.0
+whitenoise==6.3.0
 
 chardet==5.1.0
 pyyaml==6.0
