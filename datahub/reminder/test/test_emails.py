@@ -25,7 +25,9 @@ from datahub.reminder.tasks import (
     send_estimated_land_date_summary,
     send_no_recent_export_interaction_reminder,
     send_no_recent_interaction_reminder,
+    update_estimated_land_date_reminder_email_status,
     update_no_recent_export_interaction_reminder_email_status,
+    update_no_recent_interaction_reminder_email_status,
 )
 from datahub.reminder.test.factories import NoRecentExportInteractionReminderFactory
 
@@ -55,19 +57,6 @@ def mock_job_scheduler(monkeypatch):
         mock_job_scheduler,
     )
     return mock_job_scheduler
-
-
-@pytest.fixture
-def mock_notify_adviser_by_email(monkeypatch):
-    """
-    Mocks the notify_adviser_by_email function.
-    """
-    mock_notify_adviser_by_email = mock.Mock()
-    monkeypatch.setattr(
-        'datahub.reminder.tasks.notify_adviser_by_email',
-        mock_notify_adviser_by_email,
-    )
-    return mock_notify_adviser_by_email
 
 
 @pytest.fixture
@@ -101,7 +90,7 @@ class TestEmailFunctions:
 
     def test_sends_estimated_land_date_notification(
         self,
-        mock_notify_adviser_by_email,
+        mock_notify_adviser_by_rq_email,
         mock_statsd,
     ):
         """Test it sends an estimated land date notification."""
@@ -119,7 +108,7 @@ class TestEmailFunctions:
                 reminders=None,
             )
 
-            mock_notify_adviser_by_email.assert_called_once_with(
+            mock_notify_adviser_by_rq_email.assert_called_once_with(
                 adviser,
                 template_id,
                 {
@@ -132,13 +121,14 @@ class TestEmailFunctions:
                     'project_stage': project.stage.name,
                     'estimated_land_date': project.estimated_land_date.strftime(DATE_FORMAT),
                 },
+                update_estimated_land_date_reminder_email_status,
                 None,
             )
             mock_statsd.incr.assert_called_once_with('send_investment_notification.30')
 
     def test_sends_estimated_land_date_summary_notification(
         self,
-        mock_notify_adviser_by_email,
+        mock_notify_adviser_by_rq_email,
         mock_statsd,
     ):
         """Test it sends an estimated land date summary notification."""
@@ -160,7 +150,7 @@ class TestEmailFunctions:
                 reminders=None,
             )
 
-            mock_notify_adviser_by_email.assert_called_once_with(
+            mock_notify_adviser_by_rq_email.assert_called_once_with(
                 adviser,
                 template_id,
                 {
@@ -169,13 +159,14 @@ class TestEmailFunctions:
                     'summary': ''.join(notifications),
                     'settings_url': settings.DATAHUB_FRONTEND_REMINDER_SETTINGS_URL,
                 },
+                update_estimated_land_date_reminder_email_status,
                 None,
             )
             mock_statsd.incr.assert_called_once_with('send_estimated_land_date_summary')
 
     def test_sends_no_recent_interaction_notification(
         self,
-        mock_notify_adviser_by_email,
+        mock_notify_adviser_by_rq_email,
         mock_statsd,
     ):
         """Test it sends a no recent interaction notification."""
@@ -197,7 +188,7 @@ class TestEmailFunctions:
                 reminders=None,
             )
 
-            mock_notify_adviser_by_email.assert_called_once_with(
+            mock_notify_adviser_by_rq_email.assert_called_once_with(
                 adviser,
                 template_id,
                 {
@@ -215,6 +206,7 @@ class TestEmailFunctions:
                     ).split(',')[0],
                     'last_interaction_date': last_interaction_date.strftime(DATE_FORMAT),
                 },
+                update_no_recent_interaction_reminder_email_status,
                 None,
             )
             mock_statsd.incr.assert_called_once_with('send_no_recent_interaction_notification.5')

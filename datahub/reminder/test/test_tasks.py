@@ -54,6 +54,7 @@ from datahub.reminder.tasks import (
     generate_no_recent_export_interaction_reminders_for_subscription,
     generate_no_recent_interaction_reminders,
     generate_no_recent_interaction_reminders_for_subscription,
+    schedule_generate_estimated_land_date_reminders,
     update_notify_email_delivery_status_for_estimated_land_date,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
     update_notify_email_delivery_status_for_no_recent_interaction,
@@ -172,13 +173,23 @@ def mock_send_estimated_land_date_reminder(monkeypatch):
 
 
 @pytest.fixture()
-def mock_generate_estimated_land_date_reminders_for_subscription(monkeypatch):
-    mock_generate_estimated_land_date_reminders_for_subscription = mock.Mock()
+def mock_generate_estimated_land_date_reminders(monkeypatch):
+    mock_generate_estimated_land_date_reminders = mock.Mock()
     monkeypatch.setattr(
-        'datahub.reminder.tasks.generate_estimated_land_date_reminders_for_subscription',
-        mock_generate_estimated_land_date_reminders_for_subscription,
+        'datahub.reminder.tasks.generate_estimated_land_date_reminders',
+        mock_generate_estimated_land_date_reminders,
     )
-    return mock_generate_estimated_land_date_reminders_for_subscription
+    return mock_generate_estimated_land_date_reminders
+
+
+@pytest.fixture()
+def mock_schedule_generate_estimated_land_date_reminders_for_subscription(monkeypatch):
+    mock_schedule_generate_estimated_land_date_reminders_for_subscription = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.reminder.tasks.schedule_generate_estimated_land_date_reminders_for_subscription',
+        mock_schedule_generate_estimated_land_date_reminders_for_subscription,
+    )
+    return mock_schedule_generate_estimated_land_date_reminders_for_subscription
 
 
 @pytest.fixture()
@@ -263,12 +274,12 @@ def mock_reminder_tasks_notify_gateway(monkeypatch):
 
 @pytest.fixture()
 def mock_job_scheduler(monkeypatch):
-    mock_notify_gateway = mock.Mock()
+    mock_job_scheduler = mock.Mock()
     monkeypatch.setattr(
         'datahub.reminder.tasks.job_scheduler',
-        mock_notify_gateway,
+        mock_job_scheduler,
     )
-    return mock_notify_gateway
+    return mock_job_scheduler
 
 
 @pytest.fixture()
@@ -483,9 +494,28 @@ class TestCreateEstimatedLandDateReminder:
 class TestGenerateEstimatedLandDateReminderTask:
     current_date = datetime.date(year=2022, month=7, day=1)
 
+    def test_schedule_generate_estimated_land_date_reminders(
+        self,
+        caplog,
+        mock_job_scheduler,
+    ):
+        """
+        Generate estimated land date reminders should be called from
+        scheduler.
+        """
+        caplog.set_level(logging.INFO)
+
+        job = schedule_generate_estimated_land_date_reminders()
+        mock_job_scheduler.assert_called_once()
+
+        # check result
+        assert caplog.messages[0] == (
+            f'Task {job.id} generate_estimated_land_date_reminders scheduled'
+        )
+
     def test_generate_estimated_land_date_reminders(
         self,
-        mock_generate_estimated_land_date_reminders_for_subscription,
+        mock_schedule_generate_estimated_land_date_reminders_for_subscription,
     ):
         """
         Reminders should be generated for all subscriptions.
@@ -495,7 +525,7 @@ class TestGenerateEstimatedLandDateReminderTask:
             subscription_count,
         )
         generate_estimated_land_date_reminders()
-        mock_generate_estimated_land_date_reminders_for_subscription.assert_has_calls(
+        mock_schedule_generate_estimated_land_date_reminders_for_subscription.assert_has_calls(
             [
                 call(subscription=subscription, current_date=self.current_date)
                 for subscription in subscriptions
@@ -841,14 +871,17 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     def test_stores_notification_id(
         self,
-        mock_notification_tasks_notify_gateway,
+        async_queue,
+        caplog,
+        mock_reminder_tasks_notify_gateway,
         adviser,
     ):
         """
         Test if a notification id is being stored against the reminder.
         """
+        caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
         notification_id = uuid.uuid4()
-        mock_notification_tasks_notify_gateway.send_email_notification = mock.Mock(
+        mock_reminder_tasks_notify_gateway.send_email_notification = mock.Mock(
             return_value={'id': notification_id},
         )
 
@@ -872,14 +905,15 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     def test_stores_notification_id_for_summary_email(
         self,
-        mock_notification_tasks_notify_gateway,
+        async_queue,
+        mock_reminder_tasks_notify_gateway,
         adviser,
     ):
         """
         Test if a notification id is being stored against the reminders from summary email.
         """
         notification_id = uuid.uuid4()
-        mock_notification_tasks_notify_gateway.send_email_notification = mock.Mock(
+        mock_reminder_tasks_notify_gateway.send_email_notification = mock.Mock(
             return_value={'id': notification_id},
         )
 
@@ -909,6 +943,7 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     def test_does_not_send_multiple_summary(
         self,
+        async_queue,
         mock_send_estimated_land_date_summary,
         adviser,
     ):
@@ -1490,7 +1525,7 @@ class TestGenerateNoRecentInteractionReminderTask:
 
     def test_generate_no_recent_interaction_reminders(
         self,
-        mock_generate_no_recent_interaction_reminders_for_subscription,
+        mock_job_scheduler,
     ):
         """
         Reminders should be generated for all subscriptions.
@@ -1500,9 +1535,22 @@ class TestGenerateNoRecentInteractionReminderTask:
             subscription_count,
         )
         generate_no_recent_interaction_reminders()
-        mock_generate_no_recent_interaction_reminders_for_subscription.assert_has_calls(
+
+        mock_job_scheduler.assert_called()
+
+        mock_job_scheduler.assert_has_calls(
             [
-                call(subscription=subscription, current_date=self.current_date)
+                call(
+                    function=generate_no_recent_interaction_reminders_for_subscription,
+                    function_args=(
+                        subscription,
+                        datetime.date(2022, 7, 17),
+                    ),
+                    max_retries=5,
+                    queue_name=LONG_RUNNING_QUEUE,
+                    retry_backoff=True,
+                    retry_intervals=30,
+                )
                 for subscription in subscriptions
             ],
             any_order=True,
@@ -1798,14 +1846,17 @@ class TestGenerateNoRecentInteractionReminderTask:
 
     def test_stores_notification_id(
         self,
-        mock_notification_tasks_notify_gateway,
+        async_queue,
+        caplog,
+        mock_reminder_tasks_notify_gateway,
         adviser,
     ):
         """
         Test if a notification id is being stored against the reminder.
         """
+        caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
         notification_id = uuid.uuid4()
-        mock_notification_tasks_notify_gateway.send_email_notification = mock.Mock(
+        mock_reminder_tasks_notify_gateway.send_email_notification = mock.Mock(
             return_value={'id': notification_id},
         )
 
@@ -1823,17 +1874,24 @@ class TestGenerateNoRecentInteractionReminderTask:
         with freeze_time(interaction_date):
             InvestmentProjectInteractionFactory(investment_project=project)
         generate_no_recent_interaction_reminders()
-
         reminder = NoRecentInvestmentInteractionReminder.objects.get(
             project=project,
             adviser=adviser,
         )
+        assert any(
+            'Task update_no_recent_interaction_reminder_email_status completed'
+            f'email_notification_id to {notification_id} and '
+            f"reminder_ids set to [UUID('{reminder.id}')]" in message
+            for message in caplog.messages)
         assert reminder.email_notification_id == notification_id
         assert reminder.email_delivery_status == EmailDeliveryStatus.UNKNOWN
 
     def test_does_not_send_multiple(
         self,
+        async_queue,
+        caplog,
         mock_send_no_recent_interaction_reminder,
+        mock_reminder_tasks_notify_gateway,
         adviser,
     ):
         """
@@ -1842,6 +1900,10 @@ class TestGenerateNoRecentInteractionReminderTask:
         Even after calling the generate function multiple times, only one reminder
         should be created and one email sent.
         """
+        notification_id = uuid.uuid4()
+        mock_reminder_tasks_notify_gateway.send_email_notification = mock.Mock(
+            return_value={'id': notification_id},
+        )
         days = 5
         NoRecentInvestmentInteractionSubscriptionFactory(
             adviser=adviser,
