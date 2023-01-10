@@ -179,7 +179,7 @@ idna==3.4
     #   yarl
 iniconfig==1.1.1
     # via pytest
-ipython==8.7.0
+ipython==8.8.0
     # via -r requirements-dev.in
 isort==5.11.4
     # via pylint
@@ -266,7 +266,7 @@ pycodestyle==2.8.0
     #   flake8-debugger
     #   flake8-import-order
     #   flake8-print
-pydocstyle==6.1.1
+pydocstyle==6.2.3
     # via
     #   -r requirements-dev.in
     #   flake8-docstrings
@@ -417,7 +417,7 @@ werkzeug==2.0.3
     # via -r requirements.in
 wheel==0.38.4
     # via pip-tools
-whitenoise==6.2.0
+whitenoise==6.3.0
     # via -r requirements.in
 wrapt==1.14.1
     # via
