@@ -18,12 +18,12 @@ Both files should be named using the template [####]_update_[model].
 
 E.g. 0035_update_specificprogrammes.py and 0035_update_specificprogrammes.yaml
 
-A .yaml would look like this
+A .yaml for disabling a field would look like this. Note that other than the model and pk only the fields that are changed are needed.
 
 ```
 - model: investment.specificprogramme
   pk: 26881936-6823-4ad7-a6e0-41fb9f714dab
-  fields: {disabled_on: '2022-12-19T11:25:03Z', name: "GREAT Investors - Capital Investment"}
+  fields: {disabled_on: '2022-12-19T11:25:03Z'}
 ```
 
 The data from the yaml file needs to be loaded and executed. A matching script needs to be created for this. An existing similar migration can be used as a base or 
