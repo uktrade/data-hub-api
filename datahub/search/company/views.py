@@ -55,6 +55,8 @@ class SearchCompanyAPIViewMixin:
         'latest_interaction_date_after',
         'latest_interaction_date_before',
         'uk_postcode',
+        'export_segment',
+        'export_sub_segment',
     )
 
     REMAP_FIELDS = {
