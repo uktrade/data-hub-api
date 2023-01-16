@@ -609,6 +609,7 @@ class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
                         'kind': str(export_interaction.kind),
                         'subject': export_interaction.subject,
                     },
+                    'last_interaction_date': format_date_or_datetime(export_interaction.date),
                 },
                 {
                     'id': str(sorted_reminders[1].id),
@@ -633,6 +634,7 @@ class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
                         'kind': str(export_interaction.kind),
                         'subject': export_interaction.subject,
                     },
+                    'last_interaction_date': format_date_or_datetime(export_interaction.date),
                 },
             ],
         }
