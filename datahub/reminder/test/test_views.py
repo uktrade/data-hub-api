@@ -590,7 +590,6 @@ class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
                     'id': str(sorted_reminders[0].id),
                     'created_on': '2022-12-15T17:00:00Z',
                     'event': sorted_reminders[0].event,
-                    'last_interaction_date': format_date_or_datetime(export_company.created_on),
                     'company': {
                         'id': str(export_company.id),
                         'name': export_company.name,
@@ -610,12 +609,12 @@ class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
                         'kind': str(export_interaction.kind),
                         'subject': export_interaction.subject,
                     },
+                    'last_interaction_date': format_date_or_datetime(export_interaction.date),
                 },
                 {
                     'id': str(sorted_reminders[1].id),
                     'created_on': '2022-12-15T17:00:00Z',
                     'event': sorted_reminders[1].event,
-                    'last_interaction_date': format_date_or_datetime(export_company.created_on),
                     'company': {
                         'id': str(export_company.id),
                         'name': export_company.name,
@@ -635,6 +634,7 @@ class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
                         'kind': str(export_interaction.kind),
                         'subject': export_interaction.subject,
                     },
+                    'last_interaction_date': format_date_or_datetime(export_interaction.date),
                 },
             ],
         }
