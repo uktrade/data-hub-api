@@ -141,6 +141,10 @@ class NewExportInteractionReminder(BaseReminder):
         related_name='new_export_interaction_reminders',
     )
 
+    @property
+    def last_interaction_date(self):
+        return self.interaction.date if self.interaction else self.company.created_on
+
 
 class NoRecentExportInteractionReminder(BaseReminder):
     """

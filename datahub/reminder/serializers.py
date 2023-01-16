@@ -135,7 +135,7 @@ class NewExportInteractionReminderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = NewExportInteractionReminder
-        fields = ('id', 'created_on', 'event', 'company', 'interaction')
+        fields = ('id', 'created_on', 'last_interaction_date', 'event', 'company', 'interaction')
 
 
 class NoRecentExportInteractionReminderSerializer(serializers.ModelSerializer):
