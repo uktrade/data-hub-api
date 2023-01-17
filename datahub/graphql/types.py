@@ -5,7 +5,11 @@ from datahub.company.models import (
     Company,
     Contact,
     ExportExperienceCategory,
-    OneListTier
+    OneListTier,
+)
+from datahub.feature_flag.models import (
+    UserFeatureFlag,
+    UserFeatureFlagGroup,
 )
 from datahub.metadata.models import (
     AdministrativeArea,
@@ -18,11 +22,7 @@ from datahub.metadata.models import (
     SectorCluster,
     Team,
     TurnoverRange,
-    UKRegion
-)
-from datahub.feature_flag.models import (
-    UserFeatureFlag,
-    UserFeatureFlagGroup
+    UKRegion,
 )
 
 
@@ -30,7 +30,7 @@ class BaseMetaFields:
     fields = (
         'id',
         'name',
-        'disabled_on'
+        'disabled_on',
     )
 
 
@@ -56,7 +56,7 @@ class SectorGraphQLType(DjangoObjectType):
             'id',
             'segment',
             'sector_cluster',
-            'parent'
+            'parent',
         )
 
 
@@ -93,7 +93,7 @@ class CountryGraphQLType(DjangoObjectType):
             'name',
             'disabled_on',
             'overseas_region',
-            'iso_alpha2_code'
+            'iso_alpha2_code',
         )
 
 
@@ -106,7 +106,7 @@ class AdministrativeAreaGraphQLType(DjangoObjectType):
             'disabled_on',
             'country',
             'area_code',
-            'area_name'
+            'area_name',
         )
 
 
@@ -224,7 +224,7 @@ class TeamGraphQLType(DjangoObjectType):
             'name',
             'uk_region',
             'country',
-            'tags'
+            'tags',
         )
 
 
