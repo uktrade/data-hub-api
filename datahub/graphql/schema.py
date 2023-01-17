@@ -1,4 +1,5 @@
 import graphene
+
 from datahub.company.models import Company, Contact
 from .types import CompanyGraphQLType, ContactGraphQLType
 
