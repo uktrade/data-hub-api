@@ -22,6 +22,7 @@ unversioned_urls = [
     path('', include('datahub.admin_report.urls')),
     path('', include('datahub.investment.project.report.urls')),
     path('', include('datahub.oauth.admin.urls')),
+    path('graphql/', include('datahub.graphql.urls')),
     *admin_oauth2_urls,
     path('admin/', admin.site.urls),
     path('ping.xml', ping, name='ping'),

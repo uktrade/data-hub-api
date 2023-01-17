@@ -221,7 +221,7 @@
     future_interest_countries:
       - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
-    export_segment: non_hep
+    export_segment: non-hep
     export_sub_segment: reassure_nurture_and_grow
     address_1: 12 First Street
     address_town: Virginia City
@@ -251,7 +251,7 @@
     future_interest_countries:
       - 37afd8d0-5d95-e211-a939-e4115bead28a
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
-    export_segment: non_hep
+    export_segment: non-hep
     export_sub_segment: reassure_nurture_and_grow
     address_1: 5000 Rue Saint-Patrick,
     address_town: Montréal

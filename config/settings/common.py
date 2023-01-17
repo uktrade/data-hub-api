@@ -83,6 +83,7 @@ THIRD_PARTY_APPS = [
     'django_filters',
     'mptt',
     'axes',
+    'graphene_django',
 ]
 
 LOCAL_APPS = [
@@ -125,6 +126,7 @@ LOCAL_APPS = [
     'datahub.dataset',
     'datahub.reminder',
     'datahub.testfixtureapi',
+    'datahub.graphql'
 ]
 
 # Can be used as a way to load a third-party app that has been removed from the

@@ -1,0 +1,264 @@
+query {
+  allCompanies {
+    id
+    name
+    referenceCode
+    companyNumber
+    vatNumber
+    dunsNumber
+    tradingNames
+    businessType {
+      id
+      name
+      disabledOn
+    }
+    sector {
+      id
+      segment
+      sectorCluster {
+        id
+        name
+        disabledOn
+      }
+      parent {
+        id
+      }
+    }
+    employeeRange {
+      id
+      name
+      disabledOn
+    }
+    numberOfEmployees
+    isNumberOfEmployeesEstimated
+    turnoverRange {
+      id
+      name
+      disabledOn
+    }
+    turnover
+    isTurnoverEstimated
+    exportToCountries {
+      id
+      name
+      disabledOn
+      overseasRegion {
+        id
+        name
+        disabledOn
+      }
+      isoAlpha2Code
+    }
+    futureInterestCountries {
+      id
+      name
+      disabledOn
+      overseasRegion {
+        id
+        name
+        disabledOn
+      }
+      isoAlpha2Code
+    }
+    description
+    website
+    ukRegion {
+      id
+      name
+      disabledOn
+    }
+    address1
+    address2
+    addressTown
+    addressCounty
+    addressArea {
+      id
+      name
+      disabledOn
+      areaCode
+      areaName
+      country {
+        id
+        name
+        disabledOn
+        overseasRegion {
+          id
+          name
+          disabledOn
+        }
+        isoAlpha2Code
+      }
+    }
+    addressCountry {
+      id
+      name
+      disabledOn
+      overseasRegion {
+        id
+        name
+        disabledOn
+      }
+      isoAlpha2Code
+    }
+    addressPostcode
+    registeredAddress1
+    registeredAddress2
+    registeredAddressTown
+    registeredAddressArea {
+      id
+      name
+      disabledOn
+      country {
+        id
+        name
+        disabledOn
+        overseasRegion {
+          id
+          name
+          disabledOn
+        }
+        isoAlpha2Code
+      }
+      areaCode
+      areaName
+    }
+    registeredAddressCounty
+    registeredAddressCountry {
+      id
+      name
+      disabledOn
+      overseasRegion {
+        id
+        name
+        disabledOn
+      }
+      isoAlpha2Code
+    }
+    registeredAddressPostcode
+    headquarterType {
+      id
+      name
+      disabledOn
+    }
+    oneListTier {
+      id
+      name
+      disabledOn
+    }
+    globalHeadquarters {
+      id
+      name
+    }
+    oneListAccountOwner {
+      id
+      email
+      firstName
+      lastName
+      telephoneNumber
+      contactEmail
+      isStaff
+      isActive
+      dateJoined
+      ssoEmailUserId
+      features {
+        createdOn
+        modifiedOn
+        createdBy {
+          id
+          email
+          firstName
+          lastName
+        }
+        modifiedBy {
+          id
+          email
+          firstName
+          lastName
+        }
+        code
+        description
+        isActive
+      }
+      featureGroups {
+        createdOn
+        modifiedOn
+        createdBy {
+          id
+        }
+        modifiedBy {
+          id
+        }
+        code
+        features {
+          code
+          description
+        }
+        description
+        isActive
+      }
+      ditTeam {
+        id
+        name
+        disabledOn
+        ukRegion {
+          id
+          name
+        }
+        country {
+          id
+          name
+        }
+        tags
+      }
+    }
+    exportExperienceCategory {
+      id
+      name
+      disabledOn
+    }
+    archivedDocumentsUrlPath
+    transferredTo {
+      id
+      name
+    }
+    transferReason
+    transferredOn
+    transferredBy {
+      id
+      email
+      firstName
+      lastName
+    }
+    dnbInvestigationId
+    pendingDnbInvestigation
+    exportPotential
+    greatProfileStatus
+    globalUltimateDunsNumber
+    dnbModifiedOn
+    exportSegment
+    exportSubSegment
+  }
+
+
+
+  company(companyId: "b2c34b41-1d5a-4b4b-9249-7c53ff2868dd") {
+    name,
+    registeredAddress1,
+    id
+  }
+
+  companyContacts(companyId: "b2c34b41-1d5a-4b4b-9249-7c53ff2868dd") {
+    firstName
+    lastName
+    fullTelephoneNumber
+  }
+
+  allContacts {
+    firstName
+    lastName
+    fullTelephoneNumber
+    company {
+      name
+    }
+  }
+}

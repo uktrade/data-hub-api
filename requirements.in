@@ -64,3 +64,6 @@ rq==1.11.1
 rq-scheduler==0.11.0
 
 python-redis-rate-limit==0.0.8
+
+# GraphQL support
+graphene-django>=2.0
