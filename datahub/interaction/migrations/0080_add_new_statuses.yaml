@@ -1,0 +1,12 @@
+- model: interaction.servicedeliverystatus
+  pk: 4cf5c648-a243-4472-a824-1a954b728d4f
+  fields:
+    name: Accepted
+    disabled_on:
+    order: 600.0
+- model: interaction.servicedeliverystatus
+  pk: 645c7525-b3d1-4913-bdf2-554c85116aa8
+  fields:
+    name: Declined
+    disabled_on:
+    order: 700.0
