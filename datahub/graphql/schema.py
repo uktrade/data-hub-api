@@ -13,7 +13,8 @@ class Query(graphene.ObjectType):
     company = graphene.Field(CompanyGraphQLType, company_id=graphene.ID())
     all_contacts = graphene.List(ContactGraphQLType)
     company_contacts = graphene.List(ContactGraphQLType, company_id=graphene.ID())
-    select_companies = graphene.List(CompanyGraphQLType, page_size=graphene.Int(), page_offset=graphene.Int(),
+    select_companies = graphene.List(CompanyGraphQLType, page_size=graphene.Int(),
+                                     page_offset=graphene.Int(),
                                      include_archived=graphene.Boolean())
 
     def resolve_all_companies(self, info):
