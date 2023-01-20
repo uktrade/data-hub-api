@@ -15,7 +15,8 @@ class Query(graphene.ObjectType):
     company_contacts = graphene.List(ContactGraphQLType, company_id=graphene.ID())
     select_companies = graphene.List(CompanyGraphQLType, page_size=graphene.Int(),
                                      page_offset=graphene.Int(),
-                                     include_archived=graphene.Boolean())
+                                     include_archived=graphene.Boolean(),
+                                     order_by=graphene.String())
 
     def resolve_all_companies(self, info):
         return query_all_companies()
@@ -29,10 +30,16 @@ class Query(graphene.ObjectType):
     def resolve_company(self, info, company_id):
         return Company.objects.get(id=company_id)
 
-    def resolve_select_companies(self, info, page_size=3, page_offset=0, include_archived=True):
+    def resolve_select_companies(self, info, page_size=3, page_offset=0, include_archived=True,
+                                 order_by=None):
         start = page_size * page_offset
         end = start + page_size
-        return query_all_companies(include_archived)[start:end]
+        companies = query_all_companies(include_archived)
+
+        if order_by is None:
+            return companies[start:end]
+
+        return companies.order_by(order_by)[start:end]
 
 
 schema = graphene.Schema(query=Query)
