@@ -1,0 +1,16 @@
+- model: metadata.service
+  pk: 090761aa-8861-4858-b7f3-b5d12f3f5ec7
+  fields:
+    disabled_on: '2023-01-18T11:25:03Z'
+    # order: 13000.0
+    # segment: Tradeshow Access Programme (TAP)
+    # parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    # contexts: ["trade_agreement_interaction"]
+- model: metadata.service
+  pk: fa6eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2023-01-18T11:30:03Z'
+    # order: 13200.0
+    # segment: Tradeshow Access Programme (TAP) - Solo
+    # parent:
+    # contexts: ["event", "interaction", "investment_project_interaction", "service_delivery"]

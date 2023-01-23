@@ -23,7 +23,6 @@ def schedule_send_email_notification(
             'context': context,
             'notify_service_name': notify_service_name,
         },
-        function_kwargs=kwargs,
         max_retries=5,
     )
 
