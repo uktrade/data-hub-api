@@ -20,6 +20,8 @@ from datahub.investment.project.models import InvestmentProject
 from datahub.notification.constants import NotifyServiceName
 from datahub.notification.core import notify_gateway
 from datahub.reminder import (
+    EXPORT_NEW_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
+    EXPORT_NEW_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
     EXPORT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
     EXPORT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
     INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME,
@@ -35,6 +37,8 @@ from datahub.reminder.emails import (
 )
 from datahub.reminder.models import (
     EmailDeliveryStatus,
+    NewExportInteractionReminder,
+    NewExportInteractionSubscription,
     NoRecentExportInteractionReminder,
     NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
@@ -126,6 +130,38 @@ def send_no_recent_export_interaction_reminder(
     )
 
 
+def send_new_export_interaction_reminder(
+    company,
+    interaction,
+    adviser,
+    reminder_days,
+    current_date,
+    reminders,
+):
+    """Sends new export interaction reminder by email."""
+    statsd.incr(f'send_new_export_interaction_notification.{reminder_days}')
+
+    item = get_company_item(company)
+    last_interaction_date = current_date - relativedelta(days=reminder_days)
+
+    params = {
+        **item,
+        'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
+    }
+
+    template_id = settings.EXPORT_NOTIFICATION_NEW_INTERACTION_TEMPLATE_ID
+    interaction_item = get_interaction_item(interaction)
+    params.update(interaction_item)
+
+    notify_adviser_by_rq_email(
+        adviser,
+        template_id,
+        params,
+        update_new_export_interaction_reminder_email_status,
+        reminders,
+    )
+
+
 def send_no_recent_interaction_reminder(project, adviser, reminder_days, current_date, reminders):
     """
     Sends no recent interaction reminder by email.
@@ -199,6 +235,13 @@ def schedule_generate_estimated_land_date_reminders():
     return job
 
 
+def update_new_export_interaction_reminder_email_status(email_notification_id, reminder_ids):
+    reminders = NewExportInteractionReminder.all_objects.filter(id__in=reminder_ids)
+    for reminder in reminders:
+        reminder.email_notification_id = email_notification_id
+        reminder.save()
+
+
 def generate_estimated_land_date_reminders():
     """
     Generates Estimated Land Date Reminders according to each adviser's Subscriptions
@@ -250,7 +293,7 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
     ):
         logger.info(
             f'Feature flag "{INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME}"'
-            'is not active for this user, exiting.',
+            f'is not active for this user with ID {subscription.adviser.id}, exiting.',
         )
         return
 
@@ -338,7 +381,7 @@ def generate_no_recent_interaction_reminders_for_subscription(subscription, curr
     ):
         logger.info(
             f'Feature flag "{INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME}"'
-            'is not active for this user, exiting.',
+            f'is not active for this user with ID {subscription.adviser.id}, exiting.',
         )
         return
 
@@ -408,7 +451,7 @@ def generate_no_recent_export_interaction_reminders_for_subscription(subscriptio
     ):
         logger.info(
             f'Feature flag "{EXPORT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME}"'
-            'is not active for this user, exiting.',
+            f'is not active for this user with ID {subscription.adviser.id}, exiting.',
         )
         return
 
@@ -431,6 +474,72 @@ def generate_no_recent_export_interaction_reminders_for_subscription(subscriptio
 
             if send_reminder:
                 create_no_recent_export_interaction_reminder(
+                    company=company,
+                    adviser=subscription.adviser,
+                    interaction=reminder_interaction,
+                    reminder_days=reminder_day,
+                    send_email=subscription.email_reminders_enabled,
+                    current_date=current_date,
+                )
+
+
+def generate_new_export_interaction_reminders():
+    """
+    Generates New Export Interaction Reminders according to each adviser's Subscriptions
+    """
+    with advisory_lock('generate_new_export_interaction_reminders', wait=False) as acquired:
+        if not acquired:
+            logger.info(
+                'Reminders for new export interactions are already being '
+                'processed by another worker.',
+            )
+            return
+        current_date = now().date()
+        for subscription in NewExportInteractionSubscription.objects.select_related(
+            'adviser',
+        ).filter(adviser__is_active=True).iterator():
+            job = job_scheduler(
+                queue_name=LONG_RUNNING_QUEUE,
+                function=generate_new_export_interaction_reminders_for_subscription,
+                function_kwargs={
+                    'subscription': subscription,
+                    'current_date': current_date,
+                },
+                max_retries=5,
+                retry_backoff=True,
+                retry_intervals=30,
+            )
+
+            logger.info(
+                f'Task {job.id} generate_new_export_interaction_reminders_for_subscription',
+            )
+
+
+def generate_new_export_interaction_reminders_for_subscription(subscription, current_date):
+    """
+    Generates the new export interaction reminders for a given subscription.
+    """
+    if not is_user_feature_flag_active(
+        EXPORT_NEW_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
+        subscription.adviser,
+    ):
+        logger.info(
+            f'Feature flag "{EXPORT_NEW_INTERACTION_REMINDERS_FEATURE_FLAG_NAME}"'
+            f'is not active for this user with ID {subscription.adviser.id}, exiting.',
+        )
+        return
+
+    for reminder_day in subscription.reminder_days:
+        threshold = current_date - relativedelta(days=reminder_day)
+
+        for company in _get_managed_companies(subscription.adviser).iterator():
+            qs = Interaction.objects.filter(companies__in=[company], created_on__date=threshold)
+            has_interactions = qs.exists()
+
+            if has_interactions:
+                reminder_interaction = qs.order_by('created_on').last()
+
+                create_new_export_interaction_reminder(
                     company=company,
                     adviser=subscription.adviser,
                     interaction=reminder_interaction,
@@ -515,7 +624,49 @@ def create_no_recent_export_interaction_reminder(
             company=company,
             interaction=interaction,
             adviser=adviser,
-            reminder_days=reminder_days, current_date=current_date,
+            reminder_days=reminder_days,
+            current_date=current_date,
+            reminders=[reminder],
+        )
+
+
+def create_new_export_interaction_reminder(
+    company,
+    adviser,
+    interaction,
+    reminder_days,
+    send_email,
+    current_date,
+):
+    """
+    Creates a new export interaction reminder and sends an email if required.
+
+    If a reminder has already been sent on the same day, then do nothing.
+    """
+    has_existing = NewExportInteractionReminder.objects.filter(
+        adviser=adviser,
+        event=f'New interaction with {company.name}',
+        company=company,
+        created_on__date=current_date,
+    ).exists()
+
+    if has_existing:
+        return
+
+    reminder = NewExportInteractionReminder.objects.create(
+        adviser=adviser,
+        event=f'New interaction with {company.name}',
+        company=company,
+        interaction=interaction,
+    )
+
+    if send_email:
+        send_new_export_interaction_reminder(
+            company=company,
+            interaction=interaction,
+            adviser=adviser,
+            reminder_days=reminder_days,
+            current_date=current_date,
             reminders=[reminder],
         )
 
@@ -675,7 +826,7 @@ def update_notify_email_delivery_status_for_no_recent_export_interaction():
     ) as acquired:
         if not acquired:
             logger.info(
-                'Email status checks for approaching no recent export interaction are already '
+                'Email status checks for no recent export interaction are already '
                 'being processed by another worker.',
             )
             return
@@ -695,6 +846,46 @@ def update_notify_email_delivery_status_for_no_recent_export_interaction():
             )
             if 'status' in result:
                 NoRecentExportInteractionReminder.all_objects.filter(
+                    email_notification_id=notification_id,
+                ).update(email_delivery_status=result['status'], modified_on=now())
+
+
+def update_notify_email_delivery_status_for_new_export_interaction():
+    if not is_feature_flag_active(
+        EXPORT_NEW_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
+    ):
+        logger.info(
+            f'Feature flag "{EXPORT_NEW_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}"'
+            ' is not active, exiting.',
+        )
+        return
+
+    with advisory_lock(
+        'update_new_export_interaction_email_delivery',
+        wait=False,
+    ) as acquired:
+        if not acquired:
+            logger.info(
+                'Email status checks for new export interaction are already '
+                'being processed by another worker.',
+            )
+            return
+        current_date = now()
+        date_threshold = current_date - relativedelta(days=4)
+
+        notification_ids = NewExportInteractionReminder.all_objects.filter(
+            Q(email_delivery_status=EmailDeliveryStatus.UNKNOWN)
+            | Q(email_delivery_status=EmailDeliveryStatus.SENDING),
+            created_on__gte=date_threshold,
+            email_notification_id__isnull=False,
+        ).values_list('email_notification_id', flat=True).distinct()
+        for notification_id in notification_ids:
+            result = notify_gateway.get_notification_by_id(
+                notification_id,
+                notify_service_name=NotifyServiceName.investment,
+            )
+            if 'status' in result:
+                NewExportInteractionReminder.all_objects.filter(
                     email_notification_id=notification_id,
                 ).update(email_delivery_status=result['status'], modified_on=now())
 

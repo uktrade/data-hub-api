@@ -266,7 +266,7 @@ pycodestyle==2.8.0
     #   flake8-debugger
     #   flake8-import-order
     #   flake8-print
-pydocstyle==6.2.3
+pydocstyle==6.3.0
     # via
     #   -r requirements-dev.in
     #   flake8-docstrings
@@ -288,7 +288,7 @@ pylint-plugin-utils==0.7
     # via pylint-django
 pylint-pytest==1.1.2
     # via -r requirements-dev.in
-pytest==7.2.0
+pytest==7.2.1
     # via
     #   -r requirements-dev.in
     #   pylint-pytest
@@ -330,7 +330,7 @@ redis==4.4.0
     #   django-redis
     #   python-redis-rate-limit
     #   rq
-requests==2.28.1
+requests==2.28.2
     # via
     #   -r requirements.in
     #   notifications-python-client
@@ -345,7 +345,7 @@ requests-mock==1.10.0
     # via -r requirements-dev.in
 requests-toolbelt==0.10.1
     # via -r requirements.in
-rq==1.11.1
+rq==1.12.0
     # via
     #   -r requirements.in
     #   rq-scheduler
@@ -353,7 +353,7 @@ rq-scheduler==0.11.0
     # via -r requirements.in
 s3transfer==0.6.0
     # via boto3
-sentry-sdk==1.12.1
+sentry-sdk==1.13.0
     # via -r requirements.in
 simplejson==3.18.0
     # via mail-parser

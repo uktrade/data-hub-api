@@ -1,0 +1,3 @@
+- model: metadata.tradeagreement
+  pk: bbe78852-d0b6-4d00-9273-9fe1d61285e9
+  fields: { disabled_on: null, name: "SACUM-UK Economic Partnership Agreement (EPA)" }

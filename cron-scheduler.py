@@ -36,10 +36,12 @@ from datahub.investment.project.tasks import (
 )
 from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
 from datahub.reminder.tasks import (
+    generate_new_export_interaction_reminders,
     generate_no_recent_export_interaction_reminders,
     generate_no_recent_interaction_reminders,
     schedule_generate_estimated_land_date_reminders,
     update_notify_email_delivery_status_for_estimated_land_date,
+    update_notify_email_delivery_status_for_new_export_interaction,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
     update_notify_email_delivery_status_for_no_recent_interaction,
 )
@@ -188,6 +190,33 @@ def schedule_jobs():
             retry_intervals=30,
             cron=EVERY_TEN_AM,
             description='Daily update of no recent export interaction reminder email status',
+        )
+
+    schedule_new_export_interaction_jobs()
+
+
+def schedule_new_export_interaction_jobs():
+    """Schedule new export interaction jobs."""
+    if settings.ENABLE_NEW_EXPORT_INTERACTION_REMINDERS:
+        job_scheduler(
+            function=generate_new_export_interaction_reminders,
+            max_retries=5,
+            queue_name=LONG_RUNNING_QUEUE,
+            retry_backoff=True,
+            retry_intervals=30,
+            cron=EVERY_EIGHT_AM,
+            description='Daily generate new export interaction reminders',
+        )
+
+    if settings.ENABLE_NEW_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS:
+        job_scheduler(
+            function=update_notify_email_delivery_status_for_new_export_interaction,
+            max_retries=5,
+            queue_name=LONG_RUNNING_QUEUE,
+            retry_backoff=True,
+            retry_intervals=30,
+            cron=EVERY_TEN_AM,
+            description='Daily update of new export interaction reminder email status',
         )
 
 

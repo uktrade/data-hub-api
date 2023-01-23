@@ -728,6 +728,8 @@ def test_get_basic_search_query():
                                 'event.name.trigram',
                                 'event_type.name',
                                 'event_type.name.trigram',
+                                'export_segment',
+                                'export_sub_segment',
                                 'full_telephone_number',
                                 'id',
                                 'investor_company.name',
