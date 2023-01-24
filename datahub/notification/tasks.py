@@ -15,6 +15,9 @@ def schedule_send_email_notification(
     *args,
     **kwargs,
 ):
+    """
+    Task to schedule send_email_notification with RQ.
+    """
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
         function=send_email_notification,
@@ -36,8 +39,9 @@ def send_email_notification(
     notify_service_name=None,
 ):
     """
-    Celery task to call the notify API to send a templated email notification
+    Call the notify API to send a templated email notification
     to an email address.
+    To schedule with RQ call schedule_send_email_notification(...)
     """
     try:
         response = notify_gateway.send_email_notification(
@@ -47,11 +51,11 @@ def send_email_notification(
             notify_service_name,
         )
     except HTTPError as exc:
-        # Raise 400/403 responses without retry - these are problems with the
+        # Raise 400/403 responses without retry when called from  RQ - these are problems with the
         # way we are calling the notify service and retries will not result in
         # a successful outcome.
         if exc.status_code in (400, 403):
-            # get current job from RQ
+            # get current job from RQ when called from scheduler and reset.
             job = get_current_job()
             if job is not None:
                 job.retries_left = 0
