@@ -78,9 +78,7 @@ def test_send_email_notification_retries_errors(
     else:
         expected_retries_left = 5
 
-    expected_exception_class = HTTPError
-
-    with pytest.raises(expected_exception_class):
+    with pytest.raises(HTTPError):
         send_email_notification('foobar@example.net', 'abcdefg')
 
         assert (expected_retries_left == mock_rq_get_current_job.return_value.job.retries_left)
