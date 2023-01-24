@@ -10,7 +10,7 @@ from datahub.core.migration_utils import load_yaml_data_in_migration
 def load_services(apps, schema_editor):
     load_yaml_data_in_migration(
         apps,
-        PurePath(__file__).parent / '0036_update_services.yaml'
+        PurePath(__file__).parent / '0037_update_services.yaml'
     )
 
 def rebuild_tree(apps, schema_editor):
@@ -24,7 +24,7 @@ def rebuild_tree(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('metadata', '0035_update_specificprogrammes'),
+        ('metadata', '0036_update_trade_agreements'),
     ]
 
     operations = [
