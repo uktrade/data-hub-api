@@ -1,12 +1,21 @@
 from unittest import mock
 
 import pytest
-from celery.exceptions import Retry
 from notifications_python_client.errors import HTTPError
 
 from datahub.notification import notify_gateway
 from datahub.notification.constants import DEFAULT_SERVICE_NAME, NotifyServiceName
 from datahub.notification.tasks import send_email_notification
+
+
+@pytest.fixture()
+def mock_rq_get_current_job(monkeypatch):
+    mock_notification_tasks_get_current_job = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.notification.tasks.get_current_job',
+        mock_notification_tasks_get_current_job,
+    )
+    return mock_notification_tasks_get_current_job
 
 
 @pytest.mark.parametrize(
@@ -47,7 +56,12 @@ def test_send_email_notification(context, service_name):
         (400, False),
     ),
 )
-def test_send_email_notification_retries_errors(monkeypatch, error_status_code, expect_retry):
+def test_send_email_notification_retries_errors(
+        monkeypatch,
+        mock_rq_get_current_job,
+        error_status_code,
+        expect_retry,
+):
     """
     Test the send_email_notification utility.
     """
@@ -59,14 +73,14 @@ def test_send_email_notification_retries_errors(monkeypatch, error_status_code, 
     error = HTTPError(mock_response)
     notification_api_client.send_email_notification.side_effect = error
 
-    # Mock the task's retry method
-    retry_mock = mock.Mock(side_effect=Retry())
-    monkeypatch.setattr('datahub.notification.tasks.send_email_notification.retry', retry_mock)
-
     if expect_retry:
-        expected_exception_class = Retry
+        expected_retries_left = 0
     else:
-        expected_exception_class = HTTPError
+        expected_retries_left = 5
+
+    expected_exception_class = HTTPError
 
     with pytest.raises(expected_exception_class):
         send_email_notification('foobar@example.net', 'abcdefg')
+
+        assert (expected_retries_left == mock_rq_get_current_job.return_value.job.retries_left)

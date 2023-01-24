@@ -1,4 +1,5 @@
 from notifications_python_client.errors import HTTPError
+from rq import get_current_job
 
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
@@ -25,7 +26,6 @@ def schedule_send_email_notification(
         },
         max_retries=5,
     )
-
     return job
 
 
@@ -51,6 +51,9 @@ def send_email_notification(
         # way we are calling the notify service and retries will not result in
         # a successful outcome.
         if exc.status_code in (400, 403):
-            raise
-        # raise self.retry(exc=exc, countdown=60)
+            # get current job from RQ
+            job = get_current_job()
+            if job is not None:
+                job.retries_left = 0
+        raise
     return response['id']
