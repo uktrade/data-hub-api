@@ -29,7 +29,7 @@ def notify_task_return_value_tracker(track_return_values):
     Attaches and returns a return value tracker for send email notification
     tasks.
     """
-    return track_return_values(send_email_notification, 'apply_async')
+    return track_return_values(send_email_notification)
 
 
 @pytest.fixture
