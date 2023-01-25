@@ -63,9 +63,9 @@ class TestTemplates:
 
     def _assert_tasks_successful(self, task_count, mock_call):
         assert mock_call.call_count == task_count
-        assert mock_call.spy_exception is None
+        assert mock_call.spy_exception is None, mock_call.spy_exception.message
 
-    def test_order_info(self, async_queue, notify_task_return_value_tracker, end_to_end_notify):
+    def test_order_info(self, end_to_end_notify, notify_task_return_value_tracker):
         """
         Test the order info template.
         If the template variables have been changed in GOV.UK notifications the
