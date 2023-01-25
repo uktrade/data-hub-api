@@ -7,7 +7,6 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import UKRegion
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.notification.core import NotifyGateway
-from datahub.notification.tasks import send_email_notification
 from datahub.omis.market.models import Market
 from datahub.omis.notification.client import Notify
 from datahub.omis.notification.constants import OMIS_USE_NOTIFICATION_APP_FEATURE_FLAG_NAME
@@ -24,12 +23,9 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def notify_task_return_value_tracker(track_return_values):
-    """
-    Attaches and returns a return value tracker for send email notification
-    tasks.
-    """
-    return track_return_values(send_email_notification)
+def notify_task_return_value_tracker(mocker):
+    notify_task_return_value_tracker = mocker.spy(NotifyGateway, 'send_email_notification')
+    return notify_task_return_value_tracker
 
 
 @pytest.fixture
@@ -65,20 +61,15 @@ class TestTemplates:
     not strictly mandatory.
     """
 
-    def _assert_tasks_successful(self, task_count, return_value_tracker):
-        task_results = return_value_tracker.return_values
-        assert len(task_results) == task_count
-        for task_result in task_results:
-            try:
-                task_result.get()
-            except Exception as exc:
-                pytest.fail(f'Notify task raised an exception {exc}')
+    def _assert_tasks_successful(self, task_count, mock_call):
+        assert mock_call.call_count == task_count
+        assert mock_call.spy_exception is None
 
-    def test_order_info(self, end_to_end_notify, notify_task_return_value_tracker):
+    def test_order_info(self, async_queue, notify_task_return_value_tracker, end_to_end_notify):
         """
         Test the order info template.
         If the template variables have been changed in GOV.UK notifications the
-        celery task will be unsuccessful.
+        RQ task will be unsuccessful.
         """
         end_to_end_notify.order_info(OrderFactory(), what_happened='', why='')
         self._assert_tasks_successful(1, notify_task_return_value_tracker)
@@ -87,7 +78,7 @@ class TestTemplates:
         """
         Test the order created template.
         If the template variables have been changed in GOV.UK notifications the
-        celery task will be unsuccessful.
+        RQ task will be unsuccessful.
         """
         market = Market.objects.first()
         market.manager_email = 'test@test.com'
@@ -114,7 +105,7 @@ class TestTemplates:
         """
         Test the notification for when an adviser is added to an order.
         If the template variables have been changed in GOV.UK notifications the
-        celery task will be unsuccessful.
+        RQ task will be unsuccessful.
         """
         order = OrderFactory()
 
@@ -134,7 +125,7 @@ class TestTemplates:
         """
         Test the notification for when an adviser is removed from an order.
         If the template variables have been changed in GOV.UK notifications the
-        celery task will be unsuccessful.
+        RQ task will be unsuccessful.
         """
         order = OrderFactory()
 
@@ -145,7 +136,7 @@ class TestTemplates:
         """
         Test templates of order paid for customer and advisers.
         If the template variables have been changed in GOV.UK notifications the
-        celery task will be unsuccessful.
+        RQ task will be unsuccessful.
         """
         order = OrderPaidFactory()
 
@@ -156,7 +147,7 @@ class TestTemplates:
         """
         Test templates of order completed for advisers.
         If the template variables have been changed in GOV.UK notifications the
-        celery task will be unsuccessful.
+        RQ task will be unsuccessful.
         """
         order = OrderCompleteFactory()
 
@@ -167,7 +158,7 @@ class TestTemplates:
         """
         Test templates of order cancelled for customer and advisers.
         If the template variables have been changed in GOV.UK notifications the
-        celery task will be unsuccessful.
+        RQ task will be unsuccessful.
         """
         order = OrderWithOpenQuoteFactory()
 
@@ -178,7 +169,7 @@ class TestTemplates:
         """
         Test templates of quote sent for customer and advisers.
         If the template variables have been changed in GOV.UK notifications the
-        celery task will be unsuccessful.
+        RQ task will be unsuccessful.
         """
         order = OrderWithOpenQuoteFactory()
 
@@ -189,7 +180,7 @@ class TestTemplates:
         """
         Test templates of quote accepted for customer and advisers.
         If the template variables have been changed in GOV.UK notifications the
-        celery task will be unsuccessful.
+        RQ task will be unsuccessful.
         """
         order = OrderPaidFactory()
 
@@ -200,7 +191,7 @@ class TestTemplates:
         """
         Test templates of quote cancelled for customer and advisers.
         If the template variables have been changed in GOV.UK notifications the
-        celery task will be unsuccessful.
+        RQ task will be unsuccessful.
         """
         order = OrderWithOpenQuoteFactory()
 
