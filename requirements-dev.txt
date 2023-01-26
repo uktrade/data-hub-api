@@ -10,8 +10,6 @@ aiosignal==1.3.1
     # via aiohttp
 amqp==5.1.1
     # via kombu
-appnope==0.1.3
-    # via ipython
 asgiref==3.6.0
     # via django
 astroid==2.11.7
@@ -248,7 +246,7 @@ platformdirs==2.6.0
     #   virtualenv
 pluggy==1.0.0
     # via pytest
-pre-commit==2.21.0
+pre-commit==3.0.0
     # via -r requirements-dev.in
 prompt-toolkit==3.0.36
     # via
