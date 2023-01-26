@@ -1,0 +1,74 @@
+#Export, Interaction and Service Delivery
+- model: metadata.service
+  pk: 380bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    disabled_on: '2023-01-18T11:20:03Z'
+    order: 1200.0
+    segment: Tradeshow Access Programme (TAP)
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["event", "export_interaction", "export_service_delivery"]
+    lft: 24
+    rght: 25
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: 27d15c52-9d78-4e3d-aaa7-64bdb45bb506
+  fields:
+    disabled_on:
+    order: 12100.0
+    segment: UK Tradeshow Programme (UKTP) – Exhibitor
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["event", "export_interaction", "export_service_delivery"]
+    lft: 24
+    rght: 25
+    tree_id: 2
+    level: 1
+- model: metadata.service
+  pk: ba47bf4b-09da-4ccf-9d56-84754e45646e
+  fields:
+    disabled_on:
+    order: 12200.0
+    segment: UK Tradeshow Programme (UKTP) – Attendee-only
+    parent: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+    contexts: ["event", "export_interaction", "export_service_delivery"]
+    lft: 24
+    rght: 25
+    tree_id: 2
+    level: 1
+#Trade Aggrement Interaction
+- model: metadata.service
+  pk: 090761aa-8861-4858-b7f3-b5d12f3f5ec7
+  fields:
+    disabled_on: '2023-01-18T11:20:03Z'
+    order: 1300.0
+    segment: Tradeshow Access Programme (TAP)
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 9a28e4dc-d96b-42c8-bdc5-3ddfb6bf74bc
+  fields:
+    disabled_on:
+    order: 13100.0
+    segment: UK Tradeshow Programme (UKTP) – Exhibitor
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+- model: metadata.service
+  pk: 5b129c32-44fc-4765-a134-a09d57e8bca8
+  fields:
+    disabled_on:
+    order: 13200.0
+    segment: UK Tradeshow Programme (UKTP) – Attendee-only
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
