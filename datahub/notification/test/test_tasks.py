@@ -15,6 +15,7 @@ def mock_rq_get_current_job(monkeypatch):
         'datahub.notification.tasks.get_current_job',
         mock_notification_tasks_get_current_job,
     )
+    mock_notification_tasks_get_current_job.retries_left = 5
     return mock_notification_tasks_get_current_job
 
 
@@ -48,12 +49,13 @@ def test_send_email_notification(context, service_name):
 
 
 @pytest.mark.parametrize(
-    'error_status_code,expect_retry',
+    'error_status_code,expect_retry,get_current_job_return_none',
     (
-        (503, True),
-        (500, True),
-        (403, False),
-        (400, False),
+        (503, True, False),
+        (500, True, False),
+        (403, False, False),
+        (400, False, False),
+        (400, False, True),
     ),
 )
 def test_send_email_notification_retries_errors(
@@ -61,6 +63,7 @@ def test_send_email_notification_retries_errors(
         mock_rq_get_current_job,
         error_status_code,
         expect_retry,
+        get_current_job_return_none,
 ):
     """
     Test the send_email_notification utility.
@@ -73,12 +76,19 @@ def test_send_email_notification_retries_errors(
     error = HTTPError(mock_response)
     notification_api_client.send_email_notification.side_effect = error
 
-    if expect_retry:
-        expected_retries_left = 0
-    else:
-        expected_retries_left = 5
+    if get_current_job_return_none:
+        mock_rq_get_current_job.return_value = None
 
     with pytest.raises(HTTPError):
         send_email_notification('foobar@example.net', 'abcdefg')
 
-        assert (expected_retries_left == mock_rq_get_current_job.return_value.job.retries_left)
+    if expect_retry:
+        # Don't expect get_current_job called
+        assert mock_rq_get_current_job.call_count == 0
+    else:
+        # Expect get_current_job called
+        assert mock_rq_get_current_job.call_count == 1
+        if get_current_job_return_none:
+            assert mock_rq_get_current_job.return_value is None
+        else:
+            assert mock_rq_get_current_job.return_value.retries_left == 0
