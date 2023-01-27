@@ -166,6 +166,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         If a valid company id is provided, check that this email is unique there, otherwise
         validate that this email is unique for the company stored in the database.
         """
+        value = value.lower()
         company_id = self.initial_data.get('company', {}).get('id')
         if company_id:
             company = Company.objects.filter(id=company_id).first()
