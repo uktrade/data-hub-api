@@ -102,3 +102,4 @@ registry.register(
     serializer=InvestmentProjectStageSerializer,
 )
 registry.register(metadata_id='fdi-value', model=models.FDIValue)
+registry.register(metadata_id='export-barrier', model=models.ExportBarrierType)
