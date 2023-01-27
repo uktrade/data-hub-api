@@ -4131,6 +4131,7 @@ Please see the [release notes](https://github.com/uktrade/data-hub-api/releases)
       - `GET /v4/metadata/title`
       - `GET /v4/metadata/turnover`
       - `GET /v4/metadata/uk-region`
+      - `GET /v4/metadata/export-barrier`
     
     The responses are exactly the same as their corresponding `/metadata` endpoints.
     
