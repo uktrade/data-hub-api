@@ -123,6 +123,24 @@ class TestListCompanies(APITestMixin):
             if result_company['is_global_ultimate']:
                 assert result_company['id'] == str(ultimate_company.id)
 
+    def test_filter_by_empty_export_segment(self):
+        """Test filtering by global_ultimate_duns_number."""
+        CompanyFactory(
+            export_segment='',
+        )
+
+        url = reverse('api-v4:company:collection')
+        response = self.api_client.get(
+            url,
+            data={
+                'export_segment': '',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 1
+
     def test_sort_by_name(self):
         """Test sorting by name."""
         companies = CompanyFactory.create_batch(
