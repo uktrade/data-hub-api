@@ -396,6 +396,7 @@ class TestCompleteCompanyReferral(APITestMixin):
             'contacts': [contact],
             'service': service,
             'was_policy_feedback_provided': False,
+            'helped_remove_export_barrier': False,
             **extra_data,
         }
 
@@ -437,6 +438,9 @@ class TestCompleteCompanyReferral(APITestMixin):
             'theme': None,
             'was_policy_feedback_provided': resolved_request_data['was_policy_feedback_provided'],
             'were_countries_discussed': None,
+            'helped_remove_export_barrier': None,
+            'export_barrier_notes': '',
+
 
             # Other fields
             'archived': False,
