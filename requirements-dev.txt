@@ -217,7 +217,7 @@ notifications-python-client==6.4.1
     # via -r requirements.in
 opensearch-dsl==2.0.1
     # via -r requirements.in
-opensearch-py==2.0.1
+opensearch-py==2.1.1
     # via
     #   -r requirements.in
     #   opensearch-dsl
