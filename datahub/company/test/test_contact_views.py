@@ -83,7 +83,7 @@ class AddContactBase(APITestMixin):
                 'company': {
                     'id': str(company.pk),
                 },
-                'email': 'foo@bar.com',
+                'email': 'FOO@bar.com',
                 'primary': True,
                 'full_telephone_number': '+44 123456789',
                 'address_same_as_company': False,
