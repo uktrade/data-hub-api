@@ -230,7 +230,7 @@ parso==0.8.3
     # via jedi
 pep517==0.13.0
     # via build
-pep8-naming==0.13.2
+pep8-naming==0.13.3
     # via -r requirements-dev.in
 pexpect==4.8.0
     # via ipython
