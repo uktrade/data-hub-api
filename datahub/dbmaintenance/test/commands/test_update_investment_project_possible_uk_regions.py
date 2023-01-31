@@ -39,7 +39,7 @@ def test_run_with_old_regions(s3_stubber, caplog):
 {investment_projects[1].pk},false,null,{regions[2].pk}
 {investment_projects[2].pk},false,"{regions[0].pk},{regions[1].pk}","{regions[0].pk},{regions[1].pk}"
 {investment_projects[3].pk},true,{regions[5].pk},"{regions[0].pk},{regions[1].pk},{regions[2].pk},{regions[3].pk}"
-"""
+"""  # noqa: E501
 
     s3_stubber.add_response(
         'get_object',
