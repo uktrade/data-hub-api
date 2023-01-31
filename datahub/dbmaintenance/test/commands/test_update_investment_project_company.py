@@ -81,7 +81,7 @@ def test_run(s3_stubber):
 {investment_projects[4].id},{file_companies[0].pk},{file_companies[1].pk},invalid_id,0
 {investment_projects[5].id},{file_companies[0].pk},{file_companies[1].pk},{file_companies[2].pk},THIS
 {investment_projects[6].id},NULL,NULL,NULL,0
-"""
+"""  # noqa: E501
 
     s3_stubber.add_response(
         'get_object',
@@ -146,7 +146,7 @@ def test_simulate(s3_stubber):
     csv_content = f"""id,investor_company_id,intermediate_company_id,uk_company_id,uk_company_decided
 {investment_projects[0].id},{file_companies[0].pk},{file_companies[1].pk},{file_companies[2].pk},1
 {investment_projects[1].id},{file_companies[0].pk},{file_companies[1].pk},{file_companies[2].pk},1
-"""
+"""  # noqa: E501
     s3_stubber.add_response(
         'get_object',
         {
@@ -182,7 +182,7 @@ def test_audit_log(s3_stubber):
     object_key = 'test_key'
     csv_content = f"""id,investor_company_id,intermediate_company_id,uk_company_id,uk_company_decided
 {investment_project.id},{file_companies[0].pk},{file_companies[1].pk},{file_companies[2].pk},1
-"""
+"""  # noqa: E501
     s3_stubber.add_response(
         'get_object',
         {
