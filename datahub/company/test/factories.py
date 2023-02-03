@@ -235,3 +235,12 @@ class CompanyExportCountryHistoryFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company.CompanyExportCountryHistory'
+
+class OneListTierFactory(factory.django.DjangoModelFactory):
+    """One List Tier factory."""
+
+    id = factory.LazyFunction(uuid.uuid4)
+    name = factory.Faker('company')
+
+    class Meta:
+        model = 'company.OneListTier'

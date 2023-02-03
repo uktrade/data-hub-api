@@ -55,3 +55,8 @@ class OneListTierID(Enum):
     """One List tier IDs."""
 
     tier_d_international_trade_advisers = UUID('1929c808-99b4-4abf-a891-45f2e187b410')
+    tier_d_overseas_post_accounts = UUID('572dfefe-cd1d-e611-9bdc-e4115bead28a')
+
+class TeamRoleID(Enum):
+    """Team role IDs."""
+    post = UUID('62329c18-6095-e211-a939-e4115bead28a')
