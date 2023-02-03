@@ -56,6 +56,7 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
 )
+from datahub.company.models import Advisor
 from datahub.reminder.tasks import (
     create_estimated_land_date_reminder,
     create_new_export_interaction_reminder,
@@ -77,7 +78,6 @@ from datahub.reminder.tasks import (
     update_notify_email_delivery_status_for_no_recent_export_interaction,
     update_notify_email_delivery_status_for_no_recent_interaction,
 )
-from datahub.company.models import Advisor
 from datahub.reminder.test.factories import (
     NewExportInteractionReminderFactory,
     NewExportInteractionSubscriptionFactory,

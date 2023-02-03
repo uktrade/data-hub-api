@@ -137,9 +137,7 @@ def send_no_recent_export_interaction_reminder(
 
     params = {
         **item,
-        'time_period': timesince(last_interaction_date, now=current_date,).split(
-            ','
-        )[0],
+        'time_period': timesince(last_interaction_date, now=current_date).split(',')[0],
         'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
     }
 
