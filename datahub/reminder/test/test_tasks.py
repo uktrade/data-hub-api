@@ -12,6 +12,7 @@ from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.company.constants import OneListTierID, TeamRoleID
+from datahub.company.models import Advisor
 from datahub.company.test.factories import (
     AdviserFactory,
     CompanyFactory,
@@ -56,7 +57,6 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
 )
-from datahub.company.models import Advisor
 from datahub.reminder.tasks import (
     create_estimated_land_date_reminder,
     create_new_export_interaction_reminder,
@@ -1338,7 +1338,10 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         ),
     )
     def test_generate_no_recent_export_interaction_reminders_for_subscription_for_core_member(
-        self, adviser, mock_create_no_recent_export_interaction_reminder, one_list_tier
+        self,
+        adviser,
+        mock_create_no_recent_export_interaction_reminder,
+        one_list_tier,
     ):
         """
         No Recent Export Interaction reminders should be created for relevant subscriptions.
@@ -1377,7 +1380,9 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         )
 
     def test_dont_generate_reminder_for_company_in_invalid_one_company_tier_and_no_core_team_members(
-        self, adviser, mock_create_no_recent_export_interaction_reminder
+        self,
+        adviser,
+        mock_create_no_recent_export_interaction_reminder,
     ):
         """
         No Recent Export Interaction reminders should be created for relevant subscriptions.
