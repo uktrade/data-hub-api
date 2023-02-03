@@ -5,7 +5,7 @@ from logging import getLogger
 import django
 import environ
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
 django.setup()
 
 from django.conf import settings
@@ -55,7 +55,7 @@ logger = getLogger(__name__)
 
 def schedule_jobs():
     cancel_existing_cron_jobs()
-    logger.info("Scheduling jobs that run on a cron")
+    logger.info('Scheduling jobs that run on a cron')
     job_scheduler(
         function=queue_health_check,
         cron=EVERY_TEN_MINUTES,
@@ -64,46 +64,46 @@ def schedule_jobs():
     job_scheduler(
         function=refresh_pending_payment_gateway_sessions,
         function_kwargs={
-            "age_check": 60,  # in minutes
+            'age_check': 60,  # in minutes
         },
         cron=EVERY_HOUR,
-        description="Refresh pending payment gateway sessions :0",
+        description='Refresh pending payment gateway sessions :0',
     )
     job_scheduler(
         function=schedule_automatic_company_archive,
         function_kwargs={
-            "limit": 20000,
-            "simulate": False,
+            'limit': 20000,
+            'simulate': False,
         },
         cron=EVERY_SEVEN_PM,
-        description="Automatic Company Archive",
+        description='Automatic Company Archive',
     )
     job_scheduler(
         function=schedule_automatic_contact_archive,
         function_kwargs={
-            "limit": 20000,
-            "simulate": False,
+            'limit': 20000,
+            'simulate': False,
         },
         cron=EVERY_SEVEN_PM,
-        description="Automatic Contact Archive",
+        description='Automatic Contact Archive',
     )
     job_scheduler(
         function=schedule_get_company_updates,
         cron=EVERY_MIDNIGHT,
-        description="Update companies from dnb service",
+        description='Update companies from dnb service',
     )
 
     if settings.ENABLE_ESTIMATED_LAND_DATE_REMINDERS:
         job_scheduler(
             function=schedule_generate_estimated_land_date_reminders,
             cron=EVERY_EIGHT_THIRTY_AM_ON_FIRST_EACH_MONTH,
-            description="schedule_generate_estimated_land_date_reminders",
+            description='schedule_generate_estimated_land_date_reminders',
         )
 
     job_scheduler(
         function=schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
         cron=EVERY_THREE_AM_ON_TWENTY_THIRD_EACH_MONTH,
-        description="schedule_refresh_gross_value_added_value_for_fdi_investment_projects",
+        description='schedule_refresh_gross_value_added_value_for_fdi_investment_projects',
     )
 
     if settings.ENABLE_ESTIMATED_LAND_DATE_REMINDERS_EMAIL_DELIVERY_STATUS:
@@ -115,8 +115,8 @@ def schedule_jobs():
             retry_intervals=30,
             job_timeout=HALF_DAY_IN_SECONDS,
             cron=EVERY_NINE_THIRTY_AM_ON_FIRST_SECOND_THIRD_FOURTH_OF_EACH_MONTH,
-            description="Start of month update notify email delivery status for estimated land "
-            "date",
+            description='Start of month update notify email delivery status for estimated land '
+            'date',
         )
 
     if settings.ENABLE_NO_RECENT_INTERACTION_EMAIL_DELIVERY_STATUS:
@@ -128,14 +128,14 @@ def schedule_jobs():
             retry_intervals=30,
             job_timeout=HALF_DAY_IN_SECONDS,
             cron=EVERY_TEN_AM,
-            description="Daily update notify email delivery status for no recent interaction",
+            description='Daily update notify email delivery status for no recent interaction',
         )
 
     if settings.ENABLE_DAILY_OPENSEARCH_SYNC:
         job_scheduler(
             function=sync_all_models,
             cron=EVERY_ONE_AM,
-            description="Daily OpenSearch sync",
+            description='Daily OpenSearch sync',
         )
 
     if settings.ENABLE_DAILY_HIERARCHY_ROLLOUT:
@@ -151,14 +151,14 @@ def schedule_jobs():
         job_scheduler(
             function=schedule_sync_outdated_companies_with_dnb,
             function_kwargs={
-                "dnb_modified_on_before": dnb_modified_on_before,
-                "fields_to_update": ["global_ultimate_duns_number"],
-                "limit": settings.DAILY_HIERARCHY_ROLLOUT_LIMIT,
-                "simulate": False,
-                "max_requests": 5,
+                'dnb_modified_on_before': dnb_modified_on_before,
+                'fields_to_update': ['global_ultimate_duns_number'],
+                'limit': settings.DAILY_HIERARCHY_ROLLOUT_LIMIT,
+                'simulate': False,
+                'max_requests': 5,
             },
             cron=EVERY_ONE_AM,
-            description="dnb hierarchies backfill",
+            description='dnb hierarchies backfill',
         )
 
     if settings.ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS:
@@ -169,7 +169,7 @@ def schedule_jobs():
             retry_backoff=True,
             retry_intervals=30,
             cron=EVERY_EIGHT_AM,
-            description="Daily generate no recent export interaction reminders",
+            description='Daily generate no recent export interaction reminders',
         )
 
     if settings.ENABLE_NO_RECENT_INTERACTION_REMINDERS:
@@ -181,7 +181,7 @@ def schedule_jobs():
             retry_intervals=30,
             cron=EVERY_EIGHT_AM,
             job_timeout=HALF_DAY_IN_SECONDS,
-            description="Daily generate no recent interaction reminders",
+            description='Daily generate no recent interaction reminders',
         )
 
     if settings.ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS:
@@ -192,7 +192,7 @@ def schedule_jobs():
             retry_backoff=True,
             retry_intervals=30,
             cron=EVERY_TEN_AM,
-            description="Daily update of no recent export interaction reminder email status",
+            description='Daily update of no recent export interaction reminder email status',
         )
     schedule_email_ingestion_tasks()
     schedule_new_export_interaction_jobs()
@@ -227,7 +227,7 @@ def schedule_new_export_interaction_jobs():
             retry_backoff=True,
             retry_intervals=30,
             cron=EVERY_EIGHT_AM,
-            description="Daily generate new export interaction reminders",
+            description='Daily generate new export interaction reminders',
         )
 
     if settings.ENABLE_NEW_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS:
@@ -238,42 +238,42 @@ def schedule_new_export_interaction_jobs():
             retry_backoff=True,
             retry_intervals=30,
             cron=EVERY_TEN_AM,
-            description="Daily update of new export interaction reminder email status",
+            description='Daily update of new export interaction reminder email status',
         )
 
 
 def schedule_ita_user_reminder_migration():
     job_scheduler(
-        function=ITAUsersMigration().generate_advisor_list_to_migrate_to_reminders,
+        function=ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders,
         max_retries=5,
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,
         retry_intervals=30,
         cron=EVERY_ONE_AM,
-        description="Daily migrate ITA users to receive notifications",
+        description='Daily migrate ITA users to receive notifications',
     )
 
 
 def schedule_post_user_reminder_migration():
     job_scheduler(
-        function=PostUsersMigration().generate_advisor_list_to_migrate_to_reminders,
+        function=PostUsersMigration.generate_advisor_list_to_migrate_to_reminders,
         max_retries=5,
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,
         retry_intervals=30,
         cron=EVERY_ONE_AM,
-        description="Daily migrate post users to receive notifications",
+        description='Daily migrate post users to receive notifications',
     )
 
 
 def cancel_existing_cron_jobs():
-    logger.info("Cancel any existing rq scheduled cron jobs")
+    logger.info('Cancel any existing rq scheduled cron jobs')
     with DataHubScheduler() as scheduler:
         scheduler.cancel_cron_jobs()
 
 
 def create_rqscheduler_command():
-    command = f"rqscheduler --url {settings.REDIS_BASE_URL} --verbose --interval 60"
+    command = f'rqscheduler --url {settings.REDIS_BASE_URL} --verbose --interval 60'
     return command
 
 

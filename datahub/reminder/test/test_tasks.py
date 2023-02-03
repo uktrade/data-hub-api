@@ -5,7 +5,6 @@ from operator import attrgetter
 from unittest import mock
 from unittest.mock import ANY, call, Mock
 
-import uuid
 import factory
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -89,7 +88,6 @@ from datahub.reminder.test.factories import (
     UpcomingEstimatedLandDateSubscriptionFactory,
 )
 from datahub.company.models import Advisor
-from datahub.metadata.test.factories import TeamFactory, TeamRoleFactory
 
 
 @pytest.fixture()
@@ -1244,8 +1242,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
             ]
             if lock_acquired
             else [
-                "Reminders for no recent export interactions are already being processed by another "
-                "worker.",
+                "Reminders for no recent export interactions are already being processed by another worker.",
             ]
         )
         assert caplog.messages == expected_messages
@@ -2765,13 +2762,15 @@ class TestUpdateEmailDeliveryStatusTask:
             []
             if lock_acquired
             else [
-                "Email status checks for no recent export interaction are already being processed by"
-                " another worker.",
+                "Email status checks for no recent export interaction are already being processed"
+                " by another worker.",
             ]
         )
         assert caplog.messages == expected_messages
-
-        mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once() if lock_acquired else mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_not_called()
+        if lock_acquired:
+            mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once()
+        else:
+            mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_not_called()
 
     def test_doesnt_update_no_recent_export_interaction_status_without_feature_flag(self, caplog):
         """
@@ -2884,8 +2883,7 @@ class TestUpdateEmailDeliveryStatusTask:
             []
             if lock_acquired
             else [
-                "Email status checks for new export interaction are already being processed by another"
-                " worker.",
+                "Email status checks for new export interaction are already being processed by another worker.",
             ]
         )
         assert caplog.messages == expected_messages
@@ -2967,7 +2965,7 @@ class TestITAUsersMigration:
             mock_advisory_lock,
         )
 
-        ITAUsersMigration().generate_advisor_list_to_migrate_to_reminders()
+        ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders()
         expected_messages = (
             [
                 "Migrated 0 ita users",
@@ -2988,11 +2986,11 @@ class TestITAUsersMigration:
         one_list_tier = OneListTierFactory()
         CompanyFactory(one_list_account_owner=advisor, one_list_tier_id=one_list_tier.id)
 
-        ITAUsersMigration().generate_advisor_list_to_migrate_to_reminders()
+        ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders()
 
-        assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() == False
+        assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         assert (
-            NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() == False
+            NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         )
 
     def test_advisor_with_feature_flag_already_is_excluded_from_migration(
@@ -3005,11 +3003,11 @@ class TestITAUsersMigration:
             one_list_account_owner=advisor,
             one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
         )
-        ITAUsersMigration().generate_advisor_list_to_migrate_to_reminders()
+        ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders()
 
-        assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() == False
+        assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         assert (
-            NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() == False
+            NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         )
 
     def test_advisor_with_subscriptions_already_get_the_feature_flag_but_do_not_get_another_subscription(
@@ -3033,11 +3031,11 @@ class TestITAUsersMigration:
             email_reminders_enabled=True,
         )
 
-        ITAUsersMigration().generate_advisor_list_to_migrate_to_reminders()
+        ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders()
 
         assert NewExportInteractionSubscription.objects.filter(adviser=advisor).count() == 1
         assert NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).count() == 1
-        assert Advisor.objects.filter(feature_groups=export_flag).exists() == True
+        assert Advisor.objects.filter(feature_groups=export_flag).exists() is True
 
     def test_new_advisor_added_to_subscription_and_assigned_feature_flag(
         self,
@@ -3049,47 +3047,48 @@ class TestITAUsersMigration:
             one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
         )
 
-        ITAUsersMigration().generate_advisor_list_to_migrate_to_reminders()
+        ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders()
 
         assert NewExportInteractionSubscription.objects.filter(adviser=advisor).count() == 1
         assert NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).count() == 1
-        assert Advisor.objects.filter(feature_groups=export_flag).exists() == True
+        assert Advisor.objects.filter(feature_groups=export_flag).exists() is True
 
 
 @pytest.mark.django_db
 @freeze_time("2022-07-01T10:00:00")
 class TestPostUsersMigration:
     def _assert_advisor_not_migrated(self, export_flag, investment_flag, advisor):
-        assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() == False
+        assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         assert (
-            NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() == False
+            NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         )
         assert (
             NoRecentInvestmentInteractionSubscription.objects.filter(adviser=advisor).exists()
-            == False
+            is False
         )
         assert (
-            NoRecentInvestmentInteractionSubscription.objects.filter(adviser=advisor).exists()
-            == False
+            UpcomingEstimatedLandDateSubscription.objects.filter(adviser=advisor).exists() is False
         )
-        assert Advisor.objects.filter(feature_groups=export_flag).exists() == False
-        assert Advisor.objects.filter(feature_groups=investment_flag).exists() == False
+        assert Advisor.objects.filter(feature_groups=export_flag).exists() is False
+        assert Advisor.objects.filter(feature_groups=investment_flag).exists() is False
 
     def _assert_advisor_migrated(self, export_flag, investment_flag, advisor):
-        assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() == True
+        assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() is True
         assert (
-            NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() == True
+            NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() is True
         )
-        assert (
-            NoRecentInvestmentInteractionSubscription.objects.filter(adviser=advisor).exists()
-            == True
-        )
+
         assert (
             NoRecentInvestmentInteractionSubscription.objects.filter(adviser=advisor).exists()
-            == True
+            is True
         )
-        assert Advisor.objects.filter(feature_groups=export_flag).exists() == True
-        assert Advisor.objects.filter(feature_groups=investment_flag).exists() == True
+
+        assert (
+            UpcomingEstimatedLandDateSubscription.objects.filter(adviser=advisor).exists() is True
+        )
+
+        assert Advisor.objects.filter(feature_groups=export_flag).exists() is True
+        assert Advisor.objects.filter(feature_groups=investment_flag).exists() is True
 
     @pytest.mark.parametrize(
         "lock_acquired",
@@ -3117,7 +3116,7 @@ class TestPostUsersMigration:
             mock_advisory_lock,
         )
 
-        PostUsersMigration().generate_advisor_list_to_migrate_to_reminders()
+        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
         expected_messages = (
             [
                 "Migrated 0 post users",
@@ -3136,7 +3135,7 @@ class TestPostUsersMigration:
         investment_flag = UserFeatureFlagGroupFactory(code="investment-notifications")
         advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
 
-        PostUsersMigration().generate_advisor_list_to_migrate_to_reminders()
+        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
 
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
@@ -3151,14 +3150,13 @@ class TestPostUsersMigration:
             adviser=advisor,
         )
 
-        PostUsersMigration().generate_advisor_list_to_migrate_to_reminders()
+        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
 
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_in_post_team_in_one_list_core_member_not_global_account_manager_added_to_subscription_and_assigned_feature_flag(
-        self, caplog
+        self,
     ):
-        caplog.set_level(logging.INFO, logger="datahub.reminder.tasks")
 
         export_flag = UserFeatureFlagGroupFactory(code="export-notifications")
         investment_flag = UserFeatureFlagGroupFactory(code="investment-notifications")
@@ -3167,14 +3165,13 @@ class TestPostUsersMigration:
             adviser=advisor,
         )
 
-        PostUsersMigration().generate_advisor_list_to_migrate_to_reminders()
+        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
 
         self._assert_advisor_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_not_in_post_team_in_one_list_core_member_global_account_manager_wrong_tier_company_is_excluded_from_migration(
-        self, caplog
+        self,
     ):
-        caplog.set_level(logging.INFO, logger="datahub.reminder.tasks")
 
         export_flag = UserFeatureFlagGroupFactory(code="export-notifications")
         investment_flag = UserFeatureFlagGroupFactory(code="investment-notifications")
@@ -3187,14 +3184,13 @@ class TestPostUsersMigration:
             one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
         )
 
-        PostUsersMigration().generate_advisor_list_to_migrate_to_reminders()
+        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
 
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_not_in_post_team_not_in_one_list_core_member_global_account_manager_correct_tier_added_to_subscription_and_assigned_feature_flag(
-        self, caplog
+        self,
     ):
-        caplog.set_level(logging.INFO, logger="datahub.reminder.tasks")
 
         export_flag = UserFeatureFlagGroupFactory(code="export-notifications")
         investment_flag = UserFeatureFlagGroupFactory(code="investment-notifications")
@@ -3205,7 +3201,6 @@ class TestPostUsersMigration:
             one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value,
         )
 
-        PostUsersMigration().generate_advisor_list_to_migrate_to_reminders()
+        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
 
         self._assert_advisor_migrated(export_flag, investment_flag, advisor)
-        pass
