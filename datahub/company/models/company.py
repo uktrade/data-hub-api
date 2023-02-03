@@ -420,6 +420,18 @@ class Company(ArchivableModel, BaseModel):
             return False
         return self.duns_number == self.global_ultimate_duns_number
 
+    @property
+    def descendants(self):
+        """
+        All direct and indirect subsidiaries of this company.
+        """
+        to_do = list(self.subsidiaries.all())
+        yield from to_do
+        while to_do:
+            for subsidiary in to_do.pop().subsidiaries.all():
+                to_do.append(subsidiary)
+                yield subsidiary
+
     def mark_as_transferred(self, to, reason, user):
         """
         Marks a company record as having been transferred to another company record.

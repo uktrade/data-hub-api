@@ -369,3 +369,61 @@ class TestAutomaticCompanyArchive:
 
         company.refresh_from_db()
         assert company.archived == expected_archived
+
+    @freeze_time('2020-01-01-12:00:00')
+    def test_company_with_active_descendant(self, automatic_company_archive_feature_flag):
+        """
+        Test that a company with active descendant is not archived
+        """
+        # Construct a tree of companies, but where some companies have an active
+        # descendant company, so we can assert they don't get archived.
+
+        gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
+        with freeze_time(gt_3m_ago):
+            company_root = CompanyFactory()
+            company_sub_1a = CompanyFactory(global_headquarters=company_root)
+            company_sub_1b = CompanyFactory(global_headquarters=company_root)
+            company_sub_2 = CompanyFactory(global_headquarters=company_sub_1a)
+        company_sub_3 = CompanyFactory(global_headquarters=company_sub_2)
+
+        schedule_automatic_company_archive(simulate=False)
+        company_root.refresh_from_db()
+        company_sub_1a.refresh_from_db()
+        company_sub_1b.refresh_from_db()
+        company_sub_2.refresh_from_db()
+        company_sub_3.refresh_from_db()
+
+        assert not company_root.archived
+        assert not company_sub_1a.archived
+        assert company_sub_1b.archived
+        assert not company_sub_2.archived
+        assert not company_sub_3.archived
+
+    @freeze_time('2020-01-01-12:00:00')
+    def test_company_without_active_descendant(self, automatic_company_archive_feature_flag):
+        """
+        Test that a company without active descendant is archived
+        """
+        # Construct a tree of companies, but where no companies have an active
+        # descendant company, so we can assert they get archived.
+
+        gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
+        with freeze_time(gt_3m_ago):
+            company_root = CompanyFactory()
+            company_sub_1a = CompanyFactory(global_headquarters=company_root)
+            company_sub_1b = CompanyFactory(global_headquarters=company_root)
+            company_sub_2 = CompanyFactory(global_headquarters=company_sub_1a)
+        company_sub_3 = CompanyFactory(global_headquarters=None)
+
+        schedule_automatic_company_archive(simulate=False)
+        company_root.refresh_from_db()
+        company_sub_1a.refresh_from_db()
+        company_sub_1b.refresh_from_db()
+        company_sub_2.refresh_from_db()
+        company_sub_3.refresh_from_db()
+
+        assert company_root.archived
+        assert company_sub_1a.archived
+        assert company_sub_1b.archived
+        assert company_sub_2.archived
+        assert not company_sub_3.archived
