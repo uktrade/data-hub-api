@@ -51,7 +51,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         [
             factory.Faker('company'),
             factory.Faker('company'),
-        ]
+        ],
     )
 
     address_1 = factory.Sequence(lambda x: f'{x} Fake Lane')

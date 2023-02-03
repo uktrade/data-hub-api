@@ -1047,7 +1047,9 @@ def update_notify_email_delivery_status_for_no_recent_interaction():
 
 
 def _get_active_projects(adviser):
-    """Get active projects for given adviser."""
+    """
+    Get active projects for given adviser.
+    """
     return InvestmentProject.objects.filter(
         Q(project_manager=adviser)
         | Q(project_assurance_adviser=adviser)
@@ -1062,8 +1064,10 @@ def _get_active_projects(adviser):
 
 
 def _get_managed_companies(adviser):
-    """For given adviser, get the companies for which they are the global account manager OR where
-    they are a member of the one list core team"""
+    """
+    For given adviser, get the companies for which they are the global account manager OR where
+    they are a member of the one list core team
+    """
     return Company.objects.filter(
         (
             (
