@@ -27,7 +27,7 @@ def _automatic_company_archive(limit, simulate):
         company=OuterRef('pk'),
     ).order_by('-date')
 
-    companies_to_be_archived = Company.objects.annotate(
+    candidate_companies_to_be_archived = list(Company.objects.annotate(
         latest_interaction_date=Subquery(
             latest_interaction.values('date')[:1],
         ),
@@ -38,13 +38,21 @@ def _automatic_company_archive(limit, simulate):
     ).filter(
         Q(latest_interaction_date__date__lt=_5y_ago) | Q(latest_interaction_date__isnull=True),
         archived=False,
-        duns_number__isnull=True,
         orders__isnull=True,
         investor_profiles__isnull=True,
         active_investment_projects__isnull=True,
         created_on__lt=_3m_ago,
         modified_on__lt=_3m_ago,
-    )[:limit]
+    ))
+
+    companies_to_be_archived = [
+        company
+        for company in candidate_companies_to_be_archived
+        if not any(
+            not (descendant.archived or descendant in candidate_companies_to_be_archived)
+            for descendant in company.descendants
+        )
+    ][:limit]
 
     for company in companies_to_be_archived:
         message = f'Automatically archived company: {company.id}'
@@ -63,7 +71,7 @@ def _automatic_company_archive(limit, simulate):
         )
         logger.info(message)
 
-    return companies_to_be_archived.count()
+    return len(companies_to_be_archived)
 
 
 def schedule_automatic_company_archive(limit=1000, simulate=True):
