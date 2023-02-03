@@ -12,8 +12,8 @@ from datahub.company.constants import (
     TeamRoleID,
 )
 from datahub.company.models import (
-    Company,
     Advisor,
+    Company,
     OneListCoreTeamMember,
 )
 from datahub.core import statsd
@@ -29,12 +29,12 @@ from datahub.core.queues.job_scheduler import (
 from datahub.core.queues.scheduler import (
     LONG_RUNNING_QUEUE,
 )
+from datahub.feature_flag.models import (
+    UserFeatureFlagGroup,
+)
 from datahub.feature_flag.utils import (
     is_feature_flag_active,
     is_user_feature_flag_active,
-)
-from datahub.feature_flag.models import (
-    UserFeatureFlagGroup,
 )
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import (
