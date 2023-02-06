@@ -249,7 +249,7 @@ def schedule_ita_user_reminder_migration():
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,
         retry_intervals=30,
-        cron=EVERY_ONE_AM,
+        cron=EVERY_MIDNIGHT,
         description='Daily migrate ITA users to receive notifications',
     )
 
