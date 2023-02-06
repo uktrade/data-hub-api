@@ -2547,7 +2547,7 @@ class TestGenerateNoRecentInteractionReminderTask:
         assert any(
             'Task update_no_recent_interaction_reminder_email_status completed'
             f'email_notification_id to {notification_id} and '
-            f'reminder_ids set to [UUID(\'{reminder.id}\')]' in message
+            f"reminder_ids set to [UUID('{reminder.id}')]" in message
             for message in caplog.messages
         )
         assert reminder.email_notification_id == notification_id
