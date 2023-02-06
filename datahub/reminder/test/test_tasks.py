@@ -70,13 +70,12 @@ from datahub.reminder.tasks import (
     generate_no_recent_export_interaction_reminders_for_subscription,
     generate_no_recent_interaction_reminders,
     generate_no_recent_interaction_reminders_for_subscription,
-    ITAUsersMigration,
-    PostUsersMigration,
     schedule_generate_estimated_land_date_reminders,
     update_notify_email_delivery_status_for_estimated_land_date,
     update_notify_email_delivery_status_for_new_export_interaction,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
     update_notify_email_delivery_status_for_no_recent_interaction,
+    UserMigrationTasks,
 )
 from datahub.reminder.test.factories import (
     NewExportInteractionReminderFactory,
@@ -2953,6 +2952,11 @@ class TestUpdateEmailDeliveryStatusTask:
         )
 
 
+@pytest.fixture()
+def user_migration_tasks():
+    return UserMigrationTasks()
+
+
 @pytest.mark.django_db
 @freeze_time('2022-07-01T10:00:00')
 class TestITAUsersMigration:
@@ -2965,6 +2969,7 @@ class TestITAUsersMigration:
         caplog,
         monkeypatch,
         lock_acquired,
+        user_migration_tasks,
     ):
         """
         Test that the task doesn't run if it cannot acquire
@@ -2981,7 +2986,7 @@ class TestITAUsersMigration:
             mock_advisory_lock,
         )
 
-        ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        user_migration_tasks.migrate_ita_users()
         expected_messages = (
             [
                 'Migrated 0 ita users',
@@ -2993,7 +2998,12 @@ class TestITAUsersMigration:
         )
         assert caplog.messages == expected_messages
 
-    def test_no_migrations_run_when_setting_is_disabled(self, caplog, monkeypatch):
+    def test_no_migrations_run_when_setting_is_disabled(
+        self,
+        caplog,
+        monkeypatch,
+        user_migration_tasks,
+    ):
         """
         Test that the task runs but no users are migrated when the setting is disabled
         """
@@ -3010,7 +3020,7 @@ class TestITAUsersMigration:
             one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
         )
 
-        ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        user_migration_tasks.migrate_ita_users()
         expected_messages = [
             'Automatic migration of users is disabled, no changes will be made to the ita user'
             f' {advisor.email} subscriptions or feature flags',
@@ -3021,6 +3031,7 @@ class TestITAUsersMigration:
     def test_advisor_account_owner_of_company_in_wrong_tier_is_excluded_from_migration(
         self,
         monkeypatch,
+        user_migration_tasks,
     ):
         """
         Test when an advisor belongs to a company that is not in the Tier D -Internation Trade
@@ -3037,7 +3048,7 @@ class TestITAUsersMigration:
         one_list_tier = OneListTierFactory()
         CompanyFactory(one_list_account_owner=advisor, one_list_tier_id=one_list_tier.id)
 
-        ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        user_migration_tasks.migrate_ita_users()
 
         assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         assert (
@@ -3047,6 +3058,7 @@ class TestITAUsersMigration:
     def test_advisor_with_feature_flag_already_is_excluded_from_migration(
         self,
         monkeypatch,
+        user_migration_tasks,
     ):
         """
         Test when an advisor already has the export-notifications feature flag they are excluded
@@ -3064,7 +3076,7 @@ class TestITAUsersMigration:
             one_list_account_owner=advisor,
             one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
         )
-        ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        user_migration_tasks.migrate_ita_users()
 
         assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         assert (
@@ -3074,6 +3086,7 @@ class TestITAUsersMigration:
     def test_advisor_with_subscriptions_already_get_the_feature_flag_but_do_not_get_another_subscription(  # noqa: E501
         self,
         monkeypatch,
+        user_migration_tasks,
     ):
         """
         Test when an advisor already has the export subscriptions but not the feature flag they
@@ -3101,7 +3114,7 @@ class TestITAUsersMigration:
             email_reminders_enabled=True,
         )
 
-        ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        user_migration_tasks.migrate_ita_users()
 
         assert NewExportInteractionSubscription.objects.filter(adviser=advisor).count() == 1
         assert NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).count() == 1
@@ -3110,6 +3123,7 @@ class TestITAUsersMigration:
     def test_new_advisor_added_to_subscription_and_assigned_feature_flag(
         self,
         monkeypatch,
+        user_migration_tasks,
     ):
         """
         Test when an advisor is the account owner for a company in the Tier D -Internation Trade
@@ -3129,7 +3143,7 @@ class TestITAUsersMigration:
             one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
         )
 
-        ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        user_migration_tasks.migrate_ita_users()
 
         assert NewExportInteractionSubscription.objects.filter(adviser=advisor).count() == 1
         assert NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).count() == 1
@@ -3187,6 +3201,7 @@ class TestPostUsersMigration:
         caplog,
         monkeypatch,
         lock_acquired,
+        user_migration_tasks,
     ):
         """
         Test that the task doesn't run if it cannot acquire
@@ -3204,7 +3219,7 @@ class TestPostUsersMigration:
             mock_advisory_lock,
         )
 
-        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        user_migration_tasks.migrate_post_users()
         expected_messages = (
             [
                 'Migrated 0 post users',
@@ -3220,6 +3235,7 @@ class TestPostUsersMigration:
         self,
         caplog,
         monkeypatch,
+        user_migration_tasks,
     ):
         """
         Test that the task runs but no users are migrated when the setting is disabled
@@ -3239,7 +3255,7 @@ class TestPostUsersMigration:
             one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value,
         )
 
-        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        user_migration_tasks.migrate_post_users()
         expected_messages = [
             'Automatic migration of users is disabled, no changes will be made to the post user'
             f' {advisor.email} subscriptions or feature flags',
@@ -3250,6 +3266,7 @@ class TestPostUsersMigration:
     def test_advisor_in_post_team_not_one_list_core_member_not_global_account_manager_is_excluded_from_migration(  # noqa: E501
         self,
         monkeypatch,
+        user_migration_tasks,
     ):
         """
         Test an advisor that belongs to a team that has role of POST, is not a member of the one
@@ -3265,13 +3282,14 @@ class TestPostUsersMigration:
         investment_flag = UserFeatureFlagGroupFactory(code='investment-notifications')
         advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
 
-        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        user_migration_tasks.migrate_post_users()
 
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_not_in_post_team_in_one_list_core_member_not_global_account_manager_is_excluded_from_migration(  # noqa: E501
         self,
         monkeypatch,
+        user_migration_tasks,
     ):
         """
         Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of'
@@ -3290,13 +3308,14 @@ class TestPostUsersMigration:
             adviser=advisor,
         )
 
-        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        user_migration_tasks.migrate_post_users()
 
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_in_post_team_in_one_list_core_member_not_global_account_manager_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
         self,
         monkeypatch,
+        user_migration_tasks,
     ):
         """
         Test an advisor that belongs to a team that has a role of POST, is a member of'
@@ -3314,13 +3333,14 @@ class TestPostUsersMigration:
             adviser=advisor,
         )
 
-        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        user_migration_tasks.migrate_post_users()
 
         self._assert_advisor_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_not_in_post_team_in_one_list_core_member_global_account_manager_wrong_tier_company_is_excluded_from_migration(  # noqa: E501
         self,
         monkeypatch,
+        user_migration_tasks,
     ):
         """
         Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of'
@@ -3343,13 +3363,14 @@ class TestPostUsersMigration:
             one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
         )
 
-        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        user_migration_tasks.migrate_post_users()
 
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_not_in_post_team_not_in_one_list_core_member_global_account_manager_correct_tier_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
         self,
         monkeypatch,
+        user_migration_tasks,
     ):
         """
         Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member'
@@ -3369,6 +3390,6 @@ class TestPostUsersMigration:
             one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value,
         )
 
-        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        user_migration_tasks.migrate_post_users()
 
         self._assert_advisor_migrated(export_flag, investment_flag, advisor)

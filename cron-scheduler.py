@@ -45,8 +45,8 @@ from datahub.reminder.tasks import (
     update_notify_email_delivery_status_for_new_export_interaction,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
     update_notify_email_delivery_status_for_no_recent_interaction,
+    UserMigrationTasks,
 )
-from datahub.reminder.tasks import ITAUsersMigration, PostUsersMigration
 from datahub.search.tasks import sync_all_models
 
 env = environ.Env()
@@ -197,9 +197,7 @@ def schedule_jobs():
     schedule_email_ingestion_tasks()
     schedule_new_export_interaction_jobs()
 
-    schedule_ita_user_reminder_migration()
-
-    schedule_post_user_reminder_migration()
+    schedule_user_reminder_migration()
 
 
 def schedule_email_ingestion_tasks():
@@ -242,9 +240,11 @@ def schedule_new_export_interaction_jobs():
         )
 
 
-def schedule_ita_user_reminder_migration():
+def schedule_user_reminder_migration():
+    migration = UserMigrationTasks()
+
     job_scheduler(
-        function=ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders,
+        function=migration.migrate_ita_users,
         max_retries=5,
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,
@@ -253,10 +253,8 @@ def schedule_ita_user_reminder_migration():
         description='Daily migrate ITA users to receive notifications',
     )
 
-
-def schedule_post_user_reminder_migration():
     job_scheduler(
-        function=PostUsersMigration.generate_advisor_list_to_migrate_to_reminders,
+        function=migration.migrate_post_users,
         max_retries=5,
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,

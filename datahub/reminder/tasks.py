@@ -1087,9 +1087,8 @@ def _get_managed_companies(adviser):
     )
 
 
-class ITAUsersMigration:
-    @staticmethod
-    def generate_advisor_list_to_migrate_to_reminders():
+class UserMigrationTasks:
+    def migrate_ita_users(self):
         with advisory_lock(
             'generate_ita_users_advisor_list_to_assign_notifications',
             wait=False,
@@ -1159,10 +1158,7 @@ class ITAUsersMigration:
             f'Migrated {advisors.count()} ita users',
         )
 
-
-class PostUsersMigration:
-    @staticmethod
-    def generate_advisor_list_to_migrate_to_reminders():
+    def migrate_post_users(self):
         with advisory_lock(
             'generate_post_users_advisor_list_to_assign_notifications',
             wait=False,
