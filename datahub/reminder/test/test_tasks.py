@@ -3222,7 +3222,6 @@ class TestPostUsersMigration:
         """
         Test that the task runs but no users are migrated when the setting is disabled
         """
-
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
             False,
@@ -3321,7 +3320,6 @@ class TestPostUsersMigration:
         self,
         monkeypatch,
     ):
-
         """
         Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of'
         ' the one list core team and is a global account manager but for a company not on the'
