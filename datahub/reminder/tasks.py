@@ -209,9 +209,7 @@ def send_no_recent_interaction_reminder(
         settings.INVESTMENT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID,
         {
             **item,
-            'time_period': timesince(last_interaction_date, now=current_date,).split(
-                ','
-            )[0],
+            'time_period': timesince(last_interaction_date, now=current_date).split(',')[0],
             'last_interaction_date': last_interaction_date.strftime('%-d %B %Y'),
         },
         update_no_recent_interaction_reminder_email_status,
@@ -1125,13 +1123,13 @@ class ITAUsersMigration:
 
         for advisor in advisors:
             logger.info(
-                f'Migrating ITA advisor {advisor.email} to receive reminders.',
+                f'Migrating ITA user {advisor.email} to receive reminders.',
             )
             advisor.feature_groups.add(export_notifications_feature_group)
 
             if not NewExportInteractionSubscription.objects.filter(adviser=advisor).exists():
                 logger.info(
-                    f'Adding ITA advisor {advisor.email} to NewExportInteractionSubscription.',
+                    f'Adding ITA user {advisor.email} to NewExportInteractionSubscription.',
                 )
                 NewExportInteractionSubscription(
                     adviser=advisor,
@@ -1140,7 +1138,7 @@ class ITAUsersMigration:
                 ).save()
             if not NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists():
                 logger.info(
-                    f'Adding ITA advisor {advisor.email} to NoRecentExportInteractionSubscription.'
+                    f'Adding ITA user {advisor.email} to NoRecentExportInteractionSubscription.'
                 )
                 NoRecentExportInteractionSubscription(
                     adviser=advisor,
@@ -1199,14 +1197,14 @@ class PostUsersMigration:
 
         for adviser in advisors:
             logger.info(
-                f'Migrating Post advisor {adviser.email} to receive reminders.',
+                f'Migrating Post user {adviser.email} to receive reminders.',
             )
             adviser.feature_groups.add(investment_feature_group)
             adviser.feature_groups.add(export_feature_group)
 
             if not NewExportInteractionSubscription.objects.filter(adviser=adviser).exists():
                 logger.info(
-                    f'Adding Post advisor {adviser.email} to NewExportInteractionSubscription.',
+                    f'Adding Post user {adviser.email} to NewExportInteractionSubscription.',
                 )
                 NewExportInteractionSubscription(
                     adviser=adviser,
@@ -1215,7 +1213,7 @@ class PostUsersMigration:
                 ).save()
             if not NoRecentExportInteractionSubscription.objects.filter(adviser=adviser).exists():
                 logger.info(
-                    f'Adding Post advisor {adviser.email} to NoRecentExportInteractionSubscription'
+                    f'Adding Post user {adviser.email} to NoRecentExportInteractionSubscription'
                 )
                 NoRecentExportInteractionSubscription(
                     adviser=adviser,
@@ -1228,7 +1226,7 @@ class PostUsersMigration:
             ).exists():
                 logger.info(
                     (
-                        f'Adding Post advisor {adviser.email} to'
+                        f'Adding Post user {adviser.email} to'
                         'NoRecentInvestmentInteractionSubscription'
                     )
                 )
@@ -1239,7 +1237,7 @@ class PostUsersMigration:
                 ).save()
             if not UpcomingEstimatedLandDateSubscription.objects.filter(adviser=adviser).exists():
                 logger.info(
-                    f'Adding Post advisor {adviser.email} to UpcomingEstimatedLandDateSubscription'
+                    f'Adding Post user {adviser.email} to UpcomingEstimatedLandDateSubscription'
                 )
                 UpcomingEstimatedLandDateSubscription(
                     adviser=adviser,
