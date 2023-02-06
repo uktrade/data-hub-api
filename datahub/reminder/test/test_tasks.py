@@ -1242,12 +1242,16 @@ class TestGenerateNoRecentExportInteractionReminderTask:
             ]
             if lock_acquired
             else [
-                'Reminders for no recent export interactions are already being processed by another worker.',
+                'Reminders for no recent export interactions are already being processed by'
+                ' another worker.',
             ]
         )
         assert caplog.messages == expected_messages
 
-        mock_job_scheduler.assert_called_once() if lock_acquired else mock_job_scheduler.assert_not_called()
+        if lock_acquired:
+            mock_job_scheduler.assert_called_once()
+        else:
+            mock_job_scheduler.assert_not_called()
 
     def test_generate_no_recent_export_interaction_reminders(
         self,
@@ -1379,7 +1383,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
             current_date=self.current_date,
         )
 
-    def test_dont_generate_reminder_for_company_in_invalid_one_company_tier_and_no_core_team_members(
+    def test_dont_generate_reminder_for_company_in_invalid_one_company_tier_and_no_core_team_members(  # noqa: E501
         self,
         adviser,
         mock_create_no_recent_export_interaction_reminder,
@@ -1780,7 +1784,10 @@ class TestGenerateNewExportInteractionReminderTask:
         )
         assert caplog.messages == expected_messages
 
-        mock_job_scheduler.assert_called_once() if lock_acquired else mock_job_scheduler.assert_not_called()
+        if lock_acquired:
+            mock_job_scheduler.assert_called_once()
+        else:
+            mock_job_scheduler.assert_not_called()
 
     def test_generate_new_export_interaction_reminders(
         self,
@@ -3017,7 +3024,7 @@ class TestITAUsersMigration:
             NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         )
 
-    def test_advisor_with_subscriptions_already_get_the_feature_flag_but_do_not_get_another_subscription(
+    def test_advisor_with_subscriptions_already_get_the_feature_flag_but_do_not_get_another_subscription(  # noqa: E501
         self,
     ):
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
@@ -3135,7 +3142,7 @@ class TestPostUsersMigration:
         )
         assert caplog.messages == expected_messages
 
-    def test_advisor_in_post_team_not_one_list_core_member_not_global_account_manager_is_excluded_from_migration(
+    def test_advisor_in_post_team_not_one_list_core_member_not_global_account_manager_is_excluded_from_migration(  # noqa: E501
         self,
     ):
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
@@ -3146,7 +3153,7 @@ class TestPostUsersMigration:
 
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
-    def test_advisor_not_in_post_team_in_one_list_core_member_not_global_account_manager_is_excluded_from_migration(
+    def test_advisor_not_in_post_team_in_one_list_core_member_not_global_account_manager_is_excluded_from_migration(  # noqa: E501
         self,
     ):
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
@@ -3161,7 +3168,7 @@ class TestPostUsersMigration:
 
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
-    def test_advisor_in_post_team_in_one_list_core_member_not_global_account_manager_added_to_subscription_and_assigned_feature_flag(
+    def test_advisor_in_post_team_in_one_list_core_member_not_global_account_manager_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
         self,
     ):
 
@@ -3176,7 +3183,7 @@ class TestPostUsersMigration:
 
         self._assert_advisor_migrated(export_flag, investment_flag, advisor)
 
-    def test_advisor_not_in_post_team_in_one_list_core_member_global_account_manager_wrong_tier_company_is_excluded_from_migration(
+    def test_advisor_not_in_post_team_in_one_list_core_member_global_account_manager_wrong_tier_company_is_excluded_from_migration(  # noqa: E501
         self,
     ):
 
@@ -3195,7 +3202,7 @@ class TestPostUsersMigration:
 
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
-    def test_advisor_not_in_post_team_not_in_one_list_core_member_global_account_manager_correct_tier_added_to_subscription_and_assigned_feature_flag(
+    def test_advisor_not_in_post_team_not_in_one_list_core_member_global_account_manager_correct_tier_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
         self,
     ):
 
