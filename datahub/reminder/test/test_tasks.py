@@ -2991,9 +2991,44 @@ class TestITAUsersMigration:
         )
         assert caplog.messages == expected_messages
 
+    def test_no_migrations_run_when_setting_is_disabled(self, caplog, monkeypatch):
+        """
+        Test that the task runs but no users are migrated when the setting is disabled
+        """
+
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            False,
+        )
+        caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
+
+        UserFeatureFlagGroupFactory(code='export-notifications')
+        advisor = AdviserFactory()
+        CompanyFactory(
+            one_list_account_owner=advisor,
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+        )
+
+        ITAUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        expected_messages = [
+            'Automatic migration of users is disabled, no changes will be made to the ita user'
+            f' {advisor.email} subscriptions or feature flags',
+            'Migrated 1 ita users',
+        ]
+        assert caplog.messages == expected_messages
+
     def test_advisor_account_owner_of_company_in_wrong_tier_is_excluded_from_migration(
-        self,
+        self, monkeypatch
     ):
+        """
+        Test when an advisor belongs to a company that is not in the Tier D -Internation Trade
+        Advisors tier they are excluded from the migraton
+        """
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            True,
+        )
+
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
         advisor = AdviserFactory()
         advisor.feature_groups.set([export_flag])
@@ -3007,9 +3042,16 @@ class TestITAUsersMigration:
             NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         )
 
-    def test_advisor_with_feature_flag_already_is_excluded_from_migration(
-        self,
-    ):
+    def test_advisor_with_feature_flag_already_is_excluded_from_migration(self, monkeypatch):
+        """
+        Test when an advisor already has the export-notifications feature flag they are excluded
+        from the migration
+        """
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            True,
+        )
+
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
         advisor = AdviserFactory()
         advisor.feature_groups.set([export_flag])
@@ -3025,8 +3067,16 @@ class TestITAUsersMigration:
         )
 
     def test_advisor_with_subscriptions_already_get_the_feature_flag_but_do_not_get_another_subscription(  # noqa: E501
-        self,
+        self, monkeypatch
     ):
+        """
+        Test when an advisor already has the export subscriptions but not the feature flag they
+        are only assigned the feature flag but not any additional subscriptions
+        """
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            True,
+        )
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
         advisor = AdviserFactory()
         CompanyFactory(
@@ -3051,9 +3101,18 @@ class TestITAUsersMigration:
         assert NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).count() == 1
         assert Advisor.objects.filter(feature_groups=export_flag).exists() is True
 
-    def test_new_advisor_added_to_subscription_and_assigned_feature_flag(
-        self,
-    ):
+    def test_new_advisor_added_to_subscription_and_assigned_feature_flag(self, monkeypatch):
+        """
+        Test when an advisor is the account owner for a company in the Tier D -Internation Trade
+        Advisors tier and do not have the export-notifications feature flag or export
+        subscriptions, they are given the export-notifications feature flag and added to the
+        export subscriptions
+        """
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            True,
+        )
+
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
         advisor = AdviserFactory()
         CompanyFactory(
@@ -3072,6 +3131,9 @@ class TestITAUsersMigration:
 @freeze_time('2022-07-01T10:00:00')
 class TestPostUsersMigration:
     def _assert_advisor_not_migrated(self, export_flag, investment_flag, advisor):
+        """
+        Check the advisor does not have any subscriptions or contain any of the feature flags
+        """
         assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         assert (
             NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
@@ -3087,6 +3149,9 @@ class TestPostUsersMigration:
         assert Advisor.objects.filter(feature_groups=investment_flag).exists() is False
 
     def _assert_advisor_migrated(self, export_flag, investment_flag, advisor):
+        """
+        Check the advisor has all the subscriptions and all feature flags
+        """
         assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() is True
         assert (
             NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() is True
@@ -3142,9 +3207,47 @@ class TestPostUsersMigration:
         )
         assert caplog.messages == expected_messages
 
+    def test_no_migrations_run_when_setting_is_disabled(self, caplog, monkeypatch):
+        """
+        Test that the task runs but no users are migrated when the setting is disabled
+        """
+
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            False,
+        )
+        caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
+
+        UserFeatureFlagGroupFactory(code='export-notifications')
+        UserFeatureFlagGroupFactory(code='investment-notifications')
+
+        advisor = AdviserFactory()
+        CompanyFactory(
+            one_list_account_owner=advisor,
+            one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value,
+        )
+
+        PostUsersMigration.generate_advisor_list_to_migrate_to_reminders()
+        expected_messages = [
+            'Automatic migration of users is disabled, no changes will be made to the post user'
+            f' {advisor.email} subscriptions or feature flags',
+            'Migrated 1 post users',
+        ]
+        assert caplog.messages == expected_messages
+
     def test_advisor_in_post_team_not_one_list_core_member_not_global_account_manager_is_excluded_from_migration(  # noqa: E501
-        self,
+        self, monkeypatch
     ):
+        """
+        Test an advisor that belongs to a team that has role of POST, is not a member of the one
+        list core team and is not a global account manager for a company on the Tier D - Overseas
+        Post Accounts one list tier is excluded from migration
+        """
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            True,
+        )
+
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
         investment_flag = UserFeatureFlagGroupFactory(code='investment-notifications')
         advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
@@ -3154,8 +3257,17 @@ class TestPostUsersMigration:
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_not_in_post_team_in_one_list_core_member_not_global_account_manager_is_excluded_from_migration(  # noqa: E501
-        self,
+        self, monkeypatch
     ):
+        """
+        Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of'
+        ' the one list core team and is not a global account manager for a company on the'
+        ' Tier D - Overseas Post Accounts one list tier is excluded from migration
+        """
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            True,
+        )
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
         investment_flag = UserFeatureFlagGroupFactory(code='investment-notifications')
         advisor = AdviserFactory()
@@ -3169,9 +3281,17 @@ class TestPostUsersMigration:
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_in_post_team_in_one_list_core_member_not_global_account_manager_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
-        self,
+        self, monkeypatch
     ):
-
+        """
+        Test an advisor that belongs to a team that has a role of POST, is a member of'
+        ' the one list core team and is not a global account manager for a company on the'
+        ' Tier D - Overseas Post Accounts one list tier is included in the migration
+        """
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            True,
+        )
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
         investment_flag = UserFeatureFlagGroupFactory(code='investment-notifications')
         advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
@@ -3184,8 +3304,18 @@ class TestPostUsersMigration:
         self._assert_advisor_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_not_in_post_team_in_one_list_core_member_global_account_manager_wrong_tier_company_is_excluded_from_migration(  # noqa: E501
-        self,
+        self, monkeypatch
     ):
+
+        """
+        Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of'
+        ' the one list core team and is a global account manager but for a company not on the'
+        ' Tier D - Overseas Post Accounts one list tier is excluded from the migration
+        """
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            True,
+        )
 
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
         investment_flag = UserFeatureFlagGroupFactory(code='investment-notifications')
@@ -3203,9 +3333,17 @@ class TestPostUsersMigration:
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_not_in_post_team_not_in_one_list_core_member_global_account_manager_correct_tier_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
-        self,
+        self, monkeypatch
     ):
-
+        """
+        Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member'
+        ' of the one list core team and is a global account manager for a company on the'
+        ' Tier D - Overseas Post Accounts one list tier is included from the migration
+        """
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            True,
+        )
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
         investment_flag = UserFeatureFlagGroupFactory(code='investment-notifications')
 

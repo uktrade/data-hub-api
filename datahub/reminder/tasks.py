@@ -1122,29 +1122,38 @@ class ITAUsersMigration:
         )
 
         for advisor in advisors:
-            logger.info(
-                f'Migrating ITA user {advisor.email} to receive reminders.',
-            )
-            advisor.feature_groups.add(export_notifications_feature_group)
+            if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
+                logger.info(
+                    'Automatic migration of users is disabled, no changes will be made to the ita'
+                    f' user {advisor.email} subscriptions or feature flags',
+                )
+            else:
+                logger.info(
+                    f'Migrating ITA user {advisor.email} to receive reminders.',
+                )
+                advisor.feature_groups.add(export_notifications_feature_group)
 
-            if not NewExportInteractionSubscription.objects.filter(adviser=advisor).exists():
-                logger.info(
-                    f'Adding ITA user {advisor.email} to NewExportInteractionSubscription.',
-                )
-                NewExportInteractionSubscription(
-                    adviser=advisor,
-                    reminder_days=[90],
-                    email_reminders_enabled=True,
-                ).save()
-            if not NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists():
-                logger.info(
-                    f'Adding ITA user {advisor.email} to NoRecentExportInteractionSubscription.',
-                )
-                NoRecentExportInteractionSubscription(
-                    adviser=advisor,
-                    reminder_days=[90],
-                    email_reminders_enabled=True,
-                ).save()
+                if not NewExportInteractionSubscription.objects.filter(adviser=advisor).exists():
+                    logger.info(
+                        f'Adding ITA user {advisor.email} to NewExportInteractionSubscription.',
+                    )
+                    NewExportInteractionSubscription(
+                        adviser=advisor,
+                        reminder_days=[90],
+                        email_reminders_enabled=True,
+                    ).save()
+                if not NoRecentExportInteractionSubscription.objects.filter(
+                    adviser=advisor
+                ).exists():
+                    logger.info(
+                        f'Adding ITA user {advisor.email} to '
+                        'NoRecentExportInteractionSubscription',
+                    )
+                    NoRecentExportInteractionSubscription(
+                        adviser=advisor,
+                        reminder_days=[90],
+                        email_reminders_enabled=True,
+                    ).save()
 
         logger.info(
             f'Migrated {advisors.count()} ita users',
@@ -1187,7 +1196,7 @@ class PostUsersMigration:
                 Q(one_list_core_team_memberships__isnull=False)
                 & Q(dit_team__role__id=TeamRoleID.post.value)
             )
-            | (Q(pk__in=one_list_account_owner_ids),),
+            | Q(pk__in=one_list_account_owner_ids),
         ).distinct()
 
         export_feature_group = UserFeatureFlagGroup.objects.get(code='export-notifications')
@@ -1196,54 +1205,66 @@ class PostUsersMigration:
         )
 
         for adviser in advisors:
-            logger.info(
-                f'Migrating Post user {adviser.email} to receive reminders.',
-            )
-            adviser.feature_groups.add(investment_feature_group)
-            adviser.feature_groups.add(export_feature_group)
-
-            if not NewExportInteractionSubscription.objects.filter(adviser=adviser).exists():
+            if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
                 logger.info(
-                    f'Adding Post user {adviser.email} to NewExportInteractionSubscription.',
+                    'Automatic migration of users is disabled, no changes will be made to the'
+                    f' post user {adviser.email} subscriptions or feature flags',
                 )
-                NewExportInteractionSubscription(
-                    adviser=adviser,
-                    reminder_days=[90],
-                    email_reminders_enabled=True,
-                ).save()
-            if not NoRecentExportInteractionSubscription.objects.filter(adviser=adviser).exists():
+            else:
                 logger.info(
-                    f'Adding Post user {adviser.email} to NoRecentExportInteractionSubscription',
+                    f'Migrating Post user {adviser.email} to receive reminders.',
                 )
-                NoRecentExportInteractionSubscription(
-                    adviser=adviser,
-                    reminder_days=[90],
-                    email_reminders_enabled=True,
-                ).save()
+                adviser.feature_groups.add(investment_feature_group)
+                adviser.feature_groups.add(export_feature_group)
 
-            if not NoRecentInvestmentInteractionSubscription.objects.filter(
-                adviser=adviser,
-            ).exists():
-                logger.info(
-                    (
+                if not NewExportInteractionSubscription.objects.filter(adviser=adviser).exists():
+                    logger.info(
+                        f'Adding Post user {adviser.email} to NewExportInteractionSubscription.',
+                    )
+                    NewExportInteractionSubscription(
+                        adviser=adviser,
+                        reminder_days=[90],
+                        email_reminders_enabled=True,
+                    ).save()
+                if not NoRecentExportInteractionSubscription.objects.filter(
+                    adviser=adviser
+                ).exists():
+                    logger.info(
                         f'Adding Post user {adviser.email} to'
-                        'NoRecentInvestmentInteractionSubscription'
-                    ),
-                )
-                NoRecentInvestmentInteractionSubscription(
+                        ' NoRecentExportInteractionSubscription',
+                    )
+                    NoRecentExportInteractionSubscription(
+                        adviser=adviser,
+                        reminder_days=[90],
+                        email_reminders_enabled=True,
+                    ).save()
+
+                if not NoRecentInvestmentInteractionSubscription.objects.filter(
                     adviser=adviser,
-                    reminder_days=[60],
-                    email_reminders_enabled=True,
-                ).save()
-            if not UpcomingEstimatedLandDateSubscription.objects.filter(adviser=adviser).exists():
-                logger.info(
-                    f'Adding Post user {adviser.email} to UpcomingEstimatedLandDateSubscription',
-                )
-                UpcomingEstimatedLandDateSubscription(
-                    adviser=adviser,
-                    reminder_days=[30, 60],
-                    email_reminders_enabled=True,
-                ).save()
+                ).exists():
+                    logger.info(
+                        (
+                            f'Adding Post user {adviser.email} to'
+                            'NoRecentInvestmentInteractionSubscription'
+                        ),
+                    )
+                    NoRecentInvestmentInteractionSubscription(
+                        adviser=adviser,
+                        reminder_days=[60],
+                        email_reminders_enabled=True,
+                    ).save()
+                if not UpcomingEstimatedLandDateSubscription.objects.filter(
+                    adviser=adviser
+                ).exists():
+                    logger.info(
+                        f'Adding Post user {adviser.email} to'
+                        ' UpcomingEstimatedLandDateSubscription',
+                    )
+                    UpcomingEstimatedLandDateSubscription(
+                        adviser=adviser,
+                        reminder_days=[30, 60],
+                        email_reminders_enabled=True,
+                    ).save()
 
         logger.info(
             f'Migrated {advisors.count()} post users',
