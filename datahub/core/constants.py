@@ -466,3 +466,15 @@ class ExportSubSegment(Enum):
         'Promote: change the game',
     )
     challenge = Constant('challenge', 'Challenge')
+
+
+class ExportBarrierType(Enum):
+    """Interaction export barrier type constant."""
+
+    finance = Constant(
+        'Finance', '758c4132-a07b-4e4d-a43d-f2f630113023',
+    )
+
+    something_else = Constant(
+        'Something else', '8ef83315-2b0f-4d5e-98da-a16f8b2217a6',
+    )

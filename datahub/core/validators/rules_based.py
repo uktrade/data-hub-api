@@ -155,6 +155,23 @@ class InRule(OperatorRule):
         super().__init__(field, partial(contains, value))
 
 
+class IsSubsetByIdRule(OperatorRule):
+    """
+    Contains operator-based rule for a field. Checks that id value is in field values.
+
+    It should be used to validate ManyToMany fields by their Id.
+    """
+
+    def __init__(self, field: str, value: Iterable[Any]):
+        """
+        Initialises the rule.
+
+        :param field: The name of the field the rule applies to.
+        :param value: a list of Values to test equality with.
+        """
+        super().__init__(field, partial(_is_subset_by_id, value))
+
+
 class ConditionalRule:
     """A rule that is only checked when a condition is met."""
 
@@ -358,3 +375,9 @@ class RulesBasedValidator:
     def __repr__(self):
         """Returns the Python representation of this object."""
         return f'{self.__class__.__name__}(*{self._rules!r})'
+
+
+def _is_subset_by_id(a, b):
+    if not a or not b:
+        return False
+    return set(a).issubset(set([obj.id for obj in b]))
