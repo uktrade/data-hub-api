@@ -1,5 +1,5 @@
 # Django and django related
-django==3.2.16
+django==3.2.17
 djangorestframework==3.14.0
 django-axes==5.40.1
 django-environ==0.9.0
@@ -20,7 +20,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.5
 psycogreen==1.0.2
 
-boto3==1.26.59
+boto3==1.26.64
 
 notifications-python-client==6.4.1
 
@@ -42,7 +42,7 @@ opensearch-py==2.1.1
 opensearch-dsl==2.0.1
 
 # ES APM
-elastic-apm==6.13.2
+elastic-apm==6.14.0
 
 # Celery
 git+https://github.com/uktrade/celery@v5.0.5p2#egg=celery[redis]
