@@ -2543,10 +2543,11 @@ class TestGenerateNoRecentInteractionReminderTask:
             project=project,
             adviser=adviser,
         )
+        print(caplog.messages)
         assert any(
             'Task update_no_recent_interaction_reminder_email_status completed'
             f'email_notification_id to {notification_id} and '
-            f'reminder_ids set to [UUID({reminder.id})]' in message
+            f'reminder_ids set to [UUID(\'{reminder.id}\')]' in message
             for message in caplog.messages
         )
         assert reminder.email_notification_id == notification_id
@@ -2858,6 +2859,7 @@ class TestUpdateEmailDeliveryStatusTask:
     )
     def test_lock_for_new_export_interaction_status(
         self,
+        new_export_interaction_email_status_feature_flag,
         mock_reminder_tasks_notify_gateway,
         caplog,
         monkeypatch,
@@ -2895,7 +2897,7 @@ class TestUpdateEmailDeliveryStatusTask:
             if lock_acquired
             else [
                 'Email status checks for new export interaction are already being processed'
-                'by another worker.',
+                ' by another worker.',
             ]
         )
         assert caplog.messages == expected_messages
@@ -2907,6 +2909,7 @@ class TestUpdateEmailDeliveryStatusTask:
 
     def test_updates_email_delivery_status_for_new_export_interaction(
         self,
+        new_export_interaction_email_status_feature_flag,
         mock_reminder_tasks_notify_gateway,
         adviser,
     ):
