@@ -8,7 +8,7 @@ from django.core.management.base import CommandError
 @pytest.fixture
 def mock_get_company_updates(monkeypatch):
     """
-    Test fixture to mock get_company_updates celery task.
+    Test fixture to mock get_company_updates scheduler task.
     """
     mocked_get_company_updates = mock.Mock()
     monkeypatch.setattr(
@@ -34,7 +34,7 @@ def test_no_argument_raises_command_error(mock_get_company_updates):
 def test_update_all_fields(mock_get_company_updates):
     """
     Test update_companies_from_dnb_service command with no options calls through to
-    get_company_updates celery task successfully.
+    get_company_updates scheduled task successfully.
     """
     datetime = '2019-01-01T00:00:00'
 
@@ -52,7 +52,7 @@ def test_update_all_fields(mock_get_company_updates):
 def test_update_partial_fields(mock_get_company_updates):
     """
     Test update_companies_from_dnb_service command with a --fields option calls through to
-    get_company_updates celery task successfully.
+    get_company_updates rq scheduler task successfully.
     """
     datetime = '2019-01-01T00:00:00'
     fields = ['name']
