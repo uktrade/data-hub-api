@@ -2543,7 +2543,6 @@ class TestGenerateNoRecentInteractionReminderTask:
             project=project,
             adviser=adviser,
         )
-        print(caplog.messages)
         assert any(
             'Task update_no_recent_interaction_reminder_email_status completed'
             f'email_notification_id to {notification_id} and '
