@@ -1143,7 +1143,7 @@ class ITAUsersMigration:
                         email_reminders_enabled=True,
                     ).save()
                 if not NoRecentExportInteractionSubscription.objects.filter(
-                    adviser=advisor
+                    adviser=advisor,
                 ).exists():
                     logger.info(
                         f'Adding ITA user {advisor.email} to '
@@ -1227,7 +1227,7 @@ class PostUsersMigration:
                         email_reminders_enabled=True,
                     ).save()
                 if not NoRecentExportInteractionSubscription.objects.filter(
-                    adviser=adviser
+                    adviser=adviser,
                 ).exists():
                     logger.info(
                         f'Adding Post user {adviser.email} to'
@@ -1254,7 +1254,7 @@ class PostUsersMigration:
                         email_reminders_enabled=True,
                     ).save()
                 if not UpcomingEstimatedLandDateSubscription.objects.filter(
-                    adviser=adviser
+                    adviser=adviser,
                 ).exists():
                     logger.info(
                         f'Adding Post user {adviser.email} to'

@@ -2995,7 +2995,6 @@ class TestITAUsersMigration:
         """
         Test that the task runs but no users are migrated when the setting is disabled
         """
-
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
             False,
@@ -3018,7 +3017,8 @@ class TestITAUsersMigration:
         assert caplog.messages == expected_messages
 
     def test_advisor_account_owner_of_company_in_wrong_tier_is_excluded_from_migration(
-        self, monkeypatch
+        self,
+        monkeypatch,
     ):
         """
         Test when an advisor belongs to a company that is not in the Tier D -Internation Trade
@@ -3042,7 +3042,10 @@ class TestITAUsersMigration:
             NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         )
 
-    def test_advisor_with_feature_flag_already_is_excluded_from_migration(self, monkeypatch):
+    def test_advisor_with_feature_flag_already_is_excluded_from_migration(
+        self,
+        monkeypatch,
+    ):
         """
         Test when an advisor already has the export-notifications feature flag they are excluded
         from the migration
@@ -3067,7 +3070,8 @@ class TestITAUsersMigration:
         )
 
     def test_advisor_with_subscriptions_already_get_the_feature_flag_but_do_not_get_another_subscription(  # noqa: E501
-        self, monkeypatch
+        self,
+        monkeypatch,
     ):
         """
         Test when an advisor already has the export subscriptions but not the feature flag they
@@ -3101,7 +3105,10 @@ class TestITAUsersMigration:
         assert NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).count() == 1
         assert Advisor.objects.filter(feature_groups=export_flag).exists() is True
 
-    def test_new_advisor_added_to_subscription_and_assigned_feature_flag(self, monkeypatch):
+    def test_new_advisor_added_to_subscription_and_assigned_feature_flag(
+        self,
+        monkeypatch,
+    ):
         """
         Test when an advisor is the account owner for a company in the Tier D -Internation Trade
         Advisors tier and do not have the export-notifications feature flag or export
@@ -3207,7 +3214,11 @@ class TestPostUsersMigration:
         )
         assert caplog.messages == expected_messages
 
-    def test_no_migrations_run_when_setting_is_disabled(self, caplog, monkeypatch):
+    def test_no_migrations_run_when_setting_is_disabled(
+        self,
+        caplog,
+        monkeypatch,
+    ):
         """
         Test that the task runs but no users are migrated when the setting is disabled
         """
@@ -3236,7 +3247,8 @@ class TestPostUsersMigration:
         assert caplog.messages == expected_messages
 
     def test_advisor_in_post_team_not_one_list_core_member_not_global_account_manager_is_excluded_from_migration(  # noqa: E501
-        self, monkeypatch
+        self,
+        monkeypatch,
     ):
         """
         Test an advisor that belongs to a team that has role of POST, is not a member of the one
@@ -3257,7 +3269,8 @@ class TestPostUsersMigration:
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_not_in_post_team_in_one_list_core_member_not_global_account_manager_is_excluded_from_migration(  # noqa: E501
-        self, monkeypatch
+        self,
+        monkeypatch,
     ):
         """
         Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of'
@@ -3281,7 +3294,8 @@ class TestPostUsersMigration:
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_in_post_team_in_one_list_core_member_not_global_account_manager_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
-        self, monkeypatch
+        self,
+        monkeypatch,
     ):
         """
         Test an advisor that belongs to a team that has a role of POST, is a member of'
@@ -3304,7 +3318,8 @@ class TestPostUsersMigration:
         self._assert_advisor_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_not_in_post_team_in_one_list_core_member_global_account_manager_wrong_tier_company_is_excluded_from_migration(  # noqa: E501
-        self, monkeypatch
+        self,
+        monkeypatch,
     ):
 
         """
@@ -3333,7 +3348,8 @@ class TestPostUsersMigration:
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
     def test_advisor_not_in_post_team_not_in_one_list_core_member_global_account_manager_correct_tier_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
-        self, monkeypatch
+        self,
+        monkeypatch,
     ):
         """
         Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member'
