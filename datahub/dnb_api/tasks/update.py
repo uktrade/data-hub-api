@@ -199,7 +199,7 @@ def update_company_from_dnb_data(dnb_company_data, fields_to_update=None, update
         raise
 
     if not update_descriptor:
-        update_descriptor = 'celery:company_update'
+        update_descriptor = 'rq:company_update'
 
     update_company_from_dnb(
         dh_company,
