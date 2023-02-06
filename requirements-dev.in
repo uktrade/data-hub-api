@@ -27,6 +27,6 @@ flake8-quotes==3.3.2
 flake8-string-format==0.3.0
 pep8-naming==0.13.3
 pydocstyle==6.3.0
-pylint==2.15.10
+pylint==2.16.1
 pylint-django==2.5.3
 pylint-pytest==1.1.2
