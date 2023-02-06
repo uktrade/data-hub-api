@@ -13,7 +13,7 @@ requests-mock==1.10.0
 pip-tools==6.12.1
 piprot==0.9.11
 watchdog[watchmedo]==2.2.1
-pre-commit==3.0.2
+pre-commit==3.0.4
 
 # Code static analysis
 flake8==6.0.0
