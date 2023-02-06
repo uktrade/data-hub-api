@@ -1075,15 +1075,15 @@ def _get_managed_companies(adviser):
                 Q(one_list_account_owner=adviser)
                 | Q(
                     pk__in=OneListCoreTeamMember.objects.filter(adviser=adviser).values(
-                        'company__id'
-                    )
+                        'company__id',
+                    ),
                 )
             )
             & (
                 Q(one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value)
                 | Q(one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value)
             )
-        )
+        ),
     )
 
 
@@ -1101,7 +1101,7 @@ class ITAUsersMigration:
                 return
 
         export_notifications_feature_group = UserFeatureFlagGroup.objects.get(
-            code='export-notifications'
+            code='export-notifications',
         )
         # Get all the advisor ids that are account owner of a tier d one list company
         one_list_account_owner_ids = (
@@ -1118,7 +1118,7 @@ class ITAUsersMigration:
             )
         )
         advisors = Advisor.objects.filter(pk__in=one_list_account_owner_ids).exclude(
-            feature_groups=export_notifications_feature_group
+            feature_groups=export_notifications_feature_group,
         )
 
         for advisor in advisors:
@@ -1138,7 +1138,7 @@ class ITAUsersMigration:
                 ).save()
             if not NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists():
                 logger.info(
-                    f'Adding ITA user {advisor.email} to NoRecentExportInteractionSubscription.'
+                    f'Adding ITA user {advisor.email} to NoRecentExportInteractionSubscription.',
                 )
                 NoRecentExportInteractionSubscription(
                     adviser=advisor,
@@ -1160,7 +1160,7 @@ class PostUsersMigration:
         ) as acquired:
             if not acquired:
                 logger.info(
-                    'Post users advisor list is already being processed by another worker.'
+                    'Post users advisor list is already being processed by another worker.',
                 )
                 return
 
@@ -1187,12 +1187,12 @@ class PostUsersMigration:
                 Q(one_list_core_team_memberships__isnull=False)
                 & Q(dit_team__role__id=TeamRoleID.post.value)
             )
-            | (Q(pk__in=one_list_account_owner_ids))
+            | (Q(pk__in=one_list_account_owner_ids),),
         ).distinct()
 
         export_feature_group = UserFeatureFlagGroup.objects.get(code='export-notifications')
         investment_feature_group = UserFeatureFlagGroup.objects.get(
-            code='investment-notifications'
+            code='investment-notifications',
         )
 
         for adviser in advisors:
@@ -1213,7 +1213,7 @@ class PostUsersMigration:
                 ).save()
             if not NoRecentExportInteractionSubscription.objects.filter(adviser=adviser).exists():
                 logger.info(
-                    f'Adding Post user {adviser.email} to NoRecentExportInteractionSubscription'
+                    f'Adding Post user {adviser.email} to NoRecentExportInteractionSubscription',
                 )
                 NoRecentExportInteractionSubscription(
                     adviser=adviser,
@@ -1222,13 +1222,13 @@ class PostUsersMigration:
                 ).save()
 
             if not NoRecentInvestmentInteractionSubscription.objects.filter(
-                adviser=adviser
+                adviser=adviser,
             ).exists():
                 logger.info(
                     (
                         f'Adding Post user {adviser.email} to'
                         'NoRecentInvestmentInteractionSubscription'
-                    )
+                    ),
                 )
                 NoRecentInvestmentInteractionSubscription(
                     adviser=adviser,
@@ -1237,7 +1237,7 @@ class PostUsersMigration:
                 ).save()
             if not UpcomingEstimatedLandDateSubscription.objects.filter(adviser=adviser).exists():
                 logger.info(
-                    f'Adding Post user {adviser.email} to UpcomingEstimatedLandDateSubscription'
+                    f'Adding Post user {adviser.email} to UpcomingEstimatedLandDateSubscription',
                 )
                 UpcomingEstimatedLandDateSubscription(
                     adviser=adviser,
