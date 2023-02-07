@@ -1192,7 +1192,7 @@ class UserMigrationTasks:
         # the one list core team member table)
         # OR who are the global account manager for a company on the
         # Tier D - Overseas Post Accounts one list tier.
-        # AND Exclude any who have both export-notifications and investment-notifications flags
+        # AND Exclude any who have both export-notifications and investment-notifications
         # feature flags
         advisors = (
             Advisor.objects.filter(
