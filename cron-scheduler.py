@@ -36,6 +36,7 @@ from datahub.investment.project.tasks import (
     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
 )
 from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
+from datahub.reminder.migration_tasks import migrate_ita_users, migrate_post_users
 from datahub.reminder.tasks import (
     generate_new_export_interaction_reminders,
     generate_no_recent_export_interaction_reminders,
@@ -46,7 +47,6 @@ from datahub.reminder.tasks import (
     update_notify_email_delivery_status_for_no_recent_export_interaction,
     update_notify_email_delivery_status_for_no_recent_interaction,
 )
-from datahub.reminder.migration_tasks import migrate_ita_users, migrate_post_users
 from datahub.search.tasks import sync_all_models
 
 env = environ.Env()

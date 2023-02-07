@@ -16,13 +16,13 @@ from datahub.feature_flag.models import UserFeatureFlagGroup
 from datahub.feature_flag.test.factories import (
     UserFeatureFlagGroupFactory,
 )
+from datahub.reminder.migration_tasks import migrate_ita_users, migrate_post_users
 from datahub.reminder.models import (
     NewExportInteractionSubscription,
     NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionSubscription,
     UpcomingEstimatedLandDateSubscription,
 )
-from datahub.reminder.migration_tasks import migrate_ita_users, migrate_post_users
 from datahub.reminder.test.factories import (
     NewExportInteractionSubscriptionFactory,
     NoRecentExportInteractionSubscriptionFactory,
