@@ -1,4 +1,5 @@
-from celery.utils.log import get_task_logger
+import logging
+
 from django.db import transaction
 from rest_framework import serializers
 
@@ -21,7 +22,7 @@ from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import InteractionSerializer
 
 
-logger = get_task_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 # Invalid email error codes that we can notify users about - we should not

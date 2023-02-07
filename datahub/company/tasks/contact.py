@@ -1,5 +1,6 @@
+import logging
+
 import requests
-from celery.utils.log import get_task_logger
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
 from django_pglocks import advisory_lock
@@ -13,7 +14,7 @@ from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.core.realtime_messaging import send_realtime_message
 
-logger = get_task_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def _automatic_contact_archive(limit=1000, simulate=False):
