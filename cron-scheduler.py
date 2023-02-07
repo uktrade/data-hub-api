@@ -45,8 +45,8 @@ from datahub.reminder.tasks import (
     update_notify_email_delivery_status_for_new_export_interaction,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
     update_notify_email_delivery_status_for_no_recent_interaction,
-    UserMigrationTasks,
 )
+from datahub.reminder.migration_tasks import migrate_ita_users, migrate_post_users
 from datahub.search.tasks import sync_all_models
 
 env = environ.Env()
@@ -241,10 +241,9 @@ def schedule_new_export_interaction_jobs():
 
 
 def schedule_user_reminder_migration():
-    migration = UserMigrationTasks()
 
     job_scheduler(
-        function=migration.migrate_ita_users,
+        function=migrate_ita_users,
         max_retries=5,
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,
@@ -254,7 +253,7 @@ def schedule_user_reminder_migration():
     )
 
     job_scheduler(
-        function=migration.migrate_post_users,
+        function=migrate_post_users,
         max_retries=5,
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,
