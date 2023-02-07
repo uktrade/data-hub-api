@@ -36,7 +36,7 @@ def notify_meeting_ingest_failure(adviser, errors, recipients):
     details and intended recipients.
     """
     domain_label = get_domain_label(adviser.get_email_domain())
-    statsd.incr(f'celery.calendar-invite-ingest.failure.{domain_label}')
+    statsd.incr(f'rq.calendar-invite-ingest.failure.{domain_label}')
     if not is_feature_flag_active(INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME):
         logger.info(
             f'Feature flag "{INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME}" is not active, '
@@ -62,7 +62,7 @@ def notify_meeting_ingest_success(adviser, interaction, recipients):
     to the interaction and intended recipients.
     """
     domain_label = get_domain_label(adviser.get_email_domain())
-    statsd.incr(f'celery.calendar-invite-ingest.success.{domain_label}')
+    statsd.incr(f'rq.calendar-invite-ingest.success.{domain_label}')
     if not is_feature_flag_active(INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME):
         logger.info(
             f'Feature flag "{INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME}" is not active, '

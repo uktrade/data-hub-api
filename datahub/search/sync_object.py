@@ -30,7 +30,7 @@ def sync_object(search_app, pk):
 
 def sync_object_async(search_app, pk):
     """
-    Syncs a single object to OpenSearch asynchronously (by scheduling a Celery task).
+    Syncs a single object to OpenSearch asynchronously (by scheduling a RQ task).
 
     This function is normally used by signal receivers to copy new or updated objects to
     OpenSearch.
