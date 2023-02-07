@@ -1,6 +1,7 @@
+import logging
+
 from enum import Enum
 
-from celery.utils.log import get_task_logger
 from django.conf import settings
 
 from datahub.core import statsd
@@ -9,7 +10,7 @@ from datahub.interaction import INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME
 from datahub.notification.notify import notify_adviser_by_email
 
 
-logger = get_task_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class Template(Enum):
