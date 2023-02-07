@@ -51,7 +51,7 @@ Note: Cannot be used if time_delta is defined.
 Note: Cannot be used if cron is defined.
 
 ## Writing tests
-When running tests jobs are scheduled but not executed (as the workers do not automatically run during tests). If you want to run a test that automatically runs the scheduled jobs include the fixture `apply_async`.
+When running tests jobs are scheduled but not executed (as the workers do not automatically run during tests). If you want to run a test that automatically runs the scheduled jobs include the fixture `async_queue`.
 
     def test_stores_notification_id(
         self,
@@ -59,7 +59,7 @@ When running tests jobs are scheduled but not executed (as the workers do not au
     ):
          # Code under test that calls job_scheduler will be executed. 
 
-Additional examples in datahub/reminder/test/test_task.py/TestGeneratenoRecentInteractionReminderTask/test_stores_notification_id or various occurences of apply_async in datahub/core/test/.queues/test_scheduler.py.
+Additional examples in datahub/reminder/test/test_task.py/TestGeneratenoRecentInteractionReminderTask/test_stores_notification_id or various occurences of async_queue in datahub/core/test/.queues/test_scheduler.py.
 
 ## Monitoring RQ locally
 
