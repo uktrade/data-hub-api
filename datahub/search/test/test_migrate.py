@@ -125,7 +125,11 @@ def test_migrate_app_with_app_needing_migration(monkeypatch, mock_opensearch_cli
     ]
 
 
-def test_migrate_app_with_app_not_needing_migration(monkeypatch, mock_opensearch_client):
+def test_migrate_app_with_app_not_needing_migration(
+    async_queue,
+    monkeypatch,
+    mock_opensearch_client,
+):
     """Test that migrate_app() migrates an app needing migration."""
     migrate_model_task_mock = Mock()
     monkeypatch.setattr('datahub.search.migrate.complete_model_migration', migrate_model_task_mock)
@@ -144,7 +148,7 @@ def test_migrate_app_with_app_not_needing_migration(monkeypatch, mock_opensearch
 
     mock_app.search_model.create_index.assert_not_called()
     mock_client.indices.update_aliases.assert_not_called()
-    migrate_model_task_mock.apply_async.assert_not_called()
+    migrate_model_task_mock.assert_not_called()
 
 
 def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_opensearch_client):
@@ -182,7 +186,7 @@ def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_opensearch
     ]
 
 
-def test_migrate_app_with_app_in_invalid_state(monkeypatch, mock_opensearch_client):
+def test_migrate_app_with_app_in_invalid_state(async_queue, monkeypatch, mock_opensearch_client):
     """
     Test that migrate_app() raises an exception for apps in an invalid state.
 
@@ -206,4 +210,4 @@ def test_migrate_app_with_app_in_invalid_state(monkeypatch, mock_opensearch_clie
     with pytest.raises(DataHubError):
         migrate_app(mock_app)
 
-    migrate_model_task_mock.apply_async.assert_not_called()
+    migrate_model_task_mock.assert_not_called()
