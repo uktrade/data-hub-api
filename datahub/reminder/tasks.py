@@ -1169,6 +1169,11 @@ class UserMigrationTasks:
                 )
                 return
 
+        export_feature_group = UserFeatureFlagGroup.objects.get(code='export-notifications')
+        investment_feature_group = UserFeatureFlagGroup.objects.get(
+            code='investment-notifications',
+        )
+
         one_list_account_owner_ids = (
             Company.objects.filter(
                 archived=False,
@@ -1186,18 +1191,19 @@ class UserMigrationTasks:
         # Get a list of all advisors (who belong to a team that has a team role of POST AND is in
         # the one list core team member table)
         # OR who are the global account manager for a company on the
-        # Tier D - Overseas Post Accounts one list tier
-        advisors = Advisor.objects.filter(
-            (
-                Q(one_list_core_team_memberships__isnull=False)
-                & Q(dit_team__role__id=TeamRoleID.post.value)
+        # Tier D - Overseas Post Accounts one list tier.
+        # AND Exclude any who have both export-notifications and investment-notifications flags
+        # feature flags
+        advisors = (
+            Advisor.objects.filter(
+                (
+                    Q(one_list_core_team_memberships__isnull=False)
+                    & Q(dit_team__role__id=TeamRoleID.post.value)
+                )
+                | Q(pk__in=one_list_account_owner_ids),
             )
-            | Q(pk__in=one_list_account_owner_ids),
-        ).distinct()
-
-        export_feature_group = UserFeatureFlagGroup.objects.get(code='export-notifications')
-        investment_feature_group = UserFeatureFlagGroup.objects.get(
-            code='investment-notifications',
+            .exclude(feature_groups__code__in=['export-notifications', 'investment-notifications'])
+            .distinct()
         )
 
         for adviser in advisors:

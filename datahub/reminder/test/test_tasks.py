@@ -21,6 +21,7 @@ from datahub.company.test.factories import (
 )
 from datahub.core.constants import InvestmentProjectStage
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
+from datahub.feature_flag.models import UserFeatureFlagGroup
 from datahub.feature_flag.test.factories import (
     FeatureFlagFactory,
     UserFeatureFlagFactory,
@@ -3153,7 +3154,20 @@ class TestITAUsersMigration:
 @pytest.mark.django_db
 @freeze_time('2022-07-01T10:00:00')
 class TestPostUsersMigration:
-    def _assert_advisor_not_migrated(self, export_flag, investment_flag, advisor):
+    def _assert_advisor_not_migrated(
+        self,
+        export_flag,
+        investment_flag,
+        advisor,
+    ):
+        """
+        Check the advisor does not have any subscriptions or contain any of the feature flags
+        """
+        self._assert_advisor_not_given_subscriptions(advisor)
+        assert Advisor.objects.filter(feature_groups=export_flag).exists() is False
+        assert Advisor.objects.filter(feature_groups=investment_flag).exists() is False
+
+    def _assert_advisor_not_given_subscriptions(self, advisor):
         """
         Check the advisor does not have any subscriptions or contain any of the feature flags
         """
@@ -3168,10 +3182,13 @@ class TestPostUsersMigration:
         assert (
             UpcomingEstimatedLandDateSubscription.objects.filter(adviser=advisor).exists() is False
         )
-        assert Advisor.objects.filter(feature_groups=export_flag).exists() is False
-        assert Advisor.objects.filter(feature_groups=investment_flag).exists() is False
 
-    def _assert_advisor_migrated(self, export_flag, investment_flag, advisor):
+    def _assert_advisor_migrated(
+        self,
+        export_flag,
+        investment_flag,
+        advisor,
+    ):
         """
         Check the advisor has all the subscriptions and all feature flags
         """
@@ -3312,7 +3329,7 @@ class TestPostUsersMigration:
 
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
-    def test_advisor_in_post_team_in_one_list_core_member_not_global_account_manager_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
+    def test_advisor_in_post_team_in_one_list_core_member_not_global_account_manager_has_both_feature_flags_is_excluded_from_migration(  # noqa: E501
         self,
         monkeypatch,
         user_migration_tasks,
@@ -3329,13 +3346,45 @@ class TestPostUsersMigration:
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
         investment_flag = UserFeatureFlagGroupFactory(code='investment-notifications')
         advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
+        advisor.feature_groups.set([export_flag, investment_flag])
         OneListCoreTeamMemberFactory(
             adviser=advisor,
         )
 
         user_migration_tasks.migrate_post_users()
 
-        self._assert_advisor_migrated(export_flag, investment_flag, advisor)
+        self._assert_advisor_not_given_subscriptions(advisor)
+
+    @pytest.mark.parametrize(
+        'feature_flag',
+        ('export-notifications', 'investment-notifications'),
+    )
+    def test_advisor_in_post_team_in_one_list_core_member_not_global_account_manager_only_one_feature_flag_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
+        self,
+        monkeypatch,
+        user_migration_tasks,
+        feature_flag,
+    ):
+        """
+        Test an advisor that belongs to a team that has a role of POST, is a member of'
+        ' the one list core team and is not a global account manager for a company on the'
+        ' Tier D - Overseas Post Accounts one list tier is included in the migration
+        """
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            True,
+        )
+        UserFeatureFlagGroupFactory(code='export-notifications')
+        UserFeatureFlagGroupFactory(code='investment-notifications')
+        advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
+        advisor.feature_groups.set(UserFeatureFlagGroup.objects.filter(code=feature_flag))
+        OneListCoreTeamMemberFactory(
+            adviser=advisor,
+        )
+
+        user_migration_tasks.migrate_post_users()
+
+        self._assert_advisor_not_given_subscriptions(advisor)
 
     def test_advisor_not_in_post_team_in_one_list_core_member_global_account_manager_wrong_tier_company_is_excluded_from_migration(  # noqa: E501
         self,
