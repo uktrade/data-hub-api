@@ -1,9 +1,10 @@
+import logging
+
 import re
 
-from celery.utils.log import get_task_logger
 from django.conf import settings
 
-logger = get_task_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 ALL_AUTH_METHODS = ('spf', 'dkim', 'dmarc', 'compauth')

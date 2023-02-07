@@ -1,4 +1,5 @@
-from celery.utils.log import get_task_logger
+import logging
+
 from dateutil.relativedelta import relativedelta
 from django.db.models import FilteredRelation, OuterRef, Q, Subquery
 from django.utils import timezone
@@ -14,7 +15,7 @@ from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 
-logger = get_task_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def _automatic_company_archive(limit, simulate):
