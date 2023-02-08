@@ -122,8 +122,8 @@ def migrate_post_users():
             | Q(pk__in=one_list_account_owner_ids),
         )
         .exclude(
-            Q(feature_groups__code="export-notifications")
-            & Q(feature_groups__code="investment-notifications")
+            Q(feature_groups__code='export-notifications')
+            & Q(feature_groups__code='investment-notifications'),
         )
         .distinct()
     )
