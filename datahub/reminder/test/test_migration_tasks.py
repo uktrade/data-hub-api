@@ -257,6 +257,12 @@ class TestPostUsersMigration:
         """
         Check the advisor has all the subscriptions and all feature flags
         """
+        self._assert_advisor_given_subscriptions(advisor)
+
+        assert Advisor.objects.filter(feature_groups=export_flag).exists() is True
+        assert Advisor.objects.filter(feature_groups=investment_flag).exists() is True
+
+    def _assert_advisor_given_subscriptions(self, advisor):
         assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() is True
         assert (
             NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() is True
@@ -270,9 +276,6 @@ class TestPostUsersMigration:
         assert (
             UpcomingEstimatedLandDateSubscription.objects.filter(adviser=advisor).exists() is True
         )
-
-        assert Advisor.objects.filter(feature_groups=export_flag).exists() is True
-        assert Advisor.objects.filter(feature_groups=investment_flag).exists() is True
 
     @pytest.mark.parametrize(
         'lock_acquired',
@@ -436,14 +439,15 @@ class TestPostUsersMigration:
         UserFeatureFlagGroupFactory(code='export-notifications')
         UserFeatureFlagGroupFactory(code='investment-notifications')
         advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
-        advisor.feature_groups.set(UserFeatureFlagGroup.objects.filter(code=feature_flag))
+        advisor.feature_groups.set([UserFeatureFlagGroup.objects.get(code=feature_flag)])
+
         OneListCoreTeamMemberFactory(
             adviser=advisor,
         )
 
         migrate_post_users()
 
-        self._assert_advisor_not_given_subscriptions(advisor)
+        self._assert_advisor_given_subscriptions(advisor)
 
     def test_advisor_not_in_post_team_in_one_list_core_member_global_account_manager_wrong_tier_company_is_excluded_from_migration(  # noqa: E501
         self,

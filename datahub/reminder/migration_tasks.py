@@ -107,7 +107,6 @@ def migrate_post_users():
             flat=True,
         )
     )
-
     # Get a list of all advisors (who belong to a team that has a team role of POST AND is in
     # the one list core team member table)
     # OR who are the global account manager for a company on the
@@ -122,7 +121,10 @@ def migrate_post_users():
             )
             | Q(pk__in=one_list_account_owner_ids),
         )
-        .exclude(feature_groups__code__in=['export-notifications', 'investment-notifications'])
+        .exclude(
+            Q(feature_groups__code="export-notifications")
+            & Q(feature_groups__code="investment-notifications")
+        )
         .distinct()
     )
 
