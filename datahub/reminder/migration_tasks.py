@@ -71,26 +71,7 @@ def migrate_ita_users():
             )
             advisor.feature_groups.add(export_notifications_feature_group)
 
-            if not NewExportInteractionSubscription.objects.filter(adviser=advisor).exists():
-                logger.info(
-                    f'Adding ITA user {advisor.email} to NewExportInteractionSubscription.',
-                )
-                NewExportInteractionSubscription(
-                    adviser=advisor,
-                    reminder_days=[90],
-                    email_reminders_enabled=True,
-                ).save()
-            if not NoRecentExportInteractionSubscription.objects.filter(
-                adviser=advisor,
-            ).exists():
-                logger.info(
-                    f'Adding ITA user {advisor.email} to ' 'NoRecentExportInteractionSubscription',
-                )
-                NoRecentExportInteractionSubscription(
-                    adviser=advisor,
-                    reminder_days=[90],
-                    email_reminders_enabled=True,
-                ).save()
+            _add_advisor_to_export_subscriptions(advisor)
 
     logger.info(
         f'Migrated {advisors.count()} ita users',
@@ -145,68 +126,75 @@ def migrate_post_users():
         .distinct()
     )
 
-    for adviser in advisors:
+    for advisor in advisors:
         if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
             logger.info(
                 'Automatic migration of users is disabled, no changes will be made to the'
-                f' post user {adviser.email} subscriptions or feature flags',
+                f' post user {advisor.email} subscriptions or feature flags',
             )
         else:
             logger.info(
-                f'Migrating Post user {adviser.email} to receive reminders.',
+                f'Migrating Post user {advisor.email} to receive reminders.',
             )
-            adviser.feature_groups.add(investment_feature_group)
-            adviser.feature_groups.add(export_feature_group)
+            advisor.feature_groups.add(investment_feature_group)
+            advisor.feature_groups.add(export_feature_group)
 
-            if not NewExportInteractionSubscription.objects.filter(adviser=adviser).exists():
-                logger.info(
-                    f'Adding Post user {adviser.email} to NewExportInteractionSubscription.',
-                )
-                NewExportInteractionSubscription(
-                    adviser=adviser,
-                    reminder_days=[90],
-                    email_reminders_enabled=True,
-                ).save()
-            if not NoRecentExportInteractionSubscription.objects.filter(
-                adviser=adviser,
-            ).exists():
-                logger.info(
-                    f'Adding Post user {adviser.email} to'
-                    ' NoRecentExportInteractionSubscription',
-                )
-                NoRecentExportInteractionSubscription(
-                    adviser=adviser,
-                    reminder_days=[90],
-                    email_reminders_enabled=True,
-                ).save()
+            _add_advisor_to_export_subscriptions(advisor)
 
-            if not NoRecentInvestmentInteractionSubscription.objects.filter(
-                adviser=adviser,
-            ).exists():
-                logger.info(
-                    (
-                        f'Adding Post user {adviser.email} to'
-                        'NoRecentInvestmentInteractionSubscription'
-                    ),
-                )
-                NoRecentInvestmentInteractionSubscription(
-                    adviser=adviser,
-                    reminder_days=[60],
-                    email_reminders_enabled=True,
-                ).save()
-            if not UpcomingEstimatedLandDateSubscription.objects.filter(
-                adviser=adviser,
-            ).exists():
-                logger.info(
-                    f'Adding Post user {adviser.email} to'
-                    ' UpcomingEstimatedLandDateSubscription',
-                )
-                UpcomingEstimatedLandDateSubscription(
-                    adviser=adviser,
-                    reminder_days=[30, 60],
-                    email_reminders_enabled=True,
-                ).save()
+            _add_advisor_to_investment_subscriptions(advisor)
 
     logger.info(
         f'Migrated {advisors.count()} post users',
     )
+
+
+def _add_advisor_to_investment_subscriptions(
+    advisor,
+):
+    if not NoRecentInvestmentInteractionSubscription.objects.filter(
+        adviser=advisor,
+    ).exists():
+        logger.info(
+            (f'Adding user {advisor.email} to NoRecentInvestmentInteractionSubscription'),
+        )
+        NoRecentInvestmentInteractionSubscription(
+            adviser=advisor,
+            reminder_days=[60],
+            email_reminders_enabled=True,
+        ).save()
+    if not UpcomingEstimatedLandDateSubscription.objects.filter(
+        adviser=advisor,
+    ).exists():
+        logger.info(
+            f'Adding  user {advisor.email} to UpcomingEstimatedLandDateSubscription',
+        )
+        UpcomingEstimatedLandDateSubscription(
+            adviser=advisor,
+            reminder_days=[30, 60],
+            email_reminders_enabled=True,
+        ).save()
+
+
+def _add_advisor_to_export_subscriptions(
+    advisor,
+):
+    if not NewExportInteractionSubscription.objects.filter(adviser=advisor).exists():
+        logger.info(
+            f'Adding user {advisor.email} to NewExportInteractionSubscription.',
+        )
+        NewExportInteractionSubscription(
+            adviser=advisor,
+            reminder_days=[90],
+            email_reminders_enabled=True,
+        ).save()
+    if not NoRecentExportInteractionSubscription.objects.filter(
+        adviser=advisor,
+    ).exists():
+        logger.info(
+            f'Adding user {advisor.email} to NoRecentExportInteractionSubscription',
+        )
+        NoRecentExportInteractionSubscription(
+            adviser=advisor,
+            reminder_days=[90],
+            email_reminders_enabled=True,
+        ).save()
