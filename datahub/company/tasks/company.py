@@ -49,8 +49,8 @@ def _automatic_company_archive(limit, simulate):
         company
         for company in candidate_companies_to_be_archived
         if not any(
-            not (descendant.archived or descendant in candidate_companies_to_be_archived)
-            for descendant in company.descendants
+            not (related_company.archived or related_company in candidate_companies_to_be_archived)
+            for related_company in company.related_companies
         )
     ][:limit]
 
