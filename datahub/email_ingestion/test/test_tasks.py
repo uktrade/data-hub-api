@@ -23,7 +23,7 @@ def interaction_email_ingestion_feature_flag():
 @pytest.mark.usefixtures('interaction_email_ingestion_feature_flag')
 class TestIngestEmails:
     """
-    Test ingest_emails celery task.
+    Test ingest_emails RQ task.
     """
 
     @override_settings(MAILBOXES=MAILBOXES_SETTING)
