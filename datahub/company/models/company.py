@@ -420,6 +420,15 @@ class Company(ArchivableModel, BaseModel):
             return False
         return self.duns_number == self.global_ultimate_duns_number
 
+    @property
+    def related_companies(self):
+        """
+        All companies that share the same global ultimate duns number
+        """
+        return Company.objects.filter(
+            global_ultimate_duns_number=self.global_ultimate_duns_number,
+        ).exclude(global_ultimate_duns_number='').exclude(global_ultimate_duns_number=None)
+
     def mark_as_transferred(self, to, reason, user):
         """
         Marks a company record as having been transferred to another company record.
