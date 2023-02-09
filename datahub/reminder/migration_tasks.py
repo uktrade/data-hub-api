@@ -15,6 +15,10 @@ from datahub.company.models import (
 from datahub.feature_flag.models import (
     UserFeatureFlagGroup,
 )
+from datahub.reminder import (
+    INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+    EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+)
 from datahub.reminder.models import (
     NewExportInteractionSubscription,
     NoRecentExportInteractionSubscription,
@@ -39,7 +43,7 @@ def migrate_ita_users():
             return
 
     export_notifications_feature_group = UserFeatureFlagGroup.objects.get(
-        code='export-notifications',
+        code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     )
     # Get all the advisor ids that are account owner of a tier d one list company
     one_list_account_owner_ids = (
@@ -89,9 +93,11 @@ def migrate_post_users():
             )
             return
 
-    export_feature_group = UserFeatureFlagGroup.objects.get(code='export-notifications')
+    export_feature_group = UserFeatureFlagGroup.objects.get(
+        code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME
+    )
     investment_feature_group = UserFeatureFlagGroup.objects.get(
-        code='investment-notifications',
+        code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     )
 
     one_list_account_owner_ids = (
@@ -122,8 +128,8 @@ def migrate_post_users():
             | Q(pk__in=one_list_account_owner_ids),
         )
         .exclude(
-            Q(feature_groups__code='export-notifications')
-            & Q(feature_groups__code='investment-notifications'),
+            Q(feature_groups__code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME)
+            & Q(feature_groups__code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME),
         )
         .distinct()
     )
@@ -168,7 +174,7 @@ def _add_advisor_to_investment_subscriptions(
         adviser=advisor,
     ).exists():
         logger.info(
-            f'Adding  user {advisor.email} to UpcomingEstimatedLandDateSubscription',
+            f'Adding user {advisor.email} to UpcomingEstimatedLandDateSubscription',
         )
         UpcomingEstimatedLandDateSubscription(
             adviser=advisor,
