@@ -371,59 +371,57 @@ class TestAutomaticCompanyArchive:
         assert company.archived == expected_archived
 
     @freeze_time('2020-01-01-12:00:00')
-    def test_company_with_active_descendant(self, automatic_company_archive_feature_flag):
+    def test_active_company_with_global_ultimate_duns_not_archived(
+        self,
+        automatic_company_archive_feature_flag,
+    ):
         """
-        Test that a company with active descendant is not archived
+        Test companies that share an global_ultimate_duns_number
+        are not archived if any of them are active
         """
-        # Construct a tree of companies, but where some companies have an active
-        # descendant company, so we can assert they don't get archived.
-
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
+        global_ultimate_duns_number = '123456789'
         with freeze_time(gt_3m_ago):
-            company_root = CompanyFactory()
-            company_sub_1a = CompanyFactory(global_headquarters=company_root)
-            company_sub_1b = CompanyFactory(global_headquarters=company_root)
-            company_sub_2 = CompanyFactory(global_headquarters=company_sub_1a)
-        company_sub_3 = CompanyFactory(global_headquarters=company_sub_2)
+            company_global_ultimate = CompanyFactory(
+                duns_number=global_ultimate_duns_number,
+                global_ultimate_duns_number=global_ultimate_duns_number,
+            )
+            company_1 = CompanyFactory(global_ultimate_duns_number=global_ultimate_duns_number)
+        company_2 = CompanyFactory(global_ultimate_duns_number=global_ultimate_duns_number)
 
         schedule_automatic_company_archive(simulate=False)
-        company_root.refresh_from_db()
-        company_sub_1a.refresh_from_db()
-        company_sub_1b.refresh_from_db()
-        company_sub_2.refresh_from_db()
-        company_sub_3.refresh_from_db()
+        company_global_ultimate.refresh_from_db()
+        company_1.refresh_from_db()
+        company_2.refresh_from_db()
 
-        assert not company_root.archived
-        assert not company_sub_1a.archived
-        assert company_sub_1b.archived
-        assert not company_sub_2.archived
-        assert not company_sub_3.archived
+        assert not company_global_ultimate.archived
+        assert not company_1.archived
+        assert not company_2.archived
 
     @freeze_time('2020-01-01-12:00:00')
-    def test_company_without_active_descendant(self, automatic_company_archive_feature_flag):
+    def test_active_company_with_global_ultimate_duns_archived(
+        self,
+        automatic_company_archive_feature_flag,
+    ):
         """
-        Test that a company without active descendant is archived
+        Test companies that share an global_ultimate_duns_number
+        can be archived if none of them are active
         """
-        # Construct a tree of companies, but where no companies have an active
-        # descendant company, so we can assert they get archived.
-
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
+        global_ultimate_duns_number = '123456789'
         with freeze_time(gt_3m_ago):
-            company_root = CompanyFactory()
-            company_sub_1a = CompanyFactory(global_headquarters=company_root)
-            company_sub_1b = CompanyFactory(global_headquarters=company_root)
-            company_sub_2 = CompanyFactory(global_headquarters=company_sub_1a)
-        company_sub_3 = CompanyFactory(global_headquarters=None)
+            company_global_ultimate = CompanyFactory(
+                duns_number=global_ultimate_duns_number,
+                global_ultimate_duns_number=global_ultimate_duns_number,
+            )
+            company_1 = CompanyFactory(global_ultimate_duns_number=global_ultimate_duns_number)
+            company_2 = CompanyFactory(global_ultimate_duns_number=global_ultimate_duns_number)
 
         schedule_automatic_company_archive(simulate=False)
-        company_root.refresh_from_db()
-        company_sub_1a.refresh_from_db()
-        company_sub_1b.refresh_from_db()
-        company_sub_2.refresh_from_db()
-        company_sub_3.refresh_from_db()
+        company_global_ultimate.refresh_from_db()
+        company_1.refresh_from_db()
+        company_2.refresh_from_db()
 
-        assert company_root.archived
-        assert company_sub_1a.archived
-        assert company_sub_1b.archived
-        assert company_sub_2.archived
-        assert not company_sub_3.archived
+        assert company_global_ultimate.archived
+        assert company_1.archived
+        assert company_2.archived

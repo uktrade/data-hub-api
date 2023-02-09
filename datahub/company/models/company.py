@@ -421,16 +421,13 @@ class Company(ArchivableModel, BaseModel):
         return self.duns_number == self.global_ultimate_duns_number
 
     @property
-    def descendants(self):
+    def related_companies(self):
         """
-        All direct and indirect subsidiaries of this company.
+        All companies that share the same global ultimate duns number
         """
-        to_do = list(self.subsidiaries.all())
-        yield from to_do
-        while to_do:
-            for subsidiary in to_do.pop().subsidiaries.all():
-                to_do.append(subsidiary)
-                yield subsidiary
+        return Company.objects.filter(
+            global_ultimate_duns_number=self.global_ultimate_duns_number,
+        ).exclude(global_ultimate_duns_number='').exclude(global_ultimate_duns_number=None)
 
     def mark_as_transferred(self, to, reason, user):
         """
