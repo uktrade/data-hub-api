@@ -51,7 +51,7 @@ class ContactSerializerBase:
 
     def test_serializer_update_call_task(self, update_contact_task_mock, synchronous_on_commit):
         """
-        Ensure that consent service celery task is called when serializer.update
+        Ensure that consent service RQ task is called when serializer.update
         is called if accepts_dit_email_marketing is True.
         """
         contact = self._make_contact()
@@ -78,7 +78,7 @@ class ContactSerializerBase:
             synchronous_on_commit,
     ):
         """
-        Ensure that consent service celery task is called when serializer.update
+        Ensure that consent service RQ task is called when serializer.update
         is called with partial data if accepts_dit_email_marketing is True.
         """
         contact = self._make_contact()
@@ -98,7 +98,7 @@ class ContactSerializerBase:
             synchronous_on_commit,
     ):
         """
-        Ensure that consent service celery task is not called when serializer.update
+        Ensure that consent service RQ task is not called when serializer.update
         is called with partial data but `accepts_dit_email_marketing` is missing.
         """
         contact = self._make_contact()
@@ -112,7 +112,7 @@ class ContactSerializerBase:
 
     def test_serializer_create_calls_task(self, update_contact_task_mock, synchronous_on_commit):
         """
-        Ensure that consent service celery task is called when serializer.create
+        Ensure that consent service RQ task is called when serializer.create
         is called.
         """
         company = CompanyFactory()
