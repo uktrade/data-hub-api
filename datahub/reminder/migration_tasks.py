@@ -160,7 +160,7 @@ def get_post_users_to_migrate():
             | (
                 _generate_advisor_investment_project_query('investment_project_project_manager')
                 | _generate_advisor_investment_project_query(
-                    'investment_project_project_assurance_adviser'
+                    'investment_project_project_assurance_adviser',
                 )
                 | _generate_advisor_investment_project_query('investment_projects')
                 | _generate_advisor_investment_project_query('referred_investment_projects')
@@ -242,7 +242,7 @@ def _log_advisor_migration(advisor, logger):
         'The investment projects this advisor is a client relationship manager of are '
         f'{advisor.investment_projects.all()}.'
         'The investment projects this advisor is a referral source advisor of are '
-        f' {advisor.referred_investment_projects.all()}.'
+        f' {advisor.referred_investment_projects.all()}.',
     )
 
 
