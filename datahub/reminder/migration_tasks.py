@@ -252,11 +252,11 @@ def _generate_advisor_investment_project_query(role):
     """
     return Q(
         **{
-            f"{role}__isnull": False,
-            f"{role}__status__in": [
+            f'{role}__isnull': False,
+            f'{role}__status__in': [
                 InvestmentProject.Status.ONGOING,
                 InvestmentProject.Status.DELAYED,
             ],
-            f"{role}__stage_id": InvestmentProjectStage.active.value.id,
-        }
+            f'{role}__stage_id': InvestmentProjectStage.active.value.id,
+        },
     )

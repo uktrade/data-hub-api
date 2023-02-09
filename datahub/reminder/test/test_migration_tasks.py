@@ -594,7 +594,7 @@ class TestPostUsersMigration:
 
         advisor_to_migrate = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
         role_field = {advisor_project_role: advisor_to_migrate}
-        for i in range(5):
+        for _ in range(5):
             InvestmentProjectFactory(
                 **role_field,
                 investor_company=CompanyFactory(),
@@ -641,7 +641,7 @@ class TestPostUsersMigration:
         migrated_users = []
 
         # Add user in dit role and member of one list core team
-        for i in range(3):
+        for _ in range(3):
             dit_role_advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
             OneListCoreTeamMemberFactory(
                 adviser=dit_role_advisor,
@@ -649,7 +649,7 @@ class TestPostUsersMigration:
             migrated_users.append(dit_role_advisor)
 
         # Add user that is the account owner of a tier d company
-        for i in range(8):
+        for _ in range(8):
             account_owner_advisor = AdviserFactory()
             CompanyFactory(
                 one_list_account_owner=account_owner_advisor,
@@ -658,7 +658,7 @@ class TestPostUsersMigration:
             migrated_users.append(account_owner_advisor)
 
         # Add user that has a relation to an investment project
-        for i in range(4):
+        for _ in range(4):
             investment_project_advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
             role_field = {advisor_project_role: investment_project_advisor}
 
@@ -671,7 +671,7 @@ class TestPostUsersMigration:
             migrated_users.append(investment_project_advisor)
 
         # Add user that meets every criteria
-        for i in range(5):
+        for _ in range(5):
             all_criteria_advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
             role_field = {advisor_project_role: all_criteria_advisor}
             OneListCoreTeamMemberFactory(
