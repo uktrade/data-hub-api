@@ -36,6 +36,7 @@ from datahub.investment.project.tasks import (
     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
 )
 from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
+from datahub.reminder.migration_tasks import run_ita_users_migration, run_post_users_migration
 from datahub.reminder.tasks import (
     generate_new_export_interaction_reminders,
     generate_no_recent_export_interaction_reminders,
@@ -45,7 +46,6 @@ from datahub.reminder.tasks import (
     update_notify_email_delivery_status_for_new_export_interaction,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
     update_notify_email_delivery_status_for_no_recent_interaction,
-    UserMigrationTasks,
 )
 from datahub.search.tasks import sync_all_models
 
@@ -241,10 +241,8 @@ def schedule_new_export_interaction_jobs():
 
 
 def schedule_user_reminder_migration():
-    migration = UserMigrationTasks()
-
     job_scheduler(
-        function=migration.migrate_ita_users,
+        function=run_ita_users_migration,
         max_retries=5,
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,
@@ -254,7 +252,7 @@ def schedule_user_reminder_migration():
     )
 
     job_scheduler(
-        function=migration.migrate_post_users,
+        function=run_post_users_migration,
         max_retries=5,
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,
