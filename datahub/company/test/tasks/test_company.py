@@ -369,3 +369,59 @@ class TestAutomaticCompanyArchive:
 
         company.refresh_from_db()
         assert company.archived == expected_archived
+
+    @freeze_time('2020-01-01-12:00:00')
+    def test_active_company_with_global_ultimate_duns_not_archived(
+        self,
+        automatic_company_archive_feature_flag,
+    ):
+        """
+        Test companies that share an global_ultimate_duns_number
+        are not archived if any of them are active
+        """
+        gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
+        global_ultimate_duns_number = '123456789'
+        with freeze_time(gt_3m_ago):
+            company_global_ultimate = CompanyFactory(
+                duns_number=global_ultimate_duns_number,
+                global_ultimate_duns_number=global_ultimate_duns_number,
+            )
+            company_1 = CompanyFactory(global_ultimate_duns_number=global_ultimate_duns_number)
+        company_2 = CompanyFactory(global_ultimate_duns_number=global_ultimate_duns_number)
+
+        schedule_automatic_company_archive(simulate=False)
+        company_global_ultimate.refresh_from_db()
+        company_1.refresh_from_db()
+        company_2.refresh_from_db()
+
+        assert not company_global_ultimate.archived
+        assert not company_1.archived
+        assert not company_2.archived
+
+    @freeze_time('2020-01-01-12:00:00')
+    def test_active_company_with_global_ultimate_duns_archived(
+        self,
+        automatic_company_archive_feature_flag,
+    ):
+        """
+        Test companies that share an global_ultimate_duns_number
+        can be archived if none of them are active
+        """
+        gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
+        global_ultimate_duns_number = '123456789'
+        with freeze_time(gt_3m_ago):
+            company_global_ultimate = CompanyFactory(
+                duns_number=global_ultimate_duns_number,
+                global_ultimate_duns_number=global_ultimate_duns_number,
+            )
+            company_1 = CompanyFactory(global_ultimate_duns_number=global_ultimate_duns_number)
+            company_2 = CompanyFactory(global_ultimate_duns_number=global_ultimate_duns_number)
+
+        schedule_automatic_company_archive(simulate=False)
+        company_global_ultimate.refresh_from_db()
+        company_1.refresh_from_db()
+        company_2.refresh_from_db()
+
+        assert company_global_ultimate.archived
+        assert company_1.archived
+        assert company_2.archived
