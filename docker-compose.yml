@@ -1,11 +1,11 @@
-version: '2'
+version: "2"
 
 services:
   api:
     build:
       context: .
     ports:
-      - '8000:8000'
+      - "8000:8000"
     volumes:
       - .:/app
     entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://opensearch:9200 -wait tcp://redis:6379 -timeout 120s
@@ -63,6 +63,8 @@ services:
   postgres:
     image: postgres:12
     restart: always
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_DB=datahub
       - POSTGRES_PASSWORD=datahub
@@ -80,7 +82,7 @@ services:
     image: redis:6.2.6
     restart: always
     ports:
-      - '6379:6379'
+      - "6379:6379"
 
   rq_exporter:
     image: mdawar/rq-exporter:latest
@@ -90,6 +92,6 @@ services:
         protocol: tcp
         mode: host
     environment:
-      RQ_REDIS_HOST: 'redis'
+      RQ_REDIS_HOST: "redis"
     depends_on:
       - redis
