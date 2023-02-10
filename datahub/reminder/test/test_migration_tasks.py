@@ -51,6 +51,11 @@ class TestITAUsersMigration:
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
 
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            True,
+        )
+
         UserFeatureFlagGroupFactory(code='export-notifications')
 
         mock_advisory_lock = mock.MagicMock()
@@ -94,12 +99,8 @@ class TestITAUsersMigration:
         )
 
         run_ita_users_migration()
-        expected_messages = [
-            'Automatic migration of users is disabled, no changes will be made to the ita user'
-            f' {advisor.email} subscriptions or feature flags',
-            'Migrated 1 ita users',
-        ]
-        assert caplog.messages == expected_messages
+
+        assert caplog.messages[0] == 'AUTOMATIC MIGRATION IS DISABLED'
 
     def test_advisor_account_owner_of_company_in_wrong_tier_is_excluded_from_migration(
         self,
@@ -297,6 +298,11 @@ class TestPostUsersMigration:
         the advisory_lock.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
+
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            True,
+        )
 
         UserFeatureFlagGroupFactory(code='export-notifications')
         UserFeatureFlagGroupFactory(code='investment-notifications')

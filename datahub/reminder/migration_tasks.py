@@ -20,8 +20,8 @@ from datahub.feature_flag.models import (
 )
 from datahub.investment.project.models import InvestmentProject
 from datahub.reminder import (
-    INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+    INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
 )
 from datahub.reminder.models import (
     NewExportInteractionSubscription,
@@ -51,28 +51,27 @@ def run_ita_users_migration():
     )
     # Get all the advisor ids that are account owner of a tier d one list company
     advisors = get_ita_users_to_migrate(export_notifications_feature_group)
-
-    migrate_ita_users(export_notifications_feature_group, advisors)
-
-    logger.info(
-        f'Migrated {advisors.count()} ita users',
-    )
+    if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
+        logger.info('AUTOMATIC MIGRATION IS DISABLED')
+        for advisor in advisors:
+            logger.info(
+                f'Advisor {advisor.email} has met criteria for migrating',
+            )
+    else:
+        migrate_ita_users(export_notifications_feature_group, advisors)
+        logger.info(
+            f'Migrated {advisors.count()} ita users',
+        )
 
 
 def migrate_ita_users(export_notifications_feature_group, advisors):
     for advisor in advisors:
-        if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
-            logger.info(
-                'Automatic migration of users is disabled, no changes will be made to the ita'
-                f' user {advisor.email} subscriptions or feature flags',
-            )
-        else:
-            logger.info(
-                f'Migrating ITA user {advisor.email} to receive reminders.',
-            )
-            advisor.feature_groups.add(export_notifications_feature_group)
+        logger.info(
+            f'Migrating ITA user {advisor.email} to receive reminders.',
+        )
+        advisor.feature_groups.add(export_notifications_feature_group)
 
-            _add_advisor_to_export_subscriptions(advisor)
+        _add_advisor_to_export_subscriptions(advisor)
 
 
 def get_ita_users_to_migrate(export_notifications_feature_group):
@@ -109,35 +108,35 @@ def run_post_users_migration():
 
     advisors = get_post_users_to_migrate()
 
-    migrate_post_users(advisors)
+    if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
+        logger.info('AUTOMATIC MIGRATION IS DISABLED')
+        for advisor in advisors:
+            _log_advisor_migration(advisor, logger)
+    else:
+        migrate_post_users(advisors)
 
-    logger.info(
-        f'Migrated {advisors.count()} post users',
-    )
+        logger.info(
+            f'Migrated {advisors.count()} post users',
+        )
 
 
 def migrate_post_users(advisors):
     export_feature_group = UserFeatureFlagGroup.objects.get(
-        code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME
+        code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     )
     investment_feature_group = UserFeatureFlagGroup.objects.get(
         code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     )
 
     for advisor in advisors:
-        if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
-            logger.info('AUTOMATIC MIGRATION IS DISABLED')
-            _log_advisor_migration(advisor, logger)
+        _log_advisor_migration(advisor, logger)
 
-        else:
-            _log_advisor_migration(advisor, logger)
+        advisor.feature_groups.add(investment_feature_group)
+        advisor.feature_groups.add(export_feature_group)
 
-            advisor.feature_groups.add(investment_feature_group)
-            advisor.feature_groups.add(export_feature_group)
+        _add_advisor_to_export_subscriptions(advisor)
 
-            _add_advisor_to_export_subscriptions(advisor)
-
-            _add_advisor_to_investment_subscriptions(advisor)
+        _add_advisor_to_investment_subscriptions(advisor)
 
 
 def get_post_users_to_migrate():
