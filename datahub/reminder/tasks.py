@@ -447,10 +447,7 @@ def generate_no_recent_interaction_reminders_for_subscription(subscription, curr
                     continue
                 send_reminder = not qs.filter(created_on__date__gt=threshold).exists()
             else:
-                if project.created_on is None:
-                    send_reminder = False
-                else:
-                    send_reminder = project.created_on.date() == threshold
+                send_reminder = project.created_on and project.created_on.date() == threshold
 
             if send_reminder:
                 create_no_recent_interaction_reminder(
@@ -529,10 +526,7 @@ def generate_no_recent_export_interaction_reminders_for_subscription(subscriptio
                 send_reminder = not qs.filter(created_on__date__gt=threshold).exists()
                 reminder_interaction = qs.order_by('created_on').last()
             else:
-                if company.created_on is None:
-                    send_reminder = False
-                else:
-                    send_reminder = company.created_on.date() == threshold
+                send_reminder = company.created_on and company.created_on.date() == threshold
 
             if send_reminder:
                 create_no_recent_export_interaction_reminder(
