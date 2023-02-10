@@ -1861,6 +1861,51 @@ class TestGenerateNewExportInteractionReminderTask:
             current_date=self.current_date,
         )
 
+    def test_dont_send_reminder_when_the_advisor_created_the_interaction(
+        self,
+        adviser,
+        mock_create_new_export_interaction_reminder,
+    ):
+        """
+        New Export Interaction reminders should not be sent to the advisor who created the
+        interaction.
+        """
+        day = 15
+        subscription = NewExportInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[day],
+            email_reminders_enabled=True,
+        )
+        company = CompanyFactory(
+            one_list_account_owner=adviser,
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+        )
+
+        interaction_date = self.current_date - relativedelta(days=day)
+
+        with freeze_time(interaction_date):
+            CompanyInteractionFactory(
+                company=company,
+                created_by=adviser,
+            )
+            included_interaction = CompanyInteractionFactory(
+                company=company,
+            )
+
+        generate_new_export_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+
+        mock_create_new_export_interaction_reminder.assert_called_with(
+            company=company,
+            adviser=adviser,
+            interaction=included_interaction,
+            reminder_days=day,
+            send_email=True,
+            current_date=self.current_date,
+        )
+
     @pytest.mark.parametrize('day_offset', (0, 1))
     def test_dont_send_reminder_if_no_new_interactions(
         self,
