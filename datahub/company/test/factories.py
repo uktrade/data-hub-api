@@ -38,7 +38,7 @@ class AdviserFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company.Advisor'
-        django_get_or_create = ('email', )
+        django_get_or_create = ('email',)
 
 
 class CompanyFactory(factory.django.DjangoModelFactory):
@@ -47,10 +47,12 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     name = factory.Faker('company')
-    trading_names = factory.List([
-        factory.Faker('company'),
-        factory.Faker('company'),
-    ])
+    trading_names = factory.List(
+        [
+            factory.Faker('company'),
+            factory.Faker('company'),
+        ],
+    )
 
     address_1 = factory.Sequence(lambda x: f'{x} Fake Lane')
     address_town = 'Woodside'
@@ -155,7 +157,7 @@ class DuplicateCompanyFactory(ArchivedCompanyFactory):
 
 
 def _get_random_company_category():
-    categories = ([key for key, val in COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING.items() if val])
+    categories = [key for key, val in COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING.items() if val]
     return choice(categories).capitalize()
 
 
@@ -235,3 +237,13 @@ class CompanyExportCountryHistoryFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company.CompanyExportCountryHistory'
+
+
+class OneListTierFactory(factory.django.DjangoModelFactory):
+    """One List Tier factory."""
+
+    id = factory.LazyFunction(uuid.uuid4)
+    name = factory.Faker('company')
+
+    class Meta:
+        model = 'company.OneListTier'
