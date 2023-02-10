@@ -100,7 +100,11 @@ class TestITAUsersMigration:
 
         run_ita_users_migration()
 
-        assert caplog.messages[0] == 'AUTOMATIC MIGRATION IS DISABLED'
+        assert (
+            caplog.messages[0]
+            == 'AUTOMATIC MIGRATION IS DISABLED. THE FOLLOWING 1 ITA USERS MEET THE CRITERIA FOR '
+            'MIGRATION BUT WILL NOT HAVE ANY CHANGES MADE TO THEIR ACCOUNTS'
+        )
 
     def test_advisor_account_owner_of_company_in_wrong_tier_is_excluded_from_migration(
         self,
@@ -351,7 +355,11 @@ class TestPostUsersMigration:
 
         run_post_users_migration()
 
-        assert caplog.messages[0] == 'AUTOMATIC MIGRATION IS DISABLED'
+        assert (
+            caplog.messages[0]
+            == 'AUTOMATIC MIGRATION IS DISABLED. THE FOLLOWING 1 POST USERS MEET THE CRITERIA FOR'
+            ' MIGRATION BUT WILL NOT HAVE ANY CHANGES MADE TO THEIR ACCOUNTS'
+        )
 
     def test_advisor_in_post_team_not_one_list_core_member_not_global_account_manager_no_project_link_is_excluded_from_migration(  # noqa: E501
         self,

@@ -52,11 +52,13 @@ def run_ita_users_migration():
     # Get all the advisor ids that are account owner of a tier d one list company
     advisors = get_ita_users_to_migrate(export_notifications_feature_group)
     if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
-        logger.info('AUTOMATIC MIGRATION IS DISABLED')
+        logger.info(
+            'AUTOMATIC MIGRATION IS DISABLED. THE FOLLOWING %s ITA USERS MEET THE CRITERIA FOR '
+            'MIGRATION BUT WILL NOT HAVE ANY CHANGES MADE TO THEIR ACCOUNTS',
+            advisors.count(),
+        )
         for advisor in advisors:
-            logger.info(
-                f'Advisor {advisor.email} has met criteria for migrating',
-            )
+            _log_ita_advisor_migration(advisor, logger)
     else:
         migrate_ita_users(export_notifications_feature_group, advisors)
         logger.info(
@@ -66,9 +68,7 @@ def run_ita_users_migration():
 
 def migrate_ita_users(export_notifications_feature_group, advisors):
     for advisor in advisors:
-        logger.info(
-            f'Migrating ITA user {advisor.email} to receive reminders.',
-        )
+        _log_ita_advisor_migration(advisor, logger)
         advisor.feature_groups.add(export_notifications_feature_group)
 
         _add_advisor_to_export_subscriptions(advisor)
@@ -109,9 +109,13 @@ def run_post_users_migration():
     advisors = get_post_users_to_migrate()
 
     if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
-        logger.info('AUTOMATIC MIGRATION IS DISABLED')
+        logger.info(
+            'AUTOMATIC MIGRATION IS DISABLED. THE FOLLOWING %s POST USERS MEET THE CRITERIA FOR '
+            'MIGRATION BUT WILL NOT HAVE ANY CHANGES MADE TO THEIR ACCOUNTS',
+            advisors.count(),
+        )
         for advisor in advisors:
-            _log_advisor_migration(advisor, logger)
+            _log_post_advisor_migration(advisor, logger)
     else:
         migrate_post_users(advisors)
 
@@ -129,7 +133,7 @@ def migrate_post_users(advisors):
     )
 
     for advisor in advisors:
-        _log_advisor_migration(advisor, logger)
+        _log_post_advisor_migration(advisor, logger)
 
         advisor.feature_groups.add(investment_feature_group)
         advisor.feature_groups.add(export_feature_group)
@@ -233,7 +237,19 @@ def _add_advisor_to_export_subscriptions(
         ).save()
 
 
-def _log_advisor_migration(advisor, logger):
+def _log_ita_advisor_migration(advisor, logger):
+
+    logger.info(
+        f'Migrating ITA user {advisor.email} to receive reminders.'
+        'The feature groups this advisor is a member of are '
+        f'{advisor.feature_groups.all()}. '
+        'The companies this advisor is an account owner of are '
+        f'{advisor.one_list_owned_companies.all()}. '
+        f'The dit_team role is {advisor.dit_team}. ',
+    )
+
+
+def _log_post_advisor_migration(advisor, logger):
 
     logger.info(
         f'Migrating Post user {advisor.email} to receive reminders.'
@@ -243,7 +259,7 @@ def _log_advisor_migration(advisor, logger):
         'The investment projects this advisor is a project manager of are '
         f'{advisor.investment_project_project_manager.all()}.'
         'The investment projects this advisor is a project assurance advisor of are '
-        f'{advisor.investment_project_project_assurance_adviser.all()} '
+        f'{advisor.investment_project_project_assurance_adviser.all()}. '
         'The investment projects this advisor is a client relationship manager of are '
         f'{advisor.investment_projects.all()}.'
         'The investment projects this advisor is a referral source advisor of are '
