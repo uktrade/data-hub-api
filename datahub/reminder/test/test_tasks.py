@@ -16,10 +16,14 @@ from datahub.company.test.factories import (
     AdviserFactory,
     CompanyFactory,
     OneListCoreTeamMemberFactory,
+    OneListTierFactory,
 )
 from datahub.core.constants import InvestmentProjectStage
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
-from datahub.feature_flag.test.factories import FeatureFlagFactory, UserFeatureFlagFactory
+from datahub.feature_flag.test.factories import (
+    FeatureFlagFactory,
+    UserFeatureFlagFactory,
+)
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     InvestmentProjectInteractionFactory,
@@ -719,15 +723,18 @@ class TestGenerateEstimatedLandDateReminderTask:
         else:
             mock_send_estimated_land_date_summary.assert_not_called()
 
-        mock_create_estimated_land_date_reminder.assert_has_calls([
-            call(
-                project=project,
-                adviser=adviser,
-                send_email=False,
-                current_date=self.current_date,
-            )
-            for project in projects
-        ], any_order=True)
+        mock_create_estimated_land_date_reminder.assert_has_calls(
+            [
+                call(
+                    project=project,
+                    adviser=adviser,
+                    send_email=False,
+                    current_date=self.current_date,
+                )
+                for project in projects
+            ],
+            any_order=True,
+        )
 
     def test_active_ongoing_or_delayed_projects_only(
         self,
@@ -777,15 +784,18 @@ class TestGenerateEstimatedLandDateReminderTask:
             subscription=subscription,
             current_date=self.current_date,
         )
-        mock_create_estimated_land_date_reminder.assert_has_calls([
-            call(
-                project=project,
-                adviser=adviser,
-                send_email=True,
-                current_date=self.current_date,
-            )
-            for project in [active_ongoing_project, active_delayed_project]
-        ], any_order=True)
+        mock_create_estimated_land_date_reminder.assert_has_calls(
+            [
+                call(
+                    project=project,
+                    adviser=adviser,
+                    send_email=True,
+                    current_date=self.current_date,
+                )
+                for project in [active_ongoing_project, active_delayed_project]
+            ],
+            any_order=True,
+        )
 
     def test_wont_send_notifications_if_no_projects(
         self,
@@ -913,10 +923,13 @@ class TestGenerateEstimatedLandDateReminderTask:
         )
         generate_estimated_land_date_reminders()
         generate_estimated_land_date_reminders()
-        assert UpcomingEstimatedLandDateReminder.objects.filter(
-            project=project,
-            adviser=adviser,
-        ).count() == 1
+        assert (
+            UpcomingEstimatedLandDateReminder.objects.filter(
+                project=project,
+                adviser=adviser,
+            ).count()
+            == 1
+        )
         reminder = UpcomingEstimatedLandDateReminder.objects.get(project=project, adviser=adviser)
         mock_send_estimated_land_date_reminder.assert_called_once_with(
             project=project,
@@ -1215,16 +1228,22 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         )
 
         generate_no_recent_export_interaction_reminders()
-        expected_messages = [
-            'Task 1234 generate_no_recent_export_interaction_reminders_for_subscription',
-        ] if lock_acquired else [
-            'Reminders for no recent export interactions are already being processed by another '
-            'worker.',
-        ]
+        expected_messages = (
+            [
+                'Task 1234 generate_no_recent_export_interaction_reminders_for_subscription',
+            ]
+            if lock_acquired
+            else [
+                'Reminders for no recent export interactions are already being processed by'
+                ' another worker.',
+            ]
+        )
         assert caplog.messages == expected_messages
 
-        mock_job_scheduler.assert_called_once() \
-            if lock_acquired else mock_job_scheduler.assert_not_called()
+        if lock_acquired:
+            mock_job_scheduler.assert_called_once()
+        else:
+            mock_job_scheduler.assert_not_called()
 
     def test_generate_no_recent_export_interaction_reminders(
         self,
@@ -1250,18 +1269,19 @@ class TestGenerateNoRecentExportInteractionReminderTask:
                     max_retries=5,
                     retry_backoff=True,
                     retry_intervals=30,
-                ) for subscription in subscriptions
+                )
+                for subscription in subscriptions
             ],
             any_order=True,
         )
 
     @pytest.mark.parametrize(
-        'days,email_reminders_enabled',
+        'days,email_reminders_enabled, one_list_tier',
         (
-            (5, True),
-            (10, True),
-            (3, False),
-            (15, False),
+            (5, True, OneListTierID.tier_d_international_trade_advisers.value),
+            (10, True, OneListTierID.tier_d_overseas_post_accounts.value),
+            (3, False, OneListTierID.tier_d_international_trade_advisers.value),
+            (15, False, OneListTierID.tier_d_overseas_post_accounts.value),
         ),
     )
     def test_generate_no_recent_export_interaction_reminders_for_subscription(
@@ -1270,6 +1290,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         mock_create_no_recent_export_interaction_reminder,
         days,
         email_reminders_enabled,
+        one_list_tier,
     ):
         """
         No Recent Export Interaction reminders should be created for relevant subscriptions.
@@ -1282,7 +1303,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
 
         company = CompanyFactory(
             one_list_account_owner=adviser,
-            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+            one_list_tier_id=one_list_tier,
         )
 
         interaction_date = self.current_date - relativedelta(days=days)
@@ -1304,6 +1325,84 @@ class TestGenerateNoRecentExportInteractionReminderTask:
             send_email=email_reminders_enabled,
             current_date=self.current_date,
         )
+
+    @pytest.mark.parametrize(
+        'one_list_tier',
+        (
+            (OneListTierID.tier_d_international_trade_advisers.value),
+            (OneListTierID.tier_d_overseas_post_accounts.value),
+        ),
+    )
+    def test_generate_no_recent_export_interaction_reminders_for_subscription_for_core_member(
+        self,
+        adviser,
+        mock_create_no_recent_export_interaction_reminder,
+        one_list_tier,
+    ):
+        """
+        No Recent Export Interaction reminders should be created for relevant subscriptions.
+        """
+        subscription = NoRecentExportInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[5],
+            email_reminders_enabled=True,
+        )
+
+        company = OneListCoreTeamMemberFactory(
+            adviser=adviser,
+            company=CompanyFactory(
+                one_list_tier_id=one_list_tier,
+            ),
+        ).company
+
+        interaction_date = self.current_date - relativedelta(days=5)
+
+        with freeze_time(interaction_date):
+            interaction = CompanyInteractionFactory(
+                company=company,
+            )
+
+        generate_no_recent_export_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        mock_create_no_recent_export_interaction_reminder.assert_called_once_with(
+            company=company,
+            adviser=adviser,
+            interaction=interaction,
+            reminder_days=5,
+            send_email=True,
+            current_date=self.current_date,
+        )
+
+    def test_dont_generate_reminder_for_company_in_invalid_one_company_tier_and_no_core_team_members(  # noqa: E501
+        self,
+        adviser,
+        mock_create_no_recent_export_interaction_reminder,
+    ):
+        """
+        No Recent Export Interaction reminders should be created for relevant subscriptions.
+        """
+        subscription = NoRecentExportInteractionSubscriptionFactory(
+            adviser=adviser,
+            reminder_days=[5],
+            email_reminders_enabled=True,
+        )
+
+        one_list_tier = OneListTierFactory()
+
+        company = CompanyFactory(one_list_account_owner=adviser, one_list_tier_id=one_list_tier.id)
+
+        interaction_date = self.current_date - relativedelta(days=5)
+
+        with freeze_time(interaction_date):
+            CompanyInteractionFactory(company=company)
+
+        generate_no_recent_export_interaction_reminders_for_subscription(
+            subscription=subscription,
+            current_date=self.current_date,
+        )
+        mock_create_no_recent_export_interaction_reminder.assert_not_called()
 
     def test_send_reminder_if_no_interactions_at_all_in_given_timeframe(
         self,
@@ -1665,16 +1764,22 @@ class TestGenerateNewExportInteractionReminderTask:
         )
 
         generate_new_export_interaction_reminders()
-        expected_messages = [
-            'Task 1234 generate_new_export_interaction_reminders_for_subscription',
-        ] if lock_acquired else [
-            'Reminders for new export interactions are already being processed by another '
-            'worker.',
-        ]
+        expected_messages = (
+            [
+                'Task 1234 generate_new_export_interaction_reminders_for_subscription',
+            ]
+            if lock_acquired
+            else [
+                'Reminders for new export interactions are already being processed by another '
+                'worker.',
+            ]
+        )
         assert caplog.messages == expected_messages
 
-        mock_job_scheduler.assert_called_once() \
-            if lock_acquired else mock_job_scheduler.assert_not_called()
+        if lock_acquired:
+            mock_job_scheduler.assert_called_once()
+        else:
+            mock_job_scheduler.assert_not_called()
 
     def test_generate_new_export_interaction_reminders(
         self,
@@ -1700,7 +1805,8 @@ class TestGenerateNewExportInteractionReminderTask:
                     max_retries=5,
                     retry_backoff=True,
                     retry_intervals=30,
-                ) for subscription in subscriptions
+                )
+                for subscription in subscriptions
             ],
             any_order=True,
         )
@@ -2216,16 +2322,19 @@ class TestGenerateNoRecentInteractionReminderTask:
             subscription=subscription,
             current_date=self.current_date,
         )
-        mock_create_no_recent_interaction_reminder.assert_has_calls([
-            call(
-                project=project,
-                adviser=adviser,
-                reminder_days=day,
-                send_email=True,
-                current_date=self.current_date,
-            )
-            for project in [active_ongoing_project, active_delayed_project]
-        ], any_order=True)
+        mock_create_no_recent_interaction_reminder.assert_has_calls(
+            [
+                call(
+                    project=project,
+                    adviser=adviser,
+                    reminder_days=day,
+                    send_email=True,
+                    current_date=self.current_date,
+                )
+                for project in [active_ongoing_project, active_delayed_project]
+            ],
+            any_order=True,
+        )
 
     def test_send_reminder_if_no_interactions_at_all_in_given_timeframe(
         self,
@@ -2430,7 +2539,8 @@ class TestGenerateNoRecentInteractionReminderTask:
             'Task update_no_recent_interaction_reminder_email_status completed'
             f'email_notification_id to {notification_id} and '
             f"reminder_ids set to [UUID('{reminder.id}')]" in message
-            for message in caplog.messages)
+            for message in caplog.messages
+        )
         assert reminder.email_notification_id == notification_id
         assert reminder.email_delivery_status == EmailDeliveryStatus.UNKNOWN
 
@@ -2495,7 +2605,7 @@ class TestUpdateEmailDeliveryStatusTask:
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
         update_notify_email_delivery_status_for_estimated_land_date()
         assert caplog.messages == [
-            f'Feature flag "{INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME}"'
+            f'Feature flag {INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME}'
             ' is not active, exiting.',
         ]
 
@@ -2541,11 +2651,13 @@ class TestUpdateEmailDeliveryStatusTask:
             for reminder_to_update in reminders_to_update
         )
         assert all(
-            reminder_to_update.modified_on == datetime.datetime.combine(
+            reminder_to_update.modified_on
+            == datetime.datetime.combine(
                 status_updated_on,
                 datetime.datetime.min.time(),
                 tzinfo=utc,
-            ) for reminder_to_update in reminders_to_update
+            )
+            for reminder_to_update in reminders_to_update
         )
         mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once_with(
             reminders_to_update[0].email_notification_id,
@@ -2560,7 +2672,7 @@ class TestUpdateEmailDeliveryStatusTask:
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
         update_notify_email_delivery_status_for_no_recent_interaction()
         assert caplog.messages == [
-            f'Feature flag "{INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}"'
+            f'Feature flag {INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}'
             ' is not active, exiting.',
         ]
 
@@ -2650,15 +2762,19 @@ class TestUpdateEmailDeliveryStatusTask:
         )
         with freeze_time(self.current_date):
             update_notify_email_delivery_status_for_no_recent_export_interaction()
-        expected_messages = [] if lock_acquired else [
-            'Email status checks for no recent export interaction are already being processed by'
-            ' another worker.',
-        ]
+        expected_messages = (
+            []
+            if lock_acquired
+            else [
+                'Email status checks for no recent export interaction are already being processed'
+                ' by another worker.',
+            ]
+        )
         assert caplog.messages == expected_messages
-
-        mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once() \
-            if lock_acquired \
-            else mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_not_called()
+        if lock_acquired:
+            mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once()
+        else:
+            mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_not_called()
 
     def test_doesnt_update_no_recent_export_interaction_status_without_feature_flag(self, caplog):
         """
@@ -2667,7 +2783,7 @@ class TestUpdateEmailDeliveryStatusTask:
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
         update_notify_email_delivery_status_for_no_recent_export_interaction()
         assert caplog.messages == [
-            f'Feature flag "{EXPORT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}"'
+            f'Feature flag {EXPORT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}'
             ' is not active, exiting.',
         ]
 
@@ -2724,7 +2840,7 @@ class TestUpdateEmailDeliveryStatusTask:
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
         update_notify_email_delivery_status_for_new_export_interaction()
         assert caplog.messages == [
-            f'Feature flag "{EXPORT_NEW_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}"'
+            f'Feature flag {EXPORT_NEW_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME}'
             ' is not active, exiting.',
         ]
 
@@ -2767,15 +2883,20 @@ class TestUpdateEmailDeliveryStatusTask:
         )
         with freeze_time(self.current_date):
             update_notify_email_delivery_status_for_new_export_interaction()
-        expected_messages = [] if lock_acquired else [
-            'Email status checks for new export interaction are already being processed by another'
-            ' worker.',
-        ]
+        expected_messages = (
+            []
+            if lock_acquired
+            else [
+                'Email status checks for new export interaction are already being processed'
+                ' by another worker.',
+            ]
+        )
         assert caplog.messages == expected_messages
 
-        mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once() \
-            if lock_acquired \
-            else mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_not_called()
+        if lock_acquired:
+            mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once()
+        else:
+            mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_not_called()
 
     def test_updates_email_delivery_status_for_new_export_interaction(
         self,
