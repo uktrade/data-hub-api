@@ -16,8 +16,8 @@ from datahub.feature_flag.models import (
     UserFeatureFlagGroup,
 )
 from datahub.reminder import (
-    INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+    INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
 )
 from datahub.reminder.models import (
     NewExportInteractionSubscription,
@@ -94,7 +94,7 @@ def migrate_post_users():
             return
 
     export_feature_group = UserFeatureFlagGroup.objects.get(
-        code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME
+        code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     )
     investment_feature_group = UserFeatureFlagGroup.objects.get(
         code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
