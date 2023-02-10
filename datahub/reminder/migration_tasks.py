@@ -240,28 +240,28 @@ def _add_advisor_to_export_subscriptions(
 def _log_ita_advisor_migration(advisor, logger):
 
     logger.info(
-        f'Migrating ITA user {advisor.email} to receive reminders.'
+        f'Migrating ITA user "{advisor.id}" with email "{advisor.email}" to receive reminders.'
         'The feature groups this advisor is a member of are '
         f'{advisor.feature_groups.all()}. '
         'The companies this advisor is an account owner of are '
         f'{advisor.one_list_owned_companies.all()}. '
-        f'The dit_team role is {advisor.dit_team}. ',
+        f'The dit_team role is "{advisor.dit_team}".',
     )
 
 
 def _log_post_advisor_migration(advisor, logger):
 
     logger.info(
-        f'Migrating Post user {advisor.email} to receive reminders.'
-        'The companies this advisor is one list member of is '
-        f'{advisor.one_list_core_team_memberships.all()}.'
-        f'The dit_team role is {advisor.dit_team}. '
+        f'Migrating Post user "{advisor.id}" with email "{advisor.email}" to receive reminders.'
+        ' The companies this advisor is one list member of is '
+        f'{advisor.one_list_core_team_memberships.all()}. '
+        f'The dit_team role is "{advisor.dit_team}". '
         'The investment projects this advisor is a project manager of are '
-        f'{advisor.investment_project_project_manager.all()}.'
+        f'{advisor.investment_project_project_manager.all()}. '
         'The investment projects this advisor is a project assurance advisor of are '
         f'{advisor.investment_project_project_assurance_adviser.all()}. '
         'The investment projects this advisor is a client relationship manager of are '
-        f'{advisor.investment_projects.all()}.'
+        f'{advisor.investment_projects.all()}. '
         'The investment projects this advisor is a referral source advisor of are '
         f' {advisor.referred_investment_projects.all()}.',
     )
