@@ -1861,6 +1861,114 @@ class TestGenerateNewExportInteractionReminderTask:
             current_date=self.current_date,
         )
 
+    def test_only_send_reminder_when_advisor_did_not_create_the_interaction(
+        self,
+        new_export_interaction_reminders_user_feature_flag,
+        mock_create_new_export_interaction_reminder,
+    ):
+        """
+        New Export Interaction reminders should not be sent to the advisor who created the
+        interaction, they should only go to an advisor when they did not create the interaction
+        """
+
+        def _export_interaction_advisor(day):
+            advisor = AdviserFactory()
+            advisor.features.set(
+                [
+                    new_export_interaction_reminders_user_feature_flag,
+                ],
+            )
+
+            subscription = NewExportInteractionSubscriptionFactory(
+                adviser=advisor,
+                reminder_days=[day],
+                email_reminders_enabled=True,
+            )
+            company = CompanyFactory(
+                one_list_account_owner=advisor,
+                one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+            )
+
+            return advisor, company, subscription
+
+        day = 15
+        interaction_date = self.current_date - relativedelta(days=day)
+
+        # setup 3 advisors, along with a company and subscription - 1 advisor with only company
+        # interactions they created, 1 with a mix of company interactions they created and created
+        # by another advisor, and 1 with only company interactions created by another advisor
+        (
+            only_own_interactions_advisor,
+            only_own_interactions_company,
+            only_own_interactions_subscription,
+        ) = _export_interaction_advisor(day)
+        with freeze_time(interaction_date):
+            CompanyInteractionFactory.create_batch(
+                3,
+                company=only_own_interactions_company,
+                created_by=only_own_interactions_advisor,
+            )
+
+        (
+            own_and_other_interations_advisor,
+            own_and_other_interations_company,
+            own_and_other_interations_subscription,
+        ) = _export_interaction_advisor(day)
+        with freeze_time(interaction_date):
+            CompanyInteractionFactory.create_batch(
+                3,
+                company=own_and_other_interations_company,
+                created_by=own_and_other_interations_advisor,
+            )
+            own_and_other_interations_expected_interaction = CompanyInteractionFactory(
+                company=own_and_other_interations_company,
+            )
+
+        (
+            only_other_interactions_advisor,
+            only_other_interactions_company,
+            only_other_interactions_subscription,
+        ) = _export_interaction_advisor(day)
+        with freeze_time(interaction_date):
+            only_other_interactions_expected_interaction = CompanyInteractionFactory(
+                company=only_other_interactions_company,
+            )
+
+        generate_new_export_interaction_reminders_for_subscription(
+            subscription=only_own_interactions_subscription,
+            current_date=self.current_date,
+        )
+        generate_new_export_interaction_reminders_for_subscription(
+            subscription=own_and_other_interations_subscription,
+            current_date=self.current_date,
+        )
+        generate_new_export_interaction_reminders_for_subscription(
+            subscription=only_other_interactions_subscription,
+            current_date=self.current_date,
+        )
+
+        assert mock_create_new_export_interaction_reminder.call_count == 2
+        mock_create_new_export_interaction_reminder.assert_has_calls(
+            [
+                mock.call(
+                    company=own_and_other_interations_company,
+                    adviser=own_and_other_interations_advisor,
+                    interaction=own_and_other_interations_expected_interaction,
+                    reminder_days=day,
+                    send_email=True,
+                    current_date=self.current_date,
+                ),
+                mock.call(
+                    company=only_other_interactions_company,
+                    adviser=only_other_interactions_advisor,
+                    interaction=only_other_interactions_expected_interaction,
+                    reminder_days=day,
+                    send_email=True,
+                    current_date=self.current_date,
+                ),
+            ],
+        )
+
     @pytest.mark.parametrize('day_offset', (0, 1))
     def test_dont_send_reminder_if_no_new_interactions(
         self,
