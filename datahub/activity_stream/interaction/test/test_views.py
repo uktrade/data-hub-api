@@ -22,8 +22,8 @@ from datahub.interaction.test.factories import (
 from datahub.metadata.test.factories import TeamFactory
 
 
-class CompaniesInteractionWithExportBarrierSomethingElseFactory(CompaniesInteractionFactory):
-    """Create companies interaction with export barriers - Something Else."""
+class CompaniesInteractionWithExportBarrierOtherFactory(CompaniesInteractionFactory):
+    """Create companies interaction with export barriers - Other."""
 
     helped_remove_export_barrier = True
     export_barrier_notes = 'Lorem ipsum'
@@ -31,9 +31,9 @@ class CompaniesInteractionWithExportBarrierSomethingElseFactory(CompaniesInterac
     @to_many_field
     def export_barrier_types(self):
         """
-        Add "something else" export barrier type
+        Add "other" export barrier type
         """
-        return [ExportBarrierType.something_else.value.id]
+        return [ExportBarrierType.other.value.id]
 
 
 class CompaniesInteractionWithExportBarrierFinanceFactory(CompaniesInteractionFactory):
@@ -45,7 +45,7 @@ class CompaniesInteractionWithExportBarrierFinanceFactory(CompaniesInteractionFa
     @to_many_field
     def export_barrier_types(self):
         """
-        Add "something else" export barrier type
+        Add "other" export barrier type
         """
         return [ExportBarrierType.finance.value.id]
 
@@ -55,7 +55,7 @@ class CompaniesInteractionWithExportBarrierFinanceFactory(CompaniesInteractionFa
     'factory',
     [
         CompaniesInteractionFactory,
-        CompaniesInteractionWithExportBarrierSomethingElseFactory,
+        CompaniesInteractionWithExportBarrierOtherFactory,
         CompaniesInteractionWithExportBarrierFinanceFactory,
     ],
 )
