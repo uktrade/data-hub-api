@@ -12,9 +12,13 @@ from datahub.company.models import (
     Advisor,
     Company,
 )
+from datahub.core.constants import (
+    InvestmentProjectStage,
+)
 from datahub.feature_flag.models import (
     UserFeatureFlagGroup,
 )
+from datahub.investment.project.models import InvestmentProject
 from datahub.reminder import (
     EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
@@ -31,7 +35,7 @@ NOTIFICATION_SUMMARY_THRESHOLD = settings.NOTIFICATION_SUMMARY_THRESHOLD
 logger = getLogger(__name__)
 
 
-def migrate_ita_users():
+def run_ita_users_migration():
     with advisory_lock(
         'generate_ita_users_advisor_list_to_assign_notifications',
         wait=False,
@@ -46,6 +50,31 @@ def migrate_ita_users():
         code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     )
     # Get all the advisor ids that are account owner of a tier d one list company
+    advisors = get_ita_users_to_migrate(export_notifications_feature_group)
+    if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
+        logger.info(
+            f'Automatic migration is disabled. The following {advisors.count()} ita users meet '
+            'the criteria for migration but will not have any changes made to their accounts.',
+        )
+        for advisor in advisors:
+            _log_ita_advisor_migration(advisor, logger)
+    else:
+        migrate_ita_users(export_notifications_feature_group, advisors)
+
+
+def migrate_ita_users(export_notifications_feature_group, advisors):
+    for advisor in advisors:
+        _log_ita_advisor_migration(advisor, logger)
+        advisor.feature_groups.add(export_notifications_feature_group)
+
+        _add_advisor_to_export_subscriptions(advisor)
+
+    logger.info(
+        f'Migrated {advisors.count()} ita users',
+    )
+
+
+def get_ita_users_to_migrate(export_notifications_feature_group):
     one_list_account_owner_ids = (
         Company.objects.filter(
             archived=False,
@@ -63,26 +92,10 @@ def migrate_ita_users():
         feature_groups=export_notifications_feature_group,
     )
 
-    for advisor in advisors:
-        if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
-            logger.info(
-                'Automatic migration of users is disabled, no changes will be made to the ita'
-                f' user {advisor.email} subscriptions or feature flags',
-            )
-        else:
-            logger.info(
-                f'Migrating ITA user {advisor.email} to receive reminders.',
-            )
-            advisor.feature_groups.add(export_notifications_feature_group)
-
-            _add_advisor_to_export_subscriptions(advisor)
-
-    logger.info(
-        f'Migrated {advisors.count()} ita users',
-    )
+    return advisors
 
 
-def migrate_post_users():
+def run_post_users_migration():
     with advisory_lock(
         'generate_post_users_advisor_list_to_assign_notifications',
         wait=False,
@@ -93,6 +106,20 @@ def migrate_post_users():
             )
             return
 
+    advisors = get_post_users_to_migrate()
+
+    if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
+        logger.info(
+            f'Automatic migration is disabled. The following {advisors.count()} post users meet '
+            'the criteria for migration but will not have any changes made to their accounts.',
+        )
+        for advisor in advisors:
+            _log_post_advisor_migration(advisor, logger)
+    else:
+        migrate_post_users(advisors)
+
+
+def migrate_post_users(advisors):
     export_feature_group = UserFeatureFlagGroup.objects.get(
         code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     )
@@ -100,6 +127,23 @@ def migrate_post_users():
         code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     )
 
+    for advisor in advisors:
+        _log_post_advisor_migration(advisor, logger)
+
+        advisor.feature_groups.add(investment_feature_group)
+        advisor.feature_groups.add(export_feature_group)
+
+        _add_advisor_to_export_subscriptions(advisor)
+
+        _add_advisor_to_investment_subscriptions(advisor)
+
+    logger.info(
+        f'Migrated {advisors.count()} post users',
+    )
+
+
+def get_post_users_to_migrate():
+    """Get all advisors to migrate"""
     one_list_account_owner_ids = (
         Company.objects.filter(
             archived=False,
@@ -113,19 +157,20 @@ def migrate_post_users():
             flat=True,
         )
     )
-    # Get a list of all advisors (who belong to a team that has a team role of POST AND is in
-    # the one list core team member table)
-    # OR who are the global account manager for a company on the
-    # Tier D - Overseas Post Accounts one list tier.
-    # AND Exclude any who have both export-notifications and investment-notifications
-    # feature flags
+
     advisors = (
         Advisor.objects.filter(
             (
                 Q(one_list_core_team_memberships__isnull=False)
                 & Q(dit_team__role__id=TeamRoleID.post.value)
             )
-            | Q(pk__in=one_list_account_owner_ids),
+            | Q(pk__in=one_list_account_owner_ids)
+            | _generate_advisor_investment_project_query('investment_project_project_manager')
+            | _generate_advisor_investment_project_query(
+                'investment_project_project_assurance_adviser',
+            )
+            | _generate_advisor_investment_project_query('investment_projects')
+            | _generate_advisor_investment_project_query('referred_investment_projects'),
         )
         .exclude(
             Q(feature_groups__code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME)
@@ -134,26 +179,7 @@ def migrate_post_users():
         .distinct()
     )
 
-    for advisor in advisors:
-        if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
-            logger.info(
-                'Automatic migration of users is disabled, no changes will be made to the'
-                f' post user {advisor.email} subscriptions or feature flags',
-            )
-        else:
-            logger.info(
-                f'Migrating Post user {advisor.email} to receive reminders.',
-            )
-            advisor.feature_groups.add(investment_feature_group)
-            advisor.feature_groups.add(export_feature_group)
-
-            _add_advisor_to_export_subscriptions(advisor)
-
-            _add_advisor_to_investment_subscriptions(advisor)
-
-    logger.info(
-        f'Migrated {advisors.count()} post users',
-    )
+    return advisors
 
 
 def _add_advisor_to_investment_subscriptions(
@@ -167,7 +193,7 @@ def _add_advisor_to_investment_subscriptions(
         )
         NoRecentInvestmentInteractionSubscription(
             adviser=advisor,
-            reminder_days=[60],
+            reminder_days=[90],
             email_reminders_enabled=True,
         ).save()
     if not UpcomingEstimatedLandDateSubscription.objects.filter(
@@ -192,7 +218,7 @@ def _add_advisor_to_export_subscriptions(
         )
         NewExportInteractionSubscription(
             adviser=advisor,
-            reminder_days=[90],
+            reminder_days=[2],
             email_reminders_enabled=True,
         ).save()
     if not NoRecentExportInteractionSubscription.objects.filter(
@@ -206,3 +232,49 @@ def _add_advisor_to_export_subscriptions(
             reminder_days=[90],
             email_reminders_enabled=True,
         ).save()
+
+
+def _log_ita_advisor_migration(advisor, logger):
+
+    logger.info(
+        f'Migrating ITA user "{advisor.id}" to receive reminders.'
+        'The feature groups this advisor is a member of are '
+        f'{advisor.feature_groups.all()}. '
+        'The companies this advisor is an account owner of are '
+        f'{advisor.one_list_owned_companies.all()}. '
+        f'The dit_team role is "{advisor.dit_team}".',
+    )
+
+
+def _log_post_advisor_migration(advisor, logger):
+
+    logger.info(
+        f'Migrating Post user "{advisor.id}" with to receive reminders.'
+        ' The companies this advisor is one list member of is '
+        f'{advisor.one_list_core_team_memberships.all()}. '
+        f'The dit_team role is "{advisor.dit_team}". '
+        'The investment projects this advisor is a project manager of are '
+        f'{advisor.investment_project_project_manager.all()}. '
+        'The investment projects this advisor is a project assurance advisor of are '
+        f'{advisor.investment_project_project_assurance_adviser.all()}. '
+        'The investment projects this advisor is a client relationship manager of are '
+        f'{advisor.investment_projects.all()}. '
+        'The investment projects this advisor is a referral source advisor of are '
+        f' {advisor.referred_investment_projects.all()}.',
+    )
+
+
+def _generate_advisor_investment_project_query(role):
+    """
+    Generate a django Q object using the advisor role to match against an investment project
+    """
+    return Q(
+        **{
+            f'{role}__isnull': False,
+            f'{role}__status__in': [
+                InvestmentProject.Status.ONGOING,
+                InvestmentProject.Status.DELAYED,
+            ],
+            f'{role}__stage_id': InvestmentProjectStage.active.value.id,
+        },
+    )

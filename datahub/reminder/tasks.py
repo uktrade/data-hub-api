@@ -518,6 +518,7 @@ def generate_no_recent_export_interaction_reminders_for_subscription(subscriptio
         for company in _get_managed_companies(subscription.adviser).iterator():
             qs = Interaction.objects.filter(companies__in=[company])
             has_interactions = qs.exists()
+
             if has_interactions:
                 exists = qs.filter(created_on__date=threshold).exists()
                 if not exists:
