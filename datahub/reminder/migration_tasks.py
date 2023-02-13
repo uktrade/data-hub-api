@@ -193,7 +193,7 @@ def _add_advisor_to_investment_subscriptions(
         )
         NoRecentInvestmentInteractionSubscription(
             adviser=advisor,
-            reminder_days=[60],
+            reminder_days=[90],
             email_reminders_enabled=True,
         ).save()
     if not UpcomingEstimatedLandDateSubscription.objects.filter(
@@ -218,7 +218,7 @@ def _add_advisor_to_export_subscriptions(
         )
         NewExportInteractionSubscription(
             adviser=advisor,
-            reminder_days=[90],
+            reminder_days=[2],
             email_reminders_enabled=True,
         ).save()
     if not NoRecentExportInteractionSubscription.objects.filter(
