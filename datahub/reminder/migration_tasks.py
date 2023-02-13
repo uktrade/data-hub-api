@@ -53,9 +53,8 @@ def run_ita_users_migration():
     advisors = get_ita_users_to_migrate(export_notifications_feature_group)
     if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
         logger.info(
-            'AUTOMATIC MIGRATION IS DISABLED. THE FOLLOWING %s ITA USERS MEET THE CRITERIA FOR '
-            'MIGRATION BUT WILL NOT HAVE ANY CHANGES MADE TO THEIR ACCOUNTS',
-            advisors.count(),
+            f'Automatic migration is disabled. The following {advisors.count()} ita users meet '
+            'the criteria for migration but will not have any changes made to their accounts.'
         )
         for advisor in advisors:
             _log_ita_advisor_migration(advisor, logger)
@@ -111,9 +110,8 @@ def run_post_users_migration():
 
     if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
         logger.info(
-            'AUTOMATIC MIGRATION IS DISABLED. THE FOLLOWING %s POST USERS MEET THE CRITERIA FOR '
-            'MIGRATION BUT WILL NOT HAVE ANY CHANGES MADE TO THEIR ACCOUNTS',
-            advisors.count(),
+            f'Automatic migration is disabled. The following {advisors.count()} post users meet '
+            'the criteria for migration but will not have any changes made to their accounts.'
         )
         for advisor in advisors:
             _log_post_advisor_migration(advisor, logger)
@@ -167,14 +165,12 @@ def get_post_users_to_migrate():
                 & Q(dit_team__role__id=TeamRoleID.post.value)
             )
             | Q(pk__in=one_list_account_owner_ids)
-            | (
-                _generate_advisor_investment_project_query('investment_project_project_manager')
-                | _generate_advisor_investment_project_query(
-                    'investment_project_project_assurance_adviser',
-                )
-                | _generate_advisor_investment_project_query('investment_projects')
-                | _generate_advisor_investment_project_query('referred_investment_projects')
-            ),
+            | _generate_advisor_investment_project_query('investment_project_project_manager')
+            | _generate_advisor_investment_project_query(
+                'investment_project_project_assurance_adviser',
+            )
+            | _generate_advisor_investment_project_query('investment_projects')
+            | _generate_advisor_investment_project_query('referred_investment_projects'),
         )
         .exclude(
             Q(feature_groups__code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME)
@@ -241,7 +237,7 @@ def _add_advisor_to_export_subscriptions(
 def _log_ita_advisor_migration(advisor, logger):
 
     logger.info(
-        f'Migrating ITA user "{advisor.id}" with email "{advisor.email}" to receive reminders.'
+        f'Migrating ITA user "{advisor.id}" to receive reminders.'
         'The feature groups this advisor is a member of are '
         f'{advisor.feature_groups.all()}. '
         'The companies this advisor is an account owner of are '
@@ -253,7 +249,7 @@ def _log_ita_advisor_migration(advisor, logger):
 def _log_post_advisor_migration(advisor, logger):
 
     logger.info(
-        f'Migrating Post user "{advisor.id}" with email "{advisor.email}" to receive reminders.'
+        f'Migrating Post user "{advisor.id}" with to receive reminders.'
         ' The companies this advisor is one list member of is '
         f'{advisor.one_list_core_team_memberships.all()}. '
         f'The dit_team role is "{advisor.dit_team}". '

@@ -1,3 +1,4 @@
+import factory
 import logging
 from unittest import mock
 
@@ -102,8 +103,8 @@ class TestITAUsersMigration:
 
         assert (
             caplog.messages[0]
-            == 'AUTOMATIC MIGRATION IS DISABLED. THE FOLLOWING 1 ITA USERS MEET THE CRITERIA FOR '
-            'MIGRATION BUT WILL NOT HAVE ANY CHANGES MADE TO THEIR ACCOUNTS'
+            == 'Automatic migration is disabled. The following 1 ita users meet the criteria for '
+            'migration but will not have any changes made to their accounts.'
         )
 
     def test_advisor_account_owner_of_company_in_wrong_tier_is_excluded_from_migration(
@@ -357,8 +358,8 @@ class TestPostUsersMigration:
 
         assert (
             caplog.messages[0]
-            == 'AUTOMATIC MIGRATION IS DISABLED. THE FOLLOWING 1 POST USERS MEET THE CRITERIA FOR'
-            ' MIGRATION BUT WILL NOT HAVE ANY CHANGES MADE TO THEIR ACCOUNTS'
+            == 'Automatic migration is disabled. The following 1 post users meet the criteria for'
+            ' migration but will not have any changes made to their accounts.'
         )
 
     def test_advisor_in_post_team_not_one_list_core_member_not_global_account_manager_no_project_link_is_excluded_from_migration(  # noqa: E501
@@ -608,13 +609,13 @@ class TestPostUsersMigration:
 
         advisor_to_migrate = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
         role_field = {advisor_project_role: advisor_to_migrate}
-        for _ in range(5):
-            InvestmentProjectFactory(
-                **role_field,
-                investor_company=CompanyFactory(),
-                stage_id=InvestmentProjectStage.active.value.id,
-                status=status,
-            )
+        InvestmentProjectFactory.create_batch(
+            5,
+            **role_field,
+            investor_company=CompanyFactory(),
+            stage_id=InvestmentProjectStage.active.value.id,
+            status=status,
+        )
 
         advisor_to_exclude = AdviserFactory()
         role_field = {advisor_project_role: advisor_to_exclude}
@@ -655,53 +656,56 @@ class TestPostUsersMigration:
         migrated_users = []
 
         # Add user in dit role and member of one list core team
-        for _ in range(3):
-            dit_role_advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
-            OneListCoreTeamMemberFactory(
-                adviser=dit_role_advisor,
-            )
-            migrated_users.append(dit_role_advisor)
+        dit_role_advisors = AdviserFactory.create_batch(3, dit_team__role_id=TeamRoleID.post.value)
+        OneListCoreTeamMemberFactory.create_batch(
+            len(dit_role_advisors),
+            adviser=factory.Iterator(dit_role_advisors),
+        )
+        migrated_users.extend(dit_role_advisors)
 
         # Add user that is the account owner of a tier d company
-        for _ in range(8):
-            account_owner_advisor = AdviserFactory()
-            CompanyFactory(
-                one_list_account_owner=account_owner_advisor,
-                one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value,
-            )
-            migrated_users.append(account_owner_advisor)
+        account_owner_advisors = AdviserFactory.create_batch(8)
+        CompanyFactory.create_batch(
+            len(account_owner_advisors),
+            one_list_account_owner=factory.Iterator(account_owner_advisors),
+            one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value,
+        )
+        migrated_users.extend(account_owner_advisors)
 
         # Add user that has a relation to an investment project
-        for _ in range(4):
-            investment_project_advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
-            role_field = {advisor_project_role: investment_project_advisor}
-
-            InvestmentProjectFactory(
-                **role_field,
-                investor_company=CompanyFactory(),
-                stage_id=InvestmentProjectStage.active.value.id,
-                status=InvestmentProject.Status.ONGOING,
-            )
-            migrated_users.append(investment_project_advisor)
+        investment_project_advisors = AdviserFactory.create_batch(
+            4, dit_team__role_id=TeamRoleID.post.value
+        )
+        InvestmentProjectFactory.create_batch(
+            len(investment_project_advisors),
+            **{advisor_project_role: factory.Iterator(investment_project_advisors)},
+            investor_company=CompanyFactory(),
+            stage_id=InvestmentProjectStage.active.value.id,
+            status=InvestmentProject.Status.ONGOING,
+        )
+        migrated_users.extend(investment_project_advisors)
 
         # Add user that meets every criteria
-        for _ in range(5):
-            all_criteria_advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
-            role_field = {advisor_project_role: all_criteria_advisor}
-            OneListCoreTeamMemberFactory(
-                adviser=all_criteria_advisor,
-            )
-
-            InvestmentProjectFactory(
-                **role_field,
-                investor_company=CompanyFactory(
-                    one_list_account_owner=all_criteria_advisor,
-                    one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value,
-                ),
-                stage_id=InvestmentProjectStage.active.value.id,
-                status=InvestmentProject.Status.DELAYED,
-            )
-            migrated_users.append(all_criteria_advisor)
+        all_criteria_advisors = AdviserFactory.create_batch(
+            5, dit_team__role_id=TeamRoleID.post.value
+        )
+        OneListCoreTeamMemberFactory.create_batch(
+            len(all_criteria_advisors),
+            adviser=factory.Iterator(all_criteria_advisors),
+        )
+        one_list_companies = CompanyFactory.create_batch(
+            len(all_criteria_advisors),
+            one_list_account_owner=factory.Iterator(all_criteria_advisors),
+            one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value,
+        )
+        InvestmentProjectFactory.create_batch(
+            len(all_criteria_advisors),
+            **{advisor_project_role: factory.Iterator(all_criteria_advisors)},
+            investor_company=factory.Iterator(one_list_companies),
+            stage_id=InvestmentProjectStage.active.value.id,
+            status=InvestmentProject.Status.DELAYED,
+        )
+        migrated_users.extend(all_criteria_advisors)
 
         run_post_users_migration()
         for user in migrated_users:
