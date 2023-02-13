@@ -61,9 +61,6 @@ def run_ita_users_migration():
             _log_ita_advisor_migration(advisor, logger)
     else:
         migrate_ita_users(export_notifications_feature_group, advisors)
-        logger.info(
-            f'Migrated {advisors.count()} ita users',
-        )
 
 
 def migrate_ita_users(export_notifications_feature_group, advisors):
@@ -72,6 +69,10 @@ def migrate_ita_users(export_notifications_feature_group, advisors):
         advisor.feature_groups.add(export_notifications_feature_group)
 
         _add_advisor_to_export_subscriptions(advisor)
+
+        logger.info(
+            f'Migrated {advisors.count()} ita users',
+        )
 
 
 def get_ita_users_to_migrate(export_notifications_feature_group):
@@ -119,10 +120,6 @@ def run_post_users_migration():
     else:
         migrate_post_users(advisors)
 
-        logger.info(
-            f'Migrated {advisors.count()} post users',
-        )
-
 
 def migrate_post_users(advisors):
     export_feature_group = UserFeatureFlagGroup.objects.get(
@@ -141,6 +138,10 @@ def migrate_post_users(advisors):
         _add_advisor_to_export_subscriptions(advisor)
 
         _add_advisor_to_investment_subscriptions(advisor)
+
+    logger.info(
+        f'Migrated {advisors.count()} post users',
+    )
 
 
 def get_post_users_to_migrate():
