@@ -1868,7 +1868,7 @@ class TestGenerateNewExportInteractionReminderTask:
     ):
         """
         New Export Interaction reminders should not be sent to the advisor who created the
-        interaction, they should only go to adviosrs when they did not create the interaction
+        interaction, they should only go to an advisor when they did not create the interaction
         """
 
         def _export_interaction_advisor(day):
@@ -1894,8 +1894,9 @@ class TestGenerateNewExportInteractionReminderTask:
         day = 15
         interaction_date = self.current_date - relativedelta(days=day)
 
-        # setup 3 users - 1 with only interactions they created, 1 with a mix and 1 with only
-        # interactions they didnt create
+        # setup 3 advisors, along with a company and subscription - 1 advisor with only company
+        # interactions they created, 1 with a mix of company interactions they created and created
+        # by another advisor, and 1 with only company interactions created by another advisor
         (
             only_own_interactions_advisor,
             only_own_interactions_company,
