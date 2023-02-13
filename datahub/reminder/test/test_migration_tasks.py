@@ -1,8 +1,8 @@
 import logging
 
-import factory
-
 from unittest import mock
+
+import factory
 
 import pytest
 from freezegun import freeze_time
