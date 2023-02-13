@@ -1614,7 +1614,7 @@ class TestAddInteraction(APITestMixin):
                     'helped_remove_export_barrier': True,
                     'export_barrier_types': [
                         {
-                            'id': ExportBarrierType.something_else.value.id,
+                            'id': ExportBarrierType.other.value.id,
                         },
                     ],
                 },
@@ -1724,7 +1724,7 @@ class TestAddInteraction(APITestMixin):
                         'This field is only valid when an interaction'
                         ' helped remove an export barrier',
                         'This field is only valid when the'
-                        ' export barrier type is \"Something else\"',
+                        ' export barrier type is \"Other\"',
                     ],
                 },
             ),
