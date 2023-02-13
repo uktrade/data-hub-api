@@ -1,5 +1,7 @@
-import factory
 import logging
+
+import factory
+
 from unittest import mock
 
 import pytest
@@ -656,7 +658,10 @@ class TestPostUsersMigration:
         migrated_users = []
 
         # Add user in dit role and member of one list core team
-        dit_role_advisors = AdviserFactory.create_batch(3, dit_team__role_id=TeamRoleID.post.value)
+        dit_role_advisors = AdviserFactory.create_batch(
+            3,
+            dit_team__role_id=TeamRoleID.post.value,
+        )
         OneListCoreTeamMemberFactory.create_batch(
             len(dit_role_advisors),
             adviser=factory.Iterator(dit_role_advisors),
@@ -674,7 +679,8 @@ class TestPostUsersMigration:
 
         # Add user that has a relation to an investment project
         investment_project_advisors = AdviserFactory.create_batch(
-            4, dit_team__role_id=TeamRoleID.post.value
+            4,
+            dit_team__role_id=TeamRoleID.post.value,
         )
         InvestmentProjectFactory.create_batch(
             len(investment_project_advisors),
@@ -687,7 +693,8 @@ class TestPostUsersMigration:
 
         # Add user that meets every criteria
         all_criteria_advisors = AdviserFactory.create_batch(
-            5, dit_team__role_id=TeamRoleID.post.value
+            5,
+            dit_team__role_id=TeamRoleID.post.value,
         )
         OneListCoreTeamMemberFactory.create_batch(
             len(all_criteria_advisors),

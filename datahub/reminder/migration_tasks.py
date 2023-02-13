@@ -54,7 +54,7 @@ def run_ita_users_migration():
     if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
         logger.info(
             f'Automatic migration is disabled. The following {advisors.count()} ita users meet '
-            'the criteria for migration but will not have any changes made to their accounts.'
+            'the criteria for migration but will not have any changes made to their accounts.',
         )
         for advisor in advisors:
             _log_ita_advisor_migration(advisor, logger)
@@ -111,7 +111,7 @@ def run_post_users_migration():
     if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
         logger.info(
             f'Automatic migration is disabled. The following {advisors.count()} post users meet '
-            'the criteria for migration but will not have any changes made to their accounts.'
+            'the criteria for migration but will not have any changes made to their accounts.',
         )
         for advisor in advisors:
             _log_post_advisor_migration(advisor, logger)
