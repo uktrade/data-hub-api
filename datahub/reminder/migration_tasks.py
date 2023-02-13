@@ -70,9 +70,9 @@ def migrate_ita_users(export_notifications_feature_group, advisors):
 
         _add_advisor_to_export_subscriptions(advisor)
 
-        logger.info(
-            f'Migrated {advisors.count()} ita users',
-        )
+    logger.info(
+        f'Migrated {advisors.count()} ita users',
+    )
 
 
 def get_ita_users_to_migrate(export_notifications_feature_group):
