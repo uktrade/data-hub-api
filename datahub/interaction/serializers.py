@@ -150,8 +150,8 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
         'invalid_when_no_helped_remove_export_barrier': gettext_lazy(
             'This field is only valid when an interaction helped remove an export barrier',
         ),
-        'invalid_when_no_something_else_selected': gettext_lazy(
-            'This field is only valid when the export barrier type is "Something else"',
+        'invalid_when_no_other_selected': gettext_lazy(
+            'This field is only valid when the export barrier type is "Other"',
         ),
     }
 
@@ -843,7 +843,7 @@ class InteractionSerializerV4(BaseInteractionSerializer):
                     OperatorRule('export_barrier_notes', bool),
                     when=IsSubsetByIdRule(
                         'export_barrier_types',
-                        [uuid.UUID(ExportBarrierTypeConstant.something_else.value.id)],
+                        [uuid.UUID(ExportBarrierTypeConstant.other.value.id)],
                     ),
                 ),
                 ValidationRule(
@@ -853,12 +853,12 @@ class InteractionSerializerV4(BaseInteractionSerializer):
                     when=OperatorRule('helped_remove_export_barrier', not_),
                 ),
                 ValidationRule(
-                    'invalid_when_no_something_else_selected',
+                    'invalid_when_no_other_selected',
                     OperatorRule('export_barrier_notes', not_),
                     when=NotRule(
                         IsSubsetByIdRule(
                             'export_barrier_types',
-                            [uuid.UUID(ExportBarrierTypeConstant.something_else.value.id)],
+                            [uuid.UUID(ExportBarrierTypeConstant.other.value.id)],
                         ),
                     ),
                 ),

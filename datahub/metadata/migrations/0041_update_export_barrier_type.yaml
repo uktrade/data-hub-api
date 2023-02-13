@@ -1,0 +1,6 @@
+- model: metadata.exportbarriertype
+  pk: 8ef83315-2b0f-4d5e-98da-a16f8b2217a6
+  fields:
+    disabled_on: null
+    name: 'Other'
+    order: 500
