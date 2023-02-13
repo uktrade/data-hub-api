@@ -29,9 +29,9 @@ backcall==0.2.0
     # via ipython
 billiard==3.6.4.0
     # via celery
-boto3==1.26.64
+boto3==1.26.69
     # via -r requirements.in
-botocore==1.29.64
+botocore==1.29.69
     # via
     #   boto3
     #   s3transfer
