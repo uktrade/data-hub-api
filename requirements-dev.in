@@ -12,7 +12,6 @@ freezegun==1.2.2
 requests-mock==1.10.0
 pip-tools==6.12.2
 piprot==0.9.11
-watchdog[watchmedo]==2.2.1
 pre-commit==3.0.4
 
 # Code static analysis
