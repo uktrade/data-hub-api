@@ -1,7 +1,6 @@
 import sys
 import sentry_sdk
 from django_log_formatter_ecs import ECSFormatter
-from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 
 from config.settings.common import *
@@ -47,7 +46,6 @@ sentry_sdk.init(
     dsn=env('DJANGO_SENTRY_DSN'),
     environment=env('SENTRY_ENVIRONMENT'),
     integrations=[
-        CeleryIntegration(),
         DjangoIntegration(),
     ],
     in_app_include=['datahub'],
