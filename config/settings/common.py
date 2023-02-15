@@ -11,7 +11,6 @@ from datetime import timedelta
 from urllib.parse import urlencode
 
 import environ
-from celery.schedules import crontab
 from django.core.exceptions import ImproperlyConfigured
 
 from config.settings.types import HawkScope
@@ -372,31 +371,12 @@ if REDIS_BASE_URL:
     }
 
 if REDIS_BASE_URL:
-    REDIS_CELERY_DB = env('REDIS_CELERY_DB', default=1)
     is_rediss = REDIS_BASE_URL.startswith('rediss://')
     url_args = {'ssl_cert_reqs': 'CERT_REQUIRED'} if is_rediss else {}
-
-    CELERY_BROKER_URL = _build_redis_url(REDIS_BASE_URL, REDIS_CELERY_DB, **url_args)
-    CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-
-    # Increase timeout from one hour for long-running tasks
-    # (If the timeout is reached before a task, Celery will start it again. This
-    # would affect in particular any long-running tasks using acks_late=True.)
-    CELERY_BROKER_TRANSPORT_OPTIONS = {
-        'visibility_timeout': int(timedelta(hours=9).total_seconds())
-    }
-    CELERY_BEAT_SCHEDULE = {}
 
     ENABLE_DAILY_HIERARCHY_ROLLOUT = env.bool('ENABLE_DAILY_HIERARCHY_ROLLOUT', False)
     DAILY_HIERARCHY_ROLLOUT_LIMIT = env.int('DAILY_HIERARCHY_ROLLOUT_LIMIT', 10)
 
-    CELERY_WORKER_LOG_FORMAT = (
-        "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
-    )
-
-CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER', False)
-CELERY_TASK_SEND_SENT_EVENT = env.bool('CELERY_TASK_SEND_SENT_EVENT', True)
-CELERY_WORKER_TASK_EVENTS = env.bool('CELERY_WORKER_TASK_EVENTS', True)
 ENABLE_DAILY_OPENSEARCH_SYNC = env.bool('ENABLE_DAILY_OPENSEARCH_SYNC', False)
 ENABLE_EMAIL_INGESTION = env.bool('ENABLE_EMAIL_INGESTION', False)
 ENABLE_ESTIMATED_LAND_DATE_REMINDERS = env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS', False)
