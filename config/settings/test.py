@@ -58,8 +58,6 @@ CACHES = {
     }
 }
 
-CELERY_TASK_ALWAYS_EAGER = True
-
 # Stop WhiteNoise emitting warnings when running tests without running collectstatic first
 WHITENOISE_AUTOREFRESH = True
 WHITENOISE_USE_FINDERS = True
