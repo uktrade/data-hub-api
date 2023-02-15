@@ -105,7 +105,7 @@ class TestITAUsersMigration:
         run_ita_users_migration()
 
         expected_messages = [
-            "Starting migration of ITA users",
+            'Starting migration of ITA users',
             'Automatic migration is disabled. The following 1 ita users meet the criteria for '
             'migration but will not have any changes made to their accounts.',
         ]
@@ -366,6 +366,19 @@ class TestPostUsersMigration:
             'Automatic migration is disabled. The following 1 post users meet the criteria for'
             ' migration but will not have any changes made to their accounts.',
         ]
+
+    def test_exception_is_caught_and_logged_and_rethrown(
+        self,
+        caplog,
+        monkeypatch,
+    ):
+        caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
+        monkeypatch.setattr(Advisor.objects, 'filter', mock.Mock(side_effect=ValueError))
+        with pytest.raises(Exception):
+            assert caplog.messages == [
+                'Starting migration of POST users',
+                'Error migrating POST users',
+            ]
 
     def test_advisor_in_post_team_not_one_list_core_member_not_global_account_manager_no_project_link_is_excluded_from_migration(  # noqa: E501
         self,

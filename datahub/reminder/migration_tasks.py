@@ -106,18 +106,23 @@ def run_post_users_migration():
                 'Post users advisor list is already being processed by another worker.',
             )
             return
-    logger.info('Starting migration of POST users')
-    advisors = get_post_users_to_migrate()
+    try:
+        logger.info('Starting migration of POST users')
+        advisors = get_post_users_to_migrate()
 
-    if not settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS:
-        logger.info(
-            f'Automatic migration is disabled. The following {advisors.count()} post users meet '
-            'the criteria for migration but will not have any changes made to their accounts.',
-        )
-        for advisor in advisors:
-            _log_post_advisor_migration(advisor, logger)
-    else:
-        migrate_post_users(advisors)
+        if not settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS:
+            logger.info(
+                f'Automatic migration is disabled. The following {advisors.count()} post users meet '
+                'the criteria for migration but will not have any changes made to their accounts.',
+            )
+            for advisor in advisors:
+                _log_post_advisor_migration(advisor, logger)
+        else:
+            migrate_post_users(advisors)
+    except Exception:
+        logger.exception('Error migrating POST users')
+
+        raise
 
 
 def migrate_post_users(advisors):

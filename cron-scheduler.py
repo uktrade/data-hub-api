@@ -16,6 +16,7 @@ from datahub.company.tasks.contact import schedule_automatic_contact_archive
 from datahub.core.queues.constants import (
     EVERY_EIGHT_AM,
     EVERY_EIGHT_THIRTY_AM_ON_FIRST_EACH_MONTH,
+    EVERY_ELEVEN_PM,
     EVERY_HOUR,
     EVERY_MIDNIGHT,
     EVERY_NINE_THIRTY_AM_ON_FIRST_SECOND_THIRD_FOURTH_OF_EACH_MONTH,
@@ -23,10 +24,9 @@ from datahub.core.queues.constants import (
     EVERY_SEVEN_PM,
     EVERY_TEN_AM,
     EVERY_TEN_MINUTES,
+    EVERY_TEN_PM,
     EVERY_THREE_AM_ON_TWENTY_THIRD_EACH_MONTH,
     HALF_DAY_IN_SECONDS,
-    EVERY_TEN_PM,
-    EVERY_ELEVEN_PM,
 )
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
