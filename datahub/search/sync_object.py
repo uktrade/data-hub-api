@@ -47,6 +47,13 @@ def sync_object_async(search_app, pk):
         max_retries=15,
         retry_backoff=True,
     )
+
+    obj = search_app.queryset.get(pk=pk)
+
+    if obj is not None:
+        logger.info(f'Object {obj.pk} created on: {obj.created_on} '
+                    f'and modified on: {obj.modified_on}')
+
     logger.info(
         f'Task {job.id} sync_object_task {search_app.name} '
         f'scheduled to synchronise object {pk} '
