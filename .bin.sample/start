@@ -2,6 +2,5 @@
 docker-compose stop
 docker-compose rm -f
 
-# Start the api and celery containers (will start dependencies too)
+# Start the api containers (will start dependencies too)
 docker-compose up --detach --build api
-docker-compose up --detach celery
