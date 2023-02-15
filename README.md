@@ -234,8 +234,8 @@ Dependencies:
     ./manage.py loaddata fixtures/test_data.yaml
     ```
 
-    Note that this will queue Celery tasks to index the created records in OpenSearch,
-    and hence the loaded records won‘t be returned by search endpoints until Celery is
+    Note that this will queue RQ tasks to index the created records in OpenSearch,
+    and hence the loaded records won‘t be returned by search endpoints until RQ is
     started and the queued tasks have run.
 
 13. Create a superuser:
@@ -252,17 +252,14 @@ Dependencies:
     ./manage.py runserver
     ```
 
-15. Start celery:
+16. Start RQ (Redis Queue): 
 
     ```shell
-    celery worker -A config -l info -Q celery,long-running -B
+    python rq/rq-worker.py
     ```
 
-    Note that in production the long-running queue is run in a separate worker with the
-    `-O fair --prefetch-multiplier 1` arguments for better fairness when long-running tasks
-    are running or pending execution.
+    Note that in production the cron-scheduler:1/1, short-running-working:4/4, long-running-worker:4/4 are run in separate instances .
 
-16. Start RQ (Redis Queue): `python rq/rq-worker.py`
 
 ## API documentation
 
@@ -384,9 +381,6 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `AWS_ACCESS_KEY_ID`                                               | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials).                                              |
 | `AWS_DEFAULT_REGION`                                              | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration)                                               |
 | `AWS_SECRET_ACCESS_KEY`                                           | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials).                                              |
-| `CELERY_TASK_ALWAYS_EAGER`                                        | No | Can be set to True when running the app locally to run Celery tasks started from the web process synchronously. Not for use in production.                                       |
-| `CELERY_TASK_SEND_SENT_EVENT`                                     | No | Whether Celery workers send the `task-sent` event (default=True).                                                                                                                |
-| `CELERY_WORKER_TASK_EVENTS`                                       | No | Whether Celery workers send task events (by default) for use by monitoring tools such as Flower (default=True).                                                                  |
 | `COMPANY_MATCHING_SERVICE_BASE_URL`                               | No | The base url of the company matching service (default=None).                                                                                                                     |
 | `COMPANY_MATCHING_HAWK_ID`                                        | No | The hawk id to use when making a request to the company matching service (default=None).                                                                                         |
 | `COMPANY_MATCHING_HAWK_KEY`                                       | No | The hawk key to use when making a request to the company matching service (default=None).                                                                                        |
@@ -418,17 +412,16 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW`                              | No | Whether to enable the add access token page for superusers in the admin site (default=True).                                                                                     |
 | `ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS`                       | No | Whether to enable automatic migration of users to receive notification reminders |
 | `ENABLE_DAILY_OPENSEARCH_SYNC`                                    | No | Whether to enable the daily OpenSearch sync (default=False).                                                                                                                     |
-| `ENABLE_EMAIL_INGESTION`                                          | No | True or False. Whether or not to activate the celery beat task for ingesting emails                                                                                              |
-| `ENABLE_INVESTMENT_NOTIFICATION`                                  | No | True or False. Whether or not to activate the celery beat task for sending investment notifications                                                                              |
-| `ENABLE_ESTIMATED_LAND_DATE_REMINDERS`                            | No | True or False. Whether or not to activate the celery beat task for sending investment notifications                                                                              |
-| `ENABLE_ESTIMATED_LAND_DATE_REMINDERS_EMAIL_DELIVERY_STATUS`      | No | True or False. Whether or not to activate the celery beat task for checking delivery status                                                                                      |
+| `ENABLE_EMAIL_INGESTION`                                          | No | True or False. Whether or not to activate the RQ task for ingesting emails                                                                                              |
+| `ENABLE_INVESTMENT_NOTIFICATION`                                  | No | True or False. Whether or not to activate the RQ task for sending investment notifications                                                                              |
+| `ENABLE_ESTIMATED_LAND_DATE_REMINDERS`                            | No | True or False. Whether or not to activate the RQ task for sending investment notifications                                                                              |
+| `ENABLE_ESTIMATED_LAND_DATE_REMINDERS_EMAIL_DELIVERY_STATUS`      | No | True or False. Whether or not to activate the RQ task for checking delivery status                                                                                      |
 | `ENABLE_NEW_EXPORT_INTERACTION_REMINDERS`                             | No | True or False. Whether or not to activate the RQ task for sending new export interaction notifications                                                                           |
 | `ENABLE_NEW_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS`       | No | True or False. Whether or not to activate the RQ task for checking delivery status                                                                                               |
 | `ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS`                       | No | True or False. Whether or not to activate the RQ task for sending no recent interaction notifications                                                                            |
 | `ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS` | No | True or False. Whether or not to activate the RQ task for checking delivery status                                                                                               |
-| `ENABLE_NO_RECENT_INTERACTION_REMINDERS`                          | No | True or False. Whether or not to activate the celery beat task for sending investment notifications                                                                              |
-| `ENABLE_NO_RECENT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS`    | No | True or False. Whether or not to activate the celery beat task for checking delivery status                                                                                      |
-| `ENABLE_MAILBOX_PROCESSING`                                       | No | True or False. Whether or not to activate the celery beat task for mailbox processing                                                                                            |
+| `ENABLE_NO_RECENT_INTERACTION_REMINDERS`                          | No | True or False. Whether or not to activate the RQ task for sending investment notifications                                                                              |
+| `ENABLE_MAILBOX_PROCESSING`                                       | No | True or False. Whether or not to activate the RQ task for mailbox processing                                                                                            |
 | `ENABLE_SLACK_MESSAGING`                                          | No | If present and truthy, enable the transmission of messages to Slack. Necessitates the specification of the other env vars `SLACK_API_TOKEN` and `SLACK_MESSAGE_CHANNEL`          |
 | `ENABLE_SPI_REPORT_GENERATION`                                    | No | Whether to enable daily SPI report (default=False).                                                                                                                              |
 | `ES_APM_ENABLED`                                                  | Yes | Enables Elasticsearch APM agent when is True.                                                                                                                                    |
@@ -476,7 +469,6 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `PAAS_IP_WHITELIST`                                               | No | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints.                                                                                                 |
 | `REDIS_BASE_URL`                                                  | No | redis base URL without the db                                                                                                                                                    |
 | `REDIS_CACHE_DB`                                                  | No | redis db for django cache (default 0)                                                                                                                                            |
-| `REDIS_CELERY_DB`                                                 | No | redis db for celery (default 1)                                                                                                                                                  |
 | `REPORT_AWS_ACCESS_KEY_ID`                                        | No | Same use as AWS_ACCESS_KEY_ID, but for reports.                                                                                                                                  |
 | `REPORT_AWS_SECRET_ACCESS_KEY`                                    | No | Same use as AWS_SECRET_ACCESS_KEY, but for reports.                                                                                                                              |
 | `REPORT_AWS_REGION`                                               | No | Same use as AWS_DEFAULT_REGION, but for reports.                                                                                                                                 |
@@ -534,19 +526,19 @@ To create missing OpenSearch indexes and migrate modified mapping types:
 ./manage.py migrate_search
 ```
 
-This will also resync data (using Celery) for any newly-created indexes.
+This will also resync data (using RQ) for any newly-created indexes.
 
 See [docs/OpenSearch migrations.md](docs/OpenSearch&#32;migrations.md) for more detail about how the command works.
 
 #### Resync all OpenSearch records
 
-To resync all records using Celery:
+To resync all records using RQ:
 
 ```shell
 ./manage.py sync_search
 ```
 
-To resync all records synchronously (without Celery running):
+To resync all records synchronously (without RQ running):
 
 ```shell
 ./manage.py sync_search --foreground

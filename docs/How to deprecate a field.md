@@ -82,4 +82,4 @@ Differences include:
 
 * the new field will need to, initially, be nullable (it can be made non-nullable if desired once it has been fully populated with data)
 
-* a different Celery task (or management command) will need to be used for the one-off copy of historical data from the old field to the new field 
+* a different RQ task (or management command) will need to be used for the one-off copy of historical data from the old field to the new field 
