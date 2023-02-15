@@ -46,12 +46,13 @@ def run_ita_users_migration():
             )
             return
 
+    logger.info('Starting migration of ITA users')
     export_notifications_feature_group = UserFeatureFlagGroup.objects.get(
         code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     )
     # Get all the advisor ids that are account owner of a tier d one list company
     advisors = get_ita_users_to_migrate(export_notifications_feature_group)
-    if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
+    if not settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS:
         logger.info(
             f'Automatic migration is disabled. The following {advisors.count()} ita users meet '
             'the criteria for migration but will not have any changes made to their accounts.',
@@ -105,10 +106,10 @@ def run_post_users_migration():
                 'Post users advisor list is already being processed by another worker.',
             )
             return
-
+    logger.info('Starting migration of POST users')
     advisors = get_post_users_to_migrate()
 
-    if not settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS:
+    if not settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS:
         logger.info(
             f'Automatic migration is disabled. The following {advisors.count()} post users meet '
             'the criteria for migration but will not have any changes made to their accounts.',

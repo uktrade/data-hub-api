@@ -25,6 +25,8 @@ from datahub.core.queues.constants import (
     EVERY_TEN_MINUTES,
     EVERY_THREE_AM_ON_TWENTY_THIRD_EACH_MONTH,
     HALF_DAY_IN_SECONDS,
+    EVERY_TEN_PM,
+    EVERY_ELEVEN_PM,
 )
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
@@ -248,7 +250,7 @@ def schedule_user_reminder_migration():
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,
         retry_intervals=30,
-        cron=EVERY_MIDNIGHT,
+        cron=EVERY_TEN_PM,
         description='Daily migrate ITA users to receive notifications',
     )
 
@@ -258,7 +260,7 @@ def schedule_user_reminder_migration():
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,
         retry_intervals=30,
-        cron=EVERY_ONE_AM,
+        cron=EVERY_ELEVEN_PM,
         description='Daily migrate post users to receive notifications',
     )
 
