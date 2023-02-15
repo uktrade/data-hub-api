@@ -55,7 +55,7 @@ class TestITAUsersMigration:
         caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
 
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
             True,
         )
 
@@ -71,6 +71,7 @@ class TestITAUsersMigration:
         run_ita_users_migration()
         expected_messages = (
             [
+                'Starting migration of ITA users',
                 'Migrated 0 ita users',
             ]
             if lock_acquired
@@ -89,7 +90,7 @@ class TestITAUsersMigration:
         Test that the task runs but no users are migrated when the setting is disabled
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
             False,
         )
         caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
@@ -103,11 +104,12 @@ class TestITAUsersMigration:
 
         run_ita_users_migration()
 
-        assert (
-            caplog.messages[0]
-            == 'Automatic migration is disabled. The following 1 ita users meet the criteria for '
-            'migration but will not have any changes made to their accounts.'
-        )
+        expected_messages = [
+            'Starting migration of ITA users',
+            'Automatic migration is disabled. The following 1 ita users meet the criteria for '
+            'migration but will not have any changes made to their accounts.',
+        ]
+        assert caplog.messages[:2] == expected_messages
 
     def test_advisor_account_owner_of_company_in_wrong_tier_is_excluded_from_migration(
         self,
@@ -118,7 +120,7 @@ class TestITAUsersMigration:
         Advisors tier they are excluded from the migraton
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
             True,
         )
 
@@ -144,7 +146,7 @@ class TestITAUsersMigration:
         from the migration
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
             True,
         )
 
@@ -171,7 +173,7 @@ class TestITAUsersMigration:
         are only assigned the feature flag but not any additional subscriptions
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
             True,
         )
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
@@ -209,7 +211,7 @@ class TestITAUsersMigration:
         export subscriptions
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
             True,
         )
 
@@ -307,7 +309,7 @@ class TestPostUsersMigration:
         caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
 
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
             True,
         )
 
@@ -324,6 +326,7 @@ class TestPostUsersMigration:
         run_post_users_migration()
         expected_messages = (
             [
+                'Starting migration of POST users',
                 'Migrated 0 post users',
             ]
             if lock_acquired
@@ -342,7 +345,7 @@ class TestPostUsersMigration:
         Test that the task runs but no users are migrated when the setting is disabled
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
             False,
         )
         caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
@@ -358,11 +361,24 @@ class TestPostUsersMigration:
 
         run_post_users_migration()
 
-        assert (
-            caplog.messages[0]
-            == 'Automatic migration is disabled. The following 1 post users meet the criteria for'
-            ' migration but will not have any changes made to their accounts.'
-        )
+        assert caplog.messages[:2] == [
+            'Starting migration of POST users',
+            'Automatic migration is disabled. The following 1 post users meet the criteria for'
+            ' migration but will not have any changes made to their accounts.',
+        ]
+
+    def test_exception_is_caught_and_logged_and_rethrown(
+        self,
+        caplog,
+        monkeypatch,
+    ):
+        caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
+        monkeypatch.setattr(Advisor.objects, 'filter', mock.Mock(side_effect=ValueError))
+        with pytest.raises(Exception):
+            assert caplog.messages == [
+                'Starting migration of POST users',
+                'Error migrating POST users',
+            ]
 
     def test_advisor_in_post_team_not_one_list_core_member_not_global_account_manager_no_project_link_is_excluded_from_migration(  # noqa: E501
         self,
@@ -374,7 +390,7 @@ class TestPostUsersMigration:
         Post Accounts one list tier and is not linked to a project is excluded from migration
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
             True,
         )
 
@@ -397,7 +413,7 @@ class TestPostUsersMigration:
         excluded from migration
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
             True,
         )
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
@@ -423,7 +439,7 @@ class TestPostUsersMigration:
         included in the migration
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
             True,
         )
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
@@ -453,7 +469,7 @@ class TestPostUsersMigration:
         Post Accounts one list tier and is not linked to a project is included in the migration
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
             True,
         )
         UserFeatureFlagGroupFactory(code='export-notifications')
@@ -479,7 +495,7 @@ class TestPostUsersMigration:
         from the migration
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
             True,
         )
 
@@ -509,7 +525,7 @@ class TestPostUsersMigration:
         migration
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
             True,
         )
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
@@ -556,7 +572,7 @@ class TestPostUsersMigration:
         ' as an {advisor_project_role} with an invalid status is excluded from the migration
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
             True,
         )
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
@@ -603,7 +619,7 @@ class TestPostUsersMigration:
         ' as an {advisor_project_role} with allowed stage is included in the migration
         """
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
             True,
         )
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
@@ -649,7 +665,7 @@ class TestPostUsersMigration:
         advisor_project_role,
     ):
         monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_USER_MIGRATIONS',
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
             True,
         )
         export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
