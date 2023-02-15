@@ -44,7 +44,7 @@ addition to the old ones).
    At this point, if an object is updated or created, the document is updated in the 
 new index, and the old version of the document is deleted from the old index.
 
-4. Celery tasks are queued to migrate data from the old indexes to the new indexes 
+4. RQ tasks are queued to migrate data from the old indexes to the new indexes 
 (one task per search app and model). This is done by indexing documents afresh 
 in batches. Once each batch has been successfully created in the new index, it 
 is deleted from the old index.
