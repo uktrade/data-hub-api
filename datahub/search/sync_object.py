@@ -1,5 +1,6 @@
 from logging import getLogger
 
+from datahub.core.models import BaseModel
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.search.bulk_sync import sync_objects
 from datahub.search.migrate_utils import delete_from_secondary_indices_callback
@@ -47,6 +48,13 @@ def sync_object_async(search_app, pk):
         max_retries=15,
         retry_backoff=True,
     )
+
+    obj = search_app.queryset.get(pk=pk)
+
+    if obj is not None and issubclass(type(obj), BaseModel):
+        logger.info(f'Object {obj.pk} created on: {obj.created_on} '
+                    f'and modified on: {obj.modified_on}')
+
     logger.info(
         f'Task {job.id} sync_object_task {search_app.name} '
         f'scheduled to synchronise object {pk} '
