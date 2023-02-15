@@ -1,5 +1,3 @@
 docker-compose stop api
-docker-compose stop celery
 
 docker-compose up --detach --build api
-docker-compose up --detach celery
