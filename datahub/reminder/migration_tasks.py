@@ -186,7 +186,7 @@ def get_post_user_ids_to_migrate():
         )
 
     one_list_core_team_advisors = _get_advisor_ids_matching_query(
-        Q(one_list_core_team_memberships__isnull=False)
+        Q(one_list_core_team_memberships__isnull=False),
     )
 
     one_list_account_owners = _get_advisor_ids_matching_query(Q(pk__in=one_list_account_owner_ids))
