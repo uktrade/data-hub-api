@@ -353,7 +353,7 @@ class TestPostUsersMigration:
         UserFeatureFlagGroupFactory(code='export-notifications')
         UserFeatureFlagGroupFactory(code='investment-notifications')
 
-        advisor = AdviserFactory()
+        advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
         CompanyFactory(
             one_list_account_owner=advisor,
             one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value,
@@ -514,7 +514,7 @@ class TestPostUsersMigration:
 
         self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
 
-    def test_advisor_not_in_post_team_not_in_one_list_core_member_global_account_manager_correct_tier_no_project_link_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
+    def test_advisor_not_in_post_team_not_in_one_list_core_member_global_account_manager_correct_tier_no_project_link_is_excluded_from_migration(  # noqa: E501
         self,
         monkeypatch,
     ):
@@ -532,6 +532,33 @@ class TestPostUsersMigration:
         investment_flag = UserFeatureFlagGroupFactory(code='investment-notifications')
 
         advisor = AdviserFactory()
+        CompanyFactory(
+            one_list_account_owner=advisor,
+            one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value,
+        )
+
+        run_post_users_migration()
+
+        self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
+
+    def test_advisor_in_post_team_not_in_one_list_core_member_global_account_manager_correct_tier_no_project_link_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
+        self,
+        monkeypatch,
+    ):
+        """
+        Test an advisor that belongs to a team that has a role of POST, is NOT a member
+        of the one list core team, is a global account manager for a company on the Tier D -
+        Overseas Post Accounts one list tier and is not linked to a project is included from the
+        migration
+        """
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
+            True,
+        )
+        export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
+        investment_flag = UserFeatureFlagGroupFactory(code='investment-notifications')
+
+        advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
         CompanyFactory(
             one_list_account_owner=advisor,
             one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value,
@@ -606,7 +633,7 @@ class TestPostUsersMigration:
             'referral_source_adviser',
         ),
     )
-    def test_advisor_not_in_post_team_not_in_one_list_core_member_not_global_account_manager_assigned_to_project_with_valid_status_and_stage_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
+    def test_advisor_in_post_team_not_in_one_list_core_member_not_global_account_manager_assigned_to_project_with_valid_status_and_stage_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
         self,
         monkeypatch,
         advisor_project_role,
@@ -685,7 +712,10 @@ class TestPostUsersMigration:
         migrated_users.extend(dit_role_advisors)
 
         # Add user that is the account owner of a tier d company
-        account_owner_advisors = AdviserFactory.create_batch(8)
+        account_owner_advisors = AdviserFactory.create_batch(
+            8,
+            dit_team__role_id=TeamRoleID.post.value,
+        )
         CompanyFactory.create_batch(
             len(account_owner_advisors),
             one_list_account_owner=factory.Iterator(account_owner_advisors),
