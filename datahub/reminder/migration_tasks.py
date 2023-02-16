@@ -171,13 +171,7 @@ def get_post_users_to_migrate():
                 Q(one_list_core_team_memberships__isnull=False)
                 & Q(dit_team__role__id=TeamRoleID.post.value)
             )
-            | Q(pk__in=one_list_account_owner_ids)
-            | _generate_advisor_investment_project_query('investment_project_project_manager')
-            | _generate_advisor_investment_project_query(
-                'investment_project_project_assurance_adviser',
-            )
-            | _generate_advisor_investment_project_query('investment_projects')
-            | _generate_advisor_investment_project_query('referred_investment_projects'),
+            | Q(pk__in=one_list_account_owner_ids),
         )
         .exclude(
             Q(feature_groups__code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME)
