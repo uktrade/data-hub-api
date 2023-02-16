@@ -171,7 +171,7 @@ def get_post_users_to_migrate():
                 Q(one_list_core_team_memberships__isnull=False)
                 & Q(dit_team__role__id=TeamRoleID.post.value)
             )
-            | Q(pk__in=one_list_account_owner_ids)
+            | Q(pk__in=one_list_account_owner_ids),
         )
         .exclude(
             Q(feature_groups__code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME)
