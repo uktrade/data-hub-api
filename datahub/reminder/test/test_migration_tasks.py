@@ -15,13 +15,10 @@ from datahub.company.test.factories import (
     OneListCoreTeamMemberFactory,
     OneListTierFactory,
 )
-from datahub.core.constants import InvestmentProjectStage
 from datahub.feature_flag.models import UserFeatureFlagGroup
 from datahub.feature_flag.test.factories import (
     UserFeatureFlagGroupFactory,
 )
-from datahub.investment.project.models import InvestmentProject
-from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.reminder.migration_tasks import run_ita_users_migration, run_post_users_migration
 from datahub.reminder.models import (
     NewExportInteractionSubscription,
@@ -541,128 +538,9 @@ class TestPostUsersMigration:
 
         self._assert_advisor_migrated(export_flag, investment_flag, advisor)
 
-    @pytest.mark.parametrize(
-        'status',
-        (
-            InvestmentProject.Status.LOST,
-            InvestmentProject.Status.ABANDONED,
-            InvestmentProject.Status.DORMANT,
-            InvestmentProject.Status.WON,
-        ),
-    )
-    @pytest.mark.parametrize(
-        'advisor_project_role',
-        (
-            'project_manager',
-            'project_assurance_adviser',
-            'client_relationship_manager',
-            'referral_source_adviser',
-        ),
-    )
-    def test_advisor_not_in_post_team_not_in_one_list_core_member_not_global_account_manager_assigned_to_invalid_project_status_is_excluded_from_migration(  # noqa: E501
-        self,
-        monkeypatch,
-        advisor_project_role,
-        status,
-    ):
-        """
-        Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member'
-        ' of the one list core team and is NOT a global account manager for a company on the'
-        ' Tier D - Overseas Post Accounts one list tier but is assigned to an investment project'
-        ' as an {advisor_project_role} with an invalid status is excluded from the migration
-        """
-        monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
-            True,
-        )
-        export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
-        investment_flag = UserFeatureFlagGroupFactory(code='investment-notifications')
-
-        advisor = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
-        role_field = {advisor_project_role: advisor}
-
-        company = CompanyFactory()
-        InvestmentProjectFactory(
-            **role_field,
-            investor_company=company,
-            stage_id=InvestmentProjectStage.active.value.id,
-            status=status,
-        )
-        self._assert_advisor_not_migrated(export_flag, investment_flag, advisor)
-
-    @pytest.mark.parametrize(
-        'status',
-        (
-            InvestmentProject.Status.ONGOING,
-            InvestmentProject.Status.DELAYED,
-        ),
-    )
-    @pytest.mark.parametrize(
-        'advisor_project_role',
-        (
-            'project_manager',
-            'project_assurance_adviser',
-            'client_relationship_manager',
-            'referral_source_adviser',
-        ),
-    )
-    def test_advisor_not_in_post_team_not_in_one_list_core_member_not_global_account_manager_assigned_to_project_with_valid_status_and_stage_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
-        self,
-        monkeypatch,
-        advisor_project_role,
-        status,
-    ):
-        """
-        Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member'
-        ' of the one list core team and is NOT a global account manager for a company on the'
-        ' Tier D - Overseas Post Accounts one list tier but is assigned to an investment project'
-        ' as an {advisor_project_role} with allowed stage is included in the migration
-        """
-        monkeypatch.setattr(
-            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
-            True,
-        )
-        export_flag = UserFeatureFlagGroupFactory(code='export-notifications')
-        investment_flag = UserFeatureFlagGroupFactory(code='investment-notifications')
-
-        advisor_to_migrate = AdviserFactory(dit_team__role_id=TeamRoleID.post.value)
-        role_field = {advisor_project_role: advisor_to_migrate}
-        InvestmentProjectFactory.create_batch(
-            5,
-            **role_field,
-            investor_company=CompanyFactory(),
-            stage_id=InvestmentProjectStage.active.value.id,
-            status=status,
-        )
-
-        advisor_to_exclude = AdviserFactory()
-        role_field = {advisor_project_role: advisor_to_exclude}
-
-        InvestmentProjectFactory(
-            **role_field,
-            investor_company=CompanyFactory(),
-            stage_id=InvestmentProjectStage.active.value.id,
-            status=InvestmentProject.Status.ABANDONED,
-        )
-
-        run_post_users_migration()
-
-        self._assert_advisor_migrated(export_flag, investment_flag, advisor_to_migrate)
-        self._assert_advisor_not_migrated(export_flag, investment_flag, advisor_to_exclude)
-
-    @pytest.mark.parametrize(
-        'advisor_project_role',
-        (
-            'project_manager',
-            'project_assurance_adviser',
-            'client_relationship_manager',
-            'referral_source_adviser',
-        ),
-    )
     def test_when_large_number_of_advisors_meeting_migration_criteria_are_found_all_are_migrated(
         self,
         monkeypatch,
-        advisor_project_role,
     ):
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
@@ -693,20 +571,6 @@ class TestPostUsersMigration:
         )
         migrated_users.extend(account_owner_advisors)
 
-        # Add user that has a relation to an investment project
-        investment_project_advisors = AdviserFactory.create_batch(
-            4,
-            dit_team__role_id=TeamRoleID.post.value,
-        )
-        InvestmentProjectFactory.create_batch(
-            len(investment_project_advisors),
-            **{advisor_project_role: factory.Iterator(investment_project_advisors)},
-            investor_company=CompanyFactory(),
-            stage_id=InvestmentProjectStage.active.value.id,
-            status=InvestmentProject.Status.ONGOING,
-        )
-        migrated_users.extend(investment_project_advisors)
-
         # Add user that meets every criteria
         all_criteria_advisors = AdviserFactory.create_batch(
             5,
@@ -716,18 +580,7 @@ class TestPostUsersMigration:
             len(all_criteria_advisors),
             adviser=factory.Iterator(all_criteria_advisors),
         )
-        one_list_companies = CompanyFactory.create_batch(
-            len(all_criteria_advisors),
-            one_list_account_owner=factory.Iterator(all_criteria_advisors),
-            one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value,
-        )
-        InvestmentProjectFactory.create_batch(
-            len(all_criteria_advisors),
-            **{advisor_project_role: factory.Iterator(all_criteria_advisors)},
-            investor_company=factory.Iterator(one_list_companies),
-            stage_id=InvestmentProjectStage.active.value.id,
-            status=InvestmentProject.Status.DELAYED,
-        )
+
         migrated_users.extend(all_criteria_advisors)
 
         run_post_users_migration()
