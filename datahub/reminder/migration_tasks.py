@@ -173,14 +173,14 @@ def get_post_user_ids_to_migrate():
             & Q(feature_groups__code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME),
         )
         .values_list(
-            "id",
+            'id',
             flat=True,
         )
     )
 
     def _get_advisor_ids(query: Q):
         return Advisor.objects.filter((query & Q(pk__in=post_advisor_ids))).values_list(
-            "id",
+            'id',
             flat=True,
         )
 
@@ -189,19 +189,19 @@ def get_post_user_ids_to_migrate():
     one_list_account_owners = _get_advisor_ids(Q(pk__in=one_list_account_owner_ids))
 
     project_manager_ids = _get_advisor_ids(
-        _generate_advisor_investment_project_query('investment_project_project_manager')
+        _generate_advisor_investment_project_query('investment_project_project_manager'),
     )
 
     project_assurance_adviser_ids = _get_advisor_ids(
-        _generate_advisor_investment_project_query('investment_project_project_assurance_adviser')
+        _generate_advisor_investment_project_query('investment_project_project_assurance_adviser'),
     )
 
     client_relationship_manager_ids = _get_advisor_ids(
-        _generate_advisor_investment_project_query('investment_projects')
+        _generate_advisor_investment_project_query('investment_projects'),
     )
 
     referral_source_adviser_ids = _get_advisor_ids(
-        _generate_advisor_investment_project_query('referred_investment_projects')
+        _generate_advisor_investment_project_query('referred_investment_projects'),
     )
 
     return set(
@@ -213,8 +213,8 @@ def get_post_user_ids_to_migrate():
                 project_assurance_adviser_ids,
                 client_relationship_manager_ids,
                 referral_source_adviser_ids,
-            )
-        )
+            ),
+        ),
     )
 
 
@@ -232,6 +232,7 @@ def _add_advisor_to_investment_subscriptions(
             reminder_days=[90],
             email_reminders_enabled=True,
         ).save()
+
     if not UpcomingEstimatedLandDateSubscription.objects.filter(
         adviser=advisor_id,
     ).exists():
@@ -257,7 +258,6 @@ def _add_advisor_to_export_subscriptions(
             reminder_days=[2],
             email_reminders_enabled=True,
         ).save()
-    print(NewExportInteractionSubscription.objects.filter(adviser=advisor_id))
 
     if not NoRecentExportInteractionSubscription.objects.filter(
         adviser=advisor_id,
