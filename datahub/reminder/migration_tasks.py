@@ -178,29 +178,32 @@ def get_post_user_ids_to_migrate():
         )
     )
 
-    def _get_advisor_ids(query: Q):
+    def _get_advisor_ids_matching_query(query: Q):
+        """Get all advisor id's matching the {query} AND are advisors with a role of POST"""
         return Advisor.objects.filter((query & Q(pk__in=post_advisor_ids))).values_list(
             'id',
             flat=True,
         )
 
-    one_list_core_team_advisors = _get_advisor_ids(Q(one_list_core_team_memberships__isnull=False))
+    one_list_core_team_advisors = _get_advisor_ids_matching_query(
+        Q(one_list_core_team_memberships__isnull=False)
+    )
 
-    one_list_account_owners = _get_advisor_ids(Q(pk__in=one_list_account_owner_ids))
+    one_list_account_owners = _get_advisor_ids_matching_query(Q(pk__in=one_list_account_owner_ids))
 
-    project_manager_ids = _get_advisor_ids(
+    project_manager_ids = _get_advisor_ids_matching_query(
         _generate_advisor_investment_project_query('investment_project_project_manager'),
     )
 
-    project_assurance_adviser_ids = _get_advisor_ids(
+    project_assurance_adviser_ids = _get_advisor_ids_matching_query(
         _generate_advisor_investment_project_query('investment_project_project_assurance_adviser'),
     )
 
-    client_relationship_manager_ids = _get_advisor_ids(
+    client_relationship_manager_ids = _get_advisor_ids_matching_query(
         _generate_advisor_investment_project_query('investment_projects'),
     )
 
-    referral_source_adviser_ids = _get_advisor_ids(
+    referral_source_adviser_ids = _get_advisor_ids_matching_query(
         _generate_advisor_investment_project_query('referred_investment_projects'),
     )
 
