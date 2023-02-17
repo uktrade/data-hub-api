@@ -65,7 +65,7 @@ def run_ita_users_migration():
 
 def get_ita_user_ids_to_migrate(export_notifications_feature_group):
     one_list_account_owner_ids = _get_one_list_account_owner_ids(
-        OneListTierID.tier_d_international_trade_advisers.value
+        OneListTierID.tier_d_international_trade_advisers.value,
     )
     advisor_ids = (
         Advisor.objects.filter(pk__in=one_list_account_owner_ids)
@@ -127,7 +127,7 @@ def run_post_users_migration():
 def get_post_user_ids_to_migrate():
     """Get all POST advisor ids to migrate"""
     one_list_account_owner_ids = _get_one_list_account_owner_ids(
-        OneListTierID.tier_d_overseas_post_accounts.value
+        OneListTierID.tier_d_overseas_post_accounts.value,
     )
 
     post_advisor_ids = (
