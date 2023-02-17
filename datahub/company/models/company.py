@@ -26,6 +26,7 @@ from datahub.core.models import (
 )
 from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata import models as metadata_models
+from datahub.company.models import Advisor
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -163,15 +164,21 @@ class Company(ArchivableModel, BaseModel):
         default=list,
     )
     business_type = models.ForeignKey(
-        metadata_models.BusinessType, blank=True, null=True,
+        metadata_models.BusinessType,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
     )
     sector = TreeForeignKey(
-        metadata_models.Sector, blank=True, null=True,
+        metadata_models.Sector,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
     )
     employee_range = models.ForeignKey(
-        metadata_models.EmployeeRange, blank=True, null=True,
+        metadata_models.EmployeeRange,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
         help_text=(
             'Not used when duns_number is set. In that case, use number_of_employees instead.'
@@ -188,7 +195,9 @@ class Company(ArchivableModel, BaseModel):
         help_text='Only used when duns_number is set.',
     )
     turnover_range = models.ForeignKey(
-        metadata_models.TurnoverRange, blank=True, null=True,
+        metadata_models.TurnoverRange,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
         help_text='Not used when duns_number is set. In that case, use turnover instead.',
     )
@@ -216,7 +225,9 @@ class Company(ArchivableModel, BaseModel):
     description = models.TextField(blank=True, null=True)
     website = models.URLField(max_length=MAX_LENGTH, blank=True, null=True)
     uk_region = models.ForeignKey(
-        metadata_models.UKRegion, blank=True, null=True,
+        metadata_models.UKRegion,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
     )
 
@@ -264,7 +275,9 @@ class Company(ArchivableModel, BaseModel):
     registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
 
     headquarter_type = models.ForeignKey(
-        metadata_models.HeadquarterType, blank=True, null=True,
+        metadata_models.HeadquarterType,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
     )
     one_list_tier = models.ForeignKey(
@@ -274,19 +287,29 @@ class Company(ArchivableModel, BaseModel):
         on_delete=models.PROTECT,
     )
     global_headquarters = models.ForeignKey(
-        'self', blank=True, null=True, on_delete=models.SET_NULL,
+        'self',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
         related_name='subsidiaries',
     )
     one_list_account_owner = models.ForeignKey(
-        'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
+        'Advisor',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
         related_name='one_list_owned_companies',
         help_text='Global account manager',
     )
     export_experience_category = models.ForeignKey(
-        ExportExperienceCategory, blank=True, null=True, on_delete=models.SET_NULL,
+        ExportExperienceCategory,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
     archived_documents_url_path = models.CharField(
-        max_length=MAX_LENGTH, blank=True,
+        max_length=MAX_LENGTH,
+        blank=True,
         help_text='Legacy field. File browser path to the archived documents for this company.',
     )
     transferred_to = models.ForeignKey(
@@ -485,16 +508,20 @@ class Company(ArchivableModel, BaseModel):
 
         # add all other core members excluding the global account manager
         # who might have already been added
-        team_members = group_global_headquarters.one_list_core_team_members.exclude(
-            adviser=global_account_manager,
-        ).select_related(
-            'adviser',
-            'adviser__dit_team',
-            'adviser__dit_team__uk_region',
-            'adviser__dit_team__country',
-        ).order_by(
-            'adviser__first_name',
-            'adviser__last_name',
+        team_members = (
+            group_global_headquarters.one_list_core_team_members.exclude(
+                adviser=global_account_manager,
+            )
+            .select_related(
+                'adviser',
+                'adviser__dit_team',
+                'adviser__dit_team__uk_region',
+                'adviser__dit_team__country',
+            )
+            .order_by(
+                'adviser__first_name',
+                'adviser__last_name',
+            )
         )
 
         core_team.extend(
@@ -635,9 +662,7 @@ class OneListCoreTeamMember(models.Model):
         return f'{self.adviser} - One List Core Team member of {self.company}'
 
     class Meta:
-        unique_together = (
-            ('company', 'adviser'),
-        )
+        unique_together = (('company', 'adviser'),)
 
 
 @reversion.register_base_model()
@@ -689,9 +714,7 @@ class CompanyExportCountry(BaseModel):
 
     def __str__(self):
         """Admin displayed human readable name"""
-        return (
-            f'{self.company} {self.country} {self.status}'
-        )
+        return f'{self.company} {self.country} {self.status}'
 
 
 class CompanyExportCountryHistory(models.Model):
@@ -744,6 +767,63 @@ class CompanyExportCountryHistory(models.Model):
 
     def __str__(self):
         """Admin displayed human readable name"""
-        return (
-            f'{self.company} {self.country} {self.status}'
-        )
+        return f'{self.company} {self.country} {self.status}'
+
+
+class CompanyExport(models.Model):
+    class ExportPotential(models.TextChoices):
+        HIGH = ('high', 'High')
+        MEDIUM = ('medium', 'Medium')
+        LOW = ('low', 'Low')
+
+    id = models.UUIDField(db_index=True)
+
+    title = models.CharField(
+        blank=False,
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+    )
+
+    owner = models.ForeignKey(
+        Advisor,
+        on_delete=models.CASCADE,
+    )
+
+    team_members = models.ManyToManyField(
+        Advisor,
+        blank=True,
+        related_name='+',
+    )
+
+    estimated_export_value_years = models.IntegerField()
+    estimated_export_value_amount = models.DecimalField(
+        max_digits=19,
+        decimal_places=0,
+    )
+
+    estimated_win_date_month = models.IntegerField()
+    estimated_win_date_year = models.IntegerField()
+
+    destination_country = models.ForeignKey(
+        'metadata.Country',
+        on_delete=models.PROTECT,
+        related_name='+',
+    )
+
+    sector = models.ForeignKey(
+        metadata_models.Sector,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+
+    status = models.CharField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=ExportPotential.choices,
+    )
+
+    contacts = models.ManyToManyField('company.Contact')
+
+    # TODO
+    exporter_experience = models.CharField()
+
+    notes = models.TextField(null=True, blank=True)
