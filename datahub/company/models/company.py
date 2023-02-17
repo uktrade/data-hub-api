@@ -13,6 +13,7 @@ from django.db import models, transaction
 from django.utils.timezone import now
 from mptt.fields import TreeForeignKey
 
+from datahub.company.models import Advisor
 from datahub.company.signal_receivers import (
     export_country_delete_signal,
     export_country_update_signal,
@@ -26,7 +27,6 @@ from datahub.core.models import (
 )
 from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata import models as metadata_models
-from datahub.company.models import Advisor
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -448,9 +448,13 @@ class Company(ArchivableModel, BaseModel):
         """
         All companies that share the same global ultimate duns number
         """
-        return Company.objects.filter(
-            global_ultimate_duns_number=self.global_ultimate_duns_number,
-        ).exclude(global_ultimate_duns_number='').exclude(global_ultimate_duns_number=None)
+        return (
+            Company.objects.filter(
+                global_ultimate_duns_number=self.global_ultimate_duns_number,
+            )
+            .exclude(global_ultimate_duns_number='')
+            .exclude(global_ultimate_duns_number=None)
+        )
 
     def mark_as_transferred(self, to, reason, user):
         """
@@ -776,6 +780,11 @@ class CompanyExport(models.Model):
         MEDIUM = ('medium', 'Medium')
         LOW = ('low', 'Low')
 
+    class ExportStatus(models.TextChoices):
+        ACTIVE = ('active', 'Active')
+        WON = ('won', 'Won')
+        INACTIVE = ('inactive', 'Inactive')
+
     id = models.UUIDField(db_index=True)
 
     title = models.CharField(
@@ -794,14 +803,17 @@ class CompanyExport(models.Model):
         related_name='+',
     )
 
+    # TODO - should this be a preset list in django or something in the ui?
     estimated_export_value_years = models.IntegerField()
     estimated_export_value_amount = models.DecimalField(
         max_digits=19,
         decimal_places=0,
+        null=False,
+        blank=False,
     )
 
-    estimated_win_date_month = models.IntegerField()
-    estimated_win_date_year = models.IntegerField()
+    estimated_win_date_month = models.IntegerField(blank=False)
+    estimated_win_date_year = models.IntegerField(blank=False)
 
     destination_country = models.ForeignKey(
         'metadata.Country',
@@ -816,14 +828,20 @@ class CompanyExport(models.Model):
         on_delete=models.SET_NULL,
     )
 
-    status = models.CharField(
+    export_potential = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
         choices=ExportPotential.choices,
     )
 
+    status = models.CharField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=ExportStatus.choices,
+    )
+
     contacts = models.ManyToManyField('company.Contact')
 
-    # TODO
+    # TODO - the list in datahub/company/fixtures/export_experience_categories.yaml
+    # dont match the designs
     exporter_experience = models.CharField()
 
     notes = models.TextField(null=True, blank=True)
