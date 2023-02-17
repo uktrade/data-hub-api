@@ -700,6 +700,28 @@ class TestPostUsersMigration:
 
         migrated_users = []
 
+        # Add users that dont meet any criteria
+        excluded_users = AdviserFactory.create_batch(40)
+
+        OneListCoreTeamMemberFactory.create_batch(
+            len(excluded_users),
+            adviser=factory.Iterator(excluded_users),
+        )
+
+        CompanyFactory.create_batch(
+            len(excluded_users),
+            one_list_account_owner=factory.Iterator(excluded_users),
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+        )
+
+        InvestmentProjectFactory.create_batch(
+            len(excluded_users),
+            **{advisor_project_role: factory.Iterator(excluded_users)},
+            investor_company=CompanyFactory(),
+            stage_id=InvestmentProjectStage.active.value.id,
+            status=InvestmentProject.Status.ONGOING,
+        )
+
         # Add user in dit role and member of one list core team
         dit_role_advisors = AdviserFactory.create_batch(
             3,
@@ -737,7 +759,7 @@ class TestPostUsersMigration:
         )
         migrated_users.extend(investment_project_advisors)
 
-        # Add user that meets every criteria
+        # Add users that meet every criteria
         all_criteria_advisors = AdviserFactory.create_batch(
             5,
             dit_team__role_id=TeamRoleID.post.value,
@@ -763,3 +785,6 @@ class TestPostUsersMigration:
         run_post_users_migration()
         for user in migrated_users:
             self._assert_advisor_migrated(export_flag, investment_flag, user)
+
+        for user in excluded_users:
+            self._assert_advisor_not_migrated(export_flag, investment_flag, user)

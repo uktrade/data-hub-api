@@ -51,50 +51,47 @@ def run_ita_users_migration():
         code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     )
     # Get all the advisor ids that are account owner of a tier d one list company
-    advisors = get_ita_users_to_migrate(export_notifications_feature_group)
+    advisor_ids = get_ita_user_ids_to_migrate(export_notifications_feature_group)
     if not settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS:
         logger.info(
-            f'Automatic migration is disabled. The following {advisors.count()} ita users meet '
+            f'Automatic migration is disabled. The following {len(advisor_ids)} ita users meet '
             'the criteria for migration but will not have any changes made to their accounts.',
         )
-        for advisor in advisors:
-            _log_ita_advisor_migration(advisor, logger)
+        for advisor_id in advisor_ids:
+            _log_ita_advisor_migration(advisor_id, logger)
     else:
-        migrate_ita_users(export_notifications_feature_group, advisors)
+        migrate_ita_users(export_notifications_feature_group, advisor_ids)
 
 
-def migrate_ita_users(export_notifications_feature_group, advisors):
-    for advisor in advisors:
-        _log_ita_advisor_migration(advisor, logger)
-
-        export_notifications_feature_group.advisers.add(advisor.id)
-
-        _add_advisor_to_export_subscriptions(advisor.id)
-
-    logger.info(
-        f'Migrated {advisors.count()} ita users',
+def get_ita_user_ids_to_migrate(export_notifications_feature_group):
+    one_list_account_owner_ids = _get_one_list_account_owner_ids(
+        OneListTierID.tier_d_international_trade_advisers.value
     )
-
-
-def get_ita_users_to_migrate(export_notifications_feature_group):
-    one_list_account_owner_ids = (
-        Company.objects.filter(
-            archived=False,
-            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
-            one_list_account_owner__id__isnull=False,
-            one_list_account_owner__is_active=True,
+    advisor_ids = (
+        Advisor.objects.filter(pk__in=one_list_account_owner_ids)
+        .exclude(
+            feature_groups=export_notifications_feature_group,
         )
-        .distinct('one_list_account_owner__id')
         .values_list(
-            'one_list_account_owner__id',
+            'id',
             flat=True,
         )
     )
-    advisors = Advisor.objects.filter(pk__in=one_list_account_owner_ids).exclude(
-        feature_groups=export_notifications_feature_group,
-    )
 
-    return advisors
+    return advisor_ids
+
+
+def migrate_ita_users(export_notifications_feature_group, advisor_ids):
+    for advisor_id in advisor_ids:
+        _log_ita_advisor_migration(advisor_id, logger)
+
+        export_notifications_feature_group.advisers.add(advisor_id)
+
+        _add_advisor_to_export_subscriptions(advisor_id)
+
+    logger.info(
+        f'Migrated {len(advisor_ids)} ita users',
+    )
 
 
 def run_post_users_migration():
@@ -127,43 +124,10 @@ def run_post_users_migration():
         raise
 
 
-def migrate_post_users(advisor_ids):
-    export_feature_group = UserFeatureFlagGroup.objects.get(
-        code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
-    )
-    investment_feature_group = UserFeatureFlagGroup.objects.get(
-        code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
-    )
-
-    for advisor_id in advisor_ids:
-        _log_post_advisor_migration(advisor_id, logger)
-
-        investment_feature_group.advisers.add(advisor_id)
-        export_feature_group.advisers.add(advisor_id)
-
-        _add_advisor_to_export_subscriptions(advisor_id)
-
-        _add_advisor_to_investment_subscriptions(advisor_id)
-
-    logger.info(
-        f'Migrated {len(advisor_ids)} post users',
-    )
-
-
 def get_post_user_ids_to_migrate():
-    """Get all advisors to migrate"""
-    one_list_account_owner_ids = (
-        Company.objects.filter(
-            archived=False,
-            one_list_tier_id=OneListTierID.tier_d_overseas_post_accounts.value,
-            one_list_account_owner__id__isnull=False,
-            one_list_account_owner__is_active=True,
-        )
-        .distinct('one_list_account_owner__id')
-        .values_list(
-            'one_list_account_owner__id',
-            flat=True,
-        )
+    """Get all POST advisor ids to migrate"""
+    one_list_account_owner_ids = _get_one_list_account_owner_ids(
+        OneListTierID.tier_d_overseas_post_accounts.value
     )
 
     post_advisor_ids = (
@@ -221,6 +185,47 @@ def get_post_user_ids_to_migrate():
     )
 
 
+def migrate_post_users(advisor_ids):
+    export_feature_group = UserFeatureFlagGroup.objects.get(
+        code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+    )
+    investment_feature_group = UserFeatureFlagGroup.objects.get(
+        code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+    )
+
+    for advisor_id in advisor_ids:
+        _log_post_advisor_migration(advisor_id, logger)
+
+        investment_feature_group.advisers.add(advisor_id)
+        export_feature_group.advisers.add(advisor_id)
+
+        _add_advisor_to_export_subscriptions(advisor_id)
+
+        _add_advisor_to_investment_subscriptions(advisor_id)
+
+    logger.info(
+        f'Migrated {len(advisor_ids)} post users',
+    )
+
+
+def _get_one_list_account_owner_ids(one_list_tier_id):
+    one_list_account_owner_ids = (
+        Company.objects.filter(
+            archived=False,
+            one_list_tier_id=one_list_tier_id,
+            one_list_account_owner__id__isnull=False,
+            one_list_account_owner__is_active=True,
+        )
+        .distinct('one_list_account_owner__id')
+        .values_list(
+            'one_list_account_owner__id',
+            flat=True,
+        )
+    )
+
+    return one_list_account_owner_ids
+
+
 def _add_advisor_to_investment_subscriptions(
     advisor_id,
 ):
@@ -275,16 +280,9 @@ def _add_advisor_to_export_subscriptions(
         ).save()
 
 
-def _log_ita_advisor_migration(advisor, logger):
+def _log_ita_advisor_migration(advisor_id, logger):
 
-    logger.info(
-        f'Migrating ITA user "{advisor.id}" to receive reminders.'
-        'The feature groups this advisor is a member of are '
-        f'{advisor.feature_groups.all()}. '
-        'The companies this advisor is an account owner of are '
-        f'{advisor.one_list_owned_companies.all()}. '
-        f'The dit_team role is "{advisor.dit_team}".',
-    )
+    logger.info(f'Migrating ITA user "{advisor_id}" to receive reminders.')
 
 
 def _log_post_advisor_migration(advisor_id, logger):
