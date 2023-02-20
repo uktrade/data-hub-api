@@ -8,11 +8,9 @@ aiohttp==3.8.3
     # via slackclient
 aiosignal==1.3.1
     # via aiohttp
-appnope==0.1.3
-    # via ipython
 asgiref==3.6.0
     # via django
-astroid==2.14.1
+astroid==2.14.2
     # via pylint
 asttokens==2.2.1
     # via stack-data
@@ -27,9 +25,9 @@ attrs==22.2.0
     #   pytest
 backcall==0.2.0
     # via ipython
-boto3==1.26.69
+boto3==1.26.74
     # via -r requirements.in
-botocore==1.29.69
+botocore==1.29.74
     # via
     #   boto3
     #   s3transfer
@@ -104,7 +102,7 @@ djangorestframework==3.14.0
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
-elastic-apm==6.14.0
+elastic-apm==6.15.0
     # via -r requirements.in
 exceptiongroup==1.1.0
     # via pytest
@@ -260,7 +258,7 @@ pygments==2.13.0
     # via ipython
 pyjwt==2.6.0
     # via notifications-python-client
-pylint==2.16.1
+pylint==2.16.2
     # via
     #   -r requirements-dev.in
     #   pylint-django
@@ -329,7 +327,7 @@ requests-mock==1.10.0
     # via -r requirements-dev.in
 requests-toolbelt==0.10.1
     # via -r requirements.in
-rq==1.12.0
+rq==1.13.0
     # via
     #   -r requirements.in
     #   rq-scheduler
