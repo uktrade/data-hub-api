@@ -12,4 +12,13 @@ urlpatterns = [
         ),
         name='list',
     ),
+    path(
+        'exports/<uuid:pk>',
+        CompanyExportViewSet.as_view(
+            {
+                'get': 'retrieve',
+            },
+        ),
+        name='item',
+    ),
 ]
