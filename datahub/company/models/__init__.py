@@ -9,6 +9,7 @@ from datahub.company.models.company import (
     OneListTier,
 )
 from datahub.company.models.contact import Contact, ContactPermission
+from datahub.company.models.export import CompanyExport
 
 __all__ = (
     'Advisor',
@@ -21,4 +22,5 @@ __all__ = (
     'ExportExperienceCategory',
     'OneListCoreTeamMember',
     'OneListTier',
+    'CompanyExport',
 )

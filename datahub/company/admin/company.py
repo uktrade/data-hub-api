@@ -17,7 +17,7 @@ from datahub.company.admin.merge.step_1 import merge_select_other_company
 from datahub.company.admin.merge.step_2 import select_primary_company
 from datahub.company.admin.merge.step_3 import confirm_merge
 from datahub.company.admin.update_from_dnb import update_from_dnb
-from datahub.company.models import Company, OneListCoreTeamMember
+from datahub.company.models import Company, CompanyExport, OneListCoreTeamMember
 from datahub.core.admin import BaseModelAdminMixin, get_change_link
 from datahub.core.templatetags.datahub_extras import admin_change_link
 
@@ -31,9 +31,7 @@ class OneListCoreTeamMemberInline(admin.TabularInline):
     formfield_overrides = {
         models.UUIDField: {'widget': forms.HiddenInput},
     }
-    raw_id_fields = (
-        'adviser',
-    )
+    raw_id_fields = ('adviser',)
 
 
 class CompanyAdminForm(forms.ModelForm):
@@ -149,7 +147,6 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'address_area',
                     'address_postcode',
                     'address_country',
-
                     'registered_address_1',
                     'registered_address_2',
                     'registered_address_town',
@@ -222,18 +219,12 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
         'name',
         'registered_address_country',
     )
-    list_filter = (
-        'dnb_modified_on',
-    )
-    inlines = (
-        OneListCoreTeamMemberInline,
-    )
+    list_filter = ('dnb_modified_on',)
+    inlines = (OneListCoreTeamMemberInline,)
     # Help text for read-only method fields
     extra_help_texts = {
-        'transferred_to_display':
-            Company._meta.get_field('transferred_to').help_text,
-        'transferred_from_display':
-            'Other records whose data has been transferred to this record.',
+        'transferred_to_display': Company._meta.get_field('transferred_to').help_text,
+        'transferred_from_display': 'Other records whose data has been transferred to this record.',
     }
 
     def get_form(self, request, obj=None, **kwargs):
@@ -253,43 +244,38 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                 'merge/step-1-select-other-company/',
                 self.admin_site.admin_view(partial(merge_select_other_company, self)),
                 name=f'{model_meta.app_label}_'
-                     f'{model_meta.model_name}_merge-select-other-company',
+                f'{model_meta.model_name}_merge-select-other-company',
             ),
             path(
                 'merge/step-2-select-primary-company/',
                 self.admin_site.admin_view(partial(select_primary_company, self)),
                 name=f'{model_meta.app_label}_'
-                     f'{model_meta.model_name}_merge-select-primary-company',
+                f'{model_meta.model_name}_merge-select-primary-company',
             ),
             path(
                 'merge/step-3-confirm/',
                 self.admin_site.admin_view(partial(confirm_merge, self)),
-                name=f'{model_meta.app_label}_'
-                     f'{model_meta.model_name}_merge-confirm',
+                name=f'{model_meta.app_label}_' f'{model_meta.model_name}_merge-confirm',
             ),
             path(
                 'archiving/unarchive-company/',
                 self.admin_site.admin_view(partial(unarchive_company, self)),
-                name=f'{model_meta.app_label}_'
-                     f'{model_meta.model_name}_unarchive-company',
+                name=f'{model_meta.app_label}_' f'{model_meta.model_name}_unarchive-company',
             ),
             path(
                 '<path:object_id>/update-from-dnb/',
                 self.admin_site.admin_view(partial(update_from_dnb, self)),
-                name=f'{model_meta.app_label}_'
-                     f'{model_meta.model_name}_update-from-dnb',
+                name=f'{model_meta.app_label}_' f'{model_meta.model_name}_update-from-dnb',
             ),
             path(
                 'dnb-link/step-1-select-ids/',
                 self.admin_site.admin_view(partial(dnb_link_select_ids, self)),
-                name=f'{model_meta.app_label}_'
-                     f'{model_meta.model_name}_dnb-link-select-ids',
+                name=f'{model_meta.app_label}_' f'{model_meta.model_name}_dnb-link-select-ids',
             ),
             path(
                 'dnb-link/step-2-review-changes/',
                 self.admin_site.admin_view(partial(dnb_link_review_changes, self)),
-                name=f'{model_meta.app_label}_'
-                     f'{model_meta.model_name}_dnb-link-review-changes',
+                name=f'{model_meta.app_label}_' f'{model_meta.model_name}_dnb-link-review-changes',
             ),
             *super().get_urls(),
         ]

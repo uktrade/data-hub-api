@@ -1152,3 +1152,6 @@ class OneListCoreTeamMemberSerializer(serializers.Serializer):
 
     adviser = NestedAdviserWithEmailAndTeamGeographyField()
     is_global_account_manager = serializers.BooleanField()
+
+class CompanyExportSerializer(serializers.Serializer):
+    company = NestedRelatedField(Company, read_only=True)
