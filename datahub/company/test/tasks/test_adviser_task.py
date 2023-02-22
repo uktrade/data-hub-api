@@ -26,7 +26,9 @@ from datahub.investment.project.test.factories import (
     InvestmentProjectFactory,
     InvestmentProjectTeamMemberFactory,
 )
-from datahub.omis.order.test.factories import OrderFactory
+from datahub.omis.order.test.factories import (
+    OrderAssigneeFactory, OrderFactory, OrderSubscriberFactory,
+)
 
 
 def deactivateable_adviser(**kwargs):
@@ -228,6 +230,8 @@ class TestAdviserDeactivateTask:
             (OrderFactory, 'modified_by'),
             (OrderFactory, 'completed_by'),
             (OrderFactory, 'cancelled_by'),
+            (OrderAssigneeFactory, 'adviser'),
+            (OrderSubscriberFactory, 'adviser'),
             (LargeCapitalOpportunityFactory, 'created_by'),
             (LargeCapitalOpportunityFactory, 'modified_by'),
             (InvestmentProjectFactory, 'created_by'),
@@ -282,6 +286,12 @@ class TestAdviserDeactivateTask:
             (InteractionDITParticipantFactory, 'adviser', 'interaction__date'),
             (EventFactory, 'organiser', 'start_date'),
             (EventFactory, 'organiser', 'end_date'),
+            (OrderSubscriberFactory, 'adviser', 'order__paid_on'),
+            (OrderSubscriberFactory, 'adviser', 'order__completed_on'),
+            (OrderSubscriberFactory, 'adviser', 'order__cancelled_on'),
+            (OrderAssigneeFactory, 'adviser', 'order__paid_on'),
+            (OrderAssigneeFactory, 'adviser', 'order__completed_on'),
+            (OrderAssigneeFactory, 'adviser', 'order__cancelled_on'),
         ),
     )
     def test_adviser_with_old_activity_but_recently_dated_object_does_not_deactivate(

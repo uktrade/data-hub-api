@@ -66,12 +66,19 @@ def _automatic_adviser_deactivate(limit=1000, simulate=False):
             ),
         )),
         ~Exists(Order.objects.filter(
-            Q(modified_on__gte=two_years_ago)
+            (
+                Q(modified_on__gte=two_years_ago)
+                | Q(paid_on__gte=two_years_ago)
+                | Q(completed_on__gte=two_years_ago)
+                | Q(cancelled_on__gte=two_years_ago)
+            )
             & (
                 Q(created_by_id=OuterRef('pk'))
                 | Q(modified_by_id=OuterRef('pk'))
                 | Q(completed_by_id=OuterRef('pk'))
                 | Q(cancelled_by_id=OuterRef('pk'))
+                | Q(assignees__adviser_id=OuterRef('pk'))
+                | Q(subscribers__adviser_id=OuterRef('pk'))
             ),
         )),
         ~Exists(LargeCapitalOpportunity.objects.filter(
