@@ -1,0 +1,36 @@
+- model: company.exportyear
+  pk: a30384b5-2852-4ec5-bc3e-561927328361
+  fields:
+    disabled_on: null
+    name: 1 year
+    order: 0
+- model: company.exportyear
+  pk: b94fbe96-c013-4dca-9b69-3c443652fd8d
+  fields:
+    disabled_on: null
+    name: 2 years
+    order: 10
+- model: company.exportyear
+  pk: 8f4548c6-6f68-42ec-9ddc-e979fe7a6bb8
+  fields:
+    disabled_on: null
+    name: 3 years
+    order: 20
+- model: company.exportyear
+  pk: 3f289d56-aec1-4472-a046-10828cad4992
+  fields:
+    disabled_on: null
+    name: 4 years
+    order: 30
+- model: company.exportyear
+  pk: a30b8a1a-70fe-4b47-b4f2-ffe662fd61c9
+  fields:
+    disabled_on: null
+    name: 5 years
+    order: 40
+- model: company.exportyear
+  pk: b9af9007-619c-426d-bfc3-cad3b96a34dd
+  fields:
+    disabled_on: null
+    name: Not yet known
+    order: 50

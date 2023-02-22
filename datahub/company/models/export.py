@@ -4,11 +4,17 @@ import uuid
 from django.conf import settings
 from django.db import models
 
-from datahub.company.models import Advisor
-from datahub.core.models import (
-    BaseModel,
-)
+from datahub.company.models import Advisor, Company, Contact
+from datahub.core.models import BaseModel, BaseOrderedConstantModel
 from datahub.metadata import models as metadata_models
+
+
+class ExportExperience(BaseOrderedConstantModel):
+    """Export experience"""
+
+
+class ExportYear(BaseOrderedConstantModel):
+    """Export year"""
 
 
 class CompanyExport(BaseModel):
@@ -25,11 +31,10 @@ class CompanyExport(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     company = models.ForeignKey(
-        'Company',
+        Company,
         related_name='exports',
-        null=False,
         blank=False,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
 
     title = models.CharField(
@@ -39,56 +44,64 @@ class CompanyExport(BaseModel):
 
     owner = models.ForeignKey(
         Advisor,
-        on_delete=models.CASCADE,
+        blank=False,
+        on_delete=models.PROTECT,
     )
 
     team_members = models.ManyToManyField(
         Advisor,
-        blank=True,
         related_name='+',
     )
 
-    # TODO - should this be a preset list in django or something in the ui?
-    estimated_export_value_years = models.IntegerField()
+    estimated_export_value_years = models.ForeignKey(
+        ExportYear,
+        blank=False,
+        on_delete=models.PROTECT,
+    )
+
     estimated_export_value_amount = models.DecimalField(
         max_digits=19,
         decimal_places=0,
-        null=False,
         blank=False,
     )
 
-    estimated_win_date_month = models.IntegerField(blank=False)
-    estimated_win_date_year = models.IntegerField(blank=False)
+    estimated_win_date = models.DateTimeField(blank=False)
 
     destination_country = models.ForeignKey(
-        'metadata.Country',
+        metadata_models.Country,
+        blank=False,
         on_delete=models.PROTECT,
         related_name='+',
     )
 
     sector = models.ForeignKey(
         metadata_models.Sector,
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
+        blank=False,
+        on_delete=models.PROTECT,
     )
 
     export_potential = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
         choices=ExportPotential.choices,
+        blank=False,
     )
 
     status = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
         choices=ExportStatus.choices,
+        default=ExportStatus.ACTIVE,
+        blank=False,
     )
 
-    contacts = models.ManyToManyField('company.Contact')
-
-    # TODO - the list in datahub/company/fixtures/export_experience_categories.yaml
-    # dont match the designs
-    exporter_experience = models.CharField(
-        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+    contacts = models.ManyToManyField(
+        Contact,
+        blank=False,
     )
 
-    notes = models.TextField(null=True, blank=True)
+    exporter_experience = models.ForeignKey(
+        ExportExperience,
+        blank=False,
+        on_delete=models.PROTECT,
+    )
+
+    notes = models.TextField(blank=True)

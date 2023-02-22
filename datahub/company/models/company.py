@@ -53,7 +53,7 @@ class CompanyPermission(StrEnum):
 
 
 class ExportExperienceCategory(BaseConstantModel):
-    """Export experience category."""
+    """Export Wins experience category."""
 
     class Meta(BaseConstantModel.Meta):
         verbose_name_plural = 'export experience categories'
