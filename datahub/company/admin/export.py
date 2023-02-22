@@ -8,3 +8,10 @@ from datahub.core.admin import BaseModelAdminMixin
 @admin.register(CompanyExport)
 class CompanyExportAdmin(BaseModelAdminMixin, VersionAdmin):
     """Company export admin."""
+
+    exclude = (
+        'created_on',
+        'created_by',
+        'modified_on',
+        'modified_by',
+    )

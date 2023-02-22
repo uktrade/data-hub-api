@@ -8,6 +8,7 @@ urlpatterns = [
         CompanyExportViewSet.as_view(
             {
                 'get': 'list',
+                'post': 'create',
             },
         ),
         name='list',

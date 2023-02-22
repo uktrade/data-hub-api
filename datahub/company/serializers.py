@@ -23,7 +23,9 @@ from datahub.company.models import (
     CompanyPermission,
     Contact,
     ContactPermission,
+    ExportExperience,
     ExportExperienceCategory,
+    ExportYear,
     OneListCoreTeamMember,
     OneListTier,
 )
@@ -1191,8 +1193,10 @@ class CompanyExportSerializer(serializers.ModelSerializer):
     owner = NestedRelatedField(Advisor)
     team_members = NestedRelatedField(Advisor, many=True)
     contacts = NestedRelatedField(Contact, many=True)
-    destination_country = NestedRelatedField(Country)
+    destination_country = NestedRelatedField(meta_models.Country)
     sector = NestedRelatedField(meta_models.Sector)
+    exporter_experience = NestedRelatedField(ExportExperience)
+    estimated_export_value_years = NestedRelatedField(ExportYear)
 
     class Meta:
         model = CompanyExport
