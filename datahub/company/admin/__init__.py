@@ -10,4 +10,5 @@ from importlib import import_module
 import_module('datahub.company.admin.adviser')
 import_module('datahub.company.admin.company')
 import_module('datahub.company.admin.contact')
+import_module('datahub.company.admin.export')
 import_module('datahub.company.admin.metadata')

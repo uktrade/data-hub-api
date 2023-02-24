@@ -29,6 +29,7 @@ from datahub.company.export_wins_api import (
 from datahub.company.models import (
     Advisor,
     Company,
+    CompanyExport,
     CompanyPermission,
     Contact,
 )
@@ -43,6 +44,7 @@ from datahub.company.serializers import (
     CompanySerializer,
     ContactDetailSerializer,
     ContactDetailV4Serializer,
+    CompanyExportSerializer,
     ContactSerializer,
     ContactV4Serializer,
     OneListCoreTeamMemberSerializer,
@@ -385,7 +387,8 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
     serializer_class = ContactSerializer
     queryset = get_contact_queryset()
     filter_backends = (
-        DjangoFilterBackend, OrderingFilter,
+        DjangoFilterBackend,
+        OrderingFilter,
     )
     filterset_fields = ['company_id', 'email']
     ordering = ('-created_on',)
@@ -491,7 +494,9 @@ class AdviserFilter(FilterSet):
 
 
 class AdviserReadOnlyViewSetV1(
-        mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
 ):
     """Adviser GET only views."""
 
@@ -553,10 +558,7 @@ class ExportWinsForCompanyView(APIView):
         """
         matches = response.json().get('matches', [])
 
-        match_ids = [
-            match['match_id']
-            for match in matches if match.get('match_id', None)
-        ]
+        match_ids = [match['match_id'] for match in matches if match.get('match_id', None)]
         return match_ids
 
     def _get_company(self, company_pk):
@@ -616,3 +618,10 @@ class ExportWinsForCompanyView(APIView):
             raise APIUpstreamException(str(exc))
 
         return JsonResponse(export_wins_results.json())
+
+
+class CompanyExportViewSet(CoreViewSet):
+    """View for company exports"""
+
+    queryset = CompanyExport.objects.select_related('company', 'owner')
+    serializer_class = CompanyExportSerializer
