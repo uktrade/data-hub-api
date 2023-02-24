@@ -1,0 +1,21 @@
+{
+  "company": "731bdcc1-f685-4c8e-bd66-b356b2c16995",
+  "owner": "95a99736-5402-11eb-ae93-0242ac130002",
+  "team_members": [
+    "f1eb4363-0a37-4344-bd96-e90abeaf483e",
+    "379f390a-e083-4a2c-9cea-e3b9a08606a7"
+  ],
+  "contacts": [
+    "435f9fa1-2e54-4205-8500-f23de614620e",
+    "952232d2-1d25-4c3a-bcac-2f3a30a94da9"
+  ],
+  "destination_country": "87756b9a-5d95-e211-a939-e4115bead28a",
+  "sector": "b022c9d2-5f95-e211-a939-e4115bead28a",
+  "title": "Postman 1",
+  "estimated_export_value_amount": "1234",
+  "estimated_win_date": "2023-02-22T10:45:36Z",
+  "export_potential": "high",
+  "notes": "Some large amount of text here",
+  "estimated_export_value_years": "a30384b5-2852-4ec5-bc3e-561927328361",
+  "exporter_experience": "051a0362-d1a9-41c0-8a58-3171e5f59a8e"
+}

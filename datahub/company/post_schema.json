@@ -1,0 +1,15 @@
+{
+  "company": "string($uuid)",
+  "owner": "string($uuid)",
+  "team_members": ["string($uuid)"],
+  "contacts": ["string($uuid)"],
+  "destination_country": "string($uuid)",
+  "sector": "string($uuid)",
+  "exporter_experience": "string($uuid)",
+  "estimated_export_value_years": "string($uuid)",
+  "title": "string",
+  "estimated_export_value_amount": "string($decimal)",
+  "estimated_win_date": "string($date-time)",
+  "export_potential": "Enum (high, medium, low)",
+  "notes": "string"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "string($uuid)",
+  "company": { "id:": "string($uuid)", "name": "string" },
+  "owner": { "id:": "string($uuid)", "name": "string" },
+  "team_members": [{ "id:": "string($uuid)", "name": "string" }],
+  "contacts": [{ "id:": "string($uuid)", "name": "string" }],
+  "destination_country": { "id:": "string($uuid)", "name": "string" },
+  "sector": { "id:": "string($uuid)", "name": "string" },
+  "exporter_experience": { "id:": "string($uuid)", "name": "string" },
+  "estimated_export_value_years": { "id:": "string($uuid)", "name": "string" },
+  "created_on": "string($date-time)",
+  "modified_on": "string($date-time)",
+  "title": "string",
+  "estimated_export_value_amount": "string($decimal)",
+  "estimated_win_date": "string($date-time)",
+  "export_potential": "Enum (high, medium, low)",
+  "status": "Enum (active, won, inactive)",
+  "notes": "string",
+  "created_by": "string($uuid)",
+  "modified_by": "string($uuid)"
+}

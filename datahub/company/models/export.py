@@ -5,7 +5,8 @@ from django.conf import settings
 from django.db import models
 
 from datahub.company.models import Advisor, Company, Contact
-from datahub.core.models import BaseModel, BaseOrderedConstantModel
+from datahub.core import reversion
+from datahub.core.models import ArchivableModel, BaseModel, BaseOrderedConstantModel
 from datahub.metadata import models as metadata_models
 
 
@@ -17,7 +18,8 @@ class ExportYear(BaseOrderedConstantModel):
     """Export year"""
 
 
-class CompanyExport(BaseModel):
+@reversion.register_base_model()
+class CompanyExport(ArchivableModel, BaseModel):
     class ExportPotential(models.TextChoices):
         HIGH = ('high', 'High')
         MEDIUM = ('medium', 'Medium')

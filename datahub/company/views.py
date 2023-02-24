@@ -619,3 +619,10 @@ class CompanyExportViewSet(CoreViewSet):
 
     queryset = CompanyExport.objects.select_related('company', 'owner')
     serializer_class = CompanyExportSerializer
+
+    def perform_destroy(self, instance):
+        """Reminder soft delete event."""
+        print("**********************")
+        print(instance)
+
+        instance.save()

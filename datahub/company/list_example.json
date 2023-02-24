@@ -1,0 +1,68 @@
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "c55af6a6-012f-4e60-9658-d75cf510765c",
+      "company": {
+        "name": "Mars Components Ltd",
+        "id": "731bdcc1-f685-4c8e-bd66-b356b2c16995"
+      },
+      "owner": {
+        "name": "Ava Walsh",
+        "id": "95a99736-5402-11eb-ae93-0242ac130002"
+      },
+      "team_members": [
+        {
+          "name": "Jenny Carey",
+          "id": "f1eb4363-0a37-4344-bd96-e90abeaf483e"
+        },
+        {
+          "name": "Holly Collins",
+          "id": "379f390a-e083-4a2c-9cea-e3b9a08606a7"
+        },
+        {
+          "name": "Barry Oling",
+          "id": "a80ff5fd-8904-4940-bf96-fe8047e34be5"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Archie Arakelian",
+          "id": "435f9fa1-2e54-4205-8500-f23de614620e"
+        },
+        {
+          "name": "Dean Cox",
+          "id": "952232d2-1d25-4c3a-bcac-2f3a30a94da9"
+        }
+      ],
+      "destination_country": {
+        "name": "Barbados",
+        "id": "a55f66a0-5d95-e211-a939-e4115bead28a"
+      },
+      "sector": {
+        "name": "Automotive : Component Manufacturing",
+        "id": "b022c9d2-5f95-e211-a939-e4115bead28a"
+      },
+      "exporter_experience": {
+        "name": "Never exported",
+        "id": "051a0362-d1a9-41c0-8a58-3171e5f59a8e"
+      },
+      "estimated_export_value_years": {
+        "name": "1 year",
+        "id": "a30384b5-2852-4ec5-bc3e-561927328361"
+      },
+      "created_on": "2023-02-22T10:45:46.174311Z",
+      "modified_on": "2023-02-22T10:45:46.174336Z",
+      "title": "Django 1",
+      "estimated_export_value_amount": "1234",
+      "estimated_win_date": "2023-02-22T10:45:36Z",
+      "export_potential": "high",
+      "status": "active",
+      "notes": "",
+      "created_by": "3c7f63ca-61df-4c1b-a7a7-20765a161481",
+      "modified_by": "3c7f63ca-61df-4c1b-a7a7-20765a161481"
+    }
+  ]
+}

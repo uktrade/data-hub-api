@@ -18,6 +18,8 @@ urlpatterns = [
         CompanyExportViewSet.as_view(
             {
                 'get': 'retrieve',
+                'patch': 'partial_update',
+                'delete': 'destroy',
             },
         ),
         name='item',
