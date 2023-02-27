@@ -113,7 +113,7 @@ multidict==6.0.4
     # via
     #   aiohttp
     #   yarl
-notifications-python-client==6.4.1
+notifications-python-client==7.0.0
     # via -r requirements.in
 opensearch-dsl==2.0.1
     # via -r requirements.in
