@@ -31,7 +31,9 @@ from datahub.company.models import (
 )
 from datahub.company.tasks.contact import schedule_update_contact_consent
 from datahub.company.validators import (
+    EXCEEDED_MAX_TEAM_MEMBER_COUNT,
     has_no_invalid_company_number_characters,
+    has_team_member_count_exceeded_max_allowed,
     has_uk_establishment_number_prefix,
 )
 from datahub.core.api_client import get_zipkin_headers
@@ -507,7 +509,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 raise serializers.ValidationError(
                     {
                         'headquarter_type': message,
-                    }
+                    },
                 )
 
         combiner = DataCombiner(self.instance, data)
@@ -737,10 +739,10 @@ class AssignRegionalAccountManagerSerializer(serializers.Serializer):
     target_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
     default_error_messages = {
         'cannot_change_account_manager_of_one_list_subsidiary': gettext_lazy(
-            "A lead adviser can't be set on a subsidiary of a One List company."
+            "A lead adviser can't be set on a subsidiary of a One List company.",
         ),
         'cannot_change_account_manager_for_other_one_list_tiers': gettext_lazy(
-            "A lead adviser can't be set for companies on this One List tier."
+            "A lead adviser can't be set for companies on this One List tier.",
         ),
     }
     regional_account_manager = NestedRelatedField(Advisor)
@@ -783,10 +785,10 @@ class SelfAssignAccountManagerSerializer(serializers.Serializer):
     target_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
     default_error_messages = {
         'cannot_change_account_manager_of_one_list_subsidiary': gettext_lazy(
-            "A lead adviser can't be set on a subsidiary of a One List company."
+            "A lead adviser can't be set on a subsidiary of a One List company.",
         ),
         'cannot_change_account_manager_for_other_one_list_tiers': gettext_lazy(
-            "A lead adviser can't be set for companies on this One List tier."
+            "A lead adviser can't be set for companies on this One List tier.",
         ),
     }
 
@@ -839,7 +841,7 @@ class RemoveAccountManagerSerializer(_RemoveCompanyFromOneListSerializer):
     allowed_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
     default_error_messages = {
         'cannot_change_account_manager_for_other_one_list_tiers': gettext_lazy(
-            "A lead adviser can't be removed from companies on this One List tier."
+            "A lead adviser can't be removed from companies on this One List tier.",
         ),
     }
 
@@ -889,13 +891,13 @@ class AssignOneListTierAndGlobalAccountManagerSerializer(serializers.Serializer)
 
     default_error_messages = {
         'cannot_assign_subsidiary_to_one_list': gettext_lazy(
-            'A subsidiary cannot be on One List.'
+            'A subsidiary cannot be on One List.',
         ),
         'cannot_assign_company_one_list_tier': gettext_lazy(
-            'A company can only have this One List tier assigned by ITA.'
+            'A company can only have this One List tier assigned by ITA.',
         ),
         'cannot_change_company_with_current_one_list_tier': gettext_lazy(
-            'A company on this One List tier can only be changed by ITA.'
+            'A company on this One List tier can only be changed by ITA.',
         ),
     }
 
@@ -1197,6 +1199,12 @@ class CompanyExportSerializer(serializers.ModelSerializer):
     sector = NestedRelatedField(meta_models.Sector)
     exporter_experience = NestedRelatedField(ExportExperience)
     estimated_export_value_years = NestedRelatedField(ExportYear)
+
+    def validate_team_members(self, value):
+
+        if has_team_member_count_exceeded_max_allowed(value):
+            raise serializers.ValidationError(EXCEEDED_MAX_TEAM_MEMBER_COUNT)
+        return value
 
     class Meta:
         model = CompanyExport

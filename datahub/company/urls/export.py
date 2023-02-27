@@ -2,14 +2,16 @@ from django.urls import path
 
 from datahub.company.views import CompanyExportViewSet
 
-urlpatterns = [
+export_v4_collection = CompanyExportViewSet.as_view(
+    {
+        'post': 'create',
+    },
+)
+
+urls_v4 = [
     path(
-        'exports',
-        CompanyExportViewSet.as_view(
-            {
-                'post': 'create',
-            },
-        ),
-        name='list',
+        'export',
+        export_v4_collection,
+        name='collection',
     ),
 ]

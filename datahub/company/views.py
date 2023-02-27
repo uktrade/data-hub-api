@@ -9,6 +9,7 @@ from django_filters.rest_framework import CharFilter, DjangoFilterBackend, Filte
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
@@ -41,10 +42,10 @@ from datahub.company.serializers import (
     AdviserSerializer,
     AssignOneListTierAndGlobalAccountManagerSerializer,
     AssignRegionalAccountManagerSerializer,
+    CompanyExportSerializer,
     CompanySerializer,
     ContactDetailSerializer,
     ContactDetailV4Serializer,
-    CompanyExportSerializer,
     ContactSerializer,
     ContactV4Serializer,
     OneListCoreTeamMemberSerializer,
@@ -625,3 +626,6 @@ class CompanyExportViewSet(CoreViewSet):
 
     queryset = CompanyExport.objects.select_related('company', 'owner')
     serializer_class = CompanyExportSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]

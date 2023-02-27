@@ -93,5 +93,5 @@ v4_urls = [
     path('', include((event_urls.urls_v4, 'event'), namespace='event')),
     path('', include((interaction_urls.urls_v4, 'interaction'), namespace='interaction')),
     path('', include((reminder_urls, 'reminder'), namespace='reminder')),
-    path('', include((export_urls.urlpatterns, 'export'), namespace='export')),
+    path('', include((export_urls.urls_v4, 'export'), namespace='export')),
 ]

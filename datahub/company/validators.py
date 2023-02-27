@@ -3,6 +3,8 @@ import re
 from rest_framework.exceptions import ValidationError
 
 _INVALID_COMPANY_NUMBER_RE = re.compile(r'[^A-Z0-9]')
+_MAX_TEAM_MEMBER_COUNT = 5
+EXCEEDED_MAX_TEAM_MEMBER_COUNT = 'You can only add 5 team members'
 
 
 class NotATransferredCompanyValidator:
@@ -31,3 +33,7 @@ def has_uk_establishment_number_prefix(value):
 def has_no_invalid_company_number_characters(value):
     """Checks if a UK establishment number only has valid characters."""
     return not value or not _INVALID_COMPANY_NUMBER_RE.search(value)
+
+
+def has_team_member_count_exceeded_max_allowed(team_members):
+    return team_members is not None and len(team_members) > _MAX_TEAM_MEMBER_COUNT

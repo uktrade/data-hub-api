@@ -22,7 +22,7 @@ from datahub.metadata.models import (
     HeadquarterType,
     TurnoverRange,
 )
-from datahub.metadata.test.factories import TeamFactory
+from datahub.metadata.test.factories import CountryFactory, SectorFactory, TeamFactory
 
 
 class AdviserFactory(factory.django.DjangoModelFactory):
@@ -247,3 +247,34 @@ class OneListTierFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company.OneListTier'
+
+
+class ExportExperienceFactory(factory.django.DjangoModelFactory):
+    """Export experience factory"""
+
+    class Meta:
+        model = 'company.ExportExperience'
+
+
+class ExportYearFactory(factory.django.DjangoModelFactory):
+    """Export year factory"""
+
+    class Meta:
+        model = 'company.ExportYear'
+
+
+class ExportFactory(factory.django.DjangoModelFactory):
+    """Export factory"""
+
+    company = factory.SubFactory(CompanyFactory)
+    title = factory.Faker('name')
+    owner = factory.SubFactory(AdviserFactory)
+    estimated_export_value_years = factory.SubFactory(ExportYearFactory)
+    estimated_export_value_amount = factory.fuzzy.FuzzyDecimal(1000, 100000)
+    estimated_win_date = now()
+    destination_country = factory.SubFactory(CountryFactory)
+    sector = factory.SubFactory(SectorFactory)
+    exporter_experience = factory.SubFactory(ExportExperienceFactory)
+
+    class Meta:
+        model = 'company.CompanyExport'

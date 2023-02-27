@@ -50,10 +50,7 @@ class CompanyExport(ArchivableModel, BaseModel):
         on_delete=models.PROTECT,
     )
 
-    team_members = models.ManyToManyField(
-        Advisor,
-        related_name='+',
-    )
+    team_members = models.ManyToManyField(Advisor, related_name='+')
 
     estimated_export_value_years = models.ForeignKey(
         ExportYear,
@@ -107,3 +104,7 @@ class CompanyExport(ArchivableModel, BaseModel):
     )
 
     notes = models.TextField(blank=True)
+
+    def __str__(self):
+        """Admin displayed human readable name."""
+        return self.title
