@@ -10,7 +10,7 @@ django-mptt==0.14.0
 django-pglocks==1.0.4
 django-reversion==5.0.4
 uritemplate==4.1.1  # required for DRF schema features
-whitenoise==6.3.0
+whitenoise==6.4.0
 
 chardet==5.1.0
 pyyaml==6.0
@@ -20,9 +20,9 @@ python-dateutil==2.8.2
 psycopg2==2.9.5
 psycogreen==1.0.2
 
-boto3==1.26.74
+boto3==1.26.79
 
-notifications-python-client==6.4.1
+notifications-python-client==7.0.0
 
 # Prometheus
 statsd==4.0.1
@@ -57,6 +57,6 @@ sentry_sdk==1.15.0
 
 # RQ and associated helpers
 rq==1.13.0
-rq-scheduler==0.11.0
+rq-scheduler==0.13.0
 
 python-redis-rate-limit==0.0.8
