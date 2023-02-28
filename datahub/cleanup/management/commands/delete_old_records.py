@@ -76,7 +76,7 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('new_export_interaction_reminders'),
                 Company._meta.get_field('no_recent_export_interaction_reminders'),
                 Company._meta.get_field('pipeline_list_items'),
-                Company._meta.get_field('exports'): (),
+                Company._meta.get_field('exports'),
             ),
         ),
         # There were multiple large bulk updates of contacts in the legacy system on and just
@@ -107,9 +107,7 @@ class Command(BaseCleanupCommand):
             ),
         ),
         'interaction.Interaction': ModelCleanupConfig(
-            (
-                DatetimeLessThanCleanupFilter('date', INTERACTION_EXPIRY_PERIOD),
-            ),
+            (DatetimeLessThanCleanupFilter('date', INTERACTION_EXPIRY_PERIOD),),
             relation_filter_mapping={
                 # Interactions are not deleted if they have any related company referrals.
                 # These must be deleted first (once they've expired).
