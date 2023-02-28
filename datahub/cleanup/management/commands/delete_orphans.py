@@ -2,7 +2,7 @@ from dateutil.relativedelta import relativedelta
 
 from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelCleanupConfig
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
-from datahub.company.models import Company, Contact
+from datahub.company.models import Company
 
 
 ORPHAN_AGE_THRESHOLD = relativedelta(months=6)
