@@ -92,10 +92,7 @@ class CompanyExport(ArchivableModel, BaseModel):
         blank=False,
     )
 
-    contacts = models.ManyToManyField(
-        Contact,
-        blank=False,
-    )
+    contacts = models.ManyToManyField(Contact, blank=False, related_name='exports')
 
     exporter_experience = models.ForeignKey(
         ExportExperience,

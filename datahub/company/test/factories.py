@@ -276,5 +276,9 @@ class ExportFactory(factory.django.DjangoModelFactory):
     sector = factory.SubFactory(SectorFactory)
     exporter_experience = factory.SubFactory(ExportExperienceFactory)
 
+    @to_many_field
+    def contacts(self):  # noqa: D102
+        return []
+
     class Meta:
         model = 'company.CompanyExport'

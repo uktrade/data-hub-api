@@ -36,6 +36,7 @@ from datahub.omis.order.test.factories import (
 from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model
 from datahub.user.company_list.test.factories import PipelineItemFactory
+
 FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
 
 """
@@ -57,6 +58,7 @@ MAPPINGS = {
             (QuoteFactory, 'accepted_by'),
             (InvestmentProjectFactory, 'client_contacts'),
             (PipelineItemFactory, 'contacts'),
+            # (ExportFactory, 'contacts'),
         ),
         'implicit_related_models': (),
         'ignored_models': (),
@@ -77,15 +79,23 @@ MAPPINGS = {
             (OneListCoreTeamMemberFactory, 'company'),
             (LargeCapitalInvestorProfileFactory, 'investor_company'),
             (LargeCapitalOpportunityFactory, 'promoters'),
+            # (ExportFactory, 'company'),
         ),
         'implicit_related_models': (),
         'ignored_models': (),
     },
+    # 'company.CompanyExport': {
+    #     'factory': ExportFactory,
+    #     'dependent_models': (),
+    #     'implicit_related_models': (
+    #         'company.CompanyExport_contacts',
+    #         'company.CompanyExport_team_members',
+    #     ),
+    #     'ignored_models': (),
+    # },
     'event.Event': {
         'factory': EventFactory,
-        'dependent_models': (
-            (CompanyInteractionFactory, 'event'),
-        ),
+        'dependent_models': ((CompanyInteractionFactory, 'event'),),
         'implicit_related_models': (
             'event.Event_teams',
             'event.Event_related_programmes',
@@ -101,10 +111,7 @@ def _format_iterable(value):
 
 
 @pytest.fixture(
-    params=(
-        (model_name, config)
-        for model_name, config in delete_orphans.Command.CONFIGS.items()
-    ),
+    params=((model_name, config) for model_name, config in delete_orphans.Command.CONFIGS.items()),
     ids=_format_iterable,
 )
 def cleanup_configs(request):
@@ -392,9 +399,7 @@ def test_with_opensearch_exception(mocked_bulk):
     filter_config = delete_orphans.Command.CONFIGS[model_name].filters[0]
 
     datetime_older_than_threshold = (
-        FROZEN_TIME
-        - filter_config.age_threshold
-        - relativedelta(days=1)
+        FROZEN_TIME - filter_config.age_threshold - relativedelta(days=1)
     )
     create_orphanable_model(model_factory, filter_config, datetime_older_than_threshold)
 
