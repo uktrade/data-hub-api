@@ -13,6 +13,7 @@ from freezegun import freeze_time
 from datahub.cleanup.management.commands import delete_old_records
 from datahub.cleanup.management.commands.delete_old_records import (
     COMPANY_EXPIRY_PERIOD,
+    COMPANY_EXPORT_EXPIRY_PERIOD,
     COMPANY_MODIFIED_ON_CUT_OFF,
     CONTACT_EXPIRY_PERIOD,
     CONTACT_MODIFIED_ON_CUT_OFF,
@@ -22,7 +23,6 @@ from datahub.cleanup.management.commands.delete_old_records import (
     INVESTOR_PROFILE_EXPIRY_PERIOD,
     ORDER_EXPIRY_PERIOD,
     ORDER_MODIFIED_ON_CUT_OFF,
-    COMPANY_EXPORT_EXPIRY_PERIOD,
 )
 from datahub.cleanup.query_utils import get_relations_to_delete
 from datahub.company.test.factories import (
