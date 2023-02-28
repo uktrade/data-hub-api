@@ -9,6 +9,8 @@ from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel, BaseOrderedConstantModel
 from datahub.metadata import models as metadata_models
 
+MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
 
 class ExportExperience(BaseOrderedConstantModel):
     """Export experience"""
@@ -41,7 +43,7 @@ class CompanyExport(ArchivableModel, BaseModel):
 
     title = models.CharField(
         blank=False,
-        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        max_length=MAX_LENGTH,
     )
 
     owner = models.ForeignKey(
@@ -50,7 +52,11 @@ class CompanyExport(ArchivableModel, BaseModel):
         on_delete=models.PROTECT,
     )
 
-    team_members = models.ManyToManyField(Advisor, related_name='+')
+    team_members = models.ManyToManyField(
+        Advisor,
+        blank=True,
+        related_name='+',
+    )
 
     estimated_export_value_years = models.ForeignKey(
         ExportYear,
@@ -64,7 +70,9 @@ class CompanyExport(ArchivableModel, BaseModel):
         blank=False,
     )
 
-    estimated_win_date = models.DateTimeField(blank=False)
+    estimated_win_date = models.DateTimeField(
+        blank=False,
+    )
 
     destination_country = models.ForeignKey(
         metadata_models.Country,
@@ -80,19 +88,23 @@ class CompanyExport(ArchivableModel, BaseModel):
     )
 
     export_potential = models.CharField(
-        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        max_length=MAX_LENGTH,
         choices=ExportPotential.choices,
         blank=False,
     )
 
     status = models.CharField(
-        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        max_length=MAX_LENGTH,
         choices=ExportStatus.choices,
         default=ExportStatus.ACTIVE,
         blank=False,
     )
 
-    contacts = models.ManyToManyField(Contact, blank=False, related_name='exports')
+    contacts = models.ManyToManyField(
+        Contact,
+        blank=False,
+        related_name='exports',
+    )
 
     exporter_experience = models.ForeignKey(
         ExportExperience,
@@ -100,7 +112,9 @@ class CompanyExport(ArchivableModel, BaseModel):
         on_delete=models.PROTECT,
     )
 
-    notes = models.TextField(blank=True)
+    notes = models.TextField(
+        blank=True,
+    )
 
     def __str__(self):
         """Admin displayed human readable name."""
