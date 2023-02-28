@@ -21,6 +21,7 @@ INVESTMENT_PROJECT_EXPIRY_PERIOD = relativedelta(years=10)
 ORDER_MODIFIED_ON_CUT_OFF = datetime(2014, 7, 12, tzinfo=utc)  # 2014-07-11 + 1 day
 ORDER_EXPIRY_PERIOD = relativedelta(years=7)
 INVESTOR_PROFILE_EXPIRY_PERIOD = relativedelta(years=10)
+COMPANY_EXPORT_EXPIRY_PERIOD = relativedelta(years=10)
 
 
 class Command(BaseCleanupCommand):
@@ -224,6 +225,12 @@ class Command(BaseCleanupCommand):
             excluded_relations=(
                 Order._meta.get_field('assignees'),
                 Order._meta.get_field('subscribers'),
+            ),
+        ),
+        'company.CompanyExport': ModelCleanupConfig(
+            (
+                DatetimeLessThanCleanupFilter('created_on', COMPANY_EXPORT_EXPIRY_PERIOD),
+                DatetimeLessThanCleanupFilter('modified_on', COMPANY_EXPORT_EXPIRY_PERIOD),
             ),
         ),
     }
