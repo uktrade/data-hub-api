@@ -76,6 +76,7 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('new_export_interaction_reminders'),
                 Company._meta.get_field('no_recent_export_interaction_reminders'),
                 Company._meta.get_field('pipeline_list_items'),
+                Company._meta.get_field('exports'): (),
             ),
         ),
         # There were multiple large bulk updates of contacts in the legacy system on and just
@@ -96,6 +97,7 @@ class Command(BaseCleanupCommand):
                 Contact._meta.get_field('referrals'): (),
                 Contact._meta.get_field('pipeline_items_m2m'): (),
                 Quote._meta.get_field('accepted_by').remote_field: (),
+                Contact._meta.get_field('exports'): (),
             },
         ),
         'company_referral.CompanyReferral': ModelCleanupConfig(

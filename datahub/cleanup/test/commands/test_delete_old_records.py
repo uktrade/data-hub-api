@@ -28,6 +28,7 @@ from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
     DuplicateCompanyFactory,
+    ExportFactory,
     OneListCoreTeamMemberFactory,
     SubsidiaryFactory,
 )
@@ -238,14 +239,14 @@ MAPPING = {
                 'field': 'investor_company',
                 'expired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTOR_PROFILE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': INVESTOR_PROFILE_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                     },
                 ],
                 'unexpired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTOR_PROFILE_DELETE_BEFORE_DATETIME + relativedelta(days=1),
+                        'modified_on': INVESTOR_PROFILE_DELETE_BEFORE_DATETIME
+                        + relativedelta(days=1),
                     },
                 ],
             },
@@ -255,6 +256,12 @@ MAPPING = {
                 'expired_objects_kwargs': [],
                 # Companies shouldn't be deleted if there is a related large capital
                 # opportunity (the opportunities have to expired and be deleted first).
+                'unexpired_objects_kwargs': [{}],
+            },
+            {
+                'factory': ExportFactory,
+                'field': 'contacts',
+                'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [{}],
             },
         ],
@@ -429,8 +436,8 @@ MAPPING = {
             {
                 'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                 'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
-                'actual_land_date':
-                    INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'actual_land_date': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                - relativedelta(days=1),
                 'date_abandoned': None,
                 'date_lost': None,
             },
@@ -438,8 +445,8 @@ MAPPING = {
                 'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                 'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
                 'actual_land_date': None,
-                'date_abandoned':
-                    INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'date_abandoned': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                - relativedelta(days=1),
                 'date_lost': None,
             },
             {
@@ -486,14 +493,13 @@ MAPPING = {
                 'field': 'investment_project',
                 'expired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                     },
                 ],
                 'unexpired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
+                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
                     },
                 ],
             },
@@ -502,14 +508,13 @@ MAPPING = {
                 'field': 'investment_project',
                 'expired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                     },
                 ],
                 'unexpired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
+                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
                     },
                 ],
             },
@@ -519,8 +524,8 @@ MAPPING = {
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
                     {
-                        'created_on':
-                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                         'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF,
                     },
                 ],
@@ -531,8 +536,8 @@ MAPPING = {
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                     },
                 ],
             },
@@ -669,20 +674,19 @@ def test_mappings(model_label, config):
     Test that `MAPPING` includes all the data necessary for covering all the cases.
     This is to avoid missing tests when new the configurations for delete_old_records are changed.
     """
-    assert model_label in MAPPING, (
-        f'No test cases for deleting old records for model {model_label} specified in MAPPING'
-    )
+    assert (
+        model_label in MAPPING
+    ), f'No test cases for deleting old records for model {model_label} specified in MAPPING'
 
     if config.relation_filter_mapping:
         mapping = MAPPING[model_label]
         related_models_in_config = {field.field.model for field in config.relation_filter_mapping}
         related_models_in_mapping = {
-            relation['factory']._meta.get_model_class()
-            for relation in mapping['relations']
+            relation['factory']._meta.get_model_class() for relation in mapping['relations']
         }
-        assert related_models_in_config <= related_models_in_mapping, (
-            f'Missing test cases for relation filters for model {model_label} detected'
-        )
+        assert (
+            related_models_in_config <= related_models_in_mapping
+        ), f'Missing test cases for relation filters for model {model_label} detected'
 
 
 @pytest.mark.parametrize('model_label,config', delete_old_records.Command.CONFIGS.items())
@@ -802,8 +806,7 @@ def test_run(
 
     if has_search_app:
         assert opensearch_with_signals.count(index=read_alias)['count'] == (
-            total_model_records
-            - num_expired_records
+            total_model_records - num_expired_records
         )
 
     # Check which models were actually deleted
