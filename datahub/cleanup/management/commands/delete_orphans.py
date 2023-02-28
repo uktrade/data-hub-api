@@ -23,7 +23,6 @@ class Command(BaseCleanupCommand):
     CONFIGS = {
         'company.Contact': ModelCleanupConfig(
             (DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),),
-            excluded_relations=(Contact._meta.get_field('exports'),),
         ),
         'company.Company': ModelCleanupConfig(
             (DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),),
@@ -35,7 +34,6 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('pipeline_list_items'),
                 Company._meta.get_field('new_export_interaction_reminders'),
                 Company._meta.get_field('no_recent_export_interaction_reminders'),
-                Company._meta.get_field('exports'),
             ),
         ),
         'event.Event': ModelCleanupConfig(

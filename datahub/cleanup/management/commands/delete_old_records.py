@@ -67,6 +67,7 @@ class Command(BaseCleanupCommand):
                     DatetimeLessThanCleanupFilter('modified_on', INVESTOR_PROFILE_EXPIRY_PERIOD),
                 ),
                 Company._meta.get_field('opportunities'): (),
+                Company._meta.get_field('exports'): (),
             },
             # We want to delete the relations below along with any expired companies
             excluded_relations=(
@@ -76,7 +77,6 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('new_export_interaction_reminders'),
                 Company._meta.get_field('no_recent_export_interaction_reminders'),
                 Company._meta.get_field('pipeline_list_items'),
-                Company._meta.get_field('exports'),
             ),
         ),
         # There were multiple large bulk updates of contacts in the legacy system on and just

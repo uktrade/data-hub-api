@@ -260,9 +260,14 @@ MAPPING = {
             },
             {
                 'factory': ExportFactory,
-                'field': 'contacts',
+                'field': 'company',
                 'expired_objects_kwargs': [],
-                'unexpired_objects_kwargs': [{}],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME,
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME,
+                    },
+                ],
             },
         ],
     },
@@ -373,6 +378,12 @@ MAPPING = {
                         'modified_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                     },
                 ],
+            },
+            {
+                'factory': ExportFactory,
+                'field': 'contacts',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
             },
         ],
     },
