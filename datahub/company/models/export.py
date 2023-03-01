@@ -36,7 +36,7 @@ class CompanyExport(ArchivableModel, BaseModel):
 
     company = models.ForeignKey(
         Company,
-        related_name='exports',
+        related_name='company_exports',
         on_delete=models.PROTECT,
     )
 
@@ -47,12 +47,13 @@ class CompanyExport(ArchivableModel, BaseModel):
     owner = models.ForeignKey(
         Advisor,
         on_delete=models.PROTECT,
+        related_name='owner_exports',
     )
 
     team_members = models.ManyToManyField(
         Advisor,
         blank=True,
-        related_name='+',
+        related_name='team_exports',
     )
 
     estimated_export_value_years = models.ForeignKey(
@@ -93,7 +94,7 @@ class CompanyExport(ArchivableModel, BaseModel):
 
     contacts = models.ManyToManyField(
         Contact,
-        related_name='exports',
+        related_name='contact_exports',
     )
 
     exporter_experience = models.ForeignKey(
