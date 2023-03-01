@@ -37,18 +37,15 @@ class CompanyExport(ArchivableModel, BaseModel):
     company = models.ForeignKey(
         Company,
         related_name='exports',
-        blank=False,
         on_delete=models.PROTECT,
     )
 
     title = models.CharField(
-        blank=False,
         max_length=MAX_LENGTH,
     )
 
     owner = models.ForeignKey(
         Advisor,
-        blank=False,
         on_delete=models.PROTECT,
     )
 
@@ -62,54 +59,48 @@ class CompanyExport(ArchivableModel, BaseModel):
         ExportYear,
         blank=False,
         on_delete=models.PROTECT,
+        related_name='+',
     )
 
     estimated_export_value_amount = models.DecimalField(
         max_digits=19,
         decimal_places=0,
-        blank=False,
     )
 
-    estimated_win_date = models.DateTimeField(
-        blank=False,
-    )
+    estimated_win_date = models.DateTimeField()
 
     destination_country = models.ForeignKey(
         metadata_models.Country,
-        blank=False,
         on_delete=models.PROTECT,
         related_name='+',
     )
 
     sector = models.ForeignKey(
         metadata_models.Sector,
-        blank=False,
         on_delete=models.PROTECT,
+        related_name='+',
     )
 
     export_potential = models.CharField(
         max_length=MAX_LENGTH,
         choices=ExportPotential.choices,
-        blank=False,
     )
 
     status = models.CharField(
         max_length=MAX_LENGTH,
         choices=ExportStatus.choices,
         default=ExportStatus.ACTIVE,
-        blank=False,
     )
 
     contacts = models.ManyToManyField(
         Contact,
-        blank=False,
         related_name='exports',
     )
 
     exporter_experience = models.ForeignKey(
         ExportExperience,
-        blank=False,
         on_delete=models.PROTECT,
+        related_name='+',
     )
 
     notes = models.TextField(
