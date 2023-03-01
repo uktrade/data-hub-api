@@ -18,17 +18,21 @@ from datahub.company.constants import (
 from datahub.company.models import (
     Advisor,
     Company,
+    CompanyExport,
     CompanyExportCountry,
     CompanyPermission,
     Contact,
     ContactPermission,
+    ExportExperience,
     ExportExperienceCategory,
+    ExportYear,
     OneListCoreTeamMember,
     OneListTier,
 )
 from datahub.company.tasks.contact import schedule_update_contact_consent
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
+    validate_team_member_max_count,
     has_uk_establishment_number_prefix,
 )
 from datahub.core.api_client import get_zipkin_headers
@@ -141,17 +145,25 @@ class ContactSerializer(PermittedFieldsModelSerializer):
     }
 
     title = NestedRelatedField(
-        meta_models.Title, required=False, allow_null=True,
+        meta_models.Title,
+        required=False,
+        allow_null=True,
     )
     company = NestedRelatedField(
-        Company, required=False, allow_null=True,
+        Company,
+        required=False,
+        allow_null=True,
     )
     adviser = NestedAdviserField(read_only=True)
     address_country = NestedRelatedField(
-        meta_models.Country, required=False, allow_null=True,
+        meta_models.Country,
+        required=False,
+        allow_null=True,
     )
     address_area = NestedRelatedField(
-        meta_models.AdministrativeArea, required=False, allow_null=True,
+        meta_models.AdministrativeArea,
+        required=False,
+        allow_null=True,
     )
     archived = serializers.BooleanField(read_only=True)
     archived_on = serializers.DateTimeField(read_only=True)
@@ -213,9 +225,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             'modified_on',
             'address_area',
         )
-        read_only_fields = (
-            'archived_documents_url_path',
-        )
+        read_only_fields = ('archived_documents_url_path',)
         validators = [
             NotArchivedValidator(),
             RulesBasedValidator(
@@ -397,37 +407,55 @@ class CompanySerializer(PermittedFieldsModelSerializer):
 
     archived_by = NestedAdviserField(read_only=True)
     business_type = NestedRelatedField(
-        meta_models.BusinessType, required=False, allow_null=True,
+        meta_models.BusinessType,
+        required=False,
+        allow_null=True,
     )
     one_list_group_tier = serializers.SerializerMethodField()
     contacts = ContactSerializer(many=True, read_only=True)
     transferred_to = NestedRelatedField('company.Company', read_only=True)
     employee_range = NestedRelatedField(
-        meta_models.EmployeeRange, required=False, allow_null=True,
+        meta_models.EmployeeRange,
+        required=False,
+        allow_null=True,
     )
     export_to_countries = NestedRelatedField(
-        meta_models.Country, many=True, read_only=True,
+        meta_models.Country,
+        many=True,
+        read_only=True,
     )
     future_interest_countries = NestedRelatedField(
-        meta_models.Country, many=True, read_only=True,
+        meta_models.Country,
+        many=True,
+        read_only=True,
     )
     headquarter_type = NestedRelatedField(
-        meta_models.HeadquarterType, required=False, allow_null=True,
+        meta_models.HeadquarterType,
+        required=False,
+        allow_null=True,
     )
     one_list_group_global_account_manager = serializers.SerializerMethodField()
     global_headquarters = NestedRelatedField(
-        'company.Company', required=False, allow_null=True,
+        'company.Company',
+        required=False,
+        allow_null=True,
     )
     sector = NestedRelatedField(meta_models.Sector, required=False, allow_null=True)
     turnover_range = NestedRelatedField(
-        meta_models.TurnoverRange, required=False, allow_null=True,
+        meta_models.TurnoverRange,
+        required=False,
+        allow_null=True,
     )
     turnover_gbp = serializers.SerializerMethodField()
     uk_region = NestedRelatedField(
-        meta_models.UKRegion, required=False, allow_null=True,
+        meta_models.UKRegion,
+        required=False,
+        allow_null=True,
     )
     export_experience_category = NestedRelatedField(
-        ExportExperienceCategory, required=False, allow_null=True,
+        ExportExperienceCategory,
+        required=False,
+        allow_null=True,
     )
     registered_address = AddressSerializer(
         source_model=Company,
@@ -477,9 +505,11 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 and global_headquarters_id is not None
             ):
                 message = self.error_messages['subsidiary_cannot_be_a_global_headquarters']
-                raise serializers.ValidationError({
-                    'headquarter_type': message,
-                })
+                raise serializers.ValidationError(
+                    {
+                        'headquarter_type': message,
+                    }
+                )
 
         combiner = DataCombiner(self.instance, data)
 
@@ -518,9 +548,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             # checks if global_headquarters is global_headquarters
             if global_headquarters.headquarter_type_id != UUID(HeadquarterType.ghq.value.id):
                 raise serializers.ValidationError(
-                    self.error_messages[
-                        'global_headquarters_hq_type_is_not_global_headquarters'
-                    ],
+                    self.error_messages['global_headquarters_hq_type_is_not_global_headquarters'],
                 )
 
         return global_headquarters
@@ -709,10 +737,12 @@ class AssignRegionalAccountManagerSerializer(serializers.Serializer):
 
     target_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
     default_error_messages = {
-        'cannot_change_account_manager_of_one_list_subsidiary':
-            gettext_lazy("A lead adviser can't be set on a subsidiary of a One List company."),
-        'cannot_change_account_manager_for_other_one_list_tiers':
-            gettext_lazy("A lead adviser can't be set for companies on this One List tier."),
+        'cannot_change_account_manager_of_one_list_subsidiary': gettext_lazy(
+            "A lead adviser can't be set on a subsidiary of a One List company."
+        ),
+        'cannot_change_account_manager_for_other_one_list_tiers': gettext_lazy(
+            "A lead adviser can't be set for companies on this One List tier."
+        ),
     }
     regional_account_manager = NestedRelatedField(Advisor)
 
@@ -753,10 +783,12 @@ class SelfAssignAccountManagerSerializer(serializers.Serializer):
 
     target_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
     default_error_messages = {
-        'cannot_change_account_manager_of_one_list_subsidiary':
-            gettext_lazy("A lead adviser can't be set on a subsidiary of a One List company."),
-        'cannot_change_account_manager_for_other_one_list_tiers':
-            gettext_lazy("A lead adviser can't be set for companies on this One List tier."),
+        'cannot_change_account_manager_of_one_list_subsidiary': gettext_lazy(
+            "A lead adviser can't be set on a subsidiary of a One List company."
+        ),
+        'cannot_change_account_manager_for_other_one_list_tiers': gettext_lazy(
+            "A lead adviser can't be set for companies on this One List tier."
+        ),
     }
 
     def validate(self, attrs):
@@ -807,8 +839,9 @@ class RemoveAccountManagerSerializer(_RemoveCompanyFromOneListSerializer):
 
     allowed_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
     default_error_messages = {
-        'cannot_change_account_manager_for_other_one_list_tiers':
-            gettext_lazy("A lead adviser can't be removed from companies on this One List tier."),
+        'cannot_change_account_manager_for_other_one_list_tiers': gettext_lazy(
+            "A lead adviser can't be removed from companies on this One List tier."
+        ),
     }
 
     def validate(self, attrs):
@@ -829,11 +862,10 @@ class RemoveCompanyFromOneListSerializer(_RemoveCompanyFromOneListSerializer):
 
     excluded_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
     default_error_messages = {
-        'cannot_remove_lead_ita':
-            gettext_lazy(
-                'It`s not possible to remove a lead ITA from a company using'
-                'One List admin functionality',
-            ),
+        'cannot_remove_lead_ita': gettext_lazy(
+            'It`s not possible to remove a lead ITA from a company using'
+            'One List admin functionality',
+        ),
     }
 
     def validate(self, attrs):
@@ -857,12 +889,15 @@ class AssignOneListTierAndGlobalAccountManagerSerializer(serializers.Serializer)
     excluded_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
 
     default_error_messages = {
-        'cannot_assign_subsidiary_to_one_list':
-            gettext_lazy('A subsidiary cannot be on One List.'),
-        'cannot_assign_company_one_list_tier':
-            gettext_lazy('A company can only have this One List tier assigned by ITA.'),
-        'cannot_change_company_with_current_one_list_tier':
-            gettext_lazy('A company on this One List tier can only be changed by ITA.'),
+        'cannot_assign_subsidiary_to_one_list': gettext_lazy(
+            'A subsidiary cannot be on One List.'
+        ),
+        'cannot_assign_company_one_list_tier': gettext_lazy(
+            'A company can only have this One List tier assigned by ITA.'
+        ),
+        'cannot_change_company_with_current_one_list_tier': gettext_lazy(
+            'A company on this One List tier can only be changed by ITA.'
+        ),
     }
 
     one_list_tier = NestedRelatedField(OneListTier)
@@ -1152,3 +1187,23 @@ class OneListCoreTeamMemberSerializer(serializers.Serializer):
 
     adviser = NestedAdviserWithEmailAndTeamGeographyField()
     is_global_account_manager = serializers.BooleanField()
+
+
+class CompanyExportSerializer(serializers.ModelSerializer):
+    company = NestedRelatedField(Company)
+    owner = NestedRelatedField(Advisor)
+    team_members = NestedRelatedField(Advisor, many=True)
+    contacts = NestedRelatedField(Contact, many=True)
+    destination_country = NestedRelatedField(meta_models.Country)
+    sector = NestedRelatedField(meta_models.Sector)
+    exporter_experience = NestedRelatedField(ExportExperience)
+    estimated_export_value_years = NestedRelatedField(ExportYear)
+
+    def validate_team_members(self, value):
+
+        validate_team_member_max_count(value, serializers.ValidationError)
+        return value
+
+    class Meta:
+        model = CompanyExport
+        fields = '__all__'
