@@ -45,7 +45,7 @@ class TestGetExport(APITestMixin):
                 'id': str(export.destination_country.id),
                 'name': export.destination_country.name,
             },
-            'estimated_export_value_amount': export.estimated_export_value_amount,
+            'estimated_export_value_amount': str(export.estimated_export_value_amount),
             'estimated_export_value_years': {
                 'id': str(export.estimated_export_value_years.id),
                 'name': export.estimated_export_value_years.name,
