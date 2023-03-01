@@ -4,8 +4,8 @@ from django.core.exceptions import ValidationError
 
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
-    validate_team_member_max_count,
     has_uk_establishment_number_prefix,
+    validate_team_member_max_count,
 )
 
 
