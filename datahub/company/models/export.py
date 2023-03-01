@@ -57,7 +57,6 @@ class CompanyExport(ArchivableModel, BaseModel):
 
     estimated_export_value_years = models.ForeignKey(
         ExportYear,
-        blank=False,
         on_delete=models.PROTECT,
         related_name='+',
     )
