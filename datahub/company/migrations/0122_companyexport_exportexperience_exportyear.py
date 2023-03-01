@@ -9,7 +9,6 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0041_update_export_barrier_type'),
         ('company', '0121_auto_20230127_1623'),
     ]
 
@@ -50,22 +49,115 @@ class Migration(migrations.Migration):
                 ('archived_reason', models.TextField(blank=True, null=True)),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('title', models.CharField(max_length=255)),
-                ('estimated_export_value_amount', models.DecimalField(decimal_places=0, max_digits=19)),
+                (
+                    'estimated_export_value_amount',
+                    models.DecimalField(decimal_places=0, max_digits=19),
+                ),
                 ('estimated_win_date', models.DateTimeField()),
-                ('export_potential', models.CharField(choices=[('high', 'High'), ('medium', 'Medium'), ('low', 'Low')], max_length=255)),
-                ('status', models.CharField(choices=[('active', 'Active'), ('won', 'Won'), ('inactive', 'Inactive')], default='active', max_length=255)),
+                (
+                    'export_potential',
+                    models.CharField(
+                        choices=[('high', 'High'), ('medium', 'Medium'), ('low', 'Low')],
+                        max_length=255,
+                    ),
+                ),
+                (
+                    'status',
+                    models.CharField(
+                        choices=[('active', 'Active'), ('won', 'Won'), ('inactive', 'Inactive')],
+                        default='active',
+                        max_length=255,
+                    ),
+                ),
                 ('notes', models.TextField(blank=True)),
-                ('archived_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('company', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='company_exports', to='company.company')),
-                ('contacts', models.ManyToManyField(related_name='contact_exports', to='company.Contact')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('destination_country', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='metadata.country')),
-                ('estimated_export_value_years', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='company.exportyear')),
-                ('exporter_experience', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='company.exportexperience')),
-                ('modified_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='owner_exports', to=settings.AUTH_USER_MODEL)),
-                ('sector', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='metadata.sector')),
-                ('team_members', models.ManyToManyField(blank=True, related_name='team_exports', to=settings.AUTH_USER_MODEL)),
+                (
+                    'archived_by',
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'company',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name='company_exports',
+                        to='company.company',
+                    ),
+                ),
+                (
+                    'contacts',
+                    models.ManyToManyField(related_name='contact_exports', to='company.Contact'),
+                ),
+                (
+                    'created_by',
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'destination_country',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name='+',
+                        to='metadata.country',
+                    ),
+                ),
+                (
+                    'estimated_export_value_years',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name='+',
+                        to='company.exportyear',
+                    ),
+                ),
+                (
+                    'exporter_experience',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name='+',
+                        to='company.exportexperience',
+                    ),
+                ),
+                (
+                    'modified_by',
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'owner',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name='owner_exports',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'sector',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name='+',
+                        to='metadata.sector',
+                    ),
+                ),
+                (
+                    'team_members',
+                    models.ManyToManyField(
+                        blank=True, related_name='team_exports', to=settings.AUTH_USER_MODEL
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
