@@ -68,7 +68,7 @@ class Command(BaseCleanupCommand):
                     DatetimeLessThanCleanupFilter('modified_on', INVESTOR_PROFILE_EXPIRY_PERIOD),
                 ),
                 Company._meta.get_field('opportunities'): (),
-                Company._meta.get_field('exports'): (),
+                Company._meta.get_field('company_exports'): (),
             },
             # We want to delete the relations below along with any expired companies
             excluded_relations=(
@@ -98,7 +98,7 @@ class Command(BaseCleanupCommand):
                 Contact._meta.get_field('referrals'): (),
                 Contact._meta.get_field('pipeline_items_m2m'): (),
                 Quote._meta.get_field('accepted_by').remote_field: (),
-                Contact._meta.get_field('exports'): (),
+                Contact._meta.get_field('contact_exports'): (),
             },
         ),
         'company_referral.CompanyReferral': ModelCleanupConfig(
