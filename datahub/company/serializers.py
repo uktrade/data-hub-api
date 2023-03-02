@@ -1203,7 +1203,6 @@ class CompanyExportSerializer(serializers.ModelSerializer):
 
     def validate_team_members(self, value):
         """Validate the value provided for the team_members field"""
-
         validate_team_member_max_count(value, serializers.ValidationError)
         return value
 

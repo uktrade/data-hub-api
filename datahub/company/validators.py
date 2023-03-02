@@ -39,7 +39,6 @@ def validate_team_member_max_count(team_members, exception_class, wrapper_obj_na
     Checks if the number of entries in team_members is above the maximum allowed.
     Throws an exception of type {exception_class} when above the maximum.
     """
-
     if team_members is not None and len(team_members) > _MAX_TEAM_MEMBER_COUNT:
         err_message = f'You can only add {_MAX_TEAM_MEMBER_COUNT} team members'
         if wrapper_obj_name is not None:

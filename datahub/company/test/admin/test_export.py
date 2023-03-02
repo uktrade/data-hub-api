@@ -16,7 +16,6 @@ class TestCompanyExportAdmin(AdminTestMixin):
         Test an error is received when the number of team members being saved is above the
         maximum allowed
         """
-
         url = reverse('admin:company_companyexport_add')
 
         response = self.client.post(

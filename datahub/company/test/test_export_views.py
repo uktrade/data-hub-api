@@ -61,7 +61,6 @@ class TestAddExport(APITestMixin):
         Test when mandatory fields are not provided these fields are included in the
         error response
         """
-
         url = reverse('api-v4:export:collection')
 
         response = self.api_client.post(
@@ -90,7 +89,6 @@ class TestAddExport(APITestMixin):
         Test when the number of team_members provided is above the maximum allowed, the response
         contains this error message
         """
-
         url = reverse('api-v4:export:collection')
         data = self._generate_valid_json()
         data['team_members'] = [advisor.id for advisor in AdviserFactory.create_batch(6)]
@@ -107,7 +105,6 @@ class TestAddExport(APITestMixin):
 
     def test_post_success(self):
         """Test a POST request with correct arguments provides a success response"""
-
         url = reverse('api-v4:export:collection')
 
         response = self.api_client.post(

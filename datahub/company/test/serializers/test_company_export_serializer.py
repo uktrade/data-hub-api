@@ -18,7 +18,6 @@ class TestCompanyExportSerializer:
         Test the team_members field is validated by the serializer and an error thrown when the
         number of team_members provided is above the max allowed
         """
-
         request = Mock()
         data = {'team_members': [advisor.id for advisor in AdviserFactory.create_batch(6)]}
         serializer = CompanyExportSerializer(data=data, context={'request': request})
