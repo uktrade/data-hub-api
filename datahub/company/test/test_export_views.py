@@ -1,3 +1,5 @@
+import uuid
+
 import pytest
 
 from rest_framework import status
@@ -15,10 +17,18 @@ pytestmark = pytest.mark.django_db
 
 
 class TestGetExport(APITestMixin):
-    """Test get export"""
+    """Test the GET export endpoint"""
+
+    def test_delete_unknown_export_returns_error(self):
+        """Test a GET with an unknown export id returns a not found error"""
+        ExportFactory.create_batch(3)
+        url = reverse('api-v4:export:item', kwargs={'pk': uuid.uuid4()})
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_get_success(self):
-
+        """Test a GET request with a known export id provides a success response"""
         export = ExportFactory(
             contacts=ContactFactory.create_batch(3),
             team_members=AdviserFactory.create_batch(4),
