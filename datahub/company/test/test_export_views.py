@@ -37,7 +37,8 @@ class TestPatchExport(APITestMixin):
         url = reverse('api-v4:export:item', kwargs={'pk': export.id})
 
         response = self.api_client.patch(
-            url, data={'team_members': [advisor.id for advisor in AdviserFactory.create_batch(6)]}
+            url,
+            data={'team_members': [advisor.id for advisor in AdviserFactory.create_batch(6)]},
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
