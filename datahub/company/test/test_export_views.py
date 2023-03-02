@@ -19,7 +19,7 @@ pytestmark = pytest.mark.django_db
 class TestGetExport(APITestMixin):
     """Test the GET export endpoint"""
 
-    def test_delete_unknown_export_returns_error(self):
+    def test_get_unknown_export_returns_error(self):
         """Test a GET with an unknown export id returns a not found error"""
         ExportFactory.create_batch(3)
         url = reverse('api-v4:export:item', kwargs={'pk': uuid.uuid4()})
