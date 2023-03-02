@@ -38,6 +38,7 @@ def test_has_uk_establishment_number_prefix(company_number, is_valid):
 
 
 def test_validate_team_member_max_count_does_not_throw_error_when_team_members_is_none():
+    """Test no error is thrown when the team_member value is None"""
     validate_team_member_max_count(None, ValidationError)
 
 
@@ -45,6 +46,9 @@ def test_validate_team_member_max_count_does_not_throw_error_when_team_members_i
 def test_validate_team_member_max_count_does_not_throw_error_when_team_members_below_max(
     size,
 ):
+    """
+    Test no error is thrown when the team_member value contains less than the maximum allowed
+    """
     validate_team_member_max_count(['a'] * size, ValidationError)
 
 
@@ -52,6 +56,10 @@ def test_validate_team_member_max_count_does_not_throw_error_when_team_members_b
 def test_validate_team_member_max_count_throws_error_when_team_members_exceed_max(
     size,
 ):
+    """
+    Test an error is thrown that matches the type of exception provided, when the team_member
+    value contains more than the maximum allowed
+    """
     with pytest.raises(ValidationError, match='You can only add 5 team members'):
         validate_team_member_max_count(['a'] * size, ValidationError)
 
@@ -60,6 +68,11 @@ def test_validate_team_member_max_count_throws_error_when_team_members_exceed_ma
 def test_validate_team_member_max_count_thrown_error_is_wrapped(
     size,
 ):
+    """
+    Test an error is thrown that matches the type of exception provided, when the team_member
+    value contains more than the maximum allowed. Test the message of the error is wrapped in an
+    object that matches the {wrapper_obj_name} argument
+    """
     with pytest.raises(ValidationError) as excinfo:
         validate_team_member_max_count(['a'] * size, ValidationError, wrapper_obj_name='error')
     assert dict(excinfo.value)['error'] == ['You can only add 5 team members']

@@ -9,7 +9,14 @@ pytestmark = pytest.mark.django_db
 
 
 class TestCompanyExportAdmin(AdminTestMixin):
+    """Tests for the CompanyExport model in the django admin site."""
+
     def test_export_team_members_validation_throws_error_for_more_than_allowed_max(self):
+        """
+        Test an error is received when the number of team members being saved is above the
+        maximum allowed
+        """
+
         url = reverse('admin:company_companyexport_add')
 
         response = self.client.post(

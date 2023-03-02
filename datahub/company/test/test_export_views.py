@@ -25,9 +25,10 @@ pytestmark = pytest.mark.django_db
 
 
 class TestAddExport(APITestMixin):
-    """Test add export"""
+    """Test the POST export endpoint"""
 
     def _generate_valid_json(self):
+        """Generate a json object containing valid values for a company export"""
         company = CompanyFactory()
         owner = AdviserFactory()
         team_members = AdviserFactory.create_batch(3)
@@ -56,6 +57,11 @@ class TestAddExport(APITestMixin):
         }
 
     def test_missing_mandatory_fields_return_expected_error(self):
+        """
+        Test when mandatory fields are not provided these fields are included in the
+        error response
+        """
+
         url = reverse('api-v4:export:collection')
 
         response = self.api_client.post(
@@ -80,6 +86,11 @@ class TestAddExport(APITestMixin):
         }
 
     def test_too_many_team_members_return_expected_error(self):
+        """
+        Test when the number of team_members provided is above the maximum allowed, the response
+        contains this error message
+        """
+
         url = reverse('api-v4:export:collection')
         data = self._generate_valid_json()
         data['team_members'] = [advisor.id for advisor in AdviserFactory.create_batch(6)]
@@ -95,6 +106,7 @@ class TestAddExport(APITestMixin):
         assert response_data['team_members'] == ['You can only add 5 team members']
 
     def test_post_success(self):
+        """Test a POST request with correct arguments provides a success response"""
 
         url = reverse('api-v4:export:collection')
 

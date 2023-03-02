@@ -1190,6 +1190,8 @@ class OneListCoreTeamMemberSerializer(serializers.Serializer):
 
 
 class CompanyExportSerializer(serializers.ModelSerializer):
+    """Company Export serializer"""
+
     company = NestedRelatedField(Company)
     owner = NestedRelatedField(Advisor)
     team_members = NestedRelatedField(Advisor, many=True)
@@ -1200,6 +1202,7 @@ class CompanyExportSerializer(serializers.ModelSerializer):
     estimated_export_value_years = NestedRelatedField(ExportYear)
 
     def validate_team_members(self, value):
+        """Validate the value provided for the team_members field"""
 
         validate_team_member_max_count(value, serializers.ValidationError)
         return value
