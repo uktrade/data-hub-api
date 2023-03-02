@@ -1189,6 +1189,8 @@ class OneListCoreTeamMemberSerializer(serializers.Serializer):
 
 
 class CompanyExportSerializer(serializers.ModelSerializer):
+    """Company Export serializer"""
+
     company = NestedRelatedField(Company)
     owner = NestedRelatedField(Advisor)
     team_members = NestedRelatedField(Advisor, many=True)
