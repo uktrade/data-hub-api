@@ -13,10 +13,12 @@ pytestmark = pytest.mark.django_db
 
 
 class TestListExport(APITestMixin):
-    """Test list export"""
+    """Test the LIST export endpoint"""
 
     def test_list_without_pagination_success(self):
-
+        """
+        Test a request without any pagination criteria returns all stored exports in the response
+        """
         ExportFactory.create_batch(20)
         url = reverse('api-v4:export:collection')
         response = self.api_client.get(url)
@@ -33,6 +35,9 @@ class TestListExport(APITestMixin):
         ),
     )
     def test_list_with_pagination_success(self, batch_size, offset, limit, expected_count):
+        """
+        Test a request with pagination criteria returns expected export results
+        """
         ExportFactory.create_batch(batch_size)
 
         url = reverse('api-v4:export:collection')
