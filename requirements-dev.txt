@@ -260,7 +260,7 @@ pygments==2.13.0
     # via ipython
 pyjwt==2.6.0
     # via notifications-python-client
-pylint==2.16.2
+pylint==2.16.3
     # via
     #   -r requirements-dev.in
     #   pylint-django
