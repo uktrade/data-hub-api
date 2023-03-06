@@ -203,7 +203,7 @@ notifications-python-client==7.0.0
     # via -r requirements.in
 opensearch-dsl==2.0.1
     # via -r requirements.in
-opensearch-py==2.1.1
+opensearch-py==2.2.0
     # via
     #   -r requirements.in
     #   opensearch-dsl
@@ -296,6 +296,7 @@ python-dateutil==2.8.2
     #   freezegun
     #   icalendar
     #   opensearch-dsl
+    #   opensearch-py
     #   rq-scheduler
 python-redis-rate-limit==0.0.8
     # via -r requirements.in
@@ -347,6 +348,7 @@ six==1.16.0
     #   mail-parser
     #   mohawk
     #   opensearch-dsl
+    #   opensearch-py
     #   piprot
     #   python-dateutil
     #   requests-mock
