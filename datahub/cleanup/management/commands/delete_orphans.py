@@ -22,14 +22,10 @@ class Command(BaseCleanupCommand):
 
     CONFIGS = {
         'company.Contact': ModelCleanupConfig(
-            (
-                DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),
-            ),
+            (DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),),
         ),
         'company.Company': ModelCleanupConfig(
-            (
-                DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),
-            ),
+            (DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),),
             # We want to delete the relations below along with any orphaned companies
             excluded_relations=(
                 Company._meta.get_field('company_list_items'),
@@ -41,8 +37,6 @@ class Command(BaseCleanupCommand):
             ),
         ),
         'event.Event': ModelCleanupConfig(
-            (
-                DatetimeLessThanCleanupFilter('end_date', relativedelta(months=18)),
-            ),
+            (DatetimeLessThanCleanupFilter('end_date', relativedelta(months=18)),),
         ),
     }

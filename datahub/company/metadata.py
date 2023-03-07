@@ -1,4 +1,9 @@
-from datahub.company.models import ExportExperienceCategory, OneListTier
+from datahub.company.models import (
+    ExportExperience,
+    ExportExperienceCategory,
+    ExportYear,
+    OneListTier,
+)
 from datahub.metadata.fixtures import Fixture
 from datahub.metadata.registry import registry
 
@@ -8,6 +13,8 @@ class InteractionFixtures(Fixture):
 
     files = [
         'fixtures/export_experience_categories.yaml',
+        'fixtures/company_export_experience.yaml',
+        'fixtures/export_years.yaml',
     ]
 
 
@@ -19,4 +26,14 @@ registry.register(
 registry.register(
     metadata_id='one-list-tier',
     model=OneListTier,
+)
+
+registry.register(
+    metadata_id='export-experience',
+    model=ExportExperience,
+)
+
+registry.register(
+    metadata_id='export-years',
+    model=ExportYear,
 )
