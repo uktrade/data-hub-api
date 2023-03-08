@@ -22,7 +22,7 @@ class ExportYear(BaseOrderedConstantModel):
 
 @reversion.register_base_model()
 class CompanyExport(ArchivableModel, BaseModel):
-    """A export item for a company"""
+    """An export item for a company"""
 
     class ExportPotential(models.TextChoices):
         HIGH = ('high', 'High')
