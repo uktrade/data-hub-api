@@ -624,7 +624,12 @@ class ExportWinsForCompanyView(APIView):
 class CompanyExportViewSet(CoreViewSet):
     """View for company exports"""
 
-    queryset = CompanyExport.objects.select_related('company', 'owner')
+    queryset = CompanyExport.objects.select_related(
+        'company',
+        'owner',
+        'estimated_export_value_years',
+        'exporter_experience',
+    )
     serializer_class = CompanyExportSerializer
     permission_classes = [
         IsAuthenticated,
