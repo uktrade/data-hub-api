@@ -13,8 +13,6 @@ class InteractionFixtures(Fixture):
 
     files = [
         'fixtures/export_experience_categories.yaml',
-        'fixtures/company_export_experience.yaml',
-        'fixtures/export_years.yaml',
     ]
 
 

@@ -33,6 +33,7 @@ from datahub.company.tasks.contact import schedule_update_contact_consent
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
     has_uk_establishment_number_prefix,
+    validate_team_member_max_count,
 )
 from datahub.core.api_client import get_zipkin_headers
 from datahub.core.constants import Country
@@ -1199,6 +1200,11 @@ class CompanyExportSerializer(serializers.ModelSerializer):
     sector = NestedRelatedField(meta_models.Sector)
     exporter_experience = NestedRelatedField(ExportExperience)
     estimated_export_value_years = NestedRelatedField(ExportYear)
+
+    def validate_team_members(self, value):
+        """Validate the value provided for the team_members field"""
+        validate_team_member_max_count(value, serializers.ValidationError)
+        return value
 
     class Meta:
         model = CompanyExport

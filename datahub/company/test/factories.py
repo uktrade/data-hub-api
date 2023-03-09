@@ -271,7 +271,7 @@ class ExportFactory(factory.django.DjangoModelFactory):
     title = factory.Faker('name')
     owner = factory.SubFactory(AdviserFactory)
     estimated_export_value_years = factory.SubFactory(ExportYearFactory)
-    estimated_export_value_amount = factory.fuzzy.FuzzyDecimal(1000, 100000)
+    estimated_export_value_amount = factory.fuzzy.FuzzyDecimal(1000, 100000, 0)
     estimated_win_date = now()
     destination_country = factory.SubFactory(CountryFactory)
     sector = factory.SubFactory(SectorFactory)
@@ -279,6 +279,10 @@ class ExportFactory(factory.django.DjangoModelFactory):
 
     @to_many_field
     def contacts(self):
+        return []
+
+    @to_many_field
+    def team_members(self):
         return []
 
     class Meta:
