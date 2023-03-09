@@ -281,5 +281,9 @@ class ExportFactory(factory.django.DjangoModelFactory):
     def contacts(self):
         return []
 
+    @to_many_field
+    def team_members(self):
+        return []
+
     class Meta:
         model = 'company.CompanyExport'
