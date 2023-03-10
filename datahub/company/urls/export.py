@@ -4,6 +4,7 @@ from datahub.company.views import CompanyExportViewSet
 
 export_v4_collection = CompanyExportViewSet.as_view(
     {
+        'get': 'list',
         'post': 'create',
     },
 )
