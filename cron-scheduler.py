@@ -11,6 +11,7 @@ django.setup()
 from django.conf import settings
 from pytz import utc
 
+from datahub.company.tasks.adviser import schedule_automatic_adviser_deactivate
 from datahub.company.tasks.company import schedule_automatic_company_archive
 from datahub.company.tasks.contact import schedule_automatic_contact_archive
 from datahub.core.queues.constants import (
@@ -79,6 +80,15 @@ def schedule_jobs():
         },
         cron=EVERY_SEVEN_PM,
         description='Automatic Company Archive',
+    )
+    job_scheduler(
+        function=schedule_automatic_adviser_deactivate,
+        function_kwargs={
+            'limit': 20000,
+            'simulate': False,
+        },
+        cron=EVERY_SEVEN_PM,
+        description='Automatic Adviser Deactivate',
     )
     job_scheduler(
         function=schedule_automatic_contact_archive,
