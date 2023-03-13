@@ -9,7 +9,11 @@ export_v4_collection = CompanyExportViewSet.as_view(
     },
 )
 export_v4_item = CompanyExportViewSet.as_view(
-    {'get': 'retrieve', 'patch': 'partial_update'},
+    {
+        'get': 'retrieve',
+        'patch': 'partial_update',
+        'delete': 'destroy',
+    },
 )
 
 urls_v4 = [
