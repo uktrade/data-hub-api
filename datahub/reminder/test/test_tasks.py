@@ -1969,7 +1969,7 @@ class TestGenerateNewExportInteractionReminderTask:
             ],
         )
 
-    def test_dont_send_reminder_when_advisor_modifed_the_interaction(
+    def test_dont_send_reminder_when_advisor_modified_the_interaction(
         self,
         new_export_interaction_reminders_user_feature_flag,
         mock_create_new_export_interaction_reminder,
