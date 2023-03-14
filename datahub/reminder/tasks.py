@@ -603,7 +603,6 @@ def generate_new_export_interaction_reminders_for_subscription(subscription, cur
             ).exclude(
                 Q(created_by=subscription.adviser) | Q(modified_by=subscription.adviser),
             )
-            print(qs.query)
             has_interactions = qs.exists()
 
             if has_interactions:
