@@ -1,0 +1,3 @@
+- model: event.programme
+  pk: bc959f75-1c50-441e-a396-987ef1fb93ef
+  fields: { disabled_on: null, name: GREAT - Unicorn Kingdom Campaign - North America (2023) }
