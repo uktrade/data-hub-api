@@ -597,14 +597,13 @@ def generate_new_export_interaction_reminders_for_subscription(subscription, cur
         threshold = current_date - relativedelta(days=reminder_day)
 
         for company in _get_managed_companies(subscription.adviser).iterator():
-            qs = (
-                Interaction.objects.filter(
-                    companies__in=[company],
-                    created_on__date=threshold,
-                )
-                .exclude(created_by=subscription.adviser)
-                .exclude(modified_by=subscription.adviser)
+            qs = Interaction.objects.filter(
+                companies__in=[company],
+                created_on__date=threshold,
+            ).exclude(
+                Q(created_by=subscription.adviser) | Q(modified_by=subscription.adviser),
             )
+            print(qs.query)
             has_interactions = qs.exists()
 
             if has_interactions:
