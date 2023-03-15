@@ -600,7 +600,9 @@ def generate_new_export_interaction_reminders_for_subscription(subscription, cur
             qs = Interaction.objects.filter(
                 companies__in=[company],
                 created_on__date=threshold,
-            ).exclude(created_by=subscription.adviser)
+            ).exclude(
+                Q(created_by=subscription.adviser) | Q(modified_by=subscription.adviser),
+            )
             has_interactions = qs.exists()
 
             if has_interactions:
