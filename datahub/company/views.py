@@ -66,7 +66,7 @@ from datahub.core.hawk_receiver import (
     HawkResponseSigningMixin,
     HawkScopePermission,
 )
-from datahub.core.mixins import ArchivableViewSetMixin
+from datahub.core.mixins import ArchivableViewSetMixin, SoftDeleteViaArchiveMixin
 from datahub.core.permissions import HasPermissions
 from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet
@@ -621,7 +621,14 @@ class ExportWinsForCompanyView(APIView):
         return JsonResponse(export_wins_results.json())
 
 
-class CompanyExportViewSet(CoreViewSet):
+class CompanyExportViewSet(
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    SoftDeleteViaArchiveMixin,
+    mixins.ListModelMixin,
+    GenericViewSet,
+):
     """View for company exports"""
 
     queryset = CompanyExport.objects.select_related(
