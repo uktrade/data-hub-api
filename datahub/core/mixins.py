@@ -2,8 +2,10 @@
 from django.conf import settings
 from rest_framework import mixins
 from rest_framework import serializers
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
 
 from datahub.core.models import ArchivableModel
 from datahub.core.schemas import StubSchema
@@ -81,9 +83,5 @@ class SoftDeleteViaArchiveMixin(mixins.DestroyModelMixin):
                 request._user,
                 reason='Archived instead of deleting when DELETE request received',
             )
+            return Response(status=status.HTTP_204_NO_CONTENT)
         return super().destroy(request, *args, **kwargs)
-
-    def perform_destroy(self, instance):
-        """Override to stop the export being deleted if the instance is an archivable model"""
-        if not issubclass(type(instance), ArchivableModel):
-            instance.save()

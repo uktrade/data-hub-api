@@ -332,8 +332,8 @@ class TestDeleteExport(APITestMixin):
 
     def test_delete_success(self):
         """
-        Test a DELETE request with a known export id provides a success response, and a second
-        request with the same id returns a not found error
+        Test a DELETE request with a known export id provides a success response, and
+        request with the same id returns the item archived
         """
         export = ExportFactory()
         url = reverse('api-v4:export:item', kwargs={'pk': export.id})
@@ -341,5 +341,5 @@ class TestDeleteExport(APITestMixin):
         response = self.api_client.delete(url)
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
-        response = self.api_client.delete(url)
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        response = self.api_client.get(url)
+        assert response.json()['archived']
