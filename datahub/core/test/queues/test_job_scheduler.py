@@ -1,4 +1,8 @@
+from datetime import timedelta
+
 from unittest.mock import Mock
+
+import pytest
 
 from datahub.core.queues.constants import EVERY_MINUTE
 from datahub.core.queues.job_scheduler import job_scheduler, retry_backoff_intervals
@@ -46,7 +50,7 @@ def test_datahub_enque_is_configured_with_correct_default_number_of_retries_and_
     monkeypatch,
     queue: DataHubScheduler,
 ):
-    datahub_queue_mock = queue_setup(monkeypatch)
+    datahub_queue_mock = enqueue_setup(monkeypatch)
     job_scheduler(
         function=PickleableMock.queue_handler,
         function_args=('arg1', 'arg2'),
@@ -74,7 +78,7 @@ def test_datahub_enque_is_configured_with_retry_backoff_for_two_retries(
     monkeypatch,
     queue: DataHubScheduler,
 ):
-    datahub_queue_mock = queue_setup(monkeypatch)
+    datahub_queue_mock = enqueue_setup(monkeypatch)
     job_scheduler(
         function=PickleableMock.queue_handler,
         function_args=('arg1', 'arg2'),
@@ -104,7 +108,7 @@ def test_datahub_enque_is_configured_with_retry_backoff_as_number(
     monkeypatch,
     queue: DataHubScheduler,
 ):
-    datahub_queue_mock = queue_setup(monkeypatch)
+    datahub_queue_mock = enqueue_setup(monkeypatch)
 
     job_scheduler(
         function=PickleableMock.queue_handler,
@@ -157,13 +161,87 @@ def test_job_scheduler_creates_cron_jobs(queue: DataHubScheduler):
     assert actual_job.description == 'Test cron'
 
 
-def queue_setup(monkeypatch):
-    datahub_queue_mock = Mock()
+def test_job_scheduler_creates_time_delta_jobs(monkeypatch, queue: DataHubScheduler):
+    datahub_enqueue_in_mock = enqueue_in_setup(monkeypatch)
+    job_scheduler(
+        function=PickleableMock.queue_handler,
+        function_args=('arg1', 'arg2'),
+        function_kwargs={'test': True},
+        queue_name='234',
+        time_delta=(timedelta(seconds=1)),
+        is_burst=True,
+    )
+
+    queue.work('234')
+
+    retry_arg = get_retry(datahub_enqueue_in_mock)
+    assert retry_arg.max == 3
+    assert retry_arg.intervals == [0]
+    datahub_enqueue_in_mock.assert_called_with(
+        queue_name='234',
+        function=PickleableMock.queue_handler,
+        args=('arg1', 'arg2'),
+        kwargs={'test': True},
+        time_delta=(timedelta(seconds=1)),
+        retry=retry_arg,
+        job_timeout=180,
+    )
+
+
+def test_job_scheduler_no_retries(
+    monkeypatch,
+    queue: DataHubScheduler,
+):
+    datahub_queue_mock = enqueue_setup(monkeypatch)
+    job_scheduler(
+        function=PickleableMock.queue_handler,
+        function_args=('arg1', 'arg2'),
+        function_kwargs={'test': True},
+        queue_name='234',
+        max_retries=None,
+        job_timeout=600,
+    )
+
+    queue.work('234')
+
+    retry_arg = get_retry(datahub_queue_mock)
+    assert retry_arg is None
+    datahub_queue_mock.assert_called_with(
+        queue_name='234',
+        function=PickleableMock.queue_handler,
+        args=('arg1', 'arg2'),
+        kwargs={'test': True},
+        retry=retry_arg,
+        job_timeout=600,
+    )
+
+
+def test_job_scheduler_can_not_define_cron_and_time_delta(queue: DataHubScheduler):
+    with pytest.raises(Exception):
+        job_scheduler(
+            function=PickleableMock.queue_handler,
+            queue_name='234',
+            cron=EVERY_MINUTE,
+            time_delta=(timedelta(seconds=1)),
+        )
+
+
+def enqueue_setup(monkeypatch):
+    datahub_enqueue_mock = Mock()
     monkeypatch.setattr(
         'datahub.core.queues.scheduler.DataHubScheduler.enqueue',
-        datahub_queue_mock,
+        datahub_enqueue_mock,
     )
-    return datahub_queue_mock
+    return datahub_enqueue_mock
+
+
+def enqueue_in_setup(monkeypatch):
+    datahub_enqueue_in_mock = Mock()
+    monkeypatch.setattr(
+        'datahub.core.queues.scheduler.DataHubScheduler.enqueue_in',
+        datahub_enqueue_in_mock,
+    )
+    return datahub_enqueue_in_mock
 
 
 def get_retry(datahub_queue_mock):

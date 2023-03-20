@@ -18,7 +18,7 @@ class Command(CSVBaseCommand):
     def _handle(self, *args, **options):
         """
         Disables search signal receivers for orders.
-        Avoid queuing huge number of Celery tasks for syncing orders to OpenSearch.
+        Avoid queuing huge number of RQ scheduled tasks for syncing orders to OpenSearch.
         (Syncing can be manually performed afterwards using sync_search if required.)
         """
         return super()._handle(*args, **options)

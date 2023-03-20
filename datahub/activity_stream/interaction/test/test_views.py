@@ -7,10 +7,12 @@ from rest_framework import status
 from datahub.activity_stream.interaction.serializers import InteractionActivitySerializer
 from datahub.activity_stream.test import hawk
 from datahub.activity_stream.test.utils import get_url
+from datahub.core.constants import ExportBarrierType
+from datahub.core.test.factories import to_many_field
 from datahub.core.test_utils import format_date_or_datetime
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.factories import (
-    CompanyInteractionFactory,
+    CompaniesInteractionFactory,
     ContactFactory,
     EventServiceDeliveryFactory,
     InteractionDITParticipantFactory,
@@ -20,17 +22,65 @@ from datahub.interaction.test.factories import (
 from datahub.metadata.test.factories import TeamFactory
 
 
+class CompaniesInteractionWithExportBarrierOtherFactory(CompaniesInteractionFactory):
+    """Create companies interaction with export barriers - Other."""
+
+    helped_remove_export_barrier = True
+    export_barrier_notes = 'Lorem ipsum'
+
+    @to_many_field
+    def export_barrier_types(self):
+        """
+        Add "other" export barrier type
+        """
+        return [ExportBarrierType.other.value.id]
+
+
+class CompaniesInteractionWithExportBarrierFinanceFactory(CompaniesInteractionFactory):
+    """Create companies interaction with export barriers - Finance."""
+
+    helped_remove_export_barrier = True
+    export_barrier_notes = ''
+
+    @to_many_field
+    def export_barrier_types(self):
+        """
+        Add "other" export barrier type
+        """
+        return [ExportBarrierType.finance.value.id]
+
+
 @pytest.mark.django_db
-def test_interaction_activity(api_client):
+@pytest.mark.parametrize(
+    'factory',
+    [
+        CompaniesInteractionFactory,
+        CompaniesInteractionWithExportBarrierOtherFactory,
+        CompaniesInteractionWithExportBarrierFinanceFactory,
+    ],
+)
+def test_interaction_activity(api_client, factory):
     """
     Get a list of interactions and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
     with freeze_time(start) as frozen_datetime:
-        interaction = CompanyInteractionFactory()
+        interaction = factory()
         frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
+
+    expected = {}
+    if interaction.helped_remove_export_barrier:
+        expected.update(
+            {
+                'dit:exportBarrierTypes': [
+                    {'name': barrier.name for barrier in interaction.export_barrier_types.all()},
+                ],
+                **({'dit:exportBarrierNotes': interaction.export_barrier_notes}
+                    if interaction.export_barrier_notes else {}),
+            },
+        )
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
@@ -99,6 +149,7 @@ def test_interaction_activity(api_client):
                         ],
                     ],
                     'url': interaction.get_absolute_url(),
+                    **expected,
                 },
             },
         ],
@@ -401,10 +452,10 @@ def test_interaction_ordering(api_client):
     interactions = []
 
     with freeze_time() as frozen_datetime:
-        interactions += CompanyInteractionFactory.create_batch(2)
+        interactions += CompaniesInteractionFactory.create_batch(2)
 
         frozen_datetime.tick(datetime.timedelta(microseconds=1))
-        interactions += CompanyInteractionFactory.create_batch(8)
+        interactions += CompaniesInteractionFactory.create_batch(8)
 
         frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
@@ -429,7 +480,7 @@ def test_contacts_ordering(api_client):
     """
     with freeze_time() as frozen_datetime:
         contacts = ContactFactory.create_batch(5)
-        CompanyInteractionFactory(contacts=contacts)
+        CompaniesInteractionFactory(contacts=contacts)
 
         frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:interactions'))
@@ -455,7 +506,7 @@ def test_dit_participant_ordering(api_client):
     Test that dit_participants are ordered by `pk`
     """
     with freeze_time() as frozen_datetime:
-        interaction = CompanyInteractionFactory(dit_participants=[])
+        interaction = CompaniesInteractionFactory(dit_participants=[])
         InteractionDITParticipantFactory.create_batch(5, interaction=interaction)
 
         frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
@@ -482,7 +533,7 @@ def test_null_adviser(api_client):
     Test that we can handle dit_participant.adviser being None
     """
     with freeze_time() as frozen_datetime:
-        interaction = CompanyInteractionFactory(dit_participants=[])
+        interaction = CompaniesInteractionFactory(dit_participants=[])
         InteractionDITParticipantFactory(
             interaction=interaction,
             adviser=None,

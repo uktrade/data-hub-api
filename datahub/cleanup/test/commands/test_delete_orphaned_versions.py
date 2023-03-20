@@ -14,6 +14,7 @@ from datahub.company.test.factories import (
     CompanyExportCountryFactory,
     CompanyFactory,
     ContactFactory,
+    ExportFactory,
 )
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import (
@@ -36,6 +37,7 @@ from datahub.user.company_list.test.factories import PipelineItemFactory
 MAPPINGS = {
     'company.Advisor': AdviserFactory,
     'company.Company': CompanyFactory,
+    'company.CompanyExport': ExportFactory,
     'company.CompanyExportCountry': CompanyExportCountryFactory,
     'company.Contact': ContactFactory,
     'company_list.PipelineItem': PipelineItemFactory,

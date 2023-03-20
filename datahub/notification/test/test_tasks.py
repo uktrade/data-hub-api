@@ -1,12 +1,22 @@
 from unittest import mock
 
 import pytest
-from celery.exceptions import Retry
 from notifications_python_client.errors import HTTPError
 
 from datahub.notification import notify_gateway
 from datahub.notification.constants import DEFAULT_SERVICE_NAME, NotifyServiceName
 from datahub.notification.tasks import send_email_notification
+
+
+@pytest.fixture()
+def mock_rq_get_current_job(monkeypatch):
+    mock_notification_tasks_get_current_job = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.notification.tasks.get_current_job',
+        mock_notification_tasks_get_current_job,
+    )
+    mock_notification_tasks_get_current_job.retries_left = 5
+    return mock_notification_tasks_get_current_job
 
 
 @pytest.mark.parametrize(
@@ -39,15 +49,22 @@ def test_send_email_notification(context, service_name):
 
 
 @pytest.mark.parametrize(
-    'error_status_code,expect_retry',
+    'error_status_code,expect_retry,get_current_job_return_none',
     (
-        (503, True),
-        (500, True),
-        (403, False),
-        (400, False),
+        (503, True, False),
+        (500, True, False),
+        (403, False, False),
+        (400, False, False),
+        (400, False, True),
     ),
 )
-def test_send_email_notification_retries_errors(monkeypatch, error_status_code, expect_retry):
+def test_send_email_notification_retries_errors(
+        monkeypatch,
+        mock_rq_get_current_job,
+        error_status_code,
+        expect_retry,
+        get_current_job_return_none,
+):
     """
     Test the send_email_notification utility.
     """
@@ -59,14 +76,19 @@ def test_send_email_notification_retries_errors(monkeypatch, error_status_code, 
     error = HTTPError(mock_response)
     notification_api_client.send_email_notification.side_effect = error
 
-    # Mock the task's retry method
-    retry_mock = mock.Mock(side_effect=Retry())
-    monkeypatch.setattr('datahub.notification.tasks.send_email_notification.retry', retry_mock)
+    if get_current_job_return_none:
+        mock_rq_get_current_job.return_value = None
+
+    with pytest.raises(HTTPError):
+        send_email_notification('foobar@example.net', 'abcdefg')
 
     if expect_retry:
-        expected_exception_class = Retry
+        # Don't expect get_current_job called
+        assert mock_rq_get_current_job.call_count == 0
     else:
-        expected_exception_class = HTTPError
-
-    with pytest.raises(expected_exception_class):
-        send_email_notification('foobar@example.net', 'abcdefg')
+        # Expect get_current_job called
+        assert mock_rq_get_current_job.call_count == 1
+        if get_current_job_return_none:
+            assert mock_rq_get_current_job.return_value is None
+        else:
+            assert mock_rq_get_current_job.return_value.retries_left == 0

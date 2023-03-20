@@ -1,0 +1,30 @@
+- model: company.exportexperience
+  pk: 051a0362-d1a9-41c0-8a58-3171e5f59a8e
+  fields:
+    disabled_on: null
+    name: Never exported
+    order: 0
+- model: company.exportexperience
+  pk: 41b37ec7-0e4d-4f2b-aeae-b5752e1fb79a
+  fields:
+    disabled_on: null
+    name: Exported before, but no exports in the last 12 months
+    order: 10
+- model: company.exportexperience
+  pk: 8937c359-157e-41dd-8520-679383847ea0
+  fields:
+    disabled_on: null
+    name: Exported in the last 12 months, but has not won an export order by having an export plan
+    order: 20
+- model: company.exportexperience
+  pk: 587928e3-cab1-45cb-ba49-0656b6d2f867
+  fields:
+    disabled_on: null
+    name: An exporter with a new export win, but has not exported to this country within the last 3 years
+    order: 30
+- model: company.exportexperience
+  pk: 02a063e3-dab8-40ca-92d3-8e9c2d9f812d
+  fields:
+    disabled_on: null
+    name: An exported that DIT are helping maintain and grow their exports
+    order: 40

@@ -47,7 +47,7 @@ def test_notify_email_ingest_failure(mock_statsd):
     adviser = AdviserFactory(contact_email='adviser@dit.gov.uk')
     notify_meeting_ingest_failure(adviser, (), ())
     mock_statsd.incr.assert_called_once_with(
-        'celery.calendar-invite-ingest.failure.dit_gov_uk',
+        'rq.calendar-invite-ingest.failure.dit_gov_uk',
     )
 
 
@@ -60,5 +60,5 @@ def test_notify_email_ingest_success(mock_statsd):
     adviser = AdviserFactory(contact_email='adviser@dit.gov.uk')
     notify_meeting_ingest_success(adviser, Mock(), ())
     mock_statsd.incr.assert_called_once_with(
-        'celery.calendar-invite-ingest.success.dit_gov_uk',
+        'rq.calendar-invite-ingest.success.dit_gov_uk',
     )

@@ -103,3 +103,10 @@ class SectorFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'metadata.Sector'
+
+
+class CountryFactory(factory.django.DjangoModelFactory):
+    """Country factory."""
+
+    class Meta:
+        model = 'metadata.Country'

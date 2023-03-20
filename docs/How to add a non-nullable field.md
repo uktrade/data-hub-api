@@ -21,8 +21,8 @@ a multiple-step approach.  These steps should be merged and released separately:
    any code which can add new entries (e.g. API views) adds them with a 
    default value for this field.
 2) Manually run our `datahub.dbmaintenance.tasks.replace_null_with_default` task
-   for the field in question.  e.g. `replace_null_with_default.apply_async(args=("interaction", "status", "complete"))`
-   This function is a recursive celery task - it will set the default value in
+   for the field in question.  e.g. `replace_null_with_default("interaction", "status", "complete")`
+   This function continues the batch in recursive RQ tasks - it will set the default value in
    small batches which ensure that the table is responsive while the default is
    added.
    **Note:** This task will need to be run in at least the dev, staging and 

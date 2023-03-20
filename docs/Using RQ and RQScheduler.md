@@ -37,11 +37,29 @@ First decide if it's a one off job, or you want to it to repeat regularly.
 1. Call `job_scheduler()` with the function you want to get called, e.g. `job_scheduler(hello_world)` some more [examples are in the tests](https://github.com/uktrade/data-hub-api/blob/main/datahub/core/test/queues/test_job_scheduler.py)
 1. You can configure args and kwargs for the function, and override the default queue, set intervals etc.
 
-### cron
+#### cron
 
 (repeat job at set intervals/times)
 
-1. The same as step 1 above, but pass in a `cron` value and it will repeat accordingly. There are [constants for some often used cron values.](https://github.com/uktrade/data-hub-api/blob/main/datahub/core/queues/cron_constants.py)
+1. The same as step 1 above, but pass in a `cron` value and it will repeat accordingly. There are [constants for some often used cron values.](https://github.com/uktrade/data-hub-api/blob/main/datahub/core/queues/cron_constants.py). Cron tasks listed in `./cron-scheduler.py` are automatically scheduled when the service (re)starts. 
+Note: Cannot be used if time_delta is defined.
+
+#### time_delta
+
+(Schedules the job to run at X seconds/minutes/hours/days/weeks later) 
+1. The same as step 1 above, but pass in a `time_delta` value. 
+Note: Cannot be used if cron is defined.
+
+## Writing tests
+When running tests jobs are scheduled but not executed (as the workers do not automatically run during tests). If you want to run a test that automatically runs the scheduled jobs include the fixture `async_queue`.
+
+    def test_stores_notification_id(
+        self,
+        async_queue,
+    ):
+         # Code under test that calls job_scheduler will be executed. 
+
+Additional examples in datahub/reminder/test/test_task.py/TestGeneratenoRecentInteractionReminderTask/test_stores_notification_id or various occurences of async_queue in datahub/core/test/.queues/test_scheduler.py.
 
 ## Monitoring RQ locally
 
@@ -71,13 +89,13 @@ The core service for facilitating RQ exported information is [RQ exporter](https
 
 1. Check services are running
 
-   Check docker dashboard to make sure all services are runnign as expected when jobs are set, and make sure if you have any jobs in environment variables, that you enable the variables to make sure the job gets scheduled.
+   Check docker dashboard to make sure all services are running as expected when jobs are set, and make sure if you have any jobs in environment variables, that you enable the variables to make sure the job gets scheduled.
 
 ## Utilities
 
 ### Monitoring
 
-1. **Grafana**, locally on localhost:4000, under **RQ Dashboard**, can help with logging queues and statistics that get run or scheduled by RQ. Queus that get run will either pass or fail. NOTE: time to live expires data on redis so sometimes the statistics seem off over longer periods but fails persist for a long duration.
+1. **Grafana**, locally on localhost:4000, under **RQ Dashboard**, can help with logging queues and statistics that get run or scheduled by RQ. Queues that get run will either pass or fail. NOTE: time to live expires data on redis so sometimes the statistics seem off over longer periods but fails persist for a long duration.
 
    ![Grafana](./grafana.png)
 

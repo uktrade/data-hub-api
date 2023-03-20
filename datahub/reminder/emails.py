@@ -8,10 +8,31 @@ from datahub.investment.project.notification.models import NotificationInnerTemp
 logger = getLogger(__name__)
 
 
+DATE_FORMAT = '%-d %B %Y'  # formats date to 1 January 2022
+
+
 @lru_cache()
 def get_inner_template_content(notification_type):
     inner_template = NotificationInnerTemplate.objects.get(notification_type=notification_type)
     return inner_template.content
+
+
+def get_company_item(company):
+    """Get company item."""
+    return {
+        'company_url': f'{company.get_absolute_url()}/activity',
+        'settings_url': settings.DATAHUB_FRONTEND_REMINDER_SETTINGS_URL,
+        'company_name': company.name,
+    }
+
+
+def get_interaction_item(interaction):
+    """Get interaction item."""
+    return {
+        'last_interaction_created_by': interaction.created_by.name,
+        'last_interaction_type': interaction.get_kind_display(),
+        'last_interaction_subject': interaction.subject,
+    }
 
 
 def get_project_item(project):
@@ -24,8 +45,7 @@ def get_project_item(project):
         'project_code': project.project_code,
         'project_status': project.status.capitalize(),
         'project_stage': project.stage.name,
-        # '%-d %B %Y' formats date to 1 January 2022
-        'estimated_land_date': project.estimated_land_date.strftime('%-d %B %Y'),
+        'estimated_land_date': project.estimated_land_date.strftime(DATE_FORMAT),
     }
 
 

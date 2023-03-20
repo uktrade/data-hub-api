@@ -316,6 +316,15 @@ class Interaction(ArchivableModel, BaseModel):
     has_related_trade_agreements = models.BooleanField(null=True, blank=True)
     related_trade_agreements = models.ManyToManyField('metadata.TradeAgreement', blank=True)
 
+    # Export barrier
+    helped_remove_export_barrier = models.BooleanField(null=True, blank=True)
+    export_barrier_types = models.ManyToManyField(
+        metadata_models.ExportBarrierType,
+        blank=True,
+        related_name='interactions',
+    )
+    export_barrier_notes = models.TextField(blank=True, default='')
+
     @property
     def is_event(self):
         """Whether this service delivery is for an event."""

@@ -11,7 +11,6 @@ from datetime import timedelta
 from urllib.parse import urlencode
 
 import environ
-from celery.schedules import crontab
 from django.core.exceptions import ImproperlyConfigured
 
 from config.settings.types import HawkScope
@@ -20,6 +19,7 @@ from config.settings.types import HawkScope
 
 CONFIG_DIR = environ.Path(__file__) - 2
 ROOT_DIR = CONFIG_DIR - 1
+
 
 env = environ.Env()
 
@@ -185,9 +185,7 @@ DATABASES = {
     },
 }
 
-FIXTURE_DIRS = [
-    str(ROOT_DIR('fixtures'))
-]
+FIXTURE_DIRS = [str(ROOT_DIR('fixtures'))]
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
@@ -208,9 +206,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTH_USER_MODEL = 'company.Advisor'
-AUTHENTICATION_BACKENDS = [
-    'datahub.core.auth.TeamModelPermissionsBackend'
-]
+AUTHENTICATION_BACKENDS = ['datahub.core.auth.TeamModelPermissionsBackend']
 
 # OAuth2 settings to authenticate Django admin users
 
@@ -334,7 +330,9 @@ OPENSEARCH_VERIFY_CERTS = env.bool('OPENSEARCH_VERIFY_CERTS', True)
 OPENSEARCH_INDEX_PREFIX = env('OPENSEARCH_INDEX_PREFIX')
 OPENSEARCH_INDEX_SETTINGS = {}
 OPENSEARCH_BULK_MAX_CHUNK_BYTES = 10 * 1024 * 1024  # 10MB
-OPENSEARCH_SEARCH_REQUEST_TIMEOUT = env.int('OPENSEARCH_SEARCH_REQUEST_TIMEOUT', default=20)  # seconds
+OPENSEARCH_SEARCH_REQUEST_TIMEOUT = env.int(
+    'OPENSEARCH_SEARCH_REQUEST_TIMEOUT', default=20
+)  # seconds
 OPENSEARCH_SEARCH_REQUEST_WARNING_THRESHOLD = env.int(
     'OPENSEARCH_SEARCH_REQUEST_WARNING_THRESHOLD',
     default=10,  # seconds
@@ -368,96 +366,40 @@ if REDIS_BASE_URL:
             'LOCATION': _build_redis_url(REDIS_BASE_URL, REDIS_CACHE_DB),
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            }
+            },
         }
     }
 
 if REDIS_BASE_URL:
-    REDIS_CELERY_DB = env('REDIS_CELERY_DB', default=1)
     is_rediss = REDIS_BASE_URL.startswith('rediss://')
     url_args = {'ssl_cert_reqs': 'CERT_REQUIRED'} if is_rediss else {}
-
-    CELERY_BROKER_URL = _build_redis_url(REDIS_BASE_URL, REDIS_CELERY_DB, **url_args)
-    CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-
-    # Increase timeout from one hour for long-running tasks
-    # (If the timeout is reached before a task, Celery will start it again. This
-    # would affect in particular any long-running tasks using acks_late=True.)
-    CELERY_BROKER_TRANSPORT_OPTIONS = {
-        'visibility_timeout': int(timedelta(hours=9).total_seconds())
-    }
-    CELERY_BEAT_SCHEDULE = {
-        'refresh_pending_payment_gateway_sessions': {
-            'task': 'datahub.omis.payment.tasks.refresh_pending_payment_gateway_sessions',
-            'schedule': crontab(minute=0, hour='*'),
-            'kwargs': {
-                'age_check': 60  # in minutes
-            }
-        },
-        'refresh_gross_value_added_values': {
-            'task': (
-                'datahub.investment.project.tasks.'
-                'refresh_gross_value_added_value_for_fdi_investment_projects'
-            ),
-            'schedule': crontab(minute=0, hour=3, day_of_month=21)
-        },
-    }
 
     ENABLE_DAILY_HIERARCHY_ROLLOUT = env.bool('ENABLE_DAILY_HIERARCHY_ROLLOUT', False)
     DAILY_HIERARCHY_ROLLOUT_LIMIT = env.int('DAILY_HIERARCHY_ROLLOUT_LIMIT', 10)
 
-    if env.bool('ENABLE_SPI_REPORT_GENERATION', False):
-        CELERY_BEAT_SCHEDULE['spi_report'] = {
-            'task': 'datahub.investment.project.report.tasks.generate_spi_report',
-            'schedule': crontab(minute=0, hour=8),
-        }
-
-    if env.bool('ENABLE_EMAIL_INGESTION', False):
-        CELERY_BEAT_SCHEDULE['email_ingestion'] = {
-            'task': 'datahub.email_ingestion.tasks.ingest_emails',
-            'schedule': crontab(minute='*/10'),
-        }
-    if env.bool('ENABLE_MAILBOX_PROCESSING', False):
-        CELERY_BEAT_SCHEDULE['process_mailbox_emails'] = {
-            'task': 'datahub.email_ingestion.tasks.process_mailbox_emails',
-            'schedule':  crontab(minute='*/10'),
-        }
-
-    if env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS', False):
-        CELERY_BEAT_SCHEDULE['generate_estimated_land_date_reminders'] = {
-            'task': 'datahub.reminder.tasks.generate_estimated_land_date_reminders',
-            'schedule': crontab(minute=30, hour=8, day_of_month=1),
-        }
-
-    if env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS_EMAIL_DELIVERY_STATUS', False):
-        CELERY_BEAT_SCHEDULE['update_notify_email_delivery_status_for_estimated_land_date'] = {
-            'task':
-                'datahub.reminder'
-                '.tasks.update_notify_email_delivery_status_for_estimated_land_date',
-            'schedule': crontab(minute=30, hour=9, day_of_month='1,2,3,4'),
-        }
-
-    if env.bool('ENABLE_NO_RECENT_INTERACTION_REMINDERS', False):
-        CELERY_BEAT_SCHEDULE['generate_no_recent_interaction_reminders'] = {
-            'task': 'datahub.reminder.tasks.generate_no_recent_interaction_reminders',
-            'schedule': crontab(minute=00, hour=8),
-        }
-
-    if env.bool('ENABLE_NO_RECENT_INTERACTION_EMAIL_DELIVERY_STATUS', False):
-        CELERY_BEAT_SCHEDULE['update_notify_email_delivery_status_for_no_recent_interaction'] = {
-            'task': 'datahub.reminder'
-            '.tasks.update_notify_email_delivery_status_for_no_recent_interaction',
-            'schedule': crontab(minute=00, hour=10),
-        }
-
-    CELERY_WORKER_LOG_FORMAT = (
-        "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
-    )
-
-CELERY_TASK_ALWAYS_EAGER = env.bool('CELERY_TASK_ALWAYS_EAGER', False)
-CELERY_TASK_SEND_SENT_EVENT = env.bool('CELERY_TASK_SEND_SENT_EVENT', True)
-CELERY_WORKER_TASK_EVENTS = env.bool('CELERY_WORKER_TASK_EVENTS', True)
 ENABLE_DAILY_OPENSEARCH_SYNC = env.bool('ENABLE_DAILY_OPENSEARCH_SYNC', False)
+ENABLE_EMAIL_INGESTION = env.bool('ENABLE_EMAIL_INGESTION', False)
+ENABLE_ESTIMATED_LAND_DATE_REMINDERS = env.bool('ENABLE_ESTIMATED_LAND_DATE_REMINDERS', False)
+ENABLE_ESTIMATED_LAND_DATE_REMINDERS_EMAIL_DELIVERY_STATUS = env.bool(
+    'ENABLE_ESTIMATED_LAND_DATE_REMINDERS_EMAIL_DELIVERY_STATUS', False
+)
+ENABLE_NEW_EXPORT_INTERACTION_REMINDERS = env.bool(
+    'ENABLE_NEW_EXPORT_INTERACTION_REMINDERS', False
+)
+ENABLE_NEW_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS = env.bool(
+    'ENABLE_NEW_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS', False
+)
+ENABLE_MAILBOX_PROCESSING = env.bool('ENABLE_MAILBOX_PROCESSING', False)
+ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS = env.bool(
+    'ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS', False
+)
+ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS = env.bool(
+    'ENABLE_NO_RECENT_EXPORT_INTERACTION_REMINDERS_EMAIL_DELIVERY_STATUS', False
+)
+ENABLE_NO_RECENT_INTERACTION_EMAIL_DELIVERY_STATUS = env.bool(
+    'ENABLE_NO_RECENT_INTERACTION_EMAIL_DELIVERY_STATUS', False
+)
+ENABLE_NO_RECENT_INTERACTION_REMINDERS = env.bool('ENABLE_NO_RECENT_INTERACTION_REMINDERS', False)
 
 # ADMIN CSV IMPORT
 
@@ -515,9 +457,29 @@ INVESTMENT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID = env(
     'INVESTMENT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID',
     default='',
 )
+EXPORT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID = env(
+    'EXPORT_NOTIFICATION_NO_RECENT_INTERACTION_TEMPLATE_ID',
+    default='',
+)
+EXPORT_NOTIFICATION_NO_INTERACTION_TEMPLATE_ID = env(
+    'EXPORT_NOTIFICATION_NO_INTERACTION_TEMPLATE_ID',
+    default='',
+)
+EXPORT_NOTIFICATION_NEW_INTERACTION_TEMPLATE_ID = env(
+    'EXPORT_NOTIFICATION_NEW_INTERACTION_TEMPLATE_ID',
+    default='',
+)
 NOTIFICATION_SUMMARY_THRESHOLD = env.int(
     'NOTIFICATION_SUMMARY_THRESHOLD',
     default=5,
+)
+ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS = env(
+    'ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
+    default=False,
+)
+ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS = env(
+    'ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
+    default=False,
 )
 
 # GOV.UK PAY
@@ -561,7 +523,10 @@ _add_hawk_credentials(
 _add_hawk_credentials(
     'MARKET_ACCESS_ACCESS_KEY_ID',
     'MARKET_ACCESS_SECRET_ACCESS_KEY',
-    (HawkScope.public_company, HawkScope.metadata,),
+    (
+        HawkScope.public_company,
+        HawkScope.metadata,
+    ),
 )
 
 _add_hawk_credentials(
@@ -594,8 +559,12 @@ SLACK_TIMEOUT_SECONDS = 10  # seconds
 
 # To read data from Activity Stream
 ACTIVITY_STREAM_OUTGOING_URL = env('ACTIVITY_STREAM_OUTGOING_URL', default=None)
-ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID = env('ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID', default=None)
-ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY = env('ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY', default=None)
+ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID = env(
+    'ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID', default=None
+)
+ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY = env(
+    'ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY', default=None
+)
 
 DOCUMENT_BUCKETS = {
     'default': {
@@ -621,7 +590,7 @@ DOCUMENT_BUCKETS = {
         'aws_access_key_id': env('MAILBOX_AWS_ACCESS_KEY_ID', default=''),
         'aws_secret_access_key': env('MAILBOX_AWS_SECRET_ACCESS_KEY', default=''),
         'aws_region': env('MAILBOX_AWS_REGION', default=''),
-    }
+    },
 }
 
 MAILBOXES = {
@@ -635,7 +604,9 @@ MAILBOXES = {
     },
 }
 
-DIT_EMAIL_INGEST_BLACKLIST = [email.lower() for email in env.list('DIT_EMAIL_INGEST_BLACKLIST', default=[])]
+DIT_EMAIL_INGEST_BLACKLIST = [
+    email.lower() for email in env.list('DIT_EMAIL_INGEST_BLACKLIST', default=[])
+]
 
 DIT_EMAIL_DOMAINS = {}
 domain_environ_names = [

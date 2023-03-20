@@ -360,3 +360,7 @@ class SalaryRange(BaseOrderedConstantModel):
 
 class FDIValue(BaseOrderedConstantModel):
     """FDI value category (used for investment projects)."""
+
+
+class ExportBarrierType(BaseOrderedConstantModel):
+    """Export barrier type (used for company interactions)."""

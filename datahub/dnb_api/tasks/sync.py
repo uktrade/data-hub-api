@@ -1,6 +1,6 @@
 import socket
+from logging import getLogger
 
-from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.db.models import F, Max, Q
 from redis import Redis
@@ -16,7 +16,7 @@ from datahub.dnb_api.utils import (
     update_company_from_dnb,
 )
 
-logger = get_task_logger(__name__)
+logger = getLogger(__name__)
 
 
 def _sync_company_with_dnb(

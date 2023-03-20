@@ -18,11 +18,11 @@ class Command(BaseCommand):
 
     help = """Migrate modified mapping types for OpenSearch indices.
 
-For new indices, the command creates each index and schedules a Celery task to synchronise
+For new indices, the command creates each index and schedules a RQ task to synchronise
 data to the new index.
 
 For existing indices, the command creates new indices for modified search models
-and schedules Celery tasks to synchronises data to the new indices and then delete the old
+and schedules RQ tasks to synchronises data to the new indices and then delete the old
 indices.
 
 See docs/OpenSearch migrations.md for further details."""

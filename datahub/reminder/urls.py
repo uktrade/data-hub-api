@@ -1,6 +1,9 @@
 from django.urls import path
 
 from datahub.reminder.views import (
+    NewExportInteractionReminderViewset,
+    NewExportInteractionSubscriptionViewset,
+    NoRecentExportInteractionReminderViewset,
     NoRecentExportInteractionSubscriptionViewset,
     NoRecentInvestmentInteractionReminderViewset,
     NoRecentInvestmentInteractionSubscriptionViewset,
@@ -18,6 +21,14 @@ urlpatterns = [
             'patch': 'partial_update',
         }),
         name='no-recent-export-interaction-subscription',
+    ),
+    path(
+        'reminder/subscription/new-export-interaction',
+        NewExportInteractionSubscriptionViewset.as_view({
+            'get': 'retrieve',
+            'patch': 'partial_update',
+        }),
+        name='new-export-interaction-subscription',
     ),
     path(
         'reminder/subscription/no-recent-investment-interaction',
@@ -41,6 +52,34 @@ urlpatterns = [
         name='subscription-summary',
     ),
 
+    path(
+        'reminder/new-export-interaction',
+        NewExportInteractionReminderViewset.as_view({
+            'get': 'list',
+        }),
+        name='new-export-interaction-reminder',
+    ),
+    path(
+        'reminder/new-export-interaction/<uuid:pk>',
+        NewExportInteractionReminderViewset.as_view({
+            'delete': 'destroy',
+        }),
+        name='new-export-interaction-reminder-detail',
+    ),
+    path(
+        'reminder/no-recent-export-interaction',
+        NoRecentExportInteractionReminderViewset.as_view({
+            'get': 'list',
+        }),
+        name='no-recent-export-interaction-reminder',
+    ),
+    path(
+        'reminder/no-recent-export-interaction/<uuid:pk>',
+        NoRecentExportInteractionReminderViewset.as_view({
+            'delete': 'destroy',
+        }),
+        name='no-recent-export-interaction-reminder-detail',
+    ),
     path(
         'reminder/no-recent-investment-interaction',
         NoRecentInvestmentInteractionReminderViewset.as_view({
