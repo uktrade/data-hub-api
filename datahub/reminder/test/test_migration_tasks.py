@@ -111,13 +111,13 @@ class TestITAUsersMigration:
         ]
         assert caplog.messages[:2] == expected_messages
 
-    def test_advisor_account_owner_of_company_in_wrong_tier_is_excluded_from_migration(
+    def test_adviser_account_owner_of_company_in_wrong_tier_is_excluded_from_migration(
         self,
         monkeypatch,
     ):
         """
-        Test when an advisor belongs to a company that is not in the Tier D -Internation Trade
-        Advisors tier they are excluded from the migraton
+        Test when an adviser belongs to a company that is not in the Tier D -Internation Trade
+        Advisors tier they are excluded from the migration
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
@@ -135,6 +135,34 @@ class TestITAUsersMigration:
         assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         assert (
             NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
+        )
+
+    def test_adviser_account_owner_of_company_in_no_notifications_group_is_excluded(
+        self,
+        monkeypatch,
+    ):
+        """
+        Test when an adviser belongs to no notification group they are excluded from the migration
+        """
+        monkeypatch.setattr(
+            'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
+            True,
+        )
+
+        no_notifications_flag = UserFeatureFlagGroupFactory(code='no-notifications')
+        adviser = AdviserFactory()
+        adviser.feature_groups.set([no_notifications_flag])
+
+        CompanyFactory(
+            one_list_account_owner=adviser,
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+        )
+
+        run_ita_users_migration()
+
+        assert NewExportInteractionSubscription.objects.filter(adviser=adviser).exists() is False
+        assert (
+            NoRecentExportInteractionSubscription.objects.filter(adviser=adviser).exists() is False
         )
 
     def test_advisor_with_feature_flag_already_is_excluded_from_migration(
@@ -686,10 +714,15 @@ class TestPostUsersMigration:
             'referral_source_adviser',
         ),
     )
+    @pytest.mark.parametrize(
+        'excluded',
+        (True, False),
+    )
     def test_when_large_number_of_advisors_meeting_migration_criteria_are_found_all_are_migrated(
         self,
         monkeypatch,
         advisor_project_role,
+        excluded,
     ):
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
@@ -700,8 +733,8 @@ class TestPostUsersMigration:
 
         migrated_users = []
 
-        # Add users that dont meet any criteria
-        excluded_users = AdviserFactory.create_batch(40)
+        # Add users that don't meet any criteria
+        excluded_users = AdviserFactory.create_batch(10)
 
         OneListCoreTeamMemberFactory.create_batch(
             len(excluded_users),
@@ -781,6 +814,13 @@ class TestPostUsersMigration:
             status=InvestmentProject.Status.DELAYED,
         )
         migrated_users.extend(all_criteria_advisors)
+
+        if excluded:
+            no_notifications_flag = UserFeatureFlagGroupFactory(code='no-notifications')
+            for adviser in migrated_users:
+                adviser.feature_groups.set([no_notifications_flag])
+            excluded_users += migrated_users
+            migrated_users = []
 
         run_post_users_migration()
         for user in migrated_users:

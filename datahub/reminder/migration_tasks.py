@@ -23,6 +23,7 @@ from datahub.investment.project.models import InvestmentProject
 from datahub.reminder import (
     EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+    NO_NOTIFICATIONS_FEATURE_GROUP_NAME,
 )
 from datahub.reminder.models import (
     NewExportInteractionSubscription,
@@ -47,11 +48,9 @@ def run_ita_users_migration():
             return
 
     logger.info('Starting migration of ITA users')
-    export_notifications_feature_group = UserFeatureFlagGroup.objects.get(
-        code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
-    )
+
     # Get all the advisor ids that are account owner of a tier d one list company
-    advisor_ids = get_ita_user_ids_to_migrate(export_notifications_feature_group)
+    advisor_ids = get_ita_user_ids_to_migrate()
     if not settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS:
         logger.info(
             f'Automatic migration is disabled. The following {len(advisor_ids)} ita users meet '
@@ -60,17 +59,20 @@ def run_ita_users_migration():
         for advisor_id in advisor_ids:
             _log_ita_advisor_migration(advisor_id, logger)
     else:
-        migrate_ita_users(export_notifications_feature_group, advisor_ids)
+        migrate_ita_users(advisor_ids)
 
 
-def get_ita_user_ids_to_migrate(export_notifications_feature_group):
+def get_ita_user_ids_to_migrate():
     one_list_account_owner_ids = _get_one_list_account_owner_ids(
         OneListTierID.tier_d_international_trade_advisers.value,
     )
     advisor_ids = (
         Advisor.objects.filter(pk__in=one_list_account_owner_ids)
         .exclude(
-            feature_groups=export_notifications_feature_group,
+            feature_groups__code__in=(
+                EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+                NO_NOTIFICATIONS_FEATURE_GROUP_NAME,
+            ),
         )
         .values_list(
             'id',
@@ -81,7 +83,16 @@ def get_ita_user_ids_to_migrate(export_notifications_feature_group):
     return advisor_ids
 
 
-def migrate_ita_users(export_notifications_feature_group, advisor_ids):
+def migrate_ita_users(advisor_ids):
+    export_notifications_feature_group = UserFeatureFlagGroup.objects.filter(
+        code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+    ).first()
+    if not export_notifications_feature_group:
+        logger.error(
+            f'{EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME} feature group does not exist.',
+        )
+        return
+
     for advisor_id in advisor_ids:
         _log_ita_advisor_migration(advisor_id, logger)
 
@@ -133,8 +144,10 @@ def get_post_user_ids_to_migrate():
     post_advisor_ids = (
         Advisor.objects.filter(dit_team__role__id=TeamRoleID.post.value)
         .exclude(
-            Q(feature_groups__code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME)
-            & Q(feature_groups__code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME),
+            (
+                Q(feature_groups__code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME)
+                & Q(feature_groups__code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME)
+            ) | Q(feature_groups__code=NO_NOTIFICATIONS_FEATURE_GROUP_NAME),
         )
         .values_list(
             'id',
