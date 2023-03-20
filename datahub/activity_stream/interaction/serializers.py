@@ -98,4 +98,11 @@ class InteractionActivitySerializer(ActivitySerializer):
                 'name': instance.service.name,
             }
 
+        if instance.helped_remove_export_barrier:
+            interaction['object']['dit:exportBarrierTypes'] = [
+                {'name': barrier.name} for barrier in instance.export_barrier_types.all()
+            ]
+            if instance.export_barrier_notes != '':
+                interaction['object']['dit:exportBarrierNotes'] = instance.export_barrier_notes
+
         return interaction

@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """
-        Run the celery task.
+        Run the scheduled task.
         """
         schedule_get_company_updates(
             last_updated_after=options['last_updated_after'],

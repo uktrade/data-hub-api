@@ -32,6 +32,8 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
     latest_interaction_date_before = RelaxedDateField(required=False)
     uk_postcode = SingleOrListField(child=serializers.CharField(), required=False)
     area = SingleOrListField(child=StringUUIDField(), required=False)
+    export_segment = SingleOrListField(required=False)
+    export_sub_segment = SingleOrListField(required=False)
 
     SORT_BY_FIELDS = (
         'modified_on',

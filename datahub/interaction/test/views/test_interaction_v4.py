@@ -22,7 +22,7 @@ from datahub.company.test.factories import (
     ContactFactory,
 )
 from datahub.company.test.utils import format_expected_adviser
-from datahub.core.constants import Country, Service
+from datahub.core.constants import Country, ExportBarrierType, Service
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.models import (
@@ -125,6 +125,7 @@ class TestAddInteraction(APITestMixin):
             'was_policy_feedback_provided': False,
             'has_related_trade_agreements': False,
             'related_trade_agreements': [],
+            'helped_remove_export_barrier': False,
             **resolve_data(extra_data),
         }
 
@@ -222,6 +223,9 @@ class TestAddInteraction(APITestMixin):
             'related_trade_agreements': request_data.get(
                 'related_trade_agreements', [],
             ),
+            'helped_remove_export_barrier': request_data.get('helped_remove_export_barrier'),
+            'export_barrier_types': [],
+            'export_barrier_notes': '',
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -377,6 +381,7 @@ class TestAddInteraction(APITestMixin):
             'was_policy_feedback_provided': False,
             'has_related_trade_agreements': False,
             'related_trade_agreements': [],
+            'helped_remove_export_barrier': False,
             **resolve_data(extra_data),
         }
         api_client = self.create_api_client(user=adviser)
@@ -473,6 +478,9 @@ class TestAddInteraction(APITestMixin):
             'related_trade_agreements': request_data.get(
                 'related_trade_agreements', [],
             ),
+            'helped_remove_export_barrier': False,
+            'export_barrier_types': [],
+            'export_barrier_notes': '',
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -1578,6 +1586,148 @@ class TestAddInteraction(APITestMixin):
                     NON_FIELD_ERRORS: ['Only either a company or companies can be provided.'],
                 },
             ),
+            # Trade barriers
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
+                    ],
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'dit_participants': [
+                        {
+                            'adviser': AdviserFactory,
+                        },
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
+                    'helped_remove_export_barrier': True,
+                    'export_barrier_types': [
+                        {
+                            'id': ExportBarrierType.other.value.id,
+                        },
+                    ],
+                },
+                {
+                    'export_barrier_notes': ['This field is required.'],
+                },
+            ),
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
+                    ],
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'dit_participants': [
+                        {
+                            'adviser': AdviserFactory,
+                        },
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
+                    'helped_remove_export_barrier': True,
+                    'export_barrier_types': [],
+                },
+                {
+                    'export_barrier_types': ['This field is required.'],
+                },
+            ),
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
+                    ],
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'dit_participants': [
+                        {
+                            'adviser': AdviserFactory,
+                        },
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
+                    'helped_remove_export_barrier': False,
+                    'export_barrier_types': [
+                        {
+                            'id': ExportBarrierType.finance.value.id,
+                        },
+                    ],
+                },
+                {
+                    'export_barrier_types':
+                        [
+                            'This field is only valid when an interaction'
+                            ' helped remove an export barrier',
+                        ],
+                },
+            ),
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
+                    ],
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'dit_participants': [
+                        {
+                            'adviser': AdviserFactory,
+                        },
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
+                    'helped_remove_export_barrier': False,
+                    'export_barrier_notes': 'My notes',
+                },
+                {
+                    'export_barrier_notes': [
+                        'This field is only valid when an interaction'
+                        ' helped remove an export barrier',
+                        'This field is only valid when the'
+                        ' export barrier type is \"Other\"',
+                    ],
+                },
+            ),
         ),
     )
     def test_validation(self, data, errors):
@@ -1870,6 +2020,9 @@ class TestGetInteraction(APITestMixin):
             'large_capital_opportunity': None,
             'has_related_trade_agreements': None,
             'related_trade_agreements': [],
+            'helped_remove_export_barrier': None,
+            'export_barrier_types': [],
+            'export_barrier_notes': '',
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -1992,6 +2145,9 @@ class TestGetInteraction(APITestMixin):
             'large_capital_opportunity': None,
             'has_related_trade_agreements': None,
             'related_trade_agreements': [],
+            'helped_remove_export_barrier': None,
+            'export_barrier_types': [],
+            'export_barrier_notes': '',
         }
 
     def test_restricted_user_cannot_get_non_associated_investment_project_interaction(

@@ -40,6 +40,12 @@ class NoRecentExportInteractionSubscription(BaseSubscription):
     """
 
 
+class NewExportInteractionSubscription(BaseSubscription):
+    """
+    Subscription to get reminders about companies with new interactions.
+    """
+
+
 class NoRecentInvestmentInteractionSubscription(BaseSubscription):
     """
     Subscription to get reminders about projects with no recent interactions.
@@ -116,6 +122,52 @@ class BaseReminder(models.Model):
 
     def __str__(self):
         return self.event
+
+
+class NewExportInteractionReminder(BaseReminder):
+    """
+    New export interaction reminders.
+    """
+
+    company = models.ForeignKey(
+        'company.Company',
+        on_delete=models.CASCADE,
+        related_name='new_export_interaction_reminders',
+    )
+
+    interaction = models.ForeignKey(
+        'interaction.Interaction',
+        on_delete=models.CASCADE,
+        related_name='new_export_interaction_reminders',
+    )
+
+    @property
+    def last_interaction_date(self):
+        return self.interaction.date if self.interaction else self.company.created_on
+
+
+class NoRecentExportInteractionReminder(BaseReminder):
+    """
+    No recent export interaction reminders.
+    """
+
+    company = models.ForeignKey(
+        'company.Company',
+        on_delete=models.CASCADE,
+        related_name='no_recent_export_interaction_reminders',
+    )
+
+    interaction = models.ForeignKey(
+        'interaction.Interaction',
+        on_delete=models.CASCADE,
+        related_name='no_recent_export_interaction_reminders',
+        null=True,
+        blank=True,
+    )
+
+    @property
+    def last_interaction_date(self):
+        return self.interaction.date if self.interaction else self.company.created_on
 
 
 class NoRecentInvestmentInteractionReminder(BaseReminder):

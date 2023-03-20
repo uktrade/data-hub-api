@@ -9,6 +9,7 @@ class WhoAmISerializer(serializers.ModelSerializer):
 
     permissions = serializers.SerializerMethodField()
     active_features = serializers.ListField(child=serializers.CharField(), read_only=True)
+    active_feature_groups = serializers.ListField(child=serializers.CharField(), read_only=True)
     dit_team = TeamSerializer(read_only=True)
 
     class Meta:
@@ -26,6 +27,7 @@ class WhoAmISerializer(serializers.ModelSerializer):
             'dit_team',
             'permissions',
             'active_features',
+            'active_feature_groups',
         )
         depth = 2
 

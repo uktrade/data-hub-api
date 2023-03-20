@@ -18,7 +18,7 @@ class Command(CSVBaseCommand):
     def _handle(self, *args, **options):
         """
         Disables search signal receivers for investment projects.
-        Avoid queuing huge number of Celery tasks for syncing investment projects to OpenSearch.
+        Avoid queuing huge number of RQ tasks for syncing investment projects to OpenSearch.
         (Syncing can be manually performed afterwards using sync_search if required.)
         """
         return super()._handle(*args, **options)

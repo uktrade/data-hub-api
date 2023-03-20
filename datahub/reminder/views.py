@@ -11,8 +11,16 @@ from rest_framework.mixins import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from datahub.feature_flag.utils import is_user_feature_flag_group_active
 from datahub.investment.project.proposition.models import Proposition, PropositionStatus
+from datahub.reminder import (
+    EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+    INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+)
 from datahub.reminder.models import (
+    NewExportInteractionReminder,
+    NewExportInteractionSubscription,
+    NoRecentExportInteractionReminder,
     NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
@@ -21,6 +29,9 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateSubscription,
 )
 from datahub.reminder.serializers import (
+    NewExportInteractionReminderSerializer,
+    NewExportInteractionSubscriptionSerializer,
+    NoRecentExportInteractionReminderSerializer,
     NoRecentExportInteractionSubscriptionSerializer,
     NoRecentInvestmentInteractionReminderSerializer,
     NoRecentInvestmentInteractionSubscriptionSerializer,
@@ -51,6 +62,11 @@ class NoRecentExportInteractionSubscriptionViewset(BaseSubscriptionViewset):
     queryset = NoRecentExportInteractionSubscription.objects.all()
 
 
+class NewExportInteractionSubscriptionViewset(BaseSubscriptionViewset):
+    serializer_class = NewExportInteractionSubscriptionSerializer
+    queryset = NewExportInteractionSubscription.objects.all()
+
+
 class NoRecentInvestmentInteractionSubscriptionViewset(BaseSubscriptionViewset):
     serializer_class = NoRecentInvestmentInteractionSubscriptionSerializer
     queryset = NoRecentInvestmentInteractionSubscription.objects.all()
@@ -66,20 +82,36 @@ class UpcomingEstimatedLandDateSubscriptionViewset(BaseSubscriptionViewset):
 @permission_classes([IsAuthenticated])
 def reminder_subscription_summary_view(request):
     """Returns the reminder subscription summary."""
+
+    def get_object(queryset):
+        """
+        Gets subscription settings instance for current user.
+
+        If settings have not been created yet, add them.
+        """
+        obj, created = queryset.get_or_create(
+            adviser=request.user,
+        )
+        return obj
+
     estimated_land_date = UpcomingEstimatedLandDateSubscriptionSerializer(
-        UpcomingEstimatedLandDateSubscription.objects.get(adviser=request.user),
+        get_object(UpcomingEstimatedLandDateSubscription.objects.all()),
     ).data
     no_recent_investment_interaction = NoRecentInvestmentInteractionSubscriptionSerializer(
-        NoRecentInvestmentInteractionSubscription.objects.get(adviser=request.user),
+        get_object(NoRecentInvestmentInteractionSubscription.objects.all()),
     ).data
     no_recent_export_interaction = NoRecentExportInteractionSubscriptionSerializer(
-        NoRecentExportInteractionSubscription.objects.get(adviser=request.user),
+        get_object(NoRecentExportInteractionSubscription.objects.all()),
+    ).data
+    new_export_interaction = NewExportInteractionSubscriptionSerializer(
+        get_object(NewExportInteractionSubscription.objects.all()),
     ).data
 
     return Response({
         'estimated_land_date': estimated_land_date,
         'no_recent_investment_interaction': no_recent_investment_interaction,
         'no_recent_export_interaction': no_recent_export_interaction,
+        'new_export_interaction': new_export_interaction,
     })
 
 
@@ -98,6 +130,16 @@ class BaseReminderViewset(viewsets.GenericViewSet, ListModelMixin, DestroyModelM
         return self.model_class.objects.filter(adviser=self.request.user)
 
 
+class NewExportInteractionReminderViewset(BaseReminderViewset):
+    serializer_class = NewExportInteractionReminderSerializer
+    model_class = NewExportInteractionReminder
+
+
+class NoRecentExportInteractionReminderViewset(BaseReminderViewset):
+    serializer_class = NoRecentExportInteractionReminderSerializer
+    model_class = NoRecentExportInteractionReminder
+
+
 class NoRecentInvestmentInteractionReminderViewset(BaseReminderViewset):
     serializer_class = NoRecentInvestmentInteractionReminderSerializer
     model_class = NoRecentInvestmentInteractionReminder
@@ -113,19 +155,56 @@ class UpcomingEstimatedLandDateReminderViewset(BaseReminderViewset):
 @permission_classes([IsAuthenticated])
 def reminder_summary_view(request):
     """Returns the reminder summary."""
-    estimated_land_date = UpcomingEstimatedLandDateReminder.objects.filter(
-        adviser=request.user,
-    ).count()
-    no_recent_interaction = NoRecentInvestmentInteractionReminder.objects.filter(
-        adviser=request.user,
-    ).count()
-    outstanding_propositions = Proposition.objects.filter(
-        adviser=request.user,
-        status=PropositionStatus.ONGOING,
-    ).count()
+    if is_user_feature_flag_group_active(
+        INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+        request.user,
+    ):
+        estimated_land_date = UpcomingEstimatedLandDateReminder.objects.filter(
+            adviser=request.user,
+        ).count()
+        no_recent_investment_interaction = NoRecentInvestmentInteractionReminder.objects.filter(
+            adviser=request.user,
+        ).count()
+        outstanding_propositions = Proposition.objects.filter(
+            adviser=request.user,
+            status=PropositionStatus.ONGOING,
+        ).count()
+    else:
+        estimated_land_date = 0
+        no_recent_investment_interaction = 0
+        outstanding_propositions = 0
+
+    if is_user_feature_flag_group_active(
+        EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
+        request.user,
+    ):
+        no_recent_export_interaction = NoRecentExportInteractionReminder.objects.filter(
+            adviser=request.user,
+        ).count()
+        new_export_interaction = NewExportInteractionReminder.objects.filter(
+            adviser=request.user,
+        ).count()
+    else:
+        no_recent_export_interaction = 0
+        new_export_interaction = 0
+
+    total_count = sum([
+        estimated_land_date,
+        no_recent_investment_interaction,
+        outstanding_propositions,
+        no_recent_export_interaction,
+        new_export_interaction,
+    ])
 
     return Response({
-        'estimated_land_date': estimated_land_date,
-        'no_recent_investment_interaction': no_recent_interaction,
-        'outstanding_propositions': outstanding_propositions,
+        'count': total_count,
+        'investment': {
+            'estimated_land_date': estimated_land_date,
+            'no_recent_interaction': no_recent_investment_interaction,
+            'outstanding_propositions': outstanding_propositions,
+        },
+        'export': {
+            'no_recent_interaction': no_recent_export_interaction,
+            'new_interaction': new_export_interaction,
+        },
     })

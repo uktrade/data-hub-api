@@ -1,5 +1,5 @@
-from celery import shared_task
-from celery.utils.log import get_task_logger
+from logging import getLogger
+
 from django_pglocks import advisory_lock
 
 from datahub.email_ingestion import emails, mailbox_handler
@@ -9,10 +9,9 @@ from datahub.interaction import (
     MAILBOX_INGESTION_FEATURE_FLAG_NAME,
 )
 
-logger = get_task_logger(__name__)
+logger = getLogger(__name__)
 
 
-@shared_task(acks_late=True, priority=9)
 def ingest_emails():
     """
     Ingest and process new emails for all mailboxes in the application - i.e.
@@ -38,7 +37,6 @@ def ingest_emails():
             mailbox.process_new_mail()
 
 
-@shared_task(acks_late=True, priority=9)
 def process_mailbox_emails():
     """
     Process new emails for S3 mailboxes.

@@ -87,7 +87,7 @@ class TestMailbox:
 @pytest.mark.usefixtures('mailbox_ingestion_feature_flag')
 class TestTasks:
     """
-    Test celery task.
+    Test RQ task.
     """
 
     @override_settings(MAILBOXES=DOCUMENT_BUCKETS_SETTING)

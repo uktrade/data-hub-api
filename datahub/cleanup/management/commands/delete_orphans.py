@@ -22,25 +22,21 @@ class Command(BaseCleanupCommand):
 
     CONFIGS = {
         'company.Contact': ModelCleanupConfig(
-            (
-                DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),
-            ),
+            (DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),),
         ),
         'company.Company': ModelCleanupConfig(
-            (
-                DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),
-            ),
+            (DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),),
             # We want to delete the relations below along with any orphaned companies
             excluded_relations=(
                 Company._meta.get_field('company_list_items'),
                 Company._meta.get_field('export_countries'),
                 Company._meta.get_field('export_countries_history'),
                 Company._meta.get_field('pipeline_list_items'),
+                Company._meta.get_field('new_export_interaction_reminders'),
+                Company._meta.get_field('no_recent_export_interaction_reminders'),
             ),
         ),
         'event.Event': ModelCleanupConfig(
-            (
-                DatetimeLessThanCleanupFilter('end_date', relativedelta(months=18)),
-            ),
+            (DatetimeLessThanCleanupFilter('end_date', relativedelta(months=18)),),
         ),
     }

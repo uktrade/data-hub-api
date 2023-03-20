@@ -270,6 +270,13 @@ def test_build_term_query(term, expected):
                             },
                         },
                     ],
+                    'must_not': [
+                        {
+                            'match': {
+                                'archived': True,
+                            },
+                        },
+                    ],
                 },
             },
         ),
@@ -311,6 +318,13 @@ def test_build_fuzzy_term_query_no_fields():
                         'type': 'cross_fields',
                         'operator': 'and',
                         'boost': 4,
+                    },
+                },
+            ],
+            'must_not': [
+                {
+                    'match': {
+                        'archived': True,
                     },
                 },
             ],

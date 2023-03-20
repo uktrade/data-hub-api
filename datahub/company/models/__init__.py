@@ -9,16 +9,20 @@ from datahub.company.models.company import (
     OneListTier,
 )
 from datahub.company.models.contact import Contact, ContactPermission
+from datahub.company.models.export import CompanyExport, ExportExperience, ExportYear
 
 __all__ = (
     'Advisor',
     'Company',
+    'CompanyExport',
     'CompanyExportCountry',
     'CompanyExportCountryHistory',
     'CompanyPermission',
     'Contact',
     'ContactPermission',
+    'ExportExperience',
     'ExportExperienceCategory',
+    'ExportYear',
     'OneListCoreTeamMember',
     'OneListTier',
 )

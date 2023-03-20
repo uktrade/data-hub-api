@@ -1,5 +1,5 @@
 """
-Contains management commands and Celery tasks for performing maintenance operations on database
+Contains management commands and scheduled tasks for performing maintenance operations on database
 records.
 
 Many of the management commands update records using a CSV file in S3.
