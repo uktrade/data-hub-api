@@ -1,0 +1,18 @@
+- model: metadata.country
+  pk: 1a50bdb8-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Curaçao
+    iso_alpha2_code: CW
+- model: metadata.country
+  pk: 7c756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Sint Maarten (Dutch part)
+    iso_alpha2_code: SX
+- model: metadata.country
+  pk: 36afd8d0-5d95-e211-a939-e4115bead28a
+  fields:
+    disabled_on: null
+    name: Western Sahara
+    iso_alpha2_code: EH
