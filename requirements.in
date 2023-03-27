@@ -4,7 +4,7 @@ djangorestframework==3.14.0
 django-axes==5.40.1
 django-environ==0.10.0
 django-extensions==3.2.1
-django-filter==22.1
+django-filter==23.1
 django-log-formatter-ecs==0.0.5
 django-mptt==0.14.0
 django-pglocks==1.0.4
