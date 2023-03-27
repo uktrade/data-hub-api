@@ -201,7 +201,7 @@ nodeenv==1.7.0
     # via pre-commit
 notifications-python-client==8.0.0
     # via -r requirements.in
-opensearch-dsl==2.0.1
+opensearch-dsl==2.1.0
     # via -r requirements.in
 opensearch-py==2.2.0
     # via
