@@ -4,7 +4,7 @@ djangorestframework==3.14.0
 django-axes==5.40.1
 django-environ==0.10.0
 django-extensions==3.2.1
-django-filter==22.1
+django-filter==23.1
 django-log-formatter-ecs==0.0.5
 django-mptt==0.14.0
 django-pglocks==1.0.4
@@ -20,7 +20,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.5
 psycogreen==1.0.2
 
-boto3==1.26.94
+boto3==1.26.99
 
 notifications-python-client==8.0.0
 
@@ -39,7 +39,7 @@ django-redis==5.2.0
 
 # OpenSearch
 opensearch-py==2.2.0
-opensearch-dsl==2.0.1
+opensearch-dsl==2.1.0
 
 # ES APM
 elastic-apm==6.15.1
