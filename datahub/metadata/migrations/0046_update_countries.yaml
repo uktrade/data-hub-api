@@ -1,0 +1,350 @@
+- model: metadata.country
+  pk: 98daa2d6-168f-4ad2-b2c4-a71fd9a59968
+  fields:
+    disabled_on: null
+    name: Abu Dhabi
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: AE-AZ
+- model: metadata.country
+  pk: 4de2a2ac-5d9c-4363-a6d2-c0939116d969
+  fields:
+    disabled_on: null
+    name: Ajman
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: AE-AJ
+- model: metadata.country
+  pk: 623c5905-2be3-4a98-9e5c-ee59da21717a
+  fields:
+    disabled_on: null
+    name: Akrotiri
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: XQZ
+- model: metadata.country
+  pk: ff996375-8adf-459a-b2a6-a477b66c7c6a
+  fields:
+    disabled_on: null
+    name: Åland Islands
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: AX
+- model: metadata.country
+  pk: e2e31128-8aa4-4a53-b492-139aa6e48d39
+  fields:
+    disabled_on: null
+    name: American Samoa
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: AS
+- model: metadata.country
+  pk: 5b3d964f-748b-4542-bb08-7732d4e373db
+  fields:
+    disabled_on: null
+    name: Aruba
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: AW
+- model: metadata.country
+  pk: 21a3b310-c284-4c7c-ac52-2c12deb2d23a
+  fields:
+    disabled_on: null
+    name: Ascension
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: SH-AC
+- model: metadata.country
+  pk: dc859cb8-23c4-4352-89cf-257fe9baaf34
+  fields:
+    disabled_on: null
+    name: Baker Island
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
+    iso_alpha2_code: UM-81
+- model: metadata.country
+  pk: e80f9cb5-bed2-436c-9a13-f37811eda3e6
+  fields:
+    disabled_on: null
+    name: Bonaire
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: BQ-BO
+- model: metadata.country
+  pk: 580da7f1-4bb7-4879-8b48-5b239504bcd5
+  fields:
+    disabled_on: null
+    name: British Indian Ocean Territory
+    overseas_region: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
+    iso_alpha2_code: IO
+- model: metadata.country
+  pk: bdf29ccb-f29a-4dab-b7a9-e1c729ce9a0b
+  fields:
+    disabled_on: null
+    name: Ceuta
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: ES-CE
+- model: metadata.country
+  pk: 82384957-87bd-4160-a535-9313f6237e36
+  fields:
+    disabled_on: null
+    name: Christmas Island
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: CX
+- model: metadata.country
+  pk: f2c14185-1b76-4b1b-8bc2-1557f0b15dcd
+  fields:
+    disabled_on: null
+    name: Cocos (Keeling) Islands
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: CC
+- model: metadata.country
+  pk: 692b594c-2fcf-47d0-82a4-40de2fb2744d
+  fields:
+    disabled_on: null
+    name: Cook Islands
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: CK
+- model: metadata.country
+  pk: f78c3de4-216c-4add-a373-62b589287785
+  fields:
+    disabled_on: null
+    name: Dhekelia
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: XXD
+- model: metadata.country
+  pk: 719fdb2a-a63a-48e6-9fd5-e047f28f00fb
+  fields:
+    disabled_on: null
+    name: Dubai
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: AE-DU
+- model: metadata.country
+  pk: 7cb78ffe-8213-4a39-909c-74df917bef19
+  fields:
+    disabled_on: null
+    name: French Guiana
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: GF
+- model: metadata.country
+  pk: f9a7e226-2681-493f-b67e-bafd6f2cb17b
+  fields:
+    disabled_on: null
+    name: French Polynesia
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: PF
+- model: metadata.country
+  pk: dac36e70-df27-47e3-af58-f7a0a812f229
+  fields:
+    disabled_on: null
+    name: Fujairah
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: AE-FU
+- model: metadata.country
+  pk: 5a1e0665-2652-4608-93e9-97a63fe69d97
+  fields:
+    disabled_on: null
+    name: Guadeloupe
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: GP
+- model: metadata.country
+  pk: 3cd61b65-24ff-4554-8935-48ebacc75bd1
+  fields:
+    disabled_on: null
+    name: Guam
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: GU
+- model: metadata.country
+  pk: 8599557e-8aee-4a5c-b336-8983ae57c298
+  fields:
+    disabled_on: null
+    name: Howland Island
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
+    iso_alpha2_code: UM-84
+- model: metadata.country
+  pk: b8d2ff01-23d6-44f8-afc4-090760187448
+  fields:
+    disabled_on: null
+    name: Jarvis Island
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
+    iso_alpha2_code: UM-86
+- model: metadata.country
+  pk: 77371ff2-de1f-4772-89f7-1cc2ebae24d2
+  fields:
+    disabled_on: null
+    name: Johnston Atoll
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
+    iso_alpha2_code: UM-67
+- model: metadata.country
+  pk: 87696be6-811d-47b9-959c-bc03295d6999
+  fields:
+    disabled_on: null
+    name: Kingman Reef
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
+    iso_alpha2_code: UM-89
+- model: metadata.country
+  pk: 8802c1c6-b198-455b-ad1e-df24d6f04e90
+  fields:
+    disabled_on: null
+    name: Martinique
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: MQ
+- model: metadata.country
+  pk: be16c5da-9a84-45d1-b161-fe6eb01b211e
+  fields:
+    disabled_on: null
+    name: Mayotte
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: YT
+- model: metadata.country
+  pk: 5907d551-e10e-4fd7-a30f-45bb2fbfe1a9
+  fields:
+    disabled_on: null
+    name: Melilla
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: ES-ML
+- model: metadata.country
+  pk: 5a1becc0-c04c-49bf-bc0e-57aec271d4d1
+  fields:
+    disabled_on: null
+    name: Midway Islands
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
+    iso_alpha2_code: UM-71
+- model: metadata.country
+  pk: f6ab164c-990f-4ca2-992f-107183fdd00a
+  fields:
+    disabled_on: null
+    name: Navassa Island
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: UM-76
+- model: metadata.country
+  pk: 75c1f2c7-d89d-4b5a-9ea9-faddb1dfc487
+  fields:
+    disabled_on: null
+    name: New Caledonia
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: NC
+- model: metadata.country
+  pk: bbca8ea2-8237-41c0-991e-e5a30d24ad0c
+  fields:
+    disabled_on: null
+    name: Niue
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: NU
+- model: metadata.country
+  pk: f31c3aa2-db3b-4af2-87bf-34da138406b0
+  fields:
+    disabled_on: null
+    name: Norfolk Island
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: NF
+- model: metadata.country
+  pk: 6832f4c2-fdf1-42dc-ade8-181fed39b8f7
+  fields:
+    disabled_on: null
+    name: Northern Mariana Islands
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: MP
+- model: metadata.country
+  pk: 2de266fa-6357-46ce-b80c-96da978ec37d
+  fields:
+    disabled_on: null
+    name: Palmyra Atoll
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
+    iso_alpha2_code: UM-95
+- model: metadata.country
+  pk: af7cd7f6-f9c9-4f3a-b33c-53d0a2b5f888
+  fields:
+    disabled_on: null
+    name: Pitcairn, Henderson, Ducie and Oeno Islands
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: PN
+- model: metadata.country
+  pk: 35c0c63d-444c-4ec6-8a5b-5cd41dda9f7b
+  fields:
+    disabled_on: null
+    name: Ras al-Khaimah
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: AE-RK
+- model: metadata.country
+  pk: 3379961f-557e-4f1a-a8cf-7f9c5536156a
+  fields:
+    disabled_on: null
+    name: Saba
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: BQ-SA
+- model: metadata.country
+  pk: 67a89f62-b5a2-427d-ab1f-cb1635aab764
+  fields:
+    disabled_on: null
+    name: Saint Barthélemy
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: BL
+- model: metadata.country
+  pk: dec8d80f-efe5-4190-a8e9-c8ccc38e7724
+  fields:
+    disabled_on: null
+    name: Saint Helena
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: SH-HL
+- model: metadata.country
+  pk: ff242fdc-ce2c-4f47-a836-78f83b0f2b7c
+  fields:
+    disabled_on: null
+    name: Saint Pierre and Miquelon
+    overseas_region: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
+    iso_alpha2_code: PM
+- model: metadata.country
+  pk: d9d59123-eaf3-4c56-9439-56d085ec7f6d
+  fields:
+    disabled_on: null
+    name: Sharjah
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: AE-SH
+- model: metadata.country
+  pk: 5c694f64-5106-4792-80f3-fa013e3cdf6b
+  fields:
+    disabled_on: null
+    name: Sint Eustatius
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: BQ-SE
+- model: metadata.country
+  pk: c37be863-56bd-46a2-8c2a-9f02a8a0a21e
+  fields:
+    disabled_on: null
+    name: South Georgia and South Sandwich Islands
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    iso_alpha2_code: GS
+- model: metadata.country
+  pk: 7835743e-3bc5-4e20-b970-9dde94b8d6fe
+  fields:
+    disabled_on: null
+    name: Svalbard and Jan Mayen
+    overseas_region: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+    iso_alpha2_code: SJ
+- model: metadata.country
+  pk: 8a2d710b-362b-4acf-8a11-7df0d6caab9d
+  fields:
+    disabled_on: null
+    name: Tokelau
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: TK
+- model: metadata.country
+  pk: 80709853-22c4-49de-ba7a-4d5032b396ec
+  fields:
+    disabled_on: null
+    name: Tristan da Cunha
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    iso_alpha2_code: SH-TA
+- model: metadata.country
+  pk: b14aece8-6f40-4eee-8c63-6cf360ed651a
+  fields:
+    disabled_on: null
+    name: Umm al-Quwain
+    overseas_region: c4679b44-079e-4394-8bf7-bb0881a5031d
+    iso_alpha2_code: AE-UQ
+- model: metadata.country
+  pk: 8b31e9ed-4215-4082-83eb-a15c22423a6d
+  fields:
+    disabled_on: null
+    name: Wake Island
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: UM-97
+- model: metadata.country
+  pk: b4b5084f-1eb6-401f-8906-d8d8eade72a2
+  fields:
+    disabled_on: null
+    name: Wallis and Futuna
+    overseas_region: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+    iso_alpha2_code: WF
