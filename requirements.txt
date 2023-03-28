@@ -149,7 +149,7 @@ pytz==2022.7
     #   icalendar
 pyyaml==6.0
     # via -r requirements.in
-redis==4.4.0
+redis==4.5.3
     # via
     #   django-redis
     #   python-redis-rate-limit
