@@ -69,7 +69,7 @@ from datahub.core.hawk_receiver import (
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.permissions import HasPermissions
 from datahub.core.schemas import StubSchema
-from datahub.core.viewsets import CoreViewSet
+from datahub.core.viewsets import CoreViewSet, SoftDeleteCoreViewSet
 from datahub.investment.project.queryset import get_slim_investment_project_queryset
 
 
@@ -621,7 +621,7 @@ class ExportWinsForCompanyView(APIView):
         return JsonResponse(export_wins_results.json())
 
 
-class CompanyExportViewSet(CoreViewSet):
+class CompanyExportViewSet(SoftDeleteCoreViewSet):
     """View for company exports"""
 
     queryset = CompanyExport.objects.select_related(

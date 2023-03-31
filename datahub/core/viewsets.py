@@ -1,8 +1,12 @@
 from copy import copy
 
 from django.core.exceptions import FieldDoesNotExist
+
+
 from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
+
+from datahub.core.mixins import SoftDeleteViaArchiveMixin
 
 
 def has_fields(model, *fields):
@@ -17,11 +21,10 @@ def has_fields(model, *fields):
     return True
 
 
-class CoreViewSet(
+class BaseViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin,
     mixins.ListModelMixin,
     GenericViewSet,
 ):
@@ -85,3 +88,17 @@ class CoreViewSet(
                 additional_data['created_by'] = self.request.user
 
         return additional_data
+
+
+class CoreViewSet(
+    BaseViewSet,
+    mixins.DestroyModelMixin,
+):
+    """Base class for view sets that need to delete via destroy."""
+
+
+class SoftDeleteCoreViewSet(
+    BaseViewSet,
+    SoftDeleteViaArchiveMixin,
+):
+    """Base class for view sets that need to delete using archive as a soft delete"""
