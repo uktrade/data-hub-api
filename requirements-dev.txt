@@ -25,9 +25,9 @@ attrs==22.2.0
     #   pytest
 backcall==0.2.0
     # via ipython
-boto3==1.26.99
+boto3==1.26.104
     # via -r requirements.in
-botocore==1.29.99
+botocore==1.29.104
     # via
     #   boto3
     #   s3transfer
