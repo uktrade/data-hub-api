@@ -309,7 +309,7 @@ pyyaml==6.0
     # via
     #   -r requirements.in
     #   pre-commit
-redis==4.5.3
+redis==4.5.4
     # via
     #   django-redis
     #   python-redis-rate-limit
