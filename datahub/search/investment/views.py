@@ -148,22 +148,13 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
     """Filtered investment project search view."""
 
     def get_base_query(self, request, validated_data):
-        from pprint import pprint
         """Add aggregations to show the number of projects at each stage."""
-        pprint("request")
-        pprint(request)
         base_query = super().get_base_query(request, validated_data)
         if validated_data.get('show_summary'):
             base_query.aggs.bucket('stage', 'terms', field='stage.id')
-        pprint("###base_quer")
-        pprint(base_query.__dict__)
         return base_query
 
-    def enhance_response(self, results, response):
-        from pprint import pprint
-        pprint("results:")
-        pprint(results)
-
+    def enhance_response(self, results, response, validated_data):
         """Add summary data to the response."""
         if 'stage' not in results.aggs:
             return response
@@ -204,27 +195,22 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
             stage = InvestmentProjectStage.get_by_id(stage_summary['key'])
             if stage is not None and stage.name in response['summary']:
                 if stage.value.id == InvestmentProjectStage.won.value.id:
-                    winners = filter(
-                        lambda x: x['stage']['id'] == InvestmentProjectStage.won.value.id,
-                        response['results']
-                    )
-                    ordered = sorted(winners, key=lambda x: x['actual_land_date'], reverse=True)
-                    latest_win_id = ordered[0]['id']
-                    stage_log = InvestmentProjectStageLog.objects.filter(
-                        investment_project_id=latest_win_id
-                    ).order_by('created_on').first()
-                    # Check for None values
-                    pprint("stage_log")
-                    pprint(stage_log)
-                    pprint(stage_log.id)
+                    investor_company_id = validated_data['investor_company'][0]
+
+                    project_stage_log = InvestmentProjectStageLog.objects.filter(
+                        stage_id=InvestmentProjectStage.won.value.id,
+                    ).filter(
+                        investment_project__investor_company_id=investor_company_id,
+                    ).select_related('investment_project').order_by('-created_on').first()
+
                     response['summary'][stage.name]['last_won_project']['id'] = (
-                        stage_log.investment_project.id
+                        project_stage_log.investment_project.id
                     )
                     response['summary'][stage.name]['last_won_project']['name'] = (
-                        stage_log.investment_project.name
+                        project_stage_log.investment_project.name
                     )
                     response['summary'][stage.name]['last_won_project']['last_changed'] = (
-                        stage_log.created_on
+                        project_stage_log.created_on
                     )
                 response['summary'][stage.name]['value'] = stage_summary['doc_count']
 
@@ -234,6 +220,7 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
 @register_v3_view(sub_path='export')
 class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchExportAPIView):
     """Investment project search export view."""
+
     # Note: Aggregations on related fields are only used via subqueries as they become very
     # expensive in the main query
     queryset = DBInvestmentProject.objects.annotate(
