@@ -1,6 +1,6 @@
 ---
 applications:
   - buildpacks:
-      - https://github.com/cloudfoundry/python-buildpack.git#v1.7.58
+      - https://github.com/cloudfoundry/python-buildpack.git#v1.8.8
     stack: cflinuxfs3
     timeout: 180
