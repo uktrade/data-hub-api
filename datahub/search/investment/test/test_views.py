@@ -1244,6 +1244,11 @@ class TestSummaryAggregation(APITestMixin):
             'won': {
                 'label': 'Won',
                 'id': constants.InvestmentProjectStage.won.value.id,
+                'last_won_project': {
+                    'id': None,
+                    'last_changed': None,
+                    'name': None,
+                },
                 'value': 0,
             },
         }
@@ -1311,8 +1316,13 @@ class TestSummaryAggregation(APITestMixin):
                 'value': 0,
             },
             'won': {
+                'id': '945ea6d1-eee3-4f5b-9144-84a75b71b8e6',
                 'label': 'Won',
-                'id': constants.InvestmentProjectStage.won.value.id,
+                'last_won_project': {
+                    'id': None,
+                    'last_changed': None,
+                    'name': None,
+                },
                 'value': 0,
             },
         }
