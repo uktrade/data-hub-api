@@ -35,6 +35,7 @@ from datahub.investment.project.test.factories import (
     InvestmentProjectTeamMemberFactory,
     VerifyWinInvestmentProjectFactory,
     WonInvestmentProjectFactory,
+    WonInvestmentProjectStageLogFactory,
 )
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
@@ -81,6 +82,67 @@ def project_with_max_gross_value_added():
             foreign_equity_investment=9999999999999999999,
         )
     return project
+
+
+@pytest.fixture
+def project_with_last_won_investment(opensearch_with_collector):
+    """Test fixture returns an investment project with a last won investment."""
+    investment_project_stage_log = WonInvestmentProjectStageLogFactory()
+    investment_projects = [
+        InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            name='abc defg',
+            description='investmentproject1',
+            estimated_land_date=datetime.date(2011, 6, 13),
+            actual_land_date=datetime.date(2010, 8, 13),
+            investor_company=CompanyFactory(
+                address_country_id=constants.Country.united_states.value.id,
+                address_area_id=constants.AdministrativeArea.texas.value.id,
+            ),
+            status=InvestmentProject.Status.ONGOING,
+            uk_region_locations=[
+                constants.UKRegion.east_midlands.value.id,
+                constants.UKRegion.isle_of_man.value.id,
+            ],
+            level_of_involvement_id=Involvement.hq_and_post_only.value.id,
+            likelihood_to_land_id=LikelihoodToLand.high.value.id,
+            foreign_equity_investment=100000,
+        ),
+        InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            name='delayed project',
+            description='investmentproject2',
+            estimated_land_date=datetime.date(2057, 6, 13),
+            actual_land_date=datetime.date(2047, 8, 13),
+            country_investment_originates_from_id=constants.Country.ireland.value.id,
+            investor_company=CompanyFactory(
+                address_country_id=constants.Country.japan.value.id,
+            ),
+            project_manager=AdviserFactory(),
+            project_assurance_adviser=AdviserFactory(),
+            fdi_value_id=constants.FDIValue.higher.value.id,
+            status=InvestmentProject.Status.DELAYED,
+            uk_region_locations=[
+                constants.UKRegion.north_west.value.id,
+            ],
+            level_of_involvement_id=Involvement.no_involvement.value.id,
+            likelihood_to_land_id=LikelihoodToLand.medium.value.id,
+        ),
+        project_with_max_gross_value_added,
+        InvestmentProjectFactory(
+            name='new project',
+            description='investmentproject4',
+            country_investment_originates_from_id=constants.Country.canada.value.id,
+            estimated_land_date=None,
+            level_of_involvement_id=None,
+            likelihood_to_land_id=LikelihoodToLand.low.value.id,
+        ),
+        investment_project_stage_log.investment_project,
+        investment_project_stage_log,
+    ]
+    opensearch_with_collector.flush_and_refresh()
+
+    yield investment_projects
 
 
 @pytest.fixture
@@ -1318,6 +1380,57 @@ class TestSummaryAggregation(APITestMixin):
             'won': {
                 'id': '945ea6d1-eee3-4f5b-9144-84a75b71b8e6',
                 'label': 'Won',
+                'last_won_project': {
+                    'id': None,
+                    'last_changed': None,
+                    'name': None,
+                },
+                'value': 0,
+            },
+        }
+
+    def test_last_won_project(
+        self, opensearch_with_collector,
+        project_with_last_won_investment,
+    ):
+        """All results should be counted when not filtered"""
+        # from pprint import pprint
+        # pprint(project_with_last_won_investment[-2].__dict__)
+        # pprint(project_with_last_won_investment[-2].id)
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, {
+            'show_summary': True,
+            'investor_company': [project_with_last_won_investment[-2].investor_company_id],
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+        assert 'summary' in response.data
+        assert response.data['summary'] == {
+            # 'prospect': {
+            #     'label': 'Prospect',
+            #     'id': constants.InvestmentProjectStage.prospect.value.id,
+            #     'value': 4,
+            # },
+            # 'assign_pm': {
+            #     'label': 'Assign PM',
+            #     'id': constants.InvestmentProjectStage.assign_pm.value.id,
+            #     'value': 0,
+            # },
+            # 'active': {
+            #     'label': 'Active',
+            #     'id': constants.InvestmentProjectStage.active.value.id,
+            #     'value': 0,
+            # },
+            # 'verify_win': {
+            #     'label': 'Verify Win',
+            #     'id': constants.InvestmentProjectStage.verify_win.value.id,
+            #     'value': 0,
+            # },
+            'won': {
+                'label': 'Won',
+                'id': constants.InvestmentProjectStage.won.value.id,
                 'last_won_project': {
                     'id': None,
                     'last_changed': None,
