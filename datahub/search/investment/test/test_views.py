@@ -85,58 +85,10 @@ def project_with_max_gross_value_added():
 
 
 @pytest.fixture
-def project_with_last_won_investment(opensearch_with_collector):
+def investment_project_with_stage_log(opensearch_with_collector):
     """Test fixture returns an investment project with a last won investment."""
     investment_project_stage_log = WonInvestmentProjectStageLogFactory()
     investment_projects = [
-        InvestmentProjectFactory(
-            investment_type_id=constants.InvestmentType.fdi.value.id,
-            name='abc defg',
-            description='investmentproject1',
-            estimated_land_date=datetime.date(2011, 6, 13),
-            actual_land_date=datetime.date(2010, 8, 13),
-            investor_company=CompanyFactory(
-                address_country_id=constants.Country.united_states.value.id,
-                address_area_id=constants.AdministrativeArea.texas.value.id,
-            ),
-            status=InvestmentProject.Status.ONGOING,
-            uk_region_locations=[
-                constants.UKRegion.east_midlands.value.id,
-                constants.UKRegion.isle_of_man.value.id,
-            ],
-            level_of_involvement_id=Involvement.hq_and_post_only.value.id,
-            likelihood_to_land_id=LikelihoodToLand.high.value.id,
-            foreign_equity_investment=100000,
-        ),
-        InvestmentProjectFactory(
-            investment_type_id=constants.InvestmentType.fdi.value.id,
-            name='delayed project',
-            description='investmentproject2',
-            estimated_land_date=datetime.date(2057, 6, 13),
-            actual_land_date=datetime.date(2047, 8, 13),
-            country_investment_originates_from_id=constants.Country.ireland.value.id,
-            investor_company=CompanyFactory(
-                address_country_id=constants.Country.japan.value.id,
-            ),
-            project_manager=AdviserFactory(),
-            project_assurance_adviser=AdviserFactory(),
-            fdi_value_id=constants.FDIValue.higher.value.id,
-            status=InvestmentProject.Status.DELAYED,
-            uk_region_locations=[
-                constants.UKRegion.north_west.value.id,
-            ],
-            level_of_involvement_id=Involvement.no_involvement.value.id,
-            likelihood_to_land_id=LikelihoodToLand.medium.value.id,
-        ),
-        project_with_max_gross_value_added,
-        InvestmentProjectFactory(
-            name='new project',
-            description='investmentproject4',
-            country_investment_originates_from_id=constants.Country.canada.value.id,
-            estimated_land_date=None,
-            level_of_involvement_id=None,
-            likelihood_to_land_id=LikelihoodToLand.low.value.id,
-        ),
         investment_project_stage_log.investment_project,
         investment_project_stage_log,
     ]
@@ -1391,52 +1343,51 @@ class TestSummaryAggregation(APITestMixin):
 
     def test_last_won_project(
         self, opensearch_with_collector,
-        project_with_last_won_investment,
+        investment_project_with_stage_log,
     ):
-        """All results should be counted when not filtered"""
-        # from pprint import pprint
-        # pprint(project_with_last_won_investment[-2].__dict__)
-        # pprint(project_with_last_won_investment[-2].id)
+        """Details of last won project should be shown in won summary for a investor company"""
+        investment_project = investment_project_with_stage_log[0]
+        investor_company = investment_project.investor_company
 
         url = reverse('api-v3:search:investment_project')
         response = self.api_client.post(url, {
             'show_summary': True,
-            'investor_company': [project_with_last_won_investment[-2].investor_company_id],
+            'investor_company': [investor_company.id],
         })
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 4
+        assert response.data['count'] == 1
         assert 'summary' in response.data
         assert response.data['summary'] == {
-            # 'prospect': {
-            #     'label': 'Prospect',
-            #     'id': constants.InvestmentProjectStage.prospect.value.id,
-            #     'value': 4,
-            # },
-            # 'assign_pm': {
-            #     'label': 'Assign PM',
-            #     'id': constants.InvestmentProjectStage.assign_pm.value.id,
-            #     'value': 0,
-            # },
-            # 'active': {
-            #     'label': 'Active',
-            #     'id': constants.InvestmentProjectStage.active.value.id,
-            #     'value': 0,
-            # },
-            # 'verify_win': {
-            #     'label': 'Verify Win',
-            #     'id': constants.InvestmentProjectStage.verify_win.value.id,
-            #     'value': 0,
-            # },
+            'prospect': {
+                'label': 'Prospect',
+                'id': constants.InvestmentProjectStage.prospect.value.id,
+                'value': 0,
+            },
+            'assign_pm': {
+                'label': 'Assign PM',
+                'id': constants.InvestmentProjectStage.assign_pm.value.id,
+                'value': 0,
+            },
+            'active': {
+                'label': 'Active',
+                'id': constants.InvestmentProjectStage.active.value.id,
+                'value': 0,
+            },
+            'verify_win': {
+                'label': 'Verify Win',
+                'id': constants.InvestmentProjectStage.verify_win.value.id,
+                'value': 0,
+            },
             'won': {
                 'label': 'Won',
                 'id': constants.InvestmentProjectStage.won.value.id,
                 'last_won_project': {
-                    'id': None,
-                    'last_changed': None,
-                    'name': None,
+                    'id': investment_project.id,
+                    'last_changed': investment_project.created_on,
+                    'name': investment_project.name,
                 },
-                'value': 0,
+                'value': 1,
             },
         }
 
