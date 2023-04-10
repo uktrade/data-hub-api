@@ -22,7 +22,6 @@ attrs==22.2.0
     # via
     #   aiohttp
     #   flake8-bugbear
-    #   pytest
 backcall==0.2.0
     # via ipython
 boto3==1.26.104
@@ -272,7 +271,7 @@ pylint-plugin-utils==0.7
     # via pylint-django
 pylint-pytest==1.1.2
     # via -r requirements-dev.in
-pytest==7.2.2
+pytest==7.3.0
     # via
     #   -r requirements-dev.in
     #   pylint-pytest
