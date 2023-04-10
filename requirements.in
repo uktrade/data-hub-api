@@ -45,7 +45,7 @@ opensearch-dsl==2.1.0
 elastic-apm==6.15.1
 
 # Testing and dev
-django-debug-toolbar==3.8.1
+django-debug-toolbar==4.0.0
 werkzeug==2.2.3  # Required by runserver_plus - useful for local dev
 
 WSGIserver==1.3
