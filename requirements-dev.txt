@@ -238,7 +238,7 @@ prompt-toolkit==3.0.36
     # via ipython
 psycogreen==1.0.2
     # via -r requirements.in
-psycopg2==2.9.5
+psycopg2==2.9.6
     # via -r requirements.in
 ptyprocess==0.7.0
     # via pexpect
