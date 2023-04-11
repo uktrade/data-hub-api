@@ -16,9 +16,9 @@ async-timeout==4.0.2
     #   redis
 attrs==22.2.0
     # via aiohttp
-boto3==1.26.104
+boto3==1.26.109
     # via -r requirements.in
-botocore==1.29.104
+botocore==1.29.109
     # via
     #   boto3
     #   s3transfer
@@ -51,7 +51,7 @@ django==3.2.18
     #   djangorestframework
 django-axes==5.41.0
     # via -r requirements.in
-django-debug-toolbar==3.8.1
+django-debug-toolbar==4.0.0
     # via -r requirements.in
 django-environ==0.10.0
     # via -r requirements.in
@@ -127,7 +127,7 @@ packaging==22.0
     # via marshmallow
 psycogreen==1.0.2
     # via -r requirements.in
-psycopg2==2.9.5
+psycopg2==2.9.6
     # via -r requirements.in
 pyjwt==2.6.0
     # via notifications-python-client
@@ -170,7 +170,7 @@ rq-scheduler==0.13.0
     # via -r requirements.in
 s3transfer==0.6.0
     # via boto3
-sentry-sdk==1.18.0
+sentry-sdk==1.19.1
     # via -r requirements.in
 simplejson==3.18.0
     # via mail-parser
