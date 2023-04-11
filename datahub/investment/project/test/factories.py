@@ -185,6 +185,15 @@ class WonInvestmentProjectFactory(VerifyWinInvestmentProjectFactory):
     actual_land_date = factory.Faker('past_date')
 
 
+class WonInvestmentProjectStageLogFactory(factory.django.DjangoModelFactory):
+    stage_id = InvestmentProjectStage.won.value.id
+    investment_project = factory.SubFactory(WonInvestmentProjectFactory)
+    created_on = factory.Faker('past_date')
+
+    class Meta:
+        model = 'investment.InvestmentProjectStageLog'
+
+
 class InvestmentProjectTeamMemberFactory(factory.django.DjangoModelFactory):
     """Investment project team member factory."""
 

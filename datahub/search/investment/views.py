@@ -194,7 +194,10 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
         for stage_summary in results.aggs['stage'].buckets:
             stage = InvestmentProjectStage.get_by_id(stage_summary['key'])
             if stage is not None and stage.name in response['summary']:
-                if stage.value.id == InvestmentProjectStage.won.value.id:
+                if (
+                    stage.value.id == InvestmentProjectStage.won.value.id
+                    and 'investor_company' in validated_data
+                ):
                     investor_company_id = validated_data['investor_company'][0]
 
                     project_stage_log = InvestmentProjectStageLog.objects.filter(
