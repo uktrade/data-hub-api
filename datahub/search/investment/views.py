@@ -19,6 +19,7 @@ from datahub.core.query_utils import (
     get_string_agg_subquery,
 )
 from datahub.investment.project.models import InvestmentProject as DBInvestmentProject
+from datahub.investment.project.models import InvestmentProjectStageLog
 from datahub.investment.project.query_utils import get_project_code_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.search.investment import InvestmentSearchApp
@@ -153,7 +154,7 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
             base_query.aggs.bucket('stage', 'terms', field='stage.id')
         return base_query
 
-    def enhance_response(self, results, response):
+    def enhance_response(self, results, response, validated_data):
         """Add summary data to the response."""
         if 'stage' not in results.aggs:
             return response
@@ -183,11 +184,37 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
                 'label': 'Won',
                 'id': InvestmentProjectStage.won.value.id,
                 'value': 0,
+                'last_won_project': {
+                    'id': None,
+                    'last_changed': None,
+                    'name': None,
+                },
             },
         }
         for stage_summary in results.aggs['stage'].buckets:
             stage = InvestmentProjectStage.get_by_id(stage_summary['key'])
             if stage is not None and stage.name in response['summary']:
+                if (
+                    stage.value.id == InvestmentProjectStage.won.value.id
+                    and 'investor_company' in validated_data
+                ):
+                    investor_company_id = validated_data['investor_company'][0]
+
+                    project_stage_log = InvestmentProjectStageLog.objects.filter(
+                        stage_id=InvestmentProjectStage.won.value.id,
+                    ).filter(
+                        investment_project__investor_company_id=investor_company_id,
+                    ).select_related('investment_project').order_by('-created_on').first()
+
+                    response['summary'][stage.name]['last_won_project']['id'] = (
+                        project_stage_log.investment_project.id
+                    )
+                    response['summary'][stage.name]['last_won_project']['name'] = (
+                        project_stage_log.investment_project.name
+                    )
+                    response['summary'][stage.name]['last_won_project']['last_changed'] = (
+                        project_stage_log.created_on
+                    )
                 response['summary'][stage.name]['value'] = stage_summary['doc_count']
 
         return response
