@@ -49,6 +49,12 @@ class InteractionsDatasetView(BaseDatasetView):
             ),
             sector=get_sector_name_subquery('company__sector'),
             service_delivery=get_service_name_subquery('service'),
+            export_barrier_type_names=get_array_agg_subquery(
+                Interaction.export_barrier_types.through,
+                'interaction',
+                'exportbarriertype__name',
+                ordering=('exportbarriertype__name',),
+            ),
         ).values(
             'adviser_ids',
             'communication_channel__name',
@@ -76,4 +82,6 @@ class InteractionsDatasetView(BaseDatasetView):
             'subject',
             'theme',
             'were_countries_discussed',
+            'export_barrier_type_names',
+            'export_barrier_notes',
         )
