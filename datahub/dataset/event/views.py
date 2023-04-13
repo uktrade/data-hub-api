@@ -1,6 +1,9 @@
 from django.contrib.postgres.aggregates import ArrayAgg
 
-from datahub.core.query_utils import get_aggregate_subquery
+from datahub.core.query_utils import (
+    get_aggregate_subquery,
+    get_array_agg_subquery,
+)
 from datahub.dataset.core.views import BaseDatasetView
 from datahub.event.models import Event
 from datahub.metadata.query_utils import get_service_name_subquery
@@ -20,6 +23,12 @@ class EventsDatasetView(BaseDatasetView):
             team_ids=get_aggregate_subquery(
                 Event,
                 ArrayAgg('teams__id', ordering=('teams__id',)),
+            ),
+            related_programme_names=get_array_agg_subquery(
+                Event.related_programmes.through,
+                'event',
+                'programme__name',
+                ordering=('programme__name',),
             ),
         ).values(
             'address_1',
@@ -43,4 +52,5 @@ class EventsDatasetView(BaseDatasetView):
             'start_date',
             'team_ids',
             'uk_region__name',
+            'related_programme_names',
         )

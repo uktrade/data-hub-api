@@ -32,6 +32,10 @@ def get_expected_data_from_event(event):
         'start_date': format_date_or_datetime(event.start_date),
         'team_ids': [str(x.id) for x in event.teams.all().order_by('id')],
         'uk_region__name': event.uk_region.name,
+        'related_programme_names': (
+            [x.name for x in event.related_programmes.all()]
+            if event.related_programmes.exists() else None
+        ),
     }
 
 
