@@ -1,6 +1,7 @@
 import logging
-import environ
 from functools import partial
+
+import environ
 
 from django.conf import settings
 from django.core.cache import cache
