@@ -1,9 +1,9 @@
-import environ
 import logging
 from functools import partial
 
 from django.conf import settings
 from django.core.cache import cache
+import environ
 from mohawk import Receiver
 from mohawk.exc import HawkFail
 from rest_framework.authentication import BaseAuthentication
