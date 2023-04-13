@@ -6,6 +6,7 @@ from rest_framework import status
 from datahub.core.test_utils import format_date_or_datetime, get_attr_or_none
 from datahub.dataset.core.test import BaseDatasetViewTest
 from datahub.interaction.test.factories import (
+    CompaniesInteractionWithExportBarrierOtherFactory,
     CompanyInteractionFactory,
     CompanyInteractionFactoryWithPolicyFeedback,
     CompanyInteractionFactoryWithRelatedTradeAgreements,
@@ -78,6 +79,11 @@ def get_expected_data_from_interaction(interaction):
         'subject': interaction.subject,
         'theme': interaction.theme,
         'were_countries_discussed': interaction.were_countries_discussed,
+        'export_barrier_type_names': (
+            [x.name for x in interaction.export_barrier_types.all()]
+            if interaction.export_barrier_types.exists() else None
+        ),
+        'export_barrier_notes': interaction.export_barrier_notes,
     }
 
 
@@ -94,6 +100,7 @@ class TestInteractionsDatasetViewSet(BaseDatasetViewTest):
         'interaction_factory', (
             CompanyInteractionFactory,
             CompanyInteractionFactoryWithPolicyFeedback,
+            CompaniesInteractionWithExportBarrierOtherFactory,
             EventServiceDeliveryFactory,
             InvestmentProjectInteractionFactory,
             ServiceDeliveryFactory,

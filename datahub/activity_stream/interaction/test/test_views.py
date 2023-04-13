@@ -7,12 +7,12 @@ from rest_framework import status
 from datahub.activity_stream.interaction.serializers import InteractionActivitySerializer
 from datahub.activity_stream.test import hawk
 from datahub.activity_stream.test.utils import get_url
-from datahub.core.constants import ExportBarrierType
-from datahub.core.test.factories import to_many_field
 from datahub.core.test_utils import format_date_or_datetime
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.factories import (
     CompaniesInteractionFactory,
+    CompaniesInteractionWithExportBarrierFinanceFactory,
+    CompaniesInteractionWithExportBarrierOtherFactory,
     ContactFactory,
     EventServiceDeliveryFactory,
     InteractionDITParticipantFactory,
@@ -20,34 +20,6 @@ from datahub.interaction.test.factories import (
     ServiceDeliveryFactory,
 )
 from datahub.metadata.test.factories import TeamFactory
-
-
-class CompaniesInteractionWithExportBarrierOtherFactory(CompaniesInteractionFactory):
-    """Create companies interaction with export barriers - Other."""
-
-    helped_remove_export_barrier = True
-    export_barrier_notes = 'Lorem ipsum'
-
-    @to_many_field
-    def export_barrier_types(self):
-        """
-        Add "other" export barrier type
-        """
-        return [ExportBarrierType.other.value.id]
-
-
-class CompaniesInteractionWithExportBarrierFinanceFactory(CompaniesInteractionFactory):
-    """Create companies interaction with export barriers - Finance."""
-
-    helped_remove_export_barrier = True
-    export_barrier_notes = ''
-
-    @to_many_field
-    def export_barrier_types(self):
-        """
-        Add "other" export barrier type
-        """
-        return [ExportBarrierType.finance.value.id]
 
 
 @pytest.mark.django_db
