@@ -1,3 +1,4 @@
+import environ
 import logging
 from functools import partial
 
@@ -9,6 +10,8 @@ from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import BasePermission
 
+environ.Env.read_env(env_file='./.env')  # reads the .env file
+env = environ.Env()
 
 logger = logging.getLogger(__name__)
 
@@ -127,7 +130,8 @@ def _authorise(request):
         request.build_absolute_uri(),
         request.method,
         content=request.body,
-        content_type=request.content_type,
+        # Running on local dev replace content type plain/text with '' to avoid validation issues.
+        content_type=request.content_type if not env.bool('LOCAL_DEV', False) else '',
         seen_nonce=_seen_nonce,
     )
 
