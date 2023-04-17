@@ -67,6 +67,8 @@ services:
       - node.name=node-001
       - discovery.type=single-node
       - bootstrap.memory_lock=true
+    ports:
+      - "9200:9200"
 
   redis:
     image: redis:6.2.6
