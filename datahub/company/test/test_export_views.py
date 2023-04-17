@@ -22,6 +22,7 @@ from datahub.core.test_utils import (
     APITestMixin,
     format_date_or_datetime,
 )
+from datahub.metadata.test.factories import CountryFactory, SectorFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
@@ -343,3 +344,113 @@ class TestDeleteExport(APITestMixin):
 
         response = self.api_client.get(url)
         assert response.json()['archived']
+
+
+class TestExportFilters(APITestMixin):
+    """Test the filters on the GET export endpoint"""
+
+    def test_filtered_by_status(self):
+        """List of exports filtered by status."""
+        ExportFactory.create_batch(3, status=CompanyExport.ExportStatus.ACTIVE)
+        ExportFactory.create_batch(3, status=CompanyExport.ExportStatus.INACTIVE)
+        ExportFactory(status=CompanyExport.ExportStatus.WON)
+
+        url = reverse('api-v4:export:collection')
+        response = self.api_client.get(url, {
+            'status': CompanyExport.ExportStatus.WON,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 1
+        assert response_data['results'][0]['status'] == CompanyExport.ExportStatus.WON
+
+    def test_filtered_by_export_potential(self):
+        """List of exports filtered by export potential."""
+        ExportFactory.create_batch(3, export_potential=CompanyExport.ExportPotential.HIGH)
+        ExportFactory.create_batch(3, export_potential=CompanyExport.ExportPotential.MEDIUM)
+        ExportFactory(export_potential=CompanyExport.ExportPotential.LOW)
+
+        url = reverse('api-v4:export:collection')
+        response = self.api_client.get(url, {
+            'export_potential': CompanyExport.ExportPotential.LOW,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 1
+        assert response_data['results'][0]['export_potential'] == CompanyExport.ExportPotential.LOW
+
+    def test_filtered_by_export_sector(self):
+        """List of exports filtered by sector."""
+        sector1 = SectorFactory()
+        sector2 = SectorFactory()
+        sector3 = SectorFactory()
+
+        ExportFactory.create_batch(3, sector=sector1)
+        ExportFactory.create_batch(3, sector=sector2)
+        ExportFactory(sector=sector3)
+
+        url = reverse('api-v4:export:collection')
+        response = self.api_client.get(url, {
+            'sector': str(sector3.pk),
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 1
+        assert response_data['results'][0]['sector']['id'] == str(sector3.pk)
+
+    def test_filtered_by_export_country(self):
+        """List of exports filtered by country."""
+        country1 = CountryFactory()
+        country2 = CountryFactory()
+        country3 = CountryFactory()
+
+        ExportFactory.create_batch(3, destination_country=country1)
+        ExportFactory.create_batch(3, destination_country=country2)
+        ExportFactory(destination_country=country3)
+
+        url = reverse('api-v4:export:collection')
+        response = self.api_client.get(url, {
+            'destination_country': str(country3.pk),
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 1
+        assert response_data['results'][0]['destination_country']['id'] == str(country3.pk)
+
+    def test_filtered_by_export_team_members(self):
+        """List of exports filtered by team members"""
+        team_member_1 = AdviserFactory()
+        team_member_2 = AdviserFactory()
+        team_member_3 = AdviserFactory()
+
+        ExportFactory(team_members=[
+            team_member_1,
+        ])
+
+        ExportFactory(team_members=[
+            team_member_2,
+        ])
+
+        ExportFactory(team_members=[
+            team_member_3,
+        ])
+
+        ExportFactory(team_members=[
+            team_member_1,
+        ])
+
+        url = reverse('api-v4:export:collection')
+        response = self.api_client.get(url, {
+            'team_members': team_member_1.id,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        assert response_data['count'] == 2
+        assert response_data['results'][0]['team_members'][0]['id'] == str(team_member_1.id)
+        assert response_data['results'][1]['team_members'][0]['id'] == str(team_member_1.id)
