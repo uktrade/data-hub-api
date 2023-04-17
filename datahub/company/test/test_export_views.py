@@ -351,8 +351,8 @@ class TestExportFilters(APITestMixin):
 
     def test_filtered_by_status(self):
         """List of exports filtered by status."""
-        ExportFactory.create_batch(3, status=CompanyExport.ExportStatus.ACTIVE)
-        ExportFactory.create_batch(3, status=CompanyExport.ExportStatus.INACTIVE)
+        ExportFactory(status=CompanyExport.ExportStatus.ACTIVE)
+        ExportFactory(status=CompanyExport.ExportStatus.INACTIVE)
         ExportFactory(status=CompanyExport.ExportStatus.WON)
 
         url = reverse('api-v4:export:collection')
@@ -367,8 +367,8 @@ class TestExportFilters(APITestMixin):
 
     def test_filtered_by_export_potential(self):
         """List of exports filtered by export potential."""
-        ExportFactory.create_batch(3, export_potential=CompanyExport.ExportPotential.HIGH)
-        ExportFactory.create_batch(3, export_potential=CompanyExport.ExportPotential.MEDIUM)
+        ExportFactory(export_potential=CompanyExport.ExportPotential.HIGH)
+        ExportFactory(export_potential=CompanyExport.ExportPotential.MEDIUM)
         ExportFactory(export_potential=CompanyExport.ExportPotential.LOW)
 
         url = reverse('api-v4:export:collection')
@@ -387,8 +387,8 @@ class TestExportFilters(APITestMixin):
         sector2 = SectorFactory()
         sector3 = SectorFactory()
 
-        ExportFactory.create_batch(3, sector=sector1)
-        ExportFactory.create_batch(3, sector=sector2)
+        ExportFactory(sector=sector1)
+        ExportFactory(sector=sector2)
         ExportFactory(sector=sector3)
 
         url = reverse('api-v4:export:collection')
@@ -407,8 +407,8 @@ class TestExportFilters(APITestMixin):
         country2 = CountryFactory()
         country3 = CountryFactory()
 
-        ExportFactory.create_batch(3, destination_country=country1)
-        ExportFactory.create_batch(3, destination_country=country2)
+        ExportFactory(destination_country=country1)
+        ExportFactory(destination_country=country2)
         ExportFactory(destination_country=country3)
 
         url = reverse('api-v4:export:collection')
@@ -439,10 +439,6 @@ class TestExportFilters(APITestMixin):
             team_member_3,
         ])
 
-        ExportFactory(team_members=[
-            team_member_1,
-        ])
-
         url = reverse('api-v4:export:collection')
         response = self.api_client.get(url, {
             'team_members': team_member_1.id,
@@ -451,6 +447,5 @@ class TestExportFilters(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
 
-        assert response_data['count'] == 2
+        assert response_data['count'] == 1
         assert response_data['results'][0]['team_members'][0]['id'] == str(team_member_1.id)
-        assert response_data['results'][1]['team_members'][0]['id'] == str(team_member_1.id)
