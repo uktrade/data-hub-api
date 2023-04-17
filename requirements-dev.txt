@@ -24,9 +24,9 @@ attrs==22.2.0
     #   flake8-bugbear
 backcall==0.2.0
     # via ipython
-boto3==1.26.109
+boto3==1.26.114
     # via -r requirements.in
-botocore==1.29.109
+botocore==1.29.114
     # via
     #   boto3
     #   s3transfer
@@ -71,7 +71,7 @@ django==3.2.18
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==5.41.0
+django-axes==5.41.1
     # via -r requirements.in
 django-debug-toolbar==4.0.0
     # via -r requirements.in
@@ -154,7 +154,7 @@ gevent==22.10.2
     # via -r requirements.in
 greenlet==2.0.2
     # via gevent
-icalendar==5.0.4
+icalendar==5.0.5
     # via -r requirements.in
 identify==2.5.11
     # via pre-commit
@@ -271,7 +271,7 @@ pylint-plugin-utils==0.7
     # via pylint-django
 pylint-pytest==1.1.2
     # via -r requirements-dev.in
-pytest==7.3.0
+pytest==7.3.1
     # via
     #   -r requirements-dev.in
     #   pylint-pytest
