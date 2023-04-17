@@ -634,3 +634,17 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+    filterset_fields = [
+        'created_on',
+        'destination_country',
+        'export_potential',
+        'sector',
+        'status',
+        'team_members',
+    ]
+    ordering_fields = ('created_on',)
+    ordering = ('-created_on')
