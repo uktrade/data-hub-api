@@ -449,3 +449,34 @@ class TestExportFilters(APITestMixin):
 
         assert response_data['count'] == 1
         assert response_data['results'][0]['team_members'][0]['id'] == str(team_member_1.id)
+
+
+class TestExportSortBy(APITestMixin):
+    """Test the sorting on the GET export endpoint"""
+
+    @pytest.mark.parametrize(
+        'data,results',
+        (
+            (  # sort by title ASC
+                {'sortby': 'title'},
+                ['Title A', 'Title B', 'Title C'],
+            ),
+            (  # sort by title DESC
+                {'sortby': '-title'},
+                ['Title C', 'Title B', 'Title A'],
+            ),
+        ),
+    )
+    def test_sort_by_export_title(self, data, results):
+        """Test sort by title (ascending)"""
+        ExportFactory(title='Title C')
+        ExportFactory(title='Title A')
+        ExportFactory(title='Title B')
+
+        url = reverse('api-v4:export:collection')
+        response = self.api_client.get(url, data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 3
+        assert [result['title'] for result in response_data['results']] == results
