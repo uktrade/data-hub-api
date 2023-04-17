@@ -208,7 +208,7 @@ Dependencies:
     cp config/settings/sample.env config/settings/.env
     ```
 
-8.  Set `DOCKER_DEV=False` in `.env`
+8.  Set `DOCKER_DEV=False` and `LOCAL_DEV=True` in `.env`
 
 9. Make sure you have OpenSearch running locally. If you don't, you can run one in Docker:
 
