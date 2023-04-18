@@ -639,7 +639,6 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
         OrderingFilter,
     )
     filterset_fields = [
-        'created_on',
         'destination_country',
         'export_potential',
         'sector',
