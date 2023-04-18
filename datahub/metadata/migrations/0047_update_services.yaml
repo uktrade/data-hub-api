@@ -1,0 +1,24 @@
+- model: metadata.service
+  pk: e76f8f6b-34f4-4972-bf0a-583a8c7c52ee
+  fields:
+    disabled_on: ~
+    order: 272.0
+    segment: Innovate UK EDGE inbound
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    contexts: ["export_interaction", "export_service_delivery"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+- model: metadata.service
+  pk: 2abf7399-2539-40f8-8b01-e77deb572b1f
+  fields:
+    disabled_on: ~
+    order: 273.0
+    segment: Innovate UK EDGE outbound
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    contexts: ["export_interaction", "export_service_delivery"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
