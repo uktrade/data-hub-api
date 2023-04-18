@@ -646,5 +646,12 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
         'status',
         'team_members',
     ]
-    ordering_fields = ('created_on',)
-    ordering = ('-created_on')
+    ordering_fields = (
+        'created_on',
+        'title',
+
+    )
+    ordering = (
+        '-created_on',
+        'title',
+    )
