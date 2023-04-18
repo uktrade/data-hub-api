@@ -465,6 +465,14 @@ class TestExportSortBy(APITestMixin):
                 {'sortby': '-title'},
                 ['Title C', 'Title B', 'Title A'],
             ),
+            (  # sort by created_on ASC
+                {'sortby': 'created_on'},
+                ['Title C', 'Title A', 'Title B'],
+            ),
+            (  # sort by created_on DESC
+                {'sortby': '-created_on'},
+                ['Title B', 'Title A', 'Title C'],
+            ),
         ),
     )
     def test_sort_by_export_title(self, data, results):
