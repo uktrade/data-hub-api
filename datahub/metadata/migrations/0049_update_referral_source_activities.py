@@ -1,6 +1,5 @@
 from pathlib import PurePath
 
-import mptt
 from django.db import migrations
 
 from datahub.core.migration_utils import load_yaml_data_in_migration
