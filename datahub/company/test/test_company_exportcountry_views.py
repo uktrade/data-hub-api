@@ -541,13 +541,13 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         response_data['export_countries'].sort(key=lambda item: item['country']['name'])
-        current_countries_request = status_wise_items.get(
+        current_countries_request = sorted(status_wise_items.get(
             CompanyExportCountry.Status.CURRENTLY_EXPORTING,
             [],
-        )
-        current_countries_response = [
+        ))
+        current_countries_response = sorted([
             c['id'] for c in response_data.get('export_to_countries', [])
-        ]
+        ])
 
         future_countries_request = sorted(status_wise_items.get(
             CompanyExportCountry.Status.FUTURE_INTEREST,
