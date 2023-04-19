@@ -440,19 +440,19 @@ class TestExportFilters(APITestMixin):
         ExportFactory(
             team_members=[
                 team_member_1,
-            ]
+            ],
         )
 
         ExportFactory(
             team_members=[
                 team_member_2,
-            ]
+            ],
         )
 
         ExportFactory(
             team_members=[
                 team_member_3,
-            ]
+            ],
         )
 
         url = reverse('api-v4:export:collection')
