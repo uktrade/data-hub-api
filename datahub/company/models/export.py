@@ -101,8 +101,10 @@ class CompanyExport(ArchivableModel, BaseModel):
 
     exporter_experience = models.ForeignKey(
         ExportExperience,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         related_name='+',
+        blank=True,
+        null=True,
     )
 
     notes = models.TextField(

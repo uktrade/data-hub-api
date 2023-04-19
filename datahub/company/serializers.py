@@ -1194,11 +1194,18 @@ class CompanyExportSerializer(serializers.ModelSerializer):
 
     company = NestedRelatedField(Company)
     owner = NestedRelatedField(Advisor)
-    team_members = NestedRelatedField(Advisor, many=True)
+    team_members = NestedRelatedField(
+        Advisor,
+        many=True,
+        required=False,
+    )
     contacts = NestedRelatedField(Contact, many=True)
     destination_country = NestedRelatedField(meta_models.Country)
     sector = NestedRelatedField(meta_models.Sector)
-    exporter_experience = NestedRelatedField(ExportExperience)
+    exporter_experience = NestedRelatedField(
+        ExportExperience,
+        required=False,
+    )
     estimated_export_value_years = NestedRelatedField(ExportYear)
 
     def validate_team_members(self, value):
