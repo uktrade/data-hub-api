@@ -76,11 +76,9 @@ class TestAddExport(APITestMixin):
         assert response.json() == {
             'company': ['This field is required.'],
             'owner': ['This field is required.'],
-            'team_members': ['This field is required.'],
             'contacts': ['This field is required.'],
             'destination_country': ['This field is required.'],
             'sector': ['This field is required.'],
-            'exporter_experience': ['This field is required.'],
             'estimated_export_value_years': ['This field is required.'],
             'title': ['This field is required.'],
             'estimated_export_value_amount': ['This field is required.'],
@@ -356,9 +354,12 @@ class TestExportFilters(APITestMixin):
         ExportFactory(status=CompanyExport.ExportStatus.WON)
 
         url = reverse('api-v4:export:collection')
-        response = self.api_client.get(url, {
-            'status': CompanyExport.ExportStatus.WON,
-        })
+        response = self.api_client.get(
+            url,
+            {
+                'status': CompanyExport.ExportStatus.WON,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -372,9 +373,12 @@ class TestExportFilters(APITestMixin):
         ExportFactory(export_potential=CompanyExport.ExportPotential.LOW)
 
         url = reverse('api-v4:export:collection')
-        response = self.api_client.get(url, {
-            'export_potential': CompanyExport.ExportPotential.LOW,
-        })
+        response = self.api_client.get(
+            url,
+            {
+                'export_potential': CompanyExport.ExportPotential.LOW,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -392,9 +396,12 @@ class TestExportFilters(APITestMixin):
         ExportFactory(sector=sector3)
 
         url = reverse('api-v4:export:collection')
-        response = self.api_client.get(url, {
-            'sector': str(sector3.pk),
-        })
+        response = self.api_client.get(
+            url,
+            {
+                'sector': str(sector3.pk),
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -412,9 +419,12 @@ class TestExportFilters(APITestMixin):
         ExportFactory(destination_country=country3)
 
         url = reverse('api-v4:export:collection')
-        response = self.api_client.get(url, {
-            'destination_country': str(country3.pk),
-        })
+        response = self.api_client.get(
+            url,
+            {
+                'destination_country': str(country3.pk),
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -427,22 +437,31 @@ class TestExportFilters(APITestMixin):
         team_member_2 = AdviserFactory()
         team_member_3 = AdviserFactory()
 
-        ExportFactory(team_members=[
-            team_member_1,
-        ])
+        ExportFactory(
+            team_members=[
+                team_member_1,
+            ],
+        )
 
-        ExportFactory(team_members=[
-            team_member_2,
-        ])
+        ExportFactory(
+            team_members=[
+                team_member_2,
+            ],
+        )
 
-        ExportFactory(team_members=[
-            team_member_3,
-        ])
+        ExportFactory(
+            team_members=[
+                team_member_3,
+            ],
+        )
 
         url = reverse('api-v4:export:collection')
-        response = self.api_client.get(url, {
-            'team_members': team_member_1.id,
-        })
+        response = self.api_client.get(
+            url,
+            {
+                'team_members': team_member_1.id,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
