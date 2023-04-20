@@ -1,7 +1,6 @@
 import logging
 from datetime import date, datetime
 from unittest import mock
-from uuid import uuid4
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -41,7 +40,7 @@ def deactivateable_adviser(**kwargs):
     in tests
     """
     return AdviserFactory(**{
-        'sso_user_id': None,
+        'sso_email_user_id': None,
         'date_joined': date.today() - relativedelta(years=2, days=1),
         'is_active': True,
         **kwargs,
@@ -181,17 +180,18 @@ class TestAdviserDeactivateTask:
                 assert adviser2.is_active is False
                 assert adviser3.is_active is True
 
-    def test_adviser_with_sso_id_does_not_dectivate(self):
+    def test_adviser_with_sso_email_id_does_not_deactivate(self):
         """
-        Test adviser with an SSO ID does not deactivate
+        Test adviser with an SSO user email ID does not deactivate if it has
+        logged in within the last 2 years
 
         The plan would be to have logic to properly deactivate these, but since
         we don't have this logic for now, we test that we don't deactivate these
         """
         with freeze_time('2017-02-21'):
             adviser1 = deactivateable_adviser()
-            adviser2 = deactivateable_adviser(sso_user_id=None)
-            adviser3 = deactivateable_adviser(sso_user_id=uuid4())
+            adviser2 = deactivateable_adviser(sso_email_user_id=None)
+            adviser3 = deactivateable_adviser(sso_email_user_id='foo@bar.com')
             assert adviser1.is_active is True
             assert adviser2.is_active is True
             assert adviser3.is_active is True
