@@ -36,6 +36,7 @@ class AdviserFactory(factory.django.DjangoModelFactory):
     telephone_number = factory.Faker('phone_number')
     date_joined = now()
     sso_user_id = factory.LazyFunction(uuid.uuid4)
+    sso_email_user_id = email
 
     class Meta:
         model = 'company.Advisor'

@@ -121,7 +121,7 @@ def _automatic_adviser_deactivate(limit=1000, simulate=False):
         )),
         date_joined__lt=two_years_ago,
         is_active=True,
-        sso_user_id__isnull=True,
+        sso_email_user_id__isnull=True,
     )[:limit]
 
     for adviser in advisers_to_be_deactivated:
