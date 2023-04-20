@@ -644,11 +644,11 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
         'sector',
         'status',
         'team_members',
+        'archived',
     ]
     ordering_fields = (
         'created_on',
         'title',
-
     )
     ordering = (
         '-created_on',
