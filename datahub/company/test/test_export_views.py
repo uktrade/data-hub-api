@@ -469,6 +469,36 @@ class TestExportFilters(APITestMixin):
         assert response_data['count'] == 1
         assert response_data['results'][0]['team_members'][0]['id'] == str(team_member_1.id)
 
+    def test_filtered_by_archived(self):
+        """List of exports filtered by archive value"""
+        archived = ExportFactory(archived=True)
+        not_archived = ExportFactory(archived=False)
+
+        url = reverse('api-v4:export:collection')
+        archived_response = self.api_client.get(
+            url,
+            {
+                'archived': True,
+            },
+        )
+        assert archived_response.status_code == status.HTTP_200_OK
+        response_data = archived_response.json()
+
+        assert response_data['count'] == 1
+        assert response_data['results'][0]['id'] == str(archived.id)
+
+        not_archived_response = self.api_client.get(
+            url,
+            {
+                'archived': False,
+            },
+        )
+        assert not_archived_response.status_code == status.HTTP_200_OK
+        response_data = not_archived_response.json()
+
+        assert response_data['count'] == 1
+        assert response_data['results'][0]['id'] == str(not_archived.id)
+
 
 class TestExportSortBy(APITestMixin):
     """Test the sorting on the GET export endpoint"""
