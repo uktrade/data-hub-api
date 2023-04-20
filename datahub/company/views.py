@@ -654,3 +654,15 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
         '-created_on',
         'title',
     )
+
+    def get_queryset(self):
+        """Filter the queryset to the authenticated user"""
+
+        if self.action == 'list':
+            return (
+                super()
+                .get_queryset()
+                .filter(Q(owner=self.request.user) | Q(team_members=self.request.user))
+            )
+
+        return super().get_queryset()
