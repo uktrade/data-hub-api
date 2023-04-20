@@ -25,7 +25,9 @@ logger = logging.getLogger(__name__)
 
 def _automatic_adviser_deactivate(limit=1000, simulate=False):
     two_years_ago = date.today() - relativedelta(years=2)
+    six_months_ago = date.today() - relativedelta(months=6)
     advisers_to_be_deactivated = Advisor.objects.filter(
+        Q(last_login__lt=six_months_ago) | Q(last_login__isnull=True),
         ~Exists(Interaction.objects.filter(
             (
                 Q(date__gte=two_years_ago)
