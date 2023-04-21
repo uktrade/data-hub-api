@@ -657,7 +657,6 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
 
     def get_queryset(self):
         """Filter the queryset to the authenticated user"""
-
         if self.action == 'list':
             return (
                 super()

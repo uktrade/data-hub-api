@@ -238,7 +238,11 @@ class TestListExport(APITestMixin):
         ),
     )
     def test_list_request_user_is_owner_user_is_a_team_member_with_pagination_success(
-        self, batch_size, offset, limit, expected_count
+        self,
+        batch_size,
+        offset,
+        limit,
+        expected_count,
     ):
         """
         Test a request with pagination criteria returns expected export results
