@@ -661,7 +661,7 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
             return (
                 super()
                 .get_queryset()
-                .filter(Q(owner=self.request.user) | Q(team_members=self.request.user))
+                .exclude(~Q(owner=self.request.user), ~Q(team_members=self.request.user))
             )
 
         return super().get_queryset()
