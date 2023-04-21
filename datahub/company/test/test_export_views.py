@@ -214,7 +214,13 @@ class TestListExport(APITestMixin):
         self,
     ):
         """Test a GET with an unknown export id returns a not found error"""
-        export = ExportFactory(owner=AdviserFactory(), team_members=[self.user])
+        export = ExportFactory(
+            owner=AdviserFactory(),
+            team_members=[
+                self.user,
+                AdviserFactory(),
+            ],
+        )
         self._assert_export_list_success(export)
 
     def test_list_export_request_user_is_owner_user_not_a_team_member_returns_success_with_results(
