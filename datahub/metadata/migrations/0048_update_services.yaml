@@ -1,0 +1,26 @@
+#Trade Agreement Interaction Services
+- model: metadata.service
+  pk: f2187053-52b3-4900-a393-89ca86724323
+  fields:
+    disabled_on:
+    order: 13300.0
+    segment: GREAT - Unicorn Kingdom Campaign - North America (2023)
+    parent: fee6779d-e127-4e1e-89f6-d614b4df3581
+    contexts: ["trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 1
+#Investment Interaction Services
+- model: metadata.service
+  pk: bf3216fe-0369-4ec1-852b-b58cf06c04fa
+  fields:
+    disabled_on:
+    order: 231.0
+    segment: GREAT - Unicorn Kingdom Campaign - North America (2023)
+    parent: dfc1577f-217c-49a7-987d-a6f8a1c61698
+    contexts: ["investment_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
