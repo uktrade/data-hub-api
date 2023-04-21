@@ -193,16 +193,47 @@ class TestGetExport(APITestMixin):
 class TestListExport(APITestMixin):
     """Test the LIST export endpoint"""
 
-    def test_list_without_pagination_success(self):
-        """
-        Test a request without any pagination criteria returns all stored exports in the response
-        """
-        ExportFactory.create_batch(20)
+    def _assert_export_list_success(self, export):
         url = reverse('api-v4:export:collection')
-        response = self.api_client.get(url)
 
+        response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == 20
+        assert response.json()['count'] == 1
+        assert response.json()['results'][0]['id'] == str(export.id)
+
+    def test_list_export_request_user_not_owner_user_not_team_member_returns_empty_results(self):
+        """Test a GET with an unknown export id returns a not found error"""
+        ExportFactory(owner=AdviserFactory(), team_members=[AdviserFactory()])
+        url = reverse('api-v4:export:collection')
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['count'] == 0
+
+    def test_list_export_request_user_not_owner_user_is_a_team_member_returns_success_with_results(
+        self,
+    ):
+        """Test a GET with an unknown export id returns a not found error"""
+        export = ExportFactory(
+            owner=AdviserFactory(),
+            team_members=[
+                self.user,
+                AdviserFactory(),
+            ],
+        )
+        self._assert_export_list_success(export)
+
+    def test_list_export_request_user_is_owner_user_not_a_team_member_returns_success_with_results(
+        self,
+    ):
+        """Test a GET with an unknown export id returns a not found error"""
+        export = ExportFactory(owner=self.user, team_members=[AdviserFactory()])
+        self._assert_export_list_success(export)
+
+    def test_get_export_request_user_is_owner_user_is_a_team_member_returns_success(self):
+        """Test a GET with an unknown export id returns a not found error"""
+        export = ExportFactory(owner=self.user, team_members=[self.user])
+        self._assert_export_list_success(export)
 
     @pytest.mark.parametrize(
         'batch_size,offset,limit,expected_count',
@@ -212,11 +243,17 @@ class TestListExport(APITestMixin):
             (2, 2, 1, 0),
         ),
     )
-    def test_list_with_pagination_success(self, batch_size, offset, limit, expected_count):
+    def test_list_request_user_is_owner_user_is_a_team_member_with_pagination_success(
+        self,
+        batch_size,
+        offset,
+        limit,
+        expected_count,
+    ):
         """
         Test a request with pagination criteria returns expected export results
         """
-        ExportFactory.create_batch(batch_size)
+        ExportFactory.create_batch(batch_size, owner=self.user, team_members=[self.user])
 
         url = reverse('api-v4:export:collection')
         response = self.api_client.get(
@@ -349,9 +386,18 @@ class TestExportFilters(APITestMixin):
 
     def test_filtered_by_status(self):
         """List of exports filtered by status."""
-        ExportFactory(status=CompanyExport.ExportStatus.ACTIVE)
-        ExportFactory(status=CompanyExport.ExportStatus.INACTIVE)
-        ExportFactory(status=CompanyExport.ExportStatus.WON)
+        ExportFactory(
+            status=CompanyExport.ExportStatus.ACTIVE,
+            owner=self.user,
+        )
+        ExportFactory(
+            status=CompanyExport.ExportStatus.INACTIVE,
+            owner=self.user,
+        )
+        ExportFactory(
+            status=CompanyExport.ExportStatus.WON,
+            owner=self.user,
+        )
 
         url = reverse('api-v4:export:collection')
         response = self.api_client.get(
@@ -368,9 +414,18 @@ class TestExportFilters(APITestMixin):
 
     def test_filtered_by_export_potential(self):
         """List of exports filtered by export potential."""
-        ExportFactory(export_potential=CompanyExport.ExportPotential.HIGH)
-        ExportFactory(export_potential=CompanyExport.ExportPotential.MEDIUM)
-        ExportFactory(export_potential=CompanyExport.ExportPotential.LOW)
+        ExportFactory(
+            export_potential=CompanyExport.ExportPotential.HIGH,
+            owner=self.user,
+        )
+        ExportFactory(
+            export_potential=CompanyExport.ExportPotential.MEDIUM,
+            owner=self.user,
+        )
+        ExportFactory(
+            export_potential=CompanyExport.ExportPotential.LOW,
+            owner=self.user,
+        )
 
         url = reverse('api-v4:export:collection')
         response = self.api_client.get(
@@ -391,9 +446,18 @@ class TestExportFilters(APITestMixin):
         sector2 = SectorFactory()
         sector3 = SectorFactory()
 
-        ExportFactory(sector=sector1)
-        ExportFactory(sector=sector2)
-        ExportFactory(sector=sector3)
+        ExportFactory(
+            sector=sector1,
+            owner=self.user,
+        )
+        ExportFactory(
+            sector=sector2,
+            owner=self.user,
+        )
+        ExportFactory(
+            sector=sector3,
+            owner=self.user,
+        )
 
         url = reverse('api-v4:export:collection')
         response = self.api_client.get(
@@ -414,9 +478,18 @@ class TestExportFilters(APITestMixin):
         country2 = CountryFactory()
         country3 = CountryFactory()
 
-        ExportFactory(destination_country=country1)
-        ExportFactory(destination_country=country2)
-        ExportFactory(destination_country=country3)
+        ExportFactory(
+            destination_country=country1,
+            owner=self.user,
+        )
+        ExportFactory(
+            destination_country=country2,
+            owner=self.user,
+        )
+        ExportFactory(
+            destination_country=country3,
+            owner=self.user,
+        )
 
         url = reverse('api-v4:export:collection')
         response = self.api_client.get(
@@ -441,18 +514,21 @@ class TestExportFilters(APITestMixin):
             team_members=[
                 team_member_1,
             ],
+            owner=self.user,
         )
 
         ExportFactory(
             team_members=[
                 team_member_2,
             ],
+            owner=self.user,
         )
 
         ExportFactory(
             team_members=[
                 team_member_3,
             ],
+            owner=self.user,
         )
 
         url = reverse('api-v4:export:collection')
@@ -471,8 +547,14 @@ class TestExportFilters(APITestMixin):
 
     def test_filtered_by_archived(self):
         """List of exports filtered by archive value"""
-        archived = ExportFactory(archived=True)
-        not_archived = ExportFactory(archived=False)
+        archived = ExportFactory(
+            archived=True,
+            owner=self.user,
+        )
+        not_archived = ExportFactory(
+            archived=False,
+            owner=self.user,
+        )
 
         url = reverse('api-v4:export:collection')
         archived_response = self.api_client.get(
@@ -526,9 +608,18 @@ class TestExportSortBy(APITestMixin):
     )
     def test_sort_by_export_title(self, data, results):
         """Test sort by title (ascending)"""
-        ExportFactory(title='Title C')
-        ExportFactory(title='Title A')
-        ExportFactory(title='Title B')
+        ExportFactory(
+            title='Title C',
+            owner=self.user,
+        )
+        ExportFactory(
+            title='Title A',
+            owner=self.user,
+        )
+        ExportFactory(
+            title='Title B',
+            owner=self.user,
+        )
 
         url = reverse('api-v4:export:collection')
         response = self.api_client.get(url, data)
