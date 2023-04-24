@@ -48,7 +48,7 @@ class AdviserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-@reversion.register_base_model(extra_exclude=('last_login',))
+@reversion.register_base_model()
 class Advisor(AbstractBaseUser, PermissionsMixin):
     """Adviser model.
 

@@ -42,6 +42,7 @@ def deactivateable_adviser(**kwargs):
     return AdviserFactory(**{
         'sso_email_user_id': None,
         'date_joined': date.today() - relativedelta(years=2, days=1),
+        'last_login': date.today() - relativedelta(months=6, days=1),
         'is_active': True,
         **kwargs,
     })
@@ -191,10 +192,15 @@ class TestAdviserDeactivateTask:
         with freeze_time('2017-02-21'):
             adviser1 = deactivateable_adviser()
             adviser2 = deactivateable_adviser(sso_email_user_id=None)
-            adviser3 = deactivateable_adviser(sso_email_user_id='foo@bar.com')
+            adviser3 = deactivateable_adviser(last_login=None)
+            adviser4 = deactivateable_adviser(
+                sso_email_user_id='foo@bar.com',
+                last_login=date.today() - relativedelta(months=3),
+            )
             assert adviser1.is_active is True
             assert adviser2.is_active is True
             assert adviser3.is_active is True
+            assert adviser4.is_active is True
 
             # run task twice expecting same result
             for _ in range(2):
@@ -203,9 +209,11 @@ class TestAdviserDeactivateTask:
                 adviser1.refresh_from_db()
                 adviser2.refresh_from_db()
                 adviser3.refresh_from_db()
+                adviser4.refresh_from_db()
                 assert adviser1.is_active is False
                 assert adviser2.is_active is False
-                assert adviser3.is_active is True
+                assert adviser3.is_active is False
+                assert adviser4.is_active is True
 
     @pytest.mark.parametrize(
         'factory, attribute_name',
