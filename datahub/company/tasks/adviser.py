@@ -2,6 +2,8 @@ import logging
 
 from datetime import date
 
+import reversion
+
 from dateutil.relativedelta import relativedelta
 
 from django.db.models import Exists, OuterRef, Q
@@ -127,13 +129,15 @@ def _automatic_adviser_deactivate(limit=1000, simulate=False):
     )[:limit]
 
     for adviser in advisers_to_be_deactivated:
-        message = f'Automatically de-activate adviser: {adviser.id}'
-        if simulate:
-            logger.info(f'[SIMULATION] {message}')
-            continue
-        adviser.is_active = False
-        adviser.save(update_fields=['is_active'])
-        logger.info(message)
+        with reversion.create_revision():
+            message = f'Automatically de-activate adviser: {adviser.id}'
+            if simulate:
+                logger.info(f'[SIMULATION] {message}')
+                continue
+            adviser.is_active = False
+            adviser.save(update_fields=['is_active'])
+            logger.info(message)
+            reversion.set_comment('Automated deactivated adviser.')
 
     return advisers_to_be_deactivated.count()
 
