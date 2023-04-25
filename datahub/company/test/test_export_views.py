@@ -193,16 +193,19 @@ class TestGetExport(APITestMixin):
 class TestListExport(APITestMixin):
     """Test the LIST export endpoint"""
 
-    def _assert_export_list_success(self, export):
+    def _assert_export_list_success(self, exports, count=1):
         url = reverse('api-v4:export:collection')
-
         response = self.api_client.get(url)
+
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['count'] == 1
-        assert response.json()['results'][0]['id'] == str(export.id)
+        assert response.json()['count'] == count
+
+        export_ids = list(map(lambda export: str(export.id), exports))
+        for result in response.json()['results']:
+            assert result['id'] in export_ids
 
     def test_list_export_request_user_not_owner_user_not_team_member_returns_empty_results(self):
-        """Test a GET with an unknown export id returns a not found error"""
+        """Test a LIST with an unknown export id returns a not found error"""
         ExportFactory(owner=AdviserFactory(), team_members=[AdviserFactory()])
         url = reverse('api-v4:export:collection')
 
@@ -213,7 +216,10 @@ class TestListExport(APITestMixin):
     def test_list_export_request_user_not_owner_user_is_a_team_member_returns_success_with_results(
         self,
     ):
-        """Test a GET with an unknown export id returns a not found error"""
+        """
+        Test a LIST with an export that has the current user as a team member returns only that
+        item
+        """
         export = ExportFactory(
             owner=AdviserFactory(),
             team_members=[
@@ -221,19 +227,71 @@ class TestListExport(APITestMixin):
                 AdviserFactory(),
             ],
         )
-        self._assert_export_list_success(export)
+        ExportFactory.create_batch(2)
+        self._assert_export_list_success([export])
 
     def test_list_export_request_user_is_owner_user_not_a_team_member_returns_success_with_results(
         self,
     ):
-        """Test a GET with an unknown export id returns a not found error"""
+        """
+        Test a LIST with an export that has the current user as the owner returns only that
+        item
+        """
         export = ExportFactory(owner=self.user, team_members=[AdviserFactory()])
-        self._assert_export_list_success(export)
+        ExportFactory.create_batch(2)
+        self._assert_export_list_success([export])
 
-    def test_get_export_request_user_is_owner_user_is_a_team_member_returns_success(self):
-        """Test a GET with an unknown export id returns a not found error"""
-        export = ExportFactory(owner=self.user, team_members=[self.user])
-        self._assert_export_list_success(export)
+    def test_list_export_request_user_is_owner_user_is_a_team_member_returns_success(self):
+        """
+        Test a LIST with an export that has the current user as the owner and a team member
+        returns only that item
+        """
+        export = ExportFactory(
+            owner=self.user,
+            team_members=[
+                self.user,
+                AdviserFactory(),
+            ],
+        )
+        ExportFactory.create_batch(2)
+        self._assert_export_list_success([export])
+
+    def test_list_multiple_exports_request_user_is_owner_user_is_a_team_member_returns_success(
+        self,
+    ):
+        """
+        Test a LIST with a combination of exports where the current user is the owner, team member
+        and both returns only those items
+        """
+        export_owner_only = ExportFactory(
+            owner=self.user,
+            team_members=[
+                AdviserFactory(),
+            ],
+        )
+        export_team_member_only = ExportFactory(
+            owner=AdviserFactory(),
+            team_members=[
+                self.user,
+                AdviserFactory(),
+            ],
+        )
+        export_owner_team_member = ExportFactory(
+            owner=self.user,
+            team_members=[
+                self.user,
+                AdviserFactory(),
+            ],
+        )
+        ExportFactory.create_batch(2)
+        self._assert_export_list_success(
+            [
+                export_owner_only,
+                export_team_member_only,
+                export_owner_team_member,
+            ],
+            3,
+        )
 
     @pytest.mark.parametrize(
         'batch_size,offset,limit,expected_count',
