@@ -1206,7 +1206,10 @@ class CompanyExportSerializer(serializers.ModelSerializer):
         ExportExperience,
         required=False,
     )
+    estimated_win_date = serializers.DateTimeField()
+    estimated_export_value_amount = serializers.DecimalField(max_digits=19, decimal_places=0)
     estimated_export_value_years = NestedRelatedField(ExportYear)
+    export_potential = serializers.CharField()
 
     def validate_team_members(self, value):
         """Validate the value provided for the team_members field"""
