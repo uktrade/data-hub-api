@@ -62,30 +62,35 @@ class CompanyExport(ArchivableModel, BaseModel):
         ExportYear,
         on_delete=models.PROTECT,
         related_name='+',
+        null=True,
     )
 
     estimated_export_value_amount = models.DecimalField(
         max_digits=19,
         decimal_places=0,
+        null=True,
     )
 
-    estimated_win_date = models.DateTimeField()
+    estimated_win_date = models.DateTimeField(null=True, blank=True)
 
     destination_country = models.ForeignKey(
         metadata_models.Country,
         on_delete=models.PROTECT,
         related_name='+',
+        null=True,
     )
 
     sector = models.ForeignKey(
         metadata_models.Sector,
         on_delete=models.PROTECT,
         related_name='+',
+        null=True,
     )
 
     export_potential = models.CharField(
         max_length=MAX_LENGTH,
         choices=ExportPotential.choices,
+        blank=True,
     )
 
     status = models.CharField(
@@ -97,6 +102,7 @@ class CompanyExport(ArchivableModel, BaseModel):
     contacts = models.ManyToManyField(
         Contact,
         related_name='contact_exports',
+        blank=True,
     )
 
     exporter_experience = models.ForeignKey(
