@@ -10,7 +10,7 @@ aiosignal==1.3.1
     # via aiohttp
 asgiref==3.6.0
     # via django
-astroid==2.15.2
+astroid==2.15.4
     # via pylint
 asttokens==2.2.1
     # via stack-data
@@ -259,7 +259,7 @@ pygments==2.13.0
     # via ipython
 pyjwt==2.6.0
     # via notifications-python-client
-pylint==2.17.2
+pylint==2.17.3
     # via
     #   -r requirements-dev.in
     #   pylint-django
