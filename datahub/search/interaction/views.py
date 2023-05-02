@@ -27,7 +27,7 @@ class SearchInteractionAPIViewMixin:
     serializer_class = SearchInteractionQuerySerializer
     es_sort_by_remappings = {
         'company.name': 'company.name.keyword',
-        'subject': 'subject',
+        'subject': 'subject.keyword',
     }
     fields_to_exclude = (
         'export_countries',
@@ -54,7 +54,6 @@ class SearchInteractionAPIViewMixin:
     )
     REMAP_FIELDS = {
         'company': 'company.id',
-        # 'subject.english': 'subject',
         'company_one_list_group_tier': 'company_one_list_group_tier.id',
         'dit_participants__adviser': 'dit_participants.adviser.id',
         'dit_participants__team': 'dit_participants.team.id',
