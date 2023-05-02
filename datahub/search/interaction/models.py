@@ -147,7 +147,7 @@ class Interaction(BaseSearchModel):
         'service.name.trigram',
         'subject',
         'subject.trigram',
-        'subject.english'
+        'subject.english',
         'dit_participants.adviser.name',
         'dit_participants.adviser.name.trigram',
         'dit_participants.team.name',
