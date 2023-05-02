@@ -1,0 +1,26 @@
+#New Trade Agreement Interaction Service Options
+- model: metadata.service
+  pk: 2cccf99b-717c-42e7-94a1-2c10f08cbf29
+  fields:
+    disabled_on:
+    order: 544.0
+    segment: GREAT - Unicorn Kingdom Campaign - North America - Trade Agreement - (2023)
+    parent:
+    contexts: ["event", "trade_agreement_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
+#New Investment Interaction Service Options
+- model: metadata.service
+  pk: f60111aa-ce49-4505-b211-40fface0e785
+  fields:
+    disabled_on:
+    order: 554.0
+    segment: GREAT - Unicorn Kingdom Campaign - North America - Investment - (2023)
+    parent:
+    contexts: ["event", "investment_interaction", "investment_project_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
