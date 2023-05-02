@@ -99,6 +99,8 @@ class Interaction(BaseSearchModel):
     subject = fields.NormalizedKeyword(
         fields={
             'english': fields.EnglishText(),
+            # 'keyword': fields.NormalizedKeyword(),
+            # 'trigram': fields.TrigramText(),
         },
     )
     was_policy_feedback_provided = Boolean()
@@ -143,7 +145,8 @@ class Interaction(BaseSearchModel):
         'event.name.trigram',
         'service.name',
         'service.name.trigram',
-        'subject.english',
+        'subject',
+        'subject.trigram',
         'dit_participants.adviser.name',
         'dit_participants.adviser.name.trigram',
         'dit_participants.team.name',

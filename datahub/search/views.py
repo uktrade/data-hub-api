@@ -2,6 +2,7 @@
 from collections import namedtuple
 from enum import auto, Enum
 from itertools import islice
+from pprint import pprint
 
 from django.conf import settings
 from django.utils.text import capfirst
@@ -113,7 +114,6 @@ class SearchBasicAPIView(APIView):
         'export_countries',
         'were_countries_discussed',
     )
-
     def get(self, request, format=None):
         """Performs basic search."""
         serializer = BasicSearchQuerySerializer(data=request.query_params)
@@ -200,6 +200,7 @@ class SearchAPIView(APIView):
 
     def validate_data(self, data):
         """Validate and clean data."""
+        pprint(data)
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
         return serializer.validated_data
@@ -210,7 +211,12 @@ class SearchAPIView(APIView):
         entities = self.get_entities()
         permission_filters = self.search_app.get_permission_filters(request)
         ordering = _map_opensearch_ordering(validated_data['sortby'], self.es_sort_by_remappings)
-
+        pprint("-----------")
+        pprint(request.__dict__)
+        pprint("-----------")
+        pprint(filter_data)
+        pprint("----------- validated data")
+        pprint(validated_data)
         fields_to_exclude = (
             *SHARED_FIELDS_TO_EXCLUDE,
             *(self.fields_to_exclude or ()),
