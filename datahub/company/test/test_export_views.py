@@ -603,6 +603,33 @@ class TestExportFilters(APITestMixin):
         assert response_data['count'] == 1
         assert response_data['results'][0]['team_members'][0]['id'] == str(team_member_1.id)
 
+    def test_filtered_by_other_owner(self):
+        """List of exports filtered by other owner"""
+        other_owner = AdviserFactory()
+
+        ExportFactory(
+            owner=self.user,
+        )
+
+        ExportFactory(
+            owner=other_owner,
+            team_members=[self.user],
+        )
+
+        url = reverse('api-v4:export:collection')
+        response = self.api_client.get(
+            url,
+            {
+                'owner': other_owner.id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        assert response_data['count'] == 1
+        assert response_data['results'][0]['owner']['id'] == str(other_owner.id)
+
     def test_filtered_by_archived(self):
         """List of exports filtered by archive value"""
         archived = ExportFactory(
