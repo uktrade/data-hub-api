@@ -639,12 +639,13 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
         OrderingFilter,
     )
     filterset_fields = [
+        'archived',
         'destination_country',
         'export_potential',
+        'owner',
         'sector',
         'status',
         'team_members',
-        'archived',
     ]
     ordering_fields = (
         'created_on',
