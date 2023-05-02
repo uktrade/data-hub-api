@@ -96,9 +96,11 @@ class Interaction(BaseSearchModel):
     policy_issue_types = fields.id_unindexed_name_field()
     service = fields.id_name_partial_field()
     service_delivery_status = fields.id_unindexed_name_field()
-    subject = fields.NormalizedKeyword(
+    subject = Text(
         fields={
             'english': fields.EnglishText(),
+            'keyword': fields.NormalizedKeyword(),
+            'trigram': fields.TrigramText(),
         },
     )
     was_policy_feedback_provided = Boolean()
@@ -143,7 +145,9 @@ class Interaction(BaseSearchModel):
         'event.name.trigram',
         'service.name',
         'service.name.trigram',
-        'subject.english',
+        'subject',
+        'subject.trigram',
+        'subject.english'
         'dit_participants.adviser.name',
         'dit_participants.adviser.name.trigram',
         'dit_participants.team.name',
