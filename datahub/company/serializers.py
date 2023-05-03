@@ -1193,7 +1193,7 @@ class CompanyExportSerializer(serializers.ModelSerializer):
     """Company Export serializer"""
 
     company = NestedRelatedField(Company)
-    owner = NestedRelatedField(Advisor)
+    owner = NestedAdviserWithTeamField()
     team_members = NestedRelatedField(
         Advisor,
         many=True,

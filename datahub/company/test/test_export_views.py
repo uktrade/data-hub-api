@@ -176,6 +176,12 @@ class TestGetExport(APITestMixin):
             'owner': {
                 'id': str(export.owner.id),
                 'name': export.owner.name,
+                'first_name': export.owner.first_name,
+                'last_name': export.owner.last_name,
+                'dit_team': {
+                    'id': str(export.owner.dit_team.id),
+                    'name': export.owner.dit_team.name,
+                },
             },
             'sector': {
                 'id': str(export.sector.id),
@@ -399,6 +405,12 @@ class TestPatchExport(APITestMixin):
                 'owner': {
                     'id': str(export.owner.id),
                     'name': export.owner.name,
+                    'first_name': export.owner.first_name,
+                    'last_name': export.owner.last_name,
+                    'dit_team': {
+                        'id': str(export.owner.dit_team.id),
+                        'name': export.owner.dit_team.name,
+                    },
                 },
                 'sector': {
                     'id': str(export.sector.id),
