@@ -355,7 +355,7 @@ slackclient==2.9.4
     # via -r requirements.in
 snowballstemmer==2.2.0
     # via pydocstyle
-sqlparse==0.4.3
+sqlparse==0.4.4
     # via
     #   django
     #   django-debug-toolbar
