@@ -25,15 +25,16 @@ class SearchInteractionAPIViewMixin:
     serializer_class = SearchInteractionQuerySerializer
     es_sort_by_remappings = {
         'company.name': 'company.name.keyword',
+        'subject': 'subject.keyword',
     }
     fields_to_exclude = (
         'export_countries',
         'were_countries_discussed',
     )
-
     FILTER_FIELDS = (
         'kind',
         'company',
+        'subject',
         'company_name',
         'company_one_list_group_tier',
         'created_on_exists',
@@ -49,7 +50,6 @@ class SearchInteractionAPIViewMixin:
         'service',
         'was_policy_feedback_provided',
     )
-
     REMAP_FIELDS = {
         'company': 'company.id',
         'company_one_list_group_tier': 'company_one_list_group_tier.id',
@@ -74,6 +74,10 @@ class SearchInteractionAPIViewMixin:
             'company_sector.ancestors.id',
             'investment_project_sector.id',
             'investment_project_sector.ancestors.id',
+        ],
+        'subject': [
+            'subject',  # to find 2-letter words
+            'subject.trigram',
         ],
     }
 
