@@ -273,7 +273,7 @@ class ExportFactory(factory.django.DjangoModelFactory):
     owner = factory.SubFactory(AdviserFactory)
     estimated_export_value_years = factory.SubFactory(ExportYearFactory)
     estimated_export_value_amount = factory.fuzzy.FuzzyDecimal(1000, 100000, 0)
-    estimated_win_date = now()
+    estimated_win_date = now().date()
     destination_country = factory.SubFactory(CountryFactory)
     sector = factory.SubFactory(SectorFactory)
     exporter_experience = factory.SubFactory(ExportExperienceFactory)
