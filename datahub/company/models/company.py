@@ -196,7 +196,6 @@ class Company(ArchivableModel, BaseModel):
         null=True,
         blank=True,
         help_text='In USD. Only used when duns_number is set.',
-        validators=[MinValueValidator(0)],
     )
     is_turnover_estimated = models.BooleanField(
         null=True,
