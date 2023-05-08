@@ -332,7 +332,7 @@ rq==1.13.0
     # via
     #   -r requirements.in
     #   rq-scheduler
-rq-scheduler==0.13.0
+rq-scheduler==0.13.1
     # via -r requirements.in
 s3transfer==0.6.0
     # via boto3
