@@ -57,6 +57,6 @@ sentry_sdk==1.21.1
 
 # RQ and associated helpers
 rq==1.13.0
-rq-scheduler==0.13.0
+rq-scheduler==0.13.1
 
 python-redis-rate-limit==0.0.8
