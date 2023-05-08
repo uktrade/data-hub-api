@@ -160,7 +160,7 @@ requests==2.30.0
     #   notifications-python-client
     #   opensearch-py
     #   requests-toolbelt
-requests-toolbelt==0.10.1
+requests-toolbelt==1.0.0
     # via -r requirements.in
 rq==1.13.0
     # via
