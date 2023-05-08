@@ -328,7 +328,7 @@ requests-mock==1.10.0
     # via -r requirements-dev.in
 requests-toolbelt==1.0.0
     # via -r requirements.in
-rq==1.13.0
+rq==1.14.1
     # via
     #   -r requirements.in
     #   rq-scheduler
