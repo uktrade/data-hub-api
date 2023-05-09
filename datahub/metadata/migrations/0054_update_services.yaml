@@ -1,0 +1,72 @@
+- model: metadata.service
+  pk: 34f583c0-6ac8-4981-9954-859c0e568204
+  fields:
+    segment: Inbound investment referral
+- model: interaction.serviceansweroption
+  pk: eee5607c-db40-41f4-ba30-454302907f20
+  fields:
+    name: Banking and funding
+- model: interaction.serviceansweroption
+  pk: d7293a68-05a6-461b-911c-2f07b4306c1e
+  fields:
+    name: Banking and funding
+- model: interaction.serviceansweroption
+  pk: cec53078-ee99-4081-8c1c-c859e2d7fcfc
+  fields:
+    name: Banking and funding
+- model: interaction.serviceansweroption
+  pk: 4cff9ba9-ca8c-4777-89db-396066ec9d78
+  fields:
+    name: DBT or government services
+- model: interaction.serviceansweroption
+  pk: e5f83d7f-f696-4069-b649-a3e295b41046
+  fields:
+    name: DBT or government services
+- model: interaction.serviceansweroption
+  pk: fe449302-03b0-42b4-a882-1768a7d7c499
+  fields:
+    name: DBT or government services
+- model: interaction.serviceansweroption
+  pk: cf30f38c-5689-4b48-8851-8582df326c29
+  fields:
+    name: Documents and regulations
+- model: interaction.serviceansweroption
+  pk: 5c617b8d-e1cc-4725-b0c3-2867cc51b6f7
+  fields:
+    name: Documents and regulations
+- model: interaction.serviceansweroption
+  pk: 5b76db2c-8e41-45bc-811b-4e510bacce56
+  fields:
+    name: Markets and sectors
+- model: interaction.serviceansweroption
+  pk: 626890c4-214e-44fd-afc7-117abced123e
+  fields:
+    name: Markets and sectors
+- model: interaction.serviceansweroption
+  pk: 447d2a9f-ba21-4bc3-8eee-37f38531d2b5
+  fields:
+    name: Markets and sectors
+- model: interaction.serviceansweroption
+  pk: 9535dc21-f390-49af-93d9-afda956c7234
+  fields:
+    name: Marketing and communication
+- model: interaction.serviceansweroption
+  pk: 58917fa8-2823-417a-907b-a6f0e340e53a
+  fields:
+    name: Marketing and communication
+- model: interaction.serviceansweroption
+  pk: 4aa74c2f-de52-472d-9d99-70493ecf7194
+  fields:
+    name: Marketing and communication
+- model: interaction.serviceansweroption
+  pk: 01ed3464-3fcb-433a-b1e4-5da6ad656c3f
+  fields:
+    name: Skills and recruitment
+- model: interaction.serviceansweroption
+  pk: a1870be2-0905-46ad-ba75-ed103cbec7cc
+  fields:
+    name: Skills and recruitment
+- model: interaction.serviceansweroption
+  pk: 88c82233-046f-4d35-ac09-d92e8ab41425
+  fields:
+    name: Skills and recruitment
