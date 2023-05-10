@@ -1,7 +1,9 @@
+import datetime
 import uuid
 
 import pytest
 
+from dateutil.parser import parse
 from django.utils.timezone import now
 from faker import Faker
 from freezegun import freeze_time
@@ -641,6 +643,87 @@ class TestExportFilters(APITestMixin):
 
         assert response_data['count'] == 1
         assert response_data['results'][0]['owner']['id'] == str(other_owner.id)
+
+    @pytest.mark.parametrize(
+        'query,num_results',
+        (
+            (
+                {
+                    'estimated_win_date_before': '2023-08-01',
+                },
+                1,
+            ),
+            (
+                {
+                    'estimated_win_date_after': '2023-08-01',
+                },
+                3,
+            ),
+            (
+                {
+                    'estimated_win_date_after': '2023-08-01',
+                    'estimated_win_date_before': '2023-08-03',
+                },
+                3,
+            ),
+            (
+                {
+                    'estimated_win_date_after': '2023-08-03',
+                },
+                1,
+            ),
+            (
+                {
+                    'estimated_win_date_before': '2023-08-01',
+                    'estimated_win_date_after': '2023-08-03',
+                },
+                0,
+            ),
+        ),
+    )
+    def test_filtered_by_estimated_win_date(
+        self,
+        query,
+        num_results,
+    ):
+        """Tests estimated_win_date filter."""
+        ExportFactory(
+            owner=self.user,
+            estimated_win_date=datetime.date(2023, 8, 1),
+        )
+
+        ExportFactory(
+            owner=self.user,
+            estimated_win_date=datetime.date(2023, 8, 2),
+        )
+
+        ExportFactory(
+            owner=self.user,
+            estimated_win_date=datetime.date(2023, 8, 3),
+        )
+
+        ExportFactory.create_batch(2)
+
+        url = reverse('api-v4:export:collection')
+
+        response = self.api_client.get(
+            url,
+            data=query,
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == num_results
+        results = response.data['results']
+        assert len(results) == num_results
+
+        for result in results:
+            estimated_win_date = parse(result['estimated_win_date'])
+            for filter_key, date in query.items():
+                date = parse(date)
+                if filter_key == 'estimated_win_date_before':
+                    assert estimated_win_date <= date
+                if filter_key == 'estimated_win_date_after':
+                    assert estimated_win_date >= date
 
     def test_filtered_by_archived(self):
         """List of exports filtered by archive value"""
