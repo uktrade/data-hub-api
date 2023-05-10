@@ -71,7 +71,7 @@ class CompanyExport(ArchivableModel, BaseModel):
         null=True,
     )
 
-    estimated_win_date = models.DateTimeField(null=True, blank=True)
+    estimated_win_date = models.DateField(null=True, blank=True)
 
     destination_country = models.ForeignKey(
         metadata_models.Country,
