@@ -42,7 +42,7 @@ class TestAddExport(APITestMixin):
         title = Faker().word()
         export_value = 24
         export_experience = ExportExperienceFactory()
-        estimated_win_date = now()
+        estimated_win_date = now().date()
         estimated_export_years = ExportYearFactory()
 
         return {
