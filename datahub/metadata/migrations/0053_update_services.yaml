@@ -418,6 +418,10 @@
   pk: 81408b2e-a22e-4901-8d3a-b981bf5592ff
   fields:
     segment: Partner country interaction - related to Market Access Barriers
+- model: metadata.service
+  pk: 9984b82b-3499-e211-a939-e4115bead28a
+  fields:
+    segment: Inbound export referral
 - model: interaction.serviceansweroption
   pk: a5ba5f67-619f-4c27-a92c-5db1a229060e
   fields:
