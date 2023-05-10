@@ -5,7 +5,12 @@ from django.http import (
     Http404,
     JsonResponse,
 )
-from django_filters.rest_framework import CharFilter, DjangoFilterBackend, FilterSet
+from django_filters.rest_framework import (
+    CharFilter,
+    DateFromToRangeFilter,
+    DjangoFilterBackend,
+    FilterSet,
+)
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
@@ -621,6 +626,25 @@ class ExportWinsForCompanyView(APIView):
         return JsonResponse(export_wins_results.json())
 
 
+class CompanyExportEstimatedWinDateFilterSet(FilterSet):
+    """CompanyExport estimated win date filter."""
+
+    estimated_win_date = DateFromToRangeFilter(field_name='estimated_win_date')
+
+    class Meta:
+        model = CompanyExport
+        fields = [
+            'archived',
+            'destination_country',
+            'estimated_win_date',
+            'export_potential',
+            'owner',
+            'sector',
+            'status',
+            'team_members',
+        ]
+
+
 class CompanyExportViewSet(SoftDeleteCoreViewSet):
     """View for company exports"""
 
@@ -638,15 +662,7 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
         DjangoFilterBackend,
         OrderingFilter,
     )
-    filterset_fields = [
-        'archived',
-        'destination_country',
-        'export_potential',
-        'owner',
-        'sector',
-        'status',
-        'team_members',
-    ]
+    filterset_class = CompanyExportEstimatedWinDateFilterSet
     ordering_fields = (
         'created_on',
         'title',
