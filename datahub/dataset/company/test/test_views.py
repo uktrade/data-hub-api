@@ -176,6 +176,30 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
         expected_result = get_expected_data_from_company(company)
         assert result == expected_result
 
+    @pytest.mark.parametrize(
+        'company_factory', (
+            CompanyWithAreaFactory,
+            ArchivedCompanyFactory,
+        ),
+    )
+    def test_turnover_negative(self, data_flow_api_client, company_factory):
+        """Test that endpoint returns with expected data for a null turnover value"""
+        company = company_factory()
+        company.created_by = None
+        company.created_on = None
+        company.turnover = -1000
+        company.save()
+
+        response = data_flow_api_client.get(self.view_url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_results = response.json()['results']
+
+        assert len(response_results) == 1
+        result = response_results[0]
+        expected_result = get_expected_data_from_company(company)
+        assert result == expected_result
+
     def test_success_subsidiary(self, data_flow_api_client):
         """Test that for a company and it's subsidiary two companies are returned"""
         company = SubsidiaryFactory()
