@@ -630,8 +630,17 @@ class ExportWinsForCompanyView(APIView):
 class CompanyExportEstimatedWinDateFilterSet(FilterSet):
     """CompanyExport estimated win date filter."""
 
-    estimated_win_date = DateFromToRangeFilter(field_name='estimated_win_date')
-    status = MultipleChoiceFilter(field_name='status', choices=CompanyExport.ExportStatus.choices)
+    estimated_win_date = DateFromToRangeFilter(
+        field_name='estimated_win_date',
+    )
+    status = MultipleChoiceFilter(
+        field_name='status',
+        choices=CompanyExport.ExportStatus.choices,
+    )
+    export_potential = MultipleChoiceFilter(
+        field_name='export_potential',
+        choices=CompanyExport.ExportPotential.choices,
+    )
 
     class Meta:
         model = CompanyExport
