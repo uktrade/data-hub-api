@@ -497,17 +497,15 @@ class TestExportFilters(APITestMixin):
         )
 
         url = reverse('api-v4:export:collection')
-        response = self.api_client.get(
-            url,
-            {
-                'export_potential': CompanyExport.ExportPotential.LOW,
-            },
-        )
+        query = '?export_potential=medium&export_potential=low'
+        response = self.api_client.get(url + query)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data['count'] == 1
-        assert response_data['results'][0]['export_potential'] == CompanyExport.ExportPotential.LOW
+        assert response_data['count'] == 2
+        results = response_data['results']
+        assert results[0]['export_potential'] == CompanyExport.ExportPotential.LOW
+        assert results[1]['export_potential'] == CompanyExport.ExportPotential.MEDIUM
 
     def test_filtered_by_export_sector(self):
         """List of exports filtered by sector."""
