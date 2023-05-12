@@ -472,17 +472,14 @@ class TestExportFilters(APITestMixin):
         )
 
         url = reverse('api-v4:export:collection')
-        response = self.api_client.get(
-            url,
-            {
-                'status': CompanyExport.ExportStatus.WON,
-            },
-        )
+        query = '?status=won&status=active'
+        response = self.api_client.get(url + query)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data['count'] == 1
+        assert response_data['count'] == 2
         assert response_data['results'][0]['status'] == CompanyExport.ExportStatus.WON
+        assert response_data['results'][1]['status'] == CompanyExport.ExportStatus.ACTIVE
 
     def test_filtered_by_export_potential(self):
         """List of exports filtered by export potential."""
