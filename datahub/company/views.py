@@ -10,6 +10,7 @@ from django_filters.rest_framework import (
     DateFromToRangeFilter,
     DjangoFilterBackend,
     FilterSet,
+    MultipleChoiceFilter,
 )
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
@@ -630,6 +631,7 @@ class CompanyExportEstimatedWinDateFilterSet(FilterSet):
     """CompanyExport estimated win date filter."""
 
     estimated_win_date = DateFromToRangeFilter(field_name='estimated_win_date')
+    status = MultipleChoiceFilter(field_name='status', choices=CompanyExport.ExportStatus.choices)
 
     class Meta:
         model = CompanyExport
