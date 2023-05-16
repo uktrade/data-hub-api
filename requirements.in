@@ -20,7 +20,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.6
 psycogreen==1.0.2
 
-boto3==1.26.129
+boto3==1.26.133
 
 notifications-python-client==8.0.1
 
@@ -53,10 +53,10 @@ gevent==22.10.2
 mohawk==1.1.0
 requests==2.30.0
 requests_toolbelt==1.0.0
-sentry_sdk==1.22.1
+sentry_sdk==1.22.2
 
 # RQ and associated helpers
-rq==1.13.0
+rq==1.14.1
 rq-scheduler==0.13.1
 
 python-redis-rate-limit==0.0.8
