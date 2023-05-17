@@ -1008,7 +1008,7 @@ class TestSearch(APITestMixin):
         InvestmentProjectFactory(investor_company=global_headquarters_sibling_company_2)
 
         ultimate_duns_hq_sibling_company = CompanyFactory(
-            global_ultimate_duns_number=parent_company_global_headquarters.duns_number,
+            global_ultimate_duns_number=parent_company_ultimate_duns_hq.duns_number,
         )
         ultimate_duns_hq_sibling_company_investment = InvestmentProjectFactory(
             investor_company=ultimate_duns_hq_sibling_company,
@@ -1036,7 +1036,7 @@ class TestSearch(APITestMixin):
         )
 
         parent_company_ultimate_duns_hq = CompanyFactory(
-            duns_number=parent_company_global_headquarters.duns_number,
+            duns_number=123,
         )
         parent_company_ultimate_duns_hq_investment = InvestmentProjectFactory(
             investor_company=parent_company_ultimate_duns_hq,
@@ -1044,9 +1044,9 @@ class TestSearch(APITestMixin):
 
         sibling_company = CompanyFactory(
             global_headquarters=parent_company_global_headquarters,
-            global_ultimate_duns_number=123,
+            global_ultimate_duns_number=parent_company_ultimate_duns_hq.duns_number,
         )
-        sibling_company = InvestmentProjectFactory(investor_company=sibling_company)
+        sibling_company_investment = InvestmentProjectFactory(investor_company=sibling_company)
 
         self._assert_parent_response(
             opensearch_with_collector,
@@ -1054,7 +1054,7 @@ class TestSearch(APITestMixin):
             [
                 parent_company_global_headquarters_investment,
                 parent_company_ultimate_duns_hq_investment,
-                sibling_company,
+                sibling_company_investment,
             ],
         )
 
@@ -1844,7 +1844,8 @@ class TestInvestmentProjectExportView(APITestMixin):
                     'investor_company.address_area.name',
                 ),
                 'Country of origin': get_attr_or_none(
-                    project, 'country_investment_originates_from.name',
+                    project,
+                    'country_investment_originates_from.name',
                 ),
                 'Investment type': get_attr_or_none(project, 'investment_type.name'),
                 'Status': project.get_status_display(),
@@ -1858,11 +1859,13 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Date of latest interaction': None,
                 'Project manager': get_attr_or_none(project, 'project_manager.name'),
                 'Client relationship manager': get_attr_or_none(
-                    project, 'client_relationship_manager.name',
+                    project,
+                    'client_relationship_manager.name',
                 ),
                 'Global account manager': self._get_global_account_manager_name(project),
                 'Project assurance adviser': get_attr_or_none(
-                    project, 'project_assurance_adviser.name',
+                    project,
+                    'project_assurance_adviser.name',
                 ),
                 'Other team members': join_attr_values(
                     project.team_members.order_by('adviser__first_name', 'adviser__last_name'),
