@@ -48,6 +48,8 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
     gross_value_added_end = serializers.IntegerField(required=False, min_value=0)
 
     show_summary = serializers.BooleanField(required=False, default=False)
+    include_parent_companies = serializers.BooleanField(required=False, default=False)
+    include_subsidiary_companies = serializers.BooleanField(required=False, default=False)
 
     SORT_BY_FIELDS = (
         'created_on',

@@ -3,6 +3,7 @@ import datetime
 from django.db.models import Case, Max, When
 from django.db.models import CharField
 from django.db.models.functions import Cast
+
 from opensearch_dsl.query import (
     Bool,
     Exists,
@@ -10,6 +11,7 @@ from opensearch_dsl.query import (
     Term,
 )
 
+from datahub.company.models import Company as DBCompany
 from datahub.core.constants import InvestmentProjectStage
 from datahub.core.query_utils import (
     get_aggregate_subquery,
@@ -93,53 +95,104 @@ class SearchInvestmentProjectAPIViewMixin:
         """Apply financial year filter."""
         # TODO: remove financial year start filter once land date filter has been
         # implemented and tested on frontend
-        financial_year_start_filter = Bool(should=[
-            Bool(should=[
-                # Non-prospects use actual land date, falling back to estimated land date
+        financial_year_start_filter = Bool(
+            should=[
+                Bool(
+                    should=[
+                        # Non-prospects use actual land date, falling back to estimated land date
+                        Bool(
+                            should=[
+                                Bool(
+                                    must=Range(
+                                        estimated_land_date={
+                                            'gte': datetime.date(
+                                                year=financial_year_start,
+                                                month=4,
+                                                day=1,
+                                            ),
+                                            'lt': datetime.date(
+                                                year=financial_year_start + 1,
+                                                month=4,
+                                                day=1,
+                                            ),
+                                        },
+                                    ),
+                                    must_not=Exists(field='actual_land_date'),
+                                ),
+                                Range(
+                                    actual_land_date={
+                                        'gte': datetime.date(
+                                            year=financial_year_start,
+                                            month=4,
+                                            day=1,
+                                        ),
+                                        'lt': datetime.date(
+                                            year=financial_year_start + 1,
+                                            month=4,
+                                            day=1,
+                                        ),
+                                    },
+                                ),
+                            ],
+                            must_not=Term(
+                                **{'stage.id': InvestmentProjectStage.prospect.value.id},
+                            ),
+                        ),
+                        # Prospects appear in all financial years from the created date
+                        Bool(
+                            must=[
+                                Range(
+                                    created_on={
+                                        'lte': datetime.date(
+                                            year=financial_year_start,
+                                            month=4,
+                                            day=1,
+                                        ),
+                                    },
+                                ),
+                                Term(**{'stage.id': InvestmentProjectStage.prospect.value.id}),
+                            ],
+                        ),
+                    ],
+                )
+                for financial_year_start in validated_data.get('financial_year_start', [])
+            ],
+        )
+        land_date_filter = Bool(
+            should=[
                 Bool(
                     should=[
                         Bool(
-                            must=Range(estimated_land_date={
-                                'gte': datetime.date(year=financial_year_start, month=4, day=1),
-                                'lt': datetime.date(year=financial_year_start + 1, month=4, day=1),
-                            }),
+                            must=Range(
+                                estimated_land_date={
+                                    'gte': datetime.date(
+                                        year=financial_year_start,
+                                        month=4,
+                                        day=1,
+                                    ),
+                                    'lt': datetime.date(
+                                        year=financial_year_start + 1,
+                                        month=4,
+                                        day=1,
+                                    ),
+                                },
+                            ),
                             must_not=Exists(field='actual_land_date'),
                         ),
-                        Range(actual_land_date={
-                            'gte': datetime.date(year=financial_year_start, month=4, day=1),
-                            'lt': datetime.date(year=financial_year_start + 1, month=4, day=1),
-                        }),
+                        Range(
+                            actual_land_date={
+                                'gte': datetime.date(year=financial_year_start, month=4, day=1),
+                                'lt': datetime.date(year=financial_year_start + 1, month=4, day=1),
+                            },
+                        ),
                     ],
-                    must_not=Term(**{'stage.id': InvestmentProjectStage.prospect.value.id}),
-                ),
-                # Prospects appear in all financial years from the created date
-                Bool(must=[
-                    Range(created_on={
-                        'lte': datetime.date(year=financial_year_start, month=4, day=1),
-                    }),
-                    Term(**{'stage.id': InvestmentProjectStage.prospect.value.id}),
-                ]),
-            ])
-            for financial_year_start in validated_data.get('financial_year_start', [])
-        ])
-        land_date_filter = Bool(should=[
-            Bool(
-                should=[
-                    Bool(
-                        must=Range(estimated_land_date={
-                            'gte': datetime.date(year=financial_year_start, month=4, day=1),
-                            'lt': datetime.date(year=financial_year_start + 1, month=4, day=1),
-                        }),
-                        must_not=Exists(field='actual_land_date'),
-                    ),
-                    Range(actual_land_date={
-                        'gte': datetime.date(year=financial_year_start, month=4, day=1),
-                        'lt': datetime.date(year=financial_year_start + 1, month=4, day=1),
-                    }),
-                ],
-            )
-            for financial_year_start in validated_data.get('land_date_financial_year_start', [])
-        ])
+                )
+                for financial_year_start in validated_data.get(
+                    'land_date_financial_year_start',
+                    [],
+                )
+            ],
+        )
         return Bool(must=[financial_year_start_filter, land_date_filter])
 
 
@@ -149,6 +202,63 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
 
     def get_base_query(self, request, validated_data):
         """Add aggregations to show the number of projects at each stage."""
+        investor_company_ids = validated_data.get('investor_company')
+
+        if investor_company_ids:
+            investor_companies = DBCompany.objects.filter(id__in=investor_company_ids)
+
+            if validated_data.get('include_parent_companies'):
+                global_headquarters_ids = []
+                global_ultimate_duns_numbers = []
+
+                parent_companies = investor_companies.exclude(
+                    global_headquarters__isnull=True,
+                    global_ultimate_duns_number__exact='',
+                ).values_list('global_ultimate_duns_number', 'global_headquarters', named=True)
+
+                for parent_company in parent_companies:
+                    if parent_company.global_headquarters:
+                        global_headquarters_ids.append(parent_company.global_headquarters)
+                    if parent_company.global_ultimate_duns_number:
+                        global_ultimate_duns_numbers.append(
+                            parent_company.global_ultimate_duns_number,
+                        )
+
+                #  if there are any global headquarters ids, append them to the original list
+                if global_headquarters_ids:
+                    investor_company_ids.extend(global_headquarters_ids)
+
+                if global_ultimate_duns_numbers:
+                    # if there are any global ultimate duns numbers, get their company id's and
+                    # append them to the original list
+                    dnb_to_ids = DBCompany.objects.filter(
+                        duns_number__in=global_ultimate_duns_numbers,
+                    ).values_list(
+                        'id',
+                        flat=True,
+                    )
+                    investor_company_ids.extend(dnb_to_ids)
+
+                validated_data['investor_company'] = investor_company_ids
+
+            if validated_data.get('include_subsidiary_companies'):
+                # get all company id's where the global ultimate duns number is equal to this
+                # companies duns number
+                duns_ids = investor_companies.exclude(duns_number__isnull=True).values_list(
+                    'duns_number',
+                    flat=True,
+                )
+                global_ultimate_duns_sibling_ids = DBCompany.objects.filter(
+                    global_ultimate_duns_number__in=duns_ids,
+                ).values_list('id', flat=True)
+                investor_company_ids.extend(global_ultimate_duns_sibling_ids)
+
+                #  get all company id's where the global headquarters is equal to this company id
+                global_headquarter_sibling_ids = DBCompany.objects.filter(
+                    global_headquarters__in=investor_companies,
+                ).values_list('id', flat=True)
+                investor_company_ids.extend(global_headquarter_sibling_ids)
+
         base_query = super().get_base_query(request, validated_data)
         if validated_data.get('show_summary'):
             base_query.aggs.bucket('stage', 'terms', field='stage.id')
@@ -200,21 +310,27 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
                 ):
                     investor_company_id = validated_data['investor_company'][0]
 
-                    project_stage_log = InvestmentProjectStageLog.objects.filter(
-                        stage_id=InvestmentProjectStage.won.value.id,
-                    ).filter(
-                        investment_project__investor_company_id=investor_company_id,
-                    ).select_related('investment_project').order_by('-created_on').first()
+                    project_stage_log = (
+                        InvestmentProjectStageLog.objects.filter(
+                            stage_id=InvestmentProjectStage.won.value.id,
+                        )
+                        .filter(
+                            investment_project__investor_company_id=investor_company_id,
+                        )
+                        .select_related('investment_project')
+                        .order_by('-created_on')
+                        .first()
+                    )
 
-                    response['summary'][stage.name]['last_won_project']['id'] = (
-                        project_stage_log.investment_project.id
-                    )
-                    response['summary'][stage.name]['last_won_project']['name'] = (
-                        project_stage_log.investment_project.name
-                    )
-                    response['summary'][stage.name]['last_won_project']['last_changed'] = (
-                        project_stage_log.created_on
-                    )
+                    response['summary'][stage.name]['last_won_project'][
+                        'id'
+                    ] = project_stage_log.investment_project.id
+                    response['summary'][stage.name]['last_won_project'][
+                        'name'
+                    ] = project_stage_log.investment_project.name
+                    response['summary'][stage.name]['last_won_project'][
+                        'last_changed'
+                    ] = project_stage_log.created_on
                 response['summary'][stage.name]['value'] = stage_summary['doc_count']
 
         return response
@@ -282,41 +398,43 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
             'investor_company__address_town': 'Investor company town or city',
         }
 
-        field_titles.update({
-            'investor_company__address_area__name': 'Investor company area',
-            'country_investment_originates_from__name': 'Country of origin',
-            'investment_type__name': 'Investment type',
-            'status_name': 'Status',
-            'stage__name': 'Stage',
-            'link': 'Link',
-            'actual_land_date': 'Actual land date',
-            'estimated_land_date': 'Estimated land date',
-            'fdi_value__name': 'FDI value',
-            'sector_name': 'Sector',
-            'date_of_latest_interaction': 'Date of latest interaction',
-            'project_manager_name': 'Project manager',
-            'client_relationship_manager_name': 'Client relationship manager',
-            'investor_company_global_account_manager': 'Global account manager',
-            'project_assurance_adviser_name': 'Project assurance adviser',
-            'team_member_names': 'Other team members',
-            'delivery_partner_names': 'Delivery partners',
-            'uk_region_location_names': 'Possible UK regions',
-            'actual_uk_region_names': 'Actual UK regions',
-            'specific_programme__name': 'Specific investment programme',
-            'referral_source_activity__name': 'Referral source activity',
-            'referral_source_activity_website__name': 'Referral source activity website',
-            'total_investment': 'Total investment',
-            'number_new_jobs': 'New jobs',
-            'average_salary__name': 'Average salary of new jobs',
-            'number_safeguarded_jobs': 'Safeguarded jobs',
-            'level_of_involvement__name': 'Level of involvement',
-            'r_and_d_budget': 'R&D budget',
-            'non_fdi_r_and_d_budget': 'Associated non-FDI R&D project',
-            'new_tech_to_uk': 'New to world tech',
-            'likelihood_to_land__name': 'Likelihood to land',
-            'fdi_type__name': 'FDI type',
-            'foreign_equity_investment': 'Foreign equity investment',
-            'gva_multiplier__multiplier': 'GVA multiplier',
-            'gross_value_added': 'GVA',
-        })
+        field_titles.update(
+            {
+                'investor_company__address_area__name': 'Investor company area',
+                'country_investment_originates_from__name': 'Country of origin',
+                'investment_type__name': 'Investment type',
+                'status_name': 'Status',
+                'stage__name': 'Stage',
+                'link': 'Link',
+                'actual_land_date': 'Actual land date',
+                'estimated_land_date': 'Estimated land date',
+                'fdi_value__name': 'FDI value',
+                'sector_name': 'Sector',
+                'date_of_latest_interaction': 'Date of latest interaction',
+                'project_manager_name': 'Project manager',
+                'client_relationship_manager_name': 'Client relationship manager',
+                'investor_company_global_account_manager': 'Global account manager',
+                'project_assurance_adviser_name': 'Project assurance adviser',
+                'team_member_names': 'Other team members',
+                'delivery_partner_names': 'Delivery partners',
+                'uk_region_location_names': 'Possible UK regions',
+                'actual_uk_region_names': 'Actual UK regions',
+                'specific_programme__name': 'Specific investment programme',
+                'referral_source_activity__name': 'Referral source activity',
+                'referral_source_activity_website__name': 'Referral source activity website',
+                'total_investment': 'Total investment',
+                'number_new_jobs': 'New jobs',
+                'average_salary__name': 'Average salary of new jobs',
+                'number_safeguarded_jobs': 'Safeguarded jobs',
+                'level_of_involvement__name': 'Level of involvement',
+                'r_and_d_budget': 'R&D budget',
+                'non_fdi_r_and_d_budget': 'Associated non-FDI R&D project',
+                'new_tech_to_uk': 'New to world tech',
+                'likelihood_to_land__name': 'Likelihood to land',
+                'fdi_type__name': 'FDI type',
+                'foreign_equity_investment': 'Foreign equity investment',
+                'gva_multiplier__multiplier': 'GVA multiplier',
+                'gross_value_added': 'GVA',
+            },
+        )
         return field_titles
