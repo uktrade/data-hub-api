@@ -206,63 +206,76 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
 
         if investor_company_ids:
             investor_companies = DBCompany.objects.filter(id__in=investor_company_ids)
-
             if validated_data.get('include_parent_companies'):
-                global_headquarters_ids = []
-                global_ultimate_duns_numbers = []
-
-                parent_companies = investor_companies.exclude(
-                    global_headquarters__isnull=True,
-                    global_ultimate_duns_number__exact='',
-                ).values_list('global_ultimate_duns_number', 'global_headquarters', named=True)
-
-                for parent_company in parent_companies:
-                    if parent_company.global_headquarters:
-                        global_headquarters_ids.append(parent_company.global_headquarters)
-                    if parent_company.global_ultimate_duns_number:
-                        global_ultimate_duns_numbers.append(
-                            parent_company.global_ultimate_duns_number,
-                        )
-
-                #  if there are any global headquarters ids, append them to the original list
-                if global_headquarters_ids:
-                    investor_company_ids.extend(global_headquarters_ids)
-
-                if global_ultimate_duns_numbers:
-                    # if there are any global ultimate duns numbers, get their company id's and
-                    # append them to the original list
-                    dnb_to_ids = DBCompany.objects.filter(
-                        duns_number__in=global_ultimate_duns_numbers,
-                    ).values_list(
-                        'id',
-                        flat=True,
-                    )
-                    investor_company_ids.extend(dnb_to_ids)
-
-                validated_data['investor_company'] = investor_company_ids
+                investor_company_ids.extend(self.get_parent_company_ids(investor_companies))
 
             if validated_data.get('include_subsidiary_companies'):
-                # get all company id's where the global ultimate duns number is equal to this
-                # companies duns number
-                duns_ids = investor_companies.exclude(duns_number__isnull=True).values_list(
-                    'duns_number',
-                    flat=True,
-                )
-                global_ultimate_duns_sibling_ids = DBCompany.objects.filter(
-                    global_ultimate_duns_number__in=duns_ids,
-                ).values_list('id', flat=True)
-                investor_company_ids.extend(global_ultimate_duns_sibling_ids)
+                investor_company_ids.extend(self.get_sibling_company_ids(investor_companies))
 
-                #  get all company id's where the global headquarters is equal to this company id
-                global_headquarter_sibling_ids = DBCompany.objects.filter(
-                    global_headquarters__in=investor_companies,
-                ).values_list('id', flat=True)
-                investor_company_ids.extend(global_headquarter_sibling_ids)
-
+            validated_data['investor_company'] = investor_company_ids
+        print('investor_company_ids:', investor_company_ids)
         base_query = super().get_base_query(request, validated_data)
         if validated_data.get('show_summary'):
             base_query.aggs.bucket('stage', 'terms', field='stage.id')
         return base_query
+
+    def get_sibling_company_ids(self, investor_companies):
+        """Get a list of all sibling company id's"""
+
+        # get all company id's where the global ultimate duns number is equal to this
+        # companies duns number
+        sibling_company_ids = []
+        duns_ids = investor_companies.exclude(duns_number__isnull=True).values_list(
+            'duns_number',
+            flat=True,
+        )
+        global_ultimate_duns_sibling_ids = DBCompany.objects.filter(
+            global_ultimate_duns_number__in=duns_ids,
+        ).values_list('id', flat=True)
+        sibling_company_ids.extend(global_ultimate_duns_sibling_ids)
+
+        #  get all company id's where the global headquarters is equal to this company id
+        global_headquarter_sibling_ids = DBCompany.objects.filter(
+            global_headquarters__in=investor_companies,
+        ).values_list('id', flat=True)
+        sibling_company_ids.extend(global_headquarter_sibling_ids)
+
+        return sibling_company_ids
+
+    def get_parent_company_ids(self, investor_companies):
+        """Get a list of all parent company id's"""
+        parent_company_ids = []
+        global_headquarters_ids = []
+        global_ultimate_duns_numbers = []
+
+        parent_companies = investor_companies.exclude(
+            global_headquarters__isnull=True,
+            global_ultimate_duns_number__exact='',
+        ).values_list('global_ultimate_duns_number', 'global_headquarters', named=True)
+
+        for parent_company in parent_companies:
+            if parent_company.global_headquarters:
+                global_headquarters_ids.append(parent_company.global_headquarters)
+            if parent_company.global_ultimate_duns_number:
+                global_ultimate_duns_numbers.append(
+                    parent_company.global_ultimate_duns_number,
+                )
+
+        #  if there are any global headquarters ids, append them to the original list
+        if global_headquarters_ids:
+            parent_company_ids.extend(global_headquarters_ids)
+
+        if global_ultimate_duns_numbers:
+            # if there are any global ultimate duns numbers, get their company id's and
+            # append them to the original list
+            dnb_to_ids = DBCompany.objects.filter(
+                duns_number__in=global_ultimate_duns_numbers,
+            ).values_list(
+                'id',
+                flat=True,
+            )
+            parent_company_ids.extend(dnb_to_ids)
+        return parent_company_ids
 
     def enhance_response(self, results, response, validated_data):
         """Add summary data to the response."""
