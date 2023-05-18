@@ -44,9 +44,9 @@ def parse_choice(value, choices, blank_value=''):
     return _parse_value(value, ChoiceField(choices=choices), blank_value=blank_value)
 
 
-def parse_limited_string(value, max_length=settings.CHAR_FIELD_MAX_LENGTH):
+def parse_limited_string(value, max_length=settings.CHAR_FIELD_MAX_LENGTH, blank_value=''):
     """Parses/validates a string."""
-    return _parse_value(value, CharField(max_length=max_length), blank_value='')
+    return _parse_value(value, CharField(max_length=max_length), blank_value=blank_value)
 
 
 def _parse_value(value, field, blank_value=None):
