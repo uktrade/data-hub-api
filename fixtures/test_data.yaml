@@ -243,6 +243,32 @@
     name: Motorleaf
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
     duns_number: "012345678"
+    global_ultimate_duns_number: "987654321"
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    export_to_countries:
+      - 82756b9a-5d95-e211-a939-e4115bead28a
+      - 83756b9a-5d95-e211-a939-e4115bead28a
+    future_interest_countries:
+      - 37afd8d0-5d95-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    export_segment: non_hep
+    export_sub_segment: reassure_nurture_and_grow
+    address_1: 5000 Rue Saint-Patrick,
+    address_town: Montréal
+    address_postcode: H4E 1A8
+    address_area: 5fc4ea61-75fe-415d-8ff0-2a2034ff6c86
+    address_country: 5daf72a6-5d95-e211-a939-e4115bead28a # CA
+    description: Canadian company for testing
+    created_on: "2020-10-16T11:00:00Z"
+    modified_on: "2020-11-16T11:00:00Z"
+
+- model: company.company
+  pk: fc3530bc-383c-4b18-94c8-8fbe918bee31
+  fields:
+    name: Motorleaf Global HQ
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
+    duns_number: "987654321"
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
