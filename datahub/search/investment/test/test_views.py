@@ -160,7 +160,11 @@ def created_on_data(opensearch_with_collector):
     """Setup data for created_on date filter test."""
     investment_projects = []
     dates = (
-        '2015-01-01', '2016-09-12', '2017-09-12', '2048-02-04', '2048-01-24',
+        '2015-01-01',
+        '2016-09-12',
+        '2017-09-12',
+        '2048-02-04',
+        '2048-01-24',
     )
 
     for date in dates:
@@ -243,14 +247,11 @@ class TestSearch(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert (
-            Counter(
-                str(Decimal(result['gross_value_added'])) for result in response.data['results']
-            ) == Counter(expected_gross_value_added)
-        ), expected_gross_value_added
-        assert (
-            Counter(result['name'] for result in response.data['results'])
-            == Counter(expected_project_name)
+        assert Counter(
+            str(Decimal(result['gross_value_added'])) for result in response.data['results']
+        ) == Counter(expected_gross_value_added), expected_gross_value_added
+        assert Counter(result['name'] for result in response.data['results']) == Counter(
+            expected_project_name,
         ), expected_project_name
 
     def test_search_adviser_filter(self, opensearch_with_collector):
@@ -297,8 +298,12 @@ class TestSearch(APITestMixin):
         assert response_data['count'] == 6
         results = response_data['results']
         expected_ids = {
-            str(project_1.pk), str(project_2.pk), str(project_3.pk),
-            str(project_4.pk), str(project_5.pk), str(project_6.pk),
+            str(project_1.pk),
+            str(project_2.pk),
+            str(project_3.pk),
+            str(project_4.pk),
+            str(project_5.pk),
+            str(project_6.pk),
         }
         assert {result['id'] for result in results} == expected_ids
 
@@ -557,7 +562,8 @@ class TestSearch(APITestMixin):
         assert response.data['results'][0]['name'] == 'abc defg'
 
     def test_search_investment_project_investor_country_when_investment_origin_set(
-        self, setup_data,
+        self,
+        setup_data,
     ):
         """Tests investor company country filter when investment origin also set."""
         url = reverse('api-v3:search:investment_project')
@@ -575,7 +581,8 @@ class TestSearch(APITestMixin):
         assert response.data['results'][0]['name'] == 'delayed project'
 
     def test_search_investment_project_investment_origin(
-        self, setup_data,
+        self,
+        setup_data,
     ):
         """Tests country investment originates from filter."""
         url = reverse('api-v3:search:investment_project')
@@ -665,12 +672,12 @@ class TestSearch(APITestMixin):
                     ],
                 },
                 [
-                    'new project', 'delayed project',
+                    'new project',
+                    'delayed project',
                 ],
             ),
             (
-                {
-                },
+                {},
                 [
                     'abc defg',
                     'delayed project',
@@ -763,7 +770,10 @@ class TestSearch(APITestMixin):
         (0, 1, 2),
     )
     def test_sector_descends_filter(
-        self, hierarchical_sectors, opensearch_with_collector, sector_level,
+        self,
+        hierarchical_sectors,
+        opensearch_with_collector,
+        sector_level,
     ):
         """Test the sector_descends filter."""
         num_sectors = len(hierarchical_sectors)
@@ -775,9 +785,11 @@ class TestSearch(APITestMixin):
         )
         InvestmentProjectFactory.create_batch(
             3,
-            sector=factory.LazyFunction(lambda: random_obj_for_queryset(
-                Sector.objects.exclude(pk__in=sectors_ids),
-            )),
+            sector=factory.LazyFunction(
+                lambda: random_obj_for_queryset(
+                    Sector.objects.exclude(pk__in=sectors_ids),
+                ),
+            ),
         )
 
         opensearch_with_collector.flush_and_refresh()
@@ -858,10 +870,7 @@ class TestSearch(APITestMixin):
         assert {
             constants.InvestmentProjectStage.active.value.id,
             constants.InvestmentProjectStage.won.value.id,
-        } == {
-            investment_project['stage']['id']
-            for investment_project in response.data['results']
-        }
+        } == {investment_project['stage']['id'] for investment_project in response.data['results']}
 
         # checks if we only have investment projects with investor companies we filtered
         assert {
@@ -922,6 +931,307 @@ class TestSearch(APITestMixin):
         ] == [
             investment_project['stage']['name'] for investment_project in response.data['results']
         ]
+
+    def test_parent_companies_dnb_only(self, opensearch_with_collector):
+        """
+        Test when a company has a parent dnb company that has investment projects, those
+        projects are included in the results
+        """
+        parent_company = CompanyFactory(duns_number=123)
+        parent_company_investment = InvestmentProjectFactory(investor_company=parent_company)
+
+        sibling_company_1 = CompanyFactory(global_ultimate_duns_number=parent_company.duns_number)
+        sibling_company_1_investment = InvestmentProjectFactory(investor_company=sibling_company_1)
+
+        sibling_company_2 = CompanyFactory(global_ultimate_duns_number=parent_company.duns_number)
+        sibling_company_2_investment = InvestmentProjectFactory(investor_company=sibling_company_2)
+
+        self._assert_parent_response(
+            opensearch_with_collector,
+            [sibling_company_1, sibling_company_2],
+            [
+                parent_company_investment,
+                sibling_company_1_investment,
+                sibling_company_2_investment,
+            ],
+        )
+
+    def test_parent_companies_global_hq_only(self, opensearch_with_collector):
+        """
+        Test when a company has a parent global hq that has investment projects, those
+        projects are included in the results
+        """
+        parent_company = CompanyFactory()
+        parent_company_investment = InvestmentProjectFactory(investor_company=parent_company)
+
+        sibling_company_1 = CompanyFactory(global_headquarters=parent_company)
+        sibling_company_1_investment = InvestmentProjectFactory(investor_company=sibling_company_1)
+
+        sibling_company_2 = CompanyFactory(global_headquarters=parent_company)
+        sibling_company_2_investment = InvestmentProjectFactory(investor_company=sibling_company_2)
+
+        self._assert_parent_response(
+            opensearch_with_collector,
+            [sibling_company_1, sibling_company_2],
+            [
+                parent_company_investment,
+                sibling_company_1_investment,
+                sibling_company_2_investment,
+            ],
+        )
+
+    def test_parent_companies_dnb_and_global_hq(self, opensearch_with_collector):
+        """
+        Test when companies requested are a combination of having a parent global hq and a parent
+        dnb company that have investment projects, those projects are included in the results
+        """
+        parent_company_global_headquarters = CompanyFactory()
+        parent_company_global_headquarters_investment = InvestmentProjectFactory(
+            investor_company=parent_company_global_headquarters,
+        )
+
+        parent_company_ultimate_duns_hq = CompanyFactory(duns_number=123)
+        parent_company_ultimate_duns_hq_investment = InvestmentProjectFactory(
+            investor_company=parent_company_ultimate_duns_hq,
+        )
+
+        global_headquarters_sibling_company_1 = CompanyFactory(
+            global_headquarters=parent_company_global_headquarters,
+        )
+        global_headquarters_sibling_company_1_investment = InvestmentProjectFactory(
+            investor_company=global_headquarters_sibling_company_1,
+        )
+
+        global_headquarters_sibling_company_2 = CompanyFactory(
+            global_headquarters=parent_company_global_headquarters,
+        )
+        InvestmentProjectFactory(investor_company=global_headquarters_sibling_company_2)
+
+        ultimate_duns_hq_sibling_company = CompanyFactory(
+            global_ultimate_duns_number=parent_company_ultimate_duns_hq.duns_number,
+        )
+        ultimate_duns_hq_sibling_company_investment = InvestmentProjectFactory(
+            investor_company=ultimate_duns_hq_sibling_company,
+        )
+
+        self._assert_parent_response(
+            opensearch_with_collector,
+            [global_headquarters_sibling_company_1, ultimate_duns_hq_sibling_company],
+            [
+                parent_company_global_headquarters_investment,
+                parent_company_ultimate_duns_hq_investment,
+                global_headquarters_sibling_company_1_investment,
+                ultimate_duns_hq_sibling_company_investment,
+            ],
+        )
+
+    def test_parent_company_with_dnb_and_global_hq(self, opensearch_with_collector):
+        """
+        Test when a company has both a parent global hq and a parent dnb company that have
+        investment projects, those are included in the results
+        """
+        parent_company_global_headquarters = CompanyFactory()
+        parent_company_global_headquarters_investment = InvestmentProjectFactory(
+            investor_company=parent_company_global_headquarters,
+        )
+
+        parent_company_ultimate_duns_hq = CompanyFactory(
+            duns_number=123,
+        )
+        parent_company_ultimate_duns_hq_investment = InvestmentProjectFactory(
+            investor_company=parent_company_ultimate_duns_hq,
+        )
+
+        sibling_company = CompanyFactory(
+            global_headquarters=parent_company_global_headquarters,
+            global_ultimate_duns_number=parent_company_ultimate_duns_hq.duns_number,
+        )
+        sibling_company_investment = InvestmentProjectFactory(investor_company=sibling_company)
+
+        self._assert_parent_response(
+            opensearch_with_collector,
+            [sibling_company],
+            [
+                parent_company_global_headquarters_investment,
+                parent_company_ultimate_duns_hq_investment,
+                sibling_company_investment,
+            ],
+        )
+
+    def _assert_parent_response(
+        self,
+        opensearch_with_collector,
+        siblings,
+        investments,
+    ):
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(
+            url,
+            {
+                'investor_company': [sibling.id for sibling in siblings],
+                'include_parent_companies': True,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == len(investments)
+
+        actual_ids = {UUID(project['id']) for project in response.data['results']}
+        expected_ids = {project.pk for project in investments}
+        assert actual_ids == expected_ids
+
+    def test_sibling_companies_dnb_only(self, opensearch_with_collector):
+        """
+        Test when a company is an ultimate dnb company, all projects belonging to subsidary
+        companies are included in the results
+        """
+        parent_company = CompanyFactory(duns_number=123)
+        parent_company_investment = InvestmentProjectFactory(investor_company=parent_company)
+
+        sibling_company_1 = CompanyFactory(global_ultimate_duns_number=parent_company.duns_number)
+        sibling_company_1_investment = InvestmentProjectFactory(investor_company=sibling_company_1)
+
+        sibling_company_2 = CompanyFactory(global_ultimate_duns_number=parent_company.duns_number)
+        sibling_company_2_investment = InvestmentProjectFactory(investor_company=sibling_company_2)
+
+        parent_company_2 = CompanyFactory(duns_number=456)
+        InvestmentProjectFactory(investor_company=parent_company_2)
+
+        parent_company_3_no_duns_number = CompanyFactory()
+        parent_company_3_no_duns_number_investment = InvestmentProjectFactory(
+            investor_company=parent_company_3_no_duns_number,
+        )
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(
+            url,
+            {
+                'investor_company': [parent_company.id, parent_company_3_no_duns_number.id],
+                'include_subsidiary_companies': True,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+
+        actual_ids = {UUID(project['id']) for project in response.data['results']}
+        expected_ids = {
+            project.pk
+            for project in [
+                parent_company_investment,
+                sibling_company_1_investment,
+                sibling_company_2_investment,
+                parent_company_3_no_duns_number_investment,
+            ]
+        }
+        assert actual_ids == expected_ids
+
+    def test_sibling_companies_global_hq_only(self, opensearch_with_collector):
+        """
+        Test when a company is a global hq company, all projects belonging to subsidary
+        companies are included in the results
+        """
+        parent_company = CompanyFactory()
+        parent_company_investment = InvestmentProjectFactory(investor_company=parent_company)
+
+        sibling_company_1 = CompanyFactory(global_headquarters=parent_company)
+        sibling_company_1_investment = InvestmentProjectFactory(investor_company=sibling_company_1)
+
+        sibling_company_2 = CompanyFactory(global_headquarters=parent_company)
+        sibling_company_2_investment = InvestmentProjectFactory(investor_company=sibling_company_2)
+
+        parent_company_2 = CompanyFactory()
+        InvestmentProjectFactory(investor_company=parent_company_2)
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(
+            url,
+            {
+                'investor_company': [parent_company.id],
+                'include_subsidiary_companies': True,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 3
+
+        actual_ids = {UUID(project['id']) for project in response.data['results']}
+        expected_ids = {
+            project.pk
+            for project in [
+                parent_company_investment,
+                sibling_company_1_investment,
+                sibling_company_2_investment,
+            ]
+        }
+        assert actual_ids == expected_ids
+
+    def test_sibling_companies_dnb_and_global_hq(self, opensearch_with_collector):
+        """
+        Test when companies requested are a combination of being a parent global hq and a parent
+        dnb company that have siblings with investment projects, those projects are included
+        in the results
+        """
+        parent_company_ultimate_duns_hq = CompanyFactory(duns_number=123)
+
+        ultimate_duns_hq_sibling_company_1 = CompanyFactory(
+            global_ultimate_duns_number=parent_company_ultimate_duns_hq.duns_number,
+        )
+        ultimate_duns_hq_sibling_company_1_investment = InvestmentProjectFactory(
+            investor_company=ultimate_duns_hq_sibling_company_1,
+        )
+
+        ultimate_duns_hq_sibling_company_2 = CompanyFactory(
+            global_ultimate_duns_number=parent_company_ultimate_duns_hq.duns_number,
+        )
+        ultimate_duns_hq_sibling_company_2_investment = InvestmentProjectFactory(
+            investor_company=ultimate_duns_hq_sibling_company_2,
+        )
+
+        parent_company_global_hq = CompanyFactory()
+        parent_company_global_hq_investment = InvestmentProjectFactory(
+            investor_company=parent_company_global_hq,
+        )
+
+        global_hq_sibling_company = CompanyFactory(global_headquarters=parent_company_global_hq)
+        global_hq_sibling_company_investment = InvestmentProjectFactory(
+            investor_company=global_hq_sibling_company,
+        )
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(
+            url,
+            {
+                'investor_company': [
+                    parent_company_ultimate_duns_hq.id,
+                    parent_company_global_hq.id,
+                ],
+                'include_subsidiary_companies': True,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+
+        actual_ids = {UUID(project['id']) for project in response.data['results']}
+        expected_ids = {
+            project.pk
+            for project in [
+                ultimate_duns_hq_sibling_company_1_investment,
+                ultimate_duns_hq_sibling_company_2_investment,
+                global_hq_sibling_company_investment,
+                parent_company_global_hq_investment,
+            ]
+        }
+        assert actual_ids == expected_ids
 
 
 class TestSearchFinancialYearFilter(APITestMixin):
@@ -1126,7 +1436,9 @@ class TestSearchPermissions(APITestMixin):
         ),
     )
     def test_non_restricted_user_can_see_all_projects(
-        self, opensearch_with_collector, permissions,
+        self,
+        opensearch_with_collector,
+        permissions,
     ):
         """Test that normal users can see all projects."""
         team = TeamFactory()
@@ -1216,8 +1528,11 @@ class TestSearchPermissions(APITestMixin):
 
         results = response_data['results']
         expected_ids = {
-            str(project_1.id), str(project_2.id), str(project_3.id),
-            str(project_4.id), str(project_5.id),
+            str(project_1.id),
+            str(project_2.id),
+            str(project_3.id),
+            str(project_4.id),
+            str(project_5.id),
         }
 
         assert {result['id'] for result in results} == expected_ids
@@ -1342,7 +1657,8 @@ class TestSummaryAggregation(APITestMixin):
         }
 
     def test_last_won_project(
-        self, opensearch_with_collector,
+        self,
+        opensearch_with_collector,
         investment_project_with_stage_log,
     ):
         """Details of last won project should be shown in won summary for a investor company"""
@@ -1350,10 +1666,13 @@ class TestSummaryAggregation(APITestMixin):
         investor_company = investment_project.investor_company
 
         url = reverse('api-v3:search:investment_project')
-        response = self.api_client.post(url, {
-            'show_summary': True,
-            'investor_company': [investor_company.id],
-        })
+        response = self.api_client.post(
+            url,
+            {
+                'show_summary': True,
+                'investor_company': [investor_company.id],
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -1503,7 +1822,8 @@ class TestInvestmentProjectExportView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {'filename': 'Data Hub - Investment projects - 2018-01-01-11-12-13.csv'},
+            'attachment',
+            {'filename': 'Data Hub - Investment projects - 2018-01-01-11-12-13.csv'},
         )
 
         sorted_projects = InvestmentProject.objects.order_by(orm_ordering, 'pk')
@@ -1520,50 +1840,58 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Investor company': project.investor_company.name,
                 'Investor company town or city': project.investor_company.address_town,
                 'Investor company area': get_attr_or_none(
-                    project, 'investor_company.address_area.name',
+                    project,
+                    'investor_company.address_area.name',
                 ),
-                'Country of origin':
-                    get_attr_or_none(project, 'country_investment_originates_from.name'),
+                'Country of origin': get_attr_or_none(
+                    project,
+                    'country_investment_originates_from.name',
+                ),
                 'Investment type': get_attr_or_none(project, 'investment_type.name'),
                 'Status': project.get_status_display(),
                 'Stage': get_attr_or_none(project, 'stage.name'),
-                'Link':
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["investmentproject"]}'
-                    f'/{project.pk}',
+                'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["investmentproject"]}'
+                f'/{project.pk}',
                 'Actual land date': project.actual_land_date,
                 'Estimated land date': project.estimated_land_date,
                 'FDI value': get_attr_or_none(project, 'fdi_value.name'),
                 'Sector': get_attr_or_none(project, 'sector.name'),
                 'Date of latest interaction': None,
                 'Project manager': get_attr_or_none(project, 'project_manager.name'),
-                'Client relationship manager':
-                    get_attr_or_none(project, 'client_relationship_manager.name'),
+                'Client relationship manager': get_attr_or_none(
+                    project,
+                    'client_relationship_manager.name',
+                ),
                 'Global account manager': self._get_global_account_manager_name(project),
-                'Project assurance adviser':
-                    get_attr_or_none(project, 'project_assurance_adviser.name'),
-                'Other team members':
-                    join_attr_values(
-                        project.team_members.order_by('adviser__first_name', 'adviser__last_name'),
-                        'adviser.name',
-                    ),  # noqa: E123
-                'Delivery partners':
-                    join_attr_values(
-                        project.delivery_partners.order_by('name'),
-                    ),  # noqa: E123
-                'Possible UK regions':
-                    join_attr_values(
-                        project.uk_region_locations.order_by('name'),
-                    ),  # noqa: E123
-                'Actual UK regions':
-                    join_attr_values(
-                        project.actual_uk_regions.order_by('name'),
-                    ),  # noqa: E123
-                'Specific investment programme':
-                    get_attr_or_none(project, 'specific_programme.name'),
-                'Referral source activity':
-                    get_attr_or_none(project, 'referral_source_activity.name'),
-                'Referral source activity website':
-                    get_attr_or_none(project, 'referral_source_activity_website.name'),
+                'Project assurance adviser': get_attr_or_none(
+                    project,
+                    'project_assurance_adviser.name',
+                ),
+                'Other team members': join_attr_values(
+                    project.team_members.order_by('adviser__first_name', 'adviser__last_name'),
+                    'adviser.name',
+                ),  # noqa: E123
+                'Delivery partners': join_attr_values(
+                    project.delivery_partners.order_by('name'),
+                ),  # noqa: E123
+                'Possible UK regions': join_attr_values(
+                    project.uk_region_locations.order_by('name'),
+                ),  # noqa: E123
+                'Actual UK regions': join_attr_values(
+                    project.actual_uk_regions.order_by('name'),
+                ),  # noqa: E123
+                'Specific investment programme': get_attr_or_none(
+                    project,
+                    'specific_programme.name',
+                ),
+                'Referral source activity': get_attr_or_none(
+                    project,
+                    'referral_source_activity.name',
+                ),
+                'Referral source activity website': get_attr_or_none(
+                    project,
+                    'referral_source_activity_website.name',
+                ),
                 'Total investment': project.total_investment,
                 'New jobs': project.number_new_jobs,
                 'Average salary of new jobs': get_attr_or_none(project, 'average_salary.name'),
@@ -1651,7 +1979,8 @@ class TestBasicSearch(APITestMixin):
         assert response.data['results'][0]['project_code'] == investment_project.project_code
 
     def test_similar_project_name_to_code_search(
-        self, opensearch_with_collector,
+        self,
+        opensearch_with_collector,
     ):
         """Projects with numeric names should not match on project codes."""
         investment_project = InvestmentProjectFactory(
@@ -1688,7 +2017,9 @@ class TestBasicSearchPermissions(APITestMixin):
         ),
     )
     def test_global_non_restricted_user_can_see_all_projects(
-        self, opensearch_with_collector, permissions,
+        self,
+        opensearch_with_collector,
+        permissions,
     ):
         """Test that normal users can see all projects."""
         team = TeamFactory()
@@ -1727,7 +2058,8 @@ class TestBasicSearchPermissions(APITestMixin):
         }
 
     def test_global_restricted_users_cannot_see_other_teams_projects(
-        self, opensearch_with_collector,
+        self,
+        opensearch_with_collector,
     ):
         """
         Automatic filter to see only associated IP for a specific (leps) user
@@ -1769,14 +2101,18 @@ class TestBasicSearchPermissions(APITestMixin):
 
         results = response_data['results']
         expected_ids = {
-            str(project_1.id), str(project_2.id), str(project_3.id),
-            str(project_4.id), str(project_5.id),
+            str(project_1.id),
+            str(project_2.id),
+            str(project_3.id),
+            str(project_4.id),
+            str(project_5.id),
         }
 
         assert {result['id'] for result in results} == expected_ids
 
     def test_global_restricted_user_with_no_team_cannot_see_projects(
-        self, opensearch_with_collector,
+        self,
+        opensearch_with_collector,
     ):
         """
         Checks that a restricted user that doesn't have a team cannot view projects associated
