@@ -17,7 +17,7 @@ class Command(CSVBaseCommand):
         """Process one single row."""
         pk = parse_uuid(row['id'])
         company = Company.objects.get(pk=pk)
-        duns_number = parse_limited_string(row['duns_number'])
+        duns_number = parse_limited_string(row['duns_number'], blank_value=None)
 
         if company.duns_number == duns_number:
             return
