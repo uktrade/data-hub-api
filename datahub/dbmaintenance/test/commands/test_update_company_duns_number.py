@@ -60,7 +60,7 @@ def test_run(s3_stubber, caplog):
     assert [company.duns_number for company in companies] == [
         '012345',
         '456',
-        '',
+        None,
         '087891',
         '087892',
     ]
