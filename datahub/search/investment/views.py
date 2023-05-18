@@ -213,7 +213,7 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
                 investor_company_ids.extend(self.get_sibling_company_ids(investor_companies))
 
             validated_data['investor_company'] = investor_company_ids
-        print('investor_company_ids:', investor_company_ids)
+
         base_query = super().get_base_query(request, validated_data)
         if validated_data.get('show_summary'):
             base_query.aggs.bucket('stage', 'terms', field='stage.id')
@@ -221,7 +221,6 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
 
     def get_sibling_company_ids(self, investor_companies):
         """Get a list of all sibling company id's"""
-
         # get all company id's where the global ultimate duns number is equal to this
         # companies duns number
         sibling_company_ids = []
