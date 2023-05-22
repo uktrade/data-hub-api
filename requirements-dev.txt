@@ -71,7 +71,7 @@ django==3.2.19
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==5.41.1
+django-axes==6.0.1
     # via -r requirements.in
 django-debug-toolbar==4.0.0
     # via -r requirements.in
@@ -82,9 +82,7 @@ django-extensions==3.2.1
 django-filter==23.2
     # via -r requirements.in
 django-ipware==3.0.7
-    # via
-    #   django-axes
-    #   django-log-formatter-ecs
+    # via django-log-formatter-ecs
 django-js-asset==2.0.0
     # via django-mptt
 django-log-formatter-ecs==0.0.5
