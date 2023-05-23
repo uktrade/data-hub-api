@@ -34,6 +34,7 @@ def test_sync_one_model(sync_model_mock, search_model):
     management.call_command(sync_search.Command(), model=[search_model])
 
     assert sync_model_mock.call_count == 1
+    sync_model_mock.assert_called_with((search_model,))
 
 
 @mock.patch('datahub.search.management.commands.sync_search.schedule_model_sync')
@@ -48,6 +49,8 @@ def test_sync_all_models(sync_model_mock):
     management.call_command(sync_search.Command())
 
     assert sync_model_mock.call_count == len(get_search_apps())
+    expected_calls = [mock.call((app.name,)) for app in get_search_apps()]
+    assert expected_calls == sync_model_mock.call_args_list
 
 
 @mock.patch('datahub.search.management.commands.sync_search.schedule_model_sync')
