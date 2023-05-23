@@ -20,18 +20,18 @@ def sync_all_models():
     Task that starts sub-tasks to sync all models to OpenSearch.
     """
     for search_app in get_search_apps():
-        schedule_model_sync(search_app)
+        schedule_model_sync((search_app.name,))
 
 
-def schedule_model_sync(search_app):
+def schedule_model_sync(search_app: tuple):
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
         function=sync_model,
-        function_args=(search_app.name,),
+        function_args=search_app,
         job_timeout=HALF_DAY_IN_SECONDS,
     )
     logger.info(
-        f'Task {job.id} sync_model scheduled for {search_app.name}',
+        f'Task {job.id} sync_model scheduled for {search_app[0]}',
     )
 
 
