@@ -23,6 +23,9 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
+from datahub.core.constants import (
+    HeadquarterType,
+)
 from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata import models as metadata_models
 
@@ -162,15 +165,21 @@ class Company(ArchivableModel, BaseModel):
         default=list,
     )
     business_type = models.ForeignKey(
-        metadata_models.BusinessType, blank=True, null=True,
+        metadata_models.BusinessType,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
     )
     sector = TreeForeignKey(
-        metadata_models.Sector, blank=True, null=True,
+        metadata_models.Sector,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
     )
     employee_range = models.ForeignKey(
-        metadata_models.EmployeeRange, blank=True, null=True,
+        metadata_models.EmployeeRange,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
         help_text=(
             'Not used when duns_number is set. In that case, use number_of_employees instead.'
@@ -187,7 +196,9 @@ class Company(ArchivableModel, BaseModel):
         help_text='Only used when duns_number is set.',
     )
     turnover_range = models.ForeignKey(
-        metadata_models.TurnoverRange, blank=True, null=True,
+        metadata_models.TurnoverRange,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
         help_text='Not used when duns_number is set. In that case, use turnover instead.',
     )
@@ -214,7 +225,9 @@ class Company(ArchivableModel, BaseModel):
     description = models.TextField(blank=True, null=True)
     website = models.URLField(max_length=MAX_LENGTH, blank=True, null=True)
     uk_region = models.ForeignKey(
-        metadata_models.UKRegion, blank=True, null=True,
+        metadata_models.UKRegion,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
     )
 
@@ -262,7 +275,9 @@ class Company(ArchivableModel, BaseModel):
     registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
 
     headquarter_type = models.ForeignKey(
-        metadata_models.HeadquarterType, blank=True, null=True,
+        metadata_models.HeadquarterType,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
     )
     one_list_tier = models.ForeignKey(
@@ -272,19 +287,29 @@ class Company(ArchivableModel, BaseModel):
         on_delete=models.PROTECT,
     )
     global_headquarters = models.ForeignKey(
-        'self', blank=True, null=True, on_delete=models.SET_NULL,
+        'self',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
         related_name='subsidiaries',
     )
     one_list_account_owner = models.ForeignKey(
-        'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
+        'Advisor',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
         related_name='one_list_owned_companies',
         help_text='Global account manager',
     )
     export_experience_category = models.ForeignKey(
-        ExportExperienceCategory, blank=True, null=True, on_delete=models.SET_NULL,
+        ExportExperienceCategory,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
     archived_documents_url_path = models.CharField(
-        max_length=MAX_LENGTH, blank=True,
+        max_length=MAX_LENGTH,
+        blank=True,
         help_text='Legacy field. File browser path to the archived documents for this company.',
     )
     transferred_to = models.ForeignKey(
@@ -423,9 +448,21 @@ class Company(ArchivableModel, BaseModel):
         """
         All companies that share the same global ultimate duns number
         """
-        return Company.objects.filter(
-            global_ultimate_duns_number=self.global_ultimate_duns_number,
-        ).exclude(global_ultimate_duns_number='').exclude(global_ultimate_duns_number=None)
+        return (
+            Company.objects.filter(
+                global_ultimate_duns_number=self.global_ultimate_duns_number,
+            )
+            .exclude(global_ultimate_duns_number='')
+            .exclude(global_ultimate_duns_number=None)
+        )
+
+    @property
+    def is_global_headquarters(self):
+        """Whether this company is the global headquarters or not"""
+        if not self.headquarter_type:
+            return False
+
+        return self.headquarter_type.name == HeadquarterType.ghq.value.id
 
     def mark_as_transferred(self, to, reason, user):
         """
@@ -483,16 +520,20 @@ class Company(ArchivableModel, BaseModel):
 
         # add all other core members excluding the global account manager
         # who might have already been added
-        team_members = group_global_headquarters.one_list_core_team_members.exclude(
-            adviser=global_account_manager,
-        ).select_related(
-            'adviser',
-            'adviser__dit_team',
-            'adviser__dit_team__uk_region',
-            'adviser__dit_team__country',
-        ).order_by(
-            'adviser__first_name',
-            'adviser__last_name',
+        team_members = (
+            group_global_headquarters.one_list_core_team_members.exclude(
+                adviser=global_account_manager,
+            )
+            .select_related(
+                'adviser',
+                'adviser__dit_team',
+                'adviser__dit_team__uk_region',
+                'adviser__dit_team__country',
+            )
+            .order_by(
+                'adviser__first_name',
+                'adviser__last_name',
+            )
         )
 
         core_team.extend(
@@ -633,9 +674,7 @@ class OneListCoreTeamMember(models.Model):
         return f'{self.adviser} - One List Core Team member of {self.company}'
 
     class Meta:
-        unique_together = (
-            ('company', 'adviser'),
-        )
+        unique_together = (('company', 'adviser'),)
 
 
 @reversion.register_base_model()
@@ -687,9 +726,7 @@ class CompanyExportCountry(BaseModel):
 
     def __str__(self):
         """Admin displayed human readable name"""
-        return (
-            f'{self.company} {self.country} {self.status}'
-        )
+        return f'{self.company} {self.country} {self.status}'
 
 
 class CompanyExportCountryHistory(models.Model):
@@ -742,6 +779,4 @@ class CompanyExportCountryHistory(models.Model):
 
     def __str__(self):
         """Admin displayed human readable name"""
-        return (
-            f'{self.company} {self.country} {self.status}'
-        )
+        return f'{self.company} {self.country} {self.status}'
