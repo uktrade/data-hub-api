@@ -723,13 +723,14 @@ class TestGetCompany(APITestMixin):
         ),
     )
     def test_get_company_is_global_headquarters(
-        self, headquarter_type, expected_is_global_headquarters
+        self,
+        headquarter_type,
+        expected_is_global_headquarters,
     ):
         """
         Test that `is_global_headquarters` is set for a company API result
         as expected.
         """
-
         company = CompanyFactory(headquarter_type_id=headquarter_type)
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
         response = self.api_client.get(url)
@@ -1114,7 +1115,7 @@ class TestUpdateCompany(APITestMixin):
                 },
                 {
                     'address_country': [
-                        'A UK establishment (branch of non-UK company) must be in the UK.'
+                        'A UK establishment (branch of non-UK company) must be in the UK.',
                     ],
                 },
             ),
@@ -1787,7 +1788,7 @@ class TestAddCompany(APITestMixin):
                 },
                 {
                     'address_country': [
-                        'A UK establishment (branch of non-UK company) must be in the UK.'
+                        'A UK establishment (branch of non-UK company) must be in the UK.',
                     ],
                 },
                 [],
@@ -1807,7 +1808,7 @@ class TestAddCompany(APITestMixin):
                 },
                 {
                     'company_number': [
-                        'This must be a valid UK establishment number, beginning with BR.'
+                        'This must be a valid UK establishment number, beginning with BR.',
                     ],
                 },
                 [],

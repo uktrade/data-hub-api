@@ -17,14 +17,14 @@ from datahub.company.signal_receivers import (
     export_country_update_signal,
 )
 from datahub.core import constants, reversion
+from datahub.core.constants import (
+    HeadquarterType,
+)
 from datahub.core.models import (
     ArchivableModel,
     BaseConstantModel,
     BaseModel,
     BaseOrderedConstantModel,
-)
-from datahub.core.constants import (
-    HeadquarterType,
 )
 from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata import models as metadata_models
