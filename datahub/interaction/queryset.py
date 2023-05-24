@@ -29,7 +29,6 @@ def get_base_interaction_queryset():
         'company_referral__recipient__dit_team',
     ).prefetch_related(
         Prefetch('contacts', queryset=Contact.objects.order_by('pk')),
-        # 'policy_issue_types',
         Prefetch(
             'dit_participants',
             queryset=(

@@ -34,7 +34,6 @@ from datahub.interaction.models import (
     Interaction,
     InteractionDITParticipant,
     InteractionExportCountry,
-    PolicyIssueType,
     ServiceDeliveryStatus,
 )
 from datahub.interaction.permissions import HasAssociatedInvestmentProjectValidator
@@ -203,12 +202,6 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
     service_delivery_status = NestedRelatedField(
         ServiceDeliveryStatus, required=False, allow_null=True,
     )
-    # policy_issue_types = NestedRelatedField(
-    #     PolicyIssueType,
-    #     allow_empty=True,
-    #     many=True,
-    #     required=False,
-    # )
     export_barrier_types = NestedRelatedField(
         ExportBarrierType,
         allow_empty=True,
@@ -469,7 +462,6 @@ class InteractionSerializer(BaseInteractionSerializer):
             'notes',
             'archived_documents_url_path',
             'policy_feedback_notes',
-            # 'policy_issue_types',
             'was_policy_feedback_provided',
             'were_countries_discussed',
             'export_countries',
@@ -533,13 +525,11 @@ class InteractionSerializer(BaseInteractionSerializer):
                 ),
                 ValidationRule(
                     'invalid_when_no_policy_feedback',
-                    # OperatorRule('policy_issue_types', not_),
                     OperatorRule('policy_feedback_notes', not_),
                     when=OperatorRule('was_policy_feedback_provided', not_),
                 ),
                 ValidationRule(
                     'required',
-                    # OperatorRule('policy_issue_types', bool),
                     OperatorRule('policy_feedback_notes', is_not_blank),
                     when=OperatorRule('was_policy_feedback_provided', bool),
                 ),
@@ -668,7 +658,6 @@ class InteractionSerializerV4(BaseInteractionSerializer):
             'notes',
             'archived_documents_url_path',
             'policy_feedback_notes',
-            # 'policy_issue_types',
             'helped_remove_export_barrier',
             'export_barrier_types',
             'export_barrier_notes',
@@ -736,13 +725,11 @@ class InteractionSerializerV4(BaseInteractionSerializer):
                 ),
                 ValidationRule(
                     'invalid_when_no_policy_feedback',
-                    # OperatorRule('policy_issue_types', not_),
                     OperatorRule('policy_feedback_notes', not_),
                     when=OperatorRule('was_policy_feedback_provided', not_),
                 ),
                 ValidationRule(
                     'required',
-                    # OperatorRule('policy_issue_types', bool),
                     OperatorRule('policy_feedback_notes', is_not_blank),
                     when=OperatorRule('was_policy_feedback_provided', bool),
                 ),

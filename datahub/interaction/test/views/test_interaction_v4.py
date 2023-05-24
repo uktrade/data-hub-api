@@ -29,7 +29,6 @@ from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
     InteractionPermission,
-    PolicyIssueType,
     ServiceDeliveryStatus,
 )
 from datahub.interaction.test.factories import (
@@ -92,7 +91,6 @@ class TestAddInteraction(APITestMixin):
             {
                 'was_policy_feedback_provided': True,
                 'policy_feedback_notes': 'Policy feedback notes',
-                # 'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
             },
         ),
     )
@@ -140,7 +138,6 @@ class TestAddInteraction(APITestMixin):
             'grant_amount_offered': None,
             'net_company_receipt': None,
             'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
-            # 'policy_issue_types': request_data.get('policy_issue_types', []),
             'was_policy_feedback_provided': request_data.get(
                 'was_policy_feedback_provided', False,
             ),
@@ -259,7 +256,6 @@ class TestAddInteraction(APITestMixin):
             {
                 'was_policy_feedback_provided': True,
                 'policy_feedback_notes': 'Policy feedback notes',
-                # 'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
             },
         ),
     )
@@ -391,7 +387,6 @@ class TestAddInteraction(APITestMixin):
             'grant_amount_offered': None,
             'net_company_receipt': None,
             'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
-            # 'policy_issue_types': request_data.get('policy_issue_types', []),
             'was_policy_feedback_provided': request_data.get(
                 'was_policy_feedback_provided', False,
             ),
@@ -724,7 +719,6 @@ class TestAddInteraction(APITestMixin):
                 },
                 {
                     'policy_feedback_notes': ['This field is required.'],
-                    # 'policy_issue_types': ['This field is required.'],
                 },
             ),
             # policy feedback fields cannot be blank when policy feedback provided
@@ -749,13 +743,11 @@ class TestAddInteraction(APITestMixin):
                     ),
                     'was_policy_feedback_provided': True,
                     'policy_feedback_notes': '',
-                    # 'policy_issue_types': [],
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
                 },
                 {
                     'policy_feedback_notes': ['This field is required.'],
-                    # 'policy_issue_types': ['This field is required.'],
                 },
             ),
             # at least one trade agreements field required when there are related trade agreements
@@ -1290,9 +1282,6 @@ class TestAddInteraction(APITestMixin):
                         ServiceDeliveryStatus,
                     ),
                     'policy_feedback_notes': 'Policy feedback notes.',
-                    # 'policy_issue_types': [
-                    #     partial(random_obj_for_model, PolicyIssueType),
-                    # ],
                     'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
                 },
                 {
@@ -1304,9 +1293,6 @@ class TestAddInteraction(APITestMixin):
                     'policy_feedback_notes': [
                         'This field is only valid when policy feedback has been provided.',
                     ],
-                    # 'policy_issue_types': [
-                    #     'This field is only valid when policy feedback has been provided.',
-                    # ],
                     'related_trade_agreements': [
                         'This field is only valid when there are related trade agreements.',
                     ],
@@ -1894,13 +1880,6 @@ class TestGetInteraction(APITestMixin):
             'grant_amount_offered': None,
             'net_company_receipt': None,
             'policy_feedback_notes': interaction.policy_feedback_notes,
-            # 'policy_issue_types': [
-            #     {
-            #         'id': str(policy_issue_type.pk),
-            #         'name': policy_issue_type.name,
-            #     }
-            #     for policy_issue_type in interaction.policy_issue_types.all()
-            # ],
             'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
@@ -2034,7 +2013,6 @@ class TestGetInteraction(APITestMixin):
             'grant_amount_offered': None,
             'net_company_receipt': None,
             'policy_feedback_notes': '',
-            # 'policy_issue_types': [],
             'was_policy_feedback_provided': False,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
