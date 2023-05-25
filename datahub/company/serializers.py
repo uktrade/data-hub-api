@@ -643,6 +643,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'export_countries',
             'export_segment',
             'export_sub_segment',
+            'is_global_headquarters',
         )
         read_only_fields = (
             'archived',
@@ -664,6 +665,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'global_ultimate_duns_number',
             'dnb_modified_on',
             'export_countries',
+            'is_global_headquarters',
         )
         dnb_read_only_fields = (
             'name',
