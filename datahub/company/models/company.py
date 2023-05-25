@@ -461,8 +461,7 @@ class Company(ArchivableModel, BaseModel):
         """Whether this company is the global headquarters or not"""
         if not self.headquarter_type:
             return False
-
-        return self.headquarter_type.name == HeadquarterType.ghq.value.id
+        return self.headquarter_type.name == HeadquarterType.ghq.value.name
 
     def mark_as_transferred(self, to, reason, user):
         """

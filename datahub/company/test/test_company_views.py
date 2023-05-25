@@ -736,7 +736,7 @@ class TestGetCompany(APITestMixin):
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        # assert response.json()['is_global_headquarters'] == expected_is_global_headquarters
+        assert response.json()['is_global_headquarters'] == expected_is_global_headquarters
 
 
 class TestUpdateCompany(APITestMixin):
