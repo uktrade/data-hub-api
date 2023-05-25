@@ -1,0 +1,448 @@
+- model: metadata.service
+  pk: f9dd5fc3-a33a-4024-b512-f345a51d295f
+  fields:
+    segment: Account management
+- model: metadata.service
+  pk: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+  fields:
+    segment: DBT export service or funding
+- model: metadata.service
+  pk: c17ab57e-1f37-4941-84ac-cc4cb5eb1370
+  fields:
+    segment: Export opportunities
+- model: metadata.service
+  pk: d520b92b-3499-e211-a939-e4115bead28a
+  fields:
+    segment: Export opportunities
+- model: metadata.service
+  pk: 8fed6f78-51e6-4b42-b9ab-ee1cf2c54f74
+  fields:
+    segment: Export Support Service – international markets
+- model: metadata.service
+  pk: 4c434df3-e7c7-4afb-ba79-7f354995600f
+  fields:
+    segment: Field Force phase 2 call
+- model: metadata.service
+  pk: 4664f856-166f-4f48-9865-653250f84086
+  fields:
+    segment: 'Global Growth Service: diagnostic and output report completed by DBT'
+- model: metadata.service
+  pk: 6a27f71a-6b4b-4e8f-83b8-35615c13fdc8
+  fields:
+    segment: 'Global Growth Service: engagement letter signed by company'
+- model: metadata.service
+  pk: bc005d16-48f2-4769-8f63-272226f84dc8
+  fields:
+    segment: 'Global Growth Service: project closed'
+- model: metadata.service
+  pk: 482fca2e-3bfa-4c4f-8649-17d292aad87f
+  fields:
+    segment: 'Global Growth Service: signed export growth plan received from company'
+- model: metadata.service
+  pk: 3e525e31-5b0a-4562-81cc-2571d7880b3d
+  fields:
+    segment: Levelling up
+- model: metadata.service
+  pk: da4751d8-07cd-4266-a365-90f0342bc07f
+  fields:
+    segment: Levelling up
+- model: metadata.service
+  pk: 58da3eec-a906-48eb-b258-bd3fb0717e7a
+  fields:
+    segment: Significant assistance
+- model: metadata.service
+  pk: f56eb92b-3499-e211-a939-e4115bead28a
+  fields:
+    segment: Significant assistance
+- model: metadata.service
+  pk: ba47bf4b-09da-4ccf-9d56-84754e45646e
+  fields:
+    segment: UK Tradeshow Programme (UKTP) – attendee
+- model: metadata.service
+  pk: 5b129c32-44fc-4765-a134-a09d57e8bca8
+  fields:
+    segment: UK Tradeshow Programme (UKTP) – attendee
+- model: metadata.service
+  pk: 27d15c52-9d78-4e3d-aaa7-64bdb45bb506
+  fields:
+    segment: UK Tradeshow Programme (UKTP) – exhibitor
+- model: metadata.service
+  pk: 9a28e4dc-d96b-42c8-bdc5-3ddfb6bf74bc
+  fields:
+    segment: UK Tradeshow Programme (UKTP) – exhibitor
+- model: metadata.service
+  pk: 552f4ba8-b993-498f-a640-c1b9a888f83e
+  fields:
+    segment: Specific service
+- model: metadata.service
+  pk: 56c42f6d-1ff3-e411-bcbe-e4115bead28a
+  fields:
+    segment: Digital Trade Advisers one-to-one
+- model: metadata.service
+  pk: 140e343e-b69c-4449-99df-bc6735498391
+  fields:
+    segment: Great international trade campaign
+- model: metadata.service
+  pk: e96a775a-1ff3-e411-bcbe-e4115bead28a
+  fields:
+    segment: Language and Culture Advisers one-to-one
+- model: metadata.service
+  pk: 0b94cd30-e5eb-e311-8a2b-e4115bead28a
+  fields:
+    segment: Overseas Business Network chargeable services (OBN)
+- model: metadata.service
+  pk: 2c5fe1c9-2f55-4443-bfb7-a43c84eae83e
+  fields:
+    segment: Overseas Business Network chargeable services (OBN)
+- model: metadata.service
+  pk: 9a84b82b-3499-e211-a939-e4115bead28a
+  fields:
+    segment: UK region local
+- model: metadata.service
+  pk: d3a25003-7f32-4087-8dd0-ae9eacf8a281
+  fields:
+    segment: Adaptation and resilience
+- model: metadata.service
+  pk: 2f97f7f8-e9a8-41d7-ac5d-819846e6f363
+  fields:
+    segment: Clean transport, including EV100
+- model: metadata.service
+  pk: e3a488c6-59ab-4343-aab7-68875f0afb39
+  fields:
+    segment: Energy transitions, including RE100 and EP100
+- model: metadata.service
+  pk: dc5255e5-44d8-461f-a699-0353728bc8eb
+  fields:
+    segment: Race to Zero, including science based targets
+- model: metadata.service
+  pk: fee6779d-e127-4e1e-89f6-d614b4df3581
+  fields:
+    segment: Enquiry or referral
+- model: metadata.service
+  pk: bb9024e0-61ff-4fd7-acd3-61e12614b776
+  fields:
+    segment: British business bank
+- model: metadata.service
+  pk: e722cad1-8caf-4f3c-957a-d6ef753088a8
+  fields:
+    segment: Chambers of commerce
+- model: metadata.service
+  pk: 1a41446a-ec87-4256-ae6c-c658df023d88
+  fields:
+    segment: Combined authorities
+- model: metadata.service
+  pk: cab605ce-5f50-4790-9378-1c8a056f7e5a
+  fields:
+    segment: County councils
+- model: metadata.service
+  pk: e7238b26-653c-e711-8a1f-e4115bead28a
+  fields:
+    segment: DBT marketing campaigns
+- model: metadata.service
+  pk: b2354de4-fa42-43ee-8475-cd7140058f37
+  fields:
+    segment: DBT Middle East and Pakistan comms and marketing campaigns
+- model: metadata.service
+  pk: fc142e9b-b9eb-47fc-9c58-3b3186457ab1
+  fields:
+    segment: General enquiry
+- model: metadata.service
+  pk: 041e7ce1-9d5a-4ce6-b77c-088aef9d816b
+  fields:
+    segment: General export enquiry
+- model: metadata.service
+  pk: d045c2e1-d218-4aa2-901a-8ae9d6e5b9a9
+  fields:
+    segment: Growth hubs
+- model: metadata.service
+  pk: b7869852-af3f-4661-8844-60545f304960
+  fields:
+    segment: Key account managers
+- model: metadata.service
+  pk: 632b8708-28b6-e611-984a-e4115bead28a
+  fields:
+    segment: Local partner referral
+- model: metadata.service
+  pk: 65dc115c-dcd8-4441-9d3a-76285a979aa4
+  fields:
+    segment: Inbound referral
+- model: metadata.service
+  pk: ed487b52-4675-4338-a904-2c27e95ee195
+  fields:
+    segment: Commonwealth Games 2022 – BATP programme
+- model: metadata.service
+  pk: fc569da6-7341-4785-9a42-b4fb2114351d
+  fields:
+    segment: Commonwealth Games 2022 – GEP programme
+- model: metadata.service
+  pk: 3a0bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    segment: General investment enquiry
+- model: metadata.service
+  pk: 66b76d45-be8f-4828-81fb-9ca9e4b29642
+  fields:
+    segment: HPO High Potential Opportunity investment enquiry from IIGB
+- model: metadata.service
+  pk: 47513afa-8313-4ec9-931e-849d4cdd4959
+  fields:
+    segment: HPO High Potential Opportunity investment enquiry from IST target company
+- model: metadata.service
+  pk: 370bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    segment: Inward mission
+- model: metadata.service
+  pk: 340bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    segment: Market visit
+- model: metadata.service
+  pk: 0696b92b-3499-e211-a939-e4115bead28a
+  fields:
+    segment: Outward mission
+- model: metadata.service
+  pk: 9584b82b-3499-e211-a939-e4115bead28a
+  fields:
+    segment: UK based
+- model: metadata.service
+  pk: 350bba2b-3499-e211-a939-e4115bead28a
+  fields:
+    segment: Export win
+- model: metadata.service
+  pk: 38a67092-f485-4ea1-8a1a-402b949d2d13
+  fields:
+    segment: Investment enquiry – assigned to HQ (IST use only)
+- model: metadata.service
+  pk: 2591b204-8a31-4824-a93b-d7a03dca8cb5
+  fields:
+    segment: Investment enquiry – assigned to IST-CMC (IST use only)
+- model: metadata.service
+  pk: c579b89b-d49d-4926-a6a4-0a1459cd25cb
+  fields:
+    segment: Investment enquiry – assigned to IST-SAS (IST use only)
+- model: metadata.service
+  pk: 4f142041-2b9d-4776-ace8-22612260eae6
+  fields:
+    segment: Investment enquiry – confirmed prospect project status (IST use only)
+- model: metadata.service
+  pk: 73ceedc1-c139-4bdf-9e47-17b1bae488da
+  fields:
+    segment: Investment enquiry – requested more information from source (IST use only)
+- model: metadata.service
+  pk: 05c8175a-abf5-4cc6-af34-bcee8699fd4b
+  fields:
+    segment: Investment enquiry – transferred to DA (IST use only)
+- model: metadata.service
+  pk: 48e6bc3e-56c5-4bdc-a718-093614547d73
+  fields:
+    segment: Investment enquiry – transferred to LEP (IST use only)
+- model: metadata.service
+  pk: c707f81d-ae66-490a-98f5-575438944c43
+  fields:
+    segment: Investment enquiry – transferred to L&P (IST use only)
+- model: metadata.service
+  pk: 79824229-fd87-483f-b929-8f2b9531492b
+  fields:
+    segment: Investment - IST aftercare offered (IST use only)
+- model: metadata.service
+  pk: 0596b92b-3499-e211-a939-e4115bead28a
+  fields:
+    segment: Investment - services
+- model: metadata.service
+  pk: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+  fields:
+    segment: IST service
+- model: metadata.service
+  pk: 2a30db0d-a6a9-4d68-8605-cb9781830d73
+  fields:
+    segment: Abandoned - no investor response (ERU Use)
+- model: metadata.service
+  pk: 4f59998a-1928-4405-8424-da3d24358128
+  fields:
+    segment: Commercial partner referral (ERU Use)
+- model: metadata.service
+  pk: 127410b1-12b5-47ba-9519-937216ee9b0f
+  fields:
+    segment: ELD notification (ERU Use)
+- model: metadata.service
+  pk: f26b708d-c165-4a07-a54a-9aa651a64804
+  fields:
+    segment: Evidence request / notify VT (ERU Use)
+- model: metadata.service
+  pk: 6340148a-0f36-4417-87e5-2283358a8f41
+  fields:
+    segment: Follow up email - no investor response (ERU Use)
+- model: metadata.service
+  pk: 599aa075-b9c4-4f18-bd37-eead2bb0fb77
+  fields:
+    segment: Further information sent (ERU Use)
+- model: metadata.service
+  pk: 44d42ae2-9a0a-4236-826f-e9110da29870
+  fields:
+    segment: High value reassignment (ERU Use)
+- model: metadata.service
+  pk: 2e764833-56f1-4b33-b9e8-5c034ec788c0
+  fields:
+    segment: Introductory pack sent (ERU Use)
+- model: metadata.service
+  pk: 42c71892-f9f7-e511-888e-e4115bead28a
+  fields:
+    segment: IST visit
+- model: metadata.service
+  pk: a0cf6892-1a98-4baf-be22-ebe82baa70f1
+  fields:
+    segment: Low value reassignment (ERU Use)
+- model: metadata.service
+  pk: 1477622e-9adb-4017-8d8d-fe3221f1d2fc
+  fields:
+    segment: Export introductions
+- model: metadata.service
+  pk: ad86cd7e-2ca7-4b06-bf60-fcc0789e275c
+  fields:
+    segment: Export introductions
+- model: metadata.service
+  pk: 8cb7deb7-7618-4eb7-b248-4686ae0634ea
+  fields:
+    segment: Other government department
+- model: metadata.service
+  pk: 9efb937b-c23f-4248-aab3-986ede3e655d
+  fields:
+    segment: Business partners (such as distributors or manufacturers)
+- model: metadata.service
+  pk: 549d657d-6930-413d-a14e-18a6427467be
+  fields:
+    segment: Financial and professional service providers
+- model: metadata.service
+  pk: 273132d7-de50-41a7-a994-ff7d93302092
+  fields:
+    segment: DBT (another team)
+- model: metadata.service
+  pk: 83834540-88d7-4f7c-a2d3-9af9192ad340
+  fields:
+    segment: DBT (another team)
+- model: metadata.service
+  pk: d44c334c-0ac7-4151-890e-4a3a5aa47aed
+  fields:
+    segment: DBT (another team)
+- model: metadata.service
+  pk: 7aa9b539-84e9-4ba8-8d93-2e1fdbfd066c
+  fields:
+    segment: Investment introductions
+- model: metadata.service
+  pk: ad243962-db79-4e40-ab53-4616f017118b
+  fields:
+    segment: Investment introductions
+- model: metadata.service
+  pk: acd20042-84a5-466e-b27a-fc3726052b59
+  fields:
+    segment: Other government department
+- model: metadata.service
+  pk: e9dd3bfe-0c1e-427b-a91a-31e60ca580e5
+  fields:
+    segment: Other government department
+- model: metadata.service
+  pk: bbee73f1-8eee-443e-8e07-c406bd8e696c
+  fields:
+    segment: Business partners (such as distributors or manufacturers)
+- model: metadata.service
+  pk: b2455298-5ccb-4ecb-96f6-86cf61aab4d2
+  fields:
+    segment: Business partners (such as distributors or manufacturers)
+- model: metadata.service
+  pk: 630a242e-c8b9-403d-b9a8-fcddada25051
+  fields:
+    segment: Financial and professional service providers
+- model: metadata.service
+  pk: 735da232-8058-44a5-be69-5c0e2bec0b7e
+  fields:
+    segment: Financial and professional service providers
+- model: metadata.service
+  pk: 64fc348f-137d-4cc1-8685-6ca15fd3206a
+  fields:
+    segment: Investment opportunities
+- model: metadata.service
+  pk: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+  fields:
+    segment: Other introductions
+- model: metadata.service
+  pk: 3f5a2216-8cb1-4fb7-9c6b-06ba77d7405b
+  fields:
+    segment: Other introductions
+- model: metadata.service
+  pk: 329353bb-a152-49bf-b4fc-fc0f5f4a0f6a
+  fields:
+    segment: Proposition development
+- model: metadata.service
+  pk: 76d912d6-e9da-4963-80ae-d07f8f6feed7
+  fields:
+    segment: Export advice and information
+- model: metadata.service
+  pk: ef3218c1-bed6-4ad8-b8d5-8af2430d32ff
+  fields:
+    segment: Investment advice and information
+- model: metadata.service
+  pk: 90f5533d-6acf-4aff-9528-75da9af9b851
+  fields:
+    segment: Other advice and information
+- model: metadata.service
+  pk: 5836a53c-a588-4c67-a510-47d0cfff8a24
+  fields:
+    segment: Other advice and information
+- model: metadata.service
+  pk: 51c9de65-f170-4bdf-adcf-473913429db7
+  fields:
+    segment: Trade agreement implementation activity
+- model: metadata.service
+  pk: 8d098d19-5988-4afd-8c0b-cc5652eccb26
+  fields:
+    segment: Civil society meetings
+- model: metadata.service
+  pk: 8d3abcc6-59a9-42a9-a9ce-9d25dc9fe5ee
+  fields:
+    segment: Engagement with Local Enterprise Partnerships (LEPs)
+- model: metadata.service
+  pk: 4cd20b7d-2b33-4a10-96a0-51f056861a97
+  fields:
+    segment: Engaging with devolved authorities on trade agreements
+- model: metadata.service
+  pk: 11b1d6e6-dc9d-4794-b54f-79920b095288
+  fields:
+    segment: Informing key stakeholder groups of opportunities and gathering business intelligence
+- model: metadata.service
+  pk: 155f0df9-e13b-445a-96cd-e1071a001fea
+  fields:
+    segment: Lobbying businesses for trade agreements
+- model: metadata.service
+  pk: 0839a7db-44e1-4090-a131-93ea95ef6a6a
+  fields:
+    segment: Partner country interaction - post-ratification (trade agreement related)
+- model: metadata.service
+  pk: 81408b2e-a22e-4901-8d3a-b981bf5592ff
+  fields:
+    segment: Partner country interaction - related to Market Access Barriers
+- model: metadata.service
+  pk: 9984b82b-3499-e211-a939-e4115bead28a
+  fields:
+    segment: Inbound export referral
+- model: interaction.serviceansweroption
+  pk: a5ba5f67-619f-4c27-a92c-5db1a229060e
+  fields:
+    name: Banking and funding
+- model: interaction.serviceansweroption
+  pk: f8186dcb-2504-45a0-87fa-bae2ea0be516
+  fields:
+    name: DBT or government services
+- model: interaction.serviceansweroption
+  pk: 5ce36b9c-6f6a-42aa-90b5-44253c35c6c9
+  fields:
+    name: Documents and regulations
+- model: interaction.serviceansweroption
+  pk: 27b8d2ac-a3c0-4e91-8550-04326bd6951d
+  fields:
+    name: Markets and sectors
+- model: interaction.serviceansweroption
+  pk: 1b894289-ccfe-4399-a7e7-0391b48e6144
+  fields:
+    name: Marketing and communication
+- model: interaction.serviceansweroption
+  pk: c413f76e-9bf0-4553-94c2-10adc33b3696
+  fields:
+    name: Skills and recruitment
