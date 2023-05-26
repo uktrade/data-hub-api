@@ -13,8 +13,7 @@ from datahub.core.test_utils import APITestMixin, random_obj_for_model
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.models import (
     CommunicationChannel,
-    Interaction, PolicyArea,
-    PolicyIssueType,
+    Interaction,
     ServiceDeliveryStatus,
 )
 from datahub.interaction.test.factories import (
@@ -64,11 +63,7 @@ class TestAddServiceDelivery(APITestMixin):
             {
                 'is_event': False,
                 'was_policy_feedback_provided': True,
-                'policy_areas': [
-                    partial(random_obj_for_model, PolicyArea),
-                ],
                 'policy_feedback_notes': 'Policy feedback notes',
-                'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
             },
             # Interaction with a status
             {
@@ -112,10 +107,7 @@ class TestAddServiceDelivery(APITestMixin):
             'grant_amount_offered': request_data.get('grant_amount_offered'),
             'net_company_receipt': request_data.get('net_company_receipt'),
             'communication_channel': None,
-            'policy_areas': request_data.get('policy_areas', []),
             'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
-            'policy_issue_types':
-                request_data.get('policy_issue_types', []),
             'was_policy_feedback_provided':
                 request_data.get('was_policy_feedback_provided', False),
             'subject': 'whatever',
@@ -242,9 +234,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'was_policy_feedback_provided': True,
                 },
                 {
-                    'policy_areas': ['This field is required.'],
                     'policy_feedback_notes': ['This field is required.'],
-                    'policy_issue_types': ['This field is required.'],
                 },
             ),
 
@@ -268,14 +258,10 @@ class TestAddServiceDelivery(APITestMixin):
                     ),
 
                     'was_policy_feedback_provided': True,
-                    'policy_areas': [],
                     'policy_feedback_notes': '',
-                    'policy_issue_types': [],
                 },
                 {
-                    'policy_areas': ['This field is required.'],
                     'policy_feedback_notes': ['This field is required.'],
-                    'policy_issue_types': ['This field is required.'],
                 },
             ),
 
@@ -303,20 +289,12 @@ class TestAddServiceDelivery(APITestMixin):
 
                     # fields not allowed
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-                    'policy_areas': [partial(random_obj_for_model, PolicyArea)],
                     'policy_feedback_notes': 'Policy feedback notes.',
-                    'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
                     'investment_project': InvestmentProjectFactory,
                 },
                 {
                     'communication_channel': ['This field is not valid for service deliveries.'],
-                    'policy_areas': [
-                        'This field is only valid when policy feedback has been provided.',
-                    ],
                     'policy_feedback_notes': [
-                        'This field is only valid when policy feedback has been provided.',
-                    ],
-                    'policy_issue_types': [
                         'This field is only valid when policy feedback has been provided.',
                     ],
                     'investment_project': ['This field is only valid for interactions.'],
