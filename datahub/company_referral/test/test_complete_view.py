@@ -257,9 +257,7 @@ class TestCompleteCompanyReferral(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
-            'policy_areas': [],
             'policy_feedback_notes': '',
-            'policy_issue_types': [],
             'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
