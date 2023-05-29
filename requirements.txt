@@ -91,7 +91,7 @@ gevent==22.10.2
     # via -r requirements.in
 greenlet==2.0.2
     # via gevent
-icalendar==5.0.5
+icalendar==5.0.6
     # via -r requirements.in
 idna==3.4
     # via
