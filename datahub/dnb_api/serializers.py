@@ -462,21 +462,3 @@ class DNBCompanyInvestigationSerializer(serializers.Serializer):
             **address_data,
         }
     
-class DNBCompanyHierarchySerializer(CompanySerializer):
-  """
-  For shaping a company hierarchy from DNB data.
-
-  """
-
-  duns_number = serializers.CharField(
-      max_length=9,
-      min_length=9,
-      validators=(integer_validator,),
-  )
-
-  global_ultimate_duns_number = serializers.CharField(
-      allow_blank=True,
-      max_length=9,
-      min_length=9,
-      validators=(integer_validator,),
-  )
