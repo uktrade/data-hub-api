@@ -18,7 +18,8 @@ from datahub.core.serializers import (
 )
 from datahub.core.validators import EqualsRule, OperatorRule, RulesBasedValidator, ValidationRule
 from datahub.interaction.models import InteractionPermission
-from datahub.metadata.models import AdministrativeArea, Country as CountryModel
+from datahub.metadata.models import AdministrativeArea
+from datahub.metadata.models import Country as CountryModel
 from datahub.metadata.utils import convert_gbp_to_usd
 
 
@@ -460,3 +461,22 @@ class DNBCompanyInvestigationSerializer(serializers.Serializer):
             **data,
             **address_data,
         }
+    
+class DNBCompanyHierarchySerializer(CompanySerializer):
+  """
+  For shaping a company hierarchy from DNB data.
+
+  """
+
+  duns_number = serializers.CharField(
+      max_length=9,
+      min_length=9,
+      validators=(integer_validator,),
+  )
+
+  global_ultimate_duns_number = serializers.CharField(
+      allow_blank=True,
+      max_length=9,
+      min_length=9,
+      validators=(integer_validator,),
+  )
