@@ -24,9 +24,9 @@ attrs==22.2.0
     #   flake8-bugbear
 backcall==0.2.0
     # via ipython
-boto3==1.26.133
+boto3==1.26.142
     # via -r requirements.in
-botocore==1.29.133
+botocore==1.29.142
     # via
     #   boto3
     #   s3transfer
@@ -71,9 +71,9 @@ django==3.2.19
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==5.41.1
+django-axes==6.0.1
     # via -r requirements.in
-django-debug-toolbar==4.0.0
+django-debug-toolbar==4.1.0
     # via -r requirements.in
 django-environ==0.10.0
     # via -r requirements.in
@@ -82,9 +82,7 @@ django-extensions==3.2.1
 django-filter==23.2
     # via -r requirements.in
 django-ipware==3.0.7
-    # via
-    #   django-axes
-    #   django-log-formatter-ecs
+    # via django-log-formatter-ecs
 django-js-asset==2.0.0
     # via django-mptt
 django-log-formatter-ecs==0.0.5
@@ -154,7 +152,7 @@ gevent==22.10.2
     # via -r requirements.in
 greenlet==2.0.2
     # via gevent
-icalendar==5.0.5
+icalendar==5.0.6
     # via -r requirements.in
 identify==2.5.11
     # via pre-commit
@@ -231,7 +229,7 @@ platformdirs==2.6.0
     #   virtualenv
 pluggy==1.0.0
     # via pytest
-pre-commit==3.3.1
+pre-commit==3.3.2
     # via -r requirements-dev.in
 prompt-toolkit==3.0.36
     # via ipython
@@ -279,13 +277,13 @@ pytest==7.3.1
     #   pytest-django
     #   pytest-mock
     #   pytest-xdist
-pytest-cov==4.0.0
+pytest-cov==4.1.0
     # via -r requirements-dev.in
 pytest-django==4.5.2
     # via -r requirements-dev.in
 pytest-mock==3.10.0
     # via -r requirements-dev.in
-pytest-xdist==3.3.0
+pytest-xdist==3.3.1
     # via -r requirements-dev.in
 python-dateutil==2.8.2
     # via
@@ -336,7 +334,7 @@ rq-scheduler==0.13.1
     # via -r requirements.in
 s3transfer==0.6.0
     # via boto3
-sentry-sdk==1.22.2
+sentry-sdk==1.24.0
     # via -r requirements.in
 simplejson==3.18.0
     # via mail-parser
