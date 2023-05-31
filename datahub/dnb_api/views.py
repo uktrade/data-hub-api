@@ -354,48 +354,48 @@ class DNBCompanyInvestigationView(APIView):
 
         return Response(response)
     
-    class DNBCompanyHierarchyView(APIView):
+class DNBCompanyHierarchyView(APIView):
+  """
+  View for receiving datahub hierarchy of a company from DNB data.
+  """
+
+  permission_classes = (
+      HasPermissions(
+          f'company.{CompanyPermission.view_company}',
+          f'company.{CompanyPermission.add_company}',
+      ),
+  )
+
+  def post(self, request):
       """
-    View for receiving datahub hierarchy of a company from DNB data.
-    """
+      Given a duns_number, get the data for the company hierarchy from dnb-service.
+      """
+      duns_serializer = DUNSNumberSerializer(data=request.data)
+      duns_serializer.is_valid(raise_exception=True)
+      duns_number = duns_serializer.validated_data['duns_number']
 
-    permission_classes = (
-        HasPermissions(
-            f'company.{CompanyPermission.view_company}',
-            f'company.{CompanyPermission.add_company}',
-        ),
-    )
+      try:
+          dnb_company_hierarchy = get_company_hierarchy_data(duns_number, request)
 
-    def post(self, request):
-        """
-        Given a duns_number, get the data for the company hierarchy from dnb-service.
-        """
-        duns_serializer = DUNSNumberSerializer(data=request.data)
-        duns_serializer.is_valid(raise_exception=True)
-        duns_number = duns_serializer.validated_data['duns_number']
+      except (DNBServiceConnectionError, DNBServiceError, DNBServiceInvalidResponseError) as exc:
+          raise APIUpstreamException(str(exc))
 
-        try:
-            dnb_company_hierarchy = get_company_hierarchy_data(duns_number, request)
+      except DNBServiceInvalidRequestError as exc:
+          raise APIBadRequestException(str(exc))
 
-        except (DNBServiceConnectionError, DNBServiceError, DNBServiceInvalidResponseError) as exc:
-            raise APIUpstreamException(str(exc))
+      # hierarchy_serializer = DNBCompanyHierarchySerializer(
+      #     data=dnb_company_hierarchy,
+      # )
 
-        except DNBServiceInvalidRequestError as exc:
-            raise APIBadRequestException(str(exc))
+      # try:
+      #     hierarchy_serializer.is_valid(raise_exception=True)
+      # except serializers.ValidationError:
+      #     message = 'Company hierarchy data from DNB failed DH serializer validation'
+      #     extra_data = {
+      #         'formatted_dnb_company_hierarchy_data': dnb_company_hierarchy,
+      #         'dh_company_serializer_errors': hierarchy_serializer.errors,
+      #     }
+      #     logger.error(message, extra=extra_data)
+      #     raise
 
-        # hierarchy_serializer = DNBCompanyHierarchySerializer(
-        #     data=dnb_company_hierarchy,
-        # )
-
-        # try:
-        #     hierarchy_serializer.is_valid(raise_exception=True)
-        # except serializers.ValidationError:
-        #     message = 'Company hierarchy data from DNB failed DH serializer validation'
-        #     extra_data = {
-        #         'formatted_dnb_company_hierarchy_data': dnb_company_hierarchy,
-        #         'dh_company_serializer_errors': hierarchy_serializer.errors,
-        #     }
-        #     logger.error(message, extra=extra_data)
-        #     raise
-
-        return Response(dnb_company_hierarchy)
+      return Response(dnb_company_hierarchy)
