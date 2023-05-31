@@ -518,3 +518,21 @@ def _get_api_client(request=None):
         default_timeout=settings.DNB_SERVICE_TIMEOUT,
         request=request,
     )
+
+def get_company_hierarchy_data(query_params, request=None):
+    """
+    Get company hierarchy data
+    """
+    if not settings.DNB_SERVICE_BASE_URL:
+        raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
+
+    api_client = _get_api_client(request)
+
+    response = api_client.request(
+        'POST',
+        'companies/hierarchy/search/',
+        json=query_params,
+        timeout=3.0,
+    )
+
+    return response
