@@ -4,16 +4,16 @@ from importlib import import_module
 from django.apps import AppConfig
 from django.conf import settings
 
-from datahub.search.elasticsearch import configure_connection, index_exists
+from datahub.search.opensearch import configure_connection, index_exists
 
 EXCLUDE_ALL = object()
 
 
 class SearchApp:
-    """Used to configure ES search modules to be used within Data Hub."""
+    """Used to configure OpenSearch search modules to be used within Data Hub."""
 
     name = None
-    es_model = None
+    search_model = None
     bulk_batch_size = 2000
 
     queryset = None
@@ -37,7 +37,7 @@ class SearchApp:
     @classmethod
     def connect_signals(cls):
         """
-        Connects all signal handlers so DB models can be synced with Elasticsearch on save.
+        Connects all signal handlers so DB models can be synced with OpenSearch on save.
         """
         for receiver in cls.get_signal_receivers():
             receiver.connect()
@@ -102,8 +102,8 @@ def get_search_app(app_name):
 
 
 def are_apps_initialised(apps):
-    """Determines whether the given apps have been initialised (by migrate_es)."""
-    return all(index_exists(app.es_model.get_write_alias()) for app in apps)
+    """Determines whether the given apps have been initialised (by migrate_search)."""
+    return all(index_exists(app.search_model.get_write_alias()) for app in apps)
 
 
 @lru_cache(maxsize=None)
@@ -127,7 +127,7 @@ def get_search_app_by_search_model(search_model):
     :raises LookupError: if it can't find the search app
     """
     for search_app in get_search_apps():
-        if search_app.es_model is search_model:
+        if search_app.search_model is search_model:
             return search_app
 
     raise LookupError(f'search app for {search_model} not found.')
@@ -149,24 +149,25 @@ def _load_search_app(cls_path):
 
 
 class SearchConfig(AppConfig):
-    """Configures Elasticsearch connection when ready."""
+    """Configures OpenSearch connection when ready."""
 
     name = 'datahub.search'
     verbose_name = 'Search'
 
     def ready(self):
         """
-        Configures the default Elasticsearch connection, connects signal receivers and
+        Configures the default OpenSearch connection, connects signal receivers and
         registers views.
         """
         # The automatic connection configuration is disabled during tests because the connection
-        # is set up using different environment variables in the _es_client pytest fixture
+        # is set up using different environment variables in the _opensearch_client pytest fixture
         if settings.SEARCH_CONFIGURE_CONNECTION_ON_READY:
             configure_connection()
 
         for app in get_search_apps():
             # For tests we disable automatic connection of signal receivers on app ready.
-            # They are instead only enabled for tests that use the es_with_signals pytest fixture
+            # They are instead only enabled for tests that use the opensearch_with_signals
+            # pytest fixture
             if settings.SEARCH_CONNECT_SIGNAL_RECEIVERS_ON_READY:
                 app.connect_signals()
 

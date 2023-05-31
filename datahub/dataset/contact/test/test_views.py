@@ -33,15 +33,13 @@ def get_expected_data_from_contact(contact):
         'created_by_id': str(contact.created_by_id) if contact.created_by is not None else None,
         'created_on': format_date_or_datetime(contact.created_on),
         'email': contact.email,
-        'email_alternative': contact.email_alternative,
         'id': str(contact.id),
         'job_title': contact.job_title,
         'modified_on': format_date_or_datetime(contact.modified_on),
         'name': contact.name,
         'notes': contact.notes,
         'primary': contact.primary,
-        'telephone_alternative': contact.telephone_alternative,
-        'telephone_number': contact.telephone_number,
+        'full_telephone_number': contact.full_telephone_number,
     }
 
 

@@ -1,96 +1,110 @@
 from datetime import datetime, time, timedelta
 
-from celery import shared_task
-from celery.result import ResultSet
 from django.conf import settings
 from django.utils.timezone import now
 from django_pglocks import advisory_lock
-from rest_framework.status import is_server_error
+from rq.exceptions import NoSuchJobError
 
 from datahub.company.models import Company
+from datahub.core.queues.constants import HALF_DAY_IN_SECONDS, THIRTY_MINUTES_IN_SECONDS
+from datahub.core.queues.errors import RetryError
+from datahub.core.queues.job_scheduler import job_scheduler
+from datahub.core.queues.scheduler import DataHubScheduler, LONG_RUNNING_QUEUE
 from datahub.core.realtime_messaging import send_realtime_message
 from datahub.core.utils import log_to_sentry
 from datahub.dnb_api.tasks.sync import logger
 from datahub.dnb_api.utils import (
-    DNBServiceConnectionError,
-    DNBServiceError,
-    DNBServiceTimeoutError,
     format_dnb_company,
     get_company_update_page,
     update_company_from_dnb,
 )
 
 
-def _record_audit(update_results, producer_task, start_time):
+def schedule_record_audit(job_ids, start_time):
+    """
+    Check all jobs every 30 minutes for the span of 4 hours
+    and then fail if not finished
+    """
+    max_retries = 8
+    job = job_scheduler(
+        function=record_audit,
+        function_args=(
+            job_ids,
+            start_time,
+        ),
+        max_retries=max_retries,
+        queue_name=LONG_RUNNING_QUEUE,
+        job_timeout=HALF_DAY_IN_SECONDS,
+        retry_intervals=[THIRTY_MINUTES_IN_SECONDS] * max_retries,
+    )
+    logger.info(
+        f'Task {job.id} schedule_get_company_updates',
+    )
+    return job
+
+
+def record_audit(job_ids, start_time):
     """
     Record an audit log for the get_company_updates task which expresses the number
-    of companies successfully updates, failures, ids of companies updated, celery
+    of companies successfully updates, failures, job_count and RQ
     task info and start/end times.
     """
     audit = {
         'success_count': 0,
         'failure_count': 0,
-        'updated_company_ids': [],
-        'producer_task_id': producer_task.request.id,
+        'job_count': len(job_ids),
         'start_time': start_time.isoformat(),
         'end_time': now().isoformat(),
     }
-    for result in update_results:
-        if result.successful():
+    scheduler = DataHubScheduler()
+    for job_id in job_ids:
+        try:
+            job = scheduler.job(job_id=job_id)
+            if job.is_finished:
+                audit['success_count'] += 1
+            elif job.is_failed:
+                audit['failure_count'] += 1
+            else:
+                raise RetryError(f'{job_id} has a {job.get_status(refresh=False)}')
+        except NoSuchJobError:
+            # Job success ttl expired within 500s assumed therefore this succeeded
             audit['success_count'] += 1
-            audit['updated_company_ids'].append(result.result)
-        else:
-            audit['failure_count'] += 1
+    audit['end_time'] = now().isoformat()
     log_to_sentry('get_company_updates task completed.', extra=audit)
     success_count, failure_count = audit['success_count'], audit['failure_count']
     realtime_message = (
-        f'{producer_task.name} updated: {success_count}; '
+        f'datahub.dnb_api.tasks.update.get_company_updates updated: {success_count}; '
         f'failed to update: {failure_count}'
     )
     send_realtime_message(realtime_message)
 
 
-def _get_company_updates_from_api(last_updated_after, next_page, task):
-    try:
-        return get_company_update_page(last_updated_after, next_page)
-
-    except DNBServiceError as exc:
-        if is_server_error(exc.status_code):
-            raise task.retry(exc=exc, countdown=60)
-        raise
-
-    except (DNBServiceConnectionError, DNBServiceTimeoutError) as exc:
-        raise task.retry(exc=exc, countdown=60)
-
-
-def _get_company_updates(task, last_updated_after, fields_to_update):
+def _get_company_updates(last_updated_after, fields_to_update):
     yesterday = now() - timedelta(days=1)
     midnight_yesterday = datetime.combine(yesterday, time.min)
     last_updated_after = last_updated_after or midnight_yesterday.isoformat()
     next_page = None
     updates_remaining = settings.DNB_AUTOMATIC_UPDATE_LIMIT
-    update_results = []
+    job_ids = []
     start_time = now()
     logger.info('Started get_company_updates task')
-    update_descriptor = f'celery:get_company_updates:{task.request.id}'
+    update_descriptor = f'rq:get_company_updates:{start_time}'
 
     while True:
 
-        response = _get_company_updates_from_api(last_updated_after, next_page, task)
+        response = get_company_update_page(last_updated_after, next_page)
         dnb_company_updates = response.get('results', [])
 
         dnb_company_updates = dnb_company_updates[:updates_remaining]
 
         # Spawn tasks that update Data Hub companies
         for data in dnb_company_updates:
-            result = update_company_from_dnb_data.apply_async(
-                args=(data,),
-                kwargs={
-                    'fields_to_update': fields_to_update,
-                    'update_descriptor': update_descriptor,
-                },
+            job = schedule_update_company_from_dnb_data(
+                dnb_company_data=data,
+                fields_to_update=fields_to_update,
+                update_descriptor=update_descriptor,
             )
-            update_results.append(result)
+            job_ids.append(job.id)
 
         if updates_remaining is not None:
             updates_remaining -= len(dnb_company_updates)
@@ -102,22 +116,31 @@ def _get_company_updates(task, last_updated_after, fields_to_update):
             break
 
     # Wait for all update tasks to finish...
-    ResultSet(results=update_results).join(
-        propagate=False,
-        disable_sync_subtasks=False,
+    schedule_record_audit(job_ids, start_time)
+    logger.info('Finished scheduling get_company_updates task')
+
+
+def schedule_get_company_updates(
+    last_updated_after=None,
+    fields_to_update=None,
+):
+    job = job_scheduler(
+        function=get_company_updates,
+        function_args=(
+            last_updated_after,
+            fields_to_update,
+        ),
+        max_retries=3,
+        queue_name=LONG_RUNNING_QUEUE,
+        job_timeout=HALF_DAY_IN_SECONDS,
     )
-    _record_audit(update_results, task, start_time)
-    logger.info('Finished get_company_updates task')
+    logger.info(
+        f'Task {job.id} schedule_get_company_updates',
+    )
+    return job
 
 
-@shared_task(
-    bind=True,
-    acks_late=True,
-    priority=9,
-    max_retries=3,
-    queue='long-running',
-)
-def get_company_updates(self, last_updated_after=None, fields_to_update=None):
+def get_company_updates(last_updated_after=None, fields_to_update=None):
     """
     Gets the lastest updates for D&B companies from dnb-service.
 
@@ -131,13 +154,28 @@ def get_company_updates(self, last_updated_after=None, fields_to_update=None):
             logger.info('Another instance of this task is already running.')
             return
 
-        _get_company_updates(self, last_updated_after, fields_to_update)
+        _get_company_updates(last_updated_after, fields_to_update)
 
 
-@shared_task(
-    acks_late=True,
-    priority=9,
-)
+def schedule_update_company_from_dnb_data(
+    dnb_company_data,
+    fields_to_update=None,
+    update_descriptor=None,
+):
+    job = job_scheduler(
+        function=update_company_from_dnb_data,
+        function_args=(
+            dnb_company_data,
+            fields_to_update,
+            update_descriptor,
+        ),
+    )
+    logger.info(
+        f'Task {job.id} update_company_from_dnb_data',
+    )
+    return job
+
+
 def update_company_from_dnb_data(dnb_company_data, fields_to_update=None, update_descriptor=None):
     """
     Update the company with the latest data from dnb-service. This task should be called
@@ -161,7 +199,7 @@ def update_company_from_dnb_data(dnb_company_data, fields_to_update=None, update
         raise
 
     if not update_descriptor:
-        update_descriptor = 'celery:company_update'
+        update_descriptor = 'rq:company_update'
 
     update_company_from_dnb(
         dh_company,

@@ -88,3 +88,7 @@ pyrightconfig.json
 
 # Ctags
 tags
+
+# IDE
+.vscode/
+.idea/

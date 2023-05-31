@@ -7,14 +7,14 @@ from datahub.search.signals import SignalReceiver
 from datahub.search.sync_object import sync_object_async, sync_related_objects_async
 
 
-def contact_sync_es(instance):
-    """Sync contact to the Elasticsearch."""
+def contact_sync_search(instance):
+    """Sync contact to the OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(ContactSearchApp, instance.pk),
     )
 
 
-def related_contact_sync_es(instance):
+def related_contact_sync_search(instance):
     """Sync related Company Contacts."""
     transaction.on_commit(
         lambda: sync_related_objects_async(instance, 'contacts'),
@@ -22,6 +22,6 @@ def related_contact_sync_es(instance):
 
 
 receivers = (
-    SignalReceiver(post_save, DBContact, contact_sync_es),
-    SignalReceiver(post_save, DBCompany, related_contact_sync_es),
+    SignalReceiver(post_save, DBContact, contact_sync_search),
+    SignalReceiver(post_save, DBCompany, related_contact_sync_search),
 )

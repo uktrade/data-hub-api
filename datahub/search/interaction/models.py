@@ -1,11 +1,11 @@
 from operator import attrgetter
 
-from elasticsearch_dsl import Boolean, Date, Double, InnerDoc, Keyword, Object, Text
+from opensearch_dsl import Boolean, Date, Double, InnerDoc, Keyword, Object, Text
 
 from datahub.search import dict_utils, fields
 from datahub.search.fields import TrigramText
 from datahub.search.inner_docs import IDNameTrigram, Person
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
 def _contact_field():
@@ -70,8 +70,8 @@ class _DITParticipant(InnerDoc):
     team = Object(IDNameTrigram)
 
 
-class Interaction(BaseESModel):
-    """Elasticsearch representation of Interaction model."""
+class Interaction(BaseSearchModel):
+    """OpenSearch representation of Interaction model."""
 
     id = Keyword()
     company = fields.company_field()
@@ -94,11 +94,13 @@ class Interaction(BaseESModel):
     notes = fields.Text(index=False)
     policy_areas = fields.id_unindexed_name_field()
     policy_issue_types = fields.id_unindexed_name_field()
-    service = fields.id_unindexed_name_field()
+    service = fields.id_name_partial_field()
     service_delivery_status = fields.id_unindexed_name_field()
-    subject = fields.NormalizedKeyword(
+    subject = Text(
         fields={
             'english': fields.EnglishText(),
+            'keyword': fields.NormalizedKeyword(),
+            'trigram': fields.TrigramText(),
         },
     )
     was_policy_feedback_provided = Boolean()
@@ -135,10 +137,16 @@ class Interaction(BaseESModel):
         'id',
         'company.name',
         'company.name.trigram',
+        'companies.name',
+        'companies.name.trigram',
         'contacts.name',  # to find 2-letter words
         'contacts.name.trigram',
         'event.name',
         'event.name.trigram',
+        'service.name',
+        'service.name.trigram',
+        'subject',
+        'subject.trigram',
         'subject.english',
         'dit_participants.adviser.name',
         'dit_participants.adviser.name.trigram',

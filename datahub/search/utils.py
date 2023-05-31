@@ -24,22 +24,22 @@ class SearchOrdering(NamedTuple):
         return self.direction == SortDirection.desc
 
 
-def get_model_fields(es_model):
-    """Gets the field objects for an ES model."""
-    return es_model._doc_type.mapping.properties._params['properties']
+def get_model_fields(search_model):
+    """Gets the field objects for an OpenSearch model."""
+    return search_model._doc_type.mapping.properties._params['properties']
 
 
-def get_model_field_names(es_model):
-    """Gets the field names for an ES model."""
-    return get_model_fields(es_model).keys()
+def get_model_field_names(search_model):
+    """Gets the field names for an OpenSearch model."""
+    return get_model_fields(search_model).keys()
 
 
-def get_model_non_mapped_field_names(es_model):
+def get_model_non_mapped_field_names(search_model):
     """Gets the names of fields that are not mapped or computed."""
     return (
-        get_model_field_names(es_model)
-        - es_model.MAPPINGS.keys()
-        - es_model.COMPUTED_MAPPINGS.keys()
+        get_model_field_names(search_model)
+        - search_model.MAPPINGS.keys()
+        - search_model.COMPUTED_MAPPINGS.keys()
         - {'_document_type'}
     )
 

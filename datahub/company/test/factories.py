@@ -22,7 +22,7 @@ from datahub.metadata.models import (
     HeadquarterType,
     TurnoverRange,
 )
-from datahub.metadata.test.factories import TeamFactory
+from datahub.metadata.test.factories import CountryFactory, SectorFactory, TeamFactory
 
 
 class AdviserFactory(factory.django.DjangoModelFactory):
@@ -35,10 +35,12 @@ class AdviserFactory(factory.django.DjangoModelFactory):
     contact_email = factory.Faker('email')
     telephone_number = factory.Faker('phone_number')
     date_joined = now()
+    sso_user_id = factory.LazyFunction(uuid.uuid4)
+    sso_email_user_id = email
 
     class Meta:
         model = 'company.Advisor'
-        django_get_or_create = ('email', )
+        django_get_or_create = ('email',)
 
 
 class CompanyFactory(factory.django.DjangoModelFactory):
@@ -47,10 +49,12 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     name = factory.Faker('company')
-    trading_names = factory.List([
-        factory.Faker('company'),
-        factory.Faker('company'),
-    ])
+    trading_names = factory.List(
+        [
+            factory.Faker('company'),
+            factory.Faker('company'),
+        ],
+    )
 
     address_1 = factory.Sequence(lambda x: f'{x} Fake Lane')
     address_town = 'Woodside'
@@ -155,7 +159,7 @@ class DuplicateCompanyFactory(ArchivedCompanyFactory):
 
 
 def _get_random_company_category():
-    categories = ([key for key, val in COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING.items() if val])
+    categories = [key for key, val in COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING.items() if val]
     return choice(categories).capitalize()
 
 
@@ -172,8 +176,7 @@ class ContactFactory(factory.django.DjangoModelFactory):
     email = 'foo@bar.com'
     job_title = factory.Faker('job')
     primary = True
-    telephone_countrycode = '+44'
-    telephone_number = '123456789'
+    full_telephone_number = '+44 123456789'
     address_same_as_company = True
     created_on = now()
     archived_documents_url_path = factory.Faker('uri_path')
@@ -236,3 +239,52 @@ class CompanyExportCountryHistoryFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company.CompanyExportCountryHistory'
+
+
+class OneListTierFactory(factory.django.DjangoModelFactory):
+    """One List Tier factory."""
+
+    id = factory.LazyFunction(uuid.uuid4)
+    name = factory.Faker('company')
+
+    class Meta:
+        model = 'company.OneListTier'
+
+
+class ExportExperienceFactory(factory.django.DjangoModelFactory):
+    """Export experience factory"""
+
+    class Meta:
+        model = 'company.ExportExperience'
+
+
+class ExportYearFactory(factory.django.DjangoModelFactory):
+    """Export year factory"""
+
+    class Meta:
+        model = 'company.ExportYear'
+
+
+class ExportFactory(factory.django.DjangoModelFactory):
+    """Export factory"""
+
+    company = factory.SubFactory(CompanyFactory)
+    title = factory.Faker('name')
+    owner = factory.SubFactory(AdviserFactory)
+    estimated_export_value_years = factory.SubFactory(ExportYearFactory)
+    estimated_export_value_amount = factory.fuzzy.FuzzyDecimal(1000, 100000, 0)
+    estimated_win_date = now().date()
+    destination_country = factory.SubFactory(CountryFactory)
+    sector = factory.SubFactory(SectorFactory)
+    exporter_experience = factory.SubFactory(ExportExperienceFactory)
+
+    @to_many_field
+    def contacts(self):
+        return []
+
+    @to_many_field
+    def team_members(self):
+        return []
+
+    class Meta:
+        model = 'company.CompanyExport'

@@ -10,7 +10,7 @@ from datahub.omis.order.test.factories import (
     OrderWithAcceptedQuoteFactory,
 )
 from datahub.search.omis import OrderSearchApp
-from datahub.search.omis.models import Order as ESOrder
+from datahub.search.omis.models import Order as SearchOrder
 
 pytestmark = pytest.mark.django_db
 
@@ -33,7 +33,7 @@ def test_order_to_dict(order_factory):
     OrderSubscriberFactory.create_batch(2, order=order)
     OrderAssigneeFactory.create_batch(2, order=order)
 
-    result = ESOrder.db_object_to_dict(order)
+    result = SearchOrder.db_object_to_dict(order)
 
     assert result == {
         '_document_type': OrderSearchApp.name,
@@ -163,10 +163,10 @@ def test_order_to_dict(order_factory):
     }
 
 
-def test_orders_to_es_documents():
-    """Test converting 2 orders to Elasticsearch documents."""
+def test_orders_to_documents():
+    """Test converting 2 orders to OpenSearch documents."""
     orders = OrderFactory.create_batch(2)
 
-    result = ESOrder.db_objects_to_es_documents(orders)
+    result = SearchOrder.db_objects_to_documents(orders)
 
     assert {item['_id'] for item in result} == {item.pk for item in orders}

@@ -1,4 +1,4 @@
 web: ./web.sh
-celeryworker: celery worker -A config -l info -Q celery
-celerylongrunning: celery worker -A config -l info -O fair --prefetch-multiplier 1 -Q long-running
-celerybeat: celery beat -A config -l info
+short-running-worker: ./rq-run.sh short-running-worker.py
+long-running-worker: ./rq-run.sh long-running-worker.py
+cron-scheduler: ./rq-run.sh cron-scheduler.py

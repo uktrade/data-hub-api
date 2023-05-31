@@ -1,5 +1,5 @@
-from celery import shared_task
-from celery.utils.log import get_task_logger
+import logging
+
 from dateutil.relativedelta import relativedelta
 from django.db.models import FilteredRelation, OuterRef, Q, Subquery
 from django.utils import timezone
@@ -7,12 +7,15 @@ from django_pglocks import advisory_lock
 
 from datahub.company.constants import AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG
 from datahub.company.models import Company
+from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
+from datahub.core.queues.job_scheduler import job_scheduler
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.core.realtime_messaging import send_realtime_message
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 
-logger = get_task_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def _automatic_company_archive(limit, simulate):
@@ -24,7 +27,7 @@ def _automatic_company_archive(limit, simulate):
         company=OuterRef('pk'),
     ).order_by('-date')
 
-    companies_to_be_archived = Company.objects.annotate(
+    candidate_companies_to_be_archived = list(Company.objects.annotate(
         latest_interaction_date=Subquery(
             latest_interaction.values('date')[:1],
         ),
@@ -35,13 +38,21 @@ def _automatic_company_archive(limit, simulate):
     ).filter(
         Q(latest_interaction_date__date__lt=_5y_ago) | Q(latest_interaction_date__isnull=True),
         archived=False,
-        duns_number__isnull=True,
         orders__isnull=True,
         investor_profiles__isnull=True,
         active_investment_projects__isnull=True,
         created_on__lt=_3m_ago,
         modified_on__lt=_3m_ago,
-    )[:limit]
+    ))
+
+    companies_to_be_archived = [
+        company
+        for company in candidate_companies_to_be_archived
+        if not any(
+            not (related_company.archived or related_company in candidate_companies_to_be_archived)
+            for related_company in company.related_companies
+        )
+    ][:limit]
 
     for company in companies_to_be_archived:
         message = f'Automatically archived company: {company.id}'
@@ -60,19 +71,28 @@ def _automatic_company_archive(limit, simulate):
         )
         logger.info(message)
 
-    return companies_to_be_archived.count()
+    return len(companies_to_be_archived)
 
 
-@shared_task(
-    bind=True,
-    acks_late=True,
-    priority=9,
-    max_retries=3,
-    queue='long-running',
-    # name set explicitly to maintain backwards compatibility
-    name='datahub.company.tasks.automatic_company_archive',
-)
-def automatic_company_archive(self, limit=1000, simulate=True):
+def schedule_automatic_company_archive(limit=1000, simulate=True):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=automatic_company_archive,
+        function_kwargs={
+            'limit': limit,
+            'simulate': simulate,
+        },
+        job_timeout=HALF_DAY_IN_SECONDS,
+        max_retries=3,
+    )
+    logger.info(
+        f'Task {job.id} automatic_company_archive '
+        f'scheduled limited to {limit} and simulate set to {simulate}',
+    )
+    return job
+
+
+def automatic_company_archive(limit=1000, simulate=True):
     """
     Archive inactive companies.
     """
@@ -89,7 +109,9 @@ def automatic_company_archive(self, limit=1000, simulate=True):
             return
 
         archive_count = _automatic_company_archive(limit, simulate)
-        realtime_message = f'{self.name} archived: {archive_count}'
+        realtime_message = (
+            f'datahub.company.tasks.automatic_company_archive archived: {archive_count}'
+        )
         if simulate:
             realtime_message = f'[SIMULATE] {realtime_message}'
         send_realtime_message(realtime_message)

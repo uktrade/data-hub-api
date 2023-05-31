@@ -21,6 +21,7 @@ INVESTMENT_PROJECT_EXPIRY_PERIOD = relativedelta(years=10)
 ORDER_MODIFIED_ON_CUT_OFF = datetime(2014, 7, 12, tzinfo=utc)  # 2014-07-11 + 1 day
 ORDER_EXPIRY_PERIOD = relativedelta(years=7)
 INVESTOR_PROFILE_EXPIRY_PERIOD = relativedelta(years=10)
+COMPANY_EXPORT_EXPIRY_PERIOD = relativedelta(years=10)
 
 
 class Command(BaseCleanupCommand):
@@ -67,12 +68,15 @@ class Command(BaseCleanupCommand):
                     DatetimeLessThanCleanupFilter('modified_on', INVESTOR_PROFILE_EXPIRY_PERIOD),
                 ),
                 Company._meta.get_field('opportunities'): (),
+                Company._meta.get_field('company_exports'): (),
             },
             # We want to delete the relations below along with any expired companies
             excluded_relations=(
                 Company._meta.get_field('company_list_items'),
                 Company._meta.get_field('export_countries'),
                 Company._meta.get_field('export_countries_history'),
+                Company._meta.get_field('new_export_interaction_reminders'),
+                Company._meta.get_field('no_recent_export_interaction_reminders'),
                 Company._meta.get_field('pipeline_list_items'),
             ),
         ),
@@ -94,6 +98,7 @@ class Command(BaseCleanupCommand):
                 Contact._meta.get_field('referrals'): (),
                 Contact._meta.get_field('pipeline_items_m2m'): (),
                 Quote._meta.get_field('accepted_by').remote_field: (),
+                Contact._meta.get_field('contact_exports'): (),
             },
         ),
         'company_referral.CompanyReferral': ModelCleanupConfig(
@@ -103,9 +108,7 @@ class Command(BaseCleanupCommand):
             ),
         ),
         'interaction.Interaction': ModelCleanupConfig(
-            (
-                DatetimeLessThanCleanupFilter('date', INTERACTION_EXPIRY_PERIOD),
-            ),
+            (DatetimeLessThanCleanupFilter('date', INTERACTION_EXPIRY_PERIOD),),
             relation_filter_mapping={
                 # Interactions are not deleted if they have any related company referrals.
                 # These must be deleted first (once they've expired).
@@ -115,6 +118,8 @@ class Command(BaseCleanupCommand):
             excluded_relations=(
                 Interaction._meta.get_field('dit_participants'),
                 Interaction._meta.get_field('export_countries'),
+                Interaction._meta.get_field('new_export_interaction_reminders'),
+                Interaction._meta.get_field('no_recent_export_interaction_reminders'),
             ),
         ),
         # There are no investment projects in the live system with a modified-on date
@@ -170,6 +175,8 @@ class Command(BaseCleanupCommand):
                 InvestmentProject._meta.get_field('stage_log'),
                 InvestmentProject._meta.get_field('investmentprojectcode'),
                 InvestmentProject._meta.get_field('activities'),
+                InvestmentProject._meta.get_field('no_recent_investment_interaction_reminders'),
+                InvestmentProject._meta.get_field('upcoming_estimated_land_date_reminders'),
             ),
         ),
         # There are no orders in the live system with a modified-on date before
@@ -218,6 +225,12 @@ class Command(BaseCleanupCommand):
             excluded_relations=(
                 Order._meta.get_field('assignees'),
                 Order._meta.get_field('subscribers'),
+            ),
+        ),
+        'company.CompanyExport': ModelCleanupConfig(
+            (
+                DatetimeLessThanCleanupFilter('created_on', COMPANY_EXPORT_EXPIRY_PERIOD),
+                DatetimeLessThanCleanupFilter('modified_on', COMPANY_EXPORT_EXPIRY_PERIOD),
             ),
         ),
     }

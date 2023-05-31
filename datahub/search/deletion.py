@@ -6,7 +6,7 @@ from django.db.models.signals import post_delete, pre_delete
 
 from datahub.core.exceptions import DataHubError
 from datahub.search.apps import get_search_app_by_model, get_search_apps
-from datahub.search.elasticsearch import bulk, get_client
+from datahub.search.opensearch import bulk, get_client
 from datahub.search.signals import SignalReceiver
 
 
@@ -14,15 +14,15 @@ BULK_DELETION_TIMEOUT_SECS = 300
 BULK_CHUNK_SIZE = 10000
 
 
-def delete_documents(index, es_docs):
+def delete_documents(index, docs):
     """
-    Deletes `es_docs` from `index`.
+    Deletes `docs` from `index`.
 
     :raises DataHubError: in case of non 404 errors
     """
     delete_actions = (
-        _create_delete_action(index, es_doc['_id'])
-        for es_doc in es_docs
+        _create_delete_action(index, doc['_id'])
+        for doc in docs
     )
 
     _, errors = bulk(
@@ -35,8 +35,7 @@ def delete_documents(index, es_docs):
     non_404_errors = [error for error in errors if error['delete']['status'] != 404]
     if non_404_errors:
         raise DataHubError(
-            f'One or more errors during an Elasticsearch bulk deletion operation: '
-            f'{non_404_errors!r}',
+            f'Errors during an OpenSearch bulk deletion operation: {non_404_errors!r}',
         )
 
 
@@ -50,10 +49,10 @@ def _create_delete_action(_index, _id):
 
 class Collector:
     """
-    Collects all the deleted django objects so that they can be deleted from ES.
+    Collects all the deleted django objects so that they can be deleted from OpenSearch.
 
     Most of the time you will want to use the context manager/decorator
-    `update_es_after_deletions` instead.
+    `update_opensearch_after_deletions` instead.
 
     Usage:
 
@@ -64,12 +63,12 @@ class Collector:
 
         collector.disconnect()  # stops listening to post_delete signals
 
-        collector.delete_from_es()  # deletes the collected objects from ES
+        collector.delete_from_opensearch()  # deletes the collected objects from OpenSearch
 
     WARNING: this temporarily disable existing post_delete and pre_delete signal
     receivers defined in all the SearchApps to avoid side effects.
     Also, be careful when starting a transaction (e.g. with `transaction.atomic()`) and
-    catching any exception in it. ES deletions would still happen because the
+    catching any exception in it. OpenSearch deletions would still happen because the
     collector would not be aware of any caught error.
     """
 
@@ -112,35 +111,36 @@ class Collector:
     def _collect(self, instance):
         """Logic that gets run on post_delete."""
         model = instance.__class__
-        es_model = get_search_app_by_model(model).es_model
+        search_model = get_search_app_by_model(model).search_model
 
-        es_doc = es_model.es_document(instance, include_index=False, include_source=False)
-        self.deletions[model].append(es_doc)
+        doc = search_model.to_document(instance, include_index=False, include_source=False)
+        self.deletions[model].append(doc)
 
-    def _delete_from_es(self):
-        for model, es_docs in self.deletions.items():
+    def _delete_from_opensearch(self):
+        for model, docs in self.deletions.items():
             search_app = get_search_app_by_model(model)
-            delete_documents(search_app.es_model.get_write_alias(), es_docs)
+            delete_documents(search_app.search_model.get_write_alias(), docs)
 
-    def delete_from_es(self):
-        """Deletes all the deleted django models from ES."""
-        transaction.on_commit(self._delete_from_es)
+    def delete_from_opensearch(self):
+        """Deletes all the deleted django models from OpenSearch."""
+        transaction.on_commit(self._delete_from_opensearch)
 
 
 @contextmanager
-def update_es_after_deletions():
+def update_opensearch_after_deletions():
     """
-    Returns a context manager that can be used to automatically delete from ES
+    Returns a context manager that can be used to automatically delete from OpenSearch
     all the django objects deleted in the block.
     It can be used as a decorator as well.
 
     This works by listening to the `post_delete` django signal, collecting all the deleted
-    django objects and deleting all of them from ES in bulk when exiting from the context manager.
+    django objects and deleting all of them from OpenSearch in bulk when exiting from the
+    context manager.
 
     WARNING: this temporarily disable existing post_delete and pre_delete signal
     receivers defined in all the SearchApps to avoid side effects.
     Also, be careful when starting a transaction (e.g. with `transaction.atomic()`) and
-    catching any exception in it. ES deletions would still happen because the
+    catching any exception in it. OpenSearch deletions would still happen because the
     context manager would not be aware of any caught error.
     """
     collector = Collector()
@@ -151,7 +151,7 @@ def update_es_after_deletions():
     finally:
         collector.disconnect()
 
-    collector.delete_from_es()
+    collector.delete_from_opensearch()
 
 
 def delete_document(model, document_id, indices=None, ignore_404_responses=True):

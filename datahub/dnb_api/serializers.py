@@ -19,6 +19,7 @@ from datahub.core.serializers import (
 from datahub.core.validators import EqualsRule, OperatorRule, RulesBasedValidator, ValidationRule
 from datahub.interaction.models import InteractionPermission
 from datahub.metadata.models import AdministrativeArea, Country as CountryModel
+from datahub.metadata.utils import convert_gbp_to_usd
 
 
 class SerializerNotPartialError(Exception):
@@ -296,7 +297,19 @@ class ChangeRequestSerializer(serializers.Serializer):
     name = serializers.CharField(source='primary_name', required=False)
     trading_names = serializers.ListField(required=False)
     number_of_employees = serializers.IntegerField(source='employee_number', required=False)
+
+    # the turnover field is no longer used in the frontend, in favour of the turnover_gbp
+    # field which will handle the currency conversion here instead of delegating it to the
+    # frontend
     turnover = serializers.IntegerField(source='annual_sales', required=False)
+    turnover_gbp = serializers.IntegerField(source='annual_sales', required=False)
+
+    def validate_turnover_gbp(self, value):
+        """
+        Convert turnover from GBP to USD
+        """
+        return convert_gbp_to_usd(value)
+
     address = AddressRequestSerializer(required=False)
     website = RelaxedURLField(source='domain', required=False)
 

@@ -9,6 +9,8 @@ class SimpleModel(BaseModel):
     """
 
     name = models.CharField(max_length=500)
+    country = models.CharField(max_length=50, blank=True)
+    address = models.CharField(max_length=500, blank=True)
     date = models.DateField(null=True)
 
 

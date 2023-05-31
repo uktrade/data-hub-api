@@ -8,21 +8,21 @@ from datahub.search.signals import SignalReceiver
 from datahub.search.sync_object import sync_object_async, sync_related_objects_async
 
 
-def company_sync_es(instance):
-    """Sync company to the Elasticsearch."""
+def company_sync_search(instance):
+    """Sync company to the OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(CompanySearchApp, instance.pk),
     )
 
 
-def company_subsidiaries_sync_es(instance):
-    """Sync company subsidiaries to the Elasticsearch."""
+def company_subsidiaries_sync_search(instance):
+    """Sync company subsidiaries to the OpenSearch."""
     transaction.on_commit(
         lambda: sync_related_objects_async(instance, 'subsidiaries'),
     )
 
 
-def sync_related_company_to_es(instance):
+def sync_related_company_to_opensearch(instance):
     """Sync related company."""
     transaction.on_commit(
         lambda: sync_object_async(CompanySearchApp, instance.company.pk),
@@ -30,7 +30,7 @@ def sync_related_company_to_es(instance):
 
 
 receivers = (
-    SignalReceiver(post_save, DBCompany, company_sync_es),
-    SignalReceiver(post_save, DBCompany, company_subsidiaries_sync_es),
-    SignalReceiver(post_save, DBInteraction, sync_related_company_to_es),
+    SignalReceiver(post_save, DBCompany, company_sync_search),
+    SignalReceiver(post_save, DBCompany, company_subsidiaries_sync_search),
+    SignalReceiver(post_save, DBInteraction, sync_related_company_to_opensearch),
 )

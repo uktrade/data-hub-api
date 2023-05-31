@@ -1,13 +1,13 @@
-from elasticsearch_dsl import Boolean, Date, Keyword, Text
+from opensearch_dsl import Boolean, Date, Keyword, Text
 
 from datahub.search import dict_utils
 from datahub.search import fields
 from datahub.search.contact import dict_utils as contact_dict_utils
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
-class Contact(BaseESModel):
-    """Elasticsearch representation of Contact model."""
+class Contact(BaseSearchModel):
+    """OpenSearch representation of Contact model."""
 
     id = Keyword()
     address_1 = Text()
@@ -29,13 +29,17 @@ class Contact(BaseESModel):
     created_by = fields.contact_or_adviser_field(include_dit_team=True)
     created_on = Date()
     email = fields.NormalizedKeyword()
-    email_alternative = Text()
     first_name = Text(
         fields={
             'keyword': fields.NormalizedKeyword(),
         },
     )
-    job_title = fields.NormalizedKeyword()
+    job_title = Text(
+        fields={
+            'keyword': fields.NormalizedKeyword(),
+            'trigram': fields.TrigramText(),
+        },
+    )
     last_name = Text(
         fields={
             'keyword': fields.NormalizedKeyword(),
@@ -48,11 +52,15 @@ class Contact(BaseESModel):
             'trigram': fields.TrigramText(),
         },
     )
+    name_with_title = Text(
+        fields={
+            'keyword': fields.NormalizedKeyword(),
+            'trigram': fields.TrigramText(),
+        },
+    )
     notes = fields.EnglishText()
     primary = Boolean()
-    telephone_alternative = Text()
-    telephone_countrycode = Keyword()
-    telephone_number = Keyword()
+    full_telephone_number = Keyword()
     title = fields.id_name_field()
 
     MAPPINGS = {
@@ -79,8 +87,12 @@ class Contact(BaseESModel):
         'id',
         'name',
         'name.trigram',
+        'name_with_title',
+        'name_with_title.trigram',
         'email',
-        'email_alternative',
         'company.name',
         'company.name.trigram',
+        'job_title',
+        'job_title.trigram',
+        'full_telephone_number',
     )

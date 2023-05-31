@@ -18,7 +18,7 @@ from datahub.notification.notify import (
         ({}, NotifyServiceName.omis),
     ),
 )
-def test_notify_adviser_by_email(adviser_data, notify_service_name):
+def test_notify_adviser_by_email(async_queue, adviser_data, notify_service_name):
     """
     Test the notify_adviser_by_email utility.
     """

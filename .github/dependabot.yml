@@ -8,22 +8,10 @@ updates:
     timezone: Europe/London
   open-pull-requests-limit: 10
   ignore:
-  - dependency-name: billiard
+  - dependency-name: werkzeug
     versions:
-    - "> 3.5.0.4, < 3.5.1"
-  - dependency-name: kombu
+    - "> 2.0.3"
+  - dependency-name: flake8-bugbear # TET-129
     versions:
-    - ">= 4.6.1.a, < 4.6.2"
-  - dependency-name: pip-tools
-    versions:
-    - ">= 5.a, < 6"
-  - dependency-name: pytest
-    versions:
-    - ">= 4.6.1.a, < 4.6.2"
-  - dependency-name: django
-    versions:
-    - "> 3.1.12"
-  - dependency-name: elasticsearch
-    versions:
-    - ">= 7.14.0"
+    - "> 22.1.11"
   rebase-strategy: disabled

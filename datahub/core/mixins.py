@@ -1,9 +1,13 @@
 """General mixins."""
 from django.conf import settings
+from rest_framework import mixins
 from rest_framework import serializers
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+
+from datahub.core.models import ArchivableModel
 from datahub.core.schemas import StubSchema
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -66,3 +70,18 @@ class ArchivableViewSetMixin:
 
         obj_serializer = self.get_serializer_class()(obj)
         return Response(data=obj_serializer.data)
+
+
+class SoftDeleteViaArchiveMixin(mixins.DestroyModelMixin):
+    """To be used with models that should be archived instead of deleted"""
+
+    def destroy(self, request, *args, **kwargs):
+        """Archive instead of deleting."""
+        instance = self.get_object()
+        if issubclass(type(instance), ArchivableModel):
+            instance.archive(
+                request._user,
+                reason='Archived instead of deleting when DELETE request received',
+            )
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return super().destroy(request, *args, **kwargs)

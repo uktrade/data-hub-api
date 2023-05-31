@@ -2,6 +2,7 @@ from django.urls import path
 
 from datahub.dataset.adviser.views import AdvisersDatasetView
 from datahub.dataset.company.views import CompaniesDatasetView
+from datahub.dataset.company_export.views import CompanyExportDatasetView
 from datahub.dataset.company_export_country.views import (
     CompanyExportCountryDatasetView,
 )
@@ -20,6 +21,7 @@ from datahub.dataset.investment_project.views import (
 )
 from datahub.dataset.order.views import OMISDatasetView
 from datahub.dataset.team.views import TeamsDatasetView
+from datahub.dataset.user_event_log.views import UserEventsView
 
 
 urlpatterns = [
@@ -27,6 +29,11 @@ urlpatterns = [
     path('omis-dataset', OMISDatasetView.as_view(), name='omis-dataset'),
     path('contacts-dataset', ContactsDatasetView.as_view(), name='contacts-dataset'),
     path('companies-dataset', CompaniesDatasetView.as_view(), name='companies-dataset'),
+    path(
+        'company-export-dataset',
+        CompanyExportDatasetView.as_view(),
+        name='company-export-dataset',
+    ),
     path(
         'company-export-country-dataset',
         CompanyExportCountryDatasetView.as_view(),
@@ -64,5 +71,10 @@ urlpatterns = [
         'pipeline-items-dataset',
         PipelineItemsDatasetView.as_view(),
         name='pipeline-items-dataset',
+    ),
+    path(
+        'user-events-dataset',
+        UserEventsView.as_view(),
+        name='user-events-dataset',
     ),
 ]

@@ -1,7 +1,7 @@
 import socket
 import environ
 
-environ.Env.read_env()  # reads the .env file
+environ.Env.read_env(env_file='./.env')  # reads the .env file
 env = environ.Env()
 
 from config.settings.common import *

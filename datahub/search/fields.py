@@ -1,8 +1,8 @@
 from functools import partial
 
-from elasticsearch_dsl import Date, Keyword, Object, Text
+from opensearch_dsl import Date, Keyword, Object, Text
 
-from datahub.search.elasticsearch import (
+from datahub.search.opensearch import (
     lowercase_asciifolding_normalizer,
     postcode_analyzer,
     postcode_search_analyzer,
@@ -120,37 +120,17 @@ def area_field():
     )
 
 
-def address_field(index_country=True, index_area=True):
+def address_field():
     """Address field as nested object."""
-    if index_country:
-        nested_country_field = country_field()
-    else:
-        nested_country_field = Object(
-            properties={
-                'id': Keyword(index=False),
-                'name': Text(index=False),
-            },
-        )
-
-    if index_area:
-        nested_area_field = area_field()
-    else:
-        nested_area_field = Object(
-            properties={
-                'id': Keyword(index=False),
-                'name': Text(index=False),
-            },
-        )
-
     return Object(
         properties={
-            'line_1': Text(index=False),
-            'line_2': Text(index=False),
-            'town': Text(index=False),
-            'county': Text(index=False),
+            'line_1': TextWithTrigram(),
+            'line_2': TextWithTrigram(),
+            'town': TextWithTrigram(),
+            'county': TextWithTrigram(),
+            'area': area_field(),
             'postcode': TextWithTrigram(),
-            'area': nested_area_field,
-            'country': nested_country_field,
+            'country': country_field(),
         },
     )
 

@@ -107,7 +107,7 @@ class Country(BaseConstantModel):
         related_name='countries',
         on_delete=models.PROTECT,
     )
-    iso_alpha2_code = models.CharField(blank=True, max_length=2)
+    iso_alpha2_code = models.CharField(blank=True, max_length=5)
 
     class Meta(BaseConstantModel.Meta):
         verbose_name_plural = 'countries'
@@ -120,9 +120,18 @@ class TradeAgreement(BaseConstantModel):
 class ExchangeRate(BaseModel):
     """Exchange rates"""
 
+    id = models.UUIDField(primary_key=True, default=uuid4)
     from_currency_code = models.CharField(max_length=3)
     to_currency_code = models.CharField(max_length=3)
     exchange_rate = models.FloatField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['from_currency_code', 'to_currency_code'],
+                name='unique_from_currency_code_to_currency_code',
+            ),
+        ]
 
 
 class AdministrativeArea(BaseConstantModel):
@@ -351,3 +360,7 @@ class SalaryRange(BaseOrderedConstantModel):
 
 class FDIValue(BaseOrderedConstantModel):
     """FDI value category (used for investment projects)."""
+
+
+class ExportBarrierType(BaseOrderedConstantModel):
+    """Export barrier type (used for company interactions)."""

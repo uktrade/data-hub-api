@@ -1,6 +1,6 @@
 import environ
 
-environ.Env.read_env()  # reads the .env file
+environ.Env.read_env(env_file='./.env')  # reads the .env file
 env = environ.Env()
 
 from config.settings.common import *
@@ -24,21 +24,12 @@ SEARCH_APPS += [
 
 # Note that the prefix used for indexes created during tests is set dynamically in
 # datahub/search/conftest.py (so that tests can be parallelised).
-ES_INDEX_PREFIX = 'example-prefix'
-ES_INDEX_SETTINGS = {
-    **ES_INDEX_SETTINGS,
+OPENSEARCH_INDEX_PREFIX = 'example-prefix'
+OPENSEARCH_INDEX_SETTINGS = {
+    **OPENSEARCH_INDEX_SETTINGS,
     'number_of_shards': 1,
     'number_of_replicas': 0,
-    # Refresh is the process in Elasticsearch that makes newly-indexed documents available for
-    # querying (see
-    # https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html
-    # for more details).
-    #
-    # Relying on automatic refreshing in tests leads to flakiness, and so all tests that use
-    # Elasticsearch explicitly refresh indices after documents have been added to Elasticsearch.
-    #
-    # This disables automatic refresh in tests to avoid inadvertently relying on it.
-    'refresh_interval': -1,
+    'refresh_interval': -1,  # Disables automatic index refreshing to avoid test flakiness
 }
 DOCUMENT_BUCKET = 'test-bucket'
 AV_V2_SERVICE_URL = 'http://av-service/'
@@ -47,6 +38,9 @@ OMIS_GENERIC_CONTACT_EMAIL = 'omis@example.com'
 OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL = ''
 OMIS_NOTIFICATION_ADMIN_EMAIL = 'fake-omis-admin@digital.trade.gov.uk'
 OMIS_NOTIFICATION_API_KEY = ''
+
+INVESTMENT_NOTIFICATION_ADMIN_EMAIL = 'fake-investment-admin@digital.trade.gov.uk'
+INVESTMENT_NOTIFICATION_API_KEY = ''
 
 GOVUK_PAY_URL = 'https://payments.example.com/'
 
@@ -64,11 +58,10 @@ CACHES = {
     }
 }
 
-CELERY_TASK_ALWAYS_EAGER = True
-
 # Stop WhiteNoise emitting warnings when running tests without running collectstatic first
 WHITENOISE_AUTOREFRESH = True
 WHITENOISE_USE_FINDERS = True
+STATICFILES_STORAGE = None
 
 PAAS_IP_WHITELIST = ['1.2.3.4']
 
@@ -184,7 +177,4 @@ if ADMIN_OAUTH2_ENABLED:
     if 'axes.backends.AxesBackend' in AUTHENTICATION_BACKENDS:
         AUTHENTICATION_BACKENDS.remove('axes.backends.AxesBackend')
 
-BED_USERNAME = 'test-user@digital.trade.gov.uk'
-BED_PASSWORD = 'test-password'
-BED_TOKEN = 'test-token'
-BED_IS_SANDBOX = True
+IS_TEST = True

@@ -14,7 +14,6 @@ from datahub.core.query_utils import (
     get_front_end_url_expression,
     get_string_agg_subquery,
 )
-from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.search.company import CompanySearchApp
 from datahub.search.company.serializers import (
@@ -56,6 +55,8 @@ class SearchCompanyAPIViewMixin:
         'latest_interaction_date_after',
         'latest_interaction_date_before',
         'uk_postcode',
+        'export_segment',
+        'export_sub_segment',
     )
 
     REMAP_FIELDS = {
@@ -222,11 +223,9 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
             'sector_name': 'Sector',
             'address_country__name': 'Country',
         }
-        if is_feature_flag_active('address-area-company-search'):
-            field_titles.update({
-                'address_area__name': 'Area',
-            })
+
         field_titles.update({
+            'address_area__name': 'Area',
             'uk_region__name': 'UK region',
             'export_to_countries_list': 'Countries exported to',
             'future_interest_countries_list': 'Countries of interest',

@@ -279,3 +279,31 @@ class ExportCountriesServiceDeliveryFactory(ServiceDeliveryFactory):
         Defaults to one InteractionExportCountryFactory.
         """
         return [InteractionExportCountryFactory(interaction=self, **kwargs)]
+
+
+class CompaniesInteractionWithExportBarrierOtherFactory(CompanyInteractionFactory):
+    """Create companies interaction with export barriers - Other."""
+
+    helped_remove_export_barrier = True
+    export_barrier_notes = 'Lorem ipsum'
+
+    @to_many_field
+    def export_barrier_types(self):
+        """
+        Add "other" export barrier type
+        """
+        return [constants.ExportBarrierType.other.value.id]
+
+
+class CompaniesInteractionWithExportBarrierFinanceFactory(CompanyInteractionFactory):
+    """Create companies interaction with export barriers - Finance."""
+
+    helped_remove_export_barrier = True
+    export_barrier_notes = ''
+
+    @to_many_field
+    def export_barrier_types(self):
+        """
+        Add "other" export barrier type
+        """
+        return [constants.ExportBarrierType.finance.value.id]

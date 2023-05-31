@@ -1,10 +1,10 @@
 from functools import partial
 
-from elasticsearch_dsl import Boolean, Date, Keyword, Object, Text
+from opensearch_dsl import Boolean, Date, Keyword, Object, Text
 
 from datahub.company.models import CompanyExportCountry
 from datahub.search import dict_utils, fields
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
 def _adviser_field_with_indexed_id():
@@ -18,9 +18,9 @@ def _adviser_field_with_indexed_id():
     )
 
 
-class Company(BaseESModel):
+class Company(BaseSearchModel):
     """
-    Elasticsearch representation of Company model.
+    OpenSearch representation of Company model.
     """
 
     id = Keyword()
@@ -82,6 +82,8 @@ class Company(BaseESModel):
         'uk_address_postcode': lambda obj: obj.address_postcode if obj.uk_based else '',
         'uk_registered_address_postcode':
             lambda obj: obj.registered_address_postcode if obj.uk_based else '',
+        'export_segment': lambda obj: obj.export_segment,
+        'export_sub_segment': lambda obj: obj.export_sub_segment,
     }
 
     MAPPINGS = {
@@ -106,11 +108,21 @@ class Company(BaseESModel):
         'trading_names',  # to find 2-letter words
         'trading_names.trigram',
         'reference_code',
-
-        'address.country.name.trigram',
-        'address.postcode.trigram',
+        'sector.name',
+        'address.line_1.trigram',
+        'address.line_2.trigram',
+        'address.town.trigram',
+        'address.county.trigram',
         'address.area.name.trigram',
-        'registered_address.country.name.trigram',
-        'registered_address.postcode.trigram',
+        'address.postcode',
+        'address.country.name.trigram',
+        'registered_address.line_1.trigram',
+        'registered_address.line_2.trigram',
+        'registered_address.town.trigram',
+        'registered_address.county.trigram',
         'registered_address.area.name.trigram',
+        'registered_address.postcode',
+        'registered_address.country.name.trigram',
+        'export_segment',
+        'export_sub_segment',
     )

@@ -132,6 +132,7 @@ class SearchBasicAPIView(APIView):
             offset=validated_params['offset'],
             limit=validated_params['limit'],
             fields_to_exclude=fields_to_exclude,
+            fuzzy=True,
         )
 
         results = execute_search_query(query)
@@ -158,7 +159,7 @@ def _get_global_search_permission_filters(request):
             continue
 
         filter_args = app.get_permission_filters(request)
-        yield (app.es_model.get_app_name(), filter_args)
+        yield (app.search_model.get_app_name(), filter_args)
 
 
 class SearchAPIView(APIView):
@@ -195,7 +196,7 @@ class SearchAPIView(APIView):
 
     def get_entities(self):
         """Returns entities"""
-        return [self.search_app.es_model]
+        return [self.search_app.search_model]
 
     def validate_data(self, data):
         """Validate and clean data."""
@@ -204,11 +205,11 @@ class SearchAPIView(APIView):
         return serializer.validated_data
 
     def get_base_query(self, request, validated_data):
-        """Gets a filtered Elasticsearch query for the provided search parameters."""
+        """Gets a filtered OpenSearch query for the provided search parameters."""
         filter_data = self._get_filter_data(validated_data)
         entities = self.get_entities()
         permission_filters = self.search_app.get_permission_filters(request)
-        ordering = _map_es_ordering(validated_data['sortby'], self.es_sort_by_remappings)
+        ordering = _map_opensearch_ordering(validated_data['sortby'], self.es_sort_by_remappings)
 
         fields_to_exclude = (
             *SHARED_FIELDS_TO_EXCLUDE,
@@ -261,11 +262,11 @@ class SearchAPIView(APIView):
             'results': [x.to_dict() for x in results.hits],
         }
 
-        response = self.enhance_response(results, response)
+        response = self.enhance_response(results, response, validated_data)
 
         return Response(data=response)
 
-    def enhance_response(self, results, response):
+    def enhance_response(self, results, response, validated_data):
         """Placeholder for a method to enhance the response with custom data."""
         return response
 
@@ -286,7 +287,7 @@ class SearchExportAPIView(SearchAPIView):
         """Performs search and returns CSV file."""
         validated_data = self.validate_data(request.data)
 
-        es_query = self._get_es_query(request, validated_data)
+        es_query = self._get_opensearch_query(request, validated_data)
         ids = tuple(self._get_ids(es_query))
         db_queryset = self._get_rows(ids, validated_data['sortby'])
         base_filename = self._get_base_filename()
@@ -311,15 +312,15 @@ class SearchExportAPIView(SearchAPIView):
 
     def _get_ids(self, es_query):
         """
-        Gets the document IDs from an Elasticsearch query using the scroll API.
+        Gets the document IDs from an OpenSearch query using the scroll API.
 
         The number of IDs returned is limited by settings.SEARCH_EXPORT_MAX_RESULTS.
         """
         for hit in islice(es_query.scan(), settings.SEARCH_EXPORT_MAX_RESULTS):
             yield hit.meta.id
 
-    def _get_es_query(self, request, validated_data):
-        """Gets a scannable Elasticsearch query for the current request."""
+    def _get_opensearch_query(self, request, validated_data):
+        """Gets a scannable OpenSearch query for the current request."""
         return self.get_base_query(
             request,
             validated_data,
@@ -469,7 +470,7 @@ def _register_view(
     view_mapping[(search_app, view_type, sub_path)] = view_cls
 
 
-def _map_es_ordering(ordering, mapping):
+def _map_opensearch_ordering(ordering, mapping):
     if not ordering:
         return None
 

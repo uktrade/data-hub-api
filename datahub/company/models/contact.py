@@ -8,8 +8,6 @@ from datahub.core.models import ArchivableModel, BaseModel
 from datahub.core.utils import get_front_end_url, join_truthy_strings, StrEnum
 from datahub.core.validators import (
     InternationalTelephoneValidator,
-    TelephoneCountryCodeValidator,
-    TelephoneValidator,
 )
 from datahub.metadata import models as metadata_models
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -27,16 +25,6 @@ class ContactPermission(StrEnum):
 class Contact(ArchivableModel, BaseModel):
     """
     Contact (a person at a company that DIT has had contact with).
-
-    Additional indexes created via migrations:
-
-        Name: company_contact_upper_email_244368
-        Definition: UPPER(email)
-        Comments: For when filtering by email__iexact
-
-        Name: company_contact_upper_email_alternative_eb17a977
-        Definition: UPPER(email_alternative)
-        Comments: For when filtering by email_alternative__iexact
     """
 
     ADDRESS_VALIDATION_MAPPING = {
@@ -65,11 +53,12 @@ class Contact(ArchivableModel, BaseModel):
         on_delete=models.SET_NULL,
     )
     primary = models.BooleanField()
-    telephone_countrycode = models.CharField(
+
+    full_telephone_number = models.CharField(
+        validators=[InternationalTelephoneValidator()],
         max_length=MAX_LENGTH,
-        validators=[TelephoneCountryCodeValidator()],
+        blank=True,
     )
-    telephone_number = models.CharField(validators=[TelephoneValidator()], max_length=MAX_LENGTH)
     email = models.EmailField()
     address_same_as_company = models.BooleanField(default=False)
     address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -88,13 +77,6 @@ class Contact(ArchivableModel, BaseModel):
         on_delete=models.SET_NULL,
     )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    telephone_alternative = models.CharField(
-        validators=[InternationalTelephoneValidator()],
-        max_length=MAX_LENGTH,
-        blank=True,
-        null=True,
-    )
-    email_alternative = models.EmailField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH, blank=True,
@@ -115,12 +97,17 @@ class Contact(ArchivableModel, BaseModel):
             models.Index(fields=('created_on', 'id')),
         ]
 
+    def __str__(self):
+        """Admin displayed human readable name."""
+        company_desc = f'({self.company})' if self.company and self.company.name else ''
+        return join_truthy_strings(self.name or '(no name)', company_desc)
+
     @property
     def name(self):
         """Full name."""
         return join_truthy_strings(self.first_name, self.last_name)
 
-    def __str__(self):
-        """Admin displayed human readable name."""
-        company_desc = f'({self.company})' if self.company and self.company.name else ''
-        return join_truthy_strings(self.name or '(no name)', company_desc)
+    @property
+    def name_with_title(self):
+        """Full name with title."""
+        return join_truthy_strings(getattr(self.title, 'name', None), self.name)

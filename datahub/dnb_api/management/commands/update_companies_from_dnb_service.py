@@ -3,7 +3,7 @@ from logging import getLogger
 from django.core.management.base import BaseCommand
 
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_SERIALIZER_FIELDS
-from datahub.dnb_api.tasks import get_company_updates
+from datahub.dnb_api.tasks.update import schedule_get_company_updates
 
 logger = getLogger(__name__)
 
@@ -11,7 +11,7 @@ logger = getLogger(__name__)
 class Command(BaseCommand):
     """
     Management command to get the latest DNB company updates from dnb-service using the
-    `datahub.dnb_api.tasks.get_company_updates` celery task.
+    `datahub.dnb_api.tasks.schedule_get_company_updates` rq task.
     """
 
     help = (
@@ -41,11 +41,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """
-        Run the celery task.
+        Run the scheduled task.
         """
-        get_company_updates.apply(
-            kwargs={
-                'last_updated_after': options['last_updated_after'],
-                'fields_to_update': options['fields'],
-            },
+        schedule_get_company_updates(
+            last_updated_after=options['last_updated_after'],
+            fields_to_update=options['fields'],
         )

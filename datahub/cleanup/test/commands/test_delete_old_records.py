@@ -13,6 +13,7 @@ from freezegun import freeze_time
 from datahub.cleanup.management.commands import delete_old_records
 from datahub.cleanup.management.commands.delete_old_records import (
     COMPANY_EXPIRY_PERIOD,
+    COMPANY_EXPORT_EXPIRY_PERIOD,
     COMPANY_MODIFIED_ON_CUT_OFF,
     CONTACT_EXPIRY_PERIOD,
     CONTACT_MODIFIED_ON_CUT_OFF,
@@ -28,6 +29,7 @@ from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
     DuplicateCompanyFactory,
+    ExportFactory,
     OneListCoreTeamMemberFactory,
     SubsidiaryFactory,
 )
@@ -70,6 +72,7 @@ INTERACTION_DELETE_BEFORE_DATETIME = FROZEN_TIME - INTERACTION_EXPIRY_PERIOD
 INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTMENT_PROJECT_EXPIRY_PERIOD
 ORDER_DELETE_BEFORE_DATETIME = FROZEN_TIME - ORDER_EXPIRY_PERIOD
 INVESTOR_PROFILE_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTOR_PROFILE_EXPIRY_PERIOD
+COMPANY_EXPORT_DELETE_BEFORE_DATETIME = FROZEN_TIME - COMPANY_EXPORT_EXPIRY_PERIOD
 
 MAPPING = {
     'company.Company': {
@@ -238,14 +241,14 @@ MAPPING = {
                 'field': 'investor_company',
                 'expired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTOR_PROFILE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': INVESTOR_PROFILE_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                     },
                 ],
                 'unexpired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTOR_PROFILE_DELETE_BEFORE_DATETIME + relativedelta(days=1),
+                        'modified_on': INVESTOR_PROFILE_DELETE_BEFORE_DATETIME
+                        + relativedelta(days=1),
                     },
                 ],
             },
@@ -256,6 +259,17 @@ MAPPING = {
                 # Companies shouldn't be deleted if there is a related large capital
                 # opportunity (the opportunities have to expired and be deleted first).
                 'unexpired_objects_kwargs': [{}],
+            },
+            {
+                'factory': ExportFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME,
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME,
+                    },
+                ],
             },
         ],
     },
@@ -367,6 +381,12 @@ MAPPING = {
                     },
                 ],
             },
+            {
+                'factory': ExportFactory,
+                'field': 'contacts',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
         ],
     },
     'interaction.Interaction': {
@@ -429,8 +449,8 @@ MAPPING = {
             {
                 'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                 'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
-                'actual_land_date':
-                    INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'actual_land_date': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                - relativedelta(days=1),
                 'date_abandoned': None,
                 'date_lost': None,
             },
@@ -438,8 +458,8 @@ MAPPING = {
                 'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                 'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
                 'actual_land_date': None,
-                'date_abandoned':
-                    INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'date_abandoned': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                - relativedelta(days=1),
                 'date_lost': None,
             },
             {
@@ -486,14 +506,13 @@ MAPPING = {
                 'field': 'investment_project',
                 'expired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                     },
                 ],
                 'unexpired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
+                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
                     },
                 ],
             },
@@ -502,14 +521,13 @@ MAPPING = {
                 'field': 'investment_project',
                 'expired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                     },
                 ],
                 'unexpired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
+                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME,
                     },
                 ],
             },
@@ -519,8 +537,8 @@ MAPPING = {
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
                     {
-                        'created_on':
-                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                         'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF,
                     },
                 ],
@@ -531,8 +549,8 @@ MAPPING = {
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
                     {
-                        'modified_on':
-                            INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                     },
                 ],
             },
@@ -657,6 +675,28 @@ MAPPING = {
             },
         ],
     },
+    'company.CompanyExport': {
+        'factory': ExportFactory,
+        'implicitly_deletable_models': set(),
+        'has_no_search_app': True,
+        'expired_objects_kwargs': [
+            {
+                'created_on': COMPANY_EXPORT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': COMPANY_EXPORT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+        ],
+        'unexpired_objects_kwargs': [
+            {
+                'created_on': COMPANY_EXPORT_DELETE_BEFORE_DATETIME,
+                'modified_on': COMPANY_EXPORT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+            {
+                'created_on': COMPANY_EXPORT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': COMPANY_EXPORT_DELETE_BEFORE_DATETIME,
+            },
+        ],
+        'relations': [],
+    },
 }
 
 
@@ -669,20 +709,19 @@ def test_mappings(model_label, config):
     Test that `MAPPING` includes all the data necessary for covering all the cases.
     This is to avoid missing tests when new the configurations for delete_old_records are changed.
     """
-    assert model_label in MAPPING, (
-        f'No test cases for deleting old records for model {model_label} specified in MAPPING'
-    )
+    assert (
+        model_label in MAPPING
+    ), f'No test cases for deleting old records for model {model_label} specified in MAPPING'
 
     if config.relation_filter_mapping:
         mapping = MAPPING[model_label]
         related_models_in_config = {field.field.model for field in config.relation_filter_mapping}
         related_models_in_mapping = {
-            relation['factory']._meta.get_model_class()
-            for relation in mapping['relations']
+            relation['factory']._meta.get_model_class() for relation in mapping['relations']
         }
-        assert related_models_in_config <= related_models_in_mapping, (
-            f'Missing test cases for relation filters for model {model_label} detected'
-        )
+        assert (
+            related_models_in_config <= related_models_in_mapping
+        ), f'Missing test cases for relation filters for model {model_label} detected'
 
 
 @pytest.mark.parametrize('model_label,config', delete_old_records.Command.CONFIGS.items())
@@ -752,8 +791,8 @@ def test_run(
     relation_factory_kwargs,
     is_expired,
     track_return_values,
-    es_with_signals,
-    es_collector_context_manager,
+    opensearch_with_signals,
+    opensearch_collector_context_manager,
 ):
     """Tests the delete_old_records commands for various cases specified by MAPPING above."""
     # Set up the state before running the command
@@ -765,7 +804,7 @@ def test_run(
 
     delete_return_value_tracker = track_return_values(QuerySet, 'delete')
 
-    with es_collector_context_manager as collector:
+    with opensearch_collector_context_manager as collector:
         obj = _create_model_obj(model_factory, **factory_kwargs)
         total_model_records = 1
 
@@ -788,22 +827,21 @@ def test_run(
 
     if has_search_app:
         search_app = get_search_app_by_model(model)
-        read_alias = search_app.es_model.get_read_alias()
-        assert es_with_signals.count(index=read_alias)['count'] == total_model_records
+        read_alias = search_app.search_model.get_read_alias()
+        assert opensearch_with_signals.count(index=read_alias)['count'] == total_model_records
 
     assert model.objects.count() == total_model_records
 
     # Run the command
     management.call_command(command, model_label)
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     # Check if the object has been deleted
     assert model.objects.count() == total_model_records - num_expired_records
 
     if has_search_app:
-        assert es_with_signals.count(index=read_alias)['count'] == (
-            total_model_records
-            - num_expired_records
+        assert opensearch_with_signals.count(index=read_alias)['count'] == (
+            total_model_records - num_expired_records
         )
 
     # Check which models were actually deleted
@@ -831,8 +869,8 @@ def test_simulate(
     model_name,
     config,
     track_return_values,
-    es_with_signals,
-    es_collector_context_manager,
+    opensearch_with_signals,
+    opensearch_collector_context_manager,
 ):
     """
     Test that if --simulate is passed in, the command only simulates the action
@@ -846,7 +884,7 @@ def test_simulate(
     model_factory = mapping['factory']
     has_search_app = not mapping.get('has_no_search_app')
 
-    with es_collector_context_manager as collector:
+    with opensearch_collector_context_manager as collector:
         for _ in range(3):
             _create_model_obj(model_factory, **mapping['expired_objects_kwargs'][0])
 
@@ -856,14 +894,14 @@ def test_simulate(
 
     if has_search_app:
         search_app = get_search_app_by_model(model)
-        read_alias = search_app.es_model.get_read_alias()
-        assert es_with_signals.count(index=read_alias)['count'] == 3
+        read_alias = search_app.search_model.get_read_alias()
+        assert opensearch_with_signals.count(index=read_alias)['count'] == 3
 
     assert model.objects.count() == 3
 
     # Run the command
     management.call_command(command, model_name, simulate=True)
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     # Check which models were deleted prior to the rollback
     return_values = delete_return_value_tracker.return_values
@@ -882,7 +920,7 @@ def test_simulate(
     assert model.objects.count() == 3
 
     if has_search_app:
-        assert es_with_signals.count(index=read_alias)['count'] == 3
+        assert opensearch_with_signals.count(index=read_alias)['count'] == 3
 
 
 @freeze_time(FROZEN_TIME)
@@ -926,9 +964,9 @@ def test_only_print_queries(model_name, config, monkeypatch, caplog):
 @mock.patch('datahub.search.deletion.bulk')
 @pytest.mark.usefixtures('synchronous_on_commit')
 @pytest.mark.django_db
-def test_with_es_exception(mocked_bulk):
+def test_with_opensearch_exception(mocked_bulk):
     """
-    Test that if ES returns a 5xx error, the command completes but it also
+    Test that if OpenSearch returns a 5xx error, the command completes but it also
     raises a DataHubError with details of the error.
     """
     mocked_bulk.return_value = (None, [{'delete': {'status': 500}}])

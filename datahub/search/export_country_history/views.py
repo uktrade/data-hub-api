@@ -1,4 +1,4 @@
-from elasticsearch_dsl.query import Term
+from opensearch_dsl.query import Term
 
 from datahub.core.permissions import HasPermissions
 from datahub.interaction.models import InteractionPermission
@@ -67,7 +67,7 @@ class ExportCountryHistoryView(SearchAPIView):
         """
         Overriding to provide multiple entities
         """
-        return [self.search_app.es_model, Interaction]
+        return [self.search_app.search_model, Interaction]
 
     def get_base_query(self, request, validated_data):
         """

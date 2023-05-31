@@ -5,10 +5,17 @@ from django.http import (
     Http404,
     JsonResponse,
 )
-from django_filters.rest_framework import CharFilter, DjangoFilterBackend, FilterSet
+from django_filters.rest_framework import (
+    CharFilter,
+    DateFromToRangeFilter,
+    DjangoFilterBackend,
+    FilterSet,
+    MultipleChoiceFilter,
+)
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
@@ -29,6 +36,7 @@ from datahub.company.export_wins_api import (
 from datahub.company.models import (
     Advisor,
     Company,
+    CompanyExport,
     CompanyPermission,
     Contact,
 )
@@ -40,6 +48,7 @@ from datahub.company.serializers import (
     AdviserSerializer,
     AssignOneListTierAndGlobalAccountManagerSerializer,
     AssignRegionalAccountManagerSerializer,
+    CompanyExportSerializer,
     CompanySerializer,
     ContactDetailSerializer,
     ContactDetailV4Serializer,
@@ -66,7 +75,7 @@ from datahub.core.hawk_receiver import (
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.permissions import HasPermissions
 from datahub.core.schemas import StubSchema
-from datahub.core.viewsets import CoreViewSet
+from datahub.core.viewsets import CoreViewSet, SoftDeleteCoreViewSet
 from datahub.investment.project.queryset import get_slim_investment_project_queryset
 
 
@@ -385,7 +394,8 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
     serializer_class = ContactSerializer
     queryset = get_contact_queryset()
     filter_backends = (
-        DjangoFilterBackend, OrderingFilter,
+        DjangoFilterBackend,
+        OrderingFilter,
     )
     filterset_fields = ['company_id', 'email']
     ordering = ('-created_on',)
@@ -491,7 +501,9 @@ class AdviserFilter(FilterSet):
 
 
 class AdviserReadOnlyViewSetV1(
-        mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
 ):
     """Adviser GET only views."""
 
@@ -553,10 +565,7 @@ class ExportWinsForCompanyView(APIView):
         """
         matches = response.json().get('matches', [])
 
-        match_ids = [
-            match['match_id']
-            for match in matches if match.get('match_id', None)
-        ]
+        match_ids = [match['match_id'] for match in matches if match.get('match_id', None)]
         return match_ids
 
     def _get_company(self, company_pk):
@@ -616,3 +625,71 @@ class ExportWinsForCompanyView(APIView):
             raise APIUpstreamException(str(exc))
 
         return JsonResponse(export_wins_results.json())
+
+
+class CompanyExportEstimatedWinDateFilterSet(FilterSet):
+    """CompanyExport estimated win date filter."""
+
+    estimated_win_date = DateFromToRangeFilter(
+        field_name='estimated_win_date',
+    )
+    status = MultipleChoiceFilter(
+        field_name='status',
+        choices=CompanyExport.ExportStatus.choices,
+    )
+    export_potential = MultipleChoiceFilter(
+        field_name='export_potential',
+        choices=CompanyExport.ExportPotential.choices,
+    )
+
+    class Meta:
+        model = CompanyExport
+        fields = [
+            'archived',
+            'destination_country',
+            'estimated_win_date',
+            'export_potential',
+            'owner',
+            'sector',
+            'status',
+            'team_members',
+        ]
+
+
+class CompanyExportViewSet(SoftDeleteCoreViewSet):
+    """View for company exports"""
+
+    queryset = CompanyExport.objects.select_related(
+        'company',
+        'owner',
+        'estimated_export_value_years',
+        'exporter_experience',
+    )
+    serializer_class = CompanyExportSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+    filterset_class = CompanyExportEstimatedWinDateFilterSet
+    ordering_fields = (
+        'created_on',
+        'title',
+    )
+    ordering = (
+        '-created_on',
+        'title',
+    )
+
+    def get_queryset(self):
+        """Filter the queryset to the authenticated user"""
+        if self.action == 'list':
+            return (
+                super()
+                .get_queryset()
+                .exclude(~Q(owner=self.request.user), ~Q(team_members=self.request.user))
+            )
+
+        return super().get_queryset()

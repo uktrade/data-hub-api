@@ -7,17 +7,18 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.management import call_command
 from django.db.models.signals import post_save
-from elasticsearch.helpers.test import get_test_client
+from opensearchpy.helpers.test import get_test_client
 from pytest_django.lazy_django import skip_if_no_django
 
 from datahub.core.constants import AdministrativeArea
-from datahub.core.test_utils import HawkAPITestClient
+from datahub.core.queues.scheduler import DataHubScheduler
+from datahub.core.test_utils import create_test_user, HawkAPITestClient
 from datahub.dnb_api.utils import format_dnb_company
 from datahub.documents.utils import get_s3_client_for_bucket
 from datahub.metadata.test.factories import SectorFactory
 from datahub.search.apps import get_search_app_by_model, get_search_apps
 from datahub.search.bulk_sync import sync_objects
-from datahub.search.elasticsearch import (
+from datahub.search.opensearch import (
     alias_exists,
     create_index,
     delete_alias,
@@ -159,35 +160,35 @@ def hierarchical_sectors():
 # SEARCH
 
 @pytest.fixture(scope='session')
-def _es_client(worker_id):
+def _opensearch_client(worker_id):
     """
-    Makes the ES test helper client available.
+    Makes the OpenSearch test helper client available.
 
     Also patches settings.ES_INDEX_PREFIX using the xdist worker ID so that each process
     gets unique indices when running tests using multiple processes using pytest -n.
     """
     # pytest's monkeypatch does not work in session fixtures, but there is no need to restore
     # the value so we just overwrite it normally
-    settings.ES_INDEX_PREFIX = f'test_{worker_id}'
+    settings.OPENSEARCH_INDEX_PREFIX = f'test_{worker_id}'
 
-    from elasticsearch_dsl.connections import connections
+    from opensearch_dsl.connections import connections
     client = get_test_client(nowait=False)
     connections.add_connection('default', client)
     yield client
 
 
 @pytest.fixture(scope='session')
-def _es_session(_es_client):
+def _opensearch_session(_opensearch_client):
     """
-    Session-scoped fixture that creates Elasticsearch indexes that persist for the entire test
+    Session-scoped fixture that creates OpenSearch indexes that persist for the entire test
     session.
     """
     # Create models in the test index
     for search_app in get_search_apps():
         # Clean up in case of any aborted test runs
-        index_name = search_app.es_model.get_target_index_name()
-        read_alias = search_app.es_model.get_read_alias()
-        write_alias = search_app.es_model.get_write_alias()
+        index_name = search_app.search_model.get_target_index_name()
+        read_alias = search_app.search_model.get_read_alias()
+        write_alias = search_app.search_model.get_write_alias()
 
         if index_exists(index_name):
             delete_index(index_name)
@@ -200,52 +201,54 @@ def _es_session(_es_client):
 
         # Create indices and aliases
         alias_names = (read_alias, write_alias)
-        create_index(index_name, search_app.es_model._doc_type.mapping, alias_names=alias_names)
+        create_index(
+            index_name, search_app.search_model._doc_type.mapping, alias_names=alias_names,
+        )
 
-    yield _es_client
+    yield _opensearch_client
 
     for search_app in get_search_apps():
-        delete_index(search_app.es_model.get_target_index_name())
+        delete_index(search_app.search_model.get_target_index_name())
 
 
 @pytest.fixture
-def es(_es_session):
+def opensearch(_opensearch_session):
     """
     Function-scoped pytest fixture that:
 
-    - ensures Elasticsearch is available for the test
-    - deletes all documents from Elasticsearch at the end of the test.
+    - ensures OpenSearch is available for the test
+    - deletes all documents from OpenSearch at the end of the test.
     """
-    yield _es_session
+    yield _opensearch_session
 
-    _es_session.indices.refresh()
-    indices = [search_app.es_model.get_target_index_name() for search_app in get_search_apps()]
-    _es_session.delete_by_query(
+    _opensearch_session.indices.refresh()
+    indices = [search_app.search_model.get_target_index_name() for search_app in get_search_apps()]
+    _opensearch_session.delete_by_query(
         indices,
         body={'query': {'match_all': {}}},
     )
-    _es_session.indices.refresh()
+    _opensearch_session.indices.refresh()
 
 
 @pytest.fixture
-def es_with_signals(es, synchronous_on_commit):
+def opensearch_with_signals(opensearch, synchronous_on_commit):
     """
     Function-scoped pytest fixture that:
 
-    - ensures Elasticsearch is available for the test
-    - connects search signal receivers so that Elasticsearch documents are automatically
+    - ensures OpenSearch is available for the test
+    - connects search signal receivers so that OpenSearch documents are automatically
     created for model instances saved during the test
-    - deletes all documents from Elasticsearch at the end of the test
+    - deletes all documents from OpenSearch at the end of the test
 
     Use this fixture when specifically testing search signal receivers.
 
-    Call es_with_signals.indices.refresh() after creating objects to refresh all search indices
-    and ensure synced objects are available for querying.
+    Call opensearch_with_signals.indices.refresh() after creating objects to refresh all
+    search indices and ensure synced objects are available for querying.
     """
     for search_app in get_search_apps():
         search_app.connect_signals()
 
-    yield es
+    yield opensearch
 
     for search_app in get_search_apps():
         search_app.disconnect_signals()
@@ -254,10 +257,10 @@ def es_with_signals(es, synchronous_on_commit):
 class SavedObjectCollector:
     """
     Collects the search apps of saved search objects and indexes those apps in bulk in
-    Elasticsearch.
+    OpenSearch.
     """
 
-    def __init__(self, es_client, apps_to_collect):
+    def __init__(self, opensearch_client, apps_to_collect):
         """
         Initialises the collector.
 
@@ -265,7 +268,7 @@ class SavedObjectCollector:
             saved objects for when `flush_and_refresh()` is called)
         """
         self.collected_apps = set()
-        self.es_client = es_client
+        self.opensearch_client = opensearch_client
 
         self.signal_receivers_to_connect = [
             SignalReceiver(post_save, search_app.queryset.model, self._collect)
@@ -299,14 +302,14 @@ class SavedObjectCollector:
             receiver.enable()
 
     def flush_and_refresh(self):
-        """Sync objects of all collected apps to Elasticsearch and refresh search indices."""
+        """Sync objects of all collected apps to OpenSearch and refresh search indices."""
         for search_app in self.collected_apps:
-            es_model = search_app.es_model
-            read_indices, write_index = es_model.get_read_and_write_indices()
-            sync_objects(es_model, search_app.queryset.all(), read_indices, write_index)
+            search_model = search_app.search_model
+            read_indices, write_index = search_model.get_read_and_write_indices()
+            sync_objects(search_model, search_app.queryset.all(), read_indices, write_index)
 
         self.collected_apps.clear()
-        self.es_client.indices.refresh()
+        self.opensearch_client.indices.refresh()
 
     def _collect(self, obj):
         """
@@ -322,65 +325,65 @@ class SavedObjectCollector:
 
 
 @pytest.fixture
-def es_collector_context_manager(es, synchronous_on_commit, request):
+def opensearch_collector_context_manager(opensearch, synchronous_on_commit, request):
     """
-    Slightly lower-level version of es_with_collector.
+    Slightly lower-level version of opensearch_with_collector.
 
     Function-scoped pytest fixture that:
 
-    - ensures Elasticsearch is available for the test
-    - deletes all documents from Elasticsearch at the end of the test
+    - ensures OpenSearch is available for the test
+    - deletes all documents from OpenSearch at the end of the test
     - yields a context manager that can be used to collects all model objects saved so
-    they can be synced to Elasticsearch in bulk
+    they can be synced to OpenSearch in bulk
 
-    Call es_collector_context_manager.flush_and_refresh() to sync collected objects to
-    Elasticsearch and refresh all indices.
+    Call opensearch_collector_context_manager.flush_and_refresh() to sync collected objects to
+    OpenSearch and refresh all indices.
 
-    In most cases, you should not use this fixture directly, but use es_with_collector or
-    es_with_signals instead.
+    In most cases, you should not use this fixture directly, but use opensearch_with_collector or
+    opensearch_with_signals instead.
     """
     marker_apps = {
         app
-        for marker in request.node.iter_markers('es_collector_apps')
+        for marker in request.node.iter_markers('opensearch_collector_apps')
         for app in marker.args
     }
     apps = marker_apps or get_search_apps()
 
-    yield SavedObjectCollector(es, apps)
+    yield SavedObjectCollector(opensearch, apps)
 
 
 @pytest.fixture
-def es_with_collector(es_collector_context_manager):
+def opensearch_with_collector(opensearch_collector_context_manager):
     """
     Function-scoped pytest fixture that:
 
-    - ensures Elasticsearch is available for the test
-    - collects all model objects saved so they can be synced to Elasticsearch in bulk
-    - deletes all documents from Elasticsearch at the end of the test
+    - ensures OpenSearch is available for the test
+    - collects all model objects saved so they can be synced to OpenSearch in bulk
+    - deletes all documents from OpenSearch at the end of the test
 
     Use this fixture for search tests that don't specifically test signal receivers.
 
-    Call es_with_collector.flush_and_refresh() to sync collected objects to Elasticsearch and
+    Call opensearch_with_collector.flush_and_refresh() to sync collected objects to OpenSearch and
     refresh all indices.
     """
-    with es_collector_context_manager as collector:
+    with opensearch_collector_context_manager as collector:
         yield collector
 
 
 @pytest.fixture
-def mock_es_client(monkeypatch):
-    """Patches the Elasticsearch library so that a mock client is used."""
+def mock_opensearch_client(monkeypatch):
+    """Patches the OpenSearch library so that a mock client is used."""
     mock_client = Mock()
-    monkeypatch.setattr('elasticsearch_dsl.connections.connections.get_connection', mock_client)
+    monkeypatch.setattr('opensearch_dsl.connections.connections.get_connection', mock_client)
     yield mock_client
 
 
 @pytest.fixture
 def mock_connection_for_create_index(monkeypatch):
-    """Patches the Elasticsearch library so that a mock client is used."""
+    """Patches the OpenSearch library so that a mock client is used."""
     mock_client = Mock()
-    monkeypatch.setattr('elasticsearch_dsl.connections.connections.get_connection', mock_client)
-    monkeypatch.setattr('elasticsearch_dsl.index.get_connection', mock_client)
+    monkeypatch.setattr('opensearch_dsl.connections.connections.get_connection', mock_client)
+    monkeypatch.setattr('opensearch_dsl.index.get_connection', mock_client)
     yield mock_client
 
 
@@ -470,6 +473,12 @@ def formatted_dnb_company_area(dnb_response_uk):
     return format_dnb_company(dnb_response_area)
 
 
+@pytest.fixture
+def search_support_user():
+    """A user with permissions for search_support views."""
+    return create_test_user(permission_codenames=['view_simplemodel', 'view_relatedmodel'])
+
+
 def pytest_addoption(parser):
     """Adds a new flag to pytest to skip excluded tests"""
     parser.addoption(
@@ -490,3 +499,31 @@ def pytest_collection_modifyitems(config, items):
             for m in item.iter_markers()
         ]):
             item.add_marker(pytest.mark.skip(reason='Test marked as excluded'))
+
+
+@pytest.fixture()
+def queue():
+    with DataHubScheduler('burst-no-fork') as queue:
+        try:
+            yield queue
+        finally:
+            queue.clear()
+
+
+@pytest.fixture()
+def async_queue():
+    with DataHubScheduler('burst-no-fork', is_async=True) as queue:
+        try:
+            yield queue
+        finally:
+            queue.clear()
+
+
+@pytest.fixture()
+def fork_queue():
+    """Don't use this if you are going to do work as this will block any tests running"""
+    with DataHubScheduler('fork') as queue:
+        try:
+            yield queue
+        finally:
+            queue.clear()

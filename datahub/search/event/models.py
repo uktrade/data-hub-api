@@ -1,11 +1,11 @@
-from elasticsearch_dsl import Date, Keyword, Text
+from opensearch_dsl import Date, Keyword, Text
 
 from datahub.search import dict_utils, fields
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
-class Event(BaseESModel):
-    """Elasticsearch representation of Event model."""
+class Event(BaseSearchModel):
+    """OpenSearch representation of Event model."""
 
     id = Keyword()
     address_1 = Text()
@@ -17,7 +17,7 @@ class Event(BaseESModel):
     created_on = Date()
     disabled_on = Date()
     end_date = Date()
-    event_type = fields.id_name_field()
+    event_type = fields.id_name_partial_field()
     lead_team = fields.id_name_field()
     location_type = fields.id_name_field()
     modified_on = Date()
@@ -54,11 +54,13 @@ class Event(BaseESModel):
         'name',
         'name.trigram',
         'address_country.name.trigram',
-        'address_postcode.trigram',
+        'address_postcode',
         'uk_region.name.trigram',
         'organiser.name.trigram',
         'teams.name',
         'teams.name.trigram',
         'related_programmes.name',
         'related_programmes.name.trigram',
+        'event_type.name',
+        'event_type.name.trigram',
     )

@@ -12,7 +12,7 @@ from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.core.utils import reverse_with_query_string
 
 
-DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
+DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/search/')
 
 
 def _get_review_changes_url(company, duns_number):
@@ -127,7 +127,7 @@ class TestReviewChangesViewGet(AdminTestMixin):
         Test that the review changes view renders proposed D&B changes.
         """
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json=dnb_response,
         )
         review_changes_url = _get_review_changes_url(
@@ -151,7 +151,7 @@ class TestReviewChangesViewPost(AdminTestMixin):
         Test that a post request to 'review changes' updates the company.
         """
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json=dnb_response,
         )
         dh_company = CompanyFactory()
@@ -199,7 +199,7 @@ class TestReviewChangesViewDNBErrors(AdminTestMixin):
         doesn't return with a 200 status code.
         """
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             status_code=dnb_response_code,
         )
         review_changes_url = _get_review_changes_url(CompanyFactory(), '123456789')
@@ -246,7 +246,7 @@ class TestReviewChangesViewDNBErrors(AdminTestMixin):
         we return an error message to the user.
         """
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json={'results': search_results},
         )
         review_changes_url = _get_review_changes_url(CompanyFactory(), '123456789')
@@ -271,7 +271,7 @@ class TestReviewChangesViewDNBErrors(AdminTestMixin):
         """
         dnb_response['results'][0]['primary_name'] = None
         requests_mock.post(
-            DNB_SEARCH_URL,
+            DNB_V2_SEARCH_URL,
             json=dnb_response,
         )
         review_changes_url = _get_review_changes_url(CompanyFactory(), '123456789')

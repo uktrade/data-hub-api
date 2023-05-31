@@ -48,7 +48,7 @@ class AdviserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-@reversion.register_base_model(extra_exclude=('last_login',))
+@reversion.register_base_model()
 class Advisor(AbstractBaseUser, PermissionsMixin):
     """Adviser model.
 
@@ -95,6 +95,13 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         verbose_name='SSO email user ID',
         help_text='This is the `Email user ID` that is shown for this user in Staff SSO.',
     )
+    sso_user_id = models.UUIDField(
+        blank=True,
+        unique=True,
+        null=True,
+        verbose_name='SSO user ID',
+        help_text='This is the `User ID` that is shown for this user in Staff SSO.',
+    )
 
     features = models.ManyToManyField(
         'feature_flag.UserFeatureFlag',
@@ -102,6 +109,14 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         blank=True,
         help_text=(
             "User's feature flags. Note that the feature flag also needs to be set to active."
+        ),
+    )
+    feature_groups = models.ManyToManyField(
+        'feature_flag.UserFeatureFlagGroup',
+        related_name='advisers',
+        blank=True,
+        help_text=(
+            "User's feature flag groups. Note that the group also needs to be set to active."
         ),
     )
 
@@ -162,4 +177,17 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         """
         :returns: Features that are currently active.
         """
-        return self.features.filter(is_active=True).values_list('code', flat=True)
+        features = []
+        for feature_group in self.feature_groups.filter(is_active=True):
+            features += feature_group.features.filter(is_active=True).values_list(
+                'code', flat=True,
+            )
+        features += self.features.filter(is_active=True).values_list('code', flat=True)
+        return list(set(features))
+
+    @cached_property
+    def active_feature_groups(self):
+        """
+        :returns: Feature groups that are currently active.
+        """
+        return self.feature_groups.filter(is_active=True).values_list('code', flat=True)

@@ -3,6 +3,12 @@
   pk: 0c4f8e74-d34f-4aca-b764-a44cdc2d0087
   fields: {disabled_on: null, name: "Cold call"}
 - model: metadata.referralsourceactivity
+  pk: 9f6f34c5-a94b-446e-9702-50be3ea3eeca
+  fields: {disabled_on: null, name: "Commonwealth Games 2022 – BATP Programme"}
+- model: metadata.referralsourceactivity
+  pk: 120c051b-e801-45d7-96c9-1dc9b447f387
+  fields: {disabled_on: null, name: "Commonwealth Games 2022 – GEP Programme"}
+- model: metadata.referralsourceactivity
   pk: 7d98f3a6-3e3f-40ac-a6f3-3f0c251ec1d2
   fields: {disabled_on: null, name: "Direct enquiry"}
 - model: metadata.referralsourceactivity

@@ -18,7 +18,7 @@
   fields: {disabled_on: null, name: "Regeneration - Capital Investment"}
 - model: investment.specificprogramme
   pk: 26881936-6823-4ad7-a6e0-41fb9f714dab
-  fields: {disabled_on: null, name: "GREAT Investors - Capital Investment"}
+  fields: {disabled_on: '2022-12-19T11:25:03Z', name: "GREAT Investors - Capital Investment"}
 - model: investment.specificprogramme
   pk: ca8bd4cd-0c6b-4afd-b010-d5b38376c0fc
   fields: {disabled_on: null, name: "HQ-UK"}

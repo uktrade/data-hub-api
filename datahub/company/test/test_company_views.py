@@ -182,8 +182,7 @@ class TestListCompanies(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == len(creation_times)
         expected_timestamps = [
-            format_date_or_datetime(creation_time)
-            for creation_time in sorted(creation_times)
+            format_date_or_datetime(creation_time) for creation_time in sorted(creation_times)
         ]
         actual_timestamps = [result['created_on'] for result in response_data['results']]
         assert expected_timestamps == actual_timestamps
@@ -193,9 +192,7 @@ class TestListCompanies(APITestMixin):
         CompanyFactory.create_batch(5, archived_documents_url_path='hello world')
 
         user = create_test_user(
-            permission_codenames=(
-                'view_company',
-            ),
+            permission_codenames=('view_company',),
         )
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:company:collection')
@@ -205,8 +202,7 @@ class TestListCompanies(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == 5
         assert all(
-            'archived_documents_url_path' not in company
-            for company in response_data['results']
+            'archived_documents_url_path' not in company for company in response_data['results']
         )
 
     def test_list_companies_with_view_document_permission(self):
@@ -244,9 +240,7 @@ class TestGetCompany(APITestMixin):
             archived_documents_url_path='http://some-documents',
         )
         user = create_test_user(
-            permission_codenames=(
-                'view_company',
-            ),
+            permission_codenames=('view_company',),
         )
         api_client = self.create_api_client(user=user)
 
@@ -319,9 +313,7 @@ class TestGetCompany(APITestMixin):
                     'name': company.registered_address_country.name,
                 },
             },
-            'uk_based': (
-                company.address_country.id == uuid.UUID(Country.united_kingdom.value.id)
-            ),
+            'uk_based': (company.address_country.id == uuid.UUID(Country.united_kingdom.value.id)),
             'uk_region': {
                 'id': str(company.uk_region.id),
                 'name': company.uk_region.name,
@@ -402,6 +394,7 @@ class TestGetCompany(APITestMixin):
             'is_global_ultimate': company.is_global_ultimate,
             'global_ultimate_duns_number': company.global_ultimate_duns_number,
             'dnb_modified_on': company.dnb_modified_on,
+            'is_global_headquarters': False,
         }
 
     def test_get_company_without_country(self):
@@ -434,7 +427,6 @@ class TestGetCompany(APITestMixin):
 
         Checks that the endpoint returns 200
         """
-        FeatureFlagFactory(code='address-area-company-required-field')
         company = CompanyFactory(
             address_country_id=country_id,
             address_area_id=None,
@@ -565,7 +557,8 @@ class TestGetCompany(APITestMixin):
                     'name': item.country.name,
                 },
                 'status': item.status,
-            } for item in company.export_countries.order_by('pk')
+            }
+            for item in company.export_countries.order_by('pk')
         ]
 
     def test_check_company_dont_return_export_countries_with_no_permission(self):
@@ -577,9 +570,7 @@ class TestGetCompany(APITestMixin):
         export_country_one, export_country_two = CompanyExportCountryFactory.create_batch(2)
         company.export_countries.set([export_country_one, export_country_two])
         user = create_test_user(
-            permission_codenames=(
-                'view_company',
-            ),
+            permission_codenames=('view_company',),
         )
         api_client = self.create_api_client(user=user)
 
@@ -720,9 +711,32 @@ class TestGetCompany(APITestMixin):
                         'id': str(global_account_manager.dit_team.country.pk),
                         'name': global_account_manager.dit_team.country.name,
                     },
-
                 },
             }
+
+    @pytest.mark.parametrize(
+        'headquarter_type, expected_is_global_headquarters',
+        (
+            (HeadquarterType.ehq.value.id, False),
+            (HeadquarterType.ghq.value.id, True),
+            (HeadquarterType.ukhq.value.id, False),
+        ),
+    )
+    def test_get_company_is_global_headquarters(
+        self,
+        headquarter_type,
+        expected_is_global_headquarters,
+    ):
+        """
+        Test that `is_global_headquarters` is set for a company API result
+        as expected.
+        """
+        company = CompanyFactory(headquarter_type_id=headquarter_type)
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['is_global_headquarters'] == expected_is_global_headquarters
 
 
 class TestUpdateCompany(APITestMixin):
@@ -746,7 +760,6 @@ class TestUpdateCompany(APITestMixin):
                     'trading_names': ['new name'],
                 },
             ),
-
             # change of address
             (
                 {
@@ -786,7 +799,6 @@ class TestUpdateCompany(APITestMixin):
                     },
                 },
             ),
-
             # change of registered address
             (
                 {
@@ -797,7 +809,6 @@ class TestUpdateCompany(APITestMixin):
                     'address_postcode': 'BT41 4QE',
                     'address_area_id': None,
                     'address_country_id': Country.ireland.value.id,
-
                     'registered_address_1': '2',
                     'registered_address_2': 'Main Road',
                     'registered_address_town': 'London',
@@ -833,7 +844,6 @@ class TestUpdateCompany(APITestMixin):
                     },
                 },
             ),
-
             # set registered address to None
             (
                 {
@@ -844,7 +854,6 @@ class TestUpdateCompany(APITestMixin):
                     'address_postcode': 'BT41 4QE',
                     'address_area_id': None,
                     'address_country_id': Country.ireland.value.id,
-
                     'registered_address_1': '2',
                     'registered_address_2': 'Main Road',
                     'registered_address_town': 'London',
@@ -874,8 +883,7 @@ class TestUpdateCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         actual_response = {
-            field_name: response_data[field_name]
-            for field_name in expected_response
+            field_name: response_data[field_name] for field_name in expected_response
         }
         assert actual_response == expected_response
 
@@ -1106,8 +1114,9 @@ class TestUpdateCompany(APITestMixin):
                     },
                 },
                 {
-                    'address_country':
-                        ['A UK establishment (branch of non-UK company) must be in the UK.'],
+                    'address_country': [
+                        'A UK establishment (branch of non-UK company) must be in the UK.',
+                    ],
                 },
             ),
             # United states should make address area mandatory
@@ -1184,7 +1193,6 @@ class TestUpdateCompany(APITestMixin):
     )
     def test_validation_error(self, data, expected_error):
         """Test validation scenarios."""
-        FeatureFlagFactory(code='address-area-company-required-field')
         company = CompanyFactory(
             registered_address_1='',
             registered_address_2='',
@@ -1504,7 +1512,7 @@ class TestAddCompany(APITestMixin):
                     },
                     'registered_address': None,
                 },
-                ['address-postcode-company-required-field'],
+                [],
             ),
             # Canadian company
             (
@@ -1539,7 +1547,7 @@ class TestAddCompany(APITestMixin):
                     },
                     'registered_address': None,
                 },
-                ['address-postcode-company-required-field'],
+                [],
             ),
             # promote a CH company
             (
@@ -1647,7 +1655,6 @@ class TestAddCompany(APITestMixin):
                 'country': Country.united_kingdom.value.id,
             },
             'uk_region': UKRegion.england.value.id,
-
             **data,
         }
 
@@ -1661,8 +1668,7 @@ class TestAddCompany(APITestMixin):
         response_data = response.json()
         assert response_data['pending_dnb_investigation']
         actual_response = {
-            field_name: response_data[field_name]
-            for field_name in expected_response
+            field_name: response_data[field_name] for field_name in expected_response
         }
         assert actual_response == expected_response
 
@@ -1781,8 +1787,9 @@ class TestAddCompany(APITestMixin):
                     },
                 },
                 {
-                    'address_country':
-                        ['A UK establishment (branch of non-UK company) must be in the UK.'],
+                    'address_country': [
+                        'A UK establishment (branch of non-UK company) must be in the UK.',
+                    ],
                 },
                 [],
             ),
@@ -1800,8 +1807,9 @@ class TestAddCompany(APITestMixin):
                     },
                 },
                 {
-                    'company_number':
-                        ['This must be a valid UK establishment number, beginning with BR.'],
+                    'company_number': [
+                        'This must be a valid UK establishment number, beginning with BR.',
+                    ],
                 },
                 [],
             ),
@@ -1819,11 +1827,10 @@ class TestAddCompany(APITestMixin):
                     },
                 },
                 {
-                    'company_number':
-                        [
-                            'This field can only contain the letters A to Z and numbers '
-                            '(no symbols, punctuation or spaces).',
-                        ],
+                    'company_number': [
+                        'This field can only contain the letters A to Z and numbers '
+                        '(no symbols, punctuation or spaces).',
+                    ],
                 },
                 [],
             ),
@@ -1846,7 +1853,7 @@ class TestAddCompany(APITestMixin):
                         ],
                     },
                 },
-                ['address-area-company-required-field'],
+                [],
             ),
             # for US company postcode is required
             (
@@ -1858,7 +1865,9 @@ class TestAddCompany(APITestMixin):
                         'country': {
                             'id': Country.united_states.value.id,
                         },
-                        'address_area': AdministrativeArea.alabama.value.id,
+                        'area': {
+                            'id': AdministrativeArea.alabama.value.id,
+                        },
                     },
                 },
                 {
@@ -1868,7 +1877,7 @@ class TestAddCompany(APITestMixin):
                         ],
                     },
                 },
-                ['address-postcode-company-required-field'],
+                [],
             ),
             # for Canadian company postcode is required
             (
@@ -1880,7 +1889,9 @@ class TestAddCompany(APITestMixin):
                         'country': {
                             'id': Country.canada.value.id,
                         },
-                        'address_area': AdministrativeArea.quebec.value.id,
+                        'area': {
+                            'id': AdministrativeArea.quebec.value.id,
+                        },
                     },
                 },
                 {
@@ -1890,7 +1901,7 @@ class TestAddCompany(APITestMixin):
                         ],
                     },
                 },
-                ['address-postcode-company-required-field'],
+                [],
             ),
         ),
     )
@@ -1908,7 +1919,6 @@ class TestAddCompany(APITestMixin):
                 'country': Country.united_kingdom.value.id,
             },
             'uk_region': UKRegion.england.value.id,
-
             **data,
         }
 

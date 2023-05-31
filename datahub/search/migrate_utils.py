@@ -3,7 +3,7 @@ from logging import getLogger
 from datahub.core.exceptions import DataHubError
 from datahub.search.bulk_sync import sync_app
 from datahub.search.deletion import delete_documents
-from datahub.search.elasticsearch import (
+from datahub.search.opensearch import (
     delete_index,
     get_aliases_for_index,
     start_alias_transaction,
@@ -18,7 +18,7 @@ def resync_after_migrate(search_app):
     """
     Completes a migration by performing a full resync, updating aliases and removing old indices.
     """
-    if not search_app.es_model.was_migration_started():
+    if not search_app.search_model.was_migration_started():
         logger.warning(
             f'No pending migration detected for the {search_app.name} search app, aborting '
             f'resync...',
@@ -30,9 +30,9 @@ def resync_after_migrate(search_app):
 
 
 def _clean_up_aliases_and_indices(search_app):
-    es_model = search_app.es_model
-    read_alias = es_model.get_read_alias()
-    read_indices, write_index = es_model.get_read_and_write_indices()
+    search_model = search_app.search_model
+    read_alias = search_model.get_read_alias()
+    read_indices, write_index = search_model.get_read_and_write_indices()
 
     if write_index not in read_indices:
         raise DataHubError('Write index not in read alias, aborting mapping migration...')

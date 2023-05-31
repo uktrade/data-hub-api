@@ -39,7 +39,7 @@ def dnb_response_non_uk():
                 'address_town': 'New York',
                 'address_county': '',
                 'address_postcode': '10033-1062',
-                'address_area': None,
+                'address_area_abbrev_name': 'NY',
                 'address_country': 'US',
                 'annual_sales': 1000000.0,
                 'annual_sales_currency': 'USD',

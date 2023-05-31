@@ -1,17 +1,16 @@
 from logging import getLogger
 
-from celery import shared_task
 from django.apps import apps
 from django.db.models import Exists, NOT_PROVIDED, OuterRef, Subquery
 from django.db.transaction import atomic
 from django_pglocks import advisory_lock
 
 from datahub.company.models import Company, CompanyExportCountry
+from datahub.core.queues.job_scheduler import job_scheduler
 
 logger = getLogger(__name__)
 
 
-@shared_task(acks_late=True)
 def replace_null_with_default(model_label, field_name, default=None, batch_size=5000):
     """
     Task that replaces NULL values for a model field with the default argument if specified
@@ -59,13 +58,14 @@ def replace_null_with_default(model_label, field_name, default=None, batch_size=
         return
 
     # Schedule another task to update another batch of rows
-    replace_null_with_default.apply_async(
-        args=(model_label, field_name),
-        kwargs={'default': default, 'batch_size': batch_size},
+    job = job_scheduler(
+        function=replace_null_with_default,
+        function_args=(model_label, field_name),
+        function_kwargs={'default': default, 'batch_size': batch_size},
     )
+    logger.info(f'Task {job.id} replace_null_with_default')
 
 
-@shared_task(acks_late=True)
 def copy_foreign_key_to_m2m_field(
     model_label,
     source_fk_field_name,
@@ -78,9 +78,7 @@ def copy_foreign_key_to_m2m_field(
 
     Usage example:
 
-        copy_foreign_key_to_m2m_field.apply_async(
-            args=('interaction.Interaction', 'contact', 'contacts'),
-        )
+        copy_foreign_key_to_m2m_field('interaction.Interaction', 'contact', 'contacts')
 
     Note: This does not create reversion revisions on the model referenced by model_label. For new
     fields, the new versions would simply show the new field being added, so would not be
@@ -116,10 +114,12 @@ def copy_foreign_key_to_m2m_field(
     # current changes have been committed.
     #
     # (Similarly, the lock should also be released before the next task is scheduled.)
-    copy_foreign_key_to_m2m_field.apply_async(
-        args=(model_label, source_fk_field_name, target_m2m_field_name),
-        kwargs={'batch_size': batch_size},
+    job = job_scheduler(
+        function=copy_foreign_key_to_m2m_field,
+        function_args=(model_label, source_fk_field_name, target_m2m_field_name),
+        function_kwargs={'batch_size': batch_size},
     )
+    logger.info(f'Task {job.id} copy_foreign_key_to_m2m_field')
 
 
 @atomic
@@ -178,7 +178,6 @@ def _copy_foreign_key_to_m2m_field(
     return len(objects_to_create)
 
 
-@shared_task(acks_late=True)
 def copy_export_countries_to_company_export_country_model(
     status,
     batch_size=5000,
@@ -197,12 +196,14 @@ def copy_export_countries_to_company_export_country_model(
     if num_updated < batch_size:
         return
 
-    copy_export_countries_to_company_export_country_model.apply_async(
-        kwargs={
+    job = job_scheduler(
+        function=copy_export_countries_to_company_export_country_model,
+        function_kwargs={
             'batch_size': batch_size,
             'status': status,
         },
     )
+    logger.info(f'Task {job.id} copy_export_countries_to_company_export_country_model')
 
 
 @atomic

@@ -83,12 +83,9 @@ class AddContactBase(APITestMixin):
                 'company': {
                     'id': str(company.pk),
                 },
-                'email': 'foo@bar.com',
-                'email_alternative': 'foo2@bar.com',
+                'email': 'FOO@bar.com',
                 'primary': True,
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
-                'telephone_alternative': '987654321',
+                'full_telephone_number': '+44 123456789',
                 'address_same_as_company': False,
                 'address_1': 'Foo st.',
                 'address_2': 'adr 2',
@@ -125,11 +122,8 @@ class AddContactBase(APITestMixin):
                 'name': self.user.name,
             },
             'email': 'foo@bar.com',
-            'email_alternative': 'foo2@bar.com',
             'primary': True,
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'telephone_alternative': '987654321',
+            'full_telephone_number': '+44 123456789',
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
@@ -164,8 +158,6 @@ class AddContactBase(APITestMixin):
                     'id': CompanyFactory().pk,
                 },
                 'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'address_same_as_company': True,
                 'primary': True,
             },
@@ -194,8 +186,6 @@ class AddContactBase(APITestMixin):
                     'id': CompanyFactory().pk,
                 },
                 'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'address_same_as_company': True,
                 'primary': True,
             },
@@ -204,9 +194,7 @@ class AddContactBase(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.data
         assert not response_data['title']
-        assert not response_data['telephone_alternative']
         assert response_data['address_same_as_company']
-        assert not response_data['email_alternative']
         assert not response_data['address_1']
         assert not response_data['address_2']
         assert not response_data['address_town']
@@ -228,8 +216,6 @@ class AddContactBase(APITestMixin):
                     'id': CompanyFactory().pk,
                 },
                 'email': 'invalid dot com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'address_same_as_company': True,
                 'primary': True,
             },
@@ -252,8 +238,6 @@ class AddContactBase(APITestMixin):
                     'id': CompanyFactory().pk,
                 },
                 'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'primary': True,
             },
         )
@@ -277,8 +261,6 @@ class AddContactBase(APITestMixin):
                     'id': CompanyFactory().pk,
                 },
                 'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'address_1': 'test',
                 'primary': True,
             },
@@ -302,8 +284,6 @@ class AddContactBase(APITestMixin):
                     'id': CompanyFactory().pk,
                 },
                 'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'address_same_as_company': True,
             },
         )
@@ -311,6 +291,59 @@ class AddContactBase(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
             'primary': ['This field is required.'],
+        }
+
+    def test_duplicate_emails_ok_for_different_company(self):
+        """It should be ok to save a non unique email if the company is different."""
+        company_1 = CompanyFactory(name='Company ABC')
+        company_2 = CompanyFactory(name='Company XYZ')
+        email = 'foo@bar.com'
+        ContactFactory(company=company_1, email=email)
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
+        response = self.api_client.post(
+            url,
+            data={
+                'primary': False,
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'company': {
+                    'id': company_2.pk,
+                },
+                'email': email,
+                'address_same_as_company': True,
+            },
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data['first_name'] == 'Oratio'
+        assert response_data['last_name'] == 'Nelson'
+        assert response_data['company']['id'] == str(company_2.id)
+
+    def test_no_duplicate_emails_for_company(self):
+        """Validation error should occur when the email address is not unique at the company."""
+        company_name = 'Test House'
+        company = CompanyFactory(name=company_name)
+        email = 'foo@bar.com'
+        ContactFactory(company=company, email=email)
+        url = reverse(f'{self.endpoint_namespace}:contact:list')
+        response = self.api_client.post(
+            url,
+            data={
+                'primary': False,
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'company': {
+                    'id': company.pk,
+                },
+                'email': email,
+                'address_same_as_company': True,
+            },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'email': [f'A contact with this email already exists at {company_name}.'],
         }
 
 
@@ -353,11 +386,8 @@ class TestAddContactV4(AddContactBase):
                     'id': str(company.pk),
                 },
                 'email': 'foo@bar.com',
-                'email_alternative': 'foo2@bar.com',
                 'primary': True,
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
-                'telephone_alternative': '987654321',
+                'full_telephone_number': '+44 123456789',
                 'address_same_as_company': False,
                 'address_1': 'Foo st.',
                 'address_2': 'adr 2',
@@ -399,11 +429,8 @@ class TestAddContactV4(AddContactBase):
                 'name': self.user.name,
             },
             'email': 'foo@bar.com',
-            'email_alternative': 'foo2@bar.com',
             'primary': True,
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'telephone_alternative': '987654321',
+            'full_telephone_number': '+44 123456789',
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
@@ -441,8 +468,7 @@ class TestAddContactV4(AddContactBase):
                     'id': CompanyFactory().pk,
                 },
                 'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
+                'full_telephone_number': '+44 123456789',
                 'address_country': {
                     'id': constants.Country.united_states.value.id,
                     'name': constants.Country.united_states.value.name,
@@ -480,12 +506,9 @@ class EditContactBase(APITestMixin):
                 job_title='Head of Sales',
                 company=company,
                 email='foo@bar.com',
-                email_alternative='foo2@bar.com',
                 primary=True,
                 adviser=self.user,
-                telephone_countrycode='+44',
-                telephone_number='123456789',
-                telephone_alternative='987654321',
+                full_telephone_number='+44 123456789',
                 address_same_as_company=False,
                 address_1='Foo st.',
                 address_2='adr 2',
@@ -521,7 +544,6 @@ class EditContactBase(APITestMixin):
                 'name': company.name,
             },
             'email': 'foo@bar.com',
-            'email_alternative': 'foo2@bar.com',
             'primary': True,
             'adviser': {
                 'id': str(self.user.pk),
@@ -529,9 +551,7 @@ class EditContactBase(APITestMixin):
                 'last_name': self.user.last_name,
                 'name': self.user.name,
             },
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'telephone_alternative': '987654321',
+            'full_telephone_number': '+44 123456789',
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
@@ -588,6 +608,69 @@ class EditContactBase(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
 
+    def test_unchanged_email_ok(self):
+        """If the email has not changed, it should not raise a validation error."""
+        company_name = 'Test House'
+        company = CompanyFactory(name=company_name)
+        email = 'foo@bar.com'
+        contact = ContactFactory(company=company, email=email)
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'company': {
+                    'id': company.pk,
+                },
+                'email': email,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_duplicate_email_at_company_from_payload(self):
+        """Error if another contact at the company specified in payload has the email."""
+        company_name = 'Test House'
+        company = CompanyFactory(name=company_name)
+        email = 'contact1@example.com'
+        ContactFactory(company=company, email=email)
+        contact = ContactFactory(company=company, email='contact2@example.com')
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'company': {
+                    'id': company.pk,
+                },
+                'email': email,
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'email': [f'A contact with this email already exists at {company_name}.'],
+        }
+
+    def test_duplicate_email_at_company_from_database(self):
+        """Error if another contact at the company in the db has the same email."""
+        company_name = 'Test House'
+        company = CompanyFactory(name=company_name)
+        email = 'contact1@example.com'
+        ContactFactory(company=company, email=email)
+        contact = ContactFactory(company=company, email='contact2@example.com')
+        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
+        response = self.api_client.patch(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'email': email,
+            },
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'email': [f'A contact with this email already exists at {company_name}.'],
+        }
+
 
 class TestEditContactV3(EditContactBase):
     """Test case for v3 of the edit contacts endpoint"""
@@ -612,12 +695,9 @@ class TestEditContactV4(EditContactBase):
                 job_title='Head of Sales',
                 company=company,
                 email='foo@bar.com',
-                email_alternative='foo2@bar.com',
                 primary=True,
                 adviser=self.user,
-                telephone_countrycode='+44',
-                telephone_number='123456789',
-                telephone_alternative='987654321',
+                full_telephone_number='+44 123456789',
                 address_same_as_company=False,
                 address_1='Foo st.',
                 address_2='adr 2',
@@ -656,7 +736,6 @@ class TestEditContactV4(EditContactBase):
                 'name': company.name,
             },
             'email': 'foo@bar.com',
-            'email_alternative': 'foo2@bar.com',
             'primary': True,
             'adviser': {
                 'id': str(self.user.pk),
@@ -664,9 +743,7 @@ class TestEditContactV4(EditContactBase):
                 'last_name': self.user.last_name,
                 'name': self.user.name,
             },
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'telephone_alternative': '987654321',
+            'full_telephone_number': '+44 123456789',
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
@@ -704,12 +781,8 @@ class TestEditContactV4(EditContactBase):
                 job_title='Head of Sales',
                 company=company,
                 email='foo@bar.com',
-                email_alternative='foo2@bar.com',
                 primary=True,
                 adviser=self.user,
-                telephone_countrycode='+44',
-                telephone_number='123456789',
-                telephone_alternative='987654321',
                 address_same_as_company=False,
                 address_1='Foo st.',
                 address_2='adr 2',
@@ -817,12 +890,9 @@ class ViewContactBase(APITestMixin):
             job_title='Head of Sales',
             company=company,
             email='foo@bar.com',
-            email_alternative='foo2@bar.com',
             primary=True,
             adviser=self.user,
-            telephone_countrycode='+1',
-            telephone_number='123456789',
-            telephone_alternative='987654321',
+            full_telephone_number='+1 123456789',
             address_same_as_company=False,
             address_1='Foo st.',
             address_2='adr 2',
@@ -858,11 +928,8 @@ class ViewContactBase(APITestMixin):
                 'name': self.user.name,
             },
             'email': 'foo@bar.com',
-            'email_alternative': 'foo2@bar.com',
             'primary': True,
-            'telephone_countrycode': '+1',
-            'telephone_number': '123456789',
-            'telephone_alternative': '987654321',
+            'full_telephone_number': '+1 123456789',
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
@@ -1049,12 +1116,9 @@ class ContactListBase(APITestMixin):
             job_title='Head of Sales',
             company=company,
             email='foo@bar.com',
-            email_alternative='foo2@bar.com',
             primary=True,
             adviser=self.user,
-            telephone_countrycode='+44',
-            telephone_number='123456789',
-            telephone_alternative='987654321',
+            full_telephone_number='+44 123456789',
             address_same_as_company=False,
             address_1='Foo st.',
             address_2='adr 2',
@@ -1103,7 +1167,6 @@ class ContactListBase(APITestMixin):
                     },
                     'created_on': '2017-04-18T13:25:30.986208Z',
                     'email': 'foo@bar.com',
-                    'email_alternative': 'foo2@bar.com',
                     'first_name': 'Oratio',
                     'job_title': 'Head of Sales',
                     'last_name': 'Nelson',
@@ -1111,9 +1174,7 @@ class ContactListBase(APITestMixin):
                     'name': 'Oratio Nelson',
                     'notes': 'lorem ipsum',
                     'primary': True,
-                    'telephone_alternative': '987654321',
-                    'telephone_countrycode': '+44',
-                    'telephone_number': '123456789',
+                    'full_telephone_number': '+44 123456789',
                     'id': str(contact.pk),
                     'title': {
                         'id': constants.Title.admiral_of_the_fleet.value.id,
@@ -1267,8 +1328,6 @@ class ContactVersioningBase(APITestMixin):
                 'last_name': 'Nelson',
                 'company': {'id': CompanyFactory().pk},
                 'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
                 'address_same_as_company': True,
                 'primary': True,
             },

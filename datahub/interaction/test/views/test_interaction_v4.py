@@ -22,15 +22,13 @@ from datahub.company.test.factories import (
     ContactFactory,
 )
 from datahub.company.test.utils import format_expected_adviser
-from datahub.core.constants import Country, Service
+from datahub.core.constants import Country, ExportBarrierType, Service
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.models import (
     CommunicationChannel,
     Interaction,
     InteractionPermission,
-    PolicyArea,
-    PolicyIssueType,
     ServiceDeliveryStatus,
 )
 from datahub.interaction.test.factories import (
@@ -92,11 +90,7 @@ class TestAddInteraction(APITestMixin):
             # company interaction with policy feedback
             {
                 'was_policy_feedback_provided': True,
-                'policy_areas': [
-                    partial(random_obj_for_model, PolicyArea),
-                ],
                 'policy_feedback_notes': 'Policy feedback notes',
-                'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
             },
         ),
     )
@@ -125,6 +119,7 @@ class TestAddInteraction(APITestMixin):
             'was_policy_feedback_provided': False,
             'has_related_trade_agreements': False,
             'related_trade_agreements': [],
+            'helped_remove_export_barrier': False,
             **resolve_data(extra_data),
         }
 
@@ -142,9 +137,7 @@ class TestAddInteraction(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
-            'policy_areas': request_data.get('policy_areas', []),
             'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
-            'policy_issue_types': request_data.get('policy_issue_types', []),
             'was_policy_feedback_provided': request_data.get(
                 'was_policy_feedback_provided', False,
             ),
@@ -222,6 +215,9 @@ class TestAddInteraction(APITestMixin):
             'related_trade_agreements': request_data.get(
                 'related_trade_agreements', [],
             ),
+            'helped_remove_export_barrier': request_data.get('helped_remove_export_barrier'),
+            'export_barrier_types': [],
+            'export_barrier_notes': '',
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -259,11 +255,7 @@ class TestAddInteraction(APITestMixin):
             # company interaction with policy feedback
             {
                 'was_policy_feedback_provided': True,
-                'policy_areas': [
-                    partial(random_obj_for_model, PolicyArea),
-                ],
                 'policy_feedback_notes': 'Policy feedback notes',
-                'policy_issue_types': [partial(random_obj_for_model, PolicyIssueType)],
             },
         ),
     )
@@ -377,6 +369,7 @@ class TestAddInteraction(APITestMixin):
             'was_policy_feedback_provided': False,
             'has_related_trade_agreements': False,
             'related_trade_agreements': [],
+            'helped_remove_export_barrier': False,
             **resolve_data(extra_data),
         }
         api_client = self.create_api_client(user=adviser)
@@ -393,9 +386,7 @@ class TestAddInteraction(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
-            'policy_areas': request_data.get('policy_areas', []),
             'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
-            'policy_issue_types': request_data.get('policy_issue_types', []),
             'was_policy_feedback_provided': request_data.get(
                 'was_policy_feedback_provided', False,
             ),
@@ -473,6 +464,9 @@ class TestAddInteraction(APITestMixin):
             'related_trade_agreements': request_data.get(
                 'related_trade_agreements', [],
             ),
+            'helped_remove_export_barrier': False,
+            'export_barrier_types': [],
+            'export_barrier_notes': '',
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -724,9 +718,7 @@ class TestAddInteraction(APITestMixin):
                     'related_trade_agreements': [],
                 },
                 {
-                    'policy_areas': ['This field is required.'],
                     'policy_feedback_notes': ['This field is required.'],
-                    'policy_issue_types': ['This field is required.'],
                 },
             ),
             # policy feedback fields cannot be blank when policy feedback provided
@@ -750,16 +742,12 @@ class TestAddInteraction(APITestMixin):
                         CommunicationChannel,
                     ),
                     'was_policy_feedback_provided': True,
-                    'policy_areas': [],
                     'policy_feedback_notes': '',
-                    'policy_issue_types': [],
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
                 },
                 {
-                    'policy_areas': ['This field is required.'],
                     'policy_feedback_notes': ['This field is required.'],
-                    'policy_issue_types': ['This field is required.'],
                 },
             ),
             # at least one trade agreements field required when there are related trade agreements
@@ -1293,11 +1281,7 @@ class TestAddInteraction(APITestMixin):
                         random_obj_for_model,
                         ServiceDeliveryStatus,
                     ),
-                    'policy_areas': [partial(random_obj_for_model, PolicyArea)],
                     'policy_feedback_notes': 'Policy feedback notes.',
-                    'policy_issue_types': [
-                        partial(random_obj_for_model, PolicyIssueType),
-                    ],
                     'related_trade_agreements': [TradeAgreement.uk_japan.value.id],
                 },
                 {
@@ -1306,13 +1290,7 @@ class TestAddInteraction(APITestMixin):
                     'service_delivery_status': [
                         'This field is only valid for service deliveries.',
                     ],
-                    'policy_areas': [
-                        'This field is only valid when policy feedback has been provided.',
-                    ],
                     'policy_feedback_notes': [
-                        'This field is only valid when policy feedback has been provided.',
-                    ],
-                    'policy_issue_types': [
                         'This field is only valid when policy feedback has been provided.',
                     ],
                     'related_trade_agreements': [
@@ -1578,6 +1556,148 @@ class TestAddInteraction(APITestMixin):
                     NON_FIELD_ERRORS: ['Only either a company or companies can be provided.'],
                 },
             ),
+            # Trade barriers
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
+                    ],
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'dit_participants': [
+                        {
+                            'adviser': AdviserFactory,
+                        },
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
+                    'helped_remove_export_barrier': True,
+                    'export_barrier_types': [
+                        {
+                            'id': ExportBarrierType.other.value.id,
+                        },
+                    ],
+                },
+                {
+                    'export_barrier_notes': ['This field is required.'],
+                },
+            ),
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
+                    ],
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'dit_participants': [
+                        {
+                            'adviser': AdviserFactory,
+                        },
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
+                    'helped_remove_export_barrier': True,
+                    'export_barrier_types': [],
+                },
+                {
+                    'export_barrier_types': ['This field is required.'],
+                },
+            ),
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
+                    ],
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'dit_participants': [
+                        {
+                            'adviser': AdviserFactory,
+                        },
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
+                    'helped_remove_export_barrier': False,
+                    'export_barrier_types': [
+                        {
+                            'id': ExportBarrierType.finance.value.id,
+                        },
+                    ],
+                },
+                {
+                    'export_barrier_types':
+                        [
+                            'This field is only valid when an interaction'
+                            ' helped remove an export barrier',
+                        ],
+                },
+            ),
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Island'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Island'),
+                        ),
+                    ],
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'dit_participants': [
+                        {
+                            'adviser': AdviserFactory,
+                        },
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
+                    'helped_remove_export_barrier': False,
+                    'export_barrier_notes': 'My notes',
+                },
+                {
+                    'export_barrier_notes': [
+                        'This field is only valid when an interaction'
+                        ' helped remove an export barrier',
+                        'This field is only valid when the'
+                        ' export barrier type is \"Other\"',
+                    ],
+                },
+            ),
         ),
     )
     def test_validation(self, data, errors):
@@ -1759,21 +1879,7 @@ class TestGetInteraction(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
-            'policy_areas': [
-                {
-                    'id': str(policy_area.pk),
-                    'name': policy_area.name,
-                }
-                for policy_area in interaction.policy_areas.all()
-            ],
             'policy_feedback_notes': interaction.policy_feedback_notes,
-            'policy_issue_types': [
-                {
-                    'id': str(policy_issue_type.pk),
-                    'name': policy_issue_type.name,
-                }
-                for policy_issue_type in interaction.policy_issue_types.all()
-            ],
             'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
@@ -1870,6 +1976,9 @@ class TestGetInteraction(APITestMixin):
             'large_capital_opportunity': None,
             'has_related_trade_agreements': None,
             'related_trade_agreements': [],
+            'helped_remove_export_barrier': None,
+            'export_barrier_types': [],
+            'export_barrier_notes': '',
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -1903,9 +2012,7 @@ class TestGetInteraction(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
-            'policy_areas': [],
             'policy_feedback_notes': '',
-            'policy_issue_types': [],
             'was_policy_feedback_provided': False,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
@@ -1992,6 +2099,9 @@ class TestGetInteraction(APITestMixin):
             'large_capital_opportunity': None,
             'has_related_trade_agreements': None,
             'related_trade_agreements': [],
+            'helped_remove_export_barrier': None,
+            'export_barrier_types': [],
+            'export_barrier_notes': '',
         }
 
     def test_restricted_user_cannot_get_non_associated_investment_project_interaction(

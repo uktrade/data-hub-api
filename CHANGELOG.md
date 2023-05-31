@@ -1,3 +1,560 @@
+This file is no longer updated and has been kept for reference purposes.
+
+Please see the [release notes](https://github.com/uktrade/data-hub-api/releases) for up-to-date change information.
+
+# Data Hub API 40.13.3 (2022-08-09)
+
+
+## Features
+
+- **Events** It's now possible to select Sector Specialist event types.
+
+
+# Data Hub API 40.13.2 (2022-08-05)
+
+
+## Features
+
+- **Reminders** Reminders are now only generated for active users.
+
+## Bug fixes
+
+- **Reminders** Notify template no longer links to deprecated individual notification settings.
+
+
+# Data Hub API 40.13.1 (2022-08-03)
+
+
+## Features
+
+- **Events** It's now possible to add event types for "Meet The Buyer".
+
+
+# Data Hub API 40.13.0 (2022-07-29)
+
+
+## Features
+
+- **Reminders** No recent investment interaction reminders are now automatically created according to each adviser's subscriptions.
+
+
+# Data Hub API 40.12.1 (2022-07-19)
+
+
+## Internal changes
+
+- RQ is now supported, replacing Celery
+
+
+# Data Hub API 40.12.0 (2022-07-14)
+
+
+## API
+
+- **Events** Events serialized for Activity Stream now have the field `object.updated` to show when they were last modified.
+
+
+# Data Hub API 40.11.0 (2022-07-05)
+
+
+## Features
+
+- **Reminders** Estimated land date reminders are now being sent on the first day of the month.
+  If number of reminders reaches a threshold and a user has enabled email reminders, then a summary email will be sent instead of individual emails.
+
+
+# Data Hub API 40.10.0 (2022-06-28)
+
+
+## Internal changes
+
+- Updated the exchange rate for USD to GBP at 1.00 US Dollar = 0.81272151 British Pounds
+
+
+# Data Hub API 40.9.0 (2022-06-24)
+
+
+## Features
+
+- **Reminders** Reminders can be deleted with the API
+
+  DELETE /api/v4/reminder/estimated-land-date/<uuid>
+  DELETE /api/v4/reminder/no-recent-investment-interaction/<uuid>
+- **Reminders** Reminders can now be sorted by created_on with the sort by parameter:
+
+  ?sortby=created_on
+  ?sortby=-created_on
+
+## Bug fixes
+
+- Several potential celery tasks can now be run asyncronously without blocking
+
+## Internal changes
+
+- It's now possible to deploy only production pips to a production environment, reducing the size of release.
+
+
+# Data Hub API 40.8.0 (2022-06-20)
+
+
+## Features
+
+- **Investment** Its now possible to view Enquiry Response Unit support in Specific investment programme
+
+
+# Data Hub API 40.7.0 (2022-06-20)
+
+
+## Features
+
+- **Events** - It is now possible to get a list of events in activity-stream [format.](https://www.w3.org/TR/activitystreams-core/)
+
+      The URL for this is:    `/v3/activity-stream/event`
+- **Interactions** It's now possible to view Free Trade Agreement: Switzerland and UK-Lebanon Association Agreement
+- **Investment** Estimated land date reminders are only generated for active ongoing and active delayed projects
+- **Investment** Reminder subscriptions can be updated with the PATCH method:
+
+  PATCH /reminder/subscription/no-recent-investment-interaction
+  PATCH /reminder/subscription/estimated-land-date
+
+## Internal changes
+
+- **Investment** Notifications for Estimated Land Date are now being sent only for active ongoing and delayed investment projects.
+- Upgrade python version from python:3.10.1 to python 3.10.5
+
+
+# Data Hub API 40.6.0 (2022-06-13)
+
+
+## Features
+
+- **Events** - It is now possible to get a list of events in activity-stream [format.](https://www.w3.org/TR/activitystreams-core/)
+
+      The URL for this is:    `/v3/activity-stream/event`
+
+
+# Data Hub API 40.5.0 (2022-06-07)
+
+
+## Features
+
+- **Investment** Now Project Assurance Advisers, Client Relationship Managers and Referral Source Advisers can also receive Estimated Land Date notifications.
+- **Reminders** Ids have now been added to the estimated land date and no recent interaction reminder endpoints.
+- **Reminders** Estimated Land Date reminders are now automatically created according to each adviser's subscriptions.
+
+## Bug fixes
+
+- **Companies** When merging two companies, the modified_on field of the objects related to the source company (e.g. interactions or contacts) will now be updated when they are moved over to the target company.
+
+
+# Data Hub API 40.4.0 (2022-05-30)
+
+
+## Features
+
+- **Reminders** API now provides reminders for the current user:
+
+  GET /v4/reminder/estimated-land-date
+  GET /v4/reminder/no-recent-investment-interaction
+- **Reminders** API now provides a summary of reminders for the current user:
+
+  GET /v4/reminder/summary
+
+
+# Data Hub API 40.3.0 (2022-05-20)
+
+
+## Internal changes
+
+- ‘Enhanced International Support Services’ metadata value has been renamed to ‘Export Support Service – International Markets'
+- It's now possible to configure rq workers on every environment.
+
+
+# Data Hub API 40.2.0 (2022-05-19)
+
+
+## Features
+
+- **Investment** The `project_stage` and `project_status` variables have been added to Estimated Land Date notification template.
+- **Reminders** API now provides reminder subscriptions for the current user:
+
+  GET /v4/reminder/subscription/estimated-land-date
+  GET /v4/reminder/subscription/no-recent-investment-interaction
+
+
+# Data Hub API 40.1.0 (2022-05-17)
+
+
+## Internal changes
+
+- The old Gunicorn config has been removed.
+- It's now possible to do RQ monitoring.
+
+
+# Data Hub API 40.0.0 (2022-05-03)
+
+
+## Removals
+
+- **Contacts** The alternative_email and alternative_telephone fields have been removed. These should be added to the notes field instead.
+
+## Features
+
+- The `modified_on` field has been added to the `SORT_BY_FIELDS` tuple.
+
+## Bug fixes
+
+- **Contacts** A bug that stopped the search app being migrated to the latest schema has been fixed.
+
+
+# Data Hub API 39.24.1 (2022-04-26)
+
+
+## Bug fixes
+
+- **Investment** Investment projects at Verify Win or Won stage are now excluded from Estimated Land Date notifications.
+
+
+# Data Hub API 39.24.0 (2022-04-25)
+
+
+## Features
+
+- We added a new API endpoint which allows data-flow to ingest user event log data. This data will be available via Data Workspace
+
+## Internal changes
+
+- Now running on the latest releases for several utilised libraries.
+
+
+# Data Hub API 39.23.0 (2022-04-22)
+
+
+## Bug fixes
+
+- **Investment** The contexts of `IST Visit` service have been reverted to original state.
+
+
+# Data Hub API 39.22.0 (2022-04-11)
+
+
+## Removals
+
+- **Contacts** The `telephone_countrycode` and `telelphone_number` fields have been removed following their deprecation a couple of weeks prior. The `full_telephone_number` field replaces their functionality.
+
+## Features
+
+- **Interactions** It's now possible to get more IST Specific Services by restricted context to investment_project_interaction only.
+
+
+# Data Hub API 39.21.0 (2022-04-04)
+
+
+## Features
+
+- **Contacts** The Contacts API is now validated to ensure that it is not possible to save duplicate email addresses at the same company.
+
+
+# Data Hub API 39.20.2 (2022-03-25)
+
+
+## Features
+
+- **Contacts** Alternative email and alternative telephone number are now appended to the end of the Contact notes.
+- **Events** It's now possible to add levelling up as a programme event.
+
+
+# Data Hub API 39.20.1 (2022-03-23)
+
+
+## Internal changes
+
+- Several dependencies have been updated to get latest changes.
+
+
+# Data Hub API 39.20.0 (2022-03-21)
+
+
+## Bug fixes
+
+- **Contacts** The full telephone number data migration has been sped up by using an sql update instead of iterating in python.
+
+
+# Data Hub API 39.19.0 (2022-03-16)
+
+
+## Bug fixes
+
+- **Contacts** The data migration to populate full telephone numbers has been updated to stop the process running out of memory.
+
+
+# Data Hub API 39.18.0 (2022-03-15)
+
+
+## Deprecations
+
+- **Contacts** The old area code and phone number fields on the contact model and api resource are now deprecated.
+
+  Expect to remove these at the earliest by Monday 28 March 2022.
+
+## Features
+
+- **Contacts** A new `full_telephone_number` field has been added that combines the area code and phone number into a single field.
+
+  The old area code and phone number fields are now deprecated.
+
+  The full_telephone_number field is available on the `v3/contact` and `v4/contact` API endpoints. The deprecated fields will remain available until API consumers have been updated.
+
+
+# Data Hub API 39.17.0 (2022-03-11)
+
+
+## Removals
+
+- Fuzzy search will now be available to all users, as the user feature flag has been removed.
+
+  A switch remains in the code to move back to the old strict way of searching should we need to.
+
+
+# Data Hub API 39.16.0 (2022-03-02)
+## Features
+
+- **Investment** A new investment business activity metadata type was added called 'Clean growth'.
+
+
+# Data Hub API 39.15.0 (2022-02-22)
+## Features
+
+- **Investment** An investment estimated land date notification sending task has been added. It runs every morning and sends notification to project managers about estimated land date due in 30 or 60 days if they have notification subscription enabled.
+
+## Internal changes
+
+- ElasticSearch configuration has been migrated to OpenSearch
+
+
+# Data Hub API 39.14.0 (2022-02-15)
+## Features
+
+- **Investment** New endpoints have been added: `GET, POST /v3/investment/<project_pk>/notification` that manage email notifications subcription preferences.
+
+  An endpoint returns and accepts the following body:
+
+  ```
+  {
+      "estimated_land_date": ["30", "60"]
+  }
+  ```
+
+## Internal changes
+
+- Missing slash in uat setup has been fixed to ensure CI works.
+
+
+# Data Hub API 39.13.0 (2022-02-11)
+## Internal changes
+
+- Search functionality was migrated from using ElasticSearch to OpenSearch.
+
+
+# Data Hub API 39.12.0 (2022-02-08)
+## Features
+
+- Fuzzy search has been fine-tuned with a boost on the importance of the name field in generic searches.
+
+
+# Data Hub API 39.11.0 (2022-02-02)
+## Internal changes
+
+- whitenoise support enabled on all our environments
+
+
+# Data Hub API 39.10.0 (2022-02-01)
+## Features
+
+- The quality of fuzzy search matches has been improved by enforcing stricter matching
+
+## Internal changes
+
+- **Investment** An Investment Notify profile support has been added.
+
+## API
+
+- **Companies** Add `one_list_core_team_advisers` field to GET responses for `/v4/dataset/companies-dataset` which represents an array of the Advisers on core team.
+
+
+# Data Hub API 39.9.0 (2022-01-28)
+## Features
+
+- A user feature flag has been added, so that users with this flag can access the fuzzy search functionality on the search endpoints.
+- Fuzzy search is now stricter and should get higher quality matches with fewer spurious results.
+
+## Internal changes
+
+- **Technology** Use a patched version of Celery 5.0.5.
+- **Technology** WSGIServer replaced gunicorn.
+
+
+# Data Hub API 39.8.7 (2022-01-24)
+## Internal changes
+
+- **Technology** Use the latest decorator on celery task
+
+
+# Data Hub API 39.8.6 (2022-01-21)
+## Internal changes
+
+- **Technology** Celery was reverted back to version 4.4.7 from version 5.
+
+
+# Data Hub API 39.8.5 (2022-01-20)
+## Internal changes
+
+- Upgrade python 3.8.8 to 3.10.1
+
+
+# Data Hub API 39.8.3 (2022-01-14)
+## Bug fixes
+
+- **Technology** Use the correct celerybeat command in procfile for Celery 5, instead of Celery 4.
+
+
+# Data Hub API 39.8.2 (2022-01-14)
+## Bug fixes
+
+- **Interactions** Trade agreement related policy areas disabled.
+
+  Trade agreements mistakenly added to the policy areas metadata table were disabled.
+
+
+# Data Hub API 39.8.1 (2022-01-13)
+## Internal changes
+
+- Celery was upgraded to version 5.2.2.
+
+  Redis, billiard and kombu packages were updated to compatible versions, and code updated in-line with version 5 breaking changes.
+
+
+# Data Hub API 39.8.0 (2022-01-11)
+## Features
+
+- Three new trade agreements were added to trade agreements metadata.
+
+
+# Data Hub API 39.7.0 (2021-12-20)
+## Features
+
+- **Interactions** New service 'Proposition Development' added for 'other' interactions.
+- Added a number of new policy areas
+
+
+# Data Hub API 39.6.0 (2021-12-09)
+## Features
+
+- **Interactions** New service types have been added to Investment Interaction - Enquiry received:
+  - Commonwealth Games 2022 – BATP Programme
+  - Commonwealth Games 2022 – GEP Programme
+- **Investment** New referral source activities have been added:
+  - Commonwealth Games 2022 – BATP Programme
+  - Commonwealth Games 2022 – GEP Programme
+
+
+# Data Hub API 39.5.0 (2021-11-22)
+## Features
+
+- Currency conversion for change requests to D&B can now be done in the API instead of the frontend.
+
+## Bug fixes
+
+- Fuzzy search now implements "AUTO" fuzzy matching for better search matches.
+
+
+# Data Hub API 39.4.0 (2021-11-17)
+## Features
+
+- Extra search fields have been added to each of the search entities.
+
+  When searching, for example via `/v3/search?term=<term>`, the term will now match on the following fields:
+
+  **Companies**
+
+  - sector.name
+  - address.line_1.trigram
+  - address.line_2.trigram
+  - address.town.trigram
+  - address.county.trigram
+  - registered_address.line_1.trigram
+  - registered_address.line_2.trigram
+  - registered_address.town.trigram
+  - registered_address.county.trigram
+
+  **Contacts**
+
+  - name_with_title
+  - job_title
+  - job_title.trigram
+  - full_telephone_number (telephone number with country code)
+  - telephone_number
+  - telephone_alternative
+
+  **Events**
+
+  - event_type
+  - event_type.trigram
+
+
+  **Interactions**
+
+  - companies.name
+  - companies.name.trigram
+  - service.name
+  - service.name.trigram
+
+  **Investment Projects**
+
+  - sector.name
+
+  **Orders**
+
+  - sector.name
+  - uk_region.name
+
+## Bug fixes
+
+- Tweaks fuzzy search matching to require at least a 70% match on name (previously 50%)
+
+
+# Data Hub API 39.3.0 (2021-11-16)
+## Removals
+
+- Removes the following feature flags and their legacy behaviours: address-postcode-company-required-field, dnb-search-v2, address-area-company-required-field, company-area-investigation-request, address-area-company-search
+
+## Features
+
+- The default session cookie for the admin interface was set to 20 minutes.
+
+## Bug fixes
+
+- Postcodes have been removed from fuzzy search so that only exact matches are listed.
+- Project code was removed from fuzzy search so that only exact matches are listed.
+
+  By doing this we should avoid a problem where thousands of results were showing on project code searches.
+- Fuzzy search now requires a closer match for fields other than name- this should reduce the number of spurious results.
+
+
+# Data Hub API 39.2.0 (2021-11-10)
+## Features
+
+- The search endpoints now utilise fuzzy search when the "fuzzy-search" feature flag is active.
+
+  This gets matches even when spellings are a little different.
+
+## API
+
+- **Companies** Add `turnover_gbp` field to GET responses for `/v4/company` and `/v4/company/{id}`, which represents the turnover (stored and returned by API in USD) converted to Great British Pounds (GBP) using the latest exchange rate stored in Data Hub API
+- **Companies** Add `turnover_gbp` field to GET responses for `/v4/dataset/companies-dataset` which represents the turnover (stored and returned by API in USD) converted to Great British Pounds (GBP) using the latest exchange rate stored in Data Hub API
+- DataHub API now stores and serves exchange rate data
+
+
 # Data Hub API 39.1.0 (2021-10-25)
 ## Removals
 
@@ -283,7 +840,6 @@
 # Data Hub API 36.22.0 (2021-06-11)
 ## Features
 
-- It's now possible to interact with BED and Salesforce using the BED salesforce API.
 - Requesting address areas for company investigations is now tested
 
 ## Bug fixes
@@ -3575,6 +4131,7 @@
       - `GET /v4/metadata/title`
       - `GET /v4/metadata/turnover`
       - `GET /v4/metadata/uk-region`
+      - `GET /v4/metadata/export-barrier`
     
     The responses are exactly the same as their corresponding `/metadata` endpoints.
     

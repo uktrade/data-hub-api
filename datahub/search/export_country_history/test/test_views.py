@@ -23,7 +23,7 @@ from datahub.search.interaction import InteractionSearchApp
 
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.es_collector_apps.with_args(ExportCountryHistoryApp, InteractionSearchApp),
+    pytest.mark.opensearch_collector_apps.with_args(ExportCountryHistoryApp, InteractionSearchApp),
 ]
 
 HistoryType = CompanyExportCountryHistory.HistoryType
@@ -54,7 +54,7 @@ class TestSearchExportCountryHistory(APITestMixin):
             ),
         ),
     )
-    @pytest.mark.usefixtures('es')
+    @pytest.mark.usefixtures('opensearch')
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
         user = create_test_user(permission_codenames=permission_codenames, dit_team=None)
@@ -67,9 +67,9 @@ class TestSearchExportCountryHistory(APITestMixin):
         )
         assert response.status_code == expected_status
 
-    def test_export_country_history_search_with_empty_request(self, es_with_collector):
+    def test_export_country_history_search_with_empty_request(self, opensearch_with_collector):
         """Should return 400."""
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
         error_response = 'Request must include either country or company parameters'
 
         response = self.api_client.post(export_country_history_search_url, data={})
@@ -77,10 +77,10 @@ class TestSearchExportCountryHistory(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json()['non_field_errors'][0] == error_response
 
-    def test_export_country_history_response_body(self, es_with_collector):
+    def test_export_country_history_response_body(self, opensearch_with_collector):
         """Test the format of an export country history result in the response body."""
         history_object = CompanyExportCountryHistoryFactory(history_type=HistoryType.INSERT)
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             export_country_history_search_url,
@@ -113,10 +113,10 @@ class TestSearchExportCountryHistory(APITestMixin):
             'status': history_object.status,
         }
 
-    def test_interaction_response_body(self, es_with_collector):
+    def test_interaction_response_body(self, opensearch_with_collector):
         """Test the format of an interaction result in the response body."""
         interaction = ExportCountriesInteractionFactory()
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             export_country_history_search_url,
@@ -194,10 +194,10 @@ class TestSearchExportCountryHistory(APITestMixin):
             ExportCountriesServiceDeliveryFactory,
         ),
     )
-    def test_filtering_by_company_returns_matches(self, es_with_collector, factory):
+    def test_filtering_by_company_returns_matches(self, opensearch_with_collector, factory):
         """Test that filtering by company includes matching objects."""
         obj = factory()
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             export_country_history_search_url,
@@ -211,7 +211,7 @@ class TestSearchExportCountryHistory(APITestMixin):
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(obj.pk)
 
-    def test_filtering_by_company_excludes_non_matches(self, es_with_collector):
+    def test_filtering_by_company_excludes_non_matches(self, opensearch_with_collector):
         """Test that filtering by company excludes non-matching objects."""
         company = CompanyFactory()
 
@@ -222,7 +222,7 @@ class TestSearchExportCountryHistory(APITestMixin):
         CompanyExportCountryHistoryFactory(history_type=HistoryType.INSERT)
         ExportCountriesInteractionFactory()
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             export_country_history_search_url,
@@ -245,12 +245,12 @@ class TestSearchExportCountryHistory(APITestMixin):
     )
     def test_filtering_by_country_returns_matching_history_objects(
         self,
-        es_with_collector,
+        opensearch_with_collector,
         factory,
     ):
         """Test that filtering by country includes matching export country history objects."""
         obj = factory()
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             export_country_history_search_url,
@@ -271,10 +271,12 @@ class TestSearchExportCountryHistory(APITestMixin):
             ExportCountriesServiceDeliveryFactory,
         ),
     )
-    def test_filtering_by_country_returns_matching_interactions(self, es_with_collector, factory):
+    def test_filtering_by_country_returns_matching_interactions(
+        self, opensearch_with_collector, factory,
+    ):
         """Test that filtering by country includes matching interactions."""
         obj = factory()
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             export_country_history_search_url,
@@ -288,7 +290,7 @@ class TestSearchExportCountryHistory(APITestMixin):
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(obj.pk)
 
-    def test_filtering_by_country_excludes_non_matches(self, es_with_collector):
+    def test_filtering_by_country_excludes_non_matches(self, opensearch_with_collector):
         """Test that filtering by country excludes non-matching objects."""
         countries = list(Country.objects.order_by('?')[:2])
         filter_country = countries[0]
@@ -301,7 +303,7 @@ class TestSearchExportCountryHistory(APITestMixin):
         CompanyExportCountryHistoryFactory(country=other_country, history_type=HistoryType.INSERT)
         ExportCountriesInteractionFactory(export_countries__country=other_country)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             export_country_history_search_url,
@@ -324,7 +326,7 @@ class TestSearchExportCountryHistory(APITestMixin):
             ({'sortby': 'date:desc'}, True),
         ),
     )
-    def test_sorts_results(self, es_with_collector, request_args, is_reversed):
+    def test_sorts_results(self, opensearch_with_collector, request_args, is_reversed):
         """
         Test sorting in various cases.
 
@@ -348,7 +350,7 @@ class TestSearchExportCountryHistory(APITestMixin):
         if is_reversed:
             objects.reverse()
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         response = self.api_client.post(
             export_country_history_search_url,

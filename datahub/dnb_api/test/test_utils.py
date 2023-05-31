@@ -40,7 +40,7 @@ from datahub.metadata.models import AdministrativeArea, Country
 
 pytestmark = pytest.mark.django_db
 
-DNB_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/search/')
+DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/search/')
 DNB_UPDATES_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/')
 
 
@@ -66,7 +66,7 @@ def test_get_company_dnb_service_error(
     message.
     """
     requests_mock.post(
-        DNB_SEARCH_URL,
+        DNB_V2_SEARCH_URL,
         status_code=dnb_response_status,
     )
 
@@ -117,7 +117,7 @@ def test_get_company_dnb_service_request_error(
     appropriate message.
     """
     requests_mock.post(
-        DNB_SEARCH_URL,
+        DNB_V2_SEARCH_URL,
         exc=request_exception,
     )
 
@@ -160,7 +160,7 @@ def test_get_company_invalid_request_response(
     from dnb-service, the get_company function raises an exception.
     """
     requests_mock.post(
-        DNB_SEARCH_URL,
+        DNB_V2_SEARCH_URL,
         json={'results': search_results},
     )
 
@@ -182,7 +182,7 @@ def test_get_company_valid(
     returns a formatted dict.
     """
     requests_mock.post(
-        DNB_SEARCH_URL,
+        DNB_V2_SEARCH_URL,
         json=dnb_response_uk,
     )
 

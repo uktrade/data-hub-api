@@ -1,9 +1,13 @@
+import logging
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from requests.exceptions import HTTPError, Timeout
 
 from datahub.core.api_client import APIClient, HawkAuth
 from datahub.core.exceptions import APIBadGatewayException
+
+logger = logging.getLogger(__name__)
 
 
 class CompanyMatchingServiceError(Exception):
@@ -111,12 +115,15 @@ def match_company(companies, request=None):
             request,
         )
     except APIBadGatewayException as exc:
+        logger.error(exc)
         error_message = 'Encountered an error connecting to Company matching service'
         raise CompanyMatchingServiceConnectionError(error_message) from exc
     except Timeout as exc:
+        logger.error(exc)
         error_message = 'Encountered a timeout interacting with Company matching service'
         raise CompanyMatchingServiceTimeoutError(error_message) from exc
     except HTTPError as exc:
+        logger.error(exc)
         error_message = (
             'The Company matching service returned an error status: '
             f'{exc.response.status_code}',

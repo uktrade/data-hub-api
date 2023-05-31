@@ -1,12 +1,12 @@
-from elasticsearch_dsl import Boolean, Date, Integer, Keyword, Text
+from opensearch_dsl import Boolean, Date, Integer, Keyword, Text
 
 from datahub.search import dict_utils
 from datahub.search import fields
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
-class Order(BaseESModel):
-    """Elasticsearch representation of Order model."""
+class Order(BaseSearchModel):
+    """OpenSearch representation of Order model."""
 
     id = Keyword()
     reference = fields.NormalizedKeyword(
@@ -102,4 +102,6 @@ class Order(BaseESModel):
         'contact.name.trigram',
         'total_cost.keyword',
         'subtotal_cost.keyword',
+        'sector.name',
+        'uk_region.name',
     )

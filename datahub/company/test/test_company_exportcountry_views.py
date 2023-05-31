@@ -501,7 +501,13 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         """Test get company details after updating export countries."""
         company = CompanyFactory()
 
-        countries_set = list(CountryModel.objects.order_by('name')[:10])
+        # Sorting in the database by name and sorting in Python by name can be different
+        # due to collation/locale differences. Here we sort in the database to choose the
+        # same 10 countries each run of the test, and then sort in Python to able to
+        # compare with other Python-sorted lists later in the test
+        countries_set = sorted(list(
+            CountryModel.objects.order_by('name')[:10],
+        ), key=lambda c: c.name)
         data_items = [
             {
                 'country': {
@@ -535,21 +541,21 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         response_data['export_countries'].sort(key=lambda item: item['country']['name'])
-        current_countries_request = status_wise_items.get(
+        current_countries_request = sorted(status_wise_items.get(
             CompanyExportCountry.Status.CURRENTLY_EXPORTING,
             [],
-        )
-        current_countries_response = [
+        ))
+        current_countries_response = sorted([
             c['id'] for c in response_data.get('export_to_countries', [])
-        ]
+        ])
 
-        future_countries_request = status_wise_items.get(
+        future_countries_request = sorted(status_wise_items.get(
             CompanyExportCountry.Status.FUTURE_INTEREST,
             [],
-        )
-        future_countries_response = [
+        ))
+        future_countries_response = sorted([
             c['id'] for c in response_data.get('future_interest_countries', [])
-        ]
+        ])
 
         assert response_data['export_countries'] == data['export_countries']
         assert current_countries_request == current_countries_response

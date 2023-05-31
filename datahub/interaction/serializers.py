@@ -1,3 +1,4 @@
+import uuid
 from functools import partial
 from operator import not_
 
@@ -13,6 +14,7 @@ from datahub.company.serializers import (
     NestedAdviserWithEmailAndTeamField,
     UniqueAdvisersBaseSerializer,
 )
+from datahub.core.constants import ExportBarrierType as ExportBarrierTypeConstant
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
 from datahub.core.validators import (
@@ -20,6 +22,8 @@ from datahub.core.validators import (
     EqualsRule,
     InRule,
     IsObjectBeingCreated,
+    IsSubsetByIdRule,
+    NotRule,
     OperatorRule,
     RulesBasedValidator,
     ValidationRule,
@@ -30,8 +34,6 @@ from datahub.interaction.models import (
     Interaction,
     InteractionDITParticipant,
     InteractionExportCountry,
-    PolicyArea,
-    PolicyIssueType,
     ServiceDeliveryStatus,
 )
 from datahub.interaction.permissions import HasAssociatedInvestmentProjectValidator
@@ -43,7 +45,7 @@ from datahub.interaction.validators import (
 )
 from datahub.investment.opportunity.models import LargeCapitalOpportunity
 from datahub.investment.project.serializers import NestedInvestmentProjectField
-from datahub.metadata.models import Country, Service, Team
+from datahub.metadata.models import Country, ExportBarrierType, Service, Team
 from datahub.metadata.serializers import SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE
 
 
@@ -143,6 +145,12 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
         'invalid_for_update': gettext_lazy(
             'This field is invalid for interaction updates.',
         ),
+        'invalid_when_no_helped_remove_export_barrier': gettext_lazy(
+            'This field is only valid when an interaction helped remove an export barrier',
+        ),
+        'invalid_when_no_other_selected': gettext_lazy(
+            'This field is only valid when the export barrier type is "Other"',
+        ),
     }
 
     INVALID_FOR_UPDATE = gettext_lazy(
@@ -194,9 +202,8 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
     service_delivery_status = NestedRelatedField(
         ServiceDeliveryStatus, required=False, allow_null=True,
     )
-    policy_areas = NestedRelatedField(PolicyArea, many=True, required=False, allow_empty=True)
-    policy_issue_types = NestedRelatedField(
-        PolicyIssueType,
+    export_barrier_types = NestedRelatedField(
+        ExportBarrierType,
         allow_empty=True,
         many=True,
         required=False,
@@ -454,9 +461,7 @@ class InteractionSerializer(BaseInteractionSerializer):
             'theme',
             'notes',
             'archived_documents_url_path',
-            'policy_areas',
             'policy_feedback_notes',
-            'policy_issue_types',
             'was_policy_feedback_provided',
             'were_countries_discussed',
             'export_countries',
@@ -520,15 +525,11 @@ class InteractionSerializer(BaseInteractionSerializer):
                 ),
                 ValidationRule(
                     'invalid_when_no_policy_feedback',
-                    OperatorRule('policy_issue_types', not_),
-                    OperatorRule('policy_areas', not_),
                     OperatorRule('policy_feedback_notes', not_),
                     when=OperatorRule('was_policy_feedback_provided', not_),
                 ),
                 ValidationRule(
                     'required',
-                    OperatorRule('policy_areas', bool),
-                    OperatorRule('policy_issue_types', bool),
                     OperatorRule('policy_feedback_notes', is_not_blank),
                     when=OperatorRule('was_policy_feedback_provided', bool),
                 ),
@@ -656,9 +657,10 @@ class InteractionSerializerV4(BaseInteractionSerializer):
             'theme',
             'notes',
             'archived_documents_url_path',
-            'policy_areas',
             'policy_feedback_notes',
-            'policy_issue_types',
+            'helped_remove_export_barrier',
+            'export_barrier_types',
+            'export_barrier_notes',
             'was_policy_feedback_provided',
             'were_countries_discussed',
             'export_countries',
@@ -723,15 +725,11 @@ class InteractionSerializerV4(BaseInteractionSerializer):
                 ),
                 ValidationRule(
                     'invalid_when_no_policy_feedback',
-                    OperatorRule('policy_issue_types', not_),
-                    OperatorRule('policy_areas', not_),
                     OperatorRule('policy_feedback_notes', not_),
                     when=OperatorRule('was_policy_feedback_provided', not_),
                 ),
                 ValidationRule(
                     'required',
-                    OperatorRule('policy_areas', bool),
-                    OperatorRule('policy_issue_types', bool),
                     OperatorRule('policy_feedback_notes', is_not_blank),
                     when=OperatorRule('was_policy_feedback_provided', bool),
                 ),
@@ -812,6 +810,35 @@ class InteractionSerializerV4(BaseInteractionSerializer):
                     when=AndRule(
                         OperatorRule('is_event', not_),
                         EqualsRule('kind', Interaction.Kind.SERVICE_DELIVERY),
+                    ),
+                ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('export_barrier_types', is_not_blank),
+                    when=OperatorRule('helped_remove_export_barrier', bool),
+                ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('export_barrier_notes', bool),
+                    when=IsSubsetByIdRule(
+                        'export_barrier_types',
+                        [uuid.UUID(ExportBarrierTypeConstant.other.value.id)],
+                    ),
+                ),
+                ValidationRule(
+                    'invalid_when_no_helped_remove_export_barrier',
+                    OperatorRule('export_barrier_types', not_),
+                    OperatorRule('export_barrier_notes', not_),
+                    when=OperatorRule('helped_remove_export_barrier', not_),
+                ),
+                ValidationRule(
+                    'invalid_when_no_other_selected',
+                    OperatorRule('export_barrier_notes', not_),
+                    when=NotRule(
+                        IsSubsetByIdRule(
+                            'export_barrier_types',
+                            [uuid.UUID(ExportBarrierTypeConstant.other.value.id)],
+                        ),
                     ),
                 ),
             ),

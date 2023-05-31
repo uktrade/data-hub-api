@@ -1,5 +1,6 @@
 import json
 import os
+import uuid
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 from operator import attrgetter
@@ -131,6 +132,7 @@ def create_test_user(permission_codenames=(), password=None, **user_attrs):
         'last_name': faker.last_name(),
         'email': faker.email(),
         'sso_email_user_id': faker.email(domain='id.test'),
+        'sso_user_id': uuid.uuid4(),
         'date_joined': now(),
     }
     user_defaults.update(user_attrs)
@@ -275,6 +277,22 @@ def get_attr_or_none(obj, attr):
         return attrgetter(attr)(obj)
     except AttributeError:
         return None
+
+
+def get_attr_or_default(obj, attr, default=None):
+    """
+    Gets an attribute of an object, or returns a default value if the attribute does not exist.
+
+    Dotted paths to attributes can be provided to specify nested attributes.
+
+    Usage example:
+        # Returns company.contact.name or [None] if contact is None
+        get_attr_or_default(company, 'contact.name', [None])
+    """
+    try:
+        return attrgetter(attr)(obj)
+    except AttributeError:
+        return default
 
 
 class MockQuerySet:

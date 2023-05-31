@@ -11,21 +11,21 @@ from datahub.search.test.utils import get_documents_by_ids
 pytestmark = pytest.mark.django_db
 
 
-def test_company_auto_sync_to_es(es_with_signals):
-    """Tests if company gets synced to Elasticsearch."""
+def test_company_auto_sync_to_opensearch(opensearch_with_signals):
+    """Tests if company gets synced to OpenSearch."""
     test_name = 'very_hard_to_find_company'
     CompanyFactory(
         name=test_name,
     )
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     result = get_basic_search_query(Company, test_name).execute()
 
     assert result.hits.total.value == 1
 
 
-def test_company_auto_updates_to_es(es_with_signals):
-    """Tests if company gets updated in Elasticsearch."""
+def test_company_auto_updates_to_opensearch(opensearch_with_signals):
+    """Tests if company gets updated in OpenSearch."""
     test_name = 'very_hard_to_find_company_international'
     company = CompanyFactory(
         name=test_name,
@@ -33,7 +33,7 @@ def test_company_auto_updates_to_es(es_with_signals):
     new_test_name = 'very_hard_to_find_company_local'
     company.name = new_test_name
     company.save()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     result = get_basic_search_query(Company, new_test_name).execute()
 
@@ -41,17 +41,17 @@ def test_company_auto_updates_to_es(es_with_signals):
     assert result.hits[0].id == str(company.id)
 
 
-def test_company_subsidiaries_auto_update_to_es(es_with_signals):
-    """Tests if company subsidiaries get updated in Elasticsearch."""
+def test_company_subsidiaries_auto_update_to_opensearch(opensearch_with_signals):
+    """Tests if company subsidiaries get updated in OpenSearch."""
     account_owner = AdviserFactory()
     global_headquarters = CompanyFactory(one_list_account_owner=account_owner)
     subsidiaries = CompanyFactory.create_batch(2, global_headquarters=global_headquarters)
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     subsidiary_ids = [subsidiary.id for subsidiary in subsidiaries]
 
     result = get_documents_by_ids(
-        es_with_signals,
+        opensearch_with_signals,
         CompanySearchApp,
         subsidiary_ids,
     )
@@ -71,10 +71,10 @@ def test_company_subsidiaries_auto_update_to_es(es_with_signals):
     global_headquarters.one_list_account_owner = new_account_owner
     global_headquarters.save()
 
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     new_result = get_documents_by_ids(
-        es_with_signals,
+        opensearch_with_signals,
         CompanySearchApp,
         subsidiary_ids,
     )
@@ -91,17 +91,17 @@ def test_company_subsidiaries_auto_update_to_es(es_with_signals):
     assert new_search_results == new_expected_results
 
 
-def test_adding_interaction_updates_company(es_with_signals):
-    """Test that when an interaction is added, the company is synced to ES."""
+def test_adding_interaction_updates_company(opensearch_with_signals):
+    """Test that when an interaction is added, the company is synced to OpenSearch."""
     test_name = 'very_hard_to_find_company'
     company = CompanyFactory(
         name=test_name,
     )
 
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
-    doc = es_with_signals.get(
-        index=CompanySearchApp.es_model.get_read_alias(),
+    doc = opensearch_with_signals.get(
+        index=CompanySearchApp.search_model.get_read_alias(),
         id=company.pk,
     )
     assert doc['_source']['name'] == test_name
@@ -112,10 +112,10 @@ def test_adding_interaction_updates_company(es_with_signals):
         company=company,
     )
 
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
-    updated_doc = es_with_signals.get(
-        index=CompanySearchApp.es_model.get_read_alias(),
+    updated_doc = opensearch_with_signals.get(
+        index=CompanySearchApp.search_model.get_read_alias(),
         id=company.pk,
     )
     assert updated_doc['_source']['name'] == test_name

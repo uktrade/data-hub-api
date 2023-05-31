@@ -8,10 +8,10 @@ es_amp=""
 if [ "$ES_APM_ENABLED" = 'True' ] ; then
    es_amp="-wait tcp://es-apm:8200"
 fi
-dockerize -wait  tcp://postgres:5432 -wait tcp://es:9200  -wait tcp://redis:6379 $es_amp
+dockerize -wait  tcp://postgres:5432 -wait tcp://opensearch:9200  -wait tcp://redis:6379 $es_amp
 
 python /app/manage.py migrate
-python /app/manage.py migrate_es
+python /app/manage.py migrate_search
 python /app/manage.py loadinitialmetadata --force
 
 # TODO abstract this into a method in ./manage.py
@@ -58,4 +58,4 @@ python /app/manage.py add_access_token --skip-checks --hours 24 --token lepStaff
 python /app/manage.py loaddata --ignorenonexistent /app/fixtures/test_data.yaml
 python /app/manage.py createinitialrevisions
 python /app/manage.py collectstatic --noinput
-DEBUG=False gunicorn config.wsgi --config config/gunicorn.py -b 0.0.0.0
+DEBUG=False python app.py

@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: b7f74b3b-a3ff-4534-ba7e-dacce2f3204a
+  fields:
+    disabled_on:
+    order: 674.0
+    segment: Global Talent Network
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["other_interaction", "trade_agreement_interaction"]
+    lft: 6
+    rght: 7
+    tree_id: 3
+    level: 1

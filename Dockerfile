@@ -1,7 +1,4 @@
-FROM python:3.8
-
-# libyaml-dev is required for watchdog (celery auto-reloader)
-RUN apt-get update && apt-get install -y wget libyaml-dev
+FROM python:3.10.5
 
 # Install dockerize https://github.com/jwilder/dockerize
 ENV DOCKERIZE_VERSION v0.6.1
@@ -13,8 +10,8 @@ EXPOSE 8000
 RUN mkdir -p /app
 WORKDIR /app
 
-ADD requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+ADD requirements-dev.txt .
+RUN pip install --no-cache-dir -r requirements-dev.txt
 
 ADD . /app/
 

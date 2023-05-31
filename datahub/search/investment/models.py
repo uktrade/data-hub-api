@@ -1,8 +1,8 @@
-from elasticsearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Object, Text
+from opensearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Object, Text
 
 from datahub.search import dict_utils
 from datahub.search import fields
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
 def _related_investment_project_field():
@@ -14,8 +14,8 @@ def _related_investment_project_field():
     })
 
 
-class InvestmentProject(BaseESModel):
-    """Elasticsearch representation of InvestmentProject."""
+class InvestmentProject(BaseSearchModel):
+    """OpenSearch representation of InvestmentProject."""
 
     id = Keyword()
     actual_land_date = Date()
@@ -181,5 +181,6 @@ class InvestmentProject(BaseESModel):
         'uk_company.name.trigram',
         'investor_company.name',
         'investor_company.name.trigram',
-        'project_code.trigram',
+        'project_code',
+        'sector.name',
     )

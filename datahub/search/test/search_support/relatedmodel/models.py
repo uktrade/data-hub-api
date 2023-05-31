@@ -1,12 +1,12 @@
-from elasticsearch_dsl import Keyword
+from opensearch_dsl import Keyword
 
 from datahub.search import dict_utils
 from datahub.search import fields
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
-class ESRelatedModel(BaseESModel):
-    """Elasticsearch representation of SimpleModel model."""
+class SearchRelatedModel(BaseSearchModel):
+    """OpenSearch representation of SimpleModel model."""
 
     id = Keyword()
     simpleton = fields.id_name_field()

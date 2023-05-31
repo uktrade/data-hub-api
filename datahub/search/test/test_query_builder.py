@@ -5,9 +5,10 @@ from uuid import UUID
 import pytest
 
 from datahub.search.query_builder import (
+    _build_basic_term_query,
     _build_entity_permission_query,
     _build_field_query,
-    _build_term_query,
+    _build_fuzzy_term_query,
     _split_range_fields,
     get_basic_search_query,
     get_search_by_entities_query,
@@ -162,6 +163,7 @@ def test_build_field_query(field, value, expected):
     assert _build_field_query(field, value).to_dict() == expected
 
 
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     'term,expected',
     (
@@ -200,10 +202,137 @@ def test_build_field_query(field, value, expected):
 )
 def test_build_term_query(term, expected):
     """Tests search term query."""
-    query = _build_term_query(term, fields=('country.id', 'sector'))
+    query = _build_basic_term_query(term, fields=('country.id', 'sector'))
     assert query.to_dict() == expected
 
 
+@pytest.mark.parametrize(
+    'term,expected',
+    (
+        (
+            'hello',
+            {
+                'bool': {
+                    'should': [
+                        {
+                            'match': {
+                                'name.keyword': {
+                                    'query': 'hello',
+                                    'boost': 10,
+                                },
+                            },
+                        },
+                        {
+                            'match': {
+                                'name': {
+                                    'query': 'hello',
+                                    'fuzziness': 'AUTO',
+                                    'operator': 'AND',
+                                    'prefix_length': '2',
+                                    'minimum_should_match': '80%',
+                                },
+                            },
+                        },
+                        {
+                            'match': {
+                                'address': {
+                                    'query': 'hello',
+                                    'fuzziness': 'AUTO',
+                                    'operator': 'AND',
+                                    'prefix_length': '2',
+                                    'minimum_should_match': '80%',
+                                },
+                            },
+                        },
+                        {
+                            'match': {
+                                'country': {
+                                    'query': 'hello',
+                                    'fuzziness': 'AUTO',
+                                    'operator': 'AND',
+                                    'prefix_length': '2',
+                                    'minimum_should_match': '80%',
+                                },
+                            },
+                        },
+                        {
+                            'multi_match': {
+                                'query': 'hello',
+                                'fields': (
+                                    'name',
+                                    'name.trigram',
+                                    'address.trigram',
+                                    'country.trigram',
+                                ),
+                                'boost': 4,
+                                'type': 'cross_fields',
+                                'operator': 'and',
+                            },
+                        },
+                    ],
+                    'must_not': [
+                        {
+                            'match': {
+                                'archived': True,
+                            },
+                        },
+                    ],
+                },
+            },
+        ),
+        (
+            '',
+            {
+                'match_all': {},
+            },
+        ),
+    ),
+)
+def test_build_fuzzy_term_query(term, expected):
+    """Tests search term query."""
+    query = _build_fuzzy_term_query(
+        term,
+        fields=('name', 'name.trigram', 'address.trigram', 'country.trigram'),
+    )
+    assert query.to_dict() == expected
+
+
+def test_build_fuzzy_term_query_no_fields():
+    """Tests search term query with no fields."""
+    query = _build_fuzzy_term_query('hello')
+    assert query.to_dict() == {
+        'bool': {
+            'should': [
+                {
+                    'match': {
+                        'name.keyword': {
+                            'query': 'hello',
+                            'boost': 10,
+                        },
+                    },
+                },
+                {
+                    'multi_match': {
+                        'query': 'hello',
+                        'fields': [],
+                        'type': 'cross_fields',
+                        'operator': 'and',
+                        'boost': 4,
+                    },
+                },
+            ],
+            'must_not': [
+                {
+                    'match': {
+                        'archived': True,
+                    },
+                },
+            ],
+        },
+    }
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     'offset,limit,expected_size', (
         (8950, 1000, 1000),
@@ -296,6 +425,7 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
         assert query.to_dict() == expected
 
 
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     (
         'term',
@@ -335,7 +465,12 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                                         {
                                             'multi_match': {
                                                 'query': None,
-                                                'fields': ('name', 'name.trigram'),
+                                                'fields': (
+                                                    'name',
+                                                    'name.trigram',
+                                                    'country.trigram',
+                                                    'address.trigram',
+                                                ),
                                                 'type': 'cross_fields',
                                                 'operator': 'and',
                                             },
@@ -390,7 +525,12 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                                         {
                                             'multi_match': {
                                                 'query': 'search term',
-                                                'fields': ('name', 'name.trigram'),
+                                                'fields': (
+                                                    'name',
+                                                    'name.trigram',
+                                                    'country.trigram',
+                                                    'address.trigram',
+                                                ),
                                                 'type': 'cross_fields',
                                                 'operator': 'and',
                                             },
@@ -474,7 +614,7 @@ def test_get_search_by_entities_query(
 ):
     """Tests for the get_search_by_entities_query function."""
     query = get_search_by_entities_query(
-        [SimpleModelSearchApp.es_model],
+        [SimpleModelSearchApp.search_model],
         term=term,
         filter_data=filter_data,
         composite_field_mapping=composite_field_mapping,
@@ -484,15 +624,16 @@ def test_get_search_by_entities_query(
         fields_to_exclude=fields_to_exclude,
     )
     assert query.to_dict() == expected_query
-    assert query._index == [SimpleModelSearchApp.es_model.get_read_alias()]
+    assert query._index == [SimpleModelSearchApp.search_model.get_read_alias()]
 
 
+@pytest.mark.django_db
 def test_get_search_by_multiple_entities_query():
     """Tests for the get_search_by_entities_query function."""
     query = get_search_by_entities_query(
         [
-            SimpleModelSearchApp.es_model,
-            RelatedModelSearchApp.es_model,
+            SimpleModelSearchApp.search_model,
+            RelatedModelSearchApp.search_model,
         ],
         term=None,
         filter_data=None,
@@ -527,6 +668,8 @@ def test_get_search_by_multiple_entities_query():
                                         'fields': (
                                             'name',
                                             'name.trigram',
+                                            'country.trigram',
+                                            'address.trigram',
                                         ),
                                         'operator': 'and',
                                         'query': None,
@@ -568,11 +711,12 @@ def test_get_search_by_multiple_entities_query():
     }
     assert query.to_dict() == expected_query
     assert query._index == [
-        SimpleModelSearchApp.es_model.get_read_alias(),
-        RelatedModelSearchApp.es_model.get_read_alias(),
+        SimpleModelSearchApp.search_model.get_read_alias(),
+        RelatedModelSearchApp.search_model.get_read_alias(),
     ]
 
 
+@pytest.mark.django_db
 @mock.patch('datahub.search.query_builder.get_global_search_apps_as_mapping')
 def test_get_basic_search_query(mocked_get_global_search_apps_as_mapping):
     """Test for get_basic_search_query."""
@@ -582,7 +726,7 @@ def test_get_basic_search_query(mocked_get_global_search_apps_as_mapping):
     }
 
     query = get_basic_search_query(
-        search_app.es_model,
+        search_app.search_model,
         'test',
         permission_filters_by_entity={
             search_app.name: [('name', 'perm')],
@@ -606,7 +750,12 @@ def test_get_basic_search_query(mocked_get_global_search_apps_as_mapping):
                     {
                         'multi_match': {
                             'query': 'test',
-                            'fields': ['name', 'name.trigram'],
+                            'fields': [
+                                'address.trigram',
+                                'country.trigram',
+                                'name',
+                                'name.trigram',
+                            ],
                             'type': 'cross_fields',
                             'operator': 'and',
                         },

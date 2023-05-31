@@ -29,7 +29,7 @@ class StringUUIDField(serializers.UUIDField):
     """
     String UUID field.
 
-    We can't use UUID in ES queries, that's why we need to convert them back to string.
+    We can't use UUID in OpenSearch queries, that's why we need to convert them back to string.
     """
 
     def to_internal_value(self, data):
@@ -48,7 +48,7 @@ class IdNameSerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
-class _ESOrderingField(serializers.Field):
+class _SearchOrderingField(serializers.Field):
     """Serialiser field for specifying an ordering for a search."""
 
     default_error_messages = {
@@ -98,7 +98,7 @@ class BaseSearchQuerySerializer(serializers.Serializer):
 
     offset = serializers.IntegerField(default=0, min_value=0, max_value=MAX_RESULTS - 1)
     limit = serializers.IntegerField(default=api_settings.PAGE_SIZE, min_value=1)
-    sortby = _ESOrderingField(required=False)
+    sortby = _SearchOrderingField(required=False)
 
     def __init__(self, *args, **kwrags):
         """Initialises the serialiser and configures the `sortby` field."""
@@ -106,8 +106,8 @@ class BaseSearchQuerySerializer(serializers.Serializer):
         self.fields['sortby'].configure(self.SORT_BY_FIELDS, self.DEFAULT_ORDERING)
 
 
-class _ESModelChoiceField(serializers.Field):
-    """Serialiser field for selecting an ES model by name."""
+class _SearchModelChoiceField(serializers.Field):
+    """Serialiser field for selecting an OpenSearch model by name."""
 
     default_error_messages = {
         'invalid_choice': gettext_lazy('"{input}" is not a valid choice.'),
@@ -126,7 +126,7 @@ class _ESModelChoiceField(serializers.Field):
         global_search_models = get_global_search_apps_as_mapping()
         if data not in global_search_models:
             self.fail('invalid_choice', input=data)
-        return global_search_models[data].es_model
+        return global_search_models[data].search_model
 
     def to_representation(self, value):
         """Translates a model to a model name."""
@@ -136,7 +136,7 @@ class _ESModelChoiceField(serializers.Field):
 class BasicSearchQuerySerializer(BaseSearchQuerySerializer):
     """Serialiser used to validate basic (global) search query parameters."""
 
-    entity = _ESModelChoiceField(default='company')
+    entity = _SearchModelChoiceField(default='company')
     term = serializers.CharField(required=True, allow_blank=True)
 
 

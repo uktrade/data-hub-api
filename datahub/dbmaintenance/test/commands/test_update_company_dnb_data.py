@@ -11,6 +11,7 @@ from datahub.dbmaintenance.management.commands.update_company_dnb_data import (
     API_CALL_INTERVAL,
     Command,
 )
+from datahub.dnb_api.tasks.sync import sync_company_with_dnb
 
 pytestmark = pytest.mark.django_db
 
@@ -46,17 +47,17 @@ def mock_time(monkeypatch):
 
 
 @pytest.fixture
-def mock_sync_company_with_dnb(monkeypatch):
+def mock_job_scheduler(monkeypatch):
     """
-    Mock sync_company_with_dnb.apply().
+    Mock sync_company_with_dnb
     """
-    mocked_sync_company_with_dnb = mock.Mock()
+    mocked_job_scheduler = mock.Mock()
     monkeypatch.setattr(
         'datahub.dbmaintenance.management.commands.update_company_dnb_data.'
-        'sync_company_with_dnb.apply',
-        mocked_sync_company_with_dnb,
+        'job_scheduler',
+        mocked_job_scheduler,
     )
-    return mocked_sync_company_with_dnb
+    return mocked_job_scheduler
 
 
 @pytest.mark.parametrize(
@@ -73,7 +74,7 @@ def test_run(
     s3_stubber,
     caplog,
     mock_time,
-    mock_sync_company_with_dnb,
+    mock_job_scheduler,
     fields,
 ):
     """
@@ -118,18 +119,18 @@ def test_run(
 
     assert mock_sleep.call_count == 4
 
-    assert mock_sync_company_with_dnb.call_count == 4
+    assert mock_job_scheduler.call_count == 4
     expected_ids = []
     for company in companies:
         if company.duns_number:
             expected_ids.append(company.id)
-            mock_sync_company_with_dnb.assert_any_call(
-                args=(
+            mock_job_scheduler.assert_any_call(
+                function=sync_company_with_dnb,
+                function_args=(
                     company.id,
                     fields,
-                    'command:update_company_dnb_data:2019-01-01T11:12:13+00:00',
-                ),
-                throw=True,
+                    'command:update_company_dnb_data:2019-01-01T11:12:13+00:00'),
+                retry_intervals=[60, 60, 60],
             )
     mocked_log_to_sentry.assert_called_with(
         'update_company_dnb_data command completed.',
@@ -148,8 +149,7 @@ def test_simulate(
     mocked_log_to_sentry,
     s3_stubber,
     caplog,
-    mock_time,
-    mock_sync_company_with_dnb,
+    mock_job_scheduler,
 ):
     """
     Test that the command simulates updates if --simulate is passed in.
@@ -190,7 +190,7 @@ def test_simulate(
 
     assert len(caplog.records) == 2
 
-    assert not mock_sync_company_with_dnb.called
+    assert not mock_job_scheduler.called
     assert not mocked_log_to_sentry.called
 
 

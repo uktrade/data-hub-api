@@ -1,7 +1,7 @@
-from elasticsearch_dsl import Boolean, Date, Keyword, Long, Text
+from opensearch_dsl import Boolean, Date, Keyword, Long, Text
 
 from datahub.search import dict_utils, fields
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
 def _get_adviser_list(col):
@@ -20,8 +20,8 @@ def _get_investment_project_list(col):
     return [dict_utils.investment_project_dict(i) for i in col.all()]
 
 
-class LargeCapitalOpportunity(BaseESModel):
-    """Elasticsearch representation of LargeCapitalOpportunity."""
+class LargeCapitalOpportunity(BaseSearchModel):
+    """OpenSearch representation of LargeCapitalOpportunity."""
 
     id = Keyword()
 

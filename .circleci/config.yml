@@ -8,9 +8,6 @@ job_defaults: &job_defaults
     es_image:
       type: string
 
-    es_apm_image:
-      type: string
-
     postgres_image:
       type: string
 
@@ -35,8 +32,8 @@ job_defaults: &job_defaults
     DJANGO_SETTINGS_MODULE: config.settings.local
     ES_INDEX_PREFIX: test_index
     ES5_URL: http://localhost:9200
-    # This has been readded to allow tests utilizing elasticsearch to be unskipped
-    ELASTICSEARCH_URL: http://localhost:9200
+    OPENSEARCH_URL: http://localhost:9200
+    OPENSEARCH_INDEX_PREFIX: test_index
     PAAS_IP_WHITELIST: 1.2.3.4
     AWS_DEFAULT_REGION: eu-west-2
     AWS_ACCESS_KEY_ID: foo
@@ -48,11 +45,12 @@ job_defaults: &job_defaults
     DIT_EMAIL_DOMAINS: trade.gov.uk,digital.trade.gov.uk
     DATA_HUB_FRONTEND_ACCESS_KEY_ID: frontend-key-id
     DATA_HUB_FRONTEND_SECRET_ACCESS_KEY: frontend-key
-    ES_APM_ENABLED: 'True'
+    ES_APM_ENABLED: 'False'
     ES_APM_SERVICE_NAME: datahub
     ES_APM_SECRET_TOKEN:
     ES_APM_SERVER_URL: http://localhost:8200
     ES_APM_ENVIRONMENT: 'circleci'
+    REDIS_BASE_URL: 'redis://localhost:6379'
 
   working_directory: ~/app
 
@@ -62,10 +60,8 @@ job_defaults: &job_defaults
     - image: <<parameters.es_image>>
       environment:
         discovery.type: single-node
+        plugins.security.disabled: 'true'
         http.port: 9200
-
-    - image: <<parameters.es_apm_image>>
-      command: ["apm-server", "-e", "-E", "output.elasticsearch.hosts=[\"localhost:9200\"]"]
 
     - image: <<parameters.postgres_image>>
       name: postgres
@@ -73,25 +69,27 @@ job_defaults: &job_defaults
         POSTGRES_DB: datahub
         POSTGRES_PASSWORD: datahub
 
+    - image: cimg/redis:6.2.6
   steps:
     - checkout
 
     - restore_cache:
         name: Restore pip cache
         keys:
-          - v2-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
+          - v2-<< parameters.python_image >>-{{ checksum "requirements-dev.txt" }}
         paths:
           - ~/cache/pip
 
     - run:
         name: Install dependencies
-        command: python -m pip install --cache-dir ~/cache/pip --progress-bar off -r requirements.txt
+        command: python -m pip install --cache-dir ~/cache/pip --progress-bar off -r requirements-dev.txt
 
     - save_cache:
         name: Save pip cache
-        key: v2-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
+        key: v2-<< parameters.python_image >>-{{ checksum "requirements-dev.txt" }}
         paths:
           - ~/cache/pip
+
     - run:
         name: Run Flake8
         command: python -m flake8
@@ -106,11 +104,11 @@ job_defaults: &job_defaults
     - when:
         condition: <<parameters.publish_coverage>>
         steps:
-        - run:
-            name: Publish coverage
-            command: |
-              wget -O codecov.sh https://codecov.io/bash
-              bash ./codecov.sh -t ${COV_TOKEN}
+          - run:
+              name: Publish coverage
+              command: |
+                wget -O codecov.sh https://codecov.io/bash
+                bash ./codecov.sh -t ${COV_TOKEN}
 
 jobs:
   build:
@@ -123,7 +121,6 @@ workflows:
     jobs:
       - build:
           publish_coverage: true
-          python_image: python:3.8
-          postgres_image: postgres:10
-          es_image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
-          es_apm_image: docker.elastic.co/apm/apm-server:7.7.1
+          python_image: python:3.10.5
+          postgres_image: postgres:12
+          es_image: opensearchproject/opensearch:1.2.4

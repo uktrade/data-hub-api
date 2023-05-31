@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: b2354de4-fa42-43ee-8475-cd7140058f37
+  fields:
+    disabled_on: ~
+    order: 300.0
+    parent_id: fee6779d-e127-4e1e-89f6-d614b4df3581
+    segment: 'DIT Middle East & Pakistan Comms & Marketing campaigns'
+    level: 0
+    lft: 0
+    rght: 0
+    tree_id: 0
+    contexts: ["export_interaction", "other_interaction"]

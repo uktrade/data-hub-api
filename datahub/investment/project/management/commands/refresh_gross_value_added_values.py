@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from datahub.investment.project.tasks import (
-    refresh_gross_value_added_value_for_fdi_investment_projects,
+    schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
 )
 
 
@@ -19,4 +19,4 @@ class Command(BaseCommand):
         'update_gross_value_added_for_investment_project_pre_save'
         which sets the Gross Value added data for a project.
         """
-        refresh_gross_value_added_value_for_fdi_investment_projects()
+        schedule_refresh_gross_value_added_value_for_fdi_investment_projects()

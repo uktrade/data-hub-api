@@ -14,9 +14,9 @@ from datahub.search.signals import SignalReceiver
 from datahub.search.sync_object import sync_object_async
 
 
-def investment_project_sync_es(instance):
-    """Sync investment project to the Elasticsearch."""
-    def sync_es_wrapper():
+def investment_project_sync_search(instance):
+    """Sync investment project to the OpenSearch."""
+    def sync_search_wrapper():
         if isinstance(instance, InvestmentProjectTeamMember):
             pk = instance.investment_project.pk
         else:
@@ -24,14 +24,14 @@ def investment_project_sync_es(instance):
 
         sync_object_async(InvestmentSearchApp, pk)
 
-    transaction.on_commit(sync_es_wrapper)
+    transaction.on_commit(sync_search_wrapper)
 
 
-def investment_project_sync_es_interaction_change(instance):
+def investment_project_sync_search_interaction_change(instance):
     """
-    Sync investment projects in elastic search when related interactions change.
+    Sync investment projects in OpenSearch when related interactions change.
 
-    When an interaction changes, the elastic search index is also updated for
+    When an interaction changes, the OpenSearch index is also updated for
     the related investment project. The previous version also needs to be
     checked to make sure that if the investment project changes, the old
     investment project is also updated in the index.
@@ -55,14 +55,14 @@ def investment_project_sync_es_interaction_change(instance):
         sync_object_async(InvestmentSearchApp, pk)
 
 
-def investment_project_sync_es_adviser_change(instance):
+def investment_project_sync_search_adviser_change(instance):
     """
     post_save handler for advisers, to make sure that any projects they're linked to are
     resynced.
 
-    This is primarily to update the teams stored against the project in ES.
+    This is primarily to update the teams stored against the project in OpenSearch.
     """
-    def sync_es_wrapper():
+    def sync_search_wrapper():
         queryset = DBInvestmentProject.objects.filter(
             Q(created_by_id=instance.pk)
             | Q(client_relationship_manager_id=instance.pk)
@@ -77,12 +77,12 @@ def investment_project_sync_es_adviser_change(instance):
                 project.pk,
             )
 
-    transaction.on_commit(sync_es_wrapper)
+    transaction.on_commit(sync_search_wrapper)
 
 
-def investment_project_sync_m2m_es(instance, action, reverse, pk_set, **kwargs):
+def investment_project_sync_m2m_opensearch(instance, action, reverse, pk_set, **kwargs):
     """
-    Sync elastic search when m2m fields change on the investment project.
+    Sync opensearch when m2m fields change on the investment project.
     """
     if action not in ('post_add', 'post_remove', 'post_clear'):
         return
@@ -97,7 +97,7 @@ investment_project_m2m_receivers = (
     SignalReceiver(
         m2m_changed,
         getattr(DBInvestmentProject, m2m_relation).through,
-        investment_project_sync_m2m_es,
+        investment_project_sync_m2m_opensearch,
         forward_kwargs=True,
     )
     for m2m_relation in [
@@ -111,11 +111,11 @@ investment_project_m2m_receivers = (
 )
 
 receivers = (
-    SignalReceiver(post_save, DBInvestmentProject, investment_project_sync_es),
+    SignalReceiver(post_save, DBInvestmentProject, investment_project_sync_search),
     *investment_project_m2m_receivers,
-    SignalReceiver(post_save, Interaction, investment_project_sync_es_interaction_change),
-    SignalReceiver(post_delete, Interaction, investment_project_sync_es_interaction_change),
-    SignalReceiver(post_save, InvestmentProjectTeamMember, investment_project_sync_es),
-    SignalReceiver(post_delete, InvestmentProjectTeamMember, investment_project_sync_es),
-    SignalReceiver(post_save, Advisor, investment_project_sync_es_adviser_change),
+    SignalReceiver(post_save, Interaction, investment_project_sync_search_interaction_change),
+    SignalReceiver(post_delete, Interaction, investment_project_sync_search_interaction_change),
+    SignalReceiver(post_save, InvestmentProjectTeamMember, investment_project_sync_search),
+    SignalReceiver(post_delete, InvestmentProjectTeamMember, investment_project_sync_search),
+    SignalReceiver(post_save, Advisor, investment_project_sync_search_adviser_change),
 )

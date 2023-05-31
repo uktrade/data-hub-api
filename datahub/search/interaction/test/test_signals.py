@@ -1,5 +1,5 @@
 import pytest
-from elasticsearch.exceptions import NotFoundError
+from opensearchpy.exceptions import NotFoundError
 
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
@@ -11,72 +11,72 @@ from datahub.search.interaction.apps import InteractionSearchApp
 pytestmark = pytest.mark.django_db
 
 
-def test_new_interaction_synced(es_with_signals):
-    """Test that new interactions are synced to ES."""
+def test_new_interaction_synced(opensearch_with_signals):
+    """Test that new interactions are synced to OpenSearch."""
     interaction = CompanyInteractionFactory()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
-    assert es_with_signals.get(
-        index=InteractionSearchApp.es_model.get_write_index(),
+    assert opensearch_with_signals.get(
+        index=InteractionSearchApp.search_model.get_write_index(),
         id=interaction.pk,
     )
 
 
-def test_updated_interaction_synced(es_with_signals):
-    """Test that when an interaction is updated it is synced to ES."""
+def test_updated_interaction_synced(opensearch_with_signals):
+    """Test that when an interaction is updated it is synced to OpenSearch."""
     interaction = CompanyInteractionFactory()
     new_subject = 'pluto'
     interaction.subject = new_subject
     interaction.save()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
-    result = es_with_signals.get(
-        index=InteractionSearchApp.es_model.get_write_index(),
+    result = opensearch_with_signals.get(
+        index=InteractionSearchApp.search_model.get_write_index(),
         id=interaction.pk,
     )
     assert result['_source']['subject'] == new_subject
 
 
-def test_deleted_interaction_deleted_from_es(es_with_signals):
+def test_deleted_interaction_deleted_from_opensearch(opensearch_with_signals):
     """
     Test that when an interaction is deleted from db it is also
-    deleted from ES.
+    deleted from OpenSearch.
     """
     interaction = InvestmentProjectInteractionFactory()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
-    assert es_with_signals.get(
-        index=InteractionSearchApp.es_model.get_write_index(),
+    assert opensearch_with_signals.get(
+        index=InteractionSearchApp.search_model.get_write_index(),
         id=interaction.pk,
     )
 
     interaction_id = interaction.pk
     interaction.delete()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
     with pytest.raises(NotFoundError):
-        assert es_with_signals.get(
-            index=InteractionSearchApp.es_model.get_write_index(),
+        assert opensearch_with_signals.get(
+            index=InteractionSearchApp.search_model.get_write_index(),
             id=interaction_id,
         ) is None
 
 
-def test_interaction_synced_when_dit_participant_added(es_with_signals):
-    """Test that interactions are synced to ES if their DIT participants change."""
+def test_interaction_synced_when_dit_participant_added(opensearch_with_signals):
+    """Test that interactions are synced to OpenSearch if their DIT participants change."""
     interaction = CompanyInteractionFactory(dit_participants=[])
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
-    doc = es_with_signals.get(
-        index=InteractionSearchApp.es_model.get_read_alias(),
+    doc = opensearch_with_signals.get(
+        index=InteractionSearchApp.search_model.get_read_alias(),
         id=interaction.pk,
     )
     assert doc['_source']['dit_participants'] == []
 
     dit_participant = InteractionDITParticipantFactory(interaction=interaction)
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
-    updated_doc = es_with_signals.get(
-        index=InteractionSearchApp.es_model.get_read_alias(),
+    updated_doc = opensearch_with_signals.get(
+        index=InteractionSearchApp.search_model.get_read_alias(),
         id=interaction.pk,
     )
     actual_dit_participants = updated_doc['_source']['dit_participants']
@@ -85,23 +85,28 @@ def test_interaction_synced_when_dit_participant_added(es_with_signals):
     assert actual_dit_participants[0]['team']['id'] == str(dit_participant.team.pk)
 
 
-def test_updating_company_name_updates_interaction(es_with_signals):
-    """Test that when a company name is updated, the company's interactions are synced to ES."""
+def test_updating_company_name_updates_interaction(opensearch_with_signals):
+    """
+    Test that when a company name is updated, the company's interactions are synced to OpenSearch.
+    """
     interaction = CompanyInteractionFactory()
     new_company_name = 'exogenous'
     interaction.company.name = new_company_name
     interaction.company.save()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
-    result = es_with_signals.get(
-        index=InteractionSearchApp.es_model.get_write_index(),
+    result = opensearch_with_signals.get(
+        index=InteractionSearchApp.search_model.get_write_index(),
         id=interaction.pk,
     )
     assert result['_source']['company']['name'] == new_company_name
 
 
-def test_updating_contact_name_updates_interaction(es_with_signals):
-    """Test that when a contact's name is updated, the contact's interactions are synced to ES."""
+def test_updating_contact_name_updates_interaction(opensearch_with_signals):
+    """
+    Test that when a contact's name is updated, the contact's interactions are
+    synced to OpenSearch.
+    """
     interaction = CompanyInteractionFactory()
     new_first_name = 'Jamie'
     new_last_name = 'Bloggs'
@@ -109,10 +114,10 @@ def test_updating_contact_name_updates_interaction(es_with_signals):
     contact.first_name = new_first_name
     contact.last_name = new_last_name
     contact.save()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
-    result = es_with_signals.get(
-        index=InteractionSearchApp.es_model.get_write_index(),
+    result = opensearch_with_signals.get(
+        index=InteractionSearchApp.search_model.get_write_index(),
         id=interaction.pk,
     )
     assert result['_source']['contacts'][0] == {
@@ -123,19 +128,19 @@ def test_updating_contact_name_updates_interaction(es_with_signals):
     }
 
 
-def test_updating_project_name_updates_interaction(es_with_signals):
+def test_updating_project_name_updates_interaction(opensearch_with_signals):
     """
     Test that when an investment project's name is updated, the project's interactions are
-    synced to ES.
+    synced to OpenSearch.
     """
     interaction = InvestmentProjectInteractionFactory()
     new_project_name = 'helios'
     interaction.investment_project.name = new_project_name
     interaction.investment_project.save()
-    es_with_signals.indices.refresh()
+    opensearch_with_signals.indices.refresh()
 
-    result = es_with_signals.get(
-        index=InteractionSearchApp.es_model.get_write_index(),
+    result = opensearch_with_signals.get(
+        index=InteractionSearchApp.search_model.get_write_index(),
         id=interaction.pk,
     )
     assert result['_source']['investment_project']['name'] == new_project_name

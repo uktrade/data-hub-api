@@ -101,6 +101,9 @@ def update_consent(email_address, accepts_dit_email_marketing, modified_at=None,
     :param accepts_dit_email_marketing: True if they want marketing, False if they don't
     :param modified_at: iso8601 formatted datetime with timezone, in UTC as a string
     """
+    if (email_address is None or len(str(email_address).strip()) == 0):
+        raise ValueError('email_address is a required field')
+
     logger.info(f'update_consent: {email_address}, {accepts_dit_email_marketing}')
 
     body = {

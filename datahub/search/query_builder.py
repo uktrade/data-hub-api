@@ -1,8 +1,8 @@
 from collections import defaultdict
 from itertools import chain
 
-from elasticsearch_dsl import Search
-from elasticsearch_dsl.query import (
+from opensearch_dsl import Search
+from opensearch_dsl.query import (
     Bool,
     Exists,
     Match,
@@ -19,7 +19,7 @@ MAX_RESULTS = 10000
 
 
 class MatchNone(Query):
-    """match_none query. This isn't defined in the Elasticsearch DSL library."""
+    """match_none query. This isn't defined in the OpenSearch DSL library."""
 
     name = 'match_none'
 
@@ -31,6 +31,7 @@ def get_basic_search_query(
         offset=0,
         limit=100,
         fields_to_exclude=None,
+        fuzzy=False,
 ):
     """
     Performs basic search for the given term in the given entity using the SEARCH_FIELDS.
@@ -44,14 +45,14 @@ def get_basic_search_query(
     limit = _clip_limit(offset, limit)
 
     search_apps = tuple(get_global_search_apps_as_mapping().values())
-    indices = [app.es_model.get_read_alias() for app in search_apps]
-    fields = set(chain.from_iterable(app.es_model.SEARCH_FIELDS for app in search_apps))
+    indices = [app.search_model.get_read_alias() for app in search_apps]
+    fields = set(chain.from_iterable(app.search_model.SEARCH_FIELDS for app in search_apps))
 
     # Sort the fields so that this function is deterministic
     # and the same query is always generated with the same inputs
     fields = sorted(fields)
 
-    query = _build_term_query(term, fields=fields)
+    query = _build_term_query(term, fields=fields, fuzzy=fuzzy)
     search = Search(index=indices).query(query)
 
     permission_query = _build_global_permission_query(permission_filters_by_entity)
@@ -102,7 +103,7 @@ def get_search_by_entities_query(
     # document must match all filters in the list (and)
     must_filter = _build_must_queries(filters, ranges, composite_field_mapping)
 
-    s = Search(
+    search = Search(
         index=[
             entity.get_read_alias()
             for entity in entities
@@ -115,12 +116,12 @@ def get_search_by_entities_query(
 
     permission_query = _build_entity_permission_query(permission_filters)
     if permission_query:
-        s = s.filter(permission_query)
+        search = search.filter(permission_query)
 
-    s = s.filter(Bool(must=must_filter))
-    s = _apply_sorting_to_query(s, ordering)
+    search = search.filter(Bool(must=must_filter))
+    search = _apply_sorting_to_query(search, ordering)
     return _apply_source_filtering_to_query(
-        s,
+        search,
         fields_to_include=fields_to_include,
         fields_to_exclude=fields_to_exclude,
     )
@@ -220,7 +221,21 @@ def _build_entity_permission_query(permission_filters):
     return MatchNone()
 
 
-def _build_term_query(term, fields=None):
+def _build_term_query(term, fields=None, fuzzy=False):
+    """
+    Builds a term query depending on the value of the fuzzy arg.
+
+    If the fuzzy argument is true, then we use fuzzy matching,
+    otherwise uses the old matching method.
+
+    """
+    if fuzzy:
+        return _build_fuzzy_term_query(term, fields)
+    else:
+        return _build_basic_term_query(term, fields)
+
+
+def _build_basic_term_query(term, fields=None):
     """Builds a term query."""
     if term == '':
         return MatchAll()
@@ -238,6 +253,60 @@ def _build_term_query(term, fields=None):
     ]
 
     return Bool(should=should_query)
+
+
+def _build_fuzzy_term_query(term, fields=None):
+    """
+    Builds a fuzzy term query that matches with minor spelling errors etc.
+
+    We use trigram fields as they are suitable indicator for fields that can be fuzzy
+    matched.
+
+    Note that we are not actually using the trigram analyzer here and using standard
+    Levensthein distances from 'fuzziness' in the match query.
+
+    Since the OpenSearch version on cloudfoundry is only 7.9.3 we are unable
+    to use the 'combined_fields' query which was introduced in version 7.13. This
+    would allow us to do fuzzy matching across different fields. Instead, this
+    does fuzzy matching on each of the trigram fields individually.
+    """
+    if term == '':
+        return MatchAll()
+
+    if fields is None:
+        fields = []
+
+    trigram_fields = [field for field in fields if field.endswith('.trigram')]
+
+    fuzzy_queries = [
+        Match(**{
+            # Drop '.trigram' from field to get predictable fuzzy matching
+            field.replace('.trigram', ''): {
+                'query': term,
+                'fuzziness': 'AUTO',
+                'operator': 'AND',
+                'prefix_length': '2',
+                'minimum_should_match': '80%',
+            },
+        })
+        for field in trigram_fields
+    ]
+    should_query = [
+        # Promote exact name match
+        Match(**{'name.keyword': {'query': term, 'boost': 10}}),
+        # Add in trigram (fuzzy) fields
+        *fuzzy_queries,
+        # Cross match fields
+        MultiMatch(
+            query=term,
+            fields=fields,
+            type='cross_fields',
+            operator='and',
+            boost=4,
+        ),
+    ]
+
+    return Bool(should=should_query, must_not=Match(archived=True))
 
 
 def _build_exists_query(field, value):

@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: db7eab2f-60a6-4a2e-87ed-1f96830092a0
+  fields:
+    disabled_on: ~
+    order: 0.0
+    segment: GREAT - Unicorn Kingdom Campaign - North America (2023)
+    parent:
+    contexts: ["export_interaction", "export_service_delivery"]
+    lft: 1
+    rght: 2
+    tree_id: 73
+    level: 0

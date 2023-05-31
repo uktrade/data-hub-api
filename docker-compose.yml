@@ -1,4 +1,5 @@
-version: '2'
+version: "2"
+
 services:
 
   api:
@@ -8,55 +9,81 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://es:9200 -wait tcp://es-apm:8200 -wait tcp://redis:6379 -timeout 120s
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://opensearch:9200 -wait tcp://redis:6379 -timeout 120s
     env_file: .env
     depends_on:
       - postgres
-      - es
+      - opensearch
       - redis
-      - es-apm
     command: /app/start-dev.sh
 
-  celery:
+  rq_short:
     build:
       context: .
     volumes:
       - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://es:9200 -wait tcp://es-apm:8200 -wait tcp://redis:6379 -wait tcp://api:8000 -timeout 300s
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://opensearch:9200 -wait tcp://redis:6379 -wait tcp://api:8000 -timeout 300s
     env_file: .env
     depends_on:
       - api
-    command: watchmedo auto-restart -d . -R -p '*.py' -- celery worker -A config -l info -Q celery -B
+    command: python short-running-worker.py
+
+  rq_long:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://opensearch:9200 -wait tcp://redis:6379 -wait tcp://api:8000 -timeout 300s
+    env_file: .env
+    depends_on:
+      - api
+    command: python long-running-worker.py
+
+  rq_sched:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://opensearch:9200 -wait tcp://redis:6379 -wait tcp://api:8000 -timeout 300s
+    env_file: .env
+    depends_on:
+      - api
+    command: python cron-scheduler.py
 
   postgres:
-    image: postgres:10
+    image: postgres:12
     restart: always
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_DB=datahub
       - POSTGRES_PASSWORD=datahub
 
-  es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+  opensearch:
+    image: opensearchproject/opensearch:1.2.4
     environment:
+      - plugins.security.disabled=true
+      - cluster.name=cluster-001
+      - node.name=node-001
       - discovery.type=single-node
-      - http.port=9200
-    restart: always
+      - bootstrap.memory_lock=true
     ports:
       - "9200:9200"
 
-  es-apm:
-    image: docker.elastic.co/apm/apm-server:7.7.1
-    restart: always
-    ports:
-      - "8200:8200"
-    command: >
-       apm-server -e
-         -E output.elasticsearch.hosts=["es:9200"]
-    depends_on:
-      - es
-
   redis:
-    image: redis:3.2
+    image: redis:6.2.6
     restart: always
     ports:
       - "6379:6379"
+
+  rq_exporter:
+    image: mdawar/rq-exporter:latest
+    ports:
+      - target: 9726
+        published: 9726
+        protocol: tcp
+        mode: host
+    environment:
+      RQ_REDIS_HOST: "redis"
+    depends_on:
+      - redis

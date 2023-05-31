@@ -1,90 +1,62 @@
 # Django and django related
-django==3.2.7
-djangorestframework==3.12.4
-django-axes==5.26.0
-django-environ==0.8.1
-django-extensions==3.1.3
-django-filter==21.1
-django-mptt==0.13.4
+django==3.2.19
+djangorestframework==3.14.0
+django-axes==5.41.1
+django-environ==0.10.0
+django-extensions==3.2.1
+django-filter==23.2
+django-log-formatter-ecs==0.0.5
+django-mptt==0.14.0
 django-pglocks==1.0.4
-django-reversion==4.0.0
+django-reversion==5.0.4
 uritemplate==4.1.1  # required for DRF schema features
-whitenoise==5.3.0
+whitenoise==6.4.0
 
-chardet==4.0.0
+chardet==5.1.0
 pyyaml==6.0
 python-dateutil==2.8.2
 
 # Persistency layer
-psycopg2==2.9.1
+psycopg2==2.9.6
 psycogreen==1.0.2
 
-boto3==1.19.7
+boto3==1.26.133
 
-notifications-python-client==6.3.0
+notifications-python-client==8.0.1
 
 # Prometheus
-statsd==3.3.0
+statsd==4.0.1
 
 # Email
 mail-parser==3.15.0
-icalendar==4.0.9
+icalendar==5.0.5
 
 # Slack
-slackclient==2.9.3
+slackclient==2.9.4
 
 # REDIS
-django-redis==5.0.0
-redis==3.5.3
+django-redis==5.2.0
 
-# ES
-elasticsearch==7.13.4
-elasticsearch-dsl==7.4.0
+# OpenSearch
+opensearch-py==2.2.0
+opensearch-dsl==2.1.0
 
 # ES APM
-elastic-apm==6.6.0
-
-# Celery
-celery[redis]==4.4.7
-billiard==3.6.4.0  # Not used directly, but pinned as it has been a source of breakage in the past
-kombu==4.6.11  # Not used directly, but pinned as it has been a source of breakage in the past
+elastic-apm==6.15.1
 
 # Testing and dev
-pytest==6.2.5
-pytest-django==4.4.0
-pytest-cov==3.0.0
-pytest-xdist==2.4.0
-ipython==7.29.0
-factory-boy==3.2.1
-freezegun==1.1.0
-requests-mock==1.9.3
-django-debug-toolbar==3.2.2
-werkzeug==2.0.2  # Required by runserver_plus - useful for local dev
-pip-tools==6.4.0
-piprot==0.9.11
-semantic_version==2.8.5
-towncrier==21.3.0
-watchdog[watchmedo]==2.1.6
-pre-commit==2.15.0
+django-debug-toolbar==4.0.0
+werkzeug==2.2.3  # Required by runserver_plus - useful for local dev
 
-
-# Code static analysis
-flake8==4.0.1
-flake8-bugbear==21.9.2
-flake8-commas==2.1.0
-flake8-debugger==4.0.0
-flake8-import-order==0.18.1
-flake8-docstrings==1.6.0
-flake8-print==4.0.0
-flake8-quotes==3.3.1
-flake8-string-format==0.3.0
-pep8-naming==0.12.1
-pydocstyle==6.1.1
-
-gunicorn==20.1.0
-gevent==21.8.0
+WSGIserver==1.3
+gevent==22.10.2
 mohawk==1.1.0
-requests==2.26.0
-requests_toolbelt==0.9.1
-sentry_sdk==1.4.3
-simple_salesforce==1.11.4
+requests==2.31.0
+requests_toolbelt==1.0.0
+sentry_sdk==1.22.2
+
+# RQ and associated helpers
+rq==1.15.0
+rq-scheduler==0.13.1
+
+python-redis-rate-limit==0.0.8

@@ -82,7 +82,7 @@ class SearchOrderAPIView(SearchOrderAPIViewMixin, SearchAPIView):
         base_query.aggs.bucket(self.subtotal_cost_field, 'sum', field=self.subtotal_cost_field)
         return base_query
 
-    def enhance_response(self, results, response):
+    def enhance_response(self, results, response, validated_data):
         """Enhance response with total subtotal cost."""
         summary = {}
 

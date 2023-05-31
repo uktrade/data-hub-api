@@ -28,10 +28,12 @@ request = Mock(headers={
 
 @pytest.fixture
 def update_contact_task_mock(monkeypatch):
-    """Mocks the apply_async method of the update_contact_consent celery task"""
-    m = Mock()
-    monkeypatch.setattr('datahub.company.serializers.update_contact_consent.apply_async', m)
-    yield m
+    mock_schedule_update_contact_consent = Mock()
+    monkeypatch.setattr(
+        'datahub.company.serializers.schedule_update_contact_consent',
+        mock_schedule_update_contact_consent,
+    )
+    yield mock_schedule_update_contact_consent
 
 
 @freeze_time(FROZEN_TIME)
@@ -49,20 +51,21 @@ class ContactSerializerBase:
 
     def test_serializer_update_call_task(self, update_contact_task_mock, synchronous_on_commit):
         """
-        Ensure that consent service celery task is called when serializer.update
+        Ensure that consent service RQ task is called when serializer.update
         is called if accepts_dit_email_marketing is True.
         """
         contact = self._make_contact()
-        c = self.serializer(
+        serialized_contact = self.serializer(
             instance=contact,
             context={'request': request},
         )
-        c.update(c.instance, {
+        serialized_contact.update(serialized_contact.instance, {
             'email': 'bar@foo.com',
             'accepts_dit_email_marketing': True,
         })
         update_contact_task_mock.assert_called_once_with(
-            args=('bar@foo.com', True),
+            'bar@foo.com',
+            True,
             kwargs={
                 'modified_at': FROZEN_TIME,
                 'zipkin_headers': request.headers,
@@ -75,16 +78,17 @@ class ContactSerializerBase:
             synchronous_on_commit,
     ):
         """
-        Ensure that consent service celery task is called when serializer.update
+        Ensure that consent service RQ task is called when serializer.update
         is called with partial data if accepts_dit_email_marketing is True.
         """
         contact = self._make_contact()
-        c = self.serializer(instance=contact, partial=True)
-        c.update(c.instance, {
+        serialized_contact = self.serializer(instance=contact, partial=True)
+        serialized_contact.update(serialized_contact.instance, {
             'accepts_dit_email_marketing': True,
         })
         update_contact_task_mock.assert_called_once_with(
-            args=(c.instance.email, True),
+            serialized_contact.instance.email,
+            True,
             kwargs={'modified_at': FROZEN_TIME, 'zipkin_headers': {}},
         )
 
@@ -94,21 +98,21 @@ class ContactSerializerBase:
             synchronous_on_commit,
     ):
         """
-        Ensure that consent service celery task is not called when serializer.update
+        Ensure that consent service RQ task is not called when serializer.update
         is called with partial data but `accepts_dit_email_marketing` is missing.
         """
         contact = self._make_contact()
-        c = self.serializer(instance=contact, partial=True)
+        serialized_contact = self.serializer(instance=contact, partial=True)
         data = {
             'last_name': 'Nelson1',
         }
-        c.update(c.instance, data)
+        serialized_contact.update(serialized_contact.instance, data)
 
         assert not update_contact_task_mock.called
 
     def test_serializer_create_calls_task(self, update_contact_task_mock, synchronous_on_commit):
         """
-        Ensure that consent service celery task is called when serializer.create
+        Ensure that consent service RQ task is called when serializer.create
         is called.
         """
         company = CompanyFactory()
@@ -123,11 +127,8 @@ class ContactSerializerBase:
                 'id': str(company.pk),
             },
             'email': 'foo@bar.com',
-            'email_alternative': 'foo2@bar.com',
             'primary': True,
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'telephone_alternative': '987654321',
+            'full_telephone_number': '+44123456789',
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
@@ -140,11 +141,12 @@ class ContactSerializerBase:
             'notes': 'lorem ipsum',
             'accepts_dit_email_marketing': True,
         }
-        c = self.serializer(data=data, context={'request': request})
-        c.is_valid(raise_exception=True)
-        c.create(c.validated_data)
+        serialized_contact = self.serializer(data=data, context={'request': request})
+        serialized_contact.is_valid(raise_exception=True)
+        serialized_contact.create(serialized_contact.validated_data)
         update_contact_task_mock.assert_called_once_with(
-            args=(data['email'], data['accepts_dit_email_marketing']),
+            data['email'],
+            data['accepts_dit_email_marketing'],
             kwargs={
                 'modified_at': FROZEN_TIME,
                 'zipkin_headers': request.headers,
@@ -262,8 +264,7 @@ class TestContactV4Serializer(ContactSerializerBase):
             },
             'primary': True,
             'email': 'foo@bar.com',
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
+            'full_telephone_number': '+44123456789',
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_town': 'Bar',

@@ -1,7 +1,7 @@
-from elasticsearch_dsl import Date, Keyword, Long
+from opensearch_dsl import Date, Keyword, Long
 
 from datahub.search import dict_utils, fields
-from datahub.search.models import BaseESModel
+from datahub.search.models import BaseSearchModel
 
 
 def _get_adviser_list(col):
@@ -12,8 +12,8 @@ def _get_many_to_many_list(col):
     return [dict_utils.id_name_dict(c) for c in col.all()]
 
 
-class LargeInvestorProfile(BaseESModel):
-    """Elasticsearch representation of LargeInvestorProfile."""
+class LargeInvestorProfile(BaseSearchModel):
+    """OpenSearch representation of LargeInvestorProfile."""
 
     id = Keyword()
 

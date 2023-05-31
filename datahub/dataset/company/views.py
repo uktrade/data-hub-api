@@ -1,6 +1,9 @@
+from django.contrib.postgres.aggregates import ArrayAgg
+
 from datahub.company.models import Company
 from datahub.dataset.core.views import BaseDatasetView
 from datahub.metadata.query_utils import get_sector_name_subquery
+from datahub.metadata.utils import convert_usd_to_gbp
 
 
 class CompaniesDatasetView(BaseDatasetView):
@@ -15,6 +18,7 @@ class CompaniesDatasetView(BaseDatasetView):
         """Returns list of Company records"""
         return Company.objects.annotate(
             sector_name=get_sector_name_subquery('sector'),
+            one_list_core_team_advisers=ArrayAgg('one_list_core_team_members__adviser_id'),
         ).values(
             'address_1',
             'address_2',
@@ -44,6 +48,7 @@ class CompaniesDatasetView(BaseDatasetView):
             'number_of_employees',
             'one_list_account_owner_id',
             'one_list_tier__name',
+            'one_list_core_team_advisers',
             'reference_code',
             'registered_address_1',
             'registered_address_2',
@@ -61,3 +66,11 @@ class CompaniesDatasetView(BaseDatasetView):
             'vat_number',
             'website',
         )
+
+    def _enrich_data(self, dataset):
+        for data in dataset:
+            if data.get('turnover') is not None:
+                data['turnover_gbp'] = convert_usd_to_gbp(data['turnover'])
+            else:
+                data['turnover_gbp'] = None
+        return super()._enrich_data(dataset)

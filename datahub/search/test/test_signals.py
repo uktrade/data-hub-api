@@ -13,7 +13,11 @@ from datahub.search.test.search_support.models import RelatedModel, SimpleModel
 class TestDisableSignalsForModel:
     """Tests for disable_search_signal_receivers()."""
 
-    def test_signal_receivers_are_not_disabled(self, es_with_signals, monkeypatch):
+    def test_signal_receivers_are_not_disabled(
+        self,
+        opensearch_with_signals,
+        monkeypatch,
+    ):
         """
         Test that signal receivers are active without the context manager being active.
         """
@@ -27,7 +31,11 @@ class TestDisableSignalsForModel:
 
         callback_mock.assert_called_once()
 
-    def test_signal_receivers_disabled_for_model(self, es_with_signals, monkeypatch):
+    def test_signal_receivers_disabled_for_model(
+        self,
+        opensearch_with_signals,
+        monkeypatch,
+    ):
         """
         Test that signal receivers are disabled for the specified model.
 
@@ -46,7 +54,11 @@ class TestDisableSignalsForModel:
 
         callback_mock.assert_not_called()
 
-    def test_does_not_affect_other_models(self, es_with_signals, monkeypatch):
+    def test_does_not_affect_other_models(
+        self,
+        opensearch_with_signals,
+        monkeypatch,
+    ):
         """Test that signal receivers are not disabled for other models."""
         callback_mock = Mock()
         monkeypatch.setattr(
@@ -59,11 +71,15 @@ class TestDisableSignalsForModel:
 
         callback_mock.assert_called_once()
 
-    def test_does_not_affect_other_threads(self, es_with_signals, monkeypatch):
+    def test_does_not_affect_other_threads(
+        self,
+        opensearch_with_signals,
+        monkeypatch,
+    ):
         """
         Test that signal receivers are not disabled for other threads.
 
-        This is important when using gevent (e.g. via Gunicorn).
+        This is important when using gevent (e.g. via WSGIServer).
 
         Note that as this test uses another thread, the usual test transaction and clean-up
         logic does not kick in. Hence, cleaning up has to be manually handled.
@@ -93,7 +109,7 @@ class TestDisableSignalsForModel:
 
         callback_mock.assert_called_once()
 
-    def test_reconnects_if_was_connected(self, es_with_signals):
+    def test_reconnects_if_was_connected(self, opensearch_with_signals):
         """Test that signal receivers are reconnected on context manager exit."""
         with disable_search_signal_receivers(SimpleModel):
             pass
@@ -105,7 +121,7 @@ class TestDisableSignalsForModel:
             if receiver.sender is SimpleModel
         )
 
-    def test_reconnects_if_exception_raised(self, es_with_signals):
+    def test_reconnects_if_exception_raised(self, opensearch_with_signals):
         """
         Test that signal receivers are reconnected if an exception is raised while the
         context manager is active.
@@ -126,8 +142,7 @@ class TestDisableSignalsForModel:
     def test_does_not_reconnect_if_was_disconnected(self):
         """
         Test that signal receivers are not reconnected when not originally connected.
-
-        Note: Signal receivers are not connected as the es_with_signals fixture is not used.
+        Signal receivers are not connected as the opensearch_with_signals fixture is not used.
         """
         with disable_search_signal_receivers(SimpleModel):
             pass

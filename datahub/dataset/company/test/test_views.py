@@ -7,15 +7,17 @@ from datahub.company.test.factories import (
     ArchivedCompanyFactory,
     CompanyFactory,
     CompanyWithAreaFactory,
+    OneListCoreTeamMemberFactory,
     SubsidiaryFactory,
 )
-from datahub.core.test_utils import format_date_or_datetime, get_attr_or_none
+from datahub.core.test_utils import format_date_or_datetime, get_attr_or_default, get_attr_or_none
 from datahub.dataset.core.test import BaseDatasetViewTest
+from datahub.metadata.utils import convert_usd_to_gbp
 
 
 def get_expected_data_from_company(company):
     """Returns company data as a dictionary"""
-    return {
+    data = {
         'address_1': company.address_1,
         'address_2': company.address_2,
         'address_county': company.address_county,
@@ -60,6 +62,11 @@ def get_expected_data_from_company(company):
         'name': company.name,
         'number_of_employees': company.number_of_employees,
         'one_list_tier__name': get_attr_or_none(company, 'one_list_tier.name'),
+        'one_list_core_team_advisers': get_attr_or_default(
+            company,
+            'one_list_core_team_advisers',
+            [None],
+        ),
         'one_list_account_owner_id': company.one_list_account_owner_id,
         'reference_code': company.reference_code,
         'registered_address_1': company.registered_address_1,
@@ -84,6 +91,12 @@ def get_expected_data_from_company(company):
         'vat_number': company.vat_number,
         'website': company.website,
     }
+    if data['turnover'] is not None:
+        data['turnover_gbp'] = convert_usd_to_gbp(data['turnover'])
+    else:
+        data['turnover_gbp'] = None
+
+    return data
 
 
 @pytest.mark.django_db
@@ -110,6 +123,78 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
+        assert len(response_results) == 1
+        result = response_results[0]
+        expected_result = get_expected_data_from_company(company)
+        assert result == expected_result
+
+    @pytest.mark.parametrize(
+        'company_factory', (
+            CompanyWithAreaFactory,
+            ArchivedCompanyFactory,
+        ),
+    )
+    def test_core_team_member(self, data_flow_api_client, company_factory):
+        """Test that endpoint returns with advisers on the core team"""
+        company = company_factory()
+        company.one_list_core_team_advisers = [
+            str(o.adviser.id) for o in OneListCoreTeamMemberFactory.create_batch(
+                3,
+                company=company,
+            )
+        ]
+        company.save()
+        response = data_flow_api_client.get(self.view_url)
+        assert response.status_code == status.HTTP_200_OK
+        response_results = response.json()['results']
+        assert len(response_results) == 1
+        result = response_results[0]
+        expected_result = get_expected_data_from_company(company)
+        assert result == expected_result
+
+    @pytest.mark.parametrize(
+        'company_factory', (
+            CompanyWithAreaFactory,
+            ArchivedCompanyFactory,
+        ),
+    )
+    def test_turnover_null(self, data_flow_api_client, company_factory):
+        """Test that endpoint returns with expected data for a null turnover value"""
+        company = company_factory()
+        company.created_by = None
+        company.created_on = None
+        company.turnover = None
+        company.save()
+
+        response = data_flow_api_client.get(self.view_url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_results = response.json()['results']
+
+        assert len(response_results) == 1
+        result = response_results[0]
+        expected_result = get_expected_data_from_company(company)
+        assert result == expected_result
+
+    @pytest.mark.parametrize(
+        'company_factory', (
+            CompanyWithAreaFactory,
+            ArchivedCompanyFactory,
+        ),
+    )
+    def test_turnover_negative(self, data_flow_api_client, company_factory):
+        """Test that endpoint returns with expected data for a null turnover value"""
+        company = company_factory()
+        company.created_by = None
+        company.created_on = None
+        company.turnover = -1000
+        company.save()
+
+        response = data_flow_api_client.get(self.view_url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_results = response.json()['results']
+
         assert len(response_results) == 1
         result = response_results[0]
         expected_result = get_expected_data_from_company(company)

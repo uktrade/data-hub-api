@@ -62,7 +62,12 @@ class InteractionActivitySerializer(ActivitySerializer):
             'generator': self._get_generator(),
             'object': {
                 'id': interaction_id,
-                'type': ['dit:Event', f'dit:{self.KINDS_JSON[instance.kind]}'],
+                'type': [
+                    'dit:Event',
+                    f'dit:{self.KINDS_JSON[instance.kind]}',
+                    f'dit:datahub:theme:{instance.theme}',
+                ],
+                'content': instance.notes,
                 'startTime': instance.date,
                 'dit:status': instance.status,
                 'dit:archived': instance.archived,
@@ -92,5 +97,12 @@ class InteractionActivitySerializer(ActivitySerializer):
             interaction['object']['dit:service'] = {
                 'name': instance.service.name,
             }
+
+        if instance.helped_remove_export_barrier:
+            interaction['object']['dit:exportBarrierTypes'] = [
+                {'name': barrier.name} for barrier in instance.export_barrier_types.all()
+            ]
+            if instance.export_barrier_notes != '':
+                interaction['object']['dit:exportBarrierNotes'] = instance.export_barrier_notes
 
         return interaction

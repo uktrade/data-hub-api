@@ -68,5 +68,14 @@ class NotifyGateway:
             personalisation=context,
         )
 
+    def get_notification_by_id(self, notification_id, notify_service_name=None):
+        """
+        Gets notification status by notification id
+        """
+        if not notify_service_name:
+            notify_service_name = DEFAULT_SERVICE_NAME
+        client = self.clients[notify_service_name]
+        return client.get_notification_by_id(notification_id)
+
 
 notify_gateway = NotifyGateway()

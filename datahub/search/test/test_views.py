@@ -34,7 +34,7 @@ class TestValidateViewAttributes:
 
     def test_validate_remap_fields_exist(self, search_view):
         """Validate that the values of REMAP_FIELDS are valid field paths."""
-        mapping = search_view.search_app.es_model._doc_type.mapping
+        mapping = search_view.search_app.search_model._doc_type.mapping
 
         invalid_fields = {
             field for field in search_view.REMAP_FIELDS.values()
@@ -59,7 +59,7 @@ class TestValidateViewAttributes:
             for field_list in search_view.COMPOSITE_FILTERS.values()
             for field in field_list
             if not any(mapping.resolve_field(field) for mapping in mappings)
-            and field not in search_view.search_app.es_model.PREVIOUS_MAPPING_FIELDS
+            and field not in search_view.search_app.search_model.PREVIOUS_MAPPING_FIELDS
         }
 
         assert not invalid_fields
@@ -71,7 +71,7 @@ class TestValidateViewSortByAttributes:
     def test_sort_by_fields(self, search_view):
         """Validate that all sort by values are valid field paths."""
         serializer_class = search_view.serializer_class
-        mapping = search_view.search_app.es_model._doc_type.mapping
+        mapping = search_view.search_app.search_model._doc_type.mapping
 
         invalid_fields = {
             field
@@ -115,7 +115,7 @@ class TestValidateExportViewAttributes:
 class TestBasicSearch(APITestMixin):
     """Tests for SearchBasicAPIView."""
 
-    def test_pagination(self, es_with_collector, search_support_user):
+    def test_pagination(self, opensearch_with_collector, search_support_user):
         """Tests the pagination."""
         total_records = 9
         page_size = 2
@@ -130,7 +130,7 @@ class TestBasicSearch(APITestMixin):
         # Note: id is a Keyword field, so string sorting must be used
         ids = sorted((obj.id for obj in objects), key=str)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         api_client = self.create_api_client(user=search_support_user)
@@ -153,7 +153,7 @@ class TestBasicSearch(APITestMixin):
             assert ids[start:end] == [result['id'] for result in response.data['results']]
 
     @pytest.mark.parametrize('entity', ('sloth', ))
-    def test_400_with_invalid_entity(self, es_with_collector, entity):
+    def test_400_with_invalid_entity(self, opensearch_with_collector, entity):
         """Tests case where provided entity is invalid."""
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(
@@ -169,14 +169,15 @@ class TestBasicSearch(APITestMixin):
             'entity': [f'"{entity}" is not a valid choice.'],
         }
 
-    def test_quality(self, es_with_collector, search_support_user):
+    def test_quality(self, opensearch_with_collector, search_support_user):
         """Tests quality of results."""
         SimpleModel.objects.create(name='The Risk Advisory Group')
         SimpleModel.objects.create(name='The Advisory Group')
         SimpleModel.objects.create(name='The Advisory')
         SimpleModel.objects.create(name='The Advisories')
+        SimpleModel.objects.create(name='The Group')
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         term = 'The Advisory'
 
@@ -201,7 +202,198 @@ class TestBasicSearch(APITestMixin):
             'The Risk Advisory Group',
         ] == [result['name'] for result in response.data['results']]
 
-    def test_partial_match(self, es_with_collector, search_support_user):
+    @pytest.mark.parametrize(
+        'name,search_term,should_match',
+        (
+            ('The Risk Advisory Group', 'The Advisory', True),
+            ('The Advisory Group', 'The Advisory', True),
+            ('The Advisory', 'The Advisory', True),
+            ('The Advisory', 'The Advasory', True),
+            ('The Advisory', 'The Adviosry', True),
+            ('The Advisory', 'The Adviosrys', True),
+            ('The Advisories', 'The Advisory', False),
+            ('The Group', 'The Advisory', False),
+            ('Smarterlight Ltd', 'Smarterlight Ltd', True),
+            ('Smarterlight Ltd', 'Smarterlight', True),
+            ('Smarterlight', 'Smatterlight', True),
+            ('Smarterlight Ltd', 'Smaxtec', False),
+            ('Smarterlight Ltd', 'Omarterlight', False),
+            ('Smarterlight Ltd', 'Sparterlight', False),
+            ('Smarterlight Ltd', 'Smarterlight Inc', False),
+            ('Charterhouse', 'Hotel', False),
+            ('Block C, The Courtyard, 55 Charterhouse Street', 'Hotel', False),
+        ),
+    )
+    def test_fuzzy_quality_single_field(
+        self,
+        opensearch_with_collector,
+        search_support_user,
+        name,
+        search_term,
+        should_match,
+    ):
+        """
+        Tests quality of results for fuzzy matching.
+
+        This should not only hit on exact matches, but also close matches.
+        """
+        SimpleModel.objects.create(name=name)
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:basic')
+        api_client = self.create_api_client(user=search_support_user)
+
+        response = api_client.get(
+            url,
+            data={
+                'term': search_term,
+                'entity': 'simplemodel',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        if should_match:
+            assert response.data['count'] == 1
+            assert response.data['results'][0]['name'] == name
+        else:
+            assert response.data['count'] == 0
+
+    @pytest.mark.parametrize(
+        'name,address,search_term,should_match',
+        (
+            ('Charterhouse', 'Block C, The Courtyard, 55 Charterhouse Street', 'Hotel', False),
+            ('Charterhouse', 'Overlook Hotel, Courtyard, 55 Charterhouse', 'Hotel', True),
+            ('Charterhouse', 'Overlook Hotel, Courtyard, 55 Charterhouse', 'Hotal', True),
+            ('Charterhouse', 'Overlook Hotel, Courtyard, 55 Charterhouse', 'Hartleyhouse', False),
+            ('Charterhouse', 'Overlook Hotel, Courtyard, 55 London Road', 'Chatterhouse', True),
+        ),
+    )
+    def test_fuzzy_quality_multi_field(
+        self,
+        opensearch_with_collector,
+        search_support_user,
+        name,
+        address,
+        search_term,
+        should_match,
+    ):
+        """
+        Tests quality of results for fuzzy matching multiple fields.
+
+        This should not only hit on exact matches, but also close matches.
+        """
+        SimpleModel.objects.create(name=name, address=address)
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:basic')
+        api_client = self.create_api_client(user=search_support_user)
+
+        response = api_client.get(
+            url,
+            data={
+                'term': search_term,
+                'entity': 'simplemodel',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        if should_match:
+            assert response.data['count'] == 1
+            assert response.data['results'][0]['name'] == name
+            assert response.data['results'][0]['address'] == address
+        else:
+            assert response.data['count'] == 0
+
+    def test_fuzzy_quality_cross_fields(
+        self,
+        opensearch_with_collector,
+        search_support_user,
+    ):
+        """
+        Tests quality of results for fuzzy matching across multiple fields.
+
+        Unfortunately we require "combined_fields" matching (introduced in OpenSearch
+        v 7.13) to do fuzzy matching across multiple fields, but we should still be
+        able to search for exact terms that can be divided across multiple fields.
+        """
+        SimpleModel.objects.create(name='The Risk Advisory Group', country='Canada')
+        SimpleModel.objects.create(name='The Advisory', country='Canada')
+        SimpleModel.objects.create(name='The Advisory Group', country='Canada')
+        SimpleModel.objects.create(name='The Group', country='Canada')
+
+        SimpleModel.objects.create(name='The Risk Advisory Group', country='France')
+        SimpleModel.objects.create(name='The Advisory', country='France')
+        SimpleModel.objects.create(name='The Advisory Group', country='France')
+        SimpleModel.objects.create(name='The Group', country='France')
+
+        opensearch_with_collector.flush_and_refresh()
+
+        term = 'The Advisory Canada'
+
+        url = reverse('api-v3:search:basic')
+        api_client = self.create_api_client(user=search_support_user)
+
+        response = api_client.get(
+            url,
+            data={
+                'term': term,
+                'entity': 'simplemodel',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data['count'] == 3
+
+        # results are in order of relevance
+        assert [
+            ('The Advisory', 'Canada'),
+            ('The Advisory Group', 'Canada'),
+            ('The Risk Advisory Group', 'Canada'),
+        ] == [(result['name'], result['country']) for result in response.data['results']]
+
+    def test_fuzzy_quality_cross_fields_address_below_name(
+        self,
+        opensearch_with_collector,
+        search_support_user,
+    ):
+        """
+        Tests that name is more important than other fields in cross field matches.
+        """
+        SimpleModel.objects.create(name='Smaxtec Limited', address='')
+        SimpleModel.objects.create(name='Newsmax Media (HQ Florida)', address='')
+        SimpleModel.objects.create(name='Smooth Notebooks', address='Smaxet House')
+        SimpleModel.objects.create(name='Other Notebooks', address='Maxet House')
+
+        opensearch_with_collector.flush_and_refresh()
+
+        term = 'Smax'
+
+        url = reverse('api-v3:search:basic')
+        api_client = self.create_api_client(user=search_support_user)
+
+        response = api_client.get(
+            url,
+            data={
+                'term': term,
+                'entity': 'simplemodel',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data['count'] == 3
+
+        # results are in order of relevance
+        assert [
+            'Smaxtec Limited',
+            'Newsmax Media (HQ Florida)',
+            'Smooth Notebooks',
+        ] == [result['name'] for result in response.data['results']]
+
+    def test_partial_match(self, opensearch_with_collector, search_support_user):
         """Tests partial matching."""
         SimpleModel.objects.create(name='Veryuniquename1')
         SimpleModel.objects.create(name='Veryuniquename2')
@@ -209,7 +401,7 @@ class TestBasicSearch(APITestMixin):
         SimpleModel.objects.create(name='Veryuniquename4')
         SimpleModel.objects.create(name='Nonmatchingobject')
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         term = 'Veryuniquenam'
 
@@ -235,14 +427,14 @@ class TestBasicSearch(APITestMixin):
             'Veryuniquename4',
         } == {result['name'] for result in response.data['results']}
 
-    def test_hyphen_match(self, es_with_collector, search_support_user):
+    def test_hyphen_match(self, opensearch_with_collector, search_support_user):
         """Tests hyphen query."""
         SimpleModel.objects.create(name='t-shirt')
         SimpleModel.objects.create(name='tshirt')
         SimpleModel.objects.create(name='electronic shirt')
         SimpleModel.objects.create(name='t and e and a')
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         term = 't-shirt'
 
@@ -266,14 +458,14 @@ class TestBasicSearch(APITestMixin):
             'tshirt',
         ] == [result['name'] for result in response.data['results']]
 
-    def test_search_by_id(self, es_with_collector, search_support_user):
+    def test_search_by_id(self, opensearch_with_collector, search_support_user):
         """Tests exact id matching."""
         SimpleModel.objects.create(id=1000)
         SimpleModel.objects.create(id=1002)
         SimpleModel.objects.create(id=1004)
         SimpleModel.objects.create(id=4560)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         term = '4560'
 
@@ -292,7 +484,7 @@ class TestBasicSearch(APITestMixin):
         assert response.data['count'] == 1
         assert 4560 == response.data['results'][0]['id']
 
-    def test_400_with_invalid_sortby(self, es, search_support_user):
+    def test_400_with_invalid_sortby(self, opensearch, search_support_user):
         """Tests attempt to sort by non existent field."""
         url = reverse('api-v3:search:basic')
         api_client = self.create_api_client(user=search_support_user)
@@ -308,7 +500,7 @@ class TestBasicSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_aggregations(self, es_with_collector, search_support_user):
+    def test_aggregations(self, opensearch_with_collector, search_support_user):
         """Tests basic aggregate query."""
         simple_obj = SimpleModel.objects.create(name='very_unique_name')
         RelatedModel.objects.create(simpleton=simple_obj)
@@ -316,7 +508,7 @@ class TestBasicSearch(APITestMixin):
         unrelated_obj = SimpleModel.objects.create(name='unmatched_object')
         RelatedModel.objects.create(simpleton=unrelated_obj)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         term = 'very_unique_name'
 
@@ -364,7 +556,7 @@ class TestBasicSearch(APITestMixin):
             'order',
         ),
     )
-    def test_permissions(self, es_with_collector, permission, permission_entity, entity):
+    def test_permissions(self, opensearch_with_collector, permission, permission_entity, entity):
         """
         Tests model permissions enforcement in basic search.
 
@@ -381,7 +573,7 @@ class TestBasicSearch(APITestMixin):
         CompanyInteractionFactory()
         OrderFactory()
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         response = api_client.get(
@@ -399,14 +591,14 @@ class TestBasicSearch(APITestMixin):
         assert len(response_data['aggregations']) == 1
         assert response_data['aggregations'][0]['entity'] == permission_entity
 
-    def test_basic_search_no_permissions(self, es_with_collector):
+    def test_basic_search_no_permissions(self, opensearch_with_collector):
         """Tests model permissions enforcement in basic search for a user with no permissions."""
         user = create_test_user(permission_codenames=[], dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
 
         SimpleModel.objects.create(name='test')
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:basic')
         response = api_client.get(
@@ -427,12 +619,14 @@ class TestBasicSearch(APITestMixin):
 class TestEntitySearch(APITestMixin):
     """Tests for `SearchAPIView`."""
 
-    def test_search_sort_asc_with_null_values(self, es_with_collector, search_support_user):
+    def test_search_sort_asc_with_null_values(
+        self, opensearch_with_collector, search_support_user,
+    ):
         """Tests placement of null values in sorted results when order is ascending."""
         SimpleModel.objects.create(name='Earth 1', date=datetime.date(2010, 1, 1))
         SimpleModel.objects.create(name='Earth 2', date=None)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         api_client = self.create_api_client(user=search_support_user)
         url = reverse('api-v3:search:simplemodel')
@@ -456,12 +650,14 @@ class TestEntitySearch(APITestMixin):
             for obj in response_data['results']
         ]
 
-    def test_search_sort_desc_with_null_values(self, es_with_collector, search_support_user):
+    def test_search_sort_desc_with_null_values(
+        self, opensearch_with_collector, search_support_user,
+    ):
         """Tests placement of null values in sorted results when order is descending."""
         SimpleModel.objects.create(name='Ether 1', date=datetime.date(2010, 1, 1))
         SimpleModel.objects.create(name='Ether 2', date=None)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         api_client = self.create_api_client(user=search_support_user)
         url = reverse('api-v3:search:simplemodel')
@@ -489,7 +685,7 @@ class TestEntitySearch(APITestMixin):
 class TestSearchExportAPIView(APITestMixin):
     """Tests for SearchExportAPIView."""
 
-    def test_creates_user_event_log_entries(self, es_with_collector):
+    def test_creates_user_event_log_entries(self, opensearch_with_collector):
         """Tests that when an export is performed, a user event is recorded."""
         user = create_test_user(permission_codenames=['view_simplemodel'])
         api_client = self.create_api_client(user=user)
@@ -500,7 +696,7 @@ class TestSearchExportAPIView(APITestMixin):
         simple_obj.save()
         sync_object(SimpleModelSearchApp, simple_obj.pk)
 
-        es_with_collector.flush_and_refresh()
+        opensearch_with_collector.flush_and_refresh()
 
         frozen_time = datetime.datetime(2018, 1, 2, 12, 30, 50, tzinfo=utc)
         with freeze_time(frozen_time):

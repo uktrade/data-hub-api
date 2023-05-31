@@ -2,16 +2,16 @@ import pytest
 
 from datahub.company.models import Contact
 from datahub.company.test.factories import ContactFactory
-from datahub.search.contact.models import Contact as ESContact
+from datahub.search.contact.models import Contact as SearchContact
 
 pytestmark = pytest.mark.django_db
 
 
-def test_contact_dbmodel_to_dict(es):
+def test_contact_dbmodel_to_dict(opensearch):
     """Tests conversion of db model to dict."""
     contact = ContactFactory()
 
-    result = ESContact.db_object_to_dict(contact)
+    result = SearchContact.db_object_to_dict(contact)
 
     keys = {
         '_document_type',
@@ -28,11 +28,11 @@ def test_contact_dbmodel_to_dict(es):
         'first_name',
         'last_name',
         'name',
+        'name_with_title',
         'job_title',
         'adviser',
         'primary',
-        'telephone_countrycode',
-        'telephone_number',
+        'full_telephone_number',
         'email',
         'address_same_as_company',
         'address_1',
@@ -42,8 +42,6 @@ def test_contact_dbmodel_to_dict(es):
         'address_county',
         'address_country',
         'address_postcode',
-        'telephone_alternative',
-        'email_alternative',
         'notes',
         'company_sector',
         'company_uk_region',
@@ -52,18 +50,18 @@ def test_contact_dbmodel_to_dict(es):
     assert set(result.keys()) == keys
 
 
-def test_contact_dbmodels_to_es_documents(es):
-    """Tests conversion of db models to Elasticsearch documents."""
+def test_contact_dbmodels_to_documents(opensearch):
+    """Tests conversion of db models to OpenSearch documents."""
     contacts = ContactFactory.create_batch(2)
 
-    result = ESContact.db_objects_to_es_documents(contacts)
+    result = SearchContact.db_objects_to_documents(contacts)
 
     assert len(list(result)) == len(contacts)
 
 
-def test_contact_dbmodels_to_es_documents_without_country(es):
+def test_contact_dbmodels_to_document_without_country(opensearch):
     """
-    Tests conversion of db models to Elasticsearch documents when
+    Tests conversion of db models to OpenSearch documents when
     country is None.
     """
     # We want to bypass any validation
@@ -71,6 +69,6 @@ def test_contact_dbmodels_to_es_documents_without_country(es):
         address_same_as_company=False,
         address_country=None,
     )
-    result = ESContact.es_document(contact)
+    result = SearchContact.to_document(contact)
 
     assert '_source' in result

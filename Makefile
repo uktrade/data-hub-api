@@ -1,12 +1,21 @@
 start-dev:
-	[ -z "$(shell docker network ls --filter=name=dh_default -q)" ] && docker network create dh_default || echo 'dh_default network already present'
+	[ -z "$(shell docker network ls --filter=name=data-infrastructure-shared-network -q)" ] && docker network create data-infrastructure-shared-network || echo 'data-infrastructure-shared-network network already present'
 	docker-compose -f docker-compose.yml -f docker-compose.single-network.yml up &
 
 stop-dev:
 	docker-compose -f docker-compose.yml -f docker-compose.single-network.yml down
 
-tests:
+start-rq-mon:
+	docker-compose -f docker-compose.yml -f docker-compose-rq-monitor.yml up &
+
+stop-rq-mon:
+	docker-compose -f docker-compose.yml -f docker-compose-rq-monitor.yml down
+
+build-tests:
 	docker-compose build
+	docker-compose run api bash tests.sh
+
+tests:
 	docker-compose run api bash tests.sh
 
 flake8:
@@ -36,13 +45,19 @@ run-shell:
 	docker-compose run api bash
 
 run-test-reuse-db:
-	docker-compose run api pytest --reuse-db -vv <Add Test File Path>
+	docker-compose run api pytest --reuse-db -vv <File(s)::test(s)>
 
-reindex-es:
-	docker-compose run api python manage.py sync_es
+test:
+	docker-compose run api pytest <File(s)::test(s)>
+
+reindex-opensearch:
+	docker-compose run api python manage.py sync_search
 
 fix-us-areas:
 	docker-compose run api python manage.py fix_us_company_address
+
+test-rq:
+	docker-compose run api python manage.py test_rq --generated_jobs 1000
 
 fix-ca-areas:
 	docker-compose run api python manage.py fix_ca_company_address
@@ -54,3 +69,10 @@ start-frontend-api-dnb:
 stop-frontend-api-dnb:
 	$(MAKE) -C ../dnb-service stop-dnb-for-data-hub-api
 	$(MAKE) -C ../data-hub-frontend stop-dev
+
+migrate-search:
+	docker-compose run api python manage.py migrate_search
+
+purge-queue:
+	echo "purge queue by queue state"
+	docker-compose run api python manage.py purge_queue long-running --queue_state queued

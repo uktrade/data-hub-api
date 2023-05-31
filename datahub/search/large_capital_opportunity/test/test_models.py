@@ -2,20 +2,20 @@ import pytest
 
 from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.search.large_capital_opportunity.models import (
-    LargeCapitalOpportunity as ESLargeCapitalOpportunity,
+    LargeCapitalOpportunity as SearchLargeCapitalOpportunity,
 )
 
 pytestmark = pytest.mark.django_db
 
 
-class TestLargeCapitalOpportunityElasticModel:
-    """Test for the large capital opportunity elasticsearch model"""
+class TestLargeCapitalOpportunitySearchModel:
+    """Test for the large capital opportunity OpenSearch model"""
 
-    def test_large_capital_opportunity_dbmodel_to_dict(self, es):
+    def test_large_capital_opportunity_dbmodel_to_dict(self, opensearch):
         """Tests conversion of db model to dict."""
         opportunity = LargeCapitalOpportunityFactory()
 
-        result = ESLargeCapitalOpportunity.db_object_to_dict(opportunity)
+        result = SearchLargeCapitalOpportunity.db_object_to_dict(opportunity)
         keys = {
             '_document_type',
             'type',
@@ -49,10 +49,10 @@ class TestLargeCapitalOpportunityElasticModel:
         }
         assert set(result.keys()) == keys
 
-    def test_large_capital_opportunity_dbmodels_to_es_documents(self, es):
-        """Tests conversion of db models to Elasticsearch documents."""
+    def test_large_capital_opportunity_dbmodels_to_documents(self, opensearch):
+        """Tests conversion of db models to OpenSearch documents."""
         opportunities = LargeCapitalOpportunityFactory.create_batch(2)
 
-        result = ESLargeCapitalOpportunity.db_objects_to_es_documents(opportunities)
+        result = SearchLargeCapitalOpportunity.db_objects_to_documents(opportunities)
 
         assert len(list(result)) == len(opportunities)
