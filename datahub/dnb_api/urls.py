@@ -36,8 +36,8 @@ urlpatterns = [
         name='company-investigation',
     ),
     path(
-        'company-hierarchy',
+        '<company_id>/family-tree',
         DNBCompanyHierarchyView.as_view(),
-        name='company-hierarchy',
+        name='family-tree',
     ),
 ]
