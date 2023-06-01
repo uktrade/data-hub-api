@@ -17,6 +17,7 @@ from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedError, link_comp
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyChangeRequestSerializer,
+    DNBCompanyHierarchySerializer,
     DNBCompanyInvestigationSerializer,
     DNBCompanyLinkSerializer,
     DNBCompanySerializer,
@@ -365,13 +366,20 @@ class DNBCompanyHierarchyView(APIView):
 
   def get(self, request):
       """
-      Given a duns_number, get the data for the company hierarchy from dnb-service.
+      Given a Company Id, get the data for the company hierarchy from dnb-service.
       """
+      print("dddddddddddd", request)
 
-      duns_number = request.query_params.get('duns_number', None)
+      company_id = "123"
+
+      hierarchy_serializer = DNBCompanyHierarchySerializer(
+            data={'company_id': company_id},
+        )
+      
+      hierarchy_serializer.is_valid(raise_exception=True)
       
       try:
-        response = get_company_hierarchy_data(duns_number, request)
+        response = get_company_hierarchy_data(**hierarchy_serializer.validated_data)
 
       except (
           DNBServiceConnectionError,
@@ -381,3 +389,4 @@ class DNBCompanyHierarchyView(APIView):
           raise APIUpstreamException(str(exc))
 
       return Response(response)
+  
