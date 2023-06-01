@@ -13,10 +13,7 @@ from datahub.core import statsd
 from datahub.core.exceptions import APIBadRequestException, APIUpstreamException
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
-from datahub.dnb_api.link_company import (
-    CompanyAlreadyDNBLinkedError,
-    link_company_with_dnb,
-)
+from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedError, link_company_with_dnb
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyChangeRequestSerializer,
@@ -380,24 +377,27 @@ class DNBCompanyHierarchyView(APIView):
         """
         print("rrrrrrrrrrrr", request)
         duns_number = Company.objects.only("duns_number").get(id=company_id).duns_number
-        # duns_number = request.get(company_id='company_id')
         print("cccccccccccc", company_id)
-        print("mmmmmmmmmmmm", duns_number)
+        print("dddddddddddd", duns_number)
 
-        # hierarchy_serializer = DNBCompanyHierarchySerializer(
-        #     data={"company_id": company_id},
-        # )
+        # hierarchy_serializer = DNBCompanyHierarchySerializer(data=duns_number)
+
+        # print("GOT HERE")
 
         # hierarchy_serializer.is_valid(raise_exception=True)
 
-        # try:
-        #     response = get_company_hierarchy_data(**hierarchy_serializer.validated_data)
+        # print("AND HERE")
 
-        # except (
-        #     DNBServiceConnectionError,
-        #     DNBServiceTimeoutError,
-        #     DNBServiceError,
-        # ) as exc:
-        #     raise APIUpstreamException(str(exc))
+        try:
+            response = get_company_hierarchy_data({"duns_number": duns_number})
+            print("RESPONSE", response)
+            # response ={"duns_number": duns_number}
 
-        return Response({"duns_number": duns_number})
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
+        return Response(response)
