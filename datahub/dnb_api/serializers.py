@@ -462,3 +462,27 @@ class DNBCompanyInvestigationSerializer(serializers.Serializer):
             **address_data,
         }
     
+class DNBCompanyHierarchySerializer(serializers.Serializer):
+    """
+    Validate GET data for DNBCompanyHierarchyView
+    """
+
+    duns_number = serializers.CharField(
+        max_length=9,
+        min_length=9,
+        validators=(integer_validator,),
+    )
+
+    def validate_duns_number(self, duns_number):
+        """
+        Validate duns_number.
+        """
+        try:
+            company = Company.objects.get(duns_number=duns_number)
+        except Company.DoesNotExist:
+            raise serializers.ValidationError(
+                f'Company with duns_number: {duns_number} does not exists in DataHub.',
+            )
+        self.company = company
+        return duns_number
+
