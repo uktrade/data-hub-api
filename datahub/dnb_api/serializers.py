@@ -481,7 +481,7 @@ class DNBCompanyHierarchySerializer(serializers.Serializer):
             company = Company.objects.get(duns_number=duns_number)
         except Company.DoesNotExist:
             raise serializers.ValidationError(
-                f'Company with duns_number: {duns_number} does not exists in DataHub.',
+                f'Company does not have duns number',
             )
         self.company = company
         return duns_number
