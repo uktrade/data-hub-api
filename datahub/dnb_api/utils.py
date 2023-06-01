@@ -524,7 +524,7 @@ def get_company_hierarchy_data(duns_number, request=None):
     Get company hierarchy data
     """
 
-    print("KKKKKKKKK", duns_number)
+    print("get_company_hierarchy_data get_company_hierarchy_data", duns_number)
 
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
@@ -534,7 +534,7 @@ def get_company_hierarchy_data(duns_number, request=None):
     response = api_client.request(
         'POST',
         'companies/hierarchy/search/',
-        json=duns_number,
+        json={"duns_number": "123456789"},
         timeout=3.0,
     )
 
