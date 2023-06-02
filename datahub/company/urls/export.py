@@ -1,6 +1,9 @@
 from django.urls import path
 
-from datahub.company.views import CompanyExportViewSet
+from datahub.company.views import (
+    CompanyExportViewSet,
+    owner_list,
+)
 
 export_v4_collection = CompanyExportViewSet.as_view(
     {
@@ -26,5 +29,10 @@ urls_v4 = [
         'export/<uuid:pk>',
         export_v4_item,
         name='item',
+    ),
+    path(
+        'export/owner',
+        owner_list,
+        name='owner',
     ),
 ]
