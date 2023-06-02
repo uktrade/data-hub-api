@@ -1,5 +1,6 @@
 """Company and related resources view sets."""
 from django.contrib.auth.models import Group, Permission
+from django.db import transaction
 from django.db.models import Exists, Prefetch, Q
 from django.http import (
     Http404,
@@ -13,7 +14,7 @@ from django_filters.rest_framework import (
     MultipleChoiceFilter,
 )
 from rest_framework import mixins, status, viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -693,3 +694,30 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
             )
 
         return super().get_queryset()
+
+
+@transaction.non_atomic_requests
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def owner_list(request):
+    """
+    Returns a list of owners. The list includes users that own an export, if the user
+    is a team member of an export then the owner of that export is also included in
+    the list of owners. An owner should only appear once in the list - no duplicates.
+    """
+    advisers = Advisor.objects.all()
+
+    # All company exports where the user is either an owner or a team member
+    company_exports = CompanyExport.objects.exclude(
+        ~Q(owner=request.user), ~Q(team_members=request.user),
+    )
+
+    # Pullout all owner ids (no duplicates)
+    owner_ids = set()
+    for company_export in company_exports:
+        owner_ids.add(company_export.owner_id)
+
+    advisers = Advisor.objects.filter(id__in=owner_ids)
+    serializer = AdviserSerializer(advisers, many=True)
+
+    return Response(serializer.data)
