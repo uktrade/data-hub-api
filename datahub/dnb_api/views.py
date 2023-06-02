@@ -375,23 +375,13 @@ class DNBCompanyHierarchyView(APIView):
         """
         Given a Company Id, get the data for the company hierarchy from dnb-service.
         """
-        print("rrrrrrrrrrrr", request)
         duns_number = Company.objects.only("duns_number").get(id=company_id).duns_number
-        print("cccccccccccc", company_id)
-        print("dddddddddddd", duns_number)
 
         hierarchy_serializer = DNBCompanyHierarchySerializer(data={"duns_number": duns_number})
-
-        print("hierarchy_serializer_hierarchy_serializer_hierarchy_serializer", hierarchy_serializer)
-        print(' Valid or no Valid or no Valid or no Valid or no Valid or no Valid or no', hierarchy_serializer.is_valid())
         hierarchy_serializer.is_valid(raise_exception=True)
-
-        # print("AND HERE")
 
         try:
             response = get_company_hierarchy_data(**hierarchy_serializer.validated_data)
-            print("RESPONSE RESPONSE RESPONSE RESPONSE", response)
-            # response ={"duns_number": duns_number}
 
         except (
             DNBServiceConnectionError,
