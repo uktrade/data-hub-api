@@ -803,3 +803,41 @@ class TestExportSortBy(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == 3
         assert [result['title'] for result in response_data['results']] == results
+
+
+class TestExportOwnerList(APITestMixin):
+    """Test a list of export owners"""
+
+    def test_a_list_of_owners(self):
+        other_owner = AdviserFactory()
+        other_team_member = AdviserFactory()
+
+        ExportFactory(
+            owner=self.user,
+            team_members=[other_team_member],
+        )
+
+        ExportFactory(
+            owner=other_owner,
+            team_members=[self.user],
+        )
+
+        ExportFactory(
+            owner=other_owner,
+            team_members=[other_team_member],
+        )
+
+        ExportFactory(
+            owner=self.user,
+            team_members=[],
+        )
+
+        url = reverse('api-v4:export:owner')
+
+        response = self.api_client.get(url)
+        response_data = response.json()
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response_data) == 2
+        assert response_data[0]['id'] == str(other_owner.id)
+        assert response_data[1]['id'] == str(self.user.id)
