@@ -1,7 +1,6 @@
 version: "2"
 
 services:
-
   api:
     build:
       context: .
@@ -87,3 +86,13 @@ services:
       RQ_REDIS_HOST: "redis"
     depends_on:
       - redis
+
+  mock-sso:
+    image: gcr.io/sre-docker-registry/github.com/uktrade/mock-sso:latest
+    ports:
+      - 8080:8080
+    environment:
+      MOCK_SSO_SCOPE: data-hub:internal-front-end
+      MOCK_SSO_TOKEN: 123
+      MOCK_SSO_EMAIL_USER_ID: test@gov.uk
+      MOCK_SSO_USERNAME: test@gov.uk
