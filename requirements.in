@@ -56,7 +56,7 @@ requests_toolbelt==1.0.0
 sentry_sdk==1.24.0
 
 # RQ and associated helpers
-rq==1.14.1
+rq==1.15.0
 rq-scheduler==0.13.1
 
 python-redis-rate-limit==0.0.8
