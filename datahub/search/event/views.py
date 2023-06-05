@@ -25,6 +25,7 @@ class SearchEventAPIViewMixin:
         'start_date_before',
         'teams',
         'uk_region',
+        'related_programmes'
     )
 
     REMAP_FIELDS = {
@@ -34,6 +35,7 @@ class SearchEventAPIViewMixin:
         'organiser': 'organiser.id',
         'teams': 'teams.id',
         'uk_region': 'uk_region.id',
+        'related_programmes': 'related_programmes.id'
     }
 
     COMPOSITE_FILTERS = {
