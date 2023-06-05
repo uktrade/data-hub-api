@@ -16,9 +16,9 @@ async-timeout==4.0.2
     #   redis
 attrs==22.2.0
     # via aiohttp
-boto3==1.26.142
+boto3==1.26.146
     # via -r requirements.in
-botocore==1.29.142
+botocore==1.29.146
     # via
     #   boto3
     #   s3transfer
