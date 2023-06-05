@@ -60,3 +60,7 @@ rq==1.14.1
 rq-scheduler==0.13.1
 
 python-redis-rate-limit==0.0.8
+
+#Tree related
+bigtree
+pandas

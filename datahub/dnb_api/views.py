@@ -38,6 +38,29 @@ from datahub.dnb_api.utils import (
     request_changes,
     search_dnb,
 )
+from datahub.search.execute_query import execute_search_query
+from opensearch_dsl import Search
+from opensearch_dsl.query import (
+    Bool,
+    Exists,
+    Match,
+    MatchAll,
+    MultiMatch,
+    Query,
+    Range,
+    Term,
+)
+from bigtree import (
+    nested_dict_to_tree,
+    dict_to_tree,
+    print_tree,
+    dataframe_to_tree,
+    dataframe_to_tree_by_relation,
+    tree_to_dict,
+    tree_to_nested_dict,
+    tree_to_dataframe,
+)
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -145,9 +168,7 @@ class DNBCompanySearchView(APIView):
         """
         duns_numbers = [result["duns_number"] for result in dnb_results]
         datahub_companies_by_duns = self._get_datahub_companies_by_duns(duns_numbers)
-        hydrated_results = self._get_hydrated_results(
-            dnb_results, datahub_companies_by_duns
-        )
+        hydrated_results = self._get_hydrated_results(dnb_results, datahub_companies_by_duns)
         return hydrated_results
 
 
@@ -380,14 +401,81 @@ class DNBCompanyHierarchyView(APIView):
         hierarchy_serializer = DNBCompanyHierarchySerializer(data={"duns_number": duns_number})
         hierarchy_serializer.is_valid(raise_exception=True)
 
-        try:
-            response = get_company_hierarchy_data(**hierarchy_serializer.validated_data)
+        dnb_ids = dnb.get("duns")
+        Company.objects.filter(duns_number__in=["1", "2"])
 
-        except (
-            DNBServiceConnectionError,
-            DNBServiceTimeoutError,
-            DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
+        dnb = [
+            {
+                "name": "a",
+                "duns": "1",
+                "hierarchy": 1,
+            },
+            {
+                "name": "b",
+                "duns": "2",
+                "hierarchy": 2,
+                "corporateLinkage": {"parent": {"duns": "1"}},
+            },
+            {
+                "name": "c",
+                "duns": "3",
+                "corporateLinkage": {"parent": {"duns": "1"}},
+            },
+            {
+                "name": "d",
+                "duns": "4",
+                "corporateLinkage": {"parent": {"duns": "2"}},
+            },
+            {
+                "name": "e",
+                "duns": "5",
+                "corporateLinkage": {"parent": {"duns": "4"}},
+            },
+            {
+                "name": "f",
+                "duns": "6",
+                "corporateLinkage": {"parent": {"duns": "3"}},
+            },
+        ]
 
-        return Response(response)
+        # relation_data = pd.DataFrame.from_records(dnb)
+        # print(relation_data)
+        # root = dataframe_to_tree_by_relation(relation_data, child_col="duns", parent_col="parent")
+        # print_tree(root)
+
+        # df1 = pd.json_normalize(
+        #     dnb, 'locations', ['date', 'number', 'name'], record_prefix='locations_'
+        # )
+        normalized_df = pd.json_normalize(dnb)
+
+        print(normalized_df)
+        root = dataframe_to_tree_by_relation(
+            normalized_df, child_col="duns", parent_col="corporateLinkage.parent.duns"
+        )
+        print(tree_to_nested_dict(root, child_key="subsidiaries", all_attrs=True))
+        print_tree(root)
+        # print_tree()
+
+        # path_dict = {
+        #     "name": "a",
+        #     "children": [{"name": "b"}],
+        # }
+        # path_dict = {
+        #     "a": {"age": 90},
+        #     "a/b": {"age": 65},
+        #     "a/c": {"age": 60},
+        #     "a/b/d": {"age": 40},
+        #     "a/b/e": {"age": 35},
+        # }
+        # root = nested_dict_to_tree(dnb)
+        # print_tree(root)
+
+        return Response({})
+
+    def _append_datahub_ids(self, dnb_response):
+        query = {}
+        search = Search().query(query)
+        print(search)
+        results = execute_search_query(query)
+        print(results)
+        return []
