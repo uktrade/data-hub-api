@@ -422,25 +422,25 @@ class DNBCompanyHierarchyView(APIView):
             duns_number__in=family_tree_members_duns
         ).values("id", "duns_number", "number_of_employees", "name")
 
+        print(family_tree_members_database_details)
+
         for family_member in family_tree_members:
             duns_number_to_find = family_member["duns"]
             for member_database_details in family_tree_members_database_details:
-                family_member["id"] = None
-                family_member["company_name"] = family_member["primaryName"]
+                family_member["id"] = ''
                 if duns_number_to_find == member_database_details["duns_number"]:
-                    family_member["company_name"] = member_database_details["name"]
-                    family_member["id"] = member_database_details["id"]
+                    family_member["primaryName"] = member_database_details["name"]
+                    family_member["companyId"] = member_database_details["id"]
+
         print(family_tree_members)
+
         normalized_df = pd.json_normalize(family_tree_members)
 
-        print("********* normalized_df **********")
         pd.set_option('display.max_columns', None)
-        print(normalized_df)
+
         root = dataframe_to_tree_by_relation(
             normalized_df, child_col="duns", parent_col="corporateLinkage.parent.duns"
         )
-
-        print_tree(root)
 
         return Response(
             {
@@ -449,8 +449,8 @@ class DNBCompanyHierarchyView(APIView):
                     name_key="duns_number",
                     child_key="subsidiaries",
                     attr_dict={
-                        "company_name": "name",
-                        "id": "id",
+                        "primaryName": "name",
+                        "companyId": "id",
                         "corporateLinkage.hierarchyLevel": "hierarchy",
                     },
                 ),
