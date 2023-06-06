@@ -20,7 +20,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.6
 psycogreen==1.0.2
 
-boto3==1.26.142
+boto3==1.26.146
 
 notifications-python-client==8.0.1
 
@@ -29,7 +29,7 @@ statsd==4.0.1
 
 # Email
 mail-parser==3.15.0
-icalendar==5.0.6
+icalendar==5.0.7
 
 # Slack
 slackclient==2.9.4
@@ -53,10 +53,10 @@ gevent==22.10.2
 mohawk==1.1.0
 requests==2.31.0
 requests_toolbelt==1.0.0
-sentry_sdk==1.24.0
+sentry_sdk==1.25.0
 
 # RQ and associated helpers
-rq==1.14.1
+rq==1.15.0
 rq-scheduler==0.13.1
 
 python-redis-rate-limit==0.0.8
