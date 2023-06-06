@@ -171,9 +171,7 @@ class DNBCompanySearchView(APIView):
         """
         duns_numbers = [result["duns_number"] for result in dnb_results]
         datahub_companies_by_duns = self._get_datahub_companies_by_duns(duns_numbers)
-        hydrated_results = self._get_hydrated_results(
-            dnb_results, datahub_companies_by_duns
-        )
+        hydrated_results = self._get_hydrated_results(dnb_results, datahub_companies_by_duns)
         return hydrated_results
 
 
@@ -403,9 +401,7 @@ class DNBCompanyHierarchyView(APIView):
         """
         duns_number = Company.objects.only("duns_number").get(id=company_id).duns_number
 
-        hierarchy_serializer = DNBCompanyHierarchySerializer(
-            data={"duns_number": duns_number}
-        )
+        hierarchy_serializer = DNBCompanyHierarchySerializer(data={"duns_number": duns_number})
         hierarchy_serializer.is_valid(raise_exception=True)
 
         try:
@@ -420,70 +416,50 @@ class DNBCompanyHierarchyView(APIView):
 
         family_tree_members = response["family_tree_members"]
 
-        family_tree_members_cleansed = []
-
-        family_tree_members_duns = list(
-            (object["duns"] for object in family_tree_members)
-        )
+        family_tree_members_duns = list((object["duns"] for object in family_tree_members))
 
         family_tree_members_database_details = Company.objects.filter(
             duns_number__in=family_tree_members_duns
-        )
-
-        family_tree_required_database_details = (
-            family_tree_members_database_details.values(
-                "id", "duns_number", "number_of_employees"
-            )
-        )
+        ).values("id", "duns_number", "number_of_employees", "name")
 
         for family_member in family_tree_members:
             duns_number_to_find = family_member["duns"]
-            for member_database_details in family_tree_required_database_details:
+            for member_database_details in family_tree_members_database_details:
+                family_member["id"] = None
+                family_member["company_name"] = family_member["primaryName"]
                 if duns_number_to_find == member_database_details["duns_number"]:
-                    if "parent" in family_member["corporateLinkage"]:
-                        print(
-                            "**************** parent ****************",
-                            family_member["corporateLinkage"]["hierarchyLevel"],
-                        )
-                        family_tree_members_cleansed.append(
-                            {
-                                "duns_number": family_member["duns"],
-                                "name": family_member["primaryName"],
-                                "corporateLinkage": {
-                                    "parent": family_member["corporateLinkage"][
-                                        "parent"
-                                    ]
-                                },
-                                "hierarchy": family_member["corporateLinkage"]["hierarchyLevel"],
-                                "id": member_database_details["id"],
-                            }
-                        )
-                    else:
-                        family_tree_members_cleansed.insert(
-                            0,
-                            {
-                                "duns_number": family_member["duns"],
-                                "name": family_member["primaryName"],
-                                "hierarchy": family_member["corporateLinkage"]["hierarchyLevel"],
-                                "id": member_database_details["id"],
-                            },
-                        )
-
-        print(
-            "**************** family_tree_members_cleansed ****************",
-            family_tree_members_cleansed,
-        )
-
+                    family_member["company_name"] = member_database_details["name"]
+                    family_member["id"] = member_database_details["id"]
+        print(family_tree_members)
         normalized_df = pd.json_normalize(family_tree_members)
 
-        print("********* normalized_df **********", normalized_df)
+        print("********* normalized_df **********")
+        pd.set_option('display.max_columns', None)
+        print(normalized_df)
         root = dataframe_to_tree_by_relation(
             normalized_df, child_col="duns", parent_col="corporateLinkage.parent.duns"
         )
-        print(tree_to_nested_dict(root, child_key="subsidiaries", all_attrs=True))
+
         print_tree(root)
 
-        return Response(response)
+        return Response(
+            {
+                "ultimate_global_company": tree_to_nested_dict(
+                    root,
+                    name_key="duns_number",
+                    child_key="subsidiaries",
+                    attr_dict={
+                        "company_name": "name",
+                        "id": "id",
+                        "corporateLinkage.hierarchyLevel": "hierarchy",
+                    },
+                ),
+                "ultimate_global_companies_count": response[
+                    "global_ultimate_family_tree_members_count"
+                ],
+                "manually_verified_subsidiaries": [],
+            }
+        )
 
     def _append_datahub_ids(self, dnb_response):
         query = {}
