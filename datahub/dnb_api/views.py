@@ -422,7 +422,6 @@ class DNBCompanyHierarchyView(APIView):
             duns_number__in=family_tree_members_duns
         ).values("id", "duns_number", "number_of_employees", "name")
 
-        print(family_tree_members_database_details)
 
         for family_member in family_tree_members:
             duns_number_to_find = family_member["duns"]
@@ -431,8 +430,6 @@ class DNBCompanyHierarchyView(APIView):
                 if duns_number_to_find == member_database_details["duns_number"]:
                     family_member["primaryName"] = member_database_details["name"]
                     family_member["companyId"] = member_database_details["id"]
-
-        print(family_tree_members)
 
         normalized_df = pd.json_normalize(family_tree_members)
 
@@ -461,10 +458,3 @@ class DNBCompanyHierarchyView(APIView):
             }
         )
 
-    def _append_datahub_ids(self, dnb_response):
-        query = {}
-        search = Search().query(query)
-        print(search)
-        results = execute_search_query(query)
-        print(results)
-        return []
