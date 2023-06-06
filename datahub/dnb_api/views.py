@@ -410,52 +410,46 @@ class DNBCompanyHierarchyView(APIView):
 
         family_tree_members_cleansed = []
 
-        for object in family_tree_members:
-            if "parent" in object["corporateLinkage"]:
-                family_tree_members_cleansed.append(
-                    {
-                        "duns_number": object["duns"],
-                        "name": object["primaryName"],
-                        "parent": object["corporateLinkage"],
-                    }
-                )
-            else:
-                family_tree_members_cleansed.insert(
-                    0,
-                    {
-                        "duns_number": object["duns"],
-                        "name": object["primaryName"],
-                        "parent": "",
-                    },
-                )
-
-
         family_tree_members_duns = list(
             (object["duns"] for object in family_tree_members)
         )
 
-        family_tree_members_details = Company.objects.filter(
+        family_tree_members_database_details = Company.objects.filter(
             duns_number__in=family_tree_members_duns
         )
 
-        family_tree_members_tree_details = family_tree_members_details.values(
+        family_tree_required_database_details = family_tree_members_database_details.values(
             "id", "duns_number", "number_of_employees"
         )
 
-
-        # loop through family_tree_members to find the duns_number which can be matched with the duns_number
-        # in family_tree_members_tree_details and append required additional details
-
-
-        for family_member in family_tree_members_cleansed:
-            print("**************** member ****************", family_member)
-            duns_number_to_find = family_member["duns_number"]
-            for member_tree_details in family_tree_members_tree_details:
-                print("**************** detail ****************", member_tree_details)
-                if duns_number_to_find == member_tree_details["duns_number"]:
-                    print("**************** member_tree_details[duns_number] ****************", member_tree_details["duns_number"])
+        for family_member in family_tree_members:
+            duns_number_to_find = family_member["duns"]
+            for member_database_details in family_tree_required_database_details:
+                print("**************** detail ****************", member_database_details)
+                if duns_number_to_find == member_database_details["duns_number"]:
+                    if "parent" in family_member["corporateLinkage"]:
+                        family_tree_members_cleansed.append(
+                            {
+                                "duns_number": family_member["duns"],
+                                "name": family_member["primaryName"],
+                                "corporateLinkage": family_member["corporateLinkage"],
+                                "hierarchy": 2,
+                                "id": member_database_details["id"]
+                            }
+                        )
+                    else:
+                        family_tree_members_cleansed.insert(
+                            0,
+                            {
+                                "duns_number": family_member["duns"],
+                                "name": family_member["primaryName"],
+                                "hierarchy": 1,
+                                "id": member_database_details["id"]
+                            },
+                        )
 
         print("**************** family_tree_members_cleansed ****************", family_tree_members_cleansed)
+
         normalized_df = pd.json_normalize(family_tree_members)
 
         print("********* normalized_df **********", normalized_df)
