@@ -1,8 +1,21 @@
 import logging
 
+import pandas as pd
+from bigtree import (
+    dataframe_to_tree,
+    dataframe_to_tree_by_relation,
+    dict_to_tree,
+    nested_dict_to_tree,
+    print_tree,
+    tree_to_dataframe,
+    tree_to_dict,
+    tree_to_nested_dict,
+)
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
+from opensearch_dsl import Search
+from opensearch_dsl.query import Bool, Exists, Match, MatchAll, MultiMatch, Query, Range, Term
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -39,28 +52,6 @@ from datahub.dnb_api.utils import (
     search_dnb,
 )
 from datahub.search.execute_query import execute_search_query
-from opensearch_dsl import Search
-from opensearch_dsl.query import (
-    Bool,
-    Exists,
-    Match,
-    MatchAll,
-    MultiMatch,
-    Query,
-    Range,
-    Term,
-)
-from bigtree import (
-    nested_dict_to_tree,
-    dict_to_tree,
-    print_tree,
-    dataframe_to_tree,
-    dataframe_to_tree_by_relation,
-    tree_to_dict,
-    tree_to_nested_dict,
-    tree_to_dataframe,
-)
-import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -168,7 +159,9 @@ class DNBCompanySearchView(APIView):
         """
         duns_numbers = [result["duns_number"] for result in dnb_results]
         datahub_companies_by_duns = self._get_datahub_companies_by_duns(duns_numbers)
-        hydrated_results = self._get_hydrated_results(dnb_results, datahub_companies_by_duns)
+        hydrated_results = self._get_hydrated_results(
+            dnb_results, datahub_companies_by_duns
+        )
         return hydrated_results
 
 
@@ -398,79 +391,81 @@ class DNBCompanyHierarchyView(APIView):
         """
         duns_number = Company.objects.only("duns_number").get(id=company_id).duns_number
 
-        hierarchy_serializer = DNBCompanyHierarchySerializer(data={"duns_number": duns_number})
+        hierarchy_serializer = DNBCompanyHierarchySerializer(
+            data={"duns_number": duns_number}
+        )
         hierarchy_serializer.is_valid(raise_exception=True)
 
-        dnb_ids = dnb.get("duns")
-        Company.objects.filter(duns_number__in=["1", "2"])
+        try:
+            response = get_company_hierarchy_data(**hierarchy_serializer.validated_data)
 
-        dnb = [
-            {
-                "name": "a",
-                "duns": "1",
-                "hierarchy": 1,
-            },
-            {
-                "name": "b",
-                "duns": "2",
-                "hierarchy": 2,
-                "corporateLinkage": {"parent": {"duns": "1"}},
-            },
-            {
-                "name": "c",
-                "duns": "3",
-                "corporateLinkage": {"parent": {"duns": "1"}},
-            },
-            {
-                "name": "d",
-                "duns": "4",
-                "corporateLinkage": {"parent": {"duns": "2"}},
-            },
-            {
-                "name": "e",
-                "duns": "5",
-                "corporateLinkage": {"parent": {"duns": "4"}},
-            },
-            {
-                "name": "f",
-                "duns": "6",
-                "corporateLinkage": {"parent": {"duns": "3"}},
-            },
-        ]
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
 
-        # relation_data = pd.DataFrame.from_records(dnb)
-        # print(relation_data)
-        # root = dataframe_to_tree_by_relation(relation_data, child_col="duns", parent_col="parent")
-        # print_tree(root)
+        family_tree_members = response["family_tree_members"]
 
-        # df1 = pd.json_normalize(
-        #     dnb, 'locations', ['date', 'number', 'name'], record_prefix='locations_'
-        # )
-        normalized_df = pd.json_normalize(dnb)
+        family_tree_members_cleansed = []
 
-        print(normalized_df)
+        for object in family_tree_members:
+            if "parent" in object["corporateLinkage"]:
+                family_tree_members_cleansed.append(
+                    {
+                        "duns_number": object["duns"],
+                        "name": object["primaryName"],
+                        "parent": object["corporateLinkage"],
+                    }
+                )
+            else:
+                family_tree_members_cleansed.insert(
+                    0,
+                    {
+                        "duns_number": object["duns"],
+                        "name": object["primaryName"],
+                        "parent": "",
+                    },
+                )
+
+
+        family_tree_members_duns = list(
+            (object["duns"] for object in family_tree_members)
+        )
+
+        family_tree_members_details = Company.objects.filter(
+            duns_number__in=family_tree_members_duns
+        )
+
+        family_tree_members_tree_details = family_tree_members_details.values(
+            "id", "duns_number", "number_of_employees"
+        )
+
+
+        # loop through family_tree_members to find the duns_number which can be matched with the duns_number
+        # in family_tree_members_tree_details and append required additional details
+
+
+        for family_member in family_tree_members_cleansed:
+            print("**************** member ****************", family_member)
+            duns_number_to_find = family_member["duns_number"]
+            for member_tree_details in family_tree_members_tree_details:
+                print("**************** detail ****************", member_tree_details)
+                if duns_number_to_find == member_tree_details["duns_number"]:
+                    print("**************** member_tree_details[duns_number] ****************", member_tree_details["duns_number"])
+
+        print("**************** family_tree_members_cleansed ****************", family_tree_members_cleansed)
+        normalized_df = pd.json_normalize(family_tree_members)
+
+        print("********* normalized_df **********", normalized_df)
         root = dataframe_to_tree_by_relation(
             normalized_df, child_col="duns", parent_col="corporateLinkage.parent.duns"
         )
         print(tree_to_nested_dict(root, child_key="subsidiaries", all_attrs=True))
         print_tree(root)
-        # print_tree()
 
-        # path_dict = {
-        #     "name": "a",
-        #     "children": [{"name": "b"}],
-        # }
-        # path_dict = {
-        #     "a": {"age": 90},
-        #     "a/b": {"age": 65},
-        #     "a/c": {"age": 60},
-        #     "a/b/d": {"age": 40},
-        #     "a/b/e": {"age": 35},
-        # }
-        # root = nested_dict_to_tree(dnb)
-        # print_tree(root)
-
-        return Response({})
+        return Response(response)
 
     def _append_datahub_ids(self, dnb_response):
         query = {}
