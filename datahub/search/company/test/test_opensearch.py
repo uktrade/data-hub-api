@@ -394,6 +394,16 @@ def test_mapping(opensearch):
             },
             'website': {'type': 'text'},
             'latest_interaction_date': {'type': 'date'},
+            'one_list_tier': {
+                'properties': {
+                    'id': {'type': 'keyword'},
+                    'name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                },
+                'type': 'object',
+            },
         },
     }
 
@@ -529,7 +539,7 @@ def test_get_basic_search_query():
 @pytest.mark.django_db
 def test_limited_get_search_by_entity_query():
     """Tests search by entity."""
-    expected_query = {
+    expected_limited_get_search_by_entity_query = {
         'query': {
             'bool': {
                 'must': [
@@ -543,7 +553,8 @@ def test_limited_get_search_by_entity_query():
                                             'boost': 2,
                                         },
                                     },
-                                }, {
+                                },
+                                {
                                     'multi_match': {
                                         'query': 'test',
                                         'fields': (
@@ -598,8 +609,7 @@ def test_limited_get_search_by_entity_query():
                                             {
                                                 'match': {
                                                     'address.country.id': {
-                                                        'query':
-                                                            '80756b9a-5d95-e211-a939-e4115bead28a',
+                                                        'query': '80756b9a-5d95-e211-a939-e4115bead28a',  # noqa: E501
                                                         'operator': 'and',
                                                     },
                                                 },
@@ -607,7 +617,8 @@ def test_limited_get_search_by_entity_query():
                                         ],
                                         'minimum_should_match': 1,
                                     },
-                                }, {
+                                },
+                                {
                                     'range': {
                                         'archived': {
                                             'lte': '2017-06-13T09:44:31.062870',
@@ -648,7 +659,7 @@ def test_limited_get_search_by_entity_query():
         limit=5,
     )
 
-    assert query.to_dict() == expected_query
+    assert query.to_dict() == expected_limited_get_search_by_entity_query
 
 
 @pytest.mark.django_db
@@ -703,4 +714,5 @@ def test_indexed_doc(opensearch):
         'latest_interaction_date',
         'export_sub_segment',
         'export_segment',
+        'one_list_tier',
     }
