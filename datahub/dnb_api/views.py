@@ -15,7 +15,16 @@ from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
 from opensearch_dsl import Search
-from opensearch_dsl.query import Bool, Exists, Match, MatchAll, MultiMatch, Query, Range, Term
+from opensearch_dsl.query import (
+    Bool,
+    Exists,
+    Match,
+    MatchAll,
+    MultiMatch,
+    Query,
+    Range,
+    Term,
+)
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -26,7 +35,10 @@ from datahub.core import statsd
 from datahub.core.exceptions import APIBadRequestException, APIUpstreamException
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
-from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedError, link_company_with_dnb
+from datahub.dnb_api.link_company import (
+    CompanyAlreadyDNBLinkedError,
+    link_company_with_dnb,
+)
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyChangeRequestSerializer,
@@ -418,23 +430,32 @@ class DNBCompanyHierarchyView(APIView):
             duns_number__in=family_tree_members_duns
         )
 
-        family_tree_required_database_details = family_tree_members_database_details.values(
-            "id", "duns_number", "number_of_employees"
+        family_tree_required_database_details = (
+            family_tree_members_database_details.values(
+                "id", "duns_number", "number_of_employees"
+            )
         )
 
         for family_member in family_tree_members:
             duns_number_to_find = family_member["duns"]
             for member_database_details in family_tree_required_database_details:
-                print("**************** detail ****************", member_database_details)
                 if duns_number_to_find == member_database_details["duns_number"]:
                     if "parent" in family_member["corporateLinkage"]:
+                        print(
+                            "**************** parent ****************",
+                            family_member["corporateLinkage"]["hierarchyLevel"],
+                        )
                         family_tree_members_cleansed.append(
                             {
                                 "duns_number": family_member["duns"],
                                 "name": family_member["primaryName"],
-                                "corporateLinkage": family_member["corporateLinkage"],
-                                "hierarchy": 2,
-                                "id": member_database_details["id"]
+                                "corporateLinkage": {
+                                    "parent": family_member["corporateLinkage"][
+                                        "parent"
+                                    ]
+                                },
+                                "hierarchy": family_member["corporateLinkage"]["hierarchyLevel"],
+                                "id": member_database_details["id"],
                             }
                         )
                     else:
@@ -443,12 +464,15 @@ class DNBCompanyHierarchyView(APIView):
                             {
                                 "duns_number": family_member["duns"],
                                 "name": family_member["primaryName"],
-                                "hierarchy": 1,
-                                "id": member_database_details["id"]
+                                "hierarchy": family_member["corporateLinkage"]["hierarchyLevel"],
+                                "id": member_database_details["id"],
                             },
                         )
 
-        print("**************** family_tree_members_cleansed ****************", family_tree_members_cleansed)
+        print(
+            "**************** family_tree_members_cleansed ****************",
+            family_tree_members_cleansed,
+        )
 
         normalized_df = pd.json_normalize(family_tree_members)
 
