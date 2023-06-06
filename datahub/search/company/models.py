@@ -62,6 +62,7 @@ class Company(BaseSearchModel):
     latest_interaction_date = Date()
     export_segment = Text()
     export_sub_segment = Text()
+    one_list_tier = fields.id_name_field()
 
     COMPUTED_MAPPINGS = {
         'address': partial(dict_utils.address_dict, prefix='address'),
@@ -71,17 +72,20 @@ class Company(BaseSearchModel):
             dict_utils.contact_or_adviser_dict,
         ),
         'export_to_countries': lambda obj: [
-            dict_utils.id_name_dict(o.country) for o in obj.export_countries.all()
+            dict_utils.id_name_dict(o.country)
+            for o in obj.export_countries.all()
             if o.status == CompanyExportCountry.Status.CURRENTLY_EXPORTING
         ],
         'future_interest_countries': lambda obj: [
-            dict_utils.id_name_dict(o.country) for o in obj.export_countries.all()
+            dict_utils.id_name_dict(o.country)
+            for o in obj.export_countries.all()
             if o.status == CompanyExportCountry.Status.FUTURE_INTEREST
         ],
         'latest_interaction_date': lambda obj: obj.latest_interaction_date,
         'uk_address_postcode': lambda obj: obj.address_postcode if obj.uk_based else '',
-        'uk_registered_address_postcode':
-            lambda obj: obj.registered_address_postcode if obj.uk_based else '',
+        'uk_registered_address_postcode': lambda obj: obj.registered_address_postcode
+        if obj.uk_based
+        else '',
         'export_segment': lambda obj: obj.export_segment,
         'export_sub_segment': lambda obj: obj.export_sub_segment,
     }
@@ -94,10 +98,10 @@ class Company(BaseSearchModel):
         'global_headquarters': dict_utils.id_name_dict,
         'headquarter_type': dict_utils.id_name_dict,
         'sector': dict_utils.sector_dict,
-
         'turnover_range': dict_utils.id_name_dict,
         'uk_based': bool,
         'uk_region': dict_utils.id_name_dict,
+        'one_list_tier': dict_utils.id_name_dict,
     }
 
     SEARCH_FIELDS = (

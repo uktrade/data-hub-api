@@ -13,29 +13,35 @@ class CompanySearchApp(SearchApp):
     search_model = Company
     view_permissions = (f'company.{CompanyPermission.view_company}',)
     export_permission = f'company.{CompanyPermission.export_company}'
-    queryset = DBCompany.objects.select_related(
-        'archived_by',
-        'business_type',
-        'employee_range',
-        'export_experience_category',
-        'headquarter_type',
-        'one_list_account_owner',
-        'global_headquarters__one_list_account_owner',
-        'global_headquarters',
-        'address_country',
-        'registered_address_country',
-        'sector',
-        'sector__parent',
-        'sector__parent__parent',
-        'turnover_range',
-        'uk_region',
-        'address_area',
-        'registered_address_area',
-    ).prefetch_related(
-        'export_countries__country',
-    ).annotate(
-        latest_interaction_date=get_aggregate_subquery(
-            DBCompany,
-            Max('interactions__date'),
-        ),
+    queryset = (
+        DBCompany.objects.select_related(
+            'archived_by',
+            'business_type',
+            'employee_range',
+            'export_experience_category',
+            'headquarter_type',
+            'one_list_account_owner',
+            'global_headquarters__one_list_account_owner',
+            'global_headquarters',
+            'address_country',
+            'registered_address_country',
+            'sector',
+            'sector__parent',
+            'sector__parent__parent',
+            'turnover_range',
+            'uk_region',
+            'address_area',
+            'registered_address_area',
+            'global_headquarters__one_list_tier',
+            'one_list_tier',
+        )
+        .prefetch_related(
+            'export_countries__country',
+        )
+        .annotate(
+            latest_interaction_date=get_aggregate_subquery(
+                DBCompany,
+                Max('interactions__date'),
+            ),
+        )
     )

@@ -57,6 +57,7 @@ class SearchCompanyAPIViewMixin:
         'uk_postcode',
         'export_segment',
         'export_sub_segment',
+        'one_list_tier',
     )
 
     REMAP_FIELDS = {
@@ -65,6 +66,7 @@ class SearchCompanyAPIViewMixin:
         'export_to_countries': 'export_to_countries.id',
         'future_interest_countries': 'future_interest_countries.id',
         'one_list_group_global_account_manager': 'one_list_group_global_account_manager.id',
+        'one_list_tier': 'one_list_tier.id',
     }
 
     COMPOSITE_FILTERS = {
@@ -224,15 +226,17 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
             'address_country__name': 'Country',
         }
 
-        field_titles.update({
-            'address_area__name': 'Area',
-            'uk_region__name': 'UK region',
-            'export_to_countries_list': 'Countries exported to',
-            'future_interest_countries_list': 'Countries of interest',
-            'archived': 'Archived',
-            'created_on': 'Date created',
-            'number_of_employees_value': 'Number of employees',
-            'turnover_value': 'Annual turnover',
-            'upper_headquarter_type_name': 'Headquarter type',
-        })
+        field_titles.update(
+            {
+                'address_area__name': 'Area',
+                'uk_region__name': 'UK region',
+                'export_to_countries_list': 'Countries exported to',
+                'future_interest_countries_list': 'Countries of interest',
+                'archived': 'Archived',
+                'created_on': 'Date created',
+                'number_of_employees_value': 'Number of employees',
+                'turnover_value': 'Annual turnover',
+                'upper_headquarter_type_name': 'Headquarter type',
+            },
+        )
         return field_titles
