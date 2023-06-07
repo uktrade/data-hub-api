@@ -4,9 +4,9 @@ import uuid
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import (
+    integer_validator,
     MaxLengthValidator,
     MinLengthValidator,
-    integer_validator,
 )
 from django.db import models, transaction
 from django.utils.timezone import now
@@ -24,7 +24,7 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
-from datahub.core.utils import StrEnum, get_front_end_url
+from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -33,29 +33,29 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 class CompanyPermission(StrEnum):
     """Permission codename constants."""
 
-    view_company = "view_company"
-    view_company_document = "view_company_document"
-    view_company_timeline = "view_company_timeline"
-    export_company = "export_company"
-    add_company = "add_company"
-    change_company = "change_company"
-    view_export_win = "view_export_win"
+    view_company = 'view_company'
+    view_company_document = 'view_company_document'
+    view_company_timeline = 'view_company_timeline'
+    export_company = 'export_company'
+    add_company = 'add_company'
+    change_company = 'change_company'
+    view_export_win = 'view_export_win'
     # Indicates that the user can assign regional One List account managers to companies
-    change_regional_account_manager = "change_regional_account_manager"
+    change_regional_account_manager = 'change_regional_account_manager'
 
     # Indicates that the user can assign One List tier and global account manager to companies
     change_one_list_tier_and_global_account_manager = (
-        "change_one_list_tier_and_global_account_manager"
+        'change_one_list_tier_and_global_account_manager'
     )
     # Indicates that the user can change core team members associated with the company
-    change_one_list_core_team_member = "change_one_list_core_team_member"
+    change_one_list_core_team_member = 'change_one_list_core_team_member'
 
 
 class ExportExperienceCategory(BaseConstantModel):
     """Export experience category."""
 
     class Meta(BaseConstantModel.Meta):
-        verbose_name_plural = "export experience categories"
+        verbose_name_plural = 'export experience categories'
 
 
 class OneListTier(BaseOrderedConstantModel):
@@ -67,78 +67,78 @@ class Company(ArchivableModel, BaseModel):
     """Representation of the company."""
 
     class TransferReason(models.TextChoices):
-        DUPLICATE = ("duplicate", "Duplicate record")
+        DUPLICATE = ('duplicate', 'Duplicate record')
 
     class ExportPotentialScore(models.TextChoices):
-        VERY_HIGH = ("very_high", "Very High")
-        HIGH = ("high", "High")
-        MEDIUM = ("medium", "Medium")
-        LOW = ("low", "Low")
-        VERY_LOW = ("very_low", "Very Low")
+        VERY_HIGH = ('very_high', 'Very High')
+        HIGH = ('high', 'High')
+        MEDIUM = ('medium', 'Medium')
+        LOW = ('low', 'Low')
+        VERY_LOW = ('very_low', 'Very Low')
 
     class GreatProfileStatus(models.TextChoices):
-        PUBLISHED = ("published", "Published")
-        UNPUBLISHED = ("unpublished", "Unpublished")
+        PUBLISHED = ('published', 'Published')
+        UNPUBLISHED = ('unpublished', 'Unpublished')
 
-        __empty__ = "No profile or not known"
+        __empty__ = 'No profile or not known'
 
     class ExportSegment(models.TextChoices):
-        HEP = ("hep", " High export potential")
-        NON_HEP = ("non-hep", "Not high export potential")
+        HEP = ('hep', ' High export potential')
+        NON_HEP = ('non-hep', 'Not high export potential')
 
-        __empty__ = "No export segment or not known"
+        __empty__ = 'No export segment or not known'
 
     class ExportSubSegment(models.TextChoices):
         SUSTAIN_NURTURE_AND_GROW = (
-            "sustain_nurture_and_grow",
-            "Sustain: nurture & grow",
+            'sustain_nurture_and_grow',
+            'Sustain: nurture & grow',
         )
         SUSTAIN_DEVELOP_EXPORT_CAPABILITY = (
-            "sustain_develop_export_capability",
-            "Sustain: develop export capability",
+            'sustain_develop_export_capability',
+            'Sustain: develop export capability',
         )
         SUSTAIN_COMMUNICATE_BENEFITS = (
-            "sustain_communicate_benefits",
-            "Sustain: communicate benefits",
+            'sustain_communicate_benefits',
+            'Sustain: communicate benefits',
         )
         SUSTAIN_INCREASE_COMPETITIVENESS = (
-            "sustain_increase_competitiveness",
-            "Sustain: increase competitiveness",
+            'sustain_increase_competitiveness',
+            'Sustain: increase competitiveness',
         )
         REASSURE_NURTURE_AND_GROW = (
-            "reassure_nurture_and_grow",
-            "Reassure: nurture & grow",
+            'reassure_nurture_and_grow',
+            'Reassure: nurture & grow',
         )
         REASSURE_DEVELOP_EXPORT_CAPABILITY = (
-            "reassure_develop_export_capability",
-            "Reassure: develop export capability",
+            'reassure_develop_export_capability',
+            'Reassure: develop export capability',
         )
         REASSURE_LEAVE_BE = (
-            "reassure_leave_be",
-            "Reassure: leave be",
+            'reassure_leave_be',
+            'Reassure: leave be',
         )
         REASSURE_CHANGE_THE_GAME = (
-            "reassure_change_the_game",
-            "Reassure: change the game",
+            'reassure_change_the_game',
+            'Reassure: change the game',
         )
         PROMOTE_DEVELOP_EXPORT_CAPABILITY = (
-            "promote_develop_export_capability",
-            "Promote: develop export capability",
+            'promote_develop_export_capability',
+            'Promote: develop export capability',
         )
         PROMOTE_COMMUNICATE_BENEFITS = (
-            "promote_communicate_benefits",
-            "Promote: communicate benefits",
+            'promote_communicate_benefits',
+            'Promote: communicate benefits',
         )
         PROMOTE_CHANGE_THE_GAME = (
-            "promote_change_the_game",
-            "Promote: change the game",
+            'promote_change_the_game',
+            'Promote: change the game',
         )
         CHALLENGE = (
-            "challenge",
-            "Challenge",
+            'challenge',
+            'Challenge',
         )
 
-        __empty__ = "No sub export segment or not known"
+        __empty__ = 'No sub export segment or not known'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=MAX_LENGTH)
@@ -148,7 +148,7 @@ class Company(ArchivableModel, BaseModel):
     duns_number = models.CharField(
         blank=True,
         null=True,
-        help_text="Dun & Bradstreet unique identifier. Nine-digit number with leading zeros.",
+        help_text='Dun & Bradstreet unique identifier. Nine-digit number with leading zeros.',
         max_length=9,
         unique=True,
         validators=[
@@ -180,45 +180,45 @@ class Company(ArchivableModel, BaseModel):
         null=True,
         on_delete=models.SET_NULL,
         help_text=(
-            "Not used when duns_number is set. In that case, use number_of_employees instead."
+            'Not used when duns_number is set. In that case, use number_of_employees instead.'
         ),
     )
     number_of_employees = models.PositiveIntegerField(
         null=True,
         blank=True,
-        help_text="Only used when duns_number is set.",
+        help_text='Only used when duns_number is set.',
     )
     is_number_of_employees_estimated = models.BooleanField(
         null=True,
         blank=True,
-        help_text="Only used when duns_number is set.",
+        help_text='Only used when duns_number is set.',
     )
     turnover_range = models.ForeignKey(
         metadata_models.TurnoverRange,
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        help_text="Not used when duns_number is set. In that case, use turnover instead.",
+        help_text='Not used when duns_number is set. In that case, use turnover instead.',
     )
     turnover = models.BigIntegerField(
         null=True,
         blank=True,
-        help_text="In USD. Only used when duns_number is set.",
+        help_text='In USD. Only used when duns_number is set.',
     )
     is_turnover_estimated = models.BooleanField(
         null=True,
         blank=True,
-        help_text="Only used when duns_number is set.",
+        help_text='Only used when duns_number is set.',
     )
     export_to_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
-        related_name="companies_exporting_to",
+        related_name='companies_exporting_to',
     )
     future_interest_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
-        related_name="companies_with_future_interest",
+        related_name='companies_with_future_interest',
     )
     description = models.TextField(blank=True, null=True)
     website = models.URLField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -237,7 +237,7 @@ class Company(ArchivableModel, BaseModel):
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_area = models.ForeignKey(
         metadata_models.AdministrativeArea,
-        related_name="companies_with_address_area",
+        related_name='companies_with_address_area',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
@@ -247,7 +247,7 @@ class Company(ArchivableModel, BaseModel):
         blank=True,
         null=True,
         on_delete=models.PROTECT,
-        related_name="companies_with_country_address",
+        related_name='companies_with_country_address',
     )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
 
@@ -256,7 +256,7 @@ class Company(ArchivableModel, BaseModel):
     registered_address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
     registered_address_area = models.ForeignKey(
         metadata_models.AdministrativeArea,
-        related_name="companies_with_registered_address_area",
+        related_name='companies_with_registered_address_area',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
@@ -265,7 +265,7 @@ class Company(ArchivableModel, BaseModel):
     registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
     registered_address_country = models.ForeignKey(
         metadata_models.Country,
-        related_name="companies_with_country_registered_address",
+        related_name='companies_with_country_registered_address',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
@@ -285,19 +285,19 @@ class Company(ArchivableModel, BaseModel):
         on_delete=models.PROTECT,
     )
     global_headquarters = models.ForeignKey(
-        "self",
+        'self',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        related_name="subsidiaries",
+        related_name='subsidiaries',
     )
     one_list_account_owner = models.ForeignKey(
-        "Advisor",
+        'Advisor',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        related_name="one_list_owned_companies",
-        help_text="Global account manager",
+        related_name='one_list_owned_companies',
+        help_text='Global account manager',
     )
     export_experience_category = models.ForeignKey(
         ExportExperienceCategory,
@@ -308,21 +308,21 @@ class Company(ArchivableModel, BaseModel):
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH,
         blank=True,
-        help_text="Legacy field. File browser path to the archived documents for this company.",
+        help_text='Legacy field. File browser path to the archived documents for this company.',
     )
     transferred_to = models.ForeignKey(
-        "self",
+        'self',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        related_name="transferred_from",
-        help_text="Where data about this company was transferred to.",
+        related_name='transferred_from',
+        help_text='Where data about this company was transferred to.',
     )
     transfer_reason = models.CharField(
         max_length=MAX_LENGTH,
         blank=True,
         choices=TransferReason.choices,
-        help_text="The reason data for this company was transferred.",
+        help_text='The reason data for this company was transferred.',
     )
     transferred_on = models.DateTimeField(blank=True, null=True)
     transferred_by = models.ForeignKey(
@@ -330,37 +330,37 @@ class Company(ArchivableModel, BaseModel):
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        related_name="+",
+        related_name='+',
     )
     dnb_investigation_id = models.UUIDField(
         null=True,
         blank=True,
         unique=True,
         help_text=(
-            "The ID for a new company investigation with D&B. This ID is provided by dnb-service."
+            'The ID for a new company investigation with D&B. This ID is provided by dnb-service.'
         ),
     )
     pending_dnb_investigation = models.BooleanField(
         default=False,
-        help_text="Whether this company is to be investigated by DNB.",
+        help_text='Whether this company is to be investigated by DNB.',
     )
     export_potential = models.CharField(
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         choices=ExportPotentialScore.choices,
-        help_text="Score that signifies export potential, imported from Data Science",
+        help_text='Score that signifies export potential, imported from Data Science',
     )
     great_profile_status = models.CharField(
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         choices=GreatProfileStatus.choices,
-        help_text="Whether this company has a profile and agreed to be published or not",
+        help_text='Whether this company has a profile and agreed to be published or not',
     )
     global_ultimate_duns_number = models.CharField(
         blank=True,
-        help_text="Dun & Bradstreet unique identifier for global ultimate.",
+        help_text='Dun & Bradstreet unique identifier for global ultimate.',
         max_length=9,
         validators=[
             MinLengthValidator(9),
@@ -372,21 +372,21 @@ class Company(ArchivableModel, BaseModel):
     dnb_modified_on = models.DateTimeField(
         blank=True,
         null=True,
-        help_text="Last updated from D&B",
+        help_text='Last updated from D&B',
         db_index=True,
     )
     export_segment = models.CharField(
         max_length=MAX_LENGTH,
         blank=True,
-        default="",
-        help_text="Segmentation of export",
+        default='',
+        help_text='Segmentation of export',
         choices=ExportSegment.choices,
     )
     export_sub_segment = models.CharField(
         max_length=MAX_LENGTH,
         blank=True,
-        default="",
-        help_text="Sub-Segmentation of export",
+        default='',
+        help_text='Sub-Segmentation of export',
         choices=ExportSubSegment.choices,
     )
 
@@ -399,34 +399,34 @@ class Company(ArchivableModel, BaseModel):
         return get_front_end_url(self)
 
     class Meta:
-        verbose_name_plural = "companies"
+        verbose_name_plural = 'companies'
         permissions = (
             (
                 CompanyPermission.view_company_document.value,
-                "Can view company document",
+                'Can view company document',
             ),
             (
                 CompanyPermission.view_company_timeline.value,
-                "Can view company timeline",
+                'Can view company timeline',
             ),
-            (CompanyPermission.export_company.value, "Can export company"),
+            (CompanyPermission.export_company.value, 'Can export company'),
             (
                 CompanyPermission.change_regional_account_manager.value,
-                "Can change regional account manager",
+                'Can change regional account manager',
             ),
             (
                 CompanyPermission.change_one_list_tier_and_global_account_manager.value,
-                "Can change one list tier and global account manager",
+                'Can change one list tier and global account manager',
             ),
             (
                 CompanyPermission.change_one_list_core_team_member.value,
-                "Can change one list core team member associated with company",
+                'Can change one list core team member associated with company',
             ),
-            (CompanyPermission.view_export_win.value, "Can view company export win"),
+            (CompanyPermission.view_export_win.value, 'Can view company export win'),
         )
         indexes = [
             # For datasets app which includes API endpoints to be consumed by data-flow
-            models.Index(fields=("created_on", "id")),
+            models.Index(fields=('created_on', 'id')),
         ]
 
     @property
@@ -456,7 +456,7 @@ class Company(ArchivableModel, BaseModel):
             Company.objects.filter(
                 global_ultimate_duns_number=self.global_ultimate_duns_number,
             )
-            .exclude(global_ultimate_duns_number="")
+            .exclude(global_ultimate_duns_number='')
             .exclude(global_ultimate_duns_number=None)
         )
 
@@ -482,8 +482,8 @@ class Company(ArchivableModel, BaseModel):
         display_reason = self.get_transfer_reason_display()
 
         archived_reason = (
-            f"This record is no longer in use and its data has been transferred to {to} for the "
-            f"following reason: {display_reason}."
+            f'This record is no longer in use and its data has been transferred to {to} for the '
+            f'following reason: {display_reason}.'
         )
 
         # Note: archive() saves the model instance
@@ -516,8 +516,8 @@ class Company(ArchivableModel, BaseModel):
         if global_account_manager:
             core_team.append(
                 {
-                    "adviser": global_account_manager,
-                    "is_global_account_manager": True,
+                    'adviser': global_account_manager,
+                    'is_global_account_manager': True,
                 },
             )
 
@@ -528,21 +528,21 @@ class Company(ArchivableModel, BaseModel):
                 adviser=global_account_manager,
             )
             .select_related(
-                "adviser",
-                "adviser__dit_team",
-                "adviser__dit_team__uk_region",
-                "adviser__dit_team__country",
+                'adviser',
+                'adviser__dit_team',
+                'adviser__dit_team__uk_region',
+                'adviser__dit_team__country',
             )
             .order_by(
-                "adviser__first_name",
-                "adviser__last_name",
+                'adviser__first_name',
+                'adviser__last_name',
             )
         )
 
         core_team.extend(
             {
-                "adviser": team_member.adviser,
-                "is_global_account_manager": False,
+                'adviser': team_member.adviser,
+                'is_global_account_manager': False,
             }
             for team_member in team_members
         )
@@ -588,7 +588,7 @@ class Company(ArchivableModel, BaseModel):
         OneListCoreTeamMember.objects.filter(adviser=adviser, company=self).delete()
 
     def add_export_country(
-        self, country, status, record_date, adviser, track_history=False
+        self, country, status, record_date, adviser, track_history=False,
     ):
         """
         Add a company export_country, if it doesn't exist.
@@ -600,9 +600,9 @@ class Company(ArchivableModel, BaseModel):
             country=country,
             company=self,
             defaults={
-                "status": status,
-                "created_by": adviser,
-                "modified_by": adviser,
+                'status': status,
+                'created_by': adviser,
+                'modified_by': adviser,
             },
         )
 
@@ -669,20 +669,20 @@ class OneListCoreTeamMember(models.Model):
     company = models.ForeignKey(
         Company,
         on_delete=models.CASCADE,
-        related_name="one_list_core_team_members",
+        related_name='one_list_core_team_members',
     )
     adviser = models.ForeignKey(
-        "company.Advisor",
+        'company.Advisor',
         on_delete=models.CASCADE,
-        related_name="one_list_core_team_memberships",
+        related_name='one_list_core_team_memberships',
     )
 
     def __str__(self):
         """Human-readable representation."""
-        return f"{self.adviser} - One List Core Team member of {self.company}"
+        return f'{self.adviser} - One List Core Team member of {self.company}'
 
     class Meta:
-        unique_together = (("company", "adviser"),)
+        unique_together = (('company', 'adviser'),)
 
 
 @reversion.register_base_model()
@@ -700,9 +700,9 @@ class CompanyExportCountry(BaseModel):
     """
 
     class Status(models.TextChoices):
-        NOT_INTERESTED = ("not_interested", "Not interested")
-        CURRENTLY_EXPORTING = ("currently_exporting", "Currently exporting to")
-        FUTURE_INTEREST = ("future_interest", "Future country of interest")
+        NOT_INTERESTED = ('not_interested', 'Not interested')
+        CURRENTLY_EXPORTING = ('currently_exporting', 'Currently exporting to')
+        FUTURE_INTEREST = ('future_interest', 'Future country of interest')
 
     id = models.UUIDField(
         primary_key=True,
@@ -711,12 +711,12 @@ class CompanyExportCountry(BaseModel):
     country = models.ForeignKey(
         metadata_models.Country,
         on_delete=models.PROTECT,
-        related_name="companies_with_interest",
+        related_name='companies_with_interest',
     )
     company = models.ForeignKey(
         Company,
         on_delete=models.CASCADE,
-        related_name="export_countries",
+        related_name='export_countries',
     )
     status = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
@@ -726,15 +726,15 @@ class CompanyExportCountry(BaseModel):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["country", "company"],
-                name="unique_country_company",
+                fields=['country', 'company'],
+                name='unique_country_company',
             ),
         ]
-        verbose_name_plural = "company export countries"
+        verbose_name_plural = 'company export countries'
 
     def __str__(self):
         """Admin displayed human readable name"""
-        return f"{self.company} {self.country} {self.status}"
+        return f'{self.company} {self.country} {self.status}'
 
 
 class CompanyExportCountryHistory(models.Model):
@@ -746,23 +746,23 @@ class CompanyExportCountryHistory(models.Model):
     """
 
     class HistoryType(models.TextChoices):
-        INSERT = ("insert", "Inserted")
-        UPDATE = ("update", "Updated")
-        DELETE = ("delete", "Deleted")
+        INSERT = ('insert', 'Inserted')
+        UPDATE = ('update', 'Updated')
+        DELETE = ('delete', 'Deleted')
 
     history_id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
     )
     history_date = models.DateTimeField(
-        db_index=True, null=True, blank=True, auto_now_add=True
+        db_index=True, null=True, blank=True, auto_now_add=True,
     )
     history_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name="+",
+        related_name='+',
     )
     history_type = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
@@ -772,12 +772,12 @@ class CompanyExportCountryHistory(models.Model):
     country = models.ForeignKey(
         metadata_models.Country,
         on_delete=models.PROTECT,
-        related_name="+",
+        related_name='+',
     )
     company = models.ForeignKey(
         Company,
         on_delete=models.CASCADE,
-        related_name="export_countries_history",
+        related_name='export_countries_history',
     )
     status = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
@@ -785,8 +785,8 @@ class CompanyExportCountryHistory(models.Model):
     )
 
     class Meta:
-        verbose_name_plural = "company export country history"
+        verbose_name_plural = 'company export country history'
 
     def __str__(self):
         """Admin displayed human readable name"""
-        return f"{self.company} {self.country} {self.status}"
+        return f'{self.company} {self.country} {self.status}'

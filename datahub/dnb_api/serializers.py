@@ -461,7 +461,8 @@ class DNBCompanyInvestigationSerializer(serializers.Serializer):
             **data,
             **address_data,
         }
-    
+
+
 class DNBCompanyHierarchySerializer(serializers.Serializer):
     """
     Validate GET data for DNBCompanyHierarchyView
@@ -481,8 +482,7 @@ class DNBCompanyHierarchySerializer(serializers.Serializer):
             company = Company.objects.get(duns_number=duns_number)
         except Company.DoesNotExist:
             raise serializers.ValidationError(
-                f'Company does not have duns number',
+                'Company does not have duns number',
             )
         self.company = company
         return duns_number
-
