@@ -395,7 +395,7 @@ class DNBCompanyHierarchyView(APIView):
         ),
     )
 
-    def get(self, request, company_id):
+    def get(self, company_id):
         """
         Given a Company Id, get the data for the company hierarchy from dnb-service.
         """

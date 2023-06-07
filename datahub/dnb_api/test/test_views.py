@@ -33,6 +33,7 @@ DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/s
 DNB_CHANGE_REQUEST_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'change-request/')
 DNB_INVESTIGATION_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'investigation/')
 
+
 REQUIRED_REGISTERED_ADDRESS_FIELDS = [
     f'registered_address_{field}' for field in AddressSerializer.REQUIRED_FIELDS
 ]
@@ -45,6 +46,7 @@ REQUIRED_REGISTERED_ADDRESS_FIELDS = [
         reverse('api-v4:dnb-api:company-create'),
         reverse('api-v4:dnb-api:company-link'),
         reverse('api-v4:dnb-api:company-change-request'),
+        reverse('api-v4:dnb-api:<company_id>/family-tree'),
     ),
 )
 class TestDNBAPICommon(APITestMixin):
@@ -2407,3 +2409,20 @@ class TestCompanyInvestigationView(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+class TestCompanyHierarchyView(APITestMixin):
+    """
+    DNB Company Hierarchy Search view test case.
+    """
+        
+    @override_settings(DNB_SERVICE_BASE_URL=None)
+    def test_get_no_dnb_setting(self):
+        """
+        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        is not set.
+        """
+        with pytest.raises(ImproperlyConfigured):
+            self.api_client.get(
+                reverse('api-v4:dnb-api:<company_id>/family-tree'),
+            )
+    
