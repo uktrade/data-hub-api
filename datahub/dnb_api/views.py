@@ -2,13 +2,7 @@ import logging
 
 import pandas as pd
 from bigtree import (
-    dataframe_to_tree,
     dataframe_to_tree_by_relation,
-    dict_to_tree,
-    nested_dict_to_tree,
-    print_tree,
-    tree_to_dataframe,
-    tree_to_dict,
     tree_to_nested_dict,
 )
 from django.http import HttpResponse, JsonResponse
@@ -17,22 +11,20 @@ from django.utils.timezone import now
 from opensearch_dsl import Search
 from opensearch_dsl.query import (
     Bool,
-    Exists,
-    Match,
-    MatchAll,
-    MultiMatch,
-    Query,
-    Range,
-    Term,
+    Terms,
 )
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from django.core.exceptions import ObjectDoesNotExist
 from datahub.company.models import Company, CompanyPermission
 from datahub.company.serializers import CompanySerializer
 from datahub.core import statsd
-from datahub.core.exceptions import APIBadRequestException, APIUpstreamException
+from datahub.core.exceptions import (
+    APIBadRequestException,
+    APIUpstreamException,
+    APINotFoundException,
+)
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
 from datahub.dnb_api.link_company import (
@@ -395,11 +387,17 @@ class DNBCompanyHierarchyView(APIView):
         ),
     )
 
-    def get(self, company_id):
+    def get(self, request, company_id):
         """
         Given a Company Id, get the data for the company hierarchy from dnb-service.
         """
-        duns_number = Company.objects.only("duns_number").get(id=company_id).duns_number
+
+        company = Company.objects.filter(id=company_id).values_list("duns_number", flat=True)
+        if not company:
+            raise APINotFoundException(f'company {company_id} not found')
+        duns_number = company.first()
+        if not duns_number:
+            raise APIBadRequestException(f'company {company_id} does not contain a duns number')
 
         hierarchy_serializer = DNBCompanyHierarchySerializer(data={"duns_number": duns_number})
         hierarchy_serializer.is_valid(raise_exception=True)
@@ -415,25 +413,17 @@ class DNBCompanyHierarchyView(APIView):
             raise APIUpstreamException(str(exc))
 
         family_tree_members = response["family_tree_members"]
+        print(family_tree_members)
 
-        family_tree_members_duns = list((object["duns"] for object in family_tree_members))
-
-        family_tree_members_database_details = Company.objects.filter(
-            duns_number__in=family_tree_members_duns
-        ).values("id", "duns_number", "number_of_employees", "name")
-
-
-        for family_member in family_tree_members:
-            duns_number_to_find = family_member["duns"]
-            for member_database_details in family_tree_members_database_details:
-                family_member["id"] = ''
-                if duns_number_to_find == member_database_details["duns_number"]:
-                    family_member["primaryName"] = member_database_details["name"]
-                    family_member["companyId"] = member_database_details["id"]
+        self.append_datahub_details_to_family_tree(family_tree_members)
 
         normalized_df = pd.json_normalize(family_tree_members)
 
-        pd.set_option('display.max_columns', None)
+        # print(normalized_df)
+
+        pd.set_option(
+            'display.max_columns', None
+        )  # todo - we can remove this line once we no longer need to print the dataframe
 
         root = dataframe_to_tree_by_relation(
             normalized_df, child_col="duns", parent_col="corporateLinkage.parent.duns"
@@ -454,7 +444,45 @@ class DNBCompanyHierarchyView(APIView):
                 "ultimate_global_companies_count": response[
                     "global_ultimate_family_tree_members_count"
                 ],
-                "manually_verified_subsidiaries": [],
+                "manually_verified_subsidiaries": self.get_manually_verified_subsidiaries(
+                    duns_number, company_id
+                ),
             }
         )
 
+    def append_datahub_details_to_family_tree(self, family_tree_members):
+        """
+        Append the details datahub knows about the family tree members to the family tree object
+        """
+        family_tree_members_datahub_details = self.load_datahub_details(family_tree_members)
+        for family_member in family_tree_members:
+            duns_number_to_find = family_member["duns"]
+            for member_database_details in family_tree_members_datahub_details:
+                family_member["id"] = ''
+                if duns_number_to_find == member_database_details["duns_number"]:
+                    family_member["primaryName"] = member_database_details["name"]
+                    family_member["companyId"] = member_database_details["id"]
+
+    def load_datahub_details(self, family_tree_members):
+        """
+        Load the details datahub knows about the family tree members
+        """
+        family_tree_members_duns = list((object["duns"] for object in family_tree_members))
+        family_tree_members_datahub_details = Company.objects.filter(
+            duns_number__in=family_tree_members_duns
+        ).values("id", "duns_number", "number_of_employees", "name")
+
+        # search = Search(index='test_index-company-read').query(
+        #     Bool(must=Terms(duns_number=family_tree_members_duns))
+        # )
+        # print(search)
+        # results = execute_search_query(search)
+        # print("took:", results.took)
+        # print("total hits:", results.hits.total.value)
+        # print([result.to_dict() for result in results.hits])
+        # return []
+
+        return family_tree_members_datahub_details
+
+    def get_manually_verified_subsidiaries(self, duns_number, company_id):
+        return []

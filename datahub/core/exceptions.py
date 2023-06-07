@@ -57,3 +57,11 @@ class APINotImplementedException(APIException):
 
 class SimulationRollbackError(Exception):
     """Used to roll back deletions during a simulation."""
+
+
+class APINotFoundException(APIException):
+    """DRF Exception for the 404 status code."""
+
+    status_code = status.HTTP_404_NOT_FOUND
+    default_detail = _('Cannot find the resource')
+    default_code = 'not_found'
