@@ -32,7 +32,6 @@ class CompanySearchApp(SearchApp):
             'uk_region',
             'address_area',
             'registered_address_area',
-            'global_headquarters__one_list_tier',
             'one_list_tier',
         )
         .prefetch_related(
