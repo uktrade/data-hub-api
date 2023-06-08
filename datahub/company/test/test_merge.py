@@ -12,6 +12,7 @@ from datahub.company.merge import (
     INVESTMENT_PROJECT_COMPANY_FIELDS,
     merge_companies,
     MergeNotAllowedError,
+    rollback_merge_companies,
 )
 from datahub.company.models import Company, Contact
 from datahub.company.test.factories import (
@@ -607,6 +608,57 @@ class TestDuplicateCompanyMerger:
         user = AdviserFactory()
         with pytest.raises(MergeNotAllowedError):
             merge_companies(source_company, target_company, user)
+
+    def test_rollback(self):
+        """
+        Test that rollback_merge_companies() rolls back a merge of companies
+        """
+        with reversion.create_revision():
+            source_company = _company_factory(2, 2, 2, 2, 2, 2)
+            target_company = _company_factory(3, 3, 3, 3, 3, 3)
+        user = AdviserFactory()
+        source_company_num_contacts = source_company.contacts.count()
+        target_company_num_contacts = target_company.contacts.count()
+
+        # Briefly make sure we really have merged the companies, so the late
+        # assertions don't just pass because the companeis have never been merged
+        merge_companies(source_company, target_company, user)
+        source_company.refresh_from_db()
+        target_company.refresh_from_db()
+        assert not source_company.interactions.exists()
+        assert not source_company.contacts.exists()
+        assert not source_company.orders.exists()
+        assert not source_company.referrals.exists()
+        assert not source_company.company_list_items.exists()
+        assert not source_company.pipeline_list_items.exists()
+        assert source_company.transferred_to == target_company
+
+        assert target_company.interactions.count() == 5
+        assert target_company.contacts.count() == \
+            source_company_num_contacts + target_company_num_contacts
+        assert target_company.orders.count() == 5
+        assert target_company.referrals.count() == 5
+        assert target_company.company_list_items.count() == 5
+        assert target_company.pipeline_list_items.count() == 5
+
+        # Make sure related models are attached to the original company
+        rollback_merge_companies(source_company)
+        source_company.refresh_from_db()
+        target_company.refresh_from_db()
+        assert source_company.interactions.count() == 2
+        assert source_company.contacts.count() == source_company_num_contacts
+        assert source_company.orders.count() == 2
+        assert source_company.referrals.count() == 2
+        assert source_company.company_list_items.count() == 2
+        assert source_company.pipeline_list_items.count() == 2
+        assert source_company.transferred_to is None
+
+        assert target_company.interactions.count() == 3
+        assert target_company.contacts.count() == target_company_num_contacts
+        assert target_company.orders.count() == 3
+        assert target_company.referrals.count() == 3
+        assert target_company.company_list_items.count() == 3
+        assert target_company.pipeline_list_items.count() == 3
 
     def test_related_fields_are_versioned(self):
         for relation in ALLOWED_RELATIONS_FOR_MERGING:
