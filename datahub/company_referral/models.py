@@ -4,10 +4,12 @@ from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
 
+from datahub.core import reversion
 from datahub.core.models import BaseModel
 from datahub.core.utils import get_front_end_url
 
 
+@reversion.register_base_model()
 class CompanyReferral(BaseModel):
     """
     An internal referral of a company, from one adviser (the creator of the referrer)
