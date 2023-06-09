@@ -1171,6 +1171,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'contacts': [contact],
             'communication_channel': communication_channel,
             'company': contact.company,
+            'companies': [contact.company],
             'date': datetime(2018, 1, 1, tzinfo=utc),
             'dit_participants': [
                 {
@@ -1215,6 +1216,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'contacts': [contact],
             'communication_channel': None,
             'company': contact.company,
+            'companies': [contact.company],
             'date': datetime(2018, 1, 1, tzinfo=utc),
             'dit_participants': [
                 {
@@ -1276,6 +1278,8 @@ class TestInteractionCSVRowFormSaving:
         assert interaction.created_by == user
         assert interaction.modified_by == user
         assert interaction.source == source
+        assert interaction.company == contact.company
+        assert [company.id for company in interaction.companies.all()] == [contact.company_id]
 
         assert list(interaction.contacts.all()) == [contact]
         assert interaction.dit_participants.count() == 1
@@ -1324,6 +1328,8 @@ class TestInteractionCSVRowFormSaving:
         assert interaction.created_by == user
         assert interaction.modified_by == user
         assert interaction.source == source
+        assert interaction.company == contact.company
+        assert [company.id for company in interaction.companies.all()] == [contact.company_id]
 
         assert list(interaction.contacts.all()) == [contact]
         assert interaction.dit_participants.count() == 2
