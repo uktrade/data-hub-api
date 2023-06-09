@@ -57,6 +57,7 @@ from datahub.dnb_api.utils import (
 )
 from datahub.search.execute_query import execute_search_query
 from datahub.search.company.views import SearchCompanyAPIView
+from django.test import RequestFactory
 
 logger = logging.getLogger(__name__)
 
@@ -376,7 +377,7 @@ class DNBCompanyInvestigationView(APIView):
         return Response(response)
 
 
-class FakeRequest:
+class SearchRequest:
     def __init__(self, data):
         self._data = data
 
@@ -386,7 +387,7 @@ class FakeRequest:
 
     @property
     def query_params(self):
-        return "GET"
+        return "POST"
 
 
 class DNBCompanyHierarchyView(APIView):
@@ -437,8 +438,9 @@ class DNBCompanyHierarchyView(APIView):
         print(request)
         print(request.__dict__)
         postResponse = SearchCompanyAPIView().post(
-            FakeRequest(data={"duns_number": family_tree_members_duns})
+            SearchRequest(data={"duns_number": ["987654321", "012345678"]})
         )
+
         # print(postResponse)
 
         return postResponse
@@ -504,9 +506,9 @@ class DNBCompanyHierarchyView(APIView):
             duns_number__in=family_tree_members_duns
         ).values("id", "duns_number", "number_of_employees", "name")
 
-        # search = Search(index='test_index-company-read').query(
-        #     Bool(must=Terms(duns_number=family_tree_members_duns))
-        # )
+        search = Search(index='test_index-company-read').query(
+            Bool(must=Terms(duns_number=family_tree_members_duns))
+        )
         # print(search)
         # results = execute_search_query(search)
         # print("took:", results.took)
