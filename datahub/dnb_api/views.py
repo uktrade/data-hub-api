@@ -56,6 +56,7 @@ from datahub.dnb_api.utils import (
     search_dnb,
 )
 from datahub.search.execute_query import execute_search_query
+from datahub.search.company.views import SearchCompanyAPIView
 
 logger = logging.getLogger(__name__)
 
@@ -375,6 +376,19 @@ class DNBCompanyInvestigationView(APIView):
         return Response(response)
 
 
+class FakeRequest:
+    def __init__(self, data):
+        self._data = data
+
+    @property
+    def data(self):
+        return self._data
+
+    @property
+    def query_params(self):
+        return "GET"
+
+
 class DNBCompanyHierarchyView(APIView):
     """
     View for receiving datahub hierarchy of a company from DNB data.
@@ -414,12 +428,26 @@ class DNBCompanyHierarchyView(APIView):
 
         family_tree_members = response["family_tree_members"]
         print(family_tree_members)
-
+        family_tree_members_duns = list((object["duns"] for object in family_tree_members))
+        # TODO check if there are any duns numbers returned before sending a query over to opensearch
+        print("************family_tree_members_duns*************", family_tree_members_duns)
+        # print(family_tree_members)
+        # request.data = {"duns_number": ["987654321", "012345678"]}
         self.append_datahub_details_to_family_tree(family_tree_members)
+        print(request)
+        print(request.__dict__)
+        postResponse = SearchCompanyAPIView().post(
+            FakeRequest(data={"duns_number": family_tree_members_duns})
+        )
+        # print(postResponse)
+
+        return postResponse
 
         normalized_df = pd.json_normalize(family_tree_members)
+        # normalized_df.fillna('')
 
-        # print(normalized_df)
+        print(normalized_df)
+        normalized_df = normalized_df.fillna({'corporateLinkage.parent.duns': '0', 'id': 'None'})
 
         pd.set_option(
             'display.max_columns', None
@@ -429,18 +457,22 @@ class DNBCompanyHierarchyView(APIView):
             normalized_df, child_col="duns", parent_col="corporateLinkage.parent.duns"
         )
 
+        # print(root)
+
+        json_tree = tree_to_nested_dict(
+            root,
+            name_key="duns_number",
+            child_key="subsidiaries",
+            attr_dict={
+                "primaryName": "name",
+                "companyId": "id",
+            },
+        )
+
+        print(json_tree)
         return Response(
             {
-                "ultimate_global_company": tree_to_nested_dict(
-                    root,
-                    name_key="duns_number",
-                    child_key="subsidiaries",
-                    attr_dict={
-                        "primaryName": "name",
-                        "companyId": "id",
-                        "corporateLinkage.hierarchyLevel": "hierarchy",
-                    },
-                ),
+                "ultimate_global_company": json_tree,
                 "ultimate_global_companies_count": response[
                     "global_ultimate_family_tree_members_count"
                 ],
@@ -458,7 +490,7 @@ class DNBCompanyHierarchyView(APIView):
         for family_member in family_tree_members:
             duns_number_to_find = family_member["duns"]
             for member_database_details in family_tree_members_datahub_details:
-                family_member["id"] = ''
+                family_member["id"] = ""
                 if duns_number_to_find == member_database_details["duns_number"]:
                     family_member["primaryName"] = member_database_details["name"]
                     family_member["companyId"] = member_database_details["id"]

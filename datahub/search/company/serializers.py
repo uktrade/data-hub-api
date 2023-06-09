@@ -34,6 +34,7 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
     area = SingleOrListField(child=StringUUIDField(), required=False)
     export_segment = SingleOrListField(required=False)
     export_sub_segment = SingleOrListField(required=False)
+    duns_number = SingleOrListField(child=serializers.CharField(), required=False)
 
     SORT_BY_FIELDS = (
         'modified_on',
