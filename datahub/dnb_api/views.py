@@ -58,6 +58,10 @@ from datahub.dnb_api.utils import (
 from datahub.search.execute_query import execute_search_query
 from datahub.search.company.views import SearchCompanyAPIView
 from django.test import RequestFactory
+from datahub.search.query_builder import (
+    get_search_by_entities_query,
+)
+from datahub.search.company.models import Company as SearchCompany
 
 logger = logging.getLogger(__name__)
 
@@ -428,28 +432,38 @@ class DNBCompanyHierarchyView(APIView):
             raise APIUpstreamException(str(exc))
 
         family_tree_members = response["family_tree_members"]
-        print(family_tree_members)
+        # print(family_tree_members)
         family_tree_members_duns = list((object["duns"] for object in family_tree_members))
         # TODO check if there are any duns numbers returned before sending a query over to opensearch
-        print("************family_tree_members_duns*************", family_tree_members_duns)
+        # print("************family_tree_members_duns*************", family_tree_members_duns)
         # print(family_tree_members)
         # request.data = {"duns_number": ["987654321", "012345678"]}
         self.append_datahub_details_to_family_tree(family_tree_members)
-        print(request)
-        print(request.__dict__)
-        postResponse = SearchCompanyAPIView().post(
-            SearchRequest(data={"duns_number": ["987654321", "012345678"]})
-        )
+        # print(request)
+        # print(request.__dict__)
+        # postResponse = SearchCompanyAPIView().post(
+        #     SearchRequest(data={"duns_number": ["987654321", "012345678"]})
+        # )
+
+        r = get_search_by_entities_query(
+            [SearchCompany], term='', filter_data={'duns_number': ["987654321", "012345678"]}
+        ).execute()
+
+        response = {
+            'count': r.hits.total.value,
+            'results': [x.to_dict() for x in r.hits],
+        }
+        print(r)
 
         # print(postResponse)
 
-        return postResponse
+        return Response(response)
 
         normalized_df = pd.json_normalize(family_tree_members)
         # normalized_df.fillna('')
 
-        print(normalized_df)
-        normalized_df = normalized_df.fillna({'corporateLinkage.parent.duns': '0', 'id': 'None'})
+        # todo add if check before below
+        normalized_df["corporateLinkage.parent.duns"] = None
 
         pd.set_option(
             'display.max_columns', None
@@ -492,7 +506,7 @@ class DNBCompanyHierarchyView(APIView):
         for family_member in family_tree_members:
             duns_number_to_find = family_member["duns"]
             for member_database_details in family_tree_members_datahub_details:
-                family_member["id"] = ""
+                family_member["companyId"] = None
                 if duns_number_to_find == member_database_details["duns_number"]:
                     family_member["primaryName"] = member_database_details["name"]
                     family_member["companyId"] = member_database_details["id"]
@@ -505,10 +519,18 @@ class DNBCompanyHierarchyView(APIView):
         family_tree_members_datahub_details = Company.objects.filter(
             duns_number__in=family_tree_members_duns
         ).values("id", "duns_number", "number_of_employees", "name")
+        r = get_search_by_entities_query(
+            [SearchCompany], term='', filter_data={'duns_number': ["987654321", "012345678"]}
+        ).execute()
 
-        search = Search(index='test_index-company-read').query(
-            Bool(must=Terms(duns_number=family_tree_members_duns))
-        )
+        response = {
+            'count': r.hits.total.value,
+            'results': [x.to_dict() for x in r.hits],
+        }
+
+        # search = Search(index='test_index-company-read').query(
+        #     Bool(must=Terms(duns_number=family_tree_members_duns))
+        # )
         # print(search)
         # results = execute_search_query(search)
         # print("took:", results.took)
