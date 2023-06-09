@@ -269,6 +269,7 @@ class InteractionCSVRowForm(forms.Form):
         serializer_data = self.cleaned_data_as_serializer_dict()
 
         contacts = serializer_data.pop('contacts')
+        companies = serializer_data.pop('companies')
         dit_participants = serializer_data.pop('dit_participants')
         # Remove `is_event` if it's present as it's a computed field and isn't saved
         # on the model
@@ -283,6 +284,7 @@ class InteractionCSVRowForm(forms.Form):
         interaction.save()
 
         interaction.contacts.add(*contacts)
+        interaction.companies.add(*companies)
 
         for dit_participant in dit_participants:
             InteractionDITParticipant(
@@ -425,6 +427,7 @@ class InteractionCSVRowForm(forms.Form):
             'contacts': [data['contact']],
             'communication_channel': data.get('communication_channel'),
             'company': data['contact'].company,
+            'companies': [data['contact'].company],
             'date': datetime.combine(data['date'], time(), tzinfo=utc),
             'dit_participants': dit_participants,
             'event': data.get('event_id'),
