@@ -1,4 +1,5 @@
 import datetime
+from pprint import pprint
 
 from django.db.models import Case, Max, When
 from django.db.models import CharField
@@ -75,7 +76,6 @@ class SearchInvestmentProjectAPIViewMixin:
 
     COMPOSITE_FILTERS = {
         'adviser': [
-            'created_by.id',
             'client_relationship_manager.id',
             'project_assurance_adviser.id',
             'project_manager.id',
@@ -217,6 +217,8 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
         base_query = super().get_base_query(request, validated_data)
         if validated_data.get('show_summary'):
             base_query.aggs.bucket('stage', 'terms', field='stage.id')
+        pprint('base_query')
+        pprint(base_query)
         return base_query
 
     def get_sibling_company_ids(self, investor_companies):
