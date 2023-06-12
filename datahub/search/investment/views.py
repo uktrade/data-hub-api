@@ -1,5 +1,4 @@
 import datetime
-from pprint import pprint
 
 from django.db.models import Case, Max, When
 from django.db.models import CharField
