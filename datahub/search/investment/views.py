@@ -217,8 +217,6 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
         base_query = super().get_base_query(request, validated_data)
         if validated_data.get('show_summary'):
             base_query.aggs.bucket('stage', 'terms', field='stage.id')
-        pprint('base_query')
-        pprint(base_query)
         return base_query
 
     def get_sibling_company_ids(self, investor_companies):
