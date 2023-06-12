@@ -324,7 +324,7 @@ requests==2.31.0
     #   requests-toolbelt
 requests-futures==1.0.0
     # via piprot
-requests-mock==1.10.0
+requests-mock==1.11.0
     # via -r requirements-dev.in
 requests-toolbelt==1.0.0
     # via -r requirements.in
