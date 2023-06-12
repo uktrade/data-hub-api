@@ -3,7 +3,7 @@ django==3.2.19
 djangorestframework==3.14.0
 django-axes==6.0.1
 django-environ==0.10.0
-django-extensions==3.2.1
+django-extensions==3.2.3
 django-filter==23.2
 django-log-formatter-ecs==0.0.5
 django-mptt==0.14.0
