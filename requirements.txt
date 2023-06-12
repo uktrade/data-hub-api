@@ -77,7 +77,9 @@ djangorestframework==3.14.0
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
-elastic-apm==6.15.1
+ecs-logging==2.0.2
+    # via elastic-apm
+elastic-apm==6.16.1
     # via -r requirements.in
 freezegun==1.2.2
     # via rq-scheduler
