@@ -378,6 +378,21 @@ class TestSearch(APITestMixin):
         }
         assert {result['id'] for result in results} == expected_ids
 
+        response = self.api_client.post(
+            url,
+            data={
+                'adviser': nonteammember.pk,
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 1
+        results = response_data['results']
+        expected_ids = {
+            str(project_4.pk),
+        }
+        assert {result['id'] for result in results} == expected_ids
+
     @pytest.mark.parametrize(
         'query,num_results',
         (
