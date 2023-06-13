@@ -269,7 +269,6 @@ class TestSearch(APITestMixin):
         InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project_1)
         InvestmentProjectTeamMemberFactory(investment_project=project_1)
 
-        project_2 = InvestmentProjectFactory(created_by=adviser)
         project_3 = InvestmentProjectFactory(client_relationship_manager=adviser)
         project_4 = InvestmentProjectFactory(project_manager=adviser)
         project_5 = InvestmentProjectFactory(project_assurance_adviser=adviser)
@@ -295,11 +294,10 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data['count'] == 6
+        assert response_data['count'] == 5
         results = response_data['results']
         expected_ids = {
             str(project_1.pk),
-            str(project_2.pk),
             str(project_3.pk),
             str(project_4.pk),
             str(project_5.pk),
@@ -338,6 +336,81 @@ class TestSearch(APITestMixin):
             ),
         ),
     )
+
+    def test_search_my_project_filter(self, opensearch_with_collector):
+        """Tests my project filter."""
+        projectMember = AdviserFactory()
+        nonTeamMember = AdviserFactory()
+
+        # Matching projects
+        project_1 = InvestmentProjectFactory()
+        InvestmentProjectTeamMemberFactory(adviser=projectMember, investment_project=project_1)
+        InvestmentProjectTeamMemberFactory(investment_project=project_1)
+
+        project_2 = InvestmentProjectFactory(created_by=projectMember)
+        # Should only be returned once
+        project_3 = InvestmentProjectFactory(
+            created_by=projectMember,
+            client_relationship_manager=projectMember,
+            project_assurance_adviser=projectMember,
+            project_manager=projectMember,
+        )
+        project_4 = InvestmentProjectFactory(created_by=nonTeamMember)
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:investment_project')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'adviser': projectMember.pk,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 3
+        results = response_data['results']
+        expected_ids = {
+            str(project_1.pk),
+            str(project_2.pk),
+            str(project_3.pk),
+        }
+        assert {result['id'] for result in results} == expected_ids
+
+    @pytest.mark.parametrize(
+        'query,num_results',
+        (
+            (
+                {
+                    'estimated_land_date_before': '2017-06-13',
+                },
+                1,
+            ),
+            (
+                {
+                    'estimated_land_date_after': '2017-06-13',
+                },
+                2,
+            ),
+            (
+                {
+                    'estimated_land_date_after': '2017-06-13',
+                    'estimated_land_date_before': '2030-06-13',
+                },
+                1,
+            ),
+            (
+                {
+                    'estimated_land_date_before': '2017-06-13',
+                    'estimated_land_date_after': '2030-06-13',
+                },
+                0,
+            ),
+        ),
+    )
+
     def test_search_investment_project_estimated_land_date_json(
         self,
         setup_data,
