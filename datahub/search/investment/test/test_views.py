@@ -939,26 +939,26 @@ class TestSearch(APITestMixin):
 
         # checks if we only have investment projects with stages we filtered
         assert {
-                   constants.InvestmentProjectStage.active.value.id,
-                   constants.InvestmentProjectStage.won.value.id,
-               } == {investment_project['stage']['id'] for investment_project in response.data['results']}
+            constants.InvestmentProjectStage.active.value.id,
+            constants.InvestmentProjectStage.won.value.id,
+        } == {investment_project['stage']['id'] for investment_project in response.data['results']}
 
         # checks if we only have investment projects with investor companies we filtered
         assert {
-                   str(investment_project1.investor_company.pk),
-                   str(investment_project2.investor_company.pk),
-               } == {
-                   investment_project['investor_company']['id']
-                   for investment_project in response.data['results']
-               }
+            str(investment_project1.investor_company.pk),
+            str(investment_project2.investor_company.pk),
+        } == {
+            investment_project['investor_company']['id']
+            for investment_project in response.data['results']
+        }
 
         # checks if we only have investment projects with fdi investment type
         assert {
-                   constants.InvestmentType.fdi.value.id,
-               } == {
-                   investment_project['investment_type']['id']
-                   for investment_project in response.data['results']
-               }
+            constants.InvestmentType.fdi.value.id,
+        } == {
+            investment_project['investment_type']['id']
+            for investment_project in response.data['results']
+        }
 
     def test_search_sort_nested_desc(self, opensearch_with_collector, setup_data):
         """Tests sorting by nested field."""
@@ -995,13 +995,13 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 4
         assert [
-                   'Won',
-                   'Won',
-                   'Prospect',
-                   'Active',
-               ] == [
-                   investment_project['stage']['name'] for investment_project in response.data['results']
-               ]
+            'Won',
+            'Won',
+            'Prospect',
+            'Active',
+        ] == [
+            investment_project['stage']['name'] for investment_project in response.data['results']
+        ]
 
     def test_parent_companies_dnb_only(self, opensearch_with_collector):
         """
@@ -1922,7 +1922,7 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Status': project.get_status_display(),
                 'Stage': get_attr_or_none(project, 'stage.name'),
                 'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["investmentproject"]}'
-                        f'/{project.pk}',
+                f'/{project.pk}',
                 'Actual land date': project.actual_land_date,
                 'Estimated land date': project.estimated_land_date,
                 'FDI value': get_attr_or_none(project, 'fdi_value.name'),
