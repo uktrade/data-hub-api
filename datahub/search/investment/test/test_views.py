@@ -336,26 +336,25 @@ class TestSearch(APITestMixin):
             ),
         ),
     )
-
     def test_search_my_project_filter(self, opensearch_with_collector):
         """Tests my project filter."""
-        projectMember = AdviserFactory()
-        nonTeamMember = AdviserFactory()
+        projectmember = AdviserFactory()
+        nonteammember = AdviserFactory()
 
         # Matching projects
         project_1 = InvestmentProjectFactory()
-        InvestmentProjectTeamMemberFactory(adviser=projectMember, investment_project=project_1)
+        InvestmentProjectTeamMemberFactory(adviser=projectmember, investment_project=project_1)
         InvestmentProjectTeamMemberFactory(investment_project=project_1)
 
-        project_2 = InvestmentProjectFactory(created_by=projectMember)
+        project_2 = InvestmentProjectFactory(created_by=projectmember)
         # Should only be returned once
         project_3 = InvestmentProjectFactory(
-            created_by=projectMember,
-            client_relationship_manager=projectMember,
-            project_assurance_adviser=projectMember,
-            project_manager=projectMember,
+            created_by=projectmember,
+            client_relationship_manager=projectmember,
+            project_assurance_adviser=projectmember,
+            project_manager=projectmember,
         )
-        project_4 = InvestmentProjectFactory(created_by=nonTeamMember)
+        project_4 = InvestmentProjectFactory(created_by=nonteammember)
 
         opensearch_with_collector.flush_and_refresh()
 
@@ -364,7 +363,7 @@ class TestSearch(APITestMixin):
         response = self.api_client.post(
             url,
             data={
-                'adviser': projectMember.pk,
+                'adviser': projectmember.pk,
             },
         )
 
@@ -410,7 +409,6 @@ class TestSearch(APITestMixin):
             ),
         ),
     )
-
     def test_search_investment_project_estimated_land_date_json(
         self,
         setup_data,
