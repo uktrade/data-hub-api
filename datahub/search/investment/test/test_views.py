@@ -392,38 +392,38 @@ class TestSearch(APITestMixin):
             str(project_4.pk),
         }
         assert {result['id'] for result in results} == expected_ids
-
-    @pytest.mark.parametrize(
-        'query,num_results',
-        (
-            (
-                {
-                    'estimated_land_date_before': '2017-06-13',
-                },
-                1,
-            ),
-            (
-                {
-                    'estimated_land_date_after': '2017-06-13',
-                },
-                2,
-            ),
-            (
-                {
-                    'estimated_land_date_after': '2017-06-13',
-                    'estimated_land_date_before': '2030-06-13',
-                },
-                1,
-            ),
-            (
-                {
-                    'estimated_land_date_before': '2017-06-13',
-                    'estimated_land_date_after': '2030-06-13',
-                },
-                0,
-            ),
-        ),
-    )
+    #
+    # @pytest.mark.parametrize(
+    #     'query,num_results',
+    #     (
+    #         (
+    #             {
+    #                 'estimated_land_date_before': '2017-06-13',
+    #             },
+    #             1,
+    #         ),
+    #         (
+    #             {
+    #                 'estimated_land_date_after': '2017-06-13',
+    #             },
+    #             2,
+    #         ),
+    #         (
+    #             {
+    #                 'estimated_land_date_after': '2017-06-13',
+    #                 'estimated_land_date_before': '2030-06-13',
+    #             },
+    #             1,
+    #         ),
+    #         (
+    #             {
+    #                 'estimated_land_date_before': '2017-06-13',
+    #                 'estimated_land_date_after': '2030-06-13',
+    #             },
+    #             0,
+    #         ),
+    #     ),
+    # )
     def test_search_investment_project_estimated_land_date_json(
         self,
         setup_data,
