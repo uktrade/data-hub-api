@@ -443,7 +443,7 @@ class DNBCompanyHierarchyView(APIView):
         return Response(json_response)
 
     def append_datahub_details(self, family_tree_members):
-        family_tree_members_duns = list((object['duns'] for object in family_tree_members))
+        family_tree_members_duns = [object['duns'] for object in family_tree_members]
 
         family_tree_members_database_details = self.load_datahub_details(family_tree_members_duns)
 
