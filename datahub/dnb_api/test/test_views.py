@@ -1,17 +1,15 @@
 import json
 from unittest.mock import Mock, patch
 from urllib.parse import urljoin
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import pytest
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
+from faker import Faker
 from freezegun import freeze_time
-from requests.exceptions import (
-    ConnectionError,
-    Timeout,
-)
+from requests.exceptions import ConnectionError, Timeout
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -32,6 +30,10 @@ from datahub.metadata.models import AdministrativeArea, Country
 DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/search/')
 DNB_CHANGE_REQUEST_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'change-request/')
 DNB_INVESTIGATION_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'investigation/')
+DNB_HIERARCHY_SEARCH_URL = urljoin(
+    f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/hierarchy/search/',
+)
+
 
 REQUIRED_REGISTERED_ADDRESS_FIELDS = [
     f'registered_address_{field}' for field in AddressSerializer.REQUIRED_FIELDS
@@ -2404,6 +2406,220 @@ class TestCompanyInvestigationView(APITestMixin):
                     'country': constants.Country.united_kingdom.value.id,
                 },
             },
+        )
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+
+class TestCompanyHierarchyView(APITestMixin):
+    """
+    DNB Company Hierarchy Search view test case.
+    """
+
+    def test_company_id_is_valid(self):
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': '11223344'}),
+            ).status_code
+            == 400
+        )
+
+    def test_company_has_no_company_id(self):
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': uuid4()}),
+            ).status_code
+            == 404
+        )
+
+    def test_company_has_no_duns_number(self):
+        company = CompanyFactory(duns_number=None)
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': company.id}),
+            ).status_code
+            == 400
+        )
+
+    def test_empty_results_returned_from_dnb_service(
+        self,
+        requests_mock,
+    ):
+        """
+        Test for POST proxy.
+        """
+        api_client = self.create_api_client()
+        company = CompanyFactory(duns_number='123456789')
+
+        requests_mock.post(
+            DNB_HIERARCHY_SEARCH_URL,
+            status_code=200,
+            content=b'{"family_tree_members":[]}',
+        )
+
+        url = reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': company.id})
+        response = api_client.get(
+            url,
+            content_type='application/json',
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {
+            'ultimate_global_company': {},
+            'ultimate_global_companies_count': 0,
+            'manually_verified_subsidiaries': [],
+        }
+
+    def test_dnb_response_with_a_duns_number_matching_dh_company_duns_number_appends_dh_id(
+        self, requests_mock,
+    ):
+        """
+        Test the scenario where the company returned by the DnB service does match a company found
+        in the Data Hub dataset and then return the correct id for that company
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '987654321',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        tree_members = [
+            ultimate_company_dnb,
+        ]
+
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_company_dnb['duns'],
+            id='8e2e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=ultimate_company_dnb['primaryName'],
+        )
+        response = self._get_family_tree_response(requests_mock, tree_members, ultimate_company_dh)
+
+        assert response.status_code == 200
+        assert response.json() == {
+            'ultimate_global_company': {
+                'duns_number': ultimate_company_dnb['duns'],
+                'id': ultimate_company_dh.id,
+                'name': ultimate_company_dh.name,
+                'hierarchy': 1,
+            },
+            'ultimate_global_companies_count': len(tree_members),
+            'manually_verified_subsidiaries': [],
+        }
+
+    def test_dnb_response_with_only_ultimate_parent_matching_a_datahub_company(
+        self, requests_mock,
+    ):
+        """
+        Test the scenario where the ultimate parent is the only company in the response from the
+        proxy service that matches a duns number in the datahub dataset
+        """
+        faker = Faker()
+
+        ultimate_tree_member_level_1 = {
+            'duns': '987654321',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+        tree_member_level_2 = {
+            'duns': '123456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_tree_member_level_1['duns']},
+            },
+        }
+        tree_member_level_3 = {
+            'duns': '777777777',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 3,
+                'parent': {'duns': tree_member_level_2['duns']},
+            },
+        }
+
+        tree_members = [
+            ultimate_tree_member_level_1,
+            tree_member_level_2,
+            tree_member_level_3,
+        ]
+
+        ultimate_company = CompanyFactory(
+            id='8e2e9b35-3415-4b9b-b9ff-f97446ac8942',
+            duns_number=ultimate_tree_member_level_1['duns'],
+        )
+
+        response = self._get_family_tree_response(requests_mock, tree_members, ultimate_company)
+        assert response.status_code == 200
+        assert response.json() == {
+            'ultimate_global_company': {
+                'duns_number': ultimate_tree_member_level_1['duns'],
+                'name': ultimate_company.name,
+                'id': ultimate_company.id,
+                'hierarchy': 1,
+                'subsidiaries': [
+                    {
+                        'duns_number': tree_member_level_2['duns'],
+                        'name': tree_member_level_2['primaryName'],
+                        'id': None,
+                        'hierarchy': 2,
+                        'subsidiaries': [
+                            {
+                                'duns_number': tree_member_level_3['duns'],
+                                'name': tree_member_level_3['primaryName'],
+                                'id': None,
+                                'hierarchy': 3,
+                            },
+                        ],
+                    },
+                ],
+            },
+            'ultimate_global_companies_count': len(tree_members),
+            'manually_verified_subsidiaries': [],
+        }
+
+    def _get_family_tree_response(self, requests_mock, tree_members, ultimate_company):
+        api_client = self.create_api_client()
+        requests_mock.post(
+            DNB_HIERARCHY_SEARCH_URL,
+            status_code=200,
+            content=json.dumps(
+                {
+                    'global_ultimate_duns': 'duns',
+                    'family_tree_members': tree_members,
+                    'global_ultimate_family_tree_members_count': len(tree_members),
+                },
+            ).encode('utf-8'),
+        )
+
+        url = reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': ultimate_company.id})
+        response = api_client.get(
+            url,
+            content_type='application/json',
+        )
+
+        return response
+
+    @pytest.mark.parametrize(
+        'request_exception',
+        ((ConnectionError), (DNBServiceTimeoutError)),
+    )
+    def test_dnb_request_connection_error(self, requests_mock, request_exception):
+        """
+        Test for POST proxy.
+        """
+        api_client = self.create_api_client()
+        company = CompanyFactory(duns_number='123456789')
+
+        requests_mock.post(
+            DNB_HIERARCHY_SEARCH_URL,
+            exc=request_exception,
+        )
+
+        url = reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': company.id})
+        response = api_client.get(
+            url,
+            content_type='application/json',
         )
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY

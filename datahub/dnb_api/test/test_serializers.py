@@ -1,9 +1,12 @@
 import pytest
 
+from rest_framework.exceptions import ValidationError
+
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.dnb_api.serializers import (
     ChangeRequestSerializer,
+    DNBCompanyHierarchySerializer,
     DNBCompanySerializer,
     SerializerNotPartialError,
 )
@@ -67,3 +70,25 @@ def test_dnb_company_serializer_partial_save_serializer_not_partial(db):
     serializer.is_valid()
     with pytest.raises(SerializerNotPartialError):
         serializer.partial_save(duns_number='123456789')
+
+
+def test_duns_number_is_not_valid(db):
+    """Tests that serializer is not valid when duns number is not provided"""
+    serializer = DNBCompanyHierarchySerializer(
+        {},
+        data={'duns_number': None},
+    )
+    with pytest.raises(ValidationError):
+        serializer.validate_duns_number(duns_number=None)
+
+    assert not serializer.is_valid()
+
+
+def test_duns_number_is_valid(db):
+    """Tests that serializer is valid when duns number is provided"""
+    dh_company = CompanyFactory(duns_number='123456789')
+    serializer = DNBCompanyHierarchySerializer(
+        dh_company,
+        data={'duns_number': '123456789'},
+    )
+    assert serializer.is_valid()

@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 import reversion
 from django.conf import settings
@@ -115,7 +116,9 @@ def get_company(duns_number, request=None):
         raise DNBServiceTimeoutError(error_message) from exc
 
     if dnb_response.status_code != status.HTTP_200_OK:
-        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
+        error_message = (
+            f'DNB service returned an error status: {dnb_response.status_code}'
+        )
         logger.error(error_message)
         raise DNBServiceError(error_message, dnb_response.status_code)
 
@@ -149,12 +152,20 @@ def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=()
     Extract address from dnb company data.  This takes a `prefix` string to
     extract address fields that start with a certain prefix.
     """
-    country = Country.objects.filter(
-        iso_alpha2_code=dnb_company[f'{prefix}_country'],
-    ).first() if dnb_company.get(f'{prefix}_country') else None
-    area = AdministrativeArea.objects.filter(
-        area_code=dnb_company[f'{prefix}_area_abbrev_name'],
-    ).first() if dnb_company.get(f'{prefix}_area_abbrev_name') else None
+    country = (
+        Country.objects.filter(
+            iso_alpha2_code=dnb_company[f'{prefix}_country'],
+        ).first()
+        if dnb_company.get(f'{prefix}_country')
+        else None
+    )
+    area = (
+        AdministrativeArea.objects.filter(
+            area_code=dnb_company[f'{prefix}_area_abbrev_name'],
+        ).first()
+        if dnb_company.get(f'{prefix}_area_abbrev_name')
+        else None
+    )
 
     extracted_address = {
         'line_1': dnb_company.get(f'{prefix}_line_1') or '',
@@ -215,13 +226,16 @@ def format_dnb_company(dnb_company):
         'company_number': registration_numbers.get('uk_companies_house_number'),
         # Optional fields
         'number_of_employees': dnb_company.get('employee_number'),
-        'is_number_of_employees_estimated': dnb_company.get('is_employees_number_estimated'),
+        'is_number_of_employees_estimated': dnb_company.get(
+            'is_employees_number_estimated',
+        ),
         'turnover': dnb_company.get('annual_sales'),
         'is_turnover_estimated': dnb_company.get('is_annual_sales_estimated'),
         'website': company_website,
         # `Company.global_ultimate_duns_number` is not nullable but allows blank values. Sample
         # response from the D&B search API suggests that this field can be set to null.
-        'global_ultimate_duns_number': dnb_company.get('global_ultimate_duns_number') or '',
+        'global_ultimate_duns_number': dnb_company.get('global_ultimate_duns_number')
+        or '',
         # TODO: Extract sensible values for the following fields form the data:
         # 'business_type': None,
         # 'description': None,
@@ -419,7 +433,9 @@ def request_changes(duns_number, changes, request=None):
         raise DNBServiceTimeoutError(error_message) from exc
 
     if not dnb_response.ok:
-        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
+        error_message = (
+            f'DNB service returned an error status: {dnb_response.status_code}'
+        )
         raise DNBServiceError(error_message, dnb_response.status_code)
 
     return dnb_response.json()
@@ -464,7 +480,7 @@ def get_change_request(duns_number, status, request=None):
         raise DNBServiceTimeoutError(error_message) from exc
 
     if not dnb_response.ok:
-        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
+        error_message = (f'DNB service returned an error status: {dnb_response.status_code}')
         raise DNBServiceError(error_message, dnb_response.status_code)
 
     return dnb_response.json()
@@ -504,7 +520,9 @@ def create_investigation(investigation_data, request=None):
         raise DNBServiceTimeoutError(error_message) from exc
 
     if not dnb_response.ok:
-        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
+        error_message = (
+            f'DNB service returned an error status: {dnb_response.status_code}'
+        )
         raise DNBServiceError(error_message, dnb_response.status_code)
 
     return dnb_response.json()
@@ -518,3 +536,30 @@ def _get_api_client(request=None):
         default_timeout=settings.DNB_SERVICE_TIMEOUT,
         request=request,
     )
+
+
+def get_company_hierarchy_data(duns_number, request=None):
+    """
+    Get company hierarchy data
+    """
+    if not settings.DNB_SERVICE_BASE_URL:
+        raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
+
+    api_client = _get_api_client(request)
+
+    response = api_client.request(
+        'POST',
+        'companies/hierarchy/search/',
+        json={'duns_number': duns_number},
+        timeout=3.0,
+    )
+
+    return response.json()
+
+
+def is_valid_uuid(value):
+    try:
+        uuid.UUID(str(value))
+        return True
+    except ValueError:
+        return False

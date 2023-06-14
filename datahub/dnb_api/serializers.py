@@ -18,7 +18,8 @@ from datahub.core.serializers import (
 )
 from datahub.core.validators import EqualsRule, OperatorRule, RulesBasedValidator, ValidationRule
 from datahub.interaction.models import InteractionPermission
-from datahub.metadata.models import AdministrativeArea, Country as CountryModel
+from datahub.metadata.models import AdministrativeArea
+from datahub.metadata.models import Country as CountryModel
 from datahub.metadata.utils import convert_gbp_to_usd
 
 
@@ -460,3 +461,28 @@ class DNBCompanyInvestigationSerializer(serializers.Serializer):
             **data,
             **address_data,
         }
+
+
+class DNBCompanyHierarchySerializer(serializers.Serializer):
+    """
+    Validate GET data for DNBCompanyHierarchyView
+    """
+
+    duns_number = serializers.CharField(
+        max_length=9,
+        min_length=9,
+        validators=(integer_validator,),
+    )
+
+    def validate_duns_number(self, duns_number):
+        """
+        Validate duns_number.
+        """
+        try:
+            company = Company.objects.get(duns_number=duns_number)
+        except Company.DoesNotExist:
+            raise serializers.ValidationError(
+                'Company does not have duns number',
+            )
+        self.company = company
+        return duns_number

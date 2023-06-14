@@ -17,9 +17,7 @@ from datahub.company.signal_receivers import (
     export_country_update_signal,
 )
 from datahub.core import constants, reversion
-from datahub.core.constants import (
-    HeadquarterType,
-)
+from datahub.core.constants import HeadquarterType
 from datahub.core.models import (
     ArchivableModel,
     BaseConstantModel,
@@ -403,8 +401,14 @@ class Company(ArchivableModel, BaseModel):
     class Meta:
         verbose_name_plural = 'companies'
         permissions = (
-            (CompanyPermission.view_company_document.value, 'Can view company document'),
-            (CompanyPermission.view_company_timeline.value, 'Can view company timeline'),
+            (
+                CompanyPermission.view_company_document.value,
+                'Can view company document',
+            ),
+            (
+                CompanyPermission.view_company_timeline.value,
+                'Can view company timeline',
+            ),
             (CompanyPermission.export_company.value, 'Can export company'),
             (
                 CompanyPermission.change_regional_account_manager.value,
@@ -583,7 +587,9 @@ class Company(ArchivableModel, BaseModel):
         """Remove Core Team member from the company."""
         OneListCoreTeamMember.objects.filter(adviser=adviser, company=self).delete()
 
-    def add_export_country(self, country, status, record_date, adviser, track_history=False):
+    def add_export_country(
+        self, country, status, record_date, adviser, track_history=False,
+    ):
         """
         Add a company export_country, if it doesn't exist.
         If the company already exists and incoming status is different
@@ -603,7 +609,10 @@ class Company(ArchivableModel, BaseModel):
         updated = False
 
         if not created:
-            if export_country.status != status and export_country.modified_on < record_date:
+            if (
+                export_country.status != status
+                and export_country.modified_on < record_date
+            ):
                 export_country.status = status
                 export_country.modified_by = adviser
                 export_country.save()
@@ -745,7 +754,9 @@ class CompanyExportCountryHistory(models.Model):
         primary_key=True,
         default=uuid.uuid4,
     )
-    history_date = models.DateTimeField(db_index=True, null=True, blank=True, auto_now_add=True)
+    history_date = models.DateTimeField(
+        db_index=True, null=True, blank=True, auto_now_add=True,
+    )
     history_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
