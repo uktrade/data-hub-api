@@ -32,12 +32,12 @@ from datahub.dnb_api.serializers import (
     DUNSNumberSerializer,
 )
 from datahub.dnb_api.utils import (
+    create_investigation,
     DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequestError,
     DNBServiceInvalidResponseError,
     DNBServiceTimeoutError,
-    create_investigation,
     get_change_request,
     get_company,
     get_company_hierarchy_data,
