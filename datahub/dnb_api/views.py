@@ -1,14 +1,10 @@
 import logging
 
 import pandas as pd
-from bigtree import (
-    dataframe_to_tree_by_relation,
-    tree_to_nested_dict,
-)
+from bigtree import dataframe_to_tree_by_relation, tree_to_nested_dict
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
-
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -23,10 +19,7 @@ from datahub.core.exceptions import (
 )
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
-from datahub.dnb_api.link_company import (
-    CompanyAlreadyDNBLinkedError,
-    link_company_with_dnb,
-)
+from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedError, link_company_with_dnb
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyChangeRequestSerializer,
@@ -39,12 +32,12 @@ from datahub.dnb_api.serializers import (
     DUNSNumberSerializer,
 )
 from datahub.dnb_api.utils import (
-    create_investigation,
     DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequestError,
     DNBServiceInvalidResponseError,
     DNBServiceTimeoutError,
+    create_investigation,
     get_change_request,
     get_company,
     get_company_hierarchy_data,
@@ -456,8 +449,8 @@ class DNBCompanyHierarchyView(APIView):
 
         for family_member in family_tree_members:
             duns_number_to_find = family_member['duns']
+            family_member['companyId'] = None
             for member_database_details in family_tree_members_database_details:
-                family_member['companyId'] = None
                 if duns_number_to_find == member_database_details['duns_number']:
                     family_member['primaryName'] = member_database_details['name']
                     family_member['companyId'] = member_database_details['id']
