@@ -1,6 +1,6 @@
 import pytest
 
-from  rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
@@ -79,7 +79,7 @@ def test_duns_number_is_not_valid(db):
         data={'duns_number': None},
     )
     with pytest.raises(ValidationError):
-      serializer.validate_duns_number(duns_number=None)
+        serializer.validate_duns_number(duns_number=None)
 
     assert not serializer.is_valid()
 
