@@ -269,7 +269,6 @@ class TestSearch(APITestMixin):
         InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project_1)
         InvestmentProjectTeamMemberFactory(investment_project=project_1)
 
-        project_2 = InvestmentProjectFactory(created_by=adviser)
         project_3 = InvestmentProjectFactory(client_relationship_manager=adviser)
         project_4 = InvestmentProjectFactory(project_manager=adviser)
         project_5 = InvestmentProjectFactory(project_assurance_adviser=adviser)
@@ -295,15 +294,53 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data['count'] == 6
+        assert response_data['count'] == 5
         results = response_data['results']
         expected_ids = {
             str(project_1.pk),
-            str(project_2.pk),
             str(project_3.pk),
             str(project_4.pk),
             str(project_5.pk),
             str(project_6.pk),
+        }
+        assert {result['id'] for result in results} == expected_ids
+
+    def test_search_my_project_filter(self, opensearch_with_collector):
+        """Tests my project filter."""
+        projectmember = AdviserFactory()
+        nonteammember = AdviserFactory()
+
+        InvestmentProjectFactory(created_by=projectmember)
+        # Should only be returned once
+        project_1 = InvestmentProjectFactory(
+            created_by=projectmember,
+            client_relationship_manager=projectmember,
+            project_assurance_adviser=projectmember,
+            project_manager=projectmember,
+        )
+        project_2 = InvestmentProjectFactory(
+            created_by=nonteammember,
+            client_relationship_manager=projectmember,
+        )
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:investment_project')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'adviser': projectmember.pk,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 2
+        results = response_data['results']
+        expected_ids = {
+            str(project_1.pk),
+            str(project_2.pk),
         }
         assert {result['id'] for result in results} == expected_ids
 
