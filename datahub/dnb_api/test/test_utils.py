@@ -4,6 +4,8 @@ from uuid import UUID
 import pytest
 import reversion
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from django.test.utils import override_settings
 from django.utils.timezone import now
 from freezegun import freeze_time
 from requests.exceptions import (
@@ -31,6 +33,7 @@ from datahub.dnb_api.utils import (
     DNBServiceTimeoutError,
     format_dnb_company,
     get_company,
+    get_company_hierarchy_data,
     get_company_update_page,
     RevisionNotFoundError,
     rollback_dnb_company_update,
@@ -621,3 +624,18 @@ class TestFormatDNBCompany:
         company = format_dnb_company(dnb_company)
         assert company['turnover'] is None
         assert company['is_turnover_estimated'] is None
+
+
+class TestDNBHierarchyData:
+    """
+    Tests for DNB Hierarchy function.
+    """
+
+    @override_settings(DNB_SERVICE_BASE_URL=None)
+    def test_dnb_hierarchy_improperly_configured_url_error(self):
+        """
+        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        is not set.
+        """
+        with pytest.raises(ImproperlyConfigured):
+            get_company_hierarchy_data('123456789')

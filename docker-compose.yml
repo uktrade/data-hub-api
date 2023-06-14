@@ -1,7 +1,6 @@
 version: "2"
 
 services:
-
   api:
     build:
       context: .
@@ -87,3 +86,4 @@ services:
       RQ_REDIS_HOST: "redis"
     depends_on:
       - redis
+
