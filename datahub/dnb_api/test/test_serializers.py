@@ -1,5 +1,7 @@
 import pytest
 
+from  rest_framework.exceptions import ValidationError
+
 from datahub.company.models import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.dnb_api.serializers import (
@@ -72,11 +74,13 @@ def test_dnb_company_serializer_partial_save_serializer_not_partial(db):
 
 def test_duns_number_is_not_valid(db):
     """Tests that serializer is not valid when duns number is not provided"""
-    dh_company = CompanyFactory(duns_number=None)
     serializer = DNBCompanyHierarchySerializer(
-        dh_company,
+        {},
         data={'duns_number': None},
     )
+    with pytest.raises(ValidationError):
+      serializer.validate_duns_number(duns_number=None)
+
     assert not serializer.is_valid()
 
 
