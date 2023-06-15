@@ -9,6 +9,7 @@ from rest_framework import serializers
 
 from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.company.test.factories import AdviserFactory, ContactFactory
+from datahub.core.constants import ExportBarrierType as ExportBarrierTypeConstant
 from datahub.core.exceptions import DataHubError
 from datahub.core.test_utils import resolve_data
 from datahub.event.test.factories import DisabledEventFactory, EventFactory
@@ -32,6 +33,7 @@ from datahub.interaction.test.factories import (
     ServiceAnswerOptionFactory,
 )
 from datahub.interaction.test.utils import random_service
+from datahub.metadata.models import ExportBarrierType
 from datahub.metadata.test.factories import ChildServiceFactory, ServiceFactory, TeamFactory
 
 EMAIL_MATCHING_CONTACT_TEST_DATA = [
@@ -360,6 +362,30 @@ class TestInteractionCSVRowFormValidation:
                 },
                 id='cannot service answer blank when is required',
             ),
+            pytest.param(
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.INVESTMENT,
+                    'export_barrier_type': 'access,knowledge',
+                },
+                {
+                    'export_barrier_type': ['Export barrier type is only valid for export theme.'],
+                },
+                id='cannot provide export barrier types for theme different than export',
+            ),
+            pytest.param(
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.EXPORT,
+                    'export_barrier_type': ['other'],
+                },
+                {
+                    'export_barrier_type': [
+                        'Select a valid choice. other is not one of the available choices.',
+                    ],
+                },
+                id="cannot select 'Other' as it is not supported",
+            ),
         ),
     )
     def test_validation_errors(self, data, errors):
@@ -380,7 +406,6 @@ class TestInteractionCSVRowFormValidation:
 
             **resolve_data(data),
         }
-
         form = InteractionCSVRowForm(data=resolved_data)
         assert form.errors == errors
 
@@ -1163,11 +1188,22 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'contact_email': contact.email,
             'service': service.name,
             'communication_channel': communication_channel.name,
+            'export_barrier_type': 'capacity,Finance',
         }
         form = InteractionCSVRowForm(data=data)
 
         assert form.is_valid()
-        assert form.cleaned_data_as_serializer_dict() == {
+        actual_dict = form.cleaned_data_as_serializer_dict()
+        actual_export_barrier_type = set(actual_dict.pop('export_barrier_type'))
+        assert actual_export_barrier_type == set(
+            ExportBarrierType.objects.filter(
+                name__in=[
+                    ExportBarrierTypeConstant.capacity.value.name,
+                    ExportBarrierTypeConstant.finance.value.name,
+                ],
+            ),
+        )
+        assert actual_dict == {
             'contacts': [contact],
             'communication_channel': communication_channel,
             'company': contact.company,
@@ -1189,6 +1225,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'theme': data['theme'],
             'was_policy_feedback_provided': False,
             'were_countries_discussed': False,
+            'helped_remove_export_barrier': True,
         }
 
     def test_cleaned_data_as_serializer_dict_for_service_delivery(self):
@@ -1235,6 +1272,56 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'theme': data['theme'],
             'was_policy_feedback_provided': False,
             'were_countries_discussed': False,
+            'helped_remove_export_barrier': None,
+            'export_barrier_type': [],
+        }
+
+    def test_cleaned_data_as_serializer_dict_for_export_interaction_without_barrier_types(self):
+        """
+        Test that cleaned_data_as_serializer_dict() transforms an export interaction
+        that has no export barrier types provided.
+        """
+        adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
+        contact = ContactFactory(email='unique@company.com')
+        service = random_service()
+        communication_channel = random_communication_channel()
+
+        data = {
+            'theme': Interaction.Theme.EXPORT,
+            'kind': Interaction.Kind.INTERACTION,
+            'date': '01/01/2018',
+            'adviser_1': adviser.name,
+            'contact_email': contact.email,
+            'service': service.name,
+            'communication_channel': communication_channel.name,
+        }
+        form = InteractionCSVRowForm(data=data)
+
+        assert form.is_valid()
+        assert form.cleaned_data_as_serializer_dict() == {
+            'contacts': [contact],
+            'communication_channel': communication_channel,
+            'company': contact.company,
+            'companies': [contact.company],
+            'date': datetime(2018, 1, 1, tzinfo=utc),
+            'dit_participants': [
+                {
+                    'adviser': adviser,
+                    'team': adviser.dit_team,
+                },
+            ],
+            'event': None,
+            'kind': data['kind'],
+            'notes': '',
+            'service': service,
+            'service_answers': None,
+            'status': Interaction.Status.COMPLETE,
+            'subject': service.name,
+            'theme': data['theme'],
+            'was_policy_feedback_provided': False,
+            'were_countries_discussed': False,
+            'helped_remove_export_barrier': False,
+            'export_barrier_type': [],
         }
 
 

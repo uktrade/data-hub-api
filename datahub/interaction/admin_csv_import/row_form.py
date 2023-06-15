@@ -1,9 +1,10 @@
 from datetime import datetime, time
+from functools import reduce
 from typing import NamedTuple
 
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
-from django.db.models import Value
+from django.db.models import Q, Value
 from django.db.transaction import atomic
 from django.utils.timezone import utc
 from django.utils.translation import gettext_lazy
@@ -14,6 +15,7 @@ from datahub.company.contact_matching import (
     find_active_contact_by_email_address,
 )
 from datahub.company.models import Advisor
+from datahub.core.constants import ExportBarrierType as ExportBarrierTypeConstant
 from datahub.core.exceptions import DataHubError
 from datahub.core.query_utils import PreferNullConcat
 from datahub.core.utils import join_truthy_strings
@@ -28,7 +30,7 @@ from datahub.interaction.models import (
     ServiceAnswerOption,
 )
 from datahub.interaction.serializers import InteractionSerializer
-from datahub.metadata.models import Service, Team
+from datahub.metadata.models import ExportBarrierType, Service, Team
 from datahub.metadata.query_utils import get_service_name_subquery
 
 
@@ -120,6 +122,24 @@ class NoDuplicatesModelChoiceField(forms.ModelChoiceField):
             )
 
 
+class CaseInsensitiveMultipleChoiceField(forms.MultipleChoiceField):
+    def to_python(self, value):
+        """Support both array and comma separated input values."""
+        if isinstance(value, str):
+            value = value.split(',')
+        return [str(val).lower().strip() for val in super().to_python(value)]
+
+    def validate(self, value):
+        """Case insensitive validation of choices."""
+        for val in value:
+            if not any(choice for choice in self.choices if val.lower() == choice[0].lower()):
+                raise ValidationError(
+                    self.error_messages['invalid_choice'],
+                    code='invalid_choice',
+                    params={'value': val},
+                )
+
+
 class InteractionCSVRowForm(forms.Form):
     """Form used for validating a single row in a CSV of interactions."""
 
@@ -177,11 +197,18 @@ class InteractionCSVRowForm(forms.Form):
     subject = forms.CharField(required=False)
     notes = forms.CharField(required=False)
 
+    export_barrier_type = CaseInsensitiveMultipleChoiceField(required=False)
+
     def __init__(self, *args, duplicate_tracker=None, row_index=None, **kwargs):
         """Initialise the form with an optional zero-based row index."""
         super().__init__(*args, **kwargs)
         self.row_index = row_index
         self.duplicate_tracker = duplicate_tracker
+        self.fields['export_barrier_type'].choices = [
+            (barrier_type.name, barrier_type.name)
+            for barrier_type in ExportBarrierType.objects.all()
+            if barrier_type.name != ExportBarrierTypeConstant.other.value.name
+        ]
 
     @classmethod
     def get_required_field_names(cls):
@@ -208,10 +235,22 @@ class InteractionCSVRowForm(forms.Form):
         """
         return self.cleaned_data['contact_matching_status'] == ContactMatchingStatus.matched
 
+    def clean_export_barrier_type(self):
+        barrier_types = self.cleaned_data.get('export_barrier_type')
+        if not barrier_types:
+            return []
+
+        # we need to match all selected export barrier types without case sensivity
+        name_query = map(lambda name: Q(name__iexact=name), barrier_types)
+        name_query = reduce(lambda a, b: a | b, name_query)
+        cleaned_services = list(ExportBarrierType.objects.filter(name_query))
+        return cleaned_services
+
     def clean(self):
         """Validate and clean the data for this row."""
         data = super().clean()
 
+        data.setdefault('export_barrier_type', [])
         kind = data.get('kind')
         subject = data.get('subject')
         service = data.get('service')
@@ -235,6 +274,9 @@ class InteractionCSVRowForm(forms.Form):
 
         self._validate_not_duplicate_of_prior_row(data)
         self._validate_not_duplicate_of_existing_interaction(data)
+
+        self._validate_export_barriers(data)
+        self._populate_export_barriers(data)
 
         return data
 
@@ -271,6 +313,7 @@ class InteractionCSVRowForm(forms.Form):
         contacts = serializer_data.pop('contacts')
         companies = serializer_data.pop('companies')
         dit_participants = serializer_data.pop('dit_participants')
+        export_barrier_type = serializer_data.pop('export_barrier_type')
         # Remove `is_event` if it's present as it's a computed field and isn't saved
         # on the model
         serializer_data.pop('is_event', None)
@@ -285,6 +328,7 @@ class InteractionCSVRowForm(forms.Form):
 
         interaction.contacts.add(*contacts)
         interaction.companies.add(*companies)
+        interaction.export_barrier_types.add(*export_barrier_type)
 
         for dit_participant in dit_participants:
             InteractionDITParticipant(
@@ -403,6 +447,22 @@ class InteractionCSVRowForm(forms.Form):
         if is_duplicate_of_existing_interaction(data):
             self.add_error(None, DUPLICATE_OF_EXISTING_INTERACTION_MESSAGE)
 
+    def _populate_export_barriers(self, data):
+        theme = data.get('theme', '')
+        if theme != Interaction.Theme.EXPORT:
+            data['helped_remove_export_barrier'] = None
+            return
+
+        data['helped_remove_export_barrier'] = len(data['export_barrier_type']) > 0
+
+    def _validate_export_barriers(self, data):
+        theme = data.get('theme', '')
+        if theme != Interaction.Theme.EXPORT and data['export_barrier_type']:
+            self.add_error(
+                'export_barrier_type',
+                ValidationError('Export barrier type is only valid for export theme.'),
+            )
+
     def cleaned_data_as_serializer_dict(self):
         """
         Transforms cleaned data into a dict suitable for use with the validators from
@@ -440,6 +500,8 @@ class InteractionCSVRowForm(forms.Form):
             'theme': data['theme'],
             'was_policy_feedback_provided': False,
             'were_countries_discussed': False,
+            'helped_remove_export_barrier': data.get('helped_remove_export_barrier'),
+            'export_barrier_type': data.get('export_barrier_type'),
         }
 
         if data['kind'] == Interaction.Kind.SERVICE_DELIVERY:
