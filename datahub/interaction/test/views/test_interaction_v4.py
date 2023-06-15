@@ -638,7 +638,6 @@ class TestAddInteraction(APITestMixin):
                     'subject': ['This field is required.'],
                     'company': ['This field is required.'],
                     'was_policy_feedback_provided': ['This field is required.'],
-                    'has_related_trade_agreements': ['This field is required.'],
                     'related_trade_agreements': ['This field is required.'],
                 },
             ),
@@ -789,6 +788,36 @@ class TestAddInteraction(APITestMixin):
                     'contacts': [
                         lambda: ContactFactory(
                             company=Company.objects.get(name='Martian Island'),
+                        ),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'was_policy_feedback_provided': False,
+                    'has_related_trade_agreements': True,
+                    'related_trade_agreements': [],
+                },
+                {
+                    'related_trade_agreements': ['This field is required.'],
+                },
+            ),
+            # related trade agreements field cannot be blank
+            # when has_related_trade_agreements is true for Export, Trade Agreement and Other theme
+            (
+                {
+                    'kind': Interaction.Kind.INTERACTION,
+                    'theme': Interaction.Theme.TRADE_AGREEMENT,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Explore Ltd'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Explore Ltd'),
                         ),
                     ],
                     'dit_participants': [
@@ -1520,6 +1549,38 @@ class TestAddInteraction(APITestMixin):
                     ),
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
+                    'related_trade_agreements': [],
+                    'were_countries_discussed': True,
+                },
+                {
+                    'were_countries_discussed': [
+                        "This value can't be selected for investment interactions.",
+                    ],
+                },
+            ),
+            # were_countries_discussed can't be true for investment theme
+            # with non-required has_related_trade_agreements field
+            (
+                {
+                    'theme': Interaction.Theme.INVESTMENT,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Explore Ltd'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Explore Ltd'),
+                        ),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'was_policy_feedback_provided': False,
                     'related_trade_agreements': [],
                     'were_countries_discussed': True,
                 },
