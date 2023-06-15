@@ -609,7 +609,7 @@ class InteractionSerializer(BaseInteractionSerializer):
 class InteractionSerializerV4(BaseInteractionSerializer):
     """Interaction Serializer for V4 Endpoint"""
 
-    has_related_trade_agreements = serializers.BooleanField(required=True)
+    has_related_trade_agreements = serializers.BooleanField(required=False)
     related_trade_agreements = NestedRelatedField(
         'metadata.TradeAgreement', many=True, required=True, allow_empty=True,
     )
@@ -736,7 +736,16 @@ class InteractionSerializerV4(BaseInteractionSerializer):
                 ValidationRule(
                     'required',
                     OperatorRule('related_trade_agreements', bool),
-                    when=OperatorRule('has_related_trade_agreements', bool),
+                    when=AndRule(
+                        OperatorRule('has_related_trade_agreements', bool),
+                        InRule(
+                            'theme',
+                            [Interaction.Theme.EXPORT,
+                             Interaction.Theme.TRADE_AGREEMENT,
+                             Interaction.Theme.OTHER,
+                             ],
+                        ),
+                    ),
                 ),
                 ValidationRule(
                     'invalid_when_no_related_trade_agreement',
