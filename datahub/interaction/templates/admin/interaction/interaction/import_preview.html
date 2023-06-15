@@ -48,6 +48,7 @@
         <th>{% trans 'Event' %}</th>
         <th>{% trans 'Subject' %}</th>
         <th>{% trans 'Notes' %}</th>
+        <th>{% trans 'Export barrier type' %}</th>
       </tr>
     </thead>
   {% for row in matched_rows %}
@@ -74,6 +75,10 @@
       <td>{{ row.event }}</td>
       <td>{{ row.subject }}</td>
       <td>{{ row.notes }}</td>
+      <td>{% for barrier_type in row.export_barrier_type %}
+        {% if not forloop.first %}<br>{%  endif %}
+        {{ barrier_type.name }}
+      {% endfor %}</td>
     </tr>
 
   {% endfor %}
