@@ -1,6 +1,7 @@
 from collections import namedtuple
 from typing import Callable, NamedTuple, Sequence, Type
 
+import reversion
 from django.db import models
 
 from datahub.company.models import (
@@ -181,18 +182,20 @@ def merge_companies(source_company: Company, target_company: Company, user):
     ):
         raise MergeNotAllowedError()
 
-    results = {
-        configuration.model: _update_objects(configuration, source_company, target_company)
-        for configuration in MERGE_CONFIGURATION
-    }
+    with reversion.create_revision():
+        reversion.set_comment('Company merged')
+        results = {
+            configuration.model: _update_objects(configuration, source_company, target_company)
+            for configuration in MERGE_CONFIGURATION
+        }
 
-    source_company.mark_as_transferred(
-        target_company,
-        Company.TransferReason.DUPLICATE,
-        user,
-    )
+        source_company.mark_as_transferred(
+            target_company,
+            Company.TransferReason.DUPLICATE,
+            user,
+        )
 
-    return results
+        return results
 
 
 def get_planned_changes(company: Company):
