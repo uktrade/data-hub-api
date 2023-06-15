@@ -12,6 +12,7 @@ from datahub.cleanup.management.commands import delete_orphaned_versions
 from datahub.company.test.factories import (
     AdviserFactory,
     CompanyExportCountryFactory,
+    CompanyExportCountryHistoryFactory,
     CompanyFactory,
     ContactFactory,
     ExportFactory,
@@ -34,7 +35,10 @@ from datahub.investment.project.test.factories import (
 )
 from datahub.metadata.test.factories import SectorFactory
 from datahub.omis.order.test.factories import OrderFactory
-from datahub.user.company_list.test.factories import PipelineItemFactory
+from datahub.user.company_list.test.factories import (
+    CompanyListItemFactory,
+    PipelineItemFactory,
+)
 
 
 MAPPINGS = {
@@ -42,7 +46,9 @@ MAPPINGS = {
     'company.Company': CompanyFactory,
     'company.CompanyExport': ExportFactory,
     'company.CompanyExportCountry': CompanyExportCountryFactory,
+    'company.CompanyExportCountryHistory': CompanyExportCountryHistoryFactory,
     'company.Contact': ContactFactory,
+    'company_list.CompanyListItem': CompanyListItemFactory,
     'company_list.PipelineItem': PipelineItemFactory,
     'company_referral.CompanyReferral': CompanyReferralFactory,
     'event.Event': EventFactory,

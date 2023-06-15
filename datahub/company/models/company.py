@@ -737,6 +737,7 @@ class CompanyExportCountry(BaseModel):
         return f'{self.company} {self.country} {self.status}'
 
 
+@reversion.register_base_model()
 class CompanyExportCountryHistory(models.Model):
     """
     Historical log of `CompanyExportCountry` model.

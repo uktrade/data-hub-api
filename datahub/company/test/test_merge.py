@@ -2,10 +2,12 @@ from datetime import datetime
 from unittest.mock import patch
 
 import pytest
+import reversion
 from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.company.merge import (
+    ALLOWED_RELATIONS_FOR_MERGING,
     get_planned_changes,
     INVESTMENT_PROJECT_COMPANY_FIELDS,
     merge_companies,
@@ -605,6 +607,11 @@ class TestDuplicateCompanyMerger:
         user = AdviserFactory()
         with pytest.raises(MergeNotAllowedError):
             merge_companies(source_company, target_company, user)
+
+    def test_related_fields_are_versioned(self):
+        for relation in ALLOWED_RELATIONS_FOR_MERGING:
+            assert reversion.is_registered(relation.model), \
+                f'{relation.model} is not registered with reversion'
 
 
 def _company_factory(
