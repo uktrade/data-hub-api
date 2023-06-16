@@ -13,12 +13,10 @@ logger = getLogger(__name__)
 
 class Command(CSVBaseCommand):
     """
-    Command to set Company.created_on where missing.
+    Command to set referral.created_by where incorrect.
 
-    Some Company records have missing created_on values which
-    besides being inconsistent with the parent BaseModel
-    class is also causing these Companies to be omitted
-    from Data Workspace.
+    Some referral records have incorrect created_by values which
+    is set as the default value for sending adviser. This changes the created_by value
     """
 
     def _process_row(self, row, simulate=False, **options):
@@ -37,7 +35,7 @@ class Command(CSVBaseCommand):
         )
 
         company_referral.created_by = company_referral_sender_advisor
-        
+
         with reversion.create_revision():
             company_referral.save(update_fields=('created_by',))
-            reversion.set_comment('Sender Advisor updated.')
+            reversion.set_comment('Sender Advisor updated. Sender Advisor by default is set to who created the referral')
