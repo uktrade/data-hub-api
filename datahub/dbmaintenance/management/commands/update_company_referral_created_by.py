@@ -20,6 +20,8 @@ class Command(CSVBaseCommand):
     is set as the default value for sending adviser. This changes the created_by value
     """
 
+    _uk_date_format_parserinfo = parserinfo(dayfirst=True)
+
     def _process_row(self, row, simulate=False, **options):
         """Process a single row."""
         # .parse() creates a datetime object even in the absence of hours, minutes
