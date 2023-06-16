@@ -3,8 +3,8 @@ from logging import getLogger
 import reversion
 from dateutil.parser import parse
 
-from datahub.company_referral.models import CompanyReferral
 from datahub.company.models import Advisor
+from datahub.company_referral.models import CompanyReferral
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
 
@@ -39,4 +39,6 @@ class Command(CSVBaseCommand):
 
         with reversion.create_revision():
             company_referral.save(update_fields=('created_by',))
-            reversion.set_comment('Sender Advisor updated. Sender Advisor by default is set to who created the referral')
+            reversion.set_comment(
+                'Sender Advisor updated. Sender Advisor by default is set to who created the referral'
+            )
