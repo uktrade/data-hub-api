@@ -40,5 +40,6 @@ class Command(CSVBaseCommand):
         with reversion.create_revision():
             company_referral.save(update_fields=('created_by',))
             reversion.set_comment(
-                'Sender Advisor updated. Sender Advisor by default is set to who created the referral'
+                'Sender Advisor updated.'
+                'Sender Advisor by default is set to who created the referral.'
             )
