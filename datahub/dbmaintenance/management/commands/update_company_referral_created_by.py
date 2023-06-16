@@ -1,6 +1,7 @@
 from logging import getLogger
 
 import reversion
+from dateutil.parser import parse
 
 from datahub.company_referral.models import CompanyReferral
 from datahub.company.models import Advisor
@@ -18,6 +19,8 @@ class Command(CSVBaseCommand):
     Some referral records have incorrect created_by values which
     is set as the default value for sending adviser. This changes the created_by value
     """
+
+    _uk_date_format_parserinfo = parserinfo(dayfirst=True)
 
     def _process_row(self, row, simulate=False, **options):
         """Process a single row."""
