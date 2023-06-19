@@ -40,12 +40,10 @@ class TestCompanySearchModel:
             'reference_code',
             'sector',
             'latest_interaction_date',
-
             'address',
             'registered_address',
-
             'one_list_group_global_account_manager',
-
+            'one_list_tier',
             'trading_names',
             'turnover_range',
             'uk_based',

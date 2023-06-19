@@ -18,6 +18,7 @@ from datahub.company.test.factories import (
     AdviserFactory,
     CompanyExportCountryFactory,
     CompanyFactory,
+    OneListTierFactory,
 )
 from datahub.core import constants
 from datahub.core.test_utils import (
@@ -118,23 +119,25 @@ def setup_data(opensearch_with_collector):
 @pytest.fixture
 def company_names_and_postcodes(opensearch_with_collector):
     """Get companies with postcodes."""
-    (names, postcodes) = zip(*(
-        ('company_w1', 'w1 2AB'),  # AB in suffix to ensure not matched in AB tests
-        ('company_w1a', 'W1A2AB'),  # AB in suffix to ensure not matched in AB tests
-        ('company_w11', 'W112AB'),  # AB in suffix to ensure not matched in AB tests
-        ('company_ab1_1', 'AB11WC'),  # WC in suffix to ensure not matched in WC tests
-        ('company_ab10', 'ab10 1WC'),  # WC in suffix to ensure not matched in WC tests
-        # to test the difference between searching for AB1 0 (sector) and AB10 (district)
-        ('company_ab1_0', 'AB1 0WC'),
-        ('company_wc2b', 'WC2B4AB'),  # AB in suffix to ensure not matched in AB tests
-        ('company_wc2n', 'WC2N9ZZ'),
-        ('company_wc1x', 'w  C   1 x0aA'),
-        ('company_wc1a', 'W C 1 A 1 G A'),
-        ('company_se1', 'SE13A J'),
-        ('company_se1_3', 'SE13AJ'),
-        ('company_se2', 'SE23AJ'),
-        ('company_se3', 'SE33AJ'),
-    ))
+    (names, postcodes) = zip(
+        *(
+            ('company_w1', 'w1 2AB'),  # AB in suffix to ensure not matched in AB tests
+            ('company_w1a', 'W1A2AB'),  # AB in suffix to ensure not matched in AB tests
+            ('company_w11', 'W112AB'),  # AB in suffix to ensure not matched in AB tests
+            ('company_ab1_1', 'AB11WC'),  # WC in suffix to ensure not matched in WC tests
+            ('company_ab10', 'ab10 1WC'),  # WC in suffix to ensure not matched in WC tests
+            # to test the difference between searching for AB1 0 (sector) and AB10 (district)
+            ('company_ab1_0', 'AB1 0WC'),
+            ('company_wc2b', 'WC2B4AB'),  # AB in suffix to ensure not matched in AB tests
+            ('company_wc2n', 'WC2N9ZZ'),
+            ('company_wc1x', 'w  C   1 x0aA'),
+            ('company_wc1a', 'W C 1 A 1 G A'),
+            ('company_se1', 'SE13A J'),
+            ('company_se1_3', 'SE13AJ'),
+            ('company_se2', 'SE23AJ'),
+            ('company_se3', 'SE33AJ'),
+        ),
+    )
 
     CompanyFactory.create_batch(
         len(names),
@@ -271,7 +274,7 @@ class TestSearch(APITestMixin):
             company_number='123',
             trading_names=['Xyz trading', 'Abc trading'],
             global_headquarters=None,
-            one_list_tier=None,
+            one_list_tier=OneListTierFactory(),
             one_list_account_owner=one_list_account_owner,
         )
         opensearch_with_collector.flush_and_refresh()
@@ -324,7 +327,8 @@ class TestSearch(APITestMixin):
                         'name': one_list_account_owner.name,
                     },
                     'uk_based': (
-                        company.address_country.id == uuid.UUID(
+                        company.address_country.id
+                        == uuid.UUID(
                             constants.Country.united_kingdom.value.id,
                         )
                     ),
@@ -354,8 +358,7 @@ class TestSearch(APITestMixin):
                         'id': str(company.sector.id),
                         'name': company.sector.name,
                         'ancestors': [
-                            {'id': str(ancestor.id)}
-                            for ancestor in company.sector.get_ancestors()
+                            {'id': str(ancestor.id)} for ancestor in company.sector.get_ancestors()
                         ],
                     },
                     'turnover_range': {
@@ -369,6 +372,10 @@ class TestSearch(APITestMixin):
                     'archived_on': None,
                     'archived_reason': None,
                     'latest_interaction_date': None,
+                    'one_list_tier': {
+                        'id': str(company.one_list_tier.id),
+                        'name': company.one_list_tier.name,
+                    },
                 },
             ],
         }
@@ -381,7 +388,6 @@ class TestSearch(APITestMixin):
                 {},
                 ['abc defg ltd', 'abc defg us ltd', 'archived'],
             ),
-
             # archived True
             (
                 {
@@ -389,7 +395,6 @@ class TestSearch(APITestMixin):
                 },
                 ['archived'],
             ),
-
             # archived False
             (
                 {
@@ -397,7 +402,6 @@ class TestSearch(APITestMixin):
                 },
                 ['abc defg ltd', 'abc defg us ltd'],
             ),
-
             # uk_region
             (
                 {
@@ -405,7 +409,6 @@ class TestSearch(APITestMixin):
                 },
                 ['abc defg ltd'],
             ),
-
             # uk_region
             (
                 {
@@ -413,7 +416,6 @@ class TestSearch(APITestMixin):
                 },
                 ['abc defg ltd'],
             ),
-
             # export_to_countries
             (
                 {
@@ -421,7 +423,6 @@ class TestSearch(APITestMixin):
                 },
                 ['abc defg ltd', 'abc defg us ltd'],
             ),
-
             # export_to_countries
             (
                 {
@@ -429,7 +430,6 @@ class TestSearch(APITestMixin):
                 },
                 ['abc defg us ltd'],
             ),
-
             # future_interest_countries
             (
                 {
@@ -437,7 +437,6 @@ class TestSearch(APITestMixin):
                 },
                 ['abc defg ltd', 'abc defg us ltd'],
             ),
-
             # future_interest_countries
             (
                 {
@@ -462,10 +461,7 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == len(expected_companies)
-        assert [
-            result['name']
-            for result in response_data['results']
-        ] == expected_companies
+        assert [result['name'] for result in response_data['results']] == expected_companies
 
     @pytest.mark.parametrize(
         'search_term,expected_companies',
@@ -475,7 +471,6 @@ class TestSearch(APITestMixin):
             ('W', ['company_w1', 'company_w1a', 'company_w11']),
             ('WC', ['company_wc2b', 'company_wc2n', 'company_wc1x', 'company_wc1a']),
             ('AB', ['company_ab1_0', 'company_ab1_1', 'company_ab10']),
-
             # Postcode district
             ('W1', ['company_w1', 'company_w1a']),
             ('W11', ['company_w11']),
@@ -483,25 +478,19 @@ class TestSearch(APITestMixin):
             ('AB1', ['company_ab1_0', 'company_ab1_1']),
             ('AB10', ['company_ab10']),  # Should not match company_ab1_0
             ('SE1', ['company_se1', 'company_se1_3']),
-
             # Postcode district with sub-district
             ('W1A', ['company_w1a']),
-
             # Postcode sector
             ('AB1 0', ['company_ab1_0']),  # Should not match company_ab10
             ('SE1 3', ['company_se1', 'company_se1_3']),
             ('WC2B 4', ['company_wc2b']),
-
             # Multiple postcodes searched
             (['W1', 'W11'], ['company_w1', 'company_w1a', 'company_w11']),
             (['AB1', 'AB10'], ['company_ab1_0', 'company_ab1_1', 'company_ab10']),
-
             # Valid and invalid
             (['SE1', 'Invalid'], ['company_se1', 'company_se1_3']),
-
             # Mixed-case search
             (['aB1', 'ab10'], ['company_ab1_0', 'company_ab1_1', 'company_ab10']),
-
             # Entire postcode (spaces should be ignored)
             (['AB101WC', 'WC2B4AB'], ['company_ab10', 'company_wc2b']),
             (['AB10 1WC', 'WC2B 4AB'], ['company_ab10', 'company_wc2b']),
@@ -587,7 +576,9 @@ class TestSearch(APITestMixin):
         (1, 2, 3),
     )
     def test_one_list_account_manager_filter(
-        self, num_account_managers, opensearch_with_collector,
+        self,
+        num_account_managers,
+        opensearch_with_collector,
     ):
         """Test one list account manager filter."""
         account_managers = AdviserFactory.create_batch(3)
@@ -600,8 +591,9 @@ class TestSearch(APITestMixin):
         opensearch_with_collector.flush_and_refresh()
 
         query = {
-            'one_list_group_global_account_manager':
-            [account_manager.id for account_manager in selected_account_managers],
+            'one_list_group_global_account_manager': [
+                account_manager.id for account_manager in selected_account_managers
+            ],
         }
 
         url = reverse('api-v4:search:company')
@@ -621,7 +613,8 @@ class TestSearch(APITestMixin):
         assert search_results == expected_results
 
     def test_one_list_account_manager_with_global_headquarters_filter(
-        self, opensearch_with_collector,
+        self,
+        opensearch_with_collector,
     ):
         """
         Tests that one list account manager filter searches for inherited one list account manager.
@@ -657,7 +650,10 @@ class TestSearch(APITestMixin):
         (0, 1, 2),
     )
     def test_sector_descends_filter(
-        self, hierarchical_sectors, opensearch_with_collector, sector_level,
+        self,
+        hierarchical_sectors,
+        opensearch_with_collector,
+        sector_level,
     ):
         """Test the sector_descends filter."""
         num_sectors = len(hierarchical_sectors)
@@ -669,9 +665,11 @@ class TestSearch(APITestMixin):
         )
         CompanyFactory.create_batch(
             3,
-            sector=factory.LazyFunction(lambda: random_obj_for_queryset(
-                Sector.objects.exclude(pk__in=sectors_ids),
-            )),
+            sector=factory.LazyFunction(
+                lambda: random_obj_for_queryset(
+                    Sector.objects.exclude(pk__in=sectors_ids),
+                ),
+            ),
         )
 
         opensearch_with_collector.flush_and_refresh()
@@ -733,7 +731,6 @@ class TestSearch(APITestMixin):
             ('his', 'whiskers and tabby'),
             ('ers', 'whiskers and tabby'),
             ('1a', '1a'),
-
             # trading names
             ('maine coon egyptian mau', 'whiskers and tabby'),
             ('maine', 'whiskers and tabby'),
@@ -741,7 +738,6 @@ class TestSearch(APITestMixin):
             ('ine oon', 'whiskers and tabby'),
             ('ine mau', 'whiskers and tabby'),
             ('3a', '1a'),
-
             # non-matches
             ('whi lorem', None),
             ('wh', None),
@@ -752,7 +748,10 @@ class TestSearch(APITestMixin):
         ),
     )
     def test_composite_name_filter(
-        self, opensearch_with_collector, name_term, matched_company_name,
+        self,
+        opensearch_with_collector,
+        name_term,
+        matched_company_name,
     ):
         """Tests composite name filter."""
         CompanyFactory(
@@ -822,9 +821,7 @@ class TestSearch(APITestMixin):
 
             start = page * page_size
             end = start + page_size
-            assert [
-                UUID(company['id']) for company in response.data['results']
-            ] == ids[start:end]
+            assert [UUID(company['id']) for company in response.data['results']] == ids[start:end]
 
     @pytest.mark.parametrize(
         'filters,expected_companies,expected_dates',
@@ -893,14 +890,10 @@ class TestSearch(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == len(expected_companies)
 
-        assert [
-            result['name']
-            for result in response_data['results']
-        ] == expected_companies
+        assert [result['name'] for result in response_data['results']] == expected_companies
 
         assert [
-            result['latest_interaction_date']
-            for result in response_data['results']
+            result['latest_interaction_date'] for result in response_data['results']
         ] == expected_dates
 
     @pytest.mark.parametrize(
@@ -952,14 +945,10 @@ class TestSearch(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == len(expected_companies)
 
-        assert [
-            result['name']
-            for result in response_data['results']
-        ] == expected_companies
+        assert [result['name'] for result in response_data['results']] == expected_companies
 
         assert [
-            result['latest_interaction_date']
-            for result in response_data['results']
+            result['latest_interaction_date'] for result in response_data['results']
         ] == expected_dates
 
     def test_address_area_filters_one_area(self, setup_us_areas):
@@ -1135,7 +1124,8 @@ class TestCompanyExportView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {'filename': 'Data Hub - Companies - 2018-01-01-11-12-13.csv'},
+            'attachment',
+            {'filename': 'Data Hub - Companies - 2018-01-01-11-12-13.csv'},
         )
 
         sorted_company = Company.objects.order_by(orm_ordering, 'pk')
@@ -1151,16 +1141,22 @@ class TestCompanyExportView(APITestMixin):
                 'Area': get_attr_or_none(company, 'address_area.name'),
                 'Country': get_attr_or_none(company, 'address_country.name'),
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
-                'Countries exported to': ', '.join([
-                    e.country.name for e in company.export_countries.filter(
-                        status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-                    ).order_by('country__name')
-                ]),
-                'Countries of interest':', '.join([
-                    e.country.name for e in company.export_countries.filter(
-                        status=CompanyExportCountry.Status.FUTURE_INTEREST,
-                    ).order_by('country__name')
-                ]),
+                'Countries exported to': ', '.join(
+                    [
+                        e.country.name
+                        for e in company.export_countries.filter(
+                            status=CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                        ).order_by('country__name')
+                    ],
+                ),
+                'Countries of interest': ', '.join(
+                    [
+                        e.country.name
+                        for e in company.export_countries.filter(
+                            status=CompanyExportCountry.Status.FUTURE_INTEREST,
+                        ).order_by('country__name')
+                    ],
+                ),
                 'Archived': company.archived,
                 'Date created': company.created_on,
                 'Number of employees': (
@@ -1173,8 +1169,9 @@ class TestCompanyExportView(APITestMixin):
                     if company.turnover is not None
                     else get_attr_or_none(company, 'turnover_range.name')
                 ),
-                'Headquarter type':
-                    (get_attr_or_none(company, 'headquarter_type.name') or '').upper(),
+                'Headquarter type': (
+                    get_attr_or_none(company, 'headquarter_type.name') or ''
+                ).upper(),
             }
             for company in sorted_company
         ]
