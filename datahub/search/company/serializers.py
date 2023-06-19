@@ -34,6 +34,7 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
     area = SingleOrListField(child=StringUUIDField(), required=False)
     export_segment = SingleOrListField(required=False)
     export_sub_segment = SingleOrListField(required=False)
+    one_list_tier = SingleOrListField(child=StringUUIDField(), required=False)
 
     SORT_BY_FIELDS = (
         'modified_on',
