@@ -1,6 +1,7 @@
 from collections import namedtuple
 from typing import Callable, NamedTuple, Sequence, Type
 
+import reversion
 from django.db import models
 
 from datahub.company.models import (
@@ -12,6 +13,7 @@ from datahub.company.models import (
 from datahub.company_referral.models import CompanyReferral
 from datahub.core.exceptions import DataHubError
 from datahub.core.model_helpers import get_related_fields, get_self_referential_relations
+from datahub.dnb_api.utils import _get_rollback_version
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 from datahub.omis.order.models import Order
@@ -181,18 +183,28 @@ def merge_companies(source_company: Company, target_company: Company, user):
     ):
         raise MergeNotAllowedError()
 
-    results = {
-        configuration.model: _update_objects(configuration, source_company, target_company)
-        for configuration in MERGE_CONFIGURATION
-    }
+    with reversion.create_revision():
+        reversion.set_comment('Company merged')
+        results = {
+            configuration.model: _update_objects(configuration, source_company, target_company)
+            for configuration in MERGE_CONFIGURATION
+        }
 
-    source_company.mark_as_transferred(
-        target_company,
-        Company.TransferReason.DUPLICATE,
-        user,
-    )
+        source_company.mark_as_transferred(
+            target_company,
+            Company.TransferReason.DUPLICATE,
+            user,
+        )
 
-    return results
+        return results
+
+
+def rollback_merge_companies(former_source_company: Company):
+    """
+    Rolls back a company merge of what was the "source_company" passed to merge_companies
+    """
+    rollback_version = _get_rollback_version(former_source_company, 'Company merged')
+    rollback_version.revision.revert()
 
 
 def get_planned_changes(company: Company):

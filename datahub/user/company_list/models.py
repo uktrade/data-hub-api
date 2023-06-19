@@ -38,6 +38,7 @@ class CompanyListItemPermissionCode(StrEnum):
     delete_company_list_item = 'delete_companylistitem'
 
 
+@reversion.register_base_model()
 class CompanyListItem(BaseModel):
     """
     An item on a user's personal list of companies.
