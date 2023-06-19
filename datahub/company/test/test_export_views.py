@@ -1,6 +1,8 @@
 import datetime
 import uuid
 
+from operator import attrgetter, itemgetter
+
 import pytest
 
 from dateutil.parser import parse
@@ -836,8 +838,12 @@ class TestExportOwnerList(APITestMixin):
 
         response = self.api_client.get(url)
         response_data = response.json()
+        response_data.sort(key=itemgetter('id'))
+
+        owners = [self.user, other_owner]
+        owners.sort(key=attrgetter('id'))
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response_data) == 2
-        assert response_data[0]['id'] == str(other_owner.id)
-        assert response_data[1]['id'] == str(self.user.id)
+        assert response_data[0]['id'] == str(owners[0].id)
+        assert response_data[1]['id'] == str(owners[1].id)
