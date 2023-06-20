@@ -1,8 +1,10 @@
 from logging import getLogger
+
 from django.core.management.base import BaseCommand
-from django.db import transaction
 
 import reversion
+
+from django.db import transaction
 
 from datahub.company.models import Advisor
 from datahub.company_referral.models import CompanyReferral
