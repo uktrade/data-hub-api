@@ -1,15 +1,12 @@
 from logging import getLogger
+from django.core.management.base import BaseCommand
+from django.db import transaction
 
 import reversion
-from dateutil.parser import parse
 
 from datahub.company.models import Advisor
 from datahub.company_referral.models import CompanyReferral
-from django.core.management.base import BaseCommand
 
-from django.db import transaction
-
-from datahub.dbmaintenance.utils import parse_uuid
 
 logger = getLogger(__name__)
 
@@ -43,9 +40,9 @@ class Command(BaseCommand):
         with reversion.create_revision():
             referral.save(update_fields=('created_by',))
             reversion.set_comment(
-                'Created by updated to new id.'
+                'Created by updated to new id.',
             )
 
         self.stdout.write(self.style.SUCCESS(
-            f'Updated referral created_by for --{referral}-- to the id: {user}'
+            f'Updated referral created_by for --{referral}-- to the id: {user}',
         ))
