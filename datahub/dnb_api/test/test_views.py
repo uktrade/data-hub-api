@@ -26,12 +26,14 @@ from datahub.dnb_api.utils import (
 )
 from datahub.interaction.models import InteractionPermission
 from datahub.metadata.models import AdministrativeArea, Country
+from datahub.search.company import CompanySearchApp
 
 DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/search/')
 DNB_CHANGE_REQUEST_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'change-request/')
 DNB_INVESTIGATION_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'investigation/')
 DNB_HIERARCHY_SEARCH_URL = urljoin(
-    f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/hierarchy/search/',
+    f'{settings.DNB_SERVICE_BASE_URL}/',
+    'companies/hierarchy/search/',
 )
 
 
@@ -361,17 +363,26 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             iso_alpha2_code=dnb_company['address_country'],
         ).first()
 
-        area = AdministrativeArea.objects.filter(
-            area_code=dnb_company['address_area_abbrev_name'],
-        ).first() if dnb_company.get('address_area_abbrev_name') else None
+        area = (
+            AdministrativeArea.objects.filter(
+                area_code=dnb_company['address_area_abbrev_name'],
+            ).first()
+            if dnb_company.get('address_area_abbrev_name')
+            else None
+        )
 
-        registered_country = Country.objects.filter(
-            iso_alpha2_code=dnb_company['registered_address_country'],
-        ).first() if dnb_company.get('registered_address_country') else None
+        registered_country = (
+            Country.objects.filter(
+                iso_alpha2_code=dnb_company['registered_address_country'],
+            ).first()
+            if dnb_company.get('registered_address_country')
+            else None
+        )
 
         company_number = (
             dnb_company['registration_numbers'][0].get('registration_number')
-            if country.iso_alpha2_code == 'GB' else None
+            if country.iso_alpha2_code == 'GB'
+            else None
         )
 
         [company.pop(k) for k in ('id', 'created_on', 'modified_on')]
@@ -379,18 +390,22 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         required_registered_address_fields_present = all(
             field in dnb_company for field in REQUIRED_REGISTERED_ADDRESS_FIELDS
         )
-        registered_address = {
-            'area': None,
-            'country': {
-                'id': str(registered_country.id),
-                'name': registered_country.name,
-            },
-            'line_1': dnb_company.get('registered_address_line_1') or '',
-            'line_2': dnb_company.get('registered_address_line_2') or '',
-            'town': dnb_company.get('registered_address_town') or '',
-            'county': dnb_company.get('registered_address_county') or '',
-            'postcode': dnb_company.get('registered_address_postcode') or '',
-        } if required_registered_address_fields_present else None
+        registered_address = (
+            {
+                'area': None,
+                'country': {
+                    'id': str(registered_country.id),
+                    'name': registered_country.name,
+                },
+                'line_1': dnb_company.get('registered_address_line_1') or '',
+                'line_2': dnb_company.get('registered_address_line_2') or '',
+                'town': dnb_company.get('registered_address_town') or '',
+                'county': dnb_company.get('registered_address_county') or '',
+                'postcode': dnb_company.get('registered_address_postcode') or '',
+            }
+            if required_registered_address_fields_present
+            else None
+        )
 
         assert company == {
             'name': dnb_company['primary_name'],
@@ -399,7 +414,9 @@ class TestDNBCompanyCreateAPI(APITestMixin):
                 'area': {
                     'id': str(area.id),
                     'name': area.name,
-                } if area is not None else None,
+                }
+                if area is not None
+                else None,
                 'country': {
                     'id': str(country.id),
                     'name': country.name,
@@ -721,8 +738,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'duns_number': [
-                f'Company with duns_number: {duns_number} already exists in DataHub.'],
+            'duns_number': [f'Company with duns_number: {duns_number} already exists in DataHub.'],
         }
 
     def test_post_invalid_country(
@@ -1070,8 +1086,7 @@ class TestCompanyLinkView(APITestMixin):
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'detail': f'Company {str(company.id)} is already linked '
-                      'with duns number 123456789',
+            'detail': f'Company {str(company.id)} is already linked ' 'with duns number 123456789',
         }
 
     def test_duplicate_duns_number(self):
@@ -1298,7 +1313,6 @@ class TestCompanyChangeRequestView(APITestMixin):
     @pytest.mark.parametrize(
         'change_request,dnb_request,dnb_response,datahub_response,address_area_id',
         (
-
             # All valid fields
             (
                 # change_request
@@ -1397,7 +1411,6 @@ class TestCompanyChangeRequestView(APITestMixin):
                 # Address Area id (of initial Company)
                 None,
             ),
-
             # Website - domain
             (
                 # change_request
@@ -1437,7 +1450,6 @@ class TestCompanyChangeRequestView(APITestMixin):
                 # Address Area id (of initial Company)
                 None,
             ),
-
             # Address area is not selected, but is associated
             (
                 # change_request
@@ -1535,7 +1547,6 @@ class TestCompanyChangeRequestView(APITestMixin):
                 # Address Area id (of initial Company)
                 constants.AdministrativeArea.texas.value.id,
             ),
-
             # Test turnover_gbp converted correctly
             (
                 # change_request
@@ -2470,7 +2481,7 @@ class TestCompanyHierarchyView(APITestMixin):
         }
 
     def test_dnb_response_with_a_duns_number_matching_dh_company_duns_number_appends_dh_id(
-        self, requests_mock,
+        self, requests_mock, opensearch_with_signals
     ):
         """
         Test the scenario where the company returned by the DnB service does match a company found
@@ -2493,6 +2504,8 @@ class TestCompanyHierarchyView(APITestMixin):
             id='8e2e9b35-3415-4b9b-b9ff-f97446ac8942',
             name=ultimate_company_dnb['primaryName'],
         )
+        opensearch_with_signals.indices.refresh()
+
         response = self._get_family_tree_response(requests_mock, tree_members, ultimate_company_dh)
 
         assert response.status_code == 200
@@ -2508,7 +2521,8 @@ class TestCompanyHierarchyView(APITestMixin):
         }
 
     def test_dnb_response_with_only_ultimate_parent_matching_a_datahub_company(
-        self, requests_mock,
+        self,
+        requests_mock,
     ):
         """
         Test the scenario where the ultimate parent is the only company in the response from the

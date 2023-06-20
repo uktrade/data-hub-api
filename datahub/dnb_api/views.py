@@ -1,7 +1,11 @@
 import logging
 
-import pandas as pd
-from bigtree import dataframe_to_tree_by_relation, tree_to_nested_dict
+from bigtree import (
+    dataframe_to_tree_by_relation,
+    tree_to_nested_dict,
+    add_dict_to_tree_by_name,
+    add_dataframe_to_tree_by_name,
+)
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
@@ -44,7 +48,9 @@ from datahub.dnb_api.utils import (
     is_valid_uuid,
     request_changes,
     search_dnb,
+    create_company_hierarchy_datatable,
 )
+
 
 logger = logging.getLogger(__name__)
 
@@ -414,11 +420,9 @@ class DNBCompanyHierarchyView(APIView):
         if not family_tree_members:
             return Response(json_response)
 
-        self.append_datahub_details(family_tree_members)
+        normalized_df = create_company_hierarchy_datatable(family_tree_members)
 
-        normalized_df = pd.json_normalize(family_tree_members)
-        if len(family_tree_members) == 1:
-            normalized_df['corporateLinkage.parent.duns'] = None
+        # return Response({})
 
         root = dataframe_to_tree_by_relation(
             normalized_df,
@@ -426,7 +430,10 @@ class DNBCompanyHierarchyView(APIView):
             parent_col='corporateLinkage.parent.duns',
         )
 
-        json_response['ultimate_global_company'] = tree_to_nested_dict(
+        print(root)
+        # print(normalized_df['numberOfEmployees.value'])
+
+        nested_tree = tree_to_nested_dict(
             root,
             name_key='duns_number',
             child_key='subsidiaries',
@@ -434,33 +441,23 @@ class DNBCompanyHierarchyView(APIView):
                 'primaryName': 'name',
                 'companyId': 'id',
                 'corporateLinkage.hierarchyLevel': 'hierarchy',
+                'ukRegion': 'uk_region',
+                'address': 'address',
+                'registeredAddress': 'registered_address',
+                'sector': 'sector',
+                'latestInteractionDate': 'latest_interaction_date',
+                'archived': 'archived',
             },
         )
+
+        print(nested_tree)
+
+        json_response['ultimate_global_company'] = nested_tree
         json_response['ultimate_global_companies_count'] = response[
             'global_ultimate_family_tree_members_count'
         ]
         json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries()
         return Response(json_response)
-
-    def append_datahub_details(self, family_tree_members):
-        family_tree_members_duns = [object['duns'] for object in family_tree_members]
-
-        family_tree_members_database_details = self.load_datahub_details(family_tree_members_duns)
-
-        for family_member in family_tree_members:
-            duns_number_to_find = family_member['duns']
-            family_member['companyId'] = None
-            for member_database_details in family_tree_members_database_details:
-                if duns_number_to_find == member_database_details['duns_number']:
-                    family_member['primaryName'] = member_database_details['name']
-                    family_member['companyId'] = member_database_details['id']
-
-    def load_datahub_details(self, family_tree_members_duns):
-        family_tree_members_database_details = Company.objects.filter(
-            duns_number__in=family_tree_members_duns,
-        ).values('id', 'duns_number', 'number_of_employees', 'name')
-
-        return family_tree_members_database_details
 
     def get_manually_verified_subsidiaries(self):
         return []
