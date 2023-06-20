@@ -2514,6 +2514,38 @@ class TestCompanyHierarchyView(APITestMixin):
                 'duns_number': ultimate_company_dnb['duns'],
                 'id': ultimate_company_dh.id,
                 'name': ultimate_company_dh.name,
+                'address': {
+                    'country': {
+                        'id': str(ultimate_company_dh.address_country.id),
+                        'name': ultimate_company_dh.address_country.name,
+                    },
+                    'county': '',
+                    'line_1': ultimate_company_dh.address_1,
+                    'line_2': '',
+                    'postcode': ultimate_company_dh.address_postcode,
+                    'town': ultimate_company_dh.address_town,
+                },
+                'registered_address': {
+                    'country': {
+                        'id': str(ultimate_company_dh.registered_address_country.id),
+                        'name': ultimate_company_dh.registered_address_country.name,
+                    },
+                    'county': '',
+                    'line_1': ultimate_company_dh.registered_address_1,
+                    'line_2': '',
+                    'postcode': ultimate_company_dh.registered_address_postcode,
+                    'town': ultimate_company_dh.registered_address_town,
+                },
+                'sector': {
+                    'id': str(ultimate_company_dh.sector.id),
+                    'name': ultimate_company_dh.sector.name,
+                },
+                'uk_region': {
+                    'id': str(ultimate_company_dh.uk_region.id),
+                    'name': ultimate_company_dh.uk_region.name,
+                },
+                'archived': False,
+                'latest_interaction_date': None,
                 'hierarchy': 1,
             },
             'ultimate_global_companies_count': len(tree_members),

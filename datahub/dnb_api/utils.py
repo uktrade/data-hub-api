@@ -687,13 +687,14 @@ def append_datahub_details(family_tree_members):
         for datahub_detail in family_tree_members_datahub_details:
             if duns_number_to_find == datahub_detail['duns_number']:
                 family_member['primaryName'] = datahub_detail['name']
-                family_member['companyId'] = datahub_detail['id']
+                family_member['companyId'] = datahub_detail.get('id')
                 family_member['ukRegion'] = datahub_detail['uk_region']
                 family_member['address'] = datahub_detail['address']
                 family_member['registeredAddress'] = datahub_detail['registered_address']
                 family_member['sector'] = datahub_detail['sector']
                 family_member['latestInteractionDate'] = datahub_detail['latest_interaction_date']
                 family_member['archived'] = datahub_detail['archived']
+                return  # Stop once we've found the match
                 # family_member['oneListTier'] = datahub_detail.get('one_list_tier')
 
 
