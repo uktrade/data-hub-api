@@ -4,7 +4,7 @@
 pytest==7.3.2
 pytest-django==4.5.2
 pytest-cov==4.1.0
-pytest-mock==3.10.0
+pytest-mock==3.11.1
 pytest-xdist==3.3.1
 ipython==8.14.0
 factory-boy==3.2.1
@@ -12,7 +12,7 @@ freezegun==1.2.2
 requests-mock==1.11.0
 pip-tools==6.13.0
 piprot==0.9.11
-pre-commit==3.3.2
+pre-commit==3.3.3
 
 # Code static analysis
 flake8==6.0.0

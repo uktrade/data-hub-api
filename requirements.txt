@@ -16,11 +16,11 @@ async-timeout==4.0.2
     #   redis
 attrs==22.2.0
     # via aiohttp
-bigtree==0.9.3
+bigtree==0.9.4
     # via -r requirements.in
-boto3==1.26.151
+boto3==1.26.155
     # via -r requirements.in
-botocore==1.29.151
+botocore==1.29.155
     # via
     #   boto3
     #   s3transfer
@@ -51,7 +51,7 @@ django==3.2.19
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==6.0.1
+django-axes==6.0.3
     # via -r requirements.in
 django-debug-toolbar==4.1.0
     # via -r requirements.in
@@ -71,7 +71,7 @@ django-mptt==0.14.0
     # via -r requirements.in
 django-pglocks==1.0.4
     # via -r requirements.in
-django-redis==5.2.0
+django-redis==5.3.0
     # via -r requirements.in
 django-reversion==5.0.4
     # via -r requirements.in
@@ -81,7 +81,7 @@ docopt==0.6.2
     # via notifications-python-client
 ecs-logging==2.0.2
     # via elastic-apm
-elastic-apm==6.16.1
+elastic-apm==6.16.2
     # via -r requirements.in
 freezegun==1.2.2
     # via rq-scheduler
@@ -213,7 +213,7 @@ urllib3==1.26.13
     #   sentry-sdk
 werkzeug==2.2.3
     # via -r requirements.in
-whitenoise==6.4.0
+whitenoise==6.5.0
     # via -r requirements.in
 wrapt==1.14.1
     # via elastic-apm
