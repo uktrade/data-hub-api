@@ -1,7 +1,7 @@
 # Django and django related
 django==3.2.19
 djangorestframework==3.14.0
-django-axes==6.0.1
+django-axes==6.0.3
 django-environ==0.10.0
 django-extensions==3.2.3
 django-filter==23.2
@@ -10,7 +10,7 @@ django-mptt==0.14.0
 django-pglocks==1.0.4
 django-reversion==5.0.4
 uritemplate==4.1.1  # required for DRF schema features
-whitenoise==6.4.0
+whitenoise==6.5.0
 
 chardet==5.1.0
 pyyaml==6.0
@@ -20,7 +20,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.6
 psycogreen==1.0.2
 
-boto3==1.26.151
+boto3==1.26.155
 
 notifications-python-client==8.0.1
 
@@ -35,14 +35,14 @@ icalendar==5.0.7
 slackclient==2.9.4
 
 # REDIS
-django-redis==5.2.0
+django-redis==5.3.0
 
 # OpenSearch
 opensearch-py==2.2.0
 opensearch-dsl==2.1.0
 
 # ES APM
-elastic-apm==6.16.1
+elastic-apm==6.16.2
 
 # Testing and dev
 django-debug-toolbar==4.1.0
