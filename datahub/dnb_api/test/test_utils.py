@@ -660,7 +660,6 @@ class TestCompanyHierarchyDataframe:
 
         CompanyFactory(
             duns_number=ultimate_company_dnb['duns'],
-            id=uuid4(),
             name=ultimate_company_dnb['primaryName'],
             uk_region_id=None,
         )
@@ -686,7 +685,6 @@ class TestCompanyHierarchyDataframe:
 
         CompanyFactory(
             duns_number=ultimate_company_dnb['duns'],
-            id=uuid4(),
             name=ultimate_company_dnb['primaryName'],
             address_country_id=None,
         )
@@ -719,14 +717,12 @@ class TestCompanyHierarchyDataframe:
 
         CompanyFactory(
             duns_number=ultimate_company_dnb['duns'],
-            id=uuid4(),
             name=ultimate_company_dnb['primaryName'],
             uk_region_id=None,
         )
 
         child_company = CompanyFactory(
             duns_number=tree_member_level_2['duns'],
-            id=uuid4(),
             name=tree_member_level_2['primaryName'],
         )
 
@@ -762,14 +758,12 @@ class TestCompanyHierarchyDataframe:
 
         CompanyFactory(
             duns_number=ultimate_company_dnb['duns'],
-            id=uuid4(),
             name=ultimate_company_dnb['primaryName'],
             address_country_id=None,
         )
 
         child_company = CompanyFactory(
             duns_number=tree_member_level_2['duns'],
-            id=uuid4(),
             name=tree_member_level_2['primaryName'],
         )
 

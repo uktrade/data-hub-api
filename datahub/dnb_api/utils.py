@@ -686,14 +686,16 @@ def append_datahub_details(family_tree_members):
         family_member['oneListTier'] = None
         for datahub_detail in family_tree_members_datahub_details:
             if duns_number_to_find == datahub_detail['duns_number']:
-                family_member['primaryName'] = datahub_detail['name']
+                family_member['primaryName'] = datahub_detail.get('name')
                 family_member['companyId'] = datahub_detail.get('id')
-                family_member['ukRegion'] = datahub_detail['uk_region']
-                family_member['address'] = datahub_detail['address']
-                family_member['registeredAddress'] = datahub_detail['registered_address']
-                family_member['sector'] = datahub_detail['sector']
-                family_member['latestInteractionDate'] = datahub_detail['latest_interaction_date']
-                family_member['archived'] = datahub_detail['archived']
+                family_member['ukRegion'] = datahub_detail.get('uk_region')
+                family_member['address'] = datahub_detail.get('address')
+                family_member['registeredAddress'] = datahub_detail.get('registered_address')
+                family_member['sector'] = datahub_detail.get('sector')
+                family_member['latestInteractionDate'] = datahub_detail.get(
+                    'latest_interaction_date'
+                )
+                family_member['archived'] = datahub_detail.get('archived')
                 break  # Stop once we've found the match
                 # family_member['oneListTier'] = datahub_detail.get('one_list_tier')
 
