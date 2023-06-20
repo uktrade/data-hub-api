@@ -2553,8 +2553,7 @@ class TestCompanyHierarchyView(APITestMixin):
         }
 
     def test_dnb_response_with_only_ultimate_parent_matching_a_datahub_company(
-        self,
-        requests_mock,
+        self, requests_mock, opensearch_with_signals
     ):
         """
         Test the scenario where the ultimate parent is the only company in the response from the
@@ -2590,30 +2589,77 @@ class TestCompanyHierarchyView(APITestMixin):
             tree_member_level_3,
         ]
 
-        ultimate_company = CompanyFactory(
+        ultimate_company_dh = CompanyFactory(
             id='8e2e9b35-3415-4b9b-b9ff-f97446ac8942',
             duns_number=ultimate_tree_member_level_1['duns'],
+            archived=True,
         )
 
-        response = self._get_family_tree_response(requests_mock, tree_members, ultimate_company)
+        opensearch_with_signals.indices.refresh()
+
+        response = self._get_family_tree_response(requests_mock, tree_members, ultimate_company_dh)
         assert response.status_code == 200
         assert response.json() == {
             'ultimate_global_company': {
                 'duns_number': ultimate_tree_member_level_1['duns'],
-                'name': ultimate_company.name,
-                'id': ultimate_company.id,
+                'name': ultimate_company_dh.name,
+                'id': ultimate_company_dh.id,
+                'address': {
+                    'country': {
+                        'id': str(ultimate_company_dh.address_country.id),
+                        'name': ultimate_company_dh.address_country.name,
+                    },
+                    'county': '',
+                    'line_1': ultimate_company_dh.address_1,
+                    'line_2': '',
+                    'postcode': ultimate_company_dh.address_postcode,
+                    'town': ultimate_company_dh.address_town,
+                },
+                'registered_address': {
+                    'country': {
+                        'id': str(ultimate_company_dh.registered_address_country.id),
+                        'name': ultimate_company_dh.registered_address_country.name,
+                    },
+                    'county': '',
+                    'line_1': ultimate_company_dh.registered_address_1,
+                    'line_2': '',
+                    'postcode': ultimate_company_dh.registered_address_postcode,
+                    'town': ultimate_company_dh.registered_address_town,
+                },
+                'sector': {
+                    'id': str(ultimate_company_dh.sector.id),
+                    'name': ultimate_company_dh.sector.name,
+                },
+                'uk_region': {
+                    'id': str(ultimate_company_dh.uk_region.id),
+                    'name': ultimate_company_dh.uk_region.name,
+                },
+                'archived': True,
+                'latest_interaction_date': None,
                 'hierarchy': 1,
                 'subsidiaries': [
                     {
                         'duns_number': tree_member_level_2['duns'],
                         'name': tree_member_level_2['primaryName'],
                         'id': None,
+                        'address': None,
+                        'registered_address': None,
+                        'sector': None,
+                        'uk_region': None,
+                        'archived': False,
+                        'latest_interaction_date': None,
                         'hierarchy': 2,
                         'subsidiaries': [
                             {
                                 'duns_number': tree_member_level_3['duns'],
                                 'name': tree_member_level_3['primaryName'],
                                 'id': None,
+                                'address': None,
+                                'registered_address': None,
+                                'sector': None,
+                                'uk_region': None,
+                                'archived': False,
+                                'latest_interaction_date': None,
                                 'hierarchy': 3,
                             },
                         ],

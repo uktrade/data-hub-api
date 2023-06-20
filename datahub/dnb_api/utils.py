@@ -583,40 +583,40 @@ def create_company_hierarchy_datatable(family_tree_members):
             df.reindex(columns=columns).replace([np.nan], [None]).to_dict(orient='records')
         )
         for index, dataframe_row in enumerate(dataframe_rows):
-            print(dataframe_row.values())
+            # print(dataframe_row.values())
             if all(value is None for value in dataframe_row.values()):
-                print("all values all none")
+                # print("all values all none")
                 dataframe_rows[index] = None
             else:
-                print('dataframe_row:')
-                print(dataframe_row)
+                # print('dataframe_row:')
+                # print(dataframe_row)
                 for col in columns:
                     dataframe_row[col.replace(f'{key}.', '')] = dataframe_row.pop(col)
                 for nested_object_key, nested_object_value in nested_objects.items():
-                    print('nested_object_key:')
-                    print(nested_object_key)
+                    # print('nested_object_key:')
+                    # print(nested_object_key)
                     dataframe_row[nested_object_key] = {}
-                    print('nested_object_value.items():')
-                    print(nested_object_value.items())
+                    # print('nested_object_value.items():')
+                    # print(nested_object_value.items())
 
                     for column_key, column_value in nested_object_value.items():
-                        print('dataframe_row[column_value]:')
-                        print(dataframe_row[column_value])
-                        print('column_key:')
-                        print(column_key)
-                        print('column_value:')
-                        print(column_value)
+                        # print('dataframe_row[column_value]:')
+                        # print(dataframe_row[column_value])
+                        # print('column_key:')
+                        # print(column_key)
+                        # print('column_value:')
+                        # print(column_value)
                         dataframe_row[nested_object_key][column_key] = dataframe_row.pop(
                             column_value
                         )
-                    print('dataframe_row[nested_object_key]:')
-                    print(dataframe_row[nested_object_key])
-                    print(dataframe_row[nested_object_key].values())
+                    # print('dataframe_row[nested_object_key]:')
+                    # print(dataframe_row[nested_object_key])
+                    # print(dataframe_row[nested_object_key].values())
                     if all(
                         nested_value is None
                         for nested_value in dataframe_row[nested_object_key].values()
                     ):
-                        print('all nested values are none')
+                        # print('all nested values are none')
                         dataframe_row[nested_object_key] = None
 
         df[key] = dataframe_rows
@@ -694,7 +694,7 @@ def append_datahub_details(family_tree_members):
                 family_member['sector'] = datahub_detail['sector']
                 family_member['latestInteractionDate'] = datahub_detail['latest_interaction_date']
                 family_member['archived'] = datahub_detail['archived']
-                return  # Stop once we've found the match
+                break  # Stop once we've found the match
                 # family_member['oneListTier'] = datahub_detail.get('one_list_tier')
 
 
