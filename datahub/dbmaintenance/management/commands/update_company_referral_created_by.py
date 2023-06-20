@@ -1,8 +1,8 @@
 from logging import getLogger
 
-from django.core.management.base import BaseCommand
-
 import reversion
+
+from django.core.management.base import BaseCommand
 
 from django.db import transaction
 
