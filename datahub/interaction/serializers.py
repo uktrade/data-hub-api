@@ -609,7 +609,6 @@ class InteractionSerializer(BaseInteractionSerializer):
 class InteractionSerializerV4(BaseInteractionSerializer):
     """Interaction Serializer for V4 Endpoint"""
 
-    has_related_trade_agreements = serializers.BooleanField(required=False)
     related_trade_agreements = NestedRelatedField(
         'metadata.TradeAgreement', many=True, required=True, allow_empty=True,
     )

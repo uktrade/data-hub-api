@@ -1356,7 +1356,6 @@ class TestAddInteraction(APITestMixin):
                     'dit_participants': ['This field may not be null.'],
                     'was_policy_feedback_provided': ['This field may not be null.'],
                     'policy_feedback_notes': ['This field may not be null.'],
-                    'has_related_trade_agreements': ['This field may not be null.'],
                     'related_trade_agreements': ['This field may not be null.'],
                 },
             ),
