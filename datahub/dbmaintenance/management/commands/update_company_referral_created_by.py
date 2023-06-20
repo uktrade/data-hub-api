@@ -5,41 +5,47 @@ from dateutil.parser import parse
 
 from datahub.company.models import Advisor
 from datahub.company_referral.models import CompanyReferral
-from datahub.dbmaintenance.management.base import CSVBaseCommand
-from datahub.dbmaintenance.utils import parse_uuid
+from django.core.management.base import BaseCommand
 
+from django.db import transaction
+
+from datahub.dbmaintenance.utils import parse_uuid
 
 logger = getLogger(__name__)
 
 
-class Command(CSVBaseCommand):
+class Command(BaseCommand):
     """
     Command to set referral.created_by where incorrect.
 
     Some referral records have incorrect created_by values which
-    is set as the default value for sending adviser. This changes the created_by value
+    is set as the default value for sending advisor. This changes the created_by value
     """
 
-    def _process_row(self, row, simulate=False, **options):
-        """Process a single row."""
-        # .parse() creates a datetime object even in the absence of hours, minutes
-        advisor_uuid = parse(row['Sender Advidor UUID'])
+    def add_arguments(self, parser):
+        parser.add_argument('referral_id', type=str, help='UUID of the referral')
+        parser.add_argument('user_id', type=str, help='UUID of the advisor')
 
-        pk = parse_uuid(row['UUID'])
-        company_referral = CompanyReferral.objects.get(pk=pk)
+    @transaction.atomic
+    def handle(self, *args, **options):
+        referral_id = options['referral_id']
+        user_id = options['user_id']
 
-        if simulate:
+        try:
+            referral = CompanyReferral.objects.get(id=referral_id)
+            user = Advisor.objects.get(id=user_id)
+        except Advisor.DoesNotExist as e:
+            self.stderr.write(self.style.ERROR(str(e)))
             return
 
-        company_referral_sender_advisor = Advisor.objects.get(
-            id=advisor_uuid,
-        )
-
-        company_referral.created_by = company_referral_sender_advisor
+        referral.created_by = user
 
         with reversion.create_revision():
-            company_referral.save(update_fields=('created_by',))
+            referral.save(update_fields=('created_by',))
             reversion.set_comment(
-                'Sender Advisor updated.'
-                'Sender Advisor by default is set to who created the referral.',
+                'Created by updated to new id.'
             )
+
+        self.stdout.write(self.style.SUCCESS(
+            f'Updated referral created_by for --{referral}-- to the id: {user}'
+        ))
