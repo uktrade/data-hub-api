@@ -1,6 +1,6 @@
 from functools import partial
 
-from opensearch_dsl import Boolean, Date, Keyword, Object, Text
+from opensearch_dsl import Boolean, Date, Integer, Keyword, Object, Text
 
 from datahub.company.models import CompanyExportCountry
 from datahub.search import dict_utils, fields
@@ -63,6 +63,7 @@ class Company(BaseSearchModel):
     export_segment = Text()
     export_sub_segment = Text()
     one_list_tier = fields.id_name_field()
+    number_of_employees = Integer()
 
     COMPUTED_MAPPINGS = {
         'address': partial(dict_utils.address_dict, prefix='address'),

@@ -404,6 +404,7 @@ def test_mapping(opensearch):
                 },
                 'type': 'object',
             },
+            'number_of_employees': {'type': 'integer'},
         },
     }
 
@@ -715,4 +716,5 @@ def test_indexed_doc(opensearch):
         'export_sub_segment',
         'export_segment',
         'one_list_tier',
+        'number_of_employees',
     }

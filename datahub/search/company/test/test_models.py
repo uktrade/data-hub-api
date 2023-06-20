@@ -55,6 +55,7 @@ class TestCompanySearchModel:
             'website',
             'export_segment',
             'export_sub_segment',
+            'number_of_employees',
         }
 
         assert set(result.keys()) == keys

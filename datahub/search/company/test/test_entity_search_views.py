@@ -376,6 +376,7 @@ class TestSearch(APITestMixin):
                         'id': str(company.one_list_tier.id),
                         'name': company.one_list_tier.name,
                     },
+                    'number_of_employees': company.number_of_employees,
                 },
             ],
         }
