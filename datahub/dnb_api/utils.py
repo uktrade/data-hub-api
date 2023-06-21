@@ -565,6 +565,37 @@ def is_valid_uuid(value):
         return False
 
 
+def _merge_columns_into_single_column(df, key: str, columns: list, nested_objects=None):
+    """
+    Merge each of the columns in the columns list into a single column with the name
+    provided in the key argument
+    """
+    dataframe_rows = (
+        df.reindex(columns=columns).replace([np.nan], [None]).to_dict(orient='records')
+    )
+    for index, dataframe_row in enumerate(dataframe_rows):
+        if all(value is None for value in dataframe_row.values()):
+            dataframe_rows[index] = None
+        else:
+            for col in columns:
+                dataframe_row[col.replace(f'{key}.', '')] = dataframe_row.pop(col)
+            if nested_objects:
+                for nested_object_key, nested_object_value in nested_objects.items():
+                    dataframe_row[nested_object_key] = {}
+
+                    for column_key, column_value in nested_object_value.items():
+                        dataframe_row[nested_object_key][column_key] = dataframe_row.pop(
+                            column_value,
+                        )
+                    if all(
+                        nested_value is None
+                        for nested_value in dataframe_row[nested_object_key].values()
+                    ):
+                        dataframe_row[nested_object_key] = None
+
+    df[key] = dataframe_rows
+
+
 def create_company_hierarchy_dataframe(family_tree_members: list):
     """
     Create a dataframe from the list of family tree members
@@ -576,39 +607,9 @@ def create_company_hierarchy_dataframe(family_tree_members: list):
     if len(family_tree_members) == 1:
         normalized_df['corporateLinkage.parent.duns'] = None
 
-    def merge_columns_into_single_column(df, key: str, columns: list, nested_objects=None):
-        """
-        Merge each of the columns in the columns list into a single column with the name
-        provided in the key argument
-        """
-        dataframe_rows = (
-            df.reindex(columns=columns).replace([np.nan], [None]).to_dict(orient='records')
-        )
-        for index, dataframe_row in enumerate(dataframe_rows):
-            if all(value is None for value in dataframe_row.values()):
-                dataframe_rows[index] = None
-            else:
-                for col in columns:
-                    dataframe_row[col.replace(f'{key}.', '')] = dataframe_row.pop(col)
-                if nested_objects:
-                    for nested_object_key, nested_object_value in nested_objects.items():
-                        dataframe_row[nested_object_key] = {}
-
-                        for column_key, column_value in nested_object_value.items():
-                            dataframe_row[nested_object_key][column_key] = dataframe_row.pop(
-                                column_value,
-                            )
-                        if all(
-                            nested_value is None
-                            for nested_value in dataframe_row[nested_object_key].values()
-                        ):
-                            dataframe_row[nested_object_key] = None
-
-        df[key] = dataframe_rows
-
-    merge_columns_into_single_column(normalized_df, 'sector', ['sector.id', 'sector.name'])
-    merge_columns_into_single_column(normalized_df, 'ukRegion', ['ukRegion.id', 'ukRegion.name'])
-    merge_columns_into_single_column(
+    _merge_columns_into_single_column(normalized_df, 'sector', ['sector.id', 'sector.name'])
+    _merge_columns_into_single_column(normalized_df, 'ukRegion', ['ukRegion.id', 'ukRegion.name'])
+    _merge_columns_into_single_column(
         normalized_df,
         'address',
         [
@@ -622,7 +623,7 @@ def create_company_hierarchy_dataframe(family_tree_members: list):
         ],
         {'country': {'id': 'country.id', 'name': 'country.name'}},
     )
-    merge_columns_into_single_column(
+    _merge_columns_into_single_column(
         normalized_df,
         'registeredAddress',
         [
