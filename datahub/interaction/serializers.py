@@ -769,17 +769,6 @@ class InteractionSerializerV4(BaseInteractionSerializer):
                 ),
                 ValidationRule(
                     'required',
-                    OperatorRule('were_countries_discussed', is_not_blank),
-                    when=AndRule(
-                        IsObjectBeingCreated(),
-                        InRule(
-                            'theme',
-                            [Interaction.Theme.EXPORT, Interaction.Theme.OTHER],
-                        ),
-                    ),
-                ),
-                ValidationRule(
-                    'required',
                     OperatorRule('export_countries', is_not_blank),
                     when=AndRule(
                         OperatorRule('were_countries_discussed', bool),

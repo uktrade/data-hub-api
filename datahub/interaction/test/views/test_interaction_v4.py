@@ -836,7 +836,8 @@ class TestAddInteraction(APITestMixin):
                     'related_trade_agreements': ['This field is required.'],
                 },
             ),
-            # were_countries_discussed can't be null for export interactions
+            # export_countries cannot be blank when
+            # were_countries_discussed is True for Export theme
             (
                 {
                     'kind': Interaction.Kind.INTERACTION,
@@ -853,124 +854,26 @@ class TestAddInteraction(APITestMixin):
                         {'adviser': AdviserFactory},
                     ],
                     'service': Service.inbound_referral.value.id,
-                    'was_policy_feedback_provided': False,
                     'communication_channel': partial(
                         random_obj_for_model,
                         CommunicationChannel,
                     ),
-                    'were_countries_discussed': None,
+                    'was_policy_feedback_provided': False,
+                    'were_countries_discussed': True,
+                    'export_countries': None,
                     'has_related_trade_agreements': False,
                     'related_trade_agreements': [],
                 },
                 {
-                    'were_countries_discussed': ['This field is required.'],
+                    'export_countries': ['This field may not be null.'],
                 },
             ),
-            # were_countries_discussed can't be null for other interactions
+            # export_countries cannot be blank when
+            # were_countries_discussed is True for Other theme
             (
                 {
                     'kind': Interaction.Kind.INTERACTION,
                     'theme': Interaction.Theme.OTHER,
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'company': lambda: CompanyFactory(name='Martian Island'),
-                    'contacts': [
-                        lambda: ContactFactory(
-                            company=Company.objects.get(name='Martian Island'),
-                        ),
-                    ],
-                    'dit_participants': [
-                        {'adviser': AdviserFactory},
-                    ],
-                    'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(
-                        random_obj_for_model,
-                        CommunicationChannel,
-                    ),
-                    'was_policy_feedback_provided': False,
-                    'were_countries_discussed': None,
-                    'has_related_trade_agreements': False,
-                    'related_trade_agreements': [],
-                },
-                {
-                    'were_countries_discussed': ['This field is required.'],
-                },
-            ),
-            # were_countries_discussed can't be missing for export/other interactions
-            (
-                {
-                    'kind': Interaction.Kind.INTERACTION,
-                    'theme': Interaction.Theme.EXPORT,
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'company': lambda: CompanyFactory(name='Martian Island'),
-                    'contacts': [
-                        lambda: ContactFactory(
-                            company=Company.objects.get(name='Martian Island'),
-                        ),
-                    ],
-                    'dit_participants': [
-                        {'adviser': AdviserFactory},
-                    ],
-                    'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(
-                        random_obj_for_model,
-                        CommunicationChannel,
-                    ),
-                    'was_policy_feedback_provided': False,
-                    'has_related_trade_agreements': False,
-                    'related_trade_agreements': [],
-                },
-                {
-                    'were_countries_discussed': ['This field is required.'],
-                },
-            ),
-            # were_countries_discussed can't be missing when sending export_countries
-            (
-                {
-                    'kind': Interaction.Kind.INTERACTION,
-                    'theme': Interaction.Theme.EXPORT,
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'company': lambda: CompanyFactory(name='Martian Island'),
-                    'contacts': [
-                        lambda: ContactFactory(
-                            company=Company.objects.get(name='Martian Island'),
-                        ),
-                    ],
-                    'dit_participants': [
-                        {'adviser': AdviserFactory},
-                    ],
-                    'service': Service.inbound_referral.value.id,
-                    'communication_channel': partial(
-                        random_obj_for_model,
-                        CommunicationChannel,
-                    ),
-                    'was_policy_feedback_provided': False,
-                    'were_countries_discussed': None,
-                    'export_countries': [
-                        {
-                            'country': {
-                                'id': Country.canada.value.id,
-                            },
-                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-                        },
-                    ],
-                    'has_related_trade_agreements': False,
-                    'related_trade_agreements': [],
-                },
-                {
-                    'were_countries_discussed': ['This field is required.'],
-                    'export_countries': [
-                        'This field is only valid when countries were discussed.',
-                    ],
-                },
-            ),
-            # export_countries cannot be blank when were_countries_discussed is True
-            (
-                {
-                    'kind': Interaction.Kind.INTERACTION,
-                    'theme': Interaction.Theme.EXPORT,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'company': lambda: CompanyFactory(name='Martian Island'),
