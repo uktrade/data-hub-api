@@ -471,6 +471,10 @@ class ExportSubSegment(Enum):
 class ExportBarrierType(Enum):
     """Interaction export barrier type constant."""
 
+    capacity = Constant(
+        'Capacity', 'd0c8fe10-dd29-4e39-a422-80dd111199e7',
+    )
+
     finance = Constant(
         'Finance', '758c4132-a07b-4e4d-a43d-f2f630113023',
     )
