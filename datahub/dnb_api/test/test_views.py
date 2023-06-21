@@ -2740,3 +2740,19 @@ class TestCompanyHierarchyView(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
+    
+    def test_manually_verified_subsidiaries(self, requests_mock):
+        faker = Faker()
+
+        ultimate_tree_member_level_1 = {
+            'duns': '987654321',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+        
+        ultimate_company_dh = CompanyFactory( duns_number=ultimate_tree_member_level_1['duns'])
+        first_subsidiary = CompanyFactory(global_head=ultimate_company_dh.duns)
+        second_subsidiary = CompanyFactory(global_head=ultimate_company_dh.duns)
+        
+        response = self._get_family_tree_response(requests_mock, [], ultimate_company_dh)
+        assert response.json()['manually_verified_subsidiaries'] == [{id:12}]

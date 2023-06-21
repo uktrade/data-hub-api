@@ -452,5 +452,28 @@ class DNBCompanyHierarchyView(APIView):
         json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries()
         return Response(json_response)
 
-    def get_manually_verified_subsidiaries(self):
-        return []
+    def append_datahub_details(self, family_tree_members):
+        family_tree_members_duns = [object['duns'] for object in family_tree_members]
+
+        family_tree_members_database_details = self.load_datahub_details(family_tree_members_duns)
+
+        for family_member in family_tree_members:
+            duns_number_to_find = family_member['duns']
+            family_member['companyId'] = None
+            for member_database_details in family_tree_members_database_details:
+                if duns_number_to_find == member_database_details['duns_number']:
+                    family_member['primaryName'] = member_database_details['name']
+                    family_member['companyId'] = member_database_details['id']
+
+    def load_datahub_details(self, family_tree_members_duns):
+        family_tree_members_database_details = Company.objects.filter(
+            duns_number__in=family_tree_members_duns,
+        ).values('id', 'duns_number', 'number_of_employees', 'name')
+
+        return family_tree_members_database_details
+
+    def get_manually_verified_subsidiaries(self, company_id):
+        company = Company.objects.filter(global_headquarters_id=company_id).values_list('duns_number', 'name', 'employee_range', 'headquarter_type', 'address', 'uk_region', 'archived' )
+
+        return company if company else []
+        
