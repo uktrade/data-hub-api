@@ -1,6 +1,9 @@
 import logging
 import uuid
 
+import numpy as np
+import pandas as pd
+
 import reversion
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -19,6 +22,10 @@ from datahub.dnb_api.constants import (
 )
 from datahub.dnb_api.serializers import DNBCompanySerializer
 from datahub.metadata.models import AdministrativeArea, Country
+from datahub.search.company.models import Company as SearchCompany
+from datahub.search.query_builder import (
+    get_search_by_entities_query,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -116,9 +123,7 @@ def get_company(duns_number, request=None):
         raise DNBServiceTimeoutError(error_message) from exc
 
     if dnb_response.status_code != status.HTTP_200_OK:
-        error_message = (
-            f'DNB service returned an error status: {dnb_response.status_code}'
-        )
+        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
         logger.error(error_message)
         raise DNBServiceError(error_message, dnb_response.status_code)
 
@@ -234,8 +239,7 @@ def format_dnb_company(dnb_company):
         'website': company_website,
         # `Company.global_ultimate_duns_number` is not nullable but allows blank values. Sample
         # response from the D&B search API suggests that this field can be set to null.
-        'global_ultimate_duns_number': dnb_company.get('global_ultimate_duns_number')
-        or '',
+        'global_ultimate_duns_number': dnb_company.get('global_ultimate_duns_number') or '',
         # TODO: Extract sensible values for the following fields form the data:
         # 'business_type': None,
         # 'description': None,
@@ -433,9 +437,7 @@ def request_changes(duns_number, changes, request=None):
         raise DNBServiceTimeoutError(error_message) from exc
 
     if not dnb_response.ok:
-        error_message = (
-            f'DNB service returned an error status: {dnb_response.status_code}'
-        )
+        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
         raise DNBServiceError(error_message, dnb_response.status_code)
 
     return dnb_response.json()
@@ -480,7 +482,7 @@ def get_change_request(duns_number, status, request=None):
         raise DNBServiceTimeoutError(error_message) from exc
 
     if not dnb_response.ok:
-        error_message = (f'DNB service returned an error status: {dnb_response.status_code}')
+        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
         raise DNBServiceError(error_message, dnb_response.status_code)
 
     return dnb_response.json()
@@ -520,9 +522,7 @@ def create_investigation(investigation_data, request=None):
         raise DNBServiceTimeoutError(error_message) from exc
 
     if not dnb_response.ok:
-        error_message = (
-            f'DNB service returned an error status: {dnb_response.status_code}'
-        )
+        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
         raise DNBServiceError(error_message, dnb_response.status_code)
 
     return dnb_response.json()
@@ -563,3 +563,140 @@ def is_valid_uuid(value):
         return True
     except ValueError:
         return False
+
+
+def _merge_columns_into_single_column(df, key: str, columns: list, nested_objects=None):
+    """
+    Merge each of the columns in the columns list into a single column with the name
+    provided in the key argument
+    """
+    dataframe_rows = (
+        df.reindex(columns=columns).replace([np.nan], [None]).to_dict(orient='records')
+    )
+    for index, dataframe_row in enumerate(dataframe_rows):
+        if all(value is None for value in dataframe_row.values()):
+            dataframe_rows[index] = None
+        else:
+            for col in columns:
+                dataframe_row[col.replace(f'{key}.', '')] = dataframe_row.pop(col)
+            if nested_objects:
+                for nested_object_key, nested_object_value in nested_objects.items():
+                    dataframe_row[nested_object_key] = {}
+
+                    for column_key, column_value in nested_object_value.items():
+                        dataframe_row[nested_object_key][column_key] = dataframe_row.pop(
+                            column_value,
+                        )
+                    if all(
+                        nested_value is None
+                        for nested_value in dataframe_row[nested_object_key].values()
+                    ):
+                        dataframe_row[nested_object_key] = None
+
+    df[key] = dataframe_rows
+
+
+def create_company_hierarchy_dataframe(family_tree_members: list):
+    """
+    Create a dataframe from the list of family tree members
+    """
+    append_datahub_details(family_tree_members)
+
+    normalized_df = pd.json_normalize(family_tree_members)
+    normalized_df.replace([np.nan], [None], inplace=True)
+    if len(family_tree_members) == 1:
+        normalized_df['corporateLinkage.parent.duns'] = None
+
+    _merge_columns_into_single_column(normalized_df, 'sector', ['sector.id', 'sector.name'])
+    _merge_columns_into_single_column(normalized_df, 'ukRegion', ['ukRegion.id', 'ukRegion.name'])
+    _merge_columns_into_single_column(
+        normalized_df,
+        'address',
+        [
+            'address.line_1',
+            'address.line_2',
+            'address.town',
+            'address.county',
+            'address.postcode',
+            'address.country.id',
+            'address.country.name',
+        ],
+        {'country': {'id': 'country.id', 'name': 'country.name'}},
+    )
+    _merge_columns_into_single_column(
+        normalized_df,
+        'registeredAddress',
+        [
+            'registeredAddress.line_1',
+            'registeredAddress.line_2',
+            'registeredAddress.town',
+            'registeredAddress.county',
+            'registeredAddress.postcode',
+            'registeredAddress.country.id',
+            'registeredAddress.country.name',
+        ],
+        {
+            'country': {'id': 'country.id', 'name': 'country.name'},
+        },
+    )
+
+    return normalized_df
+
+
+def append_datahub_details(family_tree_members: list):
+    """
+    Appended any known datahub details to the list of family tree members provided
+    """
+    family_tree_members_duns = [object['duns'] for object in family_tree_members]
+
+    family_tree_members_datahub_details = _load_datahub_details(family_tree_members_duns)
+
+    empty_address = {
+        'line_1': None,
+        'line_2': None,
+        'town': None,
+        'county': None,
+        'postcode': None,
+        'country': {'id': None, 'name': None},
+    }
+    empty_id_name = {'id': None, 'name': None}
+
+    for family_member in family_tree_members:
+        duns_number_to_find = family_member['duns']
+        family_member['companyId'] = None
+        family_member['ukRegion'] = empty_id_name
+        family_member['address'] = empty_address
+        family_member['registeredAddress'] = empty_address
+        family_member['sector'] = empty_id_name
+        family_member['latestInteractionDate'] = None
+        family_member['archived'] = False
+        family_member['oneListTier'] = None
+        number_of_employees = family_member.get('numberOfEmployees')
+        if isinstance(number_of_employees, list):
+            family_member['numberOfEmployees'] = number_of_employees[0].get('value')
+        for datahub_detail in family_tree_members_datahub_details:
+            if duns_number_to_find == datahub_detail['duns_number']:
+                family_member['primaryName'] = datahub_detail.get('name')
+                family_member['companyId'] = datahub_detail.get('id')
+                family_member['ukRegion'] = datahub_detail.get('uk_region')
+                family_member['address'] = datahub_detail.get('address')
+                family_member['registeredAddress'] = datahub_detail.get('registered_address')
+                family_member['sector'] = datahub_detail.get('sector')
+                family_member['latestInteractionDate'] = datahub_detail.get(
+                    'latest_interaction_date',
+                )
+                family_member['archived'] = datahub_detail.get('archived')
+                break  # Stop once we've found the match
+
+
+def _load_datahub_details(family_tree_members_duns):
+    """
+    Load any known datahub details for the duns numbers provided
+    """
+    opensearch_results = get_search_by_entities_query(
+        [SearchCompany],
+        term='',
+        filter_data={'duns_number': family_tree_members_duns},
+    ).execute()
+
+    return [x.to_dict() for x in opensearch_results.hits]
