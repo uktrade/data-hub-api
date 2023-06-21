@@ -27,7 +27,7 @@ from datahub.company.test.factories import (
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_MODEL_FIELDS
 from datahub.dnb_api.test.utils import model_to_dict_company
 from datahub.dnb_api.utils import (
-    create_company_hierarchy_datatable,
+    create_company_hierarchy_dataframe,
     DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequestError,
@@ -668,7 +668,7 @@ class TestCompanyHierarchyDataframe:
         tree_members = [ultimate_company_dnb]
 
         opensearch_with_signals.indices.refresh()
-        df = create_company_hierarchy_datatable(tree_members)
+        df = create_company_hierarchy_dataframe(tree_members)
 
         assert df['ukRegion'][0] is None
 
@@ -697,7 +697,7 @@ class TestCompanyHierarchyDataframe:
         tree_members = [ultimate_company_dnb]
 
         opensearch_with_signals.indices.refresh()
-        df = create_company_hierarchy_datatable(tree_members)
+        df = create_company_hierarchy_dataframe(tree_members)
         assert df['address'][0]['country'] is None
 
     def test_multiple_companies_with_nested_opensearch_field_combination_of_null_and_not_null(
@@ -739,7 +739,7 @@ class TestCompanyHierarchyDataframe:
         tree_members = [ultimate_company_dnb, tree_member_level_2]
 
         opensearch_with_signals.indices.refresh()
-        df = create_company_hierarchy_datatable(tree_members)
+        df = create_company_hierarchy_dataframe(tree_members)
 
         assert df['ukRegion'][0] is None
         assert df['ukRegion'][1] == {
@@ -786,7 +786,7 @@ class TestCompanyHierarchyDataframe:
         tree_members = [ultimate_company_dnb, tree_member_level_2]
 
         opensearch_with_signals.indices.refresh()
-        df = create_company_hierarchy_datatable(tree_members)
+        df = create_company_hierarchy_dataframe(tree_members)
 
         assert df['address'][0]['country'] is None
         assert df['address'][1]['country']['id'] == child_company.address_country_id

@@ -34,7 +34,7 @@ from datahub.dnb_api.serializers import (
     DUNSNumberSerializer,
 )
 from datahub.dnb_api.utils import (
-    create_company_hierarchy_datatable,
+    create_company_hierarchy_dataframe,
     create_investigation,
     DNBServiceConnectionError,
     DNBServiceError,
@@ -418,10 +418,10 @@ class DNBCompanyHierarchyView(APIView):
         if not family_tree_members:
             return Response(json_response)
 
-        normalized_df = create_company_hierarchy_datatable(family_tree_members)
+        company_hierarchy_dataframe = create_company_hierarchy_dataframe(family_tree_members)
 
         root = dataframe_to_tree_by_relation(
-            normalized_df,
+            company_hierarchy_dataframe,
             child_col='duns',
             parent_col='corporateLinkage.parent.duns',
         )

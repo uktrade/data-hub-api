@@ -565,7 +565,10 @@ def is_valid_uuid(value):
         return False
 
 
-def create_company_hierarchy_datatable(family_tree_members):
+def create_company_hierarchy_dataframe(family_tree_members: list):
+    """
+    Create a dataframe from the list of family tree members
+    """
     append_datahub_details(family_tree_members)
 
     normalized_df = pd.json_normalize(family_tree_members)
@@ -573,7 +576,11 @@ def create_company_hierarchy_datatable(family_tree_members):
     if len(family_tree_members) == 1:
         normalized_df['corporateLinkage.parent.duns'] = None
 
-    def add_json_col(df, key: str, columns: list, nested_objects=None):
+    def merge_columns_into_single_column(df, key: str, columns: list, nested_objects=None):
+        """
+        Merge each of the columns in the columns list into a single column with the name
+        provided in the key argument
+        """
         dataframe_rows = (
             df.reindex(columns=columns).replace([np.nan], [None]).to_dict(orient='records')
         )
@@ -599,9 +606,9 @@ def create_company_hierarchy_datatable(family_tree_members):
 
         df[key] = dataframe_rows
 
-    add_json_col(normalized_df, 'sector', ['sector.id', 'sector.name'])
-    add_json_col(normalized_df, 'ukRegion', ['ukRegion.id', 'ukRegion.name'])
-    add_json_col(
+    merge_columns_into_single_column(normalized_df, 'sector', ['sector.id', 'sector.name'])
+    merge_columns_into_single_column(normalized_df, 'ukRegion', ['ukRegion.id', 'ukRegion.name'])
+    merge_columns_into_single_column(
         normalized_df,
         'address',
         [
@@ -615,7 +622,7 @@ def create_company_hierarchy_datatable(family_tree_members):
         ],
         {'country': {'id': 'country.id', 'name': 'country.name'}},
     )
-    add_json_col(
+    merge_columns_into_single_column(
         normalized_df,
         'registeredAddress',
         [
@@ -635,7 +642,10 @@ def create_company_hierarchy_datatable(family_tree_members):
     return normalized_df
 
 
-def append_datahub_details(family_tree_members):
+def append_datahub_details(family_tree_members: list):
+    """
+    Appended any known datahub details to the list of family tree members provided
+    """
     family_tree_members_duns = [object['duns'] for object in family_tree_members]
 
     family_tree_members_datahub_details = _load_datahub_details(family_tree_members_duns)
@@ -679,6 +689,9 @@ def append_datahub_details(family_tree_members):
 
 
 def _load_datahub_details(family_tree_members_duns):
+    """
+    Load any known datahub details for the duns numbers provided
+    """
     opensearch_results = get_search_by_entities_query(
         [SearchCompany],
         term='',
