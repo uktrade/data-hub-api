@@ -1,5 +1,5 @@
 from urllib.parse import urljoin
-from uuid import UUID, uuid4
+from uuid import UUID
 
 import pytest
 import reversion
@@ -7,8 +7,8 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
 from django.utils.timezone import now
-from freezegun import freeze_time
 from faker import Faker
+from freezegun import freeze_time
 from requests.exceptions import (
     ConnectionError,
     ConnectTimeout,
@@ -27,6 +27,7 @@ from datahub.company.test.factories import (
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_MODEL_FIELDS
 from datahub.dnb_api.test.utils import model_to_dict_company
 from datahub.dnb_api.utils import (
+    create_company_hierarchy_datatable,
     DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequestError,
@@ -39,7 +40,6 @@ from datahub.dnb_api.utils import (
     RevisionNotFoundError,
     rollback_dnb_company_update,
     update_company_from_dnb,
-    create_company_hierarchy_datatable,
 )
 from datahub.metadata.models import AdministrativeArea, Country
 
@@ -646,10 +646,11 @@ class TestDNBHierarchyData:
 
 
 class TestCompanyHierarchyDataframe:
-    # def test_field_missing_from_opensearch_response(self, opensearch_with_signals):
-    #     pass
-
     def test_single_company_with_nested_opensearch_field_is_null(self, opensearch_with_signals):
+        """
+        Test when a single company contains a nested field in opensearch that is null the
+        datatable is created with the correct column value
+        """
         faker = Faker()
 
         ultimate_company_dnb = {
@@ -669,12 +670,16 @@ class TestCompanyHierarchyDataframe:
         opensearch_with_signals.indices.refresh()
         df = create_company_hierarchy_datatable(tree_members)
 
-        print(df['ukRegion'][0])
-        assert df['ukRegion'][0] == None
+        assert df['ukRegion'][0] is None
 
     def test_single_company_with_deeply_nested_opensearch_field_is_null(
-        self, opensearch_with_signals
+        self,
+        opensearch_with_signals,
     ):
+        """
+        Test when a single company contains a deeply nested field in opensearch that is null the
+        datatable is created with the correct column value
+        """
         faker = Faker()
 
         ultimate_company_dnb = {
@@ -693,12 +698,17 @@ class TestCompanyHierarchyDataframe:
 
         opensearch_with_signals.indices.refresh()
         df = create_company_hierarchy_datatable(tree_members)
-        print(df['address'][0])
-        assert df['address'][0]['country'] == None
+        assert df['address'][0]['country'] is None
 
     def test_multiple_companies_with_nested_opensearch_field_combination_of_null_and_not_null(
-        self, opensearch_with_signals
+        self,
+        opensearch_with_signals,
     ):
+        """
+        Test when a multiple companies are returned from an opensearch query, that contain a
+        nested field where some companies have a null value but other companies have a populated
+        value, the datatable is created with the correct column value for each company
+        """
         faker = Faker()
 
         ultimate_company_dnb = {
@@ -731,15 +741,21 @@ class TestCompanyHierarchyDataframe:
         opensearch_with_signals.indices.refresh()
         df = create_company_hierarchy_datatable(tree_members)
 
-        assert df['ukRegion'][0] == None
+        assert df['ukRegion'][0] is None
         assert df['ukRegion'][1] == {
             'id': str(child_company.uk_region.id),
             'name': child_company.uk_region.name,
         }
 
-    def test_multiple_companies_with_deeply_nested_opensearch_field_combination_of_null_and_not_null(
-        self, opensearch_with_signals
+    def test_multiple_companies_with_deeply_nested_opensearch_field_combination_of_null__not_null(
+        self,
+        opensearch_with_signals,
     ):
+        """
+        Test when a multiple companies are returned from an opensearch query, that contain a
+        deeply nested field where some companies have a null value but other companies have a
+        populated value, the datatable is created with the correct column value for each company
+        """
         faker = Faker()
 
         ultimate_company_dnb = {
@@ -772,5 +788,5 @@ class TestCompanyHierarchyDataframe:
         opensearch_with_signals.indices.refresh()
         df = create_company_hierarchy_datatable(tree_members)
 
-        assert df['address'][0]['country'] == None
+        assert df['address'][0]['country'] is None
         assert df['address'][1]['country']['id'] == child_company.address_country_id

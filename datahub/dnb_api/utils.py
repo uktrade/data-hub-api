@@ -1,8 +1,8 @@
 import logging
 import uuid
-import json
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
 import reversion
 from django.conf import settings
@@ -22,10 +22,10 @@ from datahub.dnb_api.constants import (
 )
 from datahub.dnb_api.serializers import DNBCompanySerializer
 from datahub.metadata.models import AdministrativeArea, Country
+from datahub.search.company.models import Company as SearchCompany
 from datahub.search.query_builder import (
     get_search_by_entities_query,
 )
-from datahub.search.company.models import Company as SearchCompany
 
 logger = logging.getLogger(__name__)
 
@@ -569,63 +569,41 @@ def create_company_hierarchy_datatable(family_tree_members):
     append_datahub_details(family_tree_members)
 
     normalized_df = pd.json_normalize(family_tree_members)
-    # normalized_df.fillna(value=None, inplace=True)
     normalized_df.replace([np.nan], [None], inplace=True)
     if len(family_tree_members) == 1:
         normalized_df['corporateLinkage.parent.duns'] = None
 
-    pd.set_option('display.max_columns', None)  # todo remove
-    # print('*******normalized_df***********')
-    # print(normalized_df)
-
-    def add_json_col(df, key: str, columns: list, nested_objects={}):
+    def add_json_col(df, key: str, columns: list, nested_objects=None):
         dataframe_rows = (
             df.reindex(columns=columns).replace([np.nan], [None]).to_dict(orient='records')
         )
         for index, dataframe_row in enumerate(dataframe_rows):
-            # print(dataframe_row.values())
             if all(value is None for value in dataframe_row.values()):
-                # print("all values all none")
                 dataframe_rows[index] = None
             else:
-                # print('dataframe_row:')
-                # print(dataframe_row)
                 for col in columns:
                     dataframe_row[col.replace(f'{key}.', '')] = dataframe_row.pop(col)
-                for nested_object_key, nested_object_value in nested_objects.items():
-                    # print('nested_object_key:')
-                    # print(nested_object_key)
-                    dataframe_row[nested_object_key] = {}
-                    # print('nested_object_value.items():')
-                    # print(nested_object_value.items())
+                if nested_objects:
+                    for nested_object_key, nested_object_value in nested_objects.items():
+                        dataframe_row[nested_object_key] = {}
 
-                    for column_key, column_value in nested_object_value.items():
-                        # print('dataframe_row[column_value]:')
-                        # print(dataframe_row[column_value])
-                        # print('column_key:')
-                        # print(column_key)
-                        # print('column_value:')
-                        # print(column_value)
-                        dataframe_row[nested_object_key][column_key] = dataframe_row.pop(
-                            column_value
-                        )
-                    # print('dataframe_row[nested_object_key]:')
-                    # print(dataframe_row[nested_object_key])
-                    # print(dataframe_row[nested_object_key].values())
-                    if all(
-                        nested_value is None
-                        for nested_value in dataframe_row[nested_object_key].values()
-                    ):
-                        # print('all nested values are none')
-                        dataframe_row[nested_object_key] = None
+                        for column_key, column_value in nested_object_value.items():
+                            dataframe_row[nested_object_key][column_key] = dataframe_row.pop(
+                                column_value,
+                            )
+                        if all(
+                            nested_value is None
+                            for nested_value in dataframe_row[nested_object_key].values()
+                        ):
+                            dataframe_row[nested_object_key] = None
 
         df[key] = dataframe_rows
 
-    add_json_col(normalized_df, "sector", ['sector.id', 'sector.name'])
-    add_json_col(normalized_df, "ukRegion", ['ukRegion.id', 'ukRegion.name'])
+    add_json_col(normalized_df, 'sector', ['sector.id', 'sector.name'])
+    add_json_col(normalized_df, 'ukRegion', ['ukRegion.id', 'ukRegion.name'])
     add_json_col(
         normalized_df,
-        "address",
+        'address',
         [
             'address.line_1',
             'address.line_2',
@@ -639,7 +617,7 @@ def create_company_hierarchy_datatable(family_tree_members):
     )
     add_json_col(
         normalized_df,
-        "registeredAddress",
+        'registeredAddress',
         [
             'registeredAddress.line_1',
             'registeredAddress.line_2',
@@ -653,8 +631,7 @@ def create_company_hierarchy_datatable(family_tree_members):
             'country': {'id': 'country.id', 'name': 'country.name'},
         },
     )
-    # normalized_df.drop(columns=['registeredAddress.area', 'address.area'], inplace=True)
-    # print(normalized_df)
+
     return normalized_df
 
 
@@ -662,19 +639,18 @@ def append_datahub_details(family_tree_members):
     family_tree_members_duns = [object['duns'] for object in family_tree_members]
 
     family_tree_members_datahub_details = _load_datahub_details(family_tree_members_duns)
+
     empty_address = {
-        "line_1": None,
-        "line_2": None,
-        "town": None,
-        "county": None,
-        "postcode": None,
-        # "area": {'id': None, 'name': None},
-        "country": {'id': None, 'name': None},
+        'line_1': None,
+        'line_2': None,
+        'town': None,
+        'county': None,
+        'postcode': None,
+        'country': {'id': None, 'name': None},
     }
     empty_id_name = {'id': None, 'name': None}
+
     for family_member in family_tree_members:
-        # print('**********family_member***********')
-        # print(family_member)
         duns_number_to_find = family_member['duns']
         family_member['companyId'] = None
         family_member['ukRegion'] = empty_id_name
@@ -684,6 +660,9 @@ def append_datahub_details(family_tree_members):
         family_member['latestInteractionDate'] = None
         family_member['archived'] = False
         family_member['oneListTier'] = None
+        number_of_employees = family_member.get('numberOfEmployees')
+        if isinstance(number_of_employees, list):
+            family_member['numberOfEmployees'] = number_of_employees[0].get('value')
         for datahub_detail in family_tree_members_datahub_details:
             if duns_number_to_find == datahub_detail['duns_number']:
                 family_member['primaryName'] = datahub_detail.get('name')
@@ -693,22 +672,17 @@ def append_datahub_details(family_tree_members):
                 family_member['registeredAddress'] = datahub_detail.get('registered_address')
                 family_member['sector'] = datahub_detail.get('sector')
                 family_member['latestInteractionDate'] = datahub_detail.get(
-                    'latest_interaction_date'
+                    'latest_interaction_date',
                 )
                 family_member['archived'] = datahub_detail.get('archived')
                 break  # Stop once we've found the match
-                # family_member['oneListTier'] = datahub_detail.get('one_list_tier')
 
 
 def _load_datahub_details(family_tree_members_duns):
     opensearch_results = get_search_by_entities_query(
-        [SearchCompany], term='', filter_data={'duns_number': family_tree_members_duns}
+        [SearchCompany],
+        term='',
+        filter_data={'duns_number': family_tree_members_duns},
     ).execute()
-    # print('*********load_datahub_details**********')
-    # print([x.to_dict() for x in opensearch_results.hits])
-    return [x.to_dict() for x in opensearch_results.hits]
-    # family_tree_members_database_details = Company.objects.filter(
-    #     duns_number__in=family_tree_members_duns,
-    # ).values('id', 'duns_number', 'number_of_employees', 'name')
 
-    # return family_tree_members_database_details
+    return [x.to_dict() for x in opensearch_results.hits]

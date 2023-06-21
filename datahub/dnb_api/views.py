@@ -3,8 +3,6 @@ import logging
 from bigtree import (
     dataframe_to_tree_by_relation,
     tree_to_nested_dict,
-    add_dict_to_tree_by_name,
-    add_dataframe_to_tree_by_name,
 )
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
@@ -36,6 +34,7 @@ from datahub.dnb_api.serializers import (
     DUNSNumberSerializer,
 )
 from datahub.dnb_api.utils import (
+    create_company_hierarchy_datatable,
     create_investigation,
     DNBServiceConnectionError,
     DNBServiceError,
@@ -48,7 +47,6 @@ from datahub.dnb_api.utils import (
     is_valid_uuid,
     request_changes,
     search_dnb,
-    create_company_hierarchy_datatable,
 )
 
 
@@ -422,16 +420,11 @@ class DNBCompanyHierarchyView(APIView):
 
         normalized_df = create_company_hierarchy_datatable(family_tree_members)
 
-        # return Response({})
-
         root = dataframe_to_tree_by_relation(
             normalized_df,
             child_col='duns',
             parent_col='corporateLinkage.parent.duns',
         )
-
-        print(root)
-        # print(normalized_df['numberOfEmployees.value'])
 
         nested_tree = tree_to_nested_dict(
             root,
@@ -447,10 +440,9 @@ class DNBCompanyHierarchyView(APIView):
                 'sector': 'sector',
                 'latestInteractionDate': 'latest_interaction_date',
                 'archived': 'archived',
+                'numberOfEmployees': 'numberOfEmployees',
             },
         )
-
-        print(nested_tree)
 
         json_response['ultimate_global_company'] = nested_tree
         json_response['ultimate_global_companies_count'] = response[

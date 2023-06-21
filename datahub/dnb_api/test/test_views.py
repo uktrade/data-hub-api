@@ -26,7 +26,6 @@ from datahub.dnb_api.utils import (
 )
 from datahub.interaction.models import InteractionPermission
 from datahub.metadata.models import AdministrativeArea, Country
-from datahub.search.company import CompanySearchApp
 
 DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/search/')
 DNB_CHANGE_REQUEST_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'change-request/')
@@ -2481,7 +2480,9 @@ class TestCompanyHierarchyView(APITestMixin):
         }
 
     def test_dnb_response_with_a_duns_number_matching_dh_company_duns_number_appends_dh_id(
-        self, requests_mock, opensearch_with_signals
+        self,
+        requests_mock,
+        opensearch_with_signals,
     ):
         """
         Test the scenario where the company returned by the DnB service does match a company found
@@ -2514,6 +2515,7 @@ class TestCompanyHierarchyView(APITestMixin):
                 'duns_number': ultimate_company_dnb['duns'],
                 'id': ultimate_company_dh.id,
                 'name': ultimate_company_dh.name,
+                'numberOfEmployees': None,
                 'address': {
                     'country': {
                         'id': str(ultimate_company_dh.address_country.id),
@@ -2553,7 +2555,9 @@ class TestCompanyHierarchyView(APITestMixin):
         }
 
     def test_dnb_response_with_only_ultimate_parent_matching_a_datahub_company(
-        self, requests_mock, opensearch_with_signals
+        self,
+        requests_mock,
+        opensearch_with_signals,
     ):
         """
         Test the scenario where the ultimate parent is the only company in the response from the
@@ -2573,6 +2577,7 @@ class TestCompanyHierarchyView(APITestMixin):
                 'hierarchyLevel': 2,
                 'parent': {'duns': ultimate_tree_member_level_1['duns']},
             },
+            'numberOfEmployees': [{'value': 150}],
         }
         tree_member_level_3 = {
             'duns': '777777777',
@@ -2603,6 +2608,7 @@ class TestCompanyHierarchyView(APITestMixin):
             'ultimate_global_company': {
                 'duns_number': ultimate_tree_member_level_1['duns'],
                 'name': ultimate_company_dh.name,
+                'numberOfEmployees': None,
                 'id': ultimate_company_dh.id,
                 'address': {
                     'country': {
@@ -2640,8 +2646,9 @@ class TestCompanyHierarchyView(APITestMixin):
                 'subsidiaries': [
                     {
                         'duns_number': tree_member_level_2['duns'],
-                        'name': tree_member_level_2['primaryName'],
                         'id': None,
+                        'name': tree_member_level_2['primaryName'],
+                        'numberOfEmployees': tree_member_level_2['numberOfEmployees'][0]['value'],
                         'address': None,
                         'registered_address': None,
                         'sector': None,
@@ -2652,8 +2659,9 @@ class TestCompanyHierarchyView(APITestMixin):
                         'subsidiaries': [
                             {
                                 'duns_number': tree_member_level_3['duns'],
-                                'name': tree_member_level_3['primaryName'],
                                 'id': None,
+                                'name': tree_member_level_3['primaryName'],
+                                'numberOfEmployees': None,
                                 'address': None,
                                 'registered_address': None,
                                 'sector': None,
@@ -2670,7 +2678,12 @@ class TestCompanyHierarchyView(APITestMixin):
             'manually_verified_subsidiaries': [],
         }
 
-    def _get_family_tree_response(self, requests_mock, tree_members, ultimate_company):
+    def _get_family_tree_response(
+        self,
+        requests_mock,
+        tree_members,
+        ultimate_company,
+    ):
         api_client = self.create_api_client()
         requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,

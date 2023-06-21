@@ -238,6 +238,6 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
                 'number_of_employees_value': 'Number of employees',
                 'turnover_value': 'Annual turnover',
                 'upper_headquarter_type_name': 'Headquarter type',
-            }
+            },
         )
         return field_titles
