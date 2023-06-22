@@ -2778,19 +2778,33 @@ class TestCompanyHierarchyView(APITestMixin):
             requests_mock, [ultimate_tree_member_level_1], ultimate_company_dh
         )
         # print(response.json())
-        # print("This is the id from first sub", first_subsidiary.id)
         assert response.json()["manually_verified_subsidiaries"] == [
-            [
-                str(first_subsidiary.id),
-                first_subsidiary.name,
-                # first_subsidiary.employee_range.name,
-                # first_subsidiary.address_1,
-                # first_subsidiary.address_2,
-                # first_subsidiary.address_town,
-                # first_subsidiary.address_county,
-                # first_subsidiary.address_postcode,
-                # first_subsidiary.address_country.name,
-                # first_subsidiary.uk_region.name,
-                # first_subsidiary.archived,
-            ]
+            {
+                'address': {
+                    'line_1': first_subsidiary.address_1,
+                    'line_2': first_subsidiary.address_2,
+                    'town': first_subsidiary.address_town,
+                    'county': first_subsidiary.address_county,
+                    'postcode': first_subsidiary.address_postcode,
+                    'country': {
+                        'id': str(first_subsidiary.address_country.id),
+                        'name': first_subsidiary.address_country.name,
+                    }
+                },
+                'archived': first_subsidiary.archived,
+                'employee_range': {
+                    'id': str(first_subsidiary.employee_range.id),
+                    'name': first_subsidiary.employee_range.name,
+                },
+                'headquarter_type': {
+                    'id': str(first_subsidiary.headquarter_type.id),
+                    'name': first_subsidiary.headquarter_type.name,
+                },
+                'id': str(first_subsidiary.id),
+                'name': first_subsidiary.name,
+                'uk_region': {
+                    'id': str(first_subsidiary.uk_region.id),
+                    'name': first_subsidiary.uk_region.name,
+                },
+            }
         ]

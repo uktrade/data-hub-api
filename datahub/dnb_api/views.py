@@ -488,7 +488,11 @@ class DNBCompanyHierarchyView(APIView):
         return family_tree_members_database_details
 
     def get_manually_verified_subsidiaries(self, company_id):
-        company = Company.objects.filter(global_headquarters_id=company_id).values_list(
+        company = Company.objects.filter(global_headquarters_id=company_id).select_related(
+            "employee_range",
+            "headquarter_type",
+            "uk_region",
+            ).values(
             "id",
             "name",
             "employee_range",
@@ -497,8 +501,14 @@ class DNBCompanyHierarchyView(APIView):
             "uk_region",
             "archived",
         )
-        # print("This is the variable company_id", company_id)
-        # print(company['name'])
-        print (company.first())
+
+        print(list(company))
+
+        # for item in company:
+        #     print(item.__dict__)
+        #     print(item.employee_range.name)
+
+        # first_company = company.first()
+        # print("*********", company.first().employee_range.id, company.first().employee_range.name)
 
         return company if company else []
