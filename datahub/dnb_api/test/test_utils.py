@@ -641,6 +641,9 @@ class TestDNBHierarchyData:
     Tests for DNB Hierarchy function.
     """
 
+    VALID_DUNS_NUMBER = "123456789"
+    FAMILY_TREE_CACHE_KEY = f'family_tree_${VALID_DUNS_NUMBER}'
+
     @override_settings(DNB_SERVICE_BASE_URL=None)
     def test_dnb_hierarchy_improperly_configured_url_error(self):
         """
@@ -650,35 +653,48 @@ class TestDNBHierarchyData:
         with pytest.raises(ImproperlyConfigured):
             get_company_hierarchy_data('123456789')
 
+    @pytest.mark.usefixtures('local_memory_cache')
     def test_when_dnb_data_not_in_cache_dnb_api_is_called(self, requests_mock):
+        """
+        Test when the dnb family tree data is missing from the cache, a call is made to the dnb
+        api to get the data and saved into the cache
+        """
         matcher = requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
             status_code=200,
             content=b'{"family_tree_members":[]}',
         )
-        get_company_hierarchy_data('123456789')
-        assert matcher.called_once
+        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
 
+        assert matcher.called_once
+        assert cache.get(self.FAMILY_TREE_CACHE_KEY) is not None
+
+    @pytest.mark.usefixtures('local_memory_cache')
     def test_when_called_multiple_times_only_first_call_makes_an_api_call_to_dnb(
         self, requests_mock
     ):
+        """
+        Test that after a successful call to the dnb api, all subsequent calls to the
+        get_company_hierarchy_data function get the data from the cache
+        """
         matcher = requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
             status_code=200,
             content=b'{"family_tree_members":[]}',
         )
 
-        get_company_hierarchy_data('123456789')
-        get_company_hierarchy_data('123456789')
-        get_company_hierarchy_data('123456789')
+        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
 
         assert matcher.called_once
 
     @pytest.mark.usefixtures('local_memory_cache')
     def test_when_dnb_data_in_cache_this_is_returned_instead_of_calling_api(self, requests_mock):
-        duns_number = "123456789"
-        cache_key = f'family_tree_${duns_number}'
-        cache.set(cache_key, "cached")
+        """
+        Test when a value is stored in the cache the dnb api is not called
+        """
+        cache.set(self.FAMILY_TREE_CACHE_KEY, "cached")
 
         matcher = requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
@@ -686,25 +702,26 @@ class TestDNBHierarchyData:
             content=b'{"family_tree_members":[]}',
         )
 
-        result = get_company_hierarchy_data('123456789')
+        result = get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
         assert result == "cached"
 
-        get_company_hierarchy_data('123456789')
-        get_company_hierarchy_data('123456789')
+        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
 
         assert not matcher.called
 
     def test_when_dnb_api_error_response_is_not_cached(self, requests_mock):
-        duns_number = "123456789"
-        cache_key = f'family_tree_${duns_number}'
+        """
+        Test when the dnb api doesn't return a success http status code the value is not cached
+        """
 
         requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
             status_code=500,
             content=b'{}',
         )
-        get_company_hierarchy_data('123456789')
-        assert cache.get(cache_key) is None
+        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+        assert cache.get(self.FAMILY_TREE_CACHE_KEY) is None
 
 
 class TestCompanyHierarchyDataframe:

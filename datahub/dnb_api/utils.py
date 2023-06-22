@@ -552,7 +552,6 @@ def get_company_hierarchy_data(duns_number):
     cache_value = cache.get(cache_key)
 
     if cache_value:
-        print("USING CACHED VALUE")
         return cache_value
     api_client = _get_api_client()
 
@@ -563,13 +562,14 @@ def get_company_hierarchy_data(duns_number):
         timeout=3.0,
     )
 
+    response_data = response.json()
+
     # only cache successful dnb calls
     if response.status_code == status.HTTP_200_OK:
-        print("SAVE VALUE IN CACHE")
         one_day_timeout = int(timedelta(days=1).total_seconds())
-        cache.set(cache_key, response.json(), one_day_timeout)
+        cache.set(cache_key, response_data, one_day_timeout)
 
-    return response.json()
+    return response_data
 
 
 def is_valid_uuid(value):
