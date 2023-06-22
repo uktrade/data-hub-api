@@ -3,7 +3,9 @@ from uuid import UUID
 
 import pytest
 import reversion
+
 from django.conf import settings
+from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
 from django.utils.timezone import now
@@ -47,6 +49,10 @@ pytestmark = pytest.mark.django_db
 
 DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/search/')
 DNB_UPDATES_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'companies/')
+DNB_HIERARCHY_SEARCH_URL = urljoin(
+    f'{settings.DNB_SERVICE_BASE_URL}/',
+    'companies/hierarchy/search/',
+)
 
 
 @pytest.mark.parametrize(
@@ -643,6 +649,62 @@ class TestDNBHierarchyData:
         """
         with pytest.raises(ImproperlyConfigured):
             get_company_hierarchy_data('123456789')
+
+    def test_when_dnb_data_not_in_cache_dnb_api_is_called(self, requests_mock):
+        matcher = requests_mock.post(
+            DNB_HIERARCHY_SEARCH_URL,
+            status_code=200,
+            content=b'{"family_tree_members":[]}',
+        )
+        get_company_hierarchy_data('123456789')
+        assert matcher.called_once
+
+    def test_when_called_multiple_times_only_first_call_makes_an_api_call_to_dnb(
+        self, requests_mock
+    ):
+        matcher = requests_mock.post(
+            DNB_HIERARCHY_SEARCH_URL,
+            status_code=200,
+            content=b'{"family_tree_members":[]}',
+        )
+
+        get_company_hierarchy_data('123456789')
+        get_company_hierarchy_data('123456789')
+        get_company_hierarchy_data('123456789')
+
+        assert matcher.called_once
+
+    @pytest.mark.usefixtures('local_memory_cache')
+    def test_when_dnb_data_in_cache_this_is_returned_instead_of_calling_api(self, requests_mock):
+        duns_number = "123456789"
+        cache_key = f'family_tree_${duns_number}'
+        cache.set(cache_key, "cached")
+
+        matcher = requests_mock.post(
+            DNB_HIERARCHY_SEARCH_URL,
+            status_code=200,
+            content=b'{"family_tree_members":[]}',
+        )
+
+        result = get_company_hierarchy_data('123456789')
+        assert result == "cached"
+
+        get_company_hierarchy_data('123456789')
+        get_company_hierarchy_data('123456789')
+
+        assert not matcher.called
+
+    def test_when_dnb_api_error_response_is_not_cached(self, requests_mock):
+        duns_number = "123456789"
+        cache_key = f'family_tree_${duns_number}'
+
+        requests_mock.post(
+            DNB_HIERARCHY_SEARCH_URL,
+            status_code=500,
+            content=b'{}',
+        )
+        get_company_hierarchy_data('123456789')
+        assert cache.get(cache_key) is None
 
 
 class TestCompanyHierarchyDataframe:
