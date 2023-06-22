@@ -2772,6 +2772,7 @@ class TestCompanyHierarchyView(APITestMixin):
         subsidiary = CompanyFactory(
             global_headquarters_id=ultimate_company_dh.id,
             headquarter_type_id=constants.HeadquarterType.ghq.value.id,
+            address_area_id = constants.AdministrativeArea.texas.value.id
         )
 
         response = self._get_family_tree_response(
@@ -2798,7 +2799,11 @@ class TestCompanyHierarchyView(APITestMixin):
                     'country': {
                         'id': str(subsidiary.address_country.id),
                         'name': subsidiary.address_country.name,
-                    }
+                    },
+                    'area': {
+                        'id': str(subsidiary.address_area.id),
+                        'name': subsidiary.address_area.name,
+                    },
                 },
                 'uk_region': {
                     'id': str(subsidiary.uk_region.id),

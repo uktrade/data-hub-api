@@ -15,8 +15,6 @@ from datahub.metadata import models as meta_models
 from datahub.core.serializers import (
     AddressSerializer,
     NestedRelatedField,
-    PermittedFieldsModelSerializer,
-    RelaxedURLField,
 )
 
 # from django.core import serializers
@@ -380,8 +378,7 @@ class DNBCompanyInvestigationView(APIView):
 
         return Response(response)
 
-
-class CompSerializer(serializers.ModelSerializer):
+class SubsidiarySerializer(serializers.ModelSerializer):
     employee_range = NestedRelatedField(
         meta_models.EmployeeRange,
         required=False,
@@ -397,6 +394,12 @@ class CompSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True,
     )
+    address = AddressSerializer(
+        source_model=Company,
+        address_source_prefix='address',
+        area_can_be_required=True,
+        postcode_can_be_required=True,
+    )
 
     class Meta:
         model = Company
@@ -407,8 +410,8 @@ class CompSerializer(serializers.ModelSerializer):
             'headquarter_type',
             'uk_region',
             'archived',
+            'address',
             ]
-
 
 class DNBCompanyHierarchyView(APIView):
     """
@@ -494,7 +497,6 @@ class DNBCompanyHierarchyView(APIView):
         json_response["manually_verified_subsidiaries"] = self.get_manually_verified_subsidiaries(
             company_id
         )
-        print("MVS json", json_response["manually_verified_subsidiaries"])
         return Response(json_response)
 
     def append_datahub_details(self, family_tree_members):
@@ -524,18 +526,8 @@ class DNBCompanyHierarchyView(APIView):
                 "headquarter_type",
                 "uk_region",
             )
-            # .values("id", "name", "employee_range")
         )
 
-        # print(list(companies))
+        serialized_data = SubsidiarySerializer(companies, many=True)
 
-        # for item in list(companies):
-        #     print(item.employee_range.name)
-
-        # first_company = company.first()
-        # print("*********", company.first().employee_range.id, company.first().employee_range.name)
-        serialized_data = CompSerializer(companies, many=True)
-        print("data", serialized_data.data)
-
-        # print(serializers.serialize('json', companies, fields=('id')))
         return serialized_data.data if companies else []
