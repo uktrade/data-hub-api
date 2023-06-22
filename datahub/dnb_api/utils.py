@@ -1,11 +1,14 @@
 import logging
 import uuid
 
+from datetime import timedelta
+
 import numpy as np
 import pandas as pd
 
+
 import reversion
-from datetime import timedelta
+
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
