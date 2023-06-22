@@ -11,6 +11,16 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from datahub.metadata import models as meta_models
+from datahub.core.serializers import (
+    AddressSerializer,
+    NestedRelatedField,
+    PermittedFieldsModelSerializer,
+    RelaxedURLField,
+)
+
+# from django.core import serializers
+
 from datahub.company.models import Company, CompanyPermission
 from datahub.company.serializers import CompanySerializer
 from datahub.core import statsd
@@ -159,9 +169,7 @@ class DNBCompanySearchView(APIView):
         """
         duns_numbers = [result["duns_number"] for result in dnb_results]
         datahub_companies_by_duns = self._get_datahub_companies_by_duns(duns_numbers)
-        hydrated_results = self._get_hydrated_results(
-            dnb_results, datahub_companies_by_duns
-        )
+        hydrated_results = self._get_hydrated_results(dnb_results, datahub_companies_by_duns)
         return hydrated_results
 
 
@@ -373,6 +381,18 @@ class DNBCompanyInvestigationView(APIView):
         return Response(response)
 
 
+class CompSerializer(serializers.ModelSerializer):
+    employee_range = NestedRelatedField(
+        meta_models.EmployeeRange,
+        required=False,
+        allow_null=True,
+    )
+
+    class Meta:
+        model = Company
+        fields = ['id', 'name', 'employee_range']
+
+
 class DNBCompanyHierarchyView(APIView):
     """
     View for receiving datahub hierarchy of a company from DNB data.
@@ -392,22 +412,16 @@ class DNBCompanyHierarchyView(APIView):
         if not is_valid_uuid(company_id):
             raise APIBadRequestException(f'company id "{company_id}" is not valid')
 
-        company = Company.objects.filter(id=company_id).values_list(
-            "duns_number", flat=True
-        )
+        company = Company.objects.filter(id=company_id).values_list("duns_number", flat=True)
 
         if not company:
             raise APINotFoundException(f"company {company_id} not found")
 
         duns_number = company.first()
         if company and not duns_number:
-            raise APIBadRequestException(
-                f"company {company_id} does not contain a duns number"
-            )
+            raise APIBadRequestException(f"company {company_id} does not contain a duns number")
 
-        hierarchy_serializer = DNBCompanyHierarchySerializer(
-            data={"duns_number": duns_number}
-        )
+        hierarchy_serializer = DNBCompanyHierarchySerializer(data={"duns_number": duns_number})
         hierarchy_serializer.is_valid(raise_exception=True)
 
         try:
@@ -460,17 +474,16 @@ class DNBCompanyHierarchyView(APIView):
         json_response['ultimate_global_companies_count'] = response[
             'global_ultimate_family_tree_members_count'
         ]
-        json_response[
-            "manually_verified_subsidiaries"
-        ] = self.get_manually_verified_subsidiaries(company_id)
+        json_response["manually_verified_subsidiaries"] = self.get_manually_verified_subsidiaries(
+            company_id
+        )
+        print(json_response["manually_verified_subsidiaries"])
         return Response(json_response)
 
     def append_datahub_details(self, family_tree_members):
         family_tree_members_duns = [object["duns"] for object in family_tree_members]
 
-        family_tree_members_database_details = self.load_datahub_details(
-            family_tree_members_duns
-        )
+        family_tree_members_database_details = self.load_datahub_details(family_tree_members_duns)
 
         for family_member in family_tree_members:
             duns_number_to_find = family_member["duns"]
@@ -488,27 +501,23 @@ class DNBCompanyHierarchyView(APIView):
         return family_tree_members_database_details
 
     def get_manually_verified_subsidiaries(self, company_id):
-        company = Company.objects.filter(global_headquarters_id=company_id).select_related(
-            "employee_range",
-            "headquarter_type",
-            "uk_region",
-            ).values(
-            "id",
-            "name",
-            "employee_range",
-            "headquarter_type",
-            "address_1",
-            "uk_region",
-            "archived",
+        companies = (
+            Company.objects.filter(global_headquarters_id=company_id).select_related(
+                "employee_range",
+                "headquarter_type",
+                "uk_region",
+            )
+            # .values("id", "name", "employee_range")
         )
 
-        print(list(company))
+        # print(list(companies))
 
-        # for item in company:
-        #     print(item.__dict__)
+        # for item in list(companies):
         #     print(item.employee_range.name)
 
         # first_company = company.first()
         # print("*********", company.first().employee_range.id, company.first().employee_range.name)
-
-        return company if company else []
+        sdfd = CompSerializer(companies, many=True)
+        print(sdfd.data)
+        # print(serializers.serialize('json', companies, fields=('id')))
+        return list(companies) if companies else []
