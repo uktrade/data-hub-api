@@ -642,7 +642,7 @@ class TestDNBHierarchyData:
     """
 
     VALID_DUNS_NUMBER = '123456789'
-    FAMILY_TREE_CACHE_KEY = f'family_tree_${VALID_DUNS_NUMBER}'
+    FAMILY_TREE_CACHE_KEY = f'family_tree_{VALID_DUNS_NUMBER}'
 
     @override_settings(DNB_SERVICE_BASE_URL=None)
     def test_dnb_hierarchy_improperly_configured_url_error(self):

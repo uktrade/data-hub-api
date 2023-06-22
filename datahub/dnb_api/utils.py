@@ -551,7 +551,7 @@ def get_company_hierarchy_data(duns_number):
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
 
-    cache_key = f'family_tree_${duns_number}'
+    cache_key = f'family_tree_{duns_number}'
     cache_value = cache.get(cache_key)
 
     if cache_value:
