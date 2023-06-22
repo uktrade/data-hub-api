@@ -2769,42 +2769,41 @@ class TestCompanyHierarchyView(APITestMixin):
         ultimate_company_dh = CompanyFactory(
             duns_number=ultimate_tree_member_level_1["duns"]
         )
-        first_subsidiary = CompanyFactory(global_headquarters_id=ultimate_company_dh.id)
-        # second_subsidiary = CompanyFactory(
-        #     global_headquarters_id=ultimate_company_dh.id
-        # )
+        subsidiary = CompanyFactory(
+            global_headquarters_id=ultimate_company_dh.id,
+            headquarter_type_id=constants.HeadquarterType.ghq.value.id,
+        )
 
         response = self._get_family_tree_response(
             requests_mock, [ultimate_tree_member_level_1], ultimate_company_dh
         )
-        # print(response.json())
         assert response.json()["manually_verified_subsidiaries"] == [
             {
-                'address': {
-                    'line_1': first_subsidiary.address_1,
-                    'line_2': first_subsidiary.address_2,
-                    'town': first_subsidiary.address_town,
-                    'county': first_subsidiary.address_county,
-                    'postcode': first_subsidiary.address_postcode,
-                    'country': {
-                        'id': str(first_subsidiary.address_country.id),
-                        'name': first_subsidiary.address_country.name,
-                    }
-                },
-                'archived': first_subsidiary.archived,
+                'id': str(subsidiary.id),
+                'name': subsidiary.name,
                 'employee_range': {
-                    'id': str(first_subsidiary.employee_range.id),
-                    'name': first_subsidiary.employee_range.name,
+                    'id': str(subsidiary.employee_range.id),
+                    'name': subsidiary.employee_range.name,
                 },
                 'headquarter_type': {
-                    'id': str(first_subsidiary.headquarter_type.id),
-                    'name': first_subsidiary.headquarter_type.name,
+                    'id': str(subsidiary.headquarter_type.id),
+                    'name': subsidiary.headquarter_type.name,
                 },
-                'id': str(first_subsidiary.id),
-                'name': first_subsidiary.name,
+                'address': {
+                    'line_1': subsidiary.address_1,
+                    'line_2': subsidiary.address_2,
+                    'town': subsidiary.address_town,
+                    'county': subsidiary.address_county,
+                    'postcode': subsidiary.address_postcode,
+                    'country': {
+                        'id': str(subsidiary.address_country.id),
+                        'name': subsidiary.address_country.name,
+                    }
+                },
                 'uk_region': {
-                    'id': str(first_subsidiary.uk_region.id),
-                    'name': first_subsidiary.uk_region.name,
+                    'id': str(subsidiary.uk_region.id),
+                    'name': subsidiary.uk_region.name,
                 },
+                'archived': subsidiary.archived,
             }
         ]

@@ -387,10 +387,27 @@ class CompSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True,
     )
+    headquarter_type = NestedRelatedField(
+        meta_models.HeadquarterType,
+        required=False,
+        allow_null=True,
+    )
+    uk_region = NestedRelatedField(
+        meta_models.UKRegion,
+        required=False,
+        allow_null=True,
+    )
 
     class Meta:
         model = Company
-        fields = ['id', 'name', 'employee_range']
+        fields = [
+            'id',
+            'name',
+            'employee_range',
+            'headquarter_type',
+            'uk_region',
+            'archived',
+            ]
 
 
 class DNBCompanyHierarchyView(APIView):
@@ -477,7 +494,7 @@ class DNBCompanyHierarchyView(APIView):
         json_response["manually_verified_subsidiaries"] = self.get_manually_verified_subsidiaries(
             company_id
         )
-        print(json_response["manually_verified_subsidiaries"])
+        print("MVS json", json_response["manually_verified_subsidiaries"])
         return Response(json_response)
 
     def append_datahub_details(self, family_tree_members):
@@ -517,7 +534,8 @@ class DNBCompanyHierarchyView(APIView):
 
         # first_company = company.first()
         # print("*********", company.first().employee_range.id, company.first().employee_range.name)
-        sdfd = CompSerializer(companies, many=True)
-        print(sdfd.data)
+        serialized_data = CompSerializer(companies, many=True)
+        print("data", serialized_data.data)
+
         # print(serializers.serialize('json', companies, fields=('id')))
-        return list(companies) if companies else []
+        return serialized_data.data if companies else []
