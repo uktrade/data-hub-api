@@ -628,7 +628,9 @@ def create_company_hierarchy_dataframe(family_tree_members: list):
     _merge_columns_into_single_column(normalized_df, 'sector', ['sector.id', 'sector.name'])
     _merge_columns_into_single_column(normalized_df, 'ukRegion', ['ukRegion.id', 'ukRegion.name'])
     _merge_columns_into_single_column(
-        normalized_df, 'oneListTier', ['oneListTier.id', 'oneListTier.name']
+        normalized_df,
+        'oneListTier',
+        ['oneListTier.id', 'oneListTier.name'],
     )
     _merge_columns_into_single_column(
         normalized_df,
