@@ -4,7 +4,7 @@ from django.core.validators import integer_validator
 from rest_framework import serializers
 
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import Company
+from datahub.company.models import Company, OneListTier
 from datahub.company.serializers import CompanySerializer
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
@@ -511,6 +511,7 @@ class SubsidiarySerializer(serializers.ModelSerializer):
         area_can_be_required=True,
         postcode_can_be_required=True,
     )
+    one_list_tier = NestedRelatedField(OneListTier)
     hierarchy = serializers.CharField(
         default='0'
     )
