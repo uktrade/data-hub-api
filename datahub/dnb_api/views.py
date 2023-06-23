@@ -11,8 +11,6 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-# from django.core import serializers
-
 from datahub.company.models import Company, CompanyPermission
 from datahub.company.serializers import CompanySerializer
 from datahub.core import statsd
@@ -23,10 +21,7 @@ from datahub.core.exceptions import (
 )
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
-from datahub.dnb_api.link_company import (
-    CompanyAlreadyDNBLinkedError,
-    link_company_with_dnb,
-)
+from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedError, link_company_with_dnb
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyChangeRequestSerializer,
@@ -37,7 +32,7 @@ from datahub.dnb_api.serializers import (
     DNBGetCompanyChangeRequestSerializer,
     DNBMatchedCompanySerializer,
     DUNSNumberSerializer,
-    SubsidiarySerializer,
+    SubsidiarySerializer
 )
 from datahub.dnb_api.utils import (
     create_company_hierarchy_dataframe,
@@ -455,30 +450,8 @@ class DNBCompanyHierarchyView(APIView):
         json_response['ultimate_global_companies_count'] = response[
             'global_ultimate_family_tree_members_count'
         ]
-        json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries(
-            company_id,
-        )
+        json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries(company_id)
         return Response(json_response)
-
-    def append_datahub_details(self, family_tree_members):
-        family_tree_members_duns = [object['duns'] for object in family_tree_members]
-
-        family_tree_members_database_details = self.load_datahub_details(family_tree_members_duns)
-
-        for family_member in family_tree_members:
-            duns_number_to_find = family_member['duns']
-            family_member['companyId'] = None
-            for member_database_details in family_tree_members_database_details:
-                if duns_number_to_find == member_database_details['duns_number']:
-                    family_member['primaryName'] = member_database_details['name']
-                    family_member['companyId'] = member_database_details['id']
-
-    def load_datahub_details(self, family_tree_members_duns):
-        family_tree_members_database_details = Company.objects.filter(
-            duns_number__in=family_tree_members_duns,
-        ).values('id', 'duns_number', 'number_of_employees', 'name')
-
-        return family_tree_members_database_details
 
     def get_manually_verified_subsidiaries(self, company_id):
         companies = (
