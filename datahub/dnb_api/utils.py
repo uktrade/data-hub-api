@@ -1,15 +1,21 @@
 import logging
 import uuid
 
+from datetime import timedelta
+
 import numpy as np
 import pandas as pd
 
+
 import reversion
+
 from django.conf import settings
+from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.timezone import now
 from requests.exceptions import ConnectionError, Timeout
 from rest_framework import serializers, status
+
 from reversion.models import Version
 
 from datahub.core import statsd
@@ -538,14 +544,19 @@ def _get_api_client(request=None):
     )
 
 
-def get_company_hierarchy_data(duns_number, request=None):
+def get_company_hierarchy_data(duns_number):
     """
     Get company hierarchy data
     """
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
 
-    api_client = _get_api_client(request)
+    cache_key = f'family_tree_{duns_number}'
+    cache_value = cache.get(cache_key)
+
+    if cache_value:
+        return cache_value
+    api_client = _get_api_client()
 
     response = api_client.request(
         'POST',
@@ -554,7 +565,14 @@ def get_company_hierarchy_data(duns_number, request=None):
         timeout=3.0,
     )
 
-    return response.json()
+    response_data = response.json()
+
+    # only cache successful dnb calls
+    if response.status_code == status.HTTP_200_OK:
+        one_day_timeout = int(timedelta(days=1).total_seconds())
+        cache.set(cache_key, response_data, one_day_timeout)
+
+    return response_data
 
 
 def is_valid_uuid(value):
