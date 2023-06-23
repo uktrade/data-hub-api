@@ -12,16 +12,16 @@ from datahub.company.validators import (
 )
 from datahub.core.constants import Country
 from datahub.core.serializers import (
+    AddressSerializer,
     NestedRelatedField,
     PermittedFieldsModelSerializer,
     RelaxedURLField,
-    AddressSerializer
 )
 from datahub.core.validators import EqualsRule, OperatorRule, RulesBasedValidator, ValidationRule
 from datahub.interaction.models import InteractionPermission
 from datahub.metadata.models import AdministrativeArea
-from datahub.metadata.models import Country as CountryModel
 from datahub.metadata import models as meta_models
+from datahub.metadata.models import Country as CountryModel
 from datahub.metadata.utils import convert_gbp_to_usd
 
 
@@ -488,7 +488,8 @@ class DNBCompanyHierarchySerializer(serializers.Serializer):
             )
         self.company = company
         return duns_number
-    
+
+
 class SubsidiarySerializer(serializers.ModelSerializer):
     employee_range = NestedRelatedField(
         meta_models.EmployeeRange,
@@ -513,7 +514,7 @@ class SubsidiarySerializer(serializers.ModelSerializer):
     )
     one_list_tier = NestedRelatedField(OneListTier)
     hierarchy = serializers.CharField(
-        default='0'
+        default='0',
     )
 
     class Meta:
@@ -528,4 +529,4 @@ class SubsidiarySerializer(serializers.ModelSerializer):
             'address',
             'hierarchy',
             'one_list_tier',
-            ]
+        ]
