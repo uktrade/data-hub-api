@@ -373,6 +373,7 @@ class DNBCompanyInvestigationView(APIView):
 
         return Response(response)
 
+
 class DNBCompanyHierarchyView(APIView):
     """
     View for receiving datahub hierarchy of a company from DNB data.
@@ -491,4 +492,3 @@ class DNBCompanyHierarchyView(APIView):
         serialized_data = SubsidiarySerializer(companies, many=True)
 
         return serialized_data.data if companies else []
-
