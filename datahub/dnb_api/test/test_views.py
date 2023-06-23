@@ -13,7 +13,7 @@ from requests.exceptions import ConnectionError, Timeout
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.models import Company, CompanyPermission
+from datahub.company.models import Company, CompanyPermission, OneListTier
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.serializers import AddressSerializer
@@ -2504,6 +2504,7 @@ class TestCompanyHierarchyView(APITestMixin):
             duns_number=ultimate_company_dnb['duns'],
             id='8e2e9b35-3415-4b9b-b9ff-f97446ac8942',
             name=ultimate_company_dnb['primaryName'],
+            one_list_tier=OneListTier.objects.first(),
         )
         opensearch_with_signals.indices.refresh()
 
@@ -2546,7 +2547,10 @@ class TestCompanyHierarchyView(APITestMixin):
                     'id': str(ultimate_company_dh.uk_region.id),
                     'name': ultimate_company_dh.uk_region.name,
                 },
-                'one_list_tier': None,
+                'one_list_tier': {
+                    'id': str(ultimate_company_dh.one_list_tier.id),
+                    'name': ultimate_company_dh.one_list_tier.name,
+                },
                 'archived': False,
                 'latest_interaction_date': None,
                 'hierarchy': 1,
