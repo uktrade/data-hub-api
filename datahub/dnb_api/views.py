@@ -455,7 +455,7 @@ class DNBCompanyHierarchyView(APIView):
             'global_ultimate_family_tree_members_count'
         ]
         json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries(
-            company_id
+            company_id,
         )
         return Response(json_response)
 
@@ -491,3 +491,4 @@ class DNBCompanyHierarchyView(APIView):
         serialized_data = SubsidiarySerializer(companies, many=True)
 
         return serialized_data.data if companies else []
+
