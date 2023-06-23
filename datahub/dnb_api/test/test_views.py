@@ -13,6 +13,7 @@ from requests.exceptions import ConnectionError, Timeout
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.constants import OneListTierID
 from datahub.company.models import Company, CompanyPermission, OneListTier
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
@@ -2791,7 +2792,8 @@ class TestCompanyHierarchyView(APITestMixin):
         subsidiary = CompanyFactory(
             global_headquarters_id=ultimate_company_dh.id,
             headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-            address_area_id = constants.AdministrativeArea.texas.value.id
+            address_area_id = constants.AdministrativeArea.texas.value.id,
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
         )
 
         response = self._get_family_tree_response(
@@ -2828,6 +2830,10 @@ class TestCompanyHierarchyView(APITestMixin):
                     'id': str(subsidiary.uk_region.id),
                     'name': subsidiary.uk_region.name,
                 },
+                'one_list_tier': {
+                    'id': str(subsidiary.one_list_tier.id),
+                    'name': subsidiary.one_list_tier.name,
+                },
                 'archived': subsidiary.archived,
                 'hierarchy': '0',
             }
@@ -2848,12 +2854,14 @@ class TestCompanyHierarchyView(APITestMixin):
       first_subsidiary = CompanyFactory(
           global_headquarters_id=ultimate_company_dh.id,
           headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-          address_area_id = constants.AdministrativeArea.texas.value.id
+          address_area_id = constants.AdministrativeArea.texas.value.id,
+          one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
       )
       second_subsidiary = CompanyFactory(
           global_headquarters_id=ultimate_company_dh.id,
           headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-          address_area_id = constants.AdministrativeArea.texas.value.id
+          address_area_id = constants.AdministrativeArea.texas.value.id,
+          one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
       )
 
       response = self._get_family_tree_response(
@@ -2890,6 +2898,10 @@ class TestCompanyHierarchyView(APITestMixin):
                   'id': str(second_subsidiary.uk_region.id),
                   'name': second_subsidiary.uk_region.name,
               },
+              'one_list_tier': {
+                  'id': str(second_subsidiary.one_list_tier.id),
+                  'name': second_subsidiary.one_list_tier.name,
+              },
               'archived': second_subsidiary.archived,
               'hierarchy': '0',
           },
@@ -2922,6 +2934,10 @@ class TestCompanyHierarchyView(APITestMixin):
               'uk_region': {
                   'id': str(first_subsidiary.uk_region.id),
                   'name': first_subsidiary.uk_region.name,
+              },
+              'one_list_tier': {
+                  'id': str(first_subsidiary.one_list_tier.id),
+                  'name': first_subsidiary.one_list_tier.name,
               },
               'archived': first_subsidiary.archived,
               'hierarchy': '0',

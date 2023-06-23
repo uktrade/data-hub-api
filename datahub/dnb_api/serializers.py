@@ -526,4 +526,5 @@ class SubsidiarySerializer(serializers.ModelSerializer):
             'archived',
             'address',
             'hierarchy',
+            'one_list_tier',
             ]
