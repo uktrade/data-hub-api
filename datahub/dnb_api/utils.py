@@ -629,6 +629,11 @@ def create_company_hierarchy_dataframe(family_tree_members: list):
     _merge_columns_into_single_column(normalized_df, 'ukRegion', ['ukRegion.id', 'ukRegion.name'])
     _merge_columns_into_single_column(
         normalized_df,
+        'oneListTier',
+        ['oneListTier.id', 'oneListTier.name'],
+    )
+    _merge_columns_into_single_column(
+        normalized_df,
         'address',
         [
             'address.line_1',
@@ -688,12 +693,12 @@ def append_datahub_details(family_tree_members: list):
         family_member['sector'] = empty_id_name
         family_member['latestInteractionDate'] = None
         family_member['archived'] = False
-        family_member['oneListTier'] = None
+        family_member['oneListTier'] = empty_id_name
         number_of_employees = family_member.get('numberOfEmployees')
         if isinstance(number_of_employees, list):
             family_member['numberOfEmployees'] = number_of_employees[0].get('value')
         for datahub_detail in family_tree_members_datahub_details:
-            if duns_number_to_find == datahub_detail['duns_number']:
+            if duns_number_to_find == datahub_detail.get('duns_number'):
                 family_member['primaryName'] = datahub_detail.get('name')
                 family_member['companyId'] = datahub_detail.get('id')
                 family_member['ukRegion'] = datahub_detail.get('uk_region')
@@ -704,6 +709,9 @@ def append_datahub_details(family_tree_members: list):
                     'latest_interaction_date',
                 )
                 family_member['archived'] = datahub_detail.get('archived')
+                family_member['oneListTier'] = datahub_detail.get('one_list_tier')
+                if not number_of_employees:
+                    family_member['numberOfEmployees'] = datahub_detail.get('number_of_employees')
                 break  # Stop once we've found the match
 
 
@@ -715,6 +723,19 @@ def _load_datahub_details(family_tree_members_duns):
         [SearchCompany],
         term='',
         filter_data={'duns_number': family_tree_members_duns},
+        fields_to_include=(
+            'id',
+            'name',
+            'duns_number',
+            'uk_region',
+            'address',
+            'registered_address',
+            'sector',
+            'latest_interaction_date',
+            'archived',
+            'one_list_tier',
+            'number_of_employees',
+        ),
     ).execute()
 
     return [x.to_dict() for x in opensearch_results.hits]

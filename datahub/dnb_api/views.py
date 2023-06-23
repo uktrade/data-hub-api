@@ -440,7 +440,8 @@ class DNBCompanyHierarchyView(APIView):
                 'sector': 'sector',
                 'latestInteractionDate': 'latest_interaction_date',
                 'archived': 'archived',
-                'numberOfEmployees': 'numberOfEmployees',
+                'numberOfEmployees': 'number_of_employees',
+                'oneListTier': 'one_list_tier',
             },
         )
 
