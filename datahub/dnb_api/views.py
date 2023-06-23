@@ -11,12 +11,6 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from datahub.metadata import models as meta_models
-from datahub.core.serializers import (
-    AddressSerializer,
-    NestedRelatedField,
-)
-
 # from django.core import serializers
 
 from datahub.company.models import Company, CompanyPermission
@@ -43,6 +37,7 @@ from datahub.dnb_api.serializers import (
     DNBGetCompanyChangeRequestSerializer,
     DNBMatchedCompanySerializer,
     DUNSNumberSerializer,
+    SubsidiarySerializer,
 )
 from datahub.dnb_api.utils import (
     create_company_hierarchy_dataframe,
@@ -377,41 +372,6 @@ class DNBCompanyInvestigationView(APIView):
         company.save()
 
         return Response(response)
-
-class SubsidiarySerializer(serializers.ModelSerializer):
-    employee_range = NestedRelatedField(
-        meta_models.EmployeeRange,
-        required=False,
-        allow_null=True,
-    )
-    headquarter_type = NestedRelatedField(
-        meta_models.HeadquarterType,
-        required=False,
-        allow_null=True,
-    )
-    uk_region = NestedRelatedField(
-        meta_models.UKRegion,
-        required=False,
-        allow_null=True,
-    )
-    address = AddressSerializer(
-        source_model=Company,
-        address_source_prefix='address',
-        area_can_be_required=True,
-        postcode_can_be_required=True,
-    )
-
-    class Meta:
-        model = Company
-        fields = [
-            'id',
-            'name',
-            'employee_range',
-            'headquarter_type',
-            'uk_region',
-            'archived',
-            'address',
-            ]
 
 class DNBCompanyHierarchyView(APIView):
     """
