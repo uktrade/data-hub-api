@@ -59,6 +59,7 @@ class SearchCompanyAPIViewMixin:
         'export_sub_segment',
         'one_list_tier',
         'duns_number',
+        'company_number',
     )
 
     REMAP_FIELDS = {
