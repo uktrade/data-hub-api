@@ -2515,7 +2515,7 @@ class TestCompanyHierarchyView(APITestMixin):
                 'duns_number': ultimate_company_dnb['duns'],
                 'id': ultimate_company_dh.id,
                 'name': ultimate_company_dh.name,
-                'numberOfEmployees': None,
+                'number_of_employees': ultimate_company_dh.number_of_employees,
                 'address': {
                     'country': {
                         'id': str(ultimate_company_dh.address_country.id),
@@ -2546,6 +2546,7 @@ class TestCompanyHierarchyView(APITestMixin):
                     'id': str(ultimate_company_dh.uk_region.id),
                     'name': ultimate_company_dh.uk_region.name,
                 },
+                'one_list_tier': None,
                 'archived': False,
                 'latest_interaction_date': None,
                 'hierarchy': 1,
@@ -2569,6 +2570,7 @@ class TestCompanyHierarchyView(APITestMixin):
             'duns': '987654321',
             'primaryName': faker.company(),
             'corporateLinkage': {'hierarchyLevel': 1},
+            'numberOfEmployees': [{'value': 400}],
         }
         tree_member_level_2 = {
             'duns': '123456789',
@@ -2598,6 +2600,7 @@ class TestCompanyHierarchyView(APITestMixin):
             id='8e2e9b35-3415-4b9b-b9ff-f97446ac8942',
             duns_number=ultimate_tree_member_level_1['duns'],
             archived=True,
+            number_of_employees=5000,
         )
 
         opensearch_with_signals.indices.refresh()
@@ -2608,7 +2611,7 @@ class TestCompanyHierarchyView(APITestMixin):
             'ultimate_global_company': {
                 'duns_number': ultimate_tree_member_level_1['duns'],
                 'name': ultimate_company_dh.name,
-                'numberOfEmployees': None,
+                'number_of_employees': 400,
                 'id': ultimate_company_dh.id,
                 'address': {
                     'country': {
@@ -2640,6 +2643,7 @@ class TestCompanyHierarchyView(APITestMixin):
                     'id': str(ultimate_company_dh.uk_region.id),
                     'name': ultimate_company_dh.uk_region.name,
                 },
+                'one_list_tier': None,
                 'archived': True,
                 'latest_interaction_date': None,
                 'hierarchy': 1,
@@ -2648,11 +2652,14 @@ class TestCompanyHierarchyView(APITestMixin):
                         'duns_number': tree_member_level_2['duns'],
                         'id': None,
                         'name': tree_member_level_2['primaryName'],
-                        'numberOfEmployees': tree_member_level_2['numberOfEmployees'][0]['value'],
+                        'number_of_employees': tree_member_level_2['numberOfEmployees'][0][
+                            'value'
+                        ],
                         'address': None,
                         'registered_address': None,
                         'sector': None,
                         'uk_region': None,
+                        'one_list_tier': None,
                         'archived': False,
                         'latest_interaction_date': None,
                         'hierarchy': 2,
@@ -2661,11 +2668,12 @@ class TestCompanyHierarchyView(APITestMixin):
                                 'duns_number': tree_member_level_3['duns'],
                                 'id': None,
                                 'name': tree_member_level_3['primaryName'],
-                                'numberOfEmployees': None,
+                                'number_of_employees': None,
                                 'address': None,
                                 'registered_address': None,
                                 'sector': None,
                                 'uk_region': None,
+                                'one_list_tier': None,
                                 'archived': False,
                                 'latest_interaction_date': None,
                                 'hierarchy': 3,
