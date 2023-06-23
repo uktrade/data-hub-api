@@ -2507,6 +2507,7 @@ class TestCompanyHierarchyView(APITestMixin):
             name=ultimate_company_dnb['primaryName'],
             one_list_tier=OneListTier.objects.first(),
         )
+        opensearch_with_signals.indices.refresh()
 
         response = self._get_family_tree_response(requests_mock, tree_members, ultimate_company_dh)
 
