@@ -511,6 +511,9 @@ class SubsidiarySerializer(serializers.ModelSerializer):
         area_can_be_required=True,
         postcode_can_be_required=True,
     )
+    hierarchy = serializers.CharField(
+        default='0'
+    )
 
     class Meta:
         model = Company
@@ -522,4 +525,5 @@ class SubsidiarySerializer(serializers.ModelSerializer):
             'uk_region',
             'archived',
             'address',
+            'hierarchy',
             ]

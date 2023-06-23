@@ -2829,6 +2829,7 @@ class TestCompanyHierarchyView(APITestMixin):
                     'name': subsidiary.uk_region.name,
                 },
                 'archived': subsidiary.archived,
+                'hierarchy': '0',
             }
         ]
 
@@ -2890,6 +2891,7 @@ class TestCompanyHierarchyView(APITestMixin):
                   'name': second_subsidiary.uk_region.name,
               },
               'archived': second_subsidiary.archived,
+              'hierarchy': '0',
           },
           {
               'id': str(first_subsidiary.id),
@@ -2922,5 +2924,6 @@ class TestCompanyHierarchyView(APITestMixin):
                   'name': first_subsidiary.uk_region.name,
               },
               'archived': first_subsidiary.archived,
+              'hierarchy': '0',
           },
     ]
