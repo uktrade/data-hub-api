@@ -693,7 +693,7 @@ def append_datahub_details(family_tree_members: list):
         family_member['sector'] = empty_id_name
         family_member['latestInteractionDate'] = None
         family_member['archived'] = False
-        family_member['oneListTier'] = None
+        family_member['oneListTier'] = empty_id_name
         number_of_employees = family_member.get('numberOfEmployees')
         if isinstance(number_of_employees, list):
             family_member['numberOfEmployees'] = number_of_employees[0].get('value')
