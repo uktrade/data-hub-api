@@ -43,12 +43,12 @@ REQUIRED_REGISTERED_ADDRESS_FIELDS = [
 
 
 @pytest.mark.parametrize(
-    "url",
+    'url',
     (
-        reverse("api-v4:dnb-api:company-search"),
-        reverse("api-v4:dnb-api:company-create"),
-        reverse("api-v4:dnb-api:company-link"),
-        reverse("api-v4:dnb-api:company-change-request"),
+        reverse('api-v4:dnb-api:company-search'),
+        reverse('api-v4:dnb-api:company-create'),
+        reverse('api-v4:dnb-api:company-link'),
+        reverse('api-v4:dnb-api:company-change-request'),
     ),
 )
 class TestDNBAPICommon(APITestMixin):
@@ -68,11 +68,11 @@ class TestDNBAPICommon(APITestMixin):
         requests_mock.post(DNB_V2_SEARCH_URL)
 
         unauthorised_api_client = self.create_api_client()
-        unauthorised_api_client.credentials(HTTP_AUTHORIZATION="foo")
+        unauthorised_api_client.credentials(HTTP_AUTHORIZATION='foo')
 
         response = unauthorised_api_client.post(
             url,
-            data={"foo": "bar"},
+            data={'foo': 'bar'},
         )
 
         assert response.status_code == 401
@@ -92,15 +92,15 @@ class TestDNBCompanySearchAPI(APITestMixin):
         """
         with pytest.raises(ImproperlyConfigured):
             self.api_client.post(
-                reverse("api-v4:dnb-api:company-search"),
+                reverse('api-v4:dnb-api:company-search'),
                 data={},
             )
 
     @pytest.mark.parametrize(
-        "content_type,expected_status_code",
+        'content_type,expected_status_code',
         (
             (None, status.HTTP_406_NOT_ACCEPTABLE),
-            ("text/html", status.HTTP_406_NOT_ACCEPTABLE),
+            ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
         ),
     )
     def test_content_type(
@@ -120,71 +120,71 @@ class TestDNBCompanySearchAPI(APITestMixin):
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-search"),
+            reverse('api-v4:dnb-api:company-search'),
             content_type=content_type,
         )
 
         assert response.status_code == expected_status_code
 
     @pytest.mark.parametrize(
-        "request_data,response_status_code,upstream_response_content,response_data",
+        'request_data,response_status_code,upstream_response_content,response_data',
         (
             pytest.param(
                 b'{"arg": "value"}',
                 200,
                 b'{"results":[{"duns_number":"9999999"}]}',
                 {
-                    "results": [
+                    'results': [
                         {
-                            "dnb_company": {"duns_number": "9999999"},
-                            "datahub_company": None,
+                            'dnb_company': {'duns_number': '9999999'},
+                            'datahub_company': None,
                         },
                     ],
                 },
-                id="successful call to proxied API with company that cannot be hydrated",
+                id='successful call to proxied API with company that cannot be hydrated',
             ),
             pytest.param(
                 b'{"arg": "value"}',
                 200,
                 b'{"results":[{"duns_number":"1234567"}, {"duns_number":"7654321"}]}',
                 {
-                    "results": [
+                    'results': [
                         {
-                            "dnb_company": {"duns_number": "1234567"},
-                            "datahub_company": {
-                                "id": "6083b732-b07a-42d6-ada4-c8082293285b",
-                                "latest_interaction": None,
+                            'dnb_company': {'duns_number': '1234567'},
+                            'datahub_company': {
+                                'id': '6083b732-b07a-42d6-ada4-c8082293285b',
+                                'latest_interaction': None,
                             },
                         },
                         {
-                            "dnb_company": {"duns_number": "7654321"},
-                            "datahub_company": {
-                                "id": "6083b732-b07a-42d6-ada4-c99999999999",
-                                "latest_interaction": {
-                                    "id": "6083b732-b07a-42d6-ada4-222222222222",
-                                    "date": "2019-08-01",
-                                    "created_on": "2019-08-01T16:00:00Z",
-                                    "subject": "Meeting with Joe Bloggs",
+                            'dnb_company': {'duns_number': '7654321'},
+                            'datahub_company': {
+                                'id': '6083b732-b07a-42d6-ada4-c99999999999',
+                                'latest_interaction': {
+                                    'id': '6083b732-b07a-42d6-ada4-222222222222',
+                                    'date': '2019-08-01',
+                                    'created_on': '2019-08-01T16:00:00Z',
+                                    'subject': 'Meeting with Joe Bloggs',
                                 },
                             },
                         },
                     ],
                 },
-                id="successful call to proxied API with company that can be hydrated",
+                id='successful call to proxied API with company that can be hydrated',
             ),
             pytest.param(
                 b'{"arg": "value"}',
                 400,
                 b'{"error":"msg"}',
-                {"error": "msg"},
-                id="proxied API returns a bad request",
+                {'error': 'msg'},
+                id='proxied API returns a bad request',
             ),
             pytest.param(
                 b'{"arg": "value"}',
                 500,
                 b'{"error":"msg"}',
-                {"error": "msg"},
-                id="proxied API returns a server error",
+                {'error': 'msg'},
+                id='proxied API returns a server error',
             ),
         ),
     )
@@ -204,7 +204,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
             DNB_V2_SEARCH_URL,
             status_code=response_status_code,
             content=upstream_response_content,
-            headers={"content-type": "application/json"},
+            headers={'content-type': 'application/json'},
         )
 
         user = create_test_user(
@@ -215,11 +215,11 @@ class TestDNBCompanySearchAPI(APITestMixin):
         )
         api_client = self.create_api_client(user=user)
 
-        url = reverse("api-v4:dnb-api:company-search")
+        url = reverse('api-v4:dnb-api:company-search')
         response = api_client.post(
             url,
             data=request_data,
-            content_type="application/json",
+            content_type='application/json',
         )
 
         assert response.status_code == response_status_code
@@ -227,52 +227,52 @@ class TestDNBCompanySearchAPI(APITestMixin):
         assert requests_mock.last_request.body == request_data
 
     @pytest.mark.parametrize(
-        "response_status_code,upstream_response_content,response_data,permission_codenames",
+        'response_status_code,upstream_response_content,response_data,permission_codenames',
         (
             pytest.param(
                 200,
                 b'{"results":[{"duns_number":"7654321"}]}',
                 {
-                    "results": [
+                    'results': [
                         # latest_interaction is omitted, because the user does not have permission
                         # to view interactions
                         {
-                            "dnb_company": {"duns_number": "7654321"},
-                            "datahub_company": {
-                                "id": "6083b732-b07a-42d6-ada4-c99999999999",
+                            'dnb_company': {'duns_number': '7654321'},
+                            'datahub_company': {
+                                'id': '6083b732-b07a-42d6-ada4-c99999999999',
                             },
                         },
                     ],
                 },
                 [CompanyPermission.view_company],
                 id=(
-                    "successful call to proxied API with company that can be hydrated "
-                    "and user that has no interaction permissions"
+                    'successful call to proxied API with company that can be hydrated '
+                    'and user that has no interaction permissions'
                 ),
             ),
             pytest.param(
                 403,
                 b'{"error":"msg"}',
-                {"detail": "You do not have permission to perform this action."},
+                {'detail': 'You do not have permission to perform this action.'},
                 [InteractionPermission.view_all],
-                id="user missing view_company permission should get a 403",
+                id='user missing view_company permission should get a 403',
             ),
             pytest.param(
                 200,
                 b'{"results":[{"duns_number":"7654321"}]}',
                 {
-                    "results": [
+                    'results': [
                         # latest_interaction is None, because the user does not have permission
                         # to view interactions
                         {
-                            "dnb_company": {"duns_number": "7654321"},
-                            "datahub_company": {
-                                "id": "6083b732-b07a-42d6-ada4-c99999999999",
-                                "latest_interaction": {
-                                    "id": "6083b732-b07a-42d6-ada4-222222222222",
-                                    "date": "2019-08-01",
-                                    "created_on": "2019-08-01T16:00:00Z",
-                                    "subject": "Meeting with Joe Bloggs",
+                            'dnb_company': {'duns_number': '7654321'},
+                            'datahub_company': {
+                                'id': '6083b732-b07a-42d6-ada4-c99999999999',
+                                'latest_interaction': {
+                                    'id': '6083b732-b07a-42d6-ada4-222222222222',
+                                    'date': '2019-08-01',
+                                    'created_on': '2019-08-01T16:00:00Z',
+                                    'subject': 'Meeting with Joe Bloggs',
                                 },
                             },
                         },
@@ -280,8 +280,8 @@ class TestDNBCompanySearchAPI(APITestMixin):
                 },
                 [CompanyPermission.view_company, InteractionPermission.view_all],
                 id=(
-                    "user with both view_company and view_all_interaction permissions should get "
-                    "a fully hydrated response"
+                    'user with both view_company and view_all_interaction permissions should get '
+                    'a fully hydrated response'
                 ),
             ),
         ),
@@ -306,16 +306,16 @@ class TestDNBCompanySearchAPI(APITestMixin):
         user = create_test_user(permission_codenames=permission_codenames)
         api_client = self.create_api_client(user=user)
 
-        url = reverse("api-v4:dnb-api:company-search")
+        url = reverse('api-v4:dnb-api:company-search')
         response = api_client.post(
             url,
-            content_type="application/json",
+            content_type='application/json',
         )
         assert response.status_code == response_status_code
         assert json.loads(response.content) == response_data
 
     @pytest.mark.parametrize(
-        "response_status_code",
+        'response_status_code',
         (
             status.HTTP_200_OK,
             status.HTTP_400_BAD_REQUEST,
@@ -335,18 +335,18 @@ class TestDNBCompanySearchAPI(APITestMixin):
         returned by the dnb-service.
         """
         statsd_mock = Mock()
-        monkeypatch.setattr("datahub.dnb_api.utils.statsd", statsd_mock)
+        monkeypatch.setattr('datahub.dnb_api.utils.statsd', statsd_mock)
         requests_mock.post(
             DNB_V2_SEARCH_URL,
             status_code=response_status_code,
             json={},
         )
         self.api_client.post(
-            reverse("api-v4:dnb-api:company-search"),
-            content_type="application/json",
+            reverse('api-v4:dnb-api:company-search'),
+            content_type='application/json',
         )
         statsd_mock.incr.assert_called_once_with(
-            f"dnb.search.{response_status_code}",
+            f'dnb.search.{response_status_code}',
         )
 
 
@@ -360,7 +360,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         Check whether the given DataHub company is the same as the given DNB company.
         """
         country = Country.objects.filter(
-            iso_alpha2_code=dnb_company["address_country"],
+            iso_alpha2_code=dnb_company['address_country'],
         ).first()
 
         area = (
@@ -385,7 +385,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             else None
         )
 
-        [company.pop(k) for k in ("id", "created_on", "modified_on")]
+        [company.pop(k) for k in ('id', 'created_on', 'modified_on')]
 
         required_registered_address_fields_present = all(
             field in dnb_company for field in REQUIRED_REGISTERED_ADDRESS_FIELDS
@@ -427,53 +427,51 @@ class TestDNBCompanyCreateAPI(APITestMixin):
                 'county': dnb_company['address_county'],
                 'postcode': dnb_company['address_postcode'],
             },
-            "registered_address": registered_address,
-            "reference_code": "",
-            "uk_based": (dnb_company["address_country"] == "GB"),
-            "duns_number": dnb_company["duns_number"],
-            "company_number": company_number,
-            "number_of_employees": dnb_company["employee_number"],
-            "is_number_of_employees_estimated": dnb_company[
-                "is_employees_number_estimated"
-            ],
-            "employee_range": None,
-            "turnover": float(dnb_company["annual_sales"]),
-            "is_turnover_estimated": dnb_company["is_annual_sales_estimated"],
-            "turnover_range": None,
-            "website": f'http://{dnb_company["domain"]}',
-            "business_type": None,
-            "description": None,
-            "global_headquarters": None,
-            "headquarter_type": None,
-            "sector": None,
-            "export_segment": "",
-            "export_sub_segment": "",
-            "uk_region": None,
-            "vat_number": "",
-            "archived": False,
-            "archived_by": None,
-            "archived_documents_url_path": "",
-            "archived_on": None,
-            "archived_reason": None,
-            "export_experience_category": None,
-            "export_potential": None,
-            "great_profile_status": None,
-            "export_to_countries": [],
-            "future_interest_countries": [],
-            "one_list_group_global_account_manager": None,
-            "one_list_group_tier": None,
-            "transfer_reason": "",
-            "transferred_by": None,
-            "transferred_to": None,
-            "transferred_on": None,
-            "contacts": [],
-            "pending_dnb_investigation": False,
-            "global_ultimate_duns_number": dnb_company["global_ultimate_duns_number"],
-            "is_global_ultimate": (
-                dnb_company["global_ultimate_duns_number"] == dnb_company["duns_number"]
+            'registered_address': registered_address,
+            'reference_code': '',
+            'uk_based': (dnb_company['address_country'] == 'GB'),
+            'duns_number': dnb_company['duns_number'],
+            'company_number': company_number,
+            'number_of_employees': dnb_company['employee_number'],
+            'is_number_of_employees_estimated': dnb_company['is_employees_number_estimated'],
+            'employee_range': None,
+            'turnover': float(dnb_company['annual_sales']),
+            'is_turnover_estimated': dnb_company['is_annual_sales_estimated'],
+            'turnover_range': None,
+            'website': f'http://{dnb_company["domain"]}',
+            'business_type': None,
+            'description': None,
+            'global_headquarters': None,
+            'headquarter_type': None,
+            'sector': None,
+            'export_segment': '',
+            'export_sub_segment': '',
+            'uk_region': None,
+            'vat_number': '',
+            'archived': False,
+            'archived_by': None,
+            'archived_documents_url_path': '',
+            'archived_on': None,
+            'archived_reason': None,
+            'export_experience_category': None,
+            'export_potential': None,
+            'great_profile_status': None,
+            'export_to_countries': [],
+            'future_interest_countries': [],
+            'one_list_group_global_account_manager': None,
+            'one_list_group_tier': None,
+            'transfer_reason': '',
+            'transferred_by': None,
+            'transferred_to': None,
+            'transferred_on': None,
+            'contacts': [],
+            'pending_dnb_investigation': False,
+            'global_ultimate_duns_number': dnb_company['global_ultimate_duns_number'],
+            'is_global_ultimate': (
+                dnb_company['global_ultimate_duns_number'] == dnb_company['duns_number']
             ),
-            "dnb_modified_on": "2019-01-01T11:12:13Z",
-            "export_countries": [],
+            'dnb_modified_on': '2019-01-01T11:12:13Z',
+            'export_countries': [],
         }
 
     @override_settings(DNB_SERVICE_BASE_URL=None)
@@ -484,11 +482,11 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         """
         with pytest.raises(ImproperlyConfigured):
             self.api_client.post(
-                reverse("api-v4:dnb-api:company-search"),
-                data={"duns_number": "12345678"},
+                reverse('api-v4:dnb-api:company-search'),
+                data={'duns_number': '12345678'},
             )
 
-    @freeze_time("2019-01-01 11:12:13")
+    @freeze_time('2019-01-01 11:12:13')
     def test_post_non_uk(
         self,
         requests_mock,
@@ -503,26 +501,26 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data={
-                "duns_number": 123456789,
+                'duns_number': 123456789,
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
 
         company = response.json()
-        dnb_company = dnb_response_non_uk["results"].pop()
+        dnb_company = dnb_response_non_uk['results'].pop()
         self._assert_companies_same(company, dnb_company)
 
         datahub_company = Company.objects.filter(
-            duns_number=company["duns_number"],
+            duns_number=company['duns_number'],
         ).first()
         assert datahub_company is not None
         assert datahub_company.created_by == self.user
         assert datahub_company.modified_by == self.user
 
-    @freeze_time("2019-01-01 11:12:13")
+    @freeze_time('2019-01-01 11:12:13')
     def test_post_uk(
         self,
         requests_mock,
@@ -537,33 +535,33 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data={
-                "duns_number": 123456789,
+                'duns_number': 123456789,
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
 
         company = response.json()
-        dnb_company = dnb_response_uk["results"].pop()
+        dnb_company = dnb_response_uk['results'].pop()
         self._assert_companies_same(company, dnb_company)
 
         datahub_company = Company.objects.filter(
-            duns_number=company["duns_number"],
+            duns_number=company['duns_number'],
         ).first()
         assert datahub_company is not None
         assert datahub_company.created_by == self.user
         assert datahub_company.modified_by == self.user
 
     @pytest.mark.parametrize(
-        "data",
+        'data',
         (
-            {"duns_number": None},
-            {"duns_number": "foobarbaz"},
-            {"duns_number": "12345678"},
-            {"duns_number": "1234567890"},
-            {"not_duns_number": "123456789"},
+            {'duns_number': None},
+            {'duns_number': 'foobarbaz'},
+            {'duns_number': '12345678'},
+            {'duns_number': '1234567890'},
+            {'not_duns_number': '123456789'},
         ),
     )
     def test_post_invalid(
@@ -574,30 +572,30 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         Test that a query without `duns_number` returns 400.
         """
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data=data,
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
-        "results, expected_status_code, expected_message",
+        'results, expected_status_code, expected_message',
         (
             (
                 [],
                 400,
-                "Cannot find a company with duns_number: 123456789",
+                'Cannot find a company with duns_number: 123456789',
             ),
             (
-                ["foo", "bar"],
+                ['foo', 'bar'],
                 502,
-                "Multiple companies found with duns_number: 123456789",
+                'Multiple companies found with duns_number: 123456789',
             ),
             (
-                [{"duns_number": "012345678"}],
+                [{'duns_number': '012345678'}],
                 502,
-                "DUNS number of the company: 012345678 "
-                "did not match searched DUNS number: 123456789",
+                'DUNS number of the company: 012345678 '
+                'did not match searched DUNS number: 123456789',
             ),
         ),
     )
@@ -615,27 +613,27 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         """
         requests_mock.post(
             DNB_V2_SEARCH_URL,
-            json={"results": results},
+            json={'results': results},
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data={
-                "duns_number": 123456789,
+                'duns_number': 123456789,
             },
         )
 
         assert response.status_code == expected_status_code
-        assert response.json()["detail"] == expected_message
+        assert response.json()['detail'] == expected_message
 
     @pytest.mark.parametrize(
-        "missing_required_field, expected_error",
+        'missing_required_field, expected_error',
         (
-            ("primary_name", {"name": ["This field may not be null."]}),
-            ("trading_names", {"trading_names": ["This field may not be null."]}),
-            ("address_line_1", {"address": {"line_1": ["This field is required."]}}),
-            ("address_town", {"address": {"town": ["This field is required."]}}),
-            ("address_country", {"address": {"country": ["This field is required."]}}),
+            ('primary_name', {'name': ['This field may not be null.']}),
+            ('trading_names', {'trading_names': ['This field may not be null.']}),
+            ('address_line_1', {'address': {'line_1': ['This field is required.']}}),
+            ('address_town', {'address': {'town': ['This field is required.']}}),
+            ('address_country', {'address': {'country': ['This field is required.']}}),
         ),
     )
     def test_post_missing_required_fields(
@@ -649,16 +647,16 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         Test if dnb-service returns a company with missing required fields,
         the create-company endpoint returns 400.
         """
-        dnb_response_uk["results"][0].pop(missing_required_field)
+        dnb_response_uk['results'][0].pop(missing_required_field)
         requests_mock.post(
             DNB_V2_SEARCH_URL,
             json=dnb_response_uk,
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data={
-                "duns_number": 123456789,
+                'duns_number': 123456789,
             },
         )
 
@@ -666,23 +664,23 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         assert response.json() == expected_error
 
     @pytest.mark.parametrize(
-        "field_overrides",
+        'field_overrides',
         (
-            {"domain": None},
-            {"trading_names": []},
-            {"annual_sales": None},
-            {"employee_number": None},
-            {"is_employee_number_estimated": None},
-            {"registered_address_line_1": ""},
-            {"registered_address_line_2": ""},
-            {"registered_address_town": ""},
-            {"registered_address_county": ""},
-            {"registered_address_postcode": ""},
-            {"registered_address_country": ""},
-            {"address_line_2": ""},
-            {"address_county": ""},
-            {"address_postcode": ""},
-            {"global_ultimate_duns_number": None},
+            {'domain': None},
+            {'trading_names': []},
+            {'annual_sales': None},
+            {'employee_number': None},
+            {'is_employee_number_estimated': None},
+            {'registered_address_line_1': ''},
+            {'registered_address_line_2': ''},
+            {'registered_address_town': ''},
+            {'registered_address_county': ''},
+            {'registered_address_postcode': ''},
+            {'registered_address_country': ''},
+            {'address_line_2': ''},
+            {'address_county': ''},
+            {'address_postcode': ''},
+            {'global_ultimate_duns_number': None},
         ),
     )
     def test_post_missing_optional_fields(
@@ -696,32 +694,30 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         the create-company endpoint still returns 200 and the company is saved
         successfully.
         """
-        dnb_response_uk["results"][0].update(field_overrides)
+        dnb_response_uk['results'][0].update(field_overrides)
         requests_mock.post(
             DNB_V2_SEARCH_URL,
             json=dnb_response_uk,
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data={
-                "duns_number": 123456789,
+                'duns_number': 123456789,
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
         created_company = Company.objects.first()
-        assert created_company.name == dnb_response_uk["results"][0]["primary_name"]
+        assert created_company.name == dnb_response_uk['results'][0]['primary_name']
         overridden_fields = field_overrides.keys()
-        if any(
-            field in overridden_fields for field in REQUIRED_REGISTERED_ADDRESS_FIELDS
-        ):
-            assert created_company.registered_address_1 == ""
-            assert created_company.registered_address_2 == ""
-            assert created_company.registered_address_town == ""
-            assert created_company.registered_address_county == ""
+        if any(field in overridden_fields for field in REQUIRED_REGISTERED_ADDRESS_FIELDS):
+            assert created_company.registered_address_1 == ''
+            assert created_company.registered_address_2 == ''
+            assert created_company.registered_address_town == ''
+            assert created_company.registered_address_county == ''
             assert created_company.registered_address_country is None
-            assert created_company.registered_address_postcode == ""
+            assert created_company.registered_address_postcode == ''
 
     def test_post_existing(
         self,
@@ -734,9 +730,9 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         CompanyFactory(duns_number=duns_number)
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data={
-                "duns_number": duns_number,
+                'duns_number': duns_number,
             },
         )
 
@@ -754,27 +750,27 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         Test if create-company endpoint returns 400 if the company is based in a country
         that does not exist in DataHub.
         """
-        dnb_response_uk["results"][0]["address_country"] = "FOO"
+        dnb_response_uk['results'][0]['address_country'] = 'FOO'
         requests_mock.post(
             DNB_V2_SEARCH_URL,
             json=dnb_response_uk,
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data={
-                "duns_number": 123456789,
+                'duns_number': 123456789,
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
-        "global_ultimate_override",
+        'global_ultimate_override',
         (
-            {"global_ultimate_duns_number": "foobarbaz"},
-            {"global_ultimate_duns_number": "12345678"},
-            {"global_ultimate_duns_number": "1234567890"},
+            {'global_ultimate_duns_number': 'foobarbaz'},
+            {'global_ultimate_duns_number': '12345678'},
+            {'global_ultimate_duns_number': '1234567890'},
         ),
     )
     def test_post_invalid_global_ultimate(
@@ -787,25 +783,23 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         Test if create-company endpoint returns 400 if the global_ultimate_duns_number
         returned from D&B is invalid.
         """
-        dnb_response_uk["results"][0][
-            "global_ultimate_duns_number"
-        ] = global_ultimate_override
+        dnb_response_uk['results'][0]['global_ultimate_duns_number'] = global_ultimate_override
         requests_mock.post(
             DNB_V2_SEARCH_URL,
             json=dnb_response_uk,
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data={
-                "duns_number": 123456789,
+                'duns_number': 123456789,
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
-        "status_code",
+        'status_code',
         (
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
@@ -831,9 +825,9 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data={
-                "duns_number": 123456789,
+                'duns_number': 123456789,
             },
         )
 
@@ -849,20 +843,20 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         """
         requests_mock.post(
             DNB_V2_SEARCH_URL,
-            exc=ConnectionError("An error occurred"),
+            exc=ConnectionError('An error occurred'),
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data={
-                "duns_number": 123456789,
+                'duns_number': 123456789,
             },
         )
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
 
     @pytest.mark.parametrize(
-        "permissions",
+        'permissions',
         (
             [],
             [CompanyPermission.add_company],
@@ -887,16 +881,16 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
         response = api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data={
-                "duns_number": 123456789,
+                'duns_number': 123456789,
             },
         )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        "response_status_code",
+        'response_status_code',
         (
             status.HTTP_200_OK,
             status.HTTP_400_BAD_REQUEST,
@@ -916,20 +910,20 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         returned by the dnb-service.
         """
         statsd_mock = Mock()
-        monkeypatch.setattr("datahub.dnb_api.utils.statsd", statsd_mock)
+        monkeypatch.setattr('datahub.dnb_api.utils.statsd', statsd_mock)
         requests_mock.post(
             DNB_V2_SEARCH_URL,
             status_code=response_status_code,
             json={},
         )
         self.api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data={
-                "duns_number": 123456789,
+                'duns_number': 123456789,
             },
         )
         statsd_mock.incr.assert_called_once_with(
-            f"dnb.search.{response_status_code}",
+            f'dnb.search.{response_status_code}',
         )
 
     def test_monitoring_create(
@@ -943,20 +937,20 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         created using dnb-service.
         """
         statsd_mock = Mock()
-        monkeypatch.setattr("datahub.dnb_api.views.statsd", statsd_mock)
+        monkeypatch.setattr('datahub.dnb_api.views.statsd', statsd_mock)
         requests_mock.post(
             DNB_V2_SEARCH_URL,
             status_code=status.HTTP_200_OK,
             json=dnb_response_uk,
         )
         self.api_client.post(
-            reverse("api-v4:dnb-api:company-create"),
+            reverse('api-v4:dnb-api:company-create'),
             data={
-                "duns_number": 123456789,
+                'duns_number': 123456789,
             },
         )
         statsd_mock.incr.assert_called_with(
-            "dnb.create.company",
+            'dnb.create.company',
         )
 
 
@@ -966,10 +960,10 @@ class TestCompanyLinkView(APITestMixin):
     """
 
     @pytest.mark.parametrize(
-        "content_type,expected_status_code",
+        'content_type,expected_status_code',
         (
             (None, status.HTTP_406_NOT_ACCEPTABLE),
-            ("text/html", status.HTTP_406_NOT_ACCEPTABLE),
+            ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
         ),
     )
     def test_content_type(
@@ -981,14 +975,14 @@ class TestCompanyLinkView(APITestMixin):
         Test that 406 is returned if Content Type is not application/json.
         """
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-link"),
+            reverse('api-v4:dnb-api:company-link'),
             content_type=content_type,
         )
 
         assert response.status_code == expected_status_code
 
     @pytest.mark.parametrize(
-        "permissions",
+        'permissions',
         (
             [],
             [CompanyPermission.change_company],
@@ -1005,22 +999,22 @@ class TestCompanyLinkView(APITestMixin):
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
         response = api_client.post(
-            reverse("api-v4:dnb-api:company-link"),
+            reverse('api-v4:dnb-api:company-link'),
             data={},
         )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        "override",
+        'override',
         (
-            {"duns_number": None},
-            {"duns_number": "foobarbaz"},
-            {"duns_number": "12345678"},
-            {"duns_number": "1234567890"},
-            {"company_id": None},
-            {"company_id": "does-not-exist"},
-            {"company_id": "11111111-2222-3333-4444-555555555555"},
+            {'duns_number': None},
+            {'duns_number': 'foobarbaz'},
+            {'duns_number': '12345678'},
+            {'duns_number': '1234567890'},
+            {'company_id': None},
+            {'company_id': 'does-not-exist'},
+            {'company_id': '11111111-2222-3333-4444-555555555555'},
         ),
     )
     def test_invalid(
@@ -1032,9 +1026,9 @@ class TestCompanyLinkView(APITestMixin):
         """
         company = CompanyFactory()
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-link"),
+            reverse('api-v4:dnb-api:company-link'),
             data={
-                "company_id": company.pk,
+                'company_id': company.pk,
                 **override,
             },
         )
@@ -1042,7 +1036,7 @@ class TestCompanyLinkView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
-        "status_code",
+        'status_code',
         (
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
@@ -1069,10 +1063,10 @@ class TestCompanyLinkView(APITestMixin):
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-link"),
+            reverse('api-v4:dnb-api:company-link'),
             data={
-                "company_id": company.id,
-                "duns_number": 123456789,
+                'company_id': company.id,
+                'duns_number': 123456789,
             },
         )
 
@@ -1082,12 +1076,12 @@ class TestCompanyLinkView(APITestMixin):
         """
         Test that the endpoint returns 400 for a company that is already linked.
         """
-        company = CompanyFactory(duns_number="123456789")
+        company = CompanyFactory(duns_number='123456789')
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-link"),
+            reverse('api-v4:dnb-api:company-link'),
             data={
-                "company_id": company.pk,
-                "duns_number": "012345678",
+                'company_id': company.pk,
+                'duns_number': '012345678',
             },
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -1100,20 +1094,18 @@ class TestCompanyLinkView(APITestMixin):
         Test that the endpoint returns 400 if we try to link a company to a D&B record
         that has already been linked to a different company.
         """
-        CompanyFactory(duns_number="123456789")
+        CompanyFactory(duns_number='123456789')
         company = CompanyFactory()
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-link"),
+            reverse('api-v4:dnb-api:company-link'),
             data={
-                "company_id": company.pk,
-                "duns_number": "123456789",
+                'company_id': company.pk,
+                'duns_number': '123456789',
             },
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            "duns_number": [
-                "Company with duns_number: 123456789 already exists in DataHub."
-            ],
+            'duns_number': ['Company with duns_number: 123456789 already exists in DataHub.'],
         }
 
     def test_company_not_found(
@@ -1128,18 +1120,18 @@ class TestCompanyLinkView(APITestMixin):
         requests_mock.post(
             DNB_V2_SEARCH_URL,
             status_code=status.HTTP_200_OK,
-            json={"results": []},
+            json={'results': []},
         )
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-link"),
+            reverse('api-v4:dnb-api:company-link'),
             data={
-                "company_id": company.pk,
-                "duns_number": "123456789",
+                'company_id': company.pk,
+                'duns_number': '123456789',
             },
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            "detail": "Cannot find a company with duns_number: 123456789",
+            'detail': 'Cannot find a company with duns_number: 123456789',
         }
 
     def test_valid(
@@ -1157,21 +1149,21 @@ class TestCompanyLinkView(APITestMixin):
             json=dnb_response_uk,
         )
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-link"),
+            reverse('api-v4:dnb-api:company-link'),
             data={
-                "company_id": company.pk,
-                "duns_number": "123456789",
+                'company_id': company.pk,
+                'duns_number': '123456789',
             },
         )
         assert response.status_code == status.HTTP_200_OK
 
         dh_company = response.json()
-        dnb_company = format_dnb_company(dnb_response_uk["results"][0])
+        dnb_company = format_dnb_company(dnb_response_uk['results'][0])
         # TODO: The format for the payload returned via CompanySerializer and that returned via
         # format_dnb_company is slightly different.
         # format_dnb_company: {... 'country': UUID(...)}
         # CompanySerializer: {... 'country': {'id': <uuid:str>}}
-        dh_company["address"]["country"] = UUID(dh_company["address"]["country"]["id"])
+        dh_company['address']['country'] = UUID(dh_company['address']['country']['id'])
 
         for field in ALL_DNB_UPDATED_SERIALIZER_FIELDS:
             assert dh_company[field] == dnb_company[field]
@@ -1183,10 +1175,10 @@ class TestCompanyChangeRequestView(APITestMixin):
     """
 
     @pytest.mark.parametrize(
-        "content_type,expected_status_code",
+        'content_type,expected_status_code',
         (
             (None, status.HTTP_406_NOT_ACCEPTABLE),
-            ("text/html", status.HTTP_406_NOT_ACCEPTABLE),
+            ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
         ),
     )
     def test_content_type(
@@ -1198,14 +1190,14 @@ class TestCompanyChangeRequestView(APITestMixin):
         Test that 406 is returned if Content Type is not application/json.
         """
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-change-request"),
+            reverse('api-v4:dnb-api:company-change-request'),
             content_type=content_type,
         )
 
         assert response.status_code == expected_status_code
 
     @pytest.mark.parametrize(
-        "permissions",
+        'permissions',
         (
             [],
             [CompanyPermission.change_company],
@@ -1222,7 +1214,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
         response = api_client.post(
-            reverse("api-v4:dnb-api:company-change-request"),
+            reverse('api-v4:dnb-api:company-change-request'),
             data={},
         )
 
@@ -1234,66 +1226,66 @@ class TestCompanyChangeRequestView(APITestMixin):
         duns_number does not exist.
         """
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-change-request"),
+            reverse('api-v4:dnb-api:company-change-request'),
             data={
-                "duns_number": "123456789",
-                "changes": {
-                    "name": "Foo Bar",
+                'duns_number': '123456789',
+                'changes': {
+                    'name': 'Foo Bar',
                 },
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            "duns_number": [
-                "Company with duns_number: 123456789 does not exists in DataHub.",
+            'duns_number': [
+                'Company with duns_number: 123456789 does not exists in DataHub.',
             ],
         }
 
     @pytest.mark.parametrize(
-        "change_request,expected_response",
+        'change_request,expected_response',
         (
             # No changes
             (
                 {
-                    "duns_number": "123456789",
+                    'duns_number': '123456789',
                 },
                 {
-                    "changes": ["This field is required."],
+                    'changes': ['This field is required.'],
                 },
             ),
             # No duns_number
             (
                 {
-                    "changes": {
-                        "website": "example.com",
+                    'changes': {
+                        'website': 'example.com',
                     },
                 },
                 {
-                    "duns_number": ["This field is required."],
+                    'duns_number': ['This field is required.'],
                 },
             ),
             # Empty changes
             (
                 {
-                    "duns_number": "123456789",
-                    "changes": {},
+                    'duns_number': '123456789',
+                    'changes': {},
                 },
                 {
-                    "changes": ["No changes submitted."],
+                    'changes': ['No changes submitted.'],
                 },
             ),
             # Invalid website
             (
                 {
-                    "duns_number": "123456789",
-                    "changes": {
-                        "website": "Foo Bar",
+                    'duns_number': '123456789',
+                    'changes': {
+                        'website': 'Foo Bar',
                     },
                 },
                 {
-                    "changes": {
-                        "website": ["Enter a valid URL."],
+                    'changes': {
+                        'website': ['Enter a valid URL.'],
                     },
                 },
             ),
@@ -1308,10 +1300,10 @@ class TestCompanyChangeRequestView(APITestMixin):
         Test that invalid payload results in 400 and an appropriate
         error message.
         """
-        CompanyFactory(duns_number="123456789")
+        CompanyFactory(duns_number='123456789')
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-change-request"),
+            reverse('api-v4:dnb-api:company-change-request'),
             data=change_request,
         )
 
@@ -1319,101 +1311,101 @@ class TestCompanyChangeRequestView(APITestMixin):
         assert response.json() == expected_response
 
     @pytest.mark.parametrize(
-        "change_request,dnb_request,dnb_response,datahub_response,address_area_id",
+        'change_request,dnb_request,dnb_response,datahub_response,address_area_id',
         (
             # All valid fields
             (
                 # change_request
                 {
-                    "duns_number": "123456789",
-                    "changes": {
-                        "name": "Foo Bar",
-                        "trading_names": ["Foo Bar INC"],
-                        "website": "https://example.com",
-                        "address": {
-                            "line_1": "123 Fake Street",
-                            "line_2": "Foo",
-                            "town": "Beverly Hills",
-                            "county": "Los Angeles",
-                            "area": {
-                                "id": constants.AdministrativeArea.alabama.value.id,
+                    'duns_number': '123456789',
+                    'changes': {
+                        'name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'website': 'https://example.com',
+                        'address': {
+                            'line_1': '123 Fake Street',
+                            'line_2': 'Foo',
+                            'town': 'Beverly Hills',
+                            'county': 'Los Angeles',
+                            'area': {
+                                'id': constants.AdministrativeArea.alabama.value.id,
                             },
-                            "postcode": "91012",
-                            "country": {
-                                "id": constants.Country.united_states.value.id,
+                            'postcode': '91012',
+                            'country': {
+                                'id': constants.Country.united_states.value.id,
                             },
                         },
-                        "number_of_employees": 100,
-                        "turnover": 1000,
+                        'number_of_employees': 100,
+                        'turnover': 1000,
                     },
                 },
                 # dnb_request
                 {
-                    "duns_number": "123456789",
-                    "changes": {
-                        "primary_name": "Foo Bar",
-                        "trading_names": ["Foo Bar INC"],
-                        "domain": "example.com",
-                        "address_line_1": "123 Fake Street",
-                        "address_line_2": "Foo",
-                        "address_town": "Beverly Hills",
-                        "address_county": "Los Angeles",
-                        "address_area": {
-                            "name": "Alabama",
-                            "abbrev_name": "AL",
+                    'duns_number': '123456789',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'Beverly Hills',
+                        'address_county': 'Los Angeles',
+                        'address_area': {
+                            'name': 'Alabama',
+                            'abbrev_name': 'AL',
                         },
-                        "address_country": "US",
-                        "address_postcode": "91012",
-                        "employee_number": 100,
-                        "annual_sales": 1000,
+                        'address_country': 'US',
+                        'address_postcode': '91012',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
                     },
                 },
                 # dnb_response
                 {
-                    "duns_number": "123456789",
-                    "id": "11111111-2222-3333-4444-555555555555",
-                    "status": "pending",
-                    "created_on": "2020-01-05T11:00:00",
-                    "changes": {
-                        "primary_name": "Foo Bar",
-                        "trading_names": ["Foo Bar INC"],
-                        "domain": "example.com",
-                        "address_line_1": "123 Fake Street",
-                        "address_line_2": "Foo",
-                        "address_town": "Beverly Hills",
-                        "address_county": "Los Angeles",
-                        "address_area": {
-                            "name": "Alabama",
-                            "abbrev_name": "AL",
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'Beverly Hills',
+                        'address_county': 'Los Angeles',
+                        'address_area': {
+                            'name': 'Alabama',
+                            'abbrev_name': 'AL',
                         },
-                        "address_country": "US",
-                        "address_postcode": "91012",
-                        "employee_number": 100,
-                        "annual_sales": 1000,
+                        'address_country': 'US',
+                        'address_postcode': '91012',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
                     },
                 },
                 # datahub_response
                 {
-                    "duns_number": "123456789",
-                    "id": "11111111-2222-3333-4444-555555555555",
-                    "status": "pending",
-                    "created_on": "2020-01-05T11:00:00",
-                    "changes": {
-                        "primary_name": "Foo Bar",
-                        "trading_names": ["Foo Bar INC"],
-                        "domain": "example.com",
-                        "address_line_1": "123 Fake Street",
-                        "address_line_2": "Foo",
-                        "address_town": "Beverly Hills",
-                        "address_county": "Los Angeles",
-                        "address_area": {
-                            "name": "Alabama",
-                            "abbrev_name": "AL",
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'Beverly Hills',
+                        'address_county': 'Los Angeles',
+                        'address_area': {
+                            'name': 'Alabama',
+                            'abbrev_name': 'AL',
                         },
-                        "address_country": "US",
-                        "address_postcode": "91012",
-                        "employee_number": 100,
-                        "annual_sales": 1000,
+                        'address_country': 'US',
+                        'address_postcode': '91012',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
                     },
                 },
                 # Address Area id (of initial Company)
@@ -1423,36 +1415,36 @@ class TestCompanyChangeRequestView(APITestMixin):
             (
                 # change_request
                 {
-                    "duns_number": "123456789",
-                    "changes": {
-                        "website": "https://example.com/hello",
+                    'duns_number': '123456789',
+                    'changes': {
+                        'website': 'https://example.com/hello',
                     },
                 },
                 # dnb_request
                 {
-                    "duns_number": "123456789",
-                    "changes": {
-                        "domain": "example.com",
+                    'duns_number': '123456789',
+                    'changes': {
+                        'domain': 'example.com',
                     },
                 },
                 # dnb_response
                 {
-                    "duns_number": "123456789",
-                    "id": "11111111-2222-3333-4444-555555555555",
-                    "status": "pending",
-                    "created_on": "2020-01-05T11:00:00",
-                    "changes": {
-                        "domain": "example.com",
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'domain': 'example.com',
                     },
                 },
                 # datahub_response
                 {
-                    "duns_number": "123456789",
-                    "id": "11111111-2222-3333-4444-555555555555",
-                    "status": "pending",
-                    "created_on": "2020-01-05T11:00:00",
-                    "changes": {
-                        "domain": "example.com",
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'domain': 'example.com',
                     },
                 },
                 # Address Area id (of initial Company)
@@ -1462,94 +1454,94 @@ class TestCompanyChangeRequestView(APITestMixin):
             (
                 # change_request
                 {
-                    "duns_number": "123456789",
-                    "changes": {
-                        "name": "Foo Bar",
-                        "trading_names": ["Foo Bar INC"],
-                        "website": "https://example.com",
-                        "address": {
-                            "line_1": "123 Fake Street",
-                            "line_2": "Foo",
-                            "town": "London",
-                            "county": "Greater London",
-                            "area_name": "",
-                            "area_abbrev_name": "",
-                            "postcode": "W1 0TN",
-                            "country": {
-                                "id": constants.Country.united_kingdom.value.id,
+                    'duns_number': '123456789',
+                    'changes': {
+                        'name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'website': 'https://example.com',
+                        'address': {
+                            'line_1': '123 Fake Street',
+                            'line_2': 'Foo',
+                            'town': 'London',
+                            'county': 'Greater London',
+                            'area_name': '',
+                            'area_abbrev_name': '',
+                            'postcode': 'W1 0TN',
+                            'country': {
+                                'id': constants.Country.united_kingdom.value.id,
                             },
                         },
-                        "number_of_employees": 100,
-                        "turnover": 1000,
+                        'number_of_employees': 100,
+                        'turnover': 1000,
                     },
                 },
                 # dnb_request
                 {
-                    "duns_number": "123456789",
-                    "changes": {
-                        "primary_name": "Foo Bar",
-                        "trading_names": ["Foo Bar INC"],
-                        "domain": "example.com",
-                        "address_line_1": "123 Fake Street",
-                        "address_line_2": "Foo",
-                        "address_town": "London",
-                        "address_county": "Greater London",
-                        "address_area": {
-                            "name": constants.AdministrativeArea.texas.value.name,
-                            "abbrev_name": constants.AdministrativeArea.texas.value.area_code,
+                    'duns_number': '123456789',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'London',
+                        'address_county': 'Greater London',
+                        'address_area': {
+                            'name': constants.AdministrativeArea.texas.value.name,
+                            'abbrev_name': constants.AdministrativeArea.texas.value.area_code,
                         },
-                        "address_country": "GB",
-                        "address_postcode": "W1 0TN",
-                        "employee_number": 100,
-                        "annual_sales": 1000,
+                        'address_country': 'GB',
+                        'address_postcode': 'W1 0TN',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
                     },
                 },
                 # dnb_response
                 {
-                    "duns_number": "123456789",
-                    "id": "11111111-2222-3333-4444-555555555555",
-                    "status": "pending",
-                    "created_on": "2020-01-05T11:00:00",
-                    "changes": {
-                        "primary_name": "Foo Bar",
-                        "trading_names": ["Foo Bar INC"],
-                        "domain": "example.com",
-                        "address_line_1": "123 Fake Street",
-                        "address_line_2": "Foo",
-                        "address_town": "London",
-                        "address_county": "Greater London",
-                        "address_country": "GB",
-                        "address_area": {
-                            "name": constants.AdministrativeArea.texas.value.name,
-                            "abbrev_name": constants.AdministrativeArea.texas.value.area_code,
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'London',
+                        'address_county': 'Greater London',
+                        'address_country': 'GB',
+                        'address_area': {
+                            'name': constants.AdministrativeArea.texas.value.name,
+                            'abbrev_name': constants.AdministrativeArea.texas.value.area_code,
                         },
-                        "address_postcode": "W1 0TN",
-                        "employee_number": 100,
-                        "annual_sales": 1000,
+                        'address_postcode': 'W1 0TN',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
                     },
                 },
                 # datahub_response
                 {
-                    "duns_number": "123456789",
-                    "id": "11111111-2222-3333-4444-555555555555",
-                    "status": "pending",
-                    "created_on": "2020-01-05T11:00:00",
-                    "changes": {
-                        "primary_name": "Foo Bar",
-                        "trading_names": ["Foo Bar INC"],
-                        "domain": "example.com",
-                        "address_line_1": "123 Fake Street",
-                        "address_line_2": "Foo",
-                        "address_town": "London",
-                        "address_county": "Greater London",
-                        "address_area": {
-                            "name": constants.AdministrativeArea.texas.value.name,
-                            "abbrev_name": constants.AdministrativeArea.texas.value.area_code,
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'London',
+                        'address_county': 'Greater London',
+                        'address_area': {
+                            'name': constants.AdministrativeArea.texas.value.name,
+                            'abbrev_name': constants.AdministrativeArea.texas.value.area_code,
                         },
-                        "address_country": "GB",
-                        "address_postcode": "W1 0TN",
-                        "employee_number": 100,
-                        "annual_sales": 1000,
+                        'address_country': 'GB',
+                        'address_postcode': 'W1 0TN',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
                     },
                 },
                 # Address Area id (of initial Company)
@@ -1559,36 +1551,36 @@ class TestCompanyChangeRequestView(APITestMixin):
             (
                 # change_request
                 {
-                    "duns_number": "123456789",
-                    "changes": {
-                        "turnover_gbp": 725,
+                    'duns_number': '123456789',
+                    'changes': {
+                        'turnover_gbp': 725,
                     },
                 },
                 # dnb_request
                 {
-                    "duns_number": "123456789",
-                    "changes": {
-                        "annual_sales": 1000.1327348575835,
+                    'duns_number': '123456789',
+                    'changes': {
+                        'annual_sales': 1000.1327348575835,
                     },
                 },
                 # dnb_response
                 {
-                    "duns_number": "123456789",
-                    "id": "11111111-2222-3333-4444-555555555555",
-                    "status": "pending",
-                    "created_on": "2020-01-05T11:00:00",
-                    "changes": {
-                        "annual_sales": 1000.1327348575835,
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'annual_sales': 1000.1327348575835,
                     },
                 },
                 # datahub_response
                 {
-                    "duns_number": "123456789",
-                    "id": "11111111-2222-3333-4444-555555555555",
-                    "status": "pending",
-                    "created_on": "2020-01-05T11:00:00",
-                    "changes": {
-                        "annual_sales": 1000.1327348575835,
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'annual_sales': 1000.1327348575835,
                     },
                 },
                 # Address Area id (of initial Company)
@@ -1610,7 +1602,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         when it is hit with a valid payload.
         """
         CompanyFactory(
-            duns_number="123456789",
+            duns_number='123456789',
             address_area_id=address_area_id,
         )
 
@@ -1620,11 +1612,9 @@ class TestCompanyChangeRequestView(APITestMixin):
             json=dnb_response,
         )
 
-        with patch(
-            "datahub.metadata.utils.get_latest_exchange_rate", return_value=0.72490378
-        ):
+        with patch('datahub.metadata.utils.get_latest_exchange_rate', return_value=0.72490378):
             response = self.api_client.post(
-                reverse("api-v4:dnb-api:company-change-request"),
+                reverse('api-v4:dnb-api:company-change-request'),
                 data=change_request,
             )
 
@@ -1633,7 +1623,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         assert response.json() == datahub_response
 
     @pytest.mark.parametrize(
-        "status_code",
+        'status_code',
         (
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
@@ -1653,18 +1643,18 @@ class TestCompanyChangeRequestView(APITestMixin):
         The  endpoint should return 502 if the upstream
         `dnb-service` returns an error.
         """
-        CompanyFactory(duns_number="123456789")
+        CompanyFactory(duns_number='123456789')
         requests_mock.post(
             DNB_CHANGE_REQUEST_URL,
             status_code=status_code,
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-change-request"),
+            reverse('api-v4:dnb-api:company-change-request'),
             data={
-                "duns_number": "123456789",
-                "changes": {
-                    "website": "www.example.com",
+                'duns_number': '123456789',
+                'changes': {
+                    'website': 'www.example.com',
                 },
             },
         )
@@ -1677,31 +1667,31 @@ class TestCompanyChangeRequestView(APITestMixin):
         Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
         is not set.
         """
-        CompanyFactory(duns_number="123456789")
+        CompanyFactory(duns_number='123456789')
 
         with pytest.raises(ImproperlyConfigured):
             self.api_client.post(
-                reverse("api-v4:dnb-api:company-change-request"),
+                reverse('api-v4:dnb-api:company-change-request'),
                 data={
-                    "duns_number": "123456789",
-                    "changes": {
-                        "website": "www.example.com",
+                    'duns_number': '123456789',
+                    'changes': {
+                        'website': 'www.example.com',
                     },
                 },
             )
 
     @pytest.mark.parametrize(
-        "request_exception, expected_exception, expected_message",
+        'request_exception, expected_exception, expected_message',
         (
             (
                 ConnectionError,
                 DNBServiceConnectionError,
-                "Encountered an error connecting to DNB service",
+                'Encountered an error connecting to DNB service',
             ),
             (
                 Timeout,
                 DNBServiceTimeoutError,
-                "Encountered a timeout interacting with DNB service",
+                'Encountered a timeout interacting with DNB service',
             ),
         ),
     )
@@ -1716,18 +1706,18 @@ class TestCompanyChangeRequestView(APITestMixin):
         Test if there is an error connecting to dnb-service, we raise the
         exception with an appropriate message.
         """
-        CompanyFactory(duns_number="123456789")
+        CompanyFactory(duns_number='123456789')
         requests_mock.post(
             DNB_CHANGE_REQUEST_URL,
             exc=request_exception,
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-change-request"),
+            reverse('api-v4:dnb-api:company-change-request'),
             data={
-                "duns_number": "123456789",
-                "changes": {
-                    "website": "www.example.com",
+                'duns_number': '123456789',
+                'changes': {
+                    'website': 'www.example.com',
                 },
             },
         )
@@ -1744,38 +1734,38 @@ class TestCompanyChangeRequestView(APITestMixin):
         """
         address_area_id = constants.AdministrativeArea.texas.value.id
         company = CompanyFactory(
-            duns_number="123456789",
+            duns_number='123456789',
             address_area_id=address_area_id,
         )
         requests_mock.post(
             DNB_CHANGE_REQUEST_URL,
             status_code=status.HTTP_201_CREATED,
             json={
-                "id": "11111111-2222-3333-4444-555555555555",
-                "status": "pending",
-                "created_on": "2020-01-05T11:00:00",
-                "duns_number": "123456789",
-                "changes": {
-                    "address_line_1": f"New {company.address_1}",
-                    "address_line_2": company.address_2,
-                    "address_town": company.address_town,
-                    "address_county": company.address_county,
-                    "address_country": company.address_country.iso_alpha2_code,
-                    "address_postcode": company.address_postcode,
-                    "address_area": {
-                        "id": address_area_id,
+                'id': '11111111-2222-3333-4444-555555555555',
+                'status': 'pending',
+                'created_on': '2020-01-05T11:00:00',
+                'duns_number': '123456789',
+                'changes': {
+                    'address_line_1': f'New {company.address_1}',
+                    'address_line_2': company.address_2,
+                    'address_town': company.address_town,
+                    'address_county': company.address_county,
+                    'address_country': company.address_country.iso_alpha2_code,
+                    'address_postcode': company.address_postcode,
+                    'address_area': {
+                        'id': address_area_id,
                     },
                 },
             },
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-change-request"),
+            reverse('api-v4:dnb-api:company-change-request'),
             data={
-                "duns_number": "123456789",
-                "changes": {
-                    "address": {
-                        "line_1": f"New {company.address_1}",
+                'duns_number': '123456789',
+                'changes': {
+                    'address': {
+                        'line_1': f'New {company.address_1}',
                     },
                 },
             },
@@ -1783,33 +1773,33 @@ class TestCompanyChangeRequestView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert requests_mock.last_request.json() == {
-            "duns_number": "123456789",
-            "changes": {
-                "address_line_1": f"New {company.address_1}",
-                "address_line_2": company.address_2,
-                "address_town": company.address_town,
-                "address_county": company.address_county,
-                "address_country": company.address_country.iso_alpha2_code,
-                "address_postcode": company.address_postcode,
-                "address_area": {
-                    "name": constants.AdministrativeArea.texas.value.name,
-                    "abbrev_name": constants.AdministrativeArea.texas.value.area_code,
+            'duns_number': '123456789',
+            'changes': {
+                'address_line_1': f'New {company.address_1}',
+                'address_line_2': company.address_2,
+                'address_town': company.address_town,
+                'address_county': company.address_county,
+                'address_country': company.address_country.iso_alpha2_code,
+                'address_postcode': company.address_postcode,
+                'address_area': {
+                    'name': constants.AdministrativeArea.texas.value.name,
+                    'abbrev_name': constants.AdministrativeArea.texas.value.area_code,
                 },
             },
         }
 
     @pytest.mark.parametrize(
-        "request_exception, expected_exception, expected_message",
+        'request_exception, expected_exception, expected_message',
         (
             (
                 ConnectionError,
                 DNBServiceConnectionError,
-                "Encountered an error connecting to DNB service",
+                'Encountered an error connecting to DNB service',
             ),
             (
                 Timeout,
                 DNBServiceTimeoutError,
-                "Encountered a timeout interacting with DNB service",
+                'Encountered a timeout interacting with DNB service',
             ),
         ),
     )
@@ -1824,72 +1814,72 @@ class TestCompanyChangeRequestView(APITestMixin):
         Test if there is an error connecting to dnb-service, we raise the
         exception with an appropriate message.
         """
-        CompanyFactory(duns_number="123456789")
+        CompanyFactory(duns_number='123456789')
         requests_mock.get(
             DNB_CHANGE_REQUEST_URL,
             exc=request_exception,
         )
 
         response = self.api_client.get(
-            reverse("api-v4:dnb-api:company-change-request"),
-            {"duns_number": "123456789", "status": "pending"},
-            content_type="application/json",
+            reverse('api-v4:dnb-api:company-change-request'),
+            {'duns_number': '123456789', 'status': 'pending'},
+            content_type='application/json',
         )
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
 
     @pytest.mark.parametrize(
-        "dnb_request,dnb_response",
+        'dnb_request,dnb_response',
         (
             (
                 # dnb_request
                 {
-                    "duns_number": "123456789",
-                    "status": "pending",
+                    'duns_number': '123456789',
+                    'status': 'pending',
                 },
                 # dnb_response
                 {
-                    "duns_number": "123456789",
-                    "id": "11111111-2222-3333-4444-555555555555",
-                    "status": "pending",
-                    "created_on": "2020-01-05T11:00:00",
-                    "changes": {
-                        "primary_name": "Foo Bar",
-                        "trading_names": ["Foo Bar INC"],
-                        "domain": "example.com",
-                        "address_line_1": "123 Fake Street",
-                        "address_line_2": "Foo",
-                        "address_town": "London",
-                        "address_county": "Greater London",
-                        "address_country": "GB",
-                        "address_postcode": "W1 0TN",
-                        "employee_number": 100,
-                        "annual_sales": 1000,
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'London',
+                        'address_county': 'Greater London',
+                        'address_country': 'GB',
+                        'address_postcode': 'W1 0TN',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
                     },
                 },
             ),
             (
                 # dnb_request
                 {
-                    "duns_number": "123456789",
+                    'duns_number': '123456789',
                 },
                 # dnb_response
                 {
-                    "duns_number": "123456789",
-                    "id": "11111111-2222-3333-4444-555555555555",
-                    "status": "pending",
-                    "created_on": "2020-01-05T11:00:00",
-                    "changes": {
-                        "primary_name": "Foo Bar",
-                        "trading_names": ["Foo Bar INC"],
-                        "domain": "example.com",
-                        "address_line_1": "123 Fake Street",
-                        "address_line_2": "Foo",
-                        "address_town": "London",
-                        "address_county": "Greater London",
-                        "address_country": "GB",
-                        "address_postcode": "W1 0TN",
-                        "employee_number": 100,
-                        "annual_sales": 1000,
+                    'duns_number': '123456789',
+                    'id': '11111111-2222-3333-4444-555555555555',
+                    'status': 'pending',
+                    'created_on': '2020-01-05T11:00:00',
+                    'changes': {
+                        'primary_name': 'Foo Bar',
+                        'trading_names': ['Foo Bar INC'],
+                        'domain': 'example.com',
+                        'address_line_1': '123 Fake Street',
+                        'address_line_2': 'Foo',
+                        'address_town': 'London',
+                        'address_county': 'Greater London',
+                        'address_country': 'GB',
+                        'address_postcode': 'W1 0TN',
+                        'employee_number': 100,
+                        'annual_sales': 1000,
                     },
                 },
             ),
@@ -1905,7 +1895,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         Test that pending change requests stored in the dnb-service can be
         retrieved correctly.
         """
-        CompanyFactory(duns_number=dnb_request["duns_number"])
+        CompanyFactory(duns_number=dnb_request['duns_number'])
         requests_mock.get(
             DNB_CHANGE_REQUEST_URL,
             status_code=status.HTTP_201_CREATED,
@@ -1913,47 +1903,47 @@ class TestCompanyChangeRequestView(APITestMixin):
         )
 
         response = self.api_client.get(
-            reverse("api-v4:dnb-api:company-change-request"),
+            reverse('api-v4:dnb-api:company-change-request'),
             data=dnb_request,
-            content_type="application/json",
+            content_type='application/json',
         )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == dnb_response
 
     @pytest.mark.parametrize(
-        "change_request,expected_response",
+        'change_request,expected_response',
         (
             # No duns_number
             (
                 {
-                    "status": "pending",
+                    'status': 'pending',
                 },
                 {
-                    "duns_number": ["This field may not be null."],
+                    'duns_number': ['This field may not be null.'],
                 },
             ),
             # Invalid duns_number
             (
                 {
-                    "duns_number": "something invalid",
-                    "status": "pending",
+                    'duns_number': 'something invalid',
+                    'status': 'pending',
                 },
                 {
-                    "duns_number": [
-                        "Enter a valid integer.",
-                        "Ensure this field has no more than 9 characters.",
+                    'duns_number': [
+                        'Enter a valid integer.',
+                        'Ensure this field has no more than 9 characters.',
                     ],
                 },
             ),
             # Invalid status
             (
                 {
-                    "duns_number": "123456789",
-                    "status": "something invalid",
+                    'duns_number': '123456789',
+                    'status': 'something invalid',
                 },
                 {
-                    "status": ['"something invalid" is not a valid choice.'],
+                    'status': ['"something invalid" is not a valid choice.'],
                 },
             ),
         ),
@@ -1967,12 +1957,12 @@ class TestCompanyChangeRequestView(APITestMixin):
         Test that invalid payload results in 400 and an appropriate
         error message.
         """
-        CompanyFactory(duns_number="123456789")
+        CompanyFactory(duns_number='123456789')
 
         response = self.api_client.get(
-            reverse("api-v4:dnb-api:company-change-request"),
+            reverse('api-v4:dnb-api:company-change-request'),
             change_request,
-            content_type="application/json",
+            content_type='application/json',
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -1985,10 +1975,10 @@ class TestCompanyInvestigationView(APITestMixin):
     """
 
     @pytest.mark.parametrize(
-        "content_type,expected_status_code",
+        'content_type,expected_status_code',
         (
             (None, status.HTTP_406_NOT_ACCEPTABLE),
-            ("text/html", status.HTTP_406_NOT_ACCEPTABLE),
+            ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
         ),
     )
     def test_content_type(
@@ -2000,7 +1990,7 @@ class TestCompanyInvestigationView(APITestMixin):
         Test that 406 is returned if Content Type is not application/json.
         """
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-investigation"),
+            reverse('api-v4:dnb-api:company-investigation'),
             content_type=content_type,
         )
 
@@ -2011,17 +2001,17 @@ class TestCompanyInvestigationView(APITestMixin):
         Ensure that a non-authenticated request gets a 401.
         """
         unauthorised_api_client = self.create_api_client()
-        unauthorised_api_client.credentials(HTTP_AUTHORIZATION="foo")
+        unauthorised_api_client.credentials(HTTP_AUTHORIZATION='foo')
 
         response = unauthorised_api_client.post(
-            reverse("api-v4:dnb-api:company-investigation"),
+            reverse('api-v4:dnb-api:company-investigation'),
             data={},
         )
 
         assert response.status_code == 401
 
     @pytest.mark.parametrize(
-        "permissions",
+        'permissions',
         (
             [],
             [CompanyPermission.change_company],
@@ -2038,7 +2028,7 @@ class TestCompanyInvestigationView(APITestMixin):
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
         response = api_client.post(
-            reverse("api-v4:dnb-api:company-investigation"),
+            reverse('api-v4:dnb-api:company-investigation'),
             data={},
         )
 
@@ -2049,87 +2039,87 @@ class TestCompanyInvestigationView(APITestMixin):
         The endpoint should return 400 if the company when the given company ID does not exist.
         """
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-investigation"),
+            reverse('api-v4:dnb-api:company-investigation'),
             data={
-                "company": "5cf5bf52-9497-465d-913b-f8fdc0331f41",
-                "name": "Foo Bar LTD",
-                "address": {
-                    "line_1": "123 Fake Street",
-                    "line_2": "Someplace",
-                    "town": "London",
-                    "county": "Greater London",
-                    "country": {
-                        "id": constants.Country.united_kingdom.value.id,
+                'company': '5cf5bf52-9497-465d-913b-f8fdc0331f41',
+                'name': 'Foo Bar LTD',
+                'address': {
+                    'line_1': '123 Fake Street',
+                    'line_2': 'Someplace',
+                    'town': 'London',
+                    'county': 'Greater London',
+                    'country': {
+                        'id': constants.Country.united_kingdom.value.id,
                     },
-                    "postcode": "W1 0TN",
+                    'postcode': 'W1 0TN',
                 },
-                "website": "https://www.example.com",
-                "telephone_number": "+44 1234 567 890",
+                'website': 'https://www.example.com',
+                'telephone_number': '+44 1234 567 890',
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            "company": [
+            'company': [
                 'Invalid pk "5cf5bf52-9497-465d-913b-f8fdc0331f41" - object does not exist.',
             ],
         }
 
     @pytest.mark.parametrize(
-        "investigation_request_overrides,expected_response",
+        'investigation_request_overrides,expected_response',
         (
             # No name
             (
                 {
-                    "name": None,
+                    'name': None,
                 },
                 {
-                    "name": ["This field may not be null."],
+                    'name': ['This field may not be null.'],
                 },
             ),
             # No address
             (
                 {
-                    "address": None,
+                    'address': None,
                 },
                 {
-                    "address": ["This field may not be null."],
+                    'address': ['This field may not be null.'],
                 },
             ),
             # Address missing required fields
             (
                 {
-                    "address": {
-                        "postcode": "W1 0TN",
+                    'address': {
+                        'postcode': 'W1 0TN',
                     },
                 },
                 {
-                    "address": {
-                        "line_1": ["This field is required."],
-                        "town": ["This field is required."],
-                        "country": ["This field is required."],
+                    'address': {
+                        'line_1': ['This field is required.'],
+                        'town': ['This field is required.'],
+                        'country': ['This field is required.'],
                     },
                 },
             ),
             # No website or phone number
             (
                 {
-                    "website": "",
-                    "telephone_number": "",
+                    'website': '',
+                    'telephone_number': '',
                 },
                 {
-                    "non_field_errors": [
-                        "Either website or telephone_number must be provided.",
+                    'non_field_errors': [
+                        'Either website or telephone_number must be provided.',
                     ],
                 },
             ),
             # Invalid website
             (
                 {
-                    "website": "Foo Bar",
+                    'website': 'Foo Bar',
                 },
                 {
-                    "website": ["Enter a valid URL."],
+                    'website': ['Enter a valid URL.'],
                 },
             ),
         ),
@@ -2144,25 +2134,25 @@ class TestCompanyInvestigationView(APITestMixin):
         """
         company = CompanyFactory()
         investigation_data = {
-            "company": company.id,
-            "name": "Foo Bar LTD",
-            "address": {
-                "line_1": "123 Fake Street",
-                "line_2": "Someplace",
-                "town": "London",
-                "county": "Greater London",
-                "country": {
-                    "id": constants.Country.united_kingdom.value.id,
+            'company': company.id,
+            'name': 'Foo Bar LTD',
+            'address': {
+                'line_1': '123 Fake Street',
+                'line_2': 'Someplace',
+                'town': 'London',
+                'county': 'Greater London',
+                'country': {
+                    'id': constants.Country.united_kingdom.value.id,
                 },
-                "postcode": "W1 0TN",
+                'postcode': 'W1 0TN',
             },
-            "website": "https://www.example.com",
-            "telephone_number": "+44 1234 567 890",
+            'website': 'https://www.example.com',
+            'telephone_number': '+44 1234 567 890',
             **investigation_request_overrides,
         }
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-investigation"),
+            reverse('api-v4:dnb-api:company-investigation'),
             data=investigation_data,
         )
 
@@ -2181,27 +2171,27 @@ class TestCompanyInvestigationView(APITestMixin):
             address_area_id=constants.AdministrativeArea.new_york.value.id,
         )
         dnb_formatted_company_details = {
-            "company_details": {
-                "primary_name": "Joe Bloggs LTD",
-                "domain": "www.example.com",
-                "telephone_number": "123456789",
-                "address_line_1": "23 Code Street",
-                "address_line_2": "Someplace",
-                "address_town": "Beverly Hills",
-                "address_county": "Los Angeles",
-                "address_area": {
-                    "name": constants.AdministrativeArea.new_york.value.name,
-                    "abbrev_name": constants.AdministrativeArea.new_york.value.area_code,
+            'company_details': {
+                'primary_name': 'Joe Bloggs LTD',
+                'domain': 'www.example.com',
+                'telephone_number': '123456789',
+                'address_line_1': '23 Code Street',
+                'address_line_2': 'Someplace',
+                'address_town': 'Beverly Hills',
+                'address_county': 'Los Angeles',
+                'address_area': {
+                    'name': constants.AdministrativeArea.new_york.value.name,
+                    'abbrev_name': constants.AdministrativeArea.new_york.value.area_code,
                 },
-                "address_postcode": "91012",
-                "address_country": "US",
+                'address_postcode': '91012',
+                'address_country': 'US',
             },
         }
 
         dnb_response = {
-            "id": "11111111-2222-3333-4444-555555555555",
-            "status": "pending",
-            "created_on": "2020-01-05T11:00:00",
+            'id': '11111111-2222-3333-4444-555555555555',
+            'status': 'pending',
+            'created_on': '2020-01-05T11:00:00',
             **dnb_formatted_company_details,
         }
 
@@ -2212,22 +2202,22 @@ class TestCompanyInvestigationView(APITestMixin):
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-investigation"),
+            reverse('api-v4:dnb-api:company-investigation'),
             data={
-                "company": company.id,
-                "name": "Joe Bloggs LTD",
-                "website": "https://www.example.com",
-                "telephone_number": "123456789",
-                "address": {
-                    "line_1": "23 Code Street",
-                    "line_2": "Someplace",
-                    "town": "Beverly Hills",
-                    "county": "Los Angeles",
-                    "area": {
-                        "id": constants.AdministrativeArea.new_york.value.id,
+                'company': company.id,
+                'name': 'Joe Bloggs LTD',
+                'website': 'https://www.example.com',
+                'telephone_number': '123456789',
+                'address': {
+                    'line_1': '23 Code Street',
+                    'line_2': 'Someplace',
+                    'town': 'Beverly Hills',
+                    'county': 'Los Angeles',
+                    'area': {
+                        'id': constants.AdministrativeArea.new_york.value.id,
                     },
-                    "postcode": "91012",
-                    "country": constants.Country.united_states.value.id,
+                    'postcode': '91012',
+                    'country': constants.Country.united_states.value.id,
                 },
             },
         )
@@ -2236,14 +2226,14 @@ class TestCompanyInvestigationView(APITestMixin):
         assert response.json() == dnb_response
         assert requests_mock.last_request.json() == dnb_formatted_company_details
         company.refresh_from_db()
-        assert str(company.dnb_investigation_id) == dnb_response["id"]
+        assert str(company.dnb_investigation_id) == dnb_response['id']
         assert company.pending_dnb_investigation is True
 
     @pytest.mark.parametrize(
-        "missing_field_data_hub, missing_field_dnb_service",
+        'missing_field_data_hub, missing_field_dnb_service',
         (
-            ("website", "domain"),
-            ("telephone_number", "telephone_number"),
+            ('website', 'domain'),
+            ('telephone_number', 'telephone_number'),
         ),
     )
     def test_valid_minimum_data(
@@ -2258,20 +2248,20 @@ class TestCompanyInvestigationView(APITestMixin):
         """
         company = CompanyFactory()
         dnb_formatted_company_details = {
-            "company_details": {
-                "primary_name": "Joe Bloggs LTD",
-                "telephone_number": "123456789",
-                "domain": "joe.com",
-                "address_line_1": "23 Code Street",
-                "address_town": "London",
-                "address_country": "GB",
+            'company_details': {
+                'primary_name': 'Joe Bloggs LTD',
+                'telephone_number': '123456789',
+                'domain': 'joe.com',
+                'address_line_1': '23 Code Street',
+                'address_town': 'London',
+                'address_country': 'GB',
             },
         }
-        dnb_formatted_company_details["company_details"].pop(missing_field_dnb_service)
+        dnb_formatted_company_details['company_details'].pop(missing_field_dnb_service)
         dnb_response = {
-            "id": "11111111-2222-3333-4444-555555555555",
-            "status": "pending",
-            "created_on": "2020-01-05T11:00:00",
+            'id': '11111111-2222-3333-4444-555555555555',
+            'status': 'pending',
+            'created_on': '2020-01-05T11:00:00',
             **dnb_formatted_company_details,
         }
 
@@ -2282,20 +2272,20 @@ class TestCompanyInvestigationView(APITestMixin):
         )
 
         payload = {
-            "company": company.id,
-            "name": "Joe Bloggs LTD",
-            "telephone_number": "123456789",
-            "website": "https://joe.com",
-            "address": {
-                "line_1": "23 Code Street",
-                "town": "London",
-                "country": constants.Country.united_kingdom.value.id,
+            'company': company.id,
+            'name': 'Joe Bloggs LTD',
+            'telephone_number': '123456789',
+            'website': 'https://joe.com',
+            'address': {
+                'line_1': '23 Code Street',
+                'town': 'London',
+                'country': constants.Country.united_kingdom.value.id,
             },
         }
         payload.pop(missing_field_data_hub)
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-investigation"),
+            reverse('api-v4:dnb-api:company-investigation'),
             data=payload,
         )
 
@@ -2303,11 +2293,11 @@ class TestCompanyInvestigationView(APITestMixin):
         assert response.json() == dnb_response
         assert requests_mock.last_request.json() == dnb_formatted_company_details
         company.refresh_from_db()
-        assert str(company.dnb_investigation_id) == dnb_response["id"]
+        assert str(company.dnb_investigation_id) == dnb_response['id']
         assert company.pending_dnb_investigation is True
 
     @pytest.mark.parametrize(
-        "status_code",
+        'status_code',
         (
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
@@ -2333,19 +2323,19 @@ class TestCompanyInvestigationView(APITestMixin):
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-investigation"),
+            reverse('api-v4:dnb-api:company-investigation'),
             data={
-                "company": company.id,
-                "name": "Joe Bloggs LTD",
-                "website": "https://www.example.com",
-                "telephone_number": "123456789",
-                "address": {
-                    "line_1": "23 Code Street",
-                    "line_2": "Someplace",
-                    "town": "London",
-                    "county": "Greater London",
-                    "postcode": "W1 0TN",
-                    "country": constants.Country.united_kingdom.value.id,
+                'company': company.id,
+                'name': 'Joe Bloggs LTD',
+                'website': 'https://www.example.com',
+                'telephone_number': '123456789',
+                'address': {
+                    'line_1': '23 Code Street',
+                    'line_2': 'Someplace',
+                    'town': 'London',
+                    'county': 'Greater London',
+                    'postcode': 'W1 0TN',
+                    'country': constants.Country.united_kingdom.value.id,
                 },
             },
         )
@@ -2362,35 +2352,35 @@ class TestCompanyInvestigationView(APITestMixin):
 
         with pytest.raises(ImproperlyConfigured):
             self.api_client.post(
-                reverse("api-v4:dnb-api:company-investigation"),
+                reverse('api-v4:dnb-api:company-investigation'),
                 data={
-                    "company": company.id,
-                    "name": "Joe Bloggs LTD",
-                    "website": "https://www.example.com",
-                    "telephone_number": "123456789",
-                    "address": {
-                        "line_1": "23 Code Street",
-                        "line_2": "Someplace",
-                        "town": "London",
-                        "county": "Greater London",
-                        "postcode": "W1 0TN",
-                        "country": constants.Country.united_kingdom.value.id,
+                    'company': company.id,
+                    'name': 'Joe Bloggs LTD',
+                    'website': 'https://www.example.com',
+                    'telephone_number': '123456789',
+                    'address': {
+                        'line_1': '23 Code Street',
+                        'line_2': 'Someplace',
+                        'town': 'London',
+                        'county': 'Greater London',
+                        'postcode': 'W1 0TN',
+                        'country': constants.Country.united_kingdom.value.id,
                     },
                 },
             )
 
     @pytest.mark.parametrize(
-        "request_exception, expected_exception, expected_message",
+        'request_exception, expected_exception, expected_message',
         (
             (
                 ConnectionError,
                 DNBServiceConnectionError,
-                "Encountered an error connecting to DNB service",
+                'Encountered an error connecting to DNB service',
             ),
             (
                 Timeout,
                 DNBServiceTimeoutError,
-                "Encountered a timeout interacting with DNB service",
+                'Encountered a timeout interacting with DNB service',
             ),
         ),
     )
@@ -2412,19 +2402,19 @@ class TestCompanyInvestigationView(APITestMixin):
         )
 
         response = self.api_client.post(
-            reverse("api-v4:dnb-api:company-investigation"),
+            reverse('api-v4:dnb-api:company-investigation'),
             data={
-                "company": company.id,
-                "name": "Joe Bloggs LTD",
-                "website": "https://www.example.com",
-                "telephone_number": "123456789",
-                "address": {
-                    "line_1": "23 Code Street",
-                    "line_2": "Someplace",
-                    "town": "London",
-                    "county": "Greater London",
-                    "postcode": "W1 0TN",
-                    "country": constants.Country.united_kingdom.value.id,
+                'company': company.id,
+                'name': 'Joe Bloggs LTD',
+                'website': 'https://www.example.com',
+                'telephone_number': '123456789',
+                'address': {
+                    'line_1': '23 Code Street',
+                    'line_2': 'Someplace',
+                    'town': 'London',
+                    'county': 'Greater London',
+                    'postcode': 'W1 0TN',
+                    'country': constants.Country.united_kingdom.value.id,
                 },
             },
         )
@@ -2439,9 +2429,7 @@ class TestCompanyHierarchyView(APITestMixin):
     def test_company_id_is_valid(self):
         assert (
             self.api_client.get(
-                reverse(
-                    "api-v4:dnb-api:family-tree", kwargs={"company_id": "11223344"}
-                ),
+                reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': '11223344'}),
             ).status_code
             == 400
         )
@@ -2449,7 +2437,7 @@ class TestCompanyHierarchyView(APITestMixin):
     def test_company_has_no_company_id(self):
         assert (
             self.api_client.get(
-                reverse("api-v4:dnb-api:family-tree", kwargs={"company_id": uuid4()}),
+                reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': uuid4()}),
             ).status_code
             == 404
         )
@@ -2458,9 +2446,7 @@ class TestCompanyHierarchyView(APITestMixin):
         company = CompanyFactory(duns_number=None)
         assert (
             self.api_client.get(
-                reverse(
-                    "api-v4:dnb-api:family-tree", kwargs={"company_id": company.id}
-                ),
+                reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': company.id}),
             ).status_code
             == 400
         )
@@ -2473,7 +2459,7 @@ class TestCompanyHierarchyView(APITestMixin):
         Test for POST proxy.
         """
         api_client = self.create_api_client()
-        company = CompanyFactory(duns_number="123456789")
+        company = CompanyFactory(duns_number='123456789')
 
         requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
@@ -2481,17 +2467,17 @@ class TestCompanyHierarchyView(APITestMixin):
             content=b'{"family_tree_members":[]}',
         )
 
-        url = reverse("api-v4:dnb-api:family-tree", kwargs={"company_id": company.id})
+        url = reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': company.id})
         response = api_client.get(
             url,
-            content_type="application/json",
+            content_type='application/json',
         )
 
         assert response.status_code == 200
         assert response.json() == {
-            "ultimate_global_company": {},
-            "ultimate_global_companies_count": 0,
-            "manually_verified_subsidiaries": [],
+            'ultimate_global_company': {},
+            'ultimate_global_companies_count': 0,
+            'manually_verified_subsidiaries': [],
         }
 
     def test_dnb_response_with_a_duns_number_matching_dh_company_duns_number_appends_dh_id(
@@ -2506,9 +2492,9 @@ class TestCompanyHierarchyView(APITestMixin):
         faker = Faker()
 
         ultimate_company_dnb = {
-            "duns": "987654321",
-            "primaryName": faker.company(),
-            "corporateLinkage": {"hierarchyLevel": 1},
+            'duns': '987654321',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
         }
 
         tree_members = [
@@ -2570,8 +2556,8 @@ class TestCompanyHierarchyView(APITestMixin):
                 'latest_interaction_date': None,
                 'hierarchy': 1,
             },
-            "ultimate_global_companies_count": len(tree_members),
-            "manually_verified_subsidiaries": [],
+            'ultimate_global_companies_count': len(tree_members),
+            'manually_verified_subsidiaries': [],
         }
 
     def test_dnb_response_with_only_ultimate_parent_matching_a_datahub_company(
@@ -2592,20 +2578,20 @@ class TestCompanyHierarchyView(APITestMixin):
             'numberOfEmployees': [{'value': 400}],
         }
         tree_member_level_2 = {
-            "duns": "123456789",
-            "primaryName": faker.company(),
-            "corporateLinkage": {
-                "hierarchyLevel": 2,
-                "parent": {"duns": ultimate_tree_member_level_1["duns"]},
+            'duns': '123456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_tree_member_level_1['duns']},
             },
             'numberOfEmployees': [{'value': 150}],
         }
         tree_member_level_3 = {
-            "duns": "777777777",
-            "primaryName": faker.company(),
-            "corporateLinkage": {
-                "hierarchyLevel": 3,
-                "parent": {"duns": tree_member_level_2["duns"]},
+            'duns': '777777777',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 3,
+                'parent': {'duns': tree_member_level_2['duns']},
             },
         }
 
@@ -2701,8 +2687,8 @@ class TestCompanyHierarchyView(APITestMixin):
                     },
                 ],
             },
-            "ultimate_global_companies_count": len(tree_members),
-            "manually_verified_subsidiaries": [],
+            'ultimate_global_companies_count': len(tree_members),
+            'manually_verified_subsidiaries': [],
         }
 
     def _get_family_tree_response(
@@ -2717,25 +2703,23 @@ class TestCompanyHierarchyView(APITestMixin):
             status_code=200,
             content=json.dumps(
                 {
-                    "global_ultimate_duns": "duns",
-                    "family_tree_members": tree_members,
-                    "global_ultimate_family_tree_members_count": len(tree_members),
+                    'global_ultimate_duns': 'duns',
+                    'family_tree_members': tree_members,
+                    'global_ultimate_family_tree_members_count': len(tree_members),
                 },
-            ).encode("utf-8"),
+            ).encode('utf-8'),
         )
 
-        url = reverse(
-            "api-v4:dnb-api:family-tree", kwargs={"company_id": ultimate_company.id}
-        )
+        url = reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': ultimate_company.id})
         response = api_client.get(
             url,
-            content_type="application/json",
+            content_type='application/json',
         )
 
         return response
 
     @pytest.mark.parametrize(
-        "request_exception",
+        'request_exception',
         ((ConnectionError), (DNBServiceTimeoutError)),
     )
     def test_dnb_request_connection_error(self, requests_mock, request_exception):
@@ -2743,17 +2727,17 @@ class TestCompanyHierarchyView(APITestMixin):
         Test for POST proxy.
         """
         api_client = self.create_api_client()
-        company = CompanyFactory(duns_number="123456789")
+        company = CompanyFactory(duns_number='123456789')
 
         requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
             exc=request_exception,
         )
 
-        url = reverse("api-v4:dnb-api:family-tree", kwargs={"company_id": company.id})
+        url = reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': company.id})
         response = api_client.get(
             url,
-            content_type="application/json",
+            content_type='application/json',
         )
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
