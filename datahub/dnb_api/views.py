@@ -452,8 +452,8 @@ class DNBCompanyHierarchyView(APIView):
         ]
         json_response[
             'manually_verified_subsidiaries'
-            ] = self.get_manually_verified_subsidiaries(company_id)
-        
+        ] = self.get_manually_verified_subsidiaries(company_id)
+
         return Response(json_response)
 
     def get_manually_verified_subsidiaries(self, company_id):
