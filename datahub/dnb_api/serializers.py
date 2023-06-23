@@ -19,8 +19,8 @@ from datahub.core.serializers import (
 )
 from datahub.core.validators import EqualsRule, OperatorRule, RulesBasedValidator, ValidationRule
 from datahub.interaction.models import InteractionPermission
-from datahub.metadata.models import AdministrativeArea
 from datahub.metadata import models as meta_models
+from datahub.metadata.models import AdministrativeArea
 from datahub.metadata.models import Country as CountryModel
 from datahub.metadata.utils import convert_gbp_to_usd
 

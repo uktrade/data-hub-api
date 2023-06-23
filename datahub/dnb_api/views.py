@@ -66,11 +66,11 @@ class DNBCompanySearchView(APIView):
 
     permission_classes = (
         HasPermissions(
-            f"company.{CompanyPermission.view_company}",
+            f'company.{CompanyPermission.view_company}',
         ),
     )
 
-    @method_decorator(enforce_request_content_type("application/json"))
+    @method_decorator(enforce_request_content_type('application/json'))
     def post(self, request):
         """
         Proxy to DNB search API for POST requests.  This will also hydrate results
@@ -84,15 +84,15 @@ class DNBCompanySearchView(APIView):
 
         if upstream_response.status_code == status.HTTP_200_OK:
             response_body = upstream_response.json()
-            response_body["results"] = self._format_and_hydrate(
-                response_body.get("results", []),
+            response_body['results'] = self._format_and_hydrate(
+                response_body.get('results', []),
             )
             return JsonResponse(response_body)
 
         return HttpResponse(
             upstream_response.text,
             status=upstream_response.status_code,
-            content_type=upstream_response.headers.get("content-type"),
+            content_type=upstream_response.headers.get('content-type'),
         )
 
     def _get_datahub_companies_by_duns(self, duns_numbers):
@@ -103,7 +103,7 @@ class DNBCompanySearchView(APIView):
         if datahub_company:
             return DNBMatchedCompanySerializer(
                 datahub_company,
-                context={"request": self.request},
+                context={'request': self.request},
             ).data
         return None
 
@@ -112,15 +112,15 @@ class DNBCompanySearchView(APIView):
             (
                 dnb_company,
                 self._get_datahub_company_data(
-                    datahub_companies_by_duns.get(dnb_company["duns_number"]),
+                    datahub_companies_by_duns.get(dnb_company['duns_number']),
                 ),
             )
             for dnb_company in dnb_results
         )
         return [
             {
-                "dnb_company": dnb_company,
-                "datahub_company": datahub_company,
+                'dnb_company': dnb_company,
+                'datahub_company': datahub_company,
             }
             for dnb_company, datahub_company in dnb_datahub_company_pairs
         ]
@@ -160,7 +160,7 @@ class DNBCompanySearchView(APIView):
         }
 
         """
-        duns_numbers = [result["duns_number"] for result in dnb_results]
+        duns_numbers = [result['duns_number'] for result in dnb_results]
         datahub_companies_by_duns = self._get_datahub_companies_by_duns(duns_numbers)
         hydrated_results = self._get_hydrated_results(dnb_results, datahub_companies_by_duns)
         return hydrated_results
@@ -173,8 +173,8 @@ class DNBCompanyCreateView(APIView):
 
     permission_classes = (
         HasPermissions(
-            f"company.{CompanyPermission.view_company}",
-            f"company.{CompanyPermission.add_company}",
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.add_company}',
         ),
     )
 
@@ -185,7 +185,7 @@ class DNBCompanyCreateView(APIView):
         """
         duns_serializer = DUNSNumberSerializer(data=request.data)
         duns_serializer.is_valid(raise_exception=True)
-        duns_number = duns_serializer.validated_data["duns_number"]
+        duns_number = duns_serializer.validated_data['duns_number']
 
         try:
             dnb_company = get_company(duns_number, request)
@@ -207,10 +207,10 @@ class DNBCompanyCreateView(APIView):
         try:
             company_serializer.is_valid(raise_exception=True)
         except serializers.ValidationError:
-            message = "Company data from DNB failed DH serializer validation"
+            message = 'Company data from DNB failed DH serializer validation'
             extra_data = {
-                "formatted_dnb_company_data": dnb_company,
-                "dh_company_serializer_errors": company_serializer.errors,
+                'formatted_dnb_company_data': dnb_company,
+                'dh_company_serializer_errors': company_serializer.errors,
             }
             logger.error(message, extra=extra_data)
             raise
@@ -221,7 +221,7 @@ class DNBCompanyCreateView(APIView):
             dnb_modified_on=now(),
         )
 
-        statsd.incr("dnb.create.company")
+        statsd.incr('dnb.create.company')
         return Response(
             company_serializer.to_representation(datahub_company),
         )
@@ -234,12 +234,12 @@ class DNBCompanyLinkView(APIView):
 
     permission_classes = (
         HasPermissions(
-            f"company.{CompanyPermission.view_company}",
-            f"company.{CompanyPermission.change_company}",
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.change_company}',
         ),
     )
 
-    @method_decorator(enforce_request_content_type("application/json"))
+    @method_decorator(enforce_request_content_type('application/json'))
     def post(self, request):
         """
         Given a Data Hub Company ID and a duns-number, link the Data Hub
@@ -252,8 +252,8 @@ class DNBCompanyLinkView(APIView):
         # This bit: validated_data['company_id'].id is weird but the alternative
         # is to rename the field to `company_id` which would (1) still be weird
         # and (2) leak the weirdness to the API
-        company_id = link_serializer.validated_data["company_id"].id
-        duns_number = link_serializer.validated_data["duns_number"]
+        company_id = link_serializer.validated_data['company_id'].id
+        duns_number = link_serializer.validated_data['duns_number']
 
         try:
             company = link_company_with_dnb(company_id, duns_number, request.user)
@@ -283,12 +283,12 @@ class DNBCompanyChangeRequestView(APIView):
 
     permission_classes = (
         HasPermissions(
-            f"company.{CompanyPermission.view_company}",
-            f"company.{CompanyPermission.change_company}",
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.change_company}',
         ),
     )
 
-    @method_decorator(enforce_request_content_type("application/json"))
+    @method_decorator(enforce_request_content_type('application/json'))
     def post(self, request):
         """
         A thin wrapper around the dnb-service change request API.
@@ -312,11 +312,11 @@ class DNBCompanyChangeRequestView(APIView):
         """
         A thin wrapper around the dnb-service change request API.
         """
-        duns_number = request.query_params.get("duns_number", None)
-        status = request.query_params.get("status", None)
+        duns_number = request.query_params.get('duns_number', None)
+        status = request.query_params.get('status', None)
 
         change_request_serializer = DNBGetCompanyChangeRequestSerializer(
-            data={"duns_number": duns_number, "status": status},
+            data={'duns_number': duns_number, 'status': status},
         )
 
         change_request_serializer.is_valid(raise_exception=True)
@@ -341,12 +341,12 @@ class DNBCompanyInvestigationView(APIView):
 
     permission_classes = (
         HasPermissions(
-            f"company.{CompanyPermission.view_company}",
-            f"company.{CompanyPermission.change_company}",
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.change_company}',
         ),
     )
 
-    @method_decorator(enforce_request_content_type("application/json"))
+    @method_decorator(enforce_request_content_type('application/json'))
     def post(self, request):
         """
         A wrapper around the investigation API endpoint for dnb-service.
@@ -354,8 +354,8 @@ class DNBCompanyInvestigationView(APIView):
         investigation_serializer = DNBCompanyInvestigationSerializer(data=request.data)
         investigation_serializer.is_valid(raise_exception=True)
 
-        data = {"company_details": investigation_serializer.validated_data}
-        company = data["company_details"].pop("company")
+        data = {'company_details': investigation_serializer.validated_data}
+        company = data['company_details'].pop('company')
 
         try:
             response = create_investigation(data)
@@ -367,7 +367,7 @@ class DNBCompanyInvestigationView(APIView):
         ) as exc:
             raise APIUpstreamException(str(exc))
 
-        company.dnb_investigation_id = response["id"]
+        company.dnb_investigation_id = response['id']
         company.pending_dnb_investigation = True
         company.save()
 
@@ -380,8 +380,8 @@ class DNBCompanyHierarchyView(APIView):
 
     permission_classes = (
         HasPermissions(
-            f"company.{CompanyPermission.view_company}",
-            f"company.{CompanyPermission.add_company}",
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.add_company}',
         ),
     )
 
@@ -392,16 +392,16 @@ class DNBCompanyHierarchyView(APIView):
         if not is_valid_uuid(company_id):
             raise APIBadRequestException(f'company id "{company_id}" is not valid')
 
-        company = Company.objects.filter(id=company_id).values_list("duns_number", flat=True)
+        company = Company.objects.filter(id=company_id).values_list('duns_number', flat=True)
 
         if not company:
-            raise APINotFoundException(f"company {company_id} not found")
+            raise APINotFoundException(f'company {company_id} not found')
 
         duns_number = company.first()
         if company and not duns_number:
-            raise APIBadRequestException(f"company {company_id} does not contain a duns number")
+            raise APIBadRequestException(f'company {company_id} does not contain a duns number')
 
-        hierarchy_serializer = DNBCompanyHierarchySerializer(data={"duns_number": duns_number})
+        hierarchy_serializer = DNBCompanyHierarchySerializer(data={'duns_number': duns_number})
         hierarchy_serializer.is_valid(raise_exception=True)
 
         try:
@@ -414,11 +414,11 @@ class DNBCompanyHierarchyView(APIView):
         ) as exc:
             raise APIUpstreamException(str(exc))
 
-        family_tree_members = response["family_tree_members"]
+        family_tree_members = response['family_tree_members']
         json_response = {
-            "ultimate_global_company": {},
-            "ultimate_global_companies_count": 0,
-            "manually_verified_subsidiaries": [],
+            'ultimate_global_company': {},
+            'ultimate_global_companies_count': 0,
+            'manually_verified_subsidiaries': [],
         }
         if not family_tree_members:
             return Response(json_response)
@@ -433,8 +433,8 @@ class DNBCompanyHierarchyView(APIView):
 
         nested_tree = tree_to_nested_dict(
             root,
-            name_key="duns_number",
-            child_key="subsidiaries",
+            name_key='duns_number',
+            child_key='subsidiaries',
             attr_dict={
                 'primaryName': 'name',
                 'companyId': 'id',
@@ -454,37 +454,37 @@ class DNBCompanyHierarchyView(APIView):
         json_response['ultimate_global_companies_count'] = response[
             'global_ultimate_family_tree_members_count'
         ]
-        json_response["manually_verified_subsidiaries"] = self.get_manually_verified_subsidiaries(
+        json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries(
             company_id
         )
         return Response(json_response)
 
     def append_datahub_details(self, family_tree_members):
-        family_tree_members_duns = [object["duns"] for object in family_tree_members]
+        family_tree_members_duns = [object['duns'] for object in family_tree_members]
 
         family_tree_members_database_details = self.load_datahub_details(family_tree_members_duns)
 
         for family_member in family_tree_members:
-            duns_number_to_find = family_member["duns"]
-            family_member["companyId"] = None
+            duns_number_to_find = family_member['duns']
+            family_member['companyId'] = None
             for member_database_details in family_tree_members_database_details:
-                if duns_number_to_find == member_database_details["duns_number"]:
-                    family_member["primaryName"] = member_database_details["name"]
-                    family_member["companyId"] = member_database_details["id"]
+                if duns_number_to_find == member_database_details['duns_number']:
+                    family_member['primaryName'] = member_database_details['name']
+                    family_member['companyId'] = member_database_details['id']
 
     def load_datahub_details(self, family_tree_members_duns):
         family_tree_members_database_details = Company.objects.filter(
             duns_number__in=family_tree_members_duns,
-        ).values("id", "duns_number", "number_of_employees", "name")
+        ).values('id', 'duns_number', 'number_of_employees', 'name')
 
         return family_tree_members_database_details
 
     def get_manually_verified_subsidiaries(self, company_id):
         companies = (
             Company.objects.filter(global_headquarters_id=company_id).select_related(
-                "employee_range",
-                "headquarter_type",
-                "uk_region",
+                'employee_range',
+                'headquarter_type',
+                'uk_region',
             )
         )
 

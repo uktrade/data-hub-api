@@ -2776,7 +2776,7 @@ class TestCompanyHierarchyView(APITestMixin):
         subsidiary = CompanyFactory(
             global_headquarters_id=ultimate_company_dh.id,
             headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-            address_area_id =constants.AdministrativeArea.texas.value.id,
+            address_area_id=constants.AdministrativeArea.texas.value.id,
             one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
         )
 
@@ -2838,13 +2838,13 @@ class TestCompanyHierarchyView(APITestMixin):
         first_subsidiary = CompanyFactory(
             global_headquarters_id=ultimate_company_dh.id,
             headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-            address_area_id = constants.AdministrativeArea.texas.value.id,
+            address_area_id=constants.AdministrativeArea.texas.value.id,
             one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
         )
         second_subsidiary = CompanyFactory(
             global_headquarters_id=ultimate_company_dh.id,
             headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-            address_area_id = constants.AdministrativeArea.texas.value.id,
+            address_area_id=constants.AdministrativeArea.texas.value.id,
             one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
         )
 
