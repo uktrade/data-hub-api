@@ -2,6 +2,7 @@ import logging
 import uuid
 
 from datetime import timedelta
+from itertools import islice
 
 import numpy as np
 import pandas as pd
@@ -719,23 +720,30 @@ def _load_datahub_details(family_tree_members_duns):
     """
     Load any known datahub details for the duns numbers provided
     """
-    opensearch_results = get_search_by_entities_query(
-        [SearchCompany],
-        term='',
-        filter_data={'duns_number': family_tree_members_duns},
-        fields_to_include=(
-            'id',
-            'name',
-            'duns_number',
-            'uk_region',
-            'address',
-            'registered_address',
-            'sector',
-            'latest_interaction_date',
-            'archived',
-            'one_list_tier',
-            'number_of_employees',
-        ),
-    ).execute()
 
-    return [x.to_dict() for x in opensearch_results.hits]
+    def batch_list(arr_range, arr_size):
+        arr_range = iter(arr_range)
+        return iter(lambda: tuple(islice(arr_range, arr_size)), ())
+
+    results = []
+    for batch_of_duns_numbers in batch_list(family_tree_members_duns, 100):
+        opensearch_results = get_search_by_entities_query(
+            [SearchCompany],
+            term='',
+            filter_data={'duns_number': list(batch_of_duns_numbers)},
+            fields_to_include=(
+                'id',
+                'name',
+                'duns_number',
+                'uk_region',
+                'address',
+                'registered_address',
+                'sector',
+                'latest_interaction_date',
+                'archived',
+                'one_list_tier',
+                'number_of_employees',
+            ),
+        ).execute()
+        results.extend(opensearch_results.hits)
+    return [x.to_dict() for x in results]
