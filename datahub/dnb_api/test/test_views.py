@@ -1,6 +1,5 @@
 import json
 import operator
-from pprint import pprint
 from unittest.mock import Mock, patch
 from urllib.parse import urljoin
 from uuid import UUID, uuid4
