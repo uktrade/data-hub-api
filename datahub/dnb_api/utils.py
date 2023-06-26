@@ -672,9 +672,7 @@ def append_datahub_details(family_tree_members: list):
     Appended any known datahub details to the list of family tree members provided
     """
     family_tree_members_duns = [object['duns'] for object in family_tree_members]
-
-    family_tree_members_datahub_details = _load_datahub_details(family_tree_members_duns)
-
+    family_tree_members_datahub_details = load_datahub_details(family_tree_members_duns)
     empty_address = {
         'line_1': None,
         'line_2': None,
@@ -731,7 +729,7 @@ def _batch_list(list, number_items):
     return iter(lambda: tuple(islice(list, number_items)), ())
 
 
-def _load_datahub_details(family_tree_members_duns):
+def load_datahub_details(family_tree_members_duns):
     """
     Load any known datahub details for the duns numbers provided
     """
