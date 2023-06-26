@@ -172,7 +172,7 @@ requests==2.31.0
     #   requests-toolbelt
 requests-toolbelt==1.0.0
     # via -r requirements.in
-rq==1.15.0
+rq==1.15.1
     # via
     #   -r requirements.in
     #   rq-scheduler
