@@ -721,16 +721,25 @@ def _load_datahub_details(family_tree_members_duns):
     Load any known datahub details for the duns numbers provided
     """
 
-    def batch_list(arr_range, arr_size):
-        arr_range = iter(arr_range)
-        return iter(lambda: tuple(islice(arr_range, arr_size)), ())
+    def batch_list(list, number_items):
+        """_summary_
+
+        Args:
+            list (_type_): The list to create a batch of lists from
+            number_items (_type_): The maximum number of items
+
+        Returns:
+            A list of lists, with each inner list containing at most the number_items. The final inner list may contain less then the number_items
+        """
+        list = iter(list)
+        return iter(lambda: tuple(islice(list, number_items)), ())
 
     results = []
     for batch_of_duns_numbers in batch_list(family_tree_members_duns, 100):
         opensearch_results = get_search_by_entities_query(
             [SearchCompany],
             term='',
-            filter_data={'duns_number': list(batch_of_duns_numbers)},
+            filter_data={'duns_number': batch_of_duns_numbers},
             fields_to_include=(
                 'id',
                 'name',
