@@ -8,7 +8,7 @@ from datahub.event.models import Event
 from datahub.interaction.models import InteractionDITParticipant
 from datahub.investment.investor_profile.models import LargeCapitalInvestorProfile
 from datahub.investment.opportunity.models import LargeCapitalOpportunity
-from datahub.investment.project.proposition.models import PropositionDocumentPermission
+from datahub.investment.project.proposition.models import Proposition
 from datahub.user.company_list.models import CompanyList, PipelineItem
 from datahub.user_event_log.models import UserEvent
 
@@ -30,7 +30,7 @@ class Command(BaseCommand):
             active_advisor = Advisor.objects.get(id=active_advisor_id, is_active=True)
         except Advisor.DoesNotExist as e:
             self.stderr.write(self.style.ERROR(str(e)))
-            return
+            raise
 
         # Dictionary of models and their respective fields that refer to Advisor
         model_fields_dict = {
@@ -40,7 +40,7 @@ class Command(BaseCommand):
             Event: ['organiser'],
             LargeCapitalInvestorProfile: ['required_checks_conducted_by'],
             LargeCapitalOpportunity: ['required_checks_conducted_by'],
-            PropositionDocumentPermission: ['adviser'],
+            Proposition: ['adviser'],
             CompanyList: ['adviser'],
             PipelineItem: ['adviser'],
             UserEvent: ['adviser'],
