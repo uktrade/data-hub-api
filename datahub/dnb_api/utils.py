@@ -2,7 +2,6 @@ import logging
 import uuid
 
 from datetime import timedelta
-from itertools import islice
 
 import numpy as np
 import pandas as pd
@@ -30,7 +29,6 @@ from datahub.dnb_api.constants import (
 from datahub.dnb_api.serializers import DNBCompanySerializer
 from datahub.metadata.models import AdministrativeArea, Country
 from datahub.search.company.models import Company as SearchCompany
-from datahub.search.execute_query import execute_search_query
 from datahub.search.query_builder import (
     get_search_by_entities_query,
 )
@@ -721,7 +719,6 @@ def _load_datahub_details(family_tree_members_duns):
     """
     Load any known datahub details for the duns numbers provided
     """
-
     query = get_search_by_entities_query(
         [SearchCompany],
         term='',
