@@ -31,9 +31,10 @@ from datahub.dnb_api.serializers import DNBCompanySerializer
 from datahub.metadata.models import AdministrativeArea, Country
 from datahub.search.company.models import Company as SearchCompany
 from datahub.search.execute_query import execute_search_query
-from datahub.search.query_builder import get_search_by_entities_query, MAX_RESULTS
+from datahub.search.query_builder import get_search_by_entities_query
 
 logger = logging.getLogger(__name__)
+MAX_DUNS_NUMBERS_PER_REQUEST = 1024
 
 
 class DNBServiceBaseError(Exception):
@@ -737,11 +738,11 @@ def _load_datahub_details(family_tree_members_duns):
     # Because of the way the get_search_by_entities_query creates an opensearch query, which is
     # to convert every duns number into a separate match filter, we need to batch the opensearch
     # queries so only 1024 are sent at a time
-    MAX_DUNS_NUMBERS_PER_REQUEST = 1024
 
     results = []
     for batch_of_duns_numbers in _batch_list(
-        family_tree_members_duns, MAX_DUNS_NUMBERS_PER_REQUEST
+        family_tree_members_duns,
+        MAX_DUNS_NUMBERS_PER_REQUEST,
     ):
         query = get_search_by_entities_query(
             [SearchCompany],
