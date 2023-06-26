@@ -2742,7 +2742,7 @@ class TestCompanyHierarchyView(APITestMixin):
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
 
-    def test_manually_verified_subsidiaries_empty(self, requests_mock):
+    def test_manually_verified_subsidiaries_empty(self, requests_mock, opensearch_with_signals):
         faker = Faker()
 
         ultimate_tree_member_level_1 = {
@@ -2754,6 +2754,8 @@ class TestCompanyHierarchyView(APITestMixin):
         ultimate_company_dh = CompanyFactory(
             duns_number=ultimate_tree_member_level_1['duns'],
         )
+
+        opensearch_with_signals.indices.refresh()
 
         response = self._get_family_tree_response(
             requests_mock, [ultimate_tree_member_level_1], ultimate_company_dh,
@@ -2823,7 +2825,7 @@ class TestCompanyHierarchyView(APITestMixin):
             },
         ]
 
-    def test_multiple_manually_verified_subsidiaries(self, requests_mock):
+    def test_multiple_manually_verified_subsidiaries(self, requests_mock, opensearch_with_signals):
         faker = Faker()
 
         ultimate_tree_member_level_1 = {
@@ -2847,6 +2849,8 @@ class TestCompanyHierarchyView(APITestMixin):
             address_area_id=constants.AdministrativeArea.texas.value.id,
             one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
         )
+
+        opensearch_with_signals.indices.refresh()
 
         response = self._get_family_tree_response(
             requests_mock, [ultimate_tree_member_level_1], ultimate_company_dh,
