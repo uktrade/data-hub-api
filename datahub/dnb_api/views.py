@@ -32,6 +32,7 @@ from datahub.dnb_api.serializers import (
     DNBGetCompanyChangeRequestSerializer,
     DNBMatchedCompanySerializer,
     DUNSNumberSerializer,
+    SubsidiarySerializer,
 )
 from datahub.dnb_api.utils import (
     create_company_hierarchy_dataframe,
@@ -449,8 +450,21 @@ class DNBCompanyHierarchyView(APIView):
         json_response['ultimate_global_companies_count'] = response[
             'global_ultimate_family_tree_members_count'
         ]
-        json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries()
+        json_response[
+            'manually_verified_subsidiaries'
+        ] = self.get_manually_verified_subsidiaries(company_id)
+
         return Response(json_response)
 
-    def get_manually_verified_subsidiaries(self):
-        return []
+    def get_manually_verified_subsidiaries(self, company_id):
+        companies = (
+            Company.objects.filter(global_headquarters_id=company_id).select_related(
+                'employee_range',
+                'headquarter_type',
+                'uk_region',
+            )
+        )
+
+        serialized_data = SubsidiarySerializer(companies, many=True)
+
+        return serialized_data.data if companies else []

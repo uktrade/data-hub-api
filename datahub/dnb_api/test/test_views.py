@@ -1,4 +1,5 @@
 import json
+import operator
 from unittest.mock import Mock, patch
 from urllib.parse import urljoin
 from uuid import UUID, uuid4
@@ -13,6 +14,7 @@ from requests.exceptions import ConnectionError, Timeout
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.constants import OneListTierID
 from datahub.company.models import Company, CompanyPermission, OneListTier
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
@@ -2740,3 +2742,200 @@ class TestCompanyHierarchyView(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+    def test_manually_verified_subsidiaries_empty(self, requests_mock, opensearch_with_signals):
+        faker = Faker()
+
+        ultimate_tree_member_level_1 = {
+            'duns': '987654321',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_tree_member_level_1['duns'],
+        )
+
+        opensearch_with_signals.indices.refresh()
+
+        response = self._get_family_tree_response(
+            requests_mock, [ultimate_tree_member_level_1], ultimate_company_dh,
+        )
+
+        assert response.json()['manually_verified_subsidiaries'] == []
+
+    def test_manually_verified_subsidiaries(self, requests_mock):
+        faker = Faker()
+
+        ultimate_tree_member_level_1 = {
+            'duns': '987654321',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_tree_member_level_1['duns'],
+        )
+        subsidiary = CompanyFactory(
+            global_headquarters_id=ultimate_company_dh.id,
+            headquarter_type_id=constants.HeadquarterType.ghq.value.id,
+            address_area_id=constants.AdministrativeArea.texas.value.id,
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+        )
+
+        response = self._get_family_tree_response(
+            requests_mock, [ultimate_tree_member_level_1], ultimate_company_dh,
+        )
+        assert response.json()['manually_verified_subsidiaries'] == [
+            {
+                'id': str(subsidiary.id),
+                'name': subsidiary.name,
+                'employee_range': {
+                    'id': str(subsidiary.employee_range.id),
+                    'name': subsidiary.employee_range.name,
+                },
+                'headquarter_type': {
+                    'id': str(subsidiary.headquarter_type.id),
+                    'name': subsidiary.headquarter_type.name,
+                },
+                'address': {
+                    'line_1': subsidiary.address_1,
+                    'line_2': subsidiary.address_2,
+                    'town': subsidiary.address_town,
+                    'county': subsidiary.address_county,
+                    'postcode': subsidiary.address_postcode,
+                    'country': {
+                        'id': str(subsidiary.address_country.id),
+                        'name': subsidiary.address_country.name,
+                    },
+                    'area': {
+                        'id': str(subsidiary.address_area.id),
+                        'name': subsidiary.address_area.name,
+                    },
+                },
+                'uk_region': {
+                    'id': str(subsidiary.uk_region.id),
+                    'name': subsidiary.uk_region.name,
+                },
+                'one_list_tier': {
+                    'id': str(subsidiary.one_list_tier.id),
+                    'name': subsidiary.one_list_tier.name,
+                },
+                'archived': subsidiary.archived,
+                'hierarchy': '0',
+            },
+        ]
+
+    def test_multiple_manually_verified_subsidiaries(self, requests_mock, opensearch_with_signals):
+        faker = Faker()
+
+        ultimate_tree_member_level_1 = {
+            'duns': '987654321',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_tree_member_level_1['duns'],
+        )
+        first_subsidiary = CompanyFactory(
+            name='First Subsidiary',
+            global_headquarters_id=ultimate_company_dh.id,
+            headquarter_type_id=constants.HeadquarterType.ghq.value.id,
+            address_area_id=constants.AdministrativeArea.texas.value.id,
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+        )
+        second_subsidiary = CompanyFactory(
+            name='Second Subsidiary',
+            global_headquarters_id=ultimate_company_dh.id,
+            headquarter_type_id=constants.HeadquarterType.ghq.value.id,
+            address_area_id=constants.AdministrativeArea.texas.value.id,
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+        )
+
+        opensearch_with_signals.indices.refresh()
+
+        response = self._get_family_tree_response(
+            requests_mock, [ultimate_tree_member_level_1], ultimate_company_dh,
+        )
+
+        response.json()['manually_verified_subsidiaries'].sort(
+            key=operator.itemgetter('name'),
+        )
+
+        assert response.json()['manually_verified_subsidiaries'] == [
+            {
+                'id': str(first_subsidiary.id),
+                'name': first_subsidiary.name,
+                'employee_range': {
+                    'id': str(first_subsidiary.employee_range.id),
+                    'name': first_subsidiary.employee_range.name,
+                },
+                'headquarter_type': {
+                    'id': str(first_subsidiary.headquarter_type.id),
+                    'name': first_subsidiary.headquarter_type.name,
+                },
+                'address': {
+                    'line_1': first_subsidiary.address_1,
+                    'line_2': first_subsidiary.address_2,
+                    'town': first_subsidiary.address_town,
+                    'county': first_subsidiary.address_county,
+                    'postcode': first_subsidiary.address_postcode,
+                    'country': {
+                        'id': str(first_subsidiary.address_country.id),
+                        'name': first_subsidiary.address_country.name,
+                    },
+                    'area': {
+                        'id': str(first_subsidiary.address_area.id),
+                        'name': first_subsidiary.address_area.name,
+                    },
+                },
+                'uk_region': {
+                    'id': str(first_subsidiary.uk_region.id),
+                    'name': first_subsidiary.uk_region.name,
+                },
+                'one_list_tier': {
+                    'id': str(first_subsidiary.one_list_tier.id),
+                    'name': first_subsidiary.one_list_tier.name,
+                },
+                'archived': first_subsidiary.archived,
+                'hierarchy': '0',
+            },
+            {
+                'id': str(second_subsidiary.id),
+                'name': second_subsidiary.name,
+                'employee_range': {
+                    'id': str(second_subsidiary.employee_range.id),
+                    'name': second_subsidiary.employee_range.name,
+                },
+                'headquarter_type': {
+                    'id': str(second_subsidiary.headquarter_type.id),
+                    'name': second_subsidiary.headquarter_type.name,
+                },
+                'address': {
+                    'line_1': second_subsidiary.address_1,
+                    'line_2': second_subsidiary.address_2,
+                    'town': second_subsidiary.address_town,
+                    'county': second_subsidiary.address_county,
+                    'postcode': second_subsidiary.address_postcode,
+                    'country': {
+                        'id': str(second_subsidiary.address_country.id),
+                        'name': second_subsidiary.address_country.name,
+                    },
+                    'area': {
+                        'id': str(second_subsidiary.address_area.id),
+                        'name': second_subsidiary.address_area.name,
+                    },
+                },
+                'uk_region': {
+                    'id': str(second_subsidiary.uk_region.id),
+                    'name': second_subsidiary.uk_region.name,
+                },
+                'one_list_tier': {
+                    'id': str(second_subsidiary.one_list_tier.id),
+                    'name': second_subsidiary.one_list_tier.name,
+                },
+                'archived': second_subsidiary.archived,
+                'hierarchy': '0',
+            },
+        ]
