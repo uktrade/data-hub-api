@@ -1,4 +1,6 @@
 import json
+import operator
+from pprint import pprint
 from unittest.mock import Mock, patch
 from urllib.parse import urljoin
 from uuid import UUID, uuid4
@@ -2838,12 +2840,14 @@ class TestCompanyHierarchyView(APITestMixin):
             duns_number=ultimate_tree_member_level_1['duns'],
         )
         first_subsidiary = CompanyFactory(
+            name='First Subsidiary',
             global_headquarters_id=ultimate_company_dh.id,
             headquarter_type_id=constants.HeadquarterType.ghq.value.id,
             address_area_id=constants.AdministrativeArea.texas.value.id,
             one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
         )
         second_subsidiary = CompanyFactory(
+            name='Second Subsidiary',
             global_headquarters_id=ultimate_company_dh.id,
             headquarter_type_id=constants.HeadquarterType.ghq.value.id,
             address_area_id=constants.AdministrativeArea.texas.value.id,
@@ -2855,44 +2859,12 @@ class TestCompanyHierarchyView(APITestMixin):
         response = self._get_family_tree_response(
             requests_mock, [ultimate_tree_member_level_1], ultimate_company_dh,
         )
+
+        response.json()['manually_verified_subsidiaries'].sort(
+            key=operator.itemgetter('name'),
+        )
+
         assert response.json()['manually_verified_subsidiaries'] == [
-            {
-                'id': str(second_subsidiary.id),
-                'name': second_subsidiary.name,
-                'employee_range': {
-                    'id': str(second_subsidiary.employee_range.id),
-                    'name': second_subsidiary.employee_range.name,
-                },
-                'headquarter_type': {
-                    'id': str(second_subsidiary.headquarter_type.id),
-                    'name': second_subsidiary.headquarter_type.name,
-                },
-                'address': {
-                    'line_1': second_subsidiary.address_1,
-                    'line_2': second_subsidiary.address_2,
-                    'town': second_subsidiary.address_town,
-                    'county': second_subsidiary.address_county,
-                    'postcode': second_subsidiary.address_postcode,
-                    'country': {
-                        'id': str(second_subsidiary.address_country.id),
-                        'name': second_subsidiary.address_country.name,
-                    },
-                    'area': {
-                        'id': str(second_subsidiary.address_area.id),
-                        'name': second_subsidiary.address_area.name,
-                    },
-                },
-                'uk_region': {
-                    'id': str(second_subsidiary.uk_region.id),
-                    'name': second_subsidiary.uk_region.name,
-                },
-                'one_list_tier': {
-                    'id': str(second_subsidiary.one_list_tier.id),
-                    'name': second_subsidiary.one_list_tier.name,
-                },
-                'archived': second_subsidiary.archived,
-                'hierarchy': '0',
-            },
             {
                 'id': str(first_subsidiary.id),
                 'name': first_subsidiary.name,
@@ -2928,6 +2900,43 @@ class TestCompanyHierarchyView(APITestMixin):
                     'name': first_subsidiary.one_list_tier.name,
                 },
                 'archived': first_subsidiary.archived,
+                'hierarchy': '0',
+            },
+            {
+                'id': str(second_subsidiary.id),
+                'name': second_subsidiary.name,
+                'employee_range': {
+                    'id': str(second_subsidiary.employee_range.id),
+                    'name': second_subsidiary.employee_range.name,
+                },
+                'headquarter_type': {
+                    'id': str(second_subsidiary.headquarter_type.id),
+                    'name': second_subsidiary.headquarter_type.name,
+                },
+                'address': {
+                    'line_1': second_subsidiary.address_1,
+                    'line_2': second_subsidiary.address_2,
+                    'town': second_subsidiary.address_town,
+                    'county': second_subsidiary.address_county,
+                    'postcode': second_subsidiary.address_postcode,
+                    'country': {
+                        'id': str(second_subsidiary.address_country.id),
+                        'name': second_subsidiary.address_country.name,
+                    },
+                    'area': {
+                        'id': str(second_subsidiary.address_area.id),
+                        'name': second_subsidiary.address_area.name,
+                    },
+                },
+                'uk_region': {
+                    'id': str(second_subsidiary.uk_region.id),
+                    'name': second_subsidiary.uk_region.name,
+                },
+                'one_list_tier': {
+                    'id': str(second_subsidiary.one_list_tier.id),
+                    'name': second_subsidiary.one_list_tier.name,
+                },
+                'archived': second_subsidiary.archived,
                 'hierarchy': '0',
             },
         ]
