@@ -5,7 +5,7 @@ import json
 from bigtree import (
     dataframe_to_tree_by_relation,
     tree_to_nested_dict,
-    find_child_by_name,
+    find,
 )
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
