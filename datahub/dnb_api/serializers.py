@@ -4,7 +4,7 @@ from django.core.validators import integer_validator
 from rest_framework import serializers
 
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import Company
+from datahub.company.models import Company, OneListTier
 from datahub.company.serializers import CompanySerializer
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
@@ -12,12 +12,14 @@ from datahub.company.validators import (
 )
 from datahub.core.constants import Country
 from datahub.core.serializers import (
+    AddressSerializer,
     NestedRelatedField,
     PermittedFieldsModelSerializer,
     RelaxedURLField,
 )
 from datahub.core.validators import EqualsRule, OperatorRule, RulesBasedValidator, ValidationRule
 from datahub.interaction.models import InteractionPermission
+from datahub.metadata import models as meta_models
 from datahub.metadata.models import AdministrativeArea
 from datahub.metadata.models import Country as CountryModel
 from datahub.metadata.utils import convert_gbp_to_usd
@@ -486,3 +488,45 @@ class DNBCompanyHierarchySerializer(serializers.Serializer):
             )
         self.company = company
         return duns_number
+
+
+class SubsidiarySerializer(serializers.ModelSerializer):
+    employee_range = NestedRelatedField(
+        meta_models.EmployeeRange,
+        required=False,
+        allow_null=True,
+    )
+    headquarter_type = NestedRelatedField(
+        meta_models.HeadquarterType,
+        required=False,
+        allow_null=True,
+    )
+    uk_region = NestedRelatedField(
+        meta_models.UKRegion,
+        required=False,
+        allow_null=True,
+    )
+    address = AddressSerializer(
+        source_model=Company,
+        address_source_prefix='address',
+        area_can_be_required=True,
+        postcode_can_be_required=True,
+    )
+    one_list_tier = NestedRelatedField(OneListTier)
+    hierarchy = serializers.CharField(
+        default='0',
+    )
+
+    class Meta:
+        model = Company
+        fields = [
+            'id',
+            'name',
+            'employee_range',
+            'headquarter_type',
+            'uk_region',
+            'archived',
+            'address',
+            'hierarchy',
+            'one_list_tier',
+        ]
