@@ -763,4 +763,4 @@ def load_datahub_details(family_tree_members_duns):
         opensearch_results = execute_search_query(query)
         results.extend(opensearch_results.hits)
 
-    return [x.to_dict() for x in results]
+    return [result.to_dict() for result in results]
