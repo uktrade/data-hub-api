@@ -1,0 +1,154 @@
+- model: metadata.service
+  pk: fee6779d-e127-4e1e-89f6-d614b4df3581
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 8dca1097-47ab-40ec-bc3a-2881c75b03f5
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 05b1c34f-6401-4f5c-b1e8-7425589f9ee3
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: f9dd5fc3-a33a-4024-b512-f345a51d295f
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 552f4ba8-b993-498f-a640-c1b9a888f83e
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: ad86cd7e-2ca7-4b06-bf60-fcc0789e275c
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: dfc1577f-217c-49a7-987d-a6f8a1c61698
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: ed487b52-4675-4338-a904-2c27e95ee195
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: fc569da6-7341-4785-9a42-b4fb2114351d
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 7b748ddd-c8ad-464f-a528-fc857abb2ee4
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 4664f856-166f-4f48-9865-653250f84086
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: ad243962-db79-4e40-ab53-4616f017118b
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 6a27f71a-6b4b-4e8f-83b8-35615c13fdc8
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 84722f7a-b7ac-4d39-9b76-7663485e0fcf
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 51c9de65-f170-4bdf-adcf-473913429db7
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: e087cda2-6d3a-41bd-95ab-a9fc77083385
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 8d3abcc6-59a9-42a9-a9ce-9d25dc9fe5ee
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: cb94ecf4-5d71-4366-bafb-5eda8139c96e
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 913244df-a720-4df7-bf74-beff01c0cfa7
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 2c5fe1c9-2f55-4443-bfb7-a43c84eae83e
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 28136f4e-1da5-437e-b921-5111d70d3eaa
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 209b01e0-31da-48a7-b65c-6fee54740da1
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 8108e8bb-9366-4133-b8d8-1a5a7d49efa3
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 6fd4b203-8e73-4a39-96ea-188bdb623b69
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: af33a094-e8e9-4cc2-9af5-4daaea62b78a
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: d3a25003-7f32-4087-8dd0-ae9eacf8a281
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 2f97f7f8-e9a8-41d7-ac5d-819846e6f363
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: e3a488c6-59ab-4343-aab7-68875f0afb39
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 5c13807a-5639-4b1b-8fb6-2531645b49bc
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: 361b3e67-55c1-4ea2-846c-0515a3f1ae34
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
+
+- model: metadata.service
+  pk: dc5255e5-44d8-461f-a699-0353728bc8eb
+  fields:
+    disabled_on: '2023-06-27T16:19:03Z'
