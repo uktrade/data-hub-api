@@ -10,7 +10,6 @@ from datahub.investment.investor_profile.models import LargeCapitalInvestorProfi
 from datahub.investment.opportunity.models import LargeCapitalOpportunity
 from datahub.investment.project.proposition.models import Proposition
 from datahub.user.company_list.models import CompanyList, PipelineItem
-from datahub.user_event_log.models import UserEvent
 
 
 class Command(BaseCommand):
@@ -43,7 +42,6 @@ class Command(BaseCommand):
             Proposition: ['adviser'],
             CompanyList: ['adviser'],
             PipelineItem: ['adviser'],
-            UserEvent: ['adviser'],
         }
 
         for model, fields in model_fields_dict.items():
