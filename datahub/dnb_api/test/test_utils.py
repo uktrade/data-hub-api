@@ -32,6 +32,7 @@ from datahub.dnb_api.constants import ALL_DNB_UPDATED_MODEL_FIELDS
 from datahub.dnb_api.test.utils import model_to_dict_company
 from datahub.dnb_api.utils import (
     create_company_hierarchy_dataframe,
+    create_related_company_dataframe,
     DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequestError,
@@ -887,3 +888,75 @@ class TestCompanyHierarchyDataframe:
         load_datahub_details(duns_numbers)
 
         assert mocked_search_entity.call_count == 4
+
+class TestRelatedCompanyDataframe:
+    def test_multiple_companies_both_directly_and_indirectly_related(
+        self,
+        opensearch_with_signals,
+    ):
+        """
+        Test when a dataframe is created using multiple companies where the parent relationship is bot
+        directly linked and indirectly linked value, the datatable is created with the correct column
+        value for each company
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '113456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+        parent_company_dnb = {
+            'duns': '223456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company_dnb['duns']},
+            },
+        }
+        child_one_company_dnb = {
+            'duns': '333456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': parent_company_dnb['duns']},
+            },
+        }
+        child_two_company_dnb = {
+            'duns': '443456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': parent_company_dnb['duns']},
+            },
+        }
+        unrelated_company_dnb = {
+            'duns': '553456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company_dnb['duns']},
+            },
+        }
+
+        tree_members = [
+            ultimate_company_dnb,
+            parent_company_dnb,
+            child_one_company_dnb,
+            child_two_company_dnb,
+            unrelated_company_dnb,
+        ]
+
+        opensearch_with_signals.indices.refresh()
+        df = create_related_company_dataframe(tree_members)
+
+        assert df['duns'][0] == ultimate_company_dnb['duns']
+        assert df['duns'][1] == parent_company_dnb['duns']
+        assert df['duns'][2] == child_one_company_dnb['duns']
+        assert df['duns'][3] == child_two_company_dnb['duns']
+        assert df['duns'][4] == unrelated_company_dnb['duns']
+        assert df['corporateLinkage.parent.duns'][0] is None
+        assert df['corporateLinkage.parent.duns'][1] == ultimate_company_dnb['duns']
+        assert df['corporateLinkage.parent.duns'][2] == parent_company_dnb['duns']
+        assert df['corporateLinkage.parent.duns'][3] == parent_company_dnb['duns']
+        assert df['corporateLinkage.parent.duns'][4] == ultimate_company_dnb['duns']

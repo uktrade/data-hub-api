@@ -758,14 +758,12 @@ def get_datahub_company_ids(family_tree_members: list):
     get company ids for related companies returned from D&B
 
     """
-
     family_tree_members_datahub_details = get_search_by_entities_query(
         [SearchCompany],
         term='',
         filter_data={'duns_number': family_tree_members},
         fields_to_include='id',
     ).execute()
-
     related_company_ids = []
 
     for related_company in family_tree_members_datahub_details:

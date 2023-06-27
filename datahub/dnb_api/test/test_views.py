@@ -37,7 +37,6 @@ DNB_HIERARCHY_SEARCH_URL = urljoin(
     'companies/hierarchy/search/',
 )
 
-
 REQUIRED_REGISTERED_ADDRESS_FIELDS = [
     f'registered_address_{field}' for field in AddressSerializer.REQUIRED_FIELDS
 ]
