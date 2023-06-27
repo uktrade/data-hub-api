@@ -2,6 +2,7 @@ import logging
 import uuid
 
 from datetime import timedelta
+from itertools import islice
 
 import numpy as np
 import pandas as pd
@@ -29,11 +30,11 @@ from datahub.dnb_api.constants import (
 from datahub.dnb_api.serializers import DNBCompanySerializer
 from datahub.metadata.models import AdministrativeArea, Country
 from datahub.search.company.models import Company as SearchCompany
-from datahub.search.query_builder import (
-    get_search_by_entities_query,
-)
+from datahub.search.execute_query import execute_search_query
+from datahub.search.query_builder import get_search_by_entities_query
 
 logger = logging.getLogger(__name__)
+MAX_DUNS_NUMBERS_PER_REQUEST = 1024
 
 
 class DNBServiceBaseError(Exception):
@@ -671,9 +672,7 @@ def append_datahub_details(family_tree_members: list):
     Appended any known datahub details to the list of family tree members provided
     """
     family_tree_members_duns = [object['duns'] for object in family_tree_members]
-
-    family_tree_members_datahub_details = _load_datahub_details(family_tree_members_duns)
-
+    family_tree_members_datahub_details = load_datahub_details(family_tree_members_duns)
     empty_address = {
         'line_1': None,
         'line_2': None,
@@ -715,27 +714,53 @@ def append_datahub_details(family_tree_members: list):
                 break  # Stop once we've found the match
 
 
-def _load_datahub_details(family_tree_members_duns):
+def _batch_list(list, number_items):
+    """
+    Create a list of lists, with the maximum number of items in each list set to the number
+    provided in number_items
+    Args:
+        list (_type_): The list to create a batch of lists from
+        number_items (_type_): The maximum number of items
+    Returns:
+        A list of lists, with each inner list containing at most the number_items. The final inner
+        list may contain less then the number_items
+    """
+    list = iter(list)
+    return iter(lambda: tuple(islice(list, number_items)), ())
+
+
+def load_datahub_details(family_tree_members_duns):
     """
     Load any known datahub details for the duns numbers provided
     """
-    opensearch_results = get_search_by_entities_query(
-        [SearchCompany],
-        term='',
-        filter_data={'duns_number': family_tree_members_duns},
-        fields_to_include=(
-            'id',
-            'name',
-            'duns_number',
-            'uk_region',
-            'address',
-            'registered_address',
-            'sector',
-            'latest_interaction_date',
-            'archived',
-            'one_list_tier',
-            'number_of_employees',
-        ),
-    ).execute()
+    # Because of the way the get_search_by_entities_query creates an opensearch query, which is
+    # to convert every duns number into a separate match filter, we need to batch the opensearch
+    # queries so only 1024 are sent at a time
 
-    return [x.to_dict() for x in opensearch_results.hits]
+    results = []
+    for batch_of_duns_numbers in _batch_list(
+        family_tree_members_duns,
+        MAX_DUNS_NUMBERS_PER_REQUEST,
+    ):
+        query = get_search_by_entities_query(
+            [SearchCompany],
+            term='',
+            filter_data={'duns_number': list(batch_of_duns_numbers)},
+            fields_to_include=(
+                'id',
+                'name',
+                'duns_number',
+                'uk_region',
+                'address',
+                'registered_address',
+                'sector',
+                'latest_interaction_date',
+                'archived',
+                'one_list_tier',
+                'number_of_employees',
+            ),
+        )[0:MAX_DUNS_NUMBERS_PER_REQUEST]
+        opensearch_results = execute_search_query(query)
+        results.extend(opensearch_results.hits)
+
+    return [result.to_dict() for result in results]
