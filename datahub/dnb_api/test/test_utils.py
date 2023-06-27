@@ -1,3 +1,4 @@
+from unittest.mock import MagicMock, patch
 from urllib.parse import urljoin
 from uuid import UUID
 
@@ -20,6 +21,7 @@ from requests.exceptions import (
 from rest_framework import serializers, status
 from reversion.models import Version
 
+
 from datahub.company.models import Company
 from datahub.company.test.factories import (
     AdviserFactory,
@@ -39,6 +41,7 @@ from datahub.dnb_api.utils import (
     get_company,
     get_company_hierarchy_data,
     get_company_update_page,
+    load_datahub_details,
     RevisionNotFoundError,
     rollback_dnb_company_update,
     update_company_from_dnb,
@@ -870,3 +873,17 @@ class TestCompanyHierarchyDataframe:
 
         assert df['address'][0]['country'] is None
         assert df['address'][1]['country']['id'] == child_company.address_country_id
+
+    @patch('datahub.dnb_api.utils.execute_search_query')
+    def test_load_opensearch_request_above_max_duns_number_batches_requests(
+        self,
+        mocked_search_entity,
+        opensearch_with_signals,
+    ):
+        mocked_search_entity.return_value = MagicMock()
+        opensearch_with_signals.indices.refresh()
+
+        duns_numbers = [str('111111111') for _ in range(0, 3100)]
+        load_datahub_details(duns_numbers)
+
+        assert mocked_search_entity.call_count == 4
