@@ -889,15 +889,16 @@ class TestCompanyHierarchyDataframe:
 
         assert mocked_search_entity.call_count == 4
 
+
 class TestRelatedCompanyDataframe:
     def test_multiple_companies_both_directly_and_indirectly_related(
         self,
         opensearch_with_signals,
     ):
         """
-        Test when a dataframe is created using multiple companies where the parent relationship is bot
-        directly linked and indirectly linked value, the datatable is created with the correct column
-        value for each company
+        Test when a dataframe is created using multiple companies where the parent
+        relationship is both directly linked and indirectly linked value, the datatable
+        is created with the correct column value for each company
         """
         faker = Faker()
 
