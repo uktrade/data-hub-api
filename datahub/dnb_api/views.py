@@ -389,7 +389,6 @@ class DNBCompanyHierarchyView(APIView):
 
         try:
             response = get_company_hierarchy_data(duns_number)
-
         except (
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
