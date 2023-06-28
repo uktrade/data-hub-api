@@ -718,4 +718,5 @@ def test_indexed_doc(opensearch):
         'export_segment',
         'one_list_tier',
         'number_of_employees',
+        'global_ultimate_duns_number',
     }

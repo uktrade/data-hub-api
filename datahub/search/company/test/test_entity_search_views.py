@@ -377,7 +377,7 @@ class TestSearch(APITestMixin):
                         'name': company.one_list_tier.name,
                     },
                     'number_of_employees': company.number_of_employees,
-                    'global_ultimate_duns_number': company.global_ultimate_duns_number,
+                    'global_ultimate_duns_number': None,
                 },
             ],
         }
