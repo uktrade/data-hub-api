@@ -38,6 +38,7 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
     duns_number = SingleOrListField(child=serializers.CharField(), required=False)
     number_of_employees = serializers.IntegerField(required=False)
     company_number = SingleOrListField(child=serializers.CharField(), required=False)
+    global_ultimate_duns_number = SingleOrListField(child=serializers.CharField(), required=False)
 
     SORT_BY_FIELDS = (
         'modified_on',

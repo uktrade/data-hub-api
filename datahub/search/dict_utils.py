@@ -4,8 +4,10 @@ def _attrgetter_with_default(attr, default):
     of attr or the default.
     Useful to convert None values to ''.
     """
+
     def _getter(obj):
         return getattr(obj, attr) or default
+
     return _getter
 
 
@@ -18,6 +20,12 @@ def id_name_dict(obj):
         'id': str(obj.id),
         'name': obj.name,
     }
+
+
+def empty_string_to_null(obj):
+    if not obj:
+        return None
+    return obj
 
 
 def id_name_list_of_dicts(manager):
@@ -123,6 +131,7 @@ def adviser_dict_with_team(obj):
 
 def _computed_nested_dict(nested_field, dict_func):
     """Creates a dictionary from a nested field using dict_func."""
+
     def get_dict(obj):
         fields = nested_field.split('.', maxsplit=1)
         if len(fields) != 2:
@@ -143,6 +152,7 @@ def _computed_nested_dict(nested_field, dict_func):
 
 def computed_field_function(function_name, dict_func):
     """Create a dictionary from a result of provided function call."""
+
     def get_dict(obj):
         field = getattr(obj, function_name, None)
         if field is None:
@@ -196,9 +206,12 @@ def sector_dict(obj):
     return {
         'id': str(obj.id),
         'name': obj.name,
-        'ancestors': [{
-            'id': str(ancestor.id),
-        } for ancestor in obj.get_ancestors()],
+        'ancestors': [
+            {
+                'id': str(ancestor.id),
+            }
+            for ancestor in obj.get_ancestors()
+        ],
     }
 
 

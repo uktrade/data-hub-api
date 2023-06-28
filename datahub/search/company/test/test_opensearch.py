@@ -405,6 +405,7 @@ def test_mapping(opensearch):
                 'type': 'object',
             },
             'number_of_employees': {'type': 'integer'},
+            'global_ultimate_duns_number': {'type': 'keyword'},
         },
     }
 
