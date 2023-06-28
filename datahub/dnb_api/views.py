@@ -450,21 +450,44 @@ class DNBCompanyHierarchyView(APIView):
         json_response['ultimate_global_companies_count'] = response[
             'global_ultimate_family_tree_members_count'
         ]
-        json_response[
-            'manually_verified_subsidiaries'
-        ] = self.get_manually_verified_subsidiaries(company_id)
+        json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries(
+            company_id
+        )
 
         return Response(json_response)
 
     def get_manually_verified_subsidiaries(self, company_id):
-        companies = (
-            Company.objects.filter(global_headquarters_id=company_id).select_related(
-                'employee_range',
-                'headquarter_type',
-                'uk_region',
-            )
+        companies = Company.objects.filter(global_headquarters_id=company_id).select_related(
+            'employee_range',
+            'headquarter_type',
+            'uk_region',
         )
 
         serialized_data = SubsidiarySerializer(companies, many=True)
 
         return serialized_data.data if companies else []
+
+
+class DNBRelatedCompaniesCountView(APIView):
+    """
+    View for returning the count of related companies a company has
+    """
+
+    def get(self, request, company_id):
+        if not is_valid_uuid(company_id):
+            raise APIBadRequestException(f'company id "{company_id}" is not valid')
+
+        company = Company.objects.filter(id=company_id).values_list('duns_number', flat=True)
+
+        if not company:
+            raise APINotFoundException(f'company {company_id} not found')
+
+        duns_number = company.first()
+        if company and not duns_number:
+            raise APIBadRequestException(f'company {company_id} does not contain a duns number')
+
+        hierarchy_serializer = DNBCompanyHierarchySerializer(data={'duns_number': duns_number})
+        hierarchy_serializer.is_valid(raise_exception=True)
+
+        companies = get_company_hierarchy_data(duns_number)
+        return Response(len(companies))

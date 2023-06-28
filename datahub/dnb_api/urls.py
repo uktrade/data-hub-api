@@ -40,4 +40,9 @@ urlpatterns = [
         DNBCompanyHierarchyView.as_view(),
         name='family-tree',
     ),
+    path(
+        '<company_id>/related-companies/count',
+        DNBCompanyHierarchyView.as_view(),
+        name='family-tree',
+    ),
 ]
