@@ -451,7 +451,7 @@ class DNBCompanyHierarchyView(APIView):
             'global_ultimate_family_tree_members_count'
         ]
         json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries(
-            company_id
+            company_id,
         )
 
         return Response(json_response)
@@ -473,6 +473,12 @@ class DNBRelatedCompaniesCountView(APIView):
     View for returning the count of related companies a company has
     """
 
+    permission_classes = (
+        HasPermissions(
+            f'company.{CompanyPermission.view_company}',
+        ),
+    )
+
     def get(self, request, company_id):
         if not is_valid_uuid(company_id):
             raise APIBadRequestException(f'company id "{company_id}" is not valid')
@@ -489,5 +495,14 @@ class DNBRelatedCompaniesCountView(APIView):
         hierarchy_serializer = DNBCompanyHierarchySerializer(data={'duns_number': duns_number})
         hierarchy_serializer.is_valid(raise_exception=True)
 
-        companies = get_company_hierarchy_data(duns_number)
-        return Response(len(companies))
+        hierarchy = get_company_hierarchy_data(duns_number)
+        companies_count = hierarchy.get('global_ultimate_family_tree_members_count', 0)
+        if request.query_params.get('include_subsidiary_companies'):
+            subsidiary_companies_count = Company.objects.filter(
+                global_headquarters_id=company_id,
+            ).count()
+            companies_count += subsidiary_companies_count
+
+        return Response(
+            companies_count - 1 if companies_count > 0 else 0,
+        )  # deduct 1 as the list from dnb contains the company requested

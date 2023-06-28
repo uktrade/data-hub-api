@@ -2422,7 +2422,22 @@ class TestCompanyInvestigationView(APITestMixin):
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
 
 
-class TestCompanyHierarchyView(APITestMixin):
+class TestHierarchyAPITestMixin:
+    def set_dnb_hierarchy_mock_response(self, requests_mock, tree_members):
+        requests_mock.post(
+            DNB_HIERARCHY_SEARCH_URL,
+            status_code=200,
+            content=json.dumps(
+                {
+                    'global_ultimate_duns': 'duns',
+                    'family_tree_members': tree_members,
+                    'global_ultimate_family_tree_members_count': len(tree_members),
+                },
+            ).encode('utf-8'),
+        )
+
+
+class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
     """
     DNB Company Hierarchy Search view test case.
     """
@@ -2699,17 +2714,7 @@ class TestCompanyHierarchyView(APITestMixin):
         ultimate_company,
     ):
         api_client = self.create_api_client()
-        requests_mock.post(
-            DNB_HIERARCHY_SEARCH_URL,
-            status_code=200,
-            content=json.dumps(
-                {
-                    'global_ultimate_duns': 'duns',
-                    'family_tree_members': tree_members,
-                    'global_ultimate_family_tree_members_count': len(tree_members),
-                },
-            ).encode('utf-8'),
-        )
+        self.set_dnb_hierarchy_mock_response(requests_mock, tree_members)
 
         url = reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': ultimate_company.id})
         response = api_client.get(
@@ -2759,7 +2764,9 @@ class TestCompanyHierarchyView(APITestMixin):
         opensearch_with_signals.indices.refresh()
 
         response = self._get_family_tree_response(
-            requests_mock, [ultimate_tree_member_level_1], ultimate_company_dh,
+            requests_mock,
+            [ultimate_tree_member_level_1],
+            ultimate_company_dh,
         )
 
         assert response.json()['manually_verified_subsidiaries'] == []
@@ -2784,7 +2791,9 @@ class TestCompanyHierarchyView(APITestMixin):
         )
 
         response = self._get_family_tree_response(
-            requests_mock, [ultimate_tree_member_level_1], ultimate_company_dh,
+            requests_mock,
+            [ultimate_tree_member_level_1],
+            ultimate_company_dh,
         )
         assert response.json()['manually_verified_subsidiaries'] == [
             {
@@ -2856,7 +2865,9 @@ class TestCompanyHierarchyView(APITestMixin):
         opensearch_with_signals.indices.refresh()
 
         response = self._get_family_tree_response(
-            requests_mock, [ultimate_tree_member_level_1], ultimate_company_dh,
+            requests_mock,
+            [ultimate_tree_member_level_1],
+            ultimate_company_dh,
         )
 
         response.json()['manually_verified_subsidiaries'].sort(
@@ -2939,3 +2950,43 @@ class TestCompanyHierarchyView(APITestMixin):
                 'hierarchy': '0',
             },
         ]
+
+
+class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
+    """
+    DNB Company Hierarchy Search view test case.
+    """
+
+    def test_dnb_company_count_of_0_returns_0(self, requests_mock):
+        ultimate_company_dh = CompanyFactory(
+            duns_number='123456789',
+        )
+        self.set_dnb_hierarchy_mock_response(requests_mock, [])
+
+        assert (
+            self.api_client.get(
+                reverse(
+                    'api-v4:dnb-api:related-companies-count',
+                    kwargs={'company_id': ultimate_company_dh.id},
+                ),
+            ).json()
+            == 0
+        )
+
+    def test_dnb_company_count_of_0_and_subsidiary_count_of_0_returns_0(self, requests_mock):
+        ultimate_company_dh = CompanyFactory(
+            duns_number='123456789',
+        )
+
+        url = reverse(
+            'api-v4:dnb-api:related-companies-count',
+            kwargs={'company_id': ultimate_company_dh.id},
+        )
+        self.set_dnb_hierarchy_mock_response(requests_mock, [])
+
+        assert (
+            self.api_client.get(
+                f'{url}?include_subsidiary_companies=true',
+            ).json()
+            == 0
+        )
