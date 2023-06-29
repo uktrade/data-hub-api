@@ -569,25 +569,6 @@ def validate_company_id(company_id):
     return duns_number
 
 
-def validate_company_id(company_id):
-    if not is_valid_uuid(company_id):
-        raise APIBadRequestException(f'company id "{company_id}" is not valid')
-
-    company = Company.objects.filter(id=company_id).values_list('duns_number', flat=True)
-
-    if not company:
-        raise APINotFoundException(f'company {company_id} not found')
-
-    duns_number = company.first()
-    if company and not duns_number:
-        raise APIBadRequestException(f'company {company_id} does not contain a duns number')
-
-    hierarchy_serializer = DNBCompanyHierarchySerializer(data={'duns_number': duns_number})
-    hierarchy_serializer.is_valid(raise_exception=True)
-
-    return duns_number
-
-
 def get_company_hierarchy_data(duns_number):
     """
     Get company hierarchy data

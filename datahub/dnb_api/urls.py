@@ -7,8 +7,8 @@ from datahub.dnb_api.views import (
     DNBCompanyInvestigationView,
     DNBCompanyLinkView,
     DNBCompanySearchView,
-    DNBRelatedCompaniesView,
     DNBRelatedCompaniesCountView,
+    DNBRelatedCompaniesView,
 )
 
 urlpatterns = [
