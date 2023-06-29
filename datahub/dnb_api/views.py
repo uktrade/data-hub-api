@@ -48,6 +48,7 @@ from datahub.dnb_api.utils import (
     is_valid_uuid,
     request_changes,
     search_dnb,
+    validate_company_id,
 )
 
 
@@ -385,23 +386,10 @@ class DNBCompanyHierarchyView(APIView):
         """
         Given a Company Id, get the data for the company hierarchy from dnb-service.
         """
-        if not is_valid_uuid(company_id):
-            raise APIBadRequestException(f'company id "{company_id}" is not valid')
-
-        company = Company.objects.filter(id=company_id).values_list('duns_number', flat=True)
-
-        if not company:
-            raise APINotFoundException(f'company {company_id} not found')
-
-        duns_number = company.first()
-        if company and not duns_number:
-            raise APIBadRequestException(f'company {company_id} does not contain a duns number')
-
-        hierarchy_serializer = DNBCompanyHierarchySerializer(data={'duns_number': duns_number})
-        hierarchy_serializer.is_valid(raise_exception=True)
+        duns_number = validate_company_id(company_id)
 
         try:
-            response = get_company_hierarchy_data(**hierarchy_serializer.validated_data)
+            response = get_company_hierarchy_data(duns_number)
 
         except (
             DNBServiceConnectionError,
@@ -480,20 +468,7 @@ class DNBRelatedCompaniesCountView(APIView):
     )
 
     def get(self, request, company_id):
-        if not is_valid_uuid(company_id):
-            raise APIBadRequestException(f'company id "{company_id}" is not valid')
-
-        company = Company.objects.filter(id=company_id).values_list('duns_number', flat=True)
-
-        if not company:
-            raise APINotFoundException(f'company {company_id} not found')
-
-        duns_number = company.first()
-        if company and not duns_number:
-            raise APIBadRequestException(f'company {company_id} does not contain a duns number')
-
-        hierarchy_serializer = DNBCompanyHierarchySerializer(data={'duns_number': duns_number})
-        hierarchy_serializer.is_valid(raise_exception=True)
+        duns_number = validate_company_id(company_id)
 
         hierarchy = get_company_hierarchy_data(duns_number)
         companies_count = hierarchy.get('global_ultimate_family_tree_members_count', 0)
