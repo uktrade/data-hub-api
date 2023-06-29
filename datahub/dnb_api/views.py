@@ -16,7 +16,6 @@ from datahub.company.serializers import CompanySerializer
 from datahub.core import statsd
 from datahub.core.exceptions import (
     APIBadRequestException,
-    APINotFoundException,
     APIUpstreamException,
 )
 from datahub.core.permissions import HasPermissions
@@ -25,7 +24,6 @@ from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedError, link_comp
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyChangeRequestSerializer,
-    DNBCompanyHierarchySerializer,
     DNBCompanyInvestigationSerializer,
     DNBCompanyLinkSerializer,
     DNBCompanySerializer,
@@ -45,9 +43,9 @@ from datahub.dnb_api.utils import (
     get_change_request,
     get_company,
     get_company_hierarchy_data,
-    is_valid_uuid,
     request_changes,
     search_dnb,
+    validate_company_id,
 )
 
 
@@ -385,23 +383,10 @@ class DNBCompanyHierarchyView(APIView):
         """
         Given a Company Id, get the data for the company hierarchy from dnb-service.
         """
-        if not is_valid_uuid(company_id):
-            raise APIBadRequestException(f'company id "{company_id}" is not valid')
-
-        company = Company.objects.filter(id=company_id).values_list('duns_number', flat=True)
-
-        if not company:
-            raise APINotFoundException(f'company {company_id} not found')
-
-        duns_number = company.first()
-        if company and not duns_number:
-            raise APIBadRequestException(f'company {company_id} does not contain a duns number')
-
-        hierarchy_serializer = DNBCompanyHierarchySerializer(data={'duns_number': duns_number})
-        hierarchy_serializer.is_valid(raise_exception=True)
+        duns_number = validate_company_id(company_id)
 
         try:
-            response = get_company_hierarchy_data(**hierarchy_serializer.validated_data)
+            response = get_company_hierarchy_data(duns_number)
 
         except (
             DNBServiceConnectionError,
@@ -450,21 +435,47 @@ class DNBCompanyHierarchyView(APIView):
         json_response['ultimate_global_companies_count'] = response[
             'global_ultimate_family_tree_members_count'
         ]
-        json_response[
-            'manually_verified_subsidiaries'
-        ] = self.get_manually_verified_subsidiaries(company_id)
+        json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries(
+            company_id,
+        )
 
         return Response(json_response)
 
     def get_manually_verified_subsidiaries(self, company_id):
-        companies = (
-            Company.objects.filter(global_headquarters_id=company_id).select_related(
-                'employee_range',
-                'headquarter_type',
-                'uk_region',
-            )
+        companies = Company.objects.filter(global_headquarters_id=company_id).select_related(
+            'employee_range',
+            'headquarter_type',
+            'uk_region',
         )
 
         serialized_data = SubsidiarySerializer(companies, many=True)
 
         return serialized_data.data if companies else []
+
+
+class DNBRelatedCompaniesCountView(APIView):
+    """
+    View for returning the count of related companies a company has
+    """
+
+    permission_classes = (
+        HasPermissions(
+            f'company.{CompanyPermission.view_company}',
+        ),
+    )
+
+    def get(self, request, company_id):
+        duns_number = validate_company_id(company_id)
+
+        hierarchy = get_company_hierarchy_data(duns_number)
+        companies_count = hierarchy.get('global_ultimate_family_tree_members_count', 0)
+
+        if request.query_params.get('include_subsidiary_companies') == 'true':
+            subsidiary_companies_count = Company.objects.filter(
+                global_headquarters_id=company_id,
+            ).count()
+            companies_count += subsidiary_companies_count
+
+        return Response(
+            companies_count - 1 if companies_count > 0 else 0,
+        )  # deduct 1 as the list from dnb contains the company requested
