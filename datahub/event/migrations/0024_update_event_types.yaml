@@ -1,0 +1,12 @@
+- model: event.eventtype
+  pk: 96246a2d-de17-4b3f-bb62-14c2acfe0522
+  fields: { disabled_on: null, name: 'Export Academy Essentials' }
+- model: event.eventtype
+  pk: eb7835f7-a35b-4b3f-af9d-dcdebb9f967d
+  fields: { disabled_on: null, name: 'Export Academy Masterclasses' }
+- model: event.eventtype
+  pk: 37ff372e-3696-4db9-aa90-802ef893fd66
+  fields: { disabled_on: null, name: 'Export Academy Sectors' }
+- model: event.eventtype
+  pk: d85fb62a-196b-4795-ad78-7660a5761034
+  fields: { disabled_on: null, name: 'Export Academy Markets' }
