@@ -45,6 +45,7 @@ from datahub.dnb_api.utils import (
     get_change_request,
     get_company,
     get_company_hierarchy_data,
+    get_datahub_company_ids,
     request_changes,
     search_dnb,
     validate_company_id,
@@ -452,6 +453,71 @@ class DNBCompanyHierarchyView(APIView):
         serialized_data = SubsidiarySerializer(companies, many=True)
 
         return serialized_data.data if companies else []
+
+
+class DNBRelatedCompaniesView(APIView):
+    """
+    View for receiving datahub hierarchy of a company from DNB data and return Data Hub IDs.
+    """
+
+    permission_classes = (
+        HasPermissions(
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.add_company}',
+        ),
+    )
+
+    def get(self, request, company_id):
+        """
+        Given a Company Id, get the data for the company hierarchy from dnb-service
+        then find the related companies to create a list of IDs
+        """
+        duns_number = validate_company_id(company_id)
+
+        try:
+            response = get_company_hierarchy_data(duns_number)
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
+        family_tree_members = response['family_tree_members']
+        json_response = {
+            'related_companies': [],
+        }
+        if not family_tree_members:
+            return Response(json_response)
+
+        company_hierarchy_dataframe = create_related_company_dataframe(family_tree_members)
+
+        root = dataframe_to_tree_by_relation(
+            company_hierarchy_dataframe,
+            child_col='duns',
+            parent_col='corporateLinkage.parent.duns',
+        )
+
+        duns_node = find(root, lambda node: node.name == duns_number)
+
+        related_duns = []
+
+        if request.query_params.get('include_parent_companies') == 'true':
+            ancestors_duns = duns_node.ancestors
+            for ancestor_duns_number in ancestors_duns:
+                related_duns.append(ancestor_duns_number.node_name)
+
+        if request.query_params.get('include_subsidiary_companies') == 'true':
+            descendants_duns = duns_node.descendants
+            for descendant_duns_number in descendants_duns:
+                related_duns.append(descendant_duns_number.node_name)
+
+        company_ids = []
+
+        if related_duns:
+            company_ids = get_datahub_company_ids(related_duns)
+
+        return Response(company_ids)
 
 
 class DNBRelatedCompaniesCountView(APIView):
