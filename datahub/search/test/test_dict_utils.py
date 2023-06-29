@@ -46,10 +46,7 @@ def test_id_name_list_of_dicts():
         {'id': '12', 'name': 'test A'},
         {'id': '99', 'name': 'testing B'},
     ]
-    objects = [
-        construct_mock(**mock_data)
-        for mock_data in data
-    ]
+    objects = [construct_mock(**mock_data) for mock_data in data]
 
     manager = mock.Mock(
         all=mock.Mock(return_value=objects),
@@ -98,7 +95,6 @@ def test_id_uri_dict():
                 'trading_names': ['Trading 1', 'Trading 2'],
             },
         ),
-
         # minimal object
         (
             construct_mock(
@@ -112,7 +108,6 @@ def test_id_uri_dict():
                 'trading_names': [],
             },
         ),
-
         # None
         (
             None,
@@ -144,14 +139,12 @@ def test_company_dict(obj, expected_dict):
             'address',
             None,
         ),
-
         # returns None when obj is None
         (
             None,
             'address',
             None,
         ),
-
         # all fields converted into a dict
         (
             construct_mock(
@@ -180,8 +173,6 @@ def test_company_dict(obj, expected_dict):
                 'area': None,
             },
         ),
-
-
         # None values converted to ''
         (
             construct_mock(
@@ -285,7 +276,6 @@ def test_contact_or_adviser_dict():
                 },
             },
         ),
-
         # with dit_team = None
         (
             construct_mock(
@@ -318,10 +308,7 @@ def test_contact_or_adviser_list_of_dicts():
         {'id': '12', 'first_name': 'first A', 'last_name': 'last A', 'name': 'test A'},
         {'id': '99', 'first_name': 'first B', 'last_name': 'last B', 'name': 'testing B'},
     ]
-    objects = [
-        construct_mock(**data_item)
-        for data_item in data
-    ]
+    objects = [construct_mock(**data_item) for data_item in data]
 
     manager = mock.Mock(
         all=mock.Mock(return_value=objects),
@@ -360,7 +347,6 @@ def test_ch_company_dict():
                 'name': 'Cats',
             },
         ),
-
         # None first level field
         (
             construct_mock(
@@ -368,7 +354,6 @@ def test_ch_company_dict():
             ),
             None,
         ),
-
         # None second level field
         (
             construct_mock(
@@ -421,3 +406,17 @@ def test_computed_field_function_not_a_function():
 
     with raises(ValueError):
         dict_utils.computed_field_function('get_cats_name', dict_utils.id_name_dict)(obj)
+
+
+def test_empty_string_to_null_when_obj_is_falsey():
+    """Tests _id_name_dict."""
+    res = dict_utils.empty_string_to_null('')
+
+    assert res is None
+
+
+def test_empty_string_to_null_when_obj_is_truthy():
+    """Tests _id_name_dict."""
+    res = dict_utils.empty_string_to_null('abc')
+
+    assert res == 'abc'
