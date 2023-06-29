@@ -408,8 +408,15 @@ def test_computed_field_function_not_a_function():
         dict_utils.computed_field_function('get_cats_name', dict_utils.id_name_dict)(obj)
 
 
-def test_empty_string_to_null():
+def test_empty_string_to_null_when_obj_is_falsey():
     """Tests _id_name_dict."""
     res = dict_utils.empty_string_to_null('')
 
     assert res is None
+
+
+def test_empty_string_to_null_when_obj_is_truthy():
+    """Tests _id_name_dict."""
+    res = dict_utils.empty_string_to_null('abc')
+
+    assert res == 'abc'
