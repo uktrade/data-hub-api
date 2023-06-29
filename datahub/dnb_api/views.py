@@ -16,7 +16,6 @@ from datahub.company.serializers import CompanySerializer
 from datahub.core import statsd
 from datahub.core.exceptions import (
     APIBadRequestException,
-    APINotFoundException,
     APIUpstreamException,
 )
 from datahub.core.permissions import HasPermissions
@@ -25,7 +24,6 @@ from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedError, link_comp
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyChangeRequestSerializer,
-    DNBCompanyHierarchySerializer,
     DNBCompanyInvestigationSerializer,
     DNBCompanyLinkSerializer,
     DNBCompanySerializer,
@@ -45,7 +43,6 @@ from datahub.dnb_api.utils import (
     get_change_request,
     get_company,
     get_company_hierarchy_data,
-    is_valid_uuid,
     request_changes,
     search_dnb,
     validate_company_id,

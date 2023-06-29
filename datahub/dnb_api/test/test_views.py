@@ -2961,7 +2961,8 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
         assert (
             self.api_client.get(
                 reverse(
-                    'api-v4:dnb-api:related-companies-count', kwargs={'company_id': '11223344'}
+                    'api-v4:dnb-api:related-companies-count',
+                    kwargs={'company_id': '11223344'},
                 ),
             ).status_code
             == 400
@@ -2980,7 +2981,8 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
         assert (
             self.api_client.get(
                 reverse(
-                    'api-v4:dnb-api:related-companies-count', kwargs={'company_id': company.id}
+                    'api-v4:dnb-api:related-companies-count',
+                    kwargs={'company_id': company.id},
                 ),
             ).status_code
             == 400
