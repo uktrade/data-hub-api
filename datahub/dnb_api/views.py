@@ -497,7 +497,8 @@ class DNBRelatedCompaniesCountView(APIView):
 
         hierarchy = get_company_hierarchy_data(duns_number)
         companies_count = hierarchy.get('global_ultimate_family_tree_members_count', 0)
-        if request.query_params.get('include_subsidiary_companies'):
+
+        if request.query_params.get('include_subsidiary_companies') == 'true':
             subsidiary_companies_count = Company.objects.filter(
                 global_headquarters_id=company_id,
             ).count()

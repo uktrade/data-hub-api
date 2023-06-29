@@ -2961,14 +2961,17 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
         ultimate_company_dh = CompanyFactory(
             duns_number='123456789',
         )
+
+        url = reverse(
+            'api-v4:dnb-api:related-companies-count',
+            kwargs={'company_id': ultimate_company_dh.id},
+        )
+
         self.set_dnb_hierarchy_mock_response(requests_mock, [])
 
         assert (
             self.api_client.get(
-                reverse(
-                    'api-v4:dnb-api:related-companies-count',
-                    kwargs={'company_id': ultimate_company_dh.id},
-                ),
+                f'{url}?include_subsidiary_companies=false',
             ).json()
             == 0
         )
@@ -2989,4 +2992,86 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
                 f'{url}?include_subsidiary_companies=true',
             ).json()
             == 0
+        )
+
+    def test_dnb_company_count_of_1_returns_0(self, requests_mock):
+        ultimate_company_dh = CompanyFactory(
+            duns_number='123456789',
+        )
+
+        url = reverse(
+            'api-v4:dnb-api:related-companies-count',
+            kwargs={'company_id': ultimate_company_dh.id},
+        )
+
+        self.set_dnb_hierarchy_mock_response(requests_mock, [])
+
+        assert (
+            self.api_client.get(
+                f'{url}?include_subsidiary_companies=false',
+            ).json()
+            == 0
+        )
+
+    def test_dnb_company_count_of_1_and_subsidiary_count_of_1_returns_1(self, requests_mock):
+        ultimate_company_dh = CompanyFactory(
+            duns_number='123456789',
+        )
+
+        CompanyFactory(global_headquarters_id=ultimate_company_dh.id)
+
+        url = reverse(
+            'api-v4:dnb-api:related-companies-count',
+            kwargs={'company_id': ultimate_company_dh.id},
+        )
+        self.set_dnb_hierarchy_mock_response(requests_mock, [1])
+
+        assert (
+            self.api_client.get(
+                f'{url}?include_subsidiary_companies=true',
+            ).json()
+            == 1
+        )
+
+    def test_dnb_company_count_of_1_and_subsidiary_count_of_1_excluding_subsidiaries_returns_0(
+        self,
+        requests_mock,
+    ):
+        ultimate_company_dh = CompanyFactory(
+            duns_number='123456789',
+        )
+
+        CompanyFactory(global_headquarters_id=ultimate_company_dh.id)
+
+        url = reverse(
+            'api-v4:dnb-api:related-companies-count',
+            kwargs={'company_id': ultimate_company_dh.id},
+        )
+        self.set_dnb_hierarchy_mock_response(requests_mock, [1])
+
+        assert (
+            self.api_client.get(
+                f'{url}?include_subsidiary_companies=false',
+            ).json()
+            == 0
+        )
+
+    def test_dnb_company_count_of_10_and_subsidiary_count_of_3_returns_12(self, requests_mock):
+        ultimate_company_dh = CompanyFactory(
+            duns_number='123456789',
+        )
+
+        CompanyFactory.create_batch(3, global_headquarters_id=ultimate_company_dh.id)
+
+        url = reverse(
+            'api-v4:dnb-api:related-companies-count',
+            kwargs={'company_id': ultimate_company_dh.id},
+        )
+        self.set_dnb_hierarchy_mock_response(requests_mock, [1] * 10)
+
+        assert (
+            self.api_client.get(
+                f'{url}?include_subsidiary_companies=true',
+            ).json()
+            == 12
         )
