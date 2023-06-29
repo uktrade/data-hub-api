@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: 33e189ac-166d-11ee-be56-0242ac120002
+  fields:
+    disabled_on: ~
+    order: 0.0
+    segment: Export Champions engagement
+    parent:
+    contexts: ["export_interaction", "export_service_delivery"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
