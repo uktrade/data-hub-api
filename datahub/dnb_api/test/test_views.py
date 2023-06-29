@@ -41,6 +41,19 @@ REQUIRED_REGISTERED_ADDRESS_FIELDS = [
     f'registered_address_{field}' for field in AddressSerializer.REQUIRED_FIELDS
 ]
 
+URL_PARENT_TRUE_SUBSIDIARY_TRUE = (
+    '?include_parent_companies=true&include_subsidiary_companies=true'
+)
+URL_PARENT_TRUE_SUBSIDIARY_FALSE = (
+    '?include_parent_companies=true&include_subsidiary_companies=false'
+)
+URL_PARENT_FALSE_SUBSIDIARY_TRUE = (
+    '?include_parent_companies=false&include_subsidiary_companies=true'
+)
+URL_PARENT_FALSE_SUBSIDIARY_FALSE = (
+    '?include_parent_companies=false&include_subsidiary_companies=false'
+)
+
 
 @pytest.mark.parametrize(
     'url',

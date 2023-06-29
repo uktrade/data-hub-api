@@ -949,6 +949,7 @@ class TestRelatedCompanyDataframe:
         ]
 
         opensearch_with_signals.indices.refresh()
+
         df = create_related_company_dataframe(tree_members)
 
         assert df['duns'][0] == ultimate_company_dnb['duns']
@@ -961,3 +962,27 @@ class TestRelatedCompanyDataframe:
         assert df['corporateLinkage.parent.duns'][2] == parent_company_dnb['duns']
         assert df['corporateLinkage.parent.duns'][3] == parent_company_dnb['duns']
         assert df['corporateLinkage.parent.duns'][4] == ultimate_company_dnb['duns']
+
+    def test_none_returned_from_empty_tree_members(
+        self,
+        opensearch_with_signals,
+    ):
+        """
+        Test when a dataframe is created using multiple companies where the parent
+        relationship is both directly linked and indirectly linked value, the datatable
+        is created with the correct column value for each company
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '113456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        tree_members = [ultimate_company_dnb]
+
+        opensearch_with_signals.indices.refresh()
+        df = create_related_company_dataframe(tree_members)
+
+        assert df['corporateLinkage.parent.duns'][0] is None
