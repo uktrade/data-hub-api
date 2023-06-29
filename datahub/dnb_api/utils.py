@@ -19,15 +19,20 @@ from rest_framework import serializers, status
 
 from reversion.models import Version
 
+from datahub.company.models import Company
 from datahub.core import statsd
 from datahub.core.api_client import APIClient, TokenAuth
-from datahub.core.exceptions import APIBadGatewayException
+from datahub.core.exceptions import (
+    APIBadGatewayException,
+    APIBadRequestException,
+    APINotFoundException,
+)
 from datahub.core.serializers import AddressSerializer
 from datahub.dnb_api.constants import (
     ALL_DNB_UPDATED_MODEL_FIELDS,
     ALL_DNB_UPDATED_SERIALIZER_FIELDS,
 )
-from datahub.dnb_api.serializers import DNBCompanySerializer
+from datahub.dnb_api.serializers import DNBCompanyHierarchySerializer, DNBCompanySerializer
 from datahub.metadata.models import AdministrativeArea, Country
 from datahub.search.company.models import Company as SearchCompany
 from datahub.search.execute_query import execute_search_query
@@ -543,6 +548,25 @@ def _get_api_client(request=None):
         default_timeout=settings.DNB_SERVICE_TIMEOUT,
         request=request,
     )
+
+
+def validate_company_id(company_id):
+    if not is_valid_uuid(company_id):
+        raise APIBadRequestException(f'company id "{company_id}" is not valid')
+
+    company = Company.objects.filter(id=company_id).values_list('duns_number', flat=True)
+
+    if not company:
+        raise APINotFoundException(f'company {company_id} not found')
+
+    duns_number = company.first()
+    if company and not duns_number:
+        raise APIBadRequestException(f'company {company_id} does not contain a duns number')
+
+    hierarchy_serializer = DNBCompanyHierarchySerializer(data={'duns_number': duns_number})
+    hierarchy_serializer.is_valid(raise_exception=True)
+
+    return duns_number
 
 
 def get_company_hierarchy_data(duns_number):
