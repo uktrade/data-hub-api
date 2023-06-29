@@ -2957,6 +2957,35 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
     DNB Company Hierarchy Search view test case.
     """
 
+    def test_company_id_is_valid(self):
+        assert (
+            self.api_client.get(
+                reverse(
+                    'api-v4:dnb-api:related-companies-count', kwargs={'company_id': '11223344'}
+                ),
+            ).status_code
+            == 400
+        )
+
+    def test_company_has_no_company_id(self):
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:related-companies-count', kwargs={'company_id': uuid4()}),
+            ).status_code
+            == 404
+        )
+
+    def test_company_has_no_duns_number(self):
+        company = CompanyFactory(duns_number=None)
+        assert (
+            self.api_client.get(
+                reverse(
+                    'api-v4:dnb-api:related-companies-count', kwargs={'company_id': company.id}
+                ),
+            ).status_code
+            == 400
+        )
+
     def test_dnb_company_count_of_0_returns_0(self, requests_mock):
         ultimate_company_dh = CompanyFactory(
             duns_number='123456789',
