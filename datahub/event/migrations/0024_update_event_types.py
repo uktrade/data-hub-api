@@ -1,4 +1,4 @@
-from datetime import timezone
+from django.utils.timezone import now
 from pathlib import PurePath
 from django.db import migrations
 
@@ -16,7 +16,7 @@ def disable_event_type(apps, schema_editor):
     try:
         # Disable Event Type { name: "Export Academy", pk: "543e4ca4-ed74-d60f-f6bf-1a0fd64b772d" }
         event_type = EventType.objects.get(pk='543e4ca4-ed74-d60f-f6bf-1a0fd64b772d')
-        event_type.disabled_on = timezone.now()
+        event_type.disabled_on = now()
         event_type.save()
     except EventType.DoesNotExist:
         pass
