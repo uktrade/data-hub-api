@@ -720,12 +720,13 @@ class TestDNBHierarchyData:
         """
         Test when the dnb api doesn't return a success http status code the value is not cached
         """
-        requests_mock.post(
-            DNB_HIERARCHY_SEARCH_URL,
-            status_code=500,
-            content=b'{"family_tree_members":[]}',
-        )
-        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+        with pytest.raises(DNBServiceError):
+            requests_mock.post(
+                DNB_HIERARCHY_SEARCH_URL,
+                status_code=500,
+                content=b'{"family_tree_members":[]}',
+            )
+            get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
         assert cache.get(self.FAMILY_TREE_CACHE_KEY) is None
 
 
