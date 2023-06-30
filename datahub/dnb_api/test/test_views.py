@@ -3044,6 +3044,26 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
             == 0
         )
 
+    def test_dnb_company_count_of_0_and_subsidiary_count_of_1_returns_1(self, requests_mock):
+        ultimate_company_dh = CompanyFactory(
+            duns_number='123456789',
+        )
+
+        CompanyFactory(global_headquarters_id=ultimate_company_dh.id)
+
+        url = reverse(
+            'api-v4:dnb-api:related-companies-count',
+            kwargs={'company_id': ultimate_company_dh.id},
+        )
+        self.set_dnb_hierarchy_mock_response(requests_mock, [])
+
+        assert (
+            self.api_client.get(
+                f'{url}?include_subsidiary_companies=true',
+            ).json()
+            == 1
+        )
+
     def test_dnb_company_count_of_1_and_subsidiary_count_of_1_returns_1(self, requests_mock):
         ultimate_company_dh = CompanyFactory(
             duns_number='123456789',
