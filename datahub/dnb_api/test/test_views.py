@@ -37,10 +37,22 @@ DNB_HIERARCHY_SEARCH_URL = urljoin(
     'companies/hierarchy/search/',
 )
 
-
 REQUIRED_REGISTERED_ADDRESS_FIELDS = [
     f'registered_address_{field}' for field in AddressSerializer.REQUIRED_FIELDS
 ]
+
+URL_PARENT_TRUE_SUBSIDIARY_TRUE = (
+    '?include_parent_companies=true&include_subsidiary_companies=true'
+)
+URL_PARENT_TRUE_SUBSIDIARY_FALSE = (
+    '?include_parent_companies=true&include_subsidiary_companies=false'
+)
+URL_PARENT_FALSE_SUBSIDIARY_TRUE = (
+    '?include_parent_companies=false&include_subsidiary_companies=true'
+)
+URL_PARENT_FALSE_SUBSIDIARY_FALSE = (
+    '?include_parent_companies=false&include_subsidiary_companies=false'
+)
 
 
 @pytest.mark.parametrize(
@@ -2950,6 +2962,897 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 'hierarchy': '0',
             },
         ]
+
+
+class TestRelatedCompanyView(APITestMixin):
+    """
+    DNB Company Hierarchy Search view test case.
+    """
+
+    def test_company_id_is_valid(self):
+        api_client = self.create_api_client()
+        company = CompanyFactory(duns_number='12345678')
+
+        url = reverse('api-v4:dnb-api:related-companies', kwargs={'company_id': company.id})
+        response = api_client.get(
+            f'{url}{URL_PARENT_TRUE_SUBSIDIARY_TRUE}',
+            content_type='application/json',
+        )
+        assert response.status_code == 400
+
+    def test_company_has_no_company_id(self):
+        api_client = self.create_api_client()
+        url = reverse('api-v4:dnb-api:related-companies', kwargs={'company_id': uuid4()})
+        response = api_client.get(
+            f'{url}{URL_PARENT_TRUE_SUBSIDIARY_TRUE}',
+            content_type='application/json',
+        )
+        assert response.status_code == 404
+
+    def test_company_has_no_duns_number(self):
+        api_client = self.create_api_client()
+        company = CompanyFactory(duns_number=None)
+
+        url = reverse('api-v4:dnb-api:related-companies', kwargs={'company_id': company.id})
+        response = api_client.get(
+            f'{url}{URL_PARENT_TRUE_SUBSIDIARY_TRUE}',
+            content_type='application/json',
+        )
+        assert response.status_code == 400
+
+    @pytest.mark.parametrize(
+        'request_exception',
+        ((ConnectionError), (DNBServiceTimeoutError)),
+    )
+    def test_related_companies_request_connection_error(self, requests_mock, request_exception):
+        """
+        Test for POST proxy.
+        """
+        api_client = self.create_api_client()
+        company = CompanyFactory(duns_number='123456789')
+
+        requests_mock.post(
+            DNB_HIERARCHY_SEARCH_URL,
+            exc=request_exception,
+        )
+
+        url = reverse('api-v4:dnb-api:related-companies', kwargs={'company_id': company.id})
+        response = api_client.get(
+            f'{url}{URL_PARENT_TRUE_SUBSIDIARY_TRUE}',
+            content_type='application/json',
+        )
+
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+    def test_empty_results_returned_from_dnb_service(self, requests_mock):
+        """
+        Test for POST proxy.
+        """
+        api_client = self.create_api_client()
+        company = CompanyFactory(duns_number='123456789')
+
+        requests_mock.post(
+            DNB_HIERARCHY_SEARCH_URL,
+            status_code=200,
+            content=b'{"family_tree_members":[]}',
+        )
+
+        url = reverse('api-v4:dnb-api:related-companies', kwargs={'company_id': company.id})
+        response = api_client.get(
+            url,
+            content_type='application/json',
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {
+            'related_companies': [],
+        }
+
+    def test_single_subsidiary_id_is_returned_when_exists_in_data_hub(
+        self,
+        requests_mock,
+        opensearch_with_signals,
+    ):
+        """
+        Test the scenario where the company returned by the DnB service does
+        match a child company found in the Data Hub dataset and then return
+        the correct id for that company
+        """
+        faker = Faker()
+        ultimate_company_dnb = {
+            'duns': '987654321',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        child_company_dnb = {
+            'duns': '123456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company_dnb['duns']},
+            },
+        }
+
+        tree_members = [ultimate_company_dnb, child_company_dnb]
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_company_dnb['duns'],
+            id='8e2e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=ultimate_company_dnb['primaryName'],
+        )
+        child_company_dh = CompanyFactory(
+            duns_number=child_company_dnb['duns'],
+            id='111e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=child_company_dnb['primaryName'],
+        )
+
+        opensearch_with_signals.indices.refresh()
+
+        params = URL_PARENT_TRUE_SUBSIDIARY_TRUE
+
+        response = self._get_related_company_response(
+            requests_mock,
+            tree_members,
+            ultimate_company_dh,
+            params,
+        )
+
+        assert response.status_code == 200
+        assert response.json() == [child_company_dh.id]
+
+    def test_single_parent_id_is_returned_when_exists_in_data_hub(
+        self,
+        requests_mock,
+        opensearch_with_signals,
+    ):
+        """
+        Test the scenario where the company returned by the DnB service does
+        match a parent company found in the Data Hub dataset and then return
+        the correct id for that company
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '987654321',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        child_company_dnb = {
+            'duns': '123456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company_dnb['duns']},
+            },
+        }
+        tree_members = [ultimate_company_dnb, child_company_dnb]
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_company_dnb['duns'],
+            id='8e2e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=ultimate_company_dnb['primaryName'],
+        )
+        child_company_dh = CompanyFactory(
+            duns_number=child_company_dnb['duns'],
+            id='111e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=child_company_dnb['primaryName'],
+        )
+
+        opensearch_with_signals.indices.refresh()
+
+        params = URL_PARENT_TRUE_SUBSIDIARY_TRUE
+
+        response = self._get_related_company_response(
+            requests_mock,
+            tree_members,
+            child_company_dh,
+            params,
+        )
+
+        assert response.status_code == 200
+        assert response.json() == [ultimate_company_dh.id]
+        assert response.json() != [child_company_dh.id]
+
+    def test_all_ids_except_self_are_returned_when_all_companies_are_in_data_hub_and_params_true(
+        self,
+        requests_mock,
+        opensearch_with_signals,
+    ):
+        """
+        Test the scenario where the companies returned by the DnB service all have
+        Data Hub ids
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '113456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        direct_company_dnb = {
+            'duns': '223456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company_dnb['duns']},
+            },
+        }
+        target_company_dnb = {
+            'duns': '333456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': direct_company_dnb['duns']},
+            },
+        }
+        child_one_company_dnb = {
+            'duns': '443456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': target_company_dnb['duns']},
+            },
+        }
+        child_two_company_dnb = {
+            'duns': '553456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': target_company_dnb['duns']},
+            },
+        }
+        tree_members = [
+            ultimate_company_dnb,
+            direct_company_dnb,
+            target_company_dnb,
+            child_one_company_dnb,
+            child_two_company_dnb,
+        ]
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_company_dnb['duns'],
+            id='111e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=ultimate_company_dnb['primaryName'],
+        )
+        direct_company_dh = CompanyFactory(
+            duns_number=direct_company_dnb['duns'],
+            id='222e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=direct_company_dnb['primaryName'],
+        )
+        target_company_dh = CompanyFactory(
+            duns_number=target_company_dnb['duns'],
+            id='333e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=target_company_dnb['primaryName'],
+        )
+        child_one_company_dh = CompanyFactory(
+            duns_number=child_one_company_dnb['duns'],
+            id='444e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=child_one_company_dnb['primaryName'],
+        )
+        child_two_company_dh = CompanyFactory(
+            duns_number=child_two_company_dnb['duns'],
+            id='555e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=child_two_company_dnb['primaryName'],
+        )
+
+        opensearch_with_signals.indices.refresh()
+
+        params = URL_PARENT_TRUE_SUBSIDIARY_TRUE
+
+        response = self._get_related_company_response(
+            requests_mock,
+            tree_members,
+            target_company_dh,
+            params,
+        )
+
+        assert response.status_code == 200
+        assert response.json() == [
+            ultimate_company_dh.id,
+            direct_company_dh.id,
+            child_one_company_dh.id,
+            child_two_company_dh.id,
+        ]
+
+    def test_only_ids_are_returned_when_companies_are_in_data_hub_and_params_true(
+        self,
+        requests_mock,
+        opensearch_with_signals,
+    ):
+        """
+        Test the scenario where not all the companies returned by the DnB service have
+        a Data Hub id so only those that do should have their ID returned
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '113456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        direct_company_dnb = {
+            'duns': '223456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company_dnb['duns']},
+            },
+        }
+        target_company_dnb = {
+            'duns': '333456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': direct_company_dnb['duns']},
+            },
+        }
+        child_one_company_dnb = {
+            'duns': '443456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': target_company_dnb['duns']},
+            },
+        }
+        child_two_company_dnb = {
+            'duns': '553456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': target_company_dnb['duns']},
+            },
+        }
+        tree_members = [
+            ultimate_company_dnb,
+            direct_company_dnb,
+            target_company_dnb,
+            child_one_company_dnb,
+            child_two_company_dnb,
+        ]
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_company_dnb['duns'],
+            id='111e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=ultimate_company_dnb['primaryName'],
+        )
+        target_company_dh = CompanyFactory(
+            duns_number=target_company_dnb['duns'],
+            id='333e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=target_company_dnb['primaryName'],
+        )
+        child_two_company_dh = CompanyFactory(
+            duns_number=child_two_company_dnb['duns'],
+            id='555e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=child_two_company_dnb['primaryName'],
+        )
+
+        opensearch_with_signals.indices.refresh()
+
+        params = URL_PARENT_TRUE_SUBSIDIARY_TRUE
+
+        response = self._get_related_company_response(
+            requests_mock,
+            tree_members,
+            target_company_dh,
+            params,
+        )
+
+        assert response.status_code == 200
+        assert response.json() == [ultimate_company_dh.id, child_two_company_dh.id]
+
+    def test_no_ids_are_returned_when_no_companies_are_in_data_hub_and_params_true(
+        self,
+        requests_mock,
+        opensearch_with_signals,
+    ):
+        """
+        Test the scenario where the no companies returned by the DnB service have
+        IDs in a Data Hub
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '113456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        direct_company_dnb = {
+            'duns': '223456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company_dnb['duns']},
+            },
+        }
+        target_company_dnb = {
+            'duns': '333456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': direct_company_dnb['duns']},
+            },
+        }
+        child_one_company_dnb = {
+            'duns': '443456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': target_company_dnb['duns']},
+            },
+        }
+        child_two_company_dnb = {
+            'duns': '553456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': target_company_dnb['duns']},
+            },
+        }
+        tree_members = [
+            ultimate_company_dnb,
+            direct_company_dnb,
+            target_company_dnb,
+            child_one_company_dnb,
+            child_two_company_dnb,
+        ]
+        target_company_dh = CompanyFactory(
+            duns_number=target_company_dnb['duns'],
+            id='333e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=target_company_dnb['primaryName'],
+        )
+
+        opensearch_with_signals.indices.refresh()
+
+        params = URL_PARENT_TRUE_SUBSIDIARY_TRUE
+
+        response = self._get_related_company_response(
+            requests_mock,
+            tree_members,
+            target_company_dh,
+            params,
+        )
+
+        assert response.status_code == 200
+        assert response.json() == []
+
+    def test_all_ids_directly_related_returned_when_all_companies_are_in_data_hub_and_params_true(
+        self,
+        requests_mock,
+        opensearch_with_signals,
+    ):
+        """
+        Test the scenario where the many companies returned by the DnB service does match
+        for companies IDs in Data Hub but only those directly related are returned
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '113456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        direct_company_dnb = {
+            'duns': '223456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company_dnb['duns']},
+            },
+        }
+        target_company_dnb = {
+            'duns': '333456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 3,
+                'parent': {'duns': direct_company_dnb['duns']},
+            },
+        }
+        child_one_company_dnb = {
+            'duns': '443456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': target_company_dnb['duns']},
+            },
+        }
+        not_directly_related_company_dnb = {
+            'duns': '553456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company_dnb['duns']},
+            },
+        }
+        tree_members = [
+            ultimate_company_dnb,
+            direct_company_dnb,
+            target_company_dnb,
+            child_one_company_dnb,
+            not_directly_related_company_dnb,
+        ]
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_company_dnb['duns'],
+            id='111e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=ultimate_company_dnb['primaryName'],
+        )
+        direct_company_dh = CompanyFactory(
+            duns_number=direct_company_dnb['duns'],
+            id='222e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=direct_company_dnb['primaryName'],
+        )
+        target_company_dh = CompanyFactory(
+            duns_number=target_company_dnb['duns'],
+            id='333e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=target_company_dnb['primaryName'],
+        )
+        child_one_company_dh = CompanyFactory(
+            duns_number=child_one_company_dnb['duns'],
+            id='444e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=child_one_company_dnb['primaryName'],
+        )
+        not_directly_related_company_dh = CompanyFactory(
+            duns_number=not_directly_related_company_dnb['duns'],
+            id='555e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=not_directly_related_company_dnb['primaryName'],
+        )
+
+        opensearch_with_signals.indices.refresh()
+
+        params = URL_PARENT_TRUE_SUBSIDIARY_TRUE
+
+        response = self._get_related_company_response(
+            requests_mock,
+            tree_members,
+            target_company_dh,
+            params,
+        )
+
+        assert response.status_code == 200
+        assert response.json() != [
+            ultimate_company_dh.id,
+            direct_company_dh.id,
+            child_one_company_dh.id,
+            not_directly_related_company_dh,
+        ]
+        assert response.json() == [
+            ultimate_company_dh.id,
+            direct_company_dh.id,
+            child_one_company_dh.id,
+        ]
+
+    def test_only_parent_ids_returned_when_include_parent_set_true_and_include_subsidiary_false(
+        self,
+        requests_mock,
+        opensearch_with_signals,
+    ):
+        """
+        Test the scenario where the companies returned by the DnB service all have
+        Data Hub ids
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '113456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        direct_company_dnb = {
+            'duns': '223456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company_dnb['duns']},
+            },
+        }
+        target_company_dnb = {
+            'duns': '333456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': direct_company_dnb['duns']},
+            },
+        }
+        child_one_company_dnb = {
+            'duns': '443456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': target_company_dnb['duns']},
+            },
+        }
+        child_two_company_dnb = {
+            'duns': '553456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': target_company_dnb['duns']},
+            },
+        }
+        tree_members = [
+            ultimate_company_dnb,
+            direct_company_dnb,
+            target_company_dnb,
+            child_one_company_dnb,
+            child_two_company_dnb,
+        ]
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_company_dnb['duns'],
+            id='111e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=ultimate_company_dnb['primaryName'],
+        )
+        direct_company_dh = CompanyFactory(
+            duns_number=direct_company_dnb['duns'],
+            id='222e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=direct_company_dnb['primaryName'],
+        )
+        target_company_dh = CompanyFactory(
+            duns_number=target_company_dnb['duns'],
+            id='333e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=target_company_dnb['primaryName'],
+        )
+        child_one_company_dh = CompanyFactory(
+            duns_number=child_one_company_dnb['duns'],
+            id='444e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=child_one_company_dnb['primaryName'],
+        )
+        child_two_company_dh = CompanyFactory(
+            duns_number=child_two_company_dnb['duns'],
+            id='555e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=child_two_company_dnb['primaryName'],
+        )
+
+        opensearch_with_signals.indices.refresh()
+
+        prams = URL_PARENT_TRUE_SUBSIDIARY_FALSE
+
+        response = self._get_related_company_response(
+            requests_mock,
+            tree_members,
+            target_company_dh,
+            prams,
+        )
+
+        assert response.status_code == 200
+        assert response.json() == [
+            ultimate_company_dh.id,
+            direct_company_dh.id,
+        ]
+        assert response.json() != [
+            child_one_company_dh.id,
+            child_two_company_dh.id,
+        ]
+
+    def test_only_subsidiary_ids_returned_when_include_parent_false_and_include_subsidiary_true(
+        self,
+        requests_mock,
+        opensearch_with_signals,
+    ):
+        """
+        Test the scenario where the companies returned by the DnB service all have
+        Data Hub ids
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '113456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        direct_company_dnb = {
+            'duns': '223456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company_dnb['duns']},
+            },
+        }
+        target_company_dnb = {
+            'duns': '333456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': direct_company_dnb['duns']},
+            },
+        }
+        child_one_company_dnb = {
+            'duns': '443456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': target_company_dnb['duns']},
+            },
+        }
+        child_two_company_dnb = {
+            'duns': '553456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': target_company_dnb['duns']},
+            },
+        }
+        tree_members = [
+            ultimate_company_dnb,
+            direct_company_dnb,
+            target_company_dnb,
+            child_one_company_dnb,
+            child_two_company_dnb,
+        ]
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_company_dnb['duns'],
+            id='111e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=ultimate_company_dnb['primaryName'],
+        )
+        direct_company_dh = CompanyFactory(
+            duns_number=direct_company_dnb['duns'],
+            id='222e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=direct_company_dnb['primaryName'],
+        )
+        target_company_dh = CompanyFactory(
+            duns_number=target_company_dnb['duns'],
+            id='333e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=target_company_dnb['primaryName'],
+        )
+        child_one_company_dh = CompanyFactory(
+            duns_number=child_one_company_dnb['duns'],
+            id='444e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=child_one_company_dnb['primaryName'],
+        )
+        child_two_company_dh = CompanyFactory(
+            duns_number=child_two_company_dnb['duns'],
+            id='555e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=child_two_company_dnb['primaryName'],
+        )
+
+        opensearch_with_signals.indices.refresh()
+
+        prams = URL_PARENT_FALSE_SUBSIDIARY_TRUE
+
+        response = self._get_related_company_response(
+            requests_mock,
+            tree_members,
+            target_company_dh,
+            prams,
+        )
+
+        assert response.status_code == 200
+        assert response.json() == [
+            child_one_company_dh.id,
+            child_two_company_dh.id,
+        ]
+        assert response.json() != [
+            ultimate_company_dh.id,
+            direct_company_dh.id,
+        ]
+
+    def test_no_ids_returned_when_include_parent_false_and_include_subsidiary_false(
+        self,
+        requests_mock,
+        opensearch_with_signals,
+    ):
+        """
+        Test the scenario where the companies returned by the DnB service all have
+        Data Hub ids
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '113456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        direct_company_dnb = {
+            'duns': '223456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company_dnb['duns']},
+            },
+        }
+        target_company_dnb = {
+            'duns': '333456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': direct_company_dnb['duns']},
+            },
+        }
+        child_one_company_dnb = {
+            'duns': '443456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': target_company_dnb['duns']},
+            },
+        }
+        child_two_company_dnb = {
+            'duns': '553456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 4,
+                'parent': {'duns': target_company_dnb['duns']},
+            },
+        }
+        tree_members = [
+            ultimate_company_dnb,
+            direct_company_dnb,
+            target_company_dnb,
+            child_one_company_dnb,
+            child_two_company_dnb,
+        ]
+        CompanyFactory(
+            duns_number=ultimate_company_dnb['duns'],
+            id='111e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=ultimate_company_dnb['primaryName'],
+        )
+        CompanyFactory(
+            duns_number=direct_company_dnb['duns'],
+            id='222e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=direct_company_dnb['primaryName'],
+        )
+        target_company_dh = CompanyFactory(
+            duns_number=target_company_dnb['duns'],
+            id='333e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=target_company_dnb['primaryName'],
+        )
+        CompanyFactory(
+            duns_number=child_one_company_dnb['duns'],
+            id='444e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=child_one_company_dnb['primaryName'],
+        )
+        CompanyFactory(
+            duns_number=child_two_company_dnb['duns'],
+            id='555e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=child_two_company_dnb['primaryName'],
+        )
+
+        opensearch_with_signals.indices.refresh()
+
+        params = URL_PARENT_FALSE_SUBSIDIARY_FALSE
+
+        response = self._get_related_company_response(
+            requests_mock,
+            tree_members,
+            target_company_dh,
+            params,
+        )
+
+        assert response.status_code == 200
+        assert response.json() == []
+
+    def _get_related_company_response(
+        self,
+        requests_mock,
+        tree_members,
+        ultimate_company,
+        params,
+    ):
+        api_client = self.create_api_client()
+        requests_mock.post(
+            DNB_HIERARCHY_SEARCH_URL,
+            status_code=200,
+            content=json.dumps(
+                {
+                    'global_ultimate_duns': 'duns',
+                    'family_tree_members': tree_members,
+                    'global_ultimate_family_tree_members_count': len(tree_members),
+                },
+            ).encode('utf-8'),
+        )
+        url = reverse(
+            'api-v4:dnb-api:related-companies',
+            kwargs={'company_id': ultimate_company.id},
+        )
+        response = api_client.get(
+            f'{url}{params}',
+            content_type='application/json',
+        )
+
+        return response
 
 
 class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):

@@ -738,6 +738,37 @@ def append_datahub_details(family_tree_members: list):
                 break  # Stop once we've found the match
 
 
+def create_related_company_dataframe(family_tree_members: list):
+    """
+    Create a dataframe from the list of family tree members that only appends with
+    Data Hub company IDs
+    """
+    normalized_df = pd.json_normalize(family_tree_members)
+    normalized_df.replace([np.nan], [None], inplace=True)
+    if len(family_tree_members) == 1:
+        normalized_df['corporateLinkage.parent.duns'] = None
+
+    return normalized_df
+
+
+def get_datahub_company_ids(family_tree_members: list):
+    """
+    Get company ids for related companies returned from D&B
+
+    """
+    family_tree_members_datahub_details = get_search_by_entities_query(
+        [SearchCompany],
+        term='',
+        filter_data={'duns_number': family_tree_members},
+        fields_to_include='id',
+    ).execute()
+    related_company_ids = []
+
+    for related_company in family_tree_members_datahub_details:
+        related_company_ids.append(related_company.id)
+    return related_company_ids
+
+
 def _batch_list(list, number_items):
     """
     Create a list of lists, with the maximum number of items in each list set to the number

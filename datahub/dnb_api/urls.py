@@ -8,6 +8,7 @@ from datahub.dnb_api.views import (
     DNBCompanyLinkView,
     DNBCompanySearchView,
     DNBRelatedCompaniesCountView,
+    DNBRelatedCompaniesView,
 )
 
 urlpatterns = [
@@ -40,6 +41,11 @@ urlpatterns = [
         '<company_id>/family-tree',
         DNBCompanyHierarchyView.as_view(),
         name='family-tree',
+    ),
+    path(
+        '<company_id>/related-companies',
+        DNBRelatedCompaniesView.as_view(),
+        name='related-companies',
     ),
     path(
         '<company_id>/related-companies/count',
