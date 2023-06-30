@@ -26,6 +26,7 @@ from datahub.core.exceptions import (
     APIBadGatewayException,
     APIBadRequestException,
     APINotFoundException,
+    APIUpstreamException,
 )
 from datahub.core.serializers import AddressSerializer
 from datahub.dnb_api.constants import (
@@ -582,22 +583,28 @@ def get_company_hierarchy_data(duns_number):
     if cache_value:
         return cache_value
     api_client = _get_api_client()
+    try:
+        response = api_client.request(
+            'POST',
+            'companies/hierarchy/search/',
+            json={'duns_number': duns_number},
+            timeout=3.0,
+        )
 
-    response = api_client.request(
-        'POST',
-        'companies/hierarchy/search/',
-        json={'duns_number': duns_number},
-        timeout=3.0,
-    )
+        response_data = response.json()
 
-    response_data = response.json()
+        # only cache successful dnb calls
+        if response.status_code == status.HTTP_200_OK:
+            one_day_timeout = int(timedelta(days=1).total_seconds())
+            cache.set(cache_key, response_data, one_day_timeout)
 
-    # only cache successful dnb calls
-    if response.status_code == status.HTTP_200_OK:
-        one_day_timeout = int(timedelta(days=1).total_seconds())
-        cache.set(cache_key, response_data, one_day_timeout)
-
-    return response_data
+        return response_data
+    except (
+        DNBServiceConnectionError,
+        DNBServiceTimeoutError,
+        DNBServiceError,
+    ) as exc:
+        raise APIUpstreamException(str(exc))
 
 
 def is_valid_uuid(value):

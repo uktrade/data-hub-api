@@ -388,14 +388,7 @@ class DNBCompanyHierarchyView(APIView):
         """
         duns_number = validate_company_id(company_id)
 
-        try:
-            response = get_company_hierarchy_data(duns_number)
-        except (
-            DNBServiceConnectionError,
-            DNBServiceTimeoutError,
-            DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
+        response = get_company_hierarchy_data(duns_number)
 
         family_tree_members = response['family_tree_members']
         json_response = {
@@ -474,14 +467,7 @@ class DNBRelatedCompaniesView(APIView):
         """
         duns_number = validate_company_id(company_id)
 
-        try:
-            response = get_company_hierarchy_data(duns_number)
-        except (
-            DNBServiceConnectionError,
-            DNBServiceTimeoutError,
-            DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
+        response = get_company_hierarchy_data(duns_number)
 
         family_tree_members = response['family_tree_members']
         json_response = {
