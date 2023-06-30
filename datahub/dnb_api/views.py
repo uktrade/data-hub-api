@@ -387,8 +387,14 @@ class DNBCompanyHierarchyView(APIView):
         Given a Company Id, get the data for the company hierarchy from dnb-service.
         """
         duns_number = validate_company_id(company_id)
-
-        response = get_company_hierarchy_data(duns_number)
+        try:
+            response = get_company_hierarchy_data(duns_number)
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
 
         family_tree_members = response['family_tree_members']
         json_response = {
@@ -466,8 +472,14 @@ class DNBRelatedCompaniesView(APIView):
         then find the related companies to create a list of IDs
         """
         duns_number = validate_company_id(company_id)
-
-        response = get_company_hierarchy_data(duns_number)
+        try:
+            response = get_company_hierarchy_data(duns_number)
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
 
         family_tree_members = response['family_tree_members']
         json_response = {
@@ -520,7 +532,15 @@ class DNBRelatedCompaniesCountView(APIView):
     def get(self, request, company_id):
         duns_number = validate_company_id(company_id)
 
-        hierarchy = get_company_hierarchy_data(duns_number)
+        try:
+            hierarchy = get_company_hierarchy_data(duns_number)
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
         companies_count = hierarchy.get('global_ultimate_family_tree_members_count', 0)
         if companies_count > 0:
             companies_count -= 1  # deduct 1 as the list from dnb contains the company requested
@@ -530,7 +550,6 @@ class DNBRelatedCompaniesCountView(APIView):
                 global_headquarters_id=company_id,
             ).count()
             companies_count += subsidiary_companies_count
-
         return Response(
             companies_count,
         )

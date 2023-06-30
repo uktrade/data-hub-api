@@ -133,10 +133,6 @@ def get_company(duns_number, request=None):
         error_message = 'Encountered a timeout interacting with DNB service'
         logger.error(error_message)
         raise DNBServiceTimeoutError(error_message) from exc
-    # except ReadTimeout as exc:
-    #     error_message = 'Encountered a timeout interacting with DNB service'
-    #     logger.error(error_message)
-    #     raise DNBServiceTimeoutError(error_message) from exc
 
     if dnb_response.status_code != status.HTTP_200_OK:
         error_message = f'DNB service returned an error status: {dnb_response.status_code}'
