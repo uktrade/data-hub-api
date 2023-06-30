@@ -589,6 +589,9 @@ def get_company_hierarchy_data(duns_number):
             json={'duns_number': duns_number},
             timeout=10.0,
         )
+    except APIBadGatewayException as exc:
+        error_message = 'Encountered an error connecting to DNB service'
+        raise DNBServiceConnectionError(error_message) from exc
 
     except ConnectionError as exc:
         error_message = 'Encountered an error connecting to DNB service'

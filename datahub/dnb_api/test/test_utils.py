@@ -716,16 +716,38 @@ class TestDNBHierarchyData:
         assert not matcher.called
 
     @pytest.mark.usefixtures('local_memory_cache')
-    def test_when_dnb_api_error_response_is_not_cached(self, requests_mock):
+    @pytest.mark.parametrize(
+        'request_exception,expected_exception',
+        (
+            (
+                ConnectionError,
+                DNBServiceConnectionError,
+            ),
+            (
+                ConnectTimeout,
+                DNBServiceConnectionError,
+            ),
+            (
+                Timeout,
+                DNBServiceTimeoutError,
+            ),
+            (
+                ReadTimeout,
+                DNBServiceTimeoutError,
+            ),
+        ),
+    )
+    def test_when_dnb_api_error_response_is_not_cached(
+        self,
+        requests_mock,
+        request_exception,
+        expected_exception,
+    ):
         """
         Test when the dnb api doesn't return a success http status code the value is not cached
         """
-        with pytest.raises(DNBServiceError):
-            requests_mock.post(
-                DNB_HIERARCHY_SEARCH_URL,
-                status_code=500,
-                content=b'{"family_tree_members":[]}',
-            )
+        with pytest.raises(expected_exception):
+            requests_mock.post(DNB_HIERARCHY_SEARCH_URL, exc=request_exception)
             get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
         assert cache.get(self.FAMILY_TREE_CACHE_KEY) is None
 
