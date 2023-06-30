@@ -743,7 +743,6 @@ def create_related_company_dataframe(family_tree_members: list):
     Create a dataframe from the list of family tree members that only appends with
     Data Hub company IDs
     """
-    # append_datahub_company_ids(family_tree_members)
 
     normalized_df = pd.json_normalize(family_tree_members)
     normalized_df.replace([np.nan], [None], inplace=True)
