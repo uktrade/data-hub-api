@@ -26,7 +26,6 @@ from datahub.core.exceptions import (
     APIBadGatewayException,
     APIBadRequestException,
     APINotFoundException,
-    APIUpstreamException,
 )
 from datahub.core.serializers import AddressSerializer
 from datahub.dnb_api.constants import (
@@ -134,6 +133,10 @@ def get_company(duns_number, request=None):
         error_message = 'Encountered a timeout interacting with DNB service'
         logger.error(error_message)
         raise DNBServiceTimeoutError(error_message) from exc
+    # except ReadTimeout as exc:
+    #     error_message = 'Encountered a timeout interacting with DNB service'
+    #     logger.error(error_message)
+    #     raise DNBServiceTimeoutError(error_message) from exc
 
     if dnb_response.status_code != status.HTTP_200_OK:
         error_message = f'DNB service returned an error status: {dnb_response.status_code}'
@@ -584,27 +587,33 @@ def get_company_hierarchy_data(duns_number):
         return cache_value
     api_client = _get_api_client()
     try:
-        response = api_client.request(
+        dnb_response = api_client.request(
             'POST',
             'companies/hierarchy/search/',
             json={'duns_number': duns_number},
             timeout=3.0,
         )
 
-        response_data = response.json()
+    except ConnectionError as exc:
+        error_message = 'Encountered an error connecting to DNB service'
+        raise DNBServiceConnectionError(error_message) from exc
 
-        # only cache successful dnb calls
-        if response.status_code == status.HTTP_200_OK:
-            one_day_timeout = int(timedelta(days=1).total_seconds())
-            cache.set(cache_key, response_data, one_day_timeout)
+    except Timeout as exc:
+        error_message = 'Encountered a timeout interacting with DNB service'
+        raise DNBServiceTimeoutError(error_message) from exc
 
-        return response_data
-    except (
-        DNBServiceConnectionError,
-        DNBServiceTimeoutError,
-        DNBServiceError,
-    ) as exc:
-        raise APIUpstreamException(str(exc))
+    if not dnb_response.ok:
+        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
+        raise DNBServiceError(error_message, dnb_response.status_code)
+
+    response_data = dnb_response.json()
+
+    # only cache successful dnb calls
+    if dnb_response.status_code == status.HTTP_200_OK:
+        one_day_timeout = int(timedelta(days=1).total_seconds())
+        cache.set(cache_key, response_data, one_day_timeout)
+
+    return response_data
 
 
 def is_valid_uuid(value):
