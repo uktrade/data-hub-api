@@ -605,9 +605,8 @@ def get_company_hierarchy_data(duns_number):
     response_data = dnb_response.json()
 
     # only cache successful dnb calls
-    if dnb_response.status_code == status.HTTP_200_OK:
-        one_day_timeout = int(timedelta(days=1).total_seconds())
-        cache.set(cache_key, response_data, one_day_timeout)
+    one_day_timeout = int(timedelta(days=1).total_seconds())
+    cache.set(cache_key, response_data, one_day_timeout)
 
     return response_data
 
