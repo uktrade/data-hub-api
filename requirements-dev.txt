@@ -215,7 +215,7 @@ packaging==22.0
     #   build
     #   marshmallow
     #   pytest
-pandas==2.0.2
+pandas==2.0.3
     # via
     #   -r requirements.in
     #   bigtree

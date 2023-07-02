@@ -129,7 +129,7 @@ opensearch-py==2.2.0
     #   opensearch-dsl
 packaging==22.0
     # via marshmallow
-pandas==2.0.2
+pandas==2.0.3
     # via
     #   -r requirements.in
     #   bigtree
