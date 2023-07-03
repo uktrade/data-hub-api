@@ -531,7 +531,6 @@ class DNBRelatedCompaniesCountView(APIView):
 
     def get(self, request, company_id):
         duns_number = validate_company_id(company_id)
-
         try:
             hierarchy = get_company_hierarchy_data(duns_number)
         except (

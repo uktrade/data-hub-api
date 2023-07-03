@@ -14,10 +14,12 @@ from requests.exceptions import ConnectionError, Timeout
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+
 from datahub.company.constants import OneListTierID
 from datahub.company.models import Company, CompanyPermission, OneListTier
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
+
 from datahub.core.serializers import AddressSerializer
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_SERIALIZER_FIELDS
@@ -2435,10 +2437,10 @@ class TestCompanyInvestigationView(APITestMixin):
 
 
 class TestHierarchyAPITestMixin:
-    def set_dnb_hierarchy_mock_response(self, requests_mock, tree_members):
+    def set_dnb_hierarchy_mock_response(self, requests_mock, tree_members, status_code=200):
         requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
-            status_code=200,
+            status_code=status_code,
             content=json.dumps(
                 {
                     'global_ultimate_duns': 'duns',

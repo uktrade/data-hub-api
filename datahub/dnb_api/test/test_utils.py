@@ -751,6 +751,22 @@ class TestDNBHierarchyData:
             get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
         assert cache.get(self.FAMILY_TREE_CACHE_KEY) is None
 
+    def test_when_dnb_api_returns_status_code_not_success_response_is_not_cached(
+        self,
+        requests_mock,
+    ):
+        """
+        Test when the dnb api doesn't return a success http status code the value is not cached
+        """
+        with pytest.raises(DNBServiceError):
+            requests_mock.post(
+                DNB_HIERARCHY_SEARCH_URL,
+                status_code=500,
+                content=b'{"family_tree_members":[]}',
+            )
+            get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+        assert cache.get(self.FAMILY_TREE_CACHE_KEY) is None
+
 
 class TestCompanyHierarchyDataframe:
     def test_single_company_with_nested_opensearch_field_is_null(self, opensearch_with_signals):
