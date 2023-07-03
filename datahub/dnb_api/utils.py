@@ -582,20 +582,34 @@ def get_company_hierarchy_data(duns_number):
     if cache_value:
         return cache_value
     api_client = _get_api_client()
+    try:
+        dnb_response = api_client.request(
+            'POST',
+            'companies/hierarchy/search/',
+            json={'duns_number': duns_number},
+            timeout=10.0,
+        )
+    except APIBadGatewayException as exc:
+        error_message = 'Encountered an error connecting to DNB service'
+        raise DNBServiceConnectionError(error_message) from exc
 
-    response = api_client.request(
-        'POST',
-        'companies/hierarchy/search/',
-        json={'duns_number': duns_number},
-        timeout=3.0,
-    )
+    except ConnectionError as exc:
+        error_message = 'Encountered an error connecting to DNB service'
+        raise DNBServiceConnectionError(error_message) from exc
 
-    response_data = response.json()
+    except Timeout as exc:
+        error_message = 'Encountered a timeout interacting with DNB service'
+        raise DNBServiceTimeoutError(error_message) from exc
+
+    if not dnb_response.ok:
+        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
+        raise DNBServiceError(error_message, dnb_response.status_code)
+
+    response_data = dnb_response.json()
 
     # only cache successful dnb calls
-    if response.status_code == status.HTTP_200_OK:
-        one_day_timeout = int(timedelta(days=1).total_seconds())
-        cache.set(cache_key, response_data, one_day_timeout)
+    one_day_timeout = int(timedelta(days=1).total_seconds())
+    cache.set(cache_key, response_data, one_day_timeout)
 
     return response_data
 
