@@ -26,9 +26,9 @@ backcall==0.2.0
     # via ipython
 bigtree==0.9.4
     # via -r requirements.in
-boto3==1.26.160
+boto3==1.26.165
     # via -r requirements.in
-botocore==1.29.160
+botocore==1.29.165
     # via
     #   boto3
     #   s3transfer
@@ -73,7 +73,7 @@ django==3.2.19
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==6.0.4
+django-axes==6.0.5
     # via -r requirements.in
 django-debug-toolbar==4.1.0
     # via -r requirements.in
@@ -215,7 +215,7 @@ packaging==22.0
     #   build
     #   marshmallow
     #   pytest
-pandas==2.0.2
+pandas==2.0.3
     # via
     #   -r requirements.in
     #   bigtree
@@ -229,7 +229,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==6.13.0
+pip-tools==6.14.0
     # via -r requirements-dev.in
 piprot==0.9.11
     # via -r requirements-dev.in
@@ -378,6 +378,7 @@ tomli==2.0.1
     #   build
     #   coverage
     #   pep517
+    #   pip-tools
     #   pylint
     #   pytest
 tomlkit==0.11.6
