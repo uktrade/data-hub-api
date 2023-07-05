@@ -833,3 +833,48 @@ def load_datahub_details(family_tree_members_duns):
         results.extend(opensearch_results.hits)
 
     return [result.to_dict() for result in results]
+
+
+def get_company_hierarchy_count(duns_number):
+    """
+    Get the count of companies in the hierarchy
+    """
+    if not settings.DNB_SERVICE_BASE_URL:
+        raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
+
+    cache_key = f'family_tree_count_{duns_number}'
+    cache_value = cache.get(cache_key)
+
+    if cache_value:
+        return cache_value
+    api_client = _get_api_client()
+    try:
+        dnb_response = api_client.request(
+            'POST',
+            'companies/hierarchy/search/count',
+            json={'duns_number': duns_number},
+            timeout=3.0,
+        )
+    except APIBadGatewayException as exc:
+        error_message = 'Encountered an error connecting to DNB service'
+        raise DNBServiceConnectionError(error_message) from exc
+
+    except ConnectionError as exc:
+        error_message = 'Encountered an error connecting to DNB service'
+        raise DNBServiceConnectionError(error_message) from exc
+
+    except Timeout as exc:
+        error_message = 'Encountered a timeout interacting with DNB service'
+        raise DNBServiceTimeoutError(error_message) from exc
+
+    if not dnb_response.ok:
+        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
+        raise DNBServiceError(error_message, dnb_response.status_code)
+
+    response_data = dnb_response.json()
+
+    # only cache successful dnb calls
+    one_day_timeout = int(timedelta(days=1).total_seconds())
+    cache.set(cache_key, response_data, one_day_timeout)
+
+    return response_data
