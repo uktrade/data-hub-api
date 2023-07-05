@@ -38,6 +38,7 @@ DNB_HIERARCHY_SEARCH_URL = urljoin(
     f'{settings.DNB_SERVICE_BASE_URL}/',
     'companies/hierarchy/search/',
 )
+DNB_HIERARCHY_COUNT_URL = urljoin(DNB_HIERARCHY_SEARCH_URL, 'count')
 
 REQUIRED_REGISTERED_ADDRESS_FIELDS = [
     f'registered_address_{field}' for field in AddressSerializer.REQUIRED_FIELDS
@@ -2450,6 +2451,13 @@ class TestHierarchyAPITestMixin:
             ).encode('utf-8'),
         )
 
+    def set_dnb_hierarchy_count_mock_response(self, requests_mock, count, status_code=200):
+        requests_mock.post(
+            DNB_HIERARCHY_COUNT_URL,
+            status_code=status_code,
+            content=str(count).encode(),
+        )
+
 
 class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
     """
@@ -3903,7 +3911,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
             kwargs={'company_id': ultimate_company_dh.id},
         )
 
-        self.set_dnb_hierarchy_mock_response(requests_mock, [])
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
 
         assert (
             self.api_client.get(
@@ -3921,7 +3929,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
             'api-v4:dnb-api:related-companies-count',
             kwargs={'company_id': ultimate_company_dh.id},
         )
-        self.set_dnb_hierarchy_mock_response(requests_mock, [])
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
 
         assert (
             self.api_client.get(
@@ -3940,7 +3948,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
             kwargs={'company_id': ultimate_company_dh.id},
         )
 
-        self.set_dnb_hierarchy_mock_response(requests_mock, [])
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
 
         assert (
             self.api_client.get(
@@ -3960,7 +3968,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
             'api-v4:dnb-api:related-companies-count',
             kwargs={'company_id': ultimate_company_dh.id},
         )
-        self.set_dnb_hierarchy_mock_response(requests_mock, [])
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
 
         assert (
             self.api_client.get(
@@ -3980,7 +3988,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
             'api-v4:dnb-api:related-companies-count',
             kwargs={'company_id': ultimate_company_dh.id},
         )
-        self.set_dnb_hierarchy_mock_response(requests_mock, [1])
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 1)
 
         assert (
             self.api_client.get(
@@ -4003,7 +4011,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
             'api-v4:dnb-api:related-companies-count',
             kwargs={'company_id': ultimate_company_dh.id},
         )
-        self.set_dnb_hierarchy_mock_response(requests_mock, [1])
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 1)
 
         assert (
             self.api_client.get(
@@ -4023,7 +4031,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
             'api-v4:dnb-api:related-companies-count',
             kwargs={'company_id': ultimate_company_dh.id},
         )
-        self.set_dnb_hierarchy_mock_response(requests_mock, [1] * 10)
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 10)
 
         assert (
             self.api_client.get(
