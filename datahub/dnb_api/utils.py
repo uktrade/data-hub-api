@@ -581,31 +581,16 @@ def get_company_hierarchy_data(duns_number):
 
     if cache_value:
         return cache_value
-    api_client = _get_api_client()
-    try:
-        dnb_response = api_client.request(
+
+    def api_request(api_client):
+        return api_client.request(
             'POST',
             'companies/hierarchy/search/',
             json={'duns_number': duns_number},
-            timeout=10.0,
+            timeout=3.0,
         )
-    except APIBadGatewayException as exc:
-        error_message = 'Encountered an error connecting to DNB service'
-        raise DNBServiceConnectionError(error_message) from exc
 
-    except ConnectionError as exc:
-        error_message = 'Encountered an error connecting to DNB service'
-        raise DNBServiceConnectionError(error_message) from exc
-
-    except Timeout as exc:
-        error_message = 'Encountered a timeout interacting with DNB service'
-        raise DNBServiceTimeoutError(error_message) from exc
-
-    if not dnb_response.ok:
-        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
-        raise DNBServiceError(error_message, dnb_response.status_code)
-
-    response_data = dnb_response.json()
+    response_data = call_api_request_with_exception_handling(api_request)
 
     # only cache successful dnb calls
     one_day_timeout = int(timedelta(days=1).total_seconds())
@@ -847,14 +832,31 @@ def get_company_hierarchy_count(duns_number):
 
     if cache_value:
         return cache_value
-    api_client = _get_api_client()
-    try:
-        dnb_response = api_client.request(
+
+    def api_request(api_client):
+        return api_client.request(
             'POST',
             'companies/hierarchy/search/count',
             json={'duns_number': duns_number},
             timeout=3.0,
         )
+
+    response_data = call_api_request_with_exception_handling(api_request)
+
+    # only cache successful dnb calls
+    one_day_timeout = int(timedelta(days=1).total_seconds())
+    cache.set(cache_key, response_data, one_day_timeout)
+
+    return response_data
+
+
+def call_api_request_with_exception_handling(api_request_function):
+    """
+    Call the dnb service api client and handle any common errors
+    """
+    api_client = _get_api_client()
+    try:
+        result = api_request_function(api_client)
     except APIBadGatewayException as exc:
         error_message = 'Encountered an error connecting to DNB service'
         raise DNBServiceConnectionError(error_message) from exc
@@ -867,14 +869,8 @@ def get_company_hierarchy_count(duns_number):
         error_message = 'Encountered a timeout interacting with DNB service'
         raise DNBServiceTimeoutError(error_message) from exc
 
-    if not dnb_response.ok:
-        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
-        raise DNBServiceError(error_message, dnb_response.status_code)
+    if not result.ok:
+        error_message = f'DNB service returned an error status: {result.status_code}'
+        raise DNBServiceError(error_message, result.status_code)
 
-    response_data = dnb_response.json()
-
-    # only cache successful dnb calls
-    one_day_timeout = int(timedelta(days=1).total_seconds())
-    cache.set(cache_key, response_data, one_day_timeout)
-
-    return response_data
+    return result.json()

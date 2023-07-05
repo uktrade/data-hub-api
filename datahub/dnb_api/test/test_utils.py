@@ -1037,76 +1037,14 @@ class TestDNBHierarchyCount:
     VALID_DUNS_NUMBER = '123456789'
     FAMILY_TREE_CACHE_KEY = f'family_tree_count_{VALID_DUNS_NUMBER}'
 
-    # @override_settings(DNB_SERVICE_BASE_URL=None)
-    # def test_dnb_hierarchy_count_improperly_configured_url_error(self):
-    #     """
-    #     Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
-    #     is not set.
-    #     """
-    #     with pytest.raises(ImproperlyConfigured):
-    #         get_company_hierarchy_count('123456789')
-
-    # def test_the_correct_hierarchy_count_value_is_returned_from_dnb_api(self, requests_mock):
-    #     """
-    #     Test when the dnb family tree data is missing from the cache, a call is made to the dnb
-    #     api to get the data and saved into the cache
-    #     """
-    #     requests_mock.post(
-    #         DNB_HIERARCHY_COUNT_URL,
-    #         status_code=200,
-    #         content=b'15',
-    #     )
-
-    #     assert get_company_hierarchy_count(self.VALID_DUNS_NUMBER) == 15
-
-    # @pytest.mark.parametrize(
-    #     'request_exception,expected_exception',
-    #     (
-    #         (
-    #             ConnectionError,
-    #             DNBServiceConnectionError,
-    #         ),
-    #         (
-    #             ConnectTimeout,
-    #             DNBServiceConnectionError,
-    #         ),
-    #         (
-    #             Timeout,
-    #             DNBServiceTimeoutError,
-    #         ),
-    #         (
-    #             ReadTimeout,
-    #             DNBServiceTimeoutError,
-    #         ),
-    #     ),
-    # )
-    # def test_when_dnb_api_error_the_correct_exception_is_raised(
-    #     self,
-    #     requests_mock,
-    #     request_exception,
-    #     expected_exception,
-    # ):
-    #     """
-    #     Test when the dnb api raises an exception the correct wrapped exception is raised
-    #     """
-    #     with pytest.raises(expected_exception):
-    #         requests_mock.post(DNB_HIERARCHY_COUNT_URL, exc=request_exception)
-    #         get_company_hierarchy_count(self.VALID_DUNS_NUMBER)
-
-    # def test_when_dnb_api_returns_status_code_not_success_the_correct_exception_is_raised(
-    #     self,
-    #     requests_mock,
-    # ):
-    #     """
-    #     Test when the dnb api doesn't return a success http status code the value is not cached
-    #     """
-    #     with pytest.raises(DNBServiceError):
-    #         requests_mock.post(
-    #             DNB_HIERARCHY_COUNT_URL,
-    #             status_code=500,
-    #             content=b'1',
-    #         )
-    #         get_company_hierarchy_count(self.VALID_DUNS_NUMBER)
+    @override_settings(DNB_SERVICE_BASE_URL=None)
+    def test_dnb_hierarchy_count_improperly_configured_url_error(self):
+        """
+        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        is not set.
+        """
+        with pytest.raises(ImproperlyConfigured):
+            get_company_hierarchy_count('123456789')
 
     @pytest.mark.usefixtures('local_memory_cache')
     def test_when_dnb_data_not_in_cache_dnb_api_is_called(self, requests_mock):
