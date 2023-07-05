@@ -44,6 +44,7 @@ from datahub.dnb_api.utils import (
     DNBServiceTimeoutError,
     get_change_request,
     get_company,
+    get_company_hierarchy_count,
     get_company_hierarchy_data,
     get_datahub_company_ids,
     request_changes,
@@ -532,7 +533,7 @@ class DNBRelatedCompaniesCountView(APIView):
     def get(self, request, company_id):
         duns_number = validate_company_id(company_id)
         try:
-            hierarchy = get_company_hierarchy_data(duns_number)
+            companies_count = get_company_hierarchy_count(duns_number)
         except (
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
@@ -540,7 +541,6 @@ class DNBRelatedCompaniesCountView(APIView):
         ) as exc:
             raise APIUpstreamException(str(exc))
 
-        companies_count = hierarchy.get('global_ultimate_family_tree_members_count', 0)
         if companies_count > 0:
             companies_count -= 1  # deduct 1 as the list from dnb contains the company requested
 
