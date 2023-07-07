@@ -10,6 +10,18 @@ logger = logging.getLogger(__name__)
 ALL_AUTH_METHODS = ('spf', 'dkim', 'dmarc', 'compauth')
 
 
+def _get_auth_headers(message):
+    """
+    When message passes through multiple servers, the authentication_results becomes an array
+    """
+    authentication_results = message.authentication_results[0] if isinstance(
+        message.authentication_results,
+        list,
+    ) else message.authentication_results
+
+    return ' '.join(authentication_results.splitlines())
+
+
 def _verify_authentication(message, auth_methods):
     """
     Verify the Authentication-Results header of a MailParser object.
@@ -21,7 +33,7 @@ def _verify_authentication(message, auth_methods):
     :returns: A boolean for whether or not the Authentication-Results header
         was verified.
     """
-    header_contents = ' '.join(message.authentication_results.splitlines())
+    header_contents = _get_auth_headers(message)
     auth_results = {auth_method: False for auth_method, _ in auth_methods}
 
     for auth_method, minimum_result in auth_methods:
@@ -43,7 +55,7 @@ def _verify_authentication(message, auth_methods):
 
 def _log_unknown_domain(from_domain, message):
     log_auth_methods = r'|'.join(re.escape(auth_method) for auth_method in ALL_AUTH_METHODS)
-    auth_header_contents = ' '.join(message.authentication_results.splitlines())
+    auth_header_contents = _get_auth_headers(message)
     authentication_results = re.findall(
         fr'((?:{log_auth_methods})=[a-z0-9]+)',
         auth_header_contents,

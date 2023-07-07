@@ -146,6 +146,64 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                 'Domain "gmail.com" not present in DIT_EMAIL_DOMAINS setting.'
             ),
         ),
+        # Domain which is not on DIT_EMAIL_DOMAINS setting, fails validation.
+        # multiple auth methods
+        (
+            'joe.bloggs@gmail.com',
+            [
+                '\n'.join([
+                    'mx.google.com;',
+                    'dkim=pass header.i=@gmail.com header.s=selector1 header.b=foobar;',
+                    'spf=pass (google.com: domain of joe.bloggs@gmail.com designates '
+                    'XX.XXX.XX.XX as permitted sender) ',
+                    'smtp.mailfrom=bill.adama@digital.trade.gov.uk;',
+                    'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) '
+                    'header.from=digital.trade.gov.uk;',
+                ]),
+                '\n'.join([
+                    'mx.google.com;',
+                    'dkim=pass header.i=@example.com header.s=selector1 header.b=foobar;',
+                    'spf=pass (google.com: domain of joe.bloggs@gmail.com designates '
+                    'XX.XXX.XX.XX as permitted sender) ',
+                    'smtp.mailfrom=bill.adama@digital.trade.gov.uk;',
+                    'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) '
+                    'header.from=digital.trade.gov.uk;',
+                ]),
+            ],
+            False,
+            (
+                'Domain "gmail.com" not present in DIT_EMAIL_DOMAINS setting.'
+            ),
+        ),
+        # Valid digital.trade.gov.uk email, ensure whitelist is case insensitive
+        # multiple auth methods
+        (
+            'bill.Adama@digital.trade.gov.uk',
+            [
+                '\n'.join([
+                    'mx.google.com;',
+                    'dkim=pass header.i=@digital.trade.gov.uk header.s=selector1 header.b=foobar;',
+                    'spf=pass (google.com: domain of bill.adama@digital.trade.gov.uk designates '
+                    'XX.XXX.XX.XX as permitted sender) ',
+                    'smtp.mailfrom=bill.adama@digital.trade.gov.uk;',
+                    'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) '
+                    'header.from=digital.trade.gov.uk',
+                    'compauth=pass (reason=109)',
+                ]),
+                '\n'.join([
+                    'mx.google.com;',
+                    'dkim=pass header.i=@digital.trade.gov.uk header.s=selector1 header.b=foobar;',
+                    'spf=pass (google.com: domain of bill.adama@digital.trade.gov.uk designates '
+                    'XX.XXX.XX.XX as permitted sender) ',
+                    'smtp.mailfrom=bill.adama@digital.trade.gov.uk;',
+                    'dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) '
+                    'header.from=digital.trade.gov.uk',
+                    'compauth=pass (reason=109)',
+                ]),
+            ],
+            True,
+            None,
+        ),
         # Blacklisted email
         (
             'blacklisted@trade.gov.uk',
