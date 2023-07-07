@@ -587,7 +587,7 @@ def get_company_hierarchy_data(duns_number):
             'POST',
             'companies/hierarchy/search/',
             json={'duns_number': duns_number},
-            timeout=3.0,
+            timeout=10.0,
         )
 
     response_data = call_api_request_with_exception_handling(api_request)
