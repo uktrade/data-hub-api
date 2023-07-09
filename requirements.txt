@@ -180,7 +180,7 @@ rq-scheduler==0.13.1
     # via -r requirements.in
 s3transfer==0.6.0
     # via boto3
-sentry-sdk==1.26.0
+sentry-sdk==1.27.1
     # via -r requirements.in
 simplejson==3.18.0
     # via mail-parser
