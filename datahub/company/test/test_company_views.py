@@ -751,10 +751,9 @@ class TestGetCompany(APITestMixin):
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
         response = self.api_client.get(url)
 
-        print(response.json())
-
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['global_ultimate_country'][0] == company.address_country.name
+
 
 class TestUpdateCompany(APITestMixin):
     """Tests for updating a single company."""
