@@ -1162,4 +1162,4 @@ class TestDNBHierarchyCount:
 
 class TestReducedHierarchy:
     def test_(self):
-        get_reduced_company_hierarchy_data("1")
+        get_reduced_company_hierarchy_data('1')

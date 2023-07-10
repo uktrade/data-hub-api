@@ -2,19 +2,17 @@ import logging
 import uuid
 
 from datetime import timedelta
-
-from bigtree import (
-    dataframe_to_tree_by_relation,
-    tree_to_nested_dict,
-)
-
 from itertools import islice
 
 import numpy as np
 import pandas as pd
 
-
 import reversion
+
+from bigtree import (
+    dataframe_to_tree_by_relation,
+    tree_to_nested_dict,
+)
 
 from django.conf import settings
 from django.core.cache import cache
