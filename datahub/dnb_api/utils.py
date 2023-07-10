@@ -843,7 +843,7 @@ def get_company_hierarchy_count(duns_number):
 
     companies_count = call_api_request_with_exception_handling(api_request)
     if companies_count > 0:
-        companies_count -= 1  # deduct 1 as the list from dnb contains the company requested
+        companies_count = companies_count - 1
 
     # only cache successful dnb calls
     one_day_timeout = int(timedelta(days=1).total_seconds())

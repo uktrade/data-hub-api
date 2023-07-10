@@ -1074,7 +1074,7 @@ class TestDNBHierarchyCount:
         matcher = requests_mock.post(
             DNB_HIERARCHY_COUNT_URL,
             status_code=200,
-            content=b'1',
+            content=b'5',
         )
 
         get_company_hierarchy_count(self.VALID_DUNS_NUMBER)
