@@ -470,7 +470,6 @@ class Company(ArchivableModel, BaseModel):
     @property
     def global_ultimate_country(self):
         """The country of the global ultimate company"""
-
         if self.global_ultimate_duns_number:
             return (
                 Company.objects.filter(

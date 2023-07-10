@@ -759,7 +759,7 @@ class TestGetCompany(APITestMixin):
         Test that `global_ultimate_country` is set for a company API result
         when the company is a subsidiary.
         """
-        global_ultimate = CompanyFactory(
+        global_company = CompanyFactory(
             duns_number='123456789',
         )
         company = CompanyFactory(
@@ -771,7 +771,7 @@ class TestGetCompany(APITestMixin):
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['global_ultimate_country'][0] == global_ultimate.address_country.name
+        assert response.json()['global_ultimate_country'][0] == global_company.address_country.name
 
 
 class TestUpdateCompany(APITestMixin):
