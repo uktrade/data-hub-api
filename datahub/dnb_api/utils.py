@@ -841,13 +841,15 @@ def get_company_hierarchy_count(duns_number):
             timeout=3.0,
         )
 
-    response_data = call_api_request_with_exception_handling(api_request)
+    companies_count = call_api_request_with_exception_handling(api_request)
+    if companies_count > 0:
+        companies_count -= 1  # deduct 1 as the list from dnb contains the company requested
 
     # only cache successful dnb calls
     one_day_timeout = int(timedelta(days=1).total_seconds())
-    cache.set(cache_key, response_data, one_day_timeout)
+    cache.set(cache_key, companies_count, one_day_timeout)
 
-    return response_data
+    return companies_count
 
 
 def call_api_request_with_exception_handling(api_request_function):
