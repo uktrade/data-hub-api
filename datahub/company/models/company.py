@@ -467,6 +467,15 @@ class Company(ArchivableModel, BaseModel):
             return False
         return self.headquarter_type.name == HeadquarterType.ghq.value.name
 
+    @property
+    def global_ultimate_country(self):
+        """ The country of the global ultimate """
+        return (
+            Company.objects.filter(
+                duns_number=self.global_ultimate_duns_number,
+            ).values_list('address_country__name').first()
+        )
+
     def mark_as_transferred(self, to, reason, user):
         """
         Marks a company record as having been transferred to another company record.
