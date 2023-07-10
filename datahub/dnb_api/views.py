@@ -544,7 +544,7 @@ class DNBRelatedCompaniesCountView(APIView):
         if companies_count > 0:
             companies_count -= 1  # deduct 1 as the list from dnb contains the company requested
 
-        if request.query_params.get('include_subsidiary_companies') == 'true':
+        if request.query_params.get('include_manually_linked_companies') == 'true':
             subsidiary_companies_count = Company.objects.filter(
                 global_headquarters_id=company_id,
             ).count()
