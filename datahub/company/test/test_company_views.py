@@ -739,10 +739,10 @@ class TestGetCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['is_global_headquarters'] == expected_is_global_headquarters
 
-    def test_get_company_global_ultimate_country(self):
+    def test_get_company_global_ultimate_country_for_global_ultimate(self):
         """
         Test that `global_ultimate_country` is set for a company API result
-        as expected.
+        when company is the global ultimate company.
         """
         company = CompanyFactory(
             duns_number='123456789',
@@ -753,6 +753,25 @@ class TestGetCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['global_ultimate_country'][0] == company.address_country.name
+
+    def test_get_company_global_ultimate_country_for_subsidiary_company(self):
+        """
+        Test that `global_ultimate_country` is set for a company API result
+        when the company is a subsidiary.
+        """
+        global_ultimate = CompanyFactory(
+            duns_number='123456789',
+        )
+        company = CompanyFactory(
+            duns_number='987654321',
+            global_ultimate_duns_number='123456789',
+        )
+
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['global_ultimate_country'][0] == global_ultimate.address_country.name
 
 
 class TestUpdateCompany(APITestMixin):
