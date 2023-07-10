@@ -188,23 +188,9 @@ class TestDNBCompanySearchAPI(APITestMixin):
                 },
                 id='successful call to proxied API with company that can be hydrated',
             ),
-            pytest.param(
-                b'{"arg": "value"}',
-                400,
-                b'{"error":"msg"}',
-                {'error': 'msg'},
-                id='proxied API returns a bad request',
-            ),
-            pytest.param(
-                b'{"arg": "value"}',
-                500,
-                b'{"error":"msg"}',
-                {'error': 'msg'},
-                id='proxied API returns a server error',
-            ),
         ),
     )
-    def test_post(
+    def test_post_success(
         self,
         dnb_company_search_datahub_companies,
         requests_mock,
@@ -214,7 +200,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         response_data,
     ):
         """
-        Test for POST proxy.
+        Test success scenarios for POST proxy.
         """
         requests_mock.post(
             DNB_V2_SEARCH_URL,
@@ -240,6 +226,57 @@ class TestDNBCompanySearchAPI(APITestMixin):
 
         assert response.status_code == response_status_code
         assert response.json() == response_data
+        assert requests_mock.last_request.body == request_data
+
+    @pytest.mark.parametrize(
+        'request_data,response_status_code,upstream_response_content',
+        (
+            pytest.param(
+                b'{"arg": "value"}',
+                400,
+                b'{"error":"msg"}',
+            ),
+            pytest.param(
+                b'{"arg": "value"}',
+                500,
+                b'{"error":"msg"}',
+            ),
+        ),
+    )
+    def test_post_errors(
+        self,
+        dnb_company_search_datahub_companies,
+        requests_mock,
+        request_data,
+        response_status_code,
+        upstream_response_content,
+    ):
+        """
+        Test error scenarios for POST proxy.
+        """
+        requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            status_code=response_status_code,
+            content=upstream_response_content,
+            headers={'content-type': 'application/json'},
+        )
+
+        user = create_test_user(
+            permission_codenames=[
+                CompanyPermission.view_company,
+                InteractionPermission.view_all,
+            ],
+        )
+        api_client = self.create_api_client(user=user)
+        url = reverse('api-v4:dnb-api:company-search')
+
+        response = api_client.post(
+            url,
+            data=request_data,
+            content_type='application/json',
+        )
+
+        assert response.status_code == response_status_code
         assert requests_mock.last_request.body == request_data
 
     @pytest.mark.parametrize(
@@ -330,17 +367,40 @@ class TestDNBCompanySearchAPI(APITestMixin):
         assert response.status_code == response_status_code
         assert json.loads(response.content) == response_data
 
+    def test_monitoring_success(
+        self,
+        monkeypatch,
+        requests_mock,
+    ):
+        """
+        Test that the right counter is incremented for the given status code
+        returned by the dnb-service.
+        """
+        statsd_mock = Mock()
+        monkeypatch.setattr('datahub.dnb_api.utils.statsd', statsd_mock)
+        requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            status_code=status.HTTP_200_OK,
+            json={},
+        )
+        self.api_client.post(
+            reverse('api-v4:dnb-api:company-search'),
+            content_type='application/json',
+        )
+        statsd_mock.incr.assert_called_once_with(
+            f'dnb.search.{status.HTTP_200_OK}',
+        )
+
     @pytest.mark.parametrize(
         'response_status_code',
         (
-            status.HTTP_200_OK,
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
         ),
     )
-    def test_monitoring(
+    def test_monitoring_errors(
         self,
         monkeypatch,
         requests_mock,

@@ -74,23 +74,28 @@ class DNBCompanySearchView(APIView):
         with Data Hub company details if the company exists (and can be matched)
         on Data Hub.
         """
-        upstream_response = search_dnb(
-            query_params=request.data,
-            request=request,
-        )
+        try:
+            upstream_response = search_dnb(
+                query_params=request.data,
+                request=request,
+            )
 
-        if upstream_response.status_code == status.HTTP_200_OK:
             response_body = upstream_response.json()
             response_body['results'] = self._format_and_hydrate(
                 response_body.get('results', []),
             )
             return JsonResponse(response_body)
-
-        return HttpResponse(
-            upstream_response.text,
-            status=upstream_response.status_code,
-            content_type=upstream_response.headers.get('content-type'),
-        )
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+        except DNBServiceError as exc:
+            return HttpResponse(
+                exc.message,
+                status=exc.status_code,
+                content_type='application/json',
+            )
 
     def _get_datahub_companies_by_duns(self, duns_numbers):
         datahub_companies = get_company_queryset().filter(duns_number__in=duns_numbers)
