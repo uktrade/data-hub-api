@@ -3915,7 +3915,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
 
         assert (
             self.api_client.get(
-                f'{url}?include_subsidiary_companies=false',
+                f'{url}?include_manually_linked_companies=false',
             ).json()
             == 0
         )
@@ -3933,7 +3933,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
 
         assert (
             self.api_client.get(
-                f'{url}?include_subsidiary_companies=true',
+                f'{url}?include_manually_linked_companies=true',
             ).json()
             == 0
         )
@@ -3952,7 +3952,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
 
         assert (
             self.api_client.get(
-                f'{url}?include_subsidiary_companies=false',
+                f'{url}?include_manually_linked_companies=false',
             ).json()
             == 0
         )
@@ -3972,7 +3972,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
 
         assert (
             self.api_client.get(
-                f'{url}?include_subsidiary_companies=true',
+                f'{url}?include_manually_linked_companies=true',
             ).json()
             == 1
         )
@@ -3992,7 +3992,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
 
         assert (
             self.api_client.get(
-                f'{url}?include_subsidiary_companies=true',
+                f'{url}?include_manually_linked_companies=true',
             ).json()
             == 1
         )
@@ -4015,7 +4015,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
 
         assert (
             self.api_client.get(
-                f'{url}?include_subsidiary_companies=false',
+                f'{url}?include_manually_linked_companies=false',
             ).json()
             == 0
         )
@@ -4035,7 +4035,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
 
         assert (
             self.api_client.get(
-                f'{url}?include_subsidiary_companies=true',
+                f'{url}?include_manually_linked_companies=true',
             ).json()
             == 12
         )
