@@ -3,12 +3,11 @@ import logging
 from bigtree import (
     dataframe_to_tree_by_relation,
     find,
-    tree_to_nested_dict,
 )
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
-from rest_framework import serializers, status
+from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -34,7 +33,7 @@ from datahub.dnb_api.serializers import (
     SubsidiarySerializer,
 )
 from datahub.dnb_api.utils import (
-    create_company_hierarchy_dataframe,
+    create_company_tree,
     create_investigation,
     create_related_company_dataframe,
     DNBServiceConnectionError,
@@ -47,6 +46,7 @@ from datahub.dnb_api.utils import (
     get_company_hierarchy_count,
     get_company_hierarchy_data,
     get_datahub_company_ids,
+    get_reduced_company_hierarchy_data,
     request_changes,
     search_dnb,
     validate_company_id,
@@ -74,23 +74,28 @@ class DNBCompanySearchView(APIView):
         with Data Hub company details if the company exists (and can be matched)
         on Data Hub.
         """
-        upstream_response = search_dnb(
-            query_params=request.data,
-            request=request,
-        )
+        try:
+            upstream_response = search_dnb(
+                query_params=request.data,
+                request=request,
+            )
 
-        if upstream_response.status_code == status.HTTP_200_OK:
             response_body = upstream_response.json()
             response_body['results'] = self._format_and_hydrate(
                 response_body.get('results', []),
             )
             return JsonResponse(response_body)
-
-        return HttpResponse(
-            upstream_response.text,
-            status=upstream_response.status_code,
-            content_type=upstream_response.headers.get('content-type'),
-        )
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+        except DNBServiceError as exc:
+            return HttpResponse(
+                exc.message,
+                status=exc.status_code,
+                content_type='application/json',
+            )
 
     def _get_datahub_companies_by_duns(self, duns_numbers):
         datahub_companies = get_company_queryset().filter(duns_number__in=duns_numbers)
@@ -371,6 +376,32 @@ class DNBCompanyInvestigationView(APIView):
         return Response(response)
 
 
+class DNBCompanyHierarchyReducedView(APIView):
+    permission_classes = (
+        HasPermissions(
+            f'company.{CompanyPermission.view_company}',
+        ),
+    )
+
+    def get(self, request, company_id):
+        """
+        Given a Company Id, get the data for the company hierarchy from dnb-service.
+        """
+        duns_number = validate_company_id(company_id)
+        try:
+            response = get_reduced_company_hierarchy_data(duns_number)
+        except (
+            DNBServiceConnectionError,
+            DNBServiceTimeoutError,
+            DNBServiceError,
+        ) as exc:
+            raise APIUpstreamException(str(exc))
+
+        tree = create_company_tree(response)
+
+        return Response(tree)
+
+
 class DNBCompanyHierarchyView(APIView):
     """
     View for receiving datahub hierarchy of a company from DNB data.
@@ -406,32 +437,7 @@ class DNBCompanyHierarchyView(APIView):
         if not family_tree_members:
             return Response(json_response)
 
-        company_hierarchy_dataframe = create_company_hierarchy_dataframe(family_tree_members)
-
-        root = dataframe_to_tree_by_relation(
-            company_hierarchy_dataframe,
-            child_col='duns',
-            parent_col='corporateLinkage.parent.duns',
-        )
-
-        nested_tree = tree_to_nested_dict(
-            root,
-            name_key='duns_number',
-            child_key='subsidiaries',
-            attr_dict={
-                'primaryName': 'name',
-                'companyId': 'id',
-                'corporateLinkage.hierarchyLevel': 'hierarchy',
-                'ukRegion': 'uk_region',
-                'address': 'address',
-                'registeredAddress': 'registered_address',
-                'sector': 'sector',
-                'latestInteractionDate': 'latest_interaction_date',
-                'archived': 'archived',
-                'numberOfEmployees': 'number_of_employees',
-                'oneListTier': 'one_list_tier',
-            },
-        )
+        nested_tree = create_company_tree(family_tree_members)
 
         json_response['ultimate_global_company'] = nested_tree
         json_response['ultimate_global_companies_count'] = response[

@@ -2,6 +2,12 @@ import logging
 import uuid
 
 from datetime import timedelta
+
+from bigtree import (
+    dataframe_to_tree_by_relation,
+    tree_to_nested_dict,
+)
+
 from itertools import islice
 
 import numpy as np
@@ -58,6 +64,7 @@ class DNBServiceError(DNBServiceBaseError):
         Initialise the exception.
         """
         super().__init__(message)
+        self.message = message
         self.status_code = status_code
 
 
@@ -101,46 +108,31 @@ def search_dnb(query_params, request=None):
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
 
-    api_client = _get_api_client(request)
+    def api_request(api_client):
+        return api_client.request(
+            'POST',
+            'v2/companies/search/',
+            json=query_params,
+            timeout=3.0,
+        )
 
-    response = api_client.request(
-        'POST',
-        'v2/companies/search/',
-        json=query_params,
-        timeout=3.0,
-    )
+    response = call_api_request_with_exception_handling(api_request, 'dnb.search')
 
-    statsd.incr(f'dnb.search.{response.status_code}')
     return response
 
 
-def get_company(duns_number, request=None):
+def get_raw_company(duns_number, request=None):
     """
     Pull data for the company with the given duns_number from DNB and
-    returns a dict formatted for use with serializer of type CompanySerializer.
+    returns the raw data.
 
     Raises exceptions if the company is not found, if multiple companies are
     found or if the `duns_number` for the company is not the same as the one
     we searched for.
     """
-    try:
-        dnb_response = search_dnb({'duns_number': duns_number})
-    except APIBadGatewayException as exc:
-        error_message = 'DNB service unavailable'
-        logger.error(error_message)
-        raise DNBServiceConnectionError(error_message) from exc
-    except Timeout as exc:
-        error_message = 'Encountered a timeout interacting with DNB service'
-        logger.error(error_message)
-        raise DNBServiceTimeoutError(error_message) from exc
-
-    if dnb_response.status_code != status.HTTP_200_OK:
-        error_message = f'DNB service returned an error status: {dnb_response.status_code}'
-        logger.error(error_message)
-        raise DNBServiceError(error_message, dnb_response.status_code)
+    dnb_response = search_dnb({'duns_number': duns_number})
 
     dnb_companies = dnb_response.json().get('results', [])
-
     if not dnb_companies:
         error_message = f'Cannot find a company with duns_number: {duns_number}'
         logger.error(error_message)
@@ -161,7 +153,19 @@ def get_company(duns_number, request=None):
         logger.error(error_message)
         raise DNBServiceInvalidResponseError(error_message)
 
-    return format_dnb_company(dnb_companies[0])
+    return dnb_company
+
+
+def get_company(duns_number, request=None):
+    """
+    Pull data for the company with the given duns_number from DNB and
+    returns a dict formatted for use with serializer of type CompanySerializer.
+
+    Raises exceptions if the company is not found, if multiple companies are
+    found or if the `duns_number` for the company is not the same as the one
+    we searched for.
+    """
+    return format_dnb_company(get_raw_company(duns_number, request))
 
 
 def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=()):
@@ -281,6 +285,7 @@ def update_company_from_dnb(
     """
     fields_to_update = fields_to_update or ALL_DNB_UPDATED_SERIALIZER_FIELDS
     # Set dnb_company data to only include the fields in fields_to_update
+
     dnb_company = {field: dnb_company[field] for field in fields_to_update}
 
     company_serializer = DNBCompanySerializer(
@@ -590,7 +595,7 @@ def get_company_hierarchy_data(duns_number):
             timeout=10.0,
         )
 
-    response_data = call_api_request_with_exception_handling(api_request)
+    response_data = call_api_request_with_exception_handling(api_request).json()
 
     # only cache successful dnb calls
     one_day_timeout = int(timedelta(days=1).total_seconds())
@@ -636,6 +641,37 @@ def _merge_columns_into_single_column(df, key: str, columns: list, nested_object
                         dataframe_row[nested_object_key] = None
 
     df[key] = dataframe_rows
+
+
+def create_company_tree(companies: list):
+    company_hierarchy_dataframe = create_company_hierarchy_dataframe(companies)
+
+    root = dataframe_to_tree_by_relation(
+        company_hierarchy_dataframe,
+        child_col='duns',
+        parent_col='corporateLinkage.parent.duns',
+    )
+
+    nested_tree = tree_to_nested_dict(
+        root,
+        name_key='duns_number',
+        child_key='subsidiaries',
+        attr_dict={
+            'primaryName': 'name',
+            'companyId': 'id',
+            'corporateLinkage.hierarchyLevel': 'hierarchy',
+            'ukRegion': 'uk_region',
+            'address': 'address',
+            'registeredAddress': 'registered_address',
+            'sector': 'sector',
+            'latestInteractionDate': 'latest_interaction_date',
+            'archived': 'archived',
+            'numberOfEmployees': 'number_of_employees',
+            'oneListTier': 'one_list_tier',
+        },
+    )
+
+    return nested_tree
 
 
 def create_company_hierarchy_dataframe(family_tree_members: list):
@@ -841,7 +877,7 @@ def get_company_hierarchy_count(duns_number):
             timeout=3.0,
         )
 
-    companies_count = call_api_request_with_exception_handling(api_request)
+    companies_count = call_api_request_with_exception_handling(api_request).json()
     if companies_count > 0:
         companies_count = companies_count - 1
 
@@ -852,27 +888,80 @@ def get_company_hierarchy_count(duns_number):
     return companies_count
 
 
-def call_api_request_with_exception_handling(api_request_function):
+def call_api_request_with_exception_handling(api_request_function, statsd_stat=None):
     """
     Call the dnb service api client and handle any common errors
     """
     api_client = _get_api_client()
     try:
         result = api_request_function(api_client)
+        if statsd_stat:
+            statsd.incr(f'{statsd_stat}.{result.status_code}')
+
     except APIBadGatewayException as exc:
         error_message = 'Encountered an error connecting to DNB service'
+        logger.error(error_message)
         raise DNBServiceConnectionError(error_message) from exc
 
     except ConnectionError as exc:
         error_message = 'Encountered an error connecting to DNB service'
+        logger.error(error_message)
         raise DNBServiceConnectionError(error_message) from exc
 
     except Timeout as exc:
         error_message = 'Encountered a timeout interacting with DNB service'
+        logger.error(error_message)
         raise DNBServiceTimeoutError(error_message) from exc
 
     if not result.ok:
         error_message = f'DNB service returned an error status: {result.status_code}'
+        logger.error(error_message)
         raise DNBServiceError(error_message, result.status_code)
 
-    return result.json()
+    return result
+
+
+def get_reduced_company_hierarchy_data(duns_number):
+    """
+    Get company data that only includes direct parents of the duns number
+    """
+    hierarchy = []
+    while duns_number:
+        company_response = _get_cached_company(duns_number)
+        hierarchy.append(company_response)
+        if company_response.get('corporateLinkage.parent.duns'):
+            duns_number = company_response.get('corporateLinkage.parent.duns')
+        else:
+            duns_number = None
+
+    return hierarchy
+
+
+def _get_cached_company(duns_number):
+    cache_key = f'{duns_number}'
+    cache_value = cache.get(cache_key)
+
+    if cache_value:
+        return cache_value
+
+    company_response = _map_company_to_family_tree_response_format(
+        get_raw_company(duns_number),
+    )
+
+    # only cache successful dnb calls
+    one_hour_timeout = int(timedelta(hours=1).total_seconds())
+    cache.set(cache_key, company_response, one_hour_timeout)
+
+    return company_response
+
+
+def _map_company_to_family_tree_response_format(company):
+    """
+    Map the response from the search api to the format provided by the family tree
+    """
+    parent_duns_number = company.get('parent_duns_number')
+    return {
+        'duns': company.get('duns_number'),
+        'corporateLinkage.parent.duns': parent_duns_number if parent_duns_number else None,
+        'primaryName': company.get('primary_name'),
+    }
