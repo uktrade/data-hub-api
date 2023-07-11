@@ -549,7 +549,7 @@ class DNBRelatedCompaniesCountView(APIView):
         ) as exc:
             raise APIUpstreamException(str(exc))
 
-        if request.query_params.get('include_subsidiary_companies') == 'true':
+        if request.query_params.get('include_manually_linked_companies') == 'true':
             subsidiary_companies_count = Company.objects.filter(
                 global_headquarters_id=company_id,
             ).count()

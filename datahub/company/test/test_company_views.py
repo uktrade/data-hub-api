@@ -395,6 +395,7 @@ class TestGetCompany(APITestMixin):
             'global_ultimate_duns_number': company.global_ultimate_duns_number,
             'dnb_modified_on': company.dnb_modified_on,
             'is_global_headquarters': False,
+            'global_ultimate_country': None,
         }
 
     def test_get_company_without_country(self):
@@ -737,6 +738,56 @@ class TestGetCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['is_global_headquarters'] == expected_is_global_headquarters
+
+    def test_get_company_global_ultimate_country_for_global_ultimate(self):
+        """
+        Test that `global_ultimate_country` is set for a company API result
+        when company is the global ultimate company.
+        """
+        company = CompanyFactory(
+            duns_number='123456789',
+            global_ultimate_duns_number='123456789',
+        )
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['global_ultimate_country'] == company.address_country.name
+
+    def test_get_company_global_ultimate_country_for_subsidiary_company(self):
+        """
+        Test that `global_ultimate_country` is set for a company API result
+        when the company is a subsidiary.
+        """
+        global_ultimate = CompanyFactory(
+            duns_number='123456789',
+        )
+        company = CompanyFactory(
+            duns_number='987654321',
+            global_ultimate_duns_number='123456789',
+        )
+
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['global_ultimate_country'] == global_ultimate.address_country.name
+
+    def test_get_company_global_ultimate_country_empty(self):
+        """
+        Test that `global_ultimate_country` is None
+        when the company has no global ultimate company.
+        """
+        company = CompanyFactory(
+            duns_number='987654321',
+            global_ultimate_duns_number='',
+        )
+
+        url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['global_ultimate_country'] is None
 
 
 class TestUpdateCompany(APITestMixin):
