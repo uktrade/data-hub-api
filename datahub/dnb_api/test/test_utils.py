@@ -42,7 +42,7 @@ from datahub.dnb_api.utils import (
     DNBServiceTimeoutError,
     format_company_for_family_tree,
     format_dnb_company,
-    get_cached_company,
+    get_cached_dnb_company,
     get_company,
     get_company_hierarchy_count,
     get_company_hierarchy_data,
@@ -1166,9 +1166,15 @@ class TestDNBHierarchyCount:
 
 class TestReducedHierarchyData:
     def test_when_no_duns_number_provided_empty_array_returned(self):
+        """
+        Test when no duns number is provided an empty array of hierarchy data is returned
+        """
         assert get_reduced_company_hierarchy_data(duns_number='') == []
 
     def test_when_company_has_no_parent_1_company_returned(self, requests_mock):
+        """
+        Test when a company has no parent only that company is returned
+        """
         requests_mock.post(
             DNB_V2_SEARCH_URL,
             status_code=200,
@@ -1181,6 +1187,10 @@ class TestReducedHierarchyData:
 
     @pytest.mark.usefixtures('local_memory_cache')
     def test_when_company_has_3_parents_all_4_companies_are_returned(self):
+        """
+        Test when a company has 3 levels of parents above them, all 4 companies are returned in
+        the hierarchy data
+        """
         responses = [
             {
                 'status_code': 200,
@@ -1232,7 +1242,7 @@ class TestCompanyCaching:
             DNB_V2_SEARCH_URL,
             json={'results': [{'duns_number': self.VALID_DUNS_NUMBER}]},
         )
-        get_cached_company(self.VALID_DUNS_NUMBER)
+        get_cached_dnb_company(self.VALID_DUNS_NUMBER)
 
         assert matcher.called_once
         assert cache.get(self.COMPANY_CACHE_KEY) is not None
@@ -1251,15 +1261,18 @@ class TestCompanyCaching:
             json={'results': [{'duns_number': self.VALID_DUNS_NUMBER}]},
         )
 
-        get_cached_company(self.VALID_DUNS_NUMBER)
-        get_cached_company(self.VALID_DUNS_NUMBER)
-        get_cached_company(self.VALID_DUNS_NUMBER)
+        get_cached_dnb_company(self.VALID_DUNS_NUMBER)
+        get_cached_dnb_company(self.VALID_DUNS_NUMBER)
+        get_cached_dnb_company(self.VALID_DUNS_NUMBER)
 
         assert matcher.called_once
 
 
 class TestFormatCompanyForFamilyTree:
     def test_no_company_returns_empty_object(self):
+        """
+        Test when the company provided is none, an object is still returned
+        """
         assert format_company_for_family_tree(None) == {
             'duns': None,
             'corporateLinkage.parent.duns': None,
@@ -1267,6 +1280,9 @@ class TestFormatCompanyForFamilyTree:
         }
 
     def test_company_with_no_parent_duns_returns_none_for_corporate_linkage_parent(self):
+        """
+        Test a company without a parent duns number returns none for the corporate linkage
+        """
         assert format_company_for_family_tree({'duns_number': '1', 'primary_name': 'abc'}) == {
             'duns': '1',
             'corporateLinkage.parent.duns': None,
@@ -1274,6 +1290,9 @@ class TestFormatCompanyForFamilyTree:
         }
 
     def test_company_with_parent_duns_returns_id_for_corporate_linkage_parent(self):
+        """
+        Test a company with a parent duns number returns that number for the corporate linkage
+        """
         assert format_company_for_family_tree(
             {'duns_number': '1', 'parent_duns_number': '2', 'primary_name': 'abc'},
         ) == {

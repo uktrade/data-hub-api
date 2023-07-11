@@ -925,7 +925,7 @@ def get_reduced_company_hierarchy_data(duns_number):
     """
     hierarchy = []
     while duns_number:
-        company_response = get_cached_company(duns_number)
+        company_response = get_cached_dnb_company(duns_number)
         hierarchy.append(company_response)
         if company_response.get('corporateLinkage.parent.duns'):
             duns_number = company_response.get('corporateLinkage.parent.duns')
@@ -935,7 +935,11 @@ def get_reduced_company_hierarchy_data(duns_number):
     return hierarchy
 
 
-def get_cached_company(duns_number):
+def get_cached_dnb_company(duns_number):
+    """
+    Get the dnb company from the cache if it exists. If not, call the dnb api and save the result
+    in the cache before returning the company
+    """
     cache_key = f'dnb_company_{duns_number}'
     cache_value = cache.get(cache_key)
 
