@@ -114,7 +114,7 @@ def search_dnb(query_params, request=None):
     return response
 
 
-def get_raw_company(duns_number, request=None):
+def get_dnb_company_data(duns_number, request=None):
     """
     Pull data for the company with the given duns_number from DNB and
     returns the raw data.
@@ -158,7 +158,7 @@ def get_company(duns_number, request=None):
     found or if the `duns_number` for the company is not the same as the one
     we searched for.
     """
-    return format_dnb_company(get_raw_company(duns_number, request))
+    return format_dnb_company(get_dnb_company_data(duns_number, request))
 
 
 def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=()):
