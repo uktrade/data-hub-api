@@ -61,181 +61,183 @@ DNB_HIERARCHY_SEARCH_URL = urljoin(
 DNB_HIERARCHY_COUNT_URL = urljoin(DNB_HIERARCHY_SEARCH_URL, 'count')
 
 
-@pytest.mark.parametrize(
-    'dnb_response_status',
-    (
-        status.HTTP_400_BAD_REQUEST,
-        status.HTTP_401_UNAUTHORIZED,
-        status.HTTP_403_FORBIDDEN,
-        status.HTTP_404_NOT_FOUND,
-        status.HTTP_405_METHOD_NOT_ALLOWED,
-        status.HTTP_500_INTERNAL_SERVER_ERROR,
-    ),
-)
-def test_get_company_dnb_service_error(
-    caplog,
-    requests_mock,
-    dnb_response_status,
-):
-    """
-    Test if the dnb-service returns a status code that is not
-    200, we log it and raise the exception with an appropriate
-    message.
-    """
-    requests_mock.post(
-        DNB_V2_SEARCH_URL,
-        status_code=dnb_response_status,
+class TestCompanySearch:
+    @pytest.mark.parametrize(
+        'dnb_response_status',
+        (
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ),
     )
+    def test_get_company_dnb_service_error(
+        self,
+        caplog,
+        requests_mock,
+        dnb_response_status,
+    ):
+        """
+        Test if the dnb-service returns a status code that is not
+        200, we log it and raise the exception with an appropriate
+        message.
+        """
+        requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            status_code=dnb_response_status,
+        )
 
-    with pytest.raises(DNBServiceError) as e:
-        get_company('123456789')
+        with pytest.raises(DNBServiceError) as e:
+            get_company('123456789')
 
-    expected_message = f'DNB service returned an error status: {dnb_response_status}'
+        expected_message = f'DNB service returned an error status: {dnb_response_status}'
 
-    assert e.value.args[0] == expected_message
-    assert len(caplog.records) == 1
-    assert caplog.records[0].getMessage() == expected_message
+        assert e.value.args[0] == expected_message
+        assert len(caplog.records) == 1
+        assert caplog.records[0].getMessage() == expected_message
 
-
-@pytest.mark.parametrize(
-    'request_exception,expected_exception,expected_message',
-    (
+    @pytest.mark.parametrize(
+        'request_exception,expected_exception,expected_message',
         (
-            ConnectionError,
-            DNBServiceConnectionError,
-            'DNB service unavailable',
+            (
+                ConnectionError,
+                DNBServiceConnectionError,
+                'Encountered an error connecting to DNB service',
+            ),
+            (
+                ConnectTimeout,
+                DNBServiceConnectionError,
+                'Encountered an error connecting to DNB service',
+            ),
+            (
+                Timeout,
+                DNBServiceTimeoutError,
+                'Encountered a timeout interacting with DNB service',
+            ),
+            (
+                ReadTimeout,
+                DNBServiceTimeoutError,
+                'Encountered a timeout interacting with DNB service',
+            ),
         ),
-        (
-            ConnectTimeout,
-            DNBServiceConnectionError,
-            'DNB service unavailable',
-        ),
-        (
-            Timeout,
-            DNBServiceTimeoutError,
-            'Encountered a timeout interacting with DNB service',
-        ),
-        (
-            ReadTimeout,
-            DNBServiceTimeoutError,
-            'Encountered a timeout interacting with DNB service',
-        ),
-    ),
-)
-def test_get_company_dnb_service_request_error(
-    caplog,
-    requests_mock,
-    request_exception,
-    expected_exception,
-    expected_message,
-):
-    """
-    Test if there is an error connecting to dnb-service, we log it and raise the exception with an
-    appropriate message.
-    """
-    requests_mock.post(
-        DNB_V2_SEARCH_URL,
-        exc=request_exception,
     )
+    def test_get_company_dnb_service_request_error(
+        self,
+        caplog,
+        requests_mock,
+        request_exception,
+        expected_exception,
+        expected_message,
+    ):
+        """
+        Test if there is an error connecting to dnb-service, we log it and raise the exception
+        with an appropriate message.
+        """
+        requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            exc=request_exception,
+        )
 
-    with pytest.raises(expected_exception) as e:
-        get_company('123456789')
+        with pytest.raises(expected_exception) as e:
+            get_company('123456789')
 
-    assert str(e.value) == str(expected_message)
+        assert str(e.value) == str(expected_message)
 
-
-@pytest.mark.parametrize(
-    'search_results, expected_exception, expected_message',
-    (
+    @pytest.mark.parametrize(
+        'search_results, expected_exception, expected_message',
         (
-            [],
-            DNBServiceInvalidRequestError,
-            'Cannot find a company with duns_number: 123456789',
+            (
+                [],
+                DNBServiceInvalidRequestError,
+                'Cannot find a company with duns_number: 123456789',
+            ),
+            (
+                ['foo', 'bar'],
+                DNBServiceInvalidResponseError,
+                'Multiple companies found with duns_number: 123456789',
+            ),
+            (
+                [{'duns_number': '012345678'}],
+                DNBServiceInvalidResponseError,
+                'DUNS number of the company: 012345678 '
+                'did not match searched DUNS number: 123456789',
+            ),
         ),
-        (
-            ['foo', 'bar'],
-            DNBServiceInvalidResponseError,
-            'Multiple companies found with duns_number: 123456789',
-        ),
-        (
-            [{'duns_number': '012345678'}],
-            DNBServiceInvalidResponseError,
-            'DUNS number of the company: 012345678 '
-            'did not match searched DUNS number: 123456789',
-        ),
-    ),
-)
-def test_get_company_invalid_request_response(
-    caplog,
-    requests_mock,
-    search_results,
-    expected_exception,
-    expected_message,
-):
-    """
-    Test if a given `duns_number` gets anything other than a single company
-    from dnb-service, the get_company function raises an exception.
-    """
-    requests_mock.post(
-        DNB_V2_SEARCH_URL,
-        json={'results': search_results},
     )
+    def test_get_company_invalid_request_response(
+        self,
+        caplog,
+        requests_mock,
+        search_results,
+        expected_exception,
+        expected_message,
+    ):
+        """
+        Test if a given `duns_number` gets anything other than a single company
+        from dnb-service, the get_company function raises an exception.
+        """
+        requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            json={'results': search_results},
+        )
 
-    with pytest.raises(expected_exception) as e:
-        get_company('123456789')
+        with pytest.raises(expected_exception) as e:
+            get_company('123456789')
 
-    assert e.value.args[0] == expected_message
-    assert len(caplog.records) == 1
-    assert caplog.records[0].getMessage() == expected_message
+        assert e.value.args[0] == expected_message
+        assert len(caplog.records) == 1
+        assert caplog.records[0].getMessage() == expected_message
 
+    def test_get_company_valid(
+        self,
+        caplog,
+        requests_mock,
+        dnb_response_uk,
+    ):
+        """
+        Test if dnb-service returns a valid response, get_company
+        returns a formatted dict.
+        """
+        requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            json=dnb_response_uk,
+        )
 
-def test_get_company_valid(
-    caplog,
-    requests_mock,
-    dnb_response_uk,
-):
-    """
-    Test if dnb-service returns a valid response, get_company
-    returns a formatted dict.
-    """
-    requests_mock.post(
-        DNB_V2_SEARCH_URL,
-        json=dnb_response_uk,
-    )
+        dnb_company = get_company('123456789')
 
-    dnb_company = get_company('123456789')
-
-    assert dnb_company == {
-        'company_number': '01261539',
-        'name': 'FOO BICYCLE LIMITED',
-        'duns_number': '123456789',
-        'trading_names': [],
-        'address': {
-            'area': None,
-            'country': UUID('80756b9a-5d95-e211-a939-e4115bead28a'),
-            'county': '',
-            'line_1': 'Unit 10, Ockham Drive',
-            'line_2': '',
-            'postcode': 'UB6 0F2',
-            'town': 'GREENFORD',
-        },
-        'registered_address': {
-            'area': None,
-            'country': UUID('80756b9a-5d95-e211-a939-e4115bead28a'),
-            'county': '',
-            'line_1': 'C/O LONE VARY',
-            'line_2': '',
-            'postcode': 'UB6 0F2',
-            'town': 'GREENFORD',
-        },
-        'number_of_employees': 260,
-        'is_number_of_employees_estimated': True,
-        'turnover': 50651895.0,
-        'is_turnover_estimated': None,
-        'uk_based': True,
-        'website': 'http://foo.com',
-        'global_ultimate_duns_number': '291332174',
-    }
+        assert dnb_company == {
+            'company_number': '01261539',
+            'name': 'FOO BICYCLE LIMITED',
+            'duns_number': '123456789',
+            'trading_names': [],
+            'address': {
+                'area': None,
+                'country': UUID('80756b9a-5d95-e211-a939-e4115bead28a'),
+                'county': '',
+                'line_1': 'Unit 10, Ockham Drive',
+                'line_2': '',
+                'postcode': 'UB6 0F2',
+                'town': 'GREENFORD',
+            },
+            'registered_address': {
+                'area': None,
+                'country': UUID('80756b9a-5d95-e211-a939-e4115bead28a'),
+                'county': '',
+                'line_1': 'C/O LONE VARY',
+                'line_2': '',
+                'postcode': 'UB6 0F2',
+                'town': 'GREENFORD',
+            },
+            'number_of_employees': 260,
+            'is_number_of_employees_estimated': True,
+            'turnover': 50651895.0,
+            'is_turnover_estimated': None,
+            'uk_based': True,
+            'website': 'http://foo.com',
+            'global_ultimate_duns_number': '291332174',
+        }
 
 
 class TestUpdateCompanyFromDNB:
@@ -1074,7 +1076,7 @@ class TestDNBHierarchyCount:
         matcher = requests_mock.post(
             DNB_HIERARCHY_COUNT_URL,
             status_code=200,
-            content=b'1',
+            content=b'5',
         )
 
         get_company_hierarchy_count(self.VALID_DUNS_NUMBER)
