@@ -474,7 +474,7 @@ class Company(ArchivableModel, BaseModel):
             return (
                 Company.objects.filter(
                     duns_number=self.global_ultimate_duns_number,
-                ).values_list('address_country__name').first()
+                ).values_list('address_country__name', flat=True).first()
             )
         else:
             return None
