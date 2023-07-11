@@ -4100,3 +4100,100 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
             ).json()
             == 12
         )
+
+
+class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
+    """
+    DNB Company Hierarchy Reduced view test case.
+    """
+
+    def test_company_id_is_valid(self):
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': '11223344'}),
+            ).status_code
+            == 400
+        )
+
+    def test_company_has_no_company_id(self):
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': uuid4()}),
+            ).status_code
+            == 404
+        )
+
+    def test_company_has_no_duns_number(self):
+        company = CompanyFactory(duns_number=None)
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': company.id}),
+            ).status_code
+            == 400
+        )
+
+    def test_empty_results_returned_from_dnb_service(
+        self,
+        requests_mock,
+    ):
+        """
+        Test empty results from dnb proxy returns error
+        """
+        company = CompanyFactory(duns_number='123456789')
+
+        requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            status_code=200,
+            content=b'{"results":[]}',
+        )
+
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': company.id}),
+            ).status_code
+            == 502
+        )
+
+    def test_more_than_single_result_returned_from_dnb_service(
+        self,
+        requests_mock,
+    ):
+        """
+        Test more than 1 result from dnb proxy returns error
+        """
+        company = CompanyFactory(duns_number='123456789')
+
+        requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            status_code=200,
+            content=b'{"results":[{}, {}]}',
+        )
+
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': company.id}),
+            ).status_code
+            == 502
+        )
+
+    def test_single_result_returned_from_dnb_service_does_not_match_request(
+        self,
+        requests_mock,
+    ):
+        """
+        Test when the result from dnb proxy does not match requested duns number
+        """
+        company = CompanyFactory(duns_number='123456789')
+
+        requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            status_code=200,
+            content=b'{"results":[{"duns_number":"000000000"}]}',
+        )
+
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': company.id}),
+            ).status_code
+            == 502
+        )

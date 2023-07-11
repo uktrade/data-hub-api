@@ -394,6 +394,8 @@ class DNBCompanyHierarchyReducedView(APIView):
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
             DNBServiceError,
+            DNBServiceInvalidRequestError,
+            DNBServiceInvalidResponseError,
         ) as exc:
             raise APIUpstreamException(str(exc))
 

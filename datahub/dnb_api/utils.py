@@ -119,7 +119,7 @@ def search_dnb(query_params, request=None):
     return response
 
 
-def get_raw_company(duns_number, request=None):
+def get_dnb_company_data(duns_number, request=None):
     """
     Pull data for the company with the given duns_number from DNB and
     returns the raw data.
@@ -163,7 +163,7 @@ def get_company(duns_number, request=None):
     found or if the `duns_number` for the company is not the same as the one
     we searched for.
     """
-    return format_dnb_company(get_raw_company(duns_number, request))
+    return format_dnb_company(get_dnb_company_data(duns_number, request))
 
 
 def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=()):
@@ -925,7 +925,7 @@ def get_reduced_company_hierarchy_data(duns_number):
     """
     hierarchy = []
     while duns_number:
-        company_response = _get_cached_company(duns_number)
+        company_response = get_cached_company(duns_number)
         hierarchy.append(company_response)
         if company_response.get('corporateLinkage.parent.duns'):
             duns_number = company_response.get('corporateLinkage.parent.duns')
@@ -935,15 +935,15 @@ def get_reduced_company_hierarchy_data(duns_number):
     return hierarchy
 
 
-def _get_cached_company(duns_number):
-    cache_key = f'{duns_number}'
+def get_cached_company(duns_number):
+    cache_key = f'dnb_company_{duns_number}'
     cache_value = cache.get(cache_key)
 
     if cache_value:
         return cache_value
 
-    company_response = _map_company_to_family_tree_response_format(
-        get_raw_company(duns_number),
+    company_response = format_company_for_family_tree(
+        get_dnb_company_data(duns_number),
     )
 
     # only cache successful dnb calls
@@ -953,13 +953,21 @@ def _get_cached_company(duns_number):
     return company_response
 
 
-def _map_company_to_family_tree_response_format(company):
+def format_company_for_family_tree(company):
     """
-    Map the response from the search api to the format provided by the family tree
+    Format the response from the search api to the format needed by the family tree
     """
-    parent_duns_number = company.get('parent_duns_number')
-    return {
-        'duns': company.get('duns_number'),
-        'corporateLinkage.parent.duns': parent_duns_number if parent_duns_number else None,
-        'primaryName': company.get('primary_name'),
+    company_object = {
+        'duns': None,
+        'corporateLinkage.parent.duns': None,
+        'primaryName': None,
     }
+    if company:
+        parent_duns_number = company.get('parent_duns_number')
+        company_object['duns'] = company.get('duns_number')
+        company_object['corporateLinkage.parent.duns'] = (
+            parent_duns_number if parent_duns_number else None
+        )
+        company_object['primaryName'] = company.get('primary_name')
+
+    return company_object
