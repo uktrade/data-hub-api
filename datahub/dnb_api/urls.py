@@ -3,8 +3,8 @@ from django.urls import path
 from datahub.dnb_api.views import (
     DNBCompanyChangeRequestView,
     DNBCompanyCreateView,
-    DNBCompanyHierarchyReducedView,
     DNBCompanyHierarchyFullView,
+    DNBCompanyHierarchyReducedView,
     DNBCompanyInvestigationView,
     DNBCompanyLinkView,
     DNBCompanySearchView,
