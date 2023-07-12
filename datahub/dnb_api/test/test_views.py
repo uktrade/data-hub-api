@@ -5,6 +5,8 @@ from urllib.parse import urljoin
 from uuid import UUID, uuid4
 
 import pytest
+import requests_mock
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
@@ -4197,3 +4199,169 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
             ).status_code
             == 502
         )
+
+    def test_reduced_family_tree_success(
+        self,
+        opensearch_with_signals,
+    ):
+        """
+        Test when the result from dnb proxy is ok a valid tree is generated
+        """
+        global_company = CompanyFactory(duns_number='111111111')
+        company = CompanyFactory(duns_number='222222222', global_ultimate_duns_number='111111111')
+
+        opensearch_with_signals.indices.refresh()
+        with requests_mock.Mocker() as m:
+            m.post(
+                DNB_V2_SEARCH_URL,
+                [
+                    {
+                        'json': {
+                            'results': [
+                                {'duns_number': '222222222', 'parent_duns_number': '111111111'},
+                            ],
+                        },
+                    },
+                    {
+                        'json': {
+                            'results': [{'duns_number': '111111111'}],
+                        },
+                    },
+                ],
+            )
+
+            response = self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': company.id}),
+            )
+
+            assert response.status_code == 200
+            assert response.json() == {
+                'duns_number': global_company.duns_number,
+                'name': global_company.name,
+                'number_of_employees': global_company.number_of_employees,
+                'id': str(global_company.id),
+                'address': {
+                    'country': {
+                        'id': str(global_company.address_country.id),
+                        'name': global_company.address_country.name,
+                    },
+                    'county': '',
+                    'line_1': global_company.address_1,
+                    'line_2': '',
+                    'postcode': global_company.address_postcode,
+                    'town': global_company.address_town,
+                },
+                'registered_address': {
+                    'country': {
+                        'id': str(global_company.registered_address_country.id),
+                        'name': global_company.registered_address_country.name,
+                    },
+                    'county': '',
+                    'line_1': global_company.registered_address_1,
+                    'line_2': '',
+                    'postcode': global_company.registered_address_postcode,
+                    'town': global_company.registered_address_town,
+                },
+                'sector': {
+                    'id': str(global_company.sector.id),
+                    'name': global_company.sector.name,
+                },
+                'uk_region': {
+                    'id': str(global_company.uk_region.id),
+                    'name': global_company.uk_region.name,
+                },
+                'one_list_tier': None,
+                'archived': global_company.archived,
+                'latest_interaction_date': None,
+                'hierarchy': 1,
+                'subsidiaries': [
+                    {
+                        'duns_number': company.duns_number,
+                        'id': str(company.id),
+                        'name': company.name,
+                        'number_of_employees': company.number_of_employees,
+                        'address': {
+                            'country': {
+                                'id': str(company.address_country.id),
+                                'name': company.address_country.name,
+                            },
+                            'county': '',
+                            'line_1': company.address_1,
+                            'line_2': '',
+                            'postcode': company.address_postcode,
+                            'town': company.address_town,
+                        },
+                        'registered_address': {
+                            'country': {
+                                'id': str(company.registered_address_country.id),
+                                'name': company.registered_address_country.name,
+                            },
+                            'county': '',
+                            'line_1': company.registered_address_1,
+                            'line_2': '',
+                            'postcode': company.registered_address_postcode,
+                            'town': company.registered_address_town,
+                        },
+                        'sector': {
+                            'id': str(company.sector.id),
+                            'name': company.sector.name,
+                        },
+                        'uk_region': {
+                            'id': str(company.uk_region.id),
+                            'name': company.uk_region.name,
+                        },
+                        'one_list_tier': None,
+                        'archived': False,
+                        'latest_interaction_date': None,
+                        'hierarchy': 2,
+                    },
+                ],
+            }
+
+        # assert response.json() == {
+        #     'ultimate_global_company': {
+        #         'duns_number': ultimate_company_dnb['duns'],
+        #         'id': ultimate_company_dh.id,
+        #         'name': ultimate_company_dh.name,
+        #         'number_of_employees': ultimate_company_dh.number_of_employees,
+        #         'address': {
+        #             'country': {
+        #                 'id': str(ultimate_company_dh.address_country.id),
+        #                 'name': ultimate_company_dh.address_country.name,
+        #             },
+        #             'county': '',
+        #             'line_1': ultimate_company_dh.address_1,
+        #             'line_2': '',
+        #             'postcode': ultimate_company_dh.address_postcode,
+        #             'town': ultimate_company_dh.address_town,
+        #         },
+        #         'registered_address': {
+        #             'country': {
+        #                 'id': str(ultimate_company_dh.registered_address_country.id),
+        #                 'name': ultimate_company_dh.registered_address_country.name,
+        #             },
+        #             'county': '',
+        #             'line_1': ultimate_company_dh.registered_address_1,
+        #             'line_2': '',
+        #             'postcode': ultimate_company_dh.registered_address_postcode,
+        #             'town': ultimate_company_dh.registered_address_town,
+        #         },
+        #         'sector': {
+        #             'id': str(ultimate_company_dh.sector.id),
+        #             'name': ultimate_company_dh.sector.name,
+        #         },
+        #         'uk_region': {
+        #             'id': str(ultimate_company_dh.uk_region.id),
+        #             'name': ultimate_company_dh.uk_region.name,
+        #         },
+        #         'one_list_tier': {
+        #             'id': str(ultimate_company_dh.one_list_tier.id),
+        #             'name': ultimate_company_dh.one_list_tier.name,
+        #         },
+        #         'archived': False,
+        #         'latest_interaction_date': None,
+        #         'hierarchy': 1,
+        #     },
+        #     'ultimate_global_companies_count': len(tree_members),
+        #     'manually_verified_subsidiaries': [],
+        # }

@@ -1226,6 +1226,10 @@ class TestReducedHierarchyData:
 
             hierarchy_data = get_reduced_company_hierarchy_data('111111111')
             assert len(hierarchy_data) == 4
+            assert hierarchy_data[0]['corporateLinkage.hierarchyLevel'] == 4
+            assert hierarchy_data[1]['corporateLinkage.hierarchyLevel'] == 3
+            assert hierarchy_data[2]['corporateLinkage.hierarchyLevel'] == 2
+            assert hierarchy_data[3]['corporateLinkage.hierarchyLevel'] == 1
 
 
 class TestCompanyCaching:

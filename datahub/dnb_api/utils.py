@@ -926,11 +926,17 @@ def get_reduced_company_hierarchy_data(duns_number):
     hierarchy = []
     while duns_number:
         company_response = get_cached_dnb_company(duns_number)
-        hierarchy.append(company_response)
-        if company_response.get('corporateLinkage.parent.duns'):
-            duns_number = company_response.get('corporateLinkage.parent.duns')
+        formatted_company = format_company_for_family_tree(company_response)
+        hierarchy.append(formatted_company)
+        if formatted_company.get('corporateLinkage.parent.duns'):
+            duns_number = formatted_company.get('corporateLinkage.parent.duns')
         else:
             duns_number = None
+
+    index = 1  # index needs to sit outside, as the reversed function also reverses the index
+    for hierarchy_item in reversed(hierarchy):
+        hierarchy_item['corporateLinkage.hierarchyLevel'] = index
+        index += 1
 
     return hierarchy
 
@@ -946,9 +952,7 @@ def get_cached_dnb_company(duns_number):
     if cache_value:
         return cache_value
 
-    company_response = format_company_for_family_tree(
-        get_dnb_company_data(duns_number),
-    )
+    company_response = get_dnb_company_data(duns_number)
 
     # only cache successful dnb calls
     one_hour_timeout = int(timedelta(hours=1).total_seconds())
