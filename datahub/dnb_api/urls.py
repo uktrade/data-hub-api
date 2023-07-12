@@ -4,7 +4,7 @@ from datahub.dnb_api.views import (
     DNBCompanyChangeRequestView,
     DNBCompanyCreateView,
     DNBCompanyHierarchyReducedView,
-    DNBCompanyHierarchyView,
+    DNBCompanyHierarchyFullView,
     DNBCompanyInvestigationView,
     DNBCompanyLinkView,
     DNBCompanySearchView,
@@ -40,7 +40,7 @@ urlpatterns = [
     ),
     path(
         '<company_id>/family-tree',
-        DNBCompanyHierarchyView.as_view(),
+        DNBCompanyHierarchyFullView.as_view(),
         name='family-tree',
     ),
     path(

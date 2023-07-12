@@ -376,7 +376,10 @@ class DNBCompanyInvestigationView(APIView):
         return Response(response)
 
 
-class DNBCompanyHierarchyReducedView(APIView):
+class DNBCompanyHierarchyView(APIView):
+    MAX_COMPANIES_IN_TREE_COUNT = 1000
+
+    reduced_tree = False
     permission_classes = (
         HasPermissions(
             f'company.{CompanyPermission.view_company}',
@@ -388,8 +391,9 @@ class DNBCompanyHierarchyReducedView(APIView):
         Given a Company Id, get the data for the company hierarchy from dnb-service.
         """
         duns_number = validate_company_id(company_id)
+
         try:
-            response = get_reduced_company_hierarchy_data(duns_number)
+            hierarchy_data = self.get_data(duns_number)
         except (
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
@@ -399,50 +403,11 @@ class DNBCompanyHierarchyReducedView(APIView):
         ) as exc:
             raise APIUpstreamException(str(exc))
 
-        tree = create_company_tree(response.data)
-
-        return Response(tree)
-
-
-class DNBCompanyHierarchyView(APIView):
-    """
-    View for receiving datahub hierarchy of a company from DNB data.
-    """
-
-    MAX_COMPANIES_IN_TREE_COUNT = 1000
-
-    permission_classes = (
-        HasPermissions(
-            f'company.{CompanyPermission.view_company}',
-            f'company.{CompanyPermission.add_company}',
-        ),
-    )
-
-    def get(self, request, company_id):
-        """
-        Given a Company Id, get the data for the company hierarchy from dnb-service.
-        """
-        duns_number = validate_company_id(company_id)
-        reduced_tree = False
-        try:
-            companies_count = get_company_hierarchy_count(duns_number)
-            if companies_count > self.MAX_COMPANIES_IN_TREE_COUNT:
-                reduced_tree = True
-                hierarchy_data = get_reduced_company_hierarchy_data(duns_number)
-            else:
-                hierarchy_data = get_company_hierarchy_data(duns_number)
-        except (
-            DNBServiceConnectionError,
-            DNBServiceTimeoutError,
-            DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
-
         json_response = {
             'ultimate_global_company': {},
             'ultimate_global_companies_count': 0,
             'manually_verified_subsidiaries': [],
-            'reduced_tree': reduced_tree,
+            'reduced_tree': self.reduced_tree,
         }
         if not hierarchy_data.data:
             return Response(json_response)
@@ -457,6 +422,9 @@ class DNBCompanyHierarchyView(APIView):
 
         return Response(json_response)
 
+    def get_data(self, duns_number):
+        return None
+
     def get_manually_verified_subsidiaries(self, company_id):
         companies = Company.objects.filter(global_headquarters_id=company_id).select_related(
             'employee_range',
@@ -467,6 +435,26 @@ class DNBCompanyHierarchyView(APIView):
         serialized_data = SubsidiarySerializer(companies, many=True)
 
         return serialized_data.data if companies else []
+
+
+class DNBCompanyHierarchyReducedView(DNBCompanyHierarchyView):
+    def get_data(self, duns_number):
+        self.reduced_tree = True
+        return get_reduced_company_hierarchy_data(duns_number)
+
+
+class DNBCompanyHierarchyFullView(DNBCompanyHierarchyView):
+    """
+    View for receiving datahub hierarchy of a company from DNB data.
+    """
+
+    def get_data(self, duns_number):
+        companies_count = get_company_hierarchy_count(duns_number)
+        if companies_count > self.MAX_COMPANIES_IN_TREE_COUNT:
+            self.reduced_tree = True
+            return get_reduced_company_hierarchy_data(duns_number)
+        else:
+            return get_company_hierarchy_data(duns_number)
 
 
 class DNBRelatedCompaniesView(APIView):
