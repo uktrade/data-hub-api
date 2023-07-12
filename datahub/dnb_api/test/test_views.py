@@ -2502,6 +2502,7 @@ class TestCompanyInvestigationView(APITestMixin):
 
 class TestHierarchyAPITestMixin:
     def set_dnb_hierarchy_mock_response(self, requests_mock, tree_members, status_code=200):
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, len(tree_members), status_code)
         requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
             status_code=status_code,
@@ -2557,15 +2558,15 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
     ):
         """
-        Test for POST proxy.
+        Test empty results from dnb return empty tree response.
         """
         api_client = self.create_api_client()
         company = CompanyFactory(duns_number='123456789')
 
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
         requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
-            status_code=200,
-            content=b'{"family_tree_members":[]}',
+            json={'family_tree_members': []},
         )
 
         url = reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': company.id})
@@ -2579,6 +2580,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
             'ultimate_global_company': {},
             'ultimate_global_companies_count': 0,
             'manually_verified_subsidiaries': [],
+            'reduced_tree': False,
         }
 
     def test_dnb_response_with_a_duns_number_matching_dh_company_duns_number_appends_dh_id(
@@ -2659,6 +2661,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
             },
             'ultimate_global_companies_count': len(tree_members),
             'manually_verified_subsidiaries': [],
+            'reduced_tree': False,
         }
 
     def test_dnb_response_with_only_ultimate_parent_matching_a_datahub_company(
@@ -2790,6 +2793,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
             },
             'ultimate_global_companies_count': len(tree_members),
             'manually_verified_subsidiaries': [],
+            'reduced_tree': False,
         }
 
     def _get_family_tree_response(
@@ -2815,11 +2819,11 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
     )
     def test_dnb_request_connection_error(self, requests_mock, request_exception):
         """
-        Test for POST proxy.
+        Test dnb api request exceptopn
         """
         api_client = self.create_api_client()
         company = CompanyFactory(duns_number='123456789')
-
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
         requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
             exc=request_exception,
@@ -3035,6 +3039,67 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 'hierarchy': '0',
             },
         ]
+
+    def test_more_than_maximum_allowed_companies_returns_reduced_tree(
+        self,
+        # requests_mock,
+        opensearch_with_signals,
+    ):
+        """
+        Test the scenario where the count of companies returned by the dnb service is above the
+        maximum allowed, so a reduced company tree is returned instead
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '111111111',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+        tree_members = [
+            {
+                'duns': '222222222',
+                'primaryName': faker.company(),
+                'corporateLinkage': {'hierarchyLevel': 2, 'parent': '111111111'},
+            }
+            for x in range(1001)
+        ]
+        tree_members.insert(0, ultimate_company_dnb)
+
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_company_dnb['duns'],
+            id='8e2e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=ultimate_company_dnb['primaryName'],
+            one_list_tier=OneListTier.objects.first(),
+        )
+        opensearch_with_signals.indices.refresh()
+        with requests_mock.Mocker() as m:
+            m.post(
+                DNB_V2_SEARCH_URL,
+                [
+                    {
+                        'json': {
+                            'results': [{'duns_number': '111111111'}],
+                        },
+                    },
+                    {
+                        'json': {
+                            'results': [
+                                {'duns_number': '222222222', 'parent_duns_number': '111111111'},
+                            ],
+                        },
+                    },
+                ],
+            )
+
+            response = self._get_family_tree_response(
+                m,
+                tree_members,
+                ultimate_company_dh,
+            )
+
+            assert response.status_code == 200
+            assert response.json()['reduced_tree'] is True
 
 
 class TestRelatedCompanyView(APITestMixin):

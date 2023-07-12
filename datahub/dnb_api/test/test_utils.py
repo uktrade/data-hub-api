@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 from urllib.parse import urljoin
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import pytest
 import requests_mock
@@ -30,6 +30,10 @@ from datahub.company.test.factories import (
     CompanyFactory,
     CompanyWithAreaFactory,
 )
+from datahub.core.exceptions import (
+    APIBadRequestException,
+    APINotFoundException,
+)
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_MODEL_FIELDS
 from datahub.dnb_api.test.utils import model_to_dict_company
 from datahub.dnb_api.utils import (
@@ -52,6 +56,7 @@ from datahub.dnb_api.utils import (
     RevisionNotFoundError,
     rollback_dnb_company_update,
     update_company_from_dnb,
+    validate_company_id,
 )
 from datahub.metadata.models import AdministrativeArea, Country
 
@@ -1169,7 +1174,7 @@ class TestReducedHierarchyData:
         """
         Test when no duns number is provided an empty array of hierarchy data is returned
         """
-        assert get_reduced_company_hierarchy_data(duns_number='') == []
+        assert get_reduced_company_hierarchy_data(duns_number='').data == []
 
     def test_when_company_has_no_parent_1_company_returned(self, requests_mock):
         """
@@ -1181,7 +1186,7 @@ class TestReducedHierarchyData:
             json={'results': [{'duns_number': '123456789', 'primary_name': 'ABC'}]},
         )
 
-        hierarchy_data = get_reduced_company_hierarchy_data('123456789')[0]
+        hierarchy_data = get_reduced_company_hierarchy_data('123456789').data[0]
         assert hierarchy_data['corporateLinkage.parent.duns'] is None
         assert hierarchy_data['duns'] == '123456789'
 
@@ -1225,11 +1230,11 @@ class TestReducedHierarchyData:
             m.post(DNB_V2_SEARCH_URL, responses)
 
             hierarchy_data = get_reduced_company_hierarchy_data('111111111')
-            assert len(hierarchy_data) == 4
-            assert hierarchy_data[0]['corporateLinkage.hierarchyLevel'] == 4
-            assert hierarchy_data[1]['corporateLinkage.hierarchyLevel'] == 3
-            assert hierarchy_data[2]['corporateLinkage.hierarchyLevel'] == 2
-            assert hierarchy_data[3]['corporateLinkage.hierarchyLevel'] == 1
+            assert hierarchy_data.count == 4
+            assert hierarchy_data.data[0]['corporateLinkage.hierarchyLevel'] == 4
+            assert hierarchy_data.data[1]['corporateLinkage.hierarchyLevel'] == 3
+            assert hierarchy_data.data[2]['corporateLinkage.hierarchyLevel'] == 2
+            assert hierarchy_data.data[3]['corporateLinkage.hierarchyLevel'] == 1
 
 
 class TestCompanyCaching:
@@ -1304,3 +1309,23 @@ class TestFormatCompanyForFamilyTree:
             'corporateLinkage.parent.duns': '2',
             'primaryName': 'abc',
         }
+
+
+class TestValidateCompanyId:
+    def test_company_id_is_valid(self):
+        with pytest.raises(APIBadRequestException):
+            validate_company_id('11223344')
+
+    def test_company_has_no_company_id(self):
+        with pytest.raises(APINotFoundException):
+            validate_company_id(uuid4())
+
+    def test_company_has_no_duns_number(self):
+        company = CompanyFactory(duns_number=None)
+        with pytest.raises(APIBadRequestException):
+            validate_company_id(company.id)
+
+    def test_company_has_invalid_duns_number(self):
+        company = CompanyFactory(duns_number='123')
+        with pytest.raises(serializers.ValidationError):
+            validate_company_id(company.id)

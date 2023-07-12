@@ -399,7 +399,7 @@ class DNBCompanyHierarchyReducedView(APIView):
         ) as exc:
             raise APIUpstreamException(str(exc))
 
-        tree = create_company_tree(response)
+        tree = create_company_tree(response.data)
 
         return Response(tree)
 
@@ -408,6 +408,8 @@ class DNBCompanyHierarchyView(APIView):
     """
     View for receiving datahub hierarchy of a company from DNB data.
     """
+
+    MAX_COMPANIES_IN_TREE_COUNT = 1000
 
     permission_classes = (
         HasPermissions(
@@ -421,8 +423,14 @@ class DNBCompanyHierarchyView(APIView):
         Given a Company Id, get the data for the company hierarchy from dnb-service.
         """
         duns_number = validate_company_id(company_id)
+        reduced_tree = False
         try:
-            response = get_company_hierarchy_data(duns_number)
+            companies_count = get_company_hierarchy_count(duns_number)
+            if companies_count > self.MAX_COMPANIES_IN_TREE_COUNT:
+                reduced_tree = True
+                hierarchy_data = get_reduced_company_hierarchy_data(duns_number)
+            else:
+                hierarchy_data = get_company_hierarchy_data(duns_number)
         except (
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
@@ -430,21 +438,19 @@ class DNBCompanyHierarchyView(APIView):
         ) as exc:
             raise APIUpstreamException(str(exc))
 
-        family_tree_members = response['family_tree_members']
         json_response = {
             'ultimate_global_company': {},
             'ultimate_global_companies_count': 0,
             'manually_verified_subsidiaries': [],
+            'reduced_tree': reduced_tree,
         }
-        if not family_tree_members:
+        if not hierarchy_data.data:
             return Response(json_response)
 
-        nested_tree = create_company_tree(family_tree_members)
+        nested_tree = create_company_tree(hierarchy_data.data)
 
         json_response['ultimate_global_company'] = nested_tree
-        json_response['ultimate_global_companies_count'] = response[
-            'global_ultimate_family_tree_members_count'
-        ]
+        json_response['ultimate_global_companies_count'] = hierarchy_data.count
         json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries(
             company_id,
         )
@@ -490,7 +496,7 @@ class DNBRelatedCompaniesView(APIView):
         ) as exc:
             raise APIUpstreamException(str(exc))
 
-        family_tree_members = response['family_tree_members']
+        family_tree_members = response.data
         json_response = {
             'related_companies': [],
         }

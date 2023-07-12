@@ -1,6 +1,8 @@
 import logging
 import uuid
 
+from collections import namedtuple
+
 from datetime import timedelta
 from itertools import islice
 
@@ -44,6 +46,8 @@ from datahub.search.query_builder import get_search_by_entities_query
 
 logger = logging.getLogger(__name__)
 MAX_DUNS_NUMBERS_PER_REQUEST = 1024
+
+HierarchyData = namedtuple('HierarchyData', ['data', 'count'])
 
 
 class DNBServiceBaseError(Exception):
@@ -572,7 +576,7 @@ def validate_company_id(company_id):
     return duns_number
 
 
-def get_company_hierarchy_data(duns_number):
+def get_company_hierarchy_data(duns_number) -> HierarchyData:
     """
     Get company hierarchy data
     """
@@ -595,11 +599,16 @@ def get_company_hierarchy_data(duns_number):
 
     response_data = call_api_request_with_exception_handling(api_request).json()
 
+    hierarchy_data = HierarchyData(
+        response_data.get('family_tree_members'),
+        response_data.get('global_ultimate_family_tree_members_count'),
+    )
+
     # only cache successful dnb calls
     one_day_timeout = int(timedelta(days=1).total_seconds())
-    cache.set(cache_key, response_data, one_day_timeout)
+    cache.set(cache_key, hierarchy_data, one_day_timeout)
 
-    return response_data
+    return hierarchy_data
 
 
 def is_valid_uuid(value):
@@ -919,7 +928,7 @@ def call_api_request_with_exception_handling(api_request_function, statsd_stat=N
     return result
 
 
-def get_reduced_company_hierarchy_data(duns_number):
+def get_reduced_company_hierarchy_data(duns_number) -> HierarchyData:
     """
     Get company data that only includes direct parents of the duns number
     """
@@ -938,7 +947,7 @@ def get_reduced_company_hierarchy_data(duns_number):
         hierarchy_item['corporateLinkage.hierarchyLevel'] = index
         index += 1
 
-    return hierarchy
+    return HierarchyData(data=hierarchy, count=len(hierarchy))
 
 
 def get_cached_dnb_company(duns_number):
