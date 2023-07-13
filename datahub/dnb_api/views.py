@@ -380,6 +380,7 @@ class DNBCompanyHierarchyView(APIView):
     MAX_COMPANIES_IN_TREE_COUNT = 1000
 
     reduced_tree = False
+
     permission_classes = (
         HasPermissions(
             f'company.{CompanyPermission.view_company}',
@@ -393,7 +394,8 @@ class DNBCompanyHierarchyView(APIView):
         duns_number = validate_company_id(company_id)
 
         try:
-            hierarchy_data = self.get_data(duns_number)
+            companies_count = get_company_hierarchy_count(duns_number)
+            hierarchy_data = self.get_data(duns_number, companies_count)
         except (
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
@@ -406,6 +408,7 @@ class DNBCompanyHierarchyView(APIView):
         json_response = {
             'ultimate_global_company': {},
             'ultimate_global_companies_count': 0,
+            'family_tree_companies_count': 0,
             'manually_verified_subsidiaries': [],
             'reduced_tree': self.reduced_tree,
         }
@@ -415,14 +418,15 @@ class DNBCompanyHierarchyView(APIView):
         nested_tree = create_company_tree(hierarchy_data.data)
 
         json_response['ultimate_global_company'] = nested_tree
-        json_response['ultimate_global_companies_count'] = hierarchy_data.count
+        json_response['ultimate_global_companies_count'] = companies_count + 1
         json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries(
             company_id,
         )
+        json_response['family_tree_companies_count'] = hierarchy_data.count
 
         return Response(json_response)
 
-    def get_data(self, duns_number):
+    def get_data(self, duns_number, companies_count):
         return None
 
     def get_manually_verified_subsidiaries(self, company_id):
@@ -438,8 +442,14 @@ class DNBCompanyHierarchyView(APIView):
 
 
 class DNBCompanyHierarchyReducedView(DNBCompanyHierarchyView):
-    def get_data(self, duns_number):
-        self.reduced_tree = True
+    """
+    View for receiving a reduced datahub hierarchy consisting of only immediate parents of
+    a company from DNB data.
+    """
+
+    reduced_tree = True
+
+    def get_data(self, duns_number, companies_count):
         return get_reduced_company_hierarchy_data(duns_number)
 
 
@@ -448,13 +458,13 @@ class DNBCompanyHierarchyFullView(DNBCompanyHierarchyView):
     View for receiving datahub hierarchy of a company from DNB data.
     """
 
-    def get_data(self, duns_number):
-        companies_count = get_company_hierarchy_count(duns_number)
+    def get_data(self, duns_number, companies_count):
+        # companies_count = get_company_hierarchy_count(duns_number)
         if companies_count > self.MAX_COMPANIES_IN_TREE_COUNT:
             self.reduced_tree = True
             return get_reduced_company_hierarchy_data(duns_number)
-        else:
-            return get_company_hierarchy_data(duns_number)
+
+        return get_company_hierarchy_data(duns_number)
 
 
 class DNBRelatedCompaniesView(APIView):
