@@ -3573,7 +3573,6 @@ class TestRelatedCompanyView(APITestMixin):
             'primaryName': faker.company(),
             'corporateLinkage': {'hierarchyLevel': 1},
         }
-
         direct_company_dnb = {
             'duns': '223456789',
             'primaryName': faker.company(),
