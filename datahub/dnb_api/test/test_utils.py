@@ -1332,6 +1332,7 @@ class TestValidateCompanyId:
             validate_company_id(company.id)
 
 
+
 class TestCreateCompanyTree:
     def test_ultimate_parent_company_subsidiaries_left_unchanged_when_it_is_the_requested_company(
         self,

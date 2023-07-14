@@ -417,6 +417,7 @@ class DNBCompanyHierarchyView(APIView):
 
         nested_tree = create_company_tree(hierarchy_data.data, duns_number)
 
+
         json_response['ultimate_global_company'] = nested_tree
         json_response['ultimate_global_companies_count'] = companies_count + 1
         json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries(

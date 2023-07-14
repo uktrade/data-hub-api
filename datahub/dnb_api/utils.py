@@ -678,6 +678,7 @@ def _move_requested_duns_to_start_of_subsidiary_list(dataframe, duns_number):
 def create_company_tree(companies: list, duns_number):
     company_hierarchy_dataframe = create_company_hierarchy_dataframe(companies, duns_number)
 
+
     root = dataframe_to_tree_by_relation(
         company_hierarchy_dataframe,
         child_col='duns',
@@ -706,7 +707,9 @@ def create_company_tree(companies: list, duns_number):
     return nested_tree
 
 
+
 def create_company_hierarchy_dataframe(family_tree_members: list, duns_number):
+
     """
     Create a dataframe from the list of family tree members
     """
