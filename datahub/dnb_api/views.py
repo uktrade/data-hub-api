@@ -3,7 +3,6 @@ import logging
 from bigtree import (
     dataframe_to_tree_by_relation,
     find,
-    tree_to_nested_dict,
 )
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
@@ -34,7 +33,7 @@ from datahub.dnb_api.serializers import (
     SubsidiarySerializer,
 )
 from datahub.dnb_api.utils import (
-    create_company_hierarchy_dataframe,
+    create_company_tree,
     create_investigation,
     create_related_company_dataframe,
     DNBServiceConnectionError,
@@ -47,6 +46,7 @@ from datahub.dnb_api.utils import (
     get_company_hierarchy_count,
     get_company_hierarchy_data,
     get_datahub_company_ids,
+    get_reduced_company_hierarchy_data,
     request_changes,
     search_dnb,
     validate_company_id,
@@ -377,14 +377,13 @@ class DNBCompanyInvestigationView(APIView):
 
 
 class DNBCompanyHierarchyView(APIView):
-    """
-    View for receiving datahub hierarchy of a company from DNB data.
-    """
+    MAX_COMPANIES_IN_TREE_COUNT = 1000
+
+    reduced_tree = False
 
     permission_classes = (
         HasPermissions(
             f'company.{CompanyPermission.view_company}',
-            f'company.{CompanyPermission.add_company}',
         ),
     )
 
@@ -393,60 +392,42 @@ class DNBCompanyHierarchyView(APIView):
         Given a Company Id, get the data for the company hierarchy from dnb-service.
         """
         duns_number = validate_company_id(company_id)
+
         try:
-            response = get_company_hierarchy_data(duns_number)
+            companies_count = get_company_hierarchy_count(duns_number)
+            hierarchy_data = self.get_data(duns_number, companies_count)
         except (
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
             DNBServiceError,
+            DNBServiceInvalidRequestError,
+            DNBServiceInvalidResponseError,
         ) as exc:
             raise APIUpstreamException(str(exc))
 
-        family_tree_members = response['family_tree_members']
         json_response = {
             'ultimate_global_company': {},
             'ultimate_global_companies_count': 0,
+            'family_tree_companies_count': 0,
             'manually_verified_subsidiaries': [],
+            'reduced_tree': self.reduced_tree,
         }
-        if not family_tree_members:
+        if not hierarchy_data.data:
             return Response(json_response)
 
-        company_hierarchy_dataframe = create_company_hierarchy_dataframe(family_tree_members)
-
-        root = dataframe_to_tree_by_relation(
-            company_hierarchy_dataframe,
-            child_col='duns',
-            parent_col='corporateLinkage.parent.duns',
-        )
-
-        nested_tree = tree_to_nested_dict(
-            root,
-            name_key='duns_number',
-            child_key='subsidiaries',
-            attr_dict={
-                'primaryName': 'name',
-                'companyId': 'id',
-                'corporateLinkage.hierarchyLevel': 'hierarchy',
-                'ukRegion': 'uk_region',
-                'address': 'address',
-                'registeredAddress': 'registered_address',
-                'sector': 'sector',
-                'latestInteractionDate': 'latest_interaction_date',
-                'archived': 'archived',
-                'numberOfEmployees': 'number_of_employees',
-                'oneListTier': 'one_list_tier',
-            },
-        )
+        nested_tree = create_company_tree(hierarchy_data.data)
 
         json_response['ultimate_global_company'] = nested_tree
-        json_response['ultimate_global_companies_count'] = response[
-            'global_ultimate_family_tree_members_count'
-        ]
+        json_response['ultimate_global_companies_count'] = companies_count + 1
         json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries(
             company_id,
         )
+        json_response['family_tree_companies_count'] = hierarchy_data.count
 
         return Response(json_response)
+
+    def get_data(self, duns_number, companies_count):
+        return None
 
     def get_manually_verified_subsidiaries(self, company_id):
         companies = Company.objects.filter(global_headquarters_id=company_id).select_related(
@@ -458,6 +439,32 @@ class DNBCompanyHierarchyView(APIView):
         serialized_data = SubsidiarySerializer(companies, many=True)
 
         return serialized_data.data if companies else []
+
+
+class DNBCompanyHierarchyReducedView(DNBCompanyHierarchyView):
+    """
+    View for receiving a reduced datahub hierarchy consisting of only immediate parents of
+    a company from DNB data.
+    """
+
+    reduced_tree = True
+
+    def get_data(self, duns_number, companies_count):
+        return get_reduced_company_hierarchy_data(duns_number)
+
+
+class DNBCompanyHierarchyFullView(DNBCompanyHierarchyView):
+    """
+    View for receiving datahub hierarchy of a company from DNB data.
+    """
+
+    def get_data(self, duns_number, companies_count):
+        # companies_count = get_company_hierarchy_count(duns_number)
+        if companies_count > self.MAX_COMPANIES_IN_TREE_COUNT:
+            self.reduced_tree = True
+            return get_reduced_company_hierarchy_data(duns_number)
+
+        return get_company_hierarchy_data(duns_number)
 
 
 class DNBRelatedCompaniesView(APIView):
@@ -487,7 +494,7 @@ class DNBRelatedCompaniesView(APIView):
         ) as exc:
             raise APIUpstreamException(str(exc))
 
-        family_tree_members = response['family_tree_members']
+        family_tree_members = response.data
         json_response = {
             'related_companies': [],
         }
@@ -545,9 +552,6 @@ class DNBRelatedCompaniesCountView(APIView):
             DNBServiceError,
         ) as exc:
             raise APIUpstreamException(str(exc))
-
-        if companies_count > 0:
-            companies_count -= 1  # deduct 1 as the list from dnb contains the company requested
 
         if request.query_params.get('include_manually_linked_companies') == 'true':
             subsidiary_companies_count = Company.objects.filter(

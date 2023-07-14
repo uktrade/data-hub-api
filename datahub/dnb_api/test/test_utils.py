@@ -1,9 +1,11 @@
 from unittest.mock import MagicMock, patch
 from urllib.parse import urljoin
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import pytest
+import requests_mock
 import reversion
+
 
 from django.conf import settings
 from django.core.cache import cache
@@ -28,6 +30,10 @@ from datahub.company.test.factories import (
     CompanyFactory,
     CompanyWithAreaFactory,
 )
+from datahub.core.exceptions import (
+    APIBadRequestException,
+    APINotFoundException,
+)
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_MODEL_FIELDS
 from datahub.dnb_api.test.utils import model_to_dict_company
 from datahub.dnb_api.utils import (
@@ -38,15 +44,19 @@ from datahub.dnb_api.utils import (
     DNBServiceInvalidRequestError,
     DNBServiceInvalidResponseError,
     DNBServiceTimeoutError,
+    format_company_for_family_tree,
     format_dnb_company,
+    get_cached_dnb_company,
     get_company,
     get_company_hierarchy_count,
     get_company_hierarchy_data,
     get_company_update_page,
+    get_reduced_company_hierarchy_data,
     load_datahub_details,
     RevisionNotFoundError,
     rollback_dnb_company_update,
     update_company_from_dnb,
+    validate_company_id,
 )
 from datahub.metadata.models import AdministrativeArea, Country
 
@@ -1157,3 +1167,165 @@ class TestDNBHierarchyCount:
             )
             get_company_hierarchy_count(self.VALID_DUNS_NUMBER)
         assert cache.get(self.FAMILY_TREE_CACHE_KEY) is None
+
+
+class TestReducedHierarchyData:
+    def test_when_no_duns_number_provided_empty_array_returned(self):
+        """
+        Test when no duns number is provided an empty array of hierarchy data is returned
+        """
+        assert get_reduced_company_hierarchy_data(duns_number='').data == []
+
+    def test_when_company_has_no_parent_1_company_returned(self, requests_mock):
+        """
+        Test when a company has no parent only that company is returned
+        """
+        requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            status_code=200,
+            json={'results': [{'duns_number': '123456789', 'primary_name': 'ABC'}]},
+        )
+
+        hierarchy_data = get_reduced_company_hierarchy_data('123456789').data[0]
+        assert hierarchy_data['corporateLinkage.parent.duns'] is None
+        assert hierarchy_data['duns'] == '123456789'
+
+    @pytest.mark.usefixtures('local_memory_cache')
+    def test_when_company_has_3_parents_all_4_companies_are_returned(self):
+        """
+        Test when a company has 3 levels of parents above them, all 4 companies are returned in
+        the hierarchy data
+        """
+        responses = [
+            {
+                'status_code': 200,
+                'json': {
+                    'results': [
+                        {
+                            'duns_number': '111111111',
+                            'parent_duns_number': '222222222',
+                            'primary_name': 'DEF',
+                        },
+                    ],
+                },
+            },
+            {
+                'status_code': 200,
+                'json': {
+                    'results': [{'duns_number': '222222222', 'parent_duns_number': '333333333'}],
+                },
+            },
+            {
+                'status_code': 200,
+                'json': {
+                    'results': [{'duns_number': '333333333', 'parent_duns_number': '444444444'}],
+                },
+            },
+            {
+                'status_code': 200,
+                'json': {'results': [{'duns_number': '444444444', 'parent_duns_number': ''}]},
+            },
+        ]
+        with requests_mock.Mocker() as m:
+            m.post(DNB_V2_SEARCH_URL, responses)
+
+            hierarchy_data = get_reduced_company_hierarchy_data('111111111')
+            assert hierarchy_data.count == 4
+            assert hierarchy_data.data[0]['corporateLinkage.hierarchyLevel'] == 4
+            assert hierarchy_data.data[1]['corporateLinkage.hierarchyLevel'] == 3
+            assert hierarchy_data.data[2]['corporateLinkage.hierarchyLevel'] == 2
+            assert hierarchy_data.data[3]['corporateLinkage.hierarchyLevel'] == 1
+
+
+class TestCompanyCaching:
+    VALID_DUNS_NUMBER = '123456789'
+    COMPANY_CACHE_KEY = f'dnb_company_{VALID_DUNS_NUMBER}'
+
+    @pytest.mark.usefixtures('local_memory_cache')
+    def test_when_company_data_not_in_cache_dnb_api_is_called(self, requests_mock):
+        """
+        Test when the dnb company data is missing from the cache, a call is made to the dnb
+        api to get the data and saved into the cache
+        """
+        matcher = requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            json={'results': [{'duns_number': self.VALID_DUNS_NUMBER}]},
+        )
+        get_cached_dnb_company(self.VALID_DUNS_NUMBER)
+
+        assert matcher.called_once
+        assert cache.get(self.COMPANY_CACHE_KEY) is not None
+
+    @pytest.mark.usefixtures('local_memory_cache')
+    def test_when_called_multiple_times_only_first_call_makes_an_api_call_to_dnb(
+        self,
+        requests_mock,
+    ):
+        """
+        Test that after a successful call to the dnb api, all subsequent calls to the
+        get_cached_company function get the data from the cache
+        """
+        matcher = requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            json={'results': [{'duns_number': self.VALID_DUNS_NUMBER}]},
+        )
+
+        get_cached_dnb_company(self.VALID_DUNS_NUMBER)
+        get_cached_dnb_company(self.VALID_DUNS_NUMBER)
+        get_cached_dnb_company(self.VALID_DUNS_NUMBER)
+
+        assert matcher.called_once
+
+
+class TestFormatCompanyForFamilyTree:
+    def test_no_company_returns_empty_object(self):
+        """
+        Test when the company provided is none, an object is still returned
+        """
+        assert format_company_for_family_tree(None) == {
+            'duns': None,
+            'corporateLinkage.parent.duns': None,
+            'primaryName': None,
+        }
+
+    def test_company_with_no_parent_duns_returns_none_for_corporate_linkage_parent(self):
+        """
+        Test a company without a parent duns number returns none for the corporate linkage
+        """
+        assert format_company_for_family_tree({'duns_number': '1', 'primary_name': 'abc'}) == {
+            'duns': '1',
+            'corporateLinkage.parent.duns': None,
+            'primaryName': 'abc',
+        }
+
+    def test_company_with_parent_duns_returns_id_for_corporate_linkage_parent(self):
+        """
+        Test a company with a parent duns number returns that number for the corporate linkage
+        """
+        assert format_company_for_family_tree(
+            {'duns_number': '1', 'parent_duns_number': '2', 'primary_name': 'abc'},
+        ) == {
+            'duns': '1',
+            'corporateLinkage.parent.duns': '2',
+            'primaryName': 'abc',
+        }
+
+
+class TestValidateCompanyId:
+    def test_company_id_is_valid(self):
+        with pytest.raises(APIBadRequestException):
+            validate_company_id('11223344')
+
+    def test_company_has_no_company_id(self):
+        with pytest.raises(APINotFoundException):
+            validate_company_id(uuid4())
+
+    def test_company_has_no_duns_number(self):
+        company = CompanyFactory(duns_number=None)
+        with pytest.raises(APIBadRequestException):
+            validate_company_id(company.id)
+
+    def test_company_has_invalid_duns_number(self):
+        company = CompanyFactory(duns_number='123')
+        with pytest.raises(serializers.ValidationError):
+            validate_company_id(company.id)

@@ -5,6 +5,8 @@ from urllib.parse import urljoin
 from uuid import UUID, uuid4
 
 import pytest
+import requests_mock
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
@@ -417,6 +419,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
             status_code=response_status_code,
             json={},
         )
+
         self.api_client.post(
             reverse('api-v4:dnb-api:company-search'),
             content_type='application/json',
@@ -2499,6 +2502,7 @@ class TestCompanyInvestigationView(APITestMixin):
 
 class TestHierarchyAPITestMixin:
     def set_dnb_hierarchy_mock_response(self, requests_mock, tree_members, status_code=200):
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, len(tree_members), status_code)
         requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
             status_code=status_code,
@@ -2554,15 +2558,15 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
     ):
         """
-        Test for POST proxy.
+        Test empty results from dnb return empty tree response.
         """
         api_client = self.create_api_client()
         company = CompanyFactory(duns_number='123456789')
 
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
         requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
-            status_code=200,
-            content=b'{"family_tree_members":[]}',
+            json={'family_tree_members': []},
         )
 
         url = reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': company.id})
@@ -2575,7 +2579,9 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         assert response.json() == {
             'ultimate_global_company': {},
             'ultimate_global_companies_count': 0,
+            'family_tree_companies_count': 0,
             'manually_verified_subsidiaries': [],
+            'reduced_tree': False,
         }
 
     def test_dnb_response_with_a_duns_number_matching_dh_company_duns_number_appends_dh_id(
@@ -2656,6 +2662,8 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
             },
             'ultimate_global_companies_count': len(tree_members),
             'manually_verified_subsidiaries': [],
+            'reduced_tree': False,
+            'family_tree_companies_count': len(tree_members),
         }
 
     def test_dnb_response_with_only_ultimate_parent_matching_a_datahub_company(
@@ -2787,6 +2795,8 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
             },
             'ultimate_global_companies_count': len(tree_members),
             'manually_verified_subsidiaries': [],
+            'reduced_tree': False,
+            'family_tree_companies_count': len(tree_members),
         }
 
     def _get_family_tree_response(
@@ -2812,11 +2822,11 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
     )
     def test_dnb_request_connection_error(self, requests_mock, request_exception):
         """
-        Test for POST proxy.
+        Test dnb api request exceptopn
         """
         api_client = self.create_api_client()
         company = CompanyFactory(duns_number='123456789')
-
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
         requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
             exc=request_exception,
@@ -3032,6 +3042,67 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 'hierarchy': '0',
             },
         ]
+
+    def test_more_than_maximum_allowed_companies_returns_reduced_tree(
+        self,
+        # requests_mock,
+        opensearch_with_signals,
+    ):
+        """
+        Test the scenario where the count of companies returned by the dnb service is above the
+        maximum allowed, so a reduced company tree is returned instead
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '111111111',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+        tree_members = [
+            {
+                'duns': '222222222',
+                'primaryName': faker.company(),
+                'corporateLinkage': {'hierarchyLevel': 2, 'parent': '111111111'},
+            }
+            for x in range(1001)
+        ]
+        tree_members.insert(0, ultimate_company_dnb)
+
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_company_dnb['duns'],
+            id='8e2e9b35-3415-4b9b-b9ff-f97446ac8942',
+            name=ultimate_company_dnb['primaryName'],
+            one_list_tier=OneListTier.objects.first(),
+        )
+        opensearch_with_signals.indices.refresh()
+        with requests_mock.Mocker() as m:
+            m.post(
+                DNB_V2_SEARCH_URL,
+                [
+                    {
+                        'json': {
+                            'results': [{'duns_number': '111111111'}],
+                        },
+                    },
+                    {
+                        'json': {
+                            'results': [
+                                {'duns_number': '222222222', 'parent_duns_number': '111111111'},
+                            ],
+                        },
+                    },
+                ],
+            )
+
+            response = self._get_family_tree_response(
+                m,
+                tree_members,
+                ultimate_company_dh,
+            )
+
+            assert response.status_code == 200
+            assert response.json()['reduced_tree'] is True
 
 
 class TestRelatedCompanyView(APITestMixin):
@@ -4099,3 +4170,223 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
             ).json()
             == 12
         )
+
+
+class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
+    """
+    DNB Company Hierarchy Reduced view test case.
+    """
+
+    def test_company_id_is_valid(self):
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': '11223344'}),
+            ).status_code
+            == 400
+        )
+
+    def test_company_has_no_company_id(self):
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': uuid4()}),
+            ).status_code
+            == 404
+        )
+
+    def test_company_has_no_duns_number(self):
+        company = CompanyFactory(duns_number=None)
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': company.id}),
+            ).status_code
+            == 400
+        )
+
+    def test_empty_results_returned_from_dnb_service(
+        self,
+        requests_mock,
+    ):
+        """
+        Test empty results from dnb proxy returns error
+        """
+        company = CompanyFactory(duns_number='123456789')
+
+        requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            json={'results': []},
+        )
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 2)
+
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': company.id}),
+            ).status_code
+            == 502
+        )
+
+    def test_more_than_single_result_returned_from_dnb_service(
+        self,
+        requests_mock,
+    ):
+        """
+        Test more than 1 result from dnb proxy returns error
+        """
+        company = CompanyFactory(duns_number='123456789')
+
+        requests_mock.post(
+            DNB_V2_SEARCH_URL,
+            json={'results': [{}, {}]},
+        )
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 2)
+
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': company.id}),
+            ).status_code
+            == 502
+        )
+
+    def test_single_result_returned_from_dnb_service_does_not_match_request(
+        self,
+        requests_mock,
+    ):
+        """
+        Test when the result from dnb proxy does not match requested duns number
+        """
+        company = CompanyFactory(duns_number='123456789')
+
+        requests_mock.post(DNB_V2_SEARCH_URL, json={'results': [{'duns_number': '000000000'}]})
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 2)
+
+        assert (
+            self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': company.id}),
+            ).status_code
+            == 502
+        )
+
+    def test_reduced_family_tree_success(
+        self,
+        opensearch_with_signals,
+    ):
+        """
+        Test when the result from dnb proxy is ok a valid tree is generated
+        """
+        global_company = CompanyFactory(duns_number='111111111')
+        company = CompanyFactory(duns_number='222222222', global_ultimate_duns_number='111111111')
+
+        opensearch_with_signals.indices.refresh()
+        with requests_mock.Mocker() as m:
+            m.post(
+                DNB_V2_SEARCH_URL,
+                [
+                    {
+                        'json': {
+                            'results': [
+                                {'duns_number': '222222222', 'parent_duns_number': '111111111'},
+                            ],
+                        },
+                    },
+                    {
+                        'json': {
+                            'results': [{'duns_number': '111111111'}],
+                        },
+                    },
+                ],
+            )
+
+            self.set_dnb_hierarchy_count_mock_response(m, 2)
+
+            response = self.api_client.get(
+                reverse('api-v4:dnb-api:reduced-family-tree', kwargs={'company_id': company.id}),
+            )
+
+            assert response.status_code == 200
+            assert response.json() == {
+                'ultimate_global_company': {
+                    'duns_number': global_company.duns_number,
+                    'name': global_company.name,
+                    'number_of_employees': global_company.number_of_employees,
+                    'id': str(global_company.id),
+                    'address': {
+                        'country': {
+                            'id': str(global_company.address_country.id),
+                            'name': global_company.address_country.name,
+                        },
+                        'county': '',
+                        'line_1': global_company.address_1,
+                        'line_2': '',
+                        'postcode': global_company.address_postcode,
+                        'town': global_company.address_town,
+                    },
+                    'registered_address': {
+                        'country': {
+                            'id': str(global_company.registered_address_country.id),
+                            'name': global_company.registered_address_country.name,
+                        },
+                        'county': '',
+                        'line_1': global_company.registered_address_1,
+                        'line_2': '',
+                        'postcode': global_company.registered_address_postcode,
+                        'town': global_company.registered_address_town,
+                    },
+                    'sector': {
+                        'id': str(global_company.sector.id),
+                        'name': global_company.sector.name,
+                    },
+                    'uk_region': {
+                        'id': str(global_company.uk_region.id),
+                        'name': global_company.uk_region.name,
+                    },
+                    'one_list_tier': None,
+                    'archived': global_company.archived,
+                    'latest_interaction_date': None,
+                    'hierarchy': 1,
+                    'subsidiaries': [
+                        {
+                            'duns_number': company.duns_number,
+                            'id': str(company.id),
+                            'name': company.name,
+                            'number_of_employees': company.number_of_employees,
+                            'address': {
+                                'country': {
+                                    'id': str(company.address_country.id),
+                                    'name': company.address_country.name,
+                                },
+                                'county': '',
+                                'line_1': company.address_1,
+                                'line_2': '',
+                                'postcode': company.address_postcode,
+                                'town': company.address_town,
+                            },
+                            'registered_address': {
+                                'country': {
+                                    'id': str(company.registered_address_country.id),
+                                    'name': company.registered_address_country.name,
+                                },
+                                'county': '',
+                                'line_1': company.registered_address_1,
+                                'line_2': '',
+                                'postcode': company.registered_address_postcode,
+                                'town': company.registered_address_town,
+                            },
+                            'sector': {
+                                'id': str(company.sector.id),
+                                'name': company.sector.name,
+                            },
+                            'uk_region': {
+                                'id': str(company.uk_region.id),
+                                'name': company.uk_region.name,
+                            },
+                            'one_list_tier': None,
+                            'archived': False,
+                            'latest_interaction_date': None,
+                            'hierarchy': 2,
+                        },
+                    ],
+                },
+                'ultimate_global_companies_count': 2,
+                'manually_verified_subsidiaries': [],
+                'reduced_tree': True,
+                'family_tree_companies_count': 2,
+            }
