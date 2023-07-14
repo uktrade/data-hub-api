@@ -665,7 +665,6 @@ def _move_requested_duns_to_start_of_subsidiary_list(dataframe, duns_number):
     if requested_duns_sibling_rows.empty is False:
         first_subsidiary_index = requested_duns_sibling_rows.head(1).index.item()
         requested_subsidiary_index = requested_duns_row.index.item()
-        print(first_subsidiary_index, requested_subsidiary_index)
         if first_subsidiary_index != requested_subsidiary_index:
             dataframe.iloc[first_subsidiary_index], dataframe.iloc[requested_subsidiary_index] = (
                 dataframe.iloc[requested_subsidiary_index].copy(),

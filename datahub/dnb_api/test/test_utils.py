@@ -1374,8 +1374,8 @@ class TestCreateCompanyTree:
         opensearch_with_signals,
     ):
         """
-        When a requested company is a parent with subsidaries and no siblings, no changes should be made to the
-        subsidiaries
+        When a requested company is a parent with subsidaries and no siblings, no changes should
+        be made to the subsidiaries
         """
         faker = Faker()
 
