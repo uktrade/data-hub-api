@@ -1,0 +1,6 @@
+- model: company.exportexperience
+  pk: 02a063e3-dab8-40ca-92d3-8e9c2d9f812d
+  fields:
+    disabled_on: null
+    name: An exported that DBT are helping maintain and grow their exports
+    order: 40
