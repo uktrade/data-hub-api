@@ -1,7 +1,6 @@
 import logging
 import uuid
 
-from collections import namedtuple
 
 from datetime import timedelta
 from itertools import islice
@@ -38,6 +37,7 @@ from datahub.dnb_api.constants import (
     ALL_DNB_UPDATED_MODEL_FIELDS,
     ALL_DNB_UPDATED_SERIALIZER_FIELDS,
 )
+from datahub.dnb_api.models import HierarchyData
 from datahub.dnb_api.serializers import DNBCompanyHierarchySerializer, DNBCompanySerializer
 from datahub.metadata.models import AdministrativeArea, Country
 from datahub.search.company.models import Company as SearchCompany
@@ -46,8 +46,9 @@ from datahub.search.query_builder import get_search_by_entities_query
 
 logger = logging.getLogger(__name__)
 MAX_DUNS_NUMBERS_PER_REQUEST = 1024
+MAX_COMPANIES_IN_TREE_COUNT = 1000
 
-HierarchyData = namedtuple('HierarchyData', ['data', 'count'])
+# HierarchyData = namedtuple('HierarchyData', ['data', 'count', 'reduced'])
 
 
 class DNBServiceBaseError(Exception):
@@ -576,9 +577,9 @@ def validate_company_id(company_id):
     return duns_number
 
 
-def get_company_hierarchy_data(duns_number) -> HierarchyData:
+def get_full_company_hierarchy_data(duns_number) -> HierarchyData:
     """
-    Get company hierarchy data
+    Get a full set of company hierarchy data direct from the dnb service
     """
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
@@ -600,8 +601,9 @@ def get_company_hierarchy_data(duns_number) -> HierarchyData:
     response_data = call_api_request_with_exception_handling(api_request).json()
 
     hierarchy_data = HierarchyData(
-        response_data.get('family_tree_members'),
-        response_data.get('global_ultimate_family_tree_members_count'),
+        data=response_data.get('family_tree_members'),
+        count=response_data.get('global_ultimate_family_tree_members_count'),
+        reduced=False,
     )
 
     # only cache successful dnb calls
@@ -609,6 +611,17 @@ def get_company_hierarchy_data(duns_number) -> HierarchyData:
     cache.set(cache_key, hierarchy_data, one_day_timeout)
 
     return hierarchy_data
+
+
+def get_company_hierarchy_data(duns_number) -> HierarchyData:
+    """
+    Get company hierarchy data
+    """
+    companies_count = get_company_hierarchy_count(duns_number)
+    if companies_count > MAX_COMPANIES_IN_TREE_COUNT:
+        return get_reduced_company_hierarchy_data(duns_number)
+
+    return get_full_company_hierarchy_data(duns_number)
 
 
 def is_valid_uuid(value):
@@ -947,7 +960,7 @@ def get_reduced_company_hierarchy_data(duns_number) -> HierarchyData:
         hierarchy_item['corporateLinkage.hierarchyLevel'] = index
         index += 1
 
-    return HierarchyData(data=hierarchy, count=len(hierarchy))
+    return HierarchyData(data=hierarchy, count=len(hierarchy), reduced=True)
 
 
 def get_cached_dnb_company(duns_number):
