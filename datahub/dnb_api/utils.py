@@ -1,14 +1,20 @@
 import logging
 import uuid
 
+from collections import namedtuple
+
 from datetime import timedelta
 from itertools import islice
 
 import numpy as np
 import pandas as pd
 
-
 import reversion
+
+from bigtree import (
+    dataframe_to_tree_by_relation,
+    tree_to_nested_dict,
+)
 
 from django.conf import settings
 from django.core.cache import cache
@@ -40,6 +46,8 @@ from datahub.search.query_builder import get_search_by_entities_query
 
 logger = logging.getLogger(__name__)
 MAX_DUNS_NUMBERS_PER_REQUEST = 1024
+
+HierarchyData = namedtuple('HierarchyData', ['data', 'count'])
 
 
 class DNBServiceBaseError(Exception):
@@ -111,6 +119,7 @@ def search_dnb(query_params, request=None):
         )
 
     response = call_api_request_with_exception_handling(api_request, 'dnb.search')
+
     return response
 
 
@@ -278,6 +287,7 @@ def update_company_from_dnb(
     """
     fields_to_update = fields_to_update or ALL_DNB_UPDATED_SERIALIZER_FIELDS
     # Set dnb_company data to only include the fields in fields_to_update
+
     dnb_company = {field: dnb_company[field] for field in fields_to_update}
 
     company_serializer = DNBCompanySerializer(
@@ -566,7 +576,7 @@ def validate_company_id(company_id):
     return duns_number
 
 
-def get_company_hierarchy_data(duns_number):
+def get_company_hierarchy_data(duns_number) -> HierarchyData:
     """
     Get company hierarchy data
     """
@@ -589,11 +599,16 @@ def get_company_hierarchy_data(duns_number):
 
     response_data = call_api_request_with_exception_handling(api_request).json()
 
+    hierarchy_data = HierarchyData(
+        response_data.get('family_tree_members'),
+        response_data.get('global_ultimate_family_tree_members_count'),
+    )
+
     # only cache successful dnb calls
     one_day_timeout = int(timedelta(days=1).total_seconds())
-    cache.set(cache_key, response_data, one_day_timeout)
+    cache.set(cache_key, hierarchy_data, one_day_timeout)
 
-    return response_data
+    return hierarchy_data
 
 
 def is_valid_uuid(value):
@@ -633,6 +648,37 @@ def _merge_columns_into_single_column(df, key: str, columns: list, nested_object
                         dataframe_row[nested_object_key] = None
 
     df[key] = dataframe_rows
+
+
+def create_company_tree(companies: list):
+    company_hierarchy_dataframe = create_company_hierarchy_dataframe(companies)
+
+    root = dataframe_to_tree_by_relation(
+        company_hierarchy_dataframe,
+        child_col='duns',
+        parent_col='corporateLinkage.parent.duns',
+    )
+
+    nested_tree = tree_to_nested_dict(
+        root,
+        name_key='duns_number',
+        child_key='subsidiaries',
+        attr_dict={
+            'primaryName': 'name',
+            'companyId': 'id',
+            'corporateLinkage.hierarchyLevel': 'hierarchy',
+            'ukRegion': 'uk_region',
+            'address': 'address',
+            'registeredAddress': 'registered_address',
+            'sector': 'sector',
+            'latestInteractionDate': 'latest_interaction_date',
+            'archived': 'archived',
+            'numberOfEmployees': 'number_of_employees',
+            'oneListTier': 'one_list_tier',
+        },
+    )
+
+    return nested_tree
 
 
 def create_company_hierarchy_dataframe(family_tree_members: list):
@@ -838,13 +884,15 @@ def get_company_hierarchy_count(duns_number):
             timeout=3.0,
         )
 
-    response_data = call_api_request_with_exception_handling(api_request).json()
+    companies_count = call_api_request_with_exception_handling(api_request).json()
+    if companies_count > 0:
+        companies_count = companies_count - 1
 
     # only cache successful dnb calls
     one_day_timeout = int(timedelta(days=1).total_seconds())
-    cache.set(cache_key, response_data, one_day_timeout)
+    cache.set(cache_key, companies_count, one_day_timeout)
 
-    return response_data
+    return companies_count
 
 
 def call_api_request_with_exception_handling(api_request_function, statsd_stat=None):
@@ -878,3 +926,65 @@ def call_api_request_with_exception_handling(api_request_function, statsd_stat=N
         raise DNBServiceError(error_message, result.status_code)
 
     return result
+
+
+def get_reduced_company_hierarchy_data(duns_number) -> HierarchyData:
+    """
+    Get company data that only includes direct parents of the duns number
+    """
+    hierarchy = []
+    while duns_number:
+        company_response = get_cached_dnb_company(duns_number)
+        formatted_company = format_company_for_family_tree(company_response)
+        hierarchy.append(formatted_company)
+        if formatted_company.get('corporateLinkage.parent.duns'):
+            duns_number = formatted_company.get('corporateLinkage.parent.duns')
+        else:
+            duns_number = None
+
+    index = 1  # index needs to sit outside, as the reversed function also reverses the index
+    for hierarchy_item in reversed(hierarchy):
+        hierarchy_item['corporateLinkage.hierarchyLevel'] = index
+        index += 1
+
+    return HierarchyData(data=hierarchy, count=len(hierarchy))
+
+
+def get_cached_dnb_company(duns_number):
+    """
+    Get the dnb company from the cache if it exists. If not, call the dnb api and save the result
+    in the cache before returning the company
+    """
+    cache_key = f'dnb_company_{duns_number}'
+    cache_value = cache.get(cache_key)
+
+    if cache_value:
+        return cache_value
+
+    company_response = get_dnb_company_data(duns_number)
+
+    # only cache successful dnb calls
+    one_day_timeout = int(timedelta(days=1).total_seconds())
+    cache.set(cache_key, company_response, one_day_timeout)
+
+    return company_response
+
+
+def format_company_for_family_tree(company):
+    """
+    Format the response from the search api to the format needed by the family tree
+    """
+    company_object = {
+        'duns': None,
+        'corporateLinkage.parent.duns': None,
+        'primaryName': None,
+    }
+    if company:
+        parent_duns_number = company.get('parent_duns_number')
+        company_object['duns'] = company.get('duns_number')
+        company_object['corporateLinkage.parent.duns'] = (
+            parent_duns_number if parent_duns_number else None
+        )
+        company_object['primaryName'] = company.get('primary_name')
+
+    return company_object

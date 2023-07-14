@@ -3,7 +3,8 @@ from django.urls import path
 from datahub.dnb_api.views import (
     DNBCompanyChangeRequestView,
     DNBCompanyCreateView,
-    DNBCompanyHierarchyView,
+    DNBCompanyHierarchyFullView,
+    DNBCompanyHierarchyReducedView,
     DNBCompanyInvestigationView,
     DNBCompanyLinkView,
     DNBCompanySearchView,
@@ -39,8 +40,13 @@ urlpatterns = [
     ),
     path(
         '<company_id>/family-tree',
-        DNBCompanyHierarchyView.as_view(),
+        DNBCompanyHierarchyFullView.as_view(),
         name='family-tree',
+    ),
+    path(
+        '<company_id>/reduced-family-tree',
+        DNBCompanyHierarchyReducedView.as_view(),
+        name='reduced-family-tree',
     ),
     path(
         '<company_id>/related-companies',
