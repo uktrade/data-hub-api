@@ -964,8 +964,8 @@ def get_cached_dnb_company(duns_number):
     company_response = get_dnb_company_data(duns_number)
 
     # only cache successful dnb calls
-    one_hour_timeout = int(timedelta(hours=1).total_seconds())
-    cache.set(cache_key, company_response, one_hour_timeout)
+    one_day_timeout = int(timedelta(days=1).total_seconds())
+    cache.set(cache_key, company_response, one_day_timeout)
 
     return company_response
 
