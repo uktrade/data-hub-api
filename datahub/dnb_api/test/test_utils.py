@@ -1369,6 +1369,51 @@ class TestCreateCompanyTree:
             tree['subsidiaries'][0]['duns_number'] == ultimate_company_subsidiary_company_1['duns']
         )
 
+    def test_parent_company_subsidiaries_left_unchanged_when_it_is_the_requested_company(
+        self,
+        opensearch_with_signals,
+    ):
+        """
+        When a requested company is a parent with subsidaries and no siblings, no changes should be made to the
+        subsidiaries
+        """
+        faker = Faker()
+
+        ultimate_company = {
+            'duns': '000000000',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+        ultimate_company_subsidiary_company_1 = {
+            'duns': '111111111',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company['duns']},
+            },
+        }
+        subsidiary_company_1_subsidiary_company_1 = {
+            'duns': '222222222',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 3,
+                'parent': {'duns': ultimate_company_subsidiary_company_1['duns']},
+            },
+        }
+
+        tree = create_company_tree(
+            [
+                ultimate_company,
+                ultimate_company_subsidiary_company_1,
+                subsidiary_company_1_subsidiary_company_1,
+            ],
+            ultimate_company_subsidiary_company_1['duns'],
+        )
+
+        assert (
+            tree['subsidiaries'][0]['duns_number'] == ultimate_company_subsidiary_company_1['duns']
+        )
+
     def test_subsidiary_company_at_start_of_list_is_left_in_place_when_it_is_the_requested_company(
         self,
         opensearch_with_signals,
