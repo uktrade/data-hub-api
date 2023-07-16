@@ -10,7 +10,7 @@ ipython==8.14.0
 factory-boy==3.2.1
 freezegun==1.2.2
 requests-mock==1.11.0
-pip-tools==6.14.0
+pip-tools==7.0.0
 piprot==0.9.11
 pre-commit==3.3.3
 
