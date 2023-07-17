@@ -2,17 +2,16 @@ import logging
 import uuid
 
 from collections import namedtuple
-
 from datetime import timedelta
 from itertools import islice
 
 import numpy as np
 import pandas as pd
-
 import reversion
 
 from bigtree import (
     dataframe_to_tree_by_relation,
+    find,
     tree_to_nested_dict,
 )
 
@@ -22,6 +21,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.timezone import now
 from requests.exceptions import ConnectionError, Timeout
 from rest_framework import serializers, status
+from rest_framework.response import Response
 
 from reversion.models import Version
 
@@ -32,11 +32,13 @@ from datahub.core.exceptions import (
     APIBadGatewayException,
     APIBadRequestException,
     APINotFoundException,
+    APIUpstreamException,
 )
 from datahub.core.serializers import AddressSerializer
 from datahub.dnb_api.constants import (
     ALL_DNB_UPDATED_MODEL_FIELDS,
     ALL_DNB_UPDATED_SERIALIZER_FIELDS,
+    MAX_COMPANIES_IN_TREE_COUNT,
 )
 from datahub.dnb_api.serializers import DNBCompanyHierarchySerializer, DNBCompanySerializer
 from datahub.metadata.models import AdministrativeArea, Country
@@ -863,6 +865,15 @@ def load_datahub_details(family_tree_members_duns):
     return [result.to_dict() for result in results]
 
 
+def get_company_datahub_hierarchy_from_dnb_data(self, duns_number):
+    companies_count = get_company_hierarchy_count(duns_number)
+    if companies_count > MAX_COMPANIES_IN_TREE_COUNT:
+        self.reduced_tree = True
+        return get_reduced_company_hierarchy_data(duns_number)
+    else:
+        return get_company_hierarchy_data(duns_number)
+
+
 def get_company_hierarchy_count(duns_number):
     """
     Get the count of companies in the hierarchy
@@ -948,6 +959,58 @@ def get_reduced_company_hierarchy_data(duns_number) -> HierarchyData:
         index += 1
 
     return HierarchyData(data=hierarchy, count=len(hierarchy))
+
+
+def get_datahub_ids_for_dnb_service_company_hierarchy(
+    include_parent_companies,
+    include_subsidiary_companies,
+    company_id,
+):
+    duns_number = validate_company_id(company_id)
+    try:
+        response = get_company_hierarchy_data(duns_number)
+    except (
+        DNBServiceConnectionError,
+        DNBServiceTimeoutError,
+        DNBServiceError,
+    ) as exc:
+        raise APIUpstreamException(str(exc))
+
+    family_tree_members = response.data
+    json_response = {
+        'related_companies': [],
+    }
+    if not family_tree_members:
+        return Response(json_response)
+
+    company_hierarchy_dataframe = create_related_company_dataframe(family_tree_members)
+
+    root = dataframe_to_tree_by_relation(
+        company_hierarchy_dataframe,
+        child_col='duns',
+        parent_col='corporateLinkage.parent.duns',
+    )
+
+    duns_node = find(root, lambda node: node.name == duns_number)
+
+    related_duns = []
+
+    if include_parent_companies:
+        ancestors_duns = duns_node.ancestors
+        for ancestor_duns_number in ancestors_duns:
+            related_duns.append(ancestor_duns_number.node_name)
+
+    if include_subsidiary_companies:
+        descendants_duns = duns_node.descendants
+        for descendant_duns_number in descendants_duns:
+            related_duns.append(descendant_duns_number.node_name)
+
+    company_ids = []
+
+    if related_duns:
+        company_ids = get_datahub_company_ids(related_duns)
+
+    return company_ids
 
 
 def get_cached_dnb_company(duns_number):

@@ -20,6 +20,9 @@ from datahub.core.query_utils import (
     get_full_name_expression,
     get_string_agg_subquery,
 )
+from datahub.dnb_api.utils import (
+    get_datahub_ids_for_dnb_service_company_hierarchy,
+)
 from datahub.investment.project.models import InvestmentProject as DBInvestmentProject
 from datahub.investment.project.models import InvestmentProjectStageLog
 from datahub.investment.project.query_utils import get_project_code_expression
@@ -204,12 +207,12 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
         investor_company_ids = validated_data.get('investor_company')
 
         if investor_company_ids:
-            investor_companies = DBCompany.objects.filter(id__in=investor_company_ids)
-            if validated_data.get('include_parent_companies'):
-                investor_company_ids.extend(self.get_parent_company_ids(investor_companies))
-
-            if validated_data.get('include_subsidiary_companies'):
-                investor_company_ids.extend(self.get_sibling_company_ids(investor_companies))
+            related_company_ids = get_datahub_ids_for_dnb_service_company_hierarchy(
+                validated_data.get('include_parent_companies'),
+                validated_data.get('include_subsidiary_companies'),
+                investor_company_ids[0],
+            )
+            investor_company_ids.extend(related_company_ids)
 
             validated_data['investor_company'] = investor_company_ids
 
@@ -365,7 +368,10 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
         team_member_names=get_string_agg_subquery(
             DBInvestmentProject,
             get_full_name_expression('team_members__adviser'),
-            ordering=('team_members__adviser__first_name', 'team_members__adviser__last_name'),
+            ordering=(
+                'team_members__adviser__first_name',
+                'team_members__adviser__last_name',
+            ),
         ),
         delivery_partner_names=get_string_agg_subquery(
             DBInvestmentProject,

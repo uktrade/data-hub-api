@@ -131,7 +131,8 @@
   pk: a73efeba-8499-11e6-ae22-56b6b6499611
   fields:
     company_number: 99919
-    name: Mercury Ltd
+    name: Branch B H3 2P(1)0C
+    duns_number: "951575726"
     business_type: 6f75408b-03e7-e611-bca1-e4115bead28a # Private Limited Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
@@ -210,9 +211,9 @@
 - model: company.company
   pk: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
   fields:
-    name: Mars Exports Ltd
+    name: Branch B H4 3P(3)0C
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
-    duns_number: "000345679"
+    duns_number: "812761721"
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
@@ -240,9 +241,9 @@
 - model: company.company
   pk: 008ba003-b528-4e79-b209-49fcfcceb371
   fields:
-    name: Motorleaf
+    name: Branch E H2 P1(1)C0
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
-    duns_number: "012345678"
+    duns_number: "985037237"
     global_ultimate_duns_number: "987654321"
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
@@ -266,9 +267,9 @@
 - model: company.company
   pk: fc3530bc-383c-4b18-94c8-8fbe918bee31
   fields:
-    name: Motorleaf Global HQ
+    name: Branch A H2 1P0C
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
-    duns_number: "987654321"
+    duns_number: "951563831"
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
@@ -318,7 +319,7 @@
 - model: company.company
   pk: 375094ac-f79a-43e5-9c88-059a7caa17f0
   fields:
-    name: One List Corp
+    name: The Global Company 0P11C
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
@@ -342,7 +343,7 @@
 - model: company.company
   pk: cc7e2f19-7251-4a41-a27a-f98437720531
   fields:
-    name: DnB Corp
+    name: Branch B H2 1P(1)6C(2)
     trading_names:
       - DnB
       - D&B
@@ -365,7 +366,7 @@
     registered_address_postcode: 10644
     registered_address_country: 84756b9a-5d95-e211-a939-e4115bead28a # Italy
     description: This is a dummy company for testing companies with DnB data
-    duns_number: "000000001"
+    duns_number: "822075198"
     created_on: "2015-10-26T11:00:00Z"
     modified_on: "2017-11-26T11:00:00Z"
 
@@ -424,16 +425,9 @@
 - model: company.company
   pk: ca141e78-e19b-4551-9234-66de570d43a6
   fields:
-    name: Mars Transferred Limited
+    name: Branch B H3 2P(2)6C(2)
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a # Company
-    transfer_reason: duplicate
-    transferred_on: "2018-07-06T15:44:56Z"
-    transferred_by: 7bad8082-4978-4fe8-a018-740257f01637
-    transferred_to: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
-    archived: true
-    archived_on: "2018-07-06T15:44:56Z"
-    archived_by: 7bad8082-4978-4fe8-a018-740257f01637
-    archived_reason: "This record is no longer in use and its data has been transferred to Mars Export Ltd for the following reason: Duplicate record."
+    duns_number: "811761659"
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
@@ -502,7 +496,7 @@
   fields:
     first_name: Johnny
     last_name: Cakeman
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611 # Venus Ltd
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31 # Venus Ltd
     primary: false
     full_telephone_number: +44 67890123432
     email: johnny@cakeman.com
@@ -520,7 +514,7 @@
   fields:
     first_name: Jenny
     last_name: Cakeman
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611 # Venus Ltd
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31 # Venus Ltd
     primary: true
     full_telephone_number: +44 67890123432
     email: jenny@cakeman.com
@@ -683,7 +677,7 @@
     kind: interaction
     subject: Provided alpha service
     date: "2017-06-01T00:00:00Z"
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
@@ -710,7 +704,7 @@
     kind: interaction
     subject: Discussed exports event
     date: "2017-06-03T00:00:00Z"
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
@@ -737,7 +731,7 @@
     kind: service_delivery
     subject: Provided beta service
     date: "2017-06-05T00:00:00Z"
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     event: ~
@@ -768,7 +762,7 @@
     kind: interaction
     subject: Want to export to the USA
     date: "2018-04-06T00:00:00Z"
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     event: ~
@@ -804,7 +798,7 @@
     kind: service_delivery
     subject: Exported to Canada
     date: "2018-06-06T00:00:00Z"
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     event: ~
@@ -840,7 +834,7 @@
     kind: service_delivery
     subject: Attended gamma event
     date: "2017-09-05T00:00:00Z"
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     contacts:
       - 9b1138ab-ec7b-497f-b8c3-27fed21694ef
     event: bda12a57-433c-4a0c-a7ce-5ebd080e09e8
@@ -872,7 +866,7 @@
     kind: service_delivery
     subject: TAP grant
     date: "2017-09-15T00:00:00Z"
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     event: ~
@@ -943,7 +937,7 @@
     status: ongoing
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
-    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    investor_company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
@@ -978,7 +972,7 @@
     status: ongoing
     estimated_land_date: 2020-01-01
     investment_type: 9c364e64-2b28-401b-b2df-50e08b0bca44 # Non-FDI
-    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    investor_company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
@@ -999,7 +993,7 @@
     status: ongoing
     estimated_land_date: 2020-01-01
     investment_type: 031269ab-b7ec-40e9-8a4e-7371404f0622 # Commitment to invest
-    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    investor_company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
@@ -1022,7 +1016,7 @@
     status: ongoing
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
-    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    investor_company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
@@ -1176,7 +1170,7 @@
     reason_delayed: Waiting on materials.
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
-    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    investor_company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
@@ -1216,7 +1210,7 @@
     date_abandoned: 2018-01-01
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
-    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    investor_company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
@@ -1257,7 +1251,7 @@
     country_lost_to: 0950bdb8-5d95-e211-a939-e4115bead28a
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
-    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    investor_company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
@@ -1295,7 +1289,7 @@
     status: ongoing
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
-    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    investor_company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
@@ -1348,7 +1342,7 @@
     estimated_land_date: 2020-01-01
     actual_land_date: 2018-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
-    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    investor_company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
@@ -1402,7 +1396,7 @@
     allow_blank_estimated_land_date: true
     actual_land_date: 2018-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
-    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    investor_company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
@@ -1560,7 +1554,7 @@
     kind: interaction
     date: "2017-06-03T00:00:00Z"
     investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
@@ -1585,7 +1579,7 @@
     kind: interaction
     date: "2017-06-05T00:00:00Z"
     investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
@@ -1710,7 +1704,7 @@
     kind: interaction
     status: draft
     date: "2030-06-05T00:00:00Z"
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     subject: Sample upcoming interaction
@@ -1733,7 +1727,7 @@
     kind: interaction
     status: draft
     date: "2019-06-05T00:00:00Z"
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     subject: Sample incomplete interaction
@@ -1756,7 +1750,7 @@
     kind: interaction
     status: draft
     date: "2030-06-05T00:00:00Z"
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     subject: Sample cancelled interaction
@@ -1942,7 +1936,7 @@
     investable_capital: 1000000
     investment_types:
       - 4170d99a-02fc-46ee-8fd4-3fe786717708
-    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    investor_company: fc3530bc-383c-4b18-94c8-8fbe918bee31
     investor_description: Some information
     investor_type: ac294431-94ba-4318-9b27-75f0ada99c0d
     minimum_equity_percentage: ec061f70-b287-41cf-aaf4-620aec79616b
@@ -1983,7 +1977,7 @@
     modified_on: "2021-01-01T11:27:48.064811+00:00"
     name: Project Zephyr
     promoters:
-      - 0f5216e0-849f-11e6-ae22-56b6b6499611
+      - fc3530bc-383c-4b18-94c8-8fbe918bee31
     required_checks_conducted: 81fafe5a-ed32-4f46-bdc5-2cafedf828e8
     status: 1386d4f4-732d-44b9-af8e-dffe7dd07d7b
     time_horizons:
@@ -2014,7 +2008,7 @@
     modified_on: "2021-01-01T11:27:48.064811+00:00"
     name: Camelot Regeneration Scheme
     promoters:
-      - 0f5216e0-849f-11e6-ae22-56b6b6499611
+      - fc3530bc-383c-4b18-94c8-8fbe918bee31
       - a73efeba-8499-11e6-ae22-56b6b6499611
     opportunity_value: 1000000000
     opportunity_value_type: edeff484-2bd1-40e6-94ca-0437d6115886

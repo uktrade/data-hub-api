@@ -1,9 +1,5 @@
 import logging
 
-from bigtree import (
-    dataframe_to_tree_by_relation,
-    find,
-)
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
@@ -20,7 +16,10 @@ from datahub.core.exceptions import (
 )
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
-from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedError, link_company_with_dnb
+from datahub.dnb_api.link_company import (
+    CompanyAlreadyDNBLinkedError,
+    link_company_with_dnb,
+)
 from datahub.dnb_api.queryset import get_company_queryset
 from datahub.dnb_api.serializers import (
     DNBCompanyChangeRequestSerializer,
@@ -35,7 +34,6 @@ from datahub.dnb_api.serializers import (
 from datahub.dnb_api.utils import (
     create_company_tree,
     create_investigation,
-    create_related_company_dataframe,
     DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequestError,
@@ -45,7 +43,7 @@ from datahub.dnb_api.utils import (
     get_company,
     get_company_hierarchy_count,
     get_company_hierarchy_data,
-    get_datahub_company_ids,
+    get_datahub_ids_for_dnb_service_company_hierarchy,
     get_reduced_company_hierarchy_data,
     request_changes,
     search_dnb,
@@ -484,49 +482,15 @@ class DNBRelatedCompaniesView(APIView):
         Given a Company Id, get the data for the company hierarchy from dnb-service
         then find the related companies to create a list of IDs
         """
-        duns_number = validate_company_id(company_id)
-        try:
-            response = get_company_hierarchy_data(duns_number)
-        except (
-            DNBServiceConnectionError,
-            DNBServiceTimeoutError,
-            DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
-
-        family_tree_members = response.data
-        json_response = {
-            'related_companies': [],
-        }
-        if not family_tree_members:
-            return Response(json_response)
-
-        company_hierarchy_dataframe = create_related_company_dataframe(family_tree_members)
-
-        root = dataframe_to_tree_by_relation(
-            company_hierarchy_dataframe,
-            child_col='duns',
-            parent_col='corporateLinkage.parent.duns',
+        company_ids = get_datahub_ids_for_dnb_service_company_hierarchy(
+            include_parent_companies=(
+                request.query_params.get('include_parent_companies') == 'true'
+            ),
+            include_subsidiary_companies=(
+                request.query_params.get('include_subsidiary_companies') == 'true'
+            ),
+            company_id=company_id,
         )
-
-        duns_node = find(root, lambda node: node.name == duns_number)
-
-        related_duns = []
-
-        if request.query_params.get('include_parent_companies') == 'true':
-            ancestors_duns = duns_node.ancestors
-            for ancestor_duns_number in ancestors_duns:
-                related_duns.append(ancestor_duns_number.node_name)
-
-        if request.query_params.get('include_subsidiary_companies') == 'true':
-            descendants_duns = duns_node.descendants
-            for descendant_duns_number in descendants_duns:
-                related_duns.append(descendant_duns_number.node_name)
-
-        company_ids = []
-
-        if related_duns:
-            company_ids = get_datahub_company_ids(related_duns)
 
         return Response(company_ids)
 
