@@ -11,6 +11,7 @@ from datahub.search.serializers import (
 class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
     """Serialiser used to validate company search POST bodies."""
 
+    id = SingleOrListField(child=StringUUIDField(), required=False)
     archived = serializers.BooleanField(required=False)
     headquarter_type = SingleOrListField(
         child=StringUUIDField(allow_null=True),

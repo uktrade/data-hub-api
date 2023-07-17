@@ -41,6 +41,7 @@ class SearchCompanyAPIViewMixin:
     )
 
     FILTER_FIELDS = (
+        'id',
         'archived',
         'headquarter_type',
         'name',
