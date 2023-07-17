@@ -650,8 +650,30 @@ def _merge_columns_into_single_column(df, key: str, columns: list, nested_object
     df[key] = dataframe_rows
 
 
-def create_company_tree(companies: list):
-    company_hierarchy_dataframe = create_company_hierarchy_dataframe(companies)
+def _move_requested_duns_to_start_of_subsidiary_list(dataframe, duns_number):
+    """
+    Move the dataframe row that matches the provided duns number to the start of it's parent
+    subsidiary list
+    """
+    requested_duns_row = dataframe.loc[dataframe['duns'] == duns_number]
+
+    requested_duns_sibling_rows = dataframe.loc[
+        dataframe['corporateLinkage.parent.duns']
+        == requested_duns_row['corporateLinkage.parent.duns'].values[0]
+    ]
+
+    if requested_duns_sibling_rows.empty is False:
+        first_subsidiary_index = requested_duns_sibling_rows.head(1).index.item()
+        requested_subsidiary_index = requested_duns_row.index.item()
+        if first_subsidiary_index != requested_subsidiary_index:
+            dataframe.iloc[first_subsidiary_index], dataframe.iloc[requested_subsidiary_index] = (
+                dataframe.iloc[requested_subsidiary_index].copy(),
+                dataframe.iloc[first_subsidiary_index].copy(),
+            )
+
+
+def create_company_tree(companies: list, duns_number):
+    company_hierarchy_dataframe = create_company_hierarchy_dataframe(companies, duns_number)
 
     root = dataframe_to_tree_by_relation(
         company_hierarchy_dataframe,
@@ -681,7 +703,7 @@ def create_company_tree(companies: list):
     return nested_tree
 
 
-def create_company_hierarchy_dataframe(family_tree_members: list):
+def create_company_hierarchy_dataframe(family_tree_members: list, duns_number):
     """
     Create a dataframe from the list of family tree members
     """
@@ -729,7 +751,7 @@ def create_company_hierarchy_dataframe(family_tree_members: list):
             'country': {'id': 'country.id', 'name': 'country.name'},
         },
     )
-
+    _move_requested_duns_to_start_of_subsidiary_list(normalized_df, duns_number)
     return normalized_df
 
 
