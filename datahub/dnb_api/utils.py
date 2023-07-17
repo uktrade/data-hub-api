@@ -48,8 +48,6 @@ logger = logging.getLogger(__name__)
 MAX_DUNS_NUMBERS_PER_REQUEST = 1024
 MAX_COMPANIES_IN_TREE_COUNT = 1000
 
-# HierarchyData = namedtuple('HierarchyData', ['data', 'count', 'reduced'])
-
 
 class DNBServiceBaseError(Exception):
     """
