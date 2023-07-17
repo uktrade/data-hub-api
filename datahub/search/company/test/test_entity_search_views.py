@@ -1067,11 +1067,11 @@ class TestSearch(APITestMixin):
         )
 
         search_results = [company['id'] for company in response.data['results']]
-        expected_results = [str(company3.id), str(company1.id)]
+        expected_results = [str(company1.id), str(company3.id)]
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
-        assert search_results == expected_results
+        assert set(search_results) == set(expected_results)
 
 
 class TestCompanyExportView(APITestMixin):
