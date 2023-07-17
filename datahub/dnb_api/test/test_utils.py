@@ -38,6 +38,7 @@ from datahub.dnb_api.constants import ALL_DNB_UPDATED_MODEL_FIELDS
 from datahub.dnb_api.test.utils import model_to_dict_company
 from datahub.dnb_api.utils import (
     create_company_hierarchy_dataframe,
+    create_company_tree,
     create_related_company_dataframe,
     DNBServiceConnectionError,
     DNBServiceError,
@@ -805,7 +806,7 @@ class TestCompanyHierarchyDataframe:
         tree_members = [ultimate_company_dnb]
 
         opensearch_with_signals.indices.refresh()
-        df = create_company_hierarchy_dataframe(tree_members)
+        df = create_company_hierarchy_dataframe(tree_members, ultimate_company_dnb['duns'])
 
         assert df['ukRegion'][0] is None
 
@@ -834,7 +835,7 @@ class TestCompanyHierarchyDataframe:
         tree_members = [ultimate_company_dnb]
 
         opensearch_with_signals.indices.refresh()
-        df = create_company_hierarchy_dataframe(tree_members)
+        df = create_company_hierarchy_dataframe(tree_members, ultimate_company_dnb['duns'])
         assert df['address'][0]['country'] is None
 
     def test_multiple_companies_with_nested_opensearch_field_combination_of_null_and_not_null(
@@ -876,7 +877,7 @@ class TestCompanyHierarchyDataframe:
         tree_members = [ultimate_company_dnb, tree_member_level_2]
 
         opensearch_with_signals.indices.refresh()
-        df = create_company_hierarchy_dataframe(tree_members)
+        df = create_company_hierarchy_dataframe(tree_members, ultimate_company_dnb['duns'])
 
         assert df['ukRegion'][0] is None
         assert df['ukRegion'][1] == {
@@ -923,7 +924,7 @@ class TestCompanyHierarchyDataframe:
         tree_members = [ultimate_company_dnb, tree_member_level_2]
 
         opensearch_with_signals.indices.refresh()
-        df = create_company_hierarchy_dataframe(tree_members)
+        df = create_company_hierarchy_dataframe(tree_members, ultimate_company_dnb['duns'])
 
         assert df['address'][0]['country'] is None
         assert df['address'][1]['country']['id'] == child_company.address_country_id
@@ -1329,3 +1330,194 @@ class TestValidateCompanyId:
         company = CompanyFactory(duns_number='123')
         with pytest.raises(serializers.ValidationError):
             validate_company_id(company.id)
+
+
+class TestCreateCompanyTree:
+    def test_ultimate_parent_company_subsidiaries_left_unchanged_when_it_is_the_requested_company(
+        self,
+        opensearch_with_signals,
+    ):
+        """
+        When a requested company is the ultimate parent, no changes should be made to the
+        subsidiaries
+        """
+        faker = Faker()
+
+        ultimate_company = {
+            'duns': '000000000',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+        ultimate_company_subsidiary_company_1 = {
+            'duns': '111111111',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company['duns']},
+            },
+        }
+
+        tree = create_company_tree(
+            [
+                ultimate_company,
+                ultimate_company_subsidiary_company_1,
+            ],
+            ultimate_company['duns'],
+        )
+
+        assert (
+            tree['subsidiaries'][0]['duns_number'] == ultimate_company_subsidiary_company_1['duns']
+        )
+
+    def test_parent_company_subsidiaries_left_unchanged_when_it_is_the_requested_company(
+        self,
+        opensearch_with_signals,
+    ):
+        """
+        When a requested company is a parent with subsidaries and no siblings, no changes should
+        be made to the subsidiaries
+        """
+        faker = Faker()
+
+        ultimate_company = {
+            'duns': '000000000',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+        ultimate_company_subsidiary_company_1 = {
+            'duns': '111111111',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company['duns']},
+            },
+        }
+        subsidiary_company_1_subsidiary_company_1 = {
+            'duns': '222222222',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 3,
+                'parent': {'duns': ultimate_company_subsidiary_company_1['duns']},
+            },
+        }
+
+        tree = create_company_tree(
+            [
+                ultimate_company,
+                ultimate_company_subsidiary_company_1,
+                subsidiary_company_1_subsidiary_company_1,
+            ],
+            ultimate_company_subsidiary_company_1['duns'],
+        )
+
+        assert (
+            tree['subsidiaries'][0]['duns_number'] == ultimate_company_subsidiary_company_1['duns']
+        )
+
+    def test_subsidiary_company_at_start_of_list_is_left_in_place_when_it_is_the_requested_company(
+        self,
+        opensearch_with_signals,
+    ):
+        """
+        When a requested company is a subsidiary company in the tree, and it is already the first
+        company in the list, check it remains at the start of the list
+        """
+        faker = Faker()
+
+        ultimate_company = {
+            'duns': '000000000',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+        ultimate_company_subsidiary_company_1 = {
+            'duns': '111111111',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company['duns']},
+            },
+        }
+        ultimate_company_subsidiary_company_2 = {
+            'duns': '222222222',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company['duns']},
+            },
+        }
+
+        tree = create_company_tree(
+            [
+                ultimate_company,
+                ultimate_company_subsidiary_company_1,
+                ultimate_company_subsidiary_company_2,
+            ],
+            ultimate_company_subsidiary_company_1['duns'],
+        )
+
+        assert (
+            tree['subsidiaries'][0]['duns_number'] == ultimate_company_subsidiary_company_1['duns']
+        )
+
+    def test_subsidiary_company_at_end_of_list_is_moved_to_top_when_it_is_the_requested_company(
+        self,
+        opensearch_with_signals,
+    ):
+        """
+        When a requested company is a subsidiary company in the tree, check it is moved to the
+        top of the list of subsidiaries
+        """
+        faker = Faker()
+
+        ultimate_company = {
+            'duns': '000000000',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+        ultimate_company_subsidiary_company_1 = {
+            'duns': '111111111',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company['duns']},
+            },
+        }
+        ultimate_company_subsidiary_company_2 = {
+            'duns': '222222222',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company['duns']},
+            },
+        }
+        ultimate_company_subsidiary_company_3 = {
+            'duns': '333333333',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 2,
+                'parent': {'duns': ultimate_company['duns']},
+            },
+        }
+        subsidiary_company_3_subsidiary_company_1 = {
+            'duns': '444444444',
+            'primaryName': faker.company(),
+            'corporateLinkage': {
+                'hierarchyLevel': 3,
+                'parent': {'duns': ultimate_company_subsidiary_company_3['duns']},
+            },
+        }
+
+        tree = create_company_tree(
+            [
+                ultimate_company,
+                ultimate_company_subsidiary_company_1,
+                ultimate_company_subsidiary_company_2,
+                ultimate_company_subsidiary_company_3,
+                subsidiary_company_3_subsidiary_company_1,
+            ],
+            ultimate_company_subsidiary_company_3['duns'],
+        )
+
+        assert (
+            tree['subsidiaries'][0]['duns_number'] == ultimate_company_subsidiary_company_3['duns']
+        )

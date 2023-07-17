@@ -3573,7 +3573,6 @@ class TestRelatedCompanyView(APITestMixin):
             'primaryName': faker.company(),
             'corporateLinkage': {'hierarchyLevel': 1},
         }
-
         direct_company_dnb = {
             'duns': '223456789',
             'primaryName': faker.company(),
@@ -3747,13 +3746,13 @@ class TestRelatedCompanyView(APITestMixin):
 
         opensearch_with_signals.indices.refresh()
 
-        prams = URL_PARENT_TRUE_SUBSIDIARY_FALSE
+        params = URL_PARENT_TRUE_SUBSIDIARY_FALSE
 
         response = self._get_related_company_response(
             requests_mock,
             tree_members,
             target_company_dh,
-            prams,
+            params,
         )
 
         assert response.status_code == 200
