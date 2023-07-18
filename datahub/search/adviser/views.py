@@ -46,14 +46,16 @@ class SearchAdviserAPIViewMixin:
         'last_name',
     )
 
-    REMAP_FIELDS = {}
+    REMAP_FIELDS = {'dit_team': 'dit_team.id'}
 
     COMPOSITE_FILTERS = {
-        'name': [
-            'name',  # to find 2-letter words
-            'name.trigram',
-            'trading_names',  # to find 2-letter words
-            'trading_names.trigram',
+        'first_name': [
+            'first_name',  # to find 2-letter words
+            'first_name.trigram',
+        ],
+        'last_name': [
+            'last_name',  # to find 2-letter words
+            'last_name.trigram',
         ],
     }
 

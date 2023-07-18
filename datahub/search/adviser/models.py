@@ -1,8 +1,8 @@
 from functools import partial
 
-from opensearch_dsl import Boolean, Date, Integer, Keyword, Object, Text
+from opensearch_dsl import Keyword, Text
 
-from datahub.company.models import CompanyExportCountry
+
 from datahub.search import dict_utils, fields
 from datahub.search.models import BaseSearchModel
 
@@ -22,4 +22,17 @@ class Adviser(BaseSearchModel):
             'keyword': fields.NormalizedKeyword(),
             'trigram': fields.TrigramText(),
         },
+    )
+    dit_team = fields.id_name_field()
+
+    MAPPINGS = {
+        'dit_team': dict_utils.id_name_dict,
+    }
+
+    SEARCH_FIELDS = (
+        'id',
+        'first_name',  # to find 2-letter words
+        'first_name.trigram',
+        'last_name',  # to find 2-letter words
+        'last_name.trigram',
     )
