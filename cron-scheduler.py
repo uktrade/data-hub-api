@@ -34,7 +34,7 @@ from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import DataHubScheduler, LONG_RUNNING_QUEUE
 from datahub.dnb_api.tasks.sync import schedule_sync_outdated_companies_with_dnb
 from datahub.dnb_api.tasks.update import schedule_get_company_updates
-from datahub.email_ingestion.tasks import ingest_emails, process_mailbox_emails
+from datahub.email_ingestion.tasks import process_mailbox_emails
 from datahub.investment.project.tasks import (
     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
 )
@@ -213,12 +213,6 @@ def schedule_jobs():
 
 
 def schedule_email_ingestion_tasks():
-    if settings.ENABLE_EMAIL_INGESTION:
-        job_scheduler(
-            function=ingest_emails,
-            cron=EVERY_TEN_MINUTES,
-            description='DataHub Email ingestion tasks ingest emails',
-        )
     if settings.ENABLE_MAILBOX_PROCESSING:
         job_scheduler(
             function=process_mailbox_emails,
