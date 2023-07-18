@@ -82,6 +82,7 @@ def test_interaction_activity(api_client, factory):
                     'dit:communicationChannel': {'name': interaction.communication_channel.name},
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
+                    'dit:business_intelligence': interaction.was_policy_feedback_provided,
                     'attributedTo': [
                         *[
                             {
@@ -169,6 +170,7 @@ def test_interaction_investment_project_activity(api_client):
                     'dit:communicationChannel': {'name': interaction.communication_channel.name},
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
+                    'dit:business_intelligence': interaction.was_policy_feedback_provided,
                     'attributedTo': [
                         *[
                             {
@@ -261,6 +263,7 @@ def test_service_delivery_activity(api_client):
                     'dit:archived': interaction.archived,
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
+                    'dit:business_intelligence': interaction.was_policy_feedback_provided,
                     'attributedTo': [
                         *[
                             {
@@ -346,6 +349,7 @@ def test_service_delivery_event_activity(api_client):
                     'dit:archived': interaction.archived,
                     'dit:subject': interaction.subject,
                     'dit:service': {'name': interaction.service.name},
+                    'dit:business_intelligence': interaction.was_policy_feedback_provided,
                     'attributedTo': [
                         *[
                             {
