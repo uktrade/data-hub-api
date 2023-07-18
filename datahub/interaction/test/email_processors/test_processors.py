@@ -9,7 +9,7 @@ from django.utils.timezone import utc
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.feature_flag.test.factories import FeatureFlagFactory
-from datahub.interaction import INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME
+from datahub.interaction import MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME
 from datahub.interaction.email_processors.exceptions import (
     BadCalendarInviteError,
     MalformedEmailError,
@@ -33,7 +33,7 @@ def interaction_email_notification_feature_flag():
     """
     Creates the email ingestion feature flag.
     """
-    yield FeatureFlagFactory(code=INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME)
+    yield FeatureFlagFactory(code=MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME)
 
 
 @pytest.fixture()

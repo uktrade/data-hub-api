@@ -593,17 +593,6 @@ DOCUMENT_BUCKETS = {
     },
 }
 
-MAILBOXES = {
-    'meetings': {
-        'username': env('MAILBOX_MEETINGS_USERNAME', default=''),
-        'password': env('MAILBOX_MEETINGS_PASSWORD', default=''),
-        'imap_domain': env('MAILBOX_MEETINGS_IMAP_DOMAIN', default=''),
-        'processor_classes': [
-            'datahub.interaction.email_processors.processors.CalendarInteractionEmailProcessor',
-        ],
-    },
-}
-
 DIT_EMAIL_INGEST_BLACKLIST = [
     email.lower() for email in env.list('DIT_EMAIL_INGEST_BLACKLIST', default=[])
 ]
