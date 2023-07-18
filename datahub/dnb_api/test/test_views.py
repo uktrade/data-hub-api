@@ -3105,7 +3105,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
             assert response.json()['reduced_tree'] is True
 
 
-class TestRelatedCompanyView(APITestMixin):
+class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
     """
     DNB Company Hierarchy Search view test case.
     """
@@ -3156,6 +3156,7 @@ class TestRelatedCompanyView(APITestMixin):
             DNB_HIERARCHY_SEARCH_URL,
             exc=request_exception,
         )
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 2)
 
         url = reverse('api-v4:dnb-api:related-companies', kwargs={'company_id': company.id})
         response = api_client.get(
@@ -3177,6 +3178,7 @@ class TestRelatedCompanyView(APITestMixin):
             status_code=200,
             content=b'{"family_tree_members":[]}',
         )
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 2)
 
         url = reverse('api-v4:dnb-api:related-companies', kwargs={'company_id': company.id})
         response = api_client.get(
@@ -3185,8 +3187,10 @@ class TestRelatedCompanyView(APITestMixin):
         )
 
         assert response.status_code == 200
+
         assert response.json() == {
             'related_companies': [],
+            'reduced_tree': None,
         }
 
     def test_single_subsidiary_id_is_returned_when_exists_in_data_hub(
@@ -3239,7 +3243,10 @@ class TestRelatedCompanyView(APITestMixin):
         )
 
         assert response.status_code == 200
-        assert response.json() == [child_company_dh.id]
+        assert response.json() == {
+            'related_companies': [child_company_dh.id],
+            'reduced_tree': False,
+        }
 
     def test_single_parent_id_is_returned_when_exists_in_data_hub(
         self,
@@ -3291,8 +3298,12 @@ class TestRelatedCompanyView(APITestMixin):
         )
 
         assert response.status_code == 200
-        assert response.json() == [ultimate_company_dh.id]
-        assert response.json() != [child_company_dh.id]
+        assert response.json() == {
+            'related_companies': [
+                ultimate_company_dh.id,
+            ],
+            'reduced_tree': False,
+        }
 
     def test_all_ids_except_self_are_returned_when_all_companies_are_in_data_hub_and_params_true(
         self,
@@ -3388,12 +3399,16 @@ class TestRelatedCompanyView(APITestMixin):
         )
 
         assert response.status_code == 200
-        assert response.json() == [
-            ultimate_company_dh.id,
-            direct_company_dh.id,
-            child_one_company_dh.id,
-            child_two_company_dh.id,
-        ]
+
+        assert response.json() == {
+            'related_companies': [
+                ultimate_company_dh.id,
+                direct_company_dh.id,
+                child_one_company_dh.id,
+                child_two_company_dh.id,
+            ],
+            'reduced_tree': False,
+        }
 
     def test_only_ids_are_returned_when_companies_are_in_data_hub_and_params_true(
         self,
@@ -3479,7 +3494,11 @@ class TestRelatedCompanyView(APITestMixin):
         )
 
         assert response.status_code == 200
-        assert response.json() == [ultimate_company_dh.id, child_two_company_dh.id]
+
+        assert response.json() == {
+            'related_companies': [ultimate_company_dh.id, child_two_company_dh.id],
+            'reduced_tree': False,
+        }
 
     def test_no_ids_are_returned_when_no_companies_are_in_data_hub_and_params_true(
         self,
@@ -3555,7 +3574,11 @@ class TestRelatedCompanyView(APITestMixin):
         )
 
         assert response.status_code == 200
-        assert response.json() == []
+
+        assert response.json() == {
+            'related_companies': [],
+            'reduced_tree': False,
+        }
 
     def test_all_ids_directly_related_returned_when_all_companies_are_in_data_hub_and_params_true(
         self,
@@ -3632,11 +3655,11 @@ class TestRelatedCompanyView(APITestMixin):
             id='444e9b35-3415-4b9b-b9ff-f97446ac8942',
             name=child_one_company_dnb['primaryName'],
         )
-        not_directly_related_company_dh = CompanyFactory(
+        CompanyFactory(
             duns_number=not_directly_related_company_dnb['duns'],
             id='555e9b35-3415-4b9b-b9ff-f97446ac8942',
             name=not_directly_related_company_dnb['primaryName'],
-        )
+        )  # not_directly_related_company_dh
 
         opensearch_with_signals.indices.refresh()
 
@@ -3650,17 +3673,15 @@ class TestRelatedCompanyView(APITestMixin):
         )
 
         assert response.status_code == 200
-        assert response.json() != [
-            ultimate_company_dh.id,
-            direct_company_dh.id,
-            child_one_company_dh.id,
-            not_directly_related_company_dh,
-        ]
-        assert response.json() == [
-            ultimate_company_dh.id,
-            direct_company_dh.id,
-            child_one_company_dh.id,
-        ]
+
+        assert response.json() == {
+            'related_companies': [
+                ultimate_company_dh.id,
+                direct_company_dh.id,
+                child_one_company_dh.id,
+            ],
+            'reduced_tree': False,
+        }
 
     def test_only_parent_ids_returned_when_include_parent_set_true_and_include_subsidiary_false(
         self,
@@ -3733,16 +3754,16 @@ class TestRelatedCompanyView(APITestMixin):
             id='333e9b35-3415-4b9b-b9ff-f97446ac8942',
             name=target_company_dnb['primaryName'],
         )
-        child_one_company_dh = CompanyFactory(
+        CompanyFactory(
             duns_number=child_one_company_dnb['duns'],
             id='444e9b35-3415-4b9b-b9ff-f97446ac8942',
             name=child_one_company_dnb['primaryName'],
-        )
-        child_two_company_dh = CompanyFactory(
+        )  # child_one_company_dh
+        CompanyFactory(
             duns_number=child_two_company_dnb['duns'],
             id='555e9b35-3415-4b9b-b9ff-f97446ac8942',
             name=child_two_company_dnb['primaryName'],
-        )
+        )  # child_two_company_dh
 
         opensearch_with_signals.indices.refresh()
 
@@ -3756,14 +3777,11 @@ class TestRelatedCompanyView(APITestMixin):
         )
 
         assert response.status_code == 200
-        assert response.json() == [
-            ultimate_company_dh.id,
-            direct_company_dh.id,
-        ]
-        assert response.json() != [
-            child_one_company_dh.id,
-            child_two_company_dh.id,
-        ]
+
+        assert response.json() == {
+            'related_companies': [ultimate_company_dh.id, direct_company_dh.id],
+            'reduced_tree': False,
+        }
 
     def test_only_subsidiary_ids_returned_when_include_parent_false_and_include_subsidiary_true(
         self,
@@ -3821,16 +3839,16 @@ class TestRelatedCompanyView(APITestMixin):
             child_one_company_dnb,
             child_two_company_dnb,
         ]
-        ultimate_company_dh = CompanyFactory(
+        CompanyFactory(
             duns_number=ultimate_company_dnb['duns'],
             id='111e9b35-3415-4b9b-b9ff-f97446ac8942',
             name=ultimate_company_dnb['primaryName'],
-        )
-        direct_company_dh = CompanyFactory(
+        )  # ultimate_company_dh
+        CompanyFactory(
             duns_number=direct_company_dnb['duns'],
             id='222e9b35-3415-4b9b-b9ff-f97446ac8942',
             name=direct_company_dnb['primaryName'],
-        )
+        )  # direct_company_dh
         target_company_dh = CompanyFactory(
             duns_number=target_company_dnb['duns'],
             id='333e9b35-3415-4b9b-b9ff-f97446ac8942',
@@ -3859,14 +3877,10 @@ class TestRelatedCompanyView(APITestMixin):
         )
 
         assert response.status_code == 200
-        assert response.json() == [
-            child_one_company_dh.id,
-            child_two_company_dh.id,
-        ]
-        assert response.json() != [
-            ultimate_company_dh.id,
-            direct_company_dh.id,
-        ]
+        assert response.json() == {
+            'related_companies': [child_one_company_dh.id, child_two_company_dh.id],
+            'reduced_tree': False,
+        }
 
     def test_no_ids_returned_when_include_parent_false_and_include_subsidiary_false(
         self,
@@ -3962,7 +3976,7 @@ class TestRelatedCompanyView(APITestMixin):
         )
 
         assert response.status_code == 200
-        assert response.json() == []
+        assert response.json() == {'related_companies': [], 'reduced_tree': False}
 
     def _get_related_company_response(
         self,
@@ -3983,6 +3997,7 @@ class TestRelatedCompanyView(APITestMixin):
                 },
             ).encode('utf-8'),
         )
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, len(tree_members))
         url = reverse(
             'api-v4:dnb-api:related-companies',
             kwargs={'company_id': ultimate_company.id},

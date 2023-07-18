@@ -50,8 +50,8 @@ from datahub.dnb_api.utils import (
     get_cached_dnb_company,
     get_company,
     get_company_hierarchy_count,
-    get_company_hierarchy_data,
     get_company_update_page,
+    get_full_company_hierarchy_data,
     get_reduced_company_hierarchy_data,
     load_datahub_details,
     RevisionNotFoundError,
@@ -655,7 +655,7 @@ class TestFormatDNBCompany:
         assert company['is_turnover_estimated'] is None
 
 
-class TestDNBHierarchyData:
+class TestDNBFullHierarchyData:
     """
     Tests for DNB Hierarchy function.
     """
@@ -670,7 +670,7 @@ class TestDNBHierarchyData:
         is not set.
         """
         with pytest.raises(ImproperlyConfigured):
-            get_company_hierarchy_data('123456789')
+            get_full_company_hierarchy_data('123456789')
 
     @pytest.mark.usefixtures('local_memory_cache')
     def test_when_dnb_data_not_in_cache_dnb_api_is_called(self, requests_mock):
@@ -683,7 +683,7 @@ class TestDNBHierarchyData:
             status_code=200,
             content=b'{"family_tree_members":[]}',
         )
-        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+        get_full_company_hierarchy_data(self.VALID_DUNS_NUMBER)
 
         assert matcher.called_once
         assert cache.get(self.FAMILY_TREE_CACHE_KEY) is not None
@@ -695,17 +695,16 @@ class TestDNBHierarchyData:
     ):
         """
         Test that after a successful call to the dnb api, all subsequent calls to the
-        get_company_hierarchy_data function get the data from the cache
+        get_full_company_hierarchy_data function get the data from the cache
         """
         matcher = requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
-            status_code=200,
             content=b'{"family_tree_members":[]}',
         )
 
-        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
-        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
-        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+        get_full_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+        get_full_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+        get_full_company_hierarchy_data(self.VALID_DUNS_NUMBER)
 
         assert matcher.called_once
 
@@ -718,15 +717,14 @@ class TestDNBHierarchyData:
 
         matcher = requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
-            status_code=200,
             content=b'{"family_tree_members":[]}',
         )
 
-        result = get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+        result = get_full_company_hierarchy_data(self.VALID_DUNS_NUMBER)
         assert result == 'cached'
 
-        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
-        get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+        get_full_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+        get_full_company_hierarchy_data(self.VALID_DUNS_NUMBER)
 
         assert not matcher.called
 
@@ -763,7 +761,7 @@ class TestDNBHierarchyData:
         """
         with pytest.raises(expected_exception):
             requests_mock.post(DNB_HIERARCHY_SEARCH_URL, exc=request_exception)
-            get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+            get_full_company_hierarchy_data(self.VALID_DUNS_NUMBER)
         assert cache.get(self.FAMILY_TREE_CACHE_KEY) is None
 
     def test_when_dnb_api_returns_status_code_not_success_response_is_not_cached(
@@ -779,7 +777,7 @@ class TestDNBHierarchyData:
                 status_code=500,
                 content=b'{"family_tree_members":[]}',
             )
-            get_company_hierarchy_data(self.VALID_DUNS_NUMBER)
+            get_full_company_hierarchy_data(self.VALID_DUNS_NUMBER)
         assert cache.get(self.FAMILY_TREE_CACHE_KEY) is None
 
 
@@ -1067,7 +1065,6 @@ class TestDNBHierarchyCount:
         """
         matcher = requests_mock.post(
             DNB_HIERARCHY_COUNT_URL,
-            status_code=200,
             content=b'1',
         )
         get_company_hierarchy_count(self.VALID_DUNS_NUMBER)
@@ -1086,7 +1083,6 @@ class TestDNBHierarchyCount:
         """
         matcher = requests_mock.post(
             DNB_HIERARCHY_COUNT_URL,
-            status_code=200,
             content=b'5',
         )
 
@@ -1105,7 +1101,6 @@ class TestDNBHierarchyCount:
 
         matcher = requests_mock.post(
             DNB_HIERARCHY_COUNT_URL,
-            status_code=200,
             content=b'1',
         )
 
