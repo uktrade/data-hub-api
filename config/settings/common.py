@@ -308,6 +308,7 @@ DEFAULT_SERVICE_TIMEOUT = float(env('DEFAULT_SERVICE_TIMEOUT', default=5.0))  # 
 MPTT_ADMIN_LEVEL_INDENT = 30
 
 SEARCH_APPS = [
+    'datahub.search.adviser.AdviserSearchApp',
     'datahub.search.company.CompanySearchApp',
     'datahub.search.contact.ContactSearchApp',
     'datahub.search.event.EventSearchApp',

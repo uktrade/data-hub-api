@@ -140,8 +140,10 @@ class SearchBasicAPIView(APIView):
         response = {
             'count': results.hits.total.value,
             'results': [result.to_dict() for result in results.hits],
-            'aggregations': [{'count': x['doc_count'], 'entity': x['key']}
-                             for x in results.aggregations['count_by_type']['buckets']],
+            'aggregations': [
+                {'count': x['doc_count'], 'entity': x['key']}
+                for x in results.aggregations['count_by_type']['buckets']
+            ],
         }
 
         return Response(data=response)
@@ -242,8 +244,10 @@ class SearchAPIView(APIView):
 
         # to support legacy paging parameters that can be in query_string
         for legacy_query_param in ('limit', 'offset'):
-            if legacy_query_param in request.query_params \
-                    and legacy_query_param not in request.data:
+            if (
+                legacy_query_param in request.query_params
+                and legacy_query_param not in request.data
+            ):
                 data[legacy_query_param] = request.query_params[legacy_query_param]
 
         validated_data = self.validate_data(data)
@@ -321,17 +325,21 @@ class SearchExportAPIView(SearchAPIView):
 
     def _get_opensearch_query(self, request, validated_data):
         """Gets a scannable OpenSearch query for the current request."""
-        return self.get_base_query(
-            request,
-            validated_data,
-        ).source(
-            # Stops _source from being returned in the responses
-            fields=False,
-        ).params(
-            # Keeps the sort order that the user specified
-            preserve_order=True,
-            # Number of results in each scroll response
-            size=settings.SEARCH_EXPORT_SCROLL_CHUNK_SIZE,
+        return (
+            self.get_base_query(
+                request,
+                validated_data,
+            )
+            .source(
+                # Stops _source from being returned in the responses
+                fields=False,
+            )
+            .params(
+                # Keeps the sort order that the user specified
+                preserve_order=True,
+                # Number of results in each scroll response
+                size=settings.SEARCH_EXPORT_SCROLL_CHUNK_SIZE,
+            )
         )
 
     def _get_rows(self, ids, search_ordering):
@@ -346,13 +354,18 @@ class SearchExportAPIView(SearchAPIView):
         """
         db_ordering = self._translate_search_ordering_to_django_ordering(search_ordering)
 
-        return self.queryset.filter(
-            pk__in=ids,
-        ).order_by(
-            *db_ordering,
-        ).values(
-            *self.field_titles.keys(),
-        ).iterator()
+        return (
+            self.queryset.filter(
+                pk__in=ids,
+            )
+            .order_by(
+                *db_ordering,
+            )
+            .values(
+                *self.field_titles.keys(),
+            )
+            .iterator()
+        )
 
     def _translate_search_ordering_to_django_ordering(self, ordering):
         """
@@ -403,6 +416,7 @@ def register_v3_view(sub_path=None):
           ...
 
     """
+
     def inner(view_cls):
         _register_view(v3_view_registry, view_cls.search_app, view_cls, 'v3', sub_path=sub_path)
         return view_cls
@@ -437,6 +451,7 @@ def register_v4_view(sub_path=None, is_public=False):
               ...
 
     """
+
     def inner(view_cls):
         _register_view(
             v4_view_registry,
@@ -460,7 +475,6 @@ def _register_view(
     is_public=False,
 ):
     view_type = ViewType.public if is_public else ViewType.default
-
     if (search_app, view_type, sub_path) in view_mapping:
         raise ValueError(
             f'There is already a {version_for_error} view with sub_path {sub_path} for search app '
