@@ -1044,6 +1044,35 @@ class TestSearch(APITestMixin):
         assert area['id'] in ids
         assert area['name'] in names
 
+    def test_company_ids(self, opensearch_with_collector):
+        """Validate searching by multiple id's returns all matches"""
+        company1 = CompanyFactory(
+            name='abc',
+        )
+        CompanyFactory(
+            name='def',
+        )
+        company3 = CompanyFactory(
+            name='ghi',
+        )
+
+        opensearch_with_collector.flush_and_refresh()
+        url = reverse('api-v4:search:company')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'id': [company1.id, company3.id],
+            },
+        )
+
+        search_results = [company['id'] for company in response.data['results']]
+        expected_results = [str(company1.id), str(company3.id)]
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert set(search_results) == set(expected_results)
+
 
 class TestCompanyExportView(APITestMixin):
     """Tests the company export view."""
