@@ -36,6 +36,7 @@ from datahub.core.serializers import AddressSerializer
 from datahub.dnb_api.constants import (
     ALL_DNB_UPDATED_MODEL_FIELDS,
     ALL_DNB_UPDATED_SERIALIZER_FIELDS,
+    MAX_COMPANIES_IN_TREE_COUNT,
 )
 from datahub.dnb_api.models import HierarchyData
 from datahub.dnb_api.serializers import DNBCompanyHierarchySerializer, DNBCompanySerializer
@@ -46,7 +47,6 @@ from datahub.search.query_builder import get_search_by_entities_query
 
 logger = logging.getLogger(__name__)
 MAX_DUNS_NUMBERS_PER_REQUEST = 1024
-MAX_COMPANIES_IN_TREE_COUNT = 1000
 
 
 class DNBServiceBaseError(Exception):
