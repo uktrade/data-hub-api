@@ -72,6 +72,7 @@ class InteractionActivitySerializer(ActivitySerializer):
                 'dit:status': instance.status,
                 'dit:archived': instance.archived,
                 'dit:subject': instance.subject,
+                'dit:business_intelligence': instance.was_policy_feedback_provided,
                 'attributedTo': [
                     *self._get_companies(instance.companies),
                     *self._get_dit_participants(instance.dit_participants),
