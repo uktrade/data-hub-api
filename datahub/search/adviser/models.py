@@ -1,6 +1,4 @@
-from functools import partial
-
-from opensearch_dsl import Keyword, Text
+from opensearch_dsl import Boolean, Keyword, Text
 
 
 from datahub.search import dict_utils, fields
@@ -8,7 +6,7 @@ from datahub.search.models import BaseSearchModel
 
 
 class Adviser(BaseSearchModel):
-    """Empty model"""
+    """Adviser model"""
 
     id = Keyword()
     first_name = Text(
@@ -24,6 +22,7 @@ class Adviser(BaseSearchModel):
         },
     )
     dit_team = fields.id_name_field()
+    is_active = Boolean()
 
     MAPPINGS = {
         'dit_team': dict_utils.id_name_dict,
@@ -35,4 +34,5 @@ class Adviser(BaseSearchModel):
         'first_name.trigram',
         'last_name',  # to find 2-letter words
         'last_name.trigram',
+        'is_active',
     )

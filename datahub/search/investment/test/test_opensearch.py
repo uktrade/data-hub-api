@@ -730,12 +730,17 @@ def test_get_basic_search_query():
                                 'event_type.name.trigram',
                                 'export_segment',
                                 'export_sub_segment',
+                                'first_name',
+                                'first_name.trigram',
                                 'full_telephone_number',
                                 'id',
                                 'investor_company.name',
                                 'investor_company.name.trigram',
+                                'is_active',
                                 'job_title',
                                 'job_title.trigram',
+                                'last_name',
+                                'last_name.trigram',
                                 'name',
                                 'name.trigram',
                                 'name_with_title',
@@ -834,7 +839,7 @@ def test_limited_get_search_by_entity_query():
         offset=5,
         limit=5,
     )
-
+    investment_query = '80756b9a-5d95-e211-a939-e4115bead28a'
     assert query.to_dict() == {
         'query': {
             'bool': {
@@ -849,7 +854,8 @@ def test_limited_get_search_by_entity_query():
                                             'boost': 2,
                                         },
                                     },
-                                }, {
+                                },
+                                {
                                     'multi_match': {
                                         'query': 'test',
                                         'fields': (
@@ -881,8 +887,7 @@ def test_limited_get_search_by_entity_query():
                                             {
                                                 'match': {
                                                     'investor_company_country.id': {
-                                                        'query':
-                                                            '80756b9a-5d95-e211-a939-e4115bead28a',
+                                                        'query': investment_query,
                                                         'operator': 'and',
                                                     },
                                                 },
@@ -890,7 +895,8 @@ def test_limited_get_search_by_entity_query():
                                         ],
                                         'minimum_should_match': 1,
                                     },
-                                }, {
+                                },
+                                {
                                     'range': {
                                         'estimated_land_date': {
                                             'gte': '2017-06-13T09:44:31.062870',

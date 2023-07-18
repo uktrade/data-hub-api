@@ -18,3 +18,4 @@ class SearchAdviserQuerySerializer(EntitySearchQuerySerializer):
         child=StringUUIDField(),
         required=False,
     )
+    is_active = serializers.BooleanField(required=False)
