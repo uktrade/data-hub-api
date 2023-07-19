@@ -1294,6 +1294,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'contact_email': contact.email,
             'service': service.name,
             'communication_channel': communication_channel.name,
+            'export_barrier_type': '',
         }
         form = InteractionCSVRowForm(data=data)
 
