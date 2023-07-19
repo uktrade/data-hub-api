@@ -6,7 +6,7 @@ from django.conf import settings
 
 from datahub.core import statsd
 from datahub.feature_flag.utils import is_feature_flag_active
-from datahub.interaction import INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME
+from datahub.interaction import MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME
 from datahub.notification.notify import notify_adviser_by_email
 
 
@@ -37,9 +37,9 @@ def notify_meeting_ingest_failure(adviser, errors, recipients):
     """
     domain_label = get_domain_label(adviser.get_email_domain())
     statsd.incr(f'rq.calendar-invite-ingest.failure.{domain_label}')
-    if not is_feature_flag_active(INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME):
+    if not is_feature_flag_active(MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME):
         logger.info(
-            f'Feature flag "{INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME}" is not active, '
+            f'Feature flag "{MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME}" is not active, '
             'exiting.',
         )
         return
@@ -63,9 +63,9 @@ def notify_meeting_ingest_success(adviser, interaction, recipients):
     """
     domain_label = get_domain_label(adviser.get_email_domain())
     statsd.incr(f'rq.calendar-invite-ingest.success.{domain_label}')
-    if not is_feature_flag_active(INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME):
+    if not is_feature_flag_active(MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME):
         logger.info(
-            f'Feature flag "{INTERACTION_EMAIL_NOTIFICATION_FEATURE_FLAG_NAME}" is not active, '
+            f'Feature flag "{MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME}" is not active, '
             'exiting.',
         )
         return
