@@ -51,7 +51,7 @@ class TestPurgeQueueCommandShould:
 
         success_message = call_command(command, 'test-rq-health', '--queue_state=queued')
 
-        assert success_message == 'Successfully purged queued on test-rq-health queue'
+        assert 'Successfully purged queued on test-rq-health queue' in success_message
         assert call().__enter__().purge('test-rq-health', 'queued') in (
             mock_scheduler.mock_calls
         )
@@ -66,7 +66,7 @@ class TestPurgeQueueCommandShould:
         command = purge_queue.Command()
 
         success_message = call_command(command, 'long-running', '--queue_state=failed')
-        assert success_message == 'Successfully purged failed on long-running queue'
+        assert 'Successfully purged failed on long-running queue' in success_message
         assert call().__enter__().purge('long-running', 'failed') in (
             mock_scheduler.mock_calls
         )

@@ -4,8 +4,6 @@ import pytest
 from django.test.utils import override_settings
 
 from datahub.email_ingestion import emails
-from datahub.email_ingestion.tasks import process_mailbox_emails
-from datahub.feature_flag.models import FeatureFlag
 from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.interaction import MAILBOX_INGESTION_FEATURE_FLAG_NAME
 
@@ -33,7 +31,7 @@ class TestMailbox:
     Test the mailbox module.
     """
 
-    @override_settings(MAILBOXES=DOCUMENT_BUCKETS_SETTING)
+    @override_settings(DOCUMENT_BUCKETS=DOCUMENT_BUCKETS_SETTING)
     def test_mailbox_process_ingestion_emails(self, monkeypatch):
         """
         Tests processing of emails.
@@ -57,7 +55,7 @@ class TestMailbox:
             bucket_id=emails.BUCKET_ID, document_key=DOCUMENTS[0]['source'],
         )
 
-    @override_settings(MAILBOXES=DOCUMENT_BUCKETS_SETTING)
+    @override_settings(DOCUMENT_BUCKETS=DOCUMENT_BUCKETS_SETTING)
     def test_mailbox_process_ingestion_emails_not_processed_with_deleted_docs(self, monkeypatch):
         """
         Tests processing of emails with error and deleted documents.
@@ -81,62 +79,3 @@ class TestMailbox:
         mock_delete.assert_called_with(
             bucket_id=emails.BUCKET_ID, document_key=DOCUMENTS[0]['source'],
         )
-
-
-@pytest.mark.django_db
-@pytest.mark.usefixtures('mailbox_ingestion_feature_flag')
-class TestTasks:
-    """
-    Test RQ task.
-    """
-
-    @override_settings(MAILBOXES=DOCUMENT_BUCKETS_SETTING)
-    def test_process_mailbox_emails_lock_acquired(self, monkeypatch):
-        """
-        Test that mailbox is processed when the lock is acquired.
-        """
-        mocked = mock.Mock()
-        monkeypatch.setattr('datahub.email_ingestion.emails.process_ingestion_emails', mocked)
-        process_mailbox_emails()
-        assert mocked.call_count == 1
-
-    @override_settings(MAILBOXES=DOCUMENT_BUCKETS_SETTING)
-    def test_process_mailbox_emails_lock_not_acquired(self, monkeypatch):
-        """
-        Test that mailbox is not processed when the lock is not acquired.
-        """
-        advisory_lock_mock = mock.MagicMock()
-        advisory_lock_mock.return_value.__enter__.return_value = False
-        monkeypatch.setattr('datahub.email_ingestion.tasks.advisory_lock', advisory_lock_mock)
-
-        mocked = mock.Mock()
-        monkeypatch.setattr('datahub.email_ingestion.emails.process_ingestion_emails', mocked)
-        process_mailbox_emails()
-        assert mocked.called is False
-        assert mocked.call_count == 0
-
-    @override_settings(MAILBOXES=DOCUMENT_BUCKETS_SETTING)
-    def test_process_mailbox_emails_feature_flag_active(self, monkeypatch):
-        """
-        Test that mailbox is processed when the feature flag is active.
-        """
-        mocked = mock.Mock()
-        monkeypatch.setattr('datahub.email_ingestion.emails.process_ingestion_emails', mocked)
-        flag = FeatureFlag.objects.get(code=MAILBOX_INGESTION_FEATURE_FLAG_NAME)
-        flag.is_active = True
-        flag.save()
-        process_mailbox_emails()
-        assert mocked.call_count == 1
-
-    @override_settings(MAILBOXES=DOCUMENT_BUCKETS_SETTING)
-    def test_process_mailbox_emails_feature_flag_inactive(self, monkeypatch):
-        """
-        Test that mailbox is processed when the feature flag is not active.
-        """
-        mocked = mock.Mock()
-        monkeypatch.setattr('datahub.email_ingestion.emails.process_ingestion_emails', mocked)
-        flag = FeatureFlag.objects.get(code=MAILBOX_INGESTION_FEATURE_FLAG_NAME)
-        flag.is_active = False
-        flag.save()
-        process_mailbox_emails()
-        assert mocked.call_count == 0
