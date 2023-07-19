@@ -211,7 +211,8 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
                 validated_data.get('include_subsidiary_companies'),
                 investor_company_ids[0],
             )
-            investor_company_ids.extend(related_company_ids)
+            print('related_company_ids', related_company_ids['related_companies'])
+            investor_company_ids.extend(related_company_ids['related_companies'])
 
             validated_data['investor_company'] = investor_company_ids
 

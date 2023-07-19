@@ -1002,9 +1002,7 @@ def get_datahub_ids_for_dnb_service_company_hierarchy(
         raise APIUpstreamException(str(exc))
 
     family_tree_members = response.data
-    json_response = {
-        'related_companies': [],
-    }
+    json_response = {'related_companies': [], 'reduced_tree': None}
     if not family_tree_members:
         return Response(json_response)
 
@@ -1019,7 +1017,7 @@ def get_datahub_ids_for_dnb_service_company_hierarchy(
     duns_node = find(root, lambda node: node.name == duns_number)
 
     related_duns = []
-
+    json_response['reduced_tree'] = response.reduced
     if include_parent_companies:
         ancestors_duns = duns_node.ancestors
         for ancestor_duns_number in ancestors_duns:
@@ -1030,12 +1028,10 @@ def get_datahub_ids_for_dnb_service_company_hierarchy(
         for descendant_duns_number in descendants_duns:
             related_duns.append(descendant_duns_number.node_name)
 
-    company_ids = []
-
     if related_duns:
-        company_ids = get_datahub_company_ids(related_duns)
+        json_response['related_companies'] = get_datahub_company_ids(related_duns)
 
-    return company_ids
+    return json_response
 
 
 def get_cached_dnb_company(duns_number):
