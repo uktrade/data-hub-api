@@ -132,6 +132,8 @@ class CaseInsensitiveMultipleChoiceField(forms.MultipleChoiceField):
     def validate(self, value):
         """Case insensitive validation of choices."""
         for val in value:
+            if not (self.required or val):
+                continue
             if not any(choice for choice in self.choices if val.lower() == choice[0].lower()):
                 raise ValidationError(
                     self.error_messages['invalid_choice'],
@@ -289,7 +291,6 @@ class InteractionCSVRowForm(forms.Form):
         added to NON_FIELD_ERRORS (but this should not happen).
         """
         super().full_clean()
-
         if not self.is_valid_and_matched():
             return
 
