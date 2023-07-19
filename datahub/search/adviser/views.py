@@ -13,12 +13,10 @@ class SearchAdviserAPIViewMixin:
 
     search_app = AdviserSearchApp
     serializer_class = SearchAdviserQuerySerializer
-    es_sort_by_remappings = {
-        'name': 'name.keyword',
-    }
+    es_sort_by_remappings = {}
     fields_to_exclude = ()
 
-    FILTER_FIELDS = ('id', 'first_name', 'last_name', 'is_active')
+    FILTER_FIELDS = ('id', 'first_name', 'last_name', 'name', 'is_active', 'dit_team')
 
     REMAP_FIELDS = {'dit_team': 'dit_team.id'}
 

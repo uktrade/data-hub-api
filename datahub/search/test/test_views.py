@@ -6,7 +6,7 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -37,7 +37,8 @@ class TestValidateViewAttributes:
         mapping = search_view.search_app.search_model._doc_type.mapping
 
         invalid_fields = {
-            field for field in search_view.REMAP_FIELDS.values()
+            field
+            for field in search_view.REMAP_FIELDS.values()
             if not mapping.resolve_field(field)
         }
 
@@ -90,8 +91,8 @@ class TestValidateViewSortByAttributes:
 
         serializer_class = search_view.serializer_class
 
-        invalid_fields = (
-            search_view.es_sort_by_remappings.keys() - set(serializer_class.SORT_BY_FIELDS)
+        invalid_fields = search_view.es_sort_by_remappings.keys() - set(
+            serializer_class.SORT_BY_FIELDS,
         )
 
         assert not invalid_fields
@@ -106,8 +107,8 @@ class TestValidateExportViewAttributes:
             return
 
         serializer_class = search_view.serializer_class
-        invalid_fields = (
-            search_view.db_sort_by_remappings.keys() - set(serializer_class.SORT_BY_FIELDS)
+        invalid_fields = search_view.db_sort_by_remappings.keys() - set(
+            serializer_class.SORT_BY_FIELDS,
         )
         assert not invalid_fields
 
@@ -152,7 +153,7 @@ class TestBasicSearch(APITestMixin):
             end = start + page_size
             assert ids[start:end] == [result['id'] for result in response.data['results']]
 
-    @pytest.mark.parametrize('entity', ('sloth', ))
+    @pytest.mark.parametrize('entity', ('sloth',))
     def test_400_with_invalid_entity(self, opensearch_with_collector, entity):
         """Tests case where provided entity is invalid."""
         url = reverse('api-v3:search:basic')
@@ -543,18 +544,12 @@ class TestBasicSearch(APITestMixin):
             ('view_all_investmentproject', 'investment_project'),
             ('view_associated_investmentproject', 'investment_project'),
             ('view_order', 'order'),
+            ('view_advisor', 'adviser'),
         ),
     )
     @pytest.mark.parametrize(
         'entity',
-        (
-            'company',
-            'contact',
-            'event',
-            'interaction',
-            'investment_project',
-            'order',
-        ),
+        ('company', 'contact', 'event', 'interaction', 'investment_project', 'order', 'adviser'),
     )
     def test_permissions(self, opensearch_with_collector, permission, permission_entity, entity):
         """
@@ -572,6 +567,7 @@ class TestBasicSearch(APITestMixin):
         EventFactory()
         CompanyInteractionFactory()
         OrderFactory()
+        AdviserFactory()
 
         opensearch_with_collector.flush_and_refresh()
 
@@ -620,7 +616,9 @@ class TestEntitySearch(APITestMixin):
     """Tests for `SearchAPIView`."""
 
     def test_search_sort_asc_with_null_values(
-        self, opensearch_with_collector, search_support_user,
+        self,
+        opensearch_with_collector,
+        search_support_user,
     ):
         """Tests placement of null values in sorted results when order is ascending."""
         SimpleModel.objects.create(name='Earth 1', date=datetime.date(2010, 1, 1))
@@ -645,13 +643,12 @@ class TestEntitySearch(APITestMixin):
         assert [
             ('Earth 2', None),
             ('Earth 1', '2010-01-01'),
-        ] == [
-            (obj['name'], obj['date'])
-            for obj in response_data['results']
-        ]
+        ] == [(obj['name'], obj['date']) for obj in response_data['results']]
 
     def test_search_sort_desc_with_null_values(
-        self, opensearch_with_collector, search_support_user,
+        self,
+        opensearch_with_collector,
+        search_support_user,
     ):
         """Tests placement of null values in sorted results when order is descending."""
         SimpleModel.objects.create(name='Ether 1', date=datetime.date(2010, 1, 1))
@@ -676,10 +673,7 @@ class TestEntitySearch(APITestMixin):
         assert [
             ('Ether 1', '2010-01-01'),
             ('Ether 2', None),
-        ] == [
-            (obj['name'], obj['date'])
-            for obj in response_data['results']
-        ]
+        ] == [(obj['name'], obj['date']) for obj in response_data['results']]
 
 
 class TestSearchExportAPIView(APITestMixin):

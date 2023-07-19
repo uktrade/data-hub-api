@@ -41,4 +41,5 @@ def test_updated_interaction_synced(opensearch_with_signals):
         'is_active': adviser.is_active,
         'last_name': adviser.last_name,
         'first_name': adviser.first_name,
+        'name': adviser.name,
     }

@@ -22,4 +22,5 @@ def test_adviser_to_dict(opensearch):
         'is_active': adviser.is_active,
         'last_name': adviser.last_name,
         'first_name': adviser.first_name,
+        'name': adviser.name,
     }

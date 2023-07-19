@@ -14,6 +14,7 @@ class SearchAdviserQuerySerializer(EntitySearchQuerySerializer):
     id = SingleOrListField(child=StringUUIDField(), required=False)
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
+    name = serializers.CharField(required=False)
     dit_team = SingleOrListField(
         child=StringUUIDField(),
         required=False,

@@ -21,6 +21,7 @@ class Adviser(BaseSearchModel):
             'trigram': fields.TrigramText(),
         },
     )
+    name = Text()
     dit_team = fields.id_name_field()
     is_active = Boolean()
 
@@ -35,4 +36,5 @@ class Adviser(BaseSearchModel):
         'last_name',  # to find 2-letter words
         'last_name.trigram',
         'is_active',
+        'name',
     )

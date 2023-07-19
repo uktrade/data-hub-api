@@ -10,10 +10,16 @@ from django.utils.functional import cached_property
 from django.utils.timezone import now
 
 from datahub.core import reversion
-from datahub.core.utils import join_truthy_strings
+from datahub.core.utils import join_truthy_strings, StrEnum
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+class AdvisorPermission(StrEnum):
+    """Permission codename constants."""
+
+    view_advisor = 'view_advisor'
 
 
 class AdviserManager(BaseUserManager):
@@ -70,7 +76,10 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     telephone_number = models.CharField(max_length=MAX_LENGTH, blank=True)
     contact_email = models.EmailField(max_length=MAX_LENGTH, blank=True)
     dit_team = models.ForeignKey(
-        metadata_models.Team, blank=True, null=True, on_delete=models.SET_NULL,
+        metadata_models.Team,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
     is_staff = models.BooleanField(
         'staff status',
@@ -180,7 +189,8 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         features = []
         for feature_group in self.feature_groups.filter(is_active=True):
             features += feature_group.features.filter(is_active=True).values_list(
-                'code', flat=True,
+                'code',
+                flat=True,
             )
         features += self.features.filter(is_active=True).values_list('code', flat=True)
         return list(set(features))
