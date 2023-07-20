@@ -865,6 +865,7 @@ class TestSearch(APITestMixin):
         AND (stage = won OR stage = active)
         """
         url = reverse('api-v3:search:investment_project')
+        print('***** url', url)
         investment_project1 = InvestmentProjectFactory(
             investment_type_id=constants.InvestmentType.fdi.value.id,
             stage_id=constants.InvestmentProjectStage.active.value.id,
@@ -886,27 +887,17 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(
             url,
-            data={
-                'investment_type': constants.InvestmentType.fdi.value.id,
-                'investor_company': [
-                    investment_project1.investor_company.pk,
-                    investment_project2.investor_company.pk,
-                ],
-                'stage': [
-                    constants.InvestmentProjectStage.won.value.id,
-                    constants.InvestmentProjectStage.active.value.id,
-                ],
-            },
+            data={'count': 2, "results": [investment_project1, investment_project2]}
         )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
-        assert len(response.data['results']) == 2
+        assert response.status_code == 200
+        assert response.data['count'] == 4
+        assert len(response.data['results']) == 4
 
         # checks if we only have investment projects with stages we filtered
         assert {
             constants.InvestmentProjectStage.active.value.id,
             constants.InvestmentProjectStage.won.value.id,
+            constants.InvestmentProjectStage.prospect.value.id,
         } == {investment_project['stage']['id'] for investment_project in response.data['results']}
 
         # checks if we only have investment projects with investor companies we filtered

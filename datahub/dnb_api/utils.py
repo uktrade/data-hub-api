@@ -992,6 +992,7 @@ def get_datahub_ids_for_dnb_service_company_hierarchy(
     company_id,
 ):
     duns_number = validate_company_id(company_id)
+    print('***** duns_number', duns_number)
     try:
         response = get_company_hierarchy_data(duns_number)
     except (
