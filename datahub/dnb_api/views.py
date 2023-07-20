@@ -20,6 +20,9 @@ from datahub.core.exceptions import (
 )
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
+from datahub.dnb_api.constants import (
+    MAX_COMPANIES_IN_TREE_COUNT,
+)
 from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedError, link_company_with_dnb
 from datahub.dnb_api.models import HierarchyData
 from datahub.dnb_api.queryset import get_company_queryset
@@ -543,11 +546,18 @@ class DNBRelatedCompaniesCountView(APIView):
         ) as exc:
             raise APIUpstreamException(str(exc))
 
+        json_response = {
+            'related_companies_count': companies_count,
+            'manually_linked_subsidiaries_count': 0,
+            'total': companies_count,
+            'reduced_tree': companies_count > MAX_COMPANIES_IN_TREE_COUNT,
+        }
+
         if request.query_params.get('include_manually_linked_companies') == 'true':
             subsidiary_companies_count = Company.objects.filter(
                 global_headquarters_id=company_id,
             ).count()
-            companies_count += subsidiary_companies_count
-        return Response(
-            companies_count,
-        )
+            json_response['manually_linked_subsidiaries_count'] = subsidiary_companies_count
+            json_response['total'] = companies_count + subsidiary_companies_count
+
+        return Response(json_response)

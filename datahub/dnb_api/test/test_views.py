@@ -4058,12 +4058,13 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
 
         self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
 
-        assert (
-            self.api_client.get(
-                f'{url}?include_manually_linked_companies=false',
-            ).json()
-            == 0
-        )
+        response = self.api_client.get(
+            f'{url}?include_manually_linked_companies=false',
+        ).json()
+
+        assert response['related_companies_count'] == 0
+        assert response['manually_linked_subsidiaries_count'] == 0
+        assert response['total'] == 0
 
     def test_dnb_company_count_of_0_and_subsidiary_count_of_0_returns_0(self, requests_mock):
         ultimate_company_dh = CompanyFactory(
@@ -4076,12 +4077,13 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
         )
         self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
 
-        assert (
-            self.api_client.get(
-                f'{url}?include_manually_linked_companies=true',
-            ).json()
-            == 0
-        )
+        response = self.api_client.get(
+            f'{url}?include_manually_linked_companies=true',
+        ).json()
+
+        assert response['related_companies_count'] == 0
+        assert response['manually_linked_subsidiaries_count'] == 0
+        assert response['total'] == 0
 
     def test_dnb_company_count_of_1_returns_0(self, requests_mock):
         ultimate_company_dh = CompanyFactory(
@@ -4095,12 +4097,13 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
 
         self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
 
-        assert (
-            self.api_client.get(
-                f'{url}?include_manually_linked_companies=false',
-            ).json()
-            == 0
-        )
+        response = self.api_client.get(
+            f'{url}?include_manually_linked_companies=false',
+        ).json()
+
+        assert response['related_companies_count'] == 0
+        assert response['manually_linked_subsidiaries_count'] == 0
+        assert response['total'] == 0
 
     def test_dnb_company_count_of_0_and_subsidiary_count_of_1_returns_1(self, requests_mock):
         ultimate_company_dh = CompanyFactory(
@@ -4115,12 +4118,13 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
         )
         self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
 
-        assert (
-            self.api_client.get(
-                f'{url}?include_manually_linked_companies=true',
-            ).json()
-            == 1
-        )
+        response = self.api_client.get(
+            f'{url}?include_manually_linked_companies=true',
+        ).json()
+
+        assert response['related_companies_count'] == 0
+        assert response['manually_linked_subsidiaries_count'] == 1
+        assert response['total'] == 1
 
     def test_dnb_company_count_of_1_and_subsidiary_count_of_1_returns_1(self, requests_mock):
         ultimate_company_dh = CompanyFactory(
@@ -4135,12 +4139,13 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
         )
         self.set_dnb_hierarchy_count_mock_response(requests_mock, 1)
 
-        assert (
-            self.api_client.get(
-                f'{url}?include_manually_linked_companies=true',
-            ).json()
-            == 1
-        )
+        response = self.api_client.get(
+            f'{url}?include_manually_linked_companies=true',
+        ).json()
+
+        assert response['related_companies_count'] == 0
+        assert response['manually_linked_subsidiaries_count'] == 1
+        assert response['total'] == 1
 
     def test_dnb_company_count_of_1_and_subsidiary_count_of_1_excluding_subsidiaries_returns_0(
         self,
@@ -4158,12 +4163,13 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
         )
         self.set_dnb_hierarchy_count_mock_response(requests_mock, 1)
 
-        assert (
-            self.api_client.get(
-                f'{url}?include_manually_linked_companies=false',
-            ).json()
-            == 0
-        )
+        response = self.api_client.get(
+            f'{url}?include_manually_linked_companies=false',
+        ).json()
+
+        assert response['related_companies_count'] == 0
+        assert response['manually_linked_subsidiaries_count'] == 0
+        assert response['total'] == 0
 
     def test_dnb_company_count_of_10_and_subsidiary_count_of_3_returns_12(self, requests_mock):
         ultimate_company_dh = CompanyFactory(
@@ -4177,13 +4183,37 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
             kwargs={'company_id': ultimate_company_dh.id},
         )
         self.set_dnb_hierarchy_count_mock_response(requests_mock, 10)
+        response = self.api_client.get(
+            f'{url}?include_manually_linked_companies=true',
+        ).json()
 
-        assert (
-            self.api_client.get(
-                f'{url}?include_manually_linked_companies=true',
-            ).json()
-            == 12
+        assert response['related_companies_count'] == 9
+        assert response['manually_linked_subsidiaries_count'] == 3
+        assert response['total'] == 12
+        assert response['reduced_tree'] is not True
+
+    def test_dnb_company_count_of_10000_and_subsidiary_count_of_3_returns_10002_and_reduced_tree(
+        self, requests_mock
+    ):
+        ultimate_company_dh = CompanyFactory(
+            duns_number='123456789',
         )
+
+        CompanyFactory.create_batch(3, global_headquarters_id=ultimate_company_dh.id)
+
+        url = reverse(
+            'api-v4:dnb-api:related-companies-count',
+            kwargs={'company_id': ultimate_company_dh.id},
+        )
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 10000)
+        response = self.api_client.get(
+            f'{url}?include_manually_linked_companies=true',
+        ).json()
+
+        assert response['related_companies_count'] == 9999
+        assert response['manually_linked_subsidiaries_count'] == 3
+        assert response['total'] == 10002
+        assert response['reduced_tree'] is True
 
 
 class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
