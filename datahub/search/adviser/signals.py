@@ -7,11 +7,11 @@ from datahub.search.signals import SignalReceiver
 from datahub.search.sync_object import sync_object_async
 
 
-def sync_event_to_opensearch(instance):
-    """Sync event to the OpenSearch."""
+def sync_adviser_to_opensearch(instance):
+    """Sync adviser to the OpenSearch."""
     transaction.on_commit(
         lambda: sync_object_async(AdviserSearchApp, instance.pk),
     )
 
 
-receivers = (SignalReceiver(post_save, DBAdviser, sync_event_to_opensearch),)
+receivers = (SignalReceiver(post_save, DBAdviser, sync_adviser_to_opensearch),)
