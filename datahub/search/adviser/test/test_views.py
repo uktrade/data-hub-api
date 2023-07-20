@@ -45,8 +45,8 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
 
-        search_results = [adviser['first_name'] for adviser in response.data['results']]
-        expected_results = [str(adviser1.first_name), str(adviser3.first_name)]
+        search_results = [adviser['id'] for adviser in response.data['results']]
+        expected_results = [str(adviser1.id), str(adviser3.id)]
 
         assert response.data['count'] == 2
         assert set(search_results) == set(expected_results)

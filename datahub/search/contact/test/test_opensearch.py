@@ -1,6 +1,7 @@
 import pytest
 from opensearch_dsl import Mapping
 
+from datahub.core.constants import Country
 from datahub.search.contact import ContactSearchApp
 from datahub.search.contact.models import Contact as SearchContact
 from datahub.search.query_builder import (
@@ -436,7 +437,7 @@ def test_get_limited_search_by_entity_query():
         offset=5,
         limit=5,
     )
-    address_query_id = '80756b9a-5d95-e211-a939-e4115bead28a'
+    address_query_id = Country.united_kingdom.value.id
     assert query.to_dict() == {
         'query': {
             'bool': {

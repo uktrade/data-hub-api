@@ -1,6 +1,7 @@
 import pytest
 from opensearch_dsl import Mapping
 
+from datahub.core.constants import Country
 from datahub.search.investment.models import InvestmentProject as SearchInvestmentProject
 from datahub.search.query_builder import (
     get_basic_search_query,
@@ -839,7 +840,7 @@ def test_limited_get_search_by_entity_query():
         offset=5,
         limit=5,
     )
-    investment_query = '80756b9a-5d95-e211-a939-e4115bead28a'
+    investment_query = Country.united_kingdom.value.id
     assert query.to_dict() == {
         'query': {
             'bool': {
