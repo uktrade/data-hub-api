@@ -991,8 +991,10 @@ def get_datahub_ids_for_dnb_service_company_hierarchy(
     include_subsidiary_companies,
     company_id,
 ):
+    json_response = {'related_companies': [], 'reduced_tree': None}
+    if not include_parent_companies and not include_subsidiary_companies:
+        return json_response
     duns_number = validate_company_id(company_id)
-    print('***** duns_number', duns_number)
     try:
         response = get_company_hierarchy_data(duns_number)
     except (
@@ -1000,12 +1002,11 @@ def get_datahub_ids_for_dnb_service_company_hierarchy(
         DNBServiceTimeoutError,
         DNBServiceError,
     ) as exc:
-        raise APIUpstreamException(str(exc))
+        return APIUpstreamException(str(exc))       
 
     family_tree_members = response.data
-    json_response = {'related_companies': [], 'reduced_tree': None}
     if not family_tree_members:
-        return Response(json_response)
+        return json_response
 
     company_hierarchy_dataframe = create_related_company_dataframe(family_tree_members)
 
@@ -1031,7 +1032,7 @@ def get_datahub_ids_for_dnb_service_company_hierarchy(
 
     if related_duns:
         json_response['related_companies'] = get_datahub_company_ids(related_duns)
-
+        
     return json_response
 
 

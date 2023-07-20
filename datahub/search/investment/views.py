@@ -205,16 +205,12 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
     def get_base_query(self, request, validated_data):
         """Add aggregations to show the number of projects at each stage."""
         investor_company_ids = validated_data.get('investor_company')
-        print('***** the test ran me')
         if investor_company_ids:
-            print('***** if investor_company_ids')
             related_company_ids = get_datahub_ids_for_dnb_service_company_hierarchy(
                 validated_data.get('include_parent_companies'),
                 validated_data.get('include_subsidiary_companies'),
                 investor_company_ids[0],
             )
-            print('***** related_company_ids', related_company_ids)
-            print('related_company_ids', related_company_ids['related_companies'])
             investor_company_ids.extend(related_company_ids['related_companies'])
 
             validated_data['investor_company'] = investor_company_ids
