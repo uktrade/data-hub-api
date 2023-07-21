@@ -1,4 +1,4 @@
-from datahub.company.models.adviser import Advisor
+from datahub.company.models.adviser import Advisor, AdvisorPermission
 from datahub.company.models.company import (
     Company,
     CompanyExportCountry,
@@ -13,6 +13,7 @@ from datahub.company.models.export import CompanyExport, ExportExperience, Expor
 
 __all__ = (
     'Advisor',
+    'AdvisorPermission',
     'Company',
     'CompanyExport',
     'CompanyExportCountry',
