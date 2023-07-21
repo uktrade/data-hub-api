@@ -1,0 +1,3 @@
+- model: event.eventtype
+  pk: 3868825d-9f65-402b-afd1-493011c47813
+  fields: { disabled_on: null, name: 'Export Academy Welcome' }
