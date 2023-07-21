@@ -4193,7 +4193,8 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
         assert response['reduced_tree'] is not True
 
     def test_dnb_company_count_of_10000_and_subsidiary_count_of_3_returns_10002_and_reduced_tree(
-        self, requests_mock
+        self,
+        requests_mock,
     ):
         ultimate_company_dh = CompanyFactory(
             duns_number='123456789',
