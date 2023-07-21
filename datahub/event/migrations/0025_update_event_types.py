@@ -12,7 +12,7 @@ def update_event_types(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('event', '0024_update_event_programme'),
+        ('event', '0024_update_event_type'),
     ]
 
     operations = [
