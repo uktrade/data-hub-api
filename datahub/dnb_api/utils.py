@@ -1030,7 +1030,7 @@ def get_datahub_ids_for_dnb_service_company_hierarchy(
 
     if related_duns:
         json_response['related_companies'] = get_datahub_company_ids(related_duns)
-        
+
     return json_response
 
 

@@ -35,7 +35,6 @@ from datahub.dnb_api.serializers import (
 from datahub.dnb_api.utils import (
     create_company_tree,
     create_investigation,
-    create_related_company_dataframe,
     DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequestError,
@@ -45,7 +44,6 @@ from datahub.dnb_api.utils import (
     get_company,
     get_company_hierarchy_count,
     get_company_hierarchy_data,
-    get_datahub_company_ids,
     get_datahub_ids_for_dnb_service_company_hierarchy,
     get_reduced_company_hierarchy_data,
     request_changes,

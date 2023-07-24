@@ -1924,10 +1924,10 @@ class TestRelatedSearch(APITestMixin):
         } == {investment_project['stage']['id'] for investment_project in response.data['results']}
 
     @mock.patch(
-        'datahub.search.investment.views.get_datahub_ids_for_dnb_service_company_hierarchy'
+        'datahub.search.investment.views.get_datahub_ids_for_dnb_service_company_hierarchy',
     )
     def test_search_investment_with_parent_with_subsidiary(
-        self, get_datahub_ids_for_dnb_service_company_hierarchy_mock, opensearch_with_collector
+        self, get_datahub_ids_dnb_service_company_hierarchy_mock, opensearch_with_collector,
     ):
         """Tests results from company with a parent and subsidiary
         that have investments
@@ -1961,7 +1961,7 @@ class TestRelatedSearch(APITestMixin):
             stage_id=constants.InvestmentProjectStage.prospect.value.id,
         )
 
-        get_datahub_ids_for_dnb_service_company_hierarchy_mock.return_value = {
+        get_datahub_ids_dnb_service_company_hierarchy_mock.return_value = {
             'related_companies': [
                 investment_project2.investor_company.pk,
                 investment_project3.investor_company.pk,
@@ -1994,10 +1994,10 @@ class TestRelatedSearch(APITestMixin):
         }
 
     @mock.patch(
-        'datahub.search.investment.views.get_datahub_ids_for_dnb_service_company_hierarchy'
+        'datahub.search.investment.views.get_datahub_ids_for_dnb_service_company_hierarchy',
     )
     def test_search_investment_error_parent_with_subsidiary(
-        self, get_datahub_ids_for_dnb_service_company_hierarchy_mock, opensearch_with_collector
+        self, get_datahub_ids_dnb_service_company_hierarchy_mock, opensearch_with_collector,
     ):
         """Tests results from company with a parent and subsidiary
         but the call to get related information errors
@@ -2018,7 +2018,7 @@ class TestRelatedSearch(APITestMixin):
             stage_id=constants.InvestmentProjectStage.prospect.value.id,
         )
 
-        get_datahub_ids_for_dnb_service_company_hierarchy_mock.side_effect=APIUpstreamException('')
+        get_datahub_ids_dnb_service_company_hierarchy_mock.side_effect=APIUpstreamException('exc')
         opensearch_with_collector.flush_and_refresh()
         response = self.api_client.post(
             url,
