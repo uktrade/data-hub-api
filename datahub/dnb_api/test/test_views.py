@@ -16,12 +16,11 @@ from requests.exceptions import ConnectionError, Timeout
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-
 from datahub.company.constants import OneListTierID
 from datahub.company.models import Company, CompanyPermission, OneListTier
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
-
+from datahub.core.exceptions import APIUpstreamException
 from datahub.core.serializers import AddressSerializer
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_SERIALIZER_FIELDS
@@ -3141,29 +3140,40 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         )
         assert response.status_code == 400
 
+    @patch(
+        'datahub.dnb_api.views.get_datahub_ids_for_dnb_service_company_hierarchy',
+    )
     @pytest.mark.parametrize(
         'request_exception',
         ((ConnectionError), (DNBServiceTimeoutError)),
     )
-    def test_related_companies_request_connection_error(self, requests_mock, request_exception):
+    def test_related_companies_request_connection_error(
+        self,
+        get_datahub_ids_for_dnb_service_company_hierarchy_mock,
+        requests_mock,
+        request_exception
+    ):
         """
         Test for POST proxy.
         """
         api_client = self.create_api_client()
         company = CompanyFactory(duns_number='123456789')
-
         requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
             exc=request_exception,
         )
         self.set_dnb_hierarchy_count_mock_response(requests_mock, 2)
 
+        get_datahub_ids_for_dnb_service_company_hierarchy_mock.side_effect = (
+            APIUpstreamException('exc')
+        )
+
         url = reverse('api-v4:dnb-api:related-companies', kwargs={'company_id': company.id})
         response = api_client.get(
             f'{url}{URL_PARENT_TRUE_SUBSIDIARY_TRUE}',
             content_type='application/json',
         )
-
+        
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
 
     def test_empty_results_returned_from_dnb_service(self, requests_mock):
@@ -3976,7 +3986,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         )
 
         assert response.status_code == 200
-        assert response.json() == {'related_companies': [], 'reduced_tree': False}
+        assert response.json() == {'related_companies': [], 'reduced_tree': None}
 
     def _get_related_company_response(
         self,
