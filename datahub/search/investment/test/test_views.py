@@ -2020,7 +2020,7 @@ class TestRelatedSearch(APITestMixin):
 
         get_datahub_ids_dnb_service_company_hierarchy_mock.side_effect = (
             APIUpstreamException('exc')
-            )
+        )
         opensearch_with_collector.flush_and_refresh()
         response = self.api_client.post(
             url,
