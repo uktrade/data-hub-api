@@ -3165,7 +3165,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         self.set_dnb_hierarchy_count_mock_response(requests_mock, 2)
 
         get_datahub_ids_for_dnb_service_company_hierarchy_mock.side_effect = APIUpstreamException(
-            'exc'
+            'exc',
         )
 
         url = reverse('api-v4:dnb-api:related-companies', kwargs={'company_id': company.id})
@@ -3186,7 +3186,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
             status_code=200,
-            json={"family_tree_members": None},
+            json={'family_tree_members': None},
         )
         self.set_dnb_hierarchy_count_mock_response(requests_mock, 2)
 
