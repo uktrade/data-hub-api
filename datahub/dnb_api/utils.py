@@ -22,7 +22,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.timezone import now
 from requests.exceptions import ConnectionError, Timeout
 from rest_framework import serializers, status
-from rest_framework.response import Response
 
 from reversion.models import Version
 
@@ -1002,8 +1001,7 @@ def get_datahub_ids_for_dnb_service_company_hierarchy(
         DNBServiceTimeoutError,
         DNBServiceError,
     ) as exc:
-        return APIUpstreamException(str(exc))       
-
+        return APIUpstreamException(str(exc))
     family_tree_members = response.data
     if not family_tree_members:
         return json_response

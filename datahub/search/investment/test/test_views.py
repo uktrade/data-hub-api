@@ -1891,10 +1891,6 @@ class TestRelatedSearch(APITestMixin):
             investment_type_id=constants.InvestmentType.fdi.value.id,
             stage_id=constants.InvestmentProjectStage.active.value.id,
         )
-        investment_project2 = InvestmentProjectFactory(
-            investment_type_id=constants.InvestmentType.fdi.value.id,
-            stage_id=constants.InvestmentProjectStage.won.value.id,
-        )
         InvestmentProjectFactory(
             investment_type_id=constants.InvestmentType.fdi.value.id,
             stage_id=constants.InvestmentProjectStage.won.value.id,
@@ -1926,7 +1922,6 @@ class TestRelatedSearch(APITestMixin):
         assert {
             constants.InvestmentProjectStage.active.value.id,
         } == {investment_project['stage']['id'] for investment_project in response.data['results']}
-
 
     @mock.patch(
         'datahub.search.investment.views.get_datahub_ids_for_dnb_service_company_hierarchy'
@@ -1993,7 +1988,10 @@ class TestRelatedSearch(APITestMixin):
             str(investment_project2.investor_company.id),
             str(investment_project3.investor_company.id),
             str(investment_project4.investor_company.id),
-        } == {investment_project['investor_company']['id'] for investment_project in response.data['results']}
+        } == {
+            investment_project['investor_company']['id']
+            for investment_project in response.data['results']
+        }
 
     @mock.patch(
         'datahub.search.investment.views.get_datahub_ids_for_dnb_service_company_hierarchy'
@@ -2012,19 +2010,6 @@ class TestRelatedSearch(APITestMixin):
             stage_id=constants.InvestmentProjectStage.active.value.id,
             investor_company=parent_company,
         )
-        investment_project2 = InvestmentProjectFactory(
-            investment_type_id=constants.InvestmentType.fdi.value.id,
-            stage_id=constants.InvestmentProjectStage.won.value.id,
-        )
-        investment_project3 = InvestmentProjectFactory(
-            investment_type_id=constants.InvestmentType.fdi.value.id,
-            stage_id=constants.InvestmentProjectStage.won.value.id,
-        )
-        investment_project4 = InvestmentProjectFactory(
-            investment_type_id=constants.InvestmentType.fdi.value.id,
-            stage_id=constants.InvestmentProjectStage.won.value.id,
-            investor_company=parent_company,
-        )
         InvestmentProjectFactory(
             stage_id=constants.InvestmentProjectStage.verify_win.value.id,
         )
@@ -2033,7 +2018,7 @@ class TestRelatedSearch(APITestMixin):
             stage_id=constants.InvestmentProjectStage.prospect.value.id,
         )
 
-        get_datahub_ids_for_dnb_service_company_hierarchy_mock.side_effect = APIUpstreamException('exc')
+        get_datahub_ids_for_dnb_service_company_hierarchy_mock.side_effect=APIUpstreamException('')
         opensearch_with_collector.flush_and_refresh()
         response = self.api_client.post(
             url,
