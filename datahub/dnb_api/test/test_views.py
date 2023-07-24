@@ -3151,7 +3151,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         self,
         get_datahub_ids_for_dnb_service_company_hierarchy_mock,
         requests_mock,
-        request_exception
+        request_exception,
     ):
         """
         Test for POST proxy.
@@ -3173,7 +3173,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
             f'{url}{URL_PARENT_TRUE_SUBSIDIARY_TRUE}',
             content_type='application/json',
         )
-        
+
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
 
     def test_empty_results_returned_from_dnb_service(self, requests_mock):

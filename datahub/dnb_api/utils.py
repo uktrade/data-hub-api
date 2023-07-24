@@ -1001,7 +1001,7 @@ def get_datahub_ids_for_dnb_service_company_hierarchy(
         DNBServiceTimeoutError,
         DNBServiceError,
     ) as exc:
-        return APIUpstreamException(str(exc))
+        raise APIUpstreamException(str(exc))
     family_tree_members = response.data
     if not family_tree_members:
         return json_response
