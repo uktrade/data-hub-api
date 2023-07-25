@@ -2607,8 +2607,8 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 {
                     'name': 'Trading name 2',
                     'priority': 2,
-                }
-            ]
+                },
+            ],
         }
 
         tree_members = [
@@ -2697,8 +2697,8 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 {
                     'name': 'Trading name 1',
                     'priority': 1,
-                }
-            ]
+                },
+            ],
         }
         tree_member_level_2 = {
             'duns': '123456789',
