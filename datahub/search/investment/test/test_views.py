@@ -19,6 +19,7 @@ from rest_framework.reverse import reverse
 from datahub.company.models import OneListTier
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
+from datahub.core.exceptions import APIUpstreamException
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
@@ -875,7 +876,7 @@ class TestSearch(APITestMixin):
         )
 
         InvestmentProjectFactory(
-            stage_id=constants.InvestmentProjectStage.won.value.id,
+            stage_id=constants.InvestmentProjectStage.verify_win.value.id,
         )
         InvestmentProjectFactory(
             investment_type_id=constants.InvestmentType.fdi.value.id,
@@ -887,6 +888,8 @@ class TestSearch(APITestMixin):
         response = self.api_client.post(
             url,
             data={
+                'include_parent_companies': False,
+                'include_subsidiary_companies': False,
                 'investment_type': constants.InvestmentType.fdi.value.id,
                 'investor_company': [
                     investment_project1.investor_company.pk,
@@ -898,8 +901,7 @@ class TestSearch(APITestMixin):
                 ],
             },
         )
-
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == 200
         assert response.data['count'] == 2
         assert len(response.data['results']) == 2
 
@@ -968,307 +970,6 @@ class TestSearch(APITestMixin):
         ] == [
             investment_project['stage']['name'] for investment_project in response.data['results']
         ]
-
-    def test_parent_companies_dnb_only(self, opensearch_with_collector):
-        """
-        Test when a company has a parent dnb company that has investment projects, those
-        projects are included in the results
-        """
-        parent_company = CompanyFactory(duns_number=123)
-        parent_company_investment = InvestmentProjectFactory(investor_company=parent_company)
-
-        sibling_company_1 = CompanyFactory(global_ultimate_duns_number=parent_company.duns_number)
-        sibling_company_1_investment = InvestmentProjectFactory(investor_company=sibling_company_1)
-
-        sibling_company_2 = CompanyFactory(global_ultimate_duns_number=parent_company.duns_number)
-        sibling_company_2_investment = InvestmentProjectFactory(investor_company=sibling_company_2)
-
-        self._assert_parent_response(
-            opensearch_with_collector,
-            [sibling_company_1, sibling_company_2],
-            [
-                parent_company_investment,
-                sibling_company_1_investment,
-                sibling_company_2_investment,
-            ],
-        )
-
-    def test_parent_companies_global_hq_only(self, opensearch_with_collector):
-        """
-        Test when a company has a parent global hq that has investment projects, those
-        projects are included in the results
-        """
-        parent_company = CompanyFactory()
-        parent_company_investment = InvestmentProjectFactory(investor_company=parent_company)
-
-        sibling_company_1 = CompanyFactory(global_headquarters=parent_company)
-        sibling_company_1_investment = InvestmentProjectFactory(investor_company=sibling_company_1)
-
-        sibling_company_2 = CompanyFactory(global_headquarters=parent_company)
-        sibling_company_2_investment = InvestmentProjectFactory(investor_company=sibling_company_2)
-
-        self._assert_parent_response(
-            opensearch_with_collector,
-            [sibling_company_1, sibling_company_2],
-            [
-                parent_company_investment,
-                sibling_company_1_investment,
-                sibling_company_2_investment,
-            ],
-        )
-
-    def test_parent_companies_dnb_and_global_hq(self, opensearch_with_collector):
-        """
-        Test when companies requested are a combination of having a parent global hq and a parent
-        dnb company that have investment projects, those projects are included in the results
-        """
-        parent_company_global_headquarters = CompanyFactory()
-        parent_company_global_headquarters_investment = InvestmentProjectFactory(
-            investor_company=parent_company_global_headquarters,
-        )
-
-        parent_company_ultimate_duns_hq = CompanyFactory(duns_number=123)
-        parent_company_ultimate_duns_hq_investment = InvestmentProjectFactory(
-            investor_company=parent_company_ultimate_duns_hq,
-        )
-
-        global_headquarters_sibling_company_1 = CompanyFactory(
-            global_headquarters=parent_company_global_headquarters,
-        )
-        global_headquarters_sibling_company_1_investment = InvestmentProjectFactory(
-            investor_company=global_headquarters_sibling_company_1,
-        )
-
-        global_headquarters_sibling_company_2 = CompanyFactory(
-            global_headquarters=parent_company_global_headquarters,
-        )
-        InvestmentProjectFactory(investor_company=global_headquarters_sibling_company_2)
-
-        ultimate_duns_hq_sibling_company = CompanyFactory(
-            global_ultimate_duns_number=parent_company_ultimate_duns_hq.duns_number,
-        )
-        ultimate_duns_hq_sibling_company_investment = InvestmentProjectFactory(
-            investor_company=ultimate_duns_hq_sibling_company,
-        )
-
-        self._assert_parent_response(
-            opensearch_with_collector,
-            [global_headquarters_sibling_company_1, ultimate_duns_hq_sibling_company],
-            [
-                parent_company_global_headquarters_investment,
-                parent_company_ultimate_duns_hq_investment,
-                global_headquarters_sibling_company_1_investment,
-                ultimate_duns_hq_sibling_company_investment,
-            ],
-        )
-
-    def test_parent_company_with_dnb_and_global_hq(self, opensearch_with_collector):
-        """
-        Test when a company has both a parent global hq and a parent dnb company that have
-        investment projects, those are included in the results
-        """
-        parent_company_global_headquarters = CompanyFactory()
-        parent_company_global_headquarters_investment = InvestmentProjectFactory(
-            investor_company=parent_company_global_headquarters,
-        )
-
-        parent_company_ultimate_duns_hq = CompanyFactory(
-            duns_number=123,
-        )
-        parent_company_ultimate_duns_hq_investment = InvestmentProjectFactory(
-            investor_company=parent_company_ultimate_duns_hq,
-        )
-
-        sibling_company = CompanyFactory(
-            global_headquarters=parent_company_global_headquarters,
-            global_ultimate_duns_number=parent_company_ultimate_duns_hq.duns_number,
-        )
-        sibling_company_investment = InvestmentProjectFactory(investor_company=sibling_company)
-
-        self._assert_parent_response(
-            opensearch_with_collector,
-            [sibling_company],
-            [
-                parent_company_global_headquarters_investment,
-                parent_company_ultimate_duns_hq_investment,
-                sibling_company_investment,
-            ],
-        )
-
-    def _assert_parent_response(
-        self,
-        opensearch_with_collector,
-        siblings,
-        investments,
-    ):
-        opensearch_with_collector.flush_and_refresh()
-
-        url = reverse('api-v3:search:investment_project')
-        response = self.api_client.post(
-            url,
-            {
-                'investor_company': [sibling.id for sibling in siblings],
-                'include_parent_companies': True,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == len(investments)
-
-        actual_ids = {UUID(project['id']) for project in response.data['results']}
-        expected_ids = {project.pk for project in investments}
-        assert actual_ids == expected_ids
-
-    def test_sibling_companies_dnb_only(self, opensearch_with_collector):
-        """
-        Test when a company is an ultimate dnb company, all projects belonging to subsidary
-        companies are included in the results
-        """
-        parent_company = CompanyFactory(duns_number=123)
-        parent_company_investment = InvestmentProjectFactory(investor_company=parent_company)
-
-        sibling_company_1 = CompanyFactory(global_ultimate_duns_number=parent_company.duns_number)
-        sibling_company_1_investment = InvestmentProjectFactory(investor_company=sibling_company_1)
-
-        sibling_company_2 = CompanyFactory(global_ultimate_duns_number=parent_company.duns_number)
-        sibling_company_2_investment = InvestmentProjectFactory(investor_company=sibling_company_2)
-
-        parent_company_2 = CompanyFactory(duns_number=456)
-        InvestmentProjectFactory(investor_company=parent_company_2)
-
-        parent_company_3_no_duns_number = CompanyFactory()
-        parent_company_3_no_duns_number_investment = InvestmentProjectFactory(
-            investor_company=parent_company_3_no_duns_number,
-        )
-
-        opensearch_with_collector.flush_and_refresh()
-
-        url = reverse('api-v3:search:investment_project')
-        response = self.api_client.post(
-            url,
-            {
-                'investor_company': [parent_company.id, parent_company_3_no_duns_number.id],
-                'include_subsidiary_companies': True,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 4
-
-        actual_ids = {UUID(project['id']) for project in response.data['results']}
-        expected_ids = {
-            project.pk
-            for project in [
-                parent_company_investment,
-                sibling_company_1_investment,
-                sibling_company_2_investment,
-                parent_company_3_no_duns_number_investment,
-            ]
-        }
-        assert actual_ids == expected_ids
-
-    def test_sibling_companies_global_hq_only(self, opensearch_with_collector):
-        """
-        Test when a company is a global hq company, all projects belonging to subsidary
-        companies are included in the results
-        """
-        parent_company = CompanyFactory()
-        parent_company_investment = InvestmentProjectFactory(investor_company=parent_company)
-
-        sibling_company_1 = CompanyFactory(global_headquarters=parent_company)
-        sibling_company_1_investment = InvestmentProjectFactory(investor_company=sibling_company_1)
-
-        sibling_company_2 = CompanyFactory(global_headquarters=parent_company)
-        sibling_company_2_investment = InvestmentProjectFactory(investor_company=sibling_company_2)
-
-        parent_company_2 = CompanyFactory()
-        InvestmentProjectFactory(investor_company=parent_company_2)
-
-        opensearch_with_collector.flush_and_refresh()
-
-        url = reverse('api-v3:search:investment_project')
-        response = self.api_client.post(
-            url,
-            {
-                'investor_company': [parent_company.id],
-                'include_subsidiary_companies': True,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 3
-
-        actual_ids = {UUID(project['id']) for project in response.data['results']}
-        expected_ids = {
-            project.pk
-            for project in [
-                parent_company_investment,
-                sibling_company_1_investment,
-                sibling_company_2_investment,
-            ]
-        }
-        assert actual_ids == expected_ids
-
-    def test_sibling_companies_dnb_and_global_hq(self, opensearch_with_collector):
-        """
-        Test when companies requested are a combination of being a parent global hq and a parent
-        dnb company that have siblings with investment projects, those projects are included
-        in the results
-        """
-        parent_company_ultimate_duns_hq = CompanyFactory(duns_number=123)
-
-        ultimate_duns_hq_sibling_company_1 = CompanyFactory(
-            global_ultimate_duns_number=parent_company_ultimate_duns_hq.duns_number,
-        )
-        ultimate_duns_hq_sibling_company_1_investment = InvestmentProjectFactory(
-            investor_company=ultimate_duns_hq_sibling_company_1,
-        )
-
-        ultimate_duns_hq_sibling_company_2 = CompanyFactory(
-            global_ultimate_duns_number=parent_company_ultimate_duns_hq.duns_number,
-        )
-        ultimate_duns_hq_sibling_company_2_investment = InvestmentProjectFactory(
-            investor_company=ultimate_duns_hq_sibling_company_2,
-        )
-
-        parent_company_global_hq = CompanyFactory()
-        parent_company_global_hq_investment = InvestmentProjectFactory(
-            investor_company=parent_company_global_hq,
-        )
-
-        global_hq_sibling_company = CompanyFactory(global_headquarters=parent_company_global_hq)
-        global_hq_sibling_company_investment = InvestmentProjectFactory(
-            investor_company=global_hq_sibling_company,
-        )
-
-        opensearch_with_collector.flush_and_refresh()
-
-        url = reverse('api-v3:search:investment_project')
-        response = self.api_client.post(
-            url,
-            {
-                'investor_company': [
-                    parent_company_ultimate_duns_hq.id,
-                    parent_company_global_hq.id,
-                ],
-                'include_subsidiary_companies': True,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 4
-
-        actual_ids = {UUID(project['id']) for project in response.data['results']}
-        expected_ids = {
-            project.pk
-            for project in [
-                ultimate_duns_hq_sibling_company_1_investment,
-                ultimate_duns_hq_sibling_company_2_investment,
-                global_hq_sibling_company_investment,
-                parent_company_global_hq_investment,
-            ]
-        }
-        assert actual_ids == expected_ids
 
 
 class TestSearchFinancialYearFilter(APITestMixin):
@@ -2178,3 +1879,155 @@ class TestBasicSearchPermissions(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == 0
+
+
+class TestRelatedSearch(APITestMixin):
+    """Tests searching view when related companies are engaged."""
+
+    def test_search_investment_no_parents_no_subsidiaries(self, opensearch_with_collector):
+        """Tests company that has no parents or subsidiaries"""
+        url = reverse('api-v3:search:investment_project')
+        investment_project1 = InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.active.value.id,
+        )
+        InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+        )
+
+        InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.verify_win.value.id,
+        )
+        InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
+        )
+
+        opensearch_with_collector.flush_and_refresh()
+
+        response = self.api_client.post(
+            url,
+            data={
+                'include_parent_companies': False,
+                'include_subsidiary_companies': False,
+                'investor_company': [investment_project1.investor_company.pk],
+            },
+        )
+        assert response.status_code == 200
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+
+        # checks if we only have investment projects with stages we filtered
+        assert {
+            constants.InvestmentProjectStage.active.value.id,
+        } == {investment_project['stage']['id'] for investment_project in response.data['results']}
+
+    @mock.patch(
+        'datahub.search.investment.views.get_datahub_ids_for_dnb_service_company_hierarchy',
+    )
+    def test_search_investment_with_parent_with_subsidiary(
+        self, get_datahub_ids_dnb_service_company_hierarchy_mock, opensearch_with_collector,
+    ):
+        """Tests results from company with a parent and subsidiary
+        that have investments
+        """
+        parent_company = CompanyFactory()
+
+        url = reverse('api-v3:search:investment_project')
+        investment_project1 = InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.active.value.id,
+            investor_company=parent_company,
+        )
+        investment_project2 = InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+        )
+        investment_project3 = InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+        )
+        investment_project4 = InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+            investor_company=parent_company,
+        )
+        InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.verify_win.value.id,
+        )
+        InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
+        )
+
+        get_datahub_ids_dnb_service_company_hierarchy_mock.return_value = {
+            'related_companies': [
+                investment_project2.investor_company.pk,
+                investment_project3.investor_company.pk,
+            ],
+            'reduced_tree': False,
+        }
+
+        opensearch_with_collector.flush_and_refresh()
+
+        response = self.api_client.post(
+            url,
+            data={
+                'include_parent_companies': True,
+                'include_subsidiary_companies': True,
+                'investor_company': [investment_project1.investor_company.pk],
+            },
+        )
+        assert response.status_code == 200
+        assert response.data['count'] == 4
+        assert len(response.data['results']) == 4
+        # checks if we only have investment projects for the companies we filtered
+        assert {
+            str(investment_project1.investor_company.id),
+            str(investment_project2.investor_company.id),
+            str(investment_project3.investor_company.id),
+            str(investment_project4.investor_company.id),
+        } == {
+            investment_project['investor_company']['id']
+            for investment_project in response.data['results']
+        }
+
+    @mock.patch(
+        'datahub.search.investment.views.get_datahub_ids_for_dnb_service_company_hierarchy',
+    )
+    def test_search_investment_error_parent_with_subsidiary(
+        self, get_datahub_ids_dnb_service_company_hierarchy_mock, opensearch_with_collector,
+    ):
+        """Tests results from company with a parent and subsidiary
+        but the call to get related information errors
+        """
+        parent_company = CompanyFactory()
+
+        url = reverse('api-v3:search:investment_project')
+        investment_project1 = InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.active.value.id,
+            investor_company=parent_company,
+        )
+        InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.verify_win.value.id,
+        )
+        InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
+        )
+
+        get_datahub_ids_dnb_service_company_hierarchy_mock.side_effect = (
+            APIUpstreamException('exc')
+        )
+        opensearch_with_collector.flush_and_refresh()
+        response = self.api_client.post(
+            url,
+            data={
+                'include_parent_companies': True,
+                'include_subsidiary_companies': True,
+                'investor_company': [investment_project1.investor_company.pk],
+            },
+        )
+        assert response.status_code == 502

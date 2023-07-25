@@ -12,6 +12,7 @@ import reversion
 
 from bigtree import (
     dataframe_to_tree_by_relation,
+    find,
     tree_to_nested_dict,
 )
 
@@ -31,6 +32,7 @@ from datahub.core.exceptions import (
     APIBadGatewayException,
     APIBadRequestException,
     APINotFoundException,
+    APIUpstreamException,
 )
 from datahub.core.serializers import AddressSerializer
 from datahub.dnb_api.constants import (
@@ -981,6 +983,55 @@ def get_reduced_company_hierarchy_data(duns_number) -> HierarchyData:
         index += 1
 
     return HierarchyData(data=hierarchy, count=len(hierarchy), reduced=True)
+
+
+def get_datahub_ids_for_dnb_service_company_hierarchy(
+    include_parent_companies,
+    include_subsidiary_companies,
+    company_id,
+):
+    json_response = {'related_companies': [], 'reduced_tree': None}
+    if not include_parent_companies and not include_subsidiary_companies:
+        return json_response
+    duns_number = validate_company_id(company_id)
+    try:
+        response = get_company_hierarchy_data(duns_number)
+    except (
+        DNBServiceConnectionError,
+        DNBServiceTimeoutError,
+        DNBServiceError,
+    ) as exc:
+        raise APIUpstreamException(str(exc))
+    family_tree_members = response.data
+    if not family_tree_members:
+        return json_response
+
+    company_hierarchy_dataframe = create_related_company_dataframe(family_tree_members)
+
+    root = dataframe_to_tree_by_relation(
+        company_hierarchy_dataframe,
+        child_col='duns',
+        parent_col='corporateLinkage.parent.duns',
+    )
+
+    duns_node = find(root, lambda node: node.name == duns_number)
+
+    related_duns = []
+    json_response['reduced_tree'] = response.reduced
+    if include_parent_companies:
+        ancestors_duns = duns_node.ancestors
+        for ancestor_duns_number in ancestors_duns:
+            related_duns.append(ancestor_duns_number.node_name)
+
+    if include_subsidiary_companies:
+        descendants_duns = duns_node.descendants
+        for descendant_duns_number in descendants_duns:
+            related_duns.append(descendant_duns_number.node_name)
+
+    if related_duns:
+        json_response['related_companies'] = get_datahub_company_ids(related_duns)
+
+    return json_response
 
 
 def get_cached_dnb_company(duns_number):
