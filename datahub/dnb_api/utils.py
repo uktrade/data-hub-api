@@ -708,6 +708,7 @@ def create_company_tree(companies: list, duns_number):
             'archived': 'archived',
             'numberOfEmployees': 'number_of_employees',
             'oneListTier': 'one_list_tier',
+            'tradeStyleNames': 'trading_names',
         },
     )
 
