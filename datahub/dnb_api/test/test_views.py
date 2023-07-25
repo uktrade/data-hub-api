@@ -2600,15 +2600,15 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
             'primaryName': faker.company(),
             'corporateLinkage': {'hierarchyLevel': 1},
             'tradeStyleNames': [
-                    {
-                        "name": "Trading name 1",
-                        "priority": 1
-                    },
-                    {
-                        "name": "Trading name 2",
-                        "priority": 2
-                    }
-                ]
+                {
+                    'name': 'Trading name 1',
+                    'priority': 1,
+                },
+                {
+                    'name': 'Trading name 2',
+                    'priority': 2,
+                }
+            ]
         }
 
         tree_members = [
@@ -2694,11 +2694,11 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
             'corporateLinkage': {'hierarchyLevel': 1},
             'numberOfEmployees': [{'value': 400}],
             'tradeStyleNames': [
-                    {
-                        "name": "Trading name 1",
-                        "priority": 1
-                    }
-                ]
+                {
+                    'name': 'Trading name 1',
+                    'priority': 1,
+                }
+            ]
         }
         tree_member_level_2 = {
             'duns': '123456789',
