@@ -9,6 +9,7 @@ class NotifyServiceName(StrEnum):
     dnb_investigation = 'dnb_investigation'
     investment = 'investment'
     reminder = 'reminder'
+    interaction = 'interaction'
 
 
 DEFAULT_SERVICE_NAME = NotifyServiceName.datahub
@@ -21,4 +22,5 @@ NOTIFY_KEYS = {
     NotifyServiceName.datahub: 'DATAHUB_NOTIFICATION_API_KEY',
     NotifyServiceName.omis: 'OMIS_NOTIFICATION_API_KEY',
     NotifyServiceName.investment: 'INVESTMENT_NOTIFICATION_API_KEY',
+    NotifyServiceName.interaction: 'INTERACTION_NOTIFICATION_API_KEY',
 }

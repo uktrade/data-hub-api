@@ -17,13 +17,12 @@ from datahub.interaction.email_processors.exceptions import (
     SenderUnverifiedError,
     UnconfirmedCalendarInviteError,
 )
-from datahub.interaction.email_processors.notify import Template
 from datahub.interaction.email_processors.processors import (
     CalendarInteractionEmailProcessor,
     EXCEPTION_NOTIFY_MESSAGES,
 )
 from datahub.interaction.models import Interaction
-
+from datahub.notification.constants import NotifyServiceName
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -205,12 +204,13 @@ class TestCalendarInteractionEmailProcessor:
         )
         mock_notify_adviser_by_email.assert_called_once_with(
             sender_participant.adviser,
-            Template.meeting_ingest_success.value,
+            settings.MAILBOX_INGESTION_SUCCESS_TEMPLATE_ID,
             context={
                 'interaction_url': interaction.get_absolute_url(),
                 'recipients': 'bill.adama@example.net, saul.tigh@example.net',
                 'support_team_email': settings.DATAHUB_SUPPORT_EMAIL_ADDRESS,
             },
+            notify_service_name=NotifyServiceName.interaction,
         )
 
     def test_process_email_meeting_exists(
@@ -308,12 +308,13 @@ class TestCalendarInteractionEmailProcessor:
                 Advisor.objects.filter(
                     email=base_interaction_data_fixture['sender_email'],
                 ).first(),
-                Template.meeting_ingest_failure.value,
+                settings.MAILBOX_INGESTION_FAILURE_TEMPLATE_ID,
                 context={
                     'errors': [expected_error_message],
                     'recipients': ', '.join(base_interaction_data_fixture['contact_emails']),
                     'support_team_email': settings.DATAHUB_SUPPORT_EMAIL_ADDRESS,
                 },
+                notify_service_name=NotifyServiceName.interaction,
             )
         else:
             mock_notify_adviser_by_email.assert_not_called()
@@ -353,10 +354,11 @@ class TestCalendarInteractionEmailProcessor:
         assert message == expected_message
         mock_notify_adviser_by_email.assert_called_once_with(
             Advisor.objects.filter(email=base_interaction_data_fixture['sender_email']).first(),
-            Template.meeting_ingest_failure.value,
+            settings.MAILBOX_INGESTION_FAILURE_TEMPLATE_ID,
             context={
                 'errors': [expected_message],
                 'recipients': ', '.join(base_interaction_data_fixture['contact_emails']),
                 'support_team_email': settings.DATAHUB_SUPPORT_EMAIL_ADDRESS,
             },
+            notify_service_name=NotifyServiceName.interaction,
         )

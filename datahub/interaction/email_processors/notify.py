@@ -1,25 +1,15 @@
 import logging
 
-from enum import Enum
-
 from django.conf import settings
 
 from datahub.core import statsd
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.interaction import MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME
+from datahub.notification.constants import NotifyServiceName
 from datahub.notification.notify import notify_adviser_by_email
 
 
 logger = logging.getLogger(__name__)
-
-
-class Template(Enum):
-    """
-    GOV.UK notifications template ids.
-    """
-
-    meeting_ingest_failure = 'fc2c07d5-9f3b-4647-853e-68c324565577'
-    meeting_ingest_success = '47418011-3f53-4b39-860a-30969b29781b'
 
 
 def get_domain_label(domain):
@@ -47,12 +37,13 @@ def notify_meeting_ingest_failure(adviser, errors, recipients):
     flat_recipients = ', '.join(recipients)
     notify_adviser_by_email(
         adviser,
-        Template.meeting_ingest_failure.value,
+        settings.MAILBOX_INGESTION_FAILURE_TEMPLATE_ID,
         context={
             'errors': errors,
             'recipients': flat_recipients,
             'support_team_email': settings.DATAHUB_SUPPORT_EMAIL_ADDRESS,
         },
+        notify_service_name=NotifyServiceName.interaction,
     )
 
 
@@ -73,10 +64,11 @@ def notify_meeting_ingest_success(adviser, interaction, recipients):
     flat_recipients = ', '.join(recipients)
     notify_adviser_by_email(
         adviser,
-        Template.meeting_ingest_success.value,
+        settings.MAILBOX_INGESTION_SUCCESS_TEMPLATE_ID,
         context={
             'interaction_url': interaction.get_absolute_url(),
             'recipients': flat_recipients,
             'support_team_email': settings.DATAHUB_SUPPORT_EMAIL_ADDRESS,
         },
+        notify_service_name=NotifyServiceName.interaction,
     )
