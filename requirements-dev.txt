@@ -4,7 +4,7 @@
 #
 #    pip-compile --output-file=requirements-dev.txt requirements-dev.in
 #
-aiohttp==3.8.3
+aiohttp==3.8.5
     # via slackclient
 aiosignal==1.3.1
     # via aiohttp
@@ -26,9 +26,9 @@ backcall==0.2.0
     # via ipython
 bigtree==0.10.0
     # via -r requirements.in
-boto3==1.28.3
+boto3==1.28.9
     # via -r requirements.in
-botocore==1.31.3
+botocore==1.31.9
     # via
     #   boto3
     #   s3transfer
@@ -111,7 +111,7 @@ execnet==1.9.0
     # via pytest-xdist
 executing==1.2.0
     # via stack-data
-factory-boy==3.2.1
+factory-boy==3.3.0
     # via -r requirements-dev.in
 faker==15.3.4
     # via factory-boy
@@ -229,7 +229,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==7.0.0
+pip-tools==7.1.0
     # via -r requirements-dev.in
 piprot==0.9.11
     # via -r requirements-dev.in
@@ -263,7 +263,7 @@ pydocstyle==6.3.0
     #   flake8-docstrings
 pyflakes==3.0.1
     # via flake8
-pygments==2.13.0
+pygments==2.15.0
     # via ipython
 pyjwt==2.6.0
     # via notifications-python-client
@@ -314,7 +314,7 @@ pytz==2022.7
     #   djangorestframework
     #   icalendar
     #   pandas
-pyyaml==6.0
+pyyaml==6.0.1
     # via
     #   -r requirements.in
     #   pre-commit
