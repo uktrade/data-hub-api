@@ -2595,17 +2595,19 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         """
         faker = Faker()
 
+        trading_names = ['Trading name 1', 'Trading name 2']
+
         ultimate_company_dnb = {
             'duns': '987654321',
             'primaryName': faker.company(),
             'corporateLinkage': {'hierarchyLevel': 1},
             'tradeStyleNames': [
                 {
-                    'name': 'Trading name 1',
+                    'name': trading_names[0],
                     'priority': 1,
                 },
                 {
-                    'name': 'Trading name 2',
+                    'name': trading_names[1],
                     'priority': 2,
                 },
             ],
@@ -2658,7 +2660,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                     'id': str(ultimate_company_dh.sector.id),
                     'name': ultimate_company_dh.sector.name,
                 },
-                'trading_names': ultimate_company_dnb.get('tradeStyleNames'),
+                'trading_names': trading_names,
                 'uk_region': {
                     'id': str(ultimate_company_dh.uk_region.id),
                     'name': ultimate_company_dh.uk_region.name,
@@ -2698,7 +2700,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                     'name': 'Trading name 1',
                     'priority': 1,
                 },
-            ],
+            ]
         }
         tree_member_level_2 = {
             'duns': '123456789',
@@ -2767,7 +2769,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                     'id': str(ultimate_company_dh.sector.id),
                     'name': ultimate_company_dh.sector.name,
                 },
-                'trading_names': ultimate_tree_member_level_1.get('tradeStyleNames'),
+                'trading_names': [ultimate_tree_member_level_1.get('tradeStyleNames')[0]['name']],
                 'uk_region': {
                     'id': str(ultimate_company_dh.uk_region.id),
                     'name': ultimate_company_dh.uk_region.name,
