@@ -787,7 +787,7 @@ def append_datahub_details(family_tree_members: list):
         if family_member.get('tradeStyleNames'):
             family_member['tradeStyleNames'] = [
                 item['name'] for item in family_member.get('tradeStyleNames')
-                ]
+            ]
         number_of_employees = family_member.get('numberOfEmployees')
         if isinstance(number_of_employees, list):
             family_member['numberOfEmployees'] = number_of_employees[0].get('value')
