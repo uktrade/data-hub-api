@@ -2944,6 +2944,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 },
                 'archived': subsidiary.archived,
                 'hierarchy': '0',
+                'trading_names': subsidiary.trading_names,
             },
         ]
 
@@ -3023,6 +3024,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 },
                 'archived': first_subsidiary.archived,
                 'hierarchy': '0',
+                'trading_names': first_subsidiary.trading_names,
             },
             {
                 'id': str(second_subsidiary.id),
@@ -3060,6 +3062,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 },
                 'archived': second_subsidiary.archived,
                 'hierarchy': '0',
+                'trading_names': second_subsidiary.trading_names,
             },
         ]
 

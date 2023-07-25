@@ -516,6 +516,7 @@ class SubsidiarySerializer(serializers.ModelSerializer):
     hierarchy = serializers.CharField(
         default='0',
     )
+    trading_names = serializers.ListField(required=False)
 
     class Meta:
         model = Company
@@ -529,4 +530,5 @@ class SubsidiarySerializer(serializers.ModelSerializer):
             'address',
             'hierarchy',
             'one_list_tier',
+            'trading_names',
         ]
