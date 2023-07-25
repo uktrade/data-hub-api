@@ -13,6 +13,7 @@ from datahub.notification.constants import DEFAULT_SERVICE_NAME, NotifyServiceNa
         ({'foo': 'bar'}, None),
         ({'foo': 'bar'}, NotifyServiceName.omis),
         ({'foo': 'bar'}, NotifyServiceName.investment),
+        ({'foo': 'bar'}, NotifyServiceName.interaction),
     ),
 )
 def test_send_email_notification(context, service_name):
@@ -43,6 +44,7 @@ def test_send_email_notification(context, service_name):
         (uuid4(), None),
         (uuid4(), NotifyServiceName.omis),
         (uuid4(), NotifyServiceName.investment),
+        (uuid4(), NotifyServiceName.interaction),
     ),
 )
 def test_get_notification_by_id(notification_id, service_name):
