@@ -6,7 +6,12 @@ from itertools import islice
 import numpy as np
 import pandas as pd
 import reversion
-from bigtree import dataframe_to_tree_by_relation, tree_to_nested_dict
+
+from bigtree import (
+    dataframe_to_tree_by_relation,
+    tree_to_nested_dict,
+)
+
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
