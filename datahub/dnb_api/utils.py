@@ -1,13 +1,10 @@
 import logging
 import uuid
-
-
 from datetime import timedelta
 from itertools import islice
 
 import numpy as np
 import pandas as pd
-
 import reversion
 
 from bigtree import (
@@ -22,7 +19,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.timezone import now
 from requests.exceptions import ConnectionError, Timeout
 from rest_framework import serializers, status
-
 from reversion.models import Version
 
 from datahub.company.models import Company
@@ -710,6 +706,7 @@ def create_company_tree(companies: list, duns_number):
             'archived': 'archived',
             'numberOfEmployees': 'number_of_employees',
             'oneListTier': 'one_list_tier',
+            'tradeStyleNames': 'trading_names',
         },
     )
 
@@ -794,6 +791,10 @@ def append_datahub_details(family_tree_members: list):
         family_member['latestInteractionDate'] = None
         family_member['archived'] = False
         family_member['oneListTier'] = empty_id_name
+        if family_member.get('tradeStyleNames'):
+            family_member['tradeStyleNames'] = [
+                item['name'] for item in family_member.get('tradeStyleNames')
+            ]
         number_of_employees = family_member.get('numberOfEmployees')
         if isinstance(number_of_employees, list):
             family_member['numberOfEmployees'] = number_of_employees[0].get('value')
