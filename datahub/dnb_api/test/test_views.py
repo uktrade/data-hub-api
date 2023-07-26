@@ -2594,10 +2594,22 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         """
         faker = Faker()
 
+        trading_names = ['Trading name 1', 'Trading name 2']
+
         ultimate_company_dnb = {
             'duns': '987654321',
             'primaryName': faker.company(),
             'corporateLinkage': {'hierarchyLevel': 1},
+            'tradeStyleNames': [
+                {
+                    'name': trading_names[0],
+                    'priority': 1,
+                },
+                {
+                    'name': trading_names[1],
+                    'priority': 2,
+                },
+            ],
         }
 
         tree_members = [
@@ -2647,6 +2659,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                     'id': str(ultimate_company_dh.sector.id),
                     'name': ultimate_company_dh.sector.name,
                 },
+                'trading_names': trading_names,
                 'uk_region': {
                     'id': str(ultimate_company_dh.uk_region.id),
                     'name': ultimate_company_dh.uk_region.name,
@@ -2681,6 +2694,12 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
             'primaryName': faker.company(),
             'corporateLinkage': {'hierarchyLevel': 1},
             'numberOfEmployees': [{'value': 400}],
+            'tradeStyleNames': [
+                {
+                    'name': 'Trading name 1',
+                    'priority': 1,
+                },
+            ],
         }
         tree_member_level_2 = {
             'duns': '123456789',
@@ -2749,6 +2768,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                     'id': str(ultimate_company_dh.sector.id),
                     'name': ultimate_company_dh.sector.name,
                 },
+                'trading_names': [ultimate_tree_member_level_1.get('tradeStyleNames')[0]['name']],
                 'uk_region': {
                     'id': str(ultimate_company_dh.uk_region.id),
                     'name': ultimate_company_dh.uk_region.name,
@@ -2768,6 +2788,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                         'address': None,
                         'registered_address': None,
                         'sector': None,
+                        'trading_names': None,
                         'uk_region': None,
                         'one_list_tier': None,
                         'archived': False,
@@ -2782,6 +2803,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                                 'address': None,
                                 'registered_address': None,
                                 'sector': None,
+                                'trading_names': None,
                                 'uk_region': None,
                                 'one_list_tier': None,
                                 'archived': False,
@@ -2923,6 +2945,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 },
                 'archived': subsidiary.archived,
                 'hierarchy': '0',
+                'trading_names': subsidiary.trading_names,
             },
         ]
 
@@ -3002,6 +3025,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 },
                 'archived': first_subsidiary.archived,
                 'hierarchy': '0',
+                'trading_names': first_subsidiary.trading_names,
             },
             {
                 'id': str(second_subsidiary.id),
@@ -3039,6 +3063,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 },
                 'archived': second_subsidiary.archived,
                 'hierarchy': '0',
+                'trading_names': second_subsidiary.trading_names,
             },
         ]
 
@@ -4389,6 +4414,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
                         'id': str(global_company.sector.id),
                         'name': global_company.sector.name,
                     },
+                    'trading_names': None,
                     'uk_region': {
                         'id': str(global_company.uk_region.id),
                         'name': global_company.uk_region.name,
@@ -4429,6 +4455,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
                                 'id': str(company.sector.id),
                                 'name': company.sector.name,
                             },
+                            'trading_names': None,
                             'uk_region': {
                                 'id': str(company.uk_region.id),
                                 'name': company.uk_region.name,
