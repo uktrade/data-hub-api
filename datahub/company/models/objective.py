@@ -20,17 +20,15 @@ class Objective(ArchivableModel, BaseModel):
         related_name='company_objective',
         on_delete=models.PROTECT,
     )
-    subject = models.CharField(max_length=MAX_LENGTH, blank=False, null=False)
-    detail = models.TextField(blank=True, null=True)
-    target_date = models.DateField(null=False, blank=False)
+    subject = models.CharField(max_length=MAX_LENGTH, null=True)
+    detail = models.TextField(null=True)
+    target_date = models.DateField()
     has_blocker = models.BooleanField(
         null=True,
         blank=True,
     )
     blocker_description = models.TextField(blank=True, null=True)
     progress = models.PositiveIntegerField(
-        null=True,
-        blank=True,
         validators=[
             MaxValueValidator(100),
         ]
