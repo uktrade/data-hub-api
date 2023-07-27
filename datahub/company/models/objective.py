@@ -25,7 +25,6 @@ class Objective(ArchivableModel, BaseModel):
     target_date = models.DateField()
     has_blocker = models.BooleanField(
         null=True,
-        blank=True,
     )
     blocker_description = models.TextField(blank=True, null=True)
     progress = models.PositiveIntegerField(
