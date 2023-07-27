@@ -17,15 +17,13 @@ class Objective(ArchivableModel, BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     company = models.ForeignKey(
         Company,
-        related_name='company_objective',
+        related_name='company_objectives',
         on_delete=models.PROTECT,
     )
-    subject = models.CharField(max_length=MAX_LENGTH, null=True)
-    detail = models.TextField(null=True)
+    subject = models.CharField(max_length=MAX_LENGTH)
+    detail = models.TextField(blank=True, null=True)
     target_date = models.DateField()
-    has_blocker = models.BooleanField(
-        null=True,
-    )
+    has_blocker = models.BooleanField()
     blocker_description = models.TextField(blank=True, null=True)
     progress = models.PositiveIntegerField(
         validators=[
