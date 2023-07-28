@@ -18,6 +18,6 @@ Objective_v4_item = ObjectiveV4ViewSet.as_view(
 )
 
 urls_v4 = [
-    path('objective', Objective_v4_collection, name='list'),
-    path('objective/<uuid:pk>', Objective_v4_item, name='detail'),
+    path('company/<company_id>/objective', Objective_v4_collection, name='list'),
+    path('company/<company_id>/objective/<uuid:pk>', Objective_v4_item, name='detail'),
 ]

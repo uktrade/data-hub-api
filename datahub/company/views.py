@@ -702,7 +702,7 @@ class ObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Contact ViewSet v4."""
 
     serializer_class = ObjectiveV4Serializer
-    queryset = Objective.objects.select_related('company')
+    queryset = Objective.objects.select_related('company').filter('company')
 
 
 @transaction.non_atomic_requests
