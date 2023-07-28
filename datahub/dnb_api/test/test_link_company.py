@@ -69,6 +69,7 @@ def test_link_company_with_dnb_success(
         'turnover_range': original_company.turnover_range_id,
         'uk_region': original_company.uk_region_id,
         'dnb_modified_on': now(),
+        'strategy': None,
     }
 
 
