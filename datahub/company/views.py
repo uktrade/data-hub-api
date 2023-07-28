@@ -40,6 +40,7 @@ from datahub.company.models import (
     CompanyExport,
     CompanyPermission,
     Contact,
+    Objective,
 )
 from datahub.company.queryset import (
     get_contact_queryset,
@@ -55,6 +56,7 @@ from datahub.company.serializers import (
     ContactDetailV4Serializer,
     ContactSerializer,
     ContactV4Serializer,
+    ObjectiveV4Serializer,
     OneListCoreTeamMemberSerializer,
     PublicCompanySerializer,
     RemoveAccountManagerSerializer,
@@ -696,6 +698,13 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
         return super().get_queryset()
 
 
+class ObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
+    """Contact ViewSet v4."""
+
+    serializer_class = ObjectiveV4Serializer
+    queryset = Objective.objects.select_related('company')
+
+
 @transaction.non_atomic_requests
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -709,7 +718,8 @@ def owner_list(request):
 
     # All company exports where the user is either an owner or a team member
     company_exports = CompanyExport.objects.exclude(
-        ~Q(owner=request.user), ~Q(team_members=request.user),
+        ~Q(owner=request.user),
+        ~Q(team_members=request.user),
     )
 
     # Pullout all owner ids (no duplicates)

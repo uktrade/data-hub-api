@@ -26,6 +26,7 @@ from datahub.company.models import (
     ExportExperience,
     ExportExperienceCategory,
     ExportYear,
+    Objective,
     OneListCoreTeamMember,
     OneListTier,
 )
@@ -1226,3 +1227,44 @@ class CompanyExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyExport
         fields = '__all__'
+
+
+class ObjectiveV4Serializer(PermittedFieldsModelSerializer):
+    """Objective serializer for writing operations."""
+
+    # subject = serializers.CharField(Objective, read_only=True)
+    # detail = serializers.(Objective, read_only=True)
+    # company = NestedRelatedField(
+    #     Company,
+    #     required=False,
+    #     allow_null=True,
+    # )
+    # target_date = NestedRelatedField(Objective, read_only=True)
+    # has_blocker = NestedRelatedField(Objective, read_only=True)
+    # blocker_description = NestedRelatedField(Objective, read_only=True)
+    # progress = NestedRelatedField(Objective, read_only=True)
+    # archived = serializers.BooleanField(read_only=True)
+    # archived_on = serializers.DateTimeField(read_only=True)
+    # archived_reason = serializers.CharField(read_only=True)
+    # archived_by = NestedAdviserField(read_only=True)
+    # primary = serializers.BooleanField()
+
+    class Meta:
+        model = Objective
+        fields = (
+            'id',
+            'subject',
+            'detail',
+            'target_date',
+            'company',
+            'has_blocker',
+            'blocker_description',
+            'progress',
+            'archived',
+            'archived_on',
+            'archived_reason',
+            'archived_by',
+            'created_on',
+            'modified_on',
+        )
+        permissions = {}

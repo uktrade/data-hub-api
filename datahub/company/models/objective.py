@@ -9,11 +9,14 @@ from datahub.company.models import Company
 from datahub.core import reversion
 
 from datahub.core.models import ArchivableModel, BaseModel
+
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
 
 @reversion.register_base_model()
 class Objective(ArchivableModel, BaseModel):
     """Representation of a company objective."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     company = models.ForeignKey(
         Company,
