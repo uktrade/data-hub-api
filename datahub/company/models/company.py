@@ -389,7 +389,7 @@ class Company(ArchivableModel, BaseModel):
         help_text='Sub-Segmentation of export',
         choices=ExportSubSegment.choices,
     )
-    strategy = models.TextField(blank=True, null=True)
+    strategy = models.TextField(blank=True, default='')
 
     def __str__(self):
         """Admin displayed human readable name."""
