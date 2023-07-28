@@ -283,7 +283,11 @@ class TestUpdateCompanyFromDNB:
         kwarg is not specified.
         """
         duns_number = '123456789'
-        company = CompanyWithAreaFactory(duns_number=duns_number, pending_dnb_investigation=True)
+        company = CompanyWithAreaFactory(
+            duns_number=duns_number,
+            pending_dnb_investigation=True,
+            strategy='ABC',
+        )
         original_company = Company.objects.get(id=company.id)
         adviser = adviser_callable()
         update_company_from_dnb(
@@ -323,6 +327,7 @@ class TestUpdateCompanyFromDNB:
             'turnover_range': original_company.turnover_range.id,
             'uk_region': original_company.uk_region.id,
             'dnb_modified_on': now(),
+            'strategy': 'ABC',
         }
 
         versions = list(Version.objects.get_for_object(company))

@@ -389,6 +389,7 @@ class Company(ArchivableModel, BaseModel):
         help_text='Sub-Segmentation of export',
         choices=ExportSubSegment.choices,
     )
+    strategy = models.TextField(blank=True, default='')
 
     def __str__(self):
         """Admin displayed human readable name."""
@@ -474,7 +475,9 @@ class Company(ArchivableModel, BaseModel):
             return (
                 Company.objects.filter(
                     duns_number=self.global_ultimate_duns_number,
-                ).values_list('address_country__name', flat=True).first()
+                )
+                .values_list('address_country__name', flat=True)
+                .first()
             )
         else:
             return None
@@ -600,7 +603,12 @@ class Company(ArchivableModel, BaseModel):
         OneListCoreTeamMember.objects.filter(adviser=adviser, company=self).delete()
 
     def add_export_country(
-        self, country, status, record_date, adviser, track_history=False,
+        self,
+        country,
+        status,
+        record_date,
+        adviser,
+        track_history=False,
     ):
         """
         Add a company export_country, if it doesn't exist.
@@ -621,10 +629,7 @@ class Company(ArchivableModel, BaseModel):
         updated = False
 
         if not created:
-            if (
-                export_country.status != status
-                and export_country.modified_on < record_date
-            ):
+            if export_country.status != status and export_country.modified_on < record_date:
                 export_country.status = status
                 export_country.modified_by = adviser
                 export_country.save()
@@ -768,7 +773,10 @@ class CompanyExportCountryHistory(models.Model):
         default=uuid.uuid4,
     )
     history_date = models.DateTimeField(
-        db_index=True, null=True, blank=True, auto_now_add=True,
+        db_index=True,
+        null=True,
+        blank=True,
+        auto_now_add=True,
     )
     history_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

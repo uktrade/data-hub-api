@@ -99,6 +99,7 @@ def test_sync_company_with_dnb_all_fields(
         'turnover_range': original_company.turnover_range_id,
         'uk_region': original_company.uk_region_id,
         'dnb_modified_on': now(),
+        'strategy': '',
     }
 
     versions = list(Version.objects.get_for_object(company))
@@ -169,6 +170,7 @@ def test_sync_company_with_dnb_partial_fields(
         'uk_region': original_company.uk_region_id,
         'website': original_company.website,
         'dnb_modified_on': now(),
+        'strategy': '',
     }
 
 
@@ -201,7 +203,6 @@ def test_sync_company_with_dnb_bubbles_up_errors(monkeypatch, error):
 
 
 class TestGetCompanyUpdates:
-
     @pytest.mark.parametrize(
         'error',
         (
@@ -209,7 +210,6 @@ class TestGetCompanyUpdates:
                 'An error occurred',
                 status_code=status.HTTP_504_GATEWAY_TIMEOUT,
             ),
-
             DNBServiceError(
                 'An error occurred',
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -452,8 +452,7 @@ class TestGetCompanyUpdates:
             },
         )
         expected_message = (
-            'datahub.dnb_api.tasks.update.get_company_updates '
-            'updated: 1; failed to update: 0'
+            'datahub.dnb_api.tasks.update.get_company_updates ' 'updated: 1; failed to update: 0'
         )
         mocked_send_realtime_message.assert_called_once_with(expected_message)
 
@@ -494,11 +493,11 @@ class TestGetCompanyUpdates:
                 'failure_count': 0,
                 'job_count': 1,
                 'start_time': '2019-01-02T02:00:00+00:00',
-                'end_time': '2019-01-02T02:00:00+00:00'},
+                'end_time': '2019-01-02T02:00:00+00:00',
+            },
         )
         expected_message = (
-            'datahub.dnb_api.tasks.update.get_company_updates '
-            'updated: 1; failed to update: 0'
+            'datahub.dnb_api.tasks.update.get_company_updates ' 'updated: 1; failed to update: 0'
         )
         mocked_send_realtime_message.assert_called_once_with(expected_message)
 
@@ -548,8 +547,7 @@ class TestGetCompanyUpdates:
             },
         )
         expected_message = (
-            'datahub.dnb_api.tasks.update.get_company_updates '
-            'updated: 1; failed to update: 1'
+            'datahub.dnb_api.tasks.update.get_company_updates ' 'updated: 1; failed to update: 1'
         )
         mocked_send_realtime_message.assert_called_once_with(expected_message)
 
@@ -597,6 +595,7 @@ def test_update_company_from_dnb_data(dnb_response_uk, base_company_dict):
         'turnover_range': original_company.turnover_range_id,
         'uk_region': original_company.uk_region_id,
         'dnb_modified_on': now(),
+        'strategy': '',
     }
 
     versions = list(Version.objects.get_for_object(company))
@@ -656,6 +655,7 @@ def test_update_company_from_dnb_data_partial_fields(dnb_response_uk, base_compa
         'uk_region': original_company.uk_region_id,
         'website': original_company.website,
         'dnb_modified_on': now(),
+        'strategy': '',
     }
 
 
@@ -750,6 +750,7 @@ def test_sync_outdated_companies_with_dnb_all_fields(
         'turnover_range': original_company.turnover_range_id,
         'uk_region': original_company.uk_region_id,
         'dnb_modified_on': now(),
+        'strategy': '',
     }
 
 
@@ -828,6 +829,7 @@ def test_sync_outdated_companies_with_dnb_partial_fields(
         'uk_region': original_company.uk_region_id,
         'website': original_company.website,
         'dnb_modified_on': now(),
+        'strategy': '',
     }
     expected_message = f'Syncing dnb-linked company "{company.id}" Succeeded'
     assert expected_message in caplog.text
