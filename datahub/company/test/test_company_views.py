@@ -396,7 +396,7 @@ class TestGetCompany(APITestMixin):
             'dnb_modified_on': company.dnb_modified_on,
             'is_global_headquarters': False,
             'global_ultimate_country': None,
-            'strategy': None,
+            'strategy': '',
         }
 
     def test_get_company_without_country(self):

@@ -99,7 +99,7 @@ def test_sync_company_with_dnb_all_fields(
         'turnover_range': original_company.turnover_range_id,
         'uk_region': original_company.uk_region_id,
         'dnb_modified_on': now(),
-        'strategy': None,
+        'strategy': '',
     }
 
     versions = list(Version.objects.get_for_object(company))
@@ -170,7 +170,7 @@ def test_sync_company_with_dnb_partial_fields(
         'uk_region': original_company.uk_region_id,
         'website': original_company.website,
         'dnb_modified_on': now(),
-        'strategy': None,
+        'strategy': '',
     }
 
 
@@ -595,7 +595,7 @@ def test_update_company_from_dnb_data(dnb_response_uk, base_company_dict):
         'turnover_range': original_company.turnover_range_id,
         'uk_region': original_company.uk_region_id,
         'dnb_modified_on': now(),
-        'strategy': None,
+        'strategy': '',
     }
 
     versions = list(Version.objects.get_for_object(company))
@@ -655,7 +655,7 @@ def test_update_company_from_dnb_data_partial_fields(dnb_response_uk, base_compa
         'uk_region': original_company.uk_region_id,
         'website': original_company.website,
         'dnb_modified_on': now(),
-        'strategy': None,
+        'strategy': '',
     }
 
 
@@ -750,7 +750,7 @@ def test_sync_outdated_companies_with_dnb_all_fields(
         'turnover_range': original_company.turnover_range_id,
         'uk_region': original_company.uk_region_id,
         'dnb_modified_on': now(),
-        'strategy': None,
+        'strategy': '',
     }
 
 
@@ -829,7 +829,7 @@ def test_sync_outdated_companies_with_dnb_partial_fields(
         'uk_region': original_company.uk_region_id,
         'website': original_company.website,
         'dnb_modified_on': now(),
-        'strategy': None,
+        'strategy': '',
     }
     expected_message = f'Syncing dnb-linked company "{company.id}" Succeeded'
     assert expected_message in caplog.text
