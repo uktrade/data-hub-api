@@ -133,9 +133,9 @@ def test_command(teams, with_empty_teams):
         relations = [RELATIONSHIP_FACTORY_MAP[model](team) for model in related_models]
         (should_stay if relations else should_be_deleted).add(team)
 
-    assert should_be_deleted & should_stay == set(),\
+    assert should_be_deleted & should_stay == set(), \
         'The sets of related and non-related teams should have no overlap'
-    assert set(Team.objects.all()) == should_stay | should_be_deleted,\
+    assert set(Team.objects.all()) == should_stay | should_be_deleted, \
         'The model should have both related and non-related teams'
 
     call_command(Command())
