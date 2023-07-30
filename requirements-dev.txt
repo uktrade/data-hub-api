@@ -206,7 +206,7 @@ numpy==1.24.3
     # via pandas
 opensearch-dsl==2.1.0
     # via -r requirements.in
-opensearch-py==2.2.0
+opensearch-py==2.3.0
     # via
     #   -r requirements.in
     #   opensearch-dsl
