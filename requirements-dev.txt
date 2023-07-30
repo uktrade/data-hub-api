@@ -103,7 +103,7 @@ docopt==0.6.2
     # via notifications-python-client
 ecs-logging==2.0.2
     # via elastic-apm
-elastic-apm==6.17.0
+elastic-apm==6.18.0
     # via -r requirements.in
 exceptiongroup==1.1.0
     # via pytest
