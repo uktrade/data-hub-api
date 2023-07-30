@@ -24,7 +24,7 @@ attrs==22.2.0
     #   flake8-bugbear
 backcall==0.2.0
     # via ipython
-bigtree==0.10.0
+bigtree==0.10.1
     # via -r requirements.in
 boto3==1.28.15
     # via -r requirements.in
