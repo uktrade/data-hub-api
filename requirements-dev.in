@@ -15,7 +15,7 @@ piprot==0.9.11
 pre-commit==3.3.3
 
 # Code static analysis
-flake8==6.0.0
+flake8==6.1.0
 flake8-bugbear==23.1.20
 flake8-commas==2.1.0
 flake8-debugger==4.1.2
