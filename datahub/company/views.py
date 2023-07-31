@@ -698,11 +698,39 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
         return super().get_queryset()
 
 
-class ObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
-    """Contact ViewSet v4."""
+class SingleObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
+    """ingle Objective ViewSet v4."""
+
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases for
+        the user as determined by the username portion of the URL.
+        """
+        objective_id = self.kwargs['pk']
+        return Objective.objects.filter(id=objective_id)
 
     serializer_class = ObjectiveV4Serializer
-    queryset = Objective.objects.select_related('company').filter('company')
+
+
+class CompanyObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
+    """Objectives for a single company  ViewSet v4."""
+
+    # permission_classes = [
+    #         IsAuthenticated,
+    #     ]
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases for
+        the user as determined by the username portion of the URL.
+        """
+        company_id = self.kwargs['company_id']
+        return Objective.objects.filter(company=company_id)
+
+    serializer_class = ObjectiveV4Serializer
 
 
 @transaction.non_atomic_requests

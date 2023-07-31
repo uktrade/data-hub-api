@@ -1,16 +1,16 @@
 from django.urls import path
 
-from datahub.company.views import ObjectiveV4ViewSet
+from datahub.company.views import SingleObjectiveV4ViewSet, CompanyObjectiveV4ViewSet
 
 
-Objective_v4_collection = ObjectiveV4ViewSet.as_view(
+Objective_v4_collection = CompanyObjectiveV4ViewSet.as_view(
     {
         'get': 'list',
         'post': 'create',
     }
 )
 
-Objective_v4_item = ObjectiveV4ViewSet.as_view(
+Objective_v4_item = SingleObjectiveV4ViewSet.as_view(
     {
         'get': 'retrieve',
         'patch': 'partial_update',
@@ -18,6 +18,6 @@ Objective_v4_item = ObjectiveV4ViewSet.as_view(
 )
 
 urls_v4 = [
-    path('company/<company_id>/objective', Objective_v4_collection, name='list'),
-    path('company/<company_id>/objective/<uuid:pk>', Objective_v4_item, name='detail'),
+    path('company/<uuid:company_id>/objective', Objective_v4_collection, name='list'),
+    path('company/<uuid:company_id>/objective/<uuid:pk>', Objective_v4_item, name='detail'),
 ]
