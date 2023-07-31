@@ -16,11 +16,11 @@ async-timeout==4.0.2
     #   redis
 attrs==22.2.0
     # via aiohttp
-bigtree==0.10.0
+bigtree==0.10.1
     # via -r requirements.in
-boto3==1.28.9
+boto3==1.28.15
     # via -r requirements.in
-botocore==1.31.9
+botocore==1.31.15
     # via
     #   boto3
     #   s3transfer
@@ -51,7 +51,7 @@ django==3.2.20
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==6.0.5
+django-axes==6.1.0
     # via -r requirements.in
 django-debug-toolbar==4.1.0
     # via -r requirements.in
@@ -123,7 +123,7 @@ numpy==1.24.3
     # via pandas
 opensearch-dsl==2.1.0
     # via -r requirements.in
-opensearch-py==2.2.0
+opensearch-py==2.3.0
     # via
     #   -r requirements.in
     #   opensearch-dsl

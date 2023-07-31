@@ -55,7 +55,7 @@ ALL_SPI_SERVICE_IDS = SPI1_END_SERVICE_IDS | SPI2_START_SERVICE_IDS | SPI5_END_S
 
 def format_date(d):
     """Date format used in the report."""
-    if type(d) == str:
+    if isinstance(d, str):
         d = dateutil_parse(d)
     return d.isoformat()
 
