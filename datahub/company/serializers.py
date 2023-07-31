@@ -1248,4 +1248,6 @@ class ObjectiveV4Serializer(PermittedFieldsModelSerializer):
             'created_on',
             'modified_on',
         )
-        permissions = {}
+        permissions = {
+            f'company.{CompanyPermission.view_company}': 'company_url_path',
+        }

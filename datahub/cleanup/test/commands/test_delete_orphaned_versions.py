@@ -16,6 +16,7 @@ from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
     ExportFactory,
+    ObjectiveFactory,
 )
 from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
@@ -48,6 +49,7 @@ MAPPINGS = {
     'company.CompanyExportCountry': CompanyExportCountryFactory,
     'company.CompanyExportCountryHistory': CompanyExportCountryHistoryFactory,
     'company.Contact': ContactFactory,
+    'company.Objective': ObjectiveFactory,
     'company_list.CompanyListItem': CompanyListItemFactory,
     'company_list.PipelineItem': PipelineItemFactory,
     'company_referral.CompanyReferral': CompanyReferralFactory,

@@ -705,13 +705,9 @@ class SingleObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
         IsAuthenticated,
     ]
 
-    def get_queryset(self):
-        """
-        This view should return a list of all the purchases for
-        the user as determined by the username portion of the URL.
-        """
-        objective_id = self.kwargs['pk']
-        return Objective.objects.filter(id=objective_id)
+    queryset = Objective.objects.all()
+    # objective_id = self.kwargs['pk']
+    # Objective.objects.filter(id=objective_id)
 
     serializer_class = ObjectiveV4Serializer
 
@@ -719,13 +715,14 @@ class SingleObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
 class CompanyObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Objectives for a single company  ViewSet v4."""
 
-    # permission_classes = [
-    #         IsAuthenticated,
-    #     ]
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
     def get_queryset(self):
         """
-        This view should return a list of all the purchases for
-        the user as determined by the username portion of the URL.
+        This view is return a list of all the objectives associated
+        with a specific company
         """
         company_id = self.kwargs['company_id']
         return Objective.objects.filter(company=company_id)

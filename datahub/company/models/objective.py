@@ -1,8 +1,8 @@
 import uuid
 
 from django.conf import settings
-from django.db import models
 from django.core.validators import MaxValueValidator
+from django.db import models
 
 from datahub.company.models import Company
 
@@ -31,5 +31,5 @@ class Objective(ArchivableModel, BaseModel):
     progress = models.PositiveIntegerField(
         validators=[
             MaxValueValidator(100),
-        ]
+        ],
     )
