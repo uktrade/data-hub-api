@@ -10,7 +10,7 @@ aiosignal==1.3.1
     # via aiohttp
 asgiref==3.6.0
     # via django
-astroid==2.15.4
+astroid==2.15.6
     # via pylint
 asttokens==2.2.1
     # via stack-data
@@ -24,11 +24,11 @@ attrs==22.2.0
     #   flake8-bugbear
 backcall==0.2.0
     # via ipython
-bigtree==0.10.0
+bigtree==0.10.1
     # via -r requirements.in
-boto3==1.28.9
+boto3==1.28.15
     # via -r requirements.in
-botocore==1.31.9
+botocore==1.31.15
     # via
     #   boto3
     #   s3transfer
@@ -73,7 +73,7 @@ django==3.2.20
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==6.0.5
+django-axes==6.1.0
     # via -r requirements.in
 django-debug-toolbar==4.1.0
     # via -r requirements.in
@@ -117,7 +117,7 @@ faker==15.3.4
     # via factory-boy
 filelock==3.8.2
     # via virtualenv
-flake8==6.0.0
+flake8==6.1.0
     # via
     #   -r requirements-dev.in
     #   flake8-bugbear
@@ -206,7 +206,7 @@ numpy==1.24.3
     # via pandas
 opensearch-dsl==2.1.0
     # via -r requirements.in
-opensearch-py==2.2.0
+opensearch-py==2.3.0
     # via
     #   -r requirements.in
     #   opensearch-dsl
@@ -251,7 +251,7 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.2
     # via stack-data
-pycodestyle==2.10.0
+pycodestyle==2.11.0
     # via
     #   flake8
     #   flake8-debugger
@@ -261,13 +261,13 @@ pydocstyle==6.3.0
     # via
     #   -r requirements-dev.in
     #   flake8-docstrings
-pyflakes==3.0.1
+pyflakes==3.1.0
     # via flake8
 pygments==2.15.0
     # via ipython
 pyjwt==2.6.0
     # via notifications-python-client
-pylint==2.17.4
+pylint==2.17.5
     # via
     #   -r requirements-dev.in
     #   pylint-django
