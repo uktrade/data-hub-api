@@ -406,6 +406,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     }
 
     archived_by = NestedAdviserField(read_only=True)
+    modified_by = NestedAdviserField(read_only=True)
     business_type = NestedRelatedField(
         meta_models.BusinessType,
         required=False,
@@ -603,6 +604,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'duns_number',
             'created_on',
             'modified_on',
+            'modified_by',
             'archived',
             'archived_documents_url_path',
             'archived_on',
