@@ -22,6 +22,7 @@ ORDER_MODIFIED_ON_CUT_OFF = datetime(2014, 7, 12, tzinfo=utc)  # 2014-07-11 + 1 
 ORDER_EXPIRY_PERIOD = relativedelta(years=7)
 INVESTOR_PROFILE_EXPIRY_PERIOD = relativedelta(years=10)
 COMPANY_EXPORT_EXPIRY_PERIOD = relativedelta(years=10)
+OBJECTIVE_EXPIRY_PERIOD = relativedelta(years=10)
 
 
 class Command(BaseCleanupCommand):
@@ -69,6 +70,7 @@ class Command(BaseCleanupCommand):
                 ),
                 Company._meta.get_field('opportunities'): (),
                 Company._meta.get_field('company_exports'): (),
+                Company._meta.get_field('company_objectives'): (),
             },
             # We want to delete the relations below along with any expired companies
             excluded_relations=(
@@ -231,6 +233,12 @@ class Command(BaseCleanupCommand):
             (
                 DatetimeLessThanCleanupFilter('created_on', COMPANY_EXPORT_EXPIRY_PERIOD),
                 DatetimeLessThanCleanupFilter('modified_on', COMPANY_EXPORT_EXPIRY_PERIOD),
+            ),
+        ),
+        'company.Objective': ModelCleanupConfig(
+            (
+                DatetimeLessThanCleanupFilter('created_on', OBJECTIVE_EXPIRY_PERIOD),
+                DatetimeLessThanCleanupFilter('modified_on', OBJECTIVE_EXPIRY_PERIOD),
             ),
         ),
     }

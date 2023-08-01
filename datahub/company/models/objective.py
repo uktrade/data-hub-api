@@ -24,10 +24,10 @@ class Objective(ArchivableModel, BaseModel):
         on_delete=models.PROTECT,
     )
     subject = models.CharField(max_length=MAX_LENGTH)
-    detail = models.TextField(blank=True, default="")
+    detail = models.TextField(blank=True, default='')
     target_date = models.DateField()
     has_blocker = models.BooleanField()
-    blocker_description = models.TextField(blank=True, default="")
+    blocker_description = models.TextField(blank=True, default='')
     progress = models.PositiveIntegerField(
         validators=[
             MaxValueValidator(100),

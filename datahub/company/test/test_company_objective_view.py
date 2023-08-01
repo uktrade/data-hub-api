@@ -56,13 +56,13 @@ class TestAddCompanyObjective(APITestMixin):
     def test_add_company_objective(self):
         company = CompanyFactory()
         post_data = {
-            "subject": "From a ways away",
-            "detail": "Get in touch and do the do",
-            "target_date": "2024-11-29",
-            "company": str(company.id),
-            "has_blocker": True,
-            "blocker_description": "More words",
-            "progress": 80,
+            'subject': 'From a ways away',
+            'detail': 'Get in touch and do the do',
+            'target_date': '2024-11-29',
+            'company': str(company.id),
+            'has_blocker': True,
+            'blocker_description': 'More words',
+            'progress': 80,
         }
         url = reverse('api-v4:objective:list', kwargs={'company_id': company.id})
         response = self.api_client.post(
@@ -82,8 +82,8 @@ class TestAmendCompanyObjective(APITestMixin):
     def test_amend_company_objective(self):
         objective = ObjectiveFactory(subject='Original subject', progress=10)
         patch_data = {
-            "subject": "Amended subject",
-            "progress": 90,
+            'subject': 'Amended subject',
+            'progress': 90,
         }
         url = reverse(
             'api-v4:objective:detail',
@@ -124,7 +124,7 @@ class TestGettingASingleObjective(APITestMixin):
             str(objective1.id),
             objective1.subject,
             objective1.detail,
-            objective1.target_date,
+            str(objective1.target_date),
             str(objective1.company.id),
             objective1.has_blocker,
             objective1.blocker_description,

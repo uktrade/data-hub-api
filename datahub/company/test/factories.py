@@ -295,11 +295,16 @@ class ObjectiveFactory(factory.django.DjangoModelFactory):
 
     company = factory.SubFactory(CompanyFactory)
     subject = factory.Faker('name')
-    detail = 'The words in the detail'
-    target_date = '2023-11-26'
-    has_blocker = True
-    blocker_description = 'The words in the blocker'
-    progress = 10
+    detail = factory.Faker('text')
+    target_date = factory.Faker('future_date')
+    has_blocker = factory.Faker('pybool')
+    blocker_description = factory.Faker('text')
+    progress = factory.Faker(
+        'pyint',
+        min_value=0,
+        max_value=100,
+        step=10,
+    )
 
     class Meta:
         model = 'company.Objective'
