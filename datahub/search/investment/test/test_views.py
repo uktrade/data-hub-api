@@ -16,6 +16,7 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+
 from datahub.company.models import OneListTier
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
@@ -29,7 +30,11 @@ from datahub.core.test_utils import (
     random_obj_for_queryset,
 )
 from datahub.investment.project.constants import Involvement, LikelihoodToLand
-from datahub.investment.project.models import InvestmentProject, InvestmentProjectPermission
+from datahub.investment.project.models import (
+    InvestmentProject,
+    InvestmentProjectPermission,
+    InvestmentProjectStageLog,
+)
 from datahub.investment.project.test.factories import (
     GVAMultiplierFactory,
     InvestmentProjectFactory,
@@ -1394,6 +1399,66 @@ class TestSummaryAggregation(APITestMixin):
             },
         }
 
+    def test_no_last_won_project(
+        self,
+        opensearch_with_collector,
+        investment_project_with_stage_log,
+    ):
+        """Details of last won project should be shown in won summary for a investor company"""
+        investment_project = investment_project_with_stage_log[0]
+        investor_company = investment_project.investor_company
+
+        # Update all this companies project logs to not be won, so the DB query in the view
+        # returns nothing
+        InvestmentProjectStageLog.objects.all().update(
+            stage=constants.InvestmentProjectStage.prospect.value.id,
+        )
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(
+            url,
+            {
+                'show_summary': True,
+                'investor_company': [investor_company.id],
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert 'summary' in response.data
+        assert response.data['summary'] == {
+            'prospect': {
+                'label': 'Prospect',
+                'id': constants.InvestmentProjectStage.prospect.value.id,
+                'value': 0,
+            },
+            'assign_pm': {
+                'label': 'Assign PM',
+                'id': constants.InvestmentProjectStage.assign_pm.value.id,
+                'value': 0,
+            },
+            'active': {
+                'label': 'Active',
+                'id': constants.InvestmentProjectStage.active.value.id,
+                'value': 0,
+            },
+            'verify_win': {
+                'label': 'Verify Win',
+                'id': constants.InvestmentProjectStage.verify_win.value.id,
+                'value': 0,
+            },
+            'won': {
+                'label': 'Won',
+                'id': constants.InvestmentProjectStage.won.value.id,
+                'last_won_project': {
+                    'id': None,
+                    'last_changed': None,
+                    'name': None,
+                },
+                'value': 1,
+            },
+        }
+
     def test_last_won_project(
         self,
         opensearch_with_collector,
@@ -1927,7 +1992,9 @@ class TestRelatedSearch(APITestMixin):
         'datahub.search.investment.views.get_datahub_ids_for_dnb_service_company_hierarchy',
     )
     def test_search_investment_with_parent_with_subsidiary(
-        self, get_datahub_ids_dnb_service_company_hierarchy_mock, opensearch_with_collector,
+        self,
+        get_datahub_ids_dnb_service_company_hierarchy_mock,
+        opensearch_with_collector,
     ):
         """Tests results from company with a parent and subsidiary
         that have investments
@@ -1997,7 +2064,9 @@ class TestRelatedSearch(APITestMixin):
         'datahub.search.investment.views.get_datahub_ids_for_dnb_service_company_hierarchy',
     )
     def test_search_investment_error_parent_with_subsidiary(
-        self, get_datahub_ids_dnb_service_company_hierarchy_mock, opensearch_with_collector,
+        self,
+        get_datahub_ids_dnb_service_company_hierarchy_mock,
+        opensearch_with_collector,
     ):
         """Tests results from company with a parent and subsidiary
         but the call to get related information errors
@@ -2018,8 +2087,8 @@ class TestRelatedSearch(APITestMixin):
             stage_id=constants.InvestmentProjectStage.prospect.value.id,
         )
 
-        get_datahub_ids_dnb_service_company_hierarchy_mock.side_effect = (
-            APIUpstreamException('exc')
+        get_datahub_ids_dnb_service_company_hierarchy_mock.side_effect = APIUpstreamException(
+            'exc',
         )
         opensearch_with_collector.flush_and_refresh()
         response = self.api_client.post(
