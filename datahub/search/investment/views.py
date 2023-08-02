@@ -334,16 +334,17 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
                         .order_by('-created_on')
                         .first()
                     )
+                    if project_stage_log:
+                        response['summary'][stage.name]['last_won_project'][
+                            'id'
+                        ] = project_stage_log.investment_project.id
+                        response['summary'][stage.name]['last_won_project'][
+                            'name'
+                        ] = project_stage_log.investment_project.name
+                        response['summary'][stage.name]['last_won_project'][
+                            'last_changed'
+                        ] = project_stage_log.created_on
 
-                    response['summary'][stage.name]['last_won_project'][
-                        'id'
-                    ] = project_stage_log.investment_project.id
-                    response['summary'][stage.name]['last_won_project'][
-                        'name'
-                    ] = project_stage_log.investment_project.name
-                    response['summary'][stage.name]['last_won_project'][
-                        'last_changed'
-                    ] = project_stage_log.created_on
                 response['summary'][stage.name]['value'] = stage_summary['doc_count']
 
         return response
