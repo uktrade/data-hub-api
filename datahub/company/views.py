@@ -699,15 +699,13 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
 
 
 class SingleObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
-    """ingle Objective ViewSet v4."""
+    """Single Objective ViewSet v4."""
 
     permission_classes = [
         IsAuthenticated,
     ]
 
     queryset = Objective.objects.all()
-    # objective_id = self.kwargs['pk']
-    # Objective.objects.filter(id=objective_id)
 
     serializer_class = ObjectiveV4Serializer
 
