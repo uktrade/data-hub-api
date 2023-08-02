@@ -1399,7 +1399,47 @@ class TestSummaryAggregation(APITestMixin):
             },
         }
 
-    def test_no_last_won_project(
+    def test_project_without_won_project_stage_log_and_a_won_project_excludes_latest_won(
+        self,
+        opensearch_with_collector,
+        investment_project_with_stage_log,
+    ):
+        """Details of last won project should be shown in won summary for a investor company"""
+        investment_project = investment_project_with_stage_log[0]
+        investor_company = investment_project.investor_company
+
+        # Update all this companies project logs to not be won, so the DB query in the view
+        # returns nothing
+        InvestmentProjectStageLog.objects.all().update(
+            stage=constants.InvestmentProjectStage.prospect.value.id,
+        )
+        InvestmentProject.objects.all().update(
+            stage=constants.InvestmentProjectStage.prospect.value.id,
+        )
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(
+            url,
+            {
+                'show_summary': True,
+                'investor_company': [investor_company.id],
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['summary']['won'] == {
+            'label': 'Won',
+            'id': constants.InvestmentProjectStage.won.value.id,
+            'last_won_project': {
+                'id': None,
+                'last_changed': None,
+                'name': None,
+            },
+            'value': 1,
+        }
+
+    def test_project_without_won_project_stage_log_returns_project_as_fallback(
         self,
         opensearch_with_collector,
         investment_project_with_stage_log,
@@ -1451,15 +1491,15 @@ class TestSummaryAggregation(APITestMixin):
                 'label': 'Won',
                 'id': constants.InvestmentProjectStage.won.value.id,
                 'last_won_project': {
-                    'id': None,
-                    'last_changed': None,
-                    'name': None,
+                    'id': investment_project.id,
+                    'last_changed': investment_project.created_on,
+                    'name': investment_project.name,
                 },
                 'value': 1,
             },
         }
 
-    def test_last_won_project(
+    def test_project_with_a_won_project_stage_log(
         self,
         opensearch_with_collector,
         investment_project_with_stage_log,

@@ -24,7 +24,7 @@ from datahub.dnb_api.utils import (
     get_datahub_ids_for_dnb_service_company_hierarchy,
 )
 from datahub.investment.project.models import InvestmentProject as DBInvestmentProject
-from datahub.investment.project.models import InvestmentProjectStageLog
+from datahub.investment.project.models import InvestmentProject, InvestmentProjectStageLog
 from datahub.investment.project.query_utils import get_project_code_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.search.investment import InvestmentSearchApp
@@ -322,32 +322,57 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
                     and 'investor_company' in validated_data
                 ):
                     investor_company_id = validated_data['investor_company'][0]
-
-                    project_stage_log = (
-                        InvestmentProjectStageLog.objects.filter(
-                            stage_id=InvestmentProjectStage.won.value.id,
-                        )
-                        .filter(
-                            investment_project__investor_company_id=investor_company_id,
-                        )
-                        .select_related('investment_project')
-                        .order_by('-created_on')
-                        .first()
-                    )
-                    if project_stage_log:
+                    last_won_project = self.get_latest_won(investor_company_id)
+                    if last_won_project:
                         response['summary'][stage.name]['last_won_project'][
                             'id'
-                        ] = project_stage_log.investment_project.id
+                        ] = last_won_project['id']
                         response['summary'][stage.name]['last_won_project'][
                             'name'
-                        ] = project_stage_log.investment_project.name
+                        ] = last_won_project['name']
                         response['summary'][stage.name]['last_won_project'][
                             'last_changed'
-                        ] = project_stage_log.created_on
+                        ] = last_won_project['created_on']
 
                 response['summary'][stage.name]['value'] = stage_summary['doc_count']
 
         return response
+
+    def get_latest_won(self, investor_company_id):
+        project_stage_log = (
+            InvestmentProjectStageLog.objects.filter(
+                stage_id=InvestmentProjectStage.won.value.id,
+            )
+            .filter(
+                investment_project__investor_company_id=investor_company_id,
+            )
+            .select_related('investment_project')
+            .order_by('-created_on')
+            .first()
+        )
+        if project_stage_log:
+            return {
+                'id': project_stage_log.investment_project.id,
+                'name': project_stage_log.investment_project.name,
+                'created_on': project_stage_log.created_on,
+            }
+
+        project_log = (
+            InvestmentProject.objects.filter(
+                stage_id=InvestmentProjectStage.won.value.id,
+                investor_company_id=investor_company_id,
+            )
+            .order_by('-created_on')
+            .first()
+        )
+        if project_log:
+            return {
+                'id': project_log.id,
+                'name': project_log.name,
+                'created_on': project_log.created_on,
+            }
+
+        return None
 
 
 @register_v3_view(sub_path='export')
