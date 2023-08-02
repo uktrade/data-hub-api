@@ -1339,7 +1339,7 @@
     modified_on: "2017-03-05T15:00:00Z"
 
 - model: investment.investmentproject
-  pk: 5d341b34-1fc8-4638-b4b1-a0922ebf401e
+  pk: fbac25ef-8437-4db6-97db-551210daf9a6
   fields:
     name: New airport
     description: This is a dummy investment project for testing

@@ -356,15 +356,15 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
                 'name': project_stage_log.investment_project.name,
                 'created_on': project_stage_log.created_on,
             }
-
         project_log = (
             InvestmentProject.objects.filter(
                 stage_id=InvestmentProjectStage.won.value.id,
                 investor_company_id=investor_company_id,
             )
-            .order_by('created_on')
+            .order_by('-created_on')
             .first()
         )
+
         if project_log:
             return {
                 'id': project_log.id,

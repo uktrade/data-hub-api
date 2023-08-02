@@ -11,7 +11,8 @@ import factory
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
-from django.utils.timezone import utc
+from django.utils.timezone import now, utc
+
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -1444,14 +1445,14 @@ class TestSummaryAggregation(APITestMixin):
         opensearch_with_collector,
     ):
         """Details of last won project should be shown in won summary for a investor company"""
+        early_created = InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+            created_on=now() - datetime.timedelta(days=7),
+        )
         newly_created_investment = InvestmentProjectFactory(
             stage_id=constants.InvestmentProjectStage.won.value.id,
+            investor_company=early_created.investor_company,
             created_on=datetime.date.today(),
-        )
-        InvestmentProjectFactory(
-            stage_id=constants.InvestmentProjectStage.won.value.id,
-            investor_company=newly_created_investment.investor_company,
-            created_on=datetime.date.today() - datetime.timedelta(weeks=1),
         )
 
         # Update all this companies project logs to not be won, so the DB query in the view
