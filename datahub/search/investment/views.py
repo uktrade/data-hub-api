@@ -362,7 +362,7 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
                 stage_id=InvestmentProjectStage.won.value.id,
                 investor_company_id=investor_company_id,
             )
-            .order_by('-created_on')
+            .order_by('created_on')
             .first()
         )
         if project_log:

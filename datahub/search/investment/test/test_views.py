@@ -1442,11 +1442,17 @@ class TestSummaryAggregation(APITestMixin):
     def test_project_without_won_project_stage_log_returns_project_as_fallback(
         self,
         opensearch_with_collector,
-        investment_project_with_stage_log,
     ):
         """Details of last won project should be shown in won summary for a investor company"""
-        investment_project = investment_project_with_stage_log[0]
-        investor_company = investment_project.investor_company
+        newly_created_investment = InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+            created_on=datetime.date.today(),
+        )
+        InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+            investor_company=newly_created_investment.investor_company,
+            created_on=datetime.date.today() - datetime.timedelta(weeks=1),
+        )
 
         # Update all this companies project logs to not be won, so the DB query in the view
         # returns nothing
@@ -1454,17 +1460,19 @@ class TestSummaryAggregation(APITestMixin):
             stage=constants.InvestmentProjectStage.prospect.value.id,
         )
 
+        opensearch_with_collector.flush_and_refresh()
+
         url = reverse('api-v3:search:investment_project')
         response = self.api_client.post(
             url,
             {
                 'show_summary': True,
-                'investor_company': [investor_company.id],
+                'investor_company': [newly_created_investment.investor_company.id],
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
+        assert response.data['count'] == 2
         assert 'summary' in response.data
         assert response.data['summary'] == {
             'prospect': {
@@ -1491,11 +1499,11 @@ class TestSummaryAggregation(APITestMixin):
                 'label': 'Won',
                 'id': constants.InvestmentProjectStage.won.value.id,
                 'last_won_project': {
-                    'id': investment_project.id,
-                    'last_changed': investment_project.created_on,
-                    'name': investment_project.name,
+                    'id': newly_created_investment.id,
+                    'last_changed': newly_created_investment.created_on,
+                    'name': newly_created_investment.name,
                 },
-                'value': 1,
+                'value': 2,
             },
         }
 
