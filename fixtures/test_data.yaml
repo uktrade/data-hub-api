@@ -1542,9 +1542,9 @@
 - model: investment.investmentproject
   pk: 5d43a289-d152-461c-ae23-c594abdd890a
   fields:
-    name: Green tea plantation
+    name: An awesome project we won
     description: This is a dummy investment project for testing a won value
-    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8 # Active
+    stage: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6 # Won
     status: won
     actual_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b # FDI
