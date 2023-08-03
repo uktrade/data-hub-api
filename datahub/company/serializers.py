@@ -1230,6 +1230,8 @@ class CompanyExportSerializer(serializers.ModelSerializer):
 
 
 class ObjectiveV4Serializer(PermittedFieldsModelSerializer):
+    modified_by = NestedAdviserField(read_only=True)
+
     class Meta:
         model = Objective
         fields = (
@@ -1247,6 +1249,7 @@ class ObjectiveV4Serializer(PermittedFieldsModelSerializer):
             'archived_by',
             'created_on',
             'modified_on',
+            'modified_by',
         )
         permissions = {
             f'company.{CompanyPermission.view_company}': 'company_url_path',
