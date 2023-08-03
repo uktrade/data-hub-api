@@ -11,7 +11,8 @@ import factory
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
-from django.utils.timezone import utc
+from django.utils.timezone import now, utc
+
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -1399,7 +1400,7 @@ class TestSummaryAggregation(APITestMixin):
             },
         }
 
-    def test_no_last_won_project(
+    def test_project_without_won_project_stage_log_and_a_won_project_excludes_latest_won(
         self,
         opensearch_with_collector,
         investment_project_with_stage_log,
@@ -1411,6 +1412,9 @@ class TestSummaryAggregation(APITestMixin):
         # Update all this companies project logs to not be won, so the DB query in the view
         # returns nothing
         InvestmentProjectStageLog.objects.all().update(
+            stage=constants.InvestmentProjectStage.prospect.value.id,
+        )
+        InvestmentProject.objects.all().update(
             stage=constants.InvestmentProjectStage.prospect.value.id,
         )
 
@@ -1425,6 +1429,51 @@ class TestSummaryAggregation(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
+        assert response.data['summary']['won'] == {
+            'label': 'Won',
+            'id': constants.InvestmentProjectStage.won.value.id,
+            'last_won_project': {
+                'id': None,
+                'last_changed': None,
+                'name': None,
+            },
+            'value': 1,
+        }
+
+    def test_project_without_won_project_stage_log_returns_project_as_fallback(
+        self,
+        opensearch_with_collector,
+    ):
+        """Details of last won project should be shown in won summary for a investor company"""
+        early_created = InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+            created_on=now() - datetime.timedelta(days=7),
+        )
+        newly_created_investment = InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+            investor_company=early_created.investor_company,
+            created_on=datetime.date.today(),
+        )
+
+        # Update all this companies project logs to not be won, so the DB query in the view
+        # returns nothing
+        InvestmentProjectStageLog.objects.all().update(
+            stage=constants.InvestmentProjectStage.prospect.value.id,
+        )
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(
+            url,
+            {
+                'show_summary': True,
+                'investor_company': [newly_created_investment.investor_company.id],
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
         assert 'summary' in response.data
         assert response.data['summary'] == {
             'prospect': {
@@ -1451,15 +1500,15 @@ class TestSummaryAggregation(APITestMixin):
                 'label': 'Won',
                 'id': constants.InvestmentProjectStage.won.value.id,
                 'last_won_project': {
-                    'id': None,
-                    'last_changed': None,
-                    'name': None,
+                    'id': newly_created_investment.id,
+                    'last_changed': newly_created_investment.created_on,
+                    'name': newly_created_investment.name,
                 },
-                'value': 1,
+                'value': 2,
             },
         }
 
-    def test_last_won_project(
+    def test_project_with_a_won_project_stage_log(
         self,
         opensearch_with_collector,
         investment_project_with_stage_log,
