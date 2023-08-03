@@ -199,7 +199,7 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             interaction_data = email_parser.extract_interaction_data_from_email()
         except InvalidInviteError as exc:
             self._handle_invalid_invite(exc, message)
-            return (False, repr(exc))
+            return (False, repr(exc), None)
 
         # Make the same-company check easy to remove later if we allow Interactions
         # to have contacts from more than one company
@@ -222,14 +222,14 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         except serializers.ValidationError as exc:
             errors = _flatten_serializer_errors_to_list(exc.detail)
             self._notify_meeting_ingest_failure(message, errors)
-            return (False, ', '.join(errors))
+            return (False, ', '.join(errors), None)
 
         # For our initial iteration of this feature, we are ignoring meeting updates
         matching_interactions = Interaction.objects.filter(
             source__contains={'meeting': {'id': interaction_data['meeting_details']['uid']}},
         )
         if matching_interactions.exists():
-            return (False, 'Meeting already exists as an interaction')
+            return (False, 'Meeting already exists as an interaction', None)
 
         interaction = self.save_serializer_as_interaction(serializer, interaction_data)
         notify_meeting_ingest_success(
@@ -237,4 +237,4 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             interaction,
             get_all_recipients(message),
         )
-        return (True, f'Successfully created interaction #{interaction.id}')
+        return (True, f'Successfully created interaction #{interaction.id}', interaction.id)
