@@ -122,6 +122,7 @@ class Command(BaseCleanupCommand):
                 Interaction._meta.get_field('export_countries'),
                 Interaction._meta.get_field('new_export_interaction_reminders'),
                 Interaction._meta.get_field('no_recent_export_interaction_reminders'),
+                Interaction._meta.get_field('mailbox'),
             ),
         ),
         # There are no investment projects in the live system with a modified-on date

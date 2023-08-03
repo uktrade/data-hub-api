@@ -4,8 +4,10 @@ from logging import getLogger
 import mailparser
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.timezone import now
 
 from datahub.documents import utils as documents
+from datahub.email_ingestion.models import MailboxLogging, MailboxProcessingStatus
 from datahub.interaction.email_processors.processors import CalendarInteractionEmailProcessor
 
 logger = getLogger(__name__)
@@ -58,13 +60,18 @@ def process_ingestion_emails():
             continue
 
         try:
+            log = _create_log_entry(source, message)
+
             email = mailparser.parse_from_bytes(message['content'])
-            processed, reason = processor.process_email(message=email)
+            processed, reason, interaction_id = processor.process_email(message=email)
             if not processed:
+                _update_log_status(log, MailboxProcessingStatus.FAILURE, reason, None)
                 logger.error('Error parsing message: "%s", error: "%s"', source, reason)
             else:
+                _update_log_status(log, MailboxProcessingStatus.PROCESSED, reason, interaction_id)
                 logger.info(reason)
         except Exception as e:
+            _update_log_status(log, MailboxProcessingStatus.FAILURE, repr(e), None)
             logger.exception('Error processing message: "%s", error: "%s"', source, e)
 
         logger.info(
@@ -72,3 +79,22 @@ def process_ingestion_emails():
             source,
             BUCKET_ID,
         )
+
+
+def _create_log_entry(source, message):
+    log = MailboxLogging(
+        retrieved_on=now(),
+        content=message['content'].decode('utf-8'),
+        source=source,
+        status=MailboxProcessingStatus.RETRIEVED,
+    )
+    log.save()
+
+    return log
+
+
+def _update_log_status(log, status, reason, interaction_id):
+    log.status = status
+    log.extra = reason
+    log.interaction_id = interaction_id
+    log.save()
