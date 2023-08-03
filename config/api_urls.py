@@ -9,6 +9,7 @@ from datahub.company import views as company_views
 from datahub.company.urls import company as company_urls
 from datahub.company.urls import contact as contact_urls
 from datahub.company.urls import export as export_urls
+from datahub.company.urls import objective as objective_urls
 from datahub.company_referral import urls as company_referral_urls
 from datahub.dataset import urls as dataset_urls
 from datahub.dnb_api import urls as dnb_api_urls
@@ -94,4 +95,5 @@ v4_urls = [
     path('', include((interaction_urls.urls_v4, 'interaction'), namespace='interaction')),
     path('', include((reminder_urls, 'reminder'), namespace='reminder')),
     path('', include((export_urls.urls_v4, 'export'), namespace='export')),
+    path('', include((objective_urls.urls_v4, 'objective'), namespace='objective')),
 ]

@@ -18,6 +18,7 @@ from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
     ExportFactory,
+    ObjectiveFactory,
     OneListCoreTeamMemberFactory,
 )
 from datahub.company_referral.test.factories import CompanyReferralFactory
@@ -81,6 +82,7 @@ MAPPINGS = {
             (LargeCapitalInvestorProfileFactory, 'investor_company'),
             (LargeCapitalOpportunityFactory, 'promoters'),
             (ExportFactory, 'company'),
+            (ObjectiveFactory, 'company'),
         ),
         'implicit_related_models': (),
         'ignored_models': (),

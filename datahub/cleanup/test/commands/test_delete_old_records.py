@@ -21,6 +21,7 @@ from datahub.cleanup.management.commands.delete_old_records import (
     INVESTMENT_PROJECT_EXPIRY_PERIOD,
     INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF,
     INVESTOR_PROFILE_EXPIRY_PERIOD,
+    OBJECTIVE_EXPIRY_PERIOD,
     ORDER_EXPIRY_PERIOD,
     ORDER_MODIFIED_ON_CUT_OFF,
 )
@@ -30,6 +31,7 @@ from datahub.company.test.factories import (
     ContactFactory,
     DuplicateCompanyFactory,
     ExportFactory,
+    ObjectiveFactory,
     OneListCoreTeamMemberFactory,
     SubsidiaryFactory,
 )
@@ -73,6 +75,7 @@ INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTMENT_PROJECT_EXP
 ORDER_DELETE_BEFORE_DATETIME = FROZEN_TIME - ORDER_EXPIRY_PERIOD
 INVESTOR_PROFILE_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTOR_PROFILE_EXPIRY_PERIOD
 COMPANY_EXPORT_DELETE_BEFORE_DATETIME = FROZEN_TIME - COMPANY_EXPORT_EXPIRY_PERIOD
+OBJECTIVE_DELETE_BEFORE_DATETIME = FROZEN_TIME - OBJECTIVE_EXPIRY_PERIOD
 
 MAPPING = {
     'company.Company': {
@@ -262,6 +265,17 @@ MAPPING = {
             },
             {
                 'factory': ExportFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME,
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME,
+                    },
+                ],
+            },
+            {
+                'factory': ObjectiveFactory,
                 'field': 'company',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
@@ -697,6 +711,28 @@ MAPPING = {
         ],
         'relations': [],
     },
+    'company.Objective': {
+        'factory': ObjectiveFactory,
+        'implicitly_deletable_models': set(),
+        'has_no_search_app': True,
+        'expired_objects_kwargs': [
+            {
+                'created_on': OBJECTIVE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': OBJECTIVE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+        ],
+        'unexpired_objects_kwargs': [
+            {
+                'created_on': OBJECTIVE_DELETE_BEFORE_DATETIME,
+                'modified_on': OBJECTIVE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+            {
+                'created_on': OBJECTIVE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': OBJECTIVE_DELETE_BEFORE_DATETIME,
+            },
+        ],
+        'relations': [],
+    },
 }
 
 
@@ -761,7 +797,6 @@ def test_configs(model_label, config):
 def _generate_run_args():
     """Flattens MAPPING so it can be used to parametrise the test_run() test."""
     for model_label, mapping in MAPPING.items():
-
         for kwargs in mapping['expired_objects_kwargs']:
             yield model_label, kwargs, None, None, True
 

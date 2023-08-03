@@ -26,6 +26,7 @@ from datahub.company.models import (
     ExportExperience,
     ExportExperienceCategory,
     ExportYear,
+    Objective,
     OneListCoreTeamMember,
     OneListTier,
 )
@@ -1226,3 +1227,27 @@ class CompanyExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyExport
         fields = '__all__'
+
+
+class ObjectiveV4Serializer(PermittedFieldsModelSerializer):
+    class Meta:
+        model = Objective
+        fields = (
+            'id',
+            'subject',
+            'detail',
+            'target_date',
+            'company',
+            'has_blocker',
+            'blocker_description',
+            'progress',
+            'archived',
+            'archived_on',
+            'archived_reason',
+            'archived_by',
+            'created_on',
+            'modified_on',
+        )
+        permissions = {
+            f'company.{CompanyPermission.view_company}': 'company_url_path',
+        }
