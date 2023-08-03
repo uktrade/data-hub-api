@@ -67,7 +67,7 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     referral_source_adviser = factory.SubFactory(AdviserFactory)
     likelihood_to_land_id = LikelihoodToLand.high.value.id
     archived_documents_url_path = factory.Faker('uri_path')
-    created_on = now()
+    created_on = factory.LazyFunction(now)
 
     @to_many_field
     def business_activities(self):
