@@ -288,3 +288,23 @@ class ExportFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company.CompanyExport'
+
+
+class ObjectiveFactory(factory.django.DjangoModelFactory):
+    """Objective factory"""
+
+    company = factory.SubFactory(CompanyFactory)
+    subject = factory.Faker('name')
+    detail = factory.Faker('text')
+    target_date = factory.Faker('future_date')
+    has_blocker = factory.Faker('pybool')
+    blocker_description = factory.Faker('text')
+    progress = factory.Faker(
+        'pyint',
+        min_value=0,
+        max_value=100,
+        step=10,
+    )
+
+    class Meta:
+        model = 'company.Objective'
