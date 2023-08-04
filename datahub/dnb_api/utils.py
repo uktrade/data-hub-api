@@ -707,6 +707,7 @@ def create_company_tree(companies: list, duns_number):
             'numberOfEmployees': 'number_of_employees',
             'oneListTier': 'one_list_tier',
             'tradeStyleNames': 'trading_names',
+            'headquarterType': 'headquarter_type',
         },
     )
 
@@ -761,6 +762,9 @@ def create_company_hierarchy_dataframe(family_tree_members: list, duns_number):
             'country': {'id': 'country.id', 'name': 'country.name'},
         },
     )
+    _merge_columns_into_single_column(
+        normalized_df, 'headquarterType', ['headquarterType.id', 'headquarterType.name']
+    )
     _move_requested_duns_to_start_of_subsidiary_list(normalized_df, duns_number)
     return normalized_df
 
@@ -809,6 +813,7 @@ def append_datahub_details(family_tree_members: list):
                 )
                 family_member['archived'] = datahub_detail.get('archived')
                 family_member['oneListTier'] = datahub_detail.get('one_list_tier')
+                family_member['headquarterType'] = datahub_detail.get('headquarter_type')
                 if not number_of_employees:
                     family_member['numberOfEmployees'] = datahub_detail.get('number_of_employees')
                 break  # Stop once we've found the match
@@ -889,6 +894,7 @@ def load_datahub_details(family_tree_members_duns):
                 'archived',
                 'one_list_tier',
                 'number_of_employees',
+                'headquarter_type',
             ),
         )[0:MAX_DUNS_NUMBERS_PER_REQUEST]
         opensearch_results = execute_search_query(query)

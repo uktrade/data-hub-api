@@ -2660,6 +2660,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                     'name': ultimate_company_dh.sector.name,
                 },
                 'trading_names': trading_names,
+                'headquarter_type': ultimate_company_dh.headquarter_type,
                 'uk_region': {
                     'id': str(ultimate_company_dh.uk_region.id),
                     'name': ultimate_company_dh.uk_region.name,
@@ -2769,6 +2770,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                     'name': ultimate_company_dh.sector.name,
                 },
                 'trading_names': [ultimate_tree_member_level_1.get('tradeStyleNames')[0]['name']],
+                'headquarter_type': ultimate_company_dh.headquarter_type,
                 'uk_region': {
                     'id': str(ultimate_company_dh.uk_region.id),
                     'name': ultimate_company_dh.uk_region.name,
@@ -2789,6 +2791,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                         'registered_address': None,
                         'sector': None,
                         'trading_names': [],
+                        'headquarter_type': None,
                         'uk_region': None,
                         'one_list_tier': None,
                         'archived': False,
@@ -2804,6 +2807,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                                 'registered_address': None,
                                 'sector': None,
                                 'trading_names': [],
+                                'headquarter_type': None,
                                 'uk_region': None,
                                 'one_list_tier': None,
                                 'archived': False,
@@ -4415,6 +4419,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
                         'name': global_company.sector.name,
                     },
                     'trading_names': [],
+                    'headquarter_type': global_company.headquarter_type,
                     'uk_region': {
                         'id': str(global_company.uk_region.id),
                         'name': global_company.uk_region.name,
