@@ -763,7 +763,7 @@ def create_company_hierarchy_dataframe(family_tree_members: list, duns_number):
         },
     )
     _merge_columns_into_single_column(
-        normalized_df, 'headquarterType', ['headquarterType.id', 'headquarterType.name']
+        normalized_df, 'headquarterType', ['headquarterType.id', 'headquarterType.name'],
     )
     _move_requested_duns_to_start_of_subsidiary_list(normalized_df, duns_number)
     return normalized_df
