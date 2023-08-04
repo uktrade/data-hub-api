@@ -4461,6 +4461,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
                                 'name': company.sector.name,
                             },
                             'trading_names': [],
+                            'headquarter_type': company.headquarter_type,
                             'uk_region': {
                                 'id': str(company.uk_region.id),
                                 'name': company.uk_region.name,
