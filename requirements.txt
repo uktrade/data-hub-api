@@ -135,7 +135,7 @@ pandas==2.0.3
     #   bigtree
 psycogreen==1.0.2
     # via -r requirements.in
-psycopg2==2.9.6
+psycopg2==2.9.7
     # via -r requirements.in
 pyjwt==2.6.0
     # via notifications-python-client
