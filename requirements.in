@@ -12,7 +12,7 @@ django-reversion==5.0.4
 uritemplate==4.1.1  # required for DRF schema features
 whitenoise==6.5.0
 
-chardet==5.1.0
+chardet==5.2.0
 pyyaml==6.0.1
 python-dateutil==2.8.2
 
