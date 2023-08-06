@@ -42,7 +42,7 @@ certifi==2023.7.22
     #   sentry-sdk
 cfgv==3.3.1
     # via pre-commit
-chardet==5.1.0
+chardet==5.2.0
     # via -r requirements.in
 charset-normalizer==2.1.1
     # via
