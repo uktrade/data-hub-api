@@ -49,6 +49,41 @@ class TestGettingObjectivesForCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['count'] == 2
 
+    def test_company_objectives_default_ordering(self):
+        user = create_test_user(
+            permission_codenames=(
+                'view_company',
+                'view_objective',
+            ),
+        )
+
+        latest_objective = ObjectiveFactory(target_date='2030-06-06')
+        middle_objective = ObjectiveFactory(
+            company=latest_objective.company,
+            target_date='2025-04-04',
+        )
+        earliest_objective = ObjectiveFactory(
+            company=latest_objective.company,
+            target_date='2020-02-02',
+        )
+
+        url = reverse(
+            'api-v4:objective:list',
+            kwargs={'company_id': earliest_objective.company.id},
+        )
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url)
+
+        expected_ids = {
+            str(earliest_objective.id),
+            str(middle_objective.id),
+            str(latest_objective.id),
+        }
+        actual_ids = {result['id'] for result in response.json()['results']}
+
+        assert expected_ids == actual_ids
+        assert response.status_code == status.HTTP_200_OK
+
 
 class TestAddCompanyObjective(APITestMixin):
     """Tests to add a single objective for a company."""

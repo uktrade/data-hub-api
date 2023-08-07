@@ -706,7 +706,6 @@ class SingleObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
     ]
 
     queryset = Objective.objects.all()
-
     serializer_class = ObjectiveV4Serializer
 
 
@@ -716,6 +715,10 @@ class CompanyObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
+    serializer_class = ObjectiveV4Serializer
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    ordering_fields = ['target_date']
+    ordering = ['target_date']
 
     def get_queryset(self):
         """
@@ -724,8 +727,6 @@ class CompanyObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
         """
         company_id = self.kwargs['company_id']
         return Objective.objects.filter(company=company_id)
-
-    serializer_class = ObjectiveV4Serializer
 
 
 @transaction.non_atomic_requests
