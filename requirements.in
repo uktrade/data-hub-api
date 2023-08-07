@@ -12,15 +12,15 @@ django-reversion==5.0.4
 uritemplate==4.1.1  # required for DRF schema features
 whitenoise==6.5.0
 
-chardet==5.1.0
+chardet==5.2.0
 pyyaml==6.0.1
 python-dateutil==2.8.2
 
 # Persistency layer
-psycopg2==2.9.6
+psycopg2==2.9.7
 psycogreen==1.0.2
 
-boto3==1.28.15
+boto3==1.28.20
 
 notifications-python-client==8.0.1
 
@@ -53,7 +53,7 @@ gevent==23.7.0
 mohawk==1.1.0
 requests==2.31.0
 requests_toolbelt==1.0.0
-sentry_sdk==1.28.1
+sentry_sdk==1.29.2
 
 # RQ and associated helpers
 rq==1.15.1
