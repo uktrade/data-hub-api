@@ -59,14 +59,17 @@ class TestGettingObjectivesForCompany(APITestMixin):
 
         latest_objective = ObjectiveFactory(target_date='2030-06-06')
         middle_objective = ObjectiveFactory(
-            company=latest_objective.company, target_date='2025-04-04'
+            company=latest_objective.company,
+            target_date='2025-04-04',
         )
         earliest_objective = ObjectiveFactory(
-            company=latest_objective.company, target_date='2020-02-02'
+            company=latest_objective.company,
+            target_date='2020-02-02',
         )
 
         url = reverse(
-            'api-v4:objective:list', kwargs={'company_id': earliest_objective.company.id}
+            'api-v4:objective:list',
+            kwargs={'company_id': earliest_objective.company.id},
         )
         api_client = self.create_api_client(user=user)
         response = api_client.get(url)
