@@ -716,7 +716,7 @@ class CompanyObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
         IsAuthenticated,
     ]
     serializer_class = ObjectiveV4Serializer
-    filter_backends = [OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     ordering_fields = ['target_date']
     ordering = ['target_date']
 
