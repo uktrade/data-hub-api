@@ -169,10 +169,11 @@ class TestCalendarInteractionEmailProcessor:
 
         # Process the message and save a draft interaction
         processor = CalendarInteractionEmailProcessor()
-        result, message = processor.process_email(mock_message)
+        result, message, interaction_id = processor.process_email(mock_message)
         assert result is True
         interaction = Interaction.objects.get(source__meeting__id='12345')
         assert message == f'Successfully created interaction #{interaction.id}'
+        assert interaction_id == interaction.id
 
         # Verify dit_participants holds all of the advisers for the interaction
         expected_adviser_emails = {
@@ -229,16 +230,19 @@ class TestCalendarInteractionEmailProcessor:
         self._get_email_parser_mock(interaction_data, monkeypatch)
         processor = CalendarInteractionEmailProcessor()
         # Create the calendar interaction initially
-        initial_result, initial_message = processor.process_email(mock_message)
+        initial_result, initial_message, _ = processor.process_email(mock_message)
         interaction_id = initial_message.split()[-1].strip('#')
         assert initial_result is True
         # Simulate processing the email again
-        duplicate_result, duplicate_message = processor.process_email(mock_message)
+        duplicate_result, duplicate_message, result_interaction_id = processor.process_email(
+            mock_message,
+        )
         assert duplicate_result is False
         assert duplicate_message == 'Meeting already exists as an interaction'
         all_interactions_by_sender = Interaction.objects.filter(
             dit_participants__adviser=Advisor.objects.get(email=interaction_data['sender_email']),
         )
+        assert result_interaction_id is None
         assert all_interactions_by_sender.count() == 1
         assert all_interactions_by_sender[0].id == UUID(interaction_id)
 
@@ -290,8 +294,9 @@ class TestCalendarInteractionEmailProcessor:
         mock_parser.side_effect = exception
         expected_exception_string = repr(exception)
         processor = CalendarInteractionEmailProcessor()
-        result, message = processor.process_email(mock_message)
+        result, message, interaction_id = processor.process_email(mock_message)
         assert result is False
+        assert interaction_id is None
         assert message == expected_exception_string
         expected_log = (
             'datahub.interaction.email_processors.processors',
@@ -349,8 +354,9 @@ class TestCalendarInteractionEmailProcessor:
         interaction_data = {**base_interaction_data_fixture, **interaction_data_overrides}
         self._get_email_parser_mock(interaction_data, monkeypatch)
         processor = CalendarInteractionEmailProcessor()
-        result, message = processor.process_email(mock_message)
+        result, message, interaction_id = processor.process_email(mock_message)
         assert result is False
+        assert interaction_id is None
         assert message == expected_message
         mock_notify_adviser_by_email.assert_called_once_with(
             Advisor.objects.filter(email=base_interaction_data_fixture['sender_email']).first(),
