@@ -2865,6 +2865,46 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
 
+    def _subsidiary_to_json(self, subsidiary):
+        return {
+            'id': str(subsidiary.id),
+            'name': subsidiary.name,
+            'employee_range': {
+                'id': str(subsidiary.employee_range.id),
+                'name': subsidiary.employee_range.name,
+            },
+            'headquarter_type': {
+                'id': str(subsidiary.headquarter_type.id),
+                'name': subsidiary.headquarter_type.name,
+            },
+            'address': {
+                'line_1': subsidiary.address_1,
+                'line_2': subsidiary.address_2,
+                'town': subsidiary.address_town,
+                'county': subsidiary.address_county,
+                'postcode': subsidiary.address_postcode,
+                'country': {
+                    'id': str(subsidiary.address_country.id),
+                    'name': subsidiary.address_country.name,
+                },
+                'area': {
+                    'id': str(subsidiary.address_area.id),
+                    'name': subsidiary.address_area.name,
+                },
+            },
+            'uk_region': {
+                'id': str(subsidiary.uk_region.id),
+                'name': subsidiary.uk_region.name,
+            },
+            'one_list_tier': {
+                'id': str(subsidiary.one_list_tier.id),
+                'name': subsidiary.one_list_tier.name,
+            },
+            'archived': subsidiary.archived,
+            'hierarchy': '0',
+            'trading_names': subsidiary.trading_names,
+        }
+
     def test_manually_verified_subsidiaries_empty(self, requests_mock, opensearch_with_signals):
         faker = Faker()
 
@@ -2913,44 +2953,28 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
             ultimate_company_dh,
         )
         assert response.json()['manually_verified_subsidiaries'] == [
-            {
-                'id': str(subsidiary.id),
-                'name': subsidiary.name,
-                'employee_range': {
-                    'id': str(subsidiary.employee_range.id),
-                    'name': subsidiary.employee_range.name,
-                },
-                'headquarter_type': {
-                    'id': str(subsidiary.headquarter_type.id),
-                    'name': subsidiary.headquarter_type.name,
-                },
-                'address': {
-                    'line_1': subsidiary.address_1,
-                    'line_2': subsidiary.address_2,
-                    'town': subsidiary.address_town,
-                    'county': subsidiary.address_county,
-                    'postcode': subsidiary.address_postcode,
-                    'country': {
-                        'id': str(subsidiary.address_country.id),
-                        'name': subsidiary.address_country.name,
-                    },
-                    'area': {
-                        'id': str(subsidiary.address_area.id),
-                        'name': subsidiary.address_area.name,
-                    },
-                },
-                'uk_region': {
-                    'id': str(subsidiary.uk_region.id),
-                    'name': subsidiary.uk_region.name,
-                },
-                'one_list_tier': {
-                    'id': str(subsidiary.one_list_tier.id),
-                    'name': subsidiary.one_list_tier.name,
-                },
-                'archived': subsidiary.archived,
-                'hierarchy': '0',
-                'trading_names': subsidiary.trading_names,
-            },
+            self._subsidiary_to_json(subsidiary),
+        ]
+
+    def test_manually_verified_subsidiaries_included_when_no_dnb_companies_found(
+        self,
+        requests_mock,
+    ):
+        ultimate_company_dh = CompanyFactory(duns_number='987654321')
+        subsidiary = CompanyFactory(
+            global_headquarters_id=ultimate_company_dh.id,
+            headquarter_type_id=constants.HeadquarterType.ghq.value.id,
+            address_area_id=constants.AdministrativeArea.texas.value.id,
+            one_list_tier_id=OneListTierID.tier_d_international_trade_advisers.value,
+        )
+
+        response = self._get_family_tree_response(
+            requests_mock,
+            [],
+            ultimate_company_dh,
+        )
+        assert response.json()['manually_verified_subsidiaries'] == [
+            self._subsidiary_to_json(subsidiary),
         ]
 
     def test_multiple_manually_verified_subsidiaries(self, requests_mock, opensearch_with_signals):
@@ -2993,82 +3017,8 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         )
 
         assert response.json()['manually_verified_subsidiaries'] == [
-            {
-                'id': str(first_subsidiary.id),
-                'name': first_subsidiary.name,
-                'employee_range': {
-                    'id': str(first_subsidiary.employee_range.id),
-                    'name': first_subsidiary.employee_range.name,
-                },
-                'headquarter_type': {
-                    'id': str(first_subsidiary.headquarter_type.id),
-                    'name': first_subsidiary.headquarter_type.name,
-                },
-                'address': {
-                    'line_1': first_subsidiary.address_1,
-                    'line_2': first_subsidiary.address_2,
-                    'town': first_subsidiary.address_town,
-                    'county': first_subsidiary.address_county,
-                    'postcode': first_subsidiary.address_postcode,
-                    'country': {
-                        'id': str(first_subsidiary.address_country.id),
-                        'name': first_subsidiary.address_country.name,
-                    },
-                    'area': {
-                        'id': str(first_subsidiary.address_area.id),
-                        'name': first_subsidiary.address_area.name,
-                    },
-                },
-                'uk_region': {
-                    'id': str(first_subsidiary.uk_region.id),
-                    'name': first_subsidiary.uk_region.name,
-                },
-                'one_list_tier': {
-                    'id': str(first_subsidiary.one_list_tier.id),
-                    'name': first_subsidiary.one_list_tier.name,
-                },
-                'archived': first_subsidiary.archived,
-                'hierarchy': '0',
-                'trading_names': first_subsidiary.trading_names,
-            },
-            {
-                'id': str(second_subsidiary.id),
-                'name': second_subsidiary.name,
-                'employee_range': {
-                    'id': str(second_subsidiary.employee_range.id),
-                    'name': second_subsidiary.employee_range.name,
-                },
-                'headquarter_type': {
-                    'id': str(second_subsidiary.headquarter_type.id),
-                    'name': second_subsidiary.headquarter_type.name,
-                },
-                'address': {
-                    'line_1': second_subsidiary.address_1,
-                    'line_2': second_subsidiary.address_2,
-                    'town': second_subsidiary.address_town,
-                    'county': second_subsidiary.address_county,
-                    'postcode': second_subsidiary.address_postcode,
-                    'country': {
-                        'id': str(second_subsidiary.address_country.id),
-                        'name': second_subsidiary.address_country.name,
-                    },
-                    'area': {
-                        'id': str(second_subsidiary.address_area.id),
-                        'name': second_subsidiary.address_area.name,
-                    },
-                },
-                'uk_region': {
-                    'id': str(second_subsidiary.uk_region.id),
-                    'name': second_subsidiary.uk_region.name,
-                },
-                'one_list_tier': {
-                    'id': str(second_subsidiary.one_list_tier.id),
-                    'name': second_subsidiary.one_list_tier.name,
-                },
-                'archived': second_subsidiary.archived,
-                'hierarchy': '0',
-                'trading_names': second_subsidiary.trading_names,
-            },
+            self._subsidiary_to_json(first_subsidiary),
+            self._subsidiary_to_json(second_subsidiary),
         ]
 
     def test_more_than_maximum_allowed_companies_returns_reduced_tree(
