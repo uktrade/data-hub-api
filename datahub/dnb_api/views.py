@@ -406,7 +406,9 @@ class DNBCompanyHierarchyView(APIView):
             'ultimate_global_company': {},
             'ultimate_global_companies_count': 0,
             'family_tree_companies_count': 0,
-            'manually_verified_subsidiaries': [],
+            'manually_verified_subsidiaries': self.get_manually_verified_subsidiaries(
+                company_id,
+            ),
             'reduced_tree': hierarchy_data.reduced,
         }
         if not hierarchy_data.data:
@@ -416,9 +418,6 @@ class DNBCompanyHierarchyView(APIView):
 
         json_response['ultimate_global_company'] = nested_tree
         json_response['ultimate_global_companies_count'] = companies_count + 1
-        json_response['manually_verified_subsidiaries'] = self.get_manually_verified_subsidiaries(
-            company_id,
-        )
         json_response['family_tree_companies_count'] = hierarchy_data.count
 
         return Response(json_response)
