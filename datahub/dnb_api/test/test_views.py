@@ -2598,7 +2598,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         """
         api_client = self.create_api_client()
         company = CompanyFactory(duns_number='123456789')
-        CompanyFactory(global_headquarters=company)
+        subsidiary_company = CompanyFactory(global_headquarters=company)
 
         opensearch_with_signals.indices.refresh()
 
@@ -2660,7 +2660,37 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
             },
             'ultimate_global_companies_count': 1,
             'family_tree_companies_count': 1,
-            'manually_verified_subsidiaries': [],
+            'manually_verified_subsidiaries': [
+                {
+                    'id': str(subsidiary_company.id),
+                    'name': subsidiary_company.name,
+                    'employee_range': {
+                        'id': str(subsidiary_company.employee_range.id),
+                        'name': subsidiary_company.employee_range.name,
+                    },
+                    'headquarter_type': None,
+                    'uk_region': {
+                        'id': str(subsidiary_company.uk_region.id),
+                        'name': subsidiary_company.uk_region.name,
+                    },
+                    'archived': False,
+                    'address': {
+                        'line_1': subsidiary_company.address_1,
+                        'line_2': '',
+                        'town': subsidiary_company.address_town,
+                        'county': '',
+                        'postcode': subsidiary_company.address_postcode,
+                        'area': None,
+                        'country': {
+                            'id': str(subsidiary_company.address_country.id),
+                            'name': subsidiary_company.address_country.name,
+                        },
+                    },
+                    'hierarchy': '0',
+                    'one_list_tier': None,
+                    'trading_names': subsidiary_company.trading_names,
+                },
+            ],
             'reduced_tree': False,
         }
 
