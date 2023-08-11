@@ -6,6 +6,7 @@ from datahub.company.test.factories import CompanyFactory, ObjectiveFactory
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
+    format_date_or_datetime,
 )
 
 
@@ -156,25 +157,22 @@ class TestGettingASingleObjective(APITestMixin):
         response = api_client.get(url)
 
         expected_response = {
-            str(objective1.id),
-            objective1.subject,
-            objective1.detail,
-            str(objective1.target_date),
-            str(objective1.company.id),
-            objective1.has_blocker,
-            objective1.blocker_description,
-            objective1.progress,
-        }
-        actual_response = {
-            response.json()['id'],
-            response.json()['subject'],
-            response.json()['detail'],
-            response.json()['target_date'],
-            response.json()['company'],
-            response.json()['has_blocker'],
-            response.json()['blocker_description'],
-            response.json()['progress'],
+            'id': str(objective1.id),
+            'subject': objective1.subject,
+            'detail': objective1.detail,
+            'target_date': str(objective1.target_date),
+            'company': {'id': str(objective1.company.id), 'name': objective1.company.name},
+            'has_blocker': objective1.has_blocker,
+            'blocker_description': objective1.blocker_description,
+            'progress': objective1.progress,
+            'archived': False,
+            'archived_by': None,
+            'archived_on': None,
+            'archived_reason': None,
+            'created_on': format_date_or_datetime(objective1.created_on),
+            'modified_by': None,
+            'modified_on': format_date_or_datetime(objective1.modified_on),
         }
 
         assert response.status_code == status.HTTP_200_OK
-        assert actual_response == expected_response
+        assert response.json() == expected_response
