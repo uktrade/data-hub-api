@@ -833,24 +833,6 @@ def create_related_company_dataframe(family_tree_members: list):
     return normalized_df
 
 
-def get_datahub_company_ids(family_tree_members: list):
-    """
-    Get company ids for related companies returned from D&B
-
-    """
-    family_tree_members_datahub_details = get_search_by_entities_query(
-        [SearchCompany],
-        term='',
-        filter_data={'duns_number': family_tree_members},
-        fields_to_include='id',
-    ).execute()
-    related_company_ids = []
-
-    for related_company in family_tree_members_datahub_details:
-        related_company_ids.append(related_company.id)
-    return related_company_ids
-
-
 def _batch_list(list, number_items):
     """
     Create a list of lists, with the maximum number of items in each list set to the number
@@ -866,40 +848,60 @@ def _batch_list(list, number_items):
     return iter(lambda: tuple(islice(list, number_items)), ())
 
 
-def load_datahub_details(family_tree_members_duns):
+def _batch_opensearch_query(duns_numbers: list, fields_to_include):
     """
-    Load any known datahub details for the duns numbers provided
+    Run a batched opensearch query for duns numbers. This query is batched as companies with a
+    large number of related companies can exceed the 1024 opensearch limit
     """
+    results = []
     # Because of the way the get_search_by_entities_query creates an opensearch query, which is
     # to convert every duns number into a separate match filter, we need to batch the opensearch
     # queries so only 1024 are sent at a time
-
-    results = []
     for batch_of_duns_numbers in _batch_list(
-        family_tree_members_duns,
+        duns_numbers,
         MAX_DUNS_NUMBERS_PER_REQUEST,
     ):
         query = get_search_by_entities_query(
             [SearchCompany],
             term='',
             filter_data={'duns_number': list(batch_of_duns_numbers)},
-            fields_to_include=(
-                'id',
-                'name',
-                'duns_number',
-                'uk_region',
-                'address',
-                'registered_address',
-                'sector',
-                'latest_interaction_date',
-                'archived',
-                'one_list_tier',
-                'number_of_employees',
-                'headquarter_type',
-            ),
+            fields_to_include=fields_to_include,
         )[0:MAX_DUNS_NUMBERS_PER_REQUEST]
         opensearch_results = execute_search_query(query)
         results.extend(opensearch_results.hits)
+    return results
+
+
+def get_datahub_company_ids(family_tree_members: list):
+    """
+    Get company ids for related companies returned from D&B
+    """
+    results = _batch_opensearch_query(family_tree_members, 'id')
+
+    return [result.id for result in results]
+
+
+def load_datahub_details(family_tree_members_duns):
+    """
+    Load any known datahub details for the duns numbers provided
+    """
+    results = _batch_opensearch_query(
+        family_tree_members_duns,
+        (
+            'id',
+            'name',
+            'duns_number',
+            'uk_region',
+            'address',
+            'registered_address',
+            'sector',
+            'latest_interaction_date',
+            'archived',
+            'one_list_tier',
+            'number_of_employees',
+            'headquarter_type',
+        ),
+    )
 
     return [result.to_dict() for result in results]
 
