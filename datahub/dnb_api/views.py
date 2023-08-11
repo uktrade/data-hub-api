@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
@@ -16,9 +17,7 @@ from datahub.core.exceptions import (
 )
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
-from datahub.dnb_api.constants import (
-    MAX_COMPANIES_IN_TREE_COUNT,
-)
+
 from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedError, link_company_with_dnb
 from datahub.dnb_api.models import HierarchyData
 from datahub.dnb_api.queryset import get_company_queryset
@@ -376,8 +375,6 @@ class DNBCompanyInvestigationView(APIView):
 
 
 class DNBCompanyHierarchyView(APIView):
-    MAX_COMPANIES_IN_TREE_COUNT = 1000
-
     permission_classes = (
         HasPermissions(
             f'company.{CompanyPermission.view_company}',
@@ -512,7 +509,7 @@ class DNBRelatedCompaniesCountView(APIView):
             'related_companies_count': companies_count,
             'manually_linked_subsidiaries_count': 0,
             'total': companies_count,
-            'reduced_tree': companies_count > MAX_COMPANIES_IN_TREE_COUNT,
+            'reduced_tree': companies_count > settings.DNB_MAX_COMPANIES_IN_TREE_COUNT,
         }
 
         if request.query_params.get('include_manually_linked_companies') == 'true':

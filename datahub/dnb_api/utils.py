@@ -34,7 +34,6 @@ from datahub.core.serializers import AddressSerializer
 from datahub.dnb_api.constants import (
     ALL_DNB_UPDATED_MODEL_FIELDS,
     ALL_DNB_UPDATED_SERIALIZER_FIELDS,
-    MAX_COMPANIES_IN_TREE_COUNT,
 )
 from datahub.dnb_api.models import HierarchyData
 from datahub.dnb_api.serializers import DNBCompanyHierarchySerializer, DNBCompanySerializer
@@ -614,7 +613,7 @@ def get_company_hierarchy_data(duns_number) -> HierarchyData:
     Get company hierarchy data
     """
     companies_count = get_company_hierarchy_count(duns_number)
-    if companies_count > MAX_COMPANIES_IN_TREE_COUNT:
+    if companies_count > settings.DNB_MAX_COMPANIES_IN_TREE_COUNT:
         return get_reduced_company_hierarchy_data(duns_number)
 
     return get_full_company_hierarchy_data(duns_number)
@@ -763,7 +762,9 @@ def create_company_hierarchy_dataframe(family_tree_members: list, duns_number):
         },
     )
     _merge_columns_into_single_column(
-        normalized_df, 'headquarterType', ['headquarterType.id', 'headquarterType.name'],
+        normalized_df,
+        'headquarterType',
+        ['headquarterType.id', 'headquarterType.name'],
     )
     _move_requested_duns_to_start_of_subsidiary_list(normalized_df, duns_number)
     return normalized_df
