@@ -11,10 +11,16 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('company_id', type=str, help='DataHub Company ID')
         parser.add_argument('export_propensity', type=str, help='Export Propensity Value')
+        parser.add_argument(
+            '--simulate',
+            action='store_true',
+            help='Simulate the command without making any actual changes',
+        )
 
     def handle(self, *args, **options):
         company_id = options['company_id']
         raw_potential = options['export_propensity']
+        simulate = options['simulate']
 
         # Convert propensity value to match Company.ExportPotentialScore.choices
         score_dict = {value.lower(): key for key, value in Company.ExportPotentialScore.choices}
@@ -31,11 +37,20 @@ class Command(BaseCommand):
 
         # Update the company if the value differs
         if company.export_potential != export_potential:
-            with reversion.create_revision():
-                company.export_potential = export_potential
-                company.save(update_fields=('export_potential',))
-                reversion.set_comment('Export potential updated via management command.')
+            if not simulate:
+                with reversion.create_revision():
+                    company.export_potential = export_potential
+                    company.save(update_fields=('export_potential',))
+                    reversion.set_comment('Export potential updated via management command.')
 
-            self.stdout.write(self.style.SUCCESS(f'Successfully updated Company ID {company_id}'))
+                self.stdout.write(self.style.SUCCESS(
+                    f'Successfully updated Company ID {company_id}'),
+                )
+            else:
+                self.stdout.write(
+                    self.style.SUCCESS(f'Would update Company ID {company_id} (SIMULATED)'),
+                )
         else:
-            self.stdout.write(self.style.SUCCESS(f'{company_id} already has the export value'))
+            self.stdout.write(self.style.SUCCESS(
+                f'{company_id} already has the desired export potential score'),
+            )
