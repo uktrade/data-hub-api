@@ -40,5 +40,3 @@ ALL_DNB_UPDATED_MODEL_FIELDS = (
     'global_ultimate_duns_number',
     'company_number',
 )
-
-MAX_COMPANIES_IN_TREE_COUNT = 1000
