@@ -2552,15 +2552,19 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
             == 400
         )
 
-    def test_empty_results_returned_from_dnb_service(
+    def test_empty_results_from_dnb_and_no_has_manually_linked(
         self,
         requests_mock,
+        opensearch_with_signals,
     ):
         """
-        Test empty results from dnb return empty tree response.
+        Test when a company has no dnb related companies and no manually linked an empty response
+        is returned
         """
         api_client = self.create_api_client()
         company = CompanyFactory(duns_number='123456789')
+
+        opensearch_with_signals.indices.refresh()
 
         self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
         requests_mock.post(
@@ -2580,6 +2584,113 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
             'ultimate_global_companies_count': 0,
             'family_tree_companies_count': 0,
             'manually_verified_subsidiaries': [],
+            'reduced_tree': False,
+        }
+
+    def test_empty_results_from_dnb_include_requested_company_when_company_has_manually_linked(
+        self,
+        requests_mock,
+        opensearch_with_signals,
+    ):
+        """
+        Test when empty results are returned from dnb but the company has manually linked
+        subsidiaries the requested company is returned as the global ultimate of the tree
+        """
+        api_client = self.create_api_client()
+        company = CompanyFactory(duns_number='123456789')
+        subsidiary_company = CompanyFactory(global_headquarters=company)
+
+        opensearch_with_signals.indices.refresh()
+
+        self.set_dnb_hierarchy_count_mock_response(requests_mock, 0)
+        requests_mock.post(
+            DNB_HIERARCHY_SEARCH_URL,
+            json={'family_tree_members': []},
+        )
+
+        url = reverse('api-v4:dnb-api:family-tree', kwargs={'company_id': company.id})
+        response = api_client.get(
+            url,
+            content_type='application/json',
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {
+            'ultimate_global_company': {
+                'duns_number': company.duns_number,
+                'id': str(company.id),
+                'name': company.name,
+                'number_of_employees': company.number_of_employees,
+                'address': {
+                    'country': {
+                        'id': str(company.address_country.id),
+                        'name': company.address_country.name,
+                    },
+                    'county': '',
+                    'line_1': company.address_1,
+                    'line_2': '',
+                    'postcode': company.address_postcode,
+                    'town': company.address_town,
+                },
+                'registered_address': {
+                    'country': {
+                        'id': str(company.registered_address_country.id),
+                        'name': company.registered_address_country.name,
+                    },
+                    'county': '',
+                    'line_1': company.registered_address_1,
+                    'line_2': '',
+                    'postcode': company.registered_address_postcode,
+                    'town': company.registered_address_town,
+                },
+                'sector': {
+                    'id': str(company.sector.id),
+                    'name': company.sector.name,
+                },
+                'trading_names': [],
+                'headquarter_type': company.headquarter_type,
+                'uk_region': {
+                    'id': str(company.uk_region.id),
+                    'name': company.uk_region.name,
+                },
+                'one_list_tier': None,
+                'archived': False,
+                'latest_interaction_date': None,
+                'hierarchy': None,
+            },
+            'ultimate_global_companies_count': 1,
+            'family_tree_companies_count': 1,
+            'manually_verified_subsidiaries': [
+                {
+                    'id': str(subsidiary_company.id),
+                    'name': subsidiary_company.name,
+                    'employee_range': {
+                        'id': str(subsidiary_company.employee_range.id),
+                        'name': subsidiary_company.employee_range.name,
+                    },
+                    'headquarter_type': None,
+                    'uk_region': {
+                        'id': str(subsidiary_company.uk_region.id),
+                        'name': subsidiary_company.uk_region.name,
+                    },
+                    'archived': False,
+                    'address': {
+                        'line_1': subsidiary_company.address_1,
+                        'line_2': '',
+                        'town': subsidiary_company.address_town,
+                        'county': '',
+                        'postcode': subsidiary_company.address_postcode,
+                        'area': None,
+                        'country': {
+                            'id': str(subsidiary_company.address_country.id),
+                            'name': subsidiary_company.address_country.name,
+                        },
+                    },
+                    'hierarchy': '0',
+                    'one_list_tier': None,
+                    'trading_names': subsidiary_company.trading_names,
+                },
+            ],
             'reduced_tree': False,
         }
 

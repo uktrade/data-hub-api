@@ -399,23 +399,40 @@ class DNBCompanyHierarchyView(APIView):
         ) as exc:
             raise APIUpstreamException(str(exc))
 
+        manually_verified = self.get_manually_verified_subsidiaries(
+            company_id,
+        )
+
         json_response = {
             'ultimate_global_company': {},
             'ultimate_global_companies_count': 0,
             'family_tree_companies_count': 0,
-            'manually_verified_subsidiaries': self.get_manually_verified_subsidiaries(
-                company_id,
-            ),
+            'manually_verified_subsidiaries': manually_verified,
             'reduced_tree': hierarchy_data.reduced,
         }
-        if not hierarchy_data.data:
-            return Response(json_response)
 
-        nested_tree = create_company_tree(hierarchy_data.data, duns_number)
+        # In the scenario that a company has no known DNB related companies, but still has
+        # manually added subsidiaries, the desired behaviour is to return the requested company
+        # as the only item in the company tree
+        if not hierarchy_data.data and len(manually_verified) > 0:
+            single_company_tree = create_company_tree(
+                [
+                    {
+                        'duns': duns_number,
+                    },
+                ],
+                duns_number,
+            )
 
-        json_response['ultimate_global_company'] = nested_tree
-        json_response['ultimate_global_companies_count'] = companies_count + 1
-        json_response['family_tree_companies_count'] = hierarchy_data.count
+            json_response['ultimate_global_company'] = single_company_tree
+            json_response['ultimate_global_companies_count'] = 1
+            json_response['family_tree_companies_count'] = 1
+
+        if hierarchy_data.data:
+            nested_tree = create_company_tree(hierarchy_data.data, duns_number)
+            json_response['ultimate_global_company'] = nested_tree
+            json_response['ultimate_global_companies_count'] = companies_count + 1
+            json_response['family_tree_companies_count'] = hierarchy_data.count
 
         return Response(json_response)
 
