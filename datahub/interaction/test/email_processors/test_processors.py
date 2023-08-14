@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
 from unittest import mock
-from uuid import UUID
 
 import pytest
 from django.conf import settings
@@ -20,6 +19,7 @@ from datahub.interaction.email_processors.exceptions import (
 from datahub.interaction.email_processors.processors import (
     CalendarInteractionEmailProcessor,
     EXCEPTION_NOTIFY_MESSAGES,
+    InteractionPlainEmailProcessor,
 )
 from datahub.interaction.models import Interaction
 from datahub.notification.constants import NotifyServiceName
@@ -39,7 +39,7 @@ def interaction_email_notification_feature_flag():
 def base_interaction_data_fixture():
     """
     Basic interaction data spec which can be used to build a return value
-    which a mock of CalendarInteractionEmailParser can return.
+    which a mock of *EmailParser can return.
     """
     return {
         'sender_email': 'adviser1@trade.gov.uk',
@@ -49,6 +49,7 @@ def base_interaction_data_fixture():
         'top_company_name': 'Company 1',
         'meeting_details': {'uid': '12345'},
         'subject': 'A meeting',
+        'body': 'A message body',
     }
 
 
@@ -79,6 +80,25 @@ def mock_message(base_interaction_data_fixture):
     message.cc = []
     message.message_id = 'abc123'
     message.received = [{'date_utc': '2019-08-01T00:00:01'}]
+    return message
+
+
+@pytest.fixture
+def mock_plain_message(base_interaction_data_fixture):
+    """
+    Mock email messsage.
+    """
+    message = mock.Mock()
+    message.from_ = [(None, base_interaction_data_fixture['sender_email'])]
+    message.to = [
+        (None, email)
+        for email in base_interaction_data_fixture['contact_emails']
+    ]
+    message.cc = []
+    message.message_id = 'abc123'
+    message.received = [{'date_utc': '2019-08-01T00:00:01'}]
+    message.subject = 'Fwd: An email'
+    message.body = base_interaction_data_fixture['body']
     return message
 
 
@@ -150,7 +170,7 @@ class TestCalendarInteractionEmailProcessor:
         self,
         interaction_data_overrides,
         expected_subject,
-        calendar_data_fixture,
+        interaction_email_fixture,
         base_interaction_data_fixture,
         mock_notify_adviser_by_email,
         interaction_email_notification_feature_flag,
@@ -217,7 +237,7 @@ class TestCalendarInteractionEmailProcessor:
     def test_process_email_meeting_exists(
         self,
         base_interaction_data_fixture,
-        calendar_data_fixture,
+        interaction_email_fixture,
         interaction_email_notification_feature_flag,
         mock_message,
         monkeypatch,
@@ -230,8 +250,7 @@ class TestCalendarInteractionEmailProcessor:
         self._get_email_parser_mock(interaction_data, monkeypatch)
         processor = CalendarInteractionEmailProcessor()
         # Create the calendar interaction initially
-        initial_result, initial_message, _ = processor.process_email(mock_message)
-        interaction_id = initial_message.split()[-1].strip('#')
+        initial_result, _, interaction_id = processor.process_email(mock_message)
         assert initial_result is True
         # Simulate processing the email again
         duplicate_result, duplicate_message, result_interaction_id = processor.process_email(
@@ -244,7 +263,7 @@ class TestCalendarInteractionEmailProcessor:
         )
         assert result_interaction_id is None
         assert all_interactions_by_sender.count() == 1
-        assert all_interactions_by_sender[0].id == UUID(interaction_id)
+        assert all_interactions_by_sender[0].id == interaction_id
 
     @pytest.mark.parametrize(
         'invalid_invite_exception_class,expected_to_notify',
@@ -274,7 +293,7 @@ class TestCalendarInteractionEmailProcessor:
     def test_process_email_parser_validation_error(
         self,
         base_interaction_data_fixture,
-        calendar_data_fixture,
+        interaction_email_fixture,
         mock_notify_adviser_by_email,
         interaction_email_notification_feature_flag,
         mock_message,
@@ -341,7 +360,7 @@ class TestCalendarInteractionEmailProcessor:
         interaction_data_overrides,
         expected_message,
         base_interaction_data_fixture,
-        calendar_data_fixture,
+        interaction_email_fixture,
         mock_notify_adviser_by_email,
         interaction_email_notification_feature_flag,
         mock_message,
@@ -368,3 +387,216 @@ class TestCalendarInteractionEmailProcessor:
             },
             notify_service_name=NotifyServiceName.interaction,
         )
+
+
+@pytest.mark.django_db
+class TestInteractionPlainEmailProcessor:
+    """
+    Test the InteractionPlainEmailProcessor class.
+    """
+
+    def _get_email_parser_mock(self, interaction_data, monkeypatch):
+        """
+        Given a spec of interaction data and monkeypatch object, sets a mocked
+        return value for InteractionEmailParser.extract_interaction_data_from_email.
+        """
+        email_parser_mock = mock.Mock()
+        monkeypatch.setattr(
+            (
+                'datahub.interaction.email_processors.parsers.InteractionEmailParser'
+                '.extract_interaction_data_from_email'
+            ),
+            email_parser_mock,
+        )
+        contacts = list(Contact.objects.filter(email__in=interaction_data['contact_emails']))
+        secondary_advisers = list(
+            Advisor.objects.filter(email__in=interaction_data['secondary_adviser_emails']),
+        )
+        email_parser_mock.return_value = {
+            'id': 'message-123@id',
+            'sender': Advisor.objects.get(email=interaction_data['sender_email']),
+            'contacts': contacts,
+            'secondary_advisers': secondary_advisers,
+            'top_company': Company.objects.get(name=interaction_data['top_company_name']),
+            'date': interaction_data['date'],
+            'meeting_details': interaction_data['meeting_details'],
+            'subject': interaction_data['subject'],
+            'body': interaction_data['body'],
+        }
+        return email_parser_mock
+
+    @pytest.mark.parametrize(
+        'interaction_data_overrides,expected_subject',
+        (
+            # Simple case; just the base interaction data
+            (
+                {},
+                'A meeting',
+            ),
+            # Including secondary advisers
+            (
+                {
+                    'subject': 'Fwd: Meeting',
+                    'secondary_adviser_emails': [
+                        'adviser2@digital.trade.gov.uk',
+                        'adviser3@digital.trade.gov.uk',
+                    ],
+                },
+                'Fwd: Meeting',
+            ),
+            # Contacts from different companies
+            (
+                {
+                    'subject': 'Fwd: Meeting',
+                    'contact_emails': [
+                        'bill.adama@example.net',
+                        'laura.roslin@example.net',
+                    ],
+                },
+                'Fwd: Meeting',
+            ),
+        ),
+    )
+    def test_process_email_successful(
+        self,
+        interaction_data_overrides,
+        expected_subject,
+        interaction_email_fixture,
+        base_interaction_data_fixture,
+        mock_notify_adviser_by_email,
+        interaction_email_notification_feature_flag,
+        mock_message,
+        monkeypatch,
+    ):
+        """
+        Test that process_email saves a draft interaction when the email parser yields good data.
+        """
+        interaction_data = {
+            **base_interaction_data_fixture,
+            **interaction_data_overrides,
+        }
+        email_parser_mock = self._get_email_parser_mock(interaction_data, monkeypatch)
+
+        # Process the message and save a draft interaction
+        processor = InteractionPlainEmailProcessor()
+        result, message, interaction_id = processor.process_email(mock_message)
+        assert result is True
+        interaction = Interaction.objects.get(source__email__id='message-123@id')
+        assert message == f'Successfully created interaction #{interaction.id}'
+        assert interaction_id == interaction.id
+
+        # Verify dit_participants holds all of the advisers for the interaction
+        expected_adviser_emails = {
+            interaction_data['sender_email'],
+            *interaction_data['secondary_adviser_emails'],
+        }
+        interaction_adviser_emails = {
+            participant.adviser.email for participant
+            in interaction.dit_participants.all()
+        }
+        assert interaction_adviser_emails == expected_adviser_emails
+
+        # Verify contacts holds all of the expected contacts for the interaction
+        interaction_contacts = interaction.contacts.all()
+        email_contacts = email_parser_mock.return_value['contacts']
+        for contact in email_contacts:
+            if contact.company.name == interaction_data['top_company_name']:
+                assert contact in interaction_contacts
+        assert interaction.company.name == interaction_data['top_company_name']
+        assert interaction.date == interaction_data['date']
+        assert interaction.source == {
+            'email': {'id': 'message-123@id'},
+        }
+        assert interaction.subject == expected_subject
+        assert interaction.status == Interaction.Status.DRAFT
+        assert interaction.notes == interaction_data['body']
+
+        sender_participant = interaction.dit_participants.get(
+            adviser__email__iexact=interaction_data['sender_email'],
+        )
+        mock_notify_adviser_by_email.assert_called_once_with(
+            sender_participant.adviser,
+            settings.MAILBOX_INGESTION_SUCCESS_TEMPLATE_ID,
+            context={
+                'interaction_url': interaction.get_absolute_url(),
+                'recipients': 'bill.adama@example.net, saul.tigh@example.net',
+                'support_team_email': settings.DATAHUB_SUPPORT_EMAIL_ADDRESS,
+            },
+            notify_service_name=NotifyServiceName.interaction,
+        )
+
+    @pytest.mark.parametrize(
+        'interaction_data_overrides,expected_message',
+        (
+            # No contacts present
+            (
+                {
+                    'contact_emails': [],
+                },
+                'contacts: This list may not be empty.',
+            ),
+        ),
+    )
+    def test_process_email_validation(
+        self,
+        interaction_data_overrides,
+        expected_message,
+        base_interaction_data_fixture,
+        interaction_email_fixture,
+        mock_notify_adviser_by_email,
+        interaction_email_notification_feature_flag,
+        mock_message,
+        monkeypatch,
+    ):
+        """
+        Test that process_email returns expected validation error messages when
+        called with invalid data.
+        """
+        interaction_data = {**base_interaction_data_fixture, **interaction_data_overrides}
+        self._get_email_parser_mock(interaction_data, monkeypatch)
+        processor = InteractionPlainEmailProcessor()
+        result, message, interaction_id = processor.process_email(mock_message)
+        assert result is False
+        assert interaction_id is None
+        assert message == expected_message
+        mock_notify_adviser_by_email.assert_called_once_with(
+            Advisor.objects.filter(email=base_interaction_data_fixture['sender_email']).first(),
+            settings.MAILBOX_INGESTION_FAILURE_TEMPLATE_ID,
+            context={
+                'errors': [expected_message],
+                'recipients': ', '.join(base_interaction_data_fixture['contact_emails']),
+                'support_team_email': settings.DATAHUB_SUPPORT_EMAIL_ADDRESS,
+            },
+            notify_service_name=NotifyServiceName.interaction,
+        )
+
+    def test_process_email_interaction_exists(
+        self,
+        base_interaction_data_fixture,
+        interaction_email_fixture,
+        interaction_email_notification_feature_flag,
+        mock_message,
+        monkeypatch,
+    ):
+        """
+        Test that process_email does not save another interaction when the email
+        already exists as an interaction.
+        """
+        interaction_data = {**base_interaction_data_fixture}
+        self._get_email_parser_mock(interaction_data, monkeypatch)
+        processor = InteractionPlainEmailProcessor()
+        # Create the email interaction initially
+        initial_result, _, interaction_id = processor.process_email(mock_message)
+        assert initial_result is True
+        # Simulate processing the email again
+        duplicate_result, duplicate_message, result_interaction_id = processor.process_email(
+            mock_message,
+        )
+        assert duplicate_result is False
+        assert duplicate_message == 'Email already exists as an interaction'
+        all_interactions_by_sender = Interaction.objects.filter(
+            dit_participants__adviser=Advisor.objects.get(email=interaction_data['sender_email']),
+        )
+        assert result_interaction_id is None
+        assert all_interactions_by_sender.count() == 1
+        assert all_interactions_by_sender[0].id == interaction_id

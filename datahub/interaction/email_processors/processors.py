@@ -13,7 +13,10 @@ from datahub.interaction.email_processors.notify import (
     notify_meeting_ingest_failure,
     notify_meeting_ingest_success,
 )
-from datahub.interaction.email_processors.parsers import CalendarInteractionEmailParser
+from datahub.interaction.email_processors.parsers import (
+    CalendarInteractionEmailParser,
+    InteractionEmailParser,
+)
 from datahub.interaction.email_processors.utils import (
     get_all_recipients,
     get_best_match_adviser_by_email,
@@ -91,12 +94,7 @@ def _get_meeting_subject(sender, contacts, secondary_advisers):
     return f'Meeting between {comma_names} and {all_names[-1]}'
 
 
-class CalendarInteractionEmailProcessor(EmailProcessor):
-    """
-    An EmailProcessor which checks whether incoming email is a valid DIT/company
-    meeting, parses meeting information and creates a draft Interaction model
-    instance for it if the information is valid.
-    """
+class BaseInteractionEmailProcessor:
 
     def _notify_meeting_ingest_failure(self, message, errors):
         try:
@@ -117,6 +115,21 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         recipient_emails = get_all_recipients(message)
         notify_meeting_ingest_failure(sender_adviser, errors, recipient_emails)
 
+    def validate_with_serializer(self, data):
+        """
+        Transforms extracted data into a dict suitable for use with InteractionSerializer
+        and then runs data through this serializer for validation.
+
+        Returns the instantiated serializer.
+        """
+        transformed_data = self._to_serializer_format(data)
+        serializer = InteractionSerializer(
+            context={'check_association_permissions': False},
+            data=transformed_data,
+        )
+        serializer.is_valid(raise_exception=True)
+        return serializer
+
     def _to_serializer_format(self, data):
         dit_participants = [
             {
@@ -136,8 +149,18 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             'subject': data['subject'],
             'was_policy_feedback_provided': False,
         }
+        if 'body' in data:
+            data_for_serializer['notes'] = data['body']
 
         return data_for_serializer
+
+
+class CalendarInteractionEmailProcessor(BaseInteractionEmailProcessor, EmailProcessor):
+    """
+    An EmailProcessor which checks whether incoming email is a valid DBT/company
+    meeting, parses meeting information and creates a draft Interaction model
+    instance for it if the information is valid.
+    """
 
     def _handle_invalid_invite(self, exception, message):
         """
@@ -155,21 +178,6 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
         if exc_class in EXCEPTION_NOTIFY_MESSAGES:
             readable_error = EXCEPTION_NOTIFY_MESSAGES[exc_class]
             self._notify_meeting_ingest_failure(message, [readable_error])
-
-    def validate_with_serializer(self, data):
-        """
-        Transforms extracted data into a dict suitable for use with InteractionSerializer
-        and then runs data through this serializer for validation.
-
-        Returns the instantiated serializer.
-        """
-        transformed_data = self._to_serializer_format(data)
-        serializer = InteractionSerializer(
-            context={'check_association_permissions': False},
-            data=transformed_data,
-        )
-        serializer.is_valid(raise_exception=True)
-        return serializer
 
     @transaction.atomic
     def save_serializer_as_interaction(self, serializer, interaction_data):
@@ -237,4 +245,67 @@ class CalendarInteractionEmailProcessor(EmailProcessor):
             interaction,
             get_all_recipients(message),
         )
+        return (True, f'Successfully created interaction #{interaction.id}', interaction.id)
+
+
+class InteractionPlainEmailProcessor(BaseInteractionEmailProcessor, EmailProcessor):
+    """
+    An EmailProcessor which checks whether incoming email is a valid DBT/company
+    interaction, parses meeting information and creates a draft Interaction model
+    instance for it if the information is valid.
+    """
+
+    @transaction.atomic
+    def save_serializer_as_interaction(self, serializer, interaction_data):
+        """
+        Create the interaction model instance from the validated serializer.
+        """
+        # Provide an overridden value for source - so that we save the meeting
+        # data properly
+        interaction = serializer.save(
+            source={
+                'email': {'id': interaction_data['id']},
+            },
+        )
+        return interaction
+
+    def process_email(self, message):
+        """
+        Review the metadata of an email message to see if it fits the our criteria
+        of a valid Data Hub interaction. If it does, create a draft Interaction for it.
+
+        :param message: mailparser.MailParser object - the message to process
+        """
+        # Parse the email for interaction data
+        email_parser = InteractionEmailParser(message)
+        interaction_data = email_parser.extract_interaction_data_from_email()
+
+        # Make the same-company check easy to remove later if we allow Interactions
+        # to have contacts from more than one company
+        sanitised_contacts = _filter_contacts_to_single_company(
+            interaction_data['contacts'],
+            interaction_data['top_company'],
+        )
+        interaction_data['contacts'] = sanitised_contacts
+
+        try:
+            serializer = self.validate_with_serializer(interaction_data)
+        except serializers.ValidationError as exc:
+            errors = _flatten_serializer_errors_to_list(exc.detail)
+            self._notify_meeting_ingest_failure(message, errors)
+            return (False, ', '.join(errors), None)
+
+        matching_interactions = Interaction.objects.filter(
+            source__contains={'email': {'id': interaction_data['id']}},
+        )
+        if matching_interactions.exists():
+            return (False, 'Email already exists as an interaction', None)
+
+        interaction = self.save_serializer_as_interaction(serializer, interaction_data)
+        notify_meeting_ingest_success(
+            interaction_data['sender'],
+            interaction,
+            get_all_recipients(message),
+        )
+
         return (True, f'Successfully created interaction #{interaction.id}', interaction.id)

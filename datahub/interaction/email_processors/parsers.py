@@ -3,7 +3,7 @@ import datetime
 from collections import Counter
 
 import icalendar
-from django.utils.timezone import utc
+from django.utils.timezone import make_aware, utc
 
 from datahub.company.contact_matching import (
     find_active_contact_by_email_address,
@@ -85,18 +85,30 @@ def _convert_calendar_time_to_utc_datetime(calendar_time):
     return calendar_time.astimezone(utc)
 
 
-class CalendarInteractionEmailParser:
-    """
-    Parses and extracts calendar interaction information from a MailParser email
-    object.
-    """
+class BaseEmailParser:
+    """Base email parser."""
 
     def __init__(self, message):
         """
-        Initialise the CalendarInteractionEmailParser with a MailParser email
+        Initialise the BaseEmailParser with a MailParser email
         object.
         """
         self.message = message
+
+    def _extract_and_validate_contacts(self, all_recipients):
+        contacts = []
+        for recipient_email in all_recipients:
+            contact, _ = find_active_contact_by_email_address(
+                recipient_email,
+                MatchStrategy.MAX_INTERACTIONS,
+            )
+            if contact:
+                contacts.append(contact)
+        if not contacts:
+            raise NoContactsError(
+                'The meeting email had no recipients which were recognised as Data Hub contacts.',
+            )
+        return contacts
 
     def _extract_and_validate_sender_adviser(self):
         try:
@@ -115,21 +127,6 @@ class CalendarInteractionEmailParser:
             )
         return sender_adviser
 
-    def _extract_and_validate_contacts(self, all_recipients):
-        contacts = []
-        for recipient_email in all_recipients:
-            contact, _ = find_active_contact_by_email_address(
-                recipient_email,
-                MatchStrategy.MAX_INTERACTIONS,
-            )
-            if contact:
-                contacts.append(contact)
-        if not contacts:
-            raise NoContactsError(
-                'The meeting email had no recipients which were recognised as Data Hub contacts.',
-            )
-        return contacts
-
     def _extract_secondary_advisers(self, all_recipients, sender_adviser):
         """
         Extract the secondary (non-sender) advisers for the calendar invite - that is,
@@ -141,6 +138,13 @@ class CalendarInteractionEmailParser:
             if adviser and adviser != sender_adviser:
                 secondary_advisers.append(adviser)
         return secondary_advisers
+
+
+class CalendarInteractionEmailParser(BaseEmailParser):
+    """
+    Parses and extracts calendar interaction information from a MailParser email
+    object.
+    """
 
     def _extract_and_validate_calendar_event_component(self):
         calendar_string = _extract_calendar_string_from_text(self.message)
@@ -214,4 +218,32 @@ class CalendarInteractionEmailParser:
             'date': calendar_event['start'],
             'meeting_details': calendar_event,
             'subject': calendar_event['subject'],
+        }
+
+
+class InteractionEmailParser(BaseEmailParser):
+    """Parses and extracts interaction information from a MailParser email object."""
+
+    def extract_interaction_data_from_email(self):
+        """
+        Extract interaction data from the email message as a dictionary.
+
+        This raises an InvalidInviteError if the interaction data could not be fully extracted
+        or is invalid according to business logic.
+        """
+        all_recipients = get_all_recipients(self.message)
+        sender = self._extract_and_validate_sender_adviser()
+        secondary_advisers = self._extract_secondary_advisers(all_recipients, sender)
+        contacts = self._extract_and_validate_contacts(all_recipients)
+        top_company = _get_top_company_from_contacts(contacts)
+
+        return {
+            'id': self.message.message_id,
+            'sender': sender,
+            'contacts': contacts,
+            'secondary_advisers': secondary_advisers,
+            'top_company': top_company,
+            'date': make_aware(self.message.date),
+            'body': self.message.body,
+            'subject': self.message.subject,
         }
