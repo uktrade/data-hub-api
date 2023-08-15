@@ -35,4 +35,24 @@ class CompanyExportAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified_on',
         'modified_by',
     )
+    search_fields = (
+        'title',
+        'id',
+        'company__pk',
+        'owner__pk',
+    )
+    autocomplete_fields = (
+        'company',
+        'contacts',
+        'owner',
+        'team_members',
+    )
+    read_only_fields = (
+        'id',
+    )
+    list_display = (
+        'title',
+        'company',
+        'owner',
+    )
     form = CompanyExportAdminForm
