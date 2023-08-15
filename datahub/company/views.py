@@ -705,7 +705,11 @@ class SingleObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
         IsAuthenticated,
     ]
 
-    queryset = Objective.objects.all()
+    queryset = Objective.objects.all().select_related(
+        'company',
+        'archived_by',
+        'modified_by',
+    )
     serializer_class = ObjectiveV4Serializer
 
 
@@ -719,6 +723,7 @@ class CompanyObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     ordering_fields = ['target_date']
     ordering = ['target_date']
+    filterset_fields = ['archived']
 
     def get_queryset(self):
         """
@@ -726,7 +731,11 @@ class CompanyObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
         with a specific company
         """
         company_id = self.kwargs['company_id']
-        return Objective.objects.filter(company=company_id)
+        return Objective.objects.filter(company=company_id).select_related(
+            'company',
+            'archived_by',
+            'modified_by',
+        )
 
 
 @transaction.non_atomic_requests
