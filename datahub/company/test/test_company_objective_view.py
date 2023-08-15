@@ -1,3 +1,5 @@
+import pytest
+
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -79,6 +81,36 @@ class TestGettingObjectivesForCompany(APITestMixin):
             str(earliest_objective.id),
             str(middle_objective.id),
             str(latest_objective.id),
+        }
+        actual_ids = {result['id'] for result in response.json()['results']}
+
+        assert expected_ids == actual_ids
+        assert response.status_code == status.HTTP_200_OK
+
+    @pytest.mark.parametrize('archived', ((True), (False)))
+    def test_company_objectives_archived_filtering(self, archived):
+        user = create_test_user(
+            permission_codenames=(
+                'view_company',
+                'view_objective',
+            ),
+        )
+
+        archived_objective = ObjectiveFactory(archived=True)
+        not_archived_objective = ObjectiveFactory(
+            company=archived_objective.company,
+            archived=False,
+        )
+
+        url = reverse(
+            'api-v4:objective:list',
+            kwargs={'company_id': archived_objective.company.id},
+        )
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(f'{url}?archived={archived}')
+
+        expected_ids = {
+            str(archived_objective.id) if archived else str(not_archived_objective.id),
         }
         actual_ids = {result['id'] for result in response.json()['results']}
 
