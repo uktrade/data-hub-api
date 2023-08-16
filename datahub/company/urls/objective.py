@@ -1,7 +1,7 @@
 from django.urls import path
 
 from datahub.company.views import (
-    CompanyObjectiveCountV4ViewSet,
+    CompanyObjectiveArchivedCountV4ViewSet,
     CompanyObjectiveV4ViewSet,
     SingleObjectiveV4ViewSet,
 )
@@ -26,7 +26,7 @@ urls_v4 = [
     path('company/<uuid:company_id>/objective', Objective_v4_collection, name='list'),
     path(
         'company/<uuid:company_id>/objective/count',
-        CompanyObjectiveCountV4ViewSet.as_view(),
+        CompanyObjectiveArchivedCountV4ViewSet.as_view(),
         name='count',
     ),
     path('company/<uuid:company_id>/objective/<uuid:pk>', Objective_v4_item, name='detail'),

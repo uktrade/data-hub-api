@@ -738,8 +738,8 @@ class CompanyObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
         )
 
 
-class CompanyObjectiveCountV4ViewSet(APIView):
-    """Objectives for getting count of objectives for a company"""
+class CompanyObjectiveArchivedCountV4ViewSet(APIView):
+    """Objectives for getting archived counts of objectives for a company"""
 
     permission_classes = [
         IsAuthenticated,
