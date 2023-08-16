@@ -1231,6 +1231,7 @@ class CompanyExportSerializer(serializers.ModelSerializer):
 
 class ObjectiveV4Serializer(PermittedFieldsModelSerializer):
     modified_by = NestedAdviserField(read_only=True)
+    archived_by = NestedAdviserField(read_only=True)
     company = NestedRelatedField(Company)
 
     class Meta:
