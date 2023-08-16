@@ -746,13 +746,15 @@ class CompanyObjectiveCountV4ViewSet(APIView):
     ]
 
     def get(self, request, company_id):
-        queryset = Objective.objects.filter(company=company_id)
-        archived = request.query_params.get('archived')
+        archived_count = Objective.objects.filter(company=company_id, archived=True).count()
+        not_archived_count = Objective.objects.filter(company=company_id, archived=False).count()
 
-        if archived is not None:
-            queryset = queryset.filter(archived=True if archived == 'true' else False)
-
-        return Response(queryset.count())
+        return Response(
+            {
+                'archived_count': archived_count,
+                'not_archived_count': not_archived_count,
+            },
+        )
 
 
 @transaction.non_atomic_requests
