@@ -87,7 +87,7 @@ class TestGettingObjectivesForCompany(APITestMixin):
         assert expected_ids == actual_ids
         assert response.status_code == status.HTTP_200_OK
 
-    @pytest.mark.parametrize('archived', ((True), (False)))
+    @pytest.mark.parametrize('archived', ((True), (False), (None)))
     def test_company_objectives_archived_filtering(self, archived):
         user = create_test_user(
             permission_codenames=(
@@ -109,9 +109,13 @@ class TestGettingObjectivesForCompany(APITestMixin):
         api_client = self.create_api_client(user=user)
         response = api_client.get(f'{url}?archived={archived}')
 
-        expected_ids = {
-            str(archived_objective.id) if archived else str(not_archived_objective.id),
-        }
+        expected_ids = (
+            {str(archived_objective.id), str(not_archived_objective.id)}
+            if archived is None
+            else {
+                str(archived_objective.id) if archived else str(not_archived_objective.id),
+            }
+        )
         actual_ids = {result['id'] for result in response.json()['results']}
 
         assert expected_ids == actual_ids
