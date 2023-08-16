@@ -154,6 +154,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'datahub.core.reversion.NonAtomicRevisionMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -634,6 +635,7 @@ DNB_SERVICE_BASE_URL = env('DNB_SERVICE_BASE_URL', default=None)
 DNB_SERVICE_TOKEN = env('DNB_SERVICE_TOKEN', default=None)
 DNB_SERVICE_TIMEOUT = 15  # seconds
 DNB_AUTOMATIC_UPDATE_LIMIT = env.int('DNB_AUTOMATIC_UPDATE_LIMIT', default=None)
+DNB_MAX_COMPANIES_IN_TREE_COUNT = env.int('DNB_MAX_COMPANIES_IN_TREE_COUNT', default=1000)
 
 # Legal Basis / Consent Service
 CONSENT_SERVICE_BASE_URL = env('CONSENT_SERVICE_BASE_URL', default=None)
@@ -671,3 +673,20 @@ ALLOW_TEST_FIXTURE_SETUP = env('ALLOW_TEST_FIXTURE_SETUP', default=False)
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 IS_TEST = env('IS_TEST', default=False)
+
+# Content Security Policy
+CSP_DEFAULT_SRC = (
+    "'self'",
+)
+CSP_STYLE_SRC = (
+    "'self'",
+    "'unsafe-inline'",
+)
+CSP_SCRIPT_SRC = (
+    "'self'",
+    "'unsafe-eval'",
+    "'unsafe-inline'",
+)
+CSP_FONT_SRC = ("'self'", "'unsafe-inline'")
+CSP_INCLUDE_NONCE_IN = ("script-src",)
+CSP_REPORT_ONLY = False
