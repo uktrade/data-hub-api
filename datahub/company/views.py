@@ -680,6 +680,7 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
     ordering_fields = (
         'company__name',
         'estimated_win_date',
+        'estimated_export_value_amount',
         'created_on',
         'title',
     )
