@@ -738,6 +738,25 @@ class CompanyObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
         )
 
 
+class CompanyObjectiveArchivedCountV4ViewSet(APIView):
+    """Objectives for getting archived counts of objectives for a company"""
+
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get(self, request, company_id):
+        archived_count = Objective.objects.filter(company=company_id, archived=True).count()
+        not_archived_count = Objective.objects.filter(company=company_id, archived=False).count()
+
+        return Response(
+            {
+                'archived_count': archived_count,
+                'not_archived_count': not_archived_count,
+            },
+        )
+
+
 @transaction.non_atomic_requests
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

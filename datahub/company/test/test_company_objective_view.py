@@ -212,3 +212,43 @@ class TestGettingASingleObjective(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == expected_response
+
+
+class TestGettingObjectivesArchivedCountForCompany(APITestMixin):
+    """Tests to retrieve the archived count of objectives"""
+
+    def test_company_has_no_objectives(self):
+        user = create_test_user(
+            permission_codenames=(
+                'view_company',
+                'view_objective',
+            ),
+        )
+        company = CompanyFactory()
+        url = reverse('api-v4:objective:count', kwargs={'company_id': company.id})
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {'archived_count': 0, 'not_archived_count': 0}
+
+    def test_company_has_objectives(self):
+        user = create_test_user(
+            permission_codenames=(
+                'view_company',
+                'view_objective',
+            ),
+        )
+        company = CompanyFactory()
+        archived_objectives = ObjectiveFactory.create_batch(3, company=company, archived=True)
+        not_archived_objectives = ObjectiveFactory.create_batch(5, company=company, archived=False)
+
+        url = reverse('api-v4:objective:count', kwargs={'company_id': company.id})
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url)
+
+        assert response.json() == {
+            'archived_count': len(archived_objectives),
+            'not_archived_count': len(not_archived_objectives),
+        }
+        assert response.status_code == status.HTTP_200_OK
