@@ -1,6 +1,7 @@
 from django.contrib.postgres.aggregates import ArrayAgg
 
 from datahub.company.models import Company
+from datahub.dataset.company.pagination import CompaniesDatasetViewCursorPagination
 from datahub.dataset.core.views import BaseDatasetView
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.metadata.utils import convert_usd_to_gbp
@@ -13,6 +14,8 @@ class CompaniesDatasetView(BaseDatasetView):
     Data-flow uses the resulting response to insert data into Data workspace which can
     then be queried to create custom reports for users.
     """
+
+    pagination_class = CompaniesDatasetViewCursorPagination
 
     def get_dataset(self):
         """Returns list of Company records"""
