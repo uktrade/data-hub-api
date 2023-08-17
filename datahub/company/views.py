@@ -678,6 +678,7 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
     )
     filterset_class = CompanyExportEstimatedWinDateFilterSet
     ordering_fields = (
+        'company__name',
         'created_on',
         'title',
     )
