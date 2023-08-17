@@ -806,6 +806,46 @@ class TestExportSortBy(APITestMixin):
         assert response_data['count'] == 3
         assert [result['title'] for result in response_data['results']] == results
 
+    @pytest.mark.parametrize(
+        'data,expected_results',
+        (
+            (  # sort by company name ASC
+                {'sortby': 'company__name'},
+                ['Abridge Ltd', 'Moon Ltd', 'Neon Ltd'],
+            ),
+            (  # sort by company name DESC
+                {'sortby': '-company__name'},
+                ['Neon Ltd', 'Moon Ltd', 'Abridge Ltd'],
+            ),
+        ),
+    )
+    def test_sort_by_company_name(self, data, expected_results):
+        """Test sort by company"""
+        ExportFactory(
+            owner=self.user,
+            company=CompanyFactory(name='Moon Ltd'),
+        )
+        ExportFactory(
+            owner=self.user,
+            company=CompanyFactory(name='Abridge Ltd'),
+        )
+        ExportFactory(
+            owner=self.user,
+            company=CompanyFactory(name='Neon Ltd'),
+        )
+
+        url = reverse('api-v4:export:collection')
+        response = self.api_client.get(url, data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        sort_results = [result['company']['name'] for result in response_data['results']]
+
+        assert response.data['count'] == 3
+        assert len(response.data['results']) == 3
+        assert sort_results == expected_results
+
 
 class TestExportOwnerList(APITestMixin):
     """Test a list of export owners"""
