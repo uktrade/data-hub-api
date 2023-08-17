@@ -886,6 +886,48 @@ class TestExportSortBy(APITestMixin):
         assert len(response.data['results']) == 3
         assert sort_results == expected_results
 
+    @pytest.mark.parametrize(
+        'data,expected_results',
+        (
+            (  # sort by value increasing
+                {'sortby': 'estimated_export_value_amount'},
+                ['1000', '2000', '3000'],
+            ),
+            (  # sort by value decreasing
+                {'sortby': '-estimated_export_value_amount'},
+                ['3000', '2000', '1000'],
+            ),
+        ),
+    )
+    def test_sort_by_estimated_export_value_amount(self, data, expected_results):
+        """Test sort estimated win date"""
+        ExportFactory(
+            owner=self.user,
+            estimated_export_value_amount=3000,
+        )
+        ExportFactory(
+            owner=self.user,
+            estimated_export_value_amount=1000,
+        )
+        ExportFactory(
+            owner=self.user,
+            estimated_export_value_amount=2000,
+        )
+
+        url = reverse('api-v4:export:collection')
+        response = self.api_client.get(url, data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        sort_results = [
+            result['estimated_export_value_amount'] for result in response_data['results']
+        ]
+
+        assert response.data['count'] == 3
+        assert len(response.data['results']) == 3
+        assert sort_results == expected_results
+
 
 class TestExportOwnerList(APITestMixin):
     """Test a list of export owners"""
