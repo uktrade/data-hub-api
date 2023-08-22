@@ -47,7 +47,7 @@ class TestMailbox:
         monkeypatch.setattr('datahub.documents.utils.delete_document', mock_delete)
         monkeypatch.setattr(
             'datahub.interaction.email_processors.processors.'
-            'CalendarInteractionEmailProcessor.process_email',
+            'InteractionPlainEmailProcessor.process_email',
             mock_process,
         )
 
@@ -78,7 +78,7 @@ class TestMailbox:
         monkeypatch.setattr('datahub.documents.utils.delete_document', mock_delete)
         monkeypatch.setattr(
             'datahub.interaction.email_processors.processors.'
-            'CalendarInteractionEmailProcessor.process_email',
+            'InteractionPlainEmailProcessor.process_email',
             mock_process,
         )
 
@@ -110,7 +110,7 @@ class TestMailbox:
         monkeypatch.setattr('datahub.documents.utils.delete_document', mock_delete)
         monkeypatch.setattr(
             'datahub.interaction.email_processors.processors.'
-            'CalendarInteractionEmailProcessor.process_email',
+            'InteractionPlainEmailProcessor.process_email',
             mock_process,
         )
 

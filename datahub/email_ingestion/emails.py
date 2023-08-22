@@ -8,7 +8,7 @@ from django.utils.timezone import now
 
 from datahub.documents import utils as documents
 from datahub.email_ingestion.models import MailboxLogging, MailboxProcessingStatus
-from datahub.interaction.email_processors.processors import CalendarInteractionEmailProcessor
+from datahub.interaction.email_processors.processors import InteractionPlainEmailProcessor
 
 logger = getLogger(__name__)
 
@@ -49,7 +49,7 @@ def process_ingestion_emails():
     """
     Gets all new mail documents in the bucket and process each message.
     """
-    processor = CalendarInteractionEmailProcessor()
+    processor = InteractionPlainEmailProcessor()
 
     for message in get_mail_docs_in_bucket():
         source = message['source']
