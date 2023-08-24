@@ -7,7 +7,7 @@ from datahub.interaction.test.factories import CompanyInteractionFactory
 
 
 @pytest.fixture()
-def calendar_data_fixture():
+def interaction_email_fixture():
     """
     Create advisers, contacts and companies so that our email samples can be
     attributed to some DB entities.
