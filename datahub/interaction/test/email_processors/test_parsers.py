@@ -12,7 +12,10 @@ from datahub.interaction.email_processors.exceptions import (
     SenderUnverifiedError,
     UnconfirmedCalendarInviteError,
 )
-from datahub.interaction.email_processors.parsers import CalendarInteractionEmailParser
+from datahub.interaction.email_processors.parsers import (
+    CalendarInteractionEmailParser,
+    InteractionEmailParser,
+)
 
 
 @pytest.mark.django_db
@@ -152,7 +155,7 @@ class TestCalendarInteractionEmailParser:
         self,
         email_file,
         expected_interaction_data,
-        calendar_data_fixture,
+        interaction_email_fixture,
     ):
         """
         Functional test to ensure that interaction data is extracted as expected
@@ -254,7 +257,147 @@ class TestCalendarInteractionEmailParser:
         self,
         email_file,
         expected_error,
-        calendar_data_fixture,
+        interaction_email_fixture,
+    ):
+        """
+        Functional test to ensure that the extract_interaction_data_from_email method
+        raises ValidationErrors as expected in a number of situations.
+        """
+        parser = self._get_parser_for_email_file(email_file)
+        with pytest.raises(expected_error.__class__) as excinfo:
+            parser.extract_interaction_data_from_email()
+        assert excinfo.value.args[0] == expected_error.args[0]
+
+
+@pytest.mark.django_db
+class TestInteractionEmailParser:
+    """
+    Test the InteractionPlainEmailParser class.
+    """
+
+    def _get_parser_for_email_file(self, relative_email_file_path):
+        email_file_path = PurePath(__file__).parent / relative_email_file_path
+        message = mailparser.parse_from_file(email_file_path)
+        return InteractionEmailParser(message)
+
+    @pytest.mark.parametrize(
+        'email_file,expected_interaction_data',
+        (
+            # Test that interaction data can be extracted for a simple case
+            (
+                'email_samples/valid/outlook_online/sample.eml',
+                {
+                    'id':
+                        '<DB6PR0101MB2261E6B26A58D05C4F5CF1C8C75A0@DB6PR0101MB2261'
+                        '.eurprd01.prod.exchangelabs.com>',
+                    'adviser_email': 'adviser1@trade.gov.uk',
+                    'contact_details': [
+                        ('bill.adama@example.net', 'Company 1'),
+                    ],
+                    'secondary_adviser_emails': [],
+                    'top_company_name': 'Company 1',
+                    'date': datetime(2019, 3, 29, 11, 28, 24, tzinfo=utc),
+                    'subject': 'test meet',
+                    'body': 'BEGIN:VCALENDAR',
+                },
+            ),
+            # Test that interaction data can be extracted for a complicated case
+            # with many advisers, contacts and some unknown contacts,
+            # sample uses sender adviser's contact_email which is different to their email,
+            # email's From field has different case to the saved Adviser's contact_email field
+            (
+                'email_samples/valid/gmail/sample.eml',
+                {
+                    'id':
+                        '<0000000000002a99a005853a155c@google.com>',
+                    'adviser_email': 'adviser3@digital.trade.gov.uk',
+                    'contact_details': [
+                        ('bill.adama@example.net', 'Company 1'),
+                        ('saul.tigh@example.net', 'Company 1'),
+                        ('laura.roslin@example.net', 'Company 2'),
+                        ('sharon.valerii@example.net', 'Company 1'),
+                    ],
+                    'secondary_adviser_emails': ['adviser2@digital.trade.gov.uk'],
+                    'top_company_name': 'Company 1',
+                    'date': datetime(2019, 3, 29, 11, 36, 33, tzinfo=utc),
+                    'subject':
+                        'Invitation: initial @ Fri 29 Mar 2019 4:30pm - 5:30pm '
+                        '(GMT) (bill.adama@example.net)',
+                    'body': 'You have been invited',
+                },
+            ),
+        ),
+    )
+    def test_extract_interaction_data_from_email(
+        self,
+        email_file,
+        expected_interaction_data,
+        interaction_email_fixture,
+    ):
+        """
+        Functional test to ensure that interaction data is extracted as expected
+        from an email.
+        """
+        parser = self._get_parser_for_email_file(email_file)
+        interaction_data = parser.extract_interaction_data_from_email()
+        assert interaction_data['sender'].email == expected_interaction_data['adviser_email']
+        contacts = interaction_data['contacts']
+        expected_contacts = expected_interaction_data['contact_details'][:]
+        for contact in contacts:
+            expected_contacts.remove((contact.email, contact.company.name))
+        assert len(expected_contacts) == 0
+        secondary_adviser_emails = {
+            adviser.email for adviser in interaction_data['secondary_advisers']
+        }
+        expected_secondary_adviser_emails = expected_interaction_data['secondary_adviser_emails']
+        assert secondary_adviser_emails == set(expected_secondary_adviser_emails)
+        assert (
+            interaction_data['top_company'].name == expected_interaction_data['top_company_name']
+        )
+        assert interaction_data['date'] == expected_interaction_data['date']
+        assert interaction_data['subject'] == expected_interaction_data['subject']
+        assert interaction_data['id'] == expected_interaction_data['id']
+        assert interaction_data['body'].startswith(expected_interaction_data['body'])
+
+    @pytest.mark.parametrize(
+        'email_file,expected_error',
+        (
+            (
+                'email_samples/invalid/email_not_sent_by_dit.eml',
+                SenderUnverifiedError(
+                    'The meeting email did not pass our minimal checks '
+                    'to be verified as having been sent by a valid DIT '
+                    'Adviser email domain.',
+                ),
+            ),
+            (
+                'email_samples/invalid/no_from_header.eml',
+                MalformedEmailError(
+                    'Email was malformed - missing "from" header.',
+                ),
+            ),
+            (
+                'email_samples/invalid/email_not_sent_by_known_adviser.eml',
+                SenderUnverifiedError(
+                    'Email was not sent by a recognised DIT Adviser.',
+                ),
+            ),
+            (
+                'email_samples/invalid/email_contacts_unknown.eml',
+                NoContactsError(
+                    (
+                        'The meeting email had no recipients which were recognised as '
+                        'Data Hub contacts.'
+                    ),
+                ),
+            ),
+        ),
+    )
+    def test_extract_interaction_data_from_email_raises_error(
+        self,
+        email_file,
+        expected_error,
+        interaction_email_fixture,
     ):
         """
         Functional test to ensure that the extract_interaction_data_from_email method
