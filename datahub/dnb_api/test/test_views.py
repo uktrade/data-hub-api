@@ -3134,7 +3134,6 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
 
     def test_more_than_maximum_allowed_companies_returns_reduced_tree(
         self,
-        # requests_mock,
         opensearch_with_signals,
     ):
         """
@@ -3192,6 +3191,47 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
 
             assert response.status_code == 200
             assert response.json()['reduced_tree'] is True
+
+    @patch(
+        'datahub.dnb_api.views.validate_company_id',
+    )
+    @pytest.mark.usefixtures('local_memory_cache')
+    def test_view_is_cached(
+        self,
+        validate_company_id_mock,
+        requests_mock,
+        opensearch_with_signals,
+    ):
+        """
+        Call the endpoint multiple times, and ensure only the first gets through the django
+        caching layer
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '987654321',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        tree_members = [
+            ultimate_company_dnb,
+        ]
+
+        ultimate_company_dh = CompanyFactory(
+            duns_number=ultimate_company_dnb['duns'],
+            id=uuid4(),
+            name=ultimate_company_dnb['primaryName'],
+            one_list_tier=OneListTier.objects.first(),
+        )
+        opensearch_with_signals.indices.refresh()
+
+        validate_company_id_mock.return_value = ultimate_company_dnb['duns']
+
+        for _ in range(3):
+            self._get_family_tree_response(requests_mock, tree_members, ultimate_company_dh)
+
+        assert validate_company_id_mock.call_count == 1
 
 
 class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
@@ -4108,6 +4148,62 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         )
 
         return response
+
+    @patch(
+        'datahub.dnb_api.utils.validate_company_id',
+    )
+    @pytest.mark.usefixtures('local_memory_cache')
+    @pytest.mark.parametrize(
+        'query_param',
+        (
+            URL_PARENT_TRUE_SUBSIDIARY_TRUE,
+            URL_PARENT_TRUE_SUBSIDIARY_FALSE,
+            URL_PARENT_FALSE_SUBSIDIARY_FALSE,
+            URL_PARENT_FALSE_SUBSIDIARY_TRUE,
+        ),
+    )
+    def test_view_is_cached(
+        self,
+        validate_company_id_mock,
+        requests_mock,
+        opensearch_with_signals,
+        query_param,
+    ):
+        """
+        Call the endpoint multiple times with different query params, and ensure only the first
+        gets through the django caching layer
+        """
+        faker = Faker()
+
+        ultimate_company_dnb = {
+            'duns': '113456789',
+            'primaryName': faker.company(),
+            'corporateLinkage': {'hierarchyLevel': 1},
+        }
+
+        tree_members = [
+            ultimate_company_dnb,
+        ]
+
+        target_company_dh = CompanyFactory(
+            duns_number=ultimate_company_dnb['duns'],
+            id=uuid4(),
+            name=ultimate_company_dnb['primaryName'],
+        )
+
+        opensearch_with_signals.indices.refresh()
+
+        validate_company_id_mock.return_value = ultimate_company_dnb['duns']
+
+        for _ in range(3):
+            self._get_related_company_response(
+                requests_mock,
+                tree_members,
+                target_company_dh,
+                query_param,
+            )
+
+        assert validate_company_id_mock.call_count <= 1
 
 
 class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
