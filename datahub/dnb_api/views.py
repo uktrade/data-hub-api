@@ -1,9 +1,13 @@
 import logging
 
+
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
+from django.views.decorators.cache import cache_page
+
+
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -32,6 +36,7 @@ from datahub.dnb_api.serializers import (
     SubsidiarySerializer,
 )
 from datahub.dnb_api.utils import (
+    COMPANY_TREE_TIMEOUT,
     create_company_tree,
     create_investigation,
     DNBServiceConnectionError,
@@ -381,6 +386,7 @@ class DNBCompanyHierarchyView(APIView):
         ),
     )
 
+    @method_decorator(cache_page(COMPANY_TREE_TIMEOUT, key_prefix='company_hierarchy'))
     def get(self, request, company_id):
         """
         Given a Company Id, get the data for the company hierarchy from dnb-service.
@@ -482,6 +488,7 @@ class DNBRelatedCompaniesView(APIView):
         ),
     )
 
+    @method_decorator(cache_page(COMPANY_TREE_TIMEOUT, key_prefix='related_companies'))
     def get(self, request, company_id):
         """
         Given a Company Id, get the data for the company hierarchy from dnb-service
