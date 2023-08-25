@@ -44,6 +44,7 @@ from datahub.search.query_builder import get_search_by_entities_query
 
 logger = logging.getLogger(__name__)
 MAX_DUNS_NUMBERS_PER_REQUEST = 1024
+COMPANY_TREE_TIMEOUT = int(timedelta(days=1).total_seconds())
 
 
 class DNBServiceBaseError(Exception):
@@ -602,8 +603,7 @@ def get_full_company_hierarchy_data(duns_number) -> HierarchyData:
     )
 
     # only cache successful dnb calls
-    one_day_timeout = int(timedelta(days=1).total_seconds())
-    cache.set(cache_key, hierarchy_data, one_day_timeout)
+    cache.set(cache_key, hierarchy_data, COMPANY_TREE_TIMEOUT)
 
     return hierarchy_data
 
@@ -932,8 +932,7 @@ def get_company_hierarchy_count(duns_number):
         companies_count = companies_count - 1
 
     # only cache successful dnb calls
-    one_day_timeout = int(timedelta(days=1).total_seconds())
-    cache.set(cache_key, companies_count, one_day_timeout)
+    cache.set(cache_key, companies_count, COMPANY_TREE_TIMEOUT)
 
     return companies_count
 
@@ -1056,8 +1055,7 @@ def get_cached_dnb_company(duns_number):
     company_response = get_dnb_company_data(duns_number)
 
     # only cache successful dnb calls
-    one_day_timeout = int(timedelta(days=1).total_seconds())
-    cache.set(cache_key, company_response, one_day_timeout)
+    cache.set(cache_key, company_response, COMPANY_TREE_TIMEOUT)
 
     return company_response
 
