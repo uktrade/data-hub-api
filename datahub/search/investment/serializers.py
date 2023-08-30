@@ -46,6 +46,8 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
     )
     gross_value_added_start = serializers.IntegerField(required=False, min_value=0)
     gross_value_added_end = serializers.IntegerField(required=False, min_value=0)
+    name = SingleOrListField(child=serializers.CharField(), required=False)
+    project_code = SingleOrListField(child=serializers.CharField(), required=False)
 
     show_summary = serializers.BooleanField(required=False, default=False)
     include_parent_companies = serializers.BooleanField(required=False, default=False)
