@@ -1,0 +1,92 @@
+- model: metadata.service
+  pk: 8fed6f78-51e6-4b42-b9ab-ee1cf2c54f74
+  fields:
+    segment: Export Support Service - international markets
+- model: metadata.service
+  pk: ba47bf4b-09da-4ccf-9d56-84754e45646e
+  fields:
+    segment: UK Tradeshow Programme (UKTP) - attendee
+- model: metadata.service
+  pk: 27d15c52-9d78-4e3d-aaa7-64bdb45bb506
+  fields:
+    segment: UK Tradeshow Programme (UKTP) - exhibitor
+- model: metadata.service
+  pk: ed487b52-4675-4338-a904-2c27e95ee195
+  fields:
+    segment: Commonwealth Games 2022 - BATP programme
+- model: metadata.service
+  pk: fc569da6-7341-4785-9a42-b4fb2114351d
+  fields:
+    segment: Commonwealth Games 2022 - GEP programme
+- model: metadata.service
+  pk: fe09d0f5-61ee-e411-bbc1-e4115bead28a
+  fields:
+    segment: First Time Exporters - Export Savvy
+- model: metadata.service
+  pk: 3a812c0a-62ee-e411-bbc1-e4115bead28a
+  fields:
+    segment: First Time Exporters - Other
+- model: metadata.service
+  pk: 21c3d5d2-9c8f-4dc0-bfd1-aa3ef8769a91
+  fields:
+    segment: Global Growth Pilot (2017) - Diagnostic completed
+- model: metadata.service
+  pk: 760b46e5-cb86-4e7d-8a31-1b44c18d1614
+  fields:
+    segment: Global Growth Pilot (2017) - Diagnostic Output Report completed
+- model: metadata.service
+  pk: 50db464c-ea17-4d24-b0f7-75e6a452f82c
+  fields:
+    segment: Global Growth Pilot (2017) - Eligible GGP customer
+- model: metadata.service
+  pk: e50fb46c-16a8-4b36-98e0-fea3284011d4
+  fields:
+    segment: Global Growth Pilot (2017) - Export Growth Plan agreed with customer
+- model: metadata.service
+  pk: 3d6d5ad0-4492-466f-a0d7-1e13f20f8528
+  fields:
+    segment: Global Growth Pilot (2017) - GGP process complete
+- model: metadata.service
+  pk: 38a67092-f485-4ea1-8a1a-402b949d2d13
+  fields:
+    segment: Investment enquiry - assigned to HQ (IST use only)
+- model: metadata.service
+  pk: 2591b204-8a31-4824-a93b-d7a03dca8cb5
+  fields:
+    segment: Investment enquiry - assigned to IST-CMC (IST use only)
+- model: metadata.service
+  pk: c579b89b-d49d-4926-a6a4-0a1459cd25cb
+  fields:
+    segment: Investment enquiry - assigned to IST-SAS (IST use only)
+- model: metadata.service
+  pk: 4f142041-2b9d-4776-ace8-22612260eae6
+  fields:
+    segment: Investment enquiry - confirmed prospect project status (IST use only)
+- model: metadata.service
+  pk: 73ceedc1-c139-4bdf-9e47-17b1bae488da
+  fields:
+    segment: Investment enquiry - requested more information from source (IST use only)
+- model: metadata.service
+  pk: 05c8175a-abf5-4cc6-af34-bcee8699fd4b
+  fields:
+    segment: Investment enquiry - transferred to DA (IST use only)
+- model: metadata.service
+  pk: 48e6bc3e-56c5-4bdc-a718-093614547d73
+  fields:
+    segment: Investment enquiry - transferred to LEP (IST use only)
+- model: metadata.service
+  pk: c707f81d-ae66-490a-98f5-575438944c43
+  fields:
+    segment: Investment enquiry - transferred to L&P (IST use only)
+- model: metadata.service
+  pk: 4d74b1e4-8d16-e611-9bdc-e4115bead28a
+  fields:
+    segment: Investment - IST Business Development Multiplier (IST use only)
+- model: metadata.service
+  pk: 5b129c32-44fc-4765-a134-a09d57e8bca8
+  fields:
+    segment: UK Tradeshow Programme (UKTP) - attendee
+- model: metadata.service
+  pk: 9a28e4dc-d96b-42c8-bdc5-3ddfb6bf74bc
+  fields:
+    segment: UK Tradeshow Programme (UKTP) - exhibitor
