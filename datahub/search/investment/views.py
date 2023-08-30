@@ -63,6 +63,8 @@ class SearchInvestmentProjectAPIViewMixin:
         'likelihood_to_land',
         'gross_value_added_start',
         'gross_value_added_end',
+        'name',
+        'project_code',
     )
 
     REMAP_FIELDS = {
