@@ -44,7 +44,7 @@ registry.register(metadata_id='employee-range', model=models.EmployeeRange)
 registry.register(metadata_id='overseas-region', model=models.OverseasRegion)
 registry.register(
     filterset_fields={
-        'level': ['lte'],
+        'level': ['lte', 'gte'],
     },
     metadata_id='sector',
     model=models.Sector,
