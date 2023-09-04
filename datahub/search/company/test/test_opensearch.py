@@ -406,6 +406,7 @@ def test_mapping(opensearch):
             },
             'number_of_employees': {'type': 'integer'},
             'global_ultimate_duns_number': {'type': 'keyword'},
+            'is_global_ultimate': {'type': 'boolean'},
         },
     }
 
@@ -724,4 +725,5 @@ def test_indexed_doc(opensearch):
         'one_list_tier',
         'number_of_employees',
         'global_ultimate_duns_number',
+        'is_global_ultimate',
     }
