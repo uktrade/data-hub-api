@@ -26,8 +26,7 @@ def dnb_response_non_uk():
                         'registration_type': 'unmapped',
                         'original_registration_type': 6863,
                         'original_registration_number': '24-3733147',
-                        'original_registration_description':
-                            'Federal Taxpayer Identification Number (US)',
+                        'original_registration_description': 'Federal Taxpayer Identification Number (US)',
                     },
                 ],
                 'global_ultimate_duns_number': '157270606',
@@ -157,4 +156,5 @@ def base_company_dict():
         'transferred_on': None,
         'transferred_to': None,
         'vat_number': '',
+        'is_out_of_business': None,
     }

@@ -34,6 +34,7 @@ def dnb_response():
                     },
                 ],
                 'global_ultimate_duns_number': '987654321',
+                'is_out_of_business': False,
             },
         ],
     }

@@ -154,9 +154,13 @@ class TestReviewChangesViewPost(AdminTestMixin):
             DNB_V2_SEARCH_URL,
             json=dnb_response,
         )
+        print('***dnb_response')
+        print(dnb_response)
         dh_company = CompanyFactory()
         review_changes_url = _get_review_changes_url(dh_company, '123456789')
         response = self.client.post(review_changes_url)
+        print('***response')
+        print(response)
         assert response.status_code == status.HTTP_302_FOUND
 
         dh_company.refresh_from_db()
@@ -168,10 +172,7 @@ class TestReviewChangesViewPost(AdminTestMixin):
         assert dh_company.address_town == dnb_company['address_town']
         assert dh_company.address_county == dnb_company['address_county']
         assert dh_company.address_country.iso_alpha2_code == dnb_company['address_country']
-        assert (
-            dh_company.global_ultimate_duns_number
-            == dnb_company['global_ultimate_duns_number']
-        )
+        assert dh_company.global_ultimate_duns_number == dnb_company['global_ultimate_duns_number']
 
 
 class TestReviewChangesViewDNBErrors(AdminTestMixin):
