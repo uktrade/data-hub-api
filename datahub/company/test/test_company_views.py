@@ -2015,7 +2015,6 @@ class TestAddCompany(APITestMixin):
             reverse('api-v4:company:collection'),
             data=payload,
         )
-        print(response.json())
 
         assert response.status_code == status.HTTP_201_CREATED
 
