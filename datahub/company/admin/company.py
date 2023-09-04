@@ -118,6 +118,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'export_segment',
                     'export_sub_segment',
                     'strategy',
+                    'is_out_of_business',
                 ),
             },
         ),
@@ -215,6 +216,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
         'transferred_by',
         'transferred_on',
         'transferred_from_display',
+        'is_out_of_business',
     )
     list_display = (
         'name',

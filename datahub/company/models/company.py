@@ -390,6 +390,10 @@ class Company(ArchivableModel, BaseModel):
         choices=ExportSubSegment.choices,
     )
     strategy = models.TextField(blank=True, default='')
+    is_out_of_business = models.BooleanField(
+        default=False,
+        help_text='This value is provided from DNB, and cannot be modified inside datahub',
+    )
 
     def __str__(self):
         """Admin displayed human readable name."""
