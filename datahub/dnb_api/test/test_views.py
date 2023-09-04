@@ -550,6 +550,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             ),
             'dnb_modified_on': '2019-01-01T11:12:13Z',
             'export_countries': [],
+            'is_out_of_business': dnb_company['is_out_of_business'],
         }
 
     @override_settings(DNB_SERVICE_BASE_URL=None)
