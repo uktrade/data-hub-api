@@ -474,7 +474,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         postcode_can_be_required=True,
     )
     export_countries = CompanyExportCountrySerializer(many=True, read_only=True)
-    is_out_of_business = serializers.BooleanField()
 
     # Use our RelaxedURLField instead to automatically fix URLs without a scheme
     serializer_field_mapping = {

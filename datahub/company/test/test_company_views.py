@@ -403,6 +403,7 @@ class TestGetCompany(APITestMixin):
                 'last_name': company.modified_by.last_name,
                 'name': company.modified_by.name,
             },
+            'is_out_of_business': company.is_out_of_business,
         }
 
     def test_get_company_without_country(self):
@@ -2014,6 +2015,7 @@ class TestAddCompany(APITestMixin):
             reverse('api-v4:company:collection'),
             data=payload,
         )
+        print(response.json())
 
         assert response.status_code == status.HTTP_201_CREATED
 
