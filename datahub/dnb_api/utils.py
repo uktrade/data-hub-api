@@ -707,6 +707,7 @@ def create_company_tree(companies: list, duns_number):
             'oneListTier': 'one_list_tier',
             'tradeStyleNames': 'trading_names',
             'headquarterType': 'headquarter_type',
+            'isOutOfBusiness': 'is_out_of_business',
         },
     )
 
@@ -801,6 +802,7 @@ def append_datahub_details(family_tree_members: list):
         number_of_employees = family_member.get('numberOfEmployees')
         if isinstance(number_of_employees, list):
             family_member['numberOfEmployees'] = number_of_employees[0].get('value')
+        family_member['isOutOfBusiness'] = False
         for datahub_detail in family_tree_members_datahub_details:
             if duns_number_to_find == datahub_detail.get('duns_number'):
                 family_member['primaryName'] = datahub_detail.get('name')
@@ -815,6 +817,7 @@ def append_datahub_details(family_tree_members: list):
                 family_member['archived'] = datahub_detail.get('archived')
                 family_member['oneListTier'] = datahub_detail.get('one_list_tier')
                 family_member['headquarterType'] = datahub_detail.get('headquarter_type')
+                family_member['isOutOfBusiness'] = datahub_detail.get('is_out_of_business')
                 if not number_of_employees:
                     family_member['numberOfEmployees'] = datahub_detail.get('number_of_employees')
                 break  # Stop once we've found the match
@@ -900,6 +903,7 @@ def load_datahub_details(family_tree_members_duns):
             'one_list_tier',
             'number_of_employees',
             'headquarter_type',
+            'is_out_of_business',
         ),
     )
 
