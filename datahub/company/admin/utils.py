@@ -10,6 +10,7 @@ def format_company_diff(dh_company, dnb_company):
     """
     Format the Datahub and D&B companies for templates.
     """
+
     def get_field(name):
         return dh_company._meta.get_field(name)
 
@@ -105,6 +106,10 @@ def format_company_diff(dh_company, dnb_company):
             dh_company.global_ultimate_duns_number,
             dnb_company.get('global_ultimate_duns_number'),
         ),
+        get_field('is_out_of_business'): (
+            dh_company.is_out_of_business,
+            dnb_company.get('is_out_of_business'),
+        ),
     }
 
 
@@ -113,6 +118,7 @@ def redirect_with_messages(func):
     Decorator that redirects to a given URL with one or more messages for the user in case of an
     error.
     """
+
     @functools.wraps(func)
     def wrapper(model_admin, request, *args, **kwargs):
         try:
@@ -123,6 +129,7 @@ def redirect_with_messages(func):
             for message in messages:
                 django_messages.add_message(request, django_messages.ERROR, message)
             return HttpResponseRedirect(redirect_url)
+
     return wrapper
 
 
