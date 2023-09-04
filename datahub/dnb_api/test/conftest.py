@@ -13,6 +13,7 @@ def dnb_response_non_uk():
     """
     Fixture for a record as returned by the dnb-service.
     """
+    original_registration_description = 'Federal Taxpayer Identification Number (US)'
     return {
         'results': [
             {
@@ -26,7 +27,7 @@ def dnb_response_non_uk():
                         'registration_type': 'unmapped',
                         'original_registration_type': 6863,
                         'original_registration_number': '24-3733147',
-                        'original_registration_description': 'Federal Taxpayer Identification Number (US)',
+                        'original_registration_description': original_registration_description,
                     },
                 ],
                 'global_ultimate_duns_number': '157270606',

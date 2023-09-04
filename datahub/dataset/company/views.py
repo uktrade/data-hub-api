@@ -65,7 +65,7 @@ class CompaniesDatasetView(BaseDatasetView):
             'uk_region__name',
             'vat_number',
             'website',
-            'is_out_of_business'
+            'is_out_of_business',
         )
 
     def _enrich_data(self, dataset):
