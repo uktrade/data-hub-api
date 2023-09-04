@@ -1,7 +1,7 @@
 -r requirements.in
 
 # Testing and dev
-pytest==7.4.0
+pytest==7.4.1
 pytest-django==4.5.2
 pytest-cov==4.1.0
 pytest-mock==3.11.1
