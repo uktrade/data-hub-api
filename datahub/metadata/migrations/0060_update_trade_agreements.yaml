@@ -1,0 +1,3 @@
+- model: metadata.tradeagreement
+  pk: 2aaa2df3-7a02-4ebc-912e-426edb76fff8
+  fields: { disabled_on: null, name: "Atlantic Declaration" }
