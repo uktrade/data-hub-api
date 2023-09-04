@@ -285,12 +285,6 @@ def update_company_from_dnb(
     """
     fields_to_update = fields_to_update or ALL_DNB_UPDATED_SERIALIZER_FIELDS
     # Set dnb_company data to only include the fields in fields_to_update
-    print('***dnb_company')
-    print(dnb_company)
-    print('***dh_company')
-    print(dh_company)
-    print('***fields_to_update')
-    print(fields_to_update)
 
     dnb_company = {field: dnb_company[field] for field in fields_to_update}
 

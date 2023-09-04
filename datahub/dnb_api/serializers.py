@@ -382,7 +382,7 @@ class DNBCompanyChangeRequestSerializer(serializers.Serializer):
                             'name': self.company.address_area.name,
                             'abbrev_name': self.company.address_area.area_code,
                         },
-                    }
+                    },
                 )
             data['changes'] = {
                 **data['changes'],
