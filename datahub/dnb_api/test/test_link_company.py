@@ -70,6 +70,7 @@ def test_link_company_with_dnb_success(
         'uk_region': original_company.uk_region_id,
         'dnb_modified_on': now(),
         'strategy': '',
+        'is_out_of_business': original_company.is_out_of_business,
     }
 
 
