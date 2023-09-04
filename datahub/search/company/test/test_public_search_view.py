@@ -190,6 +190,7 @@ class TestPublicCompanySearch:
                     'archived_on': None,
                     'archived_reason': None,
                     'is_global_ultimate': False,
+                    'is_out_of_business': False,
                 },
             ],
         }

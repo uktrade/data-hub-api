@@ -41,6 +41,7 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
     company_number = SingleOrListField(child=serializers.CharField(), required=False)
     global_ultimate_duns_number = SingleOrListField(child=serializers.CharField(), required=False)
     is_global_ultimate = serializers.BooleanField(required=False)
+    is_out_of_business = serializers.BooleanField(required=False)
 
     SORT_BY_FIELDS = (
         'modified_on',

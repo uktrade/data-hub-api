@@ -379,6 +379,7 @@ class TestSearch(APITestMixin):
                     'number_of_employees': company.number_of_employees,
                     'global_ultimate_duns_number': None,
                     'is_global_ultimate': False,
+                    'is_out_of_business': False,
                 },
             ],
         }

@@ -62,6 +62,7 @@ class SearchCompanyAPIViewMixin:
         'one_list_tier',
         'duns_number',
         'company_number',
+        'is_out_of_business',
     )
 
     REMAP_FIELDS = {
@@ -153,6 +154,7 @@ class PublicSearchCompanyAPIView(HawkResponseSigningMixin, SearchAPIView):
         'website',
         'export_segment',
         'export_sub_segment',
+        'is_out_of_business',
     )
 
     FILTER_FIELDS = (

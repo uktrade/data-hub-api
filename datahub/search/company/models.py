@@ -66,6 +66,7 @@ class Company(BaseSearchModel):
     number_of_employees = Integer()
     global_ultimate_duns_number = Keyword()
     is_global_ultimate = Boolean()
+    is_out_of_business = Boolean()
 
     COMPUTED_MAPPINGS = {
         'address': partial(dict_utils.address_dict, prefix='address'),
@@ -107,6 +108,7 @@ class Company(BaseSearchModel):
         'one_list_tier': dict_utils.id_name_dict,
         'global_ultimate_duns_number': dict_utils.empty_string_to_null,
         'is_global_ultimate': bool,
+        'is_out_of_business': bool,
     }
 
     SEARCH_FIELDS = (
