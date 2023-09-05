@@ -391,24 +391,29 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
         for new_country, export_data in new_country_mapping.items():
             status = export_data['status']
             if new_country in existing_country_mapping:
-                # TODO: updates are not supported yet
-                raise NotImplementedError()
+                continue
             InteractionExportCountry.objects.create(
                 country=new_country,
                 interaction=interaction,
                 status=status,
                 created_by=interaction.created_by,
             )
-            # Sync company_CompanyExportCountry model
-            # NOTE: current date is preferred over future interaction date
-            current_date = now()
-            record_date = current_date if interaction.date > current_date else interaction.date
-            interaction.company.add_export_country(
-                new_country,
-                status,
-                record_date,
-                interaction.created_by,
-            )
+            if not existing_country_mapping:
+                # Sync company_CompanyExportCountry model
+                # NOTE: current date is preferred over future interaction date
+                current_date = now()
+                record_date = current_date if interaction.date > current_date else interaction.date
+                interaction.company.add_export_country(
+                    new_country,
+                    status,
+                    record_date,
+                    interaction.created_by,
+                )
+        existing_country_ids = [item.country.id for item in interaction.export_countries.all()]
+        new_country_ids = [item['country'].id for item in validated_export_countries]
+        country_ids_delta = list(set(existing_country_ids) - set(new_country_ids))
+
+        interaction.export_countries.filter(country_id__in=country_ids_delta).delete()
 
 
 class InteractionSerializer(BaseInteractionSerializer):
