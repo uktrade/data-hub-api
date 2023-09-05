@@ -221,26 +221,6 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE)
         return value
 
-    def validate_were_countries_discussed(self, were_countries_discussed):
-        """
-        Make sure `were_countries_discussed` field is not being updated.
-        Updates are not allowed on this field.
-        """
-        if self.instance is None:
-            return were_countries_discussed
-
-        raise serializers.ValidationError(self.INVALID_FOR_UPDATE)
-
-    def validate_export_countries(self, export_countries):
-        """
-        Make sure `export_countries` field is not being updated.
-        updates are not allowed on this field.
-        """
-        if self.instance is None:
-            return export_countries
-
-        raise serializers.ValidationError(self.INVALID_FOR_UPDATE)
-
     def to_internal_value(self, data):
         """
         Add support for both `company` and `companies` field.
