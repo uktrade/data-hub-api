@@ -2657,6 +2657,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 'archived': False,
                 'latest_interaction_date': None,
                 'hierarchy': None,
+                'is_out_of_business': None,
             },
             'ultimate_global_companies_count': 1,
             'family_tree_companies_count': 1,
@@ -2783,6 +2784,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 'archived': False,
                 'latest_interaction_date': None,
                 'hierarchy': 1,
+                'is_out_of_business': None,
             },
             'ultimate_global_companies_count': len(tree_members),
             'manually_verified_subsidiaries': [],
@@ -2890,6 +2892,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                 'archived': True,
                 'latest_interaction_date': None,
                 'hierarchy': 1,
+                'is_out_of_business': None,
                 'subsidiaries': [
                     {
                         'duns_number': tree_member_level_2['duns'],
@@ -2908,6 +2911,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                         'archived': False,
                         'latest_interaction_date': None,
                         'hierarchy': 2,
+                        'is_out_of_business': False,
                         'subsidiaries': [
                             {
                                 'duns_number': tree_member_level_3['duns'],
@@ -2924,6 +2928,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
                                 'archived': False,
                                 'latest_interaction_date': None,
                                 'hierarchy': 3,
+                                'is_out_of_business': False,
                             },
                         ],
                     },
@@ -4585,6 +4590,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
                     'archived': global_company.archived,
                     'latest_interaction_date': None,
                     'hierarchy': 1,
+                    'is_out_of_business': None,
                     'subsidiaries': [
                         {
                             'duns_number': company.duns_number,
@@ -4627,6 +4633,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
                             'archived': False,
                             'latest_interaction_date': None,
                             'hierarchy': 2,
+                            'is_out_of_business': None,
                         },
                     ],
                 },
