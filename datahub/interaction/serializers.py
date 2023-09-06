@@ -354,10 +354,9 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
     def _save_export_countries(self, interaction, validated_export_countries):
         """
         Adds export countries related to an interaction.
-        Update is not allowed yet.
-        An attempt to update will result in `NotImplementedError` exception.
 
-        Syncs interaction export countries into company export countries.
+        Syncs interaction export countries into company export countries
+        when interaction is created.
         """
         existing_country_mapping = {
             export_country.country: export_country
