@@ -140,6 +140,19 @@ class TestCreateTask(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert list(response.json().keys()) == ['title', 'advisers']
 
+    def test_create_task_with_unknown_advisor_id_returns_bad_request(self):
+        faker = Faker()
+
+        url = reverse('api-v4:task:collection')
+
+        response = self.api_client.post(
+            url,
+            data={'title': faker.word(), 'advisers': [uuid4()]},
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert list(response.json().keys()) == ['advisers']
+
     def test_create_task_with_valid_mandatory_fields_returns_success_created(self):
         faker = Faker()
 
@@ -202,3 +215,40 @@ class TestCreateTask(APITestMixin):
             },
         }
         assert get_response.json() == expected_response
+
+
+class TestEditTask(APITestMixin):
+    def test_edit_task_return_404_when_task_id_unknown(self):
+        url = reverse('api-v4:task:item', kwargs={'pk': uuid4()})
+
+        response = self.api_client.patch(
+            url,
+            data={'title': 'abc'},
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_edit_task_with_unknown_advisor_id_returns_bad_request(self):
+        task = TaskFactory()
+
+        url = reverse('api-v4:task:item', kwargs={'pk': task.id})
+
+        response = self.api_client.patch(
+            url,
+            data={'advisers': [uuid4()]},
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert list(response.json().keys()) == ['advisers']
+
+    def test_edit_task_with_valid_fields_returns_success(self):
+        task = TaskFactory()
+        new_adviser = AdviserFactory()
+
+        url = reverse('api-v4:task:item', kwargs={'pk': task.id})
+
+        response = self.api_client.patch(
+            url,
+            data={'advisers': [new_adviser.id]},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['advisers'][0]['id'] == str(new_adviser.id)
