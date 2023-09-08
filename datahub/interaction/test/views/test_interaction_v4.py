@@ -1799,6 +1799,79 @@ class TestAddInteraction(APITestMixin):
             'investment_project': ['This field is required.'],
         }
 
+    @freeze_time('2017-04-18 13:25:30.986208')
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
+    def test_add_export_countries_interaction_without_existing_country_mapping(self, permissions):
+        """
+        Test that a user can update the interaction
+        when the interaction without existing export country set
+        """
+        adviser = create_test_user(
+            permission_codenames=permissions, dit_team=TeamFactory(),
+        )
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        communication_channel = random_obj_for_model(CommunicationChannel)
+
+        url = reverse('api-v4:interaction:collection')
+        request_data = {
+            'kind': Interaction.Kind.INTERACTION,
+            'communication_channel': communication_channel.pk,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_participants': [
+                {'adviser': adviser.pk},
+            ],
+            'company': company.pk,
+            'contacts': [contact.pk],
+            'service': Service.inbound_referral.value.id,
+            'was_policy_feedback_provided': False,
+            'theme': Interaction.Theme.EXPORT,
+            'were_countries_discussed': True,
+            'export_countries': [
+                {
+                    'country': {
+                        'id': Country.canada.value.id,
+                    },
+                    'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                },
+                {
+                    'country': {
+                        'id': Country.japan.value.id,
+                    },
+                    'status': CompanyExportCountry.Status.FUTURE_INTEREST,
+                },
+                {
+                    'country': {
+                        'id': Country.azerbaijan.value.id,
+                    },
+                    'status': CompanyExportCountry.Status.NOT_INTERESTED,
+                },
+            ],
+            'has_related_trade_agreements': True,
+            'related_trade_agreements': ['50cf99fd-1150-421d-9e1c-b23750ebf5ca'],
+        }
+
+        api_client = self.create_api_client(user=adviser)
+        response = api_client.post(url, request_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+        export_countries = company.export_countries.all()
+        assert export_countries.count() == 3
+
+        assert str(export_countries[0].country.id) == Country.canada.value.id
+        currently_exporting = CompanyExportCountry.Status.CURRENTLY_EXPORTING
+        assert export_countries[0].status == currently_exporting
+
+        assert str(export_countries[1].country.id) == Country.japan.value.id
+        future_interest = CompanyExportCountry.Status.FUTURE_INTEREST
+        assert export_countries[1].status == future_interest
+
+        assert str(export_countries[2].country.id) == Country.azerbaijan.value.id
+        not_interested = CompanyExportCountry.Status.NOT_INTERESTED
+        assert export_countries[2].status == not_interested
+
 
 class TestGetInteraction(APITestMixin):
     """Tests for the get interaction view."""
@@ -2295,82 +2368,8 @@ class TestUpdateInteraction(APITestMixin):
         assert response.data == error_response
 
     @freeze_time('2017-04-18 13:25:30.986208')
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
-    def test_add_export_countries_interaction_without_existing_country_mapping(self, permissions):
-        """
-        Test that a user can update the interaction
-        when the interaction without existing export country set
-        """
-        adviser = create_test_user(
-            permission_codenames=permissions, dit_team=TeamFactory(),
-        )
-        company = CompanyFactory()
-        contact = ContactFactory(company=company)
-        communication_channel = random_obj_for_model(CommunicationChannel)
-
-        url = reverse('api-v4:interaction:collection')
-        request_data = {
-            'kind': Interaction.Kind.INTERACTION,
-            'communication_channel': communication_channel.pk,
-            'subject': 'whatever',
-            'date': date.today().isoformat(),
-            'dit_participants': [
-                {'adviser': adviser.pk},
-            ],
-            'company': company.pk,
-            'contacts': [contact.pk],
-            'service': Service.inbound_referral.value.id,
-            'was_policy_feedback_provided': False,
-            'theme': Interaction.Theme.EXPORT,
-            'were_countries_discussed': True,
-            'export_countries': [
-                {
-                    'country': {
-                        'id': Country.canada.value.id,
-                    },
-                    'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-                },
-                {
-                    'country': {
-                        'id': Country.japan.value.id,
-                    },
-                    'status': CompanyExportCountry.Status.FUTURE_INTEREST,
-                },
-                {
-                    'country': {
-                        'id': Country.azerbaijan.value.id,
-                    },
-                    'status': CompanyExportCountry.Status.NOT_INTERESTED
-                },
-            ],
-            'has_related_trade_agreements': True,
-            'related_trade_agreements': ['50cf99fd-1150-421d-9e1c-b23750ebf5ca'],
-        }
-
-        api_client = self.create_api_client(user=adviser)
-        response = api_client.post(url, request_data)
-
-        assert response.status_code == status.HTTP_201_CREATED
-
-        export_countries = company.export_countries.all()
-        assert export_countries.count() == 3
-
-        assert str(export_countries[0].country.id) == Country.canada.value.id
-        currently_exporting = CompanyExportCountry.Status.CURRENTLY_EXPORTING
-        assert export_countries[0].status == currently_exporting
-
-        assert str(export_countries[1].country.id) == Country.japan.value.id
-        future_interest = CompanyExportCountry.Status.FUTURE_INTEREST
-        assert export_countries[1].status == future_interest
-
-        assert str(export_countries[2].country.id) == Country.azerbaijan.value.id
-        not_interested = CompanyExportCountry.Status.NOT_INTERESTED
-        assert export_countries[2].status == not_interested
-
-    @pytest.mark.parametrize('flag', ((True, False)))
-    @freeze_time('2017-04-18 13:25:30.986208')
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
-    def test_update_export_countries_interaction_with_existing_country_mapping(self, permissions, flag):
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
+    def test_update_export_countries_interaction_with_existing_country_mapping(self, permissions):
         """
         Test that a user can update the interaction
         when the interaction with existing export country
@@ -2378,106 +2377,48 @@ class TestUpdateInteraction(APITestMixin):
         adviser = create_test_user(
             permission_codenames=permissions, dit_team=TeamFactory(),
         )
-        company = CompanyFactory()
-        contact = ContactFactory(company=company)
-        communication_channel = random_obj_for_model(CommunicationChannel)
+        interaction = ExportCountriesInteractionFactory()
+        export_countries = interaction.export_countries.all()
+        assert export_countries.count() == 1
 
-        url = reverse('api-v4:interaction:collection')
         request_data = {
-            'kind': Interaction.Kind.INTERACTION,
-            'communication_channel': communication_channel.pk,
-            'subject': 'whatever',
-            'date': date.today().isoformat(),
-            'dit_participants': [
-                {'adviser': adviser.pk},
-            ],
-            'company': company.pk,
-            'contacts': [contact.pk],
-            'service': Service.inbound_referral.value.id,
-            'was_policy_feedback_provided': False,
-            'theme': Interaction.Theme.EXPORT,
-            'were_countries_discussed': True,
             'export_countries': [
                 {
                     'country': {
-                        'id': Country.canada.value.id,
+                        'id': Country.anguilla.value.id,
                     },
-                    'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-                },
-                {
-                    'country': {
-                        'id': Country.japan.value.id,
-                    },
-                    'status': CompanyExportCountry.Status.FUTURE_INTEREST,
-                },
-                {
-                    'country': {
-                        'id': Country.azerbaijan.value.id,
-                    },
-                    'status': CompanyExportCountry.Status.NOT_INTERESTED
-                },
-            ],
-            'has_related_trade_agreements': True,
-            'related_trade_agreements': ['50cf99fd-1150-421d-9e1c-b23750ebf5ca'],
-        }
-
-        new_request_data = {
-            'kind': Interaction.Kind.INTERACTION,
-            'communication_channel': communication_channel.pk,
-            'subject': 'whatever',
-            'date': date.today().isoformat(),
-            'dit_participants': [
-                {'adviser': adviser.pk},
-            ],
-            'company': company.pk,
-            'contacts': [contact.pk],
-            'service': Service.inbound_referral.value.id,
-            'was_policy_feedback_provided': False,
-            'theme': Interaction.Theme.EXPORT,
-            'were_countries_discussed': True,
-            'export_countries': [
-                {
-                    'country': {
-                        'id': Country.france.value.id,
-                    },
-                    'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                    'status': str(CompanyExportCountry.Status.NOT_INTERESTED),
                 },
                 {
                     'country': {
                         'id': Country.argentina.value.id,
                     },
-                    'status': CompanyExportCountry.Status.FUTURE_INTEREST,
+                    'status': str(CompanyExportCountry.Status.FUTURE_INTEREST),
                 },
                 {
                     'country': {
-                        'id': Country.anguilla.value.id,
+                        'id': Country.france.value.id,
                     },
-                    'status': CompanyExportCountry.Status.NOT_INTERESTED
+                    'status': str(CompanyExportCountry.Status.CURRENTLY_EXPORTING),
                 },
             ],
-            'has_related_trade_agreements': True,
-            'related_trade_agreements': ['50cf99fd-1150-421d-9e1c-b23750ebf5ca'],
         }
 
+        update_url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         api_client = self.create_api_client(user=adviser)
-        response = api_client.post(url, request_data)
+        response = api_client.patch(update_url, data=request_data)
 
-        assert response.status_code == status.HTTP_201_CREATED
+        assert response.status_code == status.HTTP_200_OK
 
-        export_countries = company.export_countries.all()
-        assert export_countries.count() == 3
+        export_countries = interaction.export_countries.all().order_by('country__name')
+        assert request_data['export_countries'] == [
+            {'country': {'id': str(export_country.country.id)}, 'status': export_country.status}
+            for export_country in export_countries
+        ]
 
-        new_response = api_client.post(url, new_request_data)
-
-        assert new_response.status_code == status.HTTP_201_CREATED
-
-        export_countries = company.export_countries.all()
-        assert export_countries.count() == 6
-
-    @pytest.mark.parametrize('flag', ((True, False)))
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_update_interaction_when_export_countries_set(self, permissions, flag):
+    def test_update_interaction_when_export_countries_set(self, permissions):
         """
         Test that a user can update the interaction otherwise
         when the interaction already has export countries set
