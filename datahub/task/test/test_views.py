@@ -1,5 +1,9 @@
 from uuid import uuid4
 
+from django.utils.timezone import now
+
+from faker import Faker
+
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -123,3 +127,78 @@ class TestGetTask(APITestMixin):
             },
         }
         assert response == expected_response
+
+
+class TestCreateTask(APITestMixin):
+    def test_create_task_with_missing_mandatory_fields_returns_bad_request(self):
+        url = reverse('api-v4:task:collection')
+
+        response = self.api_client.post(
+            url,
+            data={},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert list(response.json().keys()) == ['title', 'advisers']
+
+    def test_create_task_with_valid_mandatory_fields_returns_success_created(self):
+        faker = Faker()
+
+        adviser = AdviserFactory()
+
+        url = reverse('api-v4:task:collection')
+
+        new_task = {
+            'title': faker.word(),
+            'description': faker.word(),
+            'due_date': now().date(),
+            'reminder_days': 3,
+            'email_reminders_enabled': True,
+            'advisers': [adviser.id],
+        }
+
+        post_response = self.api_client.post(
+            url,
+            data=new_task,
+        )
+        post_response_json = post_response.json()
+
+        assert post_response.status_code == status.HTTP_201_CREATED
+
+        get_url = reverse(
+            'api-v4:task:item',
+            kwargs={'pk': post_response_json['id']},
+        )
+        get_response = self.api_client.get(get_url)
+
+        assert get_response.status_code == status.HTTP_200_OK
+        expected_response = {
+            'id': post_response_json['id'],
+            'title': post_response_json['title'],
+            'description': post_response_json['description'],
+            'due_date': post_response_json['due_date'],
+            'reminder_days': post_response_json['reminder_days'],
+            'email_reminders_enabled': post_response_json['email_reminders_enabled'],
+            'advisers': [
+                {
+                    'id': str(adviser.id),
+                    'name': adviser.name,
+                    'first_name': adviser.first_name,
+                    'last_name': adviser.last_name,
+                },
+            ],
+            'archived': post_response_json['archived'],
+            'archived_by': post_response_json['archived_by'],
+            'created_by': {
+                'name': self.user.name,
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'id': str(self.user.id),
+            },
+            'modified_by': {
+                'name': self.user.name,
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'id': str(self.user.id),
+            },
+        }
+        assert get_response.json() == expected_response

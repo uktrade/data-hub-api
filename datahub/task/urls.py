@@ -6,12 +6,14 @@ from datahub.task.views import TaskV4ViewSet
 Task_v4_item = TaskV4ViewSet.as_view(
     {
         'get': 'retrieve',
+        'patch': 'partial_update',
     },
 )
 
 Task_v4_collection = TaskV4ViewSet.as_view(
     {
         'get': 'list',
+        'post': 'create',
     },
 )
 
