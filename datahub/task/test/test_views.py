@@ -16,6 +16,11 @@ from datahub.core.test_utils import (
 from datahub.task.test.factories import TaskFactory
 
 
+class BaseTaskTests(APITestMixin):
+    def adviser_api_client(self, adviser):
+        return self.create_api_client(user=adviser)
+
+
 class TestGetTasks(APITestMixin):
     def test_get_all_tasks_returns_empty_when_no_tasks_exist(self):
         url = reverse('api-v4:task:collection')
@@ -113,6 +118,7 @@ class TestGetTask(APITestMixin):
             ],
             'archived': task.archived,
             'archived_by': task.archived_by,
+            'archived_reason': task.archived_reason,
             'created_by': {
                 'name': task.created_by.name,
                 'first_name': task.created_by.first_name,
@@ -201,6 +207,7 @@ class TestCreateTask(APITestMixin):
             ],
             'archived': post_response_json['archived'],
             'archived_by': post_response_json['archived_by'],
+            'archived_reason': post_response_json['archived_reason'],
             'created_by': {
                 'name': self.user.name,
                 'first_name': self.user.first_name,
@@ -217,7 +224,7 @@ class TestCreateTask(APITestMixin):
         assert get_response.json() == expected_response
 
 
-class TestEditTask(APITestMixin):
+class TestEditTask(BaseTaskTests):
     def test_edit_task_return_404_when_task_id_unknown(self):
         url = reverse('api-v4:task:item', kwargs={'pk': uuid4()})
 
@@ -228,11 +235,12 @@ class TestEditTask(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_edit_task_with_unknown_advisor_id_returns_bad_request(self):
-        task = TaskFactory()
+        adviser = AdviserFactory()
+        task = TaskFactory(created_by=adviser)
 
         url = reverse('api-v4:task:item', kwargs={'pk': task.id})
 
-        response = self.api_client.patch(
+        response = self.adviser_api_client(adviser).patch(
             url,
             data={'advisers': [uuid4()]},
         )
@@ -240,13 +248,66 @@ class TestEditTask(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert list(response.json().keys()) == ['advisers']
 
-    def test_edit_task_with_valid_fields_returns_success(self):
+    def test_edit_task_returns_forbidden_when_user_not_creator_or_assigned_to_task(self):
         task = TaskFactory()
-        new_adviser = AdviserFactory()
+        adviser = AdviserFactory()
 
         url = reverse('api-v4:task:item', kwargs={'pk': task.id})
 
         response = self.api_client.patch(
+            url,
+            data={'advisers': [adviser.id]},
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_edit_task_returns_success_when_user_is_creator_but_not_assigned_to_task(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(created_by=adviser)
+
+        url = reverse('api-v4:task:item', kwargs={'pk': task.id})
+
+        response = self.adviser_api_client(adviser).patch(
+            url,
+            data={'advisers': [adviser.id]},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_edit_task_returns_success_when_user_is_not_creator_but_is_assigned_to_task(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser])
+
+        url = reverse('api-v4:task:item', kwargs={'pk': task.id})
+
+        response = self.adviser_api_client(adviser).patch(
+            url,
+            data={'advisers': [adviser.id]},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_edit_task_returns_success_when_user_is_creator_and_is_assigned_to_task(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser], created_by=adviser)
+
+        url = reverse('api-v4:task:item', kwargs={'pk': task.id})
+
+        response = self.adviser_api_client(adviser).patch(
+            url,
+            data={'advisers': [adviser.id]},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_edit_task_with_valid_fields_returns_success(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(created_by=adviser)
+        new_adviser = AdviserFactory()
+
+        url = reverse('api-v4:task:item', kwargs={'pk': task.id})
+
+        response = self.adviser_api_client(adviser).patch(
             url,
             data={'advisers': [new_adviser.id]},
         )
@@ -254,29 +315,72 @@ class TestEditTask(APITestMixin):
         assert response.json()['advisers'][0]['id'] == str(new_adviser.id)
 
 
-class TestArchiveTask(APITestMixin):
+class TestArchiveTask(BaseTaskTests):
     def test_archive_task_without_reason_returns_bad_request(self):
-        task = TaskFactory()
-        url = reverse('api-v4:task:archive', kwargs={'pk': task.id})
-        response = self.api_client.post(url)
+        adviser = AdviserFactory()
+        task = TaskFactory(created_by=adviser)
+
+        url = reverse('api-v4:task:task_archive', kwargs={'pk': task.id})
+
+        response = self.adviser_api_client(adviser).post(url, data={})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
             'reason': ['This field is required.'],
         }
 
-    def test_archive_task_with_valid_reason_returns_success(self):
+    def test_archive_task_returns_forbidden_when_user_not_creator_or_assigned_to_task(self):
         task = TaskFactory()
-        url = reverse('api-v4:task:archive', kwargs={'pk': task.id})
+
+        url = reverse('api-v4:task:task_archive', kwargs={'pk': task.id})
+
         response = self.api_client.post(url, data={'reason': 'completed'})
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_archive_task_returns_success_when_user_is_creator_but_not_assigned_to_task(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(created_by=adviser)
+
+        url = reverse('api-v4:task:task_archive', kwargs={'pk': task.id})
+
+        response = self.adviser_api_client(adviser).post(url, data={'reason': 'completed'})
+
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_archive_task_returns_success_when_user_is_not_creator_but_is_assigned_to_task(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser])
+
+        url = reverse('api-v4:task:task_archive', kwargs={'pk': task.id})
+
+        response = self.adviser_api_client(adviser).post(url, data={'reason': 'completed'})
+
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_archive_task_returns_success_when_user_is_creator_and_is_assigned_to_task(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser], created_by=adviser)
+
+        url = reverse('api-v4:task:task_archive', kwargs={'pk': task.id})
+
+        response = self.adviser_api_client(adviser).post(url, data={'reason': 'completed'})
+
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_archive_task_with_valid_reason_returns_success(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(created_by=adviser)
+        url = reverse('api-v4:task:task_archive', kwargs={'pk': task.id})
+        response = self.adviser_api_client(adviser).post(url, data={'reason': 'completed'})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived']
         assert response.data['archived_by'] == {
-            'id': str(self.user.pk),
-            'first_name': self.user.first_name,
-            'last_name': self.user.last_name,
-            'name': self.user.name,
+            'id': str(adviser.id),
+            'first_name': adviser.first_name,
+            'last_name': adviser.last_name,
+            'name': adviser.name,
         }
         assert response.data['archived_reason'] == 'completed'
         assert response.data['id'] == str(task.id)
