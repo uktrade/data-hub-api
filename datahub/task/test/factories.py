@@ -1,0 +1,24 @@
+import factory.fuzzy
+from django.utils.timezone import now
+
+from datahub.company.test.factories import AdviserFactory
+from datahub.core.test.factories import to_many_field
+from datahub.task.models import Task
+
+
+class TaskFactory(factory.django.DjangoModelFactory):
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SelfAttribute('created_by')
+    created_on = now()
+
+    archived = False
+
+    @to_many_field
+    def advisers(self):  # noqa: D102
+        """
+        Add support for setting `advisers`.
+        """
+        return []
+
+    class Meta:
+        model = Task

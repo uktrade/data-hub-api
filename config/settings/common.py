@@ -124,6 +124,7 @@ LOCAL_APPS = [
     'datahub.dataset',
     'datahub.reminder',
     'datahub.testfixtureapi',
+    'datahub.task',
 ]
 
 # Can be used as a way to load a third-party app that has been removed from the
@@ -675,9 +676,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 IS_TEST = env('IS_TEST', default=False)
 
 # Content Security Policy
-CSP_DEFAULT_SRC = (
-    "'self'",
-)
+CSP_DEFAULT_SRC = ("'self'",)
 CSP_STYLE_SRC = (
     "'self'",
     "'unsafe-inline'",
