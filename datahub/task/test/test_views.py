@@ -1,13 +1,18 @@
+from uuid import uuid4
+
+from rest_framework import status
 from rest_framework.reverse import reverse
+
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import (
     APITestMixin,
 )
+
 from datahub.task.test.factories import TaskFactory
 
 
-class TestGetAllTasks(APITestMixin):
+class TestGetTasks(APITestMixin):
     def test_get_all_tasks_returns_empty_when_no_tasks_exist(self):
         url = reverse('api-v4:task:collection')
         response = self.api_client.get(url).json()
@@ -65,3 +70,56 @@ class TestGetAllTasks(APITestMixin):
             'previous': None,
             'results': [],
         }
+
+
+class TestGetTask(APITestMixin):
+    def test_get_task_return_404_when_task_id_unknown(self):
+        TaskFactory()
+
+        url = reverse(
+            'api-v4:task:item',
+            kwargs={'pk': uuid4()},
+        )
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_get_task_return_task_when_task_id_valid(self):
+        task = TaskFactory()
+
+        url = reverse(
+            'api-v4:task:item',
+            kwargs={'pk': task.id},
+        )
+        response = self.api_client.get(url).json()
+        expected_response = {
+            'id': str(task.id),
+            'title': task.title,
+            'description': task.description,
+            'due_date': task.due_date,
+            'reminder_days': task.reminder_days,
+            'email_reminders_enabled': task.email_reminders_enabled,
+            'advisers': [
+                {
+                    'id': str(adviser.id),
+                    'name': adviser.name,
+                    'first_name': adviser.first_name,
+                    'last_name': adviser.last_name,
+                }
+                for adviser in task.advisers.all()
+            ],
+            'archived': task.archived,
+            'archived_by': task.archived_by,
+            'created_by': {
+                'name': task.created_by.name,
+                'first_name': task.created_by.first_name,
+                'last_name': task.created_by.last_name,
+                'id': str(task.created_by.id),
+            },
+            'modified_by': {
+                'name': task.modified_by.name,
+                'first_name': task.modified_by.first_name,
+                'last_name': task.modified_by.last_name,
+                'id': str(task.modified_by.id),
+            },
+        }
+        assert response == expected_response
