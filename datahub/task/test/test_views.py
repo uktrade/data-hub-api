@@ -252,3 +252,31 @@ class TestEditTask(APITestMixin):
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['advisers'][0]['id'] == str(new_adviser.id)
+
+
+class TestArchiveTask(APITestMixin):
+    def test_archive_task_without_reason_returns_bad_request(self):
+        task = TaskFactory()
+        url = reverse('api-v4:task:archive', kwargs={'pk': task.id})
+        response = self.api_client.post(url)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'reason': ['This field is required.'],
+        }
+
+    def test_archive_task_with_valid_reason_returns_success(self):
+        task = TaskFactory()
+        url = reverse('api-v4:task:archive', kwargs={'pk': task.id})
+        response = self.api_client.post(url, data={'reason': 'completed'})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['archived']
+        assert response.data['archived_by'] == {
+            'id': str(self.user.pk),
+            'first_name': self.user.first_name,
+            'last_name': self.user.last_name,
+            'name': self.user.name,
+        }
+        assert response.data['archived_reason'] == 'completed'
+        assert response.data['id'] == str(task.id)

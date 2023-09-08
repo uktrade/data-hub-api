@@ -26,6 +26,7 @@ class TaskSerializer(serializers.ModelSerializer):
             'email_reminders_enabled',
             'advisers',
             'archived',
+            'archived_reason',
             'archived_by',
             'created_by',
             'modified_by',

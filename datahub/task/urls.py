@@ -17,7 +17,10 @@ Task_v4_collection = TaskV4ViewSet.as_view(
     },
 )
 
+contact_archive = TaskV4ViewSet.as_action_view('archive')
+
 urls_v4 = [
     path('task', Task_v4_collection, name='collection'),
     path('task/<uuid:pk>', Task_v4_item, name='item'),
+    path('task/<uuid:pk>/archive', contact_archive, name='archive'),
 ]
