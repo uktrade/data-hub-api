@@ -24,6 +24,5 @@ class Task(ArchivableModel, BaseModel):
     email_reminders_enabled = models.BooleanField(default=False)
     advisers = models.ManyToManyField(
         Advisor,
-        blank=False,
         related_name='+',
     )
