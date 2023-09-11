@@ -1,10 +1,16 @@
+from functools import reduce
+
 from django.db.models.expressions import Case, Value, When
 from django.db.models.fields import CharField
 from django.db.models.functions import Cast, Concat, Upper
 
+
+from opensearch_dsl import Search
+
 from config.settings.types import HawkScope
 from datahub.company.models import Company as DBCompany, CompanyExportCountry
 from datahub.core.auth import PaaSIPAuthentication
+from datahub.core.constants import HeadquarterType
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
     HawkResponseSigningMixin,
@@ -103,7 +109,61 @@ class SearchCompanyAPIViewMixin:
 class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
 
-    pass
+    def deep_get(self, dictionary, keys, default=None):
+        """
+        Perform a deep search on a dictionary to find the item at the location provided in the keys
+        """
+        return reduce(
+            lambda d, key: d.get(key, default) if isinstance(d, dict) else default,
+            keys.split('|'),
+            dictionary,
+        )
+
+    def get_base_query(self, request, validated_data):
+        base_query = super().get_base_query(request, validated_data)
+
+        raw_query = base_query.to_dict()
+        filters = self.deep_get(raw_query, 'query|bool|filter')
+        if not filters:
+            return base_query
+
+        filter_index = None
+        for index, filter in enumerate(filters):
+            if filter.get('bool'):
+                filter_index = index
+                break
+
+        if filter_index is None:
+            return base_query
+
+        must_filters = filters[filter_index]['bool']['must']
+        for index, filter in enumerate(must_filters):
+            # By default the logic to generate an opensearch query inside get_base_query uses an
+            # and for each column passed to it. In this use case, when we detect a query for the
+            # ghq headquarter id we add an addiitonal should entry into the should array
+            should_queries = self.deep_get(filter, 'bool|should')
+
+            if should_queries:
+                for should_query in should_queries:
+                    if (
+                        self.deep_get(should_query, 'match|headquarter_type.id|query')
+                        == HeadquarterType.ghq.value.id
+                    ):
+                        should_queries.append(
+                            {
+                                'match': {
+                                    'is_global_ultimate': {
+                                        'query': True,
+                                    },
+                                },
+                            },
+                        )
+                        break
+                raw_query['query']['bool']['filter'][filter_index]['bool']['must'][index]['bool'][
+                    'should'
+                ] = should_queries
+
+        return Search.from_dict(raw_query)
 
 
 @register_v4_view(is_public=True)

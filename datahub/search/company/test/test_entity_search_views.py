@@ -574,6 +574,50 @@ class TestSearch(APITestMixin):
         search_results = {company['name'] for company in response.data['results']}
         assert search_results == results
 
+    def test_headquarter_type_ghq_includes_global_ultimate_companies(
+        self,
+        opensearch_with_collector,
+    ):
+        ghq_company = CompanyFactory(headquarter_type_id=constants.HeadquarterType.ghq.value.id)
+        ukhq_company = CompanyFactory(headquarter_type_id=constants.HeadquarterType.ukhq.value.id)
+        CompanyFactory(headquarter_type_id=constants.HeadquarterType.ehq.value.id)
+        ultimate_1_company = CompanyFactory(
+            duns_number='123456789',
+            global_ultimate_duns_number='123456789',
+        )
+        ultimate_2_company = CompanyFactory(
+            duns_number='987654321',
+            global_ultimate_duns_number='987654321',
+        )
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:company')
+        response = self.api_client.post(
+            url,
+            {
+                'headquarter_type': [
+                    constants.HeadquarterType.ghq.value.id,
+                    constants.HeadquarterType.ukhq.value.id,
+                ],
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        search_results = {company['id'] for company in response.data['results']}
+        expected_results = {
+            str(company.id)
+            for company in [
+                ghq_company,
+                ukhq_company,
+                ultimate_1_company,
+                ultimate_2_company,
+            ]
+        }
+        for expected_result in expected_results:
+            assert expected_result in search_results
+
     @pytest.mark.parametrize(
         'num_account_managers',
         (1, 2, 3),
