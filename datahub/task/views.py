@@ -13,6 +13,11 @@ from datahub.task.serializers import TaskSerializer
 
 
 class IsAdviserPermittedToEditTask(BasePermission):
+    """
+    Permission class to limit edit access to a task to only the original creator, or to an adviser
+    that has had the task assigned to them
+    """
+
     def has_object_permission(self, request, view, obj):
         if request.method == 'PATCH':
             return self.validate_task_permission(request, view, obj)
@@ -34,6 +39,8 @@ class IsAdviserPermittedToEditTask(BasePermission):
 
 
 class TaskV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
+    """View for tasks"""
+
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     permission_classes = [IsAuthenticated, IsAdviserPermittedToEditTask]
     ordering_fields = ['title']

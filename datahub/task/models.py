@@ -14,6 +14,8 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 @reversion.register_base_model()
 class Task(ArchivableModel, BaseModel):
+    """Representation of a task."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     title = models.CharField(max_length=MAX_LENGTH)
     description = models.TextField(blank=True, default='')

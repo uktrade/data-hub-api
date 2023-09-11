@@ -18,10 +18,13 @@ from datahub.task.test.factories import TaskFactory
 
 class BaseTaskTests(APITestMixin):
     def adviser_api_client(self, adviser):
+        """Create an api client where the adviser is the authenticated user"""
         return self.create_api_client(user=adviser)
 
 
-class TestGetTasks(APITestMixin):
+class TestListTask(APITestMixin):
+    """Test the LIST task endpoint"""
+
     def test_get_all_tasks_returns_empty_when_no_tasks_exist(self):
         url = reverse('api-v4:task:collection')
         response = self.api_client.get(url).json()
@@ -82,6 +85,8 @@ class TestGetTasks(APITestMixin):
 
 
 class TestGetTask(APITestMixin):
+    """Test the GET task endpoint"""
+
     def test_get_task_return_404_when_task_id_unknown(self):
         TaskFactory()
 
@@ -135,7 +140,9 @@ class TestGetTask(APITestMixin):
         assert response == expected_response
 
 
-class TestCreateTask(APITestMixin):
+class TestAddTask(APITestMixin):
+    """Test the POST task endpoint"""
+
     def test_create_task_with_missing_mandatory_fields_returns_bad_request(self):
         url = reverse('api-v4:task:collection')
 
@@ -225,6 +232,8 @@ class TestCreateTask(APITestMixin):
 
 
 class TestEditTask(BaseTaskTests):
+    """Test the PATCH task endpoint"""
+
     def test_edit_task_return_404_when_task_id_unknown(self):
         url = reverse('api-v4:task:item', kwargs={'pk': uuid4()})
 
@@ -316,6 +325,8 @@ class TestEditTask(BaseTaskTests):
 
 
 class TestArchiveTask(BaseTaskTests):
+    """Test the archive POST endpoint for task"""
+
     def test_archive_task_without_reason_returns_bad_request(self):
         adviser = AdviserFactory()
         task = TaskFactory(created_by=adviser)
