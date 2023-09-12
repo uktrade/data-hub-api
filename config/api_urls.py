@@ -24,6 +24,7 @@ from datahub.metadata import urls as metadata_urls
 from datahub.omis import urls as omis_urls
 from datahub.reminder import urls as reminder_urls
 from datahub.search import urls as search_urls
+from datahub.task import urls as task_urls
 from datahub.user.company_list import urls as company_list_urls
 
 # API V1
@@ -96,4 +97,5 @@ v4_urls = [
     path('', include((reminder_urls, 'reminder'), namespace='reminder')),
     path('', include((export_urls.urls_v4, 'export'), namespace='export')),
     path('', include((objective_urls.urls_v4, 'objective'), namespace='objective')),
+    path('', include((task_urls.urls_v4, 'task'), namespace='task')),
 ]
