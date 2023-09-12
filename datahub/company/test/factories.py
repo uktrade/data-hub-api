@@ -84,6 +84,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     created_on = now()
     export_segment = constants.ExportSegment.hep.value.id
     export_sub_segment = constants.ExportSubSegment.challenge.value.id
+    is_out_of_business = False
 
     @to_many_field
     def export_to_countries(self):  # noqa: D102
