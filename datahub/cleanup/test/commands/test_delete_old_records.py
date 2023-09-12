@@ -58,8 +58,8 @@ from datahub.omis.payment.test.factories import (
     PaymentFactory,
     PaymentGatewaySessionFactory,
 )
-from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model
+from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.user.company_list.test.factories import (
     CompanyListItemFactory,
     PipelineItemFactory,
