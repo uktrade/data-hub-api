@@ -1,7 +1,7 @@
 # Django and django related
 django==3.2.20
 djangorestframework==3.14.0
-django-axes==6.1.0
+django-axes==6.1.1
 django-csp==3.7
 django-environ==0.10.0
 django-extensions==3.2.3
