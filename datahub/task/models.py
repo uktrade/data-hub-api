@@ -29,16 +29,16 @@ class Task(ArchivableModel, BaseModel):
     )
 
 
-# @reversion.register_base_model()
-# class InvestmentProjectTask(ArchivableModel, BaseModel):
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-#     task = models.ForeignKey(
-#         Task,
-#         on_delete=models.CASCADE,
-#         related_name='investment_project',
-#     )
-#     investment_project = models.ForeignKey(
-#         InvestmentProject,
-#         on_delete=models.PROTECT,
-#         related_name='task',
-#     )
+@reversion.register_base_model()
+class InvestmentProjectTask(BaseModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        related_name='investment_project',
+    )
+    investment_project = models.ForeignKey(
+        InvestmentProject,
+        on_delete=models.PROTECT,
+        related_name='task',
+    )
