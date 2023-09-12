@@ -578,6 +578,12 @@ MAPPING = {
                 # opportunity (the opportunities have to expired and be deleted first).
                 'unexpired_objects_kwargs': [{}],
             },
+            {
+                'factory': InvestmentProjectTaskFactory,
+                'field': 'investment_project_task',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
         ],
     },
     'order.Order': {

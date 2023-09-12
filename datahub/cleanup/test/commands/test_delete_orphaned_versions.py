@@ -36,7 +36,7 @@ from datahub.investment.project.test.factories import (
 )
 from datahub.metadata.test.factories import SectorFactory
 from datahub.omis.order.test.factories import OrderFactory
-from datahub.task.test.factories import TaskFactory, InvestmentProjectTaskFactory
+from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
 from datahub.user.company_list.test.factories import (
     CompanyListItemFactory,
     PipelineItemFactory,
