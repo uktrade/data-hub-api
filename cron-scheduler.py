@@ -247,7 +247,6 @@ def schedule_new_export_interaction_jobs():
 
 
 def schedule_user_reminder_migration():
-
     job_scheduler(
         function=run_ita_users_migration,
         max_retries=5,

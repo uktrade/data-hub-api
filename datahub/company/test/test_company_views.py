@@ -403,6 +403,7 @@ class TestGetCompany(APITestMixin):
                 'last_name': company.modified_by.last_name,
                 'name': company.modified_by.name,
             },
+            'is_out_of_business': company.is_out_of_business,
         }
 
     def test_get_company_without_country(self):

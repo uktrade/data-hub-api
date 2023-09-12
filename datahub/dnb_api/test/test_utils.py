@@ -248,6 +248,7 @@ class TestCompanySearch:
             'uk_based': True,
             'website': 'http://foo.com',
             'global_ultimate_duns_number': '291332174',
+            'is_out_of_business': False,
         }
 
 
@@ -328,6 +329,7 @@ class TestUpdateCompanyFromDNB:
             'uk_region': original_company.uk_region.id,
             'dnb_modified_on': now(),
             'strategy': 'ABC',
+            'is_out_of_business': original_company.is_out_of_business,
         }
 
         versions = list(Version.objects.get_for_object(company))

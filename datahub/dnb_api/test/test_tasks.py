@@ -100,6 +100,7 @@ def test_sync_company_with_dnb_all_fields(
         'uk_region': original_company.uk_region_id,
         'dnb_modified_on': now(),
         'strategy': '',
+        'is_out_of_business': original_company.is_out_of_business,
     }
 
     versions = list(Version.objects.get_for_object(company))
@@ -171,6 +172,7 @@ def test_sync_company_with_dnb_partial_fields(
         'website': original_company.website,
         'dnb_modified_on': now(),
         'strategy': '',
+        'is_out_of_business': original_company.is_out_of_business,
     }
 
 
@@ -596,6 +598,7 @@ def test_update_company_from_dnb_data(dnb_response_uk, base_company_dict):
         'uk_region': original_company.uk_region_id,
         'dnb_modified_on': now(),
         'strategy': '',
+        'is_out_of_business': original_company.is_out_of_business,
     }
 
     versions = list(Version.objects.get_for_object(company))
@@ -656,6 +659,7 @@ def test_update_company_from_dnb_data_partial_fields(dnb_response_uk, base_compa
         'website': original_company.website,
         'dnb_modified_on': now(),
         'strategy': '',
+        'is_out_of_business': original_company.is_out_of_business,
     }
 
 
@@ -751,6 +755,7 @@ def test_sync_outdated_companies_with_dnb_all_fields(
         'uk_region': original_company.uk_region_id,
         'dnb_modified_on': now(),
         'strategy': '',
+        'is_out_of_business': original_company.is_out_of_business,
     }
 
 
@@ -830,6 +835,7 @@ def test_sync_outdated_companies_with_dnb_partial_fields(
         'website': original_company.website,
         'dnb_modified_on': now(),
         'strategy': '',
+        'is_out_of_business': original_company.is_out_of_business,
     }
     expected_message = f'Syncing dnb-linked company "{company.id}" Succeeded'
     assert expected_message in caplog.text

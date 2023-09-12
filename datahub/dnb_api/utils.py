@@ -252,6 +252,7 @@ def format_dnb_company(dnb_company):
         'turnover': dnb_company.get('annual_sales'),
         'is_turnover_estimated': dnb_company.get('is_annual_sales_estimated'),
         'website': company_website,
+        'is_out_of_business': dnb_company.get('is_out_of_business', False),
         # `Company.global_ultimate_duns_number` is not nullable but allows blank values. Sample
         # response from the D&B search API suggests that this field can be set to null.
         'global_ultimate_duns_number': dnb_company.get('global_ultimate_duns_number') or '',

@@ -12,6 +12,7 @@ ALL_DNB_UPDATED_SERIALIZER_FIELDS = (
     # 'website',
     'global_ultimate_duns_number',
     'company_number',
+    'is_out_of_business',
 )
 
 ALL_DNB_UPDATED_MODEL_FIELDS = (
@@ -39,4 +40,5 @@ ALL_DNB_UPDATED_MODEL_FIELDS = (
     # 'website',
     'global_ultimate_duns_number',
     'company_number',
+    'is_out_of_business',
 )

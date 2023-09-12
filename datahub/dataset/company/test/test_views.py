@@ -33,11 +33,7 @@ def get_expected_data_from_company(company):
         'archived_reason': company.archived_reason,
         'business_type__name': get_attr_or_none(company, 'business_type.name'),
         'company_number': company.company_number,
-        'created_by_id': (
-            str(company.created_by_id)
-            if company.created_by is not None
-            else None
-        ),
+        'created_by_id': (str(company.created_by_id) if company.created_by is not None else None),
         'created_on': format_date_or_datetime(company.created_on),
         'description': company.description,
         'duns_number': company.duns_number,
@@ -90,6 +86,7 @@ def get_expected_data_from_company(company):
         'uk_region__name': get_attr_or_none(company, 'uk_region.name'),
         'vat_number': company.vat_number,
         'website': company.website,
+        'is_out_of_business': company.is_out_of_business,
     }
     if data['turnover'] is not None:
         data['turnover_gbp'] = convert_usd_to_gbp(data['turnover'])
@@ -109,7 +106,8 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
     factory = CompanyWithAreaFactory
 
     @pytest.mark.parametrize(
-        'company_factory', (
+        'company_factory',
+        (
             CompanyWithAreaFactory,
             ArchivedCompanyFactory,
         ),
@@ -129,7 +127,8 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
         assert result == expected_result
 
     @pytest.mark.parametrize(
-        'company_factory', (
+        'company_factory',
+        (
             CompanyWithAreaFactory,
             ArchivedCompanyFactory,
         ),
@@ -138,7 +137,8 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
         """Test that endpoint returns with advisers on the core team"""
         company = company_factory()
         company.one_list_core_team_advisers = [
-            str(o.adviser.id) for o in OneListCoreTeamMemberFactory.create_batch(
+            str(o.adviser.id)
+            for o in OneListCoreTeamMemberFactory.create_batch(
                 3,
                 company=company,
             )
@@ -153,7 +153,8 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
         assert result == expected_result
 
     @pytest.mark.parametrize(
-        'company_factory', (
+        'company_factory',
+        (
             CompanyWithAreaFactory,
             ArchivedCompanyFactory,
         ),
@@ -177,7 +178,8 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
         assert result == expected_result
 
     @pytest.mark.parametrize(
-        'company_factory', (
+        'company_factory',
+        (
             CompanyWithAreaFactory,
             ArchivedCompanyFactory,
         ),
