@@ -59,6 +59,7 @@ from datahub.omis.payment.test.factories import (
     PaymentGatewaySessionFactory,
 )
 from datahub.omis.quote.test.factories import QuoteFactory
+from datahub.task.test.factories import InvestmentProjectTaskFactory
 from datahub.search.apps import get_search_app_by_model
 from datahub.user.company_list.test.factories import (
     CompanyListItemFactory,
@@ -76,6 +77,7 @@ ORDER_DELETE_BEFORE_DATETIME = FROZEN_TIME - ORDER_EXPIRY_PERIOD
 INVESTOR_PROFILE_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTOR_PROFILE_EXPIRY_PERIOD
 COMPANY_EXPORT_DELETE_BEFORE_DATETIME = FROZEN_TIME - COMPANY_EXPORT_EXPIRY_PERIOD
 OBJECTIVE_DELETE_BEFORE_DATETIME = FROZEN_TIME - OBJECTIVE_EXPIRY_PERIOD
+TASK_DELETE_BEFORE_DATETIME = FROZEN_TIME - OBJECTIVE_EXPIRY_PERIOD
 
 MAPPING = {
     'company.Company': {
@@ -729,6 +731,28 @@ MAPPING = {
             {
                 'created_on': OBJECTIVE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                 'modified_on': OBJECTIVE_DELETE_BEFORE_DATETIME,
+            },
+        ],
+        'relations': [],
+    },
+    'task.InvestmentProjectTask': {
+        'factory': InvestmentProjectTaskFactory,
+        'implicitly_deletable_models': set(),
+        'has_no_search_app': True,
+        'expired_objects_kwargs': [
+            {
+                'created_on': TASK_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': TASK_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+        ],
+        'unexpired_objects_kwargs': [
+            {
+                'created_on': TASK_DELETE_BEFORE_DATETIME,
+                'modified_on': TASK_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+            {
+                'created_on': TASK_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': TASK_DELETE_BEFORE_DATETIME,
             },
         ],
         'relations': [],
