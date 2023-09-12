@@ -282,7 +282,7 @@ pylint-plugin-utils==0.7
     # via pylint-django
 pylint-pytest==1.1.2
     # via -r requirements-dev.in
-pytest==7.4.0
+pytest==7.4.2
     # via
     #   -r requirements-dev.in
     #   pylint-pytest
