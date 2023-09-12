@@ -8,6 +8,7 @@ from datahub.company.models import Advisor
 from datahub.core import reversion
 
 from datahub.core.models import ArchivableModel, BaseModel
+from datahub.investment.project.models import InvestmentProject
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -25,4 +26,21 @@ class Task(ArchivableModel, BaseModel):
     advisers = models.ManyToManyField(
         Advisor,
         related_name='+',
+    )
+
+
+@reversion.register_base_model()
+class InvestmentProjectTask(BaseModel):
+    """Representation as an investment project task"""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        related_name='investment_project',
+    )
+    investment_project = models.ForeignKey(
+        InvestmentProject,
+        on_delete=models.PROTECT,
+        related_name='task',
     )
