@@ -59,8 +59,8 @@ from datahub.omis.payment.test.factories import (
     PaymentGatewaySessionFactory,
 )
 from datahub.omis.quote.test.factories import QuoteFactory
-from datahub.task.test.factories import InvestmentProjectTaskFactory
 from datahub.search.apps import get_search_app_by_model
+from datahub.task.test.factories import InvestmentProjectTaskFactory
 from datahub.user.company_list.test.factories import (
     CompanyListItemFactory,
     PipelineItemFactory,
