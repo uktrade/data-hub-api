@@ -82,6 +82,7 @@ class Contact(ArchivableModel, BaseModel):
         max_length=MAX_LENGTH, blank=True,
         help_text='Legacy field. File browser path to the archived documents for this contact.',
     )
+    valid_email = models.BooleanField(null=True, blank=True)
 
     def get_absolute_url(self):
         """URL to the object in the Data Hub internal front end."""
