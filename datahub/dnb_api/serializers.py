@@ -89,7 +89,7 @@ class DNBCompanySerializer(CompanySerializer):
         allow_blank=True,
         max_length=9,
         min_length=9,
-        validators=(integer_validator, ),
+        validators=(integer_validator,),
     )
 
     class Meta(CompanySerializer.Meta):
@@ -144,6 +144,7 @@ class DNBCompanySerializer(CompanySerializer):
             'export_countries',
             'export_segment',
             'export_sub_segment',
+            'is_out_of_business',
         )
         read_only_fields = []
         dnb_read_only_fields = []
@@ -375,12 +376,14 @@ class DNBCompanyChangeRequestSerializer(serializers.Serializer):
                 'address_postcode': self.company.address_postcode,
             }
             if self.company.address_area:
-                existing_address_data.update({
-                    'address_area': {
-                        'name': self.company.address_area.name,
-                        'abbrev_name': self.company.address_area.area_code,
+                existing_address_data.update(
+                    {
+                        'address_area': {
+                            'name': self.company.address_area.name,
+                            'abbrev_name': self.company.address_area.area_code,
+                        },
                     },
-                })
+                )
             data['changes'] = {
                 **data['changes'],
                 **existing_address_data,
@@ -450,10 +453,7 @@ class DNBCompanyInvestigationSerializer(serializers.Serializer):
         """
         data = super().validate(data)
 
-        if (
-            data.get('domain') in (None, '')
-            and data.get('telephone_number') in (None, '')
-        ):
+        if data.get('domain') in (None, '') and data.get('telephone_number') in (None, ''):
             raise serializers.ValidationError(
                 'Either website or telephone_number must be provided.',
             )
