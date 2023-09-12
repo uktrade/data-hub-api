@@ -146,7 +146,8 @@ class TestPublicCompanySearch:
                         },
                     },
                     'uk_based': (
-                        company.address_country.id == uuid.UUID(
+                        company.address_country.id
+                        == uuid.UUID(
                             constants.Country.united_kingdom.value.id,
                         )
                     ),
@@ -176,8 +177,7 @@ class TestPublicCompanySearch:
                         'id': str(company.sector.id),
                         'name': company.sector.name,
                         'ancestors': [
-                            {'id': str(ancestor.id)}
-                            for ancestor in company.sector.get_ancestors()
+                            {'id': str(ancestor.id)} for ancestor in company.sector.get_ancestors()
                         ],
                     },
                     'turnover_range': {
@@ -189,6 +189,7 @@ class TestPublicCompanySearch:
                     'archived': False,
                     'archived_on': None,
                     'archived_reason': None,
+                    'is_global_ultimate': False,
                 },
             ],
         }
@@ -209,7 +210,6 @@ class TestPublicCompanySearch:
                 {},
                 ['abc defg ltd', 'abc defg us ltd', 'archived'],
             ),
-
             # archived True
             (
                 {
@@ -217,7 +217,6 @@ class TestPublicCompanySearch:
                 },
                 ['archived'],
             ),
-
             # archived False
             (
                 {
@@ -247,7 +246,6 @@ class TestPublicCompanySearch:
             ('his', 'whiskers and tabby'),
             ('ers', 'whiskers and tabby'),
             ('1a', '1a'),
-
             # trading names
             ('maine coon egyptian mau', 'whiskers and tabby'),
             ('maine', 'whiskers and tabby'),
@@ -255,7 +253,6 @@ class TestPublicCompanySearch:
             ('ine oon', 'whiskers and tabby'),
             ('ine mau', 'whiskers and tabby'),
             ('3a', '1a'),
-
             # non-matches
             ('whi lorem', None),
             ('wh', None),
@@ -329,6 +326,4 @@ class TestPublicCompanySearch:
 
             start = page * page_size
             end = start + page_size
-            assert [
-                UUID(company['id']) for company in response.data['results']
-            ] == ids[start:end]
+            assert [UUID(company['id']) for company in response.data['results']] == ids[start:end]

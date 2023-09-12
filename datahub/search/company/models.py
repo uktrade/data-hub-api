@@ -65,6 +65,7 @@ class Company(BaseSearchModel):
     one_list_tier = fields.id_name_field()
     number_of_employees = Integer()
     global_ultimate_duns_number = Keyword()
+    is_global_ultimate = Boolean()
 
     COMPUTED_MAPPINGS = {
         'address': partial(dict_utils.address_dict, prefix='address'),
@@ -105,6 +106,7 @@ class Company(BaseSearchModel):
         'uk_region': dict_utils.id_name_dict,
         'one_list_tier': dict_utils.id_name_dict,
         'global_ultimate_duns_number': dict_utils.empty_string_to_null,
+        'is_global_ultimate': bool,
     }
 
     SEARCH_FIELDS = (
