@@ -5,7 +5,7 @@ from django.db.models.fields import CharField
 from django.db.models.functions import Cast, Concat, Upper
 
 
-from opensearch_dsl import Search
+# from opensearch_dsl import Search
 
 from config.settings.types import HawkScope
 from datahub.company.models import Company as DBCompany, CompanyExportCountry
@@ -163,7 +163,9 @@ class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
                     'should'
                 ] = should_queries
 
-        return Search.from_dict(raw_query)
+#        return Search.from_dict(raw_query)
+        base_query.raw_query = raw_query
+        return base_query
 
 
 @register_v4_view(is_public=True)
