@@ -164,7 +164,7 @@ def schedule_jobs():
             function=schedule_sync_outdated_companies_with_dnb,
             function_kwargs={
                 'dnb_modified_on_before': dnb_modified_on_before,
-                'fields_to_update': ['global_ultimate_duns_number', 'is_out_of_business'],
+                'fields_to_update': ['global_ultimate_duns_number'],
                 'limit': settings.DAILY_HIERARCHY_ROLLOUT_LIMIT,
                 'simulate': False,
                 'max_requests': 5,
