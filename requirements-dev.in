@@ -12,7 +12,7 @@ freezegun==1.2.2
 requests-mock==1.11.0
 pip-tools==7.3.0
 piprot==0.9.11
-pre-commit==3.3.3
+pre-commit==3.4.0
 
 # Code static analysis
 flake8==6.1.0
