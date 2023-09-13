@@ -4,9 +4,6 @@ from django.db.models.expressions import Case, Value, When
 from django.db.models.fields import CharField
 from django.db.models.functions import Cast, Concat, Upper
 
-
-# from opensearch_dsl import Search
-
 from config.settings.types import HawkScope
 from datahub.company.models import Company as DBCompany, CompanyExportCountry
 from datahub.core.auth import PaaSIPAuthentication
@@ -159,12 +156,12 @@ class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
                             },
                         )
                         break
+                base_query.filter('terms', tags=['search', 'python'])
                 raw_query['query']['bool']['filter'][filter_index]['bool']['must'][index]['bool'][
                     'should'
                 ] = should_queries
 
-#        return Search.from_dict(raw_query)
-        base_query.raw_query = raw_query
+        base_query.update_from_dict(raw_query)
         return base_query
 
 
