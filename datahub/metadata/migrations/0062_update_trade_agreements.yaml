@@ -1,0 +1,6 @@
+- model: metadata.tradeagreement
+  pk: 22e09a18-135c-4d39-aac8-24a631663119
+  fields: { disabled_on: null, name: "UK-Australia Free Trade Agreement" }
+- model: metadata.tradeagreement
+  pk: a67b0cfe-56a4-468b-9811-cb57d8ee67d5
+  fields: { disabled_on: null, name: "UK-New Zealand Free Trade Agreement" }
