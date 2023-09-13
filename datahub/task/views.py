@@ -8,9 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSet
-from datahub.task.models import Task
+from datahub.task.models import InvestmentProjectTask, Task
 from datahub.task.permissions import IsAdviserPermittedToEditTask
-from datahub.task.serializers import TaskSerializer
+from datahub.task.serializers import InvestmentProjectTaskSerializer, TaskSerializer
 
 
 class TaskV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
@@ -34,3 +34,12 @@ class TaskV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
             queryset = queryset.filter(advisers__in=[advisers])
 
         return queryset
+
+
+class InvestmentProjectTaskV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    permission_classes = [IsAuthenticated]
+
+    serializer_class = InvestmentProjectTaskSerializer
+
+    queryset = InvestmentProjectTask.objects.all()

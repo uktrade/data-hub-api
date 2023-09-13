@@ -1,8 +1,9 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from datahub.company.serializers import NestedAdviserField
-from datahub.task.models import Task
+from datahub.company.serializers import NestedAdviserField, NestedRelatedField
+from datahub.task.models import InvestmentProjectTask, Task
+from datahub.investment.project.models import InvestmentProject
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -30,6 +31,25 @@ class TaskSerializer(serializers.ModelSerializer):
             'advisers',
             'archived',
             'archived_reason',
+            'archived_by',
+            'created_by',
+            'modified_by',
+        )
+
+
+class InvestmentProjectTaskSerializer(serializers.ModelSerializer):
+    task = TaskSerializer()
+    modified_by = NestedAdviserField(read_only=True)
+    archived_by = NestedAdviserField(read_only=True)
+    created_by = NestedAdviserField(read_only=True)
+    investment_project = NestedRelatedField(InvestmentProject)
+
+    class Meta:
+        model = InvestmentProjectTask
+        fields = (
+            'id',
+            'investment_project',
+            'task',
             'archived_by',
             'created_by',
             'modified_by',
