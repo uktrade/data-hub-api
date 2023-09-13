@@ -22,6 +22,13 @@ Task_v4_collection = TaskV4ViewSet.as_view(
     },
 )
 
+InvestmentProjectTask_v4_collection = InvestmentProjectTaskV4ViewSet.as_view(
+    {
+        'get': 'list',
+        'post': 'create',
+    },
+)
+
 contact_archive = TaskV4ViewSet.as_action_view('archive')
 
 urls_v4 = [
@@ -29,4 +36,6 @@ urls_v4 = [
     path('task/<uuid:pk>', Task_v4_item, name='item'),
     path('task/<uuid:pk>/archive', contact_archive, name='task_archive'),
     path('investmentprojecttask/<uuid:pk>', InvestmentProjectTask_v4_item, name='item'),
+    path('investmentprojecttask', InvestmentProjectTask_v4_collection, name='collection'),
 ]
+
