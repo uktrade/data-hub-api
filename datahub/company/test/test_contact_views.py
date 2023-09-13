@@ -144,6 +144,7 @@ class AddContactBase(APITestMixin):
             'archived_reason': None,
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
+            'valid_email': None,
         }
 
     def test_with_address_same_as_company(self):
@@ -404,6 +405,7 @@ class TestAddContactV4(AddContactBase):
                 'address_postcode': 'SW1A1AA',
                 'notes': 'lorem ipsum',
                 'accepts_dit_email_marketing': True,
+                'valid_email': True,
             },
         )
 
@@ -454,6 +456,7 @@ class TestAddContactV4(AddContactBase):
             'archived_reason': None,
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
+            'valid_email': True,
         }
 
     def test_fails_with_us_but_no_area(self):
@@ -525,6 +528,7 @@ class EditContactBase(APITestMixin):
                 url,
                 data={
                     'first_name': 'New Oratio',
+                    'valid_email': True,
                 },
             )
 
@@ -572,6 +576,7 @@ class EditContactBase(APITestMixin):
             'archived_reason': None,
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-19T13:25:30.986208Z',
+            'valid_email': True,
         }
 
     def test_cannot_update_if_archived(self):
@@ -717,6 +722,7 @@ class TestEditContactV4(EditContactBase):
                         'id': constants.AdministrativeArea.new_york.value.id,
                         'name': constants.AdministrativeArea.new_york.value.name,
                     },
+                    'valid_email': True,
                 },
             )
 
@@ -767,6 +773,7 @@ class TestEditContactV4(EditContactBase):
             'archived_reason': None,
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-19T13:25:30.986208Z',
+            'valid_email': True,
         }
 
     def test_try_to_remove_area(self):
@@ -902,6 +909,7 @@ class ViewContactBase(APITestMixin):
             address_country_id=constants.Country.united_states.value.id,
             address_postcode='YO22 4JU',
             notes='lorem ipsum',
+            valid_email=True,
         )
         url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
@@ -953,6 +961,7 @@ class ViewContactBase(APITestMixin):
             'archived_reason': None,
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
+            'valid_email': True,
         }
 
     def test_get_contact_without_view_document_permission(self):
@@ -1127,6 +1136,7 @@ class ContactListBase(APITestMixin):
             address_country_id=constants.Country.united_kingdom.value.id,
             address_postcode='SW1A1AA',
             notes='lorem ipsum',
+            valid_email=True,
         )
 
         url = reverse(f'{self.endpoint_namespace}:contact:list')
@@ -1180,6 +1190,7 @@ class ContactListBase(APITestMixin):
                         'id': constants.Title.admiral_of_the_fleet.value.id,
                         'name': constants.Title.admiral_of_the_fleet.value.name,
                     },
+                    'valid_email': True,
                 },
             ],
         }
