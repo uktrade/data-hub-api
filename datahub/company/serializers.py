@@ -171,6 +171,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
     archived_reason = serializers.CharField(read_only=True)
     archived_by = NestedAdviserField(read_only=True)
     primary = serializers.BooleanField()
+    valid_email = serializers.BooleanField(required=False, allow_null=True)
 
     def validate_email(self, value):
         """
@@ -209,6 +210,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             'primary',
             'full_telephone_number',
             'email',
+            'valid_email',
             'address_same_as_company',
             'address_1',
             'address_2',
