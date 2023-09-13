@@ -13,6 +13,7 @@ class TaskFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     created_on = now()
+    title = factory.Faker('company')
 
     archived = False
 

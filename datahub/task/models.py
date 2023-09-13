@@ -28,6 +28,10 @@ class Task(ArchivableModel, BaseModel):
         related_name='+',
     )
 
+    def __str__(self):
+        """Admin displayed human readable name."""
+        return self.title
+
 
 @reversion.register_base_model()
 class InvestmentProjectTask(BaseModel):
@@ -44,3 +48,7 @@ class InvestmentProjectTask(BaseModel):
         on_delete=models.CASCADE,
         related_name='task',
     )
+
+    def __str__(self):
+        """Admin displayed human readable name."""
+        return f'Investment project - {self.task.title}'
