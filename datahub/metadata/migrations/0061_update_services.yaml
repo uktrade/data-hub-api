@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: 346acc5a-1b45-4920-8620-29b1ea89b032
+  fields:
+    disabled_on:
+    order: 515.0
+    segment: South England Region (SER)
+    parent: f9dd5fc3-a33a-4024-b512-f345a51d295f
+    contexts: ["export_interaction", "export_service_delivery"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
