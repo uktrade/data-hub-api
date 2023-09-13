@@ -15,7 +15,7 @@ def load_trade_agreements(apps, _):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0062_update_services'),
+        ('metadata', '0062_update_trade_agreements'),
     ]
 
     operations = [
