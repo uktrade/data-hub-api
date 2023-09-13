@@ -18,9 +18,9 @@ attrs==22.2.0
     # via aiohttp
 bigtree==0.10.3
     # via -r requirements.in
-boto3==1.28.25
+boto3==1.28.44
     # via -r requirements.in
-botocore==1.31.25
+botocore==1.31.44
     # via
     #   boto3
     #   s3transfer
@@ -52,7 +52,7 @@ django==3.2.20
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==6.1.0
+django-axes==6.1.1
     # via -r requirements.in
 django-csp==3.7
     # via -r requirements.in
@@ -126,13 +126,13 @@ numpy==1.24.3
     # via pandas
 opensearch-dsl==2.1.0
     # via -r requirements.in
-opensearch-py==2.3.0
+opensearch-py==2.3.1
     # via
     #   -r requirements.in
     #   opensearch-dsl
 packaging==22.0
     # via marshmallow
-pandas==2.0.3
+pandas==2.1.0
     # via
     #   -r requirements.in
     #   bigtree
@@ -183,7 +183,7 @@ rq-scheduler==0.13.1
     # via -r requirements.in
 s3transfer==0.6.0
     # via boto3
-sentry-sdk==1.29.2
+sentry-sdk==1.30.0
     # via -r requirements.in
 simplejson==3.18.0
     # via mail-parser
