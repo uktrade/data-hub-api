@@ -23,6 +23,7 @@ ORDER_EXPIRY_PERIOD = relativedelta(years=7)
 INVESTOR_PROFILE_EXPIRY_PERIOD = relativedelta(years=10)
 COMPANY_EXPORT_EXPIRY_PERIOD = relativedelta(years=10)
 OBJECTIVE_EXPIRY_PERIOD = relativedelta(years=10)
+TASK_EXPIRY_PERIOD = relativedelta(years=10)
 
 
 class Command(BaseCleanupCommand):
@@ -241,6 +242,12 @@ class Command(BaseCleanupCommand):
             (
                 DatetimeLessThanCleanupFilter('created_on', OBJECTIVE_EXPIRY_PERIOD),
                 DatetimeLessThanCleanupFilter('modified_on', OBJECTIVE_EXPIRY_PERIOD),
+            ),
+        ),
+        'task.InvestmentProjectTask': ModelCleanupConfig(
+            (
+                DatetimeLessThanCleanupFilter('created_on', TASK_EXPIRY_PERIOD),
+                DatetimeLessThanCleanupFilter('modified_on', TASK_EXPIRY_PERIOD),
             ),
         ),
     }

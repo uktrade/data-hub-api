@@ -41,6 +41,6 @@ class InvestmentProjectTask(BaseModel):
     )
     investment_project = models.ForeignKey(
         InvestmentProject,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name='task',
     )

@@ -580,7 +580,7 @@ MAPPING = {
             },
             {
                 'factory': InvestmentProjectTaskFactory,
-                'field': 'investment_project_task',
+                'field': 'investment_project',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [{}],
             },

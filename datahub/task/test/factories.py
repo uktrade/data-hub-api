@@ -3,6 +3,7 @@ from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test.factories import to_many_field
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.task.models import InvestmentProjectTask, Task
 
 
@@ -16,7 +17,7 @@ class TaskFactory(factory.django.DjangoModelFactory):
     archived = False
 
     @to_many_field
-    def advisers(self):  # noqa: D102
+    def advisers(self):
         """
         Add support for setting `advisers`.
         """
@@ -32,6 +33,9 @@ class InvestmentProjectTaskFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     created_on = now()
+
+    task = factory.SubFactory(TaskFactory)
+    investment_project = factory.SubFactory(InvestmentProjectFactory)
 
     class Meta:
         model = InvestmentProjectTask
