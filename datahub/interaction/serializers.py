@@ -221,26 +221,6 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE)
         return value
 
-    def validate_were_countries_discussed(self, were_countries_discussed):
-        """
-        Make sure `were_countries_discussed` field is not being updated.
-        Updates are not allowed on this field.
-        """
-        if self.instance is None:
-            return were_countries_discussed
-
-        raise serializers.ValidationError(self.INVALID_FOR_UPDATE)
-
-    def validate_export_countries(self, export_countries):
-        """
-        Make sure `export_countries` field is not being updated.
-        updates are not allowed on this field.
-        """
-        if self.instance is None:
-            return export_countries
-
-        raise serializers.ValidationError(self.INVALID_FOR_UPDATE)
-
     def to_internal_value(self, data):
         """
         Add support for both `company` and `companies` field.
@@ -374,10 +354,9 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
     def _save_export_countries(self, interaction, validated_export_countries):
         """
         Adds export countries related to an interaction.
-        Update is not allowed yet.
-        An attempt to update will result in `NotImplementedError` exception.
 
-        Syncs interaction export countries into company export countries.
+        Syncs interaction export countries into company export countries
+        when interaction is created.
         """
         existing_country_mapping = {
             export_country.country: export_country
@@ -391,24 +370,29 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
         for new_country, export_data in new_country_mapping.items():
             status = export_data['status']
             if new_country in existing_country_mapping:
-                # TODO: updates are not supported yet
-                raise NotImplementedError()
+                continue
             InteractionExportCountry.objects.create(
                 country=new_country,
                 interaction=interaction,
                 status=status,
                 created_by=interaction.created_by,
             )
-            # Sync company_CompanyExportCountry model
-            # NOTE: current date is preferred over future interaction date
-            current_date = now()
-            record_date = current_date if interaction.date > current_date else interaction.date
-            interaction.company.add_export_country(
-                new_country,
-                status,
-                record_date,
-                interaction.created_by,
-            )
+            if not existing_country_mapping:
+                # Sync company_CompanyExportCountry model
+                # NOTE: current date is preferred over future interaction date
+                current_date = now()
+                record_date = current_date if interaction.date > current_date else interaction.date
+                interaction.company.add_export_country(
+                    new_country,
+                    status,
+                    record_date,
+                    interaction.created_by,
+                )
+        existing_country_ids = [item.country.id for item in interaction.export_countries.all()]
+        new_country_ids = [item['country'].id for item in validated_export_countries]
+        country_ids_delta = list(set(existing_country_ids) - set(new_country_ids))
+
+        interaction.export_countries.filter(country_id__in=country_ids_delta).delete()
 
 
 class InteractionSerializer(BaseInteractionSerializer):
