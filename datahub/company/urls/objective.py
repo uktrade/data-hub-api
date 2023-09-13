@@ -21,6 +21,7 @@ Objective_v4_item = SingleObjectiveV4ViewSet.as_view(
     },
 )
 
+objective_archive = SingleObjectiveV4ViewSet.as_action_view('archive')
 
 urls_v4 = [
     path('company/<uuid:company_id>/objective', Objective_v4_collection, name='list'),
@@ -30,4 +31,9 @@ urls_v4 = [
         name='count',
     ),
     path('company/<uuid:company_id>/objective/<uuid:pk>', Objective_v4_item, name='detail'),
+    path(
+        'company/objective/<uuid:pk>/archive',
+        objective_archive,
+        name='archive',
+    ),
 ]

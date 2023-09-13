@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.models import Objective
-from datahub.company.test.factories import CompanyFactory, ObjectiveFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ObjectiveFactory
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
@@ -12,39 +12,41 @@ from datahub.core.test_utils import (
 )
 
 
-class TestGettingObjectivesForCompany(APITestMixin):
-    """Tests to retrieve a single objective for a company."""
-
-    def test_company_has_no_objectives(self):
+class BaseObjectivesTests(APITestMixin):
+    def user_api_client(self):
+        """Create an api client where the user is the authenticated user"""
         user = create_test_user(
             permission_codenames=(
                 'view_company',
                 'view_objective',
             ),
         )
+        return self.create_api_client(user)
+
+    def adviser_api_client(self, adviser):
+        """Create an api client where the adviser is the authenticated user"""
+        return self.create_api_client(user=adviser)
+
+
+class TestGettingObjectivesForCompany(BaseObjectivesTests):
+    """Tests to retrieve a single objective for a company."""
+
+    def test_company_has_no_objectives(self):
         company = CompanyFactory()
         url = reverse('api-v4:objective:list', kwargs={'company_id': company.id})
-        api_client = self.create_api_client(user=user)
-        response = api_client.get(url)
+        response = self.user_api_client().get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['count'] == 0
 
     def test_company_has_objectives(self):
-        user = create_test_user(
-            permission_codenames=(
-                'view_company',
-                'view_objective',
-            ),
-        )
         ObjectiveFactory()
         objective1 = ObjectiveFactory()
         ObjectiveFactory()
         objective2 = ObjectiveFactory(company=objective1.company)
 
         url = reverse('api-v4:objective:list', kwargs={'company_id': objective1.company.id})
-        api_client = self.create_api_client(user=user)
-        response = api_client.get(url)
+        response = self.user_api_client().get(url)
 
         expected_ids = {str(objective1.id), str(objective2.id)}
         actual_ids = {result['id'] for result in response.json()['results']}
@@ -53,13 +55,6 @@ class TestGettingObjectivesForCompany(APITestMixin):
         assert response.json()['count'] == 2
 
     def test_company_objectives_default_ordering(self):
-        user = create_test_user(
-            permission_codenames=(
-                'view_company',
-                'view_objective',
-            ),
-        )
-
         latest_objective = ObjectiveFactory(target_date='2030-06-06')
         middle_objective = ObjectiveFactory(
             company=latest_objective.company,
@@ -74,8 +69,7 @@ class TestGettingObjectivesForCompany(APITestMixin):
             'api-v4:objective:list',
             kwargs={'company_id': earliest_objective.company.id},
         )
-        api_client = self.create_api_client(user=user)
-        response = api_client.get(url)
+        response = self.user_api_client().get(url)
 
         expected_ids = {
             str(earliest_objective.id),
@@ -89,13 +83,6 @@ class TestGettingObjectivesForCompany(APITestMixin):
 
     @pytest.mark.parametrize('archived', ((True), (False), (None)))
     def test_company_objectives_archived_filtering(self, archived):
-        user = create_test_user(
-            permission_codenames=(
-                'view_company',
-                'view_objective',
-            ),
-        )
-
         archived_objective = ObjectiveFactory(archived=True)
         not_archived_objective = ObjectiveFactory(
             company=archived_objective.company,
@@ -106,8 +93,7 @@ class TestGettingObjectivesForCompany(APITestMixin):
             'api-v4:objective:list',
             kwargs={'company_id': archived_objective.company.id},
         )
-        api_client = self.create_api_client(user=user)
-        response = api_client.get(f'{url}?archived={archived}')
+        response = self.user_api_client().get(f'{url}?archived={archived}')
 
         expected_ids = (
             {str(archived_objective.id), str(not_archived_objective.id)}
@@ -175,22 +161,15 @@ class TestAmendCompanyObjective(APITestMixin):
         assert objective.subject != database_objective.progress
 
 
-class TestGettingASingleObjective(APITestMixin):
+class TestGettingASingleObjective(BaseObjectivesTests):
     def test_view_objective(self):
-        user = create_test_user(
-            permission_codenames=(
-                'view_company',
-                'view_objective',
-            ),
-        )
         objective1 = ObjectiveFactory()
 
         url = reverse(
             'api-v4:objective:detail',
             kwargs={'company_id': objective1.company.id, 'pk': objective1.id},
         )
-        api_client = self.create_api_client(user=user)
-        response = api_client.get(url)
+        response = self.user_api_client().get(url)
 
         expected_response = {
             'id': str(objective1.id),
@@ -206,7 +185,12 @@ class TestGettingASingleObjective(APITestMixin):
             'archived_on': None,
             'archived_reason': None,
             'created_on': format_date_or_datetime(objective1.created_on),
-            'modified_by': None,
+            'modified_by': {
+                'id': str(objective1.modified_by.id),
+                'first_name': objective1.modified_by.first_name,
+                'last_name': objective1.modified_by.last_name,
+                'name': objective1.modified_by.name,
+            },
             'modified_on': format_date_or_datetime(objective1.modified_on),
         }
 
@@ -214,41 +198,62 @@ class TestGettingASingleObjective(APITestMixin):
         assert response.json() == expected_response
 
 
-class TestGettingObjectivesArchivedCountForCompany(APITestMixin):
+class TestGettingObjectivesArchivedCountForCompany(BaseObjectivesTests):
     """Tests to retrieve the archived count of objectives"""
 
     def test_company_has_no_objectives(self):
-        user = create_test_user(
-            permission_codenames=(
-                'view_company',
-                'view_objective',
-            ),
-        )
         company = CompanyFactory()
         url = reverse('api-v4:objective:count', kwargs={'company_id': company.id})
-        api_client = self.create_api_client(user=user)
-        response = api_client.get(url)
+        response = self.user_api_client().get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {'archived_count': 0, 'not_archived_count': 0}
 
     def test_company_has_objectives(self):
-        user = create_test_user(
-            permission_codenames=(
-                'view_company',
-                'view_objective',
-            ),
-        )
         company = CompanyFactory()
         archived_objectives = ObjectiveFactory.create_batch(3, company=company, archived=True)
         not_archived_objectives = ObjectiveFactory.create_batch(5, company=company, archived=False)
 
         url = reverse('api-v4:objective:count', kwargs={'company_id': company.id})
-        api_client = self.create_api_client(user=user)
-        response = api_client.get(url)
+        response = self.user_api_client().get(url)
 
         assert response.json() == {
             'archived_count': len(archived_objectives),
             'not_archived_count': len(not_archived_objectives),
         }
         assert response.status_code == status.HTTP_200_OK
+
+
+class TestArchiveObjective(BaseObjectivesTests):
+    """Test the archive POST endpoint for objective"""
+
+    def test_archive_objective_without_reason_returns_bad_request(self):
+        objective = ObjectiveFactory()
+
+        url = reverse('api-v4:objective:archive', kwargs={'pk': objective.id})
+
+        response = self.user_api_client().post(url, data={})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'reason': ['This field is required.'],
+        }
+
+    def test_archive_objective_with_valid_reason_returns_success(self):
+        adviser = AdviserFactory()
+        objective = ObjectiveFactory(created_by=adviser)
+
+        url = reverse('api-v4:objective:archive', kwargs={'pk': objective.id})
+
+        response = self.adviser_api_client(adviser).post(url, data={'reason': 'completed'})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['archived']
+        assert response.data['archived_by'] == {
+            'id': str(adviser.id),
+            'first_name': adviser.first_name,
+            'last_name': adviser.last_name,
+            'name': adviser.name,
+        }
+        assert response.data['archived_reason'] == 'completed'
+        assert response.data['id'] == str(objective.id)

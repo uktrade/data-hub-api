@@ -307,5 +307,11 @@ class ObjectiveFactory(factory.django.DjangoModelFactory):
         step=10,
     )
 
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SelfAttribute('created_by')
+    created_on = now()
+
+    archived = False
+
     class Meta:
         model = 'company.Objective'
