@@ -1799,6 +1799,79 @@ class TestAddInteraction(APITestMixin):
             'investment_project': ['This field is required.'],
         }
 
+    @freeze_time('2017-04-18 13:25:30.986208')
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
+    def test_add_export_countries_interaction_without_existing_country_mapping(self, permissions):
+        """
+        Test that a user can update the interaction
+        when the interaction without existing export country set
+        """
+        adviser = create_test_user(
+            permission_codenames=permissions, dit_team=TeamFactory(),
+        )
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        communication_channel = random_obj_for_model(CommunicationChannel)
+
+        url = reverse('api-v4:interaction:collection')
+        request_data = {
+            'kind': Interaction.Kind.INTERACTION,
+            'communication_channel': communication_channel.pk,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_participants': [
+                {'adviser': adviser.pk},
+            ],
+            'company': company.pk,
+            'contacts': [contact.pk],
+            'service': Service.inbound_referral.value.id,
+            'was_policy_feedback_provided': False,
+            'theme': Interaction.Theme.EXPORT,
+            'were_countries_discussed': True,
+            'export_countries': [
+                {
+                    'country': {
+                        'id': Country.canada.value.id,
+                    },
+                    'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                },
+                {
+                    'country': {
+                        'id': Country.japan.value.id,
+                    },
+                    'status': CompanyExportCountry.Status.FUTURE_INTEREST,
+                },
+                {
+                    'country': {
+                        'id': Country.azerbaijan.value.id,
+                    },
+                    'status': CompanyExportCountry.Status.NOT_INTERESTED,
+                },
+            ],
+            'has_related_trade_agreements': True,
+            'related_trade_agreements': ['50cf99fd-1150-421d-9e1c-b23750ebf5ca'],
+        }
+
+        api_client = self.create_api_client(user=adviser)
+        response = api_client.post(url, request_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+        export_countries = company.export_countries.all()
+        assert export_countries.count() == 3
+
+        assert str(export_countries[0].country.id) == Country.canada.value.id
+        currently_exporting = CompanyExportCountry.Status.CURRENTLY_EXPORTING
+        assert export_countries[0].status == currently_exporting
+
+        assert str(export_countries[1].country.id) == Country.japan.value.id
+        future_interest = CompanyExportCountry.Status.FUTURE_INTEREST
+        assert export_countries[1].status == future_interest
+
+        assert str(export_countries[2].country.id) == Country.azerbaijan.value.id
+        not_interested = CompanyExportCountry.Status.NOT_INTERESTED
+        assert export_countries[2].status == not_interested
+
 
 class TestGetInteraction(APITestMixin):
     """Tests for the get interaction view."""
@@ -2294,180 +2367,58 @@ class TestUpdateInteraction(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == error_response
 
-    @pytest.mark.parametrize(
-        'data,error_response',
-        (
-            (
-                {
-                    'were_countries_discussed': False,
-                },
-                {
-                    'were_countries_discussed': [
-                        'This field is invalid for interaction updates.',
-                    ],
-                },
-            ),
-            (
-                {
-                    'were_countries_discussed': True,
-                    'export_countries': [
-                        {
-                            'country': {
-                                'id': Country.greece.value.id,
-                            },
-                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-                        },
-                    ],
-                },
-                {
-                    'were_countries_discussed': [
-                        'This field is invalid for interaction updates.',
-                    ],
-                    'export_countries': [
-                        'This field is invalid for interaction updates.',
-                    ],
-                },
-            ),
-            (
-                {
-                    'export_countries': [
-                        {
-                            'country': {
-                                'id': Country.greece.value.id,
-                            },
-                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-                        },
-                    ],
-                },
-                {
-                    'export_countries': [
-                        'This field is invalid for interaction updates.',
-                    ],
-                },
-            ),
-        ),
-    )
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
-    @pytest.mark.parametrize('flag', ((True, False)))
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_clean_interaction_update_export_countries_validation_error(
-        self,
-        permissions,
-        data,
-        error_response,
-        flag,
-    ):
-        """
-        Test that a user can't update export countries in an interaction
-        when the interaction doesn't have any export countries.
-        """
-        requester = create_test_user(permission_codenames=permissions)
-        interaction = CompanyInteractionFactory(
-            subject='I am a subject',
-            theme=Interaction.Theme.EXPORT,
-        )
-
-        assert (
-            len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) == 0
-        )
-
-        api_client = self.create_api_client(user=requester)
-        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
-        data = resolve_data(data)
-        response = api_client.patch(url, data=data)
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == error_response
-
-    @pytest.mark.parametrize(
-        'data,error_response',
-        (
-            (
-                {
-                    'were_countries_discussed': False,
-                },
-                {
-                    'were_countries_discussed': [
-                        'This field is invalid for interaction updates.',
-                    ],
-                },
-            ),
-            (
-                {
-                    'were_countries_discussed': True,
-                    'export_countries': [
-                        {
-                            'country': {
-                                'id': Country.greece.value.id,
-                            },
-                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-                        },
-                    ],
-                },
-                {
-                    'were_countries_discussed': [
-                        'This field is invalid for interaction updates.',
-                    ],
-                    'export_countries': [
-                        'This field is invalid for interaction updates.',
-                    ],
-                },
-            ),
-            (
-                {
-                    'export_countries': [
-                        {
-                            'country': {
-                                'id': Country.greece.value.id,
-                            },
-                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-                        },
-                    ],
-                },
-                {
-                    'export_countries': [
-                        'This field is invalid for interaction updates.',
-                    ],
-                },
-            ),
-        ),
-    )
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
-    @pytest.mark.parametrize('flag', ((True, False)))
-    @freeze_time('2017-04-18 13:25:30.986208')
-    def test_update_export_countries_validation_error(
-        self,
-        permissions,
-        data,
-        error_response,
-        flag,
-    ):
+    def test_update_export_countries_interaction_with_existing_country_mapping(self, permissions):
         """
-        Test that a user can't update export countries in an interaction
-        when the interaction already has export countries set.
+        Test that a user can update the interaction
+        when the interaction with existing export country
         """
-        requester = create_test_user(permission_codenames=permissions)
-        interaction = ExportCountriesInteractionFactory(
-            export_countries__country_id=Country.canada.value.id,
-            export_countries__status=CompanyExportCountry.Status.NOT_INTERESTED,
+        adviser = create_test_user(
+            permission_codenames=permissions, dit_team=TeamFactory(),
         )
+        interaction = ExportCountriesInteractionFactory()
+        export_countries = interaction.export_countries.all()
+        assert export_countries.count() == 1
 
-        assert (
-            len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) > 0
-        )
+        request_data = {
+            'export_countries': [
+                {
+                    'country': {
+                        'id': Country.anguilla.value.id,
+                    },
+                    'status': str(CompanyExportCountry.Status.NOT_INTERESTED),
+                },
+                {
+                    'country': {
+                        'id': Country.argentina.value.id,
+                    },
+                    'status': str(CompanyExportCountry.Status.FUTURE_INTEREST),
+                },
+                {
+                    'country': {
+                        'id': Country.france.value.id,
+                    },
+                    'status': str(CompanyExportCountry.Status.CURRENTLY_EXPORTING),
+                },
+            ],
+        }
 
-        api_client = self.create_api_client(user=requester)
-        url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
-        data = resolve_data(data)
-        response = api_client.patch(url, data=data)
+        update_url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
+        api_client = self.create_api_client(user=adviser)
+        response = api_client.patch(update_url, data=request_data)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == error_response
+        assert response.status_code == status.HTTP_200_OK
 
-    @pytest.mark.parametrize('flag', ((True, False)))
+        export_countries = interaction.export_countries.all().order_by('country__name')
+        assert request_data['export_countries'] == [
+            {'country': {'id': str(export_country.country.id)}, 'status': export_country.status}
+            for export_country in export_countries
+        ]
+
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_update_interaction_when_export_countries_set(self, permissions, flag):
+    def test_update_interaction_when_export_countries_set(self, permissions):
         """
         Test that a user can update the interaction otherwise
         when the interaction already has export countries set
