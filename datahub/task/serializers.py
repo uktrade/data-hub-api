@@ -2,8 +2,8 @@ from django.conf import settings
 from rest_framework import serializers
 
 from datahub.company.serializers import NestedAdviserField, NestedRelatedField
-from datahub.task.models import InvestmentProjectTask, Task
 from datahub.investment.project.models import InvestmentProject
+from datahub.task.models import InvestmentProjectTask, Task
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 

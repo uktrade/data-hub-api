@@ -1,3 +1,7 @@
+from abc import ABC, abstractmethod
+
+from django.db import transaction
+
 from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
@@ -6,7 +10,6 @@ from django_filters.rest_framework import (
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 
-from django.db import transaction
 
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSet
@@ -17,7 +20,10 @@ from datahub.task.serializers import InvestmentProjectTaskSerializer, TaskSerial
 
 class BaseTaskV4ViewSet(CoreViewSet):
     def get_base_task_queryset(self, request):
-        """Get the base task query that filters all task objects using common filters from the query params"""
+        """
+        Get the base task query that filters all task objects using common filters from the
+        query params
+        """
         queryset = Task.objects.all().prefetch_related('advisers')
 
         archived = request.query_params.get('archived')
@@ -31,10 +37,14 @@ class BaseTaskV4ViewSet(CoreViewSet):
         return queryset
 
 
-class BaseTaskTypeV4ViewSet(BaseTaskV4ViewSet):
+class BaseTaskTypeV4ViewSet(BaseTaskV4ViewSet, ABC):
     task_type_model_class = None
 
-    def get_filtered_by_type(self, request):
+    def get_filtered_task_by_type(self, request):
+        """
+        Get a list of get_filtered_by_type objects filtered by the list of tasks matching
+        the common filters
+        """
         tasks = self.get_base_task_queryset(request)
         task_query_model_queryset = self.task_type_model_class.objects.filter(
             task__in=tasks,
@@ -42,15 +52,25 @@ class BaseTaskTypeV4ViewSet(BaseTaskV4ViewSet):
         return task_query_model_queryset
 
     def perform_create(self, serializer):
+        """
+        Override the default save functionality of the serializer to allow custom saving of a Task
+        and associated task models
+        """
         self.save_model(serializer)
 
     @transaction.atomic
     def save_model(self, serializer):
+        """
+        Create and save both the Task model and the task_type_model_class in a single transaction.
+        If either fail neither is added to django
+        """
         extra_data = self.get_additional_data(True)
 
         task = self.create_and_save_task(serializer, extra_data)
         task_type_object = self.create_and_save_task_type_model(
-            serializer.validated_data, task, extra_data
+            serializer.validated_data,
+            task,
+            extra_data,
         )
 
         serializer.validated_data.update(extra_data)
@@ -58,13 +78,21 @@ class BaseTaskTypeV4ViewSet(BaseTaskV4ViewSet):
             {
                 'id': task_type_object.id,
                 'created_on': task_type_object.created_on,
-            }
+            },
         )
 
+    @abstractmethod
     def create_and_save_task_type_model(self, validated_data, task, extra_data):
+        """
+        Create a new object of type task_type_model_class and save it. This new object will assign
+        the task provided
+        """
         return None
 
     def create_and_save_task(self, serializer, extra_data):
+        """
+        Create a new Task object and save it
+        """
         many_to_many_fields = ['advisers']
         # Many to many fields cannot be created automatically using the objects.create syntax.
         # They need to be added later using a set()
@@ -75,7 +103,7 @@ class BaseTaskTypeV4ViewSet(BaseTaskV4ViewSet):
         advisers = task_data['advisers']
 
         task = Task.objects.create(
-            **{k: v for k, v in task_data.items() if k not in many_to_many_fields}
+            **{k: v for k, v in task_data.items() if k not in many_to_many_fields},
         )
         task.advisers.set(advisers)
         task.save()
@@ -97,6 +125,10 @@ class TaskV4ViewSet(ArchivableViewSetMixin, BaseTaskV4ViewSet):
 
 
 class InvestmentProjectTaskV4ViewSet(BaseTaskTypeV4ViewSet):
+    """
+    View for InvestmentProjectTask
+    """
+
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     permission_classes = [IsAuthenticated]
 
@@ -105,13 +137,13 @@ class InvestmentProjectTaskV4ViewSet(BaseTaskTypeV4ViewSet):
     task_type_model_class = InvestmentProjectTask
 
     def get_queryset(self):
-        filtered_investment_projects = super().get_filtered_by_type(self.request)
+        filtered_investment_projects = super().get_filtered_task_by_type(self.request)
 
         investment_project_id = self.request.query_params.get('investment_project')
 
         if investment_project_id is not None:
             filtered_investment_projects = filtered_investment_projects.filter(
-                investment_project_id=investment_project_id
+                investment_project_id=investment_project_id,
             )
 
         return filtered_investment_projects
@@ -120,6 +152,8 @@ class InvestmentProjectTaskV4ViewSet(BaseTaskTypeV4ViewSet):
         investment_project_data = validated_data['investment_project']
 
         investment_project_task = self.task_type_model_class.objects.create(
-            task=task, investment_project=investment_project_data, **extra_data
+            task=task,
+            investment_project=investment_project_data,
+            **extra_data,
         )
         return investment_project_task

@@ -1,5 +1,7 @@
 from uuid import uuid4
 
+import factory
+
 from django.utils.timezone import now
 
 from faker import Faker
@@ -14,7 +16,7 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
 )
 
-from datahub.task.test.factories import TaskFactory
+from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
 
 
 class BaseTaskTests(APITestMixin):
@@ -23,67 +25,91 @@ class BaseTaskTests(APITestMixin):
         return self.create_api_client(user=adviser)
 
 
+class BaseListTaskTests(BaseTaskTests):
+    reverse_url = None
+    task_type_factory = None
+
+    def test_get_all_tasks_returns_empty_when_no_tasks_exist(self):
+        url = reverse(self.reverse_url)
+        response = self.api_client.get(url).json()
+        assert response == {
+            'count': 0,
+            'next': None,
+            'previous': None,
+            'results': [],
+        }
+
+    def test_get_all_tasks_returns_not_archived_tasks(self):
+        TaskFactory(archived=True)
+        not_archived_task = TaskFactory(archived=False)
+        id = not_archived_task.id
+
+        if self.task_type_factory:
+            task_type = self.task_type_factory(task=not_archived_task)
+            id = task_type.id
+
+        url = f'{reverse(self.reverse_url)}?archived=false'
+
+        response = self.api_client.get(url).json()
+        assert response['count'] == 1
+        assert response['results'][0]['id'] == str(id)
+
+    def test_get_all_tasks_returns_archived_tasks(self):
+        archived_task = TaskFactory(archived=True)
+        TaskFactory(archived=False)
+        id = archived_task.id
+
+        if self.task_type_factory:
+            task_type = self.task_type_factory(task=archived_task)
+            id = task_type.id
+
+        url = f'{reverse(self.reverse_url)}?archived=true'
+
+        response = self.api_client.get(url).json()
+        assert response['count'] == 1
+        assert response['results'][0]['id'] == str(id)
+
+    def test_get_all_tasks_returns_tasks_belonging_to_an_adviser(self):
+        adviser = AdviserFactory()
+        adviser_tasks = TaskFactory.create_batch(2, advisers=[adviser])
+        TaskFactory.create_batch(3)
+        task_ids = [str(x.id) for x in adviser_tasks]
+
+        if self.task_type_factory:
+            task_types = self.task_type_factory.create_batch(
+                2,
+                task=factory.Iterator(adviser_tasks),
+            )
+            task_ids = [str(x.id) for x in task_types]
+
+        url = f'{reverse(self.reverse_url)}?advisers={adviser.id}'
+
+        response = self.api_client.get(url).json()
+        assert response['count'] == len(adviser_tasks)
+
+        for result in response['results']:
+            assert result['id'] in task_ids
+
+    def test_get_all_tasks_returns_no_tasks_when_adviser_has_no_assigned_tasks(self):
+        adviser = AdviserFactory()
+        TaskFactory.create_batch(3)
+
+        url = f'{reverse(self.reverse_url)}?advisers={adviser.id}'
+
+        response = self.api_client.get(url).json()
+        assert response == {
+            'count': 0,
+            'next': None,
+            'previous': None,
+            'results': [],
+        }
+
+
 class TestTaskV4ViewSet:
-    class TestListTask(APITestMixin):
+    class TestListTask(BaseListTaskTests):
         """Test the LIST task endpoint"""
 
-        def test_get_all_tasks_returns_empty_when_no_tasks_exist(self):
-            url = reverse('api-v4:task:collection')
-            response = self.api_client.get(url).json()
-            assert response == {
-                'count': 0,
-                'next': None,
-                'previous': None,
-                'results': [],
-            }
-
-        def test_get_all_tasks_returns_not_archived_tasks(self):
-            TaskFactory(archived=True)
-            not_archived_task = TaskFactory(archived=False)
-
-            url = f'{reverse("api-v4:task:collection")}?archived=false'
-
-            response = self.api_client.get(url).json()
-            assert response['count'] == 1
-            assert response['results'][0]['id'] == str(not_archived_task.id)
-
-        def test_get_all_tasks_returns_archived_tasks(self):
-            archived_task = TaskFactory(archived=True)
-            TaskFactory(archived=False)
-
-            url = f'{reverse("api-v4:task:collection")}?archived=true'
-
-            response = self.api_client.get(url).json()
-            assert response['count'] == 1
-            assert response['results'][0]['id'] == str(archived_task.id)
-
-        def test_get_all_tasks_returns_tasks_belonging_to_an_adviser(self):
-            adviser = AdviserFactory()
-            adviser_tasks = TaskFactory.create_batch(2, advisers=[adviser])
-            TaskFactory.create_batch(3)
-
-            url = f'{reverse("api-v4:task:collection")}?advisers={adviser.id}'
-
-            response = self.api_client.get(url).json()
-            assert response['count'] == len(adviser_tasks)
-            task_ids = [str(x.id) for x in adviser_tasks]
-
-            for result in response['results']:
-                assert result['id'] in task_ids
-
-        def test_get_all_tasks_returns_no_tasks_when_adviser_has_no_assigned_tasks(self):
-            adviser = AdviserFactory()
-            TaskFactory.create_batch(3)
-
-            url = f'{reverse("api-v4:task:collection")}?advisers={adviser.id}'
-
-            response = self.api_client.get(url).json()
-            assert response == {
-                'count': 0,
-                'next': None,
-                'previous': None,
-                'results': [],
-            }
+        reverse_url = 'api-v4:task:collection'
 
     class TestGetTask(APITestMixin):
         """Test the GET task endpoint"""
@@ -397,3 +423,11 @@ class TestTaskV4ViewSet:
             }
             assert response.data['archived_reason'] == 'completed'
             assert response.data['id'] == str(task.id)
+
+
+class TestInvestmentProjectTaskV4ViewSet:
+    class TestListInvestmentProjectTask(BaseListTaskTests):
+        """Test the LIST investment project task endpoint"""
+
+        reverse_url = 'api-v4:task:investment_project_task_collection'
+        task_type_factory = InvestmentProjectTaskFactory
