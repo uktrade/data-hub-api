@@ -27,6 +27,8 @@ from datahub.reminder.models import (
     ReminderStatus,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
+    UpcomingTaskReminder,
+    UpcomingTaskSubscription,
 )
 from datahub.reminder.serializers import (
     NewExportInteractionReminderSerializer,
@@ -37,6 +39,8 @@ from datahub.reminder.serializers import (
     NoRecentInvestmentInteractionSubscriptionSerializer,
     UpcomingEstimatedLandDateReminderSerializer,
     UpcomingEstimatedLandDateSubscriptionSerializer,
+    UpcomingTaskReminderSerializer,
+    UpcomingTaskSubscriptionSerializer,
 )
 
 
@@ -77,6 +81,11 @@ class UpcomingEstimatedLandDateSubscriptionViewset(BaseSubscriptionViewset):
     queryset = UpcomingEstimatedLandDateSubscription.objects.all()
 
 
+class UpcomingTaskSubscriptionViewset(BaseSubscriptionViewset):
+    serializer_class = UpcomingTaskSubscriptionSerializer
+    queryset = UpcomingTaskSubscription.objects.all()
+
+
 @transaction.non_atomic_requests
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -106,13 +115,19 @@ def reminder_subscription_summary_view(request):
     new_export_interaction = NewExportInteractionSubscriptionSerializer(
         get_object(NewExportInteractionSubscription.objects.all()),
     ).data
+    upcoming_task = UpcomingTaskSubscriptionSerializer(
+        get_object(UpcomingTaskSubscription.objects.all()),
+    ).data
 
-    return Response({
-        'estimated_land_date': estimated_land_date,
-        'no_recent_investment_interaction': no_recent_investment_interaction,
-        'no_recent_export_interaction': no_recent_export_interaction,
-        'new_export_interaction': new_export_interaction,
-    })
+    return Response(
+        {
+            'estimated_land_date': estimated_land_date,
+            'no_recent_investment_interaction': no_recent_investment_interaction,
+            'no_recent_export_interaction': no_recent_export_interaction,
+            'new_export_interaction': new_export_interaction,
+            'upcoming_task': upcoming_task,
+        }
+    )
 
 
 class BaseReminderViewset(viewsets.GenericViewSet, ListModelMixin, DestroyModelMixin):
@@ -148,6 +163,11 @@ class NoRecentInvestmentInteractionReminderViewset(BaseReminderViewset):
 class UpcomingEstimatedLandDateReminderViewset(BaseReminderViewset):
     serializer_class = UpcomingEstimatedLandDateReminderSerializer
     model_class = UpcomingEstimatedLandDateReminder
+
+
+class UpcomingTaskReminderViewset(BaseReminderViewset):
+    serializer_class = UpcomingTaskReminderSerializer
+    model_class = UpcomingTaskReminder
 
 
 @transaction.non_atomic_requests
@@ -188,23 +208,33 @@ def reminder_summary_view(request):
         no_recent_export_interaction = 0
         new_export_interaction = 0
 
-    total_count = sum([
-        estimated_land_date,
-        no_recent_investment_interaction,
-        outstanding_propositions,
-        no_recent_export_interaction,
-        new_export_interaction,
-    ])
+    upcoming_task = UpcomingTaskReminder.objects.filter(
+        adviser=request.user,
+    ).count()
 
-    return Response({
-        'count': total_count,
-        'investment': {
-            'estimated_land_date': estimated_land_date,
-            'no_recent_interaction': no_recent_investment_interaction,
-            'outstanding_propositions': outstanding_propositions,
-        },
-        'export': {
-            'no_recent_interaction': no_recent_export_interaction,
-            'new_interaction': new_export_interaction,
-        },
-    })
+    total_count = sum(
+        [
+            estimated_land_date,
+            no_recent_investment_interaction,
+            outstanding_propositions,
+            no_recent_export_interaction,
+            new_export_interaction,
+            upcoming_task,
+        ]
+    )
+
+    return Response(
+        {
+            'count': total_count,
+            'investment': {
+                'estimated_land_date': estimated_land_date,
+                'no_recent_interaction': no_recent_investment_interaction,
+                'outstanding_propositions': outstanding_propositions,
+            },
+            'export': {
+                'no_recent_interaction': no_recent_export_interaction,
+                'new_interaction': new_export_interaction,
+            },
+            'upcoming_task': upcoming_task,
+        }
+    )
