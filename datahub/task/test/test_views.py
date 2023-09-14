@@ -431,3 +431,78 @@ class TestInvestmentProjectTaskV4ViewSet:
 
         reverse_url = 'api-v4:task:investment_project_task_collection'
         task_type_factory = InvestmentProjectTaskFactory
+
+    class TestGetInvestmentProjectTask(APITestMixin):
+        """Test the GET investment project task endpoint"""
+
+        def test_get_task_return_404_when_task_id_unknown(self):
+            InvestmentProjectTaskFactory()
+
+            url = reverse(
+                'api-v4:task:investment_project_task_item',
+                kwargs={'pk': uuid4()},
+            )
+            response = self.api_client.get(url)
+            assert response.status_code == status.HTTP_404_NOT_FOUND
+
+        def test_get_task_return_task_when_task_id_valid(self):
+            investment_task = InvestmentProjectTaskFactory()
+            url = reverse(
+                'api-v4:task:investment_project_task_item',
+                kwargs={'pk': investment_task.id},
+            )
+            response = self.api_client.get(url).json()
+            expected_response = {
+                "id": str(investment_task.id),
+                "investment_project": {
+                    "name": investment_task.investment_project.name,
+                    "id": str(investment_task.investment_project.id),
+                },
+                'task': {
+                    'id': str(investment_task.task.id),
+                    'title': investment_task.task.title,
+                    'description': investment_task.task.description,
+                    'due_date': investment_task.task.due_date,
+                    'reminder_days': investment_task.task.reminder_days,
+                    'email_reminders_enabled': investment_task.task.email_reminders_enabled,
+                    'advisers': [
+                        {
+                            'id': str(adviser.id),
+                            'name': adviser.name,
+                            'first_name': adviser.first_name,
+                            'last_name': adviser.last_name,
+                        }
+                        for adviser in investment_task.task.advisers.all()
+                    ],
+                    'archived': investment_task.task.archived,
+                    'archived_by': investment_task.task.archived_by,
+                    'archived_reason': investment_task.task.archived_reason,
+                    'created_by': {
+                        'name': investment_task.task.created_by.name,
+                        'first_name': investment_task.task.created_by.first_name,
+                        'last_name': investment_task.task.created_by.last_name,
+                        'id': str(investment_task.task.created_by.id),
+                    },
+                    'modified_by': {
+                        'name': investment_task.task.modified_by.name,
+                        'first_name': investment_task.task.modified_by.first_name,
+                        'last_name': investment_task.task.modified_by.last_name,
+                        'id': str(investment_task.task.modified_by.id),
+                    },
+                    'created_on': format_date_or_datetime(investment_task.task.created_on),
+                },
+                'created_by': {
+                    'name': investment_task.created_by.name,
+                    'first_name': investment_task.created_by.first_name,
+                    'last_name': investment_task.created_by.last_name,
+                    'id': str(investment_task.created_by.id),
+                },
+                'modified_by': {
+                    'name': investment_task.modified_by.name,
+                    'first_name': investment_task.modified_by.first_name,
+                    'last_name': investment_task.modified_by.last_name,
+                    'id': str(investment_task.modified_by.id),
+                },
+                'created_on': format_date_or_datetime(investment_task.created_on),
+            }
+            assert response == expected_response
