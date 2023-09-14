@@ -11,6 +11,10 @@ from rest_framework.reverse import reverse
 
 
 from datahub.company.test.factories import AdviserFactory
+from datahub.investment.project.test.factories import (
+    InvestmentProjectFactory,
+)
+
 from datahub.core.test_utils import (
     APITestMixin,
     format_date_or_datetime,
@@ -506,3 +510,86 @@ class TestInvestmentProjectTaskV4ViewSet:
                 'created_on': format_date_or_datetime(investment_task.created_on),
             }
             assert response == expected_response
+
+    class TestAddInvestmentProjectTask(APITestMixin):
+        """Test the POST investment project task endpoint"""
+
+        def test_create_task_with_missing_mandatory_fields_returns_bad_request(self):
+            url = reverse('api-v4:task:investment_project_task_collection')
+
+            response = self.api_client.post(
+                url,
+                data={},
+            )
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+            assert list(response.json().keys()) == ['investment_project', 'task']
+
+        def test_create_task_with_unknown_advisor_id_returns_bad_request(self):
+            faker = Faker()
+
+            url = reverse('api-v4:task:investment_project_task_collection')
+            investment_project = InvestmentProjectFactory()
+
+            response = self.api_client.post(
+                url,
+                data={
+                    'investment_project': investment_project.id,
+                    'task': {'title': faker.word(), 'advisers': [uuid4()]},
+                },
+            )
+
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+            assert list(response.json()['task'].keys()) == ['advisers']
+
+        def test_create_task_with_unknown_investment_project_id_returns_bad_request(self):
+            faker = Faker()
+
+            url = reverse('api-v4:task:investment_project_task_collection')
+            adviser = AdviserFactory()
+
+            response = self.api_client.post(
+                url,
+                data={
+                    'investment_project': uuid4(),
+                    'task': {'title': faker.word(), 'advisers': [adviser.id]},
+                },
+            )
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+            assert list(response.json().keys()) == ['investment_project']
+
+        def test_create_task_with_valid_mandatory_fields_returns_success_created(self):
+            faker = Faker()
+
+            adviser = AdviserFactory()
+            investment_project = InvestmentProjectFactory()
+
+            url = reverse('api-v4:task:investment_project_task_collection')
+
+            new_investment_task = {
+                'investment_project': investment_project.id,
+                'task': {
+                    'title': faker.word(),
+                    'description': faker.word(),
+                    'due_date': now().date(),
+                    'reminder_days': 3,
+                    'email_reminders_enabled': True,
+                    'advisers': [adviser.id],
+                },
+            }
+
+            post_response = self.api_client.post(
+                url,
+                data=new_investment_task,
+            )
+            post_response_json = post_response.json()
+
+            assert post_response.status_code == status.HTTP_201_CREATED
+
+            get_url = reverse(
+                'api-v4:task:investment_project_task_item',
+                kwargs={'pk': post_response_json['id']},
+            )
+            get_response = self.api_client.get(get_url)
+
+            assert get_response.status_code == status.HTTP_200_OK
+            assert get_response.json()['id'] == post_response_json['id']
