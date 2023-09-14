@@ -202,15 +202,3 @@ class UpcomingEstimatedLandDateReminder(BaseReminder):
         on_delete=models.CASCADE,
         related_name='upcoming_estimated_land_date_reminders',
     )
-
-
-class UpcomingTaskReminder(BaseReminder):
-    """
-    Upcoming task reminders.
-    """
-
-    task = models.ForeignKey(
-        'task.Task',
-        on_delete=models.CASCADE,
-        related_name='upcoming_task_reminders',
-    )
