@@ -86,7 +86,6 @@ class BaseViewSet(
 
             if create:
                 additional_data['created_by'] = self.request.user
-
         return additional_data
 
 
