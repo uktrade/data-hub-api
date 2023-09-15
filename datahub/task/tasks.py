@@ -1,8 +1,5 @@
 import logging
 
-import reversion
-from django.db.models import Q
-
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
