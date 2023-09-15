@@ -1,3 +1,6 @@
+from abc import ABC, abstractmethod
+from typing import Any
+
 import uuid
 
 from django.conf import settings
@@ -33,16 +36,23 @@ class Task(ArchivableModel, BaseModel):
         return self.title
 
 
-@reversion.register_base_model()
-class InvestmentProjectTask(BaseModel):
-    """Representation as an investment project task"""
-
+class BaseTaskType(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
     task = models.ForeignKey(
         Task,
         on_delete=models.CASCADE,
-        related_name='investment_project',
+        related_name="%(app_label)s_%(class)s",
     )
+
+    class Meta:
+        abstract = True
+
+
+@reversion.register_base_model()
+class InvestmentProjectTask(BaseTaskType):
+    """Representation as an investment project task"""
+
     investment_project = models.ForeignKey(
         InvestmentProject,
         on_delete=models.CASCADE,
