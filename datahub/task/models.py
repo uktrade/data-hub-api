@@ -1,6 +1,3 @@
-from abc import ABC, abstractmethod
-from typing import Any
-
 import uuid
 
 from django.conf import settings
@@ -42,7 +39,7 @@ class BaseTaskType(BaseModel):
     task = models.ForeignKey(
         Task,
         on_delete=models.CASCADE,
-        related_name="%(app_label)s_%(class)s",
+        related_name='%(app_label)s_%(class)s',
     )
 
     class Meta:
