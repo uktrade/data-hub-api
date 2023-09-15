@@ -35,6 +35,7 @@ class TaskSerializer(serializers.ModelSerializer):
             'created_by',
             'modified_by',
             'created_on',
+            'modified_on',
         )
 
 
@@ -55,4 +56,5 @@ class InvestmentProjectTaskSerializer(serializers.ModelSerializer):
             'created_by',
             'modified_by',
             'created_on',
+            'modified_on',
         )

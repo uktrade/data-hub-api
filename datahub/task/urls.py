@@ -12,7 +12,10 @@ Task_v4_item = TaskV4ViewSet.as_view(
 
 
 InvestmentProjectTask_v4_item = InvestmentProjectTaskV4ViewSet.as_view(
-    {'get': 'retrieve'},
+    {
+        'get': 'retrieve',
+        'patch': 'partial_update',
+    },
 )
 
 Task_v4_collection = TaskV4ViewSet.as_view(

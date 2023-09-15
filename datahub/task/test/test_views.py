@@ -593,3 +593,7 @@ class TestInvestmentProjectTaskV4ViewSet:
 
             assert get_response.status_code == status.HTTP_200_OK
             assert get_response.json()['id'] == post_response_json['id']
+
+        def test_add_task_success_but_add_investment_task_fail_orphan_task_not_created(self):
+            """Test when the task is added but the investment project task fails to add, there is not an orphaned task in the system"""
+            pass
