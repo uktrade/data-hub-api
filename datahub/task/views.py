@@ -155,7 +155,7 @@ class InvestmentProjectTaskV4ViewSet(BaseTaskTypeV4ViewSet):
 
         filtered_investment_projects = super().get_filtered_task_by_type(self.request)
 
-        investment_project_id = self.request.query_params.get('investment_project')
+        investment_project_id = serializer.validated_data.get('investment_project')
 
         if investment_project_id is not None:
             filtered_investment_projects = filtered_investment_projects.filter(
@@ -165,7 +165,7 @@ class InvestmentProjectTaskV4ViewSet(BaseTaskTypeV4ViewSet):
         return filtered_investment_projects
 
     def create_and_save_task_type_model(self, validated_data, task, extra_data):
-        investment_project_data = validated_data['investment_project']
+        investment_project_data = validated_data.get('investment_project')
 
         investment_project_task = self.task_type_model_class.objects.create(
             task=task,
