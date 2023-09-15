@@ -57,37 +57,6 @@ class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
         """
         self._save_task_and_task_type_models(serializer)
 
-    def perform_update(self, serializer):
-        many_to_many_fields = ['advisers']
-        # Many to many fields cannot be created automatically using the objects.create syntax.
-        # They need to be added later using a set()
-
-        extra_data = self.get_additional_data(False)
-
-        task_data = serializer.validated_data['task']
-
-        investment_project_task = (
-            self.task_type_model_class.objects.filter(id=serializer.validated_data['id'])
-            .select_related('task')
-            .first()
-        )
-
-        for key, value in self._filter_task_data(task_data, many_to_many_fields).items():
-            setattr(investment_project_task.task, key, value)
-
-        advisers = task_data['advisers']
-        investment_project_task.task.advisers.set(advisers)
-        investment_project_task.task.save()
-
-        task_data.update(
-            {
-                'id': investment_project_task.task.id,
-                'created_on': investment_project_task.task.created_on,
-                'modified_on': investment_project_task.task.modified_on,
-            },
-        )
-        serializer.validated_data.update(extra_data)
-
     @abstractmethod
     def create_and_save_task_type_model(self, validated_data, task, extra_data):
         """
