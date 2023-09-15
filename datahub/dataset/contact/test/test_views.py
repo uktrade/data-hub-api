@@ -42,6 +42,7 @@ def get_expected_data_from_contact(contact):
         'notes': contact.notes,
         'primary': contact.primary,
         'full_telephone_number': contact.full_telephone_number,
+        'valid_email': contact.valid_email,
     }
 
 

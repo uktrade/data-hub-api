@@ -39,4 +39,5 @@ class ContactsDatasetView(BaseDatasetView):
             'notes',
             'primary',
             'full_telephone_number',
+            'valid_email',
         )
