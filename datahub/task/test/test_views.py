@@ -269,6 +269,8 @@ class TestTaskV4ViewSet:
             assert get_response.json() == expected_response
 
     class TestEditTask(BaseTaskTests):
+        reverse_url = 'api-v4:task:item'
+
         """Test the PATCH task endpoint"""
 
         def test_edit_task_return_404_when_task_id_unknown(self):
@@ -441,6 +443,33 @@ class TestInvestmentProjectTaskV4ViewSet:
 
         reverse_url = 'api-v4:task:investment_project_task_collection'
         task_type_factory = InvestmentProjectTaskFactory
+
+        def test_get_all_tasks_returns_error_when_query_params_are_invalid(self):
+            InvestmentProjectFactory()
+
+            url = f'{reverse(self.reverse_url)}?investment_project=not_valid'
+
+            response = self.api_client.get(url)
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+            assert list(response.json().keys()) == ['investment_project']
+
+        def test_get_all_tasks_returns_only_investment_project_tasks_when_filtering(self):
+            investment_project = InvestmentProjectFactory()
+            investment_project_tasks = InvestmentProjectTaskFactory.create_batch(
+                2,
+                investment_project=investment_project,
+            )
+            InvestmentProjectTaskFactory()
+
+            url = f'{reverse(self.reverse_url)}?investment_project={investment_project.id}'
+
+            task_ids = [str(x.id) for x in investment_project_tasks]
+
+            response = self.api_client.get(url).json()
+
+            assert response['count'] == 2
+            for result in response['results']:
+                assert result['id'] in task_ids
 
     class TestGetInvestmentProjectTask(APITestMixin):
         """Test the GET investment project task endpoint"""

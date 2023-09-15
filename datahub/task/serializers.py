@@ -58,3 +58,7 @@ class InvestmentProjectTaskSerializer(serializers.ModelSerializer):
             'created_on',
             'modified_on',
         )
+
+
+class InvestmentProjectTaskQueryParamSerializer(serializers.Serializer):
+    investment_project = serializers.UUIDField(required=False)

@@ -15,7 +15,11 @@ from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSet
 from datahub.task.models import InvestmentProjectTask, Task
 from datahub.task.permissions import IsAdviserPermittedToEditTask
-from datahub.task.serializers import InvestmentProjectTaskSerializer, TaskSerializer
+from datahub.task.serializers import (
+    InvestmentProjectTaskQueryParamSerializer,
+    InvestmentProjectTaskSerializer,
+    TaskSerializer,
+)
 
 
 class TasksMixin(CoreViewSet):
@@ -170,13 +174,16 @@ class InvestmentProjectTaskV4ViewSet(BaseTaskTypeV4ViewSet):
     """
 
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdviserPermittedToEditTask]
 
     serializer_class = InvestmentProjectTaskSerializer
 
     task_type_model_class = InvestmentProjectTask
 
     def get_queryset(self):
+        serializer = InvestmentProjectTaskQueryParamSerializer(data=self.request.query_params)
+        serializer.is_valid(raise_exception=True)
+
         filtered_investment_projects = super().get_filtered_task_by_type(self.request)
 
         investment_project_id = self.request.query_params.get('investment_project')
