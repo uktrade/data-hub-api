@@ -1,11 +1,13 @@
 from unittest.mock import Mock
 
+import factory
 import pytest
 import reversion
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.core.management.base import CommandError
+from django.db.models import signals
 from reversion.models import Revision, Version
 
 from datahub.cleanup.management.commands import delete_orphaned_versions
@@ -36,7 +38,7 @@ from datahub.investment.project.test.factories import (
 )
 from datahub.metadata.test.factories import SectorFactory
 from datahub.omis.order.test.factories import OrderFactory
-from datahub.task.test.factories import TaskFactory
+from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
 from datahub.user.company_list.test.factories import (
     CompanyListItemFactory,
     PipelineItemFactory,
@@ -66,6 +68,7 @@ MAPPINGS = {
     'metadata.Sector': SectorFactory,
     'order.Order': OrderFactory,
     'task.Task': TaskFactory,
+    'task.InvestmentProjectTask': InvestmentProjectTaskFactory,
 }
 
 
@@ -109,6 +112,7 @@ def test_with_one_model(model_label, model_factory):
 
 
 @pytest.mark.django_db
+@factory.django.mute_signals(signals.post_delete)
 def test_with_all_models(caplog):
     """
     Test that if --model_label is not specified, the command cleans up the versions
@@ -119,8 +123,8 @@ def test_with_all_models(caplog):
     objs = []
     for model_factory in MAPPINGS.values():
         with reversion.create_revision():
-            obj, _ = model_factory.create_batch(2)  # keep only one
-            objs.append(obj)
+            obj = model_factory.create_batch(2)  # keep only one
+            objs.append(obj[0])
 
     total_versions = Version.objects.count()
 
