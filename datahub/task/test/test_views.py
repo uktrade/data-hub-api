@@ -113,6 +113,33 @@ class BaseListTaskTests(BaseTaskTests):
         }
 
 
+class BaseEditTaskTests(BaseTaskTests):
+    reverse_url = None
+    task_type_factory = None
+
+    def test_edit_task_with_unknown_advisor_id_returns_bad_request(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(created_by=adviser)
+        id = task.id
+
+        data = {'advisers': [uuid4()]}
+
+        if self.task_type_factory:
+            task_type = self.task_type_factory(task=task)
+            id = task_type.id
+            data = {'task': data}
+
+        url = reverse(self.reverse_url, kwargs={'pk': id})
+
+        response = self.adviser_api_client(adviser).patch(
+            url,
+            data,
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert list(response.json().keys()) == ['advisers']
+
+
 class TestTaskV4ViewSet:
     class TestListTask(BaseListTaskTests):
         """Test the LIST task endpoint"""
@@ -268,7 +295,7 @@ class TestTaskV4ViewSet:
             }
             assert get_response.json() == expected_response
 
-    class TestEditTask(BaseTaskTests):
+    class TestEditTask(BaseEditTaskTests):
         reverse_url = 'api-v4:task:item'
 
         """Test the PATCH task endpoint"""
@@ -282,19 +309,19 @@ class TestTaskV4ViewSet:
             )
             assert response.status_code == status.HTTP_404_NOT_FOUND
 
-        def test_edit_task_with_unknown_advisor_id_returns_bad_request(self):
-            adviser = AdviserFactory()
-            task = TaskFactory(created_by=adviser)
+        # def test_edit_task_with_unknown_advisor_id_returns_bad_request(self):
+        #     adviser = AdviserFactory()
+        #     task = TaskFactory(created_by=adviser)
 
-            url = reverse('api-v4:task:item', kwargs={'pk': task.id})
+        #     url = reverse('api-v4:task:item', kwargs={'pk': task.id})
 
-            response = self.adviser_api_client(adviser).patch(
-                url,
-                data={'advisers': [uuid4()]},
-            )
+        #     response = self.adviser_api_client(adviser).patch(
+        #         url,
+        #         data={'advisers': [uuid4()]},
+        #     )
 
-            assert response.status_code == status.HTTP_400_BAD_REQUEST
-            assert list(response.json().keys()) == ['advisers']
+        #     assert response.status_code == status.HTTP_400_BAD_REQUEST
+        #     assert list(response.json().keys()) == ['advisers']
 
         def test_edit_task_returns_forbidden_when_user_not_creator_or_assigned_to_task(self):
             task = TaskFactory()
@@ -456,8 +483,7 @@ class TestInvestmentProjectTaskV4ViewSet:
         def test_get_all_tasks_returns_only_investment_project_tasks_when_filtering(self):
             investment_project = InvestmentProjectFactory()
             investment_project_tasks = InvestmentProjectTaskFactory.create_batch(
-                2,
-                investment_project=investment_project,
+                2, investment_project=investment_project
             )
             InvestmentProjectTaskFactory()
 
