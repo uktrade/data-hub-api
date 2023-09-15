@@ -27,7 +27,7 @@ from datahub.reminder.models import (
     ReminderStatus,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
-    UpcomingTaskSubscription,
+    UpcomingTaskReminderSubscription,
 )
 from datahub.reminder.serializers import (
     NewExportInteractionReminderSerializer,
@@ -38,7 +38,7 @@ from datahub.reminder.serializers import (
     NoRecentInvestmentInteractionSubscriptionSerializer,
     UpcomingEstimatedLandDateReminderSerializer,
     UpcomingEstimatedLandDateSubscriptionSerializer,
-    UpcomingTaskSubscriptionSerializer,
+    UpcomingTaskReminderSubscriptionSerializer,
 )
 
 
@@ -79,9 +79,9 @@ class UpcomingEstimatedLandDateSubscriptionViewset(BaseSubscriptionViewset):
     queryset = UpcomingEstimatedLandDateSubscription.objects.all()
 
 
-class UpcomingTaskSubscriptionViewset(BaseSubscriptionViewset):
-    serializer_class = UpcomingTaskSubscriptionSerializer
-    queryset = UpcomingTaskSubscription.objects.all()
+class UpcomingTaskReminderSubscriptionViewset(BaseSubscriptionViewset):
+    serializer_class = UpcomingTaskReminderSubscriptionSerializer
+    queryset = UpcomingTaskReminderSubscription.objects.all()
 
 
 @transaction.non_atomic_requests
@@ -113,8 +113,8 @@ def reminder_subscription_summary_view(request):
     new_export_interaction = NewExportInteractionSubscriptionSerializer(
         get_object(NewExportInteractionSubscription.objects.all()),
     ).data
-    upcoming_task = UpcomingTaskSubscriptionSerializer(
-        get_object(UpcomingTaskSubscription.objects.all()),
+    upcoming_task_reminder = UpcomingTaskReminderSubscriptionSerializer(
+        get_object(UpcomingTaskReminderSubscription.objects.all()),
     ).data
 
     return Response(
@@ -123,7 +123,7 @@ def reminder_subscription_summary_view(request):
             'no_recent_investment_interaction': no_recent_investment_interaction,
             'no_recent_export_interaction': no_recent_export_interaction,
             'new_export_interaction': new_export_interaction,
-            'upcoming_task': upcoming_task,
+            'upcoming_task_reminder': upcoming_task_reminder,
         }
     )
 

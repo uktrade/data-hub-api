@@ -58,7 +58,7 @@ class UpcomingEstimatedLandDateSubscription(BaseSubscription):
     """
 
 
-class UpcomingTaskSubscription(BaseSubscription):
+class UpcomingTaskReminderSubscription(BaseSubscription):
     """
     Subscription to get reminders about upcoming tasks.
     """

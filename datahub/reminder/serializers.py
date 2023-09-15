@@ -16,7 +16,7 @@ from datahub.reminder.models import (
     NoRecentInvestmentInteractionSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
-    UpcomingTaskSubscription,
+    UpcomingTaskReminderSubscription,
 )
 
 
@@ -82,11 +82,11 @@ class UpcomingEstimatedLandDateSubscriptionSerializer(serializers.ModelSerialize
         fields = ('reminder_days', 'email_reminders_enabled')
 
 
-class UpcomingTaskSubscriptionSerializer(serializers.ModelSerializer):
+class UpcomingTaskReminderSubscriptionSerializer(serializers.ModelSerializer):
     """Serializer for Upcoming Task Subscription."""
 
     class Meta:
-        model = UpcomingTaskSubscription
+        model = UpcomingTaskReminderSubscription
         fields = ('reminder_days', 'email_reminders_enabled')
 
 
