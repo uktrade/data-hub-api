@@ -84,7 +84,7 @@ class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
                 'id': investment_project_task.task.id,
                 'created_on': investment_project_task.task.created_on,
                 'modified_on': investment_project_task.task.modified_on,
-            }
+            },
         )
         serializer.validated_data.update(extra_data)
 
@@ -146,7 +146,7 @@ class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
                 'id': task.id,
                 'created_on': task.created_on,
                 'modified_on': task.modified_on,
-            }
+            },
         )
         return task
 

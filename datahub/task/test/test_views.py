@@ -1,6 +1,9 @@
+from unittest.mock import patch
 from uuid import uuid4
 
 import factory
+
+import pytest
 
 from django.utils.timezone import now
 
@@ -11,16 +14,17 @@ from rest_framework.reverse import reverse
 
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.investment.project.test.factories import (
-    InvestmentProjectFactory,
-)
-
 from datahub.core.test_utils import (
     APITestMixin,
     format_date_or_datetime,
 )
+from datahub.investment.project.test.factories import (
+    InvestmentProjectFactory,
+)
+from datahub.task.models import InvestmentProjectTask, Task
 
 from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
+from datahub.task.views import InvestmentProjectTaskV4ViewSet
 
 
 class BaseTaskTests(APITestMixin):
@@ -459,10 +463,10 @@ class TestInvestmentProjectTaskV4ViewSet:
             )
             response = self.api_client.get(url).json()
             expected_response = {
-                "id": str(investment_task.id),
-                "investment_project": {
-                    "name": investment_task.investment_project.name,
-                    "id": str(investment_task.investment_project.id),
+                'id': str(investment_task.id),
+                'investment_project': {
+                    'name': investment_task.investment_project.name,
+                    'id': str(investment_task.investment_project.id),
                 },
                 'task': {
                     'id': str(investment_task.task.id),
@@ -598,6 +602,41 @@ class TestInvestmentProjectTaskV4ViewSet:
             assert get_response.status_code == status.HTTP_200_OK
             assert get_response.json()['id'] == post_response_json['id']
 
-        def test_add_task_success_but_add_investment_task_fail_orphan_task_not_created(self):
-            """Test when the task is added but the investment project task fails to add, there is not an orphaned task in the system"""
-            pass
+        @patch.object(InvestmentProjectTaskV4ViewSet, 'create_and_save_task_type_model')
+        def test_create_task_success_but_add_investment_task_fails_an_orphan_task_not_created(
+            self,
+            save_task,
+        ):
+            """
+            Test when the task is added but the investment project task fails to add, there is
+            not an orphaned task in the system
+            """
+            save_task.side_effect = NotImplementedError()
+
+            faker = Faker()
+
+            adviser = AdviserFactory()
+            investment_project = InvestmentProjectFactory()
+
+            url = reverse('api-v4:task:investment_project_task_collection')
+
+            new_investment_task = {
+                'investment_project': investment_project.id,
+                'task': {
+                    'title': faker.word(),
+                    'description': faker.word(),
+                    'due_date': now().date(),
+                    'reminder_days': 3,
+                    'email_reminders_enabled': True,
+                    'advisers': [adviser.id],
+                },
+            }
+
+            with pytest.raises(NotImplementedError):
+                self.api_client.post(
+                    url,
+                    data=new_investment_task,
+                )
+
+            assert Task.objects.exists() is False
+            assert InvestmentProjectTask.objects.exists() is False
