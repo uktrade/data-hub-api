@@ -71,7 +71,7 @@ class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
         task_data = serializer.validated_data['task']
 
         investment_project_task = (
-            self.task_type_model_class.objects.filter(id=serializer.validated_data['id'])
+            self.task_type_model_class.objects.filter(id=self.kwargs['pk'])
             .select_related('task')
             .first()
         )
@@ -186,7 +186,7 @@ class InvestmentProjectTaskV4ViewSet(BaseTaskTypeV4ViewSet):
 
         filtered_investment_projects = super().get_filtered_task_by_type(self.request)
 
-        investment_project_id = self.request.query_params.get('investment_project')
+        investment_project_id = serializer.validated_data.get('investment_project')
 
         if investment_project_id is not None:
             filtered_investment_projects = filtered_investment_projects.filter(

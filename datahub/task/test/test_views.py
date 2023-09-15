@@ -695,3 +695,7 @@ class TestInvestmentProjectTaskV4ViewSet:
 
             assert Task.objects.exists() is False
             assert InvestmentProjectTask.objects.exists() is False
+
+    class TestEditTask(BaseEditTaskTests):
+        reverse_url = 'api-v4:task:investment_project_task_item'
+        task_type_factory = InvestmentProjectTaskFactory
