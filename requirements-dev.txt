@@ -80,7 +80,7 @@ django-csp==3.7
     # via -r requirements.in
 django-debug-toolbar==4.2.0
     # via -r requirements.in
-django-environ==0.10.0
+django-environ==0.11.2
     # via -r requirements.in
 django-extensions==3.2.3
     # via -r requirements.in
