@@ -62,7 +62,7 @@ dill==0.3.6
     # via pylint
 distlib==0.3.6
     # via virtualenv
-django==3.2.20
+django==3.2.21
     # via
     #   -r requirements.in
     #   django-axes
