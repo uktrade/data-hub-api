@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def schedule_create_task_reminder_subscription_task(adviser_id):
+    print('******** Hello I scheduled a thing')
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
         function=create_task_reminder_subscription_task,
@@ -28,9 +29,11 @@ def create_task_reminder_subscription_task(adviser_id):
     """
     Creates a task reminder subscription doe an adviser if the adviser doesn't have on already.
     """
+    print('******** Hello I created a thing')
     try:
         instance = UpcomingTaskReminderSubscription.objects.get(adviser=adviser_id)
-    except adviser_id.DoesNotExist:
+    except UpcomingTaskReminderSubscription.DoesNotExist:
         print('Create the task reminder subscription')
+        UpcomingTaskReminderSubscription.objects.create(adviser=adviser_id)
     else:
         print('Do not create the task reminder subscription')
