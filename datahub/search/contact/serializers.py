@@ -27,6 +27,7 @@ class SearchContactQuerySerializer(EntitySearchQuerySerializer):
     address_area = SingleOrListField(child=StringUUIDField(), required=False)
     created_by = SingleOrListField(child=StringUUIDField(), required=False)
     created_on_exists = serializers.BooleanField(required=False)
+    valid_email = serializers.BooleanField(required=False)
 
     SORT_BY_FIELDS = (
         'address_country.name',

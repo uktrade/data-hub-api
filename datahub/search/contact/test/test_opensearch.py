@@ -277,6 +277,7 @@ def test_mapping(opensearch):
                 },
                 'type': 'object',
             },
+            'valid_email': {'type': 'boolean'},
         },
         'dynamic': 'false',
     }
