@@ -45,6 +45,7 @@ def test_contact_dbmodel_to_dict(opensearch):
         'notes',
         'company_sector',
         'company_uk_region',
+        'valid_email',
     }
 
     assert set(result.keys()) == keys
