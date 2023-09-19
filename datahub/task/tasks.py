@@ -29,7 +29,7 @@ def create_task_reminder_subscription_task(adviser_id):
     """
     Creates a task reminder subscription doe an adviser if the adviser doesn't have on already.
     """
-    print('******** Hello I created a thing')
+    print('******** Hello I created a thing', adviser_id)
     try:
         instance = UpcomingTaskReminderSubscription.objects.get(adviser=adviser_id)
     except UpcomingTaskReminderSubscription.DoesNotExist:
