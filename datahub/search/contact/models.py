@@ -62,6 +62,7 @@ class Contact(BaseSearchModel):
     primary = Boolean()
     full_telephone_number = Keyword()
     title = fields.id_name_field()
+    valid_email = Boolean()
 
     MAPPINGS = {
         'adviser': dict_utils.contact_or_adviser_dict,
