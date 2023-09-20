@@ -27,6 +27,7 @@ def set_task_reminder_subscription_after_task_post_save(sender, instance, **kwar
     passed to the task for processing to add task reminder subscriptions
     """
 
-    if instance.advisers != None:
+    if instance.advisers.all().count():
         print('***** signal ***** signal ***** signal ***** signal')
-        schedule_create_task_reminder_subscription_task(instance.pk)
+        print(instance.advisers.all().count())
+        schedule_create_task_reminder_subscription_task(instance.advisers.all())
