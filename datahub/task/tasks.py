@@ -12,33 +12,33 @@ logger = logging.getLogger(__name__)
 def schedule_create_task_reminder_subscription_task(advisers):
     print('******** Hello I scheduled a thing')
     print('******** scheduled', advisers)
-    create_task_reminder_subscription_task(advisers)
-    # job = job_scheduler(
-    #     queue_name=LONG_RUNNING_QUEUE,
-    #     function=create_task_reminder_subscription_task,
-    #     function_args=(id,),
-    #     # job_timeout=HALF_DAY_IN_SECONDS,
-    #     # max_retries=5,
-    #     # retry_backoff=True,
-    #     # retry_intervals=30,
-    # )
-    # logger.info(
-    #     f'Task {job.id} create_task_reminder_subscription_task',
-    # )
-    return
-    # return job
+    for adviser in advisers:
+        print(';;;;;;;', adviser)
+        job = job_scheduler(
+            queue_name=LONG_RUNNING_QUEUE,
+            function=create_task_reminder_subscription_task,
+            function_args=(adviser,),
+            # job_timeout=HALF_DAY_IN_SECONDS,
+            # max_retries=5,
+            # retry_backoff=True,
+            # retry_intervals=30,
+        )
+        logger.info(
+            f'Task {job.id} create_task_reminder_subscription_task',
+        )
+
+        return job
 
 
-def create_task_reminder_subscription_task(advisers):
+def create_task_reminder_subscription_task(adviser):
     """
     Creates a task reminder subscription doe an adviser if the adviser doesn't have on already.
     """
-    for adviser in advisers:
-        print('////', adviser)
-        try:
-            instance = UpcomingTaskReminderSubscription.objects.get(adviser=adviser)
-        except UpcomingTaskReminderSubscription.DoesNotExist:
-            print('Create the task reminder subscription')
-            UpcomingTaskReminderSubscription.objects.create(adviser=adviser)
-        else:
-            print('Do not create the task reminder subscription')
+    print('////', adviser)
+    try:
+        instance = UpcomingTaskReminderSubscription.objects.get(adviser=adviser)
+    except UpcomingTaskReminderSubscription.DoesNotExist:
+        print('Create the task reminder subscription')
+        UpcomingTaskReminderSubscription.objects.create(adviser=adviser)
+    else:
+        print('Do not create the task reminder subscription')
