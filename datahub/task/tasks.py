@@ -8,12 +8,15 @@ from datahub.reminder.models import UpcomingTaskReminderSubscription
 logger = logging.getLogger(__name__)
 
 
-def schedule_create_task_reminder_subscription_task(adviser_id):
+def schedule_create_task_reminder_subscription_task(task_id):
     print('******** Hello I scheduled a thing')
+    from pprint import pprint
+
+    print('******** scheduled', task_id)
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
         function=create_task_reminder_subscription_task,
-        function_args=(adviser_id,),
+        function_args=(task_id,),
         job_timeout=HALF_DAY_IN_SECONDS,
         max_retries=5,
         retry_backoff=True,
@@ -25,15 +28,17 @@ def schedule_create_task_reminder_subscription_task(adviser_id):
     return job
 
 
-def create_task_reminder_subscription_task(adviser_id):
+def create_task_reminder_subscription_task(task_id):
     """
     Creates a task reminder subscription doe an adviser if the adviser doesn't have on already.
     """
-    print('******** Hello I created a thing', adviser_id)
-    try:
-        instance = UpcomingTaskReminderSubscription.objects.get(adviser=adviser_id)
-    except UpcomingTaskReminderSubscription.DoesNotExist:
-        print('Create the task reminder subscription')
-        UpcomingTaskReminderSubscription.objects.create(adviser=adviser_id)
-    else:
-        print('Do not create the task reminder subscription')
+    from pprint import pprint
+
+    print('******** The task', task_id)
+    # try:
+    #     instance = UpcomingTaskReminderSubscription.objects.get(adviser=adviser_id)
+    # except UpcomingTaskReminderSubscription.DoesNotExist:
+    #     print('Create the task reminder subscription')
+    #     UpcomingTaskReminderSubscription.objects.create(adviser=adviser_id)
+    # else:
+    #     print('Do not create the task reminder subscription')

@@ -1,4 +1,5 @@
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import post_delete, post_save, m2m_changed
+from django.forms.models import model_to_dict
 from django.dispatch import receiver
 from datahub.task.models import InvestmentProjectTask, Task
 from datahub.task.tasks import schedule_create_task_reminder_subscription_task
@@ -16,15 +17,16 @@ def delete_investment_project_task_delete(sender, instance, **kwargs):
 
 
 @receiver(
-    post_save,
-    sender=Task,
+    m2m_changed,
+    sender=Task.advisers.through,
     dispatch_uid='set_task_reminder_subscription_after_task_post_save',
 )
 def set_task_reminder_subscription_after_task_post_save(sender, instance, **kwargs):
     """
-    Checks to see if an Adviser has a Task Reminder Subscription. If they do not
-    then a subscription for the Adviser will be created
+    Checks to see if a Task has any advisers. If there are advisers then this is
+    passed to the task for processing to add task reminder subscriptions
     """
-    adviser = instance.created_by
-    print('11111111111111', adviser)
-    schedule_create_task_reminder_subscription_task(adviser)
+
+    if instance.advisers != None:
+        print('***** signal ***** signal ***** signal ***** signal')
+        schedule_create_task_reminder_subscription_task(instance.pk)
