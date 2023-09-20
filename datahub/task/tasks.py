@@ -3,7 +3,6 @@ import logging
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.reminder.models import UpcomingTaskReminderSubscription
-from datahub.task.models import Task
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +25,6 @@ def create_task_reminder_subscription_task(adviser):
     a subscription already.
     """
     try:
-        instance = UpcomingTaskReminderSubscription.objects.get(adviser=adviser)
+        UpcomingTaskReminderSubscription.objects.get(adviser=adviser)
     except UpcomingTaskReminderSubscription.DoesNotExist:
         UpcomingTaskReminderSubscription.objects.create(adviser=adviser)

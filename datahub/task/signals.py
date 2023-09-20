@@ -1,6 +1,6 @@
-from django.db.models.signals import post_delete, post_save, m2m_changed
-from django.forms.models import model_to_dict
+from django.db.models.signals import m2m_changed, post_delete
 from django.dispatch import receiver
+
 from datahub.task.models import InvestmentProjectTask, Task
 from datahub.task.tasks import schedule_create_task_reminder_subscription_task
 
@@ -26,6 +26,5 @@ def set_task_reminder_subscription_after_task_post_save(sender, instance, **kwar
     Checks to see if a Task has any advisers. If there are advisers then this is
     passed to the task for processing to add task reminder subscriptions
     """
-
     if instance.advisers.all().count():
         schedule_create_task_reminder_subscription_task(instance.advisers.all())
