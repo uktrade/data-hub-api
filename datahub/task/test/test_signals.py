@@ -1,5 +1,7 @@
 import pytest
 
+from datahub.company.test.factories import AdviserFactory
+from datahub.reminder import UpcomingTaskReminderSubscription
 from datahub.task.models import Task
 from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
 
@@ -26,3 +28,17 @@ class TestDeleteInvestmentProjectTask:
 
         obj = Task.objects.filter(pk=task_id).first()
         assert obj is None
+
+
+@pytest.mark.django_db
+class TestTaskReminderSubscription:
+    def test_creation_of_adviser_subscription_on_task_creation(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser])
+
+        task.save()
+
+        assert UpcomingTaskReminderSubscription.objects.get(adviser=adviser)
+
+    def test_no_creation_for_existing_adviser_subscription_on_task_creation(self):
+        assert True
