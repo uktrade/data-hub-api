@@ -931,8 +931,8 @@ class TestGetReminderSummaryView(APITestMixin):
             [
                 investment_notifications_user_feature_group,
                 export_notifications_user_feature_group,
-            ]
-        ),
+            ],
+        )
         reminder_count = 3
         reminder_categories = 5  # used for finding the total number of reminders in this test
         UpcomingEstimatedLandDateReminderFactory.create_batch(
