@@ -124,7 +124,7 @@ def reminder_subscription_summary_view(request):
             'no_recent_export_interaction': no_recent_export_interaction,
             'new_export_interaction': new_export_interaction,
             'upcoming_task_reminder': upcoming_task_reminder,
-        }
+        },
     )
 
 
@@ -208,7 +208,7 @@ def reminder_summary_view(request):
             outstanding_propositions,
             no_recent_export_interaction,
             new_export_interaction,
-        ]
+        ],
     )
 
     return Response(
@@ -223,5 +223,5 @@ def reminder_summary_view(request):
                 'no_recent_interaction': no_recent_export_interaction,
                 'new_interaction': new_export_interaction,
             },
-        }
+        },
     )
