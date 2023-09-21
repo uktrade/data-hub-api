@@ -79,8 +79,12 @@ class BaseReminderManager(models.Manager):
     """
 
     def get_queryset(self):
-        return super().get_queryset().filter(
-            models.Q(status=ReminderStatus.LIVE) | models.Q(status=''),
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                models.Q(status=ReminderStatus.LIVE) | models.Q(status=''),
+            )
         )
 
 
@@ -191,4 +195,30 @@ class UpcomingEstimatedLandDateReminder(BaseReminder):
         'investment.InvestmentProject',
         on_delete=models.CASCADE,
         related_name='upcoming_estimated_land_date_reminders',
+    )
+
+
+class UpcomingInvestmentProjectTaskReminder(BaseReminder):
+    """
+    Upcoming investment project task reminder.
+    """
+
+    task = models.ForeignKey(
+        'task.Task',
+        on_delete=models.CASCADE,
+        related_name='upcoming_investment_project_task_reminder',
+    )
+
+    company = models.ForeignKey(
+        'company.Company',
+        on_delete=models.CASCADE,
+        related_name='upcoming_investment_project_task_reminder',
+    )
+
+    investment = models.ForeignKey(
+        'investment.Investment',
+        on_delete=models.CASCADE,
+        related_name='upcoming_investment_project_task_reminder',
+        null=True,
+        blank=True,
     )
