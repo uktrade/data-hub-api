@@ -66,3 +66,10 @@ class UpcomingEstimatedLandDateReminderAdmin(admin.ModelAdmin):
     """Upcoming Estimated Land Date Reminder admin."""
 
     raw_id_fields = ('adviser', 'project')
+
+
+@admin.register(UpcomingEstimatedLandDateReminder)
+class UpcomingInvestmentProjectTaskReminderAdmin(admin.ModelAdmin):
+    """Upcoming investmnet project task reminder admin."""
+
+    raw_id_fields = ('adviser', 'task', 'company', 'project')
