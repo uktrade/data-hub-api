@@ -20,7 +20,6 @@ from datahub.reminder.models import (
     NoRecentExportInteractionReminder,
     NoRecentInvestmentInteractionReminder,
     UpcomingEstimatedLandDateReminder,
-    UpcomingTaskReminderSubscription,
 )
 from datahub.reminder.test.factories import (
     NewExportInteractionReminderFactory,
@@ -441,10 +440,6 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
                 'reminder_days': [10, 20, 40],
             },
             'no_recent_investment_interaction': {
-                'email_reminders_enabled': True,
-                'reminder_days': [10, 20, 40],
-            },
-            'no_recent_export_interaction': {
                 'email_reminders_enabled': True,
                 'reminder_days': [10, 20, 40],
             },
@@ -937,7 +932,7 @@ class TestGetReminderSummaryView(APITestMixin):
                 investment_notifications_user_feature_group,
                 export_notifications_user_feature_group,
             ]
-        )
+        ),
         reminder_count = 3
         reminder_categories = 5  # used for finding the total number of reminders in this test
         UpcomingEstimatedLandDateReminderFactory.create_batch(
