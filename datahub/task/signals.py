@@ -10,8 +10,8 @@ from datahub.task.tasks import schedule_create_task_reminder_subscription_task
     sender=InvestmentProjectTask,
 )
 def delete_investment_project_task_delete(sender, instance, **kwargs):
+    associated_task = Task.objects.filter(pk=instance.task.id).first()
     if instance.task.id:
-        associated_task = Task.objects.filter(pk=instance.task.id).first()
         if associated_task:
             associated_task.delete()
 
