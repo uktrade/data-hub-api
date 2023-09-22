@@ -9,6 +9,7 @@ from datahub.reminder.models import (
     NoRecentInvestmentInteractionSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
+    UpcomingInvestmentProjectTaskReminder,
 )
 
 
@@ -68,8 +69,8 @@ class UpcomingEstimatedLandDateReminderAdmin(admin.ModelAdmin):
     raw_id_fields = ('adviser', 'project')
 
 
-@admin.register(UpcomingEstimatedLandDateReminder)
+@admin.register(UpcomingInvestmentProjectTaskReminder)
 class UpcomingInvestmentProjectTaskReminderAdmin(admin.ModelAdmin):
-    """Upcoming investmnet project task reminder admin."""
+    """Upcoming investment project task reminder admin."""
 
-    raw_id_fields = ('adviser', 'task', 'company', 'project')
+    raw_id_fields = ('adviser', 'task', 'company')

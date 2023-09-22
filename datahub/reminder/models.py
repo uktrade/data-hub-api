@@ -215,10 +215,8 @@ class UpcomingInvestmentProjectTaskReminder(BaseReminder):
         related_name='upcoming_investment_project_task_reminder',
     )
 
-    investment = models.ForeignKey(
-        'investment.Investment',
+    project = models.ForeignKey(
+        'investment.InvestmentProject',
         on_delete=models.CASCADE,
         related_name='upcoming_investment_project_task_reminder',
-        null=True,
-        blank=True,
     )
