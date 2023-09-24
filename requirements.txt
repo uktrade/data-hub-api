@@ -16,7 +16,7 @@ async-timeout==4.0.2
     #   redis
 attrs==22.2.0
     # via aiohttp
-bigtree==0.10.3
+bigtree==0.12.4
     # via -r requirements.in
 boto3==1.28.49
     # via -r requirements.in
@@ -133,9 +133,7 @@ opensearch-py==2.3.1
 packaging==22.0
     # via marshmallow
 pandas==2.1.0
-    # via
-    #   -r requirements.in
-    #   bigtree
+    # via -r requirements.in
 psycogreen==1.0.2
     # via -r requirements.in
 psycopg2==2.9.7

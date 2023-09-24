@@ -24,7 +24,7 @@ attrs==22.2.0
     #   flake8-bugbear
 backcall==0.2.0
     # via ipython
-bigtree==0.10.3
+bigtree==0.12.4
     # via -r requirements.in
 boto3==1.28.49
     # via -r requirements.in
@@ -221,9 +221,7 @@ packaging==22.0
     #   marshmallow
     #   pytest
 pandas==2.1.0
-    # via
-    #   -r requirements.in
-    #   bigtree
+    # via -r requirements.in
 parso==0.8.3
     # via jedi
 pep517==0.13.0
