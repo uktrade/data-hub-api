@@ -1,5 +1,7 @@
 from rest_framework.permissions import BasePermission
 
+from datahub.task.models import BaseTaskType
+
 
 class IsAdviserPermittedToEditTask(BasePermission):
     """
@@ -22,6 +24,11 @@ class IsAdviserPermittedToEditTask(BasePermission):
     def validate_task_permission(self, request, view, obj):
         if obj.created_by.id == request.user.id:
             return True
+        if isinstance(obj, BaseTaskType):
+            if obj.task.advisers.filter(id=request.user.id).exists():
+                return True
+            return False
         if obj.advisers.filter(id=request.user.id).exists():
             return True
+
         return False

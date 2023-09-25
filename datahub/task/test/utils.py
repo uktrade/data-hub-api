@@ -1,6 +1,9 @@
+from uuid import uuid4
+
 import factory
 
 
+from rest_framework import status
 from rest_framework.reverse import reverse
 
 
@@ -96,3 +99,81 @@ class BaseListTaskTests(BaseTaskTests):
             'previous': None,
             'results': [],
         }
+
+
+class BaseEditTaskTests(BaseTaskTests):
+    reverse_url = None
+    task_type_factory = None
+    nested_task_field_name = None
+
+    def test_edit_task_with_unknown_advisor_id_returns_bad_request(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(created_by=adviser)
+
+        data = {'advisers': [uuid4()]}
+
+        response = self._call_task_endpoint_assert_response(
+            adviser,
+            task,
+            data,
+            status.HTTP_400_BAD_REQUEST,
+        )
+
+        json = response.json()
+
+        if self.nested_task_field_name:
+            json = json.get(self.nested_task_field_name)
+
+        assert list(json.keys()) == ['advisers']
+
+    def test_edit_task_returns_forbidden_when_user_not_creator_or_assigned_to_task(self):
+        task = TaskFactory()
+        adviser = AdviserFactory()
+
+        data = {'advisers': [adviser.id]}
+        self._call_task_endpoint_assert_response(adviser, task, data, status.HTTP_403_FORBIDDEN)
+
+    def test_edit_task_returns_success_when_user_is_creator_but_not_assigned_to_task(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(created_by=adviser)
+
+        data = {'advisers': [adviser.id]}
+
+        self._call_task_endpoint_assert_response(adviser, task, data, status.HTTP_200_OK)
+
+    def test_edit_task_returns_success_when_user_is_not_creator_but_is_assigned_to_task(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser])
+
+        data = {'advisers': [adviser.id]}
+
+        self._call_task_endpoint_assert_response(adviser, task, data, status.HTTP_200_OK)
+
+    def test_edit_task_returns_success_when_user_is_creator_and_is_assigned_to_task(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser], created_by=adviser)
+
+        data = {'advisers': [adviser.id]}
+
+        self._call_task_endpoint_assert_response(adviser, task, data, status.HTTP_200_OK)
+
+    def _call_task_endpoint_assert_response(self, adviser, task, data, status_code):
+        """
+        Call the task endpoint and check the response is expected
+        """
+        id = task.id
+
+        if self.task_type_factory:
+            task_type = self.task_type_factory(task=task, created_by=task.created_by)
+            id = task_type.id
+            data = {'task': data}
+
+        url = reverse(self.reverse_url, kwargs={'pk': id})
+
+        response = self.adviser_api_client(adviser).patch(
+            url,
+            data,
+        )
+
+        assert response.status_code == status_code
+        return response
