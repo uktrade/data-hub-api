@@ -16,10 +16,8 @@ from datahub.reminder.models import (
     NoRecentInvestmentInteractionSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
-    UpcomingInvestmentProjectTaskReminder,
     UpcomingTaskReminderSubscription,
 )
-from datahub.task.models import InvestmentProjectTask, Task
 
 
 class NoRecentExportInteractionSubscriptionSerializer(serializers.ModelSerializer):
@@ -100,24 +98,6 @@ class NestedInvestmentProjectSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'project_code')
 
 
-class NestedTaskSerializer(serializers.ModelSerializer):
-    """Selects relevant fields from Task serializer to nest inside reminders."""
-
-    created_by = NestedAdviserWithTeamField(read_only=True)
-
-    class Meta:
-        model = Task
-        fields = ('due_date', 'title', 'reminder_days', 'email_reminders_enabled', 'advisers')
-
-
-class NestedInvestmentProjectTaskSerializer(NestedTaskSerializer):
-    """Selects relevant fields from Investment Project Task serializer to nest inside reminders."""
-
-    class Meta:
-        model = InvestmentProjectTask
-        fields = ('due_date', 'title', 'reminder_days', 'email_reminders_enabled', 'advisers')
-
-
 class NestedInteractionSerializer(BaseInteractionSerializer):
     """Selects relevant fields from Interaction serializer to nest inside reminders."""
 
@@ -144,14 +124,6 @@ class UpcomingEstimatedLandDateReminderSerializer(serializers.ModelSerializer):
     class Meta:
         model = UpcomingEstimatedLandDateReminder
         fields = ('id', 'created_on', 'event', 'project')
-
-
-class NestedUpcomingInvestmentProjectTaskReminderSerializer(serializers.ModelSerializer):
-    """Simple Project serializer to nest inside reminders."""
-
-    class Meta:
-        model = UpcomingInvestmentProjectTaskReminder
-        fields = ('id', 'name', 'task', 'company', 'project')
 
 
 class NoRecentInvestmentInteractionReminderSerializer(serializers.ModelSerializer):
@@ -184,13 +156,3 @@ class NoRecentExportInteractionReminderSerializer(serializers.ModelSerializer):
     class Meta:
         model = NoRecentExportInteractionReminder
         fields = ('id', 'created_on', 'last_interaction_date', 'event', 'company', 'interaction')
-
-
-class UpcomingInvestmentProjectTaskReminderSerializer(serializers.ModelSerializer):
-    """Serializer for Upcoming investment project task reminder."""
-
-    investment_project_task = NestedInvestmentProjectTaskSerializer(read_only=True)
-
-    class Meta:
-        model = UpcomingInvestmentProjectTaskReminder
-        fields = ('id', 'created_on', 'investment_project_task')
