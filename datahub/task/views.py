@@ -47,6 +47,9 @@ class TasksMixin(CoreViewSet):
 class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
     task_type_model_class = None
     ordering_fields = ['task__due_date']
+    # Many to many fields cannot be created automatically using the objects.create syntax.
+    # They need to be added later using a set()
+    many_to_many_fields = ['advisers']
 
     def get_filtered_task_by_type(self, request):
         """
@@ -94,27 +97,15 @@ class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
         """
         Create a new Task object and save it
         """
-        many_to_many_fields = ['advisers']
-        # Many to many fields cannot be created automatically using the objects.create syntax.
-        # They need to be added later using a set()
 
         task_data = serializer.validated_data['task']
         task_data.update(extra_data)
 
-        advisers = task_data['advisers']
-
         task = Task.objects.create(
-            **self._filter_task_data(task_data, many_to_many_fields),
+            **self._filter_task_data(task_data, self.many_to_many_fields),
         )
-        task.advisers.set(advisers)
-        task.save()
-        task_data.update(
-            {
-                'id': task.id,
-                'created_on': task.created_on,
-                'modified_on': task.modified_on,
-            },
-        )
+
+        self._save_many_to_many_task_fields(task_data, task)
         return task
 
     def perform_update(self, serializer):
@@ -126,10 +117,6 @@ class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
 
     @transaction.atomic
     def _update_task_and_task_type_models(self, serializer):
-        many_to_many_fields = ['advisers']
-        # Many to many fields cannot be created automatically using the objects.create syntax.
-        # They need to be added later using a set()
-
         extra_data = self.get_additional_data(False)
 
         task_data = serializer.validated_data['task']
@@ -140,19 +127,25 @@ class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
             .first()
         )
 
-        for key, value in self._filter_task_data(task_data, many_to_many_fields).items():
+        for key, value in self._filter_task_data(task_data, self.many_to_many_fields).items():
             setattr(task_type_model.task, key, value)
 
-        advisers = task_data['advisers']
-        task_type_model.task.advisers.set(advisers)
-        task_type_model.task.save()
+        self._save_many_to_many_task_fields(task_data, task_type_model.task)
 
         serializer.validated_data.update(extra_data)
+
+    def _save_many_to_many_task_fields(self, task_data, task):
+        """
+        Save the many to many fields on the task
+        """
+        advisers = task_data['advisers']
+        task.advisers.set(advisers)
+        task.save()
         task_data.update(
             {
-                'id': task_type_model.task.id,
-                'created_on': task_type_model.task.created_on,
-                'modified_on': task_type_model.task.modified_on,
+                'id': task.id,
+                'created_on': task.created_on,
+                'modified_on': task.modified_on,
             },
         )
 
