@@ -14,7 +14,7 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateSubscription,
     UpcomingInvestmentProjectTaskReminder,
 )
-from datahub.task.test.factories import TaskFactory
+from datahub.task.test.factories import InvestmentProjectTaskFactory
 
 
 class BaseSubscriptionFactory(factory.django.DjangoModelFactory):
@@ -76,9 +76,7 @@ class UpcomingEstimatedLandDateReminderFactory(BaseReminderFactory):
 
 
 class UpcomingInvestmentProjectTaskReminderFactory(BaseReminderFactory):
-    task = factory.SubFactory(TaskFactory)
-    company = factory.SubFactory(CompanyFactory)
-    project = factory.SubFactory(InvestmentProjectFactory)
+    investment_project_task = factory.SubFactory(InvestmentProjectTaskFactory)
 
     class Meta:
         model = UpcomingInvestmentProjectTaskReminder
