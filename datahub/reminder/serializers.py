@@ -180,7 +180,7 @@ class NoRecentExportInteractionReminderSerializer(serializers.ModelSerializer):
 class UpcomingInvestmentProjectTaskReminderSerializer(serializers.ModelSerializer):
     """Serializer for Upcoming investment project task reminder."""
 
-    investment_project_task = NestedInvestmentProjectTaskSerializer()
+    investment_project_task = NestedInvestmentProjectTaskSerializer(read_only=True)
 
     class Meta:
         model = UpcomingInvestmentProjectTaskReminder
