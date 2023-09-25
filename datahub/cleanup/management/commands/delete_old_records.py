@@ -251,7 +251,9 @@ class Command(BaseCleanupCommand):
                 DatetimeLessThanCleanupFilter('modified_on', TASK_EXPIRY_PERIOD),
             ),
             excluded_relations=(
-                InvestmentProjectTask._meta.get_field('upcoming_investment_project_task_reminder'),
+                InvestmentProjectTask._meta.get_field(
+                    'upcoming_investment_project_task_reminders'
+                ),
             ),
         ),
     }
