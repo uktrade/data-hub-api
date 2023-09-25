@@ -11,8 +11,7 @@ logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """
-    """
+    """Command to update an interaction advisers to a new team"""
 
     help = 'Updates interaction advisers to a new team with the history up to a certain date'
 
@@ -31,4 +30,5 @@ class Command(BaseCommand):
             return
 
         reversion.set_comment(
-            'Set the advisers: ' + adviser_ids + ' to the team: ' + new_team_name + ' for the given interaction: ' + pk)
+            'Set the advisers: ' + adviser_ids + ' to the team: ' + new_team_name
+            + ' for the given interaction: ' + pk)
