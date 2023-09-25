@@ -58,6 +58,12 @@ class UpcomingEstimatedLandDateSubscription(BaseSubscription):
     """
 
 
+class UpcomingTaskReminderSubscription(BaseSubscription):
+    """
+    Subscription to get reminders about upcoming tasks.
+    """
+
+
 class EmailDeliveryStatus(models.TextChoices):
     SENDING = ('sending', 'Sending')
     DELIVERED = ('delivered', 'Delivered')

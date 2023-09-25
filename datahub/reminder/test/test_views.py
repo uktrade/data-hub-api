@@ -30,6 +30,7 @@ from datahub.reminder.test.factories import (
     NoRecentInvestmentInteractionSubscriptionFactory,
     UpcomingEstimatedLandDateReminderFactory,
     UpcomingEstimatedLandDateSubscriptionFactory,
+    UpcomingTaskReminderSubscriptionFactory,
 )
 
 
@@ -419,6 +420,11 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             reminder_days=reminder_days,
             email_reminders_enabled=email_reminders_enabled,
         )
+        UpcomingTaskReminderSubscriptionFactory(
+            adviser=self.user,
+            reminder_days=reminder_days,
+            email_reminders_enabled=email_reminders_enabled,
+        )
 
         url = reverse(self.url_name)
         response = self.api_client.get(url)
@@ -426,16 +432,24 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
         data = response.json()
         assert data == {
             'estimated_land_date': {
-                'email_reminders_enabled': True, 'reminder_days': [10, 20, 40],
+                'email_reminders_enabled': True,
+                'reminder_days': [10, 20, 40],
             },
             'new_export_interaction': {
-                'email_reminders_enabled': True, 'reminder_days': [10, 20, 40],
+                'email_reminders_enabled': True,
+                'reminder_days': [10, 20, 40],
             },
             'no_recent_investment_interaction': {
-                'email_reminders_enabled': True, 'reminder_days': [10, 20, 40],
+                'email_reminders_enabled': True,
+                'reminder_days': [10, 20, 40],
             },
             'no_recent_export_interaction': {
-                'email_reminders_enabled': True, 'reminder_days': [10, 20, 40],
+                'email_reminders_enabled': True,
+                'reminder_days': [10, 20, 40],
+            },
+            'upcoming_task_reminder': {
+                'email_reminders_enabled': True,
+                'reminder_days': [10, 20, 40],
             },
         }
 
@@ -447,16 +461,24 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
         data = response.json()
         assert data == {
             'estimated_land_date': {
-                'email_reminders_enabled': False, 'reminder_days': [],
+                'email_reminders_enabled': False,
+                'reminder_days': [],
             },
             'new_export_interaction': {
-                'email_reminders_enabled': False, 'reminder_days': [],
+                'email_reminders_enabled': False,
+                'reminder_days': [],
             },
             'no_recent_investment_interaction': {
-                'email_reminders_enabled': False, 'reminder_days': [],
+                'email_reminders_enabled': False,
+                'reminder_days': [],
             },
             'no_recent_export_interaction': {
-                'email_reminders_enabled': False, 'reminder_days': [],
+                'email_reminders_enabled': False,
+                'reminder_days': [],
+            },
+            'upcoming_task_reminder': {
+                'email_reminders_enabled': False,
+                'reminder_days': [],
             },
         }
 
@@ -548,9 +570,12 @@ class ReminderTestMixin:
         url = reverse(self.detail_url_name, kwargs={'pk': str(reminder.id)})
         response = self.api_client.delete(url)
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert self.tested_model.objects.filter(
-            adviser=self.user,
-        ).count() == reminder_count - 1
+        assert (
+            self.tested_model.objects.filter(
+                adviser=self.user,
+            ).count()
+            == reminder_count - 1
+        )
 
 
 @freeze_time('2022-12-15T17:00:00.000000Z')
@@ -793,7 +818,8 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMix
         export_interaction = CompaniesInteractionFactory(created_by=interaction_adviser)
 
         NoRecentExportInteractionReminderFactory.create(
-            adviser=self.user, interaction=export_interaction,
+            adviser=self.user,
+            interaction=export_interaction,
         )
 
         response = self.get_response
@@ -901,10 +927,12 @@ class TestGetReminderSummaryView(APITestMixin):
         export_notifications_user_feature_group,
     ):
         """Should return a summary of reminders."""
-        self.user.feature_groups.set([
-            investment_notifications_user_feature_group,
-            export_notifications_user_feature_group,
-        ])
+        self.user.feature_groups.set(
+            [
+                investment_notifications_user_feature_group,
+                export_notifications_user_feature_group,
+            ],
+        )
         reminder_count = 3
         reminder_categories = 5  # used for finding the total number of reminders in this test
         UpcomingEstimatedLandDateReminderFactory.create_batch(
