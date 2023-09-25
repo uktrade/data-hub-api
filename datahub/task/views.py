@@ -97,7 +97,6 @@ class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
         """
         Create a new Task object and save it
         """
-
         task_data = serializer.validated_data['task']
         task_data.update(extra_data)
 
