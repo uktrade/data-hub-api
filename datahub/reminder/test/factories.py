@@ -76,7 +76,7 @@ class UpcomingEstimatedLandDateReminderFactory(BaseReminderFactory):
 
 
 class UpcomingInvestmentProjectTaskReminderFactory(BaseReminderFactory):
-    task = factory.Task(TaskFactory)
+    task = factory.SubFactory(TaskFactory)
     company = factory.SubFactory(CompanyFactory)
     project = factory.SubFactory(InvestmentProjectFactory)
 
