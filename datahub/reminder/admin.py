@@ -73,4 +73,4 @@ class UpcomingEstimatedLandDateReminderAdmin(admin.ModelAdmin):
 class UpcomingInvestmentProjectTaskReminderAdmin(admin.ModelAdmin):
     """Upcoming investment project task reminder admin."""
 
-    raw_id_fields = ('adviser', 'task', 'company')
+    raw_id_fields = ('investment_project_task',)
