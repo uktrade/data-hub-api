@@ -137,6 +137,11 @@ class TestGetInvestmentProjectTask(APITestMixin):
         }
         assert response == expected_response
 
+    def test_investment_project_details_returned_is_expected(self):
+        pass
+
+    # Tests for missing FK links to investment project, task etc
+
 
 class TestAddInvestmentProjectTask(APITestMixin):
     """Test the POST investment project task endpoint"""

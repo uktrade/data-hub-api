@@ -4,7 +4,9 @@ from django.conf import settings
 from rest_framework import serializers
 
 from datahub.company.serializers import NestedAdviserField, NestedRelatedField
-from datahub.investment.project.serializers import NestedInvestmentProjectField
+from datahub.investment.project.serializers import (
+    NestedInvestmentProjectInvestorCompanyField,
+)
 from datahub.task.models import InvestmentProjectTask, Task
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -17,23 +19,14 @@ NestedInvestmentProjectTaskField = partial(
     extra_fields=(
         (
             'investment_project',
-            NestedInvestmentProjectField(
-                extra_fields=(
-                    (
-                        'investor_company',
-                        NestedRelatedField(
-                            'company.Company',
-                        ),
-                    ),
-                ),
-            ),
+            NestedInvestmentProjectInvestorCompanyField(),
         ),
     ),
 )
 
 
-class TaskSerializer(serializers.ModelSerializer):
-    """Task serilizer"""
+class BasicTaskSerializer(serializers.ModelSerializer):
+    """Basic task serilizer that contains the fields shared among all other task serializers"""
 
     modified_by = NestedAdviserField(read_only=True)
     archived_by = NestedAdviserField(read_only=True)
@@ -43,7 +36,6 @@ class TaskSerializer(serializers.ModelSerializer):
         allow_empty=False,
     )
     archived = serializers.BooleanField(read_only=True)
-    investment_project_task = NestedInvestmentProjectTaskField()
 
     class Meta:
         model = Task
@@ -62,15 +54,24 @@ class TaskSerializer(serializers.ModelSerializer):
             'modified_by',
             'created_on',
             'modified_on',
-            'investment_project_task',
         )
 
 
+class TaskSerializer(BasicTaskSerializer):
+    """Task serializer"""
+
+    investment_project_task = NestedInvestmentProjectTaskField(read_only=True)
+
+    class Meta:
+        model = BasicTaskSerializer.Meta.model
+        fields = BasicTaskSerializer.Meta.fields + ('investment_project_task',)
+
+
 class InvestmentProjectTaskSerializer(serializers.ModelSerializer):
-    task = TaskSerializer()
+    task = BasicTaskSerializer()
     modified_by = NestedAdviserField(read_only=True)
     created_by = NestedAdviserField(read_only=True)
-    investment_project = NestedInvestmentProjectField(read_only=True)
+    investment_project = NestedInvestmentProjectInvestorCompanyField()
 
     class Meta:
         model = InvestmentProjectTask
