@@ -1,3 +1,5 @@
+from functools import partial
+
 from django.conf import settings
 from rest_framework import serializers
 
@@ -8,11 +10,28 @@ from datahub.task.models import InvestmentProjectTask, Task
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-# NestedInvestmentProjectTaskField = partial(
-#     NestedRelatedField,
-#     InvestmentProject,
-#     extra_fields=('investment_project'),
-# )
+NestedInvestmentProjectTaskField = partial(
+    NestedRelatedField,
+    model=InvestmentProjectTask,
+    source='task_investmentprojecttask',
+    extra_fields=(
+        (
+            'investment_project',
+            NestedInvestmentProjectField(
+                extra_fields=(
+                    (
+                        'investor_company',
+                        NestedRelatedField(
+                            'company.Company',
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    ),
+)
+
+
 class TaskSerializer(serializers.ModelSerializer):
     """Task serilizer"""
 
@@ -24,25 +43,7 @@ class TaskSerializer(serializers.ModelSerializer):
         allow_empty=False,
     )
     archived = serializers.BooleanField(read_only=True)
-    investment_project_task = NestedRelatedField(
-        model=InvestmentProjectTask,
-        source='task_investmentprojecttask',
-        extra_fields=(
-            (
-                'investment_project',
-                NestedInvestmentProjectField(
-                    extra_fields=(
-                        (
-                            'investor_company',
-                            NestedRelatedField(
-                                'company.Company',
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        ),
-    )
+    investment_project_task = NestedInvestmentProjectTaskField()
 
     class Meta:
         model = Task
