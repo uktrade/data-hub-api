@@ -85,6 +85,11 @@ class TestGetInvestmentProjectTask(APITestMixin):
             'investment_project': {
                 'name': investment_task.investment_project.name,
                 'id': str(investment_task.investment_project.id),
+                'investor_company': {
+                    'name': investment_task.investment_project.investor_company.name,
+                    'id': str(investment_task.investment_project.investor_company.id),
+                },
+                'project_code': investment_task.investment_project.project_code,
             },
             'task': {
                 'id': str(investment_task.task.id),

@@ -79,6 +79,7 @@ class TestGetTask(APITestMixin):
             },
             'created_on': format_date_or_datetime(task.created_on),
             'modified_on': format_date_or_datetime(task.modified_on),
+            'investment_project_task': None,
         }
         assert response == expected_response
 
@@ -185,6 +186,7 @@ class TestAddTask(APITestMixin):
             },
             'created_on': post_response_json['created_on'],
             'modified_on': post_response_json['modified_on'],
+            'investment_project_task': None,
         }
         assert get_response.json() == expected_response
 
