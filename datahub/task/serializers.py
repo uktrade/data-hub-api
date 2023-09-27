@@ -2,12 +2,17 @@ from django.conf import settings
 from rest_framework import serializers
 
 from datahub.company.serializers import NestedAdviserField, NestedRelatedField
-from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.serializers import NestedInvestmentProjectField
 from datahub.task.models import InvestmentProjectTask, Task
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
+# NestedInvestmentProjectTaskField = partial(
+#     NestedRelatedField,
+#     InvestmentProject,
+#     extra_fields=('investment_project'),
+# )
 class TaskSerializer(serializers.ModelSerializer):
     """Task serilizer"""
 
@@ -19,6 +24,25 @@ class TaskSerializer(serializers.ModelSerializer):
         allow_empty=False,
     )
     archived = serializers.BooleanField(read_only=True)
+    investment_project_task = NestedRelatedField(
+        model=InvestmentProjectTask,
+        source='task_investmentprojecttask',
+        extra_fields=(
+            (
+                'investment_project',
+                NestedInvestmentProjectField(
+                    extra_fields=(
+                        (
+                            'investor_company',
+                            NestedRelatedField(
+                                'company.Company',
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
 
     class Meta:
         model = Task
@@ -37,15 +61,15 @@ class TaskSerializer(serializers.ModelSerializer):
             'modified_by',
             'created_on',
             'modified_on',
+            'investment_project_task',
         )
 
 
 class InvestmentProjectTaskSerializer(serializers.ModelSerializer):
     task = TaskSerializer()
     modified_by = NestedAdviserField(read_only=True)
-    archived_by = NestedAdviserField(read_only=True)
     created_by = NestedAdviserField(read_only=True)
-    investment_project = NestedRelatedField(InvestmentProject)
+    investment_project = NestedInvestmentProjectField(read_only=True)
 
     class Meta:
         model = InvestmentProjectTask
@@ -53,7 +77,6 @@ class InvestmentProjectTaskSerializer(serializers.ModelSerializer):
             'id',
             'investment_project',
             'task',
-            'archived_by',
             'created_by',
             'modified_by',
             'created_on',

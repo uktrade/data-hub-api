@@ -27,7 +27,11 @@ class TasksMixin(CoreViewSet):
         """
         Get the task queryset that is filtered using common filters from the query params
         """
-        queryset = Task.objects.all().prefetch_related('advisers')
+        queryset = (
+            Task.objects.all()
+            .prefetch_related('advisers')
+            .select_related('task_investmentprojecttask')
+        )
 
         archived = request.query_params.get('archived')
         advisers = request.query_params.get('advisers')
