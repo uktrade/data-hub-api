@@ -568,15 +568,17 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         )
 
 
-def NestedInvestmentProject(extra_fields=()):
+def nested_investment_project(extra_fields=()):
     return partial(
-        NestedRelatedField, InvestmentProject, extra_fields=('name', 'project_code') + extra_fields
+        NestedRelatedField,
+        InvestmentProject,
+        extra_fields=('name', 'project_code') + extra_fields,
     )
 
 
-NestedInvestmentProjectField = NestedInvestmentProject()
+NestedInvestmentProjectField = nested_investment_project()
 
-NestedInvestmentProjectInvestorCompanyField = NestedInvestmentProject(
+NestedInvestmentProjectInvestorCompanyField = nested_investment_project(
     extra_fields=(
         (
             'investor_company',
@@ -584,7 +586,7 @@ NestedInvestmentProjectInvestorCompanyField = NestedInvestmentProject(
                 Company,
             ),
         ),
-    )
+    ),
 )
 
 
