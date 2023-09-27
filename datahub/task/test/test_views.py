@@ -109,6 +109,19 @@ class TestAddTask(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert list(response.json().keys()) == ['advisers']
 
+    def test_create_task_with_empty_advisors_returns_bad_request(self):
+        faker = Faker()
+
+        url = reverse('api-v4:task:collection')
+
+        response = self.api_client.post(
+            url,
+            data={'title': faker.word(), 'advisers': []},
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert list(response.json().keys()) == ['advisers']
+
     def test_create_task_with_valid_mandatory_fields_returns_success_created(self):
         faker = Faker()
 

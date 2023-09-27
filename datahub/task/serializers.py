@@ -16,6 +16,7 @@ class TaskSerializer(serializers.ModelSerializer):
     created_by = NestedAdviserField(read_only=True)
     advisers = NestedAdviserField(
         many=True,
+        allow_empty=False,
     )
     archived = serializers.BooleanField(read_only=True)
 
