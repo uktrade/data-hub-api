@@ -568,26 +568,23 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         )
 
 
-# TODO can these be combined
-NestedInvestmentProjectInvestorCompanyField = partial(
-    NestedRelatedField,
-    InvestmentProject,
+def NestedInvestmentProject(extra_fields=()):
+    return partial(
+        NestedRelatedField, InvestmentProject, extra_fields=('name', 'project_code') + extra_fields
+    )
+
+
+NestedInvestmentProjectField = NestedInvestmentProject()
+
+NestedInvestmentProjectInvestorCompanyField = NestedInvestmentProject(
     extra_fields=(
-        ('name'),
-        ('project_code'),
         (
             'investor_company',
             NestedRelatedField(
                 Company,
             ),
         ),
-    ),
-)
-
-NestedInvestmentProjectField = partial(
-    NestedRelatedField,
-    InvestmentProject,
-    extra_fields=('name', 'project_code'),
+    )
 )
 
 
