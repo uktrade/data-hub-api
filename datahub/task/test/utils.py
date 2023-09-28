@@ -153,7 +153,7 @@ class BaseEditTaskTests(BaseTaskTests):
         adviser = AdviserFactory()
         task = TaskFactory(advisers=[adviser], created_by=adviser)
 
-        data = {'advisers': [adviser.id]}
+        data = {'advisers': [adviser.id], 'title': 'New title'}
 
         self._call_task_endpoint_assert_response(adviser, task, data, status.HTTP_200_OK)
 
