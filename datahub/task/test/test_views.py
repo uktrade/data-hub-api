@@ -1,5 +1,6 @@
-from uuid import uuid4
+import datetime
 
+from uuid import uuid4
 
 from django.utils.timezone import now
 
@@ -23,6 +24,22 @@ class TestListTask(BaseListTaskTests):
     """Test the LIST task endpoint"""
 
     reverse_url = 'api-v4:task:collection'
+
+    def test_get_all_tasks_returns_ordered_results_when_sortby_param_is_used(self):
+        earliest_task = TaskFactory(due_date=datetime.date.today() - datetime.timedelta(days=1))
+        latest_task = TaskFactory(due_date=datetime.date.today() + datetime.timedelta(days=1))
+        middle_task = TaskFactory(due_date=datetime.date.today())
+
+        url = f'{reverse(self.reverse_url)}?sortby=due_date'
+
+        response = self.api_client.get(url).json()
+
+        ordered_ids_response = [result['id'] for result in response['results']]
+        assert ordered_ids_response == [
+            str(earliest_task.id),
+            str(middle_task.id),
+            str(latest_task.id),
+        ]
 
 
 class TestGetTask(APITestMixin):
