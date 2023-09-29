@@ -46,6 +46,7 @@ class TasksMixin(CoreViewSet):
 
 class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
     task_type_model_class = None
+    ordering_fields = ['task__due_date']
 
     def get_filtered_task_by_type(self, request):
         """
@@ -133,7 +134,7 @@ class TaskV4ViewSet(ArchivableViewSetMixin, TasksMixin):
 
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     permission_classes = [IsAuthenticated, IsAdviserPermittedToEditTask]
-    ordering_fields = ['title']
+    ordering_fields = ['title', 'due_date']
 
     serializer_class = TaskSerializer
 
