@@ -58,6 +58,12 @@ class UpcomingEstimatedLandDateSubscription(BaseSubscription):
     """
 
 
+class UpcomingTaskReminderSubscription(BaseSubscription):
+    """
+    Subscription to get reminders about upcoming tasks.
+    """
+
+
 class EmailDeliveryStatus(models.TextChoices):
     SENDING = ('sending', 'Sending')
     DELIVERED = ('delivered', 'Delivered')
@@ -79,8 +85,12 @@ class BaseReminderManager(models.Manager):
     """
 
     def get_queryset(self):
-        return super().get_queryset().filter(
-            models.Q(status=ReminderStatus.LIVE) | models.Q(status=''),
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                models.Q(status=ReminderStatus.LIVE) | models.Q(status=''),
+            )
         )
 
 
@@ -191,4 +201,16 @@ class UpcomingEstimatedLandDateReminder(BaseReminder):
         'investment.InvestmentProject',
         on_delete=models.CASCADE,
         related_name='upcoming_estimated_land_date_reminders',
+    )
+
+
+class UpcomingInvestmentProjectTaskReminder(BaseReminder):
+    """
+    Upcoming investment project task reminder.
+    """
+
+    investment_project_task = models.ForeignKey(
+        'task.InvestmentProjectTask',
+        on_delete=models.CASCADE,
+        related_name='upcoming_investment_project_task_reminders',
     )

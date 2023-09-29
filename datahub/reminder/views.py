@@ -27,6 +27,7 @@ from datahub.reminder.models import (
     ReminderStatus,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
+    UpcomingTaskReminderSubscription,
 )
 from datahub.reminder.serializers import (
     NewExportInteractionReminderSerializer,
@@ -37,6 +38,7 @@ from datahub.reminder.serializers import (
     NoRecentInvestmentInteractionSubscriptionSerializer,
     UpcomingEstimatedLandDateReminderSerializer,
     UpcomingEstimatedLandDateSubscriptionSerializer,
+    UpcomingTaskReminderSubscriptionSerializer,
 )
 
 
@@ -77,6 +79,11 @@ class UpcomingEstimatedLandDateSubscriptionViewset(BaseSubscriptionViewset):
     queryset = UpcomingEstimatedLandDateSubscription.objects.all()
 
 
+class UpcomingTaskReminderSubscriptionViewset(BaseSubscriptionViewset):
+    serializer_class = UpcomingTaskReminderSubscriptionSerializer
+    queryset = UpcomingTaskReminderSubscription.objects.all()
+
+
 @transaction.non_atomic_requests
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -106,13 +113,19 @@ def reminder_subscription_summary_view(request):
     new_export_interaction = NewExportInteractionSubscriptionSerializer(
         get_object(NewExportInteractionSubscription.objects.all()),
     ).data
+    upcoming_task_reminder = UpcomingTaskReminderSubscriptionSerializer(
+        get_object(UpcomingTaskReminderSubscription.objects.all()),
+    ).data
 
-    return Response({
-        'estimated_land_date': estimated_land_date,
-        'no_recent_investment_interaction': no_recent_investment_interaction,
-        'no_recent_export_interaction': no_recent_export_interaction,
-        'new_export_interaction': new_export_interaction,
-    })
+    return Response(
+        {
+            'estimated_land_date': estimated_land_date,
+            'no_recent_investment_interaction': no_recent_investment_interaction,
+            'no_recent_export_interaction': no_recent_export_interaction,
+            'new_export_interaction': new_export_interaction,
+            'upcoming_task_reminder': upcoming_task_reminder,
+        },
+    )
 
 
 class BaseReminderViewset(viewsets.GenericViewSet, ListModelMixin, DestroyModelMixin):
@@ -188,23 +201,27 @@ def reminder_summary_view(request):
         no_recent_export_interaction = 0
         new_export_interaction = 0
 
-    total_count = sum([
-        estimated_land_date,
-        no_recent_investment_interaction,
-        outstanding_propositions,
-        no_recent_export_interaction,
-        new_export_interaction,
-    ])
+    total_count = sum(
+        [
+            estimated_land_date,
+            no_recent_investment_interaction,
+            outstanding_propositions,
+            no_recent_export_interaction,
+            new_export_interaction,
+        ],
+    )
 
-    return Response({
-        'count': total_count,
-        'investment': {
-            'estimated_land_date': estimated_land_date,
-            'no_recent_interaction': no_recent_investment_interaction,
-            'outstanding_propositions': outstanding_propositions,
+    return Response(
+        {
+            'count': total_count,
+            'investment': {
+                'estimated_land_date': estimated_land_date,
+                'no_recent_interaction': no_recent_investment_interaction,
+                'outstanding_propositions': outstanding_propositions,
+            },
+            'export': {
+                'no_recent_interaction': no_recent_export_interaction,
+                'new_interaction': new_export_interaction,
+            },
         },
-        'export': {
-            'no_recent_interaction': no_recent_export_interaction,
-            'new_interaction': new_export_interaction,
-        },
-    })
+    )

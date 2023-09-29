@@ -36,8 +36,8 @@ class Task(ArchivableModel, BaseModel):
 class BaseTaskType(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
-    task = models.ForeignKey(
-        Task,
+    task = models.OneToOneField(
+        to=Task,
         on_delete=models.CASCADE,
         related_name='%(app_label)s_%(class)s',
     )
@@ -53,7 +53,7 @@ class InvestmentProjectTask(BaseTaskType):
     investment_project = models.ForeignKey(
         InvestmentProject,
         on_delete=models.CASCADE,
-        related_name='task',
+        related_name='investment_project_task',
     )
 
     def __str__(self):

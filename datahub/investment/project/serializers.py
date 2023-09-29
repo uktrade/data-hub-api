@@ -168,7 +168,8 @@ def _get_updated_status(instance, data):
     if str(new_stage.id) == InvestmentProjectStage.won.value.id:
         return InvestmentProject.Status.WON
     elif (
-        old_stage and str(old_stage.id) == InvestmentProjectStage.won.value.id
+        old_stage
+        and str(old_stage.id) == InvestmentProjectStage.won.value.id
         and new_status == InvestmentProject.Status.WON
     ):
         return InvestmentProject.Status.ONGOING
@@ -323,42 +324,62 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
     likelihood_to_land = NestedRelatedField(LikelihoodToLand, required=False, allow_null=True)
     specific_programme = NestedRelatedField(SpecificProgramme, required=False, allow_null=True)
     client_contacts = NestedRelatedField(
-        Contact, many=True, required=True, allow_null=False, allow_empty=False,
+        Contact,
+        many=True,
+        required=True,
+        allow_null=False,
+        allow_empty=False,
     )
 
     client_relationship_manager = NestedAdviserField(required=True, allow_null=False)
     client_relationship_manager_team = NestedRelatedField(meta_models.Team, read_only=True)
     referral_source_adviser = NestedAdviserField(required=True, allow_null=False)
     referral_source_activity = NestedRelatedField(
-        meta_models.ReferralSourceActivity, required=True, allow_null=False,
+        meta_models.ReferralSourceActivity,
+        required=True,
+        allow_null=False,
     )
     referral_source_activity_website = NestedRelatedField(
-        meta_models.ReferralSourceWebsite, required=False, allow_null=True,
+        meta_models.ReferralSourceWebsite,
+        required=False,
+        allow_null=True,
     )
     referral_source_activity_marketing = NestedRelatedField(
-        meta_models.ReferralSourceMarketing, required=False, allow_null=True,
+        meta_models.ReferralSourceMarketing,
+        required=False,
+        allow_null=True,
     )
     fdi_type = NestedRelatedField(meta_models.FDIType, required=False, allow_null=True)
     sector = NestedRelatedField(meta_models.Sector, required=True, allow_null=False)
     business_activities = NestedRelatedField(
-        meta_models.InvestmentBusinessActivity, many=True, required=True,
-        allow_null=False, allow_empty=False,
+        meta_models.InvestmentBusinessActivity,
+        many=True,
+        required=True,
+        allow_null=False,
+        allow_empty=False,
     )
     archived_by = NestedAdviserField(read_only=True)
     created_by = NestedAdviserWithEmailAndTeamField(read_only=True)
 
     project_manager_request_status = NestedRelatedField(
-        ProjectManagerRequestStatus, required=False, allow_null=True,
+        ProjectManagerRequestStatus,
+        required=False,
+        allow_null=True,
     )
 
     # Value fields
     fdi_value = NestedRelatedField(meta_models.FDIValue, required=False, allow_null=True)
     average_salary = NestedRelatedField(
-        meta_models.SalaryRange, required=False, allow_null=True,
+        meta_models.SalaryRange,
+        required=False,
+        allow_null=True,
     )
     value_complete = serializers.SerializerMethodField()
     associated_non_fdi_r_and_d_project = NestedRelatedField(
-        InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code'),
+        InvestmentProject,
+        required=False,
+        allow_null=True,
+        extra_fields=('name', 'project_code'),
     )
 
     # Requirements fields
@@ -369,7 +390,9 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
     actual_uk_regions = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
     delivery_partners = NestedRelatedField(InvestmentDeliveryPartner, many=True, required=False)
     strategic_drivers = NestedRelatedField(
-        meta_models.InvestmentStrategicDriver, many=True, required=False,
+        meta_models.InvestmentStrategicDriver,
+        many=True,
+        required=False,
     )
     uk_company = NestedRelatedField(Company, required=False, allow_null=True)
     incomplete_fields = serializers.ListField(child=serializers.CharField(), read_only=True)
@@ -390,9 +413,8 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
 
     def save(self, **kwargs):
         """Saves when and who assigned a project manager for the first time."""
-        if (
-            'project_manager' in self.validated_data
-            and (self.instance is None or self.instance.project_manager is None)
+        if 'project_manager' in self.validated_data and (
+            self.instance is None or self.instance.project_manager is None
         ):
             kwargs['project_manager_first_assigned_on'] = now()
             kwargs['project_manager_first_assigned_by'] = self.context['current_user']
@@ -451,13 +473,9 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
             return
         investor_company = data['investor_company']
 
-        if (
-            self.instance
-            and (
-                str(self.instance.stage_id) == InvestmentProjectStage.won.value.id
-                or investor_company.address_country
-                == self.instance.country_investment_originates_from
-            )
+        if self.instance and (
+            str(self.instance.stage_id) == InvestmentProjectStage.won.value.id
+            or investor_company.address_country == self.instance.country_investment_originates_from
         ):
             # nothing to update, as either project is won or country is the same
             return
@@ -469,7 +487,8 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         if self.instance and 'stage' in data:
             current_user_id = self.context['current_user'].id
             allowed_users_ids = (
-                self.instance.project_manager_id, self.instance.project_assurance_adviser_id,
+                self.instance.project_manager_id,
+                self.instance.project_assurance_adviser_id,
             )
 
             if (
@@ -508,27 +527,33 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
     def get_value_complete(self, instance):
         """Whether the value fields required to move to the next stage are complete."""
         return not validate(
-            instance=instance, fields=VALUE_FIELDS, next_stage=True,
+            instance=instance,
+            fields=VALUE_FIELDS,
+            next_stage=True,
         )
 
     def get_requirements_complete(self, instance):
         """Whether the requirements fields required to move to the next stage are complete."""
         return not validate(
-            instance=instance, fields=REQUIREMENTS_FIELDS, next_stage=True,
+            instance=instance,
+            fields=REQUIREMENTS_FIELDS,
+            next_stage=True,
         )
 
     def get_team_complete(self, instance):
         """Whether the team fields required to move to the next stage are complete."""
         return not validate(
-            instance=instance, fields=TEAM_FIELDS, next_stage=True,
+            instance=instance,
+            fields=TEAM_FIELDS,
+            next_stage=True,
         )
 
     class Meta:
+        view_permission = InvestmentProjectPermission.view_investmentproject_document
         model = InvestmentProject
         fields = ALL_FIELDS
         permissions = {
-            f'investment.{InvestmentProjectPermission.view_investmentproject_document}':
-                'archived_documents_url_path',
+            f'investment.{view_permission}': 'archived_documents_url_path',
         }
         read_only_fields = (
             'allow_blank_estimated_land_date',
@@ -543,9 +568,25 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         )
 
 
-NestedInvestmentProjectField = partial(
-    NestedRelatedField, InvestmentProject,
-    extra_fields=('name', 'project_code'),
+def nested_investment_project(extra_fields=()):
+    return partial(
+        NestedRelatedField,
+        InvestmentProject,
+        extra_fields=('name', 'project_code') + extra_fields,
+    )
+
+
+NestedInvestmentProjectField = nested_investment_project()
+
+NestedInvestmentProjectInvestorCompanyField = nested_investment_project(
+    extra_fields=(
+        (
+            'investor_company',
+            NestedRelatedField(
+                Company,
+            ),
+        ),
+    ),
 )
 
 
@@ -564,10 +605,10 @@ class IProjectTeamMemberListSerializer(serializers.ListSerializer):
 
         Based on example code in DRF documentation for ListSerializer.
         """
-        old_advisers_mapping = {team_member.adviser.id: team_member for team_member in
-                                instances}
-        new_advisers_mapping = {team_member['adviser'].id: team_member for team_member in
-                                validated_data}
+        old_advisers_mapping = {team_member.adviser.id: team_member for team_member in instances}
+        new_advisers_mapping = {
+            team_member['adviser'].id: team_member for team_member in validated_data
+        }
 
         # Create new team members and update existing ones
         ret = []
