@@ -74,6 +74,7 @@ class TestGetInvestmentProjectTask(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_get_task_return_task_when_task_id_valid(self):
+        """Test the get_task endpoint returns a task with the expected body"""
         investment_task = InvestmentProjectTaskFactory()
         url = reverse(
             'api-v4:task:investment_project_task_item',
@@ -85,6 +86,11 @@ class TestGetInvestmentProjectTask(APITestMixin):
             'investment_project': {
                 'name': investment_task.investment_project.name,
                 'id': str(investment_task.investment_project.id),
+                'investor_company': {
+                    'name': investment_task.investment_project.investor_company.name,
+                    'id': str(investment_task.investment_project.investor_company.id),
+                },
+                'project_code': investment_task.investment_project.project_code,
             },
             'task': {
                 'id': str(investment_task.task.id),
