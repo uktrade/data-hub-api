@@ -10,6 +10,7 @@ from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 from datahub.omis.order.models import Order
 from datahub.omis.quote.models import Quote
+from datahub.task.models import InvestmentProjectTask
 
 COMPANY_MODIFIED_ON_CUT_OFF = datetime(2013, 8, 19, tzinfo=utc)  # 2013-08-18 + 1 day
 COMPANY_EXPIRY_PERIOD = relativedelta(years=10)
@@ -171,7 +172,7 @@ class Command(BaseCleanupCommand):
                     'associated_non_fdi_r_and_d_project',
                 ).remote_field: (),
                 InvestmentProject._meta.get_field('opportunities'): (),
-                InvestmentProject._meta.get_field('task'): (),
+                InvestmentProject._meta.get_field('investment_project_task'): (),
             },
             # These relations do not have any datetime fields to check – we just want them to be
             # deleted along with expired records.
@@ -248,6 +249,11 @@ class Command(BaseCleanupCommand):
             (
                 DatetimeLessThanCleanupFilter('created_on', TASK_EXPIRY_PERIOD),
                 DatetimeLessThanCleanupFilter('modified_on', TASK_EXPIRY_PERIOD),
+            ),
+            excluded_relations=(
+                InvestmentProjectTask._meta.get_field(
+                    'upcoming_investment_project_task_reminders',
+                ),
             ),
         ),
     }
