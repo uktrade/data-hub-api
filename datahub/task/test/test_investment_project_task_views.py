@@ -1,5 +1,8 @@
+import datetime
+
 from unittest.mock import patch
 from uuid import uuid4
+
 
 import pytest
 
@@ -16,12 +19,10 @@ from datahub.core.test_utils import (
     APITestMixin,
     format_date_or_datetime,
 )
-from datahub.investment.project.test.factories import (
-    InvestmentProjectFactory,
-)
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.task.models import InvestmentProjectTask, Task
 
-from datahub.task.test.factories import InvestmentProjectTaskFactory
+from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
 from datahub.task.test.utils import BaseListTaskTests
 from datahub.task.views import InvestmentProjectTaskV4ViewSet
 
@@ -58,6 +59,30 @@ class TestListInvestmentProjectTask(BaseListTaskTests):
         assert response['count'] == 2
         for result in response['results']:
             assert result['id'] in task_ids
+
+    def test_get_all_tasks_returns_ordered_investment_project_tasks_when_sortby_param_is_used(
+        self,
+    ):
+        earliest_task = InvestmentProjectTaskFactory(
+            task=TaskFactory(due_date=datetime.date.today() - datetime.timedelta(days=1)),
+        )
+        latest_task = InvestmentProjectTaskFactory(
+            task=TaskFactory(due_date=datetime.date.today() + datetime.timedelta(days=1)),
+        )
+        middle_task = InvestmentProjectTaskFactory(
+            task=TaskFactory(due_date=datetime.date.today()),
+        )
+
+        url = f'{reverse(self.reverse_url)}?sortby=task__due_date'
+
+        response = self.api_client.get(url).json()
+
+        ordered_ids_response = [result['id'] for result in response['results']]
+        assert ordered_ids_response == [
+            str(earliest_task.id),
+            str(middle_task.id),
+            str(latest_task.id),
+        ]
 
 
 class TestGetInvestmentProjectTask(APITestMixin):
