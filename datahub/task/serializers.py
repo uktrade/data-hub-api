@@ -1,15 +1,32 @@
+from functools import partial
+
 from django.conf import settings
 from rest_framework import serializers
 
 from datahub.company.serializers import NestedAdviserField, NestedRelatedField
-from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.serializers import (
+    NestedInvestmentProjectInvestorCompanyField,
+)
 from datahub.task.models import InvestmentProjectTask, Task
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class TaskSerializer(serializers.ModelSerializer):
-    """Task serilizer"""
+NestedInvestmentProjectTaskField = partial(
+    NestedRelatedField,
+    model=InvestmentProjectTask,
+    source='task_investmentprojecttask',
+    extra_fields=(
+        (
+            'investment_project',
+            NestedInvestmentProjectInvestorCompanyField(),
+        ),
+    ),
+)
+
+
+class BasicTaskSerializer(serializers.ModelSerializer):
+    """Basic task serilizer that contains the fields shared among all other task serializers"""
 
     modified_by = NestedAdviserField(read_only=True)
     archived_by = NestedAdviserField(read_only=True)
@@ -40,12 +57,21 @@ class TaskSerializer(serializers.ModelSerializer):
         )
 
 
+class TaskSerializer(BasicTaskSerializer):
+    """Task serializer"""
+
+    investment_project_task = NestedInvestmentProjectTaskField(read_only=True)
+
+    class Meta:
+        model = BasicTaskSerializer.Meta.model
+        fields = BasicTaskSerializer.Meta.fields + ('investment_project_task',)
+
+
 class InvestmentProjectTaskSerializer(serializers.ModelSerializer):
-    task = TaskSerializer()
+    task = BasicTaskSerializer()
     modified_by = NestedAdviserField(read_only=True)
-    archived_by = NestedAdviserField(read_only=True)
     created_by = NestedAdviserField(read_only=True)
-    investment_project = NestedRelatedField(InvestmentProject)
+    investment_project = NestedInvestmentProjectInvestorCompanyField()
 
     class Meta:
         model = InvestmentProjectTask
@@ -53,7 +79,6 @@ class InvestmentProjectTaskSerializer(serializers.ModelSerializer):
             'id',
             'investment_project',
             'task',
-            'archived_by',
             'created_by',
             'modified_by',
             'created_on',
