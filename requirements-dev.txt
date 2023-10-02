@@ -26,9 +26,9 @@ backcall==0.2.0
     # via ipython
 bigtree==0.13.0
     # via -r requirements.in
-boto3==1.28.49
+boto3==1.28.57
     # via -r requirements.in
-botocore==1.31.49
+botocore==1.31.57
     # via
     #   boto3
     #   s3transfer
@@ -347,7 +347,7 @@ rq==1.15.1
     #   rq-scheduler
 rq-scheduler==0.13.1
     # via -r requirements.in
-s3transfer==0.6.0
+s3transfer==0.7.0
     # via boto3
 sentry-sdk==1.31.0
     # via -r requirements.in
