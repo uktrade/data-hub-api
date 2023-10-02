@@ -578,3 +578,16 @@ If making requests to this endpoint locally, you must manually add this header o
 ### Hawk authentication
 
 In general, Hawk authentication hashing the HTTP payload and `Content-Type` header, and using a nonce, are both _optional_. Here, as with the Activity Stream endpoints in other DIT projects, both are _required_. `Content-Type` may be the empty string, and if there is no payload, then it should be treated as the empty string.
+
+### Emails
+
+Email templates are created in [GOV UK Notify](https://www.notifications.service.gov.uk/). You can create a personal account for testing new templates or template changes locally. To test locally you need to update the API Keys and template ID environment variables.
+
+#### Updating emails
+Only update the live email templates once your changes are pushed live. Extra parameters passed to email templates are ignored but not sending parameters required by an email template will cause the emails to error.
+
+Example of environment variables for updating the interaction notification email template:
+```
+INTERACTION_NOTIFICATION_API_KEY=<noftify-api-key>
+EXPORT_NOTIFICATION_NEW_INTERACTION_TEMPLATE_ID=<template-id>
+```
