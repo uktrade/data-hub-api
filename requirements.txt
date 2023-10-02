@@ -132,8 +132,10 @@ opensearch-py==2.3.1
     #   opensearch-dsl
 packaging==22.0
     # via marshmallow
-pandas==2.1.0
-    # via -r requirements.in
+pandas==2.1.1
+    # via
+    #   -r requirements.in
+    #   bigtree
 psycogreen==1.0.2
     # via -r requirements.in
 psycopg2==2.9.8
