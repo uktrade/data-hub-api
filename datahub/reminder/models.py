@@ -202,3 +202,15 @@ class UpcomingEstimatedLandDateReminder(BaseReminder):
         on_delete=models.CASCADE,
         related_name='upcoming_estimated_land_date_reminders',
     )
+
+
+class UpcomingInvestmentProjectTaskReminder(BaseReminder):
+    """
+    Upcoming investment project task reminder.
+    """
+
+    investment_project_task = models.ForeignKey(
+        'task.InvestmentProjectTask',
+        on_delete=models.CASCADE,
+        related_name='upcoming_investment_project_task_reminders',
+    )
