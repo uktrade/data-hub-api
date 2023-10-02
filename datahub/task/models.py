@@ -34,6 +34,10 @@ class Task(ArchivableModel, BaseModel):
 
 
 class BaseTaskType(BaseModel):
+    """
+    Base task model for task types to have a FK to task
+    """
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     task = models.OneToOneField(

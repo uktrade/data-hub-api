@@ -47,6 +47,9 @@ class TasksMixin(CoreViewSet):
 class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
     task_type_model_class = None
     ordering_fields = ['task__due_date']
+    # Many to many fields cannot be created automatically using the objects.create syntax.
+    # They need to be added later using a set()
+    many_to_many_fields = ['advisers']
 
     def get_filtered_task_by_type(self, request):
         """
@@ -61,18 +64,10 @@ class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
 
     def perform_create(self, serializer):
         """
-        Override the default save functionality of the serializer to allow custom saving of a Task
-        and associated task models
+        Override the default create functionality of the serializer to allow custom saving of a
+        Task and associated task models
         """
         self._save_task_and_task_type_models(serializer)
-
-    @abstractmethod
-    def create_and_save_task_type_model(self, validated_data, task, extra_data):
-        """
-        Create a new object of type task_type_model_class and save it. This new object will assign
-        the task provided
-        """
-        raise NotImplementedError()
 
     @transaction.atomic
     def _save_task_and_task_type_models(self, serializer):
@@ -98,25 +93,51 @@ class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
             },
         )
 
-    def _filter_task_data(self, task_data, fields_to_exclude):
-        return {k: v for k, v in task_data.items() if k not in fields_to_exclude}
-
     def _create_and_save_task(self, serializer, extra_data):
         """
         Create a new Task object and save it
         """
-        many_to_many_fields = ['advisers']
-        # Many to many fields cannot be created automatically using the objects.create syntax.
-        # They need to be added later using a set()
-
         task_data = serializer.validated_data['task']
         task_data.update(extra_data)
 
-        advisers = task_data['advisers']
-
         task = Task.objects.create(
-            **self._filter_task_data(task_data, many_to_many_fields),
+            **self._filter_task_data(task_data, self.many_to_many_fields),
         )
+
+        self._save_many_to_many_task_fields(task_data, task)
+        return task
+
+    def perform_update(self, serializer):
+        """
+        Override the default update functionality of the serializer to allow custom saving of a
+        Task and associated task models
+        """
+        self._update_task_and_task_type_models(serializer)
+
+    @transaction.atomic
+    def _update_task_and_task_type_models(self, serializer):
+        extra_data = self.get_additional_data(False)
+
+        task_data = serializer.validated_data['task']
+
+        task_type_model = (
+            self.task_type_model_class.objects.filter(id=self.kwargs['pk'])
+            .select_related('task')
+            .first()
+        )
+
+        for key, value in self._filter_task_data(task_data, self.many_to_many_fields).items():
+            setattr(task_type_model.task, key, value)
+
+        self._save_many_to_many_task_fields(task_data, task_type_model.task)
+
+        serializer.validated_data.update(extra_data)
+
+    def _save_many_to_many_task_fields(self, task_data, task):
+        """
+        Save the many to many fields on the task
+        """
+        advisers = task_data['advisers']
         task.advisers.set(advisers)
         task.save()
         task_data.update(
@@ -126,7 +147,17 @@ class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
                 'modified_on': task.modified_on,
             },
         )
-        return task
+
+    @abstractmethod
+    def create_and_save_task_type_model(self, validated_data, task, extra_data):
+        """
+        Create a new object of type task_type_model_class and save it. This new object will assign
+        the task provided
+        """
+        raise NotImplementedError()
+
+    def _filter_task_data(self, task_data, fields_to_exclude):
+        return {k: v for k, v in task_data.items() if k not in fields_to_exclude}
 
 
 class TaskV4ViewSet(ArchivableViewSetMixin, TasksMixin):
@@ -148,7 +179,7 @@ class InvestmentProjectTaskV4ViewSet(BaseTaskTypeV4ViewSet):
     """
 
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdviserPermittedToEditTask]
 
     serializer_class = InvestmentProjectTaskSerializer
 
