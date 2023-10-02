@@ -9,7 +9,7 @@ django-filter==23.3
 django-log-formatter-ecs==0.0.5
 django-mptt==0.14.0
 django-pglocks==1.0.4
-django-reversion==5.0.4
+django-reversion==5.0.6
 uritemplate==4.1.1  # required for DRF schema features
 whitenoise==6.5.0
 
@@ -18,10 +18,10 @@ pyyaml==6.0.1
 python-dateutil==2.8.2
 
 # Persistency layer
-psycopg2==2.9.7
+psycopg2==2.9.8
 psycogreen==1.0.2
 
-boto3==1.28.49
+boto3==1.28.57
 
 notifications-python-client==8.0.1
 
@@ -30,13 +30,13 @@ statsd==4.0.1
 
 # Email
 mail-parser==3.15.0
-icalendar==5.0.7
+icalendar==5.0.10
 
 # Slack
 slackclient==2.9.4
 
 # REDIS
-django-redis==5.3.0
+django-redis==5.4.0
 
 # OpenSearch
 opensearch-py==2.3.1
