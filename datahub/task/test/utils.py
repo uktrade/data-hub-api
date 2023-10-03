@@ -126,12 +126,12 @@ class BaseEditTaskTests(BaseTaskTests):
 
         assert list(json.keys()) == ['advisers']
 
-    def test_edit_task_returns_forbidden_when_user_not_creator_or_assigned_to_task(self):
+    def test_edit_task_returns_ok_when_user_not_creator_or_assigned_to_task(self):
         task = TaskFactory()
         adviser = AdviserFactory()
 
         data = {'advisers': [adviser.id]}
-        self._call_task_endpoint_assert_response(adviser, task, data, status.HTTP_403_FORBIDDEN)
+        self._call_task_endpoint_assert_response(adviser, task, data, status.HTTP_200_OK)
 
     def test_edit_task_returns_success_when_user_is_creator_but_not_assigned_to_task(self):
         adviser = AdviserFactory()
