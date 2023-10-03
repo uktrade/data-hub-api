@@ -221,9 +221,7 @@ packaging==22.0
     #   marshmallow
     #   pytest
 pandas==2.1.1
-    # via
-    #   -r requirements.in
-    #   bigtree
+    # via -r requirements.in
 parso==0.8.3
     # via jedi
 pep517==0.13.0
@@ -398,7 +396,7 @@ tzdata==2023.3
     # via pandas
 uritemplate==4.1.1
     # via -r requirements.in
-urllib3==1.26.13
+urllib3==1.26.17
     # via
     #   botocore
     #   elastic-apm
