@@ -253,14 +253,14 @@ class TestArchiveTask(BaseTaskTests):
             'reason': ['This field is required.'],
         }
 
-    def test_archive_task_returns_forbidden_when_user_not_creator_or_assigned_to_task(self):
+    def test_archive_task_returns_ok_when_user_not_creator_or_assigned_to_task(self):
         task = TaskFactory()
 
         url = reverse('api-v4:task:task_archive', kwargs={'pk': task.id})
 
         response = self.api_client.post(url, data={'reason': 'completed'})
 
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_200_OK
 
     def test_archive_task_returns_success_when_user_is_creator_but_not_assigned_to_task(self):
         adviser = AdviserFactory()
