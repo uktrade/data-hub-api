@@ -8,7 +8,7 @@ from faker import Faker
 
 from rest_framework import status
 from rest_framework.reverse import reverse
-
+from rest_framework.test import APIClient
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import (
@@ -253,14 +253,15 @@ class TestArchiveTask(BaseTaskTests):
             'reason': ['This field is required.'],
         }
 
-    def test_archive_task_returns_forbidden_when_user_not_creator_or_assigned_to_task(self):
-        task = TaskFactory()
+    def test_archive_task_returns_unauthorized_when_user_not_authenticated(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser])
 
         url = reverse('api-v4:task:task_archive', kwargs={'pk': task.id})
 
-        response = self.api_client.post(url, data={'reason': 'completed'})
+        response = APIClient().post(url, data={'reason': 'completed'})
 
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_archive_task_returns_success_when_user_is_creator_but_not_assigned_to_task(self):
         adviser = AdviserFactory()

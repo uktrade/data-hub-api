@@ -14,7 +14,6 @@ from rest_framework.permissions import IsAuthenticated
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSet
 from datahub.task.models import InvestmentProjectTask, Task
-from datahub.task.permissions import IsAdviserPermittedToEditTask
 from datahub.task.serializers import (
     InvestmentProjectTaskQueryParamSerializer,
     InvestmentProjectTaskSerializer,
@@ -164,7 +163,7 @@ class TaskV4ViewSet(ArchivableViewSetMixin, TasksMixin):
     """View for tasks"""
 
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    permission_classes = [IsAuthenticated, IsAdviserPermittedToEditTask]
+    permission_classes = [IsAuthenticated]
     ordering_fields = ['title', 'due_date']
 
     serializer_class = TaskSerializer
@@ -179,7 +178,7 @@ class InvestmentProjectTaskV4ViewSet(BaseTaskTypeV4ViewSet):
     """
 
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    permission_classes = [IsAuthenticated, IsAdviserPermittedToEditTask]
+    permission_classes = [IsAuthenticated]
 
     serializer_class = InvestmentProjectTaskSerializer
 
