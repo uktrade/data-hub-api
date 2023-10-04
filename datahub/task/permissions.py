@@ -24,5 +24,3 @@ class IsAdviserPermittedToEditTask(BasePermission):
     def validate_task_permission(self, request, view, obj):
         if request.user.is_authenticated:
             return True
-
-        return False
