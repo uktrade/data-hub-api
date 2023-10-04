@@ -5,7 +5,7 @@ class IsAdviserPermittedToEditTask(BasePermission):
     """
     Permission class to limit edit access to a task. For MVP allow any authenticated user to edit
     any task.
-    Origintally to only the original creator, or to an adviser that has had the task assigned to
+    Originally: to only the original creator, or to an adviser that has had the task assigned to
     them.
     """
 
