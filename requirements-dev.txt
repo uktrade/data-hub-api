@@ -92,7 +92,7 @@ django-js-asset==2.0.0
     # via django-mptt
 django-log-formatter-ecs==0.0.5
     # via -r requirements.in
-django-mptt==0.14.0
+django-mptt==0.15.0
     # via -r requirements.in
 django-pglocks==1.0.4
     # via -r requirements.in
