@@ -23,7 +23,7 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.task.models import InvestmentProjectTask, Task
 
 from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
-from datahub.task.test.utils import BaseListTaskTests
+from datahub.task.test.utils import BaseEditTaskTests, BaseListTaskTests
 from datahub.task.views import InvestmentProjectTaskV4ViewSet
 
 
@@ -290,3 +290,9 @@ class TestAddInvestmentProjectTask(APITestMixin):
 
         assert Task.objects.exists() is False
         assert InvestmentProjectTask.objects.exists() is False
+
+
+class TestEditTask(BaseEditTaskTests):
+    reverse_url = 'api-v4:task:investment_project_task_item'
+    task_type_factory = InvestmentProjectTaskFactory
+    nested_task_field_name = 'task'
