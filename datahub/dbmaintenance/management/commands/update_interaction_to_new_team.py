@@ -23,12 +23,12 @@ class Command(BaseCommand):
         adviser_ids = parse_uuid_list(row['adviser_id'])
         new_team_name = parse_uuid(row['team_name'])
 
-        if interaction.adviser == set(adviser_ids):
-            interaction.update(team=team_id)
-
         if simulate:
             return
 
-        reversion.set_comment(
-            'Set the advisers: ' + adviser_ids + ' to the team: ' + new_team_name
-            + ' for the given interaction: ' + pk)
+        with reversion.create_revision():
+            if interaction.adviser == set(adviser_ids):
+                interaction.update(team=team_id)
+                reversion.set_comment(
+                    'Set the advisers: ' + adviser_ids + ' to the team: ' + new_team_name
+                    + ' for the given interaction: ' + pk)
