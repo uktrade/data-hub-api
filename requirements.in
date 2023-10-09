@@ -1,5 +1,5 @@
 # Django and django related
-django==3.2.21
+django==3.2.22
 djangorestframework==3.14.0
 django-axes==6.1.1
 django-csp==3.7
@@ -7,7 +7,7 @@ django-environ==0.11.2
 django-extensions==3.2.3
 django-filter==23.3
 django-log-formatter-ecs==0.0.5
-django-mptt==0.14.0
+django-mptt==0.15.0
 django-pglocks==1.0.4
 django-reversion==5.0.6
 uritemplate==4.1.1  # required for DRF schema features
@@ -18,10 +18,10 @@ pyyaml==6.0.1
 python-dateutil==2.8.2
 
 # Persistency layer
-psycopg2==2.9.8
+psycopg2==2.9.9
 psycogreen==1.0.2
 
-boto3==1.28.57
+boto3==1.28.62
 
 notifications-python-client==8.0.1
 
