@@ -32,6 +32,8 @@ def get_interaction_item(interaction):
         'last_interaction_created_by': interaction.created_by.name,
         'last_interaction_type': interaction.get_kind_display(),
         'last_interaction_subject': interaction.subject,
+        'date_of_interaction': interaction.date.strftime('%-d %B %Y'),
+        'link_to_interaction': interaction.get_absolute_url(),
     }
 
 

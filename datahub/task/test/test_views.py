@@ -8,7 +8,7 @@ from faker import Faker
 
 from rest_framework import status
 from rest_framework.reverse import reverse
-
+from rest_framework.test import APIClient
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import (
@@ -17,7 +17,7 @@ from datahub.core.test_utils import (
 )
 
 from datahub.task.test.factories import TaskFactory
-from datahub.task.test.utils import BaseListTaskTests, BaseTaskTests
+from datahub.task.test.utils import BaseEditTaskTests, BaseListTaskTests, BaseTaskTests
 
 
 class TestListTask(BaseListTaskTests):
@@ -208,6 +208,35 @@ class TestAddTask(APITestMixin):
         assert get_response.json() == expected_response
 
 
+class TestEditTask(BaseEditTaskTests):
+    reverse_url = 'api-v4:task:item'
+
+    """Test the PATCH task endpoint"""
+
+    def test_edit_task_return_404_when_task_id_unknown(self):
+        url = reverse('api-v4:task:item', kwargs={'pk': uuid4()})
+
+        response = self.api_client.patch(
+            url,
+            data={'title': 'abc'},
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_edit_task_with_valid_fields_returns_success(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(created_by=adviser)
+        new_adviser = AdviserFactory()
+
+        url = reverse('api-v4:task:item', kwargs={'pk': task.id})
+
+        response = self.adviser_api_client(adviser).patch(
+            url,
+            data={'advisers': [new_adviser.id]},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['advisers'][0]['id'] == str(new_adviser.id)
+
+
 class TestArchiveTask(BaseTaskTests):
     """Test the archive POST endpoint for task"""
 
@@ -224,14 +253,15 @@ class TestArchiveTask(BaseTaskTests):
             'reason': ['This field is required.'],
         }
 
-    def test_archive_task_returns_forbidden_when_user_not_creator_or_assigned_to_task(self):
-        task = TaskFactory()
+    def test_archive_task_returns_unauthorized_when_user_not_authenticated(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser])
 
         url = reverse('api-v4:task:task_archive', kwargs={'pk': task.id})
 
-        response = self.api_client.post(url, data={'reason': 'completed'})
+        response = APIClient().post(url, data={'reason': 'completed'})
 
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_archive_task_returns_success_when_user_is_creator_but_not_assigned_to_task(self):
         adviser = AdviserFactory()
