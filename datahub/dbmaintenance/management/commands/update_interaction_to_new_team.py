@@ -3,8 +3,6 @@ from datahub.dbmaintenance.management.base import CSVBaseCommand
 
 import reversion
 
-from django.core.management.base import BaseCommand
-
 from datahub.dbmaintenance.utils import parse_uuid, parse_uuid_list
 from datahub.interaction.models import Interaction
 
