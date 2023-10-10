@@ -27,7 +27,7 @@ class Command(BaseCommand):
             return
 
         with reversion.create_revision():
-            if interaction.adviser == set(adviser_ids):
+            if interaction.adviser.id in set(adviser_ids):
                 interaction.update(team=team_id)
                 reversion.set_comment(
                     'Set the advisers: ' + adviser_ids + ' to the team: ' + new_team_name
