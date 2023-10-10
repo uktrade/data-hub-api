@@ -1,4 +1,5 @@
 from logging import getLogger
+from datahub.dbmaintenance.management.base import CSVBaseCommand
 
 import reversion
 
@@ -10,7 +11,7 @@ from datahub.interaction.models import Interaction
 logger = getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(CSVBaseCommand):
     """Command to update an interaction advisers to a new team"""
 
     help = 'Updates interaction advisers to a new team with the history up to a certain date'
