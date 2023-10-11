@@ -51,6 +51,7 @@ from datahub.reminder.tasks import (
     update_notify_email_delivery_status_for_no_recent_interaction,
 )
 from datahub.search.tasks import sync_all_models
+from datahub.task.tasks import schedule_reminders_upcoming_tasks
 
 env = environ.Env()
 logger = getLogger(__name__)
@@ -80,6 +81,11 @@ def schedule_jobs():
         },
         cron=EVERY_SEVEN_PM,
         description='Automatic Company Archive',
+    )
+    job_scheduler(
+        function=schedule_reminders_upcoming_tasks,
+        cron=EVERY_EIGHT_AM,
+        description='Schedule reminders upcoming tasks',
     )
     job_scheduler(
         function=schedule_automatic_adviser_deactivate,
