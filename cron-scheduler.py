@@ -74,6 +74,11 @@ def schedule_jobs():
         description='Refresh pending payment gateway sessions :0',
     )
     job_scheduler(
+        function=schedule_reminders_upcoming_tasks,
+        cron=EVERY_EIGHT_AM,
+        description='Schedule reminders upcoming tasks',
+    )
+    job_scheduler(
         function=schedule_automatic_company_archive,
         function_kwargs={
             'limit': 20000,
@@ -81,11 +86,6 @@ def schedule_jobs():
         },
         cron=EVERY_SEVEN_PM,
         description='Automatic Company Archive',
-    )
-    job_scheduler(
-        function=schedule_reminders_upcoming_tasks,
-        cron=EVERY_EIGHT_AM,
-        description='Schedule reminders upcoming tasks',
     )
     job_scheduler(
         function=schedule_automatic_adviser_deactivate,
