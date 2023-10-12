@@ -19,6 +19,12 @@ class Command(CSVBaseCommand):
 
     help = 'Updates interaction advisers to a new team with the history up to a certain date'
 
+    def add_arguments(self, parser):
+        """Define extra arguments."""
+        super().add_arguments(parser)
+        parser.add_argument('team_id', type=str,
+                            help='team id to move the interaction to a new team')
+
     def _process_row(self, row, simulate=True, **options):
         """Processes a CSV file row."""
         interaction_pk = parse_uuid(row['id'])
