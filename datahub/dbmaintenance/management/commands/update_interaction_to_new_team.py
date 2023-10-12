@@ -25,7 +25,7 @@ class Command(CSVBaseCommand):
         parser.add_argument('team_id', type=str,
                             help='team id to move the interaction to a new team')
 
-    def _process_row(self, row, simulate=True, **options):
+    def _process_row(self, row, simulate=False, **options):
         """Processes a CSV file row."""
         interaction_pk = parse_uuid(row['id'])
 
