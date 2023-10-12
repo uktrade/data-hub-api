@@ -1,5 +1,15 @@
 import logging
 
+from django.db.models import (
+    DateTimeField,
+    DecimalField,
+    ExpressionWrapper,
+    F,
+    IntegerField,
+)
+from django.db.models.functions import Cast
+from django.utils import timezone
+
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
@@ -56,12 +66,39 @@ def generate_reminders_upcoming_tasks():
     #         f'Feature flag {ADVISER_TASKS_USER_FEATURE_FLAG_NAME}' ' is not active, exiting.',
     #     )
     #     return
+    now = timezone.now()
 
-    tasks = Task.objects.filter(reminder_days__gt=0)
+    #     set4 = Race.objects.annotate(
+    #     diff=ExpressionWrapper(F('end') - F('start'), output_field=DurationField())).filter(
+    #     diff__gte=datetime.timedelta(5))
+    # len(set4)
+    # # 364
+    # len(Race.objects.filter(end__gte=F("start")+5))
+
+    tasks = Task.objects.annotate(
+        due_date_days=Cast(
+            ExpressionWrapper(
+                Cast('due_date', output_field=DateTimeField()) - Cast(now, DateTimeField()),
+                output_field=IntegerField(),
+            )
+            / 86400000000,
+            output_field=DecimalField(),
+        ),
+    ).filter(due_date_days=F('reminder_days'))
+    # Cast(
+    #     Cast('due_date', output_field=DateTimeField()) - Cast(now, DateTimeField()),
+    #     output_field=DurationField(),
+    # )
+
+    # tasks = Task.objects.filter(
+    #     Q(
+    #         reminder_days=
+    #     )
+    # )
 
     # from pprint import pprint
 
-    # pprint(tasks.__dict__)
+    # pprint(tasks.get().__dict__)
     return tasks
     # tasks [due_date - reminder_days = today]
     #   advisers [is_active && ]

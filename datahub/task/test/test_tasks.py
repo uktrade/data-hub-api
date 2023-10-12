@@ -20,7 +20,7 @@ class TestTaskReminders:
     def test_generate_reminders_for_upcoming_tasks(self):
         # create a few tasks without due reminders
         # create a few tasks with due reminders
-        tasks = InvestmentProjectTaskFactory.create_batch(3)
+        tasks = InvestmentProjectTaskFactory.create_batch(4)
         tasks_due = []
         tasks_due.append(invstment_project_factory_due_today(1))
         tasks_due.append(invstment_project_factory_due_today(7))
@@ -30,9 +30,10 @@ class TestTaskReminders:
         # investment_project_task = InvestmentProjectTaskFactory(task=task)
 
         tasks = generate_reminders_upcoming_tasks()
+        assert tasks.count() == 3
 
         # Check tasks count is number due reminders expected
-        assert tasks.count() == 1
+        # assert tasks.count() == 3
 
     # tasks [due_date - reminder_days = today]
     #   advisers [is_active && ]
