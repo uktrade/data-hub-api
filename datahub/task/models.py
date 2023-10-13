@@ -1,5 +1,7 @@
 import uuid
 
+from datetime import timedelta
+
 from django.conf import settings
 from django.db import models
 
@@ -27,6 +29,13 @@ class Task(ArchivableModel, BaseModel):
         Advisor,
         related_name='+',
     )
+    reminder_date = models.DateField(null=True, blank=True, editable=False)
+
+    # override the save method and calculate reminder_date
+    def save(self, *args, **kwargs):
+        if self.due_date and self.reminder_days:
+            self.reminder_date = self.due_date - timedelta(days=self.reminder_days)
+        super(Task, self).save(*args, **kwargs)
 
     def __str__(self):
         """Admin displayed human readable name."""

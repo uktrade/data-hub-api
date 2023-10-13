@@ -75,16 +75,29 @@ def generate_reminders_upcoming_tasks():
     # # 364
     # len(Race.objects.filter(end__gte=F("start")+5))
 
-    tasks = Task.objects.annotate(
-        due_date_days=Cast(
-            ExpressionWrapper(
-                Cast('due_date', output_field=DateTimeField()) - Cast(now, DateTimeField()),
-                output_field=IntegerField(),
-            )
-            / 86400000000,
-            output_field=DecimalField(),
-        ),
-    ).filter(due_date_days=F('reminder_days'))
+    tasks = Task.objects.filter(reminder_date=now)
+    for task in tasks:
+        # GET ALL ACTIVE ADVISERS ASSIGNED TO THE TASK
+        active_advisers = task.advisers.filter(is_active=True)
+        print(active_advisers)
+        for adviser in active_advisers:
+            print(adviser)
+            # GET SUBSCRIPTION TO KNOW IF EMAILS ARE NEEDED
+            adviser_subscription = UpcomingTaskReminderSubscription.objects.filter(adviser=adviser)
+            print(adviser_subscription)
+
+    print(tasks)
+
+    # tasks = Task.objects.annotate(
+    #     due_date_days=Cast(
+    #         ExpressionWrapper(
+    #             Cast('due_date', output_field=DateTimeField()) - Cast(now, DateTimeField()),
+    #             output_field=IntegerField(),
+    #         )
+    #         / 86400000000,
+    #         output_field=DecimalField(),
+    #     ),
+    # ).filter(due_date_days=F('reminder_days'))
     # Cast(
     #     Cast('due_date', output_field=DateTimeField()) - Cast(now, DateTimeField()),
     #     output_field=DurationField(),
