@@ -364,7 +364,3 @@ class FDIValue(BaseOrderedConstantModel):
 
 class ExportBarrierType(BaseOrderedConstantModel):
     """Export barrier type (used for company interactions)."""
-
-
-class TeamType(BaseOrderedConstantModel):
-    """Team type (for export wins)."""
