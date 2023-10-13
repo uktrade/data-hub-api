@@ -1,6 +1,8 @@
-from datahub.core.models import BaseOrderedConstantModel
-from django.db import models
 from django.conf import settings
+
+from django.db import models
+
+from datahub.core.models import BaseOrderedConstantModel
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
