@@ -1,0 +1,55 @@
+- model: metadata.teamtype
+  pk: a4839e09-e30e-492c-93b5-8ab2ef90b891
+  fields:
+    disabled_on: null
+    name: 'Trade (TD or ST)'
+    order: 100
+  
+- model: metadata.teamtype
+  pk: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+  fields:
+    disabled_on: null
+    name: 'Investment (ITFG or IG)'
+    order: 200
+
+- model: metadata.teamtype
+  pk: c2d215e2-d564-4c50-b209-ec838eef761d
+  fields:
+    disabled_on: null
+    name: 'DSO'
+    order: 300
+
+- model: metadata.teamtype
+  pk: bbb7fad4-417c-411e-a40a-11184b0c635d
+  fields:
+    disabled_on: null
+    name: 'Other HQ Team'
+    order: 400
+
+- model: metadata.teamtype
+  pk: 1f6eccf9-289a-450b-a4af-b75600ea521b
+  fields:
+    disabled_on: null
+    name: 'International Trade Team'
+    order: 500
+
+- model: metadata.teamtype
+  pk: 17f95045-63b4-489d-9af8-7246e6ab370e
+  fields:
+    disabled_on: null
+    name: 'Overseas Business Network'
+    order: 600
+
+- model: metadata.teamtype
+  pk: 6e798633-83da-4597-8e9a-9bb033ca06a4
+  fields:
+    disabled_on: null
+    name: 'Overseas Post'
+    order: 700
+
+- model: metadata.teamtype
+  pk: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+  fields:
+    disabled_on: null
+    name: 'Trade Challenge Partners (TCP)'
+    order: 800
