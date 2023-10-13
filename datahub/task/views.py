@@ -45,7 +45,7 @@ class TasksMixin(CoreViewSet):
 
 class BaseTaskTypeV4ViewSet(TasksMixin, ABC):
     task_type_model_class = None
-    ordering_fields = ['task__due_date']
+    ordering_fields = ['task__due_date', 'task__created_on']
     # Many to many fields cannot be created automatically using the objects.create syntax.
     # They need to be added later using a set()
     many_to_many_fields = ['advisers']
@@ -164,7 +164,7 @@ class TaskV4ViewSet(ArchivableViewSetMixin, TasksMixin):
 
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     permission_classes = [IsAuthenticated]
-    ordering_fields = ['title', 'due_date']
+    ordering_fields = ['title', 'due_date', 'created_on']
 
     serializer_class = TaskSerializer
 
