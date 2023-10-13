@@ -103,3 +103,4 @@ registry.register(
 )
 registry.register(metadata_id='fdi-value', model=models.FDIValue)
 registry.register(metadata_id='export-barrier', model=models.ExportBarrierType)
+registry.register(metadata_id='team-type', model=models.TeamType)
