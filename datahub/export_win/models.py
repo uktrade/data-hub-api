@@ -14,6 +14,10 @@ class BaseExportWinOrderedConstantModel(BaseOrderedConstantModel):
         max_length=MAX_LENGTH,
     )
 
+    class Meta:
+        abstract = True
+        ordering = ('order', )
+
 
 class TeamType(BaseExportWinOrderedConstantModel):
     """Team type (for export wins)."""
