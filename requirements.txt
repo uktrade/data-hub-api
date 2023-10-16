@@ -16,7 +16,7 @@ async-timeout==4.0.2
     #   redis
 attrs==22.2.0
     # via aiohttp
-bigtree==0.13.0
+bigtree==0.13.1
     # via -r requirements.in
 boto3==1.28.62
     # via -r requirements.in
