@@ -214,7 +214,7 @@ urllib3==1.26.17
     #   sentry-sdk
 werkzeug==2.2.3
     # via -r requirements.in
-whitenoise==6.5.0
+whitenoise==6.6.0
     # via -r requirements.in
 wrapt==1.14.1
     # via elastic-apm
