@@ -55,7 +55,6 @@ class TaskAssignedToMeFromOthersSubscriptionAdmin(admin.ModelAdmin):
     """Task Assigned ToMe From Others Subscription admin."""
 
     raw_id_fields = ('adviser',)
-    exclude = ('reminder_days',)
 
 
 @admin.register(NewExportInteractionReminder)
