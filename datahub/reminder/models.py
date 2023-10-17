@@ -19,12 +19,6 @@ class BaseSubscription(models.Model):
         on_delete=models.CASCADE,
         related_name='+',
     )
-    reminder_days = ArrayField(
-        models.PositiveSmallIntegerField(),
-        size=5,
-        blank=True,
-        default=list,
-    )
     email_reminders_enabled = models.BooleanField(default=False)
 
     class Meta:
@@ -34,31 +28,53 @@ class BaseSubscription(models.Model):
         return f'Subscription: {self.adviser}'
 
 
-class NoRecentExportInteractionSubscription(BaseSubscription):
+class ScheduledSubscription(models.Model):
+    """
+    Model for reminder adding reminder days to a subscription.
+    """
+
+    reminder_days = ArrayField(
+        models.PositiveSmallIntegerField(),
+        size=5,
+        blank=True,
+        default=list,
+    )
+
+    class Meta:
+        abstract = True
+
+
+class NoRecentExportInteractionSubscription(BaseSubscription, ScheduledSubscription):
     """
     Subscription to get reminders about companies with no recent interactions.
     """
 
 
-class NewExportInteractionSubscription(BaseSubscription):
+class NewExportInteractionSubscription(BaseSubscription, ScheduledSubscription):
     """
     Subscription to get reminders about companies with new interactions.
     """
 
 
-class NoRecentInvestmentInteractionSubscription(BaseSubscription):
+class NoRecentInvestmentInteractionSubscription(BaseSubscription, ScheduledSubscription):
     """
     Subscription to get reminders about projects with no recent interactions.
     """
 
 
-class UpcomingEstimatedLandDateSubscription(BaseSubscription):
+class UpcomingEstimatedLandDateSubscription(BaseSubscription, ScheduledSubscription):
     """
     Subscription to get reminders about upcoming estimated land dates.
     """
 
 
-class UpcomingTaskReminderSubscription(BaseSubscription):
+class UpcomingTaskReminderSubscription(BaseSubscription, ScheduledSubscription):
+    """
+    Subscription to get reminders about upcoming tasks.
+    """
+
+
+class TaskAssignedToMeFromOthersSubscription(BaseSubscription):
     """
     Subscription to get reminders about upcoming tasks.
     """
