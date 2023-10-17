@@ -30,7 +30,6 @@ def set_task_reminder_subscription_after_task_post_save(sender, instance, **kwar
     passed to the task for processing to add task reminder subscriptions
     """
     advisers = instance.advisers.all()
-    print('****', advisers)
     for adviser in advisers:
         schedule_create_task_reminder_subscription_task(adviser)
         schedule_create_task_assigned_to_me_from_others_subscription_task(adviser)

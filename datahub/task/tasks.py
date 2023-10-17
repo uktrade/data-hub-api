@@ -26,9 +26,7 @@ def create_task_reminder_subscription_task(adviser):
     Creates a task reminder subscription for an adviser if the adviser doesn't have
     a subscription already.
     """
-    try:
-        UpcomingTaskReminderSubscription.objects.get(adviser=adviser)
-    except UpcomingTaskReminderSubscription.DoesNotExist:
+    if not UpcomingTaskReminderSubscription.objects.filter(adviser=adviser).first():
         UpcomingTaskReminderSubscription.objects.create(adviser=adviser)
 
 
