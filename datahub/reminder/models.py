@@ -230,3 +230,15 @@ class UpcomingInvestmentProjectTaskReminder(BaseReminder):
         on_delete=models.CASCADE,
         related_name='upcoming_investment_project_task_reminders',
     )
+
+
+class InvestmentProjectTaskTaskAssignedToMeFromOthersReminder(BaseReminder):
+    """
+    Investment project task assigned to me from others notification.
+    """
+
+    invest_project_task_task_assigned_to_me_from_others = models.ForeignKey(
+        'task.InvestmentProjectTask',
+        on_delete=models.CASCADE,
+        related_name='investment_project_task_task_assigned_to_me_from_others',
+    )
