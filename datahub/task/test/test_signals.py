@@ -1,7 +1,10 @@
 import pytest
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.reminder.models import UpcomingTaskReminderSubscription
+from datahub.reminder.models import (
+    UpcomingTaskReminderSubscription,
+    TaskAssignedToMeFromOthersSubscription,
+)
 from datahub.task.models import Task
 from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
 
@@ -44,5 +47,23 @@ class TestTaskReminderSubscription:
         TaskFactory()
         TaskFactory(advisers=[adviser])
         subscriptions = UpcomingTaskReminderSubscription.objects.filter(adviser=adviser)
+
+        assert subscriptions.count() == 1
+
+
+@pytest.mark.django_db
+class TestTaskAssignedToMeFromOthersSubscription:
+    def test_creation_of_single_adviser_subscription_on_task_creation(self):
+        TaskFactory()
+        adviser = AdviserFactory()
+        TaskFactory(advisers=[adviser])
+        subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(adviser=adviser)
+
+        assert subscriptions.count() == 1
+
+        TaskFactory()
+        TaskFactory()
+        TaskFactory(advisers=[adviser])
+        subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(adviser=adviser)
 
         assert subscriptions.count() == 1

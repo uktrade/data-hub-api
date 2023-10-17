@@ -7,6 +7,7 @@ from datahub.reminder.models import (
     NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
+    TaskAssignedToMeFromOthersSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
     UpcomingInvestmentProjectTaskReminder,
@@ -47,6 +48,14 @@ class UpcomingTaskReminderSubscriptionAdmin(admin.ModelAdmin):
     """Upcoming Task Subscription admin."""
 
     raw_id_fields = ('adviser',)
+
+
+@admin.register(TaskAssignedToMeFromOthersSubscription)
+class TaskAssignedToMeFromOthersSubscriptionAdmin(admin.ModelAdmin):
+    """Task Assigned ToMe From Others Subscription admin."""
+
+    raw_id_fields = ('adviser',)
+    exclude = ('reminder_days',)
 
 
 @admin.register(NewExportInteractionReminder)

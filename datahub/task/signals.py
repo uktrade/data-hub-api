@@ -2,7 +2,10 @@ from django.db.models.signals import m2m_changed, post_delete
 from django.dispatch import receiver
 
 from datahub.task.models import InvestmentProjectTask, Task
-from datahub.task.tasks import schedule_create_task_reminder_subscription_task
+from datahub.task.tasks import (
+    schedule_create_task_reminder_subscription_task,
+    schedule_create_task_assigned_to_me_from_others_subscription_task,
+)
 
 
 @receiver(
@@ -28,3 +31,4 @@ def set_task_reminder_subscription_after_task_post_save(sender, instance, **kwar
     """
     if instance.advisers.all().count():
         schedule_create_task_reminder_subscription_task(instance.advisers.all())
+        schedule_create_task_assigned_to_me_from_others_subscription_task(instance.advisers.all())

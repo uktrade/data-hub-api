@@ -28,6 +28,7 @@ from datahub.reminder.test.factories import (
     NoRecentExportInteractionSubscriptionFactory,
     NoRecentInvestmentInteractionReminderFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
+    TaskAssignedToMeFromOthersSubscriptionFactory,
     UpcomingEstimatedLandDateReminderFactory,
     UpcomingEstimatedLandDateSubscriptionFactory,
     UpcomingTaskReminderSubscriptionFactory,
@@ -423,6 +424,10 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
         UpcomingTaskReminderSubscriptionFactory(
             adviser=self.user,
             reminder_days=reminder_days,
+            email_reminders_enabled=email_reminders_enabled,
+        )
+        TaskAssignedToMeFromOthersSubscriptionFactory(
+            adviser=self.user,
             email_reminders_enabled=email_reminders_enabled,
         )
 
