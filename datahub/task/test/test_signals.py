@@ -2,8 +2,8 @@ import pytest
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.reminder.models import (
-    UpcomingTaskReminderSubscription,
     TaskAssignedToMeFromOthersSubscription,
+    UpcomingTaskReminderSubscription,
 )
 from datahub.task.models import Task
 from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory

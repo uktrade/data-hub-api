@@ -3,8 +3,8 @@ import logging
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.reminder.models import (
-    UpcomingTaskReminderSubscription,
     TaskAssignedToMeFromOthersSubscription,
+    UpcomingTaskReminderSubscription,
 )
 
 logger = logging.getLogger(__name__)
