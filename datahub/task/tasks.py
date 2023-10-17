@@ -12,7 +12,7 @@ from datahub.reminder.models import (
     UpcomingTaskReminderSubscription,
 )
 from datahub.reminder.tasks import notify_adviser_by_rq_email
-from datahub.task.models import Task
+from datahub.task.models import InvestmentProjectTask
 
 
 logger = logging.getLogger(__name__)
@@ -38,7 +38,10 @@ def create_task_reminder_subscription_task(adviser):
     try:
         UpcomingTaskReminderSubscription.objects.get(adviser=adviser)
     except UpcomingTaskReminderSubscription.DoesNotExist:
-        UpcomingTaskReminderSubscription.objects.create(adviser=adviser)
+        UpcomingTaskReminderSubscription.objects.create(
+            adviser=adviser,
+            email_reminders_enabled=True,
+        )
 
 
 def schedule_reminders_upcoming_tasks():
@@ -74,10 +77,12 @@ def generate_reminders_upcoming_tasks():
     # # 364
     # len(Race.objects.filter(end__gte=F("start")+5))
 
-    tasks = Task.objects.filter(reminder_date=now)
-    for task in tasks:
+    # When adding additional tasks are added this query will need to be moved to Open Search
+    # to return all types.
+    investment_project_tasks = InvestmentProjectTask.objects.filter(task__reminder_date=now)
+    for investment_project_task in investment_project_tasks:
         # GET ALL ACTIVE ADVISERS ASSIGNED TO THE TASK
-        active_advisers = task.advisers.filter(is_active=True)
+        active_advisers = investment_project_task.task.advisers.filter(is_active=True)
         # print("task: ", task)
         # print("active_advisers: ", active_advisers)
         for adviser in active_advisers:
@@ -87,85 +92,53 @@ def generate_reminders_upcoming_tasks():
             # Schedule bell reminder
 
             # GET SUBSCRIPTION TO KNOW IF EMAILS ARE NEEDED
-            adviser_subscription = UpcomingTaskReminderSubscription.objects.filter(adviser=adviser)
+            adviser_subscription = UpcomingTaskReminderSubscription.objects.filter(
+                adviser=adviser,
+            ).first()
 
-            create_upcoming_task_reminder(task, adviser, adviser_subscription, now)
-
-            # If subscription send email
-
-    #         print("adviser_subscription:", adviser_subscription)
-
-    # print("tasks:", tasks)
-
-    # tasks = Task.objects.annotate(
-    #     due_date_days=Cast(
-    #         ExpressionWrapper(
-    #             Cast('due_date', output_field=DateTimeField()) - Cast(now, DateTimeField()),
-    #             output_field=IntegerField(),
-    #         )
-    #         / 86400000000,
-    #         output_field=DecimalField(),
-    #     ),
-    # ).filter(due_date_days=F('reminder_days'))
-    # Cast(
-    #     Cast('due_date', output_field=DateTimeField()) - Cast(now, DateTimeField()),
-    #     output_field=DurationField(),
-    # )
-
-    # tasks = Task.objects.filter(
-    #     Q(
-    #         reminder_days=
-    #     )
-    # )
-
-    # from pprint import pprint
-
-    # pprint(tasks.get().__dict__)
-    return tasks
-    # tasks [due_date - reminder_days = today]
-    #   advisers [is_active && ]
-    #       upcoming_task_reminder_subscription [select email_reminder_enabled]
-
-    #   userfeatureflag or userfeatureflag group set
-
-    # Add reminder to DataHub reminders
-    # Send email if upcoming_task_reminder_subscription.email_reminder_enabled
+            create_upcoming_task_reminder(
+                investment_project_task.task,
+                investment_project_task,
+                adviser,
+                adviser_subscription.email_reminders_enabled,
+                now,
+            )
+    return investment_project_tasks
 
 
-def create_upcoming_task_reminder(task, adviser, send_email, current_date):
+def create_upcoming_task_reminder(
+    task, investment_project_task, adviser, send_email, current_date,
+):
     """
     Creates a reminder and sends an email if required.
 
     If a reminder has already been sent on the same day, then do nothing.
     """
-    if _has_existing_upcoming_task_reminder(task, adviser, current_date):
+    if _has_existing_upcoming_task_reminder(task, investment_project_task, adviser, current_date):
         return
 
     reminder = UpcomingTaskReminder.objects.create(
         adviser=adviser,
         event=f'{task.reminder_days} days left to task due',
         task=task,
-        # project=task,
     )
-
-    # from pprint import pprint
-    # pprint("reminder: ", reminder.__dict__)
 
     if send_email:
         # print('send_email: sending...')
         send_task_reminder_email(
             adviser=adviser,
             task=task,
+            company=investment_project_task.investment_project.investor_company,
             reminders=[reminder],
         )
 
     return reminder
 
 
-def _has_existing_upcoming_task_reminder(investment_project_task, adviser, current_date):
+def _has_existing_upcoming_task_reminder(task, investment_project_task, adviser, current_date):
     return UpcomingTaskReminder.objects.filter(
+        task=task,
         adviser=adviser,
-        # investment_project_task=investment_project_task,
         created_on__month=current_date.month,
         created_on__year=current_date.year,
     ).exists()
@@ -174,6 +147,7 @@ def _has_existing_upcoming_task_reminder(investment_project_task, adviser, curre
 def send_task_reminder_email(
     adviser,
     task,
+    company,
     reminders,
 ):
     """
@@ -186,11 +160,11 @@ def send_task_reminder_email(
         template_identifier=settings.TASK_REMINDER_STATUS_TEMPLATE_ID,
         context={
             'task_title': task.title,
-            'company_name': '',
+            'company_name': company.name,
             'task_due_date': task.due_date,
             'company_contact_email_address': '',
-            'task_url': '',
-            'complete_task_url': '',
+            'task_url': task.get_absolute_url(),
+            'complete_task_url': task.get_absolute_url(),
         },
         update_task=update_task_reminder_email_status,
         reminders=reminders,
@@ -202,25 +176,3 @@ def update_task_reminder_email_status(email_notification_id, reminder_ids):
     for reminder in reminders:
         reminder.email_notification_id = email_notification_id
         reminder.save()
-
-
-# Q(due_date-reminder_days=today)
-# Select all Reminders that are due for advisers that have active feature flag
-# Schedule reminder/notification
-# return Task
-
-# def _get_active_projects(adviser):
-#     """
-#     Get active projects for given adviser.
-#     """
-#     return InvestmentProject.objects.filter(
-#         Q(project_manager=adviser)
-#         | Q(project_assurance_adviser=adviser)
-#         | Q(client_relationship_manager=adviser)
-#         | Q(referral_source_adviser=adviser),
-#         status__in=[
-#             InvestmentProject.Status.ONGOING,
-#             InvestmentProject.Status.DELAYED,
-#         ],
-#         stage_id=InvestmentProjectStage.active.value.id,
-#     )

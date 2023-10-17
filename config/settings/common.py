@@ -426,6 +426,7 @@ DATAHUB_FRONTEND_URL_PREFIXES = {
     'largecapitalinvestorprofile': f'{DATAHUB_FRONTEND_BASE_URL}/investments/profiles',
     'largecapitalopportunity': f'{DATAHUB_FRONTEND_BASE_URL}/investments/opportunities',
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
+    'task': f'{DATAHUB_FRONTEND_BASE_URL}/tasks',
 }
 
 DATAHUB_FRONTEND_REMINDER_SETTINGS_URL = f'{DATAHUB_FRONTEND_BASE_URL}/reminders/settings'

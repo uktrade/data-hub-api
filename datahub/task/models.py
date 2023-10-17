@@ -5,11 +5,12 @@ from datetime import timedelta
 from django.conf import settings
 from django.db import models
 
+
 from datahub.company.models import Advisor
 
 from datahub.core import reversion
-
 from datahub.core.models import ArchivableModel, BaseModel
+from datahub.core.utils import get_front_end_url
 from datahub.investment.project.models import InvestmentProject
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -30,6 +31,10 @@ class Task(ArchivableModel, BaseModel):
         related_name='+',
     )
     reminder_date = models.DateField(null=True, blank=True, editable=False)
+
+    def get_absolute_url(self):
+        """URL to the object in the Data Hub internal front end."""
+        return get_front_end_url(self)
 
     # override the save method and calculate reminder_date
     def save(self, *args, **kwargs):
