@@ -7,6 +7,8 @@ from datahub.core import statsd
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
+from datahub.feature_flag.utils import is_user_feature_flag_active
+from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
@@ -107,7 +109,11 @@ def generate_reminders_upcoming_tasks():
 
 
 def create_upcoming_task_reminder(
-    task, investment_project_task, adviser, send_email, current_date,
+    task,
+    investment_project_task,
+    adviser,
+    send_email,
+    current_date,
 ):
     """
     Creates a reminder and sends an email if required.
@@ -123,8 +129,10 @@ def create_upcoming_task_reminder(
         task=task,
     )
 
-    if send_email:
-        # print('send_email: sending...')
+    if send_email and is_user_feature_flag_active(
+        ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
+        adviser,
+    ):
         send_task_reminder_email(
             adviser=adviser,
             task=task,
