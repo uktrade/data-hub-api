@@ -10,16 +10,15 @@ from datahub.reminder.models import (
 logger = logging.getLogger(__name__)
 
 
-def schedule_create_task_reminder_subscription_task(advisers):
-    for adviser in advisers:
-        job = job_scheduler(
-            queue_name=LONG_RUNNING_QUEUE,
-            function=create_task_reminder_subscription_task,
-            function_args=(adviser,),
-        )
-        logger.info(
-            f'Task {job.id} create_task_reminder_subscription_task',
-        )
+def schedule_create_task_reminder_subscription_task(adviser):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=create_task_reminder_subscription_task,
+        function_args=(adviser,),
+    )
+    logger.info(
+        f'Task {job.id} create_task_reminder_subscription_task',
+    )
 
 
 def create_task_reminder_subscription_task(adviser):
@@ -33,16 +32,15 @@ def create_task_reminder_subscription_task(adviser):
         UpcomingTaskReminderSubscription.objects.create(adviser=adviser)
 
 
-def schedule_create_task_assigned_to_me_from_others_subscription_task(advisers):
-    for adviser in advisers:
-        job = job_scheduler(
-            queue_name=LONG_RUNNING_QUEUE,
-            function=create_task_assigned_to_me_from_others_task,
-            function_args=(adviser,),
-        )
-        logger.info(
-            f'Task {job.id} create_task_assigned_to_me_from_others_task',
-        )
+def schedule_create_task_assigned_to_me_from_others_subscription_task(adviser):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=create_task_assigned_to_me_from_others_task,
+        function_args=(adviser,),
+    )
+    logger.info(
+        f'Task {job.id} create_task_assigned_to_me_from_others_task',
+    )
 
 
 def create_task_assigned_to_me_from_others_task(adviser):

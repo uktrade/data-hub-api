@@ -29,6 +29,8 @@ def set_task_reminder_subscription_after_task_post_save(sender, instance, **kwar
     Checks to see if a Task has any advisers. If there are advisers then this is
     passed to the task for processing to add task reminder subscriptions
     """
-    if instance.advisers.all().count():
-        schedule_create_task_reminder_subscription_task(instance.advisers.all())
-        schedule_create_task_assigned_to_me_from_others_subscription_task(instance.advisers.all())
+    advisers = instance.advisers.all()
+    print('****', advisers)
+    for adviser in advisers:
+        schedule_create_task_reminder_subscription_task(adviser)
+        schedule_create_task_assigned_to_me_from_others_subscription_task(adviser)

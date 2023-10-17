@@ -50,6 +50,32 @@ class TestTaskReminderSubscription:
 
         assert subscriptions.count() == 1
 
+    def test_creation_of_multiple_adviser_subscription_on_task_creation(self):
+        TaskFactory()
+        adviser1 = AdviserFactory()
+        adviser2 = AdviserFactory()
+        AdviserFactory()
+        TaskFactory(advisers=[adviser1, adviser2])
+        subscriptions = UpcomingTaskReminderSubscription.objects.filter(
+            adviser__in=[adviser1, adviser2]
+        )
+
+        assert subscriptions.count() == 2
+
+        """
+        Test that only additional subscriptions for new advisers is created
+        """
+        TaskFactory()
+        adviser3 = AdviserFactory()
+        AdviserFactory()
+        TaskFactory()
+        TaskFactory(advisers=[adviser1, adviser2, adviser3])
+        subscriptions = UpcomingTaskReminderSubscription.objects.filter(
+            adviser__in=[adviser1, adviser2, adviser3]
+        )
+
+        assert subscriptions.count() == 3
+
 
 @pytest.mark.django_db
 class TestTaskAssignedToMeFromOthersSubscription:
@@ -67,3 +93,30 @@ class TestTaskAssignedToMeFromOthersSubscription:
         subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(adviser=adviser)
 
         assert subscriptions.count() == 1
+
+    def test_creation_of_multiple_adviser_subscriptions_on_task_creation(self):
+        TaskFactory()
+        adviser1 = AdviserFactory()
+        adviser2 = AdviserFactory()
+        AdviserFactory()
+        AdviserFactory()
+        TaskFactory(advisers=[adviser1, adviser2])
+        subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(
+            adviser__in=[adviser1, adviser2]
+        )
+
+        assert subscriptions.count() == 2
+
+        """
+        Test that only additional subscriptions for new advisers is created
+        """
+        TaskFactory()
+        adviser3 = AdviserFactory()
+        AdviserFactory()
+        TaskFactory()
+        TaskFactory(advisers=[adviser1, adviser2, adviser3])
+        subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(
+            adviser__in=[adviser1, adviser2, adviser3]
+        )
+
+        assert subscriptions.count() == 3
