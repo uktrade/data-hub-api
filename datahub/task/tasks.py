@@ -1,20 +1,19 @@
 import logging
 
-from django.db.models import (
-    DateTimeField,
-    DecimalField,
-    ExpressionWrapper,
-    F,
-    IntegerField,
-)
-from django.db.models.functions import Cast
+from django.conf import settings
 from django.utils import timezone
 
+from datahub.core import statsd
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
-from datahub.reminder.models import UpcomingTaskReminderSubscription
+from datahub.reminder.models import (
+    UpcomingTaskReminder,
+    UpcomingTaskReminderSubscription,
+)
+from datahub.reminder.tasks import notify_adviser_by_rq_email
 from datahub.task.models import Task
+
 
 logger = logging.getLogger(__name__)
 
@@ -79,14 +78,24 @@ def generate_reminders_upcoming_tasks():
     for task in tasks:
         # GET ALL ACTIVE ADVISERS ASSIGNED TO THE TASK
         active_advisers = task.advisers.filter(is_active=True)
-        print(active_advisers)
+        # print("task: ", task)
+        # print("active_advisers: ", active_advisers)
         for adviser in active_advisers:
-            print(adviser)
+            # userfeatureflag or userfeatureflag group set
+
+            # print("adviser:", adviser)
+            # Schedule bell reminder
+
             # GET SUBSCRIPTION TO KNOW IF EMAILS ARE NEEDED
             adviser_subscription = UpcomingTaskReminderSubscription.objects.filter(adviser=adviser)
-            print(adviser_subscription)
 
-    print(tasks)
+            create_upcoming_task_reminder(task, adviser, adviser_subscription, now)
+
+            # If subscription send email
+
+    #         print("adviser_subscription:", adviser_subscription)
+
+    # print("tasks:", tasks)
 
     # tasks = Task.objects.annotate(
     #     due_date_days=Cast(
@@ -121,6 +130,78 @@ def generate_reminders_upcoming_tasks():
 
     # Add reminder to DataHub reminders
     # Send email if upcoming_task_reminder_subscription.email_reminder_enabled
+
+
+def create_upcoming_task_reminder(task, adviser, send_email, current_date):
+    """
+    Creates a reminder and sends an email if required.
+
+    If a reminder has already been sent on the same day, then do nothing.
+    """
+    if _has_existing_upcoming_task_reminder(task, adviser, current_date):
+        return
+
+    reminder = UpcomingTaskReminder.objects.create(
+        adviser=adviser,
+        event=f'{task.reminder_days} days left to task due',
+        task=task,
+        # project=task,
+    )
+
+    # from pprint import pprint
+    # pprint("reminder: ", reminder.__dict__)
+
+    if send_email:
+        # print('send_email: sending...')
+        send_task_reminder_email(
+            adviser=adviser,
+            task=task,
+            reminders=[reminder],
+        )
+
+    return reminder
+
+
+def _has_existing_upcoming_task_reminder(investment_project_task, adviser, current_date):
+    return UpcomingTaskReminder.objects.filter(
+        adviser=adviser,
+        # investment_project_task=investment_project_task,
+        created_on__month=current_date.month,
+        created_on__year=current_date.year,
+    ).exists()
+
+
+def send_task_reminder_email(
+    adviser,
+    task,
+    reminders,
+):
+    """
+    Sends task reminder by email.
+    """
+    statsd.incr(f'send_task_reminder_notification.{task.reminder_days}')
+
+    notify_adviser_by_rq_email(
+        adviser=adviser,
+        template_identifier=settings.TASK_REMINDER_STATUS_TEMPLATE_ID,
+        context={
+            'task_title': task.title,
+            'company_name': '',
+            'task_due_date': task.due_date,
+            'company_contact_email_address': '',
+            'task_url': '',
+            'complete_task_url': '',
+        },
+        update_task=update_task_reminder_email_status,
+        reminders=reminders,
+    )
+
+
+def update_task_reminder_email_status(email_notification_id, reminder_ids):
+    reminders = UpcomingTaskReminder.all_objects.filter(id__in=reminder_ids)
+    for reminder in reminders:
+        reminder.email_notification_id = email_notification_id
+        reminder.save()
 
 
 # Q(due_date-reminder_days=today)
