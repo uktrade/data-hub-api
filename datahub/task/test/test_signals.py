@@ -57,7 +57,7 @@ class TestTaskReminderSubscription:
         AdviserFactory()
         TaskFactory(advisers=[adviser1, adviser2])
         subscriptions = UpcomingTaskReminderSubscription.objects.filter(
-            adviser__in=[adviser1, adviser2]
+            adviser__in=[adviser1, adviser2],
         )
 
         assert subscriptions.count() == 2
@@ -68,7 +68,7 @@ class TestTaskReminderSubscription:
         adviser3 = AdviserFactory()
         TaskFactory(advisers=[adviser1, adviser2, adviser3])
         subscriptions = UpcomingTaskReminderSubscription.objects.filter(
-            adviser__in=[adviser1, adviser2, adviser3]
+            adviser__in=[adviser1, adviser2, adviser3],
         )
 
         assert subscriptions.count() == 3
@@ -99,7 +99,7 @@ class TestTaskAssignedToMeFromOthersSubscription:
         AdviserFactory()
         TaskFactory(advisers=[adviser1, adviser2])
         subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(
-            adviser__in=[adviser1, adviser2]
+            adviser__in=[adviser1, adviser2],
         )
 
         assert subscriptions.count() == 2
@@ -110,7 +110,7 @@ class TestTaskAssignedToMeFromOthersSubscription:
         adviser3 = AdviserFactory()
         TaskFactory(advisers=[adviser1, adviser2, adviser3])
         subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(
-            adviser__in=[adviser1, adviser2, adviser3]
+            adviser__in=[adviser1, adviser2, adviser3],
         )
 
         assert subscriptions.count() == 3
