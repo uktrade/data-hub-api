@@ -65,10 +65,7 @@ class TestTaskReminderSubscription:
         """
         Test that only additional subscriptions for new advisers is created
         """
-        TaskFactory()
         adviser3 = AdviserFactory()
-        AdviserFactory()
-        TaskFactory()
         TaskFactory(advisers=[adviser1, adviser2, adviser3])
         subscriptions = UpcomingTaskReminderSubscription.objects.filter(
             adviser__in=[adviser1, adviser2, adviser3]
@@ -110,10 +107,7 @@ class TestTaskAssignedToMeFromOthersSubscription:
         """
         Test that only additional subscriptions for new advisers is created
         """
-        TaskFactory()
         adviser3 = AdviserFactory()
-        AdviserFactory()
-        TaskFactory()
         TaskFactory(advisers=[adviser1, adviser2, adviser3])
         subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(
             adviser__in=[adviser1, adviser2, adviser3]
