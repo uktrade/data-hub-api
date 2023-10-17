@@ -9,9 +9,10 @@ class CompanyExportDatasetView(BaseDatasetView):
     A GET API view to return pipeline item data for syncing by data-flow periodically.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of CompanyExport records"""
-        return CompanyExport.objects.annotate(
+        updated_since = request.GET.get('updated_since')
+        list_of_company_export = CompanyExport.objects.annotate(
             sector_name=get_sector_name_subquery('sector'),
             contact_ids=get_array_agg_subquery(
                 CompanyExport.contacts.through,
@@ -51,3 +52,6 @@ class CompanyExportDatasetView(BaseDatasetView):
             'contact_ids',
             'team_member_ids',
         )
+        if updated_since:
+            return list_of_company_export.filter('modified_on' > updated_since)
+        return list_of_company_export

@@ -32,9 +32,10 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
     and let analyst to work on denormalized table to get more meaningful insight.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of Investment Projects Dataset records"""
-        return InvestmentProject.objects.annotate(
+        updated_since = request.GET.get('updated_since')
+        list_of_investment_projects = InvestmentProject.objects.annotate(
             actual_uk_region_names=get_array_agg_subquery(
                 InvestmentProject.actual_uk_regions.through,
                 'investmentproject',
@@ -149,6 +150,9 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
             'uk_company_sector',
             'uk_region_location_names',
         )
+        if updated_since:
+            return list_of_investment_projects.filter('modified_on' > updated_since)
+        return list_of_investment_projects
 
 
 class InvestmentProjectsActivityDatasetView(BaseDatasetView):

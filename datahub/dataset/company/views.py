@@ -14,9 +14,10 @@ class CompaniesDatasetView(BaseDatasetView):
     then be queried to create custom reports for users.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of Company records"""
-        return Company.objects.annotate(
+        updated_since = request.GET.get('updated_since')
+        list_of_companies = Company.objects.annotate(
             sector_name=get_sector_name_subquery('sector'),
             one_list_core_team_advisers=ArrayAgg('one_list_core_team_members__adviser_id'),
         ).values(
@@ -68,6 +69,9 @@ class CompaniesDatasetView(BaseDatasetView):
             'is_out_of_business',
             'strategy',
         )
+        if updated_since:
+            return list_of_companies.filter('modified_on' > updated_since)
+        return list_of_companies
 
     def _enrich_data(self, dataset):
         for data in dataset:

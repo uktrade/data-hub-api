@@ -17,9 +17,10 @@ class InteractionsDatasetView(BaseDatasetView):
     Data-flow periodically.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns a list of all interaction records"""
-        return get_base_interaction_queryset().annotate(
+        updated_since = request.GET.get('updated_since')
+        list_of_interactions = get_base_interaction_queryset().annotate(
             adviser_ids=get_aggregate_subquery(
                 Interaction,
                 ArrayAgg('dit_participants__adviser_id', ordering=('dit_participants__id',)),
@@ -55,6 +56,7 @@ class InteractionsDatasetView(BaseDatasetView):
                 'exportbarriertype__name',
                 ordering=('exportbarriertype__name',),
             ),
+
         ).values(
             'adviser_ids',
             'communication_channel__name',
@@ -84,4 +86,8 @@ class InteractionsDatasetView(BaseDatasetView):
             'were_countries_discussed',
             'export_barrier_type_names',
             'export_barrier_notes',
+            'updated_since',
         )
+        if updated_since:
+            return list_of_interactions.filter('modified_on' > updated_since)
+        return list_of_interactions

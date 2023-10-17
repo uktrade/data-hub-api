@@ -10,9 +10,10 @@ class CompanyExportCountryDatasetView(BaseDatasetView):
     then be queried to create custom reports for users.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of company_export_country records"""
-        return CompanyExportCountry.objects.values(
+        updated_since = request.GET.get('updated_since')
+        list_company_export_countries = CompanyExportCountry.objects.values(
             'id',
             'company_id',
             'country__name',
@@ -21,3 +22,6 @@ class CompanyExportCountryDatasetView(BaseDatasetView):
             'modified_on',
             'status',
         )
+        if updated_since:
+            return list_company_export_countries.filter('modified_on' > updated_since)
+        return list_company_export_countries

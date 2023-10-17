@@ -8,9 +8,10 @@ class CompanyReferralDatasetView(BaseDatasetView):
     by data flow periodically.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of CompanyReferral records"""
-        return CompanyReferral.objects.values(
+        updated_since = request.GET.get('updated_since')
+        list_of_company_referrals = CompanyReferral.objects.values(
             'company_id',
             'completed_by_id',
             'completed_on',
@@ -24,3 +25,6 @@ class CompanyReferralDatasetView(BaseDatasetView):
             'status',
             'subject',
         )
+        if updated_since:
+            return list_of_company_referrals.filter('modified_on' > updated_since)
+        return list_of_company_referrals

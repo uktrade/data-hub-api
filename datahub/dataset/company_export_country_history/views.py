@@ -15,9 +15,10 @@ class CompanyExportCountryHistoryDatasetView(BaseDatasetView):
 
     pagination_class = CompanyExportCountryHistoryDatasetViewCursorPagination
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of company_export_country_history records"""
-        return CompanyExportCountryHistory.objects.values(
+        updated_since = request.GET.get('updated_since')
+        list_of_company_export_country_history = CompanyExportCountryHistory.objects.values(
             'id',
             'company_id',
             'country__name',
@@ -27,3 +28,6 @@ class CompanyExportCountryHistoryDatasetView(BaseDatasetView):
             'history_type',
             'status',
         )
+        if updated_since:
+            return list_of_company_export_country_history.filter('modified_on' > updated_since)
+        return list_of_company_export_country_history

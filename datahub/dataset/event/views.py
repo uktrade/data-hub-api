@@ -16,9 +16,10 @@ class EventsDatasetView(BaseDatasetView):
     response result to insert data into Dataworkspace through its defined API endpoints.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns a list of all interaction records"""
-        return Event.objects.annotate(
+        updated_since = request.GET.get('updated_since')
+        list_of_events = Event.objects.annotate(
             service_name=get_service_name_subquery('service'),
             team_ids=get_aggregate_subquery(
                 Event,
@@ -54,3 +55,6 @@ class EventsDatasetView(BaseDatasetView):
             'uk_region__name',
             'related_programme_names',
         )
+        if updated_since:
+            return list_of_events.filter('modified_on' > updated_since)
+        return list_of_events

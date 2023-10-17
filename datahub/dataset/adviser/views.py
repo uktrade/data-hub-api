@@ -12,9 +12,10 @@ class AdvisersDatasetView(BaseDatasetView):
 
     pagination_class = AdvisersDatasetViewCursorPagination
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of Advisers Dataset records"""
-        return Adviser.objects.values(
+        updated_since = request.GET.get('updated_since')
+        list_of_adviers = Adviser.objects.values(
             'id',
             'date_joined',
             'first_name',
@@ -26,3 +27,6 @@ class AdvisersDatasetView(BaseDatasetView):
             'is_active',
             'sso_email_user_id',
         )
+        if updated_since:
+            return list_of_adviers.filter('modified_on' > updated_since)
+        return list_of_adviers

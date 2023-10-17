@@ -12,9 +12,10 @@ class ContactsDatasetView(BaseDatasetView):
     table to get more meaningful insight.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of Contacts Dataset records"""
-        return Contact.objects.annotate(
+        updated_since = request.GET.get('updated_since')
+        list_of_contacts = Contact.objects.annotate(
             name=get_full_name_expression(),
         ).values(
             'address_1',
@@ -41,3 +42,6 @@ class ContactsDatasetView(BaseDatasetView):
             'full_telephone_number',
             'valid_email',
         )
+        if updated_since:
+            return list_of_contacts.filter('modified_on' > updated_since)
+        return list_of_contacts

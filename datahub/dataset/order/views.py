@@ -16,9 +16,10 @@ class OMISDatasetView(BaseDatasetView):
     more meaningful insight.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of OMIS Dataset records"""
-        return Order.objects.annotate(
+        updated_since = request.GET.get('updated_since')
+        list_of_orders = Order.objects.annotate(
             refund_created=get_aggregate_subquery(Order, Max('refunds__created_on')),
             refund_total_amount=get_aggregate_subquery(Order, Sum('refunds__total_amount')),
             sector_name=get_sector_name_subquery('sector'),
@@ -50,3 +51,6 @@ class OMISDatasetView(BaseDatasetView):
             'uk_region__name',
             'vat_cost',
         )
+        if updated_since:
+            return list_of_orders.filter('modified_on' > updated_since)
+        return list_of_orders

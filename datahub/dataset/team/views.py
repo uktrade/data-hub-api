@@ -12,9 +12,10 @@ class TeamsDatasetView(BaseDatasetView):
 
     pagination_class = TeamsDatasetViewCursorPagination
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of Teams Dataset records"""
-        return Team.objects.values(
+        updated_since = request.GET.get('updated_since')
+        list_of_teams = Team.objects.values(
             'country__name',
             'disabled_on',
             'id',
@@ -22,3 +23,6 @@ class TeamsDatasetView(BaseDatasetView):
             'role__name',
             'uk_region__name',
         )
+        if updated_since:
+            return list_of_teams.filter('modified_on' > updated_since)
+        return list_of_teams

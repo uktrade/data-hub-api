@@ -11,11 +11,15 @@ class UserEventsView(BaseDatasetView):
     response result to insert data into Dataworkspace through its defined API endpoints.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns a list of all interaction records"""
-        return UserEvent.objects.values(
+        updated_since = request.GET.get('updated_since')
+        list_of_user_events = UserEvent.objects.values(
             'adviser__id',
             'type',
             'api_url_path',
             created_on=F('timestamp'),
         )
+        if updated_since:
+            return list_of_user_events.filter('modified_on' > updated_since)
+        return list_of_user_events

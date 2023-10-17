@@ -23,10 +23,13 @@ class BaseDatasetView(HawkResponseSigningMixin, APIView):
 
     def get(self, request):
         """Endpoint which serves all records for a specific Dataset"""
+        updated_since = request.GET.get('updated_since')
         dataset = self.get_dataset()
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(dataset, request, view=self)
         self._enrich_data(page)
+        if updated_since:
+            return dataset.filter('modified_on' > updated_since)
         return paginator.get_paginated_response(page)
 
     def _enrich_data(self, dataset):
