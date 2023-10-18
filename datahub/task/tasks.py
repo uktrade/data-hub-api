@@ -62,38 +62,15 @@ def schedule_reminders_upcoming_tasks():
 
 
 def generate_reminders_upcoming_tasks():
-    # if not is_user_feature_flag_active(
-    #     ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
-    #     subscription.adviser,
-    # ):
-    #     logger.info(
-    #         f'Feature flag {ADVISER_TASKS_USER_FEATURE_FLAG_NAME}' ' is not active, exiting.',
-    #     )
-    #     return
     now = timezone.now()
-
-    #     set4 = Race.objects.annotate(
-    #     diff=ExpressionWrapper(F('end') - F('start'), output_field=DurationField())).filter(
-    #     diff__gte=datetime.timedelta(5))
-    # len(set4)
-    # # 364
-    # len(Race.objects.filter(end__gte=F("start")+5))
-
-    # When adding additional tasks are added this query will need to be moved to Open Search
-    # to return all types.
+    # When adding additional tasks this query will need to be moved to Open Search to return all
+    # task types.
     investment_project_tasks = InvestmentProjectTask.objects.filter(task__reminder_date=now)
     for investment_project_task in investment_project_tasks:
-        # GET ALL ACTIVE ADVISERS ASSIGNED TO THE TASK
+        # Get all active advisers assigned to the task
         active_advisers = investment_project_task.task.advisers.filter(is_active=True)
-        # print("task: ", task)
-        # print("active_advisers: ", active_advisers)
         for adviser in active_advisers:
-            # userfeatureflag or userfeatureflag group set
-
-            # print("adviser:", adviser)
-            # Schedule bell reminder
-
-            # GET SUBSCRIPTION TO KNOW IF EMAILS ARE NEEDED
+            # Get subscription to know if emails are needed
             adviser_subscription = UpcomingTaskReminderSubscription.objects.filter(
                 adviser=adviser,
             ).first()

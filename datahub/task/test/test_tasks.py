@@ -10,7 +10,7 @@ from django.test.utils import override_settings
 
 from datahub.feature_flag.test.factories import UserFeatureFlagFactory
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
-from datahub.reminder.models import UpcomingTaskReminderSubscription
+from datahub.reminder.models import UpcomingTaskReminder, UpcomingTaskReminderSubscription
 from datahub.reminder.test.factories import UpcomingTaskReminderFactory
 from datahub.task.tasks import generate_reminders_upcoming_tasks, update_task_reminder_email_status
 from datahub.task.test.factories import AdviserFactory, InvestmentProjectTaskFactory, TaskFactory
@@ -104,8 +104,7 @@ class TestTaskReminders:
         mock_notify_adviser_by_rq_email,
         mock_statsd,
     ):
-        # create a few tasks without due reminders
-        # create a few tasks with due reminders
+        # create a few tasks with and without due reminders
         tasks = InvestmentProjectTaskFactory.create_batch(4)
         tasks_due = []
         matching_advisers = AdviserFactory.create_batch(3)
@@ -134,12 +133,13 @@ class TestTaskReminders:
             any_order=True,
         )
 
-    def test_emails_not_send_when_email_subscription_not_enabled_by_adviser(
+    def test_emails_only_send_when_email_subscription_enabled_by_adviser(
         self,
         adviser_tasks_user_feature_flag,
         mock_notify_adviser_by_rq_email,
         mock_statsd,
     ):
+        # Create two advisers one with and one without an task reminder email subscription
         matching_advisers = AdviserFactory.create_batch(2)
         matching_advisers = [add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
                              for adviser in matching_advisers]
@@ -167,6 +167,7 @@ class TestTaskReminders:
         mock_notify_adviser_by_rq_email,
         mock_statsd,
     ):
+        # Create a adviser with and another without the feature flag set.
         matching_advisers = AdviserFactory.create_batch(2)
         matching_advisers[0] = add_user_feature_flag(
             adviser_tasks_user_feature_flag, matching_advisers[0],
@@ -190,16 +191,50 @@ class TestTaskReminders:
         ])
         mock_notify_adviser_by_rq_email.assert_called_once()
 
-    def test_update_task_reminder_email_status_set(self, adviser_tasks_user_feature_flag):
-        # Test that the update_task_reminder_email_status method is called from
-        # send_task_reminder_email
-        pass
+    def test_if_reminder_already_sent_the_same_day_do_nothing(
+        self,
+        adviser_tasks_user_feature_flag,
+        mock_notify_adviser_by_rq_email,
+        mock_statsd,
+    ):
+        adviser = AdviserFactory()
+        adviser = add_user_feature_flag(
+            adviser_tasks_user_feature_flag, adviser,
+        )
+        task_due = investment_project_factory_due_today(1, advisers=[adviser])
 
-    # tasks [due_date - reminder_days = today]
-    #   advisers [is_active && ]
-    #       upcoming_task_reminder_subscription [select email_reminder_enabled]
+        template_id = str(uuid4())
+        with override_settings(
+            TASK_REMINDER_STATUS_TEMPLATE_ID=template_id,
+        ):
+            generate_reminders_upcoming_tasks()
+            generate_reminders_upcoming_tasks()
 
-    #   userfeatureflag or userfeatureflag group set
+        mock_notify_adviser_by_rq_email.assert_has_calls([
+            mock_notify_adviser_email_call(task_due, adviser, template_id),
+        ])
+        mock_notify_adviser_by_rq_email.assert_called_once()
 
-    # Add reminder to DataHub reminders
-    # Send email if upcoming_task_reminder_subscription.email_reminder_enabled
+    def test_update_task_reminder_email_status(
+        self,
+    ):
+        """
+        Test it updates reminder data with the connected email notification information.
+        """
+        task = TaskFactory()
+        reminder_number = 3
+        notification_id = str(uuid4())
+        reminders = UpcomingTaskReminderFactory.create_batch(reminder_number, task_id=task.id)
+
+        update_task_reminder_email_status(
+            notification_id,
+            [reminder.id for reminder in reminders],
+        )
+
+        task2 = TaskFactory()
+        UpcomingTaskReminderFactory.create_batch(2, task_id=task2.id)
+
+        linked_reminders = UpcomingTaskReminder.objects.filter(
+            email_notification_id=notification_id,
+        )
+        assert linked_reminders.count() == (reminder_number)
