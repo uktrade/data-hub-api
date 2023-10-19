@@ -1,0 +1,4392 @@
+# TEAM (100)
+- model: export_win.hqteamregionorpost
+  pk: 8923e259-617d-4581-830f-43bfaa572936
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Financial & Professional Business Services'
+    export_win_id: 'team:1'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  100
+- model: export_win.hqteamregionorpost
+  pk: 2f883a06-5811-4668-878f-92a1e3de548d
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Education'
+    export_win_id: 'team:2'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  110
+- model: export_win.hqteamregionorpost
+  pk: b9afc253-5aa1-498f-b5d7-d43dad1ced82
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Services'
+    export_win_id: 'team:3'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  120
+- model: export_win.hqteamregionorpost
+  pk: 64488de6-21b0-452c-9bd5-ee454a313c48
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Creative Industries'
+    export_win_id: 'team:4'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  130
+- model: export_win.hqteamregionorpost
+  pk: 2f608479-8871-447f-9aab-334520b432c6
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Retail'
+    export_win_id: 'team:5'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  140
+- model: export_win.hqteamregionorpost
+  pk: 2bec4f86-7ee9-4271-9e95-f9ec30685ce1
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Large Events Support'
+    export_win_id: 'team:6'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  150
+- model: export_win.hqteamregionorpost
+  pk: da679df0-8e7c-491d-a143-748bc012d7db
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Rapid Response'
+    export_win_id: 'team:7'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  160
+- model: export_win.hqteamregionorpost
+  pk: 8cc04f14-d685-40e0-9e6f-f9092adb1762
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Large Events'
+    export_win_id: 'team:8'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  170
+- model: export_win.hqteamregionorpost
+  pk: 042a3616-7c01-43e5-a451-fa303b5927dd
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Venture Capital'
+    export_win_id: 'team:9'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  180
+- model: export_win.hqteamregionorpost
+  pk: 896e6159-817c-425d-8cb0-f45e06cf114a
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Energy'
+    export_win_id: 'team:10'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  190
+- model: export_win.hqteamregionorpost
+  pk: 4e7ab807-2af1-4780-8f11-8e3ec63a5102
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Advanced Manufacturing'
+    export_win_id: 'team:11'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  200
+- model: export_win.hqteamregionorpost
+  pk: ead9276b-741c-48d7-a881-cc179bb79a4c
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Advanced Engineering'
+    export_win_id: 'team:12'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  210
+- model: export_win.hqteamregionorpost
+  pk: 85e6f3b7-5f49-4743-b91e-b73681711cf6
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Agrifood'
+    export_win_id: 'team:13'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  220
+- model: export_win.hqteamregionorpost
+  pk: 62102f3f-d60a-4ab4-81d9-bb8a683193e9
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Consumer Goods'
+    export_win_id: 'team:14'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  230
+- model: export_win.hqteamregionorpost
+  pk: b7d0ad8d-c044-4ddb-ab52-7f71741576e7
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Marine'
+    export_win_id: 'team:15'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  240
+- model: export_win.hqteamregionorpost
+  pk: 4288a4ab-a3eb-42ea-b804-8fe24b06e86f
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Advanced Manufacturing - Support'
+    export_win_id: 'team:16'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  250
+- model: export_win.hqteamregionorpost
+  pk: 87c4e825-69b0-4c94-b5fe-e73b50b8cece
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Planning and Procurement'
+    export_win_id: 'team:17'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  260
+- model: export_win.hqteamregionorpost
+  pk: ebba11e7-8195-4f1e-b272-8a19eea853b4
+  fields:
+    disabled_on: null
+    name: 'TD - Finance & Performance'
+    export_win_id: 'team:18'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  270
+- model: export_win.hqteamregionorpost
+  pk: 2e704222-02b6-4d21-b901-a220ab333855
+  fields:
+    disabled_on: null
+    name: 'TD - Technology, Innovation and Events - Venture Capital Unit'
+    export_win_id: 'team:19'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  280
+- model: export_win.hqteamregionorpost
+  pk: 4598486d-bed2-47e7-bd17-e7e4b561dc47
+  fields:
+    disabled_on: null
+    name: 'TD - Technology, Innovation and Events - Science and Innovation'
+    export_win_id: 'team:20'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  290
+- model: export_win.hqteamregionorpost
+  pk: 3732642e-e9fe-4447-9ab5-dc7f1850c5e8
+  fields:
+    disabled_on: null
+    name: 'TD - Technology, Innovation and Events - Technology Partnerships'
+    export_win_id: 'team:21'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  300
+- model: export_win.hqteamregionorpost
+  pk: 61d40dbe-c399-4a69-9c5a-12c84be11766
+  fields:
+    disabled_on: null
+    name: 'TD - Technology, Innovation and Events - Open to Export'
+    export_win_id: 'team:22'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  310
+- model: export_win.hqteamregionorpost
+  pk: 24447113-92ea-4615-846e-93f1539976c6
+  fields:
+    disabled_on: null
+    name: 'TD - Technology, Innovation and Events'
+    export_win_id: 'team:23'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  320
+- model: export_win.hqteamregionorpost
+  pk: 12fb6a60-3b83-4b1e-bbb8-c0a292219247
+  fields:
+    disabled_on: null
+    name: 'TD - Events Delivery & Performance'
+    export_win_id: 'team:24'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  330
+- model: export_win.hqteamregionorpost
+  pk: 28ce4378-887a-4877-ac85-3aeba84a80a6
+  fields:
+    disabled_on: null
+    name: 'TD - Events - BDV'
+    export_win_id: 'team:25'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  340
+- model: export_win.hqteamregionorpost
+  pk: abaa6ec3-aff9-4cc6-bb56-29d097d4f998
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Markets'
+    export_win_id: 'team:26'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  350
+- model: export_win.hqteamregionorpost
+  pk: 12b17cb8-1ef9-44bd-b139-940c60bdde21
+  fields:
+    disabled_on: null
+    name: 'TD - TAP Team'
+    export_win_id: 'team:27'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  360
+- model: export_win.hqteamregionorpost
+  pk: a191b0f1-c052-4a7e-8177-38711ddb37d2
+  fields:
+    disabled_on: null
+    name: 'TD - Business Development'
+    export_win_id: 'team:28'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  370
+- model: export_win.hqteamregionorpost
+  pk: dddc67dd-d779-4f15-a8ba-cdd63fc7bf6c
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Sport'
+    export_win_id: 'team:29'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  380
+- model: export_win.hqteamregionorpost
+  pk: 11bf1e8b-ea81-467e-8f00-a1b27154fb20
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Infrastructure & Life Sciences'
+    export_win_id: 'team:30'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  390
+- model: export_win.hqteamregionorpost
+  pk: cdb4690a-6a36-48b2-b275-48877f78857f
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Infrastructure'
+    export_win_id: 'team:31'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  400
+- model: export_win.hqteamregionorpost
+  pk: a1c27db3-b6e4-4674-9402-acccefe17df7
+  fields:
+    disabled_on: null
+    name: 'TD - Infrastructure & Life Sciences'
+    export_win_id: 'team:32'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  410
+- model: export_win.hqteamregionorpost
+  pk: 46937dd0-ef9f-4476-b528-59fe42efa13e
+  fields:
+    disabled_on: null
+    name: 'TD - Events - ICT'
+    export_win_id: 'team:33'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  420
+- model: export_win.hqteamregionorpost
+  pk: dad3618b-d324-4cec-8943-4c18ca9a9c2a
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Transport'
+    export_win_id: 'team:34'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  430
+- model: export_win.hqteamregionorpost
+  pk: 58e5eb54-7a56-49c4-b903-8b5d9a11197a
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Healthcare'
+    export_win_id: 'team:35'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  440
+- model: export_win.hqteamregionorpost
+  pk: 5769c374-ee37-4334-a692-dd36a749c20b
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Construction'
+    export_win_id: 'team:36'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  450
+- model: export_win.hqteamregionorpost
+  pk: 3d4101d9-35f2-4227-bd5a-813c38bfcd4f
+  fields:
+    disabled_on: null
+    name: 'TD - Events - Open to Export'
+    export_win_id: 'team:37'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  460
+- model: export_win.hqteamregionorpost
+  pk: ba8bc4c9-4b39-4c6b-aa4c-6e39a9da4388
+  fields:
+    disabled_on: null
+    name: 'ST - Managing Director and PA'
+    export_win_id: 'team:38'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  470
+- model: export_win.hqteamregionorpost
+  pk: d4049d8a-03aa-4e24-9ca3-fe57260d42a8
+  fields:
+    disabled_on: null
+    name: 'ST - Infrastructure and Life Science - Healthcare Pharma and Bio'
+    export_win_id: 'team:39'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  480
+- model: export_win.hqteamregionorpost
+  pk: 14e0bb31-fc2d-4c32-bb4b-dc72b84dc5cf
+  fields:
+    disabled_on: null
+    name: 'ST - Infrastructure & Life Science - Construction/Mass Transport'
+    export_win_id: 'team:40'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  490
+- model: export_win.hqteamregionorpost
+  pk: acf34c3f-fa58-4b16-85ba-03dd979f224b
+  fields:
+    disabled_on: null
+    name: 'ST - Infrastructure and Life Science - Low Carbon Env Water'
+    export_win_id: 'team:41'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  500
+- model: export_win.hqteamregionorpost
+  pk: b6734d3e-1f20-404a-b024-079aeadc9b5c
+  fields:
+    disabled_on: null
+    name: 'ST - Infrastructure and Life Science - High Value Opportunities'
+    export_win_id: 'team:42'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  510
+- model: export_win.hqteamregionorpost
+  pk: 47b26824-e937-4571-ac3f-5f20d94b390a
+  fields:
+    disabled_on: null
+    name: 'ST - Infrastructure and Life Science - Support Team'
+    export_win_id: 'team:43'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  520
+- model: export_win.hqteamregionorpost
+  pk: c393a697-a7dd-44a3-bf48-b8db1e0eb88b
+  fields:
+    disabled_on: null
+    name: 'ST - Infrastructure and Life Science - Sport'
+    export_win_id: 'team:44'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  530
+- model: export_win.hqteamregionorpost
+  pk: 4f416069-f820-4a8d-ba9e-136bc7efefd8
+  fields:
+    disabled_on: null
+    name: 'ST - High Value Opportunities Activities'
+    export_win_id: 'team:45'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  540
+- model: export_win.hqteamregionorpost
+  pk: 3257b17f-7b28-4ff4-bd5b-3078f25b5854
+  fields:
+    disabled_on: null
+    name: 'ST - Service Industries - Education and Experience Economy'
+    export_win_id: 'team:46'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  550
+- model: export_win.hqteamregionorpost
+  pk: 0585e0e4-7029-4f8b-8542-6c43d5f0606f
+  fields:
+    disabled_on: null
+    name: 'ST - Service Industries - Financial Professional and Business'
+    export_win_id: 'team:47'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  560
+- model: export_win.hqteamregionorpost
+  pk: 9236c0e2-8204-4bdb-932a-d6f330ad54de
+  fields:
+    disabled_on: null
+    name: 'ST - Service Industries - Retail and Lifestyle'
+    export_win_id: 'team:48'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  570
+- model: export_win.hqteamregionorpost
+  pk: 0142f34b-a1b4-4b41-8a49-ecb47a3a93fd
+  fields:
+    disabled_on: null
+    name: 'ST - Service Industries - Agri-Food Drink & Aid Funded Business'
+    export_win_id: 'team:49'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  580
+- model: export_win.hqteamregionorpost
+  pk: fff29d6b-eef5-4516-8c82-ec52344c3ff5
+  fields:
+    disabled_on: null
+    name: 'ST - Director - Service Industries'
+    export_win_id: 'team:50'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  590
+- model: export_win.hqteamregionorpost
+  pk: 646bec22-e157-4ac7-b528-46d7e2d0f3d6
+  fields:
+    disabled_on: null
+    name: 'ST - Service Industries - Support Team'
+    export_win_id: 'team:51'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  600
+- model: export_win.hqteamregionorpost
+  pk: 80e06eef-4f3b-42b1-8dfd-7a52460b6147
+  fields:
+    disabled_on: null
+    name: 'ST - Service Industries - Creative Industries'
+    export_win_id: 'team:52'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  610
+- model: export_win.hqteamregionorpost
+  pk: 409f60b9-93e7-492b-8380-014763930fdb
+  fields:
+    disabled_on: null
+    name: 'ST - Advanced Manufacturing - Support Team'
+    export_win_id: 'team:53'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  620
+- model: export_win.hqteamregionorpost
+  pk: fc52cbc3-5b9c-45a5-a999-9a991a872052
+  fields:
+    disabled_on: null
+    name: 'ST - Advanced Manufacturing - Advanced Engineering'
+    export_win_id: 'team:54'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  630
+- model: export_win.hqteamregionorpost
+  pk: 6ff6682a-74c2-4e68-bb0e-e86fe80ce4c6
+  fields:
+    disabled_on: null
+    name: 'ST - Advanced Manufacturing - ICT'
+    export_win_id: 'team:55'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  640
+- model: export_win.hqteamregionorpost
+  pk: adda930b-c911-4bbc-a117-5bc50ed1c57e
+  fields:
+    disabled_on: null
+    name: 'ST - Advanced Manufacturing - Energy'
+    export_win_id: 'team:56'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  650
+- model: export_win.hqteamregionorpost
+  pk: 7cbb3075-ccf2-4e5e-b792-c5d0d7f4fb28
+  fields:
+    disabled_on: null
+    name: 'ST - Middle East'
+    export_win_id: 'team:57'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  660
+- model: export_win.hqteamregionorpost
+  pk: 95fa3711-8dcc-4dd4-9c88-cadc5a3734b4
+  fields:
+    disabled_on: null
+    name: 'ST - Central and Latin America'
+    export_win_id: 'team:58'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  670
+- model: export_win.hqteamregionorpost
+  pk: 412b6908-a354-47ae-a9dc-777b443cce20
+  fields:
+    disabled_on: null
+    name: 'ST - Russia - Turkey - Central Asia'
+    export_win_id: 'team:59'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  680
+- model: export_win.hqteamregionorpost
+  pk: b27906e9-aead-4dbf-8640-e70850c83702
+  fields:
+    disabled_on: null
+    name: 'ST - Africa'
+    export_win_id: 'team:60'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  690
+- model: export_win.hqteamregionorpost
+  pk: 0acd579b-0f38-487d-bbd5-8b0af1f88013
+  fields:
+    disabled_on: null
+    name: 'ST - Dir - Emerging Markets - China - Southern Asia'
+    export_win_id: 'team:61'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  700
+- model: export_win.hqteamregionorpost
+  pk: c011c70e-dfd8-426a-b478-15db6b6e246e
+  fields:
+    disabled_on: null
+    name: 'ST - Emerging Markets - China - Southern Asia - Support'
+    export_win_id: 'team:62'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  710
+- model: export_win.hqteamregionorpost
+  pk: 4a3ccd76-559d-4552-886e-34181f42fd49
+  fields:
+    disabled_on: null
+    name: 'ST - Emerging Markets'
+    export_win_id: 'team:63'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  720
+- model: export_win.hqteamregionorpost
+  pk: 5b1aeb3c-dade-49d3-a663-9c17be1c2157
+  fields:
+    disabled_on: null
+    name: 'ST - China'
+    export_win_id: 'team:64'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  730
+- model: export_win.hqteamregionorpost
+  pk: 33b5a935-11ea-4da4-9690-6e043d08ae31
+  fields:
+    disabled_on: null
+    name: 'ST - South Asia'
+    export_win_id: 'team:65'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  740
+- model: export_win.hqteamregionorpost
+  pk: 2579c26a-57d7-46ba-ad02-b7f4fd26e718
+  fields:
+    disabled_on: null
+    name: 'ST - South East Asia'
+    export_win_id: 'team:66'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  750
+- model: export_win.hqteamregionorpost
+  pk: 91769b69-d3fb-4b69-9f97-9bfdbc4101b8
+  fields:
+    disabled_on: null
+    name: 'ST - Dir - Developed Markets'
+    export_win_id: 'team:67'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  760
+- model: export_win.hqteamregionorpost
+  pk: c0c08ec5-7b94-4211-a598-6fe5714971dc
+  fields:
+    disabled_on: null
+    name: 'ST - Developed Markets - Support Team'
+    export_win_id: 'team:68'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  770
+- model: export_win.hqteamregionorpost
+  pk: fe6f4afa-2feb-49d9-b7ff-823eaff6392a
+  fields:
+    disabled_on: null
+    name: 'ST - North America - East Asia - Australasia - Caribbean'
+    export_win_id: 'team:69'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  780
+- model: export_win.hqteamregionorpost
+  pk: cdc35063-74e9-49a5-a667-bec8c1be163a
+  fields:
+    disabled_on: null
+    name: 'ST - Europe'
+    export_win_id: 'team:70'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  790
+- model: export_win.hqteamregionorpost
+  pk: 77be6c68-218f-4df1-87ae-b4600e60a8a1
+  fields:
+    disabled_on: null
+    name: 'ST - Group Resources - Support Team'
+    export_win_id: 'team:71'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  800
+- model: export_win.hqteamregionorpost
+  pk: 7f08fc97-bc89-4827-bd33-3201696ca040
+  fields:
+    disabled_on: null
+    name: 'ST - E-Exporting Programme'
+    export_win_id: 'team:72'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  810
+- model: export_win.hqteamregionorpost
+  pk: af8ceddb-4015-4b6c-88d0-23357eb91e25
+  fields:
+    disabled_on: null
+    name: 'ST - Marine'
+    export_win_id: 'team:73'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  820
+# INVESTMENT (1000)
+- model: export_win.hqteamregionorpost
+  pk: 1e5aec69-c581-4356-b0ca-1f710d3d077d
+  fields:
+    disabled_on: null
+    name: 'ITFG - E-Business Projects Team'
+    export_win_id: 'investment:1'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1000
+- model: export_win.hqteamregionorpost
+  pk: 71cb1a48-a62d-4682-9e5e-7bae5e346d07
+  fields:
+    disabled_on: null
+    name: 'ITFG - Overseas Resources Team'
+    export_win_id: 'investment:2'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1010
+- model: export_win.hqteamregionorpost
+  pk: e6258f94-d5d7-491a-b5be-7d7bd20be212
+  fields:
+    disabled_on: null
+    name: 'ITFG - ICT & Data Policy and Support'
+    export_win_id: 'investment:3'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1020
+- model: export_win.hqteamregionorpost
+  pk: 2c3e48e0-c346-4ed4-aea1-3c15463370c5
+  fields:
+    disabled_on: null
+    name: 'ITFG - E-Business Operational Support Team'
+    export_win_id: 'investment:4'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1030
+- model: export_win.hqteamregionorpost
+  pk: c83017d7-3b6f-4174-95d5-bcc8ccb0c500
+  fields:
+    disabled_on: null
+    name: 'ITFG - Director ITFG & PA'
+    export_win_id: 'investment:5'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1040
+- model: export_win.hqteamregionorpost
+  pk: 2dd0d5bd-5f38-4ff1-afe0-bdf581072a4e
+  fields:
+    disabled_on: null
+    name: 'ITFG - Finance Team'
+    export_win_id: 'investment:6'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1050
+- model: export_win.hqteamregionorpost
+  pk: baacae83-9ffa-4c98-9573-d82fa3e5861d
+  fields:
+    disabled_on: null
+    name: 'ITFG - Business Planning Team'
+    export_win_id: 'investment:7'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1060
+- model: export_win.hqteamregionorpost
+  pk: 79c6fdc7-7d18-4ea0-bdb3-8883779b6f40
+  fields:
+    disabled_on: null
+    name: 'IG - Regeneration Investment Organisation (RIO)'
+    export_win_id: 'investment:8'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1070
+- model: export_win.hqteamregionorpost
+  pk: c1112eb0-7e7c-4d09-a0dc-88685bb71068
+  fields:
+    disabled_on: null
+    name: 'IG - Global Accounts - Director & Deputy Director & PA'
+    export_win_id: 'investment:9'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1080
+- model: export_win.hqteamregionorpost
+  pk: 6f361a4b-3d85-4439-a758-c68581a6c545
+  fields:
+    disabled_on: null
+    name: 'IG - Global Accounts - IT Software & Creative'
+    export_win_id: 'investment:10'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1090
+- model: export_win.hqteamregionorpost
+  pk: 66d885e4-8b13-482f-89f7-33db481ae162
+  fields:
+    disabled_on: null
+    name: 'IG - Global Accounts - Electronics & Communications'
+    export_win_id: 'investment:11'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1100
+- model: export_win.hqteamregionorpost
+  pk: b57685fa-a71e-4f04-a21c-22fcfb8946aa
+  fields:
+    disabled_on: null
+    name: 'IG - Global Accounts - Financial & Business Services'
+    export_win_id: 'investment:12'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1110
+- model: export_win.hqteamregionorpost
+  pk: 3e730d5f-417d-4bd7-bae1-2cc1ffbd40c6
+  fields:
+    disabled_on: null
+    name: 'IG - Global Accounts - Energy & Infrastructure'
+    export_win_id: 'investment:13'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1120
+- model: export_win.hqteamregionorpost
+  pk: 67001252-7a21-4877-a6bc-02530acdb693
+  fields:
+    disabled_on: null
+    name: 'IG - Global Accounts - Adv Man - Auto, Rail MEPE'
+    export_win_id: 'investment:14'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1130
+- model: export_win.hqteamregionorpost
+  pk: f72dfafb-2d32-46fd-9266-21df1386599a
+  fields:
+    disabled_on: null
+    name: 'IG - Global Accounts - Adv Man - Aero, Space, Chem'
+    export_win_id: 'investment:15'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1140
+- model: export_win.hqteamregionorpost
+  pk: 04fba46e-0aa3-477f-b202-bdd38093e474
+  fields:
+    disabled_on: null
+    name: 'IG - Global Accounts - Life Science, Agri- Tech'
+    export_win_id: 'investment:16'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1150
+- model: export_win.hqteamregionorpost
+  pk: 6ad8b33f-274f-47e6-8ce6-d5516c988faa
+  fields:
+    disabled_on: null
+    name: 'IG - Global Operations - Global Entrepreneurs Programme'
+    export_win_id: 'investment:17'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1160
+- model: export_win.hqteamregionorpost
+  pk: 9b148202-614e-45bf-ab30-3a414d09e8d9
+  fields:
+    disabled_on: null
+    name: 'IG - Global Operations - Graduate Entrepreneurs'
+    export_win_id: 'investment:18'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1170
+- model: export_win.hqteamregionorpost
+  pk: bf937936-d1cf-435d-84f7-13b3d8cd9ab1
+  fields:
+    disabled_on: null
+    name: 'IG - Global Operations - Network Linkages & Professional Development'
+    export_win_id: 'investment:19'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1180
+- model: export_win.hqteamregionorpost
+  pk: b6f70956-208f-45c9-b444-aef8104ab03c
+  fields:
+    disabled_on: null
+    name: 'IG - Global Operations - In Market Strategies & Development'
+    export_win_id: 'investment:20'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1190
+- model: export_win.hqteamregionorpost
+  pk: 78a9c209-9836-4899-80b0-68d0b66373bf
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy/Policy/Local Engagement - Director & PA'
+    export_win_id: 'investment:21'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1200
+- model: export_win.hqteamregionorpost
+  pk: f8c7c5ef-9abb-4f86-9f0c-4d8740aabc21
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy/Policy/Local Engagement - Strategy'
+    export_win_id: 'investment:22'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1210
+- model: export_win.hqteamregionorpost
+  pk: bfd94ea7-ff78-4077-b74b-83e8eee4b66f
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy/Policy/Local Engagement - Global Intelligence'
+    export_win_id: 'investment:23'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1220
+- model: export_win.hqteamregionorpost
+  pk: a6bfdfc8-4c2e-4cee-9faf-c833a151c342
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy/Policy/Local Engagement - Local Engagement & Delivery'
+    export_win_id: 'investment:24'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1230
+- model: export_win.hqteamregionorpost
+  pk: e32aadfa-6d30-4d3c-a73e-fb0edb797f51
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy/Policy/Local Engagement - National & Local Policy'
+    export_win_id: 'investment:25'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1240
+- model: export_win.hqteamregionorpost
+  pk: 5c5035ae-85f7-4935-a8b6-38981daaf6d2
+  fields:
+    disabled_on: null
+    name: 'IG - Specialists - Advanced Manufacturing'
+    export_win_id: 'investment:26'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1250
+- model: export_win.hqteamregionorpost
+  pk: 7a41db8d-76a6-4b70-a234-94bc21a91a31
+  fields:
+    disabled_on: null
+    name: 'IG - Specialists - Knowledge Intensive Industry'
+    export_win_id: 'investment:27'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1260
+- model: export_win.hqteamregionorpost
+  pk: ca63ce65-ab55-4278-ba1c-6c216372d778
+  fields:
+    disabled_on: null
+    name: 'IG - Specialists - Energy & Infrastructure'
+    export_win_id: 'investment:28'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1270
+- model: export_win.hqteamregionorpost
+  pk: 6135d4bb-d976-46c6-b5f5-83158c55f833
+  fields:
+    disabled_on: null
+    name: 'IG - Specialists - Life Sciences'
+    export_win_id: 'investment:29'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1280
+- model: export_win.hqteamregionorpost
+  pk: 0a20649d-d01e-488b-8372-0d5db10d03f8
+  fields:
+    disabled_on: null
+    name: 'IG - Finance & Business Planning'
+    export_win_id: 'investment:30'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1290
+- model: export_win.hqteamregionorpost
+  pk: 96d1313f-761e-40d2-b3af-fb92468b4377
+  fields:
+    disabled_on: null
+    name: 'IG - Global Intelligence Unit'
+    export_win_id: 'investment:31'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1300
+- model: export_win.hqteamregionorpost
+  pk: ec2c5b79-2208-4abb-a563-3b2f51420ad1
+  fields:
+    disabled_on: null
+    name: 'IG - SR - Strategic Accounts'
+    export_win_id: 'investment:32'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1310
+- model: export_win.hqteamregionorpost
+  pk: 9555d2e3-a77c-4f0c-8465-7c35dae699d0
+  fields:
+    disabled_on: null
+    name: 'IG - SR - Institutional Investment'
+    export_win_id: 'investment:33'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1320
+- model: export_win.hqteamregionorpost
+  pk: 5a489ec8-001a-490e-87dc-c1cff658d961
+  fields:
+    disabled_on: null
+    name: 'IG - Global Operations - FDI Projects - Advanced Engineering'
+    export_win_id: 'investment:34'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1330
+- model: export_win.hqteamregionorpost
+  pk: 1c5eb56c-1846-43ad-bdd9-d4ec0850b15d
+  fields:
+    disabled_on: null
+    name: 'IG - Global Operations - Director & PA'
+    export_win_id: 'investment:35'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1340
+- model: export_win.hqteamregionorpost
+  pk: 84716bcc-68f4-4dd8-b0cc-313fa7499ad8
+  fields:
+    disabled_on: null
+    name: 'IG - Global Operations - FDI Projects - Energy and Infrastructure'
+    export_win_id: 'investment:36'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1350
+- model: export_win.hqteamregionorpost
+  pk: abf77120-2265-4e1a-9622-1a358a7c45f8
+  fields:
+    disabled_on: null
+    name: 'IG - Global Operations - Briefing Tours and Visits'
+    export_win_id: 'investment:37'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1360
+- model: export_win.hqteamregionorpost
+  pk: cd72e07f-68bf-4af6-b915-4866d5695e09
+  fields:
+    disabled_on: null
+    name: 'IG - Global Operations and Network Performance'
+    export_win_id: 'investment:38'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1370
+- model: export_win.hqteamregionorpost
+  pk: 58311a13-8662-47dd-af57-4f5c737fa8b0
+  fields:
+    disabled_on: null
+    name: 'IG - Global Operations - Deputy Director'
+    export_win_id: 'investment:39'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1380
+- model: export_win.hqteamregionorpost
+  pk: 5db293a4-8227-4259-a90b-508bb5fb9e3f
+  fields:
+    disabled_on: null
+    name: 'IG - Global Operations - Shared Services'
+    export_win_id: 'investment:40'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1390
+- model: export_win.hqteamregionorpost
+  pk: e6a6cd57-5d00-4f3e-a037-5580274f0a26
+  fields:
+    disabled_on: null
+    name: 'IG - UKAN Involvement'
+    export_win_id: 'investment:41'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1400
+- model: export_win.hqteamregionorpost
+  pk: f3b21044-090c-46ba-b8a6-7ca71d07cd2d
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy & Policy - Resources and Finance'
+    export_win_id: 'investment:42'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1410
+- model: export_win.hqteamregionorpost
+  pk: 6c8ee169-90ae-4e3d-88a9-bf23fd8eaaa2
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy & Policy - FDI Projects - Financial Services'
+    export_win_id: 'investment:43'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1420
+- model: export_win.hqteamregionorpost
+  pk: d13e173b-68a2-4f26-a68e-f96d77e83f7b
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy & Policy - FDI Contract - Networks & Partnerships'
+    export_win_id: 'investment:44'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1430
+- model: export_win.hqteamregionorpost
+  pk: c387594c-5ffb-4f39-9153-a7889addb835
+  fields:
+    disabled_on: null
+    name: 'Business Environment Advisory Team'
+    export_win_id: 'investment:45'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1440
+- model: export_win.hqteamregionorpost
+  pk: 0cbb194d-1844-47b4-8f1a-eda4814da318
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy & Policy - Briefing Tours and Visits'
+    export_win_id: 'investment:46'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1450
+- model: export_win.hqteamregionorpost
+  pk: 02354e61-ebf3-4e56-9710-56aad28e5088
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy & Policy - Director & PA'
+    export_win_id: 'investment:47'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1460
+- model: export_win.hqteamregionorpost
+  pk: fd7fda9f-4710-4b9e-a074-02c669b86282
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy & Policy - FDI Projects - Electronics and Comms'
+    export_win_id: 'investment:48'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1470
+- model: export_win.hqteamregionorpost
+  pk: 9816a8d9-114d-4536-a3fa-25f87ca0c89f
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy & Policy - Deputy Director'
+    export_win_id: 'investment:49'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1480
+- model: export_win.hqteamregionorpost
+  pk: 87842c21-f939-4c40-8d5c-22ef9cf0e9d4
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy & Policy - Information Hub'
+    export_win_id: 'investment:50'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1490
+- model: export_win.hqteamregionorpost
+  pk: 33a05dff-4874-4902-b68d-7a340e5ef668
+  fields:
+    disabled_on: null
+    name: 'IG - Strategy & Policy - Local Policy & Engagement - DAs & Eng'
+    export_win_id: 'investment:51'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1500
+- model: export_win.hqteamregionorpost
+  pk: 08493190-27d8-4185-b9e9-fcb2c60ed75a
+  fields:
+    disabled_on: null
+    name: 'IG - CPI - FDI Projects - Life Sciences - Food & Drink'
+    export_win_id: 'investment:52'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1510
+- model: export_win.hqteamregionorpost
+  pk: 3a06564c-220f-427f-ae08-a124f2990043
+  fields:
+    disabled_on: null
+    name: 'IG - CPI - FDI Projects - New Technologies'
+    export_win_id: 'investment:53'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1520
+- model: export_win.hqteamregionorpost
+  pk: 76099840-ad86-4542-81ca-1630363a4bab
+  fields:
+    disabled_on: null
+    name: 'IG - Campaigns and Special Programmes'
+    export_win_id: 'investment:54'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1530
+- model: export_win.hqteamregionorpost
+  pk: ab866dc5-33b4-40c7-a3aa-4566d7a55601
+  fields:
+    disabled_on: null
+    name: 'IG - Tech City Investment Organisation'
+    export_win_id: 'investment:55'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1540
+- model: export_win.hqteamregionorpost
+  pk: 7b21307a-84bb-44c4-9d64-d9c6a0fe7427
+  fields:
+    disabled_on: null
+    name: 'GREAT Investors'
+    export_win_id: 'investment:56'
+    team_type_id: 42bdaf2e-ae19-4589-9840-5dbb67b50add
+    order:  1550
+# DSO (2000)
+- model: export_win.hqteamregionorpost
+  pk: a287ee72-87b5-4d47-9dc1-ac064adc742a
+  fields:
+    disabled_on: null
+    name: 'DSO Head Office'
+    export_win_id: 'dso:1'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2000
+- model: export_win.hqteamregionorpost
+  pk: 59299e5a-63fe-4902-8709-90877194b509
+  fields:
+    disabled_on: null
+    name: 'DSO Cyber Security Export Team'
+    export_win_id: 'dso:2'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2010
+- model: export_win.hqteamregionorpost
+  pk: 97797bb2-0a2c-4071-b680-b7b78cce5a29
+  fields:
+    disabled_on: null
+    name: 'DSO Business Development - Market Analysis'
+    export_win_id: 'dso:3'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2020
+- model: export_win.hqteamregionorpost
+  pk: ae5d7b9a-ae35-45c9-935a-65ec7bebf1a2
+  fields:
+    disabled_on: null
+    name: 'DSO Director - Business Development - Events'
+    export_win_id: 'dso:4'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2030
+- model: export_win.hqteamregionorpost
+  pk: 6af0fe7d-4ed2-490c-ad72-1b8806019443
+  fields:
+    disabled_on: null
+    name: 'DSO - Business Development - Events'
+    export_win_id: 'dso:5'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2040
+- model: export_win.hqteamregionorpost
+  pk: 70f54ef8-45e5-4110-b1a1-7810596c9694
+  fields:
+    disabled_on: null
+    name: 'DSO - Director - Business Development - Support to Business'
+    export_win_id: 'dso:6'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2050
+- model: export_win.hqteamregionorpost
+  pk: 2c002311-8056-4cda-9258-e7f84fb66353
+  fields:
+    disabled_on: null
+    name: 'DSO - Head - Business Development - SME Team'
+    export_win_id: 'dso:7'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2060
+- model: export_win.hqteamregionorpost
+  pk: 27cf2d73-0666-4423-aa23-f7bcf389a9aa
+  fields:
+    disabled_on: null
+    name: 'DSO - Business Development - Exportability'
+    export_win_id: 'dso:8'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2070
+- model: export_win.hqteamregionorpost
+  pk: ce902e8a-6979-4cf5-a9e0-9c9555672149
+  fields:
+    disabled_on: null
+    name: 'DSO - Business Development - SME Team'
+    export_win_id: 'dso:9'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2080
+- model: export_win.hqteamregionorpost
+  pk: a4d82ff3-e7d8-45db-8f42-f69e39713a50
+  fields:
+    disabled_on: null
+    name: 'DSO - Business Development - Key Account Management'
+    export_win_id: 'dso:10'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2090
+- model: export_win.hqteamregionorpost
+  pk: d09d00ab-c1e2-4e4e-9b76-3887b367b263
+  fields:
+    disabled_on: null
+    name: 'DSO - Business Development - Mid Sized Businesses'
+    export_win_id: 'dso:11'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2100
+- model: export_win.hqteamregionorpost
+  pk: 0b3ee84a-41c8-4448-9d1f-70aa4aa61699
+  fields:
+    disabled_on: null
+    name: 'DSO - Director - RD1'
+    export_win_id: 'dso:12'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2110
+- model: export_win.hqteamregionorpost
+  pk: d98d9291-49f2-4350-8ea2-4741cbd5f195
+  fields:
+    disabled_on: null
+    name: 'DSO - Deputy Director - RD 1'
+    export_win_id: 'dso:13'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2120
+- model: export_win.hqteamregionorpost
+  pk: 8dc3b661-1873-4968-8a31-b3f984d53cb4
+  fields:
+    disabled_on: null
+    name: 'DSO - RD 1A'
+    export_win_id: 'dso:14'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2130
+- model: export_win.hqteamregionorpost
+  pk: 71c13ed5-bbff-4704-bc51-0e90792900c9
+  fields:
+    disabled_on: null
+    name: 'DSO - RD 1B'
+    export_win_id: 'dso:15'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2140
+- model: export_win.hqteamregionorpost
+  pk: b701a939-fcca-4544-be45-c9f4bb05ff3f
+  fields:
+    disabled_on: null
+    name: 'DSO - RD 1C'
+    export_win_id: 'dso:16'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2150
+- model: export_win.hqteamregionorpost
+  pk: d365b94d-acaa-47de-930c-0b720300319c
+  fields:
+    disabled_on: null
+    name: 'DSO - RD 1D'
+    export_win_id: 'dso:17'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2160
+- model: export_win.hqteamregionorpost
+  pk: 3a13cd05-efba-4a8e-b88f-3f52d9dac705
+  fields:
+    disabled_on: null
+    name: 'DSO - RD 1E'
+    export_win_id: 'dso:18'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2170
+- model: export_win.hqteamregionorpost
+  pk: 2d5bf160-46de-4331-b5f2-915c2696e16f
+  fields:
+    disabled_on: null
+    name: 'DSO - Director - RD2'
+    export_win_id: 'dso:19'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2180
+- model: export_win.hqteamregionorpost
+  pk: 1b6641fd-0843-4124-a2d5-dde54258fce1
+  fields:
+    disabled_on: null
+    name: 'DSO - RD 2A'
+    export_win_id: 'dso:20'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2190
+- model: export_win.hqteamregionorpost
+  pk: 9cb52a67-8f17-4c5e-bc61-8001b6c4c508
+  fields:
+    disabled_on: null
+    name: 'DSO - Deputy Director - RD2'
+    export_win_id: 'dso:21'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2200
+- model: export_win.hqteamregionorpost
+  pk: 40b27b9e-1f1c-48d8-a873-5b1ce2787bbd
+  fields:
+    disabled_on: null
+    name: 'DSO - RD 2B'
+    export_win_id: 'dso:22'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2210
+- model: export_win.hqteamregionorpost
+  pk: 0ac24043-148e-4293-8b5c-85f43c128496
+  fields:
+    disabled_on: null
+    name: 'DSO - RD 2C'
+    export_win_id: 'dso:23'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2220
+- model: export_win.hqteamregionorpost
+  pk: 43e84de9-bf72-466d-8138-1ae765b84fe6
+  fields:
+    disabled_on: null
+    name: 'DSO - RD 2D'
+    export_win_id: 'dso:24'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2230
+- model: export_win.hqteamregionorpost
+  pk: 4dedbe2b-4e4e-4a9b-85d7-52ae49f041fb
+  fields:
+    disabled_on: null
+    name: 'DSO - Senior Military Advisors'
+    export_win_id: 'dso:25'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2240
+- model: export_win.hqteamregionorpost
+  pk: c3e41b35-00a3-4293-99c9-e6c1d99947ce
+  fields:
+    disabled_on: null
+    name: 'DSO Policy and Resources'
+    export_win_id: 'dso:26'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2250
+- model: export_win.hqteamregionorpost
+  pk: d7eb1dff-c95a-4635-a6db-8d78fe3aedca
+  fields:
+    disabled_on: null
+    name: 'DSO EM Exhibitions'
+    export_win_id: 'dso:27'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2260
+- model: export_win.hqteamregionorpost
+  pk: 3b25c774-6a61-4765-b527-afb62c76256b
+  fields:
+    disabled_on: null
+    name: 'DSO Export Support Team (Bovington)'
+    export_win_id: 'dso:28'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2270
+- model: export_win.hqteamregionorpost
+  pk: da64b271-267c-47c1-af9b-d3737fde987c
+  fields:
+    disabled_on: null
+    name: 'DSO Export Support Team (Larkhill)'
+    export_win_id: 'dso:29'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2280
+- model: export_win.hqteamregionorpost
+  pk: d01f0b16-1d92-479b-9a36-b33f9f46d665
+  fields:
+    disabled_on: null
+    name: 'DSO Director Business Development'
+    export_win_id: 'dso:30'
+    team_type_id: c2d215e2-d564-4c50-b209-ec838eef761d
+    order:  2290
+# OBN (3000)
+- model: export_win.hqteamregionorpost
+  pk: c4bac47e-8753-4d89-b5a1-0c5290fa2f31
+  fields:
+    disabled_on: null
+    name: 'Burma - British Chamber of Commerce Myanmar'
+    export_win_id: 'obn:1'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3000
+- model: export_win.hqteamregionorpost
+  pk: 24a75c41-1420-43c2-8b1d-cd09d86e0c9f
+  fields:
+    disabled_on: null
+    name: 'Business Link Japan'
+    export_win_id: 'obn:37'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3010
+- model: export_win.hqteamregionorpost
+  pk: 9d2b82f5-b19b-43c2-9139-d03243a27a4a
+  fields:
+    disabled_on: null
+    name: 'Cambodia - British Chamber of Commerce'
+    export_win_id: 'obn:2'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3020
+- model: export_win.hqteamregionorpost
+  pk: cdc4c7d0-a6fe-4920-af37-3b6a72ca223f
+  fields:
+    disabled_on: null
+    name: 'Chile - British Chamber of Commerce Chile'
+    export_win_id: 'obn:3'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3030
+- model: export_win.hqteamregionorpost
+  pk: 0b8c038d-318e-42b2-bf8b-64b11282ce55
+  fields:
+    disabled_on: null
+    name: 'China - CBBC'
+    export_win_id: 'obn:4'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3040
+- model: export_win.hqteamregionorpost
+  pk: 83d6c78e-5d74-49a6-ae91-b4cc5a47069a
+  fields:
+    disabled_on: null
+    name: 'China – Grant Thornton'
+    export_win_id: 'obn:36'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3050
+- model: export_win.hqteamregionorpost
+  pk: a465ced3-fb0d-4f11-95e9-df6e60e59af9
+  fields:
+    disabled_on: null
+    name: 'Colombia - UK Colombia Trade'
+    export_win_id: 'obn:5'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3060
+- model: export_win.hqteamregionorpost
+  pk: e5abe88e-cd45-4bff-aedd-50e8cb700682
+  fields:
+    disabled_on: null
+    name: 'ESS - IM Europe Team'
+    export_win_id: 'obn:6'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3070
+- model: export_win.hqteamregionorpost
+  pk: 6effb3a7-eb0b-4a96-aa4d-0c17f86a3a66
+  fields:
+    disabled_on: null
+    name: 'ESS - IM LATAC'
+    export_win_id: 'obn:39'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3080
+- model: export_win.hqteamregionorpost
+  pk: 2f1e526f-1b8a-404d-9f43-dd5b0c8aadb4
+  fields:
+    disabled_on: null
+    name: 'ESS - IM MEaP'
+    export_win_id: 'obn:38'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3090
+- model: export_win.hqteamregionorpost
+  pk: 6785f28f-21f1-4ce4-a377-6c00c18fb6b1
+  fields:
+    disabled_on: null
+    name: 'ESS - IM South Asia'
+    export_win_id: 'obn:40'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3100
+- model: export_win.hqteamregionorpost
+  pk: b09d5f17-2147-4bf6-b856-46492d7b4935
+  fields:
+    disabled_on: null
+    name: 'ESS - IM APAC'
+    export_win_id: 'obn:41'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3110
+- model: export_win.hqteamregionorpost
+  pk: 7c5e6c26-fa17-402f-8c99-f3c874ea6d80
+  fields:
+    disabled_on: null
+    name: 'ESS - IM EECAN'
+    export_win_id: 'obn:42'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3120
+- model: export_win.hqteamregionorpost
+  pk: f4d589b0-166d-41bb-a10d-32f250b1f470
+  fields:
+    disabled_on: null
+    name: 'ESS - IM Africa'
+    export_win_id: 'obn:43'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3130
+- model: export_win.hqteamregionorpost
+  pk: 4fd743d8-eca1-463c-97a0-daf047c32d39
+  fields:
+    disabled_on: null
+    name: 'ESS - IM North America - OCO Global'
+    export_win_id: 'obn:35'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3140
+- model: export_win.hqteamregionorpost
+  pk: ac869d16-30ba-42f4-8cee-7f05b30afbea
+  fields:
+    disabled_on: null
+    name: 'Ghana - British Chamber of Commerce'
+    export_win_id: 'obn:7'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3150
+- model: export_win.hqteamregionorpost
+  pk: 0bc15d7a-5b8f-4acf-8494-353093808ae8
+  fields:
+    disabled_on: null
+    name: 'Hungary - British Business Centre Budapest'
+    export_win_id: 'obn:8'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3160
+- model: export_win.hqteamregionorpost
+  pk: b822b503-6665-4902-8332-c344e4a50062
+  fields:
+    disabled_on: null
+    name: 'India - UKIBC'
+    export_win_id: 'obn:9'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3170
+- model: export_win.hqteamregionorpost
+  pk: 42d5cb7d-c5f5-408c-8b87-5dd3161fed90
+  fields:
+    disabled_on: null
+    name: 'Indonesia - British Chamber of Commerce'
+    export_win_id: 'obn:10'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3180
+- model: export_win.hqteamregionorpost
+  pk: 2aaaefae-3602-4d74-aa7e-11cb797fc32a
+  fields:
+    disabled_on: null
+    name: 'Kazakhstan - British Chamber of Commerce'
+    export_win_id: 'obn:11'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3190
+- model: export_win.hqteamregionorpost
+  pk: f41e1312-5bec-44a8-af02-31bd7f8f6aa2
+  fields:
+    disabled_on: null
+    name: 'Kenya - British Chamber of Commerce Kenya'
+    export_win_id: 'obn:34'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3200
+- model: export_win.hqteamregionorpost
+  pk: 30a15ac4-90f3-43ef-a77e-f4c73e906051
+  fields:
+    disabled_on: null
+    name: 'Kuwait - Kuwait British Business Centre'
+    export_win_id: 'obn:12'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3210
+- model: export_win.hqteamregionorpost
+  pk: 339215d6-0a5d-41e1-9a7d-8cab718fae16
+  fields:
+    disabled_on: null
+    name: 'Malaysia - British Malaysian Chamber of Commerce'
+    export_win_id: 'obn:13'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3220
+- model: export_win.hqteamregionorpost
+  pk: b0205c7b-d030-488c-bff4-ae51558d31c4
+  fields:
+    disabled_on: null
+    name: 'Morocco - British Chamber of Commerce'
+    export_win_id: 'obn:14'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3230
+- model: export_win.hqteamregionorpost
+  pk: 4328f0d2-7ebf-4ff9-a942-d11e76d3574f
+  fields:
+    disabled_on: null
+    name: 'Pakistan - British Business Centre Karachi'
+    export_win_id: 'obn:15'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3240
+- model: export_win.hqteamregionorpost
+  pk: e5fbcd17-7841-429b-82b4-7282d023ec30
+  fields:
+    disabled_on: null
+    name: 'Philippines - British Chamber of Commerce'
+    export_win_id: 'obn:16'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3250
+- model: export_win.hqteamregionorpost
+  pk: 2b1487ff-8e16-484a-8f52-c82c8e67d4ff
+  fields:
+    disabled_on: null
+    name: 'Poland - British Polish Chamber of Commerce'
+    export_win_id: 'obn:17'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3260
+- model: export_win.hqteamregionorpost
+  pk: defd53ef-3e48-4385-ad76-b5f2fb3553e7
+  fields:
+    disabled_on: null
+    name: 'Qatar - British Chamber of Commerce'
+    export_win_id: 'obn:18'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3270
+- model: export_win.hqteamregionorpost
+  pk: 07a17665-c241-4591-815f-34ed68425abb
+  fields:
+    disabled_on: null
+    name: 'Romania - British-Romanian Chamber of Commerce'
+    export_win_id: 'obn:19'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3280
+- model: export_win.hqteamregionorpost
+  pk: 0ba85ea6-ae43-4822-8ba6-107560d8a594
+  fields:
+    disabled_on: null
+    name: 'Saudi Arabia - Arabian Enterprise Incubators (AEI Saudi)'
+    export_win_id: 'obn:20'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3290
+- model: export_win.hqteamregionorpost
+  pk: 96d7966d-cfd9-4f97-b6c9-f236c201a041
+  fields:
+    disabled_on: null
+    name: 'Singapore - British Chamber of Commerce'
+    export_win_id: 'obn:21'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3300
+- model: export_win.hqteamregionorpost
+  pk: 240ffc45-22ff-48c6-a2a3-719f85d38c07
+  fields:
+    disabled_on: null
+    name: 'Slovakia - British Slovak Business Centre'
+    export_win_id: 'obn:22'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3310
+- model: export_win.hqteamregionorpost
+  pk: 1445b90a-230d-429c-8bec-2c25bf3314b7
+  fields:
+    disabled_on: null
+    name: 'Slovenia - British Slovenian Chamber of Commerce'
+    export_win_id: 'obn:23'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3320
+- model: export_win.hqteamregionorpost
+  pk: 50e3dfc9-07c9-4036-8dd9-fe3d877e1e32
+  fields:
+    disabled_on: null
+    name: 'South Africa - British Chamber of Business in Southern Africa'
+    export_win_id: 'obn:24'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3330
+- model: export_win.hqteamregionorpost
+  pk: 88a53208-2343-4312-8f1a-9b18b67da4b8
+  fields:
+    disabled_on: null
+    name: 'South East Asia - UK-ASEAN Business Council'
+    export_win_id: 'obn:25'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3340
+- model: export_win.hqteamregionorpost
+  pk: 4f509e6c-44b0-4da8-a450-f1ac2b6472cc
+  fields:
+    disabled_on: null
+    name: 'South Korea - British Chamber of Commerce Korea'
+    export_win_id: 'obn:26'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3350
+- model: export_win.hqteamregionorpost
+  pk: 21de5d20-da9d-4d6c-b985-bc3acd7331cd
+  fields:
+    disabled_on: null
+    name: 'Taiwan - British Chamber of Commerce Taipei'
+    export_win_id: 'obn:27'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3360
+- model: export_win.hqteamregionorpost
+  pk: f8969197-88f2-4b2e-94a7-2267d803517a
+  fields:
+    disabled_on: null
+    name: 'Thailand - British Chamber of Commerce'
+    export_win_id: 'obn:28'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3370
+- model: export_win.hqteamregionorpost
+  pk: 99477090-4dd7-49a7-9075-0f77acbdec08
+  fields:
+    disabled_on: null
+    name: 'Turkey - British Chamber of Commerce'
+    export_win_id: 'obn:29'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3380
+- model: export_win.hqteamregionorpost
+  pk: 90d570e7-528f-4fe7-8915-6e624c21d1a3
+  fields:
+    disabled_on: null
+    name: 'UAE - British Centres for Business'
+    export_win_id: 'obn:30'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3390
+- model: export_win.hqteamregionorpost
+  pk: d2c98fa2-edec-42ad-9e83-2577bf8094e9
+  fields:
+    disabled_on: null
+    name: 'Vietnam - British Business Group'
+    export_win_id: 'obn:31'
+    team_type_id: 17f95045-63b4-489d-9af8-7246e6ab370e
+    order:  3400
+# OTHER (4000)
+- model: export_win.hqteamregionorpost
+  pk: adc1596b-7468-487f-a251-e873f1732583
+  fields:
+    disabled_on: null
+    name: 'DIT Education'
+    export_win_id: 'other:1'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4000
+- model: export_win.hqteamregionorpost
+  pk: 88819506-2d67-4f7e-96f8-1f9d9a849bc5
+  fields:
+    disabled_on: null
+    name: 'Healthcare UK'
+    export_win_id: 'other:2'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4010
+- model: export_win.hqteamregionorpost
+  pk: de6ce5d1-cdc5-4acb-ade2-0433cf695d7f
+  fields:
+    disabled_on: null
+    name: 'Offshore Wind Investment Organisation'
+    export_win_id: 'other:3'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4020
+- model: export_win.hqteamregionorpost
+  pk: bc0fdcb7-76f7-4dac-9319-625986afedd2
+  fields:
+    disabled_on: null
+    name: 'Tech City Project'
+    export_win_id: 'other:4'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4030
+- model: export_win.hqteamregionorpost
+  pk: 1170a853-8459-44fc-98c8-d3fa181812cd
+  fields:
+    disabled_on: null
+    name: 'BG - Tech City'
+    export_win_id: 'other:5'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4040
+- model: export_win.hqteamregionorpost
+  pk: ca498c9e-238d-4063-a7ae-f646c5325a0f
+  fields:
+    disabled_on: null
+    name: 'Financial Services Organisation (FSO)'
+    export_win_id: 'other:6'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4050
+- model: export_win.hqteamregionorpost
+  pk: 30eaa72c-2575-47b1-9cf0-41f92a615ae4
+  fields:
+    disabled_on: null
+    name: 'Export Control Unit'
+    export_win_id: 'other:7'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4060
+- model: export_win.hqteamregionorpost
+  pk: 11a33251-11a1-4584-b763-e5337ce83075
+  fields:
+    disabled_on: null
+    name: 'Life Sciences Organisation'
+    export_win_id: 'other:8'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4070
+- model: export_win.hqteamregionorpost
+  pk: 56a62305-aa36-46ec-867f-407bcf9a23e9
+  fields:
+    disabled_on: null
+    name: 'UK Export Finance'
+    export_win_id: 'other:9'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4080
+- model: export_win.hqteamregionorpost
+  pk: c7d92da7-e04e-45bd-abae-473be99faf29
+  fields:
+    disabled_on: null
+    name: 'GREAT BRITAIN Campaign'
+    export_win_id: 'other:10'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4090
+- model: export_win.hqteamregionorpost
+  pk: 7290b44c-bcd6-4402-a851-4a24e4f5cde7
+  fields:
+    disabled_on: null
+    name: 'DBT Scotland'
+    export_win_id: 'other:11'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4100
+- model: export_win.hqteamregionorpost
+  pk: 59f61555-e10c-4698-8291-7e8c444c4c89
+  fields:
+    disabled_on: null
+    name: 'DBT Northern Ireland'
+    export_win_id: 'other:12'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4110
+- model: export_win.hqteamregionorpost
+  pk: 90008657-99ce-476c-8711-cb7c92e5407a
+  fields:
+    disabled_on: null
+    name: 'DBT Wales'
+    export_win_id: 'other:13'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4120
+# ITT (5000)
+- model: export_win.hqteamregionorpost
+  pk: 59a6e66e-dfa9-4590-9880-d01f13865f52
+  fields:
+    disabled_on: null
+    name: 'DIT Dubai Regional Hub'
+    export_win_id: 'itt:DIT Dubai Regional Hub'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5000
+- model: export_win.hqteamregionorpost
+  pk: 390f8423-6b09-49e7-99f5-b969f04e9b9a
+  fields:
+    disabled_on: null
+    name: 'DIT North East Regional International Trade Office'
+    export_win_id: 'itt:DIT North East Regional International Trade Office'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5010
+- model: export_win.hqteamregionorpost
+  pk: 9fbf5af1-2398-4e21-a44e-d852029e30cd
+  fields:
+    disabled_on: null
+    name: 'DIT South West'
+    export_win_id: 'itt:DIT South West'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5020
+- model: export_win.hqteamregionorpost
+  pk: 270d9a97-c345-43f5-b558-85c10742fa68
+  fields:
+    disabled_on: null
+    name: 'DIT Team East'
+    export_win_id: 'itt:DIT Team East'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5030
+- model: export_win.hqteamregionorpost
+  pk: 9afc5cce-f86b-4b80-9ef3-8233852ccf5f
+  fields:
+    disabled_on: null
+    name: 'DIT Team East Midlands - International Trade Team'
+    export_win_id: 'itt:DIT Team East Midlands - International Trade Team'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5040
+- model: export_win.hqteamregionorpost
+  pk: be66c589-3e4e-409c-92e4-908f2803eea1
+  fields:
+    disabled_on: null
+    name: 'DIT Team South East - International Trade Team'
+    export_win_id: 'itt:DIT Team South East - International Trade Team'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5050
+- model: export_win.hqteamregionorpost
+  pk: 23722c3a-4cf8-4f99-87cc-2cd8d923cff3
+  fields:
+    disabled_on: null
+    name: 'DIT Team West Midlands - Birmingham'
+    export_win_id: 'itt:DIT Team West Midlands - Birmingham'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5060
+- model: export_win.hqteamregionorpost
+  pk: c2f6055e-89af-471e-ab8f-a094adb0d91e
+  fields:
+    disabled_on: null
+    name: 'DIT Team West Midlands - Black Country'
+    export_win_id: 'itt:DIT Team West Midlands - Black Country'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5070
+- model: export_win.hqteamregionorpost
+  pk: dd0ae349-1bf3-4a17-b5c4-b505403819ec
+  fields:
+    disabled_on: null
+    name: 'DIT Team West Midlands - Coventry'
+    export_win_id: 'itt:DIT Team West Midlands - Coventry'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5080
+- model: export_win.hqteamregionorpost
+  pk: 00a758c3-4ea6-40da-aeca-4c3fb8497026
+  fields:
+    disabled_on: null
+    name: 'DIT Team West Midlands - Hereford and Worcester'
+    export_win_id: 'itt:DIT Team West Midlands - Hereford and Worcester'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5090
+- model: export_win.hqteamregionorpost
+  pk: ecb19ffe-08eb-4b7b-8bc0-0330a163de97
+  fields:
+    disabled_on: null
+    name: 'DIT Team West Midlands - NEC'
+    export_win_id: 'itt:DIT Team West Midlands - NEC'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5100
+- model: export_win.hqteamregionorpost
+  pk: 51a36a72-ed70-4214-ad9c-b4a07df99a61
+  fields:
+    disabled_on: null
+    name: 'DIT Team West Midlands - Regional and LLP'
+    export_win_id: 'itt:DIT Team West Midlands - Regional and LLP'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5110
+- model: export_win.hqteamregionorpost
+  pk: 212dd943-daf9-445f-a7ac-c8290edc36c2
+  fields:
+    disabled_on: null
+    name: 'DIT Team West Midlands - Shropshire'
+    export_win_id: 'itt:DIT Team West Midlands - Shropshire'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5120
+- model: export_win.hqteamregionorpost
+  pk: 221fdaed-2285-4799-b452-4aee7e2d9b72
+  fields:
+    disabled_on: null
+    name: 'DIT Team West Midlands - Staffordshire'
+    export_win_id: 'itt:DIT Team West Midlands - Staffordshire'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5130
+- model: export_win.hqteamregionorpost
+  pk: d658acf5-6500-4369-8f77-f1da3a3f2753
+  fields:
+    disabled_on: null
+    name: 'DIT West Midlands Team - Regional Team'
+    export_win_id: 'itt:DIT West Midlands Team - Regional Team'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5140
+- model: export_win.hqteamregionorpost
+  pk: c2444706-b1aa-4baa-bff1-7734cb6d852f
+  fields:
+    disabled_on: null
+    name: 'DIT Yorkshire'
+    export_win_id: 'itt:DIT Yorkshire'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5150
+- model: export_win.hqteamregionorpost
+  pk: dcf911ff-cde8-45c3-9ab7-89ebd93e43d9
+  fields:
+    disabled_on: null
+    name: 'DIT Yorkshire and Humber Regional Sector Specialists'
+    export_win_id: 'itt:DIT Yorkshire and Humber Regional Sector Specialists'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5160
+- model: export_win.hqteamregionorpost
+  pk: 0bd08b5c-97cb-40b9-81ac-45e75871be51
+  fields:
+    disabled_on: null
+    name: 'Invest Northern Ireland (Trade)'
+    export_win_id: 'itt:Invest Northern Ireland (Trade)'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5170
+- model: export_win.hqteamregionorpost
+  pk: 7cd6deed-ca05-4791-9199-a907fd41f4b4
+  fields:
+    disabled_on: null
+    name: 'London International Trade Team'
+    export_win_id: 'itt:London International Trade Team'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5180
+- model: export_win.hqteamregionorpost
+  pk: c928d70a-f801-4c06-ab78-17550141d495
+  fields:
+    disabled_on: null
+    name: 'National Chemicals Sector Unit'
+    export_win_id: 'itt:National Chemicals Sector Unit'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5190
+- model: export_win.hqteamregionorpost
+  pk: 7502d0f4-a255-4f49-9f7f-8dfcb0cb30f3
+  fields:
+    disabled_on: null
+    name: 'Scottish Development International - International Trade Enquiries Team'
+    export_win_id: 'itt:Scottish Development International - International Trade Enquiries Team'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5200
+- model: export_win.hqteamregionorpost
+  pk: 6ffa4d2e-fa1e-4ad4-9fdf-9effe11d31cd
+  fields:
+    disabled_on: null
+    name: 'The North West International Trade Team'
+    export_win_id: 'itt:The North West International Trade Team'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5210
+- model: export_win.hqteamregionorpost
+  pk: 1b2e78b1-0b13-4e90-b4a2-de70a4119180
+  fields:
+    disabled_on: null
+    name: 'Welsh Government'
+    export_win_id: 'itt:Welsh Government'
+    team_type_id: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    order:  5220
+# POST (6000)
+- model: export_win.hqteamregionorpost
+  pk: f74b22e2-da12-4492-8ede-6fd111687332
+  fields:
+    disabled_on: null
+    name: 'Afghanistan - Kabul'
+    export_win_id: 'post:Afghanistan - Kabul'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6000
+- model: export_win.hqteamregionorpost
+  pk: dc0d4f77-ff12-4343-9480-7c6e5b768031
+  fields:
+    disabled_on: null
+    name: 'Albania - Tirana'
+    export_win_id: 'post:Albania - Tirana'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6010
+- model: export_win.hqteamregionorpost
+  pk: b4e5c73f-f664-415d-a0c5-13bed4d78523
+  fields:
+    disabled_on: null
+    name: 'Algeria - Algiers'
+    export_win_id: 'post:Algeria - Algiers'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6020
+- model: export_win.hqteamregionorpost
+  pk: 5a90d933-1c2f-43d9-b696-45f1208c546e
+  fields:
+    disabled_on: null
+    name: 'Angola - Luanda'
+    export_win_id: 'post:Angola - Luanda'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6030
+- model: export_win.hqteamregionorpost
+  pk: c65ae287-6b24-47f6-9de9-ff4ecee48533
+  fields:
+    disabled_on: null
+    name: "Antigua - St John's"
+    export_win_id: "post:Antigua - St John's"
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6040
+- model: export_win.hqteamregionorpost
+  pk: ade7adc9-96cc-42ca-a803-e2011bf60c5f
+  fields:
+    disabled_on: null
+    name: 'Argentina - Buenos Aires'
+    export_win_id: 'post:Argentina - Buenos Aires'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6050
+- model: export_win.hqteamregionorpost
+  pk: d7757197-a8e8-4cec-b41b-d178027dd703
+  fields:
+    disabled_on: null
+    name: 'Armenia - Yerevan'
+    export_win_id: 'post:Armenia - Yerevan'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6060
+- model: export_win.hqteamregionorpost
+  pk: 650b2e4a-91e4-4d02-b54a-26beb196ac74
+  fields:
+    disabled_on: null
+    name: 'Australia - Brisbane'
+    export_win_id: 'post:Australia - Brisbane'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6070
+- model: export_win.hqteamregionorpost
+  pk: 13e40ce2-0627-4b68-b976-743caeb41285
+  fields:
+    disabled_on: null
+    name: 'Australia - Canberra'
+    export_win_id: 'post:Australia - Canberra'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6080
+- model: export_win.hqteamregionorpost
+  pk: e1ddc6fe-1d19-46e6-b3bc-f84c5eb33cf7
+  fields:
+    disabled_on: null
+    name: 'Australia - Melbourne'
+    export_win_id: 'post:Australia - Melbourne'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6090
+- model: export_win.hqteamregionorpost
+  pk: 7aeedb3d-c2e3-42e9-823b-4720b0ede2df
+  fields:
+    disabled_on: null
+    name: 'Australia - Perth'
+    export_win_id: 'post:Australia - Perth'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6100
+- model: export_win.hqteamregionorpost
+  pk: fcf42c44-881c-43ce-ac17-533609f93fdb
+  fields:
+    disabled_on: null
+    name: 'Australia - Sydney'
+    export_win_id: 'post:Australia - Sydney'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6110
+- model: export_win.hqteamregionorpost
+  pk: 84b9ba3c-f916-48f4-9427-e48891de7209
+  fields:
+    disabled_on: null
+    name: 'Austria - Vienna'
+    export_win_id: 'post:Austria - Vienna'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6120
+- model: export_win.hqteamregionorpost
+  pk: 3bf2a836-eccf-4e7e-a4ff-eeb699ef9e0c
+  fields:
+    disabled_on: null
+    name: 'Azerbaijan - Baku'
+    export_win_id: 'post:Azerbaijan - Baku'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6130
+- model: export_win.hqteamregionorpost
+  pk: e0241791-3380-42c2-981a-a497a3fd8372
+  fields:
+    disabled_on: null
+    name: 'Bahamas - Nassau'
+    export_win_id: 'post:Bahamas - Nassau'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6140
+- model: export_win.hqteamregionorpost
+  pk: 8df10f6a-6937-494f-8ef1-9d3968d551fa
+  fields:
+    disabled_on: null
+    name: 'Bahrain - Manama'
+    export_win_id: 'post:Bahrain - Manama'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6150
+- model: export_win.hqteamregionorpost
+  pk: 23842a9a-33c3-48e7-b61b-2143170a91cb
+  fields:
+    disabled_on: null
+    name: 'Bangladesh - Dhaka'
+    export_win_id: 'post:Bangladesh - Dhaka'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6160
+- model: export_win.hqteamregionorpost
+  pk: dbb39226-2d1e-4c74-aeea-1ee35e594fba
+  fields:
+    disabled_on: null
+    name: 'Barbados - Bridgetown'
+    export_win_id: 'post:Barbados - Bridgetown'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6170
+- model: export_win.hqteamregionorpost
+  pk: fc53222b-358b-4589-b1b0-5c461cdc7b3b
+  fields:
+    disabled_on: null
+    name: 'Belarus - Minsk'
+    export_win_id: 'post:Belarus - Minsk'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6180
+- model: export_win.hqteamregionorpost
+  pk: 73197c02-bcbd-4288-b597-374de9186e85
+  fields:
+    disabled_on: null
+    name: 'Belgium - Brussels'
+    export_win_id: 'post:Belgium - Brussels'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6190
+- model: export_win.hqteamregionorpost
+  pk: 517043e4-8d69-4fa5-8966-8740f2507adb
+  fields:
+    disabled_on: null
+    name: 'Belize - Belmopan'
+    export_win_id: 'post:Belize - Belmopan'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6200
+- model: export_win.hqteamregionorpost
+  pk: f589f0e6-7f6f-4964-abc6-7603038505c0
+  fields:
+    disabled_on: null
+    name: 'Bolivia - La Paz'
+    export_win_id: 'post:Bolivia - La Paz'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6210
+- model: export_win.hqteamregionorpost
+  pk: a685d580-9c8c-4fc9-b819-2154e90014bb
+  fields:
+    disabled_on: null
+    name: 'Bosnia and Herzegovina - Sarajevo'
+    export_win_id: 'post:Bosnia and Herzegovina - Sarajevo'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6220
+- model: export_win.hqteamregionorpost
+  pk: 5cafddc4-20d0-4ff2-9be2-1287fb20dc78
+  fields:
+    disabled_on: null
+    name: 'Botswana - Gaborone'
+    export_win_id: 'post:Botswana - Gaborone'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6230
+- model: export_win.hqteamregionorpost
+  pk: 3147845a-1939-4b58-9f50-07af7fe48d67
+  fields:
+    disabled_on: null
+    name: 'Brazil - Belo Horizonte'
+    export_win_id: 'post:Brazil - Belo Horizonte'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6240
+- model: export_win.hqteamregionorpost
+  pk: 84abf215-22e9-4322-a36d-1ea065eda8e9
+  fields:
+    disabled_on: null
+    name: 'Brazil - Brasilia'
+    export_win_id: 'post:Brazil - Brasilia'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6250
+- model: export_win.hqteamregionorpost
+  pk: 8258c9b3-a9c3-4c97-a092-3c86ff86e7d9
+  fields:
+    disabled_on: null
+    name: 'Brazil - Porto Alegre'
+    export_win_id: 'post:Brazil - Porto Alegre'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6260
+- model: export_win.hqteamregionorpost
+  pk: 0778a31b-0f72-48c7-91db-8783644ababa
+  fields:
+    disabled_on: null
+    name: 'Brazil - Recife'
+    export_win_id: 'post:Brazil - Recife'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6270
+- model: export_win.hqteamregionorpost
+  pk: 59ebe253-defe-4975-a417-c6aa0bed2964
+  fields:
+    disabled_on: null
+    name: 'Brazil - Rio de Janeiro'
+    export_win_id: 'post:Brazil - Rio de Janeiro'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6280
+- model: export_win.hqteamregionorpost
+  pk: 405de7b6-9e63-4c19-a0ca-1be7ec3c8607
+  fields:
+    disabled_on: null
+    name: 'Brazil - Sao Paulo'
+    export_win_id: 'post:Brazil - Sao Paulo'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6290
+- model: export_win.hqteamregionorpost
+  pk: 6b146e89-541a-4ec7-b0f4-dbdda886e9b6
+  fields:
+    disabled_on: null
+    name: 'Brunei - Bandar Seri Begawan'
+    export_win_id: 'post:Brunei - Bandar Seri Begawan'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6300
+- model: export_win.hqteamregionorpost
+  pk: 42f1ff83-9773-42b2-b2c1-b7531c986ce8
+  fields:
+    disabled_on: null
+    name: 'Bulgaria - Sofia'
+    export_win_id: 'post:Bulgaria - Sofia'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6310
+- model: export_win.hqteamregionorpost
+  pk: 1d06cf0f-c7df-46fc-b6e8-a3f6d97c3721
+  fields:
+    disabled_on: null
+    name: 'Burma - Rangoon'
+    export_win_id: 'post:Burma - Rangoon'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6320
+- model: export_win.hqteamregionorpost
+  pk: dad339a5-c3a8-4331-a7da-d401c0241016
+  fields:
+    disabled_on: null
+    name: 'Cambodia - Phnom Penh'
+    export_win_id: 'post:Cambodia - Phnom Penh'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6330
+- model: export_win.hqteamregionorpost
+  pk: 5fb23955-59f1-469c-a742-cbf18f9c08fe
+  fields:
+    disabled_on: null
+    name: 'Cameroon - Douala'
+    export_win_id: 'post:Cameroon - Douala'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6340
+- model: export_win.hqteamregionorpost
+  pk: 5034b8c8-b8f9-4474-a62d-e8ea83e920af
+  fields:
+    disabled_on: null
+    name: 'Cameroon - Yaounde'
+    export_win_id: 'post:Cameroon - Yaounde'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6350
+- model: export_win.hqteamregionorpost
+  pk: d738eb5f-073f-40e5-a995-991189f6f049
+  fields:
+    disabled_on: null
+    name: 'Canada - Calgary'
+    export_win_id: 'post:Canada - Calgary'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6360
+- model: export_win.hqteamregionorpost
+  pk: 2c5c6d94-c7b2-4b90-8fb5-eeaffa1de952
+  fields:
+    disabled_on: null
+    name: 'Canada - Montreal'
+    export_win_id: 'post:Canada - Montreal'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6370
+- model: export_win.hqteamregionorpost
+  pk: 426239f5-721b-4566-8d3c-8d9ac351ed37
+  fields:
+    disabled_on: null
+    name: 'Canada - Ottawa'
+    export_win_id: 'post:Canada - Ottawa'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6380
+- model: export_win.hqteamregionorpost
+  pk: 930d4bb9-09db-477e-9e6e-ff050f4bb8d3
+  fields:
+    disabled_on: null
+    name: 'Canada - Toronto'
+    export_win_id: 'post:Canada - Toronto'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6390
+- model: export_win.hqteamregionorpost
+  pk: 485d48ad-b1d3-4eff-abc9-3896aaf220fd
+  fields:
+    disabled_on: null
+    name: 'Canada - Vancouver'
+    export_win_id: 'post:Canada - Vancouver'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6400
+- model: export_win.hqteamregionorpost
+  pk: 4c94e1b6-a963-40e3-8c12-cf7c5d8e37c2
+  fields:
+    disabled_on: null
+    name: 'Chile - Santiago'
+    export_win_id: 'post:Chile - Santiago'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6410
+- model: export_win.hqteamregionorpost
+  pk: be93b618-0066-4e5e-ac73-569f84980da2
+  fields:
+    disabled_on: null
+    name: 'China - Beijing'
+    export_win_id: 'post:China - Beijing'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6420
+- model: export_win.hqteamregionorpost
+  pk: 99818c10-cadb-4513-81db-b8ea6a0705a6
+  fields:
+    disabled_on: null
+    name: 'China - Chongqing'
+    export_win_id: 'post:China - Chongqing'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6430
+- model: export_win.hqteamregionorpost
+  pk: b376b363-cd75-4a20-90c6-f7fea6610788
+  fields:
+    disabled_on: null
+    name: 'China - Guangzhou'
+    export_win_id: 'post:China - Guangzhou'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6440
+- model: export_win.hqteamregionorpost
+  pk: b9430d4f-05d3-4a5e-b84c-83201cdc97e1
+  fields:
+    disabled_on: null
+    name: 'China - Shanghai'
+    export_win_id: 'post:China - Shanghai'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6450
+- model: export_win.hqteamregionorpost
+  pk: 318f9c34-6f97-4eb2-b86d-608bb24cc36d
+  fields:
+    disabled_on: null
+    name: 'China - Wuhan'
+    export_win_id: 'post:China - Wuhan'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6460
+- model: export_win.hqteamregionorpost
+  pk: e3998228-67e9-4b57-9412-abc62557ecb8
+  fields:
+    disabled_on: null
+    name: 'Colombia - Bogota'
+    export_win_id: 'post:Colombia - Bogota'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6470
+- model: export_win.hqteamregionorpost
+  pk: f355610b-4f1f-4e42-87d9-0fddcd43889a
+  fields:
+    disabled_on: null
+    name: 'Congo - Kinshasa'
+    export_win_id: 'post:Congo - Kinshasa'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6480
+- model: export_win.hqteamregionorpost
+  pk: 8a47265d-da6a-477a-840b-30c94b18c60f
+  fields:
+    disabled_on: null
+    name: 'Costa Rica - San Jose'
+    export_win_id: 'post:Costa Rica - San Jose'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6490
+- model: export_win.hqteamregionorpost
+  pk: 67049f57-f7e0-4216-b5a3-d2f4c153ed9e
+  fields:
+    disabled_on: null
+    name: 'Croatia - Split'
+    export_win_id: 'post:Croatia - Split'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6500
+- model: export_win.hqteamregionorpost
+  pk: 63938af1-e722-4cc2-8ec8-bf48eb51bec9
+  fields:
+    disabled_on: null
+    name: 'Croatia - Zagreb'
+    export_win_id: 'post:Croatia - Zagreb'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6510
+- model: export_win.hqteamregionorpost
+  pk: 40f6be75-b2e1-4887-96b6-f455b173dbe3
+  fields:
+    disabled_on: null
+    name: 'Cuba - Havana'
+    export_win_id: 'post:Cuba - Havana'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6520
+- model: export_win.hqteamregionorpost
+  pk: cd654826-44eb-44a3-b0af-74d2c05c703f
+  fields:
+    disabled_on: null
+    name: 'Cyprus - Nicosia'
+    export_win_id: 'post:Cyprus - Nicosia'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6530
+- model: export_win.hqteamregionorpost
+  pk: 0a12350b-6e02-4b9a-b962-889ff2b0031b
+  fields:
+    disabled_on: null
+    name: 'Czech Republic - Prague'
+    export_win_id: 'post:Czech Republic - Prague'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6540
+- model: export_win.hqteamregionorpost
+  pk: 812e9e32-53b9-4c27-b09f-4b37694de405
+  fields:
+    disabled_on: null
+    name: 'Denmark - Copenhagen'
+    export_win_id: 'post:Denmark - Copenhagen'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6550
+- model: export_win.hqteamregionorpost
+  pk: da68c13f-4dee-4909-9904-57c89cdb90ed
+  fields:
+    disabled_on: null
+    name: 'Dominica - Roseau'
+    export_win_id: 'post:Dominica - Roseau'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6560
+- model: export_win.hqteamregionorpost
+  pk: b00bc2b3-ce97-40f8-8cf1-f22418dd4925
+  fields:
+    disabled_on: null
+    name: 'Dominican Republic - Santo Domingo'
+    export_win_id: 'post:Dominican Republic - Santo Domingo'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6570
+- model: export_win.hqteamregionorpost
+  pk: abf01da7-0334-4d6c-ada0-51b7d59fb59c
+  fields:
+    disabled_on: null
+    name: 'East Timor - Dili'
+    export_win_id: 'post:East Timor - Dili'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6580
+- model: export_win.hqteamregionorpost
+  pk: 51aed624-0c13-421b-8441-886f92f16a53
+  fields:
+    disabled_on: null
+    name: 'Ecuador - Guayaquil'
+    export_win_id: 'post:Ecuador - Guayaquil'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6590
+- model: export_win.hqteamregionorpost
+  pk: f1315cfc-43b8-4e8f-8bfc-987caed255c2
+  fields:
+    disabled_on: null
+    name: 'Ecuador - Quito'
+    export_win_id: 'post:Ecuador - Quito'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6600
+- model: export_win.hqteamregionorpost
+  pk: 47f91d13-6059-4a0d-a366-a74b0d461929
+  fields:
+    disabled_on: null
+    name: 'Egypt - Alexandria'
+    export_win_id: 'post:Egypt - Alexandria'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6610
+- model: export_win.hqteamregionorpost
+  pk: 0b9c65a5-01d8-4046-9fb6-537c309c4e8c
+  fields:
+    disabled_on: null
+    name: 'Egypt - Cairo'
+    export_win_id: 'post:Egypt - Cairo'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6620
+- model: export_win.hqteamregionorpost
+  pk: bd5fefa0-984d-41ea-b4ef-87508327e428
+  fields:
+    disabled_on: null
+    name: 'El Salvador - San Salvador'
+    export_win_id: 'post:El Salvador - San Salvador'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6630
+- model: export_win.hqteamregionorpost
+  pk: 0661a561-8969-4f3f-a9bc-6270274fb6f7
+  fields:
+    disabled_on: null
+    name: 'Eritria - Asmara'
+    export_win_id: 'post:Eritria - Asmara'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6640
+- model: export_win.hqteamregionorpost
+  pk: d718e0d4-cd60-4175-9184-31abd4c08664
+  fields:
+    disabled_on: null
+    name: 'Estonia - Tallinn'
+    export_win_id: 'post:Estonia - Tallinn'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6650
+- model: export_win.hqteamregionorpost
+  pk: 184812c6-3f5a-49a9-bd7b-70c5df4533f9
+  fields:
+    disabled_on: null
+    name: 'Ethiopia - Addis Ababa'
+    export_win_id: 'post:Ethiopia - Addis Ababa'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6660
+- model: export_win.hqteamregionorpost
+  pk: 7fa9930c-ef5a-48a9-954e-a8cdafe3654d
+  fields:
+    disabled_on: null
+    name: 'Fiji - Suva'
+    export_win_id: 'post:Fiji - Suva'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6670
+- model: export_win.hqteamregionorpost
+  pk: bf3866b2-2b5c-4ede-959a-c0d3207fa145
+  fields:
+    disabled_on: null
+    name: 'Finland - Helsinki'
+    export_win_id: 'post:Finland - Helsinki'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6680
+- model: export_win.hqteamregionorpost
+  pk: 8933b2f2-d491-449c-b8ba-86af5e6313e3
+  fields:
+    disabled_on: null
+    name: 'France - Bordeaux'
+    export_win_id: 'post:France - Bordeaux'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6690
+- model: export_win.hqteamregionorpost
+  pk: b859a895-1a07-47b3-86f6-1b002a028312
+  fields:
+    disabled_on: null
+    name: 'France - Lille'
+    export_win_id: 'post:France - Lille'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6700
+- model: export_win.hqteamregionorpost
+  pk: 38d88664-95fa-445d-b888-1e0b009e2bce
+  fields:
+    disabled_on: null
+    name: 'France - Lyon'
+    export_win_id: 'post:France - Lyon'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6710
+- model: export_win.hqteamregionorpost
+  pk: c13cef3d-7ab1-41d5-a4bb-078a34bdffc1
+  fields:
+    disabled_on: null
+    name: 'France - Paris'
+    export_win_id: 'post:France - Paris'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6720
+- model: export_win.hqteamregionorpost
+  pk: 9a15aeb3-299a-4933-a74b-8d9170dbbaf1
+  fields:
+    disabled_on: null
+    name: 'Gabon - Libreville'
+    export_win_id: 'post:Gabon - Libreville'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6730
+- model: export_win.hqteamregionorpost
+  pk: 2a586152-1ecb-4efd-84df-c066ad7a1d56
+  fields:
+    disabled_on: null
+    name: 'Gambia - Banjul'
+    export_win_id: 'post:Gambia - Banjul'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6740
+- model: export_win.hqteamregionorpost
+  pk: d0ed0975-de11-4fb2-ac5c-8a88bfc64dec
+  fields:
+    disabled_on: null
+    name: 'Georgia - Tbilisi'
+    export_win_id: 'post:Georgia - Tbilisi'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6750
+- model: export_win.hqteamregionorpost
+  pk: d6c4f45b-35d0-4757-b0bf-7e2efb73294a
+  fields:
+    disabled_on: null
+    name: 'Germany - Berlin'
+    export_win_id: 'post:Germany - Berlin'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6760
+- model: export_win.hqteamregionorpost
+  pk: 230e08d4-8bf0-4f02-9876-88e58cd9fb34
+  fields:
+    disabled_on: null
+    name: 'Germany - Dusseldorf'
+    export_win_id: 'post:Germany - Dusseldorf'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6770
+- model: export_win.hqteamregionorpost
+  pk: 56797749-641a-49ff-b76e-d4989f18be93
+  fields:
+    disabled_on: null
+    name: 'Germany - Munich'
+    export_win_id: 'post:Germany - Munich'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6780
+- model: export_win.hqteamregionorpost
+  pk: 342648c4-b7b2-434e-9065-1f36dd905798
+  fields:
+    disabled_on: null
+    name: 'Ghana - Accra'
+    export_win_id: 'post:Ghana - Accra'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6790
+- model: export_win.hqteamregionorpost
+  pk: b6233b64-72e5-470c-b8f4-bf9fbe556171
+  fields:
+    disabled_on: null
+    name: 'Greece - Athens'
+    export_win_id: 'post:Greece - Athens'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6800
+- model: export_win.hqteamregionorpost
+  pk: a2a2d8b1-dc47-4fb0-93d0-cf827cf0d0d5
+  fields:
+    disabled_on: null
+    name: 'Greece - Thessaloniki'
+    export_win_id: 'post:Greece - Thessaloniki'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6810
+- model: export_win.hqteamregionorpost
+  pk: 6bf98ed2-129c-4dc2-a2f1-333c1541eff1
+  fields:
+    disabled_on: null
+    name: "Grenada - St George's"
+    export_win_id: "post:Grenada - St George's"
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6820
+- model: export_win.hqteamregionorpost
+  pk: dc9f0a3a-6e57-4033-a246-b5016e4dc9c9
+  fields:
+    disabled_on: null
+    name: 'Guatemala - Guatemala City'
+    export_win_id: 'post:Guatemala - Guatemala City'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6830
+- model: export_win.hqteamregionorpost
+  pk: f6ec5f35-80a6-4b9e-9667-07275e808f26
+  fields:
+    disabled_on: null
+    name: 'Guyana - Georgetown'
+    export_win_id: 'post:Guyana - Georgetown'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6840
+- model: export_win.hqteamregionorpost
+  pk: 784ab6ae-1cd2-4f8b-8932-3444bd8942ca
+  fields:
+    disabled_on: null
+    name: 'Honduras - Tegucigalpa'
+    export_win_id: 'post:Honduras - Tegucigalpa'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6850
+- model: export_win.hqteamregionorpost
+  pk: 27e80fec-b1ad-4593-88f2-38da5094cad1
+  fields:
+    disabled_on: null
+    name: 'Hong Kong'
+    export_win_id: 'post:Hong Kong'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6860
+- model: export_win.hqteamregionorpost
+  pk: 98e0e5db-0162-4ef4-8458-955249932ac4
+  fields:
+    disabled_on: null
+    name: 'Hungary - Budapest'
+    export_win_id: 'post:Hungary - Budapest'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6870
+- model: export_win.hqteamregionorpost
+  pk: e68407c6-0a83-4b96-948e-c0ecc2a7c768
+  fields:
+    disabled_on: null
+    name: 'Iceland - Reykjavik'
+    export_win_id: 'post:Iceland - Reykjavik'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6880
+- model: export_win.hqteamregionorpost
+  pk: 2a24b70f-9e0d-4f8a-a1fe-b4c9d29bb944
+  fields:
+    disabled_on: null
+    name: 'India - Ahmedabad'
+    export_win_id: 'post:India - Ahmedabad'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6890
+- model: export_win.hqteamregionorpost
+  pk: c5efac25-34f4-4ce2-a452-6aba9a06b10f
+  fields:
+    disabled_on: null
+    name: 'India - Bangalore'
+    export_win_id: 'post:India - Bangalore'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6900
+- model: export_win.hqteamregionorpost
+  pk: 2ca148c1-4946-4112-97a0-acb5b8a7535a
+  fields:
+    disabled_on: null
+    name: 'India - Chandigarh'
+    export_win_id: 'post:India - Chandigarh'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6910
+- model: export_win.hqteamregionorpost
+  pk: 034fbfec-5814-4292-a0bc-1d743b5fe370
+  fields:
+    disabled_on: null
+    name: 'India - Chennai'
+    export_win_id: 'post:India - Chennai'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6920
+- model: export_win.hqteamregionorpost
+  pk: 41edeb21-c4e4-4a57-8a87-98eabbbe9260
+  fields:
+    disabled_on: null
+    name: 'India - Hyderabad'
+    export_win_id: 'post:India - Hyderabad'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6930
+- model: export_win.hqteamregionorpost
+  pk: 5262ce78-dec4-4b48-9a98-3ab6d08b74d7
+  fields:
+    disabled_on: null
+    name: 'India - Kolkata'
+    export_win_id: 'post:India - Kolkata'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6940
+- model: export_win.hqteamregionorpost
+  pk: 6bc4e71d-daef-4a54-8b86-60dae7518b5c
+  fields:
+    disabled_on: null
+    name: 'India - Mumbai'
+    export_win_id: 'post:India - Mumbai'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6950
+- model: export_win.hqteamregionorpost
+  pk: 4c084fae-2768-401a-b585-b257d57cd596
+  fields:
+    disabled_on: null
+    name: 'India - New Delhi'
+    export_win_id: 'post:India - New Delhi'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6960
+- model: export_win.hqteamregionorpost
+  pk: b9fd2bbd-de71-4332-a609-426ae7bacdba
+  fields:
+    disabled_on: null
+    name: 'India - Pune'
+    export_win_id: 'post:India - Pune'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6970
+- model: export_win.hqteamregionorpost
+  pk: 56e54f50-b08d-4ffb-b942-87a966c69515
+  fields:
+    disabled_on: null
+    name: 'Indonesia - Jakarta'
+    export_win_id: 'post:Indonesia - Jakarta'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6980
+- model: export_win.hqteamregionorpost
+  pk: 6f273453-f6e3-4fb9-8a6b-3f737f9dd61d
+  fields:
+    disabled_on: null
+    name: 'Iran - Tehran'
+    export_win_id: 'post:Iran - Tehran'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  6990
+- model: export_win.hqteamregionorpost
+  pk: 9c7cbe0d-a8cd-4c58-b378-ea1050d2bcd9
+  fields:
+    disabled_on: null
+    name: 'Iraq - Baghdad'
+    export_win_id: 'post:Iraq - Baghdad'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7000
+- model: export_win.hqteamregionorpost
+  pk: 4fe42ec4-e131-4895-8f87-994b17fdf418
+  fields:
+    disabled_on: null
+    name: 'Iraq - Erbil'
+    export_win_id: 'post:Iraq - Erbil'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7010
+- model: export_win.hqteamregionorpost
+  pk: 39ab6c05-1dfe-4bde-98ec-96bf475d5a03
+  fields:
+    disabled_on: null
+    name: 'Ireland - Dublin'
+    export_win_id: 'post:Ireland - Dublin'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7020
+- model: export_win.hqteamregionorpost
+  pk: 96b555ec-48a3-49fe-bb96-636b917d3ed0
+  fields:
+    disabled_on: null
+    name: 'Israel - Tel Aviv'
+    export_win_id: 'post:Israel - Tel Aviv'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7030
+- model: export_win.hqteamregionorpost
+  pk: fd49e7a0-ea9b-4ec6-b92e-103d67b630f2
+  fields:
+    disabled_on: null
+    name: 'Italy - Milan'
+    export_win_id: 'post:Italy - Milan'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7040
+- model: export_win.hqteamregionorpost
+  pk: 4c2a1f06-beff-4e25-b475-8d7b7723e5eb
+  fields:
+    disabled_on: null
+    name: 'Italy - Naples'
+    export_win_id: 'post:Italy - Naples'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7050
+- model: export_win.hqteamregionorpost
+  pk: 1e974013-bcb6-409e-9c25-25ed89917ae2
+  fields:
+    disabled_on: null
+    name: 'Italy - Rome'
+    export_win_id: 'post:Italy - Rome'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7060
+- model: export_win.hqteamregionorpost
+  pk: 23480886-5652-40ac-abc2-5d3492462272
+  fields:
+    disabled_on: null
+    name: 'Ivory Coast - Abidjan'
+    export_win_id: 'post:Ivory Coast - Abidjan'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7070
+- model: export_win.hqteamregionorpost
+  pk: 95f23032-2fe9-41dc-be0b-f5edb487d693
+  fields:
+    disabled_on: null
+    name: 'Jamaica - Kingston'
+    export_win_id: 'post:Jamaica - Kingston'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7080
+- model: export_win.hqteamregionorpost
+  pk: 2aa0e153-f0ea-49cf-a206-ce1cd4f61961
+  fields:
+    disabled_on: null
+    name: 'Japan - Osaka'
+    export_win_id: 'post:Japan - Osaka'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7090
+- model: export_win.hqteamregionorpost
+  pk: 71c8cc9f-f14a-444c-b658-c24a8709ec4f
+  fields:
+    disabled_on: null
+    name: 'Japan - Tokyo'
+    export_win_id: 'post:Japan - Tokyo'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7100
+- model: export_win.hqteamregionorpost
+  pk: bd829ed6-799c-489a-8a08-31a32237583c
+  fields:
+    disabled_on: null
+    name: 'Jerusalem'
+    export_win_id: 'post:Jerusalem'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7110
+- model: export_win.hqteamregionorpost
+  pk: 64c0e2f7-2505-4119-825c-d10f3b575a67
+  fields:
+    disabled_on: null
+    name: 'Jordan - Amman'
+    export_win_id: 'post:Jordan - Amman'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7120
+- model: export_win.hqteamregionorpost
+  pk: 58c745bb-32c4-4d63-89df-a522606f1d00
+  fields:
+    disabled_on: null
+    name: 'Kazakhstan - Almaty'
+    export_win_id: 'post:Kazakhstan - Almaty'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7130
+- model: export_win.hqteamregionorpost
+  pk: 265a0e75-1925-4fe3-aebe-790420f57614
+  fields:
+    disabled_on: null
+    name: 'Kazakhstan - Astana'
+    export_win_id: 'post:Kazakhstan - Astana'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7140
+- model: export_win.hqteamregionorpost
+  pk: a03cff37-6e23-4225-93ed-681475290111
+  fields:
+    disabled_on: null
+    name: 'Kazakhstan - Atyrau'
+    export_win_id: 'post:Kazakhstan - Atyrau'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7150
+- model: export_win.hqteamregionorpost
+  pk: d7673a95-9103-41f2-a08b-eaa0b4779a68
+  fields:
+    disabled_on: null
+    name: 'Kenya - Nairobi'
+    export_win_id: 'post:Kenya - Nairobi'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7160
+- model: export_win.hqteamregionorpost
+  pk: cb9d22f5-6495-43e9-9416-f281260a95e7
+  fields:
+    disabled_on: null
+    name: 'Kiribati - Tarawa'
+    export_win_id: 'post:Kiribati - Tarawa'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7170
+- model: export_win.hqteamregionorpost
+  pk: 16e8a1c5-b4a3-4f54-be6d-7668a8b8c52c
+  fields:
+    disabled_on: null
+    name: 'North Korea - Pyongyang'
+    export_win_id: 'post:North Korea - Pyongyang'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7180
+- model: export_win.hqteamregionorpost
+  pk: d81502b3-7923-4768-b75c-4b0e5eef0cf7
+  fields:
+    disabled_on: null
+    name: 'Kosovo - Pristina'
+    export_win_id: 'post:Kosovo - Pristina'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7190
+- model: export_win.hqteamregionorpost
+  pk: 1dc17fbd-672b-4685-bfa4-1b263c881f36
+  fields:
+    disabled_on: null
+    name: 'Kuwait'
+    export_win_id: 'post:Kuwait'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7200
+- model: export_win.hqteamregionorpost
+  pk: c64605ec-5a3b-4f54-9c94-9d35d117e003
+  fields:
+    disabled_on: null
+    name: 'Kyrgyzstan - Bishkek'
+    export_win_id: 'post:Kyrgyzstan - Bishkek'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7210
+- model: export_win.hqteamregionorpost
+  pk: 04780595-39e4-4318-a9df-3cdd03b97aef
+  fields:
+    disabled_on: null
+    name: 'Laos - Vientiane'
+    export_win_id: 'post:Laos - Vientiane'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7220
+- model: export_win.hqteamregionorpost
+  pk: 55d25a74-6faa-4303-9fcc-612d0ffe1908
+  fields:
+    disabled_on: null
+    name: 'Latvia - Riga'
+    export_win_id: 'post:Latvia - Riga'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7230
+- model: export_win.hqteamregionorpost
+  pk: 4cd01316-c6af-4bb9-9eff-a8f1882ad8ad
+  fields:
+    disabled_on: null
+    name: 'Lebanon - Beirut'
+    export_win_id: 'post:Lebanon - Beirut'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7240
+- model: export_win.hqteamregionorpost
+  pk: 1c46caa0-d50f-4f54-af46-d275eeb7bf01
+  fields:
+    disabled_on: null
+    name: 'Lesotho - Maseru'
+    export_win_id: 'post:Lesotho - Maseru'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7250
+- model: export_win.hqteamregionorpost
+  pk: fecb99b6-824b-4eb5-b95d-6055c3c2d822
+  fields:
+    disabled_on: null
+    name: 'Libya - Tripoli'
+    export_win_id: 'post:Libya - Tripoli'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7260
+- model: export_win.hqteamregionorpost
+  pk: 0ae19d97-ae12-4310-8675-2a4218e07089
+  fields:
+    disabled_on: null
+    name: 'Lithuania - Vilnius'
+    export_win_id: 'post:Lithuania - Vilnius'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7270
+- model: export_win.hqteamregionorpost
+  pk: 5f54eaf1-73ae-499b-87fb-ae1a4088bb71
+  fields:
+    disabled_on: null
+    name: 'Luxembourg'
+    export_win_id: 'post:Luxembourg'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7280
+- model: export_win.hqteamregionorpost
+  pk: 3b1c3f9e-2cd0-415c-8fae-1b91b430e87b
+  fields:
+    disabled_on: null
+    name: 'Macedonia - Skopje'
+    export_win_id: 'post:Macedonia - Skopje'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7290
+- model: export_win.hqteamregionorpost
+  pk: 794cb797-ca16-4702-a990-ba4a17cf1475
+  fields:
+    disabled_on: null
+    name: 'Madagascar - Antananarivo'
+    export_win_id: 'post:Madagascar - Antananarivo'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7300
+- model: export_win.hqteamregionorpost
+  pk: 2176d1b3-321a-4f17-a189-b2e038d051f9
+  fields:
+    disabled_on: null
+    name: 'Malawi - Lilongwe'
+    export_win_id: 'post:Malawi - Lilongwe'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7310
+- model: export_win.hqteamregionorpost
+  pk: 79993ea3-c2a6-4139-bc29-d9055022a3a8
+  fields:
+    disabled_on: null
+    name: 'Malaysia - Kuala Lumpur'
+    export_win_id: 'post:Malaysia - Kuala Lumpur'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7320
+- model: export_win.hqteamregionorpost
+  pk: c10d7eae-8fd7-4fd0-9a13-062d76c82e8e
+  fields:
+    disabled_on: null
+    name: 'Malta - Valletta'
+    export_win_id: 'post:Malta - Valletta'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7330
+- model: export_win.hqteamregionorpost
+  pk: 8bcf69cf-e90a-4033-812c-623f7d2e543c
+  fields:
+    disabled_on: null
+    name: 'Mauritius - Port Louis'
+    export_win_id: 'post:Mauritius - Port Louis'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7340
+- model: export_win.hqteamregionorpost
+  pk: 08c288d1-d179-42ad-b9de-a2f1d3ac1694
+  fields:
+    disabled_on: null
+    name: 'Mexico - Guadalajara'
+    export_win_id: 'post:Mexico - Guadalajara'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7350
+- model: export_win.hqteamregionorpost
+  pk: 333b3f8f-c335-4918-96c6-cb1f7458104a
+  fields:
+    disabled_on: null
+    name: 'Mexico - Mexico City'
+    export_win_id: 'post:Mexico - Mexico City'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7360
+- model: export_win.hqteamregionorpost
+  pk: 194b36a2-c462-44ff-a2d9-39c19df78c4c
+  fields:
+    disabled_on: null
+    name: 'Mexico - Monterrey'
+    export_win_id: 'post:Mexico - Monterrey'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7370
+- model: export_win.hqteamregionorpost
+  pk: 193c2f02-421b-4261-bca5-09168c096f31
+  fields:
+    disabled_on: null
+    name: 'Mexico - Tijuana'
+    export_win_id: 'post:Mexico - Tijuana'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7380
+- model: export_win.hqteamregionorpost
+  pk: bf8b4b9f-8e97-43d0-bcef-be59855fba72
+  fields:
+    disabled_on: null
+    name: 'Moldova - Chisinau'
+    export_win_id: 'post:Moldova - Chisinau'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7390
+- model: export_win.hqteamregionorpost
+  pk: 75131d66-591d-455a-b9e2-b3d736301d22
+  fields:
+    disabled_on: null
+    name: 'Mongolia - Ulaanbaatar'
+    export_win_id: 'post:Mongolia - Ulaanbaatar'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7400
+- model: export_win.hqteamregionorpost
+  pk: 953b6739-9c1d-4107-9e3e-9c54b07e7802
+  fields:
+    disabled_on: null
+    name: 'Morocco - Casablanca'
+    export_win_id: 'post:Morocco - Casablanca'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7410
+- model: export_win.hqteamregionorpost
+  pk: d0008a2c-6563-4998-a421-4cb394ee0059
+  fields:
+    disabled_on: null
+    name: 'Morocco - Rabat'
+    export_win_id: 'post:Morocco - Rabat'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7420
+- model: export_win.hqteamregionorpost
+  pk: 879d6ce2-ad59-47d1-b72d-695cdddcfff8
+  fields:
+    disabled_on: null
+    name: 'Mozambique - Maputo'
+    export_win_id: 'post:Mozambique - Maputo'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7430
+- model: export_win.hqteamregionorpost
+  pk: 35e91550-3702-4671-adea-0d36fa38300d
+  fields:
+    disabled_on: null
+    name: 'Namibia - Windhoek'
+    export_win_id: 'post:Namibia - Windhoek'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7440
+- model: export_win.hqteamregionorpost
+  pk: 98d2c509-6508-43aa-80ae-863c4cf59eb9
+  fields:
+    disabled_on: null
+    name: 'Nepal - Kathmandu'
+    export_win_id: 'post:Nepal - Kathmandu'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7450
+- model: export_win.hqteamregionorpost
+  pk: 036efb05-9190-4649-a51a-09826adf4665
+  fields:
+    disabled_on: null
+    name: 'Netherlands - The Hague'
+    export_win_id: 'post:Netherlands - The Hague'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7460
+- model: export_win.hqteamregionorpost
+  pk: f7d4ee0b-2f49-45fe-af92-a70735d90833
+  fields:
+    disabled_on: null
+    name: 'New Zealand - Auckland'
+    export_win_id: 'post:New Zealand - Auckland'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7470
+- model: export_win.hqteamregionorpost
+  pk: 27527b88-27b3-4b4a-aa89-c36c1e6da159
+  fields:
+    disabled_on: null
+    name: 'New Zealand - Wellington'
+    export_win_id: 'post:New Zealand - Wellington'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7480
+- model: export_win.hqteamregionorpost
+  pk: f986b197-320f-4ec8-b06e-f005241a34c1
+  fields:
+    disabled_on: null
+    name: 'Nigeria - Abuja'
+    export_win_id: 'post:Nigeria - Abuja'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7490
+- model: export_win.hqteamregionorpost
+  pk: c8527aad-fc8c-4849-86e4-bd0cf61348ad
+  fields:
+    disabled_on: null
+    name: 'Nigeria - Kaduna'
+    export_win_id: 'post:Nigeria - Kaduna'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7500
+- model: export_win.hqteamregionorpost
+  pk: ce575c6f-2957-4dbf-a193-bbdca7aa436d
+  fields:
+    disabled_on: null
+    name: 'Nigeria - Lagos'
+    export_win_id: 'post:Nigeria - Lagos'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7510
+- model: export_win.hqteamregionorpost
+  pk: ccb87365-1d33-40f5-85e4-1f530ba19201
+  fields:
+    disabled_on: null
+    name: 'Nigeria - Port Harcourt'
+    export_win_id: 'post:Nigeria - Port Harcourt'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7520
+- model: export_win.hqteamregionorpost
+  pk: 31b7d632-f039-47e4-86a8-d84c2f06e161
+  fields:
+    disabled_on: null
+    name: 'Norway - Oslo'
+    export_win_id: 'post:Norway - Oslo'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7530
+- model: export_win.hqteamregionorpost
+  pk: 08c5153b-4013-483f-88b9-3b41335bad9e
+  fields:
+    disabled_on: null
+    name: 'Oman - Muscat'
+    export_win_id: 'post:Oman - Muscat'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7540
+- model: export_win.hqteamregionorpost
+  pk: 854720ab-72a4-4cb5-9213-245f966de8c8
+  fields:
+    disabled_on: null
+    name: 'Pakistan -  Islamabad'
+    export_win_id: 'post:Pakistan -  Islamabad'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7550
+- model: export_win.hqteamregionorpost
+  pk: 69c33871-f073-4bc5-bf99-403b723280ae
+  fields:
+    disabled_on: null
+    name: 'Pakistan - Karachi'
+    export_win_id: 'post:Pakistan - Karachi'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7560
+- model: export_win.hqteamregionorpost
+  pk: e8753151-9ff2-447f-a92d-451dc11003d8
+  fields:
+    disabled_on: null
+    name: 'Pakistan - Lahore'
+    export_win_id: 'post:Pakistan - Lahore'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7570
+- model: export_win.hqteamregionorpost
+  pk: 17d980a7-03bd-4bb5-b926-e56b3452d0b8
+  fields:
+    disabled_on: null
+    name: 'Panama - Panama City'
+    export_win_id: 'post:Panama - Panama City'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7580
+- model: export_win.hqteamregionorpost
+  pk: a48ebd0c-8573-4133-a847-9d27ae0b6409
+  fields:
+    disabled_on: null
+    name: 'Papua New Guinea - Port Moresby'
+    export_win_id: 'post:Papua New Guinea - Port Moresby'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7590
+- model: export_win.hqteamregionorpost
+  pk: 8f02e05f-b9c3-4d86-9704-869ca3f2d772
+  fields:
+    disabled_on: null
+    name: 'Paraguay - Asuncion'
+    export_win_id: 'post:Paraguay - Asuncion'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7600
+- model: export_win.hqteamregionorpost
+  pk: 1c66003b-8ea4-4aba-a5df-ab8fda502a77
+  fields:
+    disabled_on: null
+    name: 'Peru - Lima'
+    export_win_id: 'post:Peru - Lima'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7610
+- model: export_win.hqteamregionorpost
+  pk: 5e847370-7081-495a-b473-6d7c56335878
+  fields:
+    disabled_on: null
+    name: 'Philippines - Manila'
+    export_win_id: 'post:Philippines - Manila'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7620
+- model: export_win.hqteamregionorpost
+  pk: 1ac63d7f-676d-463b-9487-ca6ef93931e5
+  fields:
+    disabled_on: null
+    name: 'Poland - Warsaw'
+    export_win_id: 'post:Poland - Warsaw'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7630
+- model: export_win.hqteamregionorpost
+  pk: 658245cb-2172-4eb1-b3de-a0040492da50
+  fields:
+    disabled_on: null
+    name: 'Portugal - Lisbon'
+    export_win_id: 'post:Portugal - Lisbon'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7640
+- model: export_win.hqteamregionorpost
+  pk: 65c0c797-878f-40ec-9c10-eb03f5a2503b
+  fields:
+    disabled_on: null
+    name: 'Portugal - Oporto'
+    export_win_id: 'post:Portugal - Oporto'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7650
+- model: export_win.hqteamregionorpost
+  pk: d6584070-34c5-4cc5-8500-b2571db394b0
+  fields:
+    disabled_on: null
+    name: 'Portugal - Portimao'
+    export_win_id: 'post:Portugal - Portimao'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7660
+- model: export_win.hqteamregionorpost
+  pk: ed282976-2bfc-4e73-b411-7e61f238392c
+  fields:
+    disabled_on: null
+    name: 'Puerto Rico'
+    export_win_id: 'post:Puerto Rico'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7670
+- model: export_win.hqteamregionorpost
+  pk: 95c707ba-9550-416a-9f46-8e0fc29bba96
+  fields:
+    disabled_on: null
+    name: 'Qatar - Doha'
+    export_win_id: 'post:Qatar - Doha'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7680
+- model: export_win.hqteamregionorpost
+  pk: e7201c93-d0dd-4e80-b797-e2831156bd60
+  fields:
+    disabled_on: null
+    name: 'Republic of Guinea - Conakry'
+    export_win_id: 'post:Republic of Guinea - Conakry'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7690
+- model: export_win.hqteamregionorpost
+  pk: 5b14d6e0-e25f-45af-832c-e92050a5101d
+  fields:
+    disabled_on: null
+    name: 'Romania - Bucharest'
+    export_win_id: 'post:Romania - Bucharest'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7700
+- model: export_win.hqteamregionorpost
+  pk: d24b647a-f209-4fcf-babb-02bb712b7c01
+  fields:
+    disabled_on: null
+    name: 'Russia - Ekaterinburg'
+    export_win_id: 'post:Russia - Ekaterinburg'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7710
+- model: export_win.hqteamregionorpost
+  pk: eeb4ba4f-82cb-4c81-b42f-cedbcfdbb646
+  fields:
+    disabled_on: null
+    name: 'Russia - Moscow'
+    export_win_id: 'post:Russia - Moscow'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7720
+- model: export_win.hqteamregionorpost
+  pk: d91ee0d7-0e73-4dce-ae80-a4fb9cf236f2
+  fields:
+    disabled_on: null
+    name: 'Russia - St Petersburg'
+    export_win_id: 'post:Russia - St Petersburg'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7730
+- model: export_win.hqteamregionorpost
+  pk: 7c796157-dbf0-4ae6-a876-60aeeddf20c7
+  fields:
+    disabled_on: null
+    name: 'Rwanda - Kigali'
+    export_win_id: 'post:Rwanda - Kigali'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7740
+- model: export_win.hqteamregionorpost
+  pk: c66a38e0-57d5-45d6-a8a3-aaa68d16081e
+  fields:
+    disabled_on: null
+    name: 'San Marino'
+    export_win_id: 'post:San Marino'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7750
+- model: export_win.hqteamregionorpost
+  pk: 5d1c27e5-19f6-4315-b988-8f7dc59231f1
+  fields:
+    disabled_on: null
+    name: 'Saudi Arabia - Al Khobar'
+    export_win_id: 'post:Saudi Arabia - Al Khobar'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7760
+- model: export_win.hqteamregionorpost
+  pk: d675de4e-18e8-4862-aa71-abf43151b59c
+  fields:
+    disabled_on: null
+    name: 'Saudi Arabia - Jeddah'
+    export_win_id: 'post:Saudi Arabia - Jeddah'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7770
+- model: export_win.hqteamregionorpost
+  pk: 15a7c5fb-7b05-422e-8700-9f5508052bd1
+  fields:
+    disabled_on: null
+    name: 'Saudi Arabia - Riyadh'
+    export_win_id: 'post:Saudi Arabia - Riyadh'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7780
+- model: export_win.hqteamregionorpost
+  pk: d22d2f8e-c443-4b98-9fe5-ddf9fdf0a295
+  fields:
+    disabled_on: null
+    name: 'Senegal - Dakar'
+    export_win_id: 'post:Senegal - Dakar'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7790
+- model: export_win.hqteamregionorpost
+  pk: c891575a-d472-4fe0-92f6-a949dbe0c861
+  fields:
+    disabled_on: null
+    name: 'Serbia - Belgrade'
+    export_win_id: 'post:Serbia - Belgrade'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7800
+- model: export_win.hqteamregionorpost
+  pk: 22855863-6b95-458f-9e8d-789ede4ac944
+  fields:
+    disabled_on: null
+    name: 'Seychelle - Victoria'
+    export_win_id: 'post:Seychelle - Victoria'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7810
+- model: export_win.hqteamregionorpost
+  pk: ce49439b-3cde-483f-ba24-c159b6dda6ef
+  fields:
+    disabled_on: null
+    name: 'Sierra Leone - Freetown'
+    export_win_id: 'post:Sierra Leone - Freetown'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7820
+- model: export_win.hqteamregionorpost
+  pk: 64231b8a-7fa0-4177-a156-3a7049005297
+  fields:
+    disabled_on: null
+    name: 'Singapore'
+    export_win_id: 'post:Singapore'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7830
+- model: export_win.hqteamregionorpost
+  pk: 354add3a-1755-459c-b8a1-6ba552d316c3
+  fields:
+    disabled_on: null
+    name: 'Slovakia - Bratislava'
+    export_win_id: 'post:Slovakia - Bratislava'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7840
+- model: export_win.hqteamregionorpost
+  pk: 89d770e1-3fc8-4ef0-b466-9ee48d438c93
+  fields:
+    disabled_on: null
+    name: 'Slovenia - Ljubljana'
+    export_win_id: 'post:Slovenia - Ljubljana'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7850
+- model: export_win.hqteamregionorpost
+  pk: e48fced5-340c-46b6-b6e0-0af110e5c27a
+  fields:
+    disabled_on: null
+    name: 'Solomon Islands - Honiara'
+    export_win_id: 'post:Solomon Islands - Honiara'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7860
+- model: export_win.hqteamregionorpost
+  pk: c37aab30-c10b-4aef-964b-b545e9459e10
+  fields:
+    disabled_on: null
+    name: 'South Africa - Cape Town'
+    export_win_id: 'post:South Africa - Cape Town'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7870
+- model: export_win.hqteamregionorpost
+  pk: b2dc6584-6fbe-4d2a-ae14-a38c41100eee
+  fields:
+    disabled_on: null
+    name: 'South Africa - Durban'
+    export_win_id: 'post:South Africa - Durban'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7880
+- model: export_win.hqteamregionorpost
+  pk: 2fadd184-e746-4376-b43f-12a3b05dd0a2
+  fields:
+    disabled_on: null
+    name: 'South Africa - Johannesburg'
+    export_win_id: 'post:South Africa - Johannesburg'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7890
+- model: export_win.hqteamregionorpost
+  pk: 230f791c-0750-4c17-b8fa-4cacae37b163
+  fields:
+    disabled_on: null
+    name: 'South Africa - Pretoria'
+    export_win_id: 'post:South Africa - Pretoria'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7900
+- model: export_win.hqteamregionorpost
+  pk: 6963cc74-1d23-4b60-a59c-72fbe2ce866a
+  fields:
+    disabled_on: null
+    name: 'South Korea - Seoul'
+    export_win_id: 'post:South Korea - Seoul'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7910
+- model: export_win.hqteamregionorpost
+  pk: f27dc58c-98e9-446b-bab1-e9fbfef656c6
+  fields:
+    disabled_on: null
+    name: 'Spain - Barcelona'
+    export_win_id: 'post:Spain - Barcelona'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7920
+- model: export_win.hqteamregionorpost
+  pk: 4bd7bcc7-99c0-4f86-ab7a-d05900f96050
+  fields:
+    disabled_on: null
+    name: 'Spain - Bilbao'
+    export_win_id: 'post:Spain - Bilbao'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7930
+- model: export_win.hqteamregionorpost
+  pk: 55778fce-9a56-4a99-9b51-afe6633d3f4d
+  fields:
+    disabled_on: null
+    name: 'Spain - Madrid'
+    export_win_id: 'post:Spain - Madrid'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7940
+- model: export_win.hqteamregionorpost
+  pk: f224c00d-5bfa-4ec5-b91b-75b7bc4f8e95
+  fields:
+    disabled_on: null
+    name: 'Sri Lanka - Colombo'
+    export_win_id: 'post:Sri Lanka - Colombo'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7950
+- model: export_win.hqteamregionorpost
+  pk: 6f5242f4-5288-4de4-8689-f6c5446b8d71
+  fields:
+    disabled_on: null
+    name: 'St Lucia - Castries'
+    export_win_id: 'post:St Lucia - Castries'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7960
+- model: export_win.hqteamregionorpost
+  pk: a93018ec-67bb-4c60-b013-e3b825fc96d6
+  fields:
+    disabled_on: null
+    name: 'St Vincent - Kingstown'
+    export_win_id: 'post:St Vincent - Kingstown'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7970
+- model: export_win.hqteamregionorpost
+  pk: 58089db7-0e54-4651-89a0-50b8a69352d4
+  fields:
+    disabled_on: null
+    name: 'Sudan - Khartoum'
+    export_win_id: 'post:Sudan - Khartoum'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7980
+- model: export_win.hqteamregionorpost
+  pk: 70a83794-caaf-44b3-b948-66d683492bf7
+  fields:
+    disabled_on: null
+    name: 'Swaziland - Mbabane'
+    export_win_id: 'post:Swaziland - Mbabane'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  7990
+- model: export_win.hqteamregionorpost
+  pk: de64919f-fa94-4b80-948b-b6d3aae750fc
+  fields:
+    disabled_on: null
+    name: 'Sweden - Stockholm'
+    export_win_id: 'post:Sweden - Stockholm'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8000
+- model: export_win.hqteamregionorpost
+  pk: a8ce88ab-0d02-4e38-b486-60b9465fcb65
+  fields:
+    disabled_on: null
+    name: 'Switzerland - Berne'
+    export_win_id: 'post:Switzerland - Berne'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8010
+- model: export_win.hqteamregionorpost
+  pk: 33f3aded-b52d-4ffd-a58c-60dce4b4cd52
+  fields:
+    disabled_on: null
+    name: 'Switzerland - Geneva'
+    export_win_id: 'post:Switzerland - Geneva'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8020
+- model: export_win.hqteamregionorpost
+  pk: 7835b422-20e1-488a-ad4c-3ffaa80b0b15
+  fields:
+    disabled_on: null
+    name: 'Syria - Damascus'
+    export_win_id: 'post:Syria - Damascus'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8030
+- model: export_win.hqteamregionorpost
+  pk: b7124323-0d7b-4a41-93b7-162f8b3964b6
+  fields:
+    disabled_on: null
+    name: 'Taiwan - Taipei'
+    export_win_id: 'post:Taiwan - Taipei'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8040
+- model: export_win.hqteamregionorpost
+  pk: 8cc7bb9d-64f6-4b66-a55c-a04a623d5880
+  fields:
+    disabled_on: null
+    name: 'Tajikistan - Dushanbe'
+    export_win_id: 'post:Tajikistan - Dushanbe'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8050
+- model: export_win.hqteamregionorpost
+  pk: 0a91501a-7163-4eae-b770-66f77586ae35
+  fields:
+    disabled_on: null
+    name: 'Tanzania - Dar es Salaam'
+    export_win_id: 'post:Tanzania - Dar es Salaam'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8060
+- model: export_win.hqteamregionorpost
+  pk: 4941ab36-3f7b-430d-89e2-06a245d1f293
+  fields:
+    disabled_on: null
+    name: 'Thailand - Bangkok'
+    export_win_id: 'post:Thailand - Bangkok'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8070
+- model: export_win.hqteamregionorpost
+  pk: 71af6823-f554-4e04-b83b-243d41363f9d
+  fields:
+    disabled_on: null
+    name: 'Togo - Lome'
+    export_win_id: 'post:Togo - Lome'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8080
+- model: export_win.hqteamregionorpost
+  pk: 54169f04-6301-4ef8-be4b-3688dbd085b1
+  fields:
+    disabled_on: null
+    name: "Tonga - Nuku' alofa"
+    export_win_id: "post:Tonga - Nuku' alofa"
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8090
+- model: export_win.hqteamregionorpost
+  pk: 02f74d3a-5504-4267-a16c-304ebb7376d3
+  fields:
+    disabled_on: null
+    name: 'Trinidad and Tobago - Port of Spain'
+    export_win_id: 'post:Trinidad and Tobago - Port of Spain'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8100
+- model: export_win.hqteamregionorpost
+  pk: 96a9ab92-af0d-4b7e-ad6c-5ee738f28e4d
+  fields:
+    disabled_on: null
+    name: 'Tunisia - Tunis'
+    export_win_id: 'post:Tunisia - Tunis'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8110
+- model: export_win.hqteamregionorpost
+  pk: d4ffc596-1b32-4d17-b7b2-2b22ab67113a
+  fields:
+    disabled_on: null
+    name: 'Turkey - Ankara'
+    export_win_id: 'post:Turkey - Ankara'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8120
+- model: export_win.hqteamregionorpost
+  pk: 1d24e567-bdbc-4713-a838-cc74d4416af1
+  fields:
+    disabled_on: null
+    name: 'Turkey - Istanbul'
+    export_win_id: 'post:Turkey - Istanbul'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8130
+- model: export_win.hqteamregionorpost
+  pk: 031339e6-ebf5-4fd7-acfc-3b1be6b04cf2
+  fields:
+    disabled_on: null
+    name: 'Turkey - Izmir'
+    export_win_id: 'post:Turkey - Izmir'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8140
+- model: export_win.hqteamregionorpost
+  pk: 0376b34b-a079-4491-8915-0e8575a45def
+  fields:
+    disabled_on: null
+    name: 'Turkmenistan - Ashgabat'
+    export_win_id: 'post:Turkmenistan - Ashgabat'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8150
+- model: export_win.hqteamregionorpost
+  pk: 6a26c044-9904-4b71-b5d9-b80b52a3a145
+  fields:
+    disabled_on: null
+    name: 'Uganda - Kampala'
+    export_win_id: 'post:Uganda - Kampala'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8160
+- model: export_win.hqteamregionorpost
+  pk: 2bcf8cf2-af24-4915-8679-c965cbfff275
+  fields:
+    disabled_on: null
+    name: 'Ukraine - Kyiv'
+    export_win_id: 'post:Ukraine - Kyiv'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8170
+- model: export_win.hqteamregionorpost
+  pk: 7c2a588b-4846-4931-96b5-ffe814dfe314
+  fields:
+    disabled_on: null
+    name: 'UAE - Abu Dhabi'
+    export_win_id: 'post:UAE - Abu Dhabi'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8180
+- model: export_win.hqteamregionorpost
+  pk: 4792b71c-f5a5-4fae-add2-02c85d80c87c
+  fields:
+    disabled_on: null
+    name: 'UAE - Dubai'
+    export_win_id: 'post:UAE - Dubai'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8190
+- model: export_win.hqteamregionorpost
+  pk: 31384494-0da8-4cd4-8e51-2b4a00a0ed3d
+  fields:
+    disabled_on: null
+    name: 'UKREP'
+    export_win_id: 'post:UKREP'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8200
+- model: export_win.hqteamregionorpost
+  pk: 67f9b8c7-46b3-4e84-8d3d-9de1daefbc27
+  fields:
+    disabled_on: null
+    name: 'USA - Atlanta'
+    export_win_id: 'post:USA - Atlanta'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8210
+- model: export_win.hqteamregionorpost
+  pk: 8122a50d-8a4c-40cf-a7cc-dd768bda10aa
+  fields:
+    disabled_on: null
+    name: 'USA - Boston'
+    export_win_id: 'post:USA - Boston'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8220
+- model: export_win.hqteamregionorpost
+  pk: a0faf4a7-a39f-4310-a89b-afff99aafcd0
+  fields:
+    disabled_on: null
+    name: 'USA - Chicago'
+    export_win_id: 'post:USA - Chicago'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8230
+- model: export_win.hqteamregionorpost
+  pk: e80c8c34-374b-49e6-b2b1-48eefd2af01e
+  fields:
+    disabled_on: null
+    name: 'USA - Houston'
+    export_win_id: 'post:USA - Houston'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8240
+- model: export_win.hqteamregionorpost
+  pk: 0acd2a5e-5985-47b4-af2c-0f6dae61a89e
+  fields:
+    disabled_on: null
+    name: 'USA - Los Angeles'
+    export_win_id: 'post:USA - Los Angeles'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8250
+- model: export_win.hqteamregionorpost
+  pk: d61ba970-3252-40b9-bbc5-2548fe0f6903
+  fields:
+    disabled_on: null
+    name: 'USA - Miami'
+    export_win_id: 'post:USA - Miami'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8260
+- model: export_win.hqteamregionorpost
+  pk: ed55cca9-2ba0-4949-8c7b-60cf0137e4bb
+  fields:
+    disabled_on: null
+    name: 'USA - New York'
+    export_win_id: 'post:USA - New York'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8270
+- model: export_win.hqteamregionorpost
+  pk: 0b476581-e051-4a0e-869f-a2ee9a02c9a1
+  fields:
+    disabled_on: null
+    name: 'USA - San Francisco'
+    export_win_id: 'post:USA - San Francisco'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8280
+- model: export_win.hqteamregionorpost
+  pk: 3e9bb21c-1d82-429b-aa55-d1bfe859f581
+  fields:
+    disabled_on: null
+    name: 'USA - Washington DC'
+    export_win_id: 'post:USA - Washington DC'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8290
+- model: export_win.hqteamregionorpost
+  pk: 46af72cd-bd12-4896-a9a7-be43464f891d
+  fields:
+    disabled_on: null
+    name: 'Uruguay - Montevideo'
+    export_win_id: 'post:Uruguay - Montevideo'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8300
+- model: export_win.hqteamregionorpost
+  pk: 15c7d8ab-bd50-4e52-9b11-e752bb3c2285
+  fields:
+    disabled_on: null
+    name: 'Uzbekistan - Tashkent'
+    export_win_id: 'post:Uzbekistan - Tashkent'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8310
+- model: export_win.hqteamregionorpost
+  pk: 1203a917-2345-4273-aa57-c479f66e062c
+  fields:
+    disabled_on: null
+    name: 'Vanuatu - Port Vila'
+    export_win_id: 'post:Vanuatu - Port Vila'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8320
+- model: export_win.hqteamregionorpost
+  pk: 73877e02-8c61-46ed-b979-a59542145397
+  fields:
+    disabled_on: null
+    name: 'Venezuela - Caracas'
+    export_win_id: 'post:Venezuela - Caracas'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8330
+- model: export_win.hqteamregionorpost
+  pk: f2c40c2d-2270-4ad7-a237-ea285d670541
+  fields:
+    disabled_on: null
+    name: 'Vietnam - Hanoi'
+    export_win_id: 'post:Vietnam - Hanoi'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8340
+- model: export_win.hqteamregionorpost
+  pk: 225ed445-ca94-4147-8985-764e36ecc629
+  fields:
+    disabled_on: null
+    name: 'Vietnam - Ho Chi Minh City'
+    export_win_id: 'post:Vietnam - Ho Chi Minh City'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8350
+- model: export_win.hqteamregionorpost
+  pk: 39979e27-6782-4994-95ff-612ed37bd166
+  fields:
+    disabled_on: null
+    name: "Yemen - Sana'a"
+    export_win_id: "post:Yemen - Sana'a"
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8360
+- model: export_win.hqteamregionorpost
+  pk: a4bab556-3db6-4918-86e4-bf1dc2a944db
+  fields:
+    disabled_on: null
+    name: 'Zambia - Lusaka'
+    export_win_id: 'post:Zambia - Lusaka'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8370
+- model: export_win.hqteamregionorpost
+  pk: 9464c7e5-2df5-48da-aff7-789112d97b50
+  fields:
+    disabled_on: null
+    name: 'Zimbabwe - Harare'
+    export_win_id: 'post:Zimbabwe - Harare'
+    team_type_id: 6e798633-83da-4597-8e9a-9bb033ca06a4
+    order:  8380
+# TCP (9000)
+- model: export_win.hqteamregionorpost
+  pk: 3f054e49-e3f4-49fd-acc6-b2970db45f84
+  fields:
+    disabled_on: null
+    name: 'ADS Group'
+    export_win_id: 'tcp:1'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9000
+- model: export_win.hqteamregionorpost
+  pk: 04b4aa33-70b5-4664-b99d-0df251abd6f3
+  fields:
+    disabled_on: null
+    name: 'Agricultural Engineers Association Ltd'
+    export_win_id: 'tcp:2'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9010
+- model: export_win.hqteamregionorpost
+  pk: c6a25173-ebd7-484c-ab94-57c05bf4fc04
+  fields:
+    disabled_on: null
+    name: 'Amusement & Leisure Equipment Suppliers'
+    export_win_id: 'tcp:3'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9020
+- model: export_win.hqteamregionorpost
+  pk: a33ab8f0-27e8-482c-a174-8d893f6777cc
+  fields:
+    disabled_on: null
+    name: 'Association of British Healthcare Industries'
+    export_win_id: 'tcp:4'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9030
+- model: export_win.hqteamregionorpost
+  pk: 48c0a78c-52d1-405b-9edb-f2ecc079a8ff
+  fields:
+    disabled_on: null
+    name: 'Association of British Mining Equipment Companies'
+    export_win_id: 'tcp:5'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9040
+- model: export_win.hqteamregionorpost
+  pk: 9b730e95-44ff-40a6-b363-3f18ccd70860
+  fields:
+    disabled_on: null
+    name: 'Baby Products Association'
+    export_win_id: 'tcp:6'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9050
+- model: export_win.hqteamregionorpost
+  pk: aa5b95b6-e625-4516-9be4-91632423c144
+  fields:
+    disabled_on: null
+    name: 'BioPartner UK'
+    export_win_id: 'tcp:7'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9060
+- model: export_win.hqteamregionorpost
+  pk: 1e71e95d-c466-4988-8748-098feb387a7f
+  fields:
+    disabled_on: null
+    name: 'Birmingham Chamber of Commerce'
+    export_win_id: 'tcp:8'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9070
+- model: export_win.hqteamregionorpost
+  pk: 06308817-5719-4b58-ab18-234d2e36450b
+  fields:
+    disabled_on: null
+    name: "Brewing, Food & Beverage Industry Suppliers' Association"
+    export_win_id: "tcp:9"
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9080
+- model: export_win.hqteamregionorpost
+  pk: 337f49bd-765e-494e-8794-9b1929b344b5
+  fields:
+    disabled_on: null
+    name: 'British Airport Services and Equipment Association'
+    export_win_id: 'tcp:10'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9090
+- model: export_win.hqteamregionorpost
+  pk: b4e907b8-9a0c-442c-9297-bc30077ea48b
+  fields:
+    disabled_on: null
+    name: 'British Allied Trades Federation'
+    export_win_id: 'tcp:11'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9100
+- model: export_win.hqteamregionorpost
+  pk: a0cdbfdb-03a7-465a-9731-4550150db299
+  fields:
+    disabled_on: null
+    name: 'British Aviation Group'
+    export_win_id: 'tcp:12'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9110
+- model: export_win.hqteamregionorpost
+  pk: 8af830c3-696c-4baf-aab3-f041492445b2
+  fields:
+    disabled_on: null
+    name: 'British Contract Furnishing & Design Association'
+    export_win_id: 'tcp:13'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9120
+- model: export_win.hqteamregionorpost
+  pk: e60bc4e4-c1ff-4f62-b112-276ff957e022
+  fields:
+    disabled_on: null
+    name: 'British Dental Industry Association'
+    export_win_id: 'tcp:14'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9130
+- model: export_win.hqteamregionorpost
+  pk: 73534f63-7b93-46e8-b6f8-2e040c87b82e
+  fields:
+    disabled_on: null
+    name: 'British Educational Suppliers Association'
+    export_win_id: 'tcp:15'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9140
+- model: export_win.hqteamregionorpost
+  pk: 8d270ecb-aaab-4058-9143-0782835ef70f
+  fields:
+    disabled_on: null
+    name: 'British Electrotechnical and Allied Manufacturers Association'
+    export_win_id: 'tcp:16'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9150
+- model: export_win.hqteamregionorpost
+  pk: 25bb1ae4-796c-4f51-a178-3fac6a94adcc
+  fields:
+    disabled_on: null
+    name: 'British Equestrian Trade Association'
+    export_win_id: 'tcp:17'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9160
+- model: export_win.hqteamregionorpost
+  pk: c535d386-06dc-412f-93d2-be7bc84430cb
+  fields:
+    disabled_on: null
+    name: 'British Footwear Association'
+    export_win_id: 'tcp:18'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9170
+- model: export_win.hqteamregionorpost
+  pk: 538a8d58-1fbc-4059-b6bc-3ca1d04d47cc
+  fields:
+    disabled_on: null
+    name: 'British Furniture Manufacturers'
+    export_win_id: 'tcp:19'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9180
+- model: export_win.hqteamregionorpost
+  pk: 71d862e3-da81-4338-8fa5-645d9781748c
+  fields:
+    disabled_on: null
+    name: 'British Home Enhancement Trade Association'
+    export_win_id: 'tcp:20'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9190
+- model: export_win.hqteamregionorpost
+  pk: 67218b1e-b92b-424e-91f4-2dfcf088dd3c
+  fields:
+    disabled_on: null
+    name: 'British Marine Federation'
+    export_win_id: 'tcp:21'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9200
+- model: export_win.hqteamregionorpost
+  pk: e6b5082c-6406-4db8-bfbe-7c21ebb30999
+  fields:
+    disabled_on: null
+    name: 'British Pig Association'
+    export_win_id: 'tcp:22'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9210
+- model: export_win.hqteamregionorpost
+  pk: 80e5aba7-b62a-4c69-863b-cffca2ddc9fc
+  fields:
+    disabled_on: null
+    name: 'British Plastics Federation'
+    export_win_id: 'tcp:23'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9220
+- model: export_win.hqteamregionorpost
+  pk: 83eb1784-6a4a-4514-b9e0-302636a7212a
+  fields:
+    disabled_on: null
+    name: 'British Promotional Merchandising Association'
+    export_win_id: 'tcp:24'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9230
+- model: export_win.hqteamregionorpost
+  pk: 9dd3e3cb-daad-46dd-8ebd-c03b80be8820
+  fields:
+    disabled_on: null
+    name: 'British Safety Industry Federation'
+    export_win_id: 'tcp:25'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9240
+- model: export_win.hqteamregionorpost
+  pk: 25205420-b6f7-4090-82de-31a6e2912f94
+  fields:
+    disabled_on: null
+    name: 'British Security Industry Association'
+    export_win_id: 'tcp:26'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9250
+- model: export_win.hqteamregionorpost
+  pk: cf584269-ad7c-46aa-bb9d-5c67ea531868
+  fields:
+    disabled_on: null
+    name: 'British Textile Machinery Association'
+    export_win_id: 'tcp:27'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9260
+- model: export_win.hqteamregionorpost
+  pk: 05ecf8de-9d32-4ce5-ab7d-cc0e2b69bcbd
+  fields:
+    disabled_on: null
+    name: 'British Water'
+    export_win_id: 'tcp:28'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9270
+- model: export_win.hqteamregionorpost
+  pk: 4b43281e-07c0-4f30-af0b-386f389b8f43
+  fields:
+    disabled_on: null
+    name: 'Building Centre'
+    export_win_id: 'tcp:29'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9280
+- model: export_win.hqteamregionorpost
+  pk: 0a58b33b-5aa0-4b0a-9d09-1d3f2147da19
+  fields:
+    disabled_on: null
+    name: 'Catering Equipment Suppliers Association'
+    export_win_id: 'tcp:30'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9290
+- model: export_win.hqteamregionorpost
+  pk: 8bd9e900-eaf2-4bbc-8908-4dd4f6227f7f
+  fields:
+    disabled_on: null
+    name: 'Chemical Industries Association'
+    export_win_id: 'tcp:31'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9300
+- model: export_win.hqteamregionorpost
+  pk: 34f804af-bb17-4ae9-81ea-398172df18e0
+  fields:
+    disabled_on: null
+    name: "Children's Media Conference"
+    export_win_id: "tcp:32"
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9310
+- model: export_win.hqteamregionorpost
+  pk: 3cebafd8-46eb-4bc7-abdf-ee8d3454f686
+  fields:
+    disabled_on: null
+    name: 'Circuit Equipment and Materials Association / SCS'
+    export_win_id: 'tcp:33'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9320
+- model: export_win.hqteamregionorpost
+  pk: 57ea7ab3-836a-4cdd-b69c-f68486fa8282
+  fields:
+    disabled_on: null
+    name: 'Commercial Horticultural Association'
+    export_win_id: 'tcp:34'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9330
+- model: export_win.hqteamregionorpost
+  pk: bf1cb2b5-5a10-4a56-a09c-8438672fc828
+  fields:
+    disabled_on: null
+    name: 'Composites UK'
+    export_win_id: 'tcp:35'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9340
+- model: export_win.hqteamregionorpost
+  pk: 2478ab9d-6de0-48ce-a912-4d6f6dec2032
+  fields:
+    disabled_on: null
+    name: 'Construction Equipment Association'
+    export_win_id: 'tcp:36'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9350
+- model: export_win.hqteamregionorpost
+  pk: d91b6830-6f93-4caf-bb65-089afc91f36a
+  fields:
+    disabled_on: null
+    name: 'Construction Products Association'
+    export_win_id: 'tcp:37'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9360
+- model: export_win.hqteamregionorpost
+  pk: 96c69690-e158-4d42-9084-65054b496607
+  fields:
+    disabled_on: null
+    name: 'Craft Scotland'
+    export_win_id: 'tcp:38'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9370
+- model: export_win.hqteamregionorpost
+  pk: fad84768-64f2-46b1-805a-b1ad5829c90d
+  fields:
+    disabled_on: null
+    name: 'Crafts Council'
+    export_win_id: 'tcp:39'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9380
+- model: export_win.hqteamregionorpost
+  pk: 818697ce-a2a9-49b9-aa71-e58a100d6cb1
+  fields:
+    disabled_on: null
+    name: 'Electronic Exporters Group / SCS'
+    export_win_id: 'tcp:40'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9390
+- model: export_win.hqteamregionorpost
+  pk: a6db95ee-97f4-4bc6-b98d-9cf49f1429dd
+  fields:
+    disabled_on: null
+    name: 'Energy Industries Council'
+    export_win_id: 'tcp:41'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9400
+- model: export_win.hqteamregionorpost
+  pk: 76ff9976-606f-487b-b006-cc26577578a6
+  fields:
+    disabled_on: null
+    name: 'Engineering Industries Association'
+    export_win_id: 'tcp:42'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9410
+- model: export_win.hqteamregionorpost
+  pk: 25e1da0b-4d2a-46ad-acd9-41ab65fef5ed
+  fields:
+    disabled_on: null
+    name: 'English UK'
+    export_win_id: 'tcp:43'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9420
+- model: export_win.hqteamregionorpost
+  pk: 5396872a-cfa5-40d3-a04f-04493efe1be4
+  fields:
+    disabled_on: null
+    name: 'Environmental Industries Commission'
+    export_win_id: 'tcp:44'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9430
+- model: export_win.hqteamregionorpost
+  pk: 4d4a8a80-139d-4197-a84a-2743ba68eda3
+  fields:
+    disabled_on: null
+    name: 'Federation of Environmental Trade Associations'
+    export_win_id: 'tcp:45'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9440
+- model: export_win.hqteamregionorpost
+  pk: a77229ae-1674-453b-b48d-6e9daf20357d
+  fields:
+    disabled_on: null
+    name: 'Federation of Sports and Play Associations'
+    export_win_id: 'tcp:46'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9450
+- model: export_win.hqteamregionorpost
+  pk: 728dd7ad-132b-4567-b25d-9961334c1a89
+  fields:
+    disabled_on: null
+    name: 'Film Export UK'
+    export_win_id: 'tcp:47'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9460
+- model: export_win.hqteamregionorpost
+  pk: 921cfac7-7eea-49b4-9f32-2ae986b063b8
+  fields:
+    disabled_on: null
+    name: 'Food & Drink Exporters Association'
+    export_win_id: 'tcp:48'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9470
+- model: export_win.hqteamregionorpost
+  pk: b18d9a1d-a5bd-45ea-a3b8-0172b52f8e25
+  fields:
+    disabled_on: null
+    name: 'GAMBICA'
+    export_win_id: 'tcp:49'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9480
+- model: export_win.hqteamregionorpost
+  pk: ecd7a920-effe-4a3e-af32-a2a0dc0da3cc
+  fields:
+    disabled_on: null
+    name: 'Gardenex & PetQuip: Federation of Garden & Leisure Manufacturers'
+    export_win_id: 'tcp:50'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9490
+- model: export_win.hqteamregionorpost
+  pk: 3f752737-3915-4d74-8f78-0859bcb80044
+  fields:
+    disabled_on: null
+    name: 'Gun Trade Association'
+    export_win_id: 'tcp:51'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9500
+- model: export_win.hqteamregionorpost
+  pk: 34c1a938-ac7e-42bd-9c98-8de91ef75112
+  fields:
+    disabled_on: null
+    name: 'Hull & Humber Chamber of Commerce'
+    export_win_id: 'tcp:52'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9510
+- model: export_win.hqteamregionorpost
+  pk: abe86fe6-7618-4333-8ab7-ab88ba940874
+  fields:
+    disabled_on: null
+    name: 'Institute of Practitioners in Advertising'
+    export_win_id: 'tcp:53'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9520
+- model: export_win.hqteamregionorpost
+  pk: 8f8b0956-3675-4077-845a-7a49bfb8c7a0
+  fields:
+    disabled_on: null
+    name: 'Lighting Industry Association'
+    export_win_id: 'tcp:54'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9530
+- model: export_win.hqteamregionorpost
+  pk: f7fccb6f-b836-4257-8006-a7585affd662
+  fields:
+    disabled_on: null
+    name: 'Manufacturing Technologies Association'
+    export_win_id: 'tcp:55'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9540
+- model: export_win.hqteamregionorpost
+  pk: f42bda40-7166-480f-8037-f0b6f9bd152f
+  fields:
+    disabled_on: null
+    name: 'Medilink UK'
+    export_win_id: 'tcp:56'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9550
+- model: export_win.hqteamregionorpost
+  pk: 61a48959-40da-41d7-9ed0-49cb9981e424
+  fields:
+    disabled_on: null
+    name: 'Midlands Aerospace Alliance'
+    export_win_id: 'tcp:57'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9560
+- model: export_win.hqteamregionorpost
+  pk: fe3f6df7-ed5c-4354-a6e2-5981c881c53f
+  fields:
+    disabled_on: null
+    name: 'Motorsport Industry Association'
+    export_win_id: 'tcp:58'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9570
+- model: export_win.hqteamregionorpost
+  pk: 2b86d67e-bfb7-4e61-868c-7b8f42645728
+  fields:
+    disabled_on: null
+    name: 'Music Industries Association'
+    export_win_id: 'tcp:59'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9580
+- model: export_win.hqteamregionorpost
+  pk: 8d76b560-36ed-4573-bad8-cb6cbbcccaec
+  fields:
+    disabled_on: null
+    name: 'National Microelectronics Institute'
+    export_win_id: 'tcp:60'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9590
+- model: export_win.hqteamregionorpost
+  pk: 0d823bd0-1315-403b-a126-78d4b446da7d
+  fields:
+    disabled_on: null
+    name: 'Pet Industry Federation'
+    export_win_id: 'tcp:61'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9600
+- model: export_win.hqteamregionorpost
+  pk: 00646f92-989a-4211-b3d7-b1146298396d
+  fields:
+    disabled_on: null
+    name: 'Processing & Packaging Machinery Association'
+    export_win_id: 'tcp:62'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9610
+- model: export_win.hqteamregionorpost
+  pk: c85f2b9d-a7c7-41b5-88d9-7f0757ccc1c5
+  fields:
+    disabled_on: null
+    name: 'Producers Alliance for Cinema & Television'
+    export_win_id: 'tcp:63'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9620
+- model: export_win.hqteamregionorpost
+  pk: aab02da0-fad9-48ea-8cfa-0d9f558f4114
+  fields:
+    disabled_on: null
+    name: 'Publishers Association'
+    export_win_id: 'tcp:64'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9630
+- model: export_win.hqteamregionorpost
+  pk: 2017e012-9eee-4c9f-ab9c-535ec54f4554
+  fields:
+    disabled_on: null
+    name: 'Railway Industry Association'
+    export_win_id: 'tcp:65'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9640
+- model: export_win.hqteamregionorpost
+  pk: 140e1b4e-8534-4117-8b27-4d91ba1c7fbb
+  fields:
+    disabled_on: null
+    name: 'RenewableUK'
+    export_win_id: 'tcp:66'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9650
+- model: export_win.hqteamregionorpost
+  pk: 735dffc4-32c9-411f-bcc5-77c5814208e1
+  fields:
+    disabled_on: null
+    name: 'Society of Maritime Industries'
+    export_win_id: 'tcp:67'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9660
+- model: export_win.hqteamregionorpost
+  pk: bbe68a69-2697-43dd-833c-ea2483acf97e
+  fields:
+    disabled_on: null
+    name: 'Society of Motor Manufacturers & Traders Limited'
+    export_win_id: 'tcp:68'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9670
+- model: export_win.hqteamregionorpost
+  pk: 59a94436-0650-4fbf-be69-54a863736d4e
+  fields:
+    disabled_on: null
+    name: 'Subsea UK'
+    export_win_id: 'tcp:69'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9680
+- model: export_win.hqteamregionorpost
+  pk: 21d90588-6cb8-49e5-bf3a-2292397181cb
+  fields:
+    disabled_on: null
+    name: 'TechUK'
+    export_win_id: 'tcp:70'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9690
+- model: export_win.hqteamregionorpost
+  pk: f3eb16e9-65be-4b23-be53-4fedc8942b4e
+  fields:
+    disabled_on: null
+    name: 'The Deep End Ltd'
+    export_win_id: 'tcp:71'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9700
+- model: export_win.hqteamregionorpost
+  pk: ee67552b-036f-4dcc-8307-0ed153f6bfd5
+  fields:
+    disabled_on: null
+    name: 'UK Fashion & Textile Association'
+    export_win_id: 'tcp:72'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9710
+- model: export_win.hqteamregionorpost
+  pk: 86955f8b-7a06-4edd-a934-87faebba5053
+  fields:
+    disabled_on: null
+    name: 'United Kingdom Interactive Entertainment Association'
+    export_win_id: 'tcp:73'
+    team_type_id: f7006548-9ef0-4c4e-bc60-1b7ca40ff75b
+    order:  9720
