@@ -1,5 +1,6 @@
-import factory.fuzzy
 import random
+
+import factory.fuzzy
 
 from django.utils.timezone import now
 
