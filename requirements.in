@@ -11,7 +11,7 @@ django-mptt==0.15.0
 django-pglocks==1.0.4
 django-reversion==5.0.6
 uritemplate==4.1.1  # required for DRF schema features
-whitenoise==6.5.0
+whitenoise==6.6.0
 
 chardet==5.2.0
 pyyaml==6.0.1
@@ -21,7 +21,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.9
 psycogreen==1.0.2
 
-boto3==1.28.62
+boto3==1.28.63
 
 notifications-python-client==8.0.1
 
@@ -39,11 +39,11 @@ slackclient==2.9.4
 django-redis==5.4.0
 
 # OpenSearch
-opensearch-py==2.3.1
+opensearch-py==2.3.2
 opensearch-dsl==2.1.0
 
 # ES APM
-elastic-apm==6.17.0
+elastic-apm==6.19.0
 
 # Testing and dev
 django-debug-toolbar==4.2.0
@@ -54,7 +54,7 @@ gevent==23.9.1
 mohawk==1.1.0
 requests==2.31.0
 requests_toolbelt==1.0.0
-sentry_sdk==1.31.0
+sentry_sdk==1.32.0
 
 # RQ and associated helpers
 rq==1.15.1

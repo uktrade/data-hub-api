@@ -10,6 +10,7 @@ from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.feature_flag.utils import is_user_feature_flag_active
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
+    TaskAssignedToMeFromOthersSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
 )
@@ -20,16 +21,15 @@ from datahub.task.models import InvestmentProjectTask
 logger = logging.getLogger(__name__)
 
 
-def schedule_create_task_reminder_subscription_task(advisers):
-    for adviser in advisers:
-        job = job_scheduler(
-            queue_name=LONG_RUNNING_QUEUE,
-            function=create_task_reminder_subscription_task,
-            function_args=(adviser,),
-        )
-        logger.info(
-            f'Task {job.id} create_task_reminder_subscription_task',
-        )
+def schedule_create_task_reminder_subscription_task(adviser):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=create_task_reminder_subscription_task,
+        function_args=(adviser,),
+    )
+    logger.info(
+        f'Task {job.id} create_task_reminder_subscription_task',
+    )
 
 
 def create_task_reminder_subscription_task(adviser):
@@ -161,3 +161,23 @@ def update_task_reminder_email_status(email_notification_id, reminder_ids):
     for reminder in reminders:
         reminder.email_notification_id = email_notification_id
         reminder.save()
+
+
+def schedule_create_task_assigned_to_me_from_others_subscription_task(adviser):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=create_task_assigned_to_me_from_others_task,
+        function_args=(adviser,),
+    )
+    logger.info(
+        f'Task {job.id} create_task_assigned_to_me_from_others_task',
+    )
+
+
+def create_task_assigned_to_me_from_others_task(adviser):
+    """
+    Creates a task reminder subscription for an adviser if the adviser doesn't have
+    a subscription already.
+    """
+    if not TaskAssignedToMeFromOthersSubscription.objects.filter(adviser=adviser).first():
+        TaskAssignedToMeFromOthersSubscription.objects.create(adviser=adviser)
