@@ -1,0 +1,23 @@
+- model: export_win.expectedvaluerelation
+  pk: 456e951d-a633-4f21-afde-d41381407efe
+  fields:
+    disabled_on: null
+    name: 'Goods'
+    export_win_id: 1
+    order: 100
+
+- model: export_win.expectedvaluerelation
+  pk: 9b65391a-0359-44c2-b020-a710fb29211f
+  fields:
+    disabled_on: null
+    name: 'Services'
+    export_win_id: 2
+    order: 200
+
+- model: export_win.expectedvaluerelation
+  pk: 8711e3dd-3a2c-4b47-aea7-9a53c135efb6
+  fields:
+    disabled_on: null
+    name: 'Both goods and services'
+    export_win_id: 3
+    order: 300
