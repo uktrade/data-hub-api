@@ -527,3 +527,13 @@ def fork_queue():
             yield queue
         finally:
             queue.clear()
+
+
+@pytest.fixture
+def metadata_client(hawk_api_client):
+    """Hawk API client fixture configured to use credentials with the metadata scope."""
+    hawk_api_client.set_credentials(
+        'test-id-with-metadata-scope',
+        'test-key-with-metadata-scope',
+    )
+    yield hawk_api_client
