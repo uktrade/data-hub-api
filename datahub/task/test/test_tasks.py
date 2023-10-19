@@ -1,4 +1,5 @@
 import datetime
+import logging
 from unittest import mock
 from unittest.mock import ANY
 from uuid import uuid4
@@ -12,7 +13,11 @@ from datahub.feature_flag.test.factories import UserFeatureFlagFactory
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import UpcomingTaskReminder, UpcomingTaskReminderSubscription
 from datahub.reminder.test.factories import UpcomingTaskReminderFactory
-from datahub.task.tasks import generate_reminders_upcoming_tasks, update_task_reminder_email_status
+from datahub.task.tasks import (
+    generate_reminders_upcoming_tasks,
+    schedule_reminders_upcoming_tasks,
+    update_task_reminder_email_status,
+)
 from datahub.task.test.factories import AdviserFactory, InvestmentProjectTaskFactory, TaskFactory
 
 
@@ -31,6 +36,16 @@ def adviser_tasks_user_feature_flag():
 def add_user_feature_flag(adviser_tasks_user_feature_flag, adviser):
     adviser.features.set([adviser_tasks_user_feature_flag])
     return adviser
+
+
+@pytest.fixture()
+def mock_job_scheduler(monkeypatch):
+    mock_job_scheduler = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.task.tasks.job_scheduler',
+        mock_job_scheduler,
+    )
+    return mock_job_scheduler
 
 
 @pytest.fixture
@@ -238,3 +253,22 @@ class TestTaskReminders:
             email_notification_id=notification_id,
         )
         assert linked_reminders.count() == (reminder_number)
+
+    def test_schedule_reminders_upcoming_tasks(
+        self,
+        caplog,
+        mock_job_scheduler,
+    ):
+        """
+        Generate reminders upcoming tasks should be called from
+        scheduler.
+        """
+        caplog.set_level(logging.INFO)
+
+        job = schedule_reminders_upcoming_tasks()
+        mock_job_scheduler.assert_called_once()
+
+        # check result
+        assert caplog.messages[0] == (
+            f'Task {job.id} generate_reminders_upcoming_tasks scheduled'
+        )
