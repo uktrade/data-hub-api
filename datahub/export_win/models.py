@@ -20,4 +20,14 @@ class BaseExportWinOrderedConstantModel(BaseOrderedConstantModel):
 
 
 class TeamType(BaseExportWinOrderedConstantModel):
-    """Team type (for export wins)."""
+    """Team type"""
+
+
+class HQTeamRegionOrPost(BaseExportWinOrderedConstantModel):
+    """HQ Team Region or Post"""
+
+    team_type = models.ForeignKey(
+        TeamType,
+        related_name='hq_team_region_or_post',
+        on_delete=models.CASCADE,
+    )
