@@ -60,6 +60,10 @@ def test_hq_team_region_or_post(metadata_client, team_type_id, results_length):
     results = response.json()
 
     assert len(results) == results_length
+
+    for result in results:
+        assert result['team_type']['id'] == str(team.pk)
+
     assert results[0] == {
         'id': str(hq_team_region_or_post.pk),
         'name': hq_team_region_or_post.name,
