@@ -12,13 +12,31 @@ from datahub.task.models import InvestmentProjectTask, Task
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-NestedInvestmentProjectTaskField = partial(
-    NestedRelatedField,
-    model=InvestmentProjectTask,
+def nested_investment_project_task(extra_fields=()):
+    return partial(
+        NestedRelatedField,
+        model=InvestmentProjectTask,
+        read_only=True,
+        extra_fields=(
+            (
+                'investment_project',
+                NestedInvestmentProjectInvestorCompanyField(),
+            ),
+        )
+        + extra_fields,
+    )
+
+
+NestedInvestmentProjectTaskField = nested_investment_project_task()
+
+NestedInvestmentProjectTaskDueDateField = nested_investment_project_task(
     extra_fields=(
         (
-            'investment_project',
-            NestedInvestmentProjectInvestorCompanyField(),
+            'task',
+            NestedRelatedField(
+                model=Task,
+                extra_fields=('due_date',),
+            ),
         ),
     ),
 )

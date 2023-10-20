@@ -511,6 +511,10 @@ class TestUpcomingTaskDueDateReminderViewset(APITestMixin, ReminderTestMixin):
             'event': reminders[0].event,
             'investment_project_task': {
                 'id': str(reminders[0].investment_project_task.id),
+                'task': {
+                    'id': str(reminders[0].investment_project_task.task.id),
+                    'due_date': None,
+                },
                 'investment_project': {
                     'id': str(reminders[0].investment_project_task.investment_project.id),
                     'name': reminders[0].investment_project_task.investment_project.name,
