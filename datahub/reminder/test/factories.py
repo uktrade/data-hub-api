@@ -4,6 +4,7 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.reminder.models import (
+    InvestmentProjectTaskTaskAssignedToMeFromOthersReminder,
     NewExportInteractionReminder,
     NewExportInteractionSubscription,
     NoRecentExportInteractionReminder,
@@ -92,3 +93,10 @@ class UpcomingInvestmentProjectTaskReminderFactory(BaseReminderFactory):
 
     class Meta:
         model = UpcomingInvestmentProjectTaskReminder
+
+
+class InvestmentProjectTaskTaskAssignedToMeFromOthersReminderFactory(BaseReminderFactory):
+    investment_project_task = factory.SubFactory(InvestmentProjectTaskFactory)
+
+    class Meta:
+        model = InvestmentProjectTaskTaskAssignedToMeFromOthersReminder

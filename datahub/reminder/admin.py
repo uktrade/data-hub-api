@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from datahub.reminder.models import (
+    InvestmentProjectTaskTaskAssignedToMeFromOthersReminder,
     NewExportInteractionReminder,
     NewExportInteractionSubscription,
     NoRecentExportInteractionReminder,
@@ -88,6 +89,16 @@ class UpcomingEstimatedLandDateReminderAdmin(admin.ModelAdmin):
 @admin.register(UpcomingInvestmentProjectTaskReminder)
 class UpcomingInvestmentProjectTaskReminderAdmin(admin.ModelAdmin):
     """Upcoming investment project task reminder admin."""
+
+    raw_id_fields = (
+        'adviser',
+        'investment_project_task',
+    )
+
+
+@admin.register(InvestmentProjectTaskTaskAssignedToMeFromOthersReminder)
+class InvestmentProjectTaskTaskAssignedToMeFromOthersReminderAdmin(admin.ModelAdmin):
+    """Investment project task assigned to me from others admin."""
 
     raw_id_fields = (
         'adviser',
