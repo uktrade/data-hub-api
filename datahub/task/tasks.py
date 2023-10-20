@@ -19,6 +19,7 @@ from datahub.reminder.tasks import notify_adviser_by_rq_email
 from datahub.task.models import Task
 
 from datahub.task.client import Notify
+from datahub.task.client import notify_adviser_added_to_task
 
 logger = logging.getLogger(__name__)
 
@@ -192,8 +193,9 @@ def create_task_assigned_to_me_from_others_task(adviser):
         TaskAssignedToMeFromOthersSubscription.objects.create(adviser=adviser)
 
 
-def send_notification_task_assigned_from_others_email_task(self, task, adviser):
+def send_notification_task_assigned_from_others_email_task(task, adviser):
     """
     Sends an email when an adviser is added to a task.
     """
-    Notify.notify_adviser_added_to_task(self, task, adviser)
+    print('**** adviser.name', adviser.name)
+    notify_adviser_added_to_task(task, adviser)

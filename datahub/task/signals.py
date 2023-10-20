@@ -41,12 +41,13 @@ def set_task_reminder_subscription_after_task_post_save(sender, instance, **kwar
     sender=Task.advisers.through,
     dispatch_uid='send_task_assigned_from_others_email',
 )
-def send_task_assigned_from_others_email(sender, self, instance, **kwargs):
+def send_task_assigned_from_others_email(sender, instance, **kwargs):
     """
     Checks to see if a Task has any advisers. If there are advisers then this is
     passed to the task for processing to add task reminder subscriptions
     """
+    print('**** instance.title', instance.title)
     advisers = instance.advisers.all()
     task = instance
     for adviser in advisers:
-        send_notification_task_assigned_from_others_email_task(self, task, adviser)
+        send_notification_task_assigned_from_others_email_task(task, adviser)
