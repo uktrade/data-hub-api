@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
 from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
+from datahub.export_win.models import TeamType
 from datahub.interaction.models import ServiceAnswerOption, ServiceQuestion
 from datahub.metadata.models import (
     Country, ExchangeRate, OverseasRegion, Service, TeamRole, UKRegion,
@@ -113,3 +114,9 @@ class InvestmentProjectStageSerializer(ConstantModelSerializer):
     """Investment project stage serializer."""
 
     exclude_from_investment_flow = serializers.ReadOnlyField()
+
+
+class HQTeamRegionOrPostSerializer(ConstantModelSerializer):
+    """HQ team region or post serializer."""
+
+    team_type = NestedRelatedField(TeamType, read_only=True)
