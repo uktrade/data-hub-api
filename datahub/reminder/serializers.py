@@ -17,8 +17,10 @@ from datahub.reminder.models import (
     TaskAssignedToMeFromOthersSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
+    UpcomingInvestmentProjectTaskReminder,
     UpcomingTaskReminderSubscription,
 )
+from datahub.task.serializers import NestedInvestmentProjectTaskField
 
 
 class NoRecentExportInteractionSubscriptionSerializer(serializers.ModelSerializer):
@@ -165,3 +167,15 @@ class NoRecentExportInteractionReminderSerializer(serializers.ModelSerializer):
     class Meta:
         model = NoRecentExportInteractionReminder
         fields = ('id', 'created_on', 'last_interaction_date', 'event', 'company', 'interaction')
+
+
+class UpcomingInvestmentProjectTaskReminderSerializer(serializers.ModelSerializer):
+    """Serializer for Upcoming Investment Project Task Reminder."""
+
+    investment_project_task = NestedInvestmentProjectTaskField(
+        read_only=True,
+    )
+
+    class Meta:
+        model = UpcomingInvestmentProjectTaskReminder
+        fields = ('id', 'created_on', 'event', 'investment_project_task')

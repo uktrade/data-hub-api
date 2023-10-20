@@ -15,7 +15,6 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 NestedInvestmentProjectTaskField = partial(
     NestedRelatedField,
     model=InvestmentProjectTask,
-    source='task_investmentprojecttask',
     extra_fields=(
         (
             'investment_project',
@@ -60,7 +59,10 @@ class BasicTaskSerializer(serializers.ModelSerializer):
 class TaskSerializer(BasicTaskSerializer):
     """Task serializer"""
 
-    investment_project_task = NestedInvestmentProjectTaskField(read_only=True)
+    investment_project_task = NestedInvestmentProjectTaskField(
+        read_only=True,
+        source='task_investmentprojecttask',
+    )
 
     class Meta:
         model = BasicTaskSerializer.Meta.model
