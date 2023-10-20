@@ -18,6 +18,7 @@ from datahub.reminder.models import (
 from datahub.reminder.tasks import notify_adviser_by_rq_email
 from datahub.task.models import Task
 
+from datahub.task.client import Notify
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +41,8 @@ def create_task_reminder_subscription_task(adviser):
     """
     if not UpcomingTaskReminderSubscription.objects.filter(adviser=adviser).first():
         UpcomingTaskReminderSubscription.objects.create(
-            adviser=adviser, email_reminders_enabled=True,
+            adviser=adviser,
+            email_reminders_enabled=True,
         )
 
 
@@ -188,3 +190,10 @@ def create_task_assigned_to_me_from_others_task(adviser):
     """
     if not TaskAssignedToMeFromOthersSubscription.objects.filter(adviser=adviser).first():
         TaskAssignedToMeFromOthersSubscription.objects.create(adviser=adviser)
+
+
+def send_notification_task_assigned_from_others_email_task(self, task, adviser):
+    """
+    Sends an email when an adviser is added to a task.
+    """
+    Notify.notify_adviser_added_to_task(self, task, adviser)
