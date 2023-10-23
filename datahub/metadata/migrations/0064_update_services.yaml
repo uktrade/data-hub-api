@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: 5fb7bd52-d734-49dc-81ef-939440c77f21
+  fields:
+    disabled_on: ~
+    order: 5000
+    segment: Northern Ireland Investment Summit 2023
+    parent:
+    contexts: ["interaction", "export_service_delivery", "trade_agreement_interaction", "investment_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0

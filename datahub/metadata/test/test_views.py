@@ -18,16 +18,6 @@ from datahub.metadata.test.factories import ServiceFactory
 pytestmark = pytest.mark.django_db
 
 
-@pytest.fixture
-def metadata_client(hawk_api_client):
-    """Hawk API client fixture configured to use credentials with the metadata scope."""
-    hawk_api_client.set_credentials(
-        'test-id-with-metadata-scope',
-        'test-key-with-metadata-scope',
-    )
-    yield hawk_api_client
-
-
 def pytest_generate_tests(metafunc):
     """
     Parametrizes the tests that use the `metadata_view_name` fixture

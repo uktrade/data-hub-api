@@ -11,39 +11,48 @@ from datahub.reminder.views import (
     reminder_summary_view,
     UpcomingEstimatedLandDateReminderViewset,
     UpcomingEstimatedLandDateSubscriptionViewset,
+    UpcomingInvestmentProjectTaskReminderViewset,
 )
 
 urlpatterns = [
     path(
         'reminder/subscription/no-recent-export-interaction',
-        NoRecentExportInteractionSubscriptionViewset.as_view({
-            'get': 'retrieve',
-            'patch': 'partial_update',
-        }),
+        NoRecentExportInteractionSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
         name='no-recent-export-interaction-subscription',
     ),
     path(
         'reminder/subscription/new-export-interaction',
-        NewExportInteractionSubscriptionViewset.as_view({
-            'get': 'retrieve',
-            'patch': 'partial_update',
-        }),
+        NewExportInteractionSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
         name='new-export-interaction-subscription',
     ),
     path(
         'reminder/subscription/no-recent-investment-interaction',
-        NoRecentInvestmentInteractionSubscriptionViewset.as_view({
-            'get': 'retrieve',
-            'patch': 'partial_update',
-        }),
+        NoRecentInvestmentInteractionSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
         name='no-recent-investment-interaction-subscription',
     ),
     path(
         'reminder/subscription/estimated-land-date',
-        UpcomingEstimatedLandDateSubscriptionViewset.as_view({
-            'get': 'retrieve',
-            'patch': 'partial_update',
-        }),
+        UpcomingEstimatedLandDateSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
         name='estimated-land-date-subscription',
     ),
     path(
@@ -51,62 +60,95 @@ urlpatterns = [
         reminder_subscription_summary_view,
         name='subscription-summary',
     ),
-
     path(
         'reminder/new-export-interaction',
-        NewExportInteractionReminderViewset.as_view({
-            'get': 'list',
-        }),
+        NewExportInteractionReminderViewset.as_view(
+            {
+                'get': 'list',
+            },
+        ),
         name='new-export-interaction-reminder',
     ),
     path(
         'reminder/new-export-interaction/<uuid:pk>',
-        NewExportInteractionReminderViewset.as_view({
-            'delete': 'destroy',
-        }),
+        NewExportInteractionReminderViewset.as_view(
+            {
+                'delete': 'destroy',
+            },
+        ),
         name='new-export-interaction-reminder-detail',
     ),
     path(
         'reminder/no-recent-export-interaction',
-        NoRecentExportInteractionReminderViewset.as_view({
-            'get': 'list',
-        }),
+        NoRecentExportInteractionReminderViewset.as_view(
+            {
+                'get': 'list',
+            },
+        ),
         name='no-recent-export-interaction-reminder',
     ),
     path(
         'reminder/no-recent-export-interaction/<uuid:pk>',
-        NoRecentExportInteractionReminderViewset.as_view({
-            'delete': 'destroy',
-        }),
+        NoRecentExportInteractionReminderViewset.as_view(
+            {
+                'delete': 'destroy',
+            },
+        ),
         name='no-recent-export-interaction-reminder-detail',
     ),
     path(
         'reminder/no-recent-investment-interaction',
-        NoRecentInvestmentInteractionReminderViewset.as_view({
-            'get': 'list',
-        }),
+        NoRecentInvestmentInteractionReminderViewset.as_view(
+            {
+                'get': 'list',
+            },
+        ),
         name='no-recent-investment-interaction-reminder',
     ),
     path(
         'reminder/no-recent-investment-interaction/<uuid:pk>',
-        NoRecentInvestmentInteractionReminderViewset.as_view({
-            'delete': 'destroy',
-        }),
+        NoRecentInvestmentInteractionReminderViewset.as_view(
+            {
+                'delete': 'destroy',
+            },
+        ),
         name='no-recent-investment-interaction-reminder-detail',
     ),
     path(
         'reminder/estimated-land-date',
-        UpcomingEstimatedLandDateReminderViewset.as_view({
-            'get': 'list',
-        }),
+        UpcomingEstimatedLandDateReminderViewset.as_view(
+            {
+                'get': 'list',
+            },
+        ),
         name='estimated-land-date-reminder',
     ),
     path(
         'reminder/estimated-land-date/<uuid:pk>',
-        UpcomingEstimatedLandDateReminderViewset.as_view({
-            'delete': 'destroy',
-        }),
+        UpcomingEstimatedLandDateReminderViewset.as_view(
+            {
+                'delete': 'destroy',
+            },
+        ),
         name='estimated-land-date-reminder-detail',
+    ),
+    path(
+        'reminder/my-tasks-due-date-approaching',
+        UpcomingInvestmentProjectTaskReminderViewset.as_view(
+            {
+                'get': 'list',
+            },
+        ),
+        name='my-tasks-due-date-approaching-reminder',
+    ),
+    path(
+        'reminder/my-tasks-due-date-approaching/<uuid:pk>',
+        UpcomingInvestmentProjectTaskReminderViewset.as_view(
+            {
+                'delete': 'destroy',
+            },
+        ),
+        name='my-tasks-due-date-approaching-reminder-detail',
     ),
     path(
         'reminder/summary',

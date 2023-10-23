@@ -12,14 +12,31 @@ from datahub.task.models import InvestmentProjectTask, Task
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-NestedInvestmentProjectTaskField = partial(
-    NestedRelatedField,
-    model=InvestmentProjectTask,
-    source='task_investmentprojecttask',
+def nested_investment_project_task(extra_fields=()):
+    return partial(
+        NestedRelatedField,
+        model=InvestmentProjectTask,
+        read_only=True,
+        extra_fields=(
+            (
+                'investment_project',
+                NestedInvestmentProjectInvestorCompanyField(),
+            ),
+        )
+        + extra_fields,
+    )
+
+
+NestedInvestmentProjectTaskField = nested_investment_project_task()
+
+NestedInvestmentProjectTaskDueDateField = nested_investment_project_task(
     extra_fields=(
         (
-            'investment_project',
-            NestedInvestmentProjectInvestorCompanyField(),
+            'task',
+            NestedRelatedField(
+                model=Task,
+                extra_fields=('due_date',),
+            ),
         ),
     ),
 )
@@ -60,7 +77,10 @@ class BasicTaskSerializer(serializers.ModelSerializer):
 class TaskSerializer(BasicTaskSerializer):
     """Task serializer"""
 
-    investment_project_task = NestedInvestmentProjectTaskField(read_only=True)
+    investment_project_task = NestedInvestmentProjectTaskField(
+        read_only=True,
+        source='task_investmentprojecttask',
+    )
 
     class Meta:
         model = BasicTaskSerializer.Meta.model
