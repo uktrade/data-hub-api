@@ -69,7 +69,7 @@ def generate_reminders_upcoming_tasks():
     ) as acquired:
         if not acquired:
             logger.info(
-                'Reminders for upcoming tasks are already being ' 'processed by another worker.',
+                'Reminders for upcoming tasks are already being processed by another worker.',
             )
             return
         now = timezone.now()
@@ -92,16 +92,17 @@ def generate_reminders_upcoming_tasks():
                         now,
                     )
 
+        logger.info(
+            'Task generate_reminders_upcoming_tasks completed',
+        )
         return tasks
-
-    logger.info(
-        'Task generate_reminders_upcoming_tasks completed',
-    )
 
 
 def get_company(task):
-    company = task.task_investmentprojecttask.get_company()
-    return company
+    """
+    Get the company associated with this task
+    """
+    return task.task_investmentprojecttask.get_company()
 
 
 def create_upcoming_task_reminder(

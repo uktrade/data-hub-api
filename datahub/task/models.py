@@ -82,7 +82,6 @@ class InvestmentProjectTask(BaseTaskType):
         related_name='investment_project_task',
     )
 
-    # @property
     def get_company(self):
         return self.investment_project.investor_company
 
