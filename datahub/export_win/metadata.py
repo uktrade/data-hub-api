@@ -20,6 +20,6 @@ registry.register(
 )
 
 registry.register(
-    metadata_id='win_type',
+    metadata_id='win-type',
     model=models.WinType,
 )
