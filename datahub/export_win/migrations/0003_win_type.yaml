@@ -1,0 +1,23 @@
+- model: export_win.wintype
+  pk: 59eb39a7-3215-4504-ae3a-8c31ba413ad7
+  fields:
+    disabled_on: null
+    name: 'Export'
+    export_win_id: 1
+    order: 100
+
+- model: export_win.wintype
+  pk: b85a49f3-b713-473d-a1de-97fbb7d41cc9
+  fields:
+    disabled_on: null
+    name: 'Business success'
+    export_win_id: 2
+    order: 200
+
+- model: export_win.wintype
+  pk: d44b7b86-d5ea-4963-9c83-41660bae0da3
+  fields:
+    disabled_on: null
+    name: 'Both export and business success'
+    export_win_id: 3
+    order: 300

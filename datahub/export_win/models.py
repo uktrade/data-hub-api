@@ -31,3 +31,7 @@ class HQTeamRegionOrPost(BaseExportWinOrderedConstantModel):
         related_name='hq_team_region_or_post',
         on_delete=models.CASCADE,
     )
+
+
+class WinType(BaseExportWinOrderedConstantModel):
+    """Win type"""

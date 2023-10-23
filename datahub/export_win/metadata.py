@@ -18,3 +18,8 @@ registry.register(
     ),
     serializer=HQTeamRegionOrPostSerializer,
 )
+
+registry.register(
+    metadata_id='win_type',
+    model=models.WinType,
+)
