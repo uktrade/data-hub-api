@@ -1,0 +1,23 @@
+- model: export_win.businesspotential
+  pk: 0e6f1d69-e9c3-4460-a74b-3881930fe3e9
+  fields:
+    disabled_on: null
+    name: 'The company is an exporter with High Export Potential'
+    export_win_id: 1
+    order: 100
+
+- model: export_win.businesspotential
+  pk: e4d74957-60a4-4eab-a17b-d4c7b792ad25
+  fields:
+    disabled_on: null
+    name: 'The company is a Medium Sized Business'
+    export_win_id: 2
+    order: 200
+
+- model: export_win.businesspotential
+  pk: 97f5e000-37a6-4452-b2be-25ccc94e5bd3
+  fields:
+    disabled_on: null
+    name: 'The company is not an exporter with High Export Potential or a Medium Sized Business'
+    export_win_id: 3
+    order: 300

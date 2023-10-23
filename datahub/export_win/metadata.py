@@ -23,3 +23,8 @@ registry.register(
     metadata_id='win-type',
     model=models.WinType,
 )
+
+registry.register(
+    metadata_id='business-potential',
+    model=models.BusinessPotential,
+)
