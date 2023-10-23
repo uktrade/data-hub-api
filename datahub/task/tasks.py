@@ -98,13 +98,6 @@ def generate_reminders_upcoming_tasks():
         return tasks
 
 
-def get_company(task):
-    """
-    Get the company associated with this task
-    """
-    return task.task_investmentprojecttask.get_company()
-
-
 def create_upcoming_task_reminder(
     task,
     adviser,
@@ -132,7 +125,7 @@ def create_upcoming_task_reminder(
         send_task_reminder_email(
             adviser=adviser,
             task=task,
-            company=get_company(task),
+            company=task.get_company(),
             reminders=[reminder],
         )
 

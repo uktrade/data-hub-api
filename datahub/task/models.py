@@ -43,6 +43,22 @@ class Task(ArchivableModel, BaseModel):
             self.reminder_date = self.due_date - timedelta(days=self.reminder_days)
         super(Task, self).save(*args, **kwargs)
 
+    def get_company(self):
+        """
+        Return the company from the related BaseTaskType model implementation.
+        """
+        task_fields = [
+            getattr(self, field.name).get_company()
+            for field in self._meta.get_fields()
+            if (
+                field.related_model
+                and issubclass(field.related_model, BaseTaskType)
+                and hasattr(self, field.name)
+            )
+        ]
+
+        return len(task_fields) > 0 and task_fields[0]
+
     def __str__(self):
         """Admin displayed human readable name."""
         return self.title

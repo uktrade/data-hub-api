@@ -117,24 +117,28 @@ def mock_notify_adviser_email_call(investment_project_task_due, matching_adviser
 class TestTaskReminders:
     @pytest.mark.parametrize(
         'lock_acquired',
-        (False, True),
+        (
+            False,
+            True,
+        ),
     )
     def test_lock(
         self,
         caplog,
         monkeypatch,
         lock_acquired,
-        mock_job_scheduler,
+        adviser_tasks_user_feature_flag,
+        mock_notify_adviser_by_rq_email,
     ):
         """
         Test that the task doesn't run if it cannot acquire
         the advisory_lock.
         """
+        adviser = AdviserFactory()
+        add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
+        investment_project_factory_due_today(1, advisers=[adviser])
+
         caplog.set_level(logging.INFO, logger='datahub.task.tasks')
-
-        mock_job_scheduler.return_value = Mock(id=1234)
-
-        InvestmentProjectTaskFactory()
 
         mock_advisory_lock = mock.MagicMock()
         mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
@@ -156,9 +160,9 @@ class TestTaskReminders:
         assert caplog.messages == expected_messages
 
         if lock_acquired:
-            mock_job_scheduler.assert_called_once()
+            mock_notify_adviser_by_rq_email.assert_called_once()
         else:
-            mock_job_scheduler.assert_not_called()
+            mock_notify_adviser_by_rq_email.assert_not_called()
 
     def test_generate_reminders_for_upcoming_tasks(
         self,
