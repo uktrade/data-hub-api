@@ -2,6 +2,7 @@ import logging
 
 from django.conf import settings
 from django.utils import timezone
+from django_pglocks import advisory_lock
 
 from datahub.core import statsd
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
@@ -62,40 +63,49 @@ def schedule_reminders_upcoming_tasks():
 
 
 def generate_reminders_upcoming_tasks():
-    now = timezone.now()
-    # When adding additional tasks this query will need to be moved to Open Search to return all
-    # task types.
-    tasks = Task.objects.filter(reminder_date=now)
-    for task in tasks:
-        # Get all active advisers assigned to the task
-        active_advisers = task.advisers.filter(is_active=True)
-        for adviser in active_advisers:
-            # Get subscription to know if emails are needed
-            adviser_subscription = UpcomingTaskReminderSubscription.objects.filter(
-                adviser=adviser,
-            ).first()
-
-            create_upcoming_task_reminder(
-                task,
-                task,
-                adviser,
-                adviser_subscription.email_reminders_enabled,
-                now,
-            )
-    logger.info(
+    with advisory_lock(
         'generate_reminders_upcoming_tasks',
+        wait=False,
+    ) as acquired:
+        if not acquired:
+            logger.info(
+                'Reminders for upcoming tasks are already being ' 'processed by another worker.',
+            )
+            return
+        now = timezone.now()
+        # When adding additional tasks this query will need to be moved to Open Search to return
+        # all task types.
+        tasks = Task.objects.filter(reminder_date=now)
+        for task in tasks:
+            # Get all active advisers assigned to the task
+            active_advisers = task.advisers.filter(is_active=True)
+            for adviser in active_advisers:
+                # Get subscription to know if emails are needed
+                adviser_subscription = UpcomingTaskReminderSubscription.objects.filter(
+                    adviser=adviser,
+                ).first()
+                if adviser_subscription:
+                    create_upcoming_task_reminder(
+                        task,
+                        adviser,
+                        adviser_subscription.email_reminders_enabled,
+                        now,
+                    )
+
+        return tasks
+
+    logger.info(
+        'Task generate_reminders_upcoming_tasks completed',
     )
 
-    return tasks
 
-
-# def get_company(task):
-#     return task.investment_project_task.get_company()
+def get_company(task):
+    company = task.task_investmentprojecttask.get_company()
+    return company
 
 
 def create_upcoming_task_reminder(
     task,
-    investment_project_task,
     adviser,
     send_email,
     current_date,
@@ -105,7 +115,7 @@ def create_upcoming_task_reminder(
 
     If a reminder has already been sent on the same day, then do nothing.
     """
-    if _has_existing_upcoming_task_reminder(task, investment_project_task, adviser, current_date):
+    if _has_existing_upcoming_task_reminder(task, adviser, current_date):
         return
 
     reminder = UpcomingTaskReminder.objects.create(
@@ -113,30 +123,22 @@ def create_upcoming_task_reminder(
         event=f'{task.reminder_days} days left to task due',
         task=task,
     )
-    logger.info(
-        'create_upcoming_task_reminder',
-    )
 
     if send_email and is_user_feature_flag_active(
         ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
         adviser,
     ):
-        logger.info(
-            '@@@@@@@@@@ send_email',
-        )
         send_task_reminder_email(
             adviser=adviser,
             task=task,
-            company=None,
-            # company=get_company(task),
+            company=get_company(task),
             reminders=[reminder],
         )
 
-    # print('END create_upcoming_task_reminder')
     return reminder
 
 
-def _has_existing_upcoming_task_reminder(task, investment_project_task, adviser, current_date):
+def _has_existing_upcoming_task_reminder(task, adviser, current_date):
     return UpcomingTaskReminder.objects.filter(
         task=task,
         adviser=adviser,

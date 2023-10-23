@@ -1,7 +1,6 @@
-# from abc import ABC, abstractmethod
-
 import uuid
 
+from abc import abstractmethod
 from datetime import timedelta
 
 from django.conf import settings
@@ -62,12 +61,15 @@ class BaseTaskType(BaseModel):
         related_name='%(app_label)s_%(class)s',
     )
 
-    # @abstractmethod
-    # def get_company(self):
-    #     """
-    #     Return the company associated with this task
-    #     """
-    #     raise NotImplementedError()
+    @abstractmethod
+    def get_company(self):
+        """
+        Return the company associated with this task
+        """
+        raise NotImplementedError()
+
+    class Meta:
+        abstract = True
 
 
 @reversion.register_base_model()
@@ -81,8 +83,8 @@ class InvestmentProjectTask(BaseTaskType):
     )
 
     # @property
-    # def get_company(self):
-    #     return self.investment_project.investor_company
+    def get_company(self):
+        return self.investment_project.investor_company
 
     def __str__(self):
         """Admin displayed human readable name."""

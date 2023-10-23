@@ -2,7 +2,7 @@ import datetime
 import logging
 from importlib import import_module
 from unittest import mock
-from unittest.mock import ANY
+from unittest.mock import ANY, Mock
 from uuid import uuid4
 
 
@@ -105,10 +105,8 @@ def mock_notify_adviser_email_call(investment_project_task_due, matching_adviser
         context={
             'task_title': investment_project_task_due.task.title,
             'company_name': investment_project_task_due.investment_project.investor_company.name,
-            'task_due_date': investment_project_task_due.task.due_date,
-            'company_contact_email_address': '',
+            'task_due_date': investment_project_task_due.task.due_date.strftime('%-d %B %Y'),
             'task_url': investment_project_task_due.task.get_absolute_url(),
-            'complete_task_url': investment_project_task_due.task.get_absolute_url(),
         },
         update_task=update_task_reminder_email_status,
         reminders=[reminder],
@@ -117,6 +115,51 @@ def mock_notify_adviser_email_call(investment_project_task_due, matching_adviser
 
 @pytest.mark.django_db
 class TestTaskReminders:
+    @pytest.mark.parametrize(
+        'lock_acquired',
+        (False, True),
+    )
+    def test_lock(
+        self,
+        caplog,
+        monkeypatch,
+        lock_acquired,
+        mock_job_scheduler,
+    ):
+        """
+        Test that the task doesn't run if it cannot acquire
+        the advisory_lock.
+        """
+        caplog.set_level(logging.INFO, logger='datahub.task.tasks')
+
+        mock_job_scheduler.return_value = Mock(id=1234)
+
+        InvestmentProjectTaskFactory()
+
+        mock_advisory_lock = mock.MagicMock()
+        mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
+        monkeypatch.setattr(
+            'datahub.task.tasks.advisory_lock',
+            mock_advisory_lock,
+        )
+
+        generate_reminders_upcoming_tasks()
+        expected_messages = (
+            [
+                'Task generate_reminders_upcoming_tasks completed',
+            ]
+            if lock_acquired
+            else [
+                'Reminders for upcoming tasks are already being processed by another worker.',
+            ]
+        )
+        assert caplog.messages == expected_messages
+
+        if lock_acquired:
+            mock_job_scheduler.assert_called_once()
+        else:
+            mock_job_scheduler.assert_not_called()
+
     def test_generate_reminders_for_upcoming_tasks(
         self,
         adviser_tasks_user_feature_flag,
@@ -127,8 +170,10 @@ class TestTaskReminders:
         tasks = InvestmentProjectTaskFactory.create_batch(4)
         tasks_due = []
         matching_advisers = AdviserFactory.create_batch(3)
-        matching_advisers = [add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
-                             for adviser in matching_advisers]
+        matching_advisers = [
+            add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
+            for adviser in matching_advisers
+        ]
         tasks_due.append(investment_project_factory_due_today(1, advisers=[matching_advisers[0]]))
         tasks_due.append(investment_project_factory_due_today(7, advisers=[matching_advisers[1]]))
         tasks_due.append(investment_project_factory_due_today(30, advisers=matching_advisers))
@@ -160,8 +205,10 @@ class TestTaskReminders:
     ):
         # Create two advisers one with and one without an task reminder email subscription
         matching_advisers = AdviserFactory.create_batch(2)
-        matching_advisers = [add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
-                             for adviser in matching_advisers]
+        matching_advisers = [
+            add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
+            for adviser in matching_advisers
+        ]
         task_due = investment_project_factory_due_today(1, advisers=matching_advisers)
         subscription = UpcomingTaskReminderSubscription.objects.filter(
             adviser=matching_advisers[1],
@@ -175,9 +222,11 @@ class TestTaskReminders:
         ):
             generate_reminders_upcoming_tasks()
 
-        mock_notify_adviser_by_rq_email.assert_has_calls([
-            mock_notify_adviser_email_call(task_due, matching_advisers[0], template_id),
-        ])
+        mock_notify_adviser_by_rq_email.assert_has_calls(
+            [
+                mock_notify_adviser_email_call(task_due, matching_advisers[0], template_id),
+            ],
+        )
         mock_notify_adviser_by_rq_email.assert_called_once()
 
     def test_task_reminder_emails_only_sent_if_feature_flag_set(
@@ -189,7 +238,8 @@ class TestTaskReminders:
         # Create a adviser with and another without the feature flag set.
         matching_advisers = AdviserFactory.create_batch(2)
         matching_advisers[0] = add_user_feature_flag(
-            adviser_tasks_user_feature_flag, matching_advisers[0],
+            adviser_tasks_user_feature_flag,
+            matching_advisers[0],
         )
 
         task_due = investment_project_factory_due_today(1, advisers=matching_advisers)
@@ -205,9 +255,11 @@ class TestTaskReminders:
         ):
             generate_reminders_upcoming_tasks()
 
-        mock_notify_adviser_by_rq_email.assert_has_calls([
-            mock_notify_adviser_email_call(task_due, matching_advisers[0], template_id),
-        ])
+        mock_notify_adviser_by_rq_email.assert_has_calls(
+            [
+                mock_notify_adviser_email_call(task_due, matching_advisers[0], template_id),
+            ],
+        )
         mock_notify_adviser_by_rq_email.assert_called_once()
 
     def test_if_reminder_already_sent_the_same_day_do_nothing(
@@ -218,7 +270,8 @@ class TestTaskReminders:
     ):
         adviser = AdviserFactory()
         adviser = add_user_feature_flag(
-            adviser_tasks_user_feature_flag, adviser,
+            adviser_tasks_user_feature_flag,
+            adviser,
         )
         task_due = investment_project_factory_due_today(1, advisers=[adviser])
 
@@ -229,9 +282,11 @@ class TestTaskReminders:
             generate_reminders_upcoming_tasks()
             generate_reminders_upcoming_tasks()
 
-        mock_notify_adviser_by_rq_email.assert_has_calls([
-            mock_notify_adviser_email_call(task_due, adviser, template_id),
-        ])
+        mock_notify_adviser_by_rq_email.assert_has_calls(
+            [
+                mock_notify_adviser_email_call(task_due, adviser, template_id),
+            ],
+        )
         mock_notify_adviser_by_rq_email.assert_called_once()
 
     def test_update_task_reminder_email_status(
@@ -273,11 +328,12 @@ class TestTaskReminders:
         mock_job_scheduler.assert_called_once()
 
         # check result
-        assert caplog.messages[0] == (
-            f'Task {job.id} generate_reminders_upcoming_tasks scheduled'
-        )
+        assert caplog.messages[0] == (f'Task {job.id} generate_reminders_upcoming_tasks scheduled')
 
     def test_schedule_reminder_upcoming_task_after_date_change(self):
+        pass
+
+    def test_no_adviser_subscription_for_adivser(self):
         pass
 
     def test_migration_forwards_func(self):
