@@ -2,7 +2,7 @@ import datetime
 import logging
 from importlib import import_module
 from unittest import mock
-from unittest.mock import ANY, Mock
+from unittest.mock import ANY
 from uuid import uuid4
 
 
@@ -78,12 +78,14 @@ def mock_statsd(monkeypatch):
     return mock_statsd
 
 
-def investment_project_factory_due_today(days=1, advisers=None):
+def investment_project_factory_due_on_date(days=1, advisers=None, due_date=None):
     if not advisers:
         advisers = [AdviserFactory()]
+    if not due_date:
+        due_date = datetime.date.today()
     return InvestmentProjectTaskFactory(
         task=TaskFactory(
-            due_date=datetime.date.today() + datetime.timedelta(days=days),
+            due_date=due_date + datetime.timedelta(days=days),
             reminder_days=days,
             advisers=advisers,
         ),
@@ -136,7 +138,7 @@ class TestTaskReminders:
         """
         adviser = AdviserFactory()
         add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
-        investment_project_factory_due_today(1, advisers=[adviser])
+        investment_project_factory_due_on_date(1, advisers=[adviser])
 
         caplog.set_level(logging.INFO, logger='datahub.task.tasks')
 
@@ -178,9 +180,13 @@ class TestTaskReminders:
             add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
             for adviser in matching_advisers
         ]
-        tasks_due.append(investment_project_factory_due_today(1, advisers=[matching_advisers[0]]))
-        tasks_due.append(investment_project_factory_due_today(7, advisers=[matching_advisers[1]]))
-        tasks_due.append(investment_project_factory_due_today(30, advisers=matching_advisers))
+        tasks_due.append(
+            investment_project_factory_due_on_date(1, advisers=[matching_advisers[0]])
+        )
+        tasks_due.append(
+            investment_project_factory_due_on_date(7, advisers=[matching_advisers[1]])
+        )
+        tasks_due.append(investment_project_factory_due_on_date(30, advisers=matching_advisers))
 
         template_id = str(uuid4())
         with override_settings(
@@ -213,7 +219,7 @@ class TestTaskReminders:
             add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
             for adviser in matching_advisers
         ]
-        task_due = investment_project_factory_due_today(1, advisers=matching_advisers)
+        task_due = investment_project_factory_due_on_date(1, advisers=matching_advisers)
         subscription = UpcomingTaskReminderSubscription.objects.filter(
             adviser=matching_advisers[1],
         ).first()
@@ -246,7 +252,7 @@ class TestTaskReminders:
             matching_advisers[0],
         )
 
-        task_due = investment_project_factory_due_today(1, advisers=matching_advisers)
+        task_due = investment_project_factory_due_on_date(1, advisers=matching_advisers)
         subscription = UpcomingTaskReminderSubscription.objects.filter(
             adviser=matching_advisers[1],
         ).first()
@@ -277,7 +283,7 @@ class TestTaskReminders:
             adviser_tasks_user_feature_flag,
             adviser,
         )
-        task_due = investment_project_factory_due_today(1, advisers=[adviser])
+        task_due = investment_project_factory_due_on_date(1, advisers=[adviser])
 
         template_id = str(uuid4())
         with override_settings(
@@ -333,12 +339,6 @@ class TestTaskReminders:
 
         # check result
         assert caplog.messages[0] == (f'Task {job.id} generate_reminders_upcoming_tasks scheduled')
-
-    def test_schedule_reminder_upcoming_task_after_date_change(self):
-        pass
-
-    def test_no_adviser_subscription_for_adivser(self):
-        pass
 
     def test_migration_forwards_func(self):
         # Import migration file dynamically as it start with a number
