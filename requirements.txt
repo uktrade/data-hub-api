@@ -16,11 +16,11 @@ async-timeout==4.0.2
     #   redis
 attrs==22.2.0
     # via aiohttp
-bigtree==0.13.1
+bigtree==0.14.2
     # via -r requirements.in
-boto3==1.28.63
+boto3==1.28.68
     # via -r requirements.in
-botocore==1.31.63
+botocore==1.31.68
     # via
     #   boto3
     #   s3transfer
@@ -120,7 +120,7 @@ multidict==6.0.4
     # via
     #   aiohttp
     #   yarl
-notifications-python-client==8.0.1
+notifications-python-client==8.1.0
     # via -r requirements.in
 numpy==1.24.3
     # via pandas
