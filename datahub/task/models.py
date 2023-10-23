@@ -1,3 +1,5 @@
+# from abc import ABC, abstractmethod
+
 import uuid
 
 from datetime import timedelta
@@ -60,8 +62,12 @@ class BaseTaskType(BaseModel):
         related_name='%(app_label)s_%(class)s',
     )
 
-    class Meta:
-        abstract = True
+    # @abstractmethod
+    # def get_company(self):
+    #     """
+    #     Return the company associated with this task
+    #     """
+    #     raise NotImplementedError()
 
 
 @reversion.register_base_model()
@@ -73,6 +79,10 @@ class InvestmentProjectTask(BaseTaskType):
         on_delete=models.CASCADE,
         related_name='investment_project_task',
     )
+
+    # @property
+    # def get_company(self):
+    #     return self.investment_project.investor_company
 
     def __str__(self):
         """Admin displayed human readable name."""

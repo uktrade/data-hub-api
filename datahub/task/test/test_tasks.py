@@ -277,6 +277,9 @@ class TestTaskReminders:
             f'Task {job.id} generate_reminders_upcoming_tasks scheduled'
         )
 
+    def test_schedule_reminder_upcoming_task_after_date_change(self):
+        pass
+
     def test_migration_forwards_func(self):
         # Import migration file dynamically as it start with a number
         module = import_module('datahub.task.migrations.0005_task_reminder_date')

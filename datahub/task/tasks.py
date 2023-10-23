@@ -15,7 +15,7 @@ from datahub.reminder.models import (
     UpcomingTaskReminderSubscription,
 )
 from datahub.reminder.tasks import notify_adviser_by_rq_email
-from datahub.task.models import InvestmentProjectTask
+from datahub.task.models import Task
 
 
 logger = logging.getLogger(__name__)
@@ -65,10 +65,10 @@ def generate_reminders_upcoming_tasks():
     now = timezone.now()
     # When adding additional tasks this query will need to be moved to Open Search to return all
     # task types.
-    investment_project_tasks = InvestmentProjectTask.objects.filter(task__reminder_date=now)
-    for investment_project_task in investment_project_tasks:
+    tasks = Task.objects.filter(reminder_date=now)
+    for task in tasks:
         # Get all active advisers assigned to the task
-        active_advisers = investment_project_task.task.advisers.filter(is_active=True)
+        active_advisers = task.advisers.filter(is_active=True)
         for adviser in active_advisers:
             # Get subscription to know if emails are needed
             adviser_subscription = UpcomingTaskReminderSubscription.objects.filter(
@@ -76,13 +76,21 @@ def generate_reminders_upcoming_tasks():
             ).first()
 
             create_upcoming_task_reminder(
-                investment_project_task.task,
-                investment_project_task,
+                task,
+                task,
                 adviser,
                 adviser_subscription.email_reminders_enabled,
                 now,
             )
-    return investment_project_tasks
+    logger.info(
+        'generate_reminders_upcoming_tasks',
+    )
+
+    return tasks
+
+
+# def get_company(task):
+#     return task.investment_project_task.get_company()
 
 
 def create_upcoming_task_reminder(
@@ -105,18 +113,26 @@ def create_upcoming_task_reminder(
         event=f'{task.reminder_days} days left to task due',
         task=task,
     )
+    logger.info(
+        'create_upcoming_task_reminder',
+    )
 
     if send_email and is_user_feature_flag_active(
         ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
         adviser,
     ):
+        logger.info(
+            '@@@@@@@@@@ send_email',
+        )
         send_task_reminder_email(
             adviser=adviser,
             task=task,
-            company=investment_project_task.investment_project.investor_company,
+            company=None,
+            # company=get_company(task),
             reminders=[reminder],
         )
 
+    # print('END create_upcoming_task_reminder')
     return reminder
 
 
@@ -146,10 +162,8 @@ def send_task_reminder_email(
         context={
             'task_title': task.title,
             'company_name': company.name,
-            'task_due_date': task.due_date,
-            'company_contact_email_address': '',
+            'task_due_date': task.due_date.strftime('%-d %B %Y'),
             'task_url': task.get_absolute_url(),
-            'complete_task_url': task.get_absolute_url(),
         },
         update_task=update_task_reminder_email_status,
         reminders=reminders,
