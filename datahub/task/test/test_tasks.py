@@ -181,10 +181,16 @@ class TestTaskReminders:
             for adviser in matching_advisers
         ]
         tasks_due.append(
-            investment_project_factory_due_on_date(1, advisers=[matching_advisers[0]])
+            investment_project_factory_due_on_date(
+                1,
+                advisers=[matching_advisers[0]],
+            ),
         )
         tasks_due.append(
-            investment_project_factory_due_on_date(7, advisers=[matching_advisers[1]])
+            investment_project_factory_due_on_date(
+                7,
+                advisers=[matching_advisers[1]],
+            ),
         )
         tasks_due.append(investment_project_factory_due_on_date(30, advisers=matching_advisers))
 

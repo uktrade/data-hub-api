@@ -3,7 +3,7 @@ import datetime
 import pytest
 
 from datahub.task.models import Task
-from datahub.task.test.factories import AdviserFactory, InvestmentProjectTaskFactory, TaskFactory
+from datahub.task.test.factories import InvestmentProjectTaskFactory
 
 pytestmark = pytest.mark.django_db
 

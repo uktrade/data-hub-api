@@ -96,14 +96,14 @@ class UpcomingInvestmentProjectTaskReminderAdmin(admin.ModelAdmin):
         'investment_project_task',
     )
 
-    
+
 @admin.register(UpcomingTaskReminder)
 class UpcomingTaskReminderAdmin(admin.ModelAdmin):
     """Upcoming task reminder admin."""
 
     raw_id_fields = ('adviser',)
 
-    
+
 @admin.register(InvestmentProjectTaskTaskAssignedToMeFromOthersReminder)
 class InvestmentProjectTaskTaskAssignedToMeFromOthersReminderAdmin(admin.ModelAdmin):
     """Investment project task assigned to me from others admin."""
