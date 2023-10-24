@@ -1,0 +1,54 @@
+- model: export_win.experiencecategories
+  pk: 42c06fd9-728c-4b6f-bbe1-608a96021e57
+  fields:
+    disabled_on: null
+    name: 'Has never exported before'
+    export_win_id: 1
+    order: 100
+
+- model: export_win.experiencecategories
+  pk: c00158d5-121b-45a4-802b-73866233f06e
+  fields:
+    disabled_on: null
+    name: 'Has exported before but not won an export order in the past twelve months'
+    export_win_id: 2
+    order: 200
+
+- model: export_win.experiencecategories
+  pk: 2aa60bce-36dd-4dcb-bac8-9deae4a06f26
+  fields:
+    disabled_on: null
+    name: 'Has exported in the past twelve months but has not won an export order proactively as a result of having an export plan'
+    export_win_id: 3
+    order: 300
+- model: export_win.experiencecategories
+  pk: b7e29848-7459-4cda-b580-562bbd81d5eb
+  fields:
+    disabled_on: null
+    name: 'Is an exporter which did not receive or fulfil any export orders to this market in the three financial years before this win'
+    export_win_id: 7
+    order: 400
+
+- model: export_win.experiencecategories
+  pk: 4df4444f-278d-4f39-aebb-b457f9e5b2b1
+  fields:
+    disabled_on: null
+    name: 'Is an exporter that we are helping to maintain and grow its exports'
+    export_win_id: 6
+    order: 500
+
+- model: export_win.experiencecategories
+  pk: b6a47b4c-4cfc-495c-aaec-d6480c4cac3b
+  fields:
+    disabled_on: null
+    name: 'Is an exporter but exports currently account for less than 10% of its overall turnover'
+    export_win_id: 4
+    order: 600
+
+- model: export_win.experiencecategories
+  pk: fd3fbbd0-6c04-4110-aa6a-ba84a91c3272
+  fields:
+    disabled_on: null
+    name: 'Is an exporter but has only won export orders in three countries or fewer'
+    export_win_id: 5
+    order: 700
