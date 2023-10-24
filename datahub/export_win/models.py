@@ -43,3 +43,7 @@ class BusinessPotential(BaseExportWinOrderedConstantModel):
 
 class SupportType(BaseExportWinOrderedConstantModel):
     """Support type"""
+
+
+class ExpectedValueRelation(BaseExportWinOrderedConstantModel):
+    """Expected value relation"""

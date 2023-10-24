@@ -33,3 +33,8 @@ registry.register(
     metadata_id='support-type',
     model=models.SupportType,
 )
+
+registry.register(
+    metadata_id='expected-value-relation',
+    model=models.ExpectedValueRelation,
+)
