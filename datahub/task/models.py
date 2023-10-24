@@ -41,7 +41,7 @@ class Task(ArchivableModel, BaseModel):
     def save(self, *args, **kwargs):
         if self.due_date and self.reminder_days:
             self.reminder_date = self.due_date - timedelta(days=self.reminder_days)
-        super(Task, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def get_company(self):
         """
