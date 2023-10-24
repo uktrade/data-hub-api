@@ -33,15 +33,19 @@ class Task(ArchivableModel, BaseModel):
     )
     reminder_date = models.DateField(null=True, blank=True, editable=False)
 
-    def get_absolute_url(self):
-        """URL to the object in the Data Hub internal front end."""
-        return get_front_end_url(self)
-
     # override the save method and calculate reminder_date
     def save(self, *args, **kwargs):
         if self.due_date and self.reminder_days:
             self.reminder_date = self.due_date - timedelta(days=self.reminder_days)
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        """Admin displayed human readable name."""
+        return self.title
+
+    def get_absolute_url(self):
+        """URL to the object in the Data Hub internal front end."""
+        return get_front_end_url(self)
 
     def get_company(self):
         """
@@ -59,10 +63,6 @@ class Task(ArchivableModel, BaseModel):
 
         return len(task_fields) > 0 and task_fields[0]
 
-    def __str__(self):
-        """Admin displayed human readable name."""
-        return self.title
-
 
 class BaseTaskType(BaseModel):
     """
@@ -77,15 +77,15 @@ class BaseTaskType(BaseModel):
         related_name='%(app_label)s_%(class)s',
     )
 
+    class Meta:
+        abstract = True
+
     @abstractmethod
     def get_company(self):
         """
         Return the company associated with this task
         """
         raise NotImplementedError()
-
-    class Meta:
-        abstract = True
 
 
 @reversion.register_base_model()
