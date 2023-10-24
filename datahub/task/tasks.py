@@ -202,6 +202,5 @@ def send_notification_task_assigned_from_others_email_task(task, adviser):
     """
 
     adviser_details = Advisor.objects.get(id=str(adviser))
-    print('*****', adviser_details.name)
 
     notify_adviser_added_to_task(task, adviser_details)

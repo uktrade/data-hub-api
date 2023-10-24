@@ -26,8 +26,8 @@ def _prepare_personalisation(task, data=None):
         'task title': task.title,
         'modified by': task.modified_by.name,
         'company name': 'A Company',
-        'due date': task.due_date,
-        'embedded link': 'task.get_datahub_frontend_url()',
+        'task due date': task.due_date,
+        'task link': f'https://www.datahub.trade.gov.uk/tasks/{task.id}',
         **(data or {}),
     }
 
