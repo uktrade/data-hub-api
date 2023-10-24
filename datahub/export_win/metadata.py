@@ -43,3 +43,8 @@ registry.register(
     metadata_id='experience-categories',
     model=models.ExperienceCategories,
 )
+
+registry.register(
+    metadata_id='breakdown-type',
+    model=models.BreakdownType,
+)
