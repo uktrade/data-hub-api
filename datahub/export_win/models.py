@@ -35,3 +35,7 @@ class HQTeamRegionOrPost(BaseExportWinOrderedConstantModel):
 
 class WinType(BaseExportWinOrderedConstantModel):
     """Win type"""
+
+
+class BusinessPotential(BaseExportWinOrderedConstantModel):
+    """Business potential"""
