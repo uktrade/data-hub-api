@@ -427,6 +427,7 @@ DATAHUB_FRONTEND_URL_PREFIXES = {
     'largecapitalinvestorprofile': f'{DATAHUB_FRONTEND_BASE_URL}/investments/profiles',
     'largecapitalopportunity': f'{DATAHUB_FRONTEND_BASE_URL}/investments/opportunities',
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
+    'task': f'{DATAHUB_FRONTEND_BASE_URL}/tasks',
 }
 
 DATAHUB_FRONTEND_REMINDER_SETTINGS_URL = f'{DATAHUB_FRONTEND_BASE_URL}/reminders/settings'
@@ -492,6 +493,10 @@ MAILBOX_INGESTION_SUCCESS_TEMPLATE_ID = env(
 )
 MAILBOX_INGESTION_FAILURE_TEMPLATE_ID = env(
     'MAILBOX_INGESTION_FAILURE_TEMPLATE_ID',
+    default='',
+)
+TASK_REMINDER_STATUS_TEMPLATE_ID = env(
+    'TASK_REMINDER_STATUS_TEMPLATE_ID',
     default='',
 )
 

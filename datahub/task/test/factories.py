@@ -1,3 +1,5 @@
+import random
+
 import factory.fuzzy
 from django.utils.timezone import now
 
@@ -22,7 +24,7 @@ class TaskFactory(factory.django.DjangoModelFactory):
         """
         Add support for setting `advisers`.
         """
-        return []
+        return AdviserFactory.create_batch(random.randint(1, 3))
 
     class Meta:
         model = Task

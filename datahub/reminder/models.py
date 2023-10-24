@@ -220,6 +220,18 @@ class UpcomingEstimatedLandDateReminder(BaseReminder):
     )
 
 
+class UpcomingTaskReminder(BaseReminder):
+    """
+    Upcoming generic task reminder.
+    """
+
+    task = models.ForeignKey(
+        'task.Task',
+        on_delete=models.CASCADE,
+        related_name='task',
+    )
+
+
 class UpcomingInvestmentProjectTaskReminder(BaseReminder):
     """
     Upcoming investment project task reminder.
