@@ -28,3 +28,8 @@ registry.register(
     metadata_id='business-potential',
     model=models.BusinessPotential,
 )
+
+registry.register(
+    metadata_id='support-type',
+    model=models.SupportType,
+)

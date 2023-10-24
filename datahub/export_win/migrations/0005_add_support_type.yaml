@@ -1,0 +1,120 @@
+
+- model: export_win.supporttype
+  pk: 5560d2ee-b75b-48b0-b6ca-36d43653be61
+  fields:
+    disabled_on: null
+    name: 'Market entry advice and support – DIT/FCO in UK'
+    export_win_id: '1'
+    order:  100
+
+- model: export_win.supporttype
+  pk: e2d19fb4-22b7-4ead-abb7-e236299e113e
+  fields:
+    disabled_on: null
+    name: 'Missions, tradeshows and events (DIT/FCO)'
+    export_win_id: '2'
+    order:  200
+
+- model: export_win.supporttype
+  pk: 42f3f9a0-3eb1-4a1e-93c6-4bbec5f2cefe
+  fields:
+    disabled_on: null
+    name: 'Advice, access and contacts – DIT/FCO Overseas'
+    export_win_id: '3'
+    order:  300
+
+- model: export_win.supporttype
+  pk: 1ed7f465-1461-4d66-b4a2-8d704ea239a8
+  fields:
+    disabled_on: null
+    name: 'Political and economic briefing'
+    export_win_id: '4'
+    order:  400
+
+- model: export_win.supporttype
+  pk: c717576d-9bb9-43ec-8cab-059ccd5a187c
+  fields:
+    disabled_on: null
+    name: 'Lobbying to overcome a problem – DIT/FCO'
+    export_win_id: '5'
+    order:  500
+
+- model: export_win.supporttype
+  pk: c997b597-1ff8-4f8a-88b6-bdaade55b69b
+  fields:
+    disabled_on: null
+    name: 'Building positive reputation – DIT/FCO'
+    export_win_id: '6'
+    order:  600
+
+- model: export_win.supporttype
+  pk: bc7e13b9-1a35-4d43-89d9-58443396d919
+  fields:
+    disabled_on: null
+    name: 'Business Successes : Outward Direct Investment – FCO'
+    export_win_id: '7'
+    order:  700
+
+- model: export_win.supporttype
+  pk: 6f26913e-905f-4d29-b9e4-8130a546039b
+  fields:
+    disabled_on: null
+    name: 'Business Successes : Reduced tax burdens – FCO'
+    export_win_id: '8'
+    order:  800
+
+- model: export_win.supporttype
+  pk: 8df64b7b-6df4-4d5e-9cf7-77ba85eea4b6
+  fields:
+    disabled_on: null
+    name: 'Business Successes : New Business in UK/3rd market – FCO'
+    export_win_id: '9'
+    order:  900
+
+- model: export_win.supporttype
+  pk: 5feaec84-8813-4abd-9d22-92078b757bf1
+  fields:
+    disabled_on: null
+    name: 'Business Successes : Overseas Export Wins'
+    export_win_id: '10'
+    order:  1000
+
+- model: export_win.supporttype
+  pk: ac43ceeb-dd19-47b0-bb8d-7c1d5d18c7fe
+  fields:
+    disabled_on: null
+    name: 'Business Successes : Export Successes'
+    export_win_id: '11'
+    order:  1100
+
+- model: export_win.supporttype
+  pk: ce67ff2d-d918-48c3-96fe-79d35b30902b
+  fields:
+    disabled_on: null
+    name: 'Business Successes : Subsidiaries'
+    export_win_id: '12'
+    order:  1200
+
+- model: export_win.supporttype
+  pk: 679fbee0-6d44-4915-9bda-5a33e9cdd137
+  fields:
+    disabled_on: null
+    name: 'Business Successes : Assets Under Management'
+    export_win_id: '13'
+    order:  1300
+
+- model: export_win.supporttype
+  pk: 39dcae32-500d-4379-af8c-fbf83d9ed052
+  fields:
+    disabled_on: null
+    name: 'Business Successes : Listing'
+    export_win_id: '14'
+    order:  1400
+
+- model: export_win.supporttype
+  pk: d239fa5b-c42c-43b6-84e8-06f18299b90c
+  fields:
+    disabled_on: null
+    name: 'Business Successes : Other – FCO'
+    export_win_id: '15'
+    order:  1500
