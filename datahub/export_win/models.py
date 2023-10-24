@@ -39,3 +39,7 @@ class WinType(BaseExportWinOrderedConstantModel):
 
 class BusinessPotential(BaseExportWinOrderedConstantModel):
     """Business potential"""
+
+
+class SupportType(BaseExportWinOrderedConstantModel):
+    """Support type"""
