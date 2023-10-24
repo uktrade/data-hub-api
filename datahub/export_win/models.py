@@ -47,3 +47,7 @@ class SupportType(BaseExportWinOrderedConstantModel):
 
 class ExpectedValueRelation(BaseExportWinOrderedConstantModel):
     """Expected value relation"""
+
+
+class ExperienceCategories(BaseExportWinOrderedConstantModel):
+    """Experience categories"""

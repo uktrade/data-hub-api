@@ -38,3 +38,8 @@ registry.register(
     metadata_id='expected-value-relation',
     model=models.ExpectedValueRelation,
 )
+
+registry.register(
+    metadata_id='experience-categories',
+    model=models.ExperienceCategories,
+)
