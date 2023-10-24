@@ -51,3 +51,7 @@ class ExpectedValueRelation(BaseExportWinOrderedConstantModel):
 
 class ExperienceCategories(BaseExportWinOrderedConstantModel):
     """Experience categories"""
+
+
+class BreakdownType(BaseExportWinOrderedConstantModel):
+    """Breakdown type"""
