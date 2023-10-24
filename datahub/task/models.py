@@ -97,9 +97,9 @@ class InvestmentProjectTask(BaseTaskType):
         related_name='investment_project_task',
     )
 
-    def get_company(self):
-        return self.investment_project.investor_company
-
     def __str__(self):
         """Admin displayed human readable name."""
         return f'Investment project - {self.task.title}'
+
+    def get_company(self):
+        return self.investment_project.investor_company
