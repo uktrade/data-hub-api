@@ -1,0 +1,23 @@
+- model: export_win.breakdowntype
+  pk: cecb1f61-abd2-4715-a0c9-b196b52671d9
+  fields:
+    disabled_on: null
+    name: 'Export'
+    export_win_id: '1'
+    order:  100
+
+- model: export_win.breakdowntype
+  pk: 07fbb895-8e04-48f8-bedb-f7054dbdb85f
+  fields:
+    disabled_on: null
+    name: 'Business success'
+    export_win_id: '2'
+    order:  200
+
+- model: export_win.breakdowntype
+  pk: 833e7aad-912b-4b93-89b4-64b05222c958
+  fields:
+    disabled_on: null
+    name: 'Outward Direct Investment'
+    export_win_id: '3'
+    order:  300
