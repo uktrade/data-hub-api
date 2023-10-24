@@ -24,9 +24,9 @@ def _prepare_personalisation(task, data=None):
     """Prepare the personalisation data with common values."""
     return {
         'task title': task.title,
-        'modified by': task.modified_by,
+        'modified by': task.modified_by.name,
         'company name': 'A Company',
-        'task due date': task.due_date,
+        'due date': task.due_date,
         'embedded link': 'task.get_datahub_frontend_url()',
         **(data or {}),
     }

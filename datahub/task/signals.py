@@ -41,13 +41,13 @@ def delete_investment_project_task_delete(sender, instance, **kwargs):
     sender=Task.advisers.through,
     # dispatch_uid='send_task_assigned_from_others_email',
 )
-def send_task_assigned_from_others_email(sender, **kwargs):
+def send_task_assigned_from_others_email(sender, instance, **kwargs):
     """
     Checks to see if a Task has any advisers. If there are advisers then this is
     passed to the task for processing to add task reminder subscriptions
     """
     pk_set = kwargs.pop('pk_set', None)
-    task = Task
+    task = instance
     print('tttttttt', task)
     print('pkpkpkpk', pk_set)
     for adviser in pk_set:
