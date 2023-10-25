@@ -4,6 +4,8 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
+from datahub.task.models import Task
+
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -226,7 +228,7 @@ class UpcomingTaskReminder(BaseReminder):
     """
 
     task = models.ForeignKey(
-        'task.Task',
+        Task,
         on_delete=models.CASCADE,
         related_name='task',
     )

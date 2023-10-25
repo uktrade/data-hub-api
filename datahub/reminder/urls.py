@@ -11,7 +11,7 @@ from datahub.reminder.views import (
     reminder_summary_view,
     UpcomingEstimatedLandDateReminderViewset,
     UpcomingEstimatedLandDateSubscriptionViewset,
-    UpcomingInvestmentProjectTaskReminderViewset,
+    UpcomingTaskReminderViewset,
 )
 
 urlpatterns = [
@@ -134,7 +134,7 @@ urlpatterns = [
     ),
     path(
         'reminder/my-tasks-due-date-approaching',
-        UpcomingInvestmentProjectTaskReminderViewset.as_view(
+        UpcomingTaskReminderViewset.as_view(
             {
                 'get': 'list',
             },
@@ -143,7 +143,7 @@ urlpatterns = [
     ),
     path(
         'reminder/my-tasks-due-date-approaching/<uuid:pk>',
-        UpcomingInvestmentProjectTaskReminderViewset.as_view(
+        UpcomingTaskReminderViewset.as_view(
             {
                 'delete': 'destroy',
             },
