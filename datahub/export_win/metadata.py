@@ -53,3 +53,8 @@ registry.register(
     metadata_id='rating',
     model=models.Rating,
 )
+
+registry.register(
+    metadata_id='experience',
+    model=models.Experience,
+)
