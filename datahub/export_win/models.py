@@ -67,3 +67,7 @@ class Experience(BaseExportWinOrderedConstantModel):
 
 class MarketingSource(BaseExportWinOrderedConstantModel):
     """Marketing source"""
+
+
+class WithoutOurSupport(BaseExportWinOrderedConstantModel):
+    """Without our support"""

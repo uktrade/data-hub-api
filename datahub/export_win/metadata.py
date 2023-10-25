@@ -63,3 +63,8 @@ registry.register(
     metadata_id='marketing-source',
     model=models.MarketingSource,
 )
+
+registry.register(
+    metadata_id='without-our-support',
+    model=models.WithoutOurSupport,
+)
