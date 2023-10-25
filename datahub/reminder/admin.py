@@ -11,7 +11,6 @@ from datahub.reminder.models import (
     TaskAssignedToMeFromOthersSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
-    UpcomingInvestmentProjectTaskReminder,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
 )
@@ -85,16 +84,6 @@ class UpcomingEstimatedLandDateReminderAdmin(admin.ModelAdmin):
     """Upcoming Estimated Land Date Reminder admin."""
 
     raw_id_fields = ('adviser', 'project')
-
-
-@admin.register(UpcomingInvestmentProjectTaskReminder)
-class UpcomingInvestmentProjectTaskReminderAdmin(admin.ModelAdmin):
-    """Upcoming investment project task reminder admin."""
-
-    raw_id_fields = (
-        'adviser',
-        'investment_project_task',
-    )
 
 
 @admin.register(UpcomingTaskReminder)
