@@ -48,3 +48,8 @@ registry.register(
     metadata_id='breakdown-type',
     model=models.BreakdownType,
 )
+
+registry.register(
+    metadata_id='rating',
+    model=models.Rating,
+)
