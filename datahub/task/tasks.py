@@ -39,7 +39,9 @@ def create_task_reminder_subscription_task(adviser):
     a subscription already.
     """
     if not UpcomingTaskReminderSubscription.objects.filter(adviser=adviser).first():
-        UpcomingTaskReminderSubscription.objects.create(adviser=adviser)
+        UpcomingTaskReminderSubscription.objects.create(
+            adviser=adviser, email_reminders_enabled=True,
+        )
 
 
 def schedule_reminders_upcoming_tasks():
