@@ -252,9 +252,6 @@ class Command(BaseCleanupCommand):
             ),
             excluded_relations=(
                 InvestmentProjectTask._meta.get_field(
-                    'upcoming_investment_project_task_reminders',
-                ),
-                InvestmentProjectTask._meta.get_field(
                     'investment_project_task_task_assigned_to_me_from_others_reminder',
                 ),
             ),
