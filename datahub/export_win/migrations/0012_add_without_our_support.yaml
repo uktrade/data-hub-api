@@ -1,0 +1,55 @@
+- model: export_win.withoutoursupport
+  pk: 9a23de5e-6961-4cb0-a8a1-03c31b7ee4b3
+  fields:
+    disabled_on: null
+    name: 'No value without our help'
+    export_win_id: 1
+    order: 100
+
+- model: export_win.withoutoursupport
+  pk: 4a4fd78b-c6fe-434d-a81c-3cc47226e09c
+  fields:
+    disabled_on: null
+    name: 'Up to 20% of the total expected value without our help'
+    export_win_id: 2
+    order: 200
+
+- model: export_win.withoutoursupport
+  pk: be65c0c4-c35e-4876-a035-21ea40134e9f
+  fields:
+    disabled_on: null
+    name: 'Up to 40%'
+    export_win_id: 3
+    order: 300
+
+- model: export_win.withoutoursupport
+  pk: 4f463265-5172-4b76-b7ce-42e8011ff856
+  fields:
+    disabled_on: null
+    name: 'Up to 60%'
+    export_win_id: 4
+    order: 400
+
+- model: export_win.withoutoursupport
+  pk: a44251c1-ab7e-4357-af87-de161c6b373c
+  fields:
+    disabled_on: null
+    name: 'Up to 80%'
+    export_win_id: 5
+    order: 500
+
+- model: export_win.withoutoursupport
+  pk: e25d8d73-6d06-42d4-9b36-99123084ad50
+  fields:
+    disabled_on: null
+    name: 'More than 80%'
+    export_win_id: 6
+    order: 600
+
+- model: export_win.withoutoursupport
+  pk: 6ff5db71-ad1c-4e45-8dd5-4e5a9ce39e7c
+  fields:
+    disabled_on: null
+    name: 'You could have won the entire value or similar without our help'
+    export_win_id: 7
+    order: 700
