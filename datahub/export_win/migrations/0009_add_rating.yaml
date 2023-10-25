@@ -1,0 +1,48 @@
+
+- model: export_win.rating
+  pk: dbfc571c-ffbe-4ef8-8840-16364ed46824
+  fields:
+    disabled_on: null
+    name: 'N/A'
+    export_win_id: '0'
+    order:  100
+
+- model: export_win.rating
+  pk: 471ce323-266f-4af5-bdd6-e38b30f78ce2
+  fields:
+    disabled_on: null
+    name: '1'
+    export_win_id: '1'
+    order:  200
+
+- model: export_win.rating
+  pk: 740f9e5e-0d26-4dff-900a-1db7e2205267
+  fields:
+    disabled_on: null
+    name: '2'
+    export_win_id: '2'
+    order:  300
+
+- model: export_win.rating
+  pk: aeb0298b-8ac8-44ff-a371-41d5bd8328d5
+  fields:
+    disabled_on: null
+    name: '3'
+    export_win_id: '3'
+    order:  400
+
+- model: export_win.rating
+  pk: 8d878413-ffc2-4562-92c9-98414d08d714
+  fields:
+    disabled_on: null
+    name: '4'
+    export_win_id: '4'
+    order:  500
+
+- model: export_win.rating
+  pk: 7efd335d-f963-4c34-8a4f-2ae57419d632
+  fields:
+    disabled_on: null
+    name: '5'
+    export_win_id: '5'
+    order:  600
