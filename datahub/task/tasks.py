@@ -10,6 +10,7 @@ from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.feature_flag.utils import is_user_feature_flag_active
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
+from datahub.company.models import Advisor
 from datahub.reminder.models import (
     TaskAssignedToMeFromOthersSubscription,
     UpcomingTaskReminder,
@@ -17,6 +18,8 @@ from datahub.reminder.models import (
 )
 from datahub.reminder.tasks import notify_adviser_by_rq_email
 from datahub.task.models import Task
+
+from datahub.task.client import notify_adviser_added_to_task
 
 
 logger = logging.getLogger(__name__)
@@ -40,7 +43,8 @@ def create_task_reminder_subscription_task(adviser):
     """
     if not UpcomingTaskReminderSubscription.objects.filter(adviser=adviser).first():
         UpcomingTaskReminderSubscription.objects.create(
-            adviser=adviser, email_reminders_enabled=True,
+            adviser=adviser,
+            email_reminders_enabled=True,
         )
 
 
@@ -188,3 +192,13 @@ def create_task_assigned_to_me_from_others_task(adviser):
     """
     if not TaskAssignedToMeFromOthersSubscription.objects.filter(adviser=adviser).first():
         TaskAssignedToMeFromOthersSubscription.objects.create(adviser=adviser)
+
+
+def send_notification_task_assigned_from_others_email_task(task, adviser):
+    """
+    Sends an email when an adviser is added to a task.
+    """
+
+    adviser_details = Advisor.objects.get(id=str(adviser))
+
+    notify_adviser_added_to_task(task, adviser_details)

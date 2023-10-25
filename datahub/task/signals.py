@@ -5,6 +5,7 @@ from datahub.task.models import InvestmentProjectTask, Task
 from datahub.task.tasks import (
     schedule_create_task_assigned_to_me_from_others_subscription_task,
     schedule_create_task_reminder_subscription_task,
+    send_notification_task_assigned_from_others_email_task,
 )
 
 
@@ -33,3 +34,22 @@ def set_task_reminder_subscription_after_task_post_save(sender, instance, **kwar
     for adviser in advisers:
         schedule_create_task_reminder_subscription_task(adviser)
         schedule_create_task_assigned_to_me_from_others_subscription_task(adviser)
+
+
+@receiver(
+    m2m_changed,
+    sender=Task.advisers.through,
+    # dispatch_uid='send_task_assigned_from_others_email',
+)
+def send_task_assigned_from_others_email(sender, **kwargs):
+    """
+    Checks to see if a Task has any advisers. If there are advisers then this is
+    passed to the task for processing to add task reminder subscriptions
+    """
+    task = kwargs.pop('instance', None)
+    pk_set = kwargs.pop('pk_set', None)
+    action = kwargs.pop('action', None)
+    print('*****************', action)
+    for adviser in pk_set:
+        print('aaaaaaaa', adviser)
+        send_notification_task_assigned_from_others_email_task(task, adviser)
