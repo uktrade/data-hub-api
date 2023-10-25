@@ -1,0 +1,48 @@
+
+- model: export_win.experience
+  pk: 28e72562-b9cf-492a-9687-c343517087e4
+  fields:
+    disabled_on: null
+    name: 'We had not started exporting before this win'
+    export_win_id: '1'
+    order:  100
+
+- model: export_win.experience
+  pk: f87ff818-4829-4695-a015-4cca8c10537c
+  fields:
+    disabled_on: null
+    name: 'Apart from this win, we have exported in the last 12 months'
+    export_win_id: '2'
+    order:  200
+
+- model: export_win.experience
+  pk: a30c77d7-62bc-475e-add8-68d49d9f6975
+  fields:
+    disabled_on: null
+    name: 'We last exported 1 to 2 years ago'
+    export_win_id: '3'
+    order:  300
+
+- model: export_win.experience
+  pk: 6d5c13f2-443e-4a64-b327-bd6ba2e9a995
+  fields:
+    disabled_on: null
+    name: '2 to 5 years ago'
+    export_win_id: '4'
+    order:  400
+
+- model: export_win.experience
+  pk: d9028c12-549f-462e-a004-e5f230127f3e
+  fields:
+    disabled_on: null
+    name: '5 to 10 years ago'
+    export_win_id: '5'
+    order:  500
+
+- model: export_win.experience
+  pk: c50614a8-79d5-49a4-a7c1-fca21bd39c57
+  fields:
+    disabled_on: null
+    name: 'More than 10 years ago'
+    export_win_id: '6'
+    order:  600
