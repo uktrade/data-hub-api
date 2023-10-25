@@ -68,3 +68,8 @@ registry.register(
     metadata_id='without-our-support',
     model=models.WithoutOurSupport,
 )
+
+registry.register(
+    metadata_id='hvo-programmes',
+    model=models.HVOProgrammes,
+)

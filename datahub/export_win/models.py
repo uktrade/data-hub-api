@@ -71,3 +71,7 @@ class MarketingSource(BaseExportWinOrderedConstantModel):
 
 class WithoutOurSupport(BaseExportWinOrderedConstantModel):
     """Without our support"""
+
+
+class HVOProgrammes(BaseExportWinOrderedConstantModel):
+    """HVO Programmes"""
