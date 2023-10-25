@@ -58,3 +58,8 @@ registry.register(
     metadata_id='experience',
     model=models.Experience,
 )
+
+registry.register(
+    metadata_id='marketing-source',
+    model=models.MarketingSource,
+)
