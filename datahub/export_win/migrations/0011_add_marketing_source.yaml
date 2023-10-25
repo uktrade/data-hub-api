@@ -1,0 +1,95 @@
+- model: export_win.marketingsource
+  pk: a1fad32d-e972-40f1-a1d9-c8b4cd7a780d
+  fields:
+    disabled_on: null
+    name: 'Business / professional contacts in the private sector'
+    export_win_id: 1
+    order: 100
+
+- model: export_win.marketingsource
+  pk: ad558b2f-e628-48c4-9240-2557de0fddff
+  fields:
+    disabled_on: null
+    name: 'Business / professional contacts in the public sector'
+    export_win_id: 2
+    order: 200
+
+- model: export_win.marketingsource
+  pk: 5001e2e8-2d3b-433e-9c1a-bbb2e7b3bfd5
+  fields:
+    disabled_on: null
+    name: 'Articles/information I saw or read'
+    export_win_id: 3
+    order: 300
+
+- model: export_win.marketingsource
+  pk: 5133b7b1-32df-488c-95a5-378ded3b4bab
+  fields:
+    disabled_on: null
+    name: 'Advertisements I saw or read about the Exporting is GREAT campaign'
+    export_win_id: 4
+    order: 400
+
+- model: export_win.marketingsource
+  pk: 4a74caa8-c3c7-44ee-a65e-b902b57bf0d5
+  fields:
+    disabled_on: null
+    name: 'Great.gov.uk website'
+    export_win_id: 5
+    order: 500
+
+- model: export_win.marketingsource
+  pk: c7e34211-e537-48e0-a3e5-f9079bdfa0e1
+  fields:
+    disabled_on: null
+    name: 'Searched online'
+    export_win_id: 6
+    order: 600
+
+- model: export_win.marketingsource
+  pk: d69437d5-e241-4160-99f3-b67d887606a8
+  fields:
+    disabled_on: null
+    name: 'Direct call from an international trade advisor'
+    export_win_id: 7
+    order: 700
+
+- model: export_win.marketingsource
+  pk: 065cb966-6789-46e2-ade0-3c173c090eec
+  fields:
+    disabled_on: null
+    name: 'The Exporting is GREAT truck'
+    export_win_id: 8
+    order: 800
+
+- model: export_win.marketingsource
+  pk: 0fe5bc9e-b405-41cb-a68d-c1150033932b
+  fields:
+    disabled_on: null
+    name: 'UK trade fair'
+    export_win_id: 9
+    order: 900
+
+- model: export_win.marketingsource
+  pk: f0f4511b-3f0d-45f3-bb73-871ca7badcf9
+  fields:
+    disabled_on: null
+    name: 'Overseas trade fair'
+    export_win_id: 10
+    order: 1000
+
+- model: export_win.marketingsource
+  pk: 5ac7e9a8-2347-4d4f-9b52-0047d32abb05
+  fields:
+    disabled_on: null
+    name: 'Don’t know'
+    export_win_id: 11
+    order: 1100
+
+- model: export_win.marketingsource
+  pk: 391ad3b8-e028-48f1-9cf6-ac7149fb3756
+  fields:
+    disabled_on: null
+    name: 'Other (please specify)'
+    export_win_id: 12
+    order: 1200
