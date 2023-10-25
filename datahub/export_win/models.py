@@ -55,3 +55,7 @@ class ExperienceCategories(BaseExportWinOrderedConstantModel):
 
 class BreakdownType(BaseExportWinOrderedConstantModel):
     """Breakdown type"""
+
+
+class Rating(BaseExportWinOrderedConstantModel):
+    """Rating"""
