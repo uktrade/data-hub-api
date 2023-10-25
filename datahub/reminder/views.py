@@ -27,6 +27,7 @@ from datahub.reminder.models import (
     ReminderStatus,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
+    UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
 )
 from datahub.reminder.serializers import (
@@ -38,8 +39,7 @@ from datahub.reminder.serializers import (
     NoRecentInvestmentInteractionSubscriptionSerializer,
     UpcomingEstimatedLandDateReminderSerializer,
     UpcomingEstimatedLandDateSubscriptionSerializer,
-    UpcomingInvestmentProjectTaskReminder,
-    UpcomingInvestmentProjectTaskReminderSerializer,
+    UpcomingTaskReminderSerializer,
     UpcomingTaskReminderSubscriptionSerializer,
 )
 
@@ -165,9 +165,9 @@ class UpcomingEstimatedLandDateReminderViewset(BaseReminderViewset):
     model_class = UpcomingEstimatedLandDateReminder
 
 
-class UpcomingInvestmentProjectTaskReminderViewset(BaseReminderViewset):
-    serializer_class = UpcomingInvestmentProjectTaskReminderSerializer
-    model_class = UpcomingInvestmentProjectTaskReminder
+class UpcomingTaskReminderViewset(BaseReminderViewset):
+    serializer_class = UpcomingTaskReminderSerializer
+    model_class = UpcomingTaskReminder
 
 
 @transaction.non_atomic_requests
@@ -208,7 +208,7 @@ def reminder_summary_view(request):
         no_recent_export_interaction = 0
         new_export_interaction = 0
 
-    task_due_date_approaching = UpcomingInvestmentProjectTaskReminder.objects.filter(
+    task_due_date_approaching = UpcomingTaskReminder.objects.filter(
         adviser=request.user,
     ).count()
 

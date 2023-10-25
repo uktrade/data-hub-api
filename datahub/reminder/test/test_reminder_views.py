@@ -20,15 +20,16 @@ from datahub.reminder.models import (
     NoRecentExportInteractionReminder,
     NoRecentInvestmentInteractionReminder,
     UpcomingEstimatedLandDateReminder,
-    UpcomingInvestmentProjectTaskReminder,
+    UpcomingTaskReminder,
 )
 from datahub.reminder.test.factories import (
     NewExportInteractionReminderFactory,
     NoRecentExportInteractionReminderFactory,
     NoRecentInvestmentInteractionReminderFactory,
     UpcomingEstimatedLandDateReminderFactory,
-    UpcomingInvestmentProjectTaskReminderFactory,
+    UpcomingTaskReminderFactory,
 )
+from datahub.task.test.factories import InvestmentProjectTaskFactory
 
 
 @pytest.fixture()
@@ -485,11 +486,14 @@ class TestUpcomingTaskDueDateReminderViewset(APITestMixin, ReminderTestMixin):
 
     url_name = 'api-v4:reminder:my-tasks-due-date-approaching-reminder'
     detail_url_name = 'api-v4:reminder:my-tasks-due-date-approaching-reminder-detail'
-    factory = UpcomingInvestmentProjectTaskReminderFactory
-    tested_model = UpcomingInvestmentProjectTaskReminder
+    factory = UpcomingTaskReminderFactory
+    tested_model = UpcomingTaskReminder
 
-    def test_get_reminders(self):
-        """Given some reminders, these should be returned"""
+    def test_get_generic_task_reminders(self):
+        """
+        Given some reminders for generic tasks, these should be returned without any references to
+        other task types
+        """
         reminder_count = 3
         reminders = self.factory.create_batch(
             reminder_count,
@@ -509,27 +513,50 @@ class TestUpcomingTaskDueDateReminderViewset(APITestMixin, ReminderTestMixin):
             'id': str(reminders[0].id),
             'created_on': '2022-05-05T17:00:00Z',
             'event': reminders[0].event,
-            'investment_project_task': {
-                'id': str(reminders[0].investment_project_task.id),
-                'task': {
-                    'id': str(reminders[0].investment_project_task.task.id),
-                    'due_date': None,
-                },
-                'investment_project': {
-                    'id': str(reminders[0].investment_project_task.investment_project.id),
-                    'name': reminders[0].investment_project_task.investment_project.name,
-                    'project_code': reminders[
-                        0
-                    ].investment_project_task.investment_project.project_code,
-                    'investor_company': {
-                        'id': str(
-                            reminders[
-                                0
-                            ].investment_project_task.investment_project.investor_company.id,
-                        ),
-                        'name': reminders[
-                            0
-                        ].investment_project_task.investment_project.investor_company.name,
+            'task': {
+                'id': str(reminders[0].task.id),
+                'due_date': None,
+                'investment_project_task': None,
+            },
+        }
+
+    def test_get_investment_project_task_reminders(self):
+        """
+        Given some reminders for investment project tasks, these should be returned with the
+        correct investment project task data
+        """
+        investment_project_task = InvestmentProjectTaskFactory()
+        investment_project = investment_project_task.investment_project
+
+        reminders = self.factory.create_batch(
+            3,
+            adviser=self.user,
+            task=investment_project_task.task,
+        )
+        response = self.get_response
+        data = response.json()
+        results = data.get('results', [])
+        reminders = sorted(reminders, key=lambda x: x.pk)
+
+        assert results[0] == {
+            'id': str(reminders[0].id),
+            'created_on': '2022-05-05T17:00:00Z',
+            'event': reminders[0].event,
+            'task': {
+                'id': str(reminders[0].task.id),
+                'due_date': None,
+                'investment_project_task': {
+                    'id': str(investment_project_task.id),
+                    'investment_project': {
+                        'name': investment_project.name,
+                        'project_code': investment_project.project_code,
+                        'investor_company': {
+                            'name': investment_project.investor_company.name,
+                            'id': str(
+                                investment_project.investor_company.id,
+                            ),
+                        },
+                        'id': str(investment_project.id),
                     },
                 },
             },
@@ -594,7 +621,7 @@ class TestGetReminderSummaryView(APITestMixin):
             adviser=self.user,
         )
         NoRecentExportInteractionReminderFactory.create_batch(2)
-        UpcomingInvestmentProjectTaskReminderFactory.create_batch(
+        UpcomingTaskReminderFactory.create_batch(
             reminder_count,
             adviser=self.user,
         )
@@ -687,7 +714,7 @@ class TestGetReminderSummaryView(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
-        UpcomingInvestmentProjectTaskReminderFactory.create_batch(
+        UpcomingTaskReminderFactory.create_batch(
             reminder_count,
             adviser=self.user,
         )
