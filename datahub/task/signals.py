@@ -51,5 +51,4 @@ def send_task_assigned_from_others_email(sender, **kwargs):
     action = kwargs.pop('action', None)
     print('*****************', action)
     for adviser in pk_set:
-        print('aaaaaaaa', adviser)
         send_notification_task_assigned_from_others_email_task(task, adviser)

@@ -18,11 +18,11 @@ def _send_email(**data):
 def _prepare_personalisation(task, data=None):
     """Prepare the personalisation data with common values."""
     return {
-        'task title': task.title,
-        'modified by': task.modified_by.name,
-        'company name': 'A Company',
-        'task due date': task.due_date,
-        'task link': f'https://www.datahub.trade.gov.uk/tasks/{task.id}',
+        'task_title': task.title,
+        'modified_by': task.modified_by.name,
+        'company_name': task.get_company(),
+        'task_due_date': task.due_date,
+        'task_url': task.get_absolute_url(),
         **(data or {}),
     }
 
