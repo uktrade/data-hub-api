@@ -526,7 +526,7 @@ class TestUpcomingTaskDueDateReminderViewset(APITestMixin, ReminderTestMixin):
         correct investment project task data
         """
         investment_project_task = InvestmentProjectTaskFactory()
-        investment_project = investment_project_task.task
+        investment_project = investment_project_task.investment_project
 
         reminders = self.factory.create_batch(
             3,
