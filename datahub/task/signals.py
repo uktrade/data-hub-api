@@ -5,7 +5,6 @@ from datahub.task.models import InvestmentProjectTask, Task
 from datahub.task.tasks import (
     schedule_create_task_assigned_to_me_from_others_subscription_task,
     schedule_create_task_reminder_subscription_task,
-    send_notification_task_assigned_from_others_email_task,
 )
 
 
@@ -33,7 +32,6 @@ def set_task_reminder_subscription_after_task_post_save(sender, instance, **kwar
     advisers = instance.advisers.all()
     for adviser in advisers:
         schedule_create_task_reminder_subscription_task(adviser)
-        schedule_create_task_assigned_to_me_from_others_subscription_task(adviser)
 
 
 @receiver(
@@ -49,6 +47,6 @@ def send_task_assigned_from_others_email(sender, **kwargs):
     task = kwargs.pop('instance', None)
     pk_set = kwargs.pop('pk_set', None)
     action = kwargs.pop('action', None)
-    print('*****************', action)
-    for adviser in pk_set:
-        send_notification_task_assigned_from_others_email_task(task, adviser)
+    if action == 'post_add':
+        for adviser_id in pk_set:
+            schedule_create_task_assigned_to_me_from_others_subscription_task(task, adviser_id)

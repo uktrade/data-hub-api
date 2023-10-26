@@ -4,22 +4,21 @@ from django.conf import settings
 from django.utils import timezone
 from django_pglocks import advisory_lock
 
+from datahub.company.models import Advisor
 from datahub.core import statsd
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.feature_flag.utils import is_user_feature_flag_active
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
-from datahub.company.models import Advisor
 from datahub.reminder.models import (
+    TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
 )
 from datahub.reminder.tasks import notify_adviser_by_rq_email
 from datahub.task.models import Task
-
-from datahub.task.client import notify_adviser_added_to_task
 
 
 logger = logging.getLogger(__name__)
@@ -174,31 +173,67 @@ def update_task_reminder_email_status(email_notification_id, reminder_ids):
         reminder.save()
 
 
-def schedule_create_task_assigned_to_me_from_others_subscription_task(adviser):
+def update_task_assigned_to_me_from_others_email_status(email_notification_id, reminder_ids):
+    reminders = TaskAssignedToMeFromOthersReminder.all_objects.filter(id__in=reminder_ids)
+    for reminder in reminders:
+        reminder.email_notification_id = email_notification_id
+        reminder.save()
+
+
+def schedule_create_task_assigned_to_me_from_others_subscription_task(task, adviser_id):
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
-        function=create_task_assigned_to_me_from_others_task,
-        function_args=(adviser,),
+        function=notify_adviser_added_to_task,
+        function_args=(task, adviser_id),
     )
     logger.info(
         f'Task {job.id} create_task_assigned_to_me_from_others_task',
     )
 
 
-def create_task_assigned_to_me_from_others_task(adviser):
+def create_task_assigned_to_me_from_others_subscription(adviser):
     """
     Creates a task reminder subscription for an adviser if the adviser doesn't have
     a subscription already.
     """
-    if not TaskAssignedToMeFromOthersSubscription.objects.filter(adviser=adviser).first():
-        TaskAssignedToMeFromOthersSubscription.objects.create(adviser=adviser)
+    current_subscription = TaskAssignedToMeFromOthersSubscription.objects.filter(
+        adviser_id=adviser.id,
+    ).first()
+    if not current_subscription:
+        return TaskAssignedToMeFromOthersSubscription.objects.create(
+            adviser=adviser,
+            email_reminders_enabled=True,
+        )
+    return current_subscription
 
 
-def send_notification_task_assigned_from_others_email_task(task, adviser):
+def notify_adviser_added_to_task(task, adviser_id):
     """
-    Sends an email when an adviser is added to a task.
+    Send a notification to the adviser added to the task
     """
+    adviser = Advisor.objects.get(id=str(adviser_id))
+    reminder = TaskAssignedToMeFromOthersReminder.objects.create(
+        adviser=adviser,
+        event=f'{task} assigned to me by {task.modified_by.name}',
+        task=task,
+    )
+    send_email = create_task_assigned_to_me_from_others_subscription(adviser)
 
-    adviser_details = Advisor.objects.get(id=str(adviser))
-
-    notify_adviser_added_to_task(task, adviser_details)
+    if send_email.email_reminders_enabled is True and is_user_feature_flag_active(
+        ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
+        adviser,
+    ):
+        notify_adviser_by_rq_email(
+            adviser=adviser,
+            template_identifier=settings.TASK_NOTIFICATION_FROM_OTHERS_TEMPLATE_ID,
+            context={
+                'task_title': task.title,
+                'modified_by': task.modified_by.name,
+                'company_name': task.get_company(),
+                'task_due_date': task.due_date,
+                'task_url': task.get_absolute_url(),
+            },
+            update_task=update_task_assigned_to_me_from_others_email_status,
+            reminders=[reminder],
+        )
+        return reminder
