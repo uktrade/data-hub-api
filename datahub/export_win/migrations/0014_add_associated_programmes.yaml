@@ -1,0 +1,784 @@
+- model: export_win.associatedprogramme
+  pk: 74b3a682-f954-48f5-9aa4-00660c496c68
+  fields:
+    disabled_on: null
+    name: "Not applicable"
+    export_win_id: "75"
+    order:  100
+- model: export_win.associatedprogramme
+  pk: b6f5c31a-aa45-4ae0-89bd-2eb3ab943f76
+  fields:
+    disabled_on: null
+    name: "Afterburner"
+    export_win_id: "1"
+    order:  110
+- model: export_win.associatedprogramme
+  pk: e29aa1cf-4206-4b00-a41f-b5997b8ee332
+  fields:
+    disabled_on: null
+    name: "Aid Funded Business Service (AFBS)"
+    export_win_id: "2"
+    order:  120
+- model: export_win.associatedprogramme
+  pk: 40cb5fcf-9a7a-48d2-ad55-737405c64bd1
+  fields:
+    disabled_on: null
+    name: "Asia-Pacific Energy & Clean Growth"
+    export_win_id: "107"
+    order:  130
+- model: export_win.associatedprogramme
+  pk: a28a21c8-63be-4ac9-99ba-0fe3bbfb5e0b
+  fields:
+    disabled_on: null
+    name: "British Business Network"
+    export_win_id: "4"
+    order:  140
+- model: export_win.associatedprogramme
+  pk: a4c07157-9cd9-4a5b-b899-4a2092ecbeb7
+  fields:
+    disabled_on: null
+    name: "British Defence Staff - US"
+    export_win_id: "5"
+    order:  150
+- model: export_win.associatedprogramme
+  pk: 20610984-8835-41f5-bd38-49f34bdbc847
+  fields:
+    disabled_on: null
+    name: "Business Win FCO Involvement"
+    export_win_id: "6"
+    order:  160
+- model: export_win.associatedprogramme
+  pk: 28fbb072-3c63-43aa-9006-968051eda79a
+  fields:
+    disabled_on: null
+    name: "CEN Adv Manufacturing"
+    export_win_id: "9"
+    order:  170
+- model: export_win.associatedprogramme
+  pk: d2ff110c-f25f-4d42-a67d-0a7cbbae2fad
+  fields:
+    disabled_on: null
+    name: "CEN Defence & Security"
+    export_win_id: "10"
+    order:  180
+- model: export_win.associatedprogramme
+  pk: e0fa617a-7f0d-4bbf-96e7-970ee8dc73e1
+  fields:
+    disabled_on: null
+    name: "CEN Health & Life Science"
+    export_win_id: "12"
+    order:  190
+- model: export_win.associatedprogramme
+  pk: 9862011f-38fa-4e93-a02c-e5aa1bbced1c
+  fields:
+    disabled_on: null
+    name: "CEN Infrastructure"
+    export_win_id: "13"
+    order:  200
+- model: export_win.associatedprogramme
+  pk: dfd2a6f9-b7c1-42aa-8a09-cd4c6cf20c04
+  fields:
+    disabled_on: null
+    name: "CEN Security"
+    export_win_id: "15"
+    order:  210
+- model: export_win.associatedprogramme
+  pk: 671be2c1-8964-4fbf-96ef-95dadcc55c29
+  fields:
+    disabled_on: null
+    name: "CEN Services"
+    export_win_id: "16"
+    order:  220
+- model: export_win.associatedprogramme
+  pk: 068bb557-a712-4c3f-9324-b592e02a199c
+  fields:
+    disabled_on: null
+    name: "Clean Growth Programme"
+    export_win_id: "102"
+    order:  230
+- model: export_win.associatedprogramme
+  pk: ec451127-948d-4ea1-b7fe-46113ddfda87
+  fields:
+    disabled_on: null
+    name: "Commonwealth Games"
+    export_win_id: "17"
+    order:  240
+- model: export_win.associatedprogramme
+  pk: 34a41aa8-cf75-44b8-87c8-bb5682366f3e
+  fields:
+    disabled_on: null
+    name: "Communication and Marketing"
+    export_win_id: "94"
+    order:  250
+- model: export_win.associatedprogramme
+  pk: c9231409-656d-4608-8489-f6463335269f
+  fields:
+    disabled_on: null
+    name: "Design our future"
+    export_win_id: "92"
+    order:  260
+- model: export_win.associatedprogramme
+  pk: 2c276779-324a-4b53-b70e-7cd1a3bf9311
+  fields:
+    disabled_on: null
+    name: "Digital Trade Advisor"
+    export_win_id: "18"
+    order:  270
+- model: export_win.associatedprogramme
+  pk: 528f0d6a-b431-4718-aa13-0d14d1facb4d
+  fields:
+    disabled_on: null
+    name: "DIT Middle East & Pakistan Comms & Marketing campaigns"
+    export_win_id: "111"
+    order:  280
+- model: export_win.associatedprogramme
+  pk: 78dff753-797c-4521-8e6e-167f25d3d337
+  fields:
+    disabled_on: null
+    name: "Dubai Expo 2020"
+    export_win_id: "77"
+    order:  290
+- model: export_win.associatedprogramme
+  pk: 5f91f965-aa1e-4743-80dc-1fbc0a399acf
+  fields:
+    disabled_on: null
+    name: "E-Exporting"
+    export_win_id: "19"
+    order:  300
+- model: export_win.associatedprogramme
+  pk: 15d97c3e-52b6-456d-98b0-46f1018bd311
+  fields:
+    disabled_on: null
+    name: "EiG Referral"
+    export_win_id: "87"
+    order:  310
+- model: export_win.associatedprogramme
+  pk: 31ff0baa-1031-499c-813f-97730abbce00
+  fields:
+    disabled_on: null
+    name: "Emerging Markets Contract (Gulf)"
+    export_win_id: "21"
+    order:  320
+- model: export_win.associatedprogramme
+  pk: 792a8e5e-1b6b-4db7-b92c-98ec0b0e2641
+  fields:
+    disabled_on: null
+    name: "Emerging Markets Contract (LA)"
+    export_win_id: "22"
+    order:  330
+- model: export_win.associatedprogramme
+  pk: 760a90e6-5a4a-4287-8fc6-d5be6c4e8c54
+  fields:
+    disabled_on: null
+    name: "ESIF"
+    export_win_id: "99"
+    order:  340
+- model: export_win.associatedprogramme
+  pk: 69f882f4-f7ec-49be-bcbd-b9825452fa07
+  fields:
+    disabled_on: null
+    name: "Events Alliance"
+    export_win_id: "24"
+    order:  350
+- model: export_win.associatedprogramme
+  pk: 4c893454-2c88-40b6-9191-2e90427ca7be
+  fields:
+    disabled_on: null
+    name: "Expo 2019 Beijing"
+    export_win_id: "88"
+    order:  360
+- model: export_win.associatedprogramme
+  pk: ef6c22ad-1a60-41df-897b-a83b337a420a
+  fields:
+    disabled_on: null
+    name: "Export Academy"
+    export_win_id: "113"
+    order:  370
+- model: export_win.associatedprogramme
+  pk: b6274519-f237-433b-9b4e-c8388ddf64ff
+  fields:
+    disabled_on: null
+    name: "Export Communication Review Scheme (ECR)"
+    export_win_id: "25"
+    order:  380
+- model: export_win.associatedprogramme
+  pk: af0599f7-9e08-488a-a257-7ea0ea4bbaf6
+  fields:
+    disabled_on: null
+    name: "Export Growth Service"
+    export_win_id: "26"
+    order:  390
+- model: export_win.associatedprogramme
+  pk: e5640993-0be3-42cd-819e-ac646e4f0f9b
+  fields:
+    disabled_on: null
+    name: "Export Opportunities"
+    export_win_id: "72"
+    order:  400
+- model: export_win.associatedprogramme
+  pk: c3887809-0cde-4f9e-9f12-ae751c8dcb3b
+  fields:
+    disabled_on: null
+    name: "Export Oriented FDI"
+    export_win_id: "27"
+    order:  410
+- model: export_win.associatedprogramme
+  pk: dfffcf56-5823-41bb-8ff1-226efefe670e
+  fields:
+    disabled_on: null
+    name: "Exporting is GREAT (EiG)"
+    export_win_id: "28"
+    order:  420
+- model: export_win.associatedprogramme
+  pk: 62f00977-536d-495c-968f-e91afc4c7290
+  fields:
+    disabled_on: null
+    name: "FinTech"
+    export_win_id: "95"
+    order:  430
+- model: export_win.associatedprogramme
+  pk: fa6e02d4-d864-4666-882c-ab8c7f6d04b4
+  fields:
+    disabled_on: null
+    name: "First Time Exporters Programme"
+    export_win_id: "30"
+    order:  440
+- model: export_win.associatedprogramme
+  pk: 980ec4bb-34bf-4421-b67a-a37cbb52bdab
+  fields:
+    disabled_on: null
+    name: "Free Trade Agreements"
+    export_win_id: "31"
+    order:  450
+- model: export_win.associatedprogramme
+  pk: ae76d02d-183e-45ae-bfe5-f0cccb320d85
+  fields:
+    disabled_on: null
+    name: "G2G Agreed Priority Project"
+    export_win_id: "104"
+    order:  460
+- model: export_win.associatedprogramme
+  pk: f860195f-7ebe-4cc9-b553-c19adf576106
+  fields:
+    disabled_on: null
+    name: "GCP - RBS"
+    export_win_id: "39"
+    order:  470
+- model: export_win.associatedprogramme
+  pk: c643fa4a-bd36-4dc6-9771-27e46d857768
+  fields:
+    disabled_on: null
+    name: "GCP - Santander"
+    export_win_id: "40"
+    order:  480
+- model: export_win.associatedprogramme
+  pk: e6d112d1-107b-43a7-bfb4-0e20d1af4d7a
+  fields:
+    disabled_on: null
+    name: "Global Entrepreneur Programme (GEP)"
+    export_win_id: "90"
+    order:  490
+- model: export_win.associatedprogramme
+  pk: 7af439e7-5dfe-44ce-b72e-8fce92783031
+  fields:
+    disabled_on: null
+    name: "Global Growth Pilot"
+    export_win_id: "83"
+    order:  500
+- model: export_win.associatedprogramme
+  pk: e4fe605c-bf58-459e-8c0a-f5b4ab9770ae
+  fields:
+    disabled_on: null
+    name: "Great British Food Programme"
+    export_win_id: "97"
+    order:  510
+- model: export_win.associatedprogramme
+  pk: 827e093b-e738-4dd5-9fbc-11f5a49b3495
+  fields:
+    disabled_on: null
+    name: "GREAT Challenge Fund"
+    export_win_id: "43"
+    order:  520
+- model: export_win.associatedprogramme
+  pk: ea489292-0e62-4858-831b-72afc53bcd29
+  fields:
+    disabled_on: null
+    name: "GREAT Festival of Innovation (GFEST)"
+    export_win_id: "78"
+    order:  530
+- model: export_win.associatedprogramme
+  pk: 761bb4b2-42c1-4015-89c6-31e7b2d506a7
+  fields:
+    disabled_on: null
+    name: "GREAT Food is GREAT"
+    export_win_id: "91"
+    order:  540
+- model: export_win.associatedprogramme
+  pk: e2b2d2af-b113-449a-a80a-6fe85678c8ae
+  fields:
+    disabled_on: null
+    name: "GREAT Funded Activity"
+    export_win_id: "44"
+    order:  550
+- model: export_win.associatedprogramme
+  pk: 69152810-98c6-448f-bae7-8b4c480bbddd
+  fields:
+    disabled_on: null
+    name: "GREAT International Trade Campaign"
+    export_win_id: "79"
+    order:  560
+- model: export_win.associatedprogramme
+  pk: 2b21b1cd-6901-4be8-8a9a-c1b82324b591
+  fields:
+    disabled_on: null
+    name: "GREAT - Unicorn Kingdom Campaign - North America (2023)"
+    export_win_id: "112"
+    order:  570
+- model: export_win.associatedprogramme
+  pk: db37c88b-d731-4fe9-87de-bf9e3a779194
+  fields:
+    disabled_on: null
+    name: "Grown in Britain Global Business Programme"
+    export_win_id: "46"
+    order:  580
+- model: export_win.associatedprogramme
+  pk: e7084a7f-efe8-4b04-bc66-08365975233c
+  fields:
+    disabled_on: null
+    name: "HAIC - Healthcare Artificial Intelligence Catalyst"
+    export_win_id: "89"
+    order:  590
+- model: export_win.associatedprogramme
+  pk: 25689107-7f1f-4cf8-8d18-cb134ff8eaae
+  fields:
+    disabled_on: null
+    name: "Innovation Programme"
+    export_win_id: "49"
+    order:  600
+- model: export_win.associatedprogramme
+  pk: 98a2bff2-f959-488b-9640-46f4f71dd109
+  fields:
+    disabled_on: null
+    name: "International Festival for Business"
+    export_win_id: "50"
+    order:  610
+- model: export_win.associatedprogramme
+  pk: b18935f7-b60c-4f79-8d9b-9ee383023093
+  fields:
+    disabled_on: null
+    name: "International Trade Show"
+    export_win_id: "101"
+    order:  620
+- model: export_win.associatedprogramme
+  pk: 49b72b44-d6f8-4039-8fea-0c6f02864afb
+  fields:
+    disabled_on: null
+    name: "Investment Promotion Programme (IPP)"
+    export_win_id: "100"
+    order:  630
+- model: export_win.associatedprogramme
+  pk: 37b7d6e2-ff31-43c0-8e1c-75021fdace1a
+  fields:
+    disabled_on: null
+    name: "JETCO"
+    export_win_id: "51"
+    order:  640
+- model: export_win.associatedprogramme
+  pk: c6b060c7-b02a-46f7-a398-ee015b6d26aa
+  fields:
+    disabled_on: null
+    name: "Levelling Up"
+    export_win_id: "105"
+    order:  650
+- model: export_win.associatedprogramme
+  pk: f3e8a90f-44c4-445f-8977-75664464a675
+  fields:
+    disabled_on: null
+    name: "Luxury Retail"
+    export_win_id: "53"
+    order:  660
+- model: export_win.associatedprogramme
+  pk: 2359a397-ea5c-40fa-bde7-cbab2f54f8c6
+  fields:
+    disabled_on: null
+    name: "Made in the UK"
+    export_win_id: "109"
+    order:  670
+- model: export_win.associatedprogramme
+  pk: 78c195d6-4569-4e72-9f2e-1f3410f9c62c
+  fields:
+    disabled_on: null
+    name: "Midlands Engine"
+    export_win_id: "73"
+    order:  680
+- model: export_win.associatedprogramme
+  pk: f96483a1-3aa0-485a-9653-dbec5798d912
+  fields:
+    disabled_on: null
+    name: "MSB Programme"
+    export_win_id: "55"
+    order:  690
+- model: export_win.associatedprogramme
+  pk: 18f29ef0-2675-4089-9bdf-70f17142a796
+  fields:
+    disabled_on: null
+    name: "National Partner Referral"
+    export_win_id: "84"
+    order:  700
+- model: export_win.associatedprogramme
+  pk: dca49262-493a-44c1-94a8-0b7ec8ea91f2
+  fields:
+    disabled_on: null
+    name: "Northern Powerhouse (NPH)"
+    export_win_id: "57"
+    order:  710
+- model: export_win.associatedprogramme
+  pk: eb1bb33f-0fed-4744-88a9-bed37e64ca72
+  fields:
+    disabled_on: null
+    name: "Offshore Wind Investment Organisation"
+    export_win_id: "58"
+    order:  720
+- model: export_win.associatedprogramme
+  pk: 3aeca122-48f3-4c24-9f41-49836f2a9bf2
+  fields:
+    disabled_on: null
+    name: "Overseas Market Introduction Service (OMIS)"
+    export_win_id: "60"
+    order:  730
+- model: export_win.associatedprogramme
+  pk: 9ace429b-d26d-4539-b5ab-9f419e5c6dcf
+  fields:
+    disabled_on: null
+    name: "Passport to Export (P2E)"
+    export_win_id: "70"
+    order:  740
+- model: export_win.associatedprogramme
+  pk: f1c00d44-0437-400e-9732-d6202bdf46f6
+  fields:
+    disabled_on: null
+    name: "PM Trade Envoy"
+    export_win_id: "82"
+    order:  750
+- model: export_win.associatedprogramme
+  pk: db57d4e5-7d8d-4065-a554-a4474aecc3b1
+  fields:
+    disabled_on: null
+    name: "PreCOP26"
+    export_win_id: "106"
+    order:  760
+- model: export_win.associatedprogramme
+  pk: 2407df99-a766-44cf-b0c4-535f3ff6f18b
+  fields:
+    disabled_on: null
+    name: "Prosperity Fund"
+    export_win_id: "81"
+    order:  770
+- model: export_win.associatedprogramme
+  pk: f1e2e3f9-c262-4537-b544-6959d0fa3eae
+  fields:
+    disabled_on: null
+    name: "Science Superpower"
+    export_win_id: "110"
+    order:  780
+- model: export_win.associatedprogramme
+  pk: 5f451651-a664-4d99-99ca-2cd0e75b8557
+  fields:
+    disabled_on: null
+    name: "Shakespeare Lives"
+    export_win_id: "64"
+    order:  790
+- model: export_win.associatedprogramme
+  pk: 8da13cf1-34a4-496d-b8c2-7227e81867ac
+  fields:
+    disabled_on: null
+    name: "South by South West (SXSW)"
+    export_win_id: "98"
+    order:  800
+- model: export_win.associatedprogramme
+  pk: baf3b7c4-bbb3-4400-aa26-1ed822c389d4
+  fields:
+    disabled_on: null
+    name: "Specialist Support"
+    export_win_id: "85"
+    order:  810
+- model: export_win.associatedprogramme
+  pk: 5e7b5f7e-b51c-4819-b9d3-4f2ef6740ecd
+  fields:
+    disabled_on: null
+    name: "Stakeholder Engagement"
+    export_win_id: "65"
+    order:  820
+- model: export_win.associatedprogramme
+  pk: a3c5c0d6-f114-4c0b-b60b-3ee146aba473
+  fields:
+    disabled_on: null
+    name: "TCC - Third Country Collaboration"
+    export_win_id: "103"
+    order:  830
+- model: export_win.associatedprogramme
+  pk: 1099abf2-3e0b-43fc-9a7a-886e1a9e92a8
+  fields:
+    disabled_on: null
+    name: "Tradeshow Access Programme"
+    export_win_id: "86"
+    order:  840
+- model: export_win.associatedprogramme
+  pk: 7d2c6fc2-3ea2-4466-82aa-9b837ce1fafc
+  fields:
+    disabled_on: null
+    name: "UK’s Finest"
+    export_win_id: "108"
+    order:  850
+- model: export_win.associatedprogramme
+  pk: 833f8f9d-f47d-4fb3-8580-28bbe7b8abe5
+  fields:
+    disabled_on: null
+    name: "Web-based Exporting Programme"
+    export_win_id: "69"
+    order:  860
+- model: export_win.associatedprogramme
+  pk: cc9b5684-3392-4648-98f9-017b307d633e
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Britain Open for Business"
+    export_win_id: "3"
+    order: 870
+- model: export_win.associatedprogramme
+  pk: d6558ca7-1719-41c8-b673-bd830d2ce250
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Catalyst Members Activities"
+    export_win_id: "7"
+    order: 880
+- model: export_win.associatedprogramme
+  pk: 2d9a6fe1-945b-441e-a476-85bc0d4b77b4
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "CEN Adv Engineering"
+    export_win_id: "8"
+    order: 890
+- model: export_win.associatedprogramme
+  pk: 0466b04f-182d-42fc-8cf6-adeda1de5fc2
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "CEN Energy"
+    export_win_id: "11"
+    order: 900
+- model: export_win.associatedprogramme
+  pk: 716cca4b-50a3-4c2a-92fc-243d81318419
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "CEN Life Science"
+    export_win_id: "14"
+    order: 910
+- model: export_win.associatedprogramme
+  pk: d989e55e-22eb-44fd-b5d4-f74241ac1246
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Emerging Markets Contract (CEE)"
+    export_win_id: "20"
+    order: 920
+- model: export_win.associatedprogramme
+  pk: 0f923255-20cb-4795-8401-c664509f70b5
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Emerging Markets Contract (Russia)"
+    export_win_id: "23"
+    order: 930
+- model: export_win.associatedprogramme
+  pk: 221211fc-a96c-485a-b78b-55c516d41eb6
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "EY Specialist Business Win"
+    export_win_id: "29"
+    order: 940
+- model: export_win.associatedprogramme
+  pk: 6e6e517a-83f2-433f-9de6-4b32e3c47b2d
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "GCP"
+    export_win_id: "32"
+    order: 950
+- model: export_win.associatedprogramme
+  pk: da940c49-bb6e-46a0-8aff-beaba9be6aad
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "GCP - Deloitte"
+    export_win_id: "33"
+    order: 960
+- model: export_win.associatedprogramme
+  pk: 456cc8f9-94e3-4399-bd5a-3efb1582cc88
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "GCP - EY"
+    export_win_id: "34"
+    order: 970
+- model: export_win.associatedprogramme
+  pk: f4e41e2a-d3c7-45c9-884b-f026ddff9ae8
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "GCP - HSBC"
+    export_win_id: "35"
+    order: 980
+- model: export_win.associatedprogramme
+  pk: 79441425-b5a3-4b28-a14d-8e5a29c94d93
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "GCP - KPMG"
+    export_win_id: "36"
+    order: 990
+- model: export_win.associatedprogramme
+  pk: cfdc3eb0-24a3-4332-aa98-2d09dff81998
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "GCP - Lloyds"
+    export_win_id: "37"
+    order: 1000
+- model: export_win.associatedprogramme
+  pk: e78caba0-7ba6-4c06-af12-fa77226d9d19
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "GCP - PwC"
+    export_win_id: "38"
+    order: 1010
+- model: export_win.associatedprogramme
+  pk: 7e898263-cd26-429b-b323-a215d5596a5a
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "GCP - Standard Chartered"
+    export_win_id: "41"
+    order: 1020
+- model: export_win.associatedprogramme
+  pk: 927ec52c-062c-42f6-b759-d366a8ef2170
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "GREAT Branded Event Great Campaign"
+    export_win_id: "42"
+    order: 1030
+- model: export_win.associatedprogramme
+  pk: b7b3889e-cea1-4488-9ee2-5b2bf1b10071
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "GREAT British House Rio"
+    export_win_id: "71"
+    order: 1040
+- model: export_win.associatedprogramme
+  pk: 2c767629-a164-48ed-b625-043259183d54
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "GREAT Weeks"
+    export_win_id: "45"
+    order: 1050
+- model: export_win.associatedprogramme
+  pk: 6454570f-d62f-444d-8e1c-9b7664f98bc4
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "HVO Specialist [involvement]"
+    export_win_id: "47"
+    order: 1060
+- model: export_win.associatedprogramme
+  pk: 10302cb8-d720-4cf0-81c9-ff6973f94732
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "III - Deal Ticket Size"
+    export_win_id: "48"
+    order: 1070
+- model: export_win.associatedprogramme
+  pk: d4af73c4-5d9c-46d7-b9ff-725c3eec1436
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Low Carbon Initiative"
+    export_win_id: "52"
+    order: 1080
+- model: export_win.associatedprogramme
+  pk: f81d2da6-316f-4db0-832e-9c7219fb9764
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Milan Expo 2015"
+    export_win_id: "54"
+    order: 1090
+- model: export_win.associatedprogramme
+  pk: 90f22eae-f97c-4a68-a699-999ddf300405
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Music Export Growth Scheme (MEGS)"
+    export_win_id: "56"
+    order: 1100
+- model: export_win.associatedprogramme
+  pk: 95f03f1a-407b-4a65-bdd7-91e061e2587b
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Olympics 2012"
+    export_win_id: "59"
+    order: 1110
+- model: export_win.associatedprogramme
+  pk: b073b6dc-2335-4ccb-9c1c-0b655ffff4f4
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "PA Specialist Business Win"
+    export_win_id: "61"
+    order: 1120
+- model: export_win.associatedprogramme
+  pk: 415563b3-80ee-44fb-a1e0-f10454ea65d7
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Red Arrows Tour 2019"
+    export_win_id: "93"
+    order: 1130
+- model: export_win.associatedprogramme
+  pk: 96b0a9d8-8665-4565-92ab-77cd82b4218f
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Reshore UK"
+    export_win_id: "62"
+    order: 1140
+- model: export_win.associatedprogramme
+  pk: c44db42d-51f2-417e-b35c-441ad47e0b7b
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Rugby World Cup - Business Festival"
+    export_win_id: "63"
+    order: 1150
+- model: export_win.associatedprogramme
+  pk: 394be5de-df46-4f0e-8253-05ac2519f511
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Technology Strategy Board (TSB)"
+    export_win_id: "66"
+    order: 1160
+- model: export_win.associatedprogramme
+  pk: 785e3df3-6954-4f72-b33a-b043cb471a7d
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "UK Israel Tech Hub"
+    export_win_id: "67"
+    order: 1170
+- model: export_win.associatedprogramme
+  pk: 4c1396f1-80ba-4405-8892-1698e03bc46e
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Venture Capital"
+    export_win_id: "68"
+    order: 1180
+- model: export_win.associatedprogramme
+  pk: 5b0ac9ac-258b-458c-99bc-ac12ad5f1142
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Astana Expo 2017"
+    export_win_id: "76"
+    order: 1190
+- model: export_win.associatedprogramme
+  pk: 43c0aaf4-fe4d-48d4-9be1-f98eb6465307
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "MIPIM 2018"
+    export_win_id: "80"
+    order: 1200
+- model: export_win.associatedprogramme
+  pk: 66126a10-6c18-4b20-962d-a9233aa1a3db
+  fields:
+    disabled_on: 2023-10-27T09:59:03Z
+    name: "Great British Food Showcase 2019"
+    export_win_id: "96"
+    order: 1210

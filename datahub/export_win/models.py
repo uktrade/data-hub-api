@@ -75,3 +75,7 @@ class WithoutOurSupport(BaseExportWinOrderedConstantModel):
 
 class HVOProgrammes(BaseExportWinOrderedConstantModel):
     """HVO Programmes"""
+
+
+class AssociatedProgramme(BaseExportWinOrderedConstantModel):
+    """Associated Programme"""
