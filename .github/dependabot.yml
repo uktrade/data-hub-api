@@ -8,9 +8,6 @@ updates:
     timezone: Europe/London
   open-pull-requests-limit: 10
   ignore:
-  - dependency-name: werkzeug
-    versions:
-    - "> 2.0.3"
   - dependency-name: flake8-bugbear # TET-129
     versions:
     - "> 22.1.11"
