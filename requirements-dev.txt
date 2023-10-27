@@ -8,11 +8,9 @@ aiohttp==3.8.5
     # via slackclient
 aiosignal==1.3.1
     # via aiohttp
-appnope==0.1.3
-    # via ipython
 asgiref==3.6.0
     # via django
-astroid==2.15.8
+astroid==3.0.1
     # via pylint
 asttokens==2.2.1
     # via stack-data
@@ -110,6 +108,10 @@ ecs-logging==2.0.2
     # via elastic-apm
 elastic-apm==6.19.0
     # via -r requirements.in
+exceptiongroup==1.1.3
+    # via
+    #   ipython
+    #   pytest
 execnet==1.9.0
     # via pytest-xdist
 executing==1.2.0
@@ -181,8 +183,6 @@ jmespath==1.0.1
     #   botocore
 kubi-ecs-logger==0.1.2
     # via django-log-formatter-ecs
-lazy-object-proxy==1.8.0
-    # via astroid
 mail-parser==3.15.0
     # via -r requirements.in
 markupsafe==2.1.2
@@ -268,7 +268,7 @@ pygments==2.15.0
     # via ipython
 pyjwt==2.6.0
     # via notifications-python-client
-pylint==2.17.7
+pylint==3.0.2
     # via
     #   -r requirements-dev.in
     #   pylint-django
@@ -374,12 +374,22 @@ stack-data==0.6.2
     # via ipython
 statsd==4.0.1
     # via -r requirements.in
+tomli==2.0.1
+    # via
+    #   build
+    #   coverage
+    #   pep517
+    #   pip-tools
+    #   pylint
+    #   pytest
 tomlkit==0.11.6
     # via pylint
 traitlets==5.8.0
     # via
     #   ipython
     #   matplotlib-inline
+typing-extensions==4.8.0
+    # via astroid
 tzdata==2023.3
     # via pandas
 uritemplate==4.1.1
@@ -402,9 +412,7 @@ wheel==0.38.4
 whitenoise==6.6.0
     # via -r requirements.in
 wrapt==1.14.1
-    # via
-    #   astroid
-    #   elastic-apm
+    # via elastic-apm
 wsgiserver==1.3
     # via -r requirements.in
 yarl==1.8.2
