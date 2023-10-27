@@ -50,12 +50,12 @@ class TestCompanyObjectiveDatasetViewSet(BaseDatasetViewTest):
 
     def test_with_multiple_records(self, data_flow_api_client):
         """Test that endpoint returns correct number of records"""
-        [objective1, objective2, objective3, objective4] = ObjectiveFactory.create_batch(4)
+        objectives = ObjectiveFactory.create_batch(4)
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
         assert len(response_results) == 4
 
-        expected_list = [objective1, objective2, objective3, objective4]
+        expected_list = objectives
         for index, item in enumerate(expected_list):
             assert str(item.id) == response_results[index]['id']
