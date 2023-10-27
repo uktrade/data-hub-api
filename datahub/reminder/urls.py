@@ -11,8 +11,8 @@ from datahub.reminder.views import (
     reminder_summary_view,
     UpcomingEstimatedLandDateReminderViewset,
     UpcomingEstimatedLandDateSubscriptionViewset,
-    UpcomingTaskReminderViewset,
     UpcomingTaskReminderSubscriptionViewset,
+    UpcomingTaskReminderViewset,
 )
 
 urlpatterns = [
