@@ -220,7 +220,7 @@ packaging==22.0
     #   build
     #   marshmallow
     #   pytest
-pandas==2.1.1
+pandas==2.1.2
     # via -r requirements.in
 parso==0.8.3
     # via jedi
