@@ -10,6 +10,9 @@ from datahub.dataset.company_export_country_history.views import (
     CompanyExportCountryHistoryDatasetView,
 )
 from datahub.dataset.company_list.views import PipelineItemsDatasetView
+from datahub.dataset.company_objective.views import (
+    CompanyObjectiveDatasetView,
+)
 from datahub.dataset.company_referral.views import CompanyReferralDatasetView
 from datahub.dataset.contact.views import ContactsDatasetView
 from datahub.dataset.event.views import EventsDatasetView
@@ -22,9 +25,6 @@ from datahub.dataset.investment_project.views import (
 from datahub.dataset.order.views import OMISDatasetView
 from datahub.dataset.team.views import TeamsDatasetView
 from datahub.dataset.user_event_log.views import UserEventsView
-from datahub.dataset.company_objective.views import (
-    CompanyObjectiveDatasetView,
-)
 
 
 urlpatterns = [

@@ -56,7 +56,6 @@ class TestCompanyObjectiveDatasetViewSet(BaseDatasetViewTest):
         objective2 = ObjectiveFactory()
         objective3 = ObjectiveFactory()
         objective4 = ObjectiveFactory()
-        
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
