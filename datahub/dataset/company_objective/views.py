@@ -20,4 +20,7 @@ class CompanyObjectiveDatasetView(BaseDatasetView):
             'blocker_description',
             'progress',
             'created_on',
+            'modified_on',
+            'created_by_id',
+            'modified_by_id',
         )

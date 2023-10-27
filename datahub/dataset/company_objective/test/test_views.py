@@ -19,6 +19,9 @@ def get_expected_data_from_company_objective(objective):
         'blocker_description': objective.blocker_description,
         'progress': objective.progress,
         'created_on': format_date_or_datetime(objective.created_on),
+        'modified_on': format_date_or_datetime(objective.modified_on),
+        'created_by_id': str(objective.created_by_id),
+        'modified_by_id': str(objective.modified_by_id),
     }
 
 
@@ -31,14 +34,9 @@ class TestCompanyObjectiveDatasetViewSet(BaseDatasetViewTest):
     view_url = reverse('api-v4:dataset:company-objective-dataset')
     factory = ObjectiveFactory
 
-    @pytest.mark.parametrize(
-        'objective_factory', (
-            ObjectiveFactory,
-        ),
-    )
-    def test_success(self, data_flow_api_client, objective_factory):
+    def test_success(self, data_flow_api_client):
         """Test that endpoint returns with expected data for a single pipeline item"""
-        objective = objective_factory()
+        objective = ObjectiveFactory()
 
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
@@ -52,10 +50,7 @@ class TestCompanyObjectiveDatasetViewSet(BaseDatasetViewTest):
 
     def test_with_multiple_records(self, data_flow_api_client):
         """Test that endpoint returns correct number of records"""
-        objective1 = ObjectiveFactory()
-        objective2 = ObjectiveFactory()
-        objective3 = ObjectiveFactory()
-        objective4 = ObjectiveFactory()
+        [objective1, objective2, objective3, objective4] = ObjectiveFactory.create_batch(4)
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
