@@ -12,6 +12,7 @@ from datahub.reminder.views import (
     UpcomingEstimatedLandDateReminderViewset,
     UpcomingEstimatedLandDateSubscriptionViewset,
     UpcomingTaskReminderViewset,
+    UpcomingTaskReminderSubscriptionViewset,
 )
 
 urlpatterns = [
@@ -149,6 +150,16 @@ urlpatterns = [
             },
         ),
         name='my-tasks-due-date-approaching-reminder-detail',
+    ),
+    path(
+        'reminder/subscription/my-tasks-due-date-approaching',
+        UpcomingTaskReminderSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
+        name='my-tasks-due-date-approaching-subscription',
     ),
     path(
         'reminder/summary',
