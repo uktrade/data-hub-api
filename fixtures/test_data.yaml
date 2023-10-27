@@ -420,6 +420,7 @@
     archived_on: "2018-07-06T10:44:56Z"
     archived_by: 7bad8082-4978-4fe8-a018-740257f01637
     archived_reason: "Company is dissolved"
+    strategy: "This is a dummy strategy"
 
 - model: company.company
   pk: ca141e78-e19b-4551-9234-66de570d43a6
@@ -457,6 +458,7 @@
     description: This is a dummy duplicate company for testing
     created_on: "2017-03-05T12:00:00Z"
     modified_on: "2018-07-06T15:44:56Z"
+    strategy: "This is a dummy strategy"
 
 - model: company.company
   pk: 3cb006bb-c8bd-4062-bc8c-c086273b84e1
@@ -484,6 +486,7 @@
     description: This is a dummy company for testing empty uk region
     created_on: "2020-05-05T12:00:00Z"
     modified_on: "2020-05-05T12:00:00Z"
+    strategy: "This is a dummy strategy"
 
 - model: company.onelistcoreteammember
   pk: 58fb3504-3e39-4f76-8662-2f4ef2387bbb
