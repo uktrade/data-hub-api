@@ -28,4 +28,4 @@ pep8-naming==0.13.3
 pydocstyle==6.3.0
 pylint==2.17.7
 pylint-django==2.5.4
-pylint-pytest==1.1.2
+pylint-pytest==1.1.3
