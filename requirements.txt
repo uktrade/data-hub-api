@@ -132,7 +132,7 @@ opensearch-py==2.3.2
     #   opensearch-dsl
 packaging==22.0
     # via marshmallow
-pandas==2.1.1
+pandas==2.1.2
     # via -r requirements.in
 psycogreen==1.0.2
     # via -r requirements.in
