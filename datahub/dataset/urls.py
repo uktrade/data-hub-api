@@ -22,6 +22,9 @@ from datahub.dataset.investment_project.views import (
 from datahub.dataset.order.views import OMISDatasetView
 from datahub.dataset.team.views import TeamsDatasetView
 from datahub.dataset.user_event_log.views import UserEventsView
+from datahub.dataset.company_objective.views import (
+    CompanyObjectiveDatasetView,
+)
 
 
 urlpatterns = [
@@ -76,5 +79,10 @@ urlpatterns = [
         'user-events-dataset',
         UserEventsView.as_view(),
         name='user-events-dataset',
+    ),
+    path(
+        'company-objective-dataset',
+        CompanyObjectiveDatasetView.as_view(),
+        name='company-objective-dataset',
     ),
 ]

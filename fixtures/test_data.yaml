@@ -2086,3 +2086,14 @@
     name: Ada Network
     status: 1386d4f4-732d-44b9-af8e-dffe7dd07d7b
     type: c064e66a-a6bc-4ad6-9a88-0bdd69519f55
+
+- model: company.objective
+  pk: f2b9d8c2-8f6f-4e7f-9a4c-9f6c8f4f8c7d
+  fields:
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    subject: "This is a dummy objective subject for testing."
+    detail: "This is a dummy objective detail for testing."
+    target_date: "2025-01-01"
+    has_blocker: False
+    blocker_description: ""
+    progress: 0
