@@ -8,8 +8,6 @@ aiohttp==3.8.5
     # via slackclient
 aiosignal==1.3.1
     # via aiohttp
-appnope==0.1.3
-    # via ipython
 asgiref==3.6.0
     # via django
 astroid==2.15.8
@@ -28,9 +26,9 @@ backcall==0.2.0
     # via ipython
 bigtree==0.14.2
     # via -r requirements.in
-boto3==1.28.68
+boto3==1.28.73
     # via -r requirements.in
-botocore==1.31.68
+botocore==1.31.73
     # via
     #   boto3
     #   s3transfer
