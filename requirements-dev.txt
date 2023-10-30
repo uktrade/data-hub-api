@@ -26,9 +26,9 @@ backcall==0.2.0
     # via ipython
 bigtree==0.14.2
     # via -r requirements.in
-boto3==1.28.68
+boto3==1.28.73
     # via -r requirements.in
-botocore==1.31.68
+botocore==1.31.73
     # via
     #   boto3
     #   s3transfer
@@ -218,7 +218,7 @@ packaging==22.0
     #   build
     #   marshmallow
     #   pytest
-pandas==2.1.1
+pandas==2.1.2
     # via -r requirements.in
 parso==0.8.3
     # via jedi
@@ -274,13 +274,13 @@ pylint==3.0.2
     #   pylint-django
     #   pylint-plugin-utils
     #   pylint-pytest
-pylint-django==2.5.4
+pylint-django==2.5.5
     # via -r requirements-dev.in
 pylint-plugin-utils==0.8.2
     # via pylint-django
 pylint-pytest==1.1.2
     # via -r requirements-dev.in
-pytest==7.4.2
+pytest==7.4.3
     # via
     #   -r requirements-dev.in
     #   pylint-pytest
