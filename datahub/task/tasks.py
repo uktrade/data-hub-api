@@ -24,25 +24,25 @@ from datahub.task.models import Task
 logger = logging.getLogger(__name__)
 
 
-def schedule_create_task_reminder_subscription_task(adviser):
+def schedule_create_task_reminder_subscription_task(adviser_id):
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
         function=create_task_reminder_subscription_task,
-        function_args=(adviser,),
+        function_args=(adviser_id,),
     )
     logger.info(
         f'Task {job.id} create_task_reminder_subscription_task',
     )
 
 
-def create_task_reminder_subscription_task(adviser):
+def create_task_reminder_subscription_task(adviser_id):
     """
     Creates a task reminder subscription for an adviser if the adviser doesn't have
     a subscription already.
     """
-    if not UpcomingTaskReminderSubscription.objects.filter(adviser=adviser).first():
+    if not UpcomingTaskReminderSubscription.objects.filter(adviser_id=adviser_id).first():
         UpcomingTaskReminderSubscription.objects.create(
-            adviser=adviser,
+            adviser_id=adviser_id,
             email_reminders_enabled=True,
         )
 
@@ -211,7 +211,9 @@ def notify_adviser_added_to_task(task, adviser_id):
     """
     Send a notification to the adviser added to the task
     """
-    adviser = Advisor.objects.get(id=str(adviser_id))
+    adviser = Advisor.objects.filter(id=str(adviser_id)).first()
+    if not adviser:
+        return
     reminder = TaskAssignedToMeFromOthersReminder.objects.create(
         adviser=adviser,
         event=f'{task} assigned to me by {task.modified_by.name}',
@@ -230,10 +232,9 @@ def notify_adviser_added_to_task(task, adviser_id):
                 'task_title': task.title,
                 'modified_by': task.modified_by.name,
                 'company_name': task.get_company(),
-                'task_due_date': task.due_date,
+                'task_due_date': task.due_date.strftime('%-d %B %Y') if task.due_date else '',
                 'task_url': task.get_absolute_url(),
             },
             update_task=update_task_assigned_to_me_from_others_email_status,
             reminders=[reminder],
         )
-        return reminder

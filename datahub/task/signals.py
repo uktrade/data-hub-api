@@ -22,24 +22,9 @@ def delete_investment_project_task_delete(sender, instance, **kwargs):
 @receiver(
     m2m_changed,
     sender=Task.advisers.through,
-    dispatch_uid='set_task_reminder_subscription_after_task_post_save',
+    dispatch_uid='send_task_assigned_from_others_email',
 )
-def set_task_reminder_subscription_after_task_post_save(sender, instance, **kwargs):
-    """
-    Checks to see if a Task has any advisers. If there are advisers then this is
-    passed to the task for processing to add task reminder subscriptions
-    """
-    advisers = instance.advisers.all()
-    for adviser in advisers:
-        schedule_create_task_reminder_subscription_task(adviser)
-
-
-@receiver(
-    m2m_changed,
-    sender=Task.advisers.through,
-    # dispatch_uid='send_task_assigned_from_others_email',
-)
-def send_task_assigned_from_others_email(sender, **kwargs):
+def set_task_subscriptions_and_schedule_notifications(sender, **kwargs):
     """
     Checks to see if a Task has any advisers. If there are advisers then this is
     passed to the task for processing to add task reminder subscriptions
@@ -49,4 +34,5 @@ def send_task_assigned_from_others_email(sender, **kwargs):
     action = kwargs.pop('action', None)
     if action == 'post_add':
         for adviser_id in pk_set:
+            schedule_create_task_reminder_subscription_task(adviser_id)
             schedule_create_task_assigned_to_me_from_others_subscription_task(task, adviser_id)

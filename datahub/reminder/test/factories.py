@@ -90,6 +90,8 @@ class UpcomingEstimatedLandDateReminderFactory(BaseReminderFactory):
 
 
 class UpcomingTaskReminderFactory(BaseReminderFactory):
+    task = factory.SubFactory(TaskFactory)
+
     class Meta:
         model = UpcomingTaskReminder
 

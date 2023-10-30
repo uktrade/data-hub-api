@@ -162,6 +162,7 @@ class TestTaskReminders:
             'datahub.task.tasks.advisory_lock',
             mock_advisory_lock,
         )
+        mock_notify_adviser_by_rq_email.reset_mock()
 
         generate_reminders_upcoming_tasks()
         expected_messages = (
@@ -265,6 +266,7 @@ class TestTaskReminders:
         ).first()
         subscription.email_reminders_enabled = False
         subscription.save()
+        mock_notify_adviser_by_rq_email.reset_mock()
 
         template_id = str(uuid4())
         with override_settings(
@@ -302,6 +304,7 @@ class TestTaskReminders:
         ).first()
         subscription.email_reminders_enabled = False
         subscription.save()
+        mock_notify_adviser_by_rq_email.reset_mock()
 
         template_id = str(uuid4())
         with override_settings(
@@ -332,6 +335,7 @@ class TestTaskReminders:
             adviser,
         )
         task_due = investment_project_factory_due_on_date(1, advisers=[adviser])
+        mock_notify_adviser_by_rq_email.reset_mock()
 
         template_id = str(uuid4())
         with override_settings(
@@ -417,7 +421,7 @@ def mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_i
             'task_title': task.title,
             'modified_by': task.modified_by.name,
             'company_name': task.get_company(),
-            'task_due_date': task.due_date,
+            'task_due_date': task.due_date.strftime('%-d %B %Y') if task.due_date else '',
             'task_url': task.get_absolute_url(),
         },
         update_task=update_task_assigned_to_me_from_others_email_status,
@@ -519,7 +523,27 @@ class TestTasksAssignedToMeFromOthers:
         with override_settings(
             TASK_NOTIFICATION_FROM_OTHERS_TEMPLATE_ID=template_id,
         ):
-            task = TaskFactory(advisers=[adviser])
+            task = TaskFactory(advisers=[adviser], due_date=datetime.date.today())
+            mock_notify_adviser_by_rq_email.assert_has_calls(
+                [
+                    mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_id),
+                ],
+            )
+
+    def test_email_sent_for_adviser_with_no_subscription_set_and_no_due_date(
+        self,
+        adviser_tasks_user_feature_flag,
+        mock_notify_adviser_by_rq_email,
+    ):
+        # create a task and assign an adviser
+        adviser = AdviserFactory()
+        adviser = add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
+
+        template_id = str(uuid4())
+        with override_settings(
+            TASK_NOTIFICATION_FROM_OTHERS_TEMPLATE_ID=template_id,
+        ):
+            task = TaskFactory(advisers=[adviser], due_date=None)
             mock_notify_adviser_by_rq_email.assert_has_calls(
                 [
                     mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_id),
@@ -541,7 +565,7 @@ class TestTasksAssignedToMeFromOthers:
         with override_settings(
             TASK_NOTIFICATION_FROM_OTHERS_TEMPLATE_ID=template_id,
         ):
-            task = TaskFactory(advisers=[adviser])
+            task = TaskFactory(advisers=[adviser], due_date=datetime.date.today())
             mock_notify_adviser_by_rq_email.assert_has_calls(
                 [
                     mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_id),
@@ -568,10 +592,45 @@ class TestTasksAssignedToMeFromOthers:
     def test_task_assigned_to_me_from_others_email_not_sent_if_feature_flag_not_enabled(
         self,
     ):
-        # create a task and assign an adviser
         adviser = AdviserFactory()
         task = TaskFactory(advisers=[adviser])
 
         response = notify_adviser_added_to_task(task, adviser.id)
+
+        assert response is None
+
+    def test_task_assigned_to_me_from_others_reminder_email_status(
+        self,
+    ):
+        """
+        Test it updates reminder data with the connected email notification information.
+        """
+        task = TaskFactory()
+        reminder_number = 3
+        notification_id = str(uuid4())
+        reminders = TaskAssignedToMeFromOthersReminderFactory.create_batch(
+            reminder_number,
+            task_id=task.id,
+        )
+
+        update_task_assigned_to_me_from_others_email_status(
+            notification_id,
+            [reminder.id for reminder in reminders],
+        )
+
+        task2 = TaskFactory()
+        TaskAssignedToMeFromOthersReminderFactory.create_batch(2, task_id=task2.id)
+
+        linked_reminders = TaskAssignedToMeFromOthersReminder.objects.filter(
+            email_notification_id=notification_id,
+        )
+        assert linked_reminders.count() == (reminder_number)
+
+    def test_task_assigned_to_me_from_others_notification_returns_if_adviser_id_not_correct(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser])
+        random_id = str(uuid4())
+
+        response = notify_adviser_added_to_task(task, random_id)
 
         assert response is None
