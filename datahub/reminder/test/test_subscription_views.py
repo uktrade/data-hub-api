@@ -16,9 +16,9 @@ from datahub.reminder.test.factories import (
     NoRecentExportInteractionSubscriptionFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
     TaskAssignedToMeFromOthersSubscriptionFactory,
+    TaskOverdueSubscriptionFactory,
     UpcomingEstimatedLandDateSubscriptionFactory,
     UpcomingTaskReminderSubscriptionFactory,
-    TaskOverdueSubscriptionFactory,
 )
 
 

@@ -14,9 +14,9 @@ from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
+    TaskOverdueSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
-    TaskOverdueSubscription,
 )
 from datahub.reminder.tasks import notify_adviser_by_rq_email
 from datahub.task.models import Task

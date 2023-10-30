@@ -27,11 +27,11 @@ from datahub.reminder.models import (
     NoRecentInvestmentInteractionSubscription,
     ReminderStatus,
     TaskAssignedToMeFromOthersSubscription,
+    TaskOverdueSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
-    TaskOverdueSubscription,
 )
 from datahub.reminder.serializers import (
     NewExportInteractionReminderSerializer,
@@ -41,11 +41,11 @@ from datahub.reminder.serializers import (
     NoRecentInvestmentInteractionReminderSerializer,
     NoRecentInvestmentInteractionSubscriptionSerializer,
     TaskAssignedToMeFromOthersSubscriptionSerializer,
+    TaskOverdueSubscriptionSerializer,
     UpcomingEstimatedLandDateReminderSerializer,
     UpcomingEstimatedLandDateSubscriptionSerializer,
     UpcomingTaskReminderSerializer,
     UpcomingTaskReminderSubscriptionSerializer,
-    TaskOverdueSubscriptionSerializer,
 )
 
 

@@ -9,11 +9,11 @@ from datahub.reminder.views import (
     NoRecentInvestmentInteractionSubscriptionViewset,
     reminder_subscription_summary_view,
     reminder_summary_view,
+    TaskOverdueSubscriptionViewset,
     UpcomingEstimatedLandDateReminderViewset,
     UpcomingEstimatedLandDateSubscriptionViewset,
     UpcomingTaskReminderSubscriptionViewset,
     UpcomingTaskReminderViewset,
-    TaskOverdueSubscriptionViewset,
 )
 
 urlpatterns = [
