@@ -11,6 +11,7 @@ from datahub.reminder import (
     INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
 )
 from datahub.reminder.test.factories import (
+    BaseSubscriptionFactory,
     NewExportInteractionSubscriptionFactory,
     NoRecentExportInteractionSubscriptionFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
@@ -42,12 +43,9 @@ def export_notifications_user_feature_group():
     )
 
 
-class TestNoRecentInvestmentInteractionSubscriptionViewset(APITestMixin):
-    """
-    Tests for the no recent investment interation subscription view.
-    """
-
-    url_name = 'api-v4:reminder:no-recent-investment-interaction-subscription'
+class SubscriptionViewsetTestMixin(APITestMixin):
+    url_name = None
+    factory = BaseSubscriptionFactory
 
     def test_not_authed(self):
         """Should return Unauthorised"""
@@ -68,7 +66,7 @@ class TestNoRecentInvestmentInteractionSubscriptionViewset(APITestMixin):
 
     def test_get_subscription(self):
         """Given an existing subscription, those details should be returned"""
-        NoRecentInvestmentInteractionSubscriptionFactory(
+        self.factory(
             adviser=self.user,
             reminder_days=[10, 20, 40],
             email_reminders_enabled=True,
@@ -83,7 +81,7 @@ class TestNoRecentInvestmentInteractionSubscriptionViewset(APITestMixin):
 
     def test_patch_existing_subscription(self):
         """Patching the subscription will update an existing subscription"""
-        NoRecentInvestmentInteractionSubscriptionFactory(
+        self.factory(
             adviser=self.user,
             reminder_days=[10, 20, 40],
             email_reminders_enabled=True,
@@ -97,21 +95,6 @@ class TestNoRecentInvestmentInteractionSubscriptionViewset(APITestMixin):
             'email_reminders_enabled': False,
         }
 
-    def test_400_patch_existing_subscription_duplicate_days(self):
-        """Patching the subscription will update an existing subscription"""
-        NoRecentInvestmentInteractionSubscriptionFactory(
-            adviser=self.user,
-            reminder_days=[10, 20, 40],
-            email_reminders_enabled=True,
-        )
-        url = reverse(self.url_name)
-        data = {'reminder_days': [15, 15], 'email_reminders_enabled': False}
-        response = self.api_client.patch(url, data)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            'reminder_days': ['Duplicate reminder days are not allowed [15]'],
-        }
-
     def test_patch_subscription_no_existing(self):
         """Patching the subscription will create one if it didn't exist already"""
         url = reverse(self.url_name)
@@ -122,6 +105,26 @@ class TestNoRecentInvestmentInteractionSubscriptionViewset(APITestMixin):
         assert response.json() == {
             'reminder_days': [15],
             'email_reminders_enabled': False,
+        }
+
+
+class SubscriptionWithReminderValidationViewsetTestMixin(APITestMixin):
+    url_name = None
+    factory = BaseSubscriptionFactory
+
+    def test_400_patch_existing_subscription_duplicate_days(self):
+        """Patching the subscription will update an existing subscription"""
+        self.factory(
+            adviser=self.user,
+            reminder_days=[10, 20, 40],
+            email_reminders_enabled=True,
+        )
+        url = reverse(self.url_name)
+        data = {'reminder_days': [15, 15], 'email_reminders_enabled': False}
+        response = self.api_client.patch(url, data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'reminder_days': ['Duplicate reminder days are not allowed [15]'],
         }
 
     def test_400_patch_subscription_no_existing_duplicate_days(self):
@@ -136,235 +139,67 @@ class TestNoRecentInvestmentInteractionSubscriptionViewset(APITestMixin):
         }
 
 
-class TestUpcomingEstimatedLandDateSubscriptionViewset(APITestMixin):
+class TestNoRecentInvestmentInteractionSubscriptionViewset(
+    SubscriptionViewsetTestMixin,
+    SubscriptionWithReminderValidationViewsetTestMixin,
+    APITestMixin,
+):
+    """
+    Tests for the no recent investment interation subscription view.
+    """
+
+    url_name = 'api-v4:reminder:no-recent-investment-interaction-subscription'
+    factory = NoRecentInvestmentInteractionSubscriptionFactory
+
+
+class TestUpcomingEstimatedLandDateSubscriptionViewset(
+    SubscriptionViewsetTestMixin,
+    APITestMixin,
+):
     """
     Tests for the upcoming estimated land date subscription view.
     """
 
     url_name = 'api-v4:reminder:estimated-land-date-subscription'
-
-    def test_not_authed(self):
-        """Should return Unauthorised"""
-        url = reverse(self.url_name)
-        api_client = APIClient()
-        response = api_client.get(url)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_get_subscription_not_present(self):
-        """Given the current user does not have a subscription, make an empty one"""
-        url = reverse(self.url_name)
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'reminder_days': [],
-            'email_reminders_enabled': False,
-        }
-
-    def test_get_subscription(self):
-        """Given an existing subscription, those details should be returned"""
-        UpcomingEstimatedLandDateSubscriptionFactory(
-            adviser=self.user,
-            reminder_days=[10, 20, 40],
-            email_reminders_enabled=True,
-        )
-        url = reverse(self.url_name)
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'reminder_days': [10, 20, 40],
-            'email_reminders_enabled': True,
-        }
-
-    def test_patch_existing_subscription(self):
-        """Patching the subscription will update an existing subscription"""
-        UpcomingEstimatedLandDateSubscriptionFactory(
-            adviser=self.user,
-            reminder_days=[10, 20, 40],
-            email_reminders_enabled=True,
-        )
-        url = reverse(self.url_name)
-        data = {'reminder_days': [15, 30], 'email_reminders_enabled': False}
-        response = self.api_client.patch(url, data)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'reminder_days': [15, 30],
-            'email_reminders_enabled': False,
-        }
-
-    def test_patch_subscription_no_existing(self):
-        """Patching the subscription will create one if it didn't exist already"""
-        url = reverse(self.url_name)
-        data = {'reminder_days': [15]}
-        response = self.api_client.patch(url, data)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'reminder_days': [15],
-            'email_reminders_enabled': False,
-        }
+    factory = UpcomingEstimatedLandDateSubscriptionFactory
 
 
-class TestNoRecentExportInteractionSubscriptionViewset(APITestMixin):
+class TestNoRecentExportInteractionSubscriptionViewset(
+    SubscriptionViewsetTestMixin,
+    SubscriptionWithReminderValidationViewsetTestMixin,
+    APITestMixin,
+):
     """
     Tests for the no recent export interaction subscription view.
     """
 
     url_name = 'api-v4:reminder:no-recent-export-interaction-subscription'
-
-    def test_not_authed(self):
-        """Should return Unauthorised"""
-        url = reverse(self.url_name)
-        api_client = APIClient()
-        response = api_client.get(url)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_get_subscription_not_present(self):
-        """Given the current user does not have a subscription, make an empty one"""
-        url = reverse(self.url_name)
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'reminder_days': [],
-            'email_reminders_enabled': False,
-        }
-
-    def test_get_subscription(self):
-        """Given an existing subscription, those details should be returned"""
-        NoRecentExportInteractionSubscriptionFactory(
-            adviser=self.user,
-            reminder_days=[10, 20, 40],
-            email_reminders_enabled=True,
-        )
-        url = reverse(self.url_name)
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'reminder_days': [10, 20, 40],
-            'email_reminders_enabled': True,
-        }
-
-    def test_patch_existing_subscription(self):
-        """Patching the subscription will update an existing subscription"""
-        NoRecentExportInteractionSubscriptionFactory(
-            adviser=self.user,
-            reminder_days=[10, 20, 40],
-            email_reminders_enabled=True,
-        )
-        url = reverse(self.url_name)
-        data = {'reminder_days': [15, 30], 'email_reminders_enabled': False}
-        response = self.api_client.patch(url, data)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'reminder_days': [15, 30],
-            'email_reminders_enabled': False,
-        }
-
-    def test_400_patch_existing_subscription_duplicate_days(self):
-        """Patching the subscription will update an existing subscription"""
-        NoRecentExportInteractionSubscriptionFactory(
-            adviser=self.user,
-            reminder_days=[10, 20, 40],
-            email_reminders_enabled=True,
-        )
-        url = reverse(self.url_name)
-        data = {'reminder_days': [15, 15], 'email_reminders_enabled': False}
-        response = self.api_client.patch(url, data)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            'reminder_days': ['Duplicate reminder days are not allowed [15]'],
-        }
-
-    def test_patch_subscription_no_existing(self):
-        """Patching the subscription will create one if it didn't exist already"""
-        url = reverse(self.url_name)
-        data = {'reminder_days': [15]}
-        response = self.api_client.patch(url, data)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'reminder_days': [15],
-            'email_reminders_enabled': False,
-        }
+    factory = NoRecentExportInteractionSubscriptionFactory
 
 
-class TestNewExportInteractionSubscriptionViewset(APITestMixin):
+class TestNewExportInteractionSubscriptionViewset(
+    SubscriptionViewsetTestMixin,
+    SubscriptionWithReminderValidationViewsetTestMixin,
+    APITestMixin,
+):
     """
     Tests for the no recent export interaction subscription view.
     """
 
     url_name = 'api-v4:reminder:new-export-interaction-subscription'
+    factory = NewExportInteractionSubscriptionFactory
 
-    def test_not_authed(self):
-        """Should return Unauthorised"""
-        url = reverse(self.url_name)
-        api_client = APIClient()
-        response = api_client.get(url)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_get_subscription_not_present(self):
-        """Given the current user does not have a subscription, make an empty one"""
-        url = reverse(self.url_name)
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'reminder_days': [],
-            'email_reminders_enabled': False,
-        }
+class TestUpcomingTaskReminderSubscriptionViewset(
+    SubscriptionViewsetTestMixin,
+    APITestMixin,
+):
+    """
+    Tests for the upcoming task reminder subscription view.
+    """
 
-    def test_get_subscription(self):
-        """Given an existing subscription, those details should be returned"""
-        NewExportInteractionSubscriptionFactory(
-            adviser=self.user,
-            reminder_days=[10, 20, 40],
-            email_reminders_enabled=True,
-        )
-        url = reverse(self.url_name)
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'reminder_days': [10, 20, 40],
-            'email_reminders_enabled': True,
-        }
-
-    def test_patch_existing_subscription(self):
-        """Patching the subscription will update an existing subscription"""
-        NewExportInteractionSubscriptionFactory(
-            adviser=self.user,
-            reminder_days=[10, 20, 40],
-            email_reminders_enabled=True,
-        )
-        url = reverse(self.url_name)
-        data = {'reminder_days': [15, 30], 'email_reminders_enabled': False}
-        response = self.api_client.patch(url, data)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'reminder_days': [15, 30],
-            'email_reminders_enabled': False,
-        }
-
-    def test_400_patch_existing_subscription_duplicate_days(self):
-        """Patching the subscription will update an existing subscription"""
-        NewExportInteractionSubscriptionFactory(
-            adviser=self.user,
-            reminder_days=[10, 20, 40],
-            email_reminders_enabled=True,
-        )
-        url = reverse(self.url_name)
-        data = {'reminder_days': [15, 15], 'email_reminders_enabled': False}
-        response = self.api_client.patch(url, data)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            'reminder_days': ['Duplicate reminder days are not allowed [15]'],
-        }
-
-    def test_patch_subscription_no_existing(self):
-        """Patching the subscription will create one if it didn't exist already"""
-        url = reverse(self.url_name)
-        data = {'reminder_days': [15]}
-        response = self.api_client.patch(url, data)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'reminder_days': [15],
-            'email_reminders_enabled': False,
-        }
+    url_name = 'api-v4:reminder:my-tasks-due-date-approaching-subscription'
+    factory = UpcomingTaskReminderSubscriptionFactory
 
 
 class TestGetReminderSubscriptionSummaryView(APITestMixin):
