@@ -31,6 +31,7 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
+    TaskOverdueSubscription,
 )
 from datahub.reminder.serializers import (
     NewExportInteractionReminderSerializer,
@@ -44,6 +45,7 @@ from datahub.reminder.serializers import (
     UpcomingEstimatedLandDateSubscriptionSerializer,
     UpcomingTaskReminderSerializer,
     UpcomingTaskReminderSubscriptionSerializer,
+    TaskOverdueSubscriptionSerializer,
 )
 
 
@@ -89,6 +91,11 @@ class UpcomingTaskReminderSubscriptionViewset(BaseSubscriptionViewset):
     queryset = UpcomingTaskReminderSubscription.objects.all()
 
 
+class TaskOverdueSubscriptionViewset(BaseSubscriptionViewset):
+    serializer_class = TaskOverdueSubscriptionSerializer
+    queryset = TaskOverdueSubscription.objects.all()
+
+
 @transaction.non_atomic_requests
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -124,6 +131,9 @@ def reminder_subscription_summary_view(request):
     task_assigned_to_me_from_others = TaskAssignedToMeFromOthersSubscriptionSerializer(
         get_object(TaskAssignedToMeFromOthersSubscription.objects.all()),
     ).data
+    task_overdue = TaskOverdueSubscriptionSerializer(
+        get_object(TaskOverdueSubscription.objects.all()),
+    ).data
 
     return Response(
         {
@@ -133,6 +143,7 @@ def reminder_subscription_summary_view(request):
             'new_export_interaction': new_export_interaction,
             'upcoming_task_reminder': upcoming_task_reminder,
             'task_assigned_to_me_from_others': task_assigned_to_me_from_others,
+            'task_overdue': task_overdue,
         },
     )
 
