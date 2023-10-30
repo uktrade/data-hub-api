@@ -71,7 +71,7 @@ class BaseDatasetViewTest:
 
     @mock.patch('datahub.dataset.core.pagination.DatasetCursorPagination.max_page_size', 2)
     def test_pagination_respects_max_page_size(self, data_flow_api_client):
-        """Test that pagination conrolled by the client cannot bypass our own max page size"""
+        """Test that pagination controlled by the client cannot bypass our own max page size"""
         self.factory.create_batch(2)
         response_for_page_size_1 = data_flow_api_client.get(self.view_url, params={'page_size': 1})
         response_for_page_size_10 = data_flow_api_client.get(
