@@ -66,6 +66,7 @@ class CompaniesDatasetView(BaseDatasetView):
             'vat_number',
             'website',
             'is_out_of_business',
+            'strategy',
         )
 
     def _enrich_data(self, dataset):
