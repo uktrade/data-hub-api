@@ -15,11 +15,11 @@ from datahub.reminder.models import (
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
     TaskAssignedToMeFromOthersSubscription,
+    TaskOverdueSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
-    TaskOverdueSubscription,
 )
 from datahub.task.models import Task
 from datahub.task.serializers import (

@@ -13,11 +13,11 @@ from datahub.reminder.models import (
     NoRecentInvestmentInteractionSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
+    TaskOverdueSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
-    TaskOverdueSubscription,
 )
 from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
 

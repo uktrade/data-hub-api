@@ -10,11 +10,11 @@ from datahub.reminder.models import (
     NoRecentInvestmentInteractionSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
+    TaskOverdueSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
-    TaskOverdueSubscription,
 )
 
 
