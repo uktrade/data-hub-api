@@ -73,3 +73,8 @@ registry.register(
     metadata_id='hvo-programmes',
     model=models.HVOProgrammes,
 )
+
+registry.register(
+    metadata_id='associated-programme',
+    model=models.AssociatedProgramme,
+)
