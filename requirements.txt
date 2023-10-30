@@ -18,9 +18,9 @@ attrs==22.2.0
     # via aiohttp
 bigtree==0.14.2
     # via -r requirements.in
-boto3==1.28.68
+boto3==1.28.73
     # via -r requirements.in
-botocore==1.31.68
+botocore==1.31.73
     # via
     #   boto3
     #   s3transfer
