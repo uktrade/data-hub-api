@@ -120,3 +120,10 @@ class HQTeamRegionOrPostSerializer(ConstantModelSerializer):
     """HQ team region or post serializer."""
 
     team_type = NestedRelatedField(TeamType, read_only=True)
+
+
+class HVCSerializer(ConstantModelSerializer):
+    """HVC serializer."""
+
+    campaign_id = serializers.ReadOnlyField()
+    financial_year = serializers.ReadOnlyField()
