@@ -8,6 +8,7 @@ from datahub.reminder.models import (
     NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
+    TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
@@ -101,3 +102,10 @@ class InvestmentProjectTaskTaskAssignedToMeFromOthersReminderAdmin(admin.ModelAd
         'adviser',
         'investment_project_task',
     )
+
+
+@admin.register(TaskAssignedToMeFromOthersReminder)
+class TaskAssignedToMeFromOthersReminderAdmin(admin.ModelAdmin):
+    """Task assigned to me from others admin."""
+
+    raw_id_fields = ('adviser',)
