@@ -19,7 +19,6 @@ from datahub.reminder import (
 )
 from datahub.reminder.models import (
     InvestmentProjectTaskTaskAssignedToMeFromOthersReminder as TaskAssignedToMeFromOthersReminder,
-    TaskAssignedToMeFromOthersSubscription,
     NewExportInteractionReminder,
     NewExportInteractionSubscription,
     NoRecentExportInteractionReminder,
@@ -27,6 +26,7 @@ from datahub.reminder.models import (
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
     ReminderStatus,
+    TaskAssignedToMeFromOthersSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
     UpcomingTaskReminder,
@@ -249,7 +249,7 @@ def reminder_summary_view(request):
             },
             'my_tasks': {
                 'due_date_approaching': task_due_date_approaching,
-                'task_assigned_to_me_from_others': task_assigned_to_me_from_others
+                'task_assigned_to_me_from_others': task_assigned_to_me_from_others,
             },
         },
     )
