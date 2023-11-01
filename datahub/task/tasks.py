@@ -219,9 +219,9 @@ def notify_adviser_added_to_task(task, adviser_id):
         event=f'{task} assigned to me by {task.modified_by.name}',
         task=task,
     )
-    send_email = create_task_assigned_to_me_from_others_subscription(adviser)
+    task_subscription = create_task_assigned_to_me_from_others_subscription(adviser)
 
-    if send_email.email_reminders_enabled is True and is_user_feature_flag_active(
+    if task_subscription.email_reminders_enabled is True and is_user_feature_flag_active(
         ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
         adviser,
     ):

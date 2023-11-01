@@ -414,9 +414,7 @@ def mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_i
     )
     reminder.id = ANY
     reminder.pk = ANY
-    print('******', task)
-    print('******', task.get_company())
-    print('******', task.get_company().name)
+
     return mock.call(
         adviser=adviser,
         template_identifier=template_id,
@@ -526,10 +524,21 @@ class TestTasksAssignedToMeFromOthers:
         with override_settings(
             TASK_NOTIFICATION_FROM_OTHERS_TEMPLATE_ID=template_id,
         ):
-            task = TaskFactory(advisers=[adviser], due_date=datetime.date.today())
+            investment_project_task = InvestmentProjectTaskFactory(
+                task=TaskFactory(advisers=[adviser], due_date=datetime.date.today()),
+            )
+            notify_adviser_added_to_task(
+                investment_project_task.task,
+                adviser.id,
+            )
+
             mock_notify_adviser_by_rq_email.assert_has_calls(
                 [
-                    mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_id),
+                    mock_notify_adviser_task_assigned_from_others_call(
+                        investment_project_task.task,
+                        adviser,
+                        template_id,
+                    ),
                 ],
             )
 
@@ -546,10 +555,22 @@ class TestTasksAssignedToMeFromOthers:
         with override_settings(
             TASK_NOTIFICATION_FROM_OTHERS_TEMPLATE_ID=template_id,
         ):
-            task = TaskFactory(advisers=[adviser], due_date=None)
+            investment_project_task = InvestmentProjectTaskFactory(
+                task=TaskFactory(advisers=[adviser], due_date=datetime.date.today()),
+            )
+
+            notify_adviser_added_to_task(
+                investment_project_task.task,
+                adviser.id,
+            )
+
             mock_notify_adviser_by_rq_email.assert_has_calls(
                 [
-                    mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_id),
+                    mock_notify_adviser_task_assigned_from_others_call(
+                        investment_project_task.task,
+                        adviser,
+                        template_id,
+                    ),
                 ],
             )
 
@@ -569,13 +590,20 @@ class TestTasksAssignedToMeFromOthers:
             TASK_NOTIFICATION_FROM_OTHERS_TEMPLATE_ID=template_id,
         ):
             investment_project_task = InvestmentProjectTaskFactory(
-                task=TaskFactory(advisers=[adviser], due_date=datetime.date.today())
+                task=TaskFactory(advisers=[adviser], due_date=datetime.date.today()),
             )
-            # task = TaskFactory(advisers=[adviser], due_date=datetime.date.today())
+
+            notify_adviser_added_to_task(
+                investment_project_task.task,
+                adviser.id,
+            )
+
             mock_notify_adviser_by_rq_email.assert_has_calls(
                 [
                     mock_notify_adviser_task_assigned_from_others_call(
-                        investment_project_task.task, adviser, template_id
+                        investment_project_task.task,
+                        adviser,
+                        template_id,
                     ),
                 ],
             )

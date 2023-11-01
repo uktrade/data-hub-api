@@ -4,7 +4,7 @@ import factory.fuzzy
 
 from django.utils.timezone import now
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory
+from datahub.company.test.factories import AdviserFactory
 from datahub.core.test.factories import to_many_field
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.task.models import InvestmentProjectTask, Task
