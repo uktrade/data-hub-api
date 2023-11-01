@@ -231,8 +231,8 @@ def notify_adviser_added_to_task(task, adviser_id):
             context={
                 'task_title': task.title,
                 'modified_by': task.modified_by.name,
-                'company_name': task.get_company(),
-                'task_due_date': task.due_date.strftime('%-d %B %Y') if task.due_date else '',
+                'company_name': task.get_company().name,
+                'task_due_date': task.due_date.strftime('%-d %B %Y') if task.due_date else None,
                 'task_url': task.get_absolute_url(),
             },
             update_task=update_task_assigned_to_me_from_others_email_status,
