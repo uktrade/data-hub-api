@@ -796,7 +796,6 @@ def notify_adviser_by_rq_email(
     Note: this should replace notify_adviser_by_email as we move towards using RQ.
     """
     email_address = adviser.get_current_email()
-
     job = job_scheduler(
         function=send_email_notification_via_rq,
         function_args=(

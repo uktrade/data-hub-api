@@ -11,6 +11,7 @@ from datahub.reminder.models import (
     NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
+    TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
@@ -100,3 +101,8 @@ class InvestmentProjectTaskTaskAssignedToMeFromOthersReminderFactory(BaseReminde
 
     class Meta:
         model = InvestmentProjectTaskTaskAssignedToMeFromOthersReminder
+
+
+class TaskAssignedToMeFromOthersReminderFactory(BaseReminderFactory):
+    class Meta:
+        model = TaskAssignedToMeFromOthersReminder
