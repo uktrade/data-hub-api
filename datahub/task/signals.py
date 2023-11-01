@@ -32,7 +32,7 @@ def set_task_subscriptions_and_schedule_notifications(sender, **kwargs):
     task = kwargs.pop('instance', None)
     pk_set = kwargs.pop('pk_set', None)
     action = kwargs.pop('action', None)
-    if action == 'post_add' and pk_set != None and task != None:
+    if action == 'post_add' and pk_set is not None and task is not None:
         for adviser_id in pk_set:
             schedule_create_task_reminder_subscription_task(adviser_id)
             schedule_create_task_assigned_to_me_from_others_subscription_task(task, adviser_id)
