@@ -34,20 +34,19 @@ class TestDeleteInvestmentProjectTask:
         assert obj is None
 
 
-@pytest.mark.django_db
-class TestTaskReminderSubscription:
+class SubscriptionBaseTestMixin():
     def test_creation_of_single_adviser_subscription_on_task_creation(self):
         TaskFactory()
         adviser = AdviserFactory()
         TaskFactory(advisers=[adviser])
-        subscriptions = UpcomingTaskReminderSubscription.objects.filter(adviser=adviser)
+        subscriptions = self.subscription.objects.filter(adviser=adviser)
 
         assert subscriptions.count() == 1
 
         TaskFactory()
         TaskFactory()
         TaskFactory(advisers=[adviser])
-        subscriptions = UpcomingTaskReminderSubscription.objects.filter(adviser=adviser)
+        subscriptions = self.subscription.objects.filter(adviser=adviser)
 
         assert subscriptions.count() == 1
 
@@ -57,7 +56,7 @@ class TestTaskReminderSubscription:
         adviser2 = AdviserFactory()
         AdviserFactory()
         TaskFactory(advisers=[adviser1, adviser2])
-        subscriptions = UpcomingTaskReminderSubscription.objects.filter(
+        subscriptions = self.subscription.objects.filter(
             adviser__in=[adviser1, adviser2],
         )
 
@@ -68,7 +67,7 @@ class TestTaskReminderSubscription:
         """
         adviser3 = AdviserFactory()
         TaskFactory(advisers=[adviser1, adviser2, adviser3])
-        subscriptions = UpcomingTaskReminderSubscription.objects.filter(
+        subscriptions = self.subscription.objects.filter(
             adviser__in=[adviser1, adviser2, adviser3],
         )
 
@@ -76,83 +75,15 @@ class TestTaskReminderSubscription:
 
 
 @pytest.mark.django_db
-class TestTaskOverdueSubscription:
-    def test_creation_of_single_adviser_subscription_on_task_creation(self):
-        TaskFactory()
-        adviser = AdviserFactory()
-        TaskFactory(advisers=[adviser])
-        subscriptions = TaskOverdueSubscription.objects.filter(adviser=adviser)
-
-        assert subscriptions.count() == 1
-
-        TaskFactory()
-        TaskFactory()
-        TaskFactory(advisers=[adviser])
-        subscriptions = TaskOverdueSubscription.objects.filter(adviser=adviser)
-
-        assert subscriptions.count() == 1
-
-    def test_creation_of_multiple_adviser_subscription_on_task_creation(self):
-        TaskFactory()
-        adviser1 = AdviserFactory()
-        adviser2 = AdviserFactory()
-        AdviserFactory()
-        TaskFactory(advisers=[adviser1, adviser2])
-        subscriptions = TaskOverdueSubscription.objects.filter(
-            adviser__in=[adviser1, adviser2],
-        )
-
-        assert subscriptions.count() == 2
-
-        """
-        Test that only additional subscriptions for new advisers is created
-        """
-        adviser3 = AdviserFactory()
-        TaskFactory(advisers=[adviser1, adviser2, adviser3])
-        subscriptions = TaskOverdueSubscription.objects.filter(
-            adviser__in=[adviser1, adviser2, adviser3],
-        )
-
-        assert subscriptions.count() == 3
+class TestTaskReminderSubscription(SubscriptionBaseTestMixin):
+    subscription = UpcomingTaskReminderSubscription
 
 
 @pytest.mark.django_db
-class TestTaskAssignedToMeFromOthersSubscription:
-    def test_creation_of_single_adviser_subscription_on_task_creation(self):
-        TaskFactory()
-        adviser = AdviserFactory()
-        TaskFactory(advisers=[adviser])
-        subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(adviser=adviser)
+class TestTaskOverdueSubscription(SubscriptionBaseTestMixin):
+    subscription = TaskOverdueSubscription
 
-        assert subscriptions.count() == 1
 
-        TaskFactory()
-        TaskFactory()
-        TaskFactory(advisers=[adviser])
-        subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(adviser=adviser)
-
-        assert subscriptions.count() == 1
-
-    def test_creation_of_multiple_adviser_subscriptions_on_task_creation(self):
-        TaskFactory()
-        adviser1 = AdviserFactory()
-        adviser2 = AdviserFactory()
-        AdviserFactory()
-        AdviserFactory()
-        TaskFactory(advisers=[adviser1, adviser2])
-        subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(
-            adviser__in=[adviser1, adviser2],
-        )
-
-        assert subscriptions.count() == 2
-
-        """
-        Test that only additional subscriptions for new advisers is created
-        """
-        adviser3 = AdviserFactory()
-        TaskFactory(advisers=[adviser1, adviser2, adviser3])
-        subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(
-            adviser__in=[adviser1, adviser2, adviser3],
-        )
-
-        assert subscriptions.count() == 3
+@pytest.mark.django_db
+class TestTaskAssignedToMeFromOthersSubscription(SubscriptionBaseTestMixin):
+    subscription = TaskAssignedToMeFromOthersSubscription
