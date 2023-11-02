@@ -3,7 +3,9 @@ from django.dispatch import receiver
 
 from datahub.task.models import InvestmentProjectTask, Task
 from datahub.task.tasks import (
+    schedule_create_task_assigned_to_me_from_others_subscription_task,
     schedule_create_task_overdue_subscription_task,
+    schedule_create_task_reminder_subscription_task,
 )
 
 
