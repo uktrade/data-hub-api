@@ -1,5 +1,11 @@
 import pytest
 
+from datahub.company.test.factories import AdviserFactory
+from datahub.reminder.models import (
+    TaskAssignedToMeFromOthersSubscription,
+    TaskOverdueSubscription,
+    UpcomingTaskReminderSubscription,
+)
 from datahub.task.models import Task
 from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
 
@@ -26,3 +32,58 @@ class TestDeleteInvestmentProjectTask:
 
         obj = Task.objects.filter(pk=task_id).first()
         assert obj is None
+
+
+class SubscriptionBaseTestMixin():
+    def test_creation_of_single_adviser_subscription_on_task_creation(self):
+        TaskFactory()
+        adviser = AdviserFactory()
+        TaskFactory(advisers=[adviser])
+        subscriptions = self.subscription.objects.filter(adviser=adviser)
+
+        assert subscriptions.count() == 1
+
+        TaskFactory()
+        TaskFactory()
+        TaskFactory(advisers=[adviser])
+        subscriptions = self.subscription.objects.filter(adviser=adviser)
+
+        assert subscriptions.count() == 1
+
+    def test_creation_of_multiple_adviser_subscription_on_task_creation(self):
+        TaskFactory()
+        adviser1 = AdviserFactory()
+        adviser2 = AdviserFactory()
+        AdviserFactory()
+        TaskFactory(advisers=[adviser1, adviser2])
+        subscriptions = self.subscription.objects.filter(
+            adviser__in=[adviser1, adviser2],
+        )
+
+        assert subscriptions.count() == 2
+
+        """
+        Test that only additional subscriptions for new advisers is created
+        """
+        adviser3 = AdviserFactory()
+        TaskFactory(advisers=[adviser1, adviser2, adviser3])
+        subscriptions = self.subscription.objects.filter(
+            adviser__in=[adviser1, adviser2, adviser3],
+        )
+
+        assert subscriptions.count() == 3
+
+
+@pytest.mark.django_db
+class TestTaskReminderSubscription(SubscriptionBaseTestMixin):
+    subscription = UpcomingTaskReminderSubscription
+
+
+@pytest.mark.django_db
+class TestTaskOverdueSubscription(SubscriptionBaseTestMixin):
+    subscription = TaskOverdueSubscription
+
+
+@pytest.mark.django_db
+class TestTaskAssignedToMeFromOthersSubscription(SubscriptionBaseTestMixin):
+    subscription = TaskAssignedToMeFromOthersSubscription
