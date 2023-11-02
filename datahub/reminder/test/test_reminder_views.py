@@ -734,8 +734,8 @@ class TestGetReminderSummaryView(APITestMixin):
             adviser=self.user,
         )
 
-        myTasksCount = reminder_count * 2
-        total_reminders = reminder_count * (int(investment) * 3 + int(export) * 2) + myTasksCount
+        my_tasks_count = reminder_count * 2
+        total_reminders = reminder_count * (int(investment) * 3 + int(export) * 2) + my_tasks_count
         url = reverse(self.url_name)
         response = self.api_client.get(url)
 
