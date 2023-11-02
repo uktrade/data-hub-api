@@ -1,3 +1,5 @@
+import logging
+
 from collections import namedtuple
 from typing import Callable, NamedTuple, Sequence, Type
 
@@ -19,6 +21,7 @@ from datahub.investment.project.models import InvestmentProject
 from datahub.omis.order.models import Order
 from datahub.user.company_list.models import CompanyListItem, PipelineItem
 
+logger = logging.getLogger(__name__)
 
 # Merging is not allowed if the source company has any relations that aren't in
 # this list. This is to avoid references to the source company being inadvertently
@@ -181,21 +184,26 @@ def merge_companies(source_company: Company, target_company: Company, user):
         is_company_a_valid_merge_source(source_company)
         and is_company_a_valid_merge_target(target_company)
     ):
+        logger.error(f'MergeNotAllowedError {source_company.id} for company {target_company.id}.')
         raise MergeNotAllowedError()
 
     with reversion.create_revision():
         reversion.set_comment('Company merged')
-        results = {
-            configuration.model: _update_objects(configuration, source_company, target_company)
-            for configuration in MERGE_CONFIGURATION
-        }
+        try:
+            results = {
+                configuration.model: _update_objects(configuration, source_company, target_company)
+                for configuration in MERGE_CONFIGURATION
+            }
+        except Exception as e:
+            logger.exception(f'An error occurred while merging companies: {e}')
+            raise
 
         source_company.mark_as_transferred(
             target_company,
             Company.TransferReason.DUPLICATE,
             user,
         )
-
+        logger.info(f'Merge completed {source_company.id} for company {target_company.id}.')
         return results
 
 
@@ -221,12 +229,16 @@ def get_planned_changes(company: Company):
 
 def _update_objects(configuration: MergeConfiguration, source, target):
     """Update fields of objects from given model with the target value."""
+    logger.info(f'Updating from {configuration.model.__name__} to source company {source.id}.')
     objects_updated = {field: 0 for field in configuration.fields}
 
     for field, filtered_objects in _get_objects_from_configuration(configuration, source):
         for obj in filtered_objects.iterator():
-            configuration.object_updater(obj, field, target, source)
-            objects_updated[field] += 1
+            try:
+                configuration.object_updater(obj, field, target, source)
+                objects_updated[field] += 1
+            except Exception as e:
+                logger.exception(f'Failed {configuration.model.__name__} object {obj.pk}: {e}')
     return objects_updated
 
 
