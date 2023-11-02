@@ -23,6 +23,7 @@ from datahub.reminder.models import (
     UpcomingTaskReminder,
 )
 from datahub.reminder.test.factories import (
+    InvestmentProjectTaskTaskAssignedToMeFromOthersReminderFactory,
     NewExportInteractionReminderFactory,
     NoRecentExportInteractionReminderFactory,
     NoRecentInvestmentInteractionReminderFactory,
@@ -590,7 +591,7 @@ class TestGetReminderSummaryView(APITestMixin):
             ],
         )
         reminder_count = 3
-        reminder_categories = 6  # used for finding the total number of reminders in this test
+        reminder_categories = 7  # used for finding the total number of reminders in this test
         UpcomingEstimatedLandDateReminderFactory.create_batch(
             reminder_count,
             adviser=self.user,
@@ -625,6 +626,10 @@ class TestGetReminderSummaryView(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
+        InvestmentProjectTaskTaskAssignedToMeFromOthersReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
 
         total_reminders = reminder_count * reminder_categories
         url = reverse(self.url_name)
@@ -643,7 +648,10 @@ class TestGetReminderSummaryView(APITestMixin):
                 'new_interaction': reminder_count,
                 'no_recent_interaction': reminder_count,
             },
-            'my_tasks': {'due_date_approaching': reminder_count},
+            'my_tasks': {
+                'due_date_approaching': reminder_count,
+                'task_assigned_to_me_from_others': reminder_count,
+            },
         }
 
     def test_get_zeroes_if_no_reminders(self):
@@ -663,7 +671,10 @@ class TestGetReminderSummaryView(APITestMixin):
                 'new_interaction': 0,
                 'no_recent_interaction': 0,
             },
-            'my_tasks': {'due_date_approaching': 0},
+            'my_tasks': {
+                'due_date_approaching': 0,
+                'task_assigned_to_me_from_others': 0,
+            },
         }
 
     @pytest.mark.parametrize(
@@ -718,8 +729,13 @@ class TestGetReminderSummaryView(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
+        InvestmentProjectTaskTaskAssignedToMeFromOthersReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
 
-        total_reminders = reminder_count * (int(investment) * 3 + int(export) * 2) + reminder_count
+        myTasksCount = reminder_count * 2
+        total_reminders = reminder_count * (int(investment) * 3 + int(export) * 2) + myTasksCount
         url = reverse(self.url_name)
         response = self.api_client.get(url)
 
@@ -736,5 +752,8 @@ class TestGetReminderSummaryView(APITestMixin):
                 'new_interaction': reminder_count if export else 0,
                 'no_recent_interaction': reminder_count if export else 0,
             },
-            'my_tasks': {'due_date_approaching': reminder_count},
+            'my_tasks': {
+                'due_date_approaching': reminder_count,
+                'task_assigned_to_me_from_others': reminder_count,
+            },
         }
