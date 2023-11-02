@@ -26,6 +26,7 @@ from datahub.company.company_matching_api import (
     CompanyMatchingServiceConnectionError,
     CompanyMatchingServiceHTTPError,
     CompanyMatchingServiceTimeoutError,
+    extract_match_ids,
     match_company,
 )
 from datahub.company.export_wins_api import (
@@ -553,24 +554,6 @@ class ExportWinsForCompanyView(APIView):
         ),
     )
 
-    def _extract_match_ids(self, response):
-        """
-        Extracts match id out of company matching response.
-        {
-            'matches': [
-                {
-                    'id': '',
-                    'match_id': 1234,
-                    'similarity': '100000'
-                },
-            ]
-        }
-        """
-        matches = response.json().get('matches', [])
-
-        match_ids = [match['match_id'] for match in matches if match.get('match_id', None)]
-        return match_ids
-
     def _get_company(self, company_pk):
         """
         Returns the company for given pk
@@ -591,7 +574,7 @@ class ExportWinsForCompanyView(APIView):
             companies.append(company)
 
         matching_response = match_company(companies, request)
-        return self._extract_match_ids(matching_response)
+        return extract_match_ids(matching_response.json().get('matches', []))
 
     def get(self, request, pk):
         """

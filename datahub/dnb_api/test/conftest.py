@@ -135,6 +135,8 @@ def base_company_dict():
         'duns_number': None,
         'export_potential': None,
         'export_to_countries': [],
+        'export_win_last_matched_on': None,
+        'export_win_match_id': None,
         'future_interest_countries': [],
         'global_headquarters': None,
         'global_ultimate_duns_number': None,

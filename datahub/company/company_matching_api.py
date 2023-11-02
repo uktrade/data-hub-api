@@ -2,8 +2,10 @@ import logging
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.timezone import now
 from requests.exceptions import HTTPError, Timeout
 
+from datahub.company.models import Company
 from datahub.core.api_client import APIClient, HawkAuth
 from datahub.core.exceptions import APIBadGatewayException
 
@@ -130,3 +132,36 @@ def match_company(companies, request=None):
         )
         raise CompanyMatchingServiceHTTPError(error_message) from exc
     return response
+
+
+def extract_match_ids(response_json):
+    """
+    Extracts match id out of company matching response.
+    {
+        'matches': [
+            {
+                'id': '',
+                'match_id': 1234,
+                'similarity': '100000'
+            },
+        ]
+    }
+    """
+    match_ids = [match['match_id'] for match in response_json if match.get('match_id', None)]
+    return match_ids
+
+
+def bulk_match_not_matched_companies(length=100):
+    """Match companies using Company Matching service and store closest match_id."""
+    companies = Company.objects.filter(export_win_last_matched_on__isnull=True)
+
+    for company in companies[:length]:
+        companies_to_match = [company]
+        for transferred_from_company in company.transferred_from.all():
+            companies_to_match.append(transferred_from_company)
+        matching_response = match_company(companies_to_match)
+        match_ids = extract_match_ids(matching_response.json().get('matches', []))
+        if len(match_ids):
+            company.export_win_match_id = match_ids[0]
+        company.export_win_last_matched_on = now()
+        company.save()
