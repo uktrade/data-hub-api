@@ -14,6 +14,7 @@ from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
+    TaskOverdueSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
 )
@@ -237,4 +238,26 @@ def notify_adviser_added_to_task(task, adviser_id):
             },
             update_task=update_task_assigned_to_me_from_others_email_status,
             reminders=[reminder],
+        )
+
+
+def schedule_create_task_overdue_subscription_task(adviser_id):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=create_task_overdue_subscription_task,
+        function_args=(adviser_id,),
+    )
+    logger.info(
+        f'Task {job.id} create_task_overdue_subscription_task',
+    )
+
+
+def create_task_overdue_subscription_task(adviser_id):
+    """
+    Creates a task overdue subscription for an adviser if the adviser doesn't have
+    a subscription already.
+    """
+    if not TaskOverdueSubscription.objects.filter(adviser_id=adviser_id).first():
+        TaskOverdueSubscription.objects.create(
+            adviser_id=adviser_id, email_reminders_enabled=True,
         )

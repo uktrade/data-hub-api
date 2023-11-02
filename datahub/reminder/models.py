@@ -82,6 +82,12 @@ class TaskAssignedToMeFromOthersSubscription(BaseSubscription):
     """
 
 
+class TaskOverdueSubscription(BaseSubscription, ScheduledSubscription):
+    """
+    Subscription to get reminders about overdue tasks.
+    """
+
+
 class EmailDeliveryStatus(models.TextChoices):
     SENDING = ('sending', 'Sending')
     DELIVERED = ('delivered', 'Delivered')

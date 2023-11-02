@@ -9,6 +9,7 @@ from datahub.reminder.views import (
     NoRecentInvestmentInteractionSubscriptionViewset,
     reminder_subscription_summary_view,
     reminder_summary_view,
+    TaskOverdueSubscriptionViewset,
     UpcomingEstimatedLandDateReminderViewset,
     UpcomingEstimatedLandDateSubscriptionViewset,
     UpcomingTaskReminderSubscriptionViewset,
@@ -160,6 +161,16 @@ urlpatterns = [
             },
         ),
         name='my-tasks-due-date-approaching-subscription',
+    ),
+    path(
+        'reminder/subscription/my-tasks-task-overdue',
+        TaskOverdueSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
+        name='my-tasks-task-overdue-subscription',
     ),
     path(
         'reminder/summary',

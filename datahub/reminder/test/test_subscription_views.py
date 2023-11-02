@@ -16,6 +16,7 @@ from datahub.reminder.test.factories import (
     NoRecentExportInteractionSubscriptionFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
     TaskAssignedToMeFromOthersSubscriptionFactory,
+    TaskOverdueSubscriptionFactory,
     UpcomingEstimatedLandDateSubscriptionFactory,
     UpcomingTaskReminderSubscriptionFactory,
 )
@@ -145,7 +146,7 @@ class TestNoRecentInvestmentInteractionSubscriptionViewset(
     APITestMixin,
 ):
     """
-    Tests for the no recent investment interation subscription view.
+    Tests for the no recent investment interaction subscription view.
     """
 
     url_name = 'api-v4:reminder:no-recent-investment-interaction-subscription'
@@ -202,6 +203,18 @@ class TestUpcomingTaskReminderSubscriptionViewset(
     factory = UpcomingTaskReminderSubscriptionFactory
 
 
+class TestTaskOverdueReminderSubscriptionViewset(
+    SubscriptionViewsetTestMixin,
+    APITestMixin,
+):
+    """
+    Tests for the task overdue reminder subscription view.
+    """
+
+    url_name = 'api-v4:reminder:my-tasks-task-overdue-subscription'
+    factory = TaskOverdueSubscriptionFactory
+
+
 class TestGetReminderSubscriptionSummaryView(APITestMixin):
     """
     Tests for the reminder subscription summary view.
@@ -250,6 +263,11 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             adviser=self.user,
             email_reminders_enabled=email_reminders_enabled,
         )
+        TaskOverdueSubscriptionFactory(
+            adviser=self.user,
+            reminder_days=reminder_days,
+            email_reminders_enabled=email_reminders_enabled,
+        )
 
         url = reverse(self.url_name)
         response = self.api_client.get(url)
@@ -278,6 +296,10 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             },
             'task_assigned_to_me_from_others': {
                 'email_reminders_enabled': True,
+            },
+            'task_overdue': {
+                'email_reminders_enabled': True,
+                'reminder_days': [10, 20, 40],
             },
         }
 
@@ -310,5 +332,9 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             },
             'task_assigned_to_me_from_others': {
                 'email_reminders_enabled': False,
+            },
+            'task_overdue': {
+                'email_reminders_enabled': False,
+                'reminder_days': [],
             },
         }
