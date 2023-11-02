@@ -2,6 +2,7 @@ import pytest
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
+from freezegun import freeze_time
 from requests.exceptions import (
     ConnectionError,
     ConnectTimeout,
@@ -11,12 +12,14 @@ from requests.exceptions import (
 from rest_framework import status
 
 from datahub.company.company_matching_api import (
+    bulk_match_not_matched_companies,
     CompanyMatchingServiceConnectionError,
     CompanyMatchingServiceHTTPError,
     CompanyMatchingServiceTimeoutError,
     match_company,
 )
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.models import Company
+from datahub.company.test.factories import CompanyFactory, DuplicateCompanyFactory
 from datahub.core.test_utils import APITestMixin, HawkMockJSONResponse
 
 
@@ -167,3 +170,72 @@ class TestCompanyMatchingApi(APITestMixin):
             match=f'The Company matching service returned an error status: {response_status}',
         ):
             match_company([company])
+
+
+@pytest.mark.django_db
+def test_bulk_match_not_matched_companies(requests_mock):
+    """Test that result of match is stored with the company."""
+    company_matching_reponse = {
+        'matches': [
+            {
+                'id': 1,
+                'match_id': match_id,
+                'similarity': '100000',
+            }
+            for match_id in [1, 2]
+        ],
+    }
+
+    dynamic_response = HawkMockJSONResponse(
+        api_id=settings.COMPANY_MATCHING_HAWK_ID,
+        api_key=settings.COMPANY_MATCHING_HAWK_KEY,
+        response=company_matching_reponse,
+    )
+    matcher = requests_mock.post(
+        '/api/v1/company/match/',
+        status_code=status.HTTP_200_OK,
+        text=dynamic_response,
+    )
+    DuplicateCompanyFactory.create_batch(5)
+
+    with freeze_time() as frozen_datetime:
+        bulk_match_not_matched_companies(length=2)
+
+        assert matcher.call_count == 2
+
+        matched = Company.objects.filter(
+            export_win_match_id=1,
+            export_win_last_matched_on=frozen_datetime(),
+        )
+        assert matched.count() == 2
+
+
+@pytest.mark.django_db
+def test_bulk_match_not_matched_companies_no_match(requests_mock):
+    """Test that last match date is set when there are no matches."""
+    company_matching_reponse = {
+        'matches': [],
+    }
+
+    dynamic_response = HawkMockJSONResponse(
+        api_id=settings.COMPANY_MATCHING_HAWK_ID,
+        api_key=settings.COMPANY_MATCHING_HAWK_KEY,
+        response=company_matching_reponse,
+    )
+    matcher = requests_mock.post(
+        '/api/v1/company/match/',
+        status_code=status.HTTP_200_OK,
+        text=dynamic_response,
+    )
+    CompanyFactory.create_batch(5)
+
+    with freeze_time() as frozen_datetime:
+        bulk_match_not_matched_companies(length=2)
+
+        assert matcher.call_count == 2
+
+        matched = Company.objects.filter(
+            export_win_match_id__isnull=True,
+            export_win_last_matched_on=frozen_datetime(),
+        )
+        assert matched.count() == 2
