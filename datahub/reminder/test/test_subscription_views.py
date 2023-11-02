@@ -276,6 +276,9 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
                 'email_reminders_enabled': True,
                 'reminder_days': [10, 20, 40],
             },
+            'task_assigned_to_me_from_others': {
+                'email_reminders_enabled': True,
+            },
         }
 
     def test_no_subscriptions(self):
@@ -304,5 +307,8 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             'upcoming_task_reminder': {
                 'email_reminders_enabled': False,
                 'reminder_days': [],
+            },
+            'task_assigned_to_me_from_others': {
+                'email_reminders_enabled': False,
             },
         }

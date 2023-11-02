@@ -18,6 +18,7 @@ from datahub.reminder import (
     INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
 )
 from datahub.reminder.models import (
+    InvestmentProjectTaskTaskAssignedToMeFromOthersReminder as TaskAssignedToMeFromOthersReminder,
     NewExportInteractionReminder,
     NewExportInteractionSubscription,
     NoRecentExportInteractionReminder,
@@ -25,6 +26,7 @@ from datahub.reminder.models import (
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
     ReminderStatus,
+    TaskAssignedToMeFromOthersSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
     UpcomingTaskReminder,
@@ -37,6 +39,7 @@ from datahub.reminder.serializers import (
     NoRecentExportInteractionSubscriptionSerializer,
     NoRecentInvestmentInteractionReminderSerializer,
     NoRecentInvestmentInteractionSubscriptionSerializer,
+    TaskAssignedToMeFromOthersSubscriptionSerializer,
     UpcomingEstimatedLandDateReminderSerializer,
     UpcomingEstimatedLandDateSubscriptionSerializer,
     UpcomingTaskReminderSerializer,
@@ -118,6 +121,9 @@ def reminder_subscription_summary_view(request):
     upcoming_task_reminder = UpcomingTaskReminderSubscriptionSerializer(
         get_object(UpcomingTaskReminderSubscription.objects.all()),
     ).data
+    task_assigned_to_me_from_others = TaskAssignedToMeFromOthersSubscriptionSerializer(
+        get_object(TaskAssignedToMeFromOthersSubscription.objects.all()),
+    ).data
 
     return Response(
         {
@@ -126,6 +132,7 @@ def reminder_subscription_summary_view(request):
             'no_recent_export_interaction': no_recent_export_interaction,
             'new_export_interaction': new_export_interaction,
             'upcoming_task_reminder': upcoming_task_reminder,
+            'task_assigned_to_me_from_others': task_assigned_to_me_from_others,
         },
     )
 
@@ -212,6 +219,10 @@ def reminder_summary_view(request):
         adviser=request.user,
     ).count()
 
+    task_assigned_to_me_from_others = TaskAssignedToMeFromOthersReminder.objects.filter(
+        adviser=request.user,
+    ).count()
+
     total_count = sum(
         [
             estimated_land_date,
@@ -220,6 +231,7 @@ def reminder_summary_view(request):
             no_recent_export_interaction,
             new_export_interaction,
             task_due_date_approaching,
+            task_assigned_to_me_from_others,
         ],
     )
 
@@ -235,6 +247,9 @@ def reminder_summary_view(request):
                 'no_recent_interaction': no_recent_export_interaction,
                 'new_interaction': new_export_interaction,
             },
-            'my_tasks': {'due_date_approaching': task_due_date_approaching},
+            'my_tasks': {
+                'due_date_approaching': task_due_date_approaching,
+                'task_assigned_to_me_from_others': task_assigned_to_me_from_others,
+            },
         },
     )

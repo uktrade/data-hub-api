@@ -101,7 +101,7 @@ class TaskAssignedToMeFromOthersSubscriptionSerializer(serializers.ModelSerializ
 
     class Meta:
         model = TaskAssignedToMeFromOthersSubscription
-        fields = 'email_reminders_enabled'
+        fields = ('email_reminders_enabled',)
 
 
 class NestedInvestmentProjectSerializer(serializers.ModelSerializer):
