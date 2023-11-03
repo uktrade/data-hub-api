@@ -8,5 +8,5 @@ class TaskSearchApp(SearchApp):
 
     name = 'task'
     search_model = Task
-    view_permissions = (f'company.{TaskPermission.view_task}',)
+    view_permissions = (f'task.{TaskPermission.view_task}',)
     queryset = DBTask.objects.all().select_related('task_investmentprojecttask')
