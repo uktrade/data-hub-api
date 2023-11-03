@@ -181,7 +181,7 @@ urlpatterns = [
                 'patch': 'partial_update',
             },
         ),
-        name='my-tasks-task-overdue-subscription',
+        name='task-assigned-to-me-from-others-subscription',
     ),
     path(
         'reminder/summary',
