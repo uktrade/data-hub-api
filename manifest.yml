@@ -4,3 +4,5 @@ applications:
       - https://github.com/cloudfoundry/python-buildpack.git#v1.8.12
     stack: cflinuxfs4
     timeout: 180
+    memory: 3G
+    disk_quota: 2G
