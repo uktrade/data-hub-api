@@ -219,6 +219,8 @@ def task_company(obj):
 
 def task_investment_project_dict(obj):
     """Creates dictionary from a task investment project containing id, name and project_code."""
+    if not hasattr(obj, 'task_investmentprojecttask'):
+        return None
     if obj.task_investmentprojecttask is None:
         return None
 

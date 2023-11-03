@@ -16,7 +16,14 @@ class SearchTaskAPIViewMixin:
     es_sort_by_remappings = {}
     fields_to_exclude = ()
 
-    FILTER_FIELDS = ('id',)
+    FILTER_FIELDS = (
+        'id',
+        'title',
+        'due_date',
+        'created_by',
+        'archived',
+        'advisers',
+    )
 
     REMAP_FIELDS = {}
 

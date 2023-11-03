@@ -141,7 +141,7 @@ def ch_company_field():
         properties={
             'id': Keyword(),
             'company_number': NormalizedKeyword(),
-        }
+        },
     )
 
 

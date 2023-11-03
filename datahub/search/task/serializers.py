@@ -12,11 +12,14 @@ class SearchTaskQuerySerializer(EntitySearchQuerySerializer):
     """Serialiser used to validate task search POST bodies."""
 
     id = SingleOrListField(child=StringUUIDField(), required=False)
-    # first_name = serializers.CharField(required=False)
-    # last_name = serializers.CharField(required=False)
-    # name = serializers.CharField(required=False)
-    # dit_team = SingleOrListField(
-    #     child=StringUUIDField(),
-    #     required=False,
-    # )
-    # is_active = serializers.BooleanField(required=False)
+    title = serializers.CharField(required=False)
+    due_date = serializers.DateField(required=False)
+    advisers = SingleOrListField(
+        child=StringUUIDField(),
+        required=False,
+    )
+    created_by = SingleOrListField(
+        child=StringUUIDField(),
+        required=False,
+    )
+    archived = serializers.BooleanField(required=False)

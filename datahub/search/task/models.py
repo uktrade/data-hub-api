@@ -35,7 +35,7 @@ class Task(BaseSearchModel):
 
     SEARCH_FIELDS = (
         'id',
-        'name',
+        'title',
         'due_date',
         'created_by',
         'archived',
