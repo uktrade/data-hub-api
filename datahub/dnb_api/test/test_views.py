@@ -1,6 +1,6 @@
 import json
 import operator
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from urllib.parse import urljoin
 from uuid import UUID, uuid4
 
@@ -367,65 +367,6 @@ class TestDNBCompanySearchAPI(APITestMixin):
         )
         assert response.status_code == response_status_code
         assert json.loads(response.content) == response_data
-
-    def test_monitoring_success(
-        self,
-        monkeypatch,
-        requests_mock,
-    ):
-        """
-        Test that the right counter is incremented for the given status code
-        returned by the dnb-service.
-        """
-        statsd_mock = Mock()
-        monkeypatch.setattr('datahub.dnb_api.utils.statsd', statsd_mock)
-        requests_mock.post(
-            DNB_V2_SEARCH_URL,
-            status_code=status.HTTP_200_OK,
-            json={},
-        )
-        self.api_client.post(
-            reverse('api-v4:dnb-api:company-search'),
-            content_type='application/json',
-        )
-        statsd_mock.incr.assert_called_once_with(
-            f'dnb.search.{status.HTTP_200_OK}',
-        )
-
-    @pytest.mark.parametrize(
-        'response_status_code',
-        (
-            status.HTTP_400_BAD_REQUEST,
-            status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_403_FORBIDDEN,
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-        ),
-    )
-    def test_monitoring_errors(
-        self,
-        monkeypatch,
-        requests_mock,
-        response_status_code,
-    ):
-        """
-        Test that the right counter is incremented for the given status code
-        returned by the dnb-service.
-        """
-        statsd_mock = Mock()
-        monkeypatch.setattr('datahub.dnb_api.utils.statsd', statsd_mock)
-        requests_mock.post(
-            DNB_V2_SEARCH_URL,
-            status_code=response_status_code,
-            json={},
-        )
-
-        self.api_client.post(
-            reverse('api-v4:dnb-api:company-search'),
-            content_type='application/json',
-        )
-        statsd_mock.incr.assert_called_once_with(
-            f'dnb.search.{response_status_code}',
-        )
 
 
 class TestDNBCompanyCreateAPI(APITestMixin):
@@ -967,70 +908,6 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    @pytest.mark.parametrize(
-        'response_status_code',
-        (
-            status.HTTP_200_OK,
-            status.HTTP_400_BAD_REQUEST,
-            status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_403_FORBIDDEN,
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-        ),
-    )
-    def test_monitoring_search(
-        self,
-        monkeypatch,
-        requests_mock,
-        response_status_code,
-    ):
-        """
-        Test that the right counter is incremented for the given status code
-        returned by the dnb-service.
-        """
-        statsd_mock = Mock()
-        monkeypatch.setattr('datahub.dnb_api.utils.statsd', statsd_mock)
-        requests_mock.post(
-            DNB_V2_SEARCH_URL,
-            status_code=response_status_code,
-            json={},
-        )
-        self.api_client.post(
-            reverse('api-v4:dnb-api:company-create'),
-            data={
-                'duns_number': 123456789,
-            },
-        )
-        statsd_mock.incr.assert_called_once_with(
-            f'dnb.search.{response_status_code}',
-        )
-
-    def test_monitoring_create(
-        self,
-        monkeypatch,
-        dnb_response_uk,
-        requests_mock,
-    ):
-        """
-        Test that the right counter is incremented when a company gets
-        created using dnb-service.
-        """
-        statsd_mock = Mock()
-        monkeypatch.setattr('datahub.dnb_api.views.statsd', statsd_mock)
-        requests_mock.post(
-            DNB_V2_SEARCH_URL,
-            status_code=status.HTTP_200_OK,
-            json=dnb_response_uk,
-        )
-        self.api_client.post(
-            reverse('api-v4:dnb-api:company-create'),
-            data={
-                'duns_number': 123456789,
-            },
-        )
-        statsd_mock.incr.assert_called_with(
-            'dnb.create.company',
-        )
 
 
 class TestCompanyLinkView(APITestMixin):

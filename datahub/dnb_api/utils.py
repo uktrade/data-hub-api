@@ -22,7 +22,6 @@ from rest_framework import serializers, status
 from reversion.models import Version
 
 from datahub.company.models import Company
-from datahub.core import statsd
 from datahub.core.api_client import APIClient, TokenAuth
 from datahub.core.exceptions import (
     APIBadGatewayException,
@@ -115,7 +114,7 @@ def search_dnb(query_params, request=None):
             timeout=3.0,
         )
 
-    response = call_api_request_with_exception_handling(api_request, 'dnb.search')
+    response = call_api_request_with_exception_handling(api_request)
 
     return response
 
@@ -942,15 +941,13 @@ def get_company_hierarchy_count(duns_number):
     return companies_count
 
 
-def call_api_request_with_exception_handling(api_request_function, statsd_stat=None):
+def call_api_request_with_exception_handling(api_request_function):
     """
     Call the dnb service api client and handle any common errors
     """
     api_client = _get_api_client()
     try:
         result = api_request_function(api_client)
-        if statsd_stat:
-            statsd.incr(f'{statsd_stat}.{result.status_code}')
 
     except APIBadGatewayException as exc:
         error_message = 'Encountered an error connecting to DNB service'
