@@ -14,7 +14,6 @@ from rest_framework.views import APIView
 
 from datahub.company.models import Company, CompanyPermission
 from datahub.company.serializers import CompanySerializer
-from datahub.core import statsd
 from datahub.core.exceptions import (
     APIBadRequestException,
     APIUpstreamException,
@@ -226,7 +225,6 @@ class DNBCompanyCreateView(APIView):
             dnb_modified_on=now(),
         )
 
-        statsd.incr('dnb.create.company')
         return Response(
             company_serializer.to_representation(datahub_company),
         )
