@@ -44,6 +44,16 @@ def id_type_dict(obj):
     }
 
 
+def task_type(obj):
+    """Returns the name of the class of the related task type"""
+    if obj is None:
+        return None
+    related_task_type = obj.get_related_task_type()
+    if related_task_type is None:
+        return obj.__class__.__name__
+    return related_task_type.__class__.__name__
+
+
 def id_uri_dict(obj):
     """Creates dictionary with selected field from supplied object."""
     if obj is None:
@@ -196,6 +206,23 @@ def investment_project_dict(obj):
         'name': obj.name,
         'project_code': obj.project_code,
     }
+
+
+def task_company(obj):
+    """Creates dictionary from a task company containing id and name"""
+    company = obj.get_company()
+    if company is None:
+        return None
+
+    return id_name_dict(company)
+
+
+def task_investment_project_dict(obj):
+    """Creates dictionary from a task investment project containing id, name and project_code."""
+    if obj.task_investmentprojecttask is None:
+        return None
+
+    return investment_project_dict(obj.task_investmentprojecttask.investment_project)
 
 
 def sector_dict(obj):

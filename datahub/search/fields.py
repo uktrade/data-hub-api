@@ -137,10 +137,12 @@ def address_field():
 
 def ch_company_field():
     """Object field with id and company_number sub-fields."""
-    return Object(properties={
-        'id': Keyword(),
-        'company_number': NormalizedKeyword(),
-    })
+    return Object(
+        properties={
+            'id': Keyword(),
+            'company_number': NormalizedKeyword(),
+        }
+    )
 
 
 def sector_field():
@@ -167,5 +169,16 @@ def interaction_field():
             'id': Keyword(),
             'subject': Text(index=False),
             'date': Date(),
+        },
+    )
+
+
+def investment_project_field():
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': Text(index=False),
+            'project_code': Text(index=False),
+            'investor_company': id_unindexed_name_field(),
         },
     )

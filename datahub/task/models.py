@@ -11,10 +11,16 @@ from datahub.company.models import Advisor
 
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import get_front_end_url
+from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.investment.project.models import InvestmentProject
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+class TaskPermission(StrEnum):
+    """Permission codename constants."""
+
+    view_task = 'view_task'
 
 
 @reversion.register_base_model()

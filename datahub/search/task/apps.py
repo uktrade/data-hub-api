@@ -1,0 +1,12 @@
+from datahub.search.apps import SearchApp
+from datahub.search.task.models import Task
+from datahub.task.models import Task as DBTask, TaskPermission
+
+
+class TaskSearchApp(SearchApp):
+    """SearchApp for task."""
+
+    name = 'task'
+    search_model = Task
+    view_permissions = (f'company.{TaskPermission.view_task}',)
+    queryset = DBTask.objects.all().select_related('task_investmentprojecttask')
