@@ -28,6 +28,8 @@ class SearchTaskAPIViewMixin:
     REMAP_FIELDS = {
         'advisers': 'advisers.id',
         'created_by': 'created_by.id',
+        'company': 'company.id',
+        'investment_project': 'investment_project.id',
     }
 
     COMPOSITE_FILTERS = {}
