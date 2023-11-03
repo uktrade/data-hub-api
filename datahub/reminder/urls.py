@@ -7,6 +7,7 @@ from datahub.reminder.views import (
     NoRecentExportInteractionSubscriptionViewset,
     NoRecentInvestmentInteractionReminderViewset,
     NoRecentInvestmentInteractionSubscriptionViewset,
+    TaskAssignedToMeFromOthersSubscriptionViewset,
     reminder_subscription_summary_view,
     reminder_summary_view,
     TaskOverdueSubscriptionViewset,
@@ -165,6 +166,16 @@ urlpatterns = [
     path(
         'reminder/subscription/my-tasks-task-overdue',
         TaskOverdueSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
+        name='my-tasks-task-overdue-subscription',
+    ),
+    path(
+        'reminder/subscription/task-assigned-to-me-from-others',
+        TaskAssignedToMeFromOthersSubscriptionViewset.as_view(
             {
                 'get': 'retrieve',
                 'patch': 'partial_update',
