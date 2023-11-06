@@ -27,6 +27,7 @@ from datahub.reminder.test.factories import (
     NewExportInteractionReminderFactory,
     NoRecentExportInteractionReminderFactory,
     NoRecentInvestmentInteractionReminderFactory,
+    TaskAmendedByOthersReminderFactory,
     UpcomingEstimatedLandDateReminderFactory,
     UpcomingTaskReminderFactory,
 )
@@ -591,7 +592,7 @@ class TestGetReminderSummaryView(APITestMixin):
             ],
         )
         reminder_count = 3
-        reminder_categories = 7  # used for finding the total number of reminders in this test
+        reminder_categories = 8  # used for finding the total number of reminders in this test
         UpcomingEstimatedLandDateReminderFactory.create_batch(
             reminder_count,
             adviser=self.user,
@@ -630,6 +631,10 @@ class TestGetReminderSummaryView(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
+        TaskAmendedByOthersReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
 
         total_reminders = reminder_count * reminder_categories
         url = reverse(self.url_name)
@@ -650,6 +655,7 @@ class TestGetReminderSummaryView(APITestMixin):
             },
             'my_tasks': {
                 'due_date_approaching': reminder_count,
+                'task_amended_by_others': reminder_count,
                 'task_assigned_to_me_from_others': reminder_count,
             },
         }
@@ -673,6 +679,7 @@ class TestGetReminderSummaryView(APITestMixin):
             },
             'my_tasks': {
                 'due_date_approaching': 0,
+                'task_amended_by_others': 0,
                 'task_assigned_to_me_from_others': 0,
             },
         }
@@ -733,16 +740,13 @@ class TestGetReminderSummaryView(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
+        TaskAmendedByOthersReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
 
-        my_tasks_count = reminder_count * 2
-        total_reminders = reminder_count * (int(investment) * 3 + int(export) * 2) + my_tasks_count
-        url = reverse(self.url_name)
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data == {
-            'count': total_reminders,
+        expected_data = {
+            'count': 0,
             'investment': {
                 'estimated_land_date': reminder_count if investment else 0,
                 'no_recent_interaction': reminder_count if investment else 0,
@@ -754,6 +758,20 @@ class TestGetReminderSummaryView(APITestMixin):
             },
             'my_tasks': {
                 'due_date_approaching': reminder_count,
+                'task_amended_by_others': reminder_count,
                 'task_assigned_to_me_from_others': reminder_count,
             },
         }
+
+        expected_data['count'] = reminder_count * (
+            int(investment) * len(expected_data['investment'])
+            + int(export) * len(expected_data['export'])
+            + len(expected_data['my_tasks'])
+        )
+
+        url = reverse(self.url_name)
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data == expected_data

@@ -122,5 +122,7 @@ class TaskAssignedToMeFromOthersReminderFactory(BaseReminderFactory):
 
 
 class TaskAmendedByOthersReminderFactory(BaseReminderFactory):
+    task = factory.SubFactory(TaskFactory)
+
     class Meta:
         model = TaskAmendedByOthersReminder
