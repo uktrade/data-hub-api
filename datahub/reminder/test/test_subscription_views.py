@@ -215,6 +215,71 @@ class TestTaskOverdueReminderSubscriptionViewset(
     factory = TaskOverdueSubscriptionFactory
 
 
+class TestTaskAssignedToMeFromOthersSubscriptionViewset(
+    APITestMixin,
+):
+    """
+    Tests for the task assigned to me from others subscription view.
+    """
+
+    url_name = 'api-v4:reminder:task-assigned-to-me-from-others-subscription'
+    factory = TaskAssignedToMeFromOthersSubscriptionFactory
+
+    def test_not_authed(self):
+        """Should return Unauthorised"""
+        url = reverse(self.url_name)
+        api_client = APIClient()
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_get_subscription_not_present(self):
+        """Given the current user does not have a subscription, make an empty one"""
+        url = reverse(self.url_name)
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'email_reminders_enabled': False,
+        }
+
+    def test_get_subscription(self):
+        """Given an existing subscription, those details should be returned"""
+        self.factory(
+            adviser=self.user,
+            email_reminders_enabled=True,
+        )
+        url = reverse(self.url_name)
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'email_reminders_enabled': True,
+        }
+
+    def test_patch_existing_subscription(self):
+        """Patching the subscription will update an existing subscription"""
+        self.factory(
+            adviser=self.user,
+            email_reminders_enabled=True,
+        )
+        url = reverse(self.url_name)
+        data = {'email_reminders_enabled': False}
+        response = self.api_client.patch(url, data)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'email_reminders_enabled': False,
+        }
+
+    def test_patch_subscription_no_existing(self):
+        """Patching the subscription will create one if it didn't exist already"""
+        url = reverse(self.url_name)
+        data = {'email_reminders_enabled': True}
+        response = self.api_client.patch(url, data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'email_reminders_enabled': True,
+        }
+
+
 class TestGetReminderSubscriptionSummaryView(APITestMixin):
     """
     Tests for the reminder subscription summary view.
