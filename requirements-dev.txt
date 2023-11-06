@@ -22,7 +22,9 @@ attrs==22.2.0
     # via
     #   aiohttp
     #   flake8-bugbear
-bigtree==0.14.2
+backcall==0.2.0
+    # via ipython
+bigtree==0.14.4
     # via -r requirements.in
 boto3==1.28.78
     # via -r requirements.in
