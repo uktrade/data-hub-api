@@ -11,6 +11,8 @@ from datahub.reminder.models import (
     NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
+    TaskAmendedByOthersReminder,
+    TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     TaskOverdueSubscription,
@@ -59,6 +61,11 @@ class TaskAssignedToMeFromOthersSubscriptionFactory(BaseSubscriptionFactory):
 class TaskOverdueSubscriptionFactory(BaseSubscriptionFactory):
     class Meta:
         model = TaskOverdueSubscription
+
+
+class TaskAmendedByOthersSubscriptionFactory(BaseSubscriptionFactory):
+    class Meta:
+        model = TaskAmendedByOthersSubscription
 
 
 class BaseReminderFactory(factory.django.DjangoModelFactory):
@@ -112,3 +119,8 @@ class InvestmentProjectTaskTaskAssignedToMeFromOthersReminderFactory(BaseReminde
 class TaskAssignedToMeFromOthersReminderFactory(BaseReminderFactory):
     class Meta:
         model = TaskAssignedToMeFromOthersReminder
+
+
+class TaskAmendedByOthersReminderFactory(BaseReminderFactory):
+    class Meta:
+        model = TaskAmendedByOthersReminder

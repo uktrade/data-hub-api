@@ -88,6 +88,12 @@ class TaskOverdueSubscription(BaseSubscription, ScheduledSubscription):
     """
 
 
+class TaskAmendedByOthersSubscription(BaseSubscription, ScheduledSubscription):
+    """
+    Subscription to get reminders about task amendments by others.
+    """
+
+
 class EmailDeliveryStatus(models.TextChoices):
     SENDING = ('sending', 'Sending')
     DELIVERED = ('delivered', 'Delivered')
@@ -261,4 +267,16 @@ class TaskAssignedToMeFromOthersReminder(BaseReminder):
         'task.Task',
         on_delete=models.CASCADE,
         related_name='task_assigned_to_me_from_others_reminder',
+    )
+
+
+class TaskAmendedByOthersReminder(BaseReminder):
+    """
+    Task amended by others generic task reminder.
+    """
+
+    task = models.ForeignKey(
+        'task.Task',
+        on_delete=models.CASCADE,
+        related_name='task_amended_by_others_reminder',
     )
