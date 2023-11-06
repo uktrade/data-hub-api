@@ -16,6 +16,7 @@ from datahub.reminder.test.factories import (
     NoRecentExportInteractionSubscriptionFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
     TaskAmendedByOthersSubscriptionFactory,
+    TaskAmendedByOthersSubscriptionFactory,
     TaskAssignedToMeFromOthersSubscriptionFactory,
     TaskOverdueSubscriptionFactory,
     UpcomingEstimatedLandDateSubscriptionFactory,
@@ -375,6 +376,9 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             'task_amended_by_others': {
                 'email_reminders_enabled': True,
             },
+            'task_amended_by_others': {
+                'email_reminders_enabled': True,
+            },
             'task_assigned_to_me_from_others': {
                 'email_reminders_enabled': True,
             },
@@ -410,6 +414,9 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             'upcoming_task_reminder': {
                 'email_reminders_enabled': False,
                 'reminder_days': [],
+            },
+            'task_amended_by_others': {
+                'email_reminders_enabled': False,
             },
             'task_amended_by_others': {
                 'email_reminders_enabled': False,

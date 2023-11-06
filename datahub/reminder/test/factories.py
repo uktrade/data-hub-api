@@ -13,6 +13,8 @@ from datahub.reminder.models import (
     NoRecentInvestmentInteractionSubscription,
     TaskAmendedByOthersReminder,
     TaskAmendedByOthersSubscription,
+    TaskAmendedByOthersReminder,
+    TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     TaskOverdueSubscription,

@@ -7,7 +7,6 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('task', '0005_task_reminder_date'),
@@ -20,7 +19,14 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('email_reminders_enabled', models.BooleanField(default=False)),
-                ('adviser', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='+', to=settings.AUTH_USER_MODEL)),
+                (
+                    'adviser',
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='+',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -33,11 +39,49 @@ class Migration(migrations.Migration):
                 ('created_on', models.DateTimeField(auto_now_add=True)),
                 ('modified_on', models.DateTimeField(auto_now=True, null=True)),
                 ('event', models.CharField(max_length=255)),
-                ('status', models.CharField(blank=True, choices=[('live', 'Live'), ('dismissed', 'Dismissed')], default='live', max_length=255)),
+                (
+                    'status',
+                    models.CharField(
+                        blank=True,
+                        choices=[('live', 'Live'), ('dismissed', 'Dismissed')],
+                        default='live',
+                        max_length=255,
+                    ),
+                ),
                 ('email_notification_id', models.UUIDField(blank=True, null=True)),
-                ('email_delivery_status', models.CharField(blank=True, choices=[('sending', 'Sending'), ('delivered', 'Delivered'), ('permanent-failure', 'Permanent failure'), ('temporary-failure', 'Temporary failure'), ('technical-failure', 'Technical failure'), ('unknown', 'Unknown')], default='unknown', help_text='Email delivery status', max_length=255)),
-                ('adviser', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('task', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='task_amended_by_others_reminder', to='task.task')),
+                (
+                    'email_delivery_status',
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ('sending', 'Sending'),
+                            ('delivered', 'Delivered'),
+                            ('permanent-failure', 'Permanent failure'),
+                            ('temporary-failure', 'Temporary failure'),
+                            ('technical-failure', 'Technical failure'),
+                            ('unknown', 'Unknown'),
+                        ],
+                        default='unknown',
+                        help_text='Email delivery status',
+                        max_length=255,
+                    ),
+                ),
+                (
+                    'adviser',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='+',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'task',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='task_amended_by_others_reminder',
+                        to='task.task',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
