@@ -8,5 +8,6 @@ class SearchSimpleModelSerializer(EntitySearchQuerySerializer):
 
     name = serializers.CharField(required=False)
     country = serializers.CharField(required=False)
+    archived = serializers.BooleanField(required=False)
 
     SORT_BY_FIELDS = ('date', 'name')
