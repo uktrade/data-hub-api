@@ -153,7 +153,6 @@ class ReminderTestMixin:
 
 
 class TaskReminderMixin:
-
     def test_get_generic_task_reminders(self):
         """
         Given some reminders for generic tasks, these should be returned without any references to
@@ -571,7 +570,9 @@ class TestUpcomingTaskDueDateReminderViewset(APITestMixin, ReminderTestMixin, Ta
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestTaskAssignedToMeFromOthersReminderViewset(
-    APITestMixin, ReminderTestMixin, TaskReminderMixin,
+    APITestMixin,
+    ReminderTestMixin,
+    TaskReminderMixin,
 ):
     """
     Tests for the task assigned to me from others reminder view.
