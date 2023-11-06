@@ -9,6 +9,7 @@ from datahub.reminder.views import (
     NoRecentInvestmentInteractionSubscriptionViewset,
     reminder_subscription_summary_view,
     reminder_summary_view,
+    TaskAssignedToMeFromOthersSubscriptionViewset,
     TaskOverdueSubscriptionViewset,
     UpcomingEstimatedLandDateReminderViewset,
     UpcomingEstimatedLandDateSubscriptionViewset,
@@ -171,6 +172,16 @@ urlpatterns = [
             },
         ),
         name='my-tasks-task-overdue-subscription',
+    ),
+    path(
+        'reminder/subscription/task-assigned-to-me-from-others',
+        TaskAssignedToMeFromOthersSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
+        name='task-assigned-to-me-from-others-subscription',
     ),
     path(
         'reminder/summary',

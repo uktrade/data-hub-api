@@ -96,6 +96,11 @@ class TaskOverdueSubscriptionViewset(BaseSubscriptionViewset):
     queryset = TaskOverdueSubscription.objects.all()
 
 
+class TaskAssignedToMeFromOthersSubscriptionViewset(BaseSubscriptionViewset):
+    serializer_class = TaskAssignedToMeFromOthersSubscriptionSerializer
+    queryset = TaskAssignedToMeFromOthersSubscription.objects.all()
+
+
 @transaction.non_atomic_requests
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
