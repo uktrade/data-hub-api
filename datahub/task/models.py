@@ -11,10 +11,16 @@ from datahub.company.models import Advisor
 
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import get_front_end_url
+from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.investment.project.models import InvestmentProject
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+class TaskPermission(StrEnum):
+    """Permission codename constants."""
+
+    view_task = 'view_task'
 
 
 @reversion.register_base_model()
@@ -47,12 +53,12 @@ class Task(ArchivableModel, BaseModel):
         """URL to the object in the Data Hub internal front end."""
         return get_front_end_url(self)
 
-    def get_company(self):
+    def get_related_task_type(self):
         """
-        Return the company from the related BaseTaskType model implementation.
+        If this task has a linked BaseTaskType model, return that task type
         """
         task_fields = [
-            getattr(self, field.name).get_company()
+            getattr(self, field.name)
             for field in self._meta.get_fields()
             if (
                 field.related_model
@@ -60,8 +66,15 @@ class Task(ArchivableModel, BaseModel):
                 and hasattr(self, field.name)
             )
         ]
+        return task_fields[0] if len(task_fields) > 0 else None
 
-        return len(task_fields) > 0 and task_fields[0]
+    def get_company(self):
+        """
+        Return the company from the related BaseTaskType model implementation.
+        """
+        related_model = self.get_related_task_type()
+
+        return related_model.get_company() if related_model else None
 
 
 class BaseTaskType(BaseModel):

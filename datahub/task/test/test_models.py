@@ -3,7 +3,7 @@ import datetime
 import pytest
 
 from datahub.task.models import Task
-from datahub.task.test.factories import InvestmentProjectTaskFactory
+from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -40,6 +40,18 @@ class TestTaskModel:
         obj.reminder_days = 8
         obj.save()
         assert obj.reminder_date == datetime.date(2030, 10, 2)
+
+    def test_task_get_related_task_type_for_generic_task(self):
+        task = TaskFactory()
+        assert task.get_related_task_type() is None
+
+    def test_task_get_related_task_type_for_investment_project(self):
+        investment_project_task = InvestmentProjectTaskFactory()
+        assert investment_project_task.task.get_related_task_type() == investment_project_task
+
+    def test_task_get_company_for_generic_task(self):
+        task = TaskFactory()
+        assert task.get_company() is None
 
     def test_task_get_company_for_investment_project(self):
         investment_project_task = InvestmentProjectTaskFactory()

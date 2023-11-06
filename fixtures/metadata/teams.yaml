@@ -523,6 +523,9 @@
     - - change_companyexportcountry
       - company
       - companyexportcountry
+    - - view_task
+      - task
+      - task
   model: auth.group
 - fields:
     name: Global account managers

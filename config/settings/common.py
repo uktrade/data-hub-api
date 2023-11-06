@@ -321,6 +321,7 @@ SEARCH_APPS = [
     'datahub.search.omis.OrderSearchApp',
     'datahub.search.large_investor_profile.LargeInvestorProfileSearchApp',
     'datahub.search.large_capital_opportunity.LargeCapitalOpportunitySearchApp',
+    'datahub.search.task.TaskSearchApp',
 ]
 
 VCAP_SERVICES = env.json('VCAP_SERVICES', default={})

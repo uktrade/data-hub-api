@@ -1,7 +1,7 @@
 from datahub.export_win import models
 from datahub.metadata.registry import registry
 from datahub.metadata.serializers import (
-    HQTeamRegionOrPostSerializer,
+    HQTeamRegionOrPostSerializer, HVCSerializer,
 )
 
 registry.register(
@@ -77,4 +77,11 @@ registry.register(
 registry.register(
     metadata_id='associated-programme',
     model=models.AssociatedProgramme,
+)
+
+registry.register(
+    filterset_fields=['financial_year'],
+    metadata_id='hvc',
+    model=models.HVC,
+    serializer=HVCSerializer,
 )

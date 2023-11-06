@@ -420,3 +420,60 @@ def test_empty_string_to_null_when_obj_is_truthy():
     res = dict_utils.empty_string_to_null('abc')
 
     assert res == 'abc'
+
+
+def test_task_type_returns_none_when_none_is_provided():
+    assert dict_utils.task_type(None) is None
+
+
+def test_task_type_returns_class_name_when_no_related_task_type():
+    task = mock.MagicMock()
+    task.get_related_task_type.return_value = None
+
+    assert dict_utils.task_type(task) is task.__class__.__name__
+
+
+def test_task_type_returns_class_name_of_related_task_type():
+    task = mock.MagicMock()
+    task.get_related_task_type.return_value = 'abc'
+
+    assert dict_utils.task_type(task) == 'str'
+
+
+def test_task_company_returns_none_when_no_company_exists():
+    task = mock.MagicMock()
+    task.get_company.return_value = None
+
+    assert dict_utils.task_company(task) is None
+
+
+def test_task_company_returns_company_when_company_exists():
+    task = mock.MagicMock()
+    company = mock.MagicMock()
+    task.get_company.return_value = company
+
+    assert dict_utils.task_company(task) == dict_utils.id_name_dict(company)
+
+
+def test_task_investment_project_dict_returns_none_when_task_investmentprojecttask_prop_missing():
+    task = mock.MagicMock()
+    del task.task_investmentprojecttask
+
+    assert dict_utils.task_investment_project_dict(task) is None
+
+
+def test_task_investment_project_dict_returns_none_when_task_investmentprojecttask_is_none():
+    task = mock.MagicMock()
+    task.task_investmentprojecttask = None
+
+    assert dict_utils.task_investment_project_dict(task) is None
+
+
+def test_task_investment_project_dict_returns_investment_project_task():
+    task = mock.MagicMock()
+    investment_project = mock.MagicMock()
+    task.task_investmentprojecttask.investment_project = investment_project
+
+    assert dict_utils.task_investment_project_dict(task) == dict_utils.investment_project_dict(
+        investment_project,
+    )
