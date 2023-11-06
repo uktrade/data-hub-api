@@ -21,8 +21,9 @@ class SearchTaskAPIViewMixin:
         'title',
         'due_date',
         'created_by',
-        'archived',
         'advisers',
+        'company',
+        'investment_project',
     )
 
     REMAP_FIELDS = {

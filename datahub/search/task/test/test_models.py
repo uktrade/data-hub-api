@@ -21,7 +21,6 @@ def test_task_to_dict(opensearch):
             'name': task.created_by.name,
             'last_name': task.created_by.last_name,
         },
-        'archived': task.archived,
         'title': task.title,
         'description': task.description,
         'due_date': task.due_date,

@@ -22,4 +22,5 @@ class SearchTaskQuerySerializer(EntitySearchQuerySerializer):
         child=StringUUIDField(),
         required=False,
     )
-    archived = serializers.BooleanField(required=False)
+    investment_project = SingleOrListField(child=StringUUIDField(), required=False)
+    company = SingleOrListField(child=StringUUIDField(), required=False)

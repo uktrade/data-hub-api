@@ -741,7 +741,6 @@ def test_get_basic_search_query():
                                 'investor_company.name',
                                 'investor_company.name.trigram',
                                 'is_active',
-                                'is_complete',
                                 'job_title',
                                 'job_title.trigram',
                                 'last_name',

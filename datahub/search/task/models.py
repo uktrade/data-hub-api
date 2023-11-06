@@ -10,7 +10,6 @@ class Task(BaseSearchModel):
 
     id = Keyword()
     created_by = fields.contact_or_adviser_field()
-    is_complete = Boolean()
     title = Text()
     description = Text()
     due_date = Date()
@@ -31,7 +30,6 @@ class Task(BaseSearchModel):
         'task_type': dict_utils.task_type,
         'investment_project': dict_utils.task_investment_project_dict,
         'company': dict_utils.task_company,
-        'is_complete': lambda obj: obj.archived,
     }
 
     SEARCH_FIELDS = (
@@ -39,6 +37,5 @@ class Task(BaseSearchModel):
         'title',
         'due_date',
         'created_by',
-        'is_complete',
         'advisers',
     )

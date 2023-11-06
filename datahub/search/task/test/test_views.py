@@ -82,28 +82,3 @@ class TestTaskSearch(APITestMixin):
 
         assert response.data['count'] == 1
         assert response.data['results'][0]['id'] == str(investment_project_task.task.id)
-
-    def test_search_task_by_archived(self, opensearch_with_collector):
-        """Tests task search by archived."""
-        archived_investment_project_task = InvestmentProjectTaskFactory(
-            task=TaskFactory(archived=True),
-        )
-        InvestmentProjectTaskFactory(
-            task=TaskFactory(archived=False),
-        )
-
-        opensearch_with_collector.flush_and_refresh()
-
-        url = reverse('api-v4:search:task')
-
-        response = self.api_client.post(
-            url,
-            data={
-                'archived': True,
-            },
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-
-        assert response.data['count'] == 1
-        assert response.data['results'][0]['id'] == str(archived_investment_project_task.task.id)
