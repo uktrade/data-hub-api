@@ -764,7 +764,9 @@ class TestGetReminderSummaryView(APITestMixin):
         }
 
         expected_data['count'] = reminder_count * (
+            # Count investments if feature set
             int(investment) * len(expected_data['investment'])
+            # Count export if feature set
             + int(export) * len(expected_data['export'])
             + len(expected_data['my_tasks'])
         )
