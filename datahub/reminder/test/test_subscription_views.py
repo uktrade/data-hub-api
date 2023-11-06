@@ -234,9 +234,6 @@ class TestTaskAssignedToMeFromOthersSubscriptionViewset(APITestMixin):
     Tests for the task assigned to me from others subscription view.
     """
 
-    # url_name = 'api-v4:reminder:task-assigned-to-me-from-others-subscription'
-    # factory = TaskAssignedToMeFromOthersSubscriptionFactory
-
     def test_not_authed(self, url_name, factory):
         """Should return Unauthorised"""
         url = reverse(url_name)
