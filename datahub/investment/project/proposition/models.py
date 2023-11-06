@@ -4,13 +4,12 @@ import uuid
 
 from django.conf import settings
 from django.db import models
-from rest_framework.exceptions import ValidationError
 from rest_framework.reverse import reverse
 
 from datahub.core.exceptions import APIConflictException
 from datahub.core.models import BaseModel
 from datahub.core.utils import StrEnum
-from datahub.documents.models import AbstractEntityDocumentModel, UploadStatus
+from datahub.documents.models import AbstractEntityDocumentModel
 from datahub.investment.project.proposition.constants import PropositionStatus
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -148,10 +147,6 @@ class Proposition(BaseModel):
         :raises ValidationError: when trying to complete proposition without uploaded documents
         :raises APIConflictException: when proposition status is not ongoing
         """
-        if self.documents.filter(document__status=UploadStatus.VIRUS_SCANNED).count() == 0:
-            raise ValidationError({
-                'non_field_errors': ['Proposition has no documents uploaded.'],
-            })
         self._change_status(PropositionStatus.COMPLETED, by, details)
 
     def abandon(self, by, details):

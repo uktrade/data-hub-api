@@ -1,6 +1,8 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from datahub.company.serializers import NestedAdviserField
+from datahub.documents.models import UploadStatus
 from datahub.investment.project.proposition.models import Proposition, PropositionDocument
 from datahub.investment.project.serializers import NestedInvestmentProjectField
 
@@ -37,6 +39,32 @@ class CompletePropositionSerializer(serializers.ModelSerializer):
             details=self.validated_data['details'],
         )
         return self.instance
+
+    def validate_doc(self):
+        message_document = 'A supporting document hasn\'t yet been uploaded, \
+                            please upload one to continue'
+        message_scanning = 'A supporting document hasn\'t finished scanning, \
+                            please try again in a few moments.'
+        if self.instance.documents.filter(
+                document__status=UploadStatus.VIRUS_SCANNED).count() == 0:
+            raise ValidationError({
+                'non_field_errors': [message_document],
+            })
+        if self.instance.documents.filter(
+                document__status=UploadStatus.VIRUS_SCANNING_IN_PROGRESS):
+            raise ValidationError({
+                'non_field_errors': [message_scanning],
+            })
+
+    def validate(self, data):
+        """
+        Validate provided data.
+
+        Checks that the referral has the expected status.
+        """
+        self.validate_doc()
+
+        return super().validate(data)
 
 
 class AbandonPropositionSerializer(serializers.ModelSerializer):
