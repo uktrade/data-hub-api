@@ -72,3 +72,29 @@ def test_hq_team_region_or_post(metadata_client, team_type_id, results_length):
             'id': str(team.pk),
         },
     }
+
+
+@pytest.mark.parametrize(
+    'financial_year,results_length',
+    (
+        (
+            17,
+            237,
+        ),
+        (
+            23,
+            147,
+        ),
+    ),
+)
+def test_hvc_filtered_by_financial_year(metadata_client, financial_year, results_length):
+    """Test the HVC view when filtered by financial year"""
+    url = reverse(viewname='api-v4:metadata:hvc')
+    response = metadata_client.get(url, params={'financial_year': financial_year})
+
+    assert response.status_code == status.HTTP_200_OK
+    results = response.json()
+
+    assert len(results) == results_length
+
+    assert all(result['financial_year'] == financial_year for result in results) is True
