@@ -8,6 +8,7 @@ class SimpleModel(BaseModel):
     Simple model extending BaseModel.
     """
 
+    archived = models.BooleanField(default=False)
     name = models.CharField(max_length=500)
     country = models.CharField(max_length=50, blank=True)
     address = models.CharField(max_length=500, blank=True)

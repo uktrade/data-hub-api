@@ -334,7 +334,8 @@ def test_build_fuzzy_term_query_no_fields():
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    'offset,limit,expected_size', (
+    'offset,limit,expected_size',
+    (
         (8950, 1000, 1000),
         (9950, 1000, 50),
         (10000, 1000, 0),
@@ -343,7 +344,10 @@ def test_build_fuzzy_term_query_no_fields():
 def test_offset_near_max_results(offset, limit, expected_size):
     """Tests limit clipping when near max_results."""
     query = get_basic_search_query(
-        mock.Mock(), 'test', offset=offset, limit=limit,
+        mock.Mock(),
+        'test',
+        offset=offset,
+        limit=limit,
     )
 
     query_dict = query.to_dict()
@@ -470,6 +474,7 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                                                     'name.trigram',
                                                     'country.trigram',
                                                     'address.trigram',
+                                                    'archived',
                                                 ),
                                                 'type': 'cross_fields',
                                                 'operator': 'and',
@@ -486,7 +491,6 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                 'track_total_hits': True,
             },
         ),
-
         # complete
         (
             'search term',
@@ -530,6 +534,7 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                                                     'name.trigram',
                                                     'country.trigram',
                                                     'address.trigram',
+                                                    'archived',
                                                 ),
                                                 'type': 'cross_fields',
                                                 'operator': 'and',
@@ -670,6 +675,7 @@ def test_get_search_by_multiple_entities_query():
                                             'name.trigram',
                                             'country.trigram',
                                             'address.trigram',
+                                            'archived',
                                         ),
                                         'operator': 'and',
                                         'query': None,
@@ -705,7 +711,8 @@ def test_get_search_by_multiple_entities_query():
             },
         },
         'sort': [
-            '_score', 'id',
+            '_score',
+            'id',
         ],
         'track_total_hits': True,
     }

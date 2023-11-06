@@ -13,7 +13,10 @@ class SearchSimpleModelAPIViewMixin:
         'name': 'name.keyword',
     }
 
-    FILTER_FIELDS = ('name',)
+    FILTER_FIELDS = (
+        'name',
+        'archived',
+    )
 
 
 @register_v3_view()
