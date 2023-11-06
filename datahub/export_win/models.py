@@ -79,3 +79,36 @@ class HVOProgrammes(BaseExportWinOrderedConstantModel):
 
 class AssociatedProgramme(BaseExportWinOrderedConstantModel):
     """Associated Programme"""
+
+
+class HVC(BaseExportWinOrderedConstantModel):
+    """HVC codes"""
+
+    campaign_id = models.CharField(max_length=4)
+    financial_year = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ('order', )
+        unique_together = ('campaign_id', 'financial_year')
+
+    def __str__(self):
+        # note name includes code
+        return f'{self.name} ({self.financial_year})'
+
+    @property
+    def campaign(self):
+        """
+        The name of the campaign alone without the code
+        e.g. Africa Agritech or Italy Automotive
+        """
+        # names are always <Name of HVC: HVCCode>
+        return self.name.split(':')[0]
+
+    @property
+    def charcode(self):
+        # see choices comment
+        return f'{self.campaign_id}{self.financial_year}'
+
+    @classmethod
+    def get_by_charcode(cls, charcode):
+        return cls.objects.get(campaign_id=charcode[:-2])
