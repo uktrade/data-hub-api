@@ -15,6 +15,7 @@ from django.test.utils import override_settings
 from datahub.feature_flag.test.factories import UserFeatureFlagFactory
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
+    TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     UpcomingTaskReminder,
@@ -670,3 +671,35 @@ class TestTasksAssignedToMeFromOthers:
         response = notify_adviser_added_to_task(task, random_id)
 
         assert response is None
+
+
+@pytest.mark.django_db
+class TestTasksAmendedByOthers:
+    def test_creation_of_adviser_subscription_on_task_creation_where_adviser_has_no_subscription(
+        self,
+        client,
+        adviser_tasks_user_feature_flag,
+    ):
+        advisers = AdviserFactory.create_batch(2)
+        add_user_feature_flag(adviser_tasks_user_feature_flag, advisers[0])
+        TaskFactory(advisers=advisers, modified_by_id=advisers[0].id)
+        subscriptions = TaskAmendedByOthersSubscription.objects.filter(adviser=advisers[1])
+        assert subscriptions.count() == 1
+
+    def test_reminder_created_on_save():
+        pass
+
+    def test_no_reminder_created_on_save_for_current_adviser():
+        pass
+
+    def test_no_reminder_created_on_mark_as_completed():
+        pass
+
+    def test_email_reminder_send_on_save():
+        pass
+
+    def test_no_email_reminder_send_on_save_for_current_adviser():
+        pass
+
+    def test_no_email_reminder_send_on_mark_as_completed():
+        pass

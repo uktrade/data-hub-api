@@ -12,6 +12,7 @@ from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.feature_flag.utils import is_user_feature_flag_active
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
+    TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     TaskOverdueSubscription,
@@ -259,5 +260,56 @@ def create_task_overdue_subscription_task(adviser_id):
     """
     if not TaskOverdueSubscription.objects.filter(adviser_id=adviser_id).first():
         TaskOverdueSubscription.objects.create(
-            adviser_id=adviser_id, email_reminders_enabled=True,
+            adviser_id=adviser_id,
+            email_reminders_enabled=True,
         )
+
+
+def schedule_task_amended_by_others_subscription_task(instance, created, update_fields):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=task_amended_by_others_subscription_task,
+        function_args=(
+            instance,
+            created,
+            update_fields,
+        ),
+    )
+    logger.info(
+        f'Task {job.id} create_task_amended_by_others_subscription_task',
+    )
+
+
+def get_or_create_task_amended_by_others_subscription(adviser):
+    """
+    Gets or creates a task reminder subscription for an adviser if the adviser doesn't have
+    a subscription already.
+    """
+    current_subscription = TaskAmendedByOthersSubscription.objects.filter(
+        adviser_id=adviser.id,
+    ).first()
+    if not current_subscription:
+        return TaskAmendedByOthersSubscription.objects.create(
+            adviser=adviser,
+            email_reminders_enabled=True,
+        )
+    return current_subscription
+
+
+def task_amended_by_others_subscription_task(task, created, update_fields):
+    """
+    Creates a task reminder subscription for an adviser if the adviser doesn't have
+    a subscription already.
+    """
+    if not created:
+        for adviser in task.advisers.all():
+            if task.modified_by_id != adviser.id:
+                subscription = get_or_create_task_amended_by_others_subscription(adviser)
+
+                # TODO Create reminder
+                if subscription.email_reminders_enabled and is_user_feature_flag_active(
+                    ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
+                    adviser,
+                ):
+                    # TODO MK Send Email
+                    pass
