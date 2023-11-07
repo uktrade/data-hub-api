@@ -15,12 +15,15 @@ from django.test.utils import override_settings
 from datahub.feature_flag.test.factories import UserFeatureFlagFactory
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
+    TaskAmendedByOthersReminder,
+    TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
 )
 from datahub.reminder.test.factories import (
+    TaskAmendedByOthersReminderFactory,
     TaskAssignedToMeFromOthersReminderFactory,
     UpcomingTaskReminderFactory,
 )
@@ -29,6 +32,7 @@ from datahub.task.tasks import (
     generate_reminders_upcoming_tasks,
     notify_adviser_added_to_task,
     schedule_reminders_upcoming_tasks,
+    update_task_amended_by_others_email_status,
     update_task_assigned_to_me_from_others_email_status,
     update_task_reminder_email_status,
 )
@@ -125,6 +129,39 @@ def mock_notify_adviser_investment_project_task_due_email_call(
             'task_url': investment_project_task_due.task.get_absolute_url(),
         },
         update_task=update_task_reminder_email_status,
+        reminders=[reminder],
+    )
+
+
+def mock_notify_adviser_task_amended_by_others_reminder_email_call(
+    investment_project_task,
+    matching_adviser,
+    template_id,
+):
+    title = f'Task `{investment_project_task.task}` amended by '\
+            f'{investment_project_task.task.modified_by.name}'
+    reminder = TaskAmendedByOthersReminderFactory(
+        adviser=matching_adviser,
+        task=investment_project_task.task,
+        event=title,
+    )
+    reminder.id = ANY
+    reminder.pk = ANY
+
+    return mock.call(
+        adviser=matching_adviser,
+        template_identifier=template_id,
+        context={
+            'email_subject': title,
+            'task_title': title,
+            'modified_by': investment_project_task.task.modified_by.name,
+            'company_name': investment_project_task.task.get_company().name,
+            'task_due_date': investment_project_task.task.due_date.strftime('%-d %B %Y')
+            if investment_project_task.task.due_date
+            else None,
+            'task_url': investment_project_task.task.get_absolute_url(),
+        },
+        update_task=update_task_amended_by_others_email_status,
         reminders=[reminder],
     )
 
@@ -670,3 +707,212 @@ class TestTasksAssignedToMeFromOthers:
         response = notify_adviser_added_to_task(task, random_id)
 
         assert response is None
+
+
+@pytest.mark.django_db
+class TestTasksAmendedByOthers:
+    def create_investment_project_task_with_advisers(
+        self,
+        adviser_tasks_user_feature_flag,
+        mock_notify_adviser_by_rq_email,
+        number_advisers=3,
+    ):
+        advisers = AdviserFactory.create_batch(number_advisers)
+        advisers = [
+            add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
+            for adviser in advisers
+        ]
+        investment_project_task = InvestmentProjectTaskFactory(
+            task=TaskFactory(advisers=advisers),
+        )
+        TaskAmendedByOthersReminder.objects.filter(task=investment_project_task.task).delete()
+        mock_notify_adviser_by_rq_email.reset_mock()
+        return advisers, investment_project_task
+
+    def test_creation_of_adviser_subscription_on_task_creation_where_adviser_has_no_subscription(
+        self,
+        client,
+        adviser_tasks_user_feature_flag,
+    ):
+        advisers = AdviserFactory.create_batch(2)
+        add_user_feature_flag(adviser_tasks_user_feature_flag, advisers[0])
+        task = TaskFactory(advisers=advisers, modified_by_id=advisers[0].id)
+        task.save()
+
+        subscriptions = TaskAmendedByOthersSubscription.objects.filter(adviser=advisers[1])
+
+        assert subscriptions.count() == 1
+
+    def test_reminders_created_on_save(
+        self,
+        adviser_tasks_user_feature_flag,
+    ):
+        advisers = AdviserFactory.create_batch(3)
+        add_user_feature_flag(adviser_tasks_user_feature_flag, advisers[0])
+        add_user_feature_flag(adviser_tasks_user_feature_flag, advisers[1])
+        add_user_feature_flag(adviser_tasks_user_feature_flag, advisers[2])
+
+        task = TaskFactory(advisers=advisers)
+        task.save()
+
+        reminders = TaskAmendedByOthersReminder.objects.filter(task=task)
+
+        assert reminders.count() == len(advisers) - 1
+
+    def test_no_reminder_created_on_save_for_current_adviser(
+        self,
+        adviser_tasks_user_feature_flag,
+    ):
+        advisers = AdviserFactory.create_batch(2)
+        add_user_feature_flag(adviser_tasks_user_feature_flag, advisers[0])
+        add_user_feature_flag(adviser_tasks_user_feature_flag, advisers[1])
+        TaskFactory(advisers=advisers, modified_by_id=advisers[1].id)
+
+        reminders = TaskAmendedByOthersReminder.objects.filter(adviser=advisers[1])
+
+        assert not reminders.exists()
+
+    def test_no_reminder_created_on_mark_as_completed(self, adviser_tasks_user_feature_flag):
+        advisers = AdviserFactory.create_batch(2)
+        add_user_feature_flag(adviser_tasks_user_feature_flag, advisers[0])
+        add_user_feature_flag(adviser_tasks_user_feature_flag, advisers[1])
+        task = TaskFactory(advisers=advisers)
+        TaskAmendedByOthersReminder.objects.filter(task=task).delete()
+        task.archived = True
+        task.archived_reason = 'completed'
+        task.save()
+
+        reminders = TaskAmendedByOthersReminder.objects.filter(task=task)
+
+        assert not reminders.exists()
+
+    def test_email_reminder_send_on_save(
+        self,
+        adviser_tasks_user_feature_flag,
+        mock_notify_adviser_by_rq_email,
+        mock_statsd,
+    ):
+        advisers, investment_project_task = self.create_investment_project_task_with_advisers(
+            adviser_tasks_user_feature_flag,
+            mock_notify_adviser_by_rq_email,
+        )
+
+        template_id = str(uuid4())
+        with override_settings(
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
+        ):
+            investment_project_task.task.save()
+
+            reminders = TaskAmendedByOthersReminder.objects.filter(
+                task=investment_project_task.task,
+            )
+            assert reminders.count() == len(advisers)
+            mock_notify_adviser_by_rq_email.assert_has_calls(
+                [
+                    mock_notify_adviser_task_amended_by_others_reminder_email_call(
+                        investment_project_task,
+                        advisers[0],
+                        template_id,
+                    ),
+                    mock_notify_adviser_task_amended_by_others_reminder_email_call(
+                        investment_project_task,
+                        advisers[1],
+                        template_id,
+                    ),
+                    mock_notify_adviser_task_amended_by_others_reminder_email_call(
+                        investment_project_task,
+                        advisers[2],
+                        template_id,
+                    ),
+                ],
+                any_order=True,
+            )
+
+    def test_no_email_reminder_send_on_save_for_current_adviser(
+        self,
+        adviser_tasks_user_feature_flag,
+        mock_notify_adviser_by_rq_email,
+        mock_statsd,
+    ):
+        advisers, investment_project_task = self.create_investment_project_task_with_advisers(
+            adviser_tasks_user_feature_flag,
+            mock_notify_adviser_by_rq_email,
+        )
+
+        template_id = str(uuid4())
+        with override_settings(
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
+        ):
+            investment_project_task.task.modified_by_id = advisers[0].id
+            investment_project_task.task.save()
+
+            reminders = TaskAmendedByOthersReminder.objects.filter(
+                task=investment_project_task.task,
+            )
+            assert reminders.count() == len(advisers) - 1
+            mock_notify_adviser_by_rq_email.assert_has_calls(
+                [
+                    mock_notify_adviser_task_amended_by_others_reminder_email_call(
+                        investment_project_task,
+                        advisers[1],
+                        template_id,
+                    ),
+                    mock_notify_adviser_task_amended_by_others_reminder_email_call(
+                        investment_project_task,
+                        advisers[2],
+                        template_id,
+                    ),
+                ],
+                any_order=True,
+            )
+
+    def test_no_email_reminder_send_on_mark_as_completed(
+        self,
+        adviser_tasks_user_feature_flag,
+        mock_notify_adviser_by_rq_email,
+        mock_statsd,
+    ):
+        advisers, investment_project_task = self.create_investment_project_task_with_advisers(
+            adviser_tasks_user_feature_flag,
+            mock_notify_adviser_by_rq_email,
+        )
+
+        template_id = str(uuid4())
+        with override_settings(
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
+        ):
+            investment_project_task.task.archived = True
+            investment_project_task.task.save()
+
+            reminders = TaskAmendedByOthersReminder.objects.filter(
+                task=investment_project_task.task,
+            )
+            assert not reminders.exists()
+            mock_notify_adviser_by_rq_email.assert_not_called()
+
+    def test_task_amended_by_others_reminder_email_status(
+        self,
+    ):
+        """
+        Test it updates reminder data with the connected email notification information.
+        """
+        task = TaskFactory()
+        reminder_number = 3
+        notification_id = str(uuid4())
+        reminders = TaskAmendedByOthersReminderFactory.create_batch(
+            reminder_number,
+            task_id=task.id,
+        )
+
+        update_task_amended_by_others_email_status(
+            notification_id,
+            [reminder.id for reminder in reminders],
+        )
+
+        task2 = TaskFactory()
+        TaskAmendedByOthersReminderFactory.create_batch(2, task_id=task2.id)
+
+        linked_reminders = TaskAmendedByOthersReminder.objects.filter(
+            email_notification_id=notification_id,
+        )
+        assert linked_reminders.count() == (reminder_number)

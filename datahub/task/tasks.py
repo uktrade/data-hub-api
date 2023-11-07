@@ -12,6 +12,8 @@ from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.feature_flag.utils import is_user_feature_flag_active
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
+    TaskAmendedByOthersReminder,
+    TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     TaskOverdueSubscription,
@@ -181,6 +183,13 @@ def update_task_assigned_to_me_from_others_email_status(email_notification_id, r
         reminder.save()
 
 
+def update_task_amended_by_others_email_status(email_notification_id, reminder_ids):
+    reminders = TaskAmendedByOthersReminder.all_objects.filter(id__in=reminder_ids)
+    for reminder in reminders:
+        reminder.email_notification_id = email_notification_id
+        reminder.save()
+
+
 def schedule_create_task_assigned_to_me_from_others_subscription_task(task, adviser_id):
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
@@ -259,5 +268,79 @@ def create_task_overdue_subscription_task(adviser_id):
     """
     if not TaskOverdueSubscription.objects.filter(adviser_id=adviser_id).first():
         TaskOverdueSubscription.objects.create(
-            adviser_id=adviser_id, email_reminders_enabled=True,
+            adviser_id=adviser_id,
+            email_reminders_enabled=True,
         )
+
+
+def schedule_task_amended_by_others_subscription_task(instance, created, update_fields):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=task_amended_by_others_subscription_task,
+        function_args=(
+            instance,
+            created,
+            update_fields,
+        ),
+    )
+    logger.info(
+        f'Task {job.id} create_task_amended_by_others_subscription_task',
+    )
+
+
+def get_or_create_task_amended_by_others_subscription(adviser):
+    """
+    Gets or creates a task reminder subscription for an adviser if the adviser doesn't have
+    a subscription already.
+    """
+    current_subscription = TaskAmendedByOthersSubscription.objects.filter(
+        adviser_id=adviser.id,
+    ).first()
+    if not current_subscription:
+        return TaskAmendedByOthersSubscription.objects.create(
+            adviser=adviser,
+            email_reminders_enabled=True,
+        )
+    return current_subscription
+
+
+def task_amended_by_others_subscription_task(task, created, update_fields):
+    """
+    Creates or reads task reminder subscription for an adviser
+    Creates a reminder if task saved by other adviser.
+    No reminder are send when task is (marked as) completed/archived.
+    """
+    if not created:
+        for adviser in task.advisers.all():
+            if task.modified_by_id != adviser.id and not task.archived:
+                title = f'Task `{task}` amended by {task.modified_by.name}'
+                reminder = TaskAmendedByOthersReminder.objects.create(
+                    adviser=adviser,
+                    event=title,
+                    task=task,
+                )
+
+                subscription = get_or_create_task_amended_by_others_subscription(adviser)
+
+                if subscription.email_reminders_enabled and is_user_feature_flag_active(
+                    ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
+                    adviser,
+                ):
+                    notify_adviser_by_rq_email(
+                        adviser=adviser,
+                        template_identifier=settings.TASK_REMINDER_EMAIL_TEMPLATE_ID,
+                        context={
+                            'email_subject': title,
+                            'task_title': title,
+                            'modified_by': task.modified_by.name,
+                            'company_name': task.get_company().name,
+                            # if task.get_company()
+                            # else None,
+                            'task_due_date': task.due_date.strftime('%-d %B %Y')
+                            if task.due_date
+                            else None,
+                            'task_url': task.get_absolute_url(),
+                        },
+                        update_task=update_task_amended_by_others_email_status,
+                        reminders=[reminder],
+                    )

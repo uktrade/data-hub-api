@@ -1,4 +1,4 @@
-from django.db.models.signals import m2m_changed, post_delete
+from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
 
 from datahub.task.models import InvestmentProjectTask, Task
@@ -6,7 +6,16 @@ from datahub.task.tasks import (
     schedule_create_task_assigned_to_me_from_others_subscription_task,
     schedule_create_task_overdue_subscription_task,
     schedule_create_task_reminder_subscription_task,
+    schedule_task_amended_by_others_subscription_task,
 )
+
+
+@receiver(
+    post_save,
+    sender=Task,
+)
+def task_post_save(sender, instance, created, update_fields, **kwargs):
+    schedule_task_amended_by_others_subscription_task(instance, created, update_fields)
 
 
 @receiver(

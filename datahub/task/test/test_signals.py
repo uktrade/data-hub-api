@@ -2,6 +2,7 @@ import pytest
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.reminder.models import (
+    TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersSubscription,
     TaskOverdueSubscription,
     UpcomingTaskReminderSubscription,
@@ -87,3 +88,8 @@ class TestTaskOverdueSubscription(SubscriptionBaseTestMixin):
 @pytest.mark.django_db
 class TestTaskAssignedToMeFromOthersSubscription(SubscriptionBaseTestMixin):
     subscription = TaskAssignedToMeFromOthersSubscription
+
+
+@pytest.mark.django_db
+class TestTaskAmendedByOthersSubscription(SubscriptionBaseTestMixin):
+    subscription = TaskAmendedByOthersSubscription
