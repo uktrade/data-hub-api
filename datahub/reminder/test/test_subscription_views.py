@@ -229,7 +229,7 @@ class TestTaskOverdueReminderSubscriptionViewset(
         ),
     ],
 )
-class TestTaskAssignedToMeFromOthersSubscriptionViewset(APITestMixin):
+class TestTaskSubscriptionViewset(APITestMixin):
     """
     Tests for the task assigned to me from others subscription view.
     """

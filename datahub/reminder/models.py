@@ -88,7 +88,7 @@ class TaskOverdueSubscription(BaseSubscription, ScheduledSubscription):
     """
 
 
-class TaskAmendedByOthersSubscription(BaseSubscription, ScheduledSubscription):
+class TaskAmendedByOthersSubscription(BaseSubscription):
     """
     Subscription to get reminders about task amendments by others.
     """
