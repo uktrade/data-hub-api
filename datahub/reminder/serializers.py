@@ -14,6 +14,7 @@ from datahub.reminder.models import (
     NoRecentExportInteractionSubscription,
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
+    TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     TaskOverdueSubscription,
     UpcomingEstimatedLandDateReminder,
@@ -219,7 +220,7 @@ class TaskAssignedToMeFromOthersSerializer(serializers.ModelSerializer):
     task = ReminderTaskSerializer()
 
     class Meta:
-        model = UpcomingTaskReminder
+        model = TaskAssignedToMeFromOthersReminder
         fields = (
             'id',
             'event',

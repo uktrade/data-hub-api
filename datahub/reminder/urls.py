@@ -7,6 +7,7 @@ from datahub.reminder.views import (
     NoRecentExportInteractionSubscriptionViewset,
     NoRecentInvestmentInteractionReminderViewset,
     NoRecentInvestmentInteractionSubscriptionViewset,
+    TaskAssignedToMeFromOthersReminderViewset,
     reminder_subscription_summary_view,
     reminder_summary_view,
     TaskAssignedToMeFromOthersSubscriptionViewset,
@@ -154,24 +155,6 @@ urlpatterns = [
         name='my-tasks-due-date-approaching-reminder-detail',
     ),
     path(
-        'reminder/task-assigned-to-me-from-others',
-        UpcomingTaskReminderViewset.as_view(
-            {
-                'get': 'list',
-            },
-        ),
-        name='task-assigned-to-me-from-others-reminder',
-    ),
-    path(
-        'reminder/task-assigned-to-me-from-others/<uuid:pk>',
-        UpcomingTaskReminderViewset.as_view(
-            {
-                'delete': 'destroy',
-            },
-        ),
-        name='task-assigned-to-me-from-others-reminder-detail',
-    ),
-    path(
         'reminder/subscription/my-tasks-due-date-approaching',
         UpcomingTaskReminderSubscriptionViewset.as_view(
             {
@@ -182,14 +165,22 @@ urlpatterns = [
         name='my-tasks-due-date-approaching-subscription',
     ),
     path(
-        'reminder/subscription/my-tasks-task-overdue',
-        TaskOverdueSubscriptionViewset.as_view(
+        'reminder/task-assigned-to-me-from-others',
+        TaskAssignedToMeFromOthersReminderViewset.as_view(
             {
-                'get': 'retrieve',
-                'patch': 'partial_update',
+                'get': 'list',
             },
         ),
-        name='my-tasks-task-overdue-subscription',
+        name='task-assigned-to-me-from-others-reminder',
+    ),
+    path(
+        'reminder/task-assigned-to-me-from-others/<uuid:pk>',
+        TaskAssignedToMeFromOthersReminderViewset.as_view(
+            {
+                'delete': 'destroy',
+            },
+        ),
+        name='task-assigned-to-me-from-others-reminder-detail',
     ),
     path(
         'reminder/subscription/task-assigned-to-me-from-others',
@@ -200,6 +191,16 @@ urlpatterns = [
             },
         ),
         name='task-assigned-to-me-from-others-subscription',
+    ),
+    path(
+        'reminder/subscription/my-tasks-task-overdue',
+        TaskOverdueSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
+        name='my-tasks-task-overdue-subscription',
     ),
     path(
         'reminder/summary',
