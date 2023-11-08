@@ -18,7 +18,7 @@ from datahub.reminder.models import (
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
 )
-from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
+from datahub.task.test.factories import TaskFactory
 
 
 class BaseSubscriptionFactory(factory.django.DjangoModelFactory):
