@@ -40,13 +40,14 @@ from datahub.reminder.serializers import (
     NoRecentExportInteractionSubscriptionSerializer,
     NoRecentInvestmentInteractionReminderSerializer,
     NoRecentInvestmentInteractionSubscriptionSerializer,
+    TaskAssignedToMeFromOthersSerializer,
     TaskAssignedToMeFromOthersSubscriptionSerializer,
     TaskOverdueSubscriptionSerializer,
     UpcomingEstimatedLandDateReminderSerializer,
     UpcomingEstimatedLandDateSubscriptionSerializer,
     UpcomingTaskReminderSerializer,
     UpcomingTaskReminderSubscriptionSerializer,
-    TaskAssignedToMeFromOthersSerializer,
+    
 )
 
 
