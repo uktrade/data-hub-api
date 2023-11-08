@@ -47,7 +47,6 @@ from datahub.reminder.serializers import (
     UpcomingEstimatedLandDateSubscriptionSerializer,
     UpcomingTaskReminderSerializer,
     UpcomingTaskReminderSubscriptionSerializer,
-    
 )
 
 
