@@ -686,20 +686,20 @@ class TestTasksAmendedByOthers:
         subscriptions = TaskAmendedByOthersSubscription.objects.filter(adviser=advisers[1])
         assert subscriptions.count() == 1
 
-    def test_reminder_created_on_save():
+    def test_reminder_created_on_save(self):
         pass
 
-    def test_no_reminder_created_on_save_for_current_adviser():
+    def test_no_reminder_created_on_save_for_current_adviser(self):
         pass
 
-    def test_no_reminder_created_on_mark_as_completed():
+    def test_no_reminder_created_on_mark_as_completed(self):
         pass
 
-    def test_email_reminder_send_on_save():
+    def test_email_reminder_send_on_save(self):
         pass
 
-    def test_no_email_reminder_send_on_save_for_current_adviser():
+    def test_no_email_reminder_send_on_save_for_current_adviser(self):
         pass
 
-    def test_no_email_reminder_send_on_mark_as_completed():
+    def test_no_email_reminder_send_on_mark_as_completed(self):
         pass

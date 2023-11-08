@@ -12,6 +12,7 @@ from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.feature_flag.utils import is_user_feature_flag_active
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
+    TaskAmendedByOthersReminder,
     TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
@@ -182,6 +183,13 @@ def update_task_assigned_to_me_from_others_email_status(email_notification_id, r
         reminder.save()
 
 
+def update_task_amended_by_others_email_status(email_notification_id, reminder_ids):
+    reminders = TaskAmendedByOthersReminder.all_objects.filter(id__in=reminder_ids)
+    for reminder in reminders:
+        reminder.email_notification_id = email_notification_id
+        reminder.save()
+
+
 def schedule_create_task_assigned_to_me_from_others_subscription_task(task, adviser_id):
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
@@ -304,12 +312,32 @@ def task_amended_by_others_subscription_task(task, created, update_fields):
     if not created:
         for adviser in task.advisers.all():
             if task.modified_by_id != adviser.id:
+                title = f'Task `{task}` amended by {task.modified_by.name}'
+                reminder = TaskAmendedByOthersReminder.objects.create(
+                    adviser=adviser,
+                    event=title,
+                    task=task,
+                )
+
                 subscription = get_or_create_task_amended_by_others_subscription(adviser)
 
-                # TODO Create reminder
                 if subscription.email_reminders_enabled and is_user_feature_flag_active(
                     ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
                     adviser,
                 ):
-                    # TODO MK Send Email
-                    pass
+                    notify_adviser_by_rq_email(
+                        adviser=adviser,
+                        template_identifier=settings.TASK_REMINDER_EMAIL_TEMPLATE_ID,
+                        context={
+                            'email_subject': title,
+                            'task_title': title,
+                            'modified_by': task.modified_by.name,
+                            'company_name': task.get_company().name,
+                            'task_due_date': task.due_date.strftime('%-d %B %Y')
+                            if task.due_date
+                            else None,
+                            'task_url': task.get_absolute_url(),
+                        },
+                        update_task=update_task_amended_by_others_email_status,
+                        reminders=[reminder],
+                    )
