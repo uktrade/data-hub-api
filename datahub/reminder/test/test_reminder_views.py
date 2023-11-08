@@ -1,4 +1,3 @@
-from asyncio import Task
 import pytest
 
 from freezegun import freeze_time
@@ -151,8 +150,9 @@ class ReminderTestMixin:
             == reminder_count - 1
         )
 
+
 class TaskReminderMixin:
-    
+
     def test_get_generic_task_reminders(self):
         """
         Given some reminders for generic tasks, these should be returned without any references to
@@ -225,6 +225,7 @@ class TaskReminderMixin:
                 },
             },
         }
+
 
 @freeze_time('2022-12-15T17:00:00.000000Z')
 class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
@@ -569,7 +570,7 @@ class TestUpcomingTaskDueDateReminderViewset(APITestMixin, ReminderTestMixin, Ta
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestTaskAssignedToMeFromOthersReminderViewset(
-    APITestMixin, ReminderTestMixin, TaskReminderMixin
+    APITestMixin, ReminderTestMixin, TaskReminderMixin,
 ):
     """
     Tests for the task assigned to me from others reminder view.
