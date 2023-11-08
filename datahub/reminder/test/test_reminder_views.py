@@ -23,7 +23,6 @@ from datahub.reminder.models import (
     UpcomingTaskReminder,
 )
 from datahub.reminder.test.factories import (
-    InvestmentProjectTaskTaskAssignedToMeFromOthersReminderFactory,
     NewExportInteractionReminderFactory,
     NoRecentExportInteractionReminderFactory,
     NoRecentInvestmentInteractionReminderFactory,
@@ -626,10 +625,6 @@ class TestGetReminderSummaryView(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
-        InvestmentProjectTaskTaskAssignedToMeFromOthersReminderFactory.create_batch(
-            reminder_count,
-            adviser=self.user,
-        )
 
         total_reminders = reminder_count * reminder_categories
         url = reverse(self.url_name)
@@ -726,10 +721,6 @@ class TestGetReminderSummaryView(APITestMixin):
             adviser=self.user,
         )
         UpcomingTaskReminderFactory.create_batch(
-            reminder_count,
-            adviser=self.user,
-        )
-        InvestmentProjectTaskTaskAssignedToMeFromOthersReminderFactory.create_batch(
             reminder_count,
             adviser=self.user,
         )
