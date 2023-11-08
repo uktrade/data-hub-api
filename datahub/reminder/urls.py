@@ -154,6 +154,24 @@ urlpatterns = [
         name='my-tasks-due-date-approaching-reminder-detail',
     ),
     path(
+        'reminder/task-assigned-to-me-from-others',
+        UpcomingTaskReminderViewset.as_view(
+            {
+                'get': 'list',
+            },
+        ),
+        name='task-assigned-to-me-from-others-reminder',
+    ),
+    path(
+        'reminder/task-assigned-to-me-from-others/<uuid:pk>',
+        UpcomingTaskReminderViewset.as_view(
+            {
+                'delete': 'destroy',
+            },
+        ),
+        name='task-assigned-to-me-from-others-reminder-detail',
+    ),
+    path(
         'reminder/subscription/my-tasks-due-date-approaching',
         UpcomingTaskReminderSubscriptionViewset.as_view(
             {

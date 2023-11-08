@@ -211,3 +211,18 @@ class UpcomingTaskReminderSerializer(serializers.ModelSerializer):
             'created_on',
             'task',
         )
+
+
+class TaskAssignedToMeFromOthersSerializer(serializers.ModelSerializer):
+    """Serializer for Task assigned to me from others"""
+
+    task = ReminderTaskSerializer()
+
+    class Meta:
+        model = UpcomingTaskReminder
+        fields = (
+            'id',
+            'event',
+            'created_on',
+            'task',
+        )

@@ -46,6 +46,7 @@ from datahub.reminder.serializers import (
     UpcomingEstimatedLandDateSubscriptionSerializer,
     UpcomingTaskReminderSerializer,
     UpcomingTaskReminderSubscriptionSerializer,
+    TaskAssignedToMeFromOthersSerializer,
 )
 
 
@@ -191,6 +192,11 @@ class UpcomingEstimatedLandDateReminderViewset(BaseReminderViewset):
 class UpcomingTaskReminderViewset(BaseReminderViewset):
     serializer_class = UpcomingTaskReminderSerializer
     model_class = UpcomingTaskReminder
+
+
+class TaskAssignedToMeFromOthersReminderViewset(BaseReminderViewset):
+    serializer_class = TaskAssignedToMeFromOthersSerializer
+    model_class = TaskAssignedToMeFromOthersReminder
 
 
 @transaction.non_atomic_requests
