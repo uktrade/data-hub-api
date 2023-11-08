@@ -110,5 +110,7 @@ class InvestmentProjectTaskTaskAssignedToMeFromOthersReminderFactory(BaseReminde
 
 
 class TaskAssignedToMeFromOthersReminderFactory(BaseReminderFactory):
+    task = factory.SubFactory(TaskFactory)
+
     class Meta:
         model = TaskAssignedToMeFromOthersReminder

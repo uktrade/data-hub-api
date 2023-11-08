@@ -18,7 +18,6 @@ from datahub.reminder import (
     INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
 )
 from datahub.reminder.models import (
-    InvestmentProjectTaskTaskAssignedToMeFromOthersReminder as TaskAssignedToMeFromOthersReminder,
     NewExportInteractionReminder,
     NewExportInteractionSubscription,
     NoRecentExportInteractionReminder,
@@ -26,6 +25,7 @@ from datahub.reminder.models import (
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
     ReminderStatus,
+    TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     TaskOverdueSubscription,
     UpcomingEstimatedLandDateReminder,
@@ -40,6 +40,7 @@ from datahub.reminder.serializers import (
     NoRecentExportInteractionSubscriptionSerializer,
     NoRecentInvestmentInteractionReminderSerializer,
     NoRecentInvestmentInteractionSubscriptionSerializer,
+    TaskAssignedToMeFromOthersSerializer,
     TaskAssignedToMeFromOthersSubscriptionSerializer,
     TaskOverdueSubscriptionSerializer,
     UpcomingEstimatedLandDateReminderSerializer,
@@ -191,6 +192,11 @@ class UpcomingEstimatedLandDateReminderViewset(BaseReminderViewset):
 class UpcomingTaskReminderViewset(BaseReminderViewset):
     serializer_class = UpcomingTaskReminderSerializer
     model_class = UpcomingTaskReminder
+
+
+class TaskAssignedToMeFromOthersReminderViewset(BaseReminderViewset):
+    serializer_class = TaskAssignedToMeFromOthersSerializer
+    model_class = TaskAssignedToMeFromOthersReminder
 
 
 @transaction.non_atomic_requests
