@@ -20,15 +20,6 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('email_reminders_enabled', models.BooleanField(default=False)),
                 (
-                    'reminder_days',
-                    django.contrib.postgres.fields.ArrayField(
-                        base_field=models.PositiveSmallIntegerField(),
-                        blank=True,
-                        default=list,
-                        size=5,
-                    ),
-                ),
-                (
                     'adviser',
                     models.OneToOneField(
                         on_delete=django.db.models.deletion.CASCADE,
