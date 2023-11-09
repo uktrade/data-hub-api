@@ -19,15 +19,16 @@ from datahub.reminder.models import (
     NewExportInteractionReminder,
     NoRecentExportInteractionReminder,
     NoRecentInvestmentInteractionReminder,
+    TaskAssignedToMeFromOthersReminder,
     UpcomingEstimatedLandDateReminder,
     UpcomingTaskReminder,
 )
 from datahub.reminder.test.factories import (
-    InvestmentProjectTaskTaskAssignedToMeFromOthersReminderFactory,
     NewExportInteractionReminderFactory,
     NoRecentExportInteractionReminderFactory,
     NoRecentInvestmentInteractionReminderFactory,
     TaskAmendedByOthersReminderFactory,
+    TaskAssignedToMeFromOthersReminderFactory,
     UpcomingEstimatedLandDateReminderFactory,
     UpcomingTaskReminderFactory,
 )
@@ -149,6 +150,82 @@ class ReminderTestMixin:
             ).count()
             == reminder_count - 1
         )
+
+
+class TaskReminderMixin:
+
+    def test_get_generic_task_reminders(self):
+        """
+        Given some reminders for generic tasks, these should be returned without any references to
+        other task types
+        """
+        reminder_count = 3
+        reminders = self.factory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
+        response = self.get_response
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data.get('count') == reminder_count
+        assert 'next' in data
+        assert 'previous' in data
+        results = data.get('results', [])
+        assert len(results) == 2
+        reminders = sorted(reminders, key=lambda x: x.pk)
+
+        assert results[0] == {
+            'id': str(reminders[0].id),
+            'created_on': '2022-05-05T17:00:00Z',
+            'event': reminders[0].event,
+            'task': {
+                'id': str(reminders[0].task.id),
+                'due_date': None,
+                'investment_project_task': None,
+            },
+        }
+
+    def test_get_investment_project_task_reminders(self):
+        """
+        Given some reminders for investment project tasks, these should be returned with the
+        correct investment project task data
+        """
+        investment_project_task = InvestmentProjectTaskFactory()
+        investment_project = investment_project_task.investment_project
+
+        reminders = self.factory.create_batch(
+            3,
+            adviser=self.user,
+            task=investment_project_task.task,
+        )
+        response = self.get_response
+        data = response.json()
+        results = data.get('results', [])
+        reminders = sorted(reminders, key=lambda x: x.pk)
+
+        assert results[0] == {
+            'id': str(reminders[0].id),
+            'created_on': '2022-05-05T17:00:00Z',
+            'event': reminders[0].event,
+            'task': {
+                'id': str(reminders[0].task.id),
+                'due_date': None,
+                'investment_project_task': {
+                    'id': str(investment_project_task.id),
+                    'investment_project': {
+                        'name': investment_project.name,
+                        'project_code': investment_project.project_code,
+                        'investor_company': {
+                            'name': investment_project.investor_company.name,
+                            'id': str(
+                                investment_project.investor_company.id,
+                            ),
+                        },
+                        'id': str(investment_project.id),
+                    },
+                },
+            },
+        }
 
 
 @freeze_time('2022-12-15T17:00:00.000000Z')
@@ -481,7 +558,7 @@ class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin, ReminderTestMix
 
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
-class TestUpcomingTaskDueDateReminderViewset(APITestMixin, ReminderTestMixin):
+class TestUpcomingTaskDueDateReminderViewset(APITestMixin, ReminderTestMixin, TaskReminderMixin):
     """
     Tests for the upcoming task due date reminder view.
     """
@@ -491,78 +568,19 @@ class TestUpcomingTaskDueDateReminderViewset(APITestMixin, ReminderTestMixin):
     factory = UpcomingTaskReminderFactory
     tested_model = UpcomingTaskReminder
 
-    def test_get_generic_task_reminders(self):
-        """
-        Given some reminders for generic tasks, these should be returned without any references to
-        other task types
-        """
-        reminder_count = 3
-        reminders = self.factory.create_batch(
-            reminder_count,
-            adviser=self.user,
-        )
-        response = self.get_response
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data.get('count') == reminder_count
-        assert 'next' in data
-        assert 'previous' in data
-        results = data.get('results', [])
-        assert len(results) == 2
-        reminders = sorted(reminders, key=lambda x: x.pk)
 
-        assert results[0] == {
-            'id': str(reminders[0].id),
-            'created_on': '2022-05-05T17:00:00Z',
-            'event': reminders[0].event,
-            'task': {
-                'id': str(reminders[0].task.id),
-                'due_date': None,
-                'investment_project_task': None,
-            },
-        }
+@freeze_time('2022-05-05T17:00:00.000000Z')
+class TestTaskAssignedToMeFromOthersReminderViewset(
+    APITestMixin, ReminderTestMixin, TaskReminderMixin,
+):
+    """
+    Tests for the task assigned to me from others reminder view.
+    """
 
-    def test_get_investment_project_task_reminders(self):
-        """
-        Given some reminders for investment project tasks, these should be returned with the
-        correct investment project task data
-        """
-        investment_project_task = InvestmentProjectTaskFactory()
-        investment_project = investment_project_task.investment_project
-
-        reminders = self.factory.create_batch(
-            3,
-            adviser=self.user,
-            task=investment_project_task.task,
-        )
-        response = self.get_response
-        data = response.json()
-        results = data.get('results', [])
-        reminders = sorted(reminders, key=lambda x: x.pk)
-
-        assert results[0] == {
-            'id': str(reminders[0].id),
-            'created_on': '2022-05-05T17:00:00Z',
-            'event': reminders[0].event,
-            'task': {
-                'id': str(reminders[0].task.id),
-                'due_date': None,
-                'investment_project_task': {
-                    'id': str(investment_project_task.id),
-                    'investment_project': {
-                        'name': investment_project.name,
-                        'project_code': investment_project.project_code,
-                        'investor_company': {
-                            'name': investment_project.investor_company.name,
-                            'id': str(
-                                investment_project.investor_company.id,
-                            ),
-                        },
-                        'id': str(investment_project.id),
-                    },
-                },
-            },
-        }
+    url_name = 'api-v4:reminder:task-assigned-to-me-from-others-reminder'
+    detail_url_name = 'api-v4:reminder:task-assigned-to-me-from-others-reminder-detail'
+    factory = TaskAssignedToMeFromOthersReminderFactory
+    tested_model = TaskAssignedToMeFromOthersReminder
 
 
 class TestGetReminderSummaryView(APITestMixin):
@@ -627,7 +645,7 @@ class TestGetReminderSummaryView(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
-        InvestmentProjectTaskTaskAssignedToMeFromOthersReminderFactory.create_batch(
+        TaskAssignedToMeFromOthersReminderFactory.create_batch(
             reminder_count,
             adviser=self.user,
         )
@@ -736,7 +754,7 @@ class TestGetReminderSummaryView(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
-        InvestmentProjectTaskTaskAssignedToMeFromOthersReminderFactory.create_batch(
+        TaskAssignedToMeFromOthersReminderFactory.create_batch(
             reminder_count,
             adviser=self.user,
         )

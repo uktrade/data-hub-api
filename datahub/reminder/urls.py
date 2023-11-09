@@ -10,6 +10,7 @@ from datahub.reminder.views import (
     reminder_subscription_summary_view,
     reminder_summary_view,
     TaskAmendedByOthersSubscriptionViewset,
+    TaskAssignedToMeFromOthersReminderViewset,
     TaskAssignedToMeFromOthersSubscriptionViewset,
     TaskOverdueSubscriptionViewset,
     UpcomingEstimatedLandDateReminderViewset,
@@ -165,14 +166,22 @@ urlpatterns = [
         name='my-tasks-due-date-approaching-subscription',
     ),
     path(
-        'reminder/subscription/my-tasks-task-overdue',
-        TaskOverdueSubscriptionViewset.as_view(
+        'reminder/task-assigned-to-me-from-others',
+        TaskAssignedToMeFromOthersReminderViewset.as_view(
             {
-                'get': 'retrieve',
-                'patch': 'partial_update',
+                'get': 'list',
             },
         ),
-        name='my-tasks-task-overdue-subscription',
+        name='task-assigned-to-me-from-others-reminder',
+    ),
+    path(
+        'reminder/task-assigned-to-me-from-others/<uuid:pk>',
+        TaskAssignedToMeFromOthersReminderViewset.as_view(
+            {
+                'delete': 'destroy',
+            },
+        ),
+        name='task-assigned-to-me-from-others-reminder-detail',
     ),
     path(
         'reminder/subscription/task-assigned-to-me-from-others',
@@ -183,6 +192,16 @@ urlpatterns = [
             },
         ),
         name='task-assigned-to-me-from-others-subscription',
+    ),
+    path(
+        'reminder/subscription/my-tasks-task-overdue',
+        TaskOverdueSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
+        name='my-tasks-task-overdue-subscription',
     ),
     path(
         'reminder/subscription/task-amended-by-others',
