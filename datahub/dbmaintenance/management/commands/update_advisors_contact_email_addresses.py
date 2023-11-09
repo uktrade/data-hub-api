@@ -6,7 +6,7 @@ from datahub.company.models import Contact
 
 
 class Command(CSVBaseCommand):
-    """Command to update the email for contacts that have with @trade in it."""
+    """Command to update the email for contacts that have @trade in it."""
 
     def _process_row(self, row, simulate=False, **options):
         """Process one row"""
