@@ -889,3 +889,30 @@ class TestTasksAmendedByOthers:
             )
             assert not reminders.exists()
             mock_notify_adviser_by_rq_email.assert_not_called()
+
+    def test_task_amended_by_others_reminder_email_status(
+        self,
+    ):
+        """
+        Test it updates reminder data with the connected email notification information.
+        """
+        task = TaskFactory()
+        reminder_number = 3
+        notification_id = str(uuid4())
+        reminders = TaskAmendedByOthersReminderFactory.create_batch(
+            reminder_number,
+            task_id=task.id,
+        )
+
+        update_task_amended_by_others_email_status(
+            notification_id,
+            [reminder.id for reminder in reminders],
+        )
+
+        task2 = TaskFactory()
+        TaskAmendedByOthersReminderFactory.create_batch(2, task_id=task2.id)
+
+        linked_reminders = TaskAmendedByOthersReminder.objects.filter(
+            email_notification_id=notification_id,
+        )
+        assert linked_reminders.count() == (reminder_number)
