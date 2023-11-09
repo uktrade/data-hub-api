@@ -395,6 +395,16 @@ class Company(ArchivableModel, BaseModel):
         help_text='This value is provided from DNB, and cannot be modified inside datahub',
     )
 
+    # Fields export_win_* are being used to match wins from Export Win
+    # based on match_id from Company Matching service
+    export_win_match_id = models.PositiveIntegerField(null=True, blank=True, db_index=True)
+    export_win_last_matched_on = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text='Last updated from Company Matching service',
+        db_index=True,
+    )
+
     def __str__(self):
         """Admin displayed human readable name."""
         return self.name
