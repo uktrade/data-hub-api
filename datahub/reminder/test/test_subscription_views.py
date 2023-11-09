@@ -15,6 +15,7 @@ from datahub.reminder.test.factories import (
     NewExportInteractionSubscriptionFactory,
     NoRecentExportInteractionSubscriptionFactory,
     NoRecentInvestmentInteractionSubscriptionFactory,
+    TaskAmendedByOthersSubscriptionFactory,
     TaskAssignedToMeFromOthersSubscriptionFactory,
     TaskOverdueSubscriptionFactory,
     UpcomingEstimatedLandDateSubscriptionFactory,
@@ -215,52 +216,60 @@ class TestTaskOverdueReminderSubscriptionViewset(
     factory = TaskOverdueSubscriptionFactory
 
 
-class TestTaskAssignedToMeFromOthersSubscriptionViewset(
-    APITestMixin,
-):
+@pytest.mark.parametrize(
+    'url_name,factory',
+    [
+        (
+            'api-v4:reminder:task-assigned-to-me-from-others-subscription',
+            TaskAssignedToMeFromOthersSubscriptionFactory,
+        ),
+        (
+            'api-v4:reminder:task-amended-by-others-subscription',
+            TaskAmendedByOthersSubscriptionFactory,
+        ),
+    ],
+)
+class TestTaskSubscriptionViewset(APITestMixin):
     """
     Tests for the task assigned to me from others subscription view.
     """
 
-    url_name = 'api-v4:reminder:task-assigned-to-me-from-others-subscription'
-    factory = TaskAssignedToMeFromOthersSubscriptionFactory
-
-    def test_not_authed(self):
+    def test_not_authed(self, url_name, factory):
         """Should return Unauthorised"""
-        url = reverse(self.url_name)
+        url = reverse(url_name)
         api_client = APIClient()
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_get_subscription_not_present(self):
+    def test_get_subscription_not_present(self, url_name, factory):
         """Given the current user does not have a subscription, make an empty one"""
-        url = reverse(self.url_name)
+        url = reverse(url_name)
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
             'email_reminders_enabled': False,
         }
 
-    def test_get_subscription(self):
+    def test_get_subscription(self, url_name, factory):
         """Given an existing subscription, those details should be returned"""
-        self.factory(
+        factory(
             adviser=self.user,
             email_reminders_enabled=True,
         )
-        url = reverse(self.url_name)
+        url = reverse(url_name)
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
             'email_reminders_enabled': True,
         }
 
-    def test_patch_existing_subscription(self):
+    def test_patch_existing_subscription(self, url_name, factory):
         """Patching the subscription will update an existing subscription"""
-        self.factory(
+        factory(
             adviser=self.user,
             email_reminders_enabled=True,
         )
-        url = reverse(self.url_name)
+        url = reverse(url_name)
         data = {'email_reminders_enabled': False}
         response = self.api_client.patch(url, data)
         assert response.status_code == status.HTTP_200_OK
@@ -268,9 +277,9 @@ class TestTaskAssignedToMeFromOthersSubscriptionViewset(
             'email_reminders_enabled': False,
         }
 
-    def test_patch_subscription_no_existing(self):
+    def test_patch_subscription_no_existing(self, url_name, factory):
         """Patching the subscription will create one if it didn't exist already"""
-        url = reverse(self.url_name)
+        url = reverse(url_name)
         data = {'email_reminders_enabled': True}
         response = self.api_client.patch(url, data)
 
@@ -324,6 +333,10 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             reminder_days=reminder_days,
             email_reminders_enabled=email_reminders_enabled,
         )
+        TaskAmendedByOthersSubscriptionFactory(
+            adviser=self.user,
+            email_reminders_enabled=email_reminders_enabled,
+        )
         TaskAssignedToMeFromOthersSubscriptionFactory(
             adviser=self.user,
             email_reminders_enabled=email_reminders_enabled,
@@ -358,6 +371,9 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             'upcoming_task_reminder': {
                 'email_reminders_enabled': True,
                 'reminder_days': [10, 20, 40],
+            },
+            'task_amended_by_others': {
+                'email_reminders_enabled': True,
             },
             'task_assigned_to_me_from_others': {
                 'email_reminders_enabled': True,
@@ -394,6 +410,9 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             'upcoming_task_reminder': {
                 'email_reminders_enabled': False,
                 'reminder_days': [],
+            },
+            'task_amended_by_others': {
+                'email_reminders_enabled': False,
             },
             'task_assigned_to_me_from_others': {
                 'email_reminders_enabled': False,

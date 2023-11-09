@@ -25,6 +25,8 @@ from datahub.reminder.models import (
     NoRecentInvestmentInteractionReminder,
     NoRecentInvestmentInteractionSubscription,
     ReminderStatus,
+    TaskAmendedByOthersReminder,
+    TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     TaskOverdueSubscription,
@@ -40,6 +42,7 @@ from datahub.reminder.serializers import (
     NoRecentExportInteractionSubscriptionSerializer,
     NoRecentInvestmentInteractionReminderSerializer,
     NoRecentInvestmentInteractionSubscriptionSerializer,
+    TaskAmendedByOthersSubscriptionSerializer,
     TaskAssignedToMeFromOthersSerializer,
     TaskAssignedToMeFromOthersSubscriptionSerializer,
     TaskOverdueSubscriptionSerializer,
@@ -102,6 +105,11 @@ class TaskAssignedToMeFromOthersSubscriptionViewset(BaseSubscriptionViewset):
     queryset = TaskAssignedToMeFromOthersSubscription.objects.all()
 
 
+class TaskAmendedByOthersSubscriptionViewset(BaseSubscriptionViewset):
+    serializer_class = TaskAmendedByOthersSubscriptionSerializer
+    queryset = TaskAmendedByOthersSubscription.objects.all()
+
+
 @transaction.non_atomic_requests
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -140,6 +148,9 @@ def reminder_subscription_summary_view(request):
     task_overdue = TaskOverdueSubscriptionSerializer(
         get_object(TaskOverdueSubscription.objects.all()),
     ).data
+    task_amended_by_others = TaskAmendedByOthersSubscriptionSerializer(
+        get_object(TaskAmendedByOthersSubscription.objects.all()),
+    ).data
 
     return Response(
         {
@@ -149,6 +160,7 @@ def reminder_subscription_summary_view(request):
             'new_export_interaction': new_export_interaction,
             'upcoming_task_reminder': upcoming_task_reminder,
             'task_assigned_to_me_from_others': task_assigned_to_me_from_others,
+            'task_amended_by_others': task_amended_by_others,
             'task_overdue': task_overdue,
         },
     )
@@ -244,6 +256,9 @@ def reminder_summary_view(request):
     task_assigned_to_me_from_others = TaskAssignedToMeFromOthersReminder.objects.filter(
         adviser=request.user,
     ).count()
+    task_amended_by_others = TaskAmendedByOthersReminder.objects.filter(
+        adviser=request.user,
+    ).count()
 
     total_count = sum(
         [
@@ -254,6 +269,7 @@ def reminder_summary_view(request):
             new_export_interaction,
             task_due_date_approaching,
             task_assigned_to_me_from_others,
+            task_amended_by_others,
         ],
     )
 
@@ -272,6 +288,7 @@ def reminder_summary_view(request):
             'my_tasks': {
                 'due_date_approaching': task_due_date_approaching,
                 'task_assigned_to_me_from_others': task_assigned_to_me_from_others,
+                'task_amended_by_others': task_amended_by_others,
             },
         },
     )
