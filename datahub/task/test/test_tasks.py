@@ -770,7 +770,7 @@ class TestTasksAmendedByOthers:
 
         reminders = TaskAmendedByOthersReminder.objects.filter(adviser=advisers[1])
 
-        assert reminders.count() == 0
+        assert not reminders.exists()
 
     def test_no_reminder_created_on_mark_as_completed(self, adviser_tasks_user_feature_flag):
         advisers = AdviserFactory.create_batch(2)
@@ -784,7 +784,7 @@ class TestTasksAmendedByOthers:
 
         reminders = TaskAmendedByOthersReminder.objects.filter(task=task)
 
-        assert reminders.count() == 0
+        assert not reminders.exists()
 
     def test_email_reminder_send_on_save(
         self,
@@ -887,5 +887,5 @@ class TestTasksAmendedByOthers:
             reminders = TaskAmendedByOthersReminder.objects.filter(
                 task=investment_project_task.task,
             )
-            assert reminders.count() == 0
+            assert not reminders.exists()
             mock_notify_adviser_by_rq_email.assert_not_called()
