@@ -10,7 +10,6 @@ from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 from datahub.omis.order.models import Order
 from datahub.omis.quote.models import Quote
-from datahub.task.models import InvestmentProjectTask
 
 COMPANY_MODIFIED_ON_CUT_OFF = datetime(2013, 8, 19, tzinfo=utc)  # 2013-08-18 + 1 day
 COMPANY_EXPIRY_PERIOD = relativedelta(years=10)
