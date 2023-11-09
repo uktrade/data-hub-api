@@ -334,8 +334,6 @@ def task_amended_by_others_subscription_task(task, created, update_fields):
                             'task_title': title,
                             'modified_by': task.modified_by.name,
                             'company_name': task.get_company().name,
-                            # if task.get_company()
-                            # else None,
                             'task_due_date': task.due_date.strftime('%-d %B %Y')
                             if task.due_date
                             else None,
