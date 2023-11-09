@@ -306,12 +306,13 @@ def get_or_create_task_amended_by_others_subscription(adviser):
 
 def task_amended_by_others_subscription_task(task, created, update_fields):
     """
-    Creates a task reminder subscription for an adviser if the adviser doesn't have
-    a subscription already.
+    Creates or reads task reminder subscription for an adviser
+    Creates a reminder if task saved by other adviser.
+    No reminder are send when task is (marked as) completed/archived.
     """
     if not created:
         for adviser in task.advisers.all():
-            if task.modified_by_id != adviser.id:
+            if task.modified_by_id != adviser.id and not task.archived:
                 title = f'Task `{task}` amended by {task.modified_by.name}'
                 reminder = TaskAmendedByOthersReminder.objects.create(
                     adviser=adviser,
@@ -333,6 +334,8 @@ def task_amended_by_others_subscription_task(task, created, update_fields):
                             'task_title': title,
                             'modified_by': task.modified_by.name,
                             'company_name': task.get_company().name,
+                            # if task.get_company()
+                            # else None,
                             'task_due_date': task.due_date.strftime('%-d %B %Y')
                             if task.due_date
                             else None,

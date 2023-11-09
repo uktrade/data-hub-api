@@ -17,6 +17,8 @@ class TaskFactory(factory.django.DjangoModelFactory):
     modified_by = factory.SelfAttribute('created_by')
     created_on = now()
     title = factory.Faker('company')
+    due_date = factory.Faker('future_date')
+    reminder_days = factory.Faker('random_int', max=90)
 
     archived = False
 
