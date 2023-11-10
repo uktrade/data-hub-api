@@ -11,7 +11,7 @@ import pytest
 
 from django.apps import apps
 from django.test.utils import override_settings
-from datahub import task
+
 
 from datahub.feature_flag.test.factories import UserFeatureFlagFactory
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
