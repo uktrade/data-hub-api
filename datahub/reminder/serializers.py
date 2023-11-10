@@ -224,7 +224,7 @@ class UpcomingTaskReminderSerializer(serializers.ModelSerializer):
         )
 
 
-class TaskAssignedToMeFromOthersSerializer(serializers.ModelSerializer):
+class TaskAssignedToMeFromOthersReminderSerializer(serializers.ModelSerializer):
     """Serializer for task assigned to me from others"""
 
     task = ReminderTaskSerializer()
