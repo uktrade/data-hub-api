@@ -19,6 +19,7 @@ from datahub.reminder.models import (
     UpcomingTaskReminderSubscription,
 )
 from datahub.reminder.tasks import notify_adviser_by_rq_email
+from datahub.task.emails import TaskAssignedToOthersEmailTemplate, UpcomingTaskEmailTemplate
 from datahub.task.models import Task
 
 
@@ -123,11 +124,18 @@ def create_upcoming_task_reminder(
         ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
         adviser,
     ):
-        send_task_reminder_email(
+        # send_task_reminder_email(
+        #     adviser=adviser,
+        #     task=task,
+        #     company=task.get_company(),
+        #     reminders=[reminder],
+        # )
+        send_task_email(
             adviser=adviser,
             task=task,
-            company=task.get_company(),
             reminders=[reminder],
+            update_task=update_task_reminder_email_status,
+            email_template_class=UpcomingTaskEmailTemplate,
         )
 
     return reminder
@@ -152,19 +160,25 @@ def send_task_reminder_email(
     Sends task reminder by email.
     """
     statsd.incr(f'send_task_reminder_notification.{task.reminder_days}')
-
-    notify_adviser_by_rq_email(
+    send_task_email(
         adviser=adviser,
-        template_identifier=settings.TASK_REMINDER_STATUS_TEMPLATE_ID,
-        context={
-            'task_title': task.title,
-            'company_name': company.name,
-            'task_due_date': task.due_date.strftime('%-d %B %Y'),
-            'task_url': task.get_absolute_url(),
-        },
-        update_task=update_task_reminder_email_status,
+        task=task,
         reminders=reminders,
+        update_task=update_task_reminder_email_status,
+        email_template_class=UpcomingTaskEmailTemplate,
     )
+    # notify_adviser_by_rq_email(
+    #     adviser=adviser,
+    #     template_identifier=settings.TASK_REMINDER_EMAIL_TEMPLATE_ID,
+    #     context={
+    #         'task_title': task.title,
+    #         'company_name': company.name,
+    #         'task_due_date': task.due_date.strftime('%-d %B %Y'),
+    #         'task_url': task.get_absolute_url(),
+    #     },
+    #     update_task=update_task_reminder_email_status,
+    #     reminders=reminders,
+    # )
 
 
 def update_task_reminder_email_status(email_notification_id, reminder_ids):
@@ -226,19 +240,26 @@ def notify_adviser_added_to_task(task, adviser_id):
         ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
         adviser,
     ):
-        notify_adviser_by_rq_email(
+        send_task_email(
             adviser=adviser,
-            template_identifier=settings.TASK_NOTIFICATION_FROM_OTHERS_TEMPLATE_ID,
-            context={
-                'task_title': task.title,
-                'modified_by': task.modified_by.name,
-                'company_name': task.get_company().name,
-                'task_due_date': task.due_date.strftime('%-d %B %Y') if task.due_date else None,
-                'task_url': task.get_absolute_url(),
-            },
-            update_task=update_task_assigned_to_me_from_others_email_status,
+            task=task,
             reminders=[reminder],
+            update_task=update_task_assigned_to_me_from_others_email_status,
+            email_template_class=TaskAssignedToOthersEmailTemplate,
         )
+        # notify_adviser_by_rq_email(
+        #     adviser=adviser,
+        #     template_identifier=settings.TASK_REMINDER_EMAIL_TEMPLATE_ID,
+        #     context={
+        #         'task_title': task.title,
+        #         'modified_by': task.modified_by.name,
+        #         'company_name': task.get_company().name,
+        #         'task_due_date': task.due_date.strftime('%-d %B %Y') if task.due_date else None,
+        #         'task_url': task.get_absolute_url(),
+        #     },
+        #     update_task=update_task_assigned_to_me_from_others_email_status,
+        #     reminders=[reminder],
+        # )
 
 
 def schedule_create_task_overdue_subscription_task(adviser_id):
@@ -259,5 +280,16 @@ def create_task_overdue_subscription_task(adviser_id):
     """
     if not TaskOverdueSubscription.objects.filter(adviser_id=adviser_id).first():
         TaskOverdueSubscription.objects.create(
-            adviser_id=adviser_id, email_reminders_enabled=True,
+            adviser_id=adviser_id,
+            email_reminders_enabled=True,
         )
+
+
+def send_task_email(adviser, task, reminders, update_task, email_template_class):
+    notify_adviser_by_rq_email(
+        adviser=adviser,
+        template_identifier=settings.TASK_REMINDER_EMAIL_TEMPLATE_ID,
+        context=email_template_class(task).get_context(),
+        update_task=update_task,
+        reminders=reminders,
+    )
