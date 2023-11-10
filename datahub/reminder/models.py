@@ -246,18 +246,6 @@ class UpcomingTaskReminder(BaseReminder):
     )
 
 
-class InvestmentProjectTaskTaskAssignedToMeFromOthersReminder(BaseReminder):
-    """
-    Investment project task assigned to me from others notification.
-    """
-
-    investment_project_task = models.ForeignKey(
-        'task.InvestmentProjectTask',
-        on_delete=models.CASCADE,
-        related_name='investment_project_task_task_assigned_to_me_from_others_reminder',
-    )
-
-
 class TaskAssignedToMeFromOthersReminder(BaseReminder):
     """
     Task assigned to me from others generic task reminder.

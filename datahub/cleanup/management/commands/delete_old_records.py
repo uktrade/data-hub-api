@@ -10,7 +10,6 @@ from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 from datahub.omis.order.models import Order
 from datahub.omis.quote.models import Quote
-from datahub.task.models import InvestmentProjectTask
 
 COMPANY_MODIFIED_ON_CUT_OFF = datetime(2013, 8, 19, tzinfo=utc)  # 2013-08-18 + 1 day
 COMPANY_EXPIRY_PERIOD = relativedelta(years=10)
@@ -249,11 +248,6 @@ class Command(BaseCleanupCommand):
             (
                 DatetimeLessThanCleanupFilter('created_on', TASK_EXPIRY_PERIOD),
                 DatetimeLessThanCleanupFilter('modified_on', TASK_EXPIRY_PERIOD),
-            ),
-            excluded_relations=(
-                InvestmentProjectTask._meta.get_field(
-                    'investment_project_task_task_assigned_to_me_from_others_reminder',
-                ),
             ),
         ),
     }
