@@ -29,6 +29,7 @@ from datahub.reminder.models import (
     TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
+    TaskOverdueReminder,
     TaskOverdueSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
@@ -45,6 +46,7 @@ from datahub.reminder.serializers import (
     TaskAmendedByOthersSubscriptionSerializer,
     TaskAssignedToMeFromOthersSerializer,
     TaskAssignedToMeFromOthersSubscriptionSerializer,
+    TaskOverdueReminderSerializer,
     TaskOverdueSubscriptionSerializer,
     UpcomingEstimatedLandDateReminderSerializer,
     UpcomingEstimatedLandDateSubscriptionSerializer,
@@ -211,6 +213,11 @@ class TaskAssignedToMeFromOthersReminderViewset(BaseReminderViewset):
     model_class = TaskAssignedToMeFromOthersReminder
 
 
+class TaskOverdueReminderViewset(BaseReminderViewset):
+    serializer_class = TaskOverdueReminderSerializer
+    model_class = TaskOverdueReminder
+
+
 @transaction.non_atomic_requests
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -259,6 +266,9 @@ def reminder_summary_view(request):
     task_amended_by_others = TaskAmendedByOthersReminder.objects.filter(
         adviser=request.user,
     ).count()
+    task_overdue = TaskOverdueReminder.objects.filter(
+        adviser=request.user,
+    ).count()
 
     total_count = sum(
         [
@@ -270,6 +280,7 @@ def reminder_summary_view(request):
             task_due_date_approaching,
             task_assigned_to_me_from_others,
             task_amended_by_others,
+            task_overdue,
         ],
     )
 
@@ -289,6 +300,7 @@ def reminder_summary_view(request):
                 'due_date_approaching': task_due_date_approaching,
                 'task_assigned_to_me_from_others': task_assigned_to_me_from_others,
                 'task_amended_by_others': task_amended_by_others,
+                'task_overdue': task_overdue,
             },
         },
     )

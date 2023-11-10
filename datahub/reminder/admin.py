@@ -11,6 +11,7 @@ from datahub.reminder.models import (
     TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
+    TaskOverdueReminder,
     TaskOverdueSubscription,
     UpcomingEstimatedLandDateReminder,
     UpcomingEstimatedLandDateSubscription,
@@ -120,5 +121,12 @@ class TaskAssignedToMeFromOthersReminderAdmin(admin.ModelAdmin):
 @admin.register(TaskAmendedByOthersReminder)
 class TaskAmendedByOthersReminderAdmin(admin.ModelAdmin):
     """Task amended by others admin."""
+
+    raw_id_fields = ('adviser',)
+
+
+@admin.register(TaskOverdueReminder)
+class TaskOverdueReminderAdmin(admin.ModelAdmin):
+    """Task overdue admin."""
 
     raw_id_fields = ('adviser',)
