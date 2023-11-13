@@ -268,3 +268,15 @@ class TaskAmendedByOthersReminder(BaseReminder):
         on_delete=models.CASCADE,
         related_name='task_amended_by_others_reminder',
     )
+
+
+class TaskOverdueReminder(BaseReminder):
+    """
+    Task overdue generic task reminder.
+    """
+
+    task = models.ForeignKey(
+        'task.Task',
+        on_delete=models.CASCADE,
+        related_name='task_overdue_reminder',
+    )
