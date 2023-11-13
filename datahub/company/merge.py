@@ -124,26 +124,28 @@ class MergeNotAllowedError(DataHubError):
 
 
 def is_company_a_valid_merge_source(company: Company):
-    """Checks if company can be moved."""
+    """Checks if company can be moved and returns fields not allowed for merging."""
     # First, check that there are no references to the company from other objects
     # (other than via the fields specified in ALLOWED_RELATIONS_FOR_MERGING).
     relations = get_related_fields(Company)
 
-    has_related_objects = any(
-        getattr(company, relation.name).count()
-        for relation in relations
-        if relation.remote_field not in ALLOWED_RELATIONS_FOR_MERGING
-    )
+    disallowed_fields = []
+    for relation in relations:
+        if relation.remote_field not in ALLOWED_RELATIONS_FOR_MERGING:
+            if getattr(company, relation.name).count():
+                disallowed_fields.append(relation.name)
 
-    if has_related_objects:
-        return False
+    if disallowed_fields:
+        return False, disallowed_fields
 
     # Then, check that the source company itself doesn't have any references to other
     # companies.
     self_referential_fields = get_self_referential_relations(Company)
-    return not any(
-        getattr(company, field.name) for field in self_referential_fields
-    )
+    for field in self_referential_fields:
+        if getattr(company, field.name):
+            return False, [field.name]
+
+    return True, []
 
 
 def is_company_a_valid_merge_target(company: Company):
