@@ -12,6 +12,7 @@ from datahub.reminder.views import (
     TaskAmendedByOthersSubscriptionViewset,
     TaskAssignedToMeFromOthersReminderViewset,
     TaskAssignedToMeFromOthersSubscriptionViewset,
+    TaskOverdueReminderViewset,
     TaskOverdueSubscriptionViewset,
     UpcomingEstimatedLandDateReminderViewset,
     UpcomingEstimatedLandDateSubscriptionViewset,
@@ -192,6 +193,24 @@ urlpatterns = [
             },
         ),
         name='task-assigned-to-me-from-others-subscription',
+    ),
+    path(
+        'reminder/my-tasks-task-overdue',
+        TaskOverdueReminderViewset.as_view(
+            {
+                'get': 'list',
+            },
+        ),
+        name='my-tasks-task-overdue-reminder',
+    ),
+    path(
+        'reminder/my-tasks-task-overdue/<uuid:pk>',
+        TaskOverdueReminderViewset.as_view(
+            {
+                'delete': 'destroy',
+            },
+        ),
+        name='my-tasks-task-overdue-reminder-detail',
     ),
     path(
         'reminder/subscription/my-tasks-task-overdue',
