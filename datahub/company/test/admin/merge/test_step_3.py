@@ -1,6 +1,7 @@
 import re
 from datetime import datetime
 from itertools import chain, cycle, islice
+from unittest.mock import patch
 
 import pytest
 from django.contrib import messages as django_messages
@@ -287,23 +288,33 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert contact_1_versions[0].revision == reversion
 
     @pytest.mark.parametrize(
-        'source_company_factory,target_company_factory',
+        'source_company_factory, target_company_factory, disallowed_fields',
         (
             (
                 CompanyFactory,
                 ArchivedCompanyFactory,
+                [],
             ),
             (
                 SubsidiaryFactory,
                 CompanyFactory,
+                ['some_disallowed_field_1', 'some_disallowed_field_2'],
             ),
             (
                 lambda: SubsidiaryFactory().global_headquarters,
                 CompanyFactory,
+                ['another_disallowed_field'],
             ),
         ),
     )
-    def test_merge_fails(self, source_company_factory, target_company_factory):
+    @patch('datahub.company.merge.is_company_a_valid_merge_source')
+    def test_merge_fails(
+        self,
+        is_company_a_valid_merge_source_mock,
+        source_company_factory,
+        target_company_factory,
+        disallowed_fields,
+    ):
         """
         Test that the merge fails when the source company cannot be merged into the target company.
         """
@@ -311,6 +322,9 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         target_company = target_company_factory()
         source_interactions = list(source_company.interactions.all())
         source_contacts = list(source_company.contacts.all())
+
+        # Mock the is_company_a_valid_merge_source function
+        is_company_a_valid_merge_source_mock.return_value = (False, disallowed_fields)
 
         confirm_merge_url = _make_confirm_merge_url(source_company, target_company)
 
