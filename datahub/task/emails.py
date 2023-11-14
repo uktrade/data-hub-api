@@ -107,3 +107,20 @@ class TaskAssignedToOthersEmailTemplate(EmailTemplate):
             self.company_name,
             self.task_due_date,
         ]
+
+
+class TaskCompletedEmailTemplate(EmailTemplate):
+    def __init__(self, task: Task):
+        super().__init__(task)
+
+    @property
+    def subject(self):
+        return 'Task completed'
+
+    @property
+    def fields_to_include(self):
+        return [
+            self.investment_project,
+            self.company_name,
+            self.task_due_date,
+        ]

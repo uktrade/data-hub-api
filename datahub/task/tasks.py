@@ -13,12 +13,18 @@ from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
+    TaskCompletedReminder,
+    TaskCompletedSubscription,
     TaskOverdueSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
 )
 from datahub.reminder.tasks import notify_adviser_by_rq_email
-from datahub.task.emails import TaskAssignedToOthersEmailTemplate, UpcomingTaskEmailTemplate
+from datahub.task.emails import (
+    TaskAssignedToOthersEmailTemplate,
+    TaskCompletedEmailTemplate,
+    UpcomingTaskEmailTemplate,
+)
 from datahub.task.models import Task
 
 
@@ -157,6 +163,13 @@ def update_task_assigned_to_me_from_others_email_status(email_notification_id, r
         reminder.save()
 
 
+def update_task_completed_email_status(email_notification_id, reminder_ids):
+    reminders = TaskCompletedReminder.all_objects.filter(id__in=reminder_ids)
+    for reminder in reminders:
+        reminder.email_notification_id = email_notification_id
+        reminder.save()
+
+
 def schedule_create_task_assigned_to_me_from_others_subscription_task(task, adviser_id):
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
@@ -231,6 +244,60 @@ def create_task_overdue_subscription_task(adviser_id):
         TaskOverdueSubscription.objects.create(
             adviser_id=adviser_id,
             email_reminders_enabled=True,
+        )
+
+
+def schedule_create_task_completed_subscription_task(task, adviser_id):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=notify_adviser_completed_task,
+        function_args=(task, adviser_id),
+    )
+    logger.info(
+        f'Task {job.id} create_task_completed_subscription_task',
+    )
+
+
+def create_task_completed_subscription(adviser):
+    """
+    Creates a task reminder subscription for an adviser if the adviser doesn't have
+    a subscription already.
+    """
+    current_subscription = TaskCompletedSubscription.objects.filter(
+        adviser_id=adviser.id,
+    ).first()
+    if not current_subscription:
+        return TaskCompletedSubscription.objects.create(
+            adviser=adviser,
+            email_reminders_enabled=True,
+        )
+    return current_subscription
+
+
+def notify_adviser_completed_task(task, adviser_id):
+    """
+    Send a notification to the adviser when task completed
+    """
+    adviser = Advisor.objects.filter(id=str(adviser_id)).first()
+    if not adviser:
+        return
+    reminder = TaskCompletedReminder.objects.create(
+        adviser=adviser,
+        event=f'{task} completed by {task.modified_by.name}',
+        task=task,
+    )
+    task_subscription = create_task_completed_subscription(adviser)
+
+    if task_subscription.email_reminders_enabled is True and is_user_feature_flag_active(
+        ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
+        adviser,
+    ):
+        send_task_email(
+            adviser=adviser,
+            task=task,
+            reminders=[reminder],
+            update_task=update_task_completed_email_status,
+            email_template_class=TaskCompletedEmailTemplate,
         )
 
 

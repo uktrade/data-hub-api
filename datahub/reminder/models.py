@@ -94,6 +94,12 @@ class TaskAmendedByOthersSubscription(BaseSubscription):
     """
 
 
+class TaskCompletedSubscription(BaseSubscription):
+    """
+    Subscription to get reminders about task completed.
+    """
+
+
 class EmailDeliveryStatus(models.TextChoices):
     SENDING = ('sending', 'Sending')
     DELIVERED = ('delivered', 'Delivered')
@@ -279,4 +285,16 @@ class TaskOverdueReminder(BaseReminder):
         'task.Task',
         on_delete=models.CASCADE,
         related_name='task_overdue_reminder',
+    )
+
+
+class TaskCompletedReminder(BaseReminder):
+    """
+    Task completed generic task reminder.
+    """
+
+    task = models.ForeignKey(
+        'task.Task',
+        on_delete=models.CASCADE,
+        related_name='task_completed_reminder',
     )
