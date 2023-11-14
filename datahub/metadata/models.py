@@ -17,6 +17,9 @@ from datahub.core.models import (
 from datahub.core.utils import join_truthy_strings
 
 
+MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
 class _MPTTObjectName:
     """
     This adds a cached property "name" to the model that gets a full name
@@ -68,6 +71,10 @@ class Sector(MPTTModel, _MPTTObjectName, DisableableModel):
         blank=True,
         related_name='children',
         on_delete=models.PROTECT,
+    )
+    export_win_id = models.CharField(
+        max_length=MAX_LENGTH,
+        blank=True,
     )
 
     def __str__(self):
