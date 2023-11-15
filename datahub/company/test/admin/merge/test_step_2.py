@@ -1,4 +1,7 @@
+from unittest.mock import patch
+
 import pytest
+
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.test.html import parse_html
@@ -13,6 +16,8 @@ from datahub.company.test.factories import (
 )
 from datahub.core.test_utils import AdminTestMixin
 from datahub.core.utils import reverse_with_query_string
+
+msg = 'The other company has related records which can’t be moved to the selected company.'
 
 
 class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
@@ -165,38 +170,51 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
 
     @pytest.mark.parametrize('swap', (False, True))
     @pytest.mark.parametrize(
-        'company_1_factory,company_2_factory,expected_error',
+        'company_1_factory, company_2_factory, expected_error, disallowed_fields',
         (
             (
                 ArchivedCompanyFactory,
                 CompanyFactory,
                 'The company selected is archived.',
+                [],
             ),
             (
                 CompanyFactory,
                 SubsidiaryFactory,
-                'The other company has related records which can’t be moved to the selected '
-                'company.',
+                msg,
+                ['global_headquarters'],
             ),
             (
                 CompanyFactory,
                 lambda: SubsidiaryFactory().global_headquarters,
-                'The other company has related records which can’t be moved to the selected '
-                'company.',
+                msg,
+                ['subsidiaries'],
             ),
         ),
     )
+    @patch('datahub.company.merge.is_company_a_valid_merge_source')
     def test_error_displayed_if_invalid_selection_made(
         self,
+        is_company_a_valid_merge_source_mock,
         swap,
         company_1_factory,
         company_2_factory,
         expected_error,
+        disallowed_fields,
     ):
+        expected_error_message = expected_error
+        if disallowed_fields:
+            expected_error_message += f': Invalid object: {disallowed_fields}'
+
         """Tests that if an invalid selection is submitted, an error is returned."""
         company_1 = (company_2_factory if swap else company_1_factory)()
         company_2 = (company_1_factory if swap else company_2_factory)()
         selected_company = 2 if swap else 1
+
+        is_company_a_valid_merge_source_mock.return_value = (
+            False,
+            disallowed_fields,
+        ) if disallowed_fields else (True, [])
 
         select_primary_route_name = admin_urlname(Company._meta, 'merge-select-primary-company')
         select_primary_query_args = {
@@ -219,7 +237,7 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
         form = response.context['form']
         assert form.errors == {
-            NON_FIELD_ERRORS: [expected_error],
+            NON_FIELD_ERRORS: [expected_error_message],
         }
 
 

@@ -580,11 +580,11 @@ class TestDuplicateCompanyMerger:
         assert source_company.transferred_to == target_company
 
     @pytest.mark.parametrize(
-        'valid_source,valid_target',
+        'valid_source_return_value, valid_target',
         (
-            (False, True),
-            (True, False),
-            (False, False),
+            ((False, ['field1', 'field2']), True),
+            ((True, []), False),
+            ((False, ['field1']), False),
         ),
     )
     @patch('datahub.company.merge.is_company_a_valid_merge_target')
@@ -593,14 +593,14 @@ class TestDuplicateCompanyMerger:
         self,
         is_company_a_valid_merge_source_mock,
         is_company_a_valid_merge_target_mock,
-        valid_source,
+        valid_source_return_value,
         valid_target,
     ):
         """
         Test that perform_merge() raises MergeNotAllowedError when the merge is not
         allowed.
         """
-        is_company_a_valid_merge_source_mock.return_value = valid_source
+        is_company_a_valid_merge_source_mock.return_value = valid_source_return_value
         is_company_a_valid_merge_target_mock.return_value = valid_target
 
         source_company = CompanyFactory()
