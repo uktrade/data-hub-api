@@ -1,4 +1,4 @@
-from opensearch_dsl import Date, Keyword, Text
+from opensearch_dsl import Boolean, Date, Keyword, Text
 
 from datahub.search import fields
 from datahub.search.models import BaseSearchModel
@@ -8,6 +8,7 @@ class SearchSimpleModel(BaseSearchModel):
     """OpenSearch representation of SimpleModel model."""
 
     id = Keyword()
+    archived = Boolean()
     name = Text(
         fields={
             'keyword': fields.NormalizedKeyword(),
@@ -32,4 +33,5 @@ class SearchSimpleModel(BaseSearchModel):
         'name.trigram',
         'country.trigram',
         'address.trigram',
+        'archived',
     )
