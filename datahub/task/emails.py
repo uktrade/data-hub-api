@@ -46,10 +46,13 @@ class EmailTemplate(ABC):
     def get_task_subject(self) -> str:
         return f'{self.subject}: {self.task.title}'
 
+    def get_body_heading(self) -> str:
+        return f'{self.subject}: {self.task.title}'
+
     def get_context(self):
         return {
             'email_subject': self.get_task_subject(),
-            'body_heading': f'{self.subject}: {self.task.title}',
+            'body_heading': self.get_body_heading(),
             'task_fields': self.get_task_fields(),
             'task_url': self.task.get_absolute_url(),
         }
