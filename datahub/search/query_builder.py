@@ -17,8 +17,12 @@ from datahub.search.apps import EXCLUDE_ALL, get_global_search_apps_as_mapping
 
 MAX_RESULTS = 10000
 V3_FIELD_EXCLUSIONS = ('archived',)
-# the V3 search endpoints use a MultiMatch query that cause issues with columns that do not have
-# an issue in the V4 endpoint.
+# The V3 search endpoint use a MultiMatch query, that combines every column defined in the
+# SEARCH_FIELDS property in each sub app of the main search app into a single query. When
+# adding a column to the list of fields that represent a boolean column in the search index,
+# for example 'archived', the MultiMatch query fails with a parsing error when a text value
+# is provided to the search endpoint. The error is due to opensearch attempting to parse a
+# text value into a boolean value of 'true' or 'false'
 
 
 class MatchNone(Query):
