@@ -12,6 +12,7 @@ import pytest
 from django.apps import apps
 from django.test.utils import override_settings
 
+
 from datahub.feature_flag.test.factories import UserFeatureFlagFactory
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
@@ -24,6 +25,7 @@ from datahub.reminder.test.factories import (
     TaskAssignedToMeFromOthersReminderFactory,
     UpcomingTaskReminderFactory,
 )
+from datahub.task.emails import TaskAssignedToOthersEmailTemplate, UpcomingTaskEmailTemplate
 
 from datahub.task.tasks import (
     generate_reminders_upcoming_tasks,
@@ -118,12 +120,7 @@ def mock_notify_adviser_investment_project_task_due_email_call(
     return mock.call(
         adviser=matching_adviser,
         template_identifier=template_id,
-        context={
-            'task_title': investment_project_task_due.task.title,
-            'company_name': investment_project_task_due.investment_project.investor_company.name,
-            'task_due_date': investment_project_task_due.task.due_date.strftime('%-d %B %Y'),
-            'task_url': investment_project_task_due.task.get_absolute_url(),
-        },
+        context=UpcomingTaskEmailTemplate(investment_project_task_due.task).get_context(),
         update_task=update_task_reminder_email_status,
         reminders=[reminder],
     )
@@ -211,7 +208,7 @@ class TestTaskReminders:
 
         template_id = str(uuid4())
         with override_settings(
-            TASK_REMINDER_STATUS_TEMPLATE_ID=template_id,
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
         ):
             tasks = generate_reminders_upcoming_tasks()
 
@@ -270,7 +267,7 @@ class TestTaskReminders:
 
         template_id = str(uuid4())
         with override_settings(
-            TASK_REMINDER_STATUS_TEMPLATE_ID=template_id,
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
         ):
             generate_reminders_upcoming_tasks()
 
@@ -308,7 +305,7 @@ class TestTaskReminders:
 
         template_id = str(uuid4())
         with override_settings(
-            TASK_REMINDER_STATUS_TEMPLATE_ID=template_id,
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
         ):
             generate_reminders_upcoming_tasks()
 
@@ -339,7 +336,7 @@ class TestTaskReminders:
 
         template_id = str(uuid4())
         with override_settings(
-            TASK_REMINDER_STATUS_TEMPLATE_ID=template_id,
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
         ):
             generate_reminders_upcoming_tasks()
             generate_reminders_upcoming_tasks()
@@ -418,13 +415,7 @@ def mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_i
     return mock.call(
         adviser=adviser,
         template_identifier=template_id,
-        context={
-            'task_title': task.title,
-            'modified_by': task.modified_by.name,
-            'company_name': task.get_company().name,
-            'task_due_date': task.due_date.strftime('%-d %B %Y') if task.due_date else None,
-            'task_url': task.get_absolute_url(),
-        },
+        context=TaskAssignedToOthersEmailTemplate(task).get_context(),
         update_task=update_task_assigned_to_me_from_others_email_status,
         reminders=[reminder],
     )
@@ -522,7 +513,7 @@ class TestTasksAssignedToMeFromOthers:
 
         template_id = str(uuid4())
         with override_settings(
-            TASK_NOTIFICATION_FROM_OTHERS_TEMPLATE_ID=template_id,
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
         ):
             investment_project_task = InvestmentProjectTaskFactory(
                 task=TaskFactory(advisers=[adviser], due_date=datetime.date.today()),
@@ -553,7 +544,7 @@ class TestTasksAssignedToMeFromOthers:
 
         template_id = str(uuid4())
         with override_settings(
-            TASK_NOTIFICATION_FROM_OTHERS_TEMPLATE_ID=template_id,
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
         ):
             investment_project_task = InvestmentProjectTaskFactory(
                 task=TaskFactory(advisers=[adviser], due_date=datetime.date.today()),
@@ -587,7 +578,7 @@ class TestTasksAssignedToMeFromOthers:
         )
         template_id = str(uuid4())
         with override_settings(
-            TASK_NOTIFICATION_FROM_OTHERS_TEMPLATE_ID=template_id,
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
         ):
             investment_project_task = InvestmentProjectTaskFactory(
                 task=TaskFactory(advisers=[adviser], due_date=datetime.date.today()),
