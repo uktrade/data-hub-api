@@ -61,8 +61,10 @@ class SelectPrimaryCompanyForm(forms.Form):
         if not is_company_a_valid_merge_target(target_company):
             raise ValidationError(self.INVALID_TARGET_COMPANY_MSG)
 
-        if not is_company_a_valid_merge_source(source_company):
-            raise ValidationError(self.INVALID_SOURCE_COMPANY_MSG)
+        is_source_valid, disallowed_objects = is_company_a_valid_merge_source(source_company)
+        if not is_source_valid:
+            error_msg = f'{self.INVALID_SOURCE_COMPANY_MSG}: Invalid object: {disallowed_objects}'
+            raise ValidationError(error_msg)
 
         cleaned_data['target_company'] = target_company
         cleaned_data['source_company'] = source_company
@@ -127,7 +129,7 @@ def _build_option_context(source_company, target_company):
     merge_results, _ = get_planned_changes(target_company)
     merge_entries = transform_merge_results_to_merge_entry_summaries(merge_results)
 
-    is_source_valid = is_company_a_valid_merge_source(source_company)
+    is_source_valid, _ = is_company_a_valid_merge_source(source_company)
     is_target_valid = is_company_a_valid_merge_target(target_company)
 
     return {
