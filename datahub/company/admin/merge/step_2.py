@@ -1,3 +1,5 @@
+import logging
+
 from django import forms
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import PermissionDenied, SuspiciousOperation, ValidationError
@@ -14,6 +16,8 @@ from datahub.company.merge import (
     transform_merge_results_to_merge_entry_summaries,
 )
 from datahub.core.utils import reverse_with_query_string
+
+logger = logging.getLogger(__name__)
 
 
 class SelectPrimaryCompanyForm(forms.Form):
@@ -64,6 +68,7 @@ class SelectPrimaryCompanyForm(forms.Form):
         is_source_valid, disallowed_objects = is_company_a_valid_merge_source(source_company)
         if not is_source_valid:
             error_msg = f'{self.INVALID_SOURCE_COMPANY_MSG}: Invalid object: {disallowed_objects}'
+            logger.error(error_msg)
             raise ValidationError(error_msg)
 
         cleaned_data['target_company'] = target_company
