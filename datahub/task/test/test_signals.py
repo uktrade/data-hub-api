@@ -1,3 +1,5 @@
+from unittest import mock
+from unittest.mock import patch
 import pytest
 
 from datahub.company.test.factories import AdviserFactory
@@ -87,3 +89,34 @@ class TestTaskOverdueSubscription(SubscriptionBaseTestMixin):
 @pytest.mark.django_db
 class TestTaskAssignedToMeFromOthersSubscription(SubscriptionBaseTestMixin):
     subscription = TaskAssignedToMeFromOthersSubscription
+
+
+@pytest.mark.django_db
+class TestTaskAdviserChangedSubscriptions:
+    @patch('datahub.task.signals.schedule_create_task_reminder_subscription_task')
+    @patch('datahub.task.signals.schedule_create_task_assigned_to_me_from_others_subscription_task')
+    def test_schedule_functions_called_for_each_adviser(self, mock_create_task_reminder, mock_create_task_assigned_to_me):
+        adviser1 = AdviserFactory()
+        adviser2 = AdviserFactory()
+        task = TaskFactory(advisers=[adviser1, adviser2])
+
+        assert mock_create_task_reminder.call_count == 2
+
+        mock_create_task_reminder.assert_has_calls([
+            mock.call(
+                adviser1.id,
+            ),
+            mock.call(
+                adviser2.id,
+            ),
+        ], any_order=True)
+        mock_create_task_assigned_to_me.assert_has_calls([
+            mock.call(
+                adviser_id=adviser1.id,
+                task=task,
+            ),
+            mock.call(
+                adviser_id=adviser2.id,
+                task=task,
+            ),
+        ], any_order=True)
