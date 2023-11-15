@@ -182,11 +182,15 @@ def merge_companies(source_company: Company, target_company: Company, user):
 
     MergeNotAllowedError will be raised if the merge is not allowed.
     """
-    is_source_valid, _ = is_company_a_valid_merge_source(source_company)
+    is_source_valid, invalid_obj = is_company_a_valid_merge_source(source_company)
     is_target_valid = is_company_a_valid_merge_target(target_company)
 
     if not (is_source_valid and is_target_valid):
-        logger.error(f'MergeNotAllowedError {source_company.id} for company {target_company.id}.')
+        logger.error(
+            f"""MergeNotAllowedError {source_company.id}
+            for company {target_company.id}.
+            Invalid bojects: {invalid_obj}""",
+        )
         raise MergeNotAllowedError()
 
     with reversion.create_revision():
