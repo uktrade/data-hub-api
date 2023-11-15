@@ -16,6 +16,13 @@ from opensearch_dsl.query import (
 from datahub.search.apps import EXCLUDE_ALL, get_global_search_apps_as_mapping
 
 MAX_RESULTS = 10000
+V3_FIELD_EXCLUSIONS = ('archived',)
+# The V3 search endpoint use a MultiMatch query, that combines every column defined in the
+# SEARCH_FIELDS property in each sub app of the main search app into a single query. When
+# adding a column to the list of fields that represent a boolean column in the search index,
+# for example 'archived', the MultiMatch query fails with a parsing error when a text value
+# is provided to the search endpoint. The error is due to opensearch attempting to parse a
+# text value into a boolean value of 'true' or 'false'
 
 
 class MatchNone(Query):
@@ -25,13 +32,13 @@ class MatchNone(Query):
 
 
 def get_basic_search_query(
-        entity,
-        term,
-        permission_filters_by_entity=None,
-        offset=0,
-        limit=100,
-        fields_to_exclude=None,
-        fuzzy=False,
+    entity,
+    term,
+    permission_filters_by_entity=None,
+    offset=0,
+    limit=100,
+    fields_to_exclude=None,
+    fuzzy=False,
 ):
     """
     Performs basic search for the given term in the given entity using the SEARCH_FIELDS.
@@ -46,11 +53,7 @@ def get_basic_search_query(
 
     search_apps = tuple(get_global_search_apps_as_mapping().values())
     indices = [app.search_model.get_read_alias() for app in search_apps]
-    fields = set(chain.from_iterable(app.search_model.SEARCH_FIELDS for app in search_apps))
-
-    # Sort the fields so that this function is deterministic
-    # and the same query is always generated with the same inputs
-    fields = sorted(fields)
+    fields = _get_search_fields(search_apps)
 
     query = _build_term_query(term, fields=fields, fuzzy=fuzzy)
     search = Search(index=indices).query(query)
@@ -59,35 +62,55 @@ def get_basic_search_query(
     if permission_query:
         search = search.filter(permission_query)
 
-    search = search.post_filter(
-        Bool(
-            should=Term(_document_type=entity.get_app_name()),
-        ),
-    ).sort(
-        '_score',
-        'id',
-    ).source(
-        excludes=fields_to_exclude,
-    ).extra(
-        track_total_hits=True,
+    search = (
+        search.post_filter(
+            Bool(
+                should=Term(_document_type=entity.get_app_name()),
+            ),
+        )
+        .sort(
+            '_score',
+            'id',
+        )
+        .source(
+            excludes=fields_to_exclude,
+        )
+        .extra(
+            track_total_hits=True,
+        )
     )
 
     search.aggs.bucket(
-        'count_by_type', 'terms', field='_document_type',
+        'count_by_type',
+        'terms',
+        field='_document_type',
     )
 
-    return search[offset:offset + limit]
+    offset_limit = offset + limit
+    return search[offset:offset_limit]
+
+
+def _get_search_fields(search_apps):
+    """Get all search fields that should be included in this query"""
+    fields = set(chain.from_iterable(app.search_model.SEARCH_FIELDS for app in search_apps))
+    for field in V3_FIELD_EXCLUSIONS:
+        fields.discard(field)
+
+    # Sort the fields so that this function is deterministic
+    # and the same query is always generated with the same inputs
+    fields = sorted(fields)
+    return fields
 
 
 def get_search_by_entities_query(
-        entities,
-        term=None,
-        filter_data=None,
-        composite_field_mapping=None,
-        permission_filters=None,
-        ordering=None,
-        fields_to_include=None,
-        fields_to_exclude=None,
+    entities,
+    term=None,
+    filter_data=None,
+    composite_field_mapping=None,
+    permission_filters=None,
+    ordering=None,
+    fields_to_include=None,
+    fields_to_exclude=None,
 ):
     """
     Performs filtered search for the given term across given entities.
@@ -103,15 +126,16 @@ def get_search_by_entities_query(
     # document must match all filters in the list (and)
     must_filter = _build_must_queries(filters, ranges, composite_field_mapping)
 
-    search = Search(
-        index=[
-            entity.get_read_alias()
-            for entity in entities
-        ],
-    ).query(
-        Bool(must=query),
-    ).extra(
-        track_total_hits=True,
+    search = (
+        Search(
+            index=[entity.get_read_alias() for entity in entities],
+        )
+        .query(
+            Bool(must=query),
+        )
+        .extra(
+            track_total_hits=True,
+        )
     )
 
     permission_query = _build_entity_permission_query(permission_filters)
@@ -130,7 +154,8 @@ def get_search_by_entities_query(
 def limit_search_query(query, offset=0, limit=100):
     """Limits search query to the page defined by offset and limit."""
     limit = _clip_limit(offset, limit)
-    return query[offset:offset + limit]
+    offset_limit = offset + limit
+    return query[offset:offset_limit]
 
 
 def _split_range_fields(fields):
@@ -141,7 +166,7 @@ def _split_range_fields(fields):
     for k, v in fields.items():
         range_type = _get_range_type(k)
         if range_type:
-            range_key = k[:k.rindex('_')]
+            range_key = k[: k.rindex('_')]
             ranges[range_key][range_type] = fields[k]
             continue
 
@@ -279,16 +304,18 @@ def _build_fuzzy_term_query(term, fields=None):
     trigram_fields = [field for field in fields if field.endswith('.trigram')]
 
     fuzzy_queries = [
-        Match(**{
-            # Drop '.trigram' from field to get predictable fuzzy matching
-            field.replace('.trigram', ''): {
-                'query': term,
-                'fuzziness': 'AUTO',
-                'operator': 'AND',
-                'prefix_length': '2',
-                'minimum_should_match': '80%',
+        Match(
+            **{
+                # Drop '.trigram' from field to get predictable fuzzy matching
+                field.replace('.trigram', ''): {
+                    'query': term,
+                    'fuzziness': 'AUTO',
+                    'operator': 'AND',
+                    'prefix_length': '2',
+                    'minimum_should_match': '80%',
+                },
             },
-        })
+        )
         for field in trigram_fields
     ]
     should_query = [
@@ -311,7 +338,7 @@ def _build_fuzzy_term_query(term, fields=None):
 
 def _build_exists_query(field, value):
     """Builds an exists query."""
-    real_field = field[:field.rindex('_')]
+    real_field = field[: field.rindex('_')]
 
     kind = 'must' if value else 'must_not'
     query = {
@@ -344,9 +371,7 @@ def _build_field_query(field, value):
     """Builds a field query."""
     if isinstance(value, list):
         # perform "or" query
-        should_filter = [
-            _build_single_field_query(field, single_value) for single_value in value
-        ]
+        should_filter = [_build_single_field_query(field, single_value) for single_value in value]
         return Bool(should=should_filter, minimum_should_match=1)
 
     return _build_single_field_query(field, value)
@@ -357,18 +382,12 @@ def _build_field_queries(filters):
     Builds field queries.
     Same as _build_field_query but expects a dict of field/values and returns a list of queries.
     """
-    return [
-        _build_field_query(field, value)
-        for field, value in filters.items()
-    ]
+    return [_build_field_query(field, value) for field, value in filters.items()]
 
 
 def _build_range_queries(filters):
     """Builds range queries."""
-    return [
-        Range(**{field: value})
-        for field, value in filters.items()
-    ]
+    return [Range(**{field: value}) for field, value in filters.items()]
 
 
 def _build_nested_queries(field, nested_filters):
