@@ -2,7 +2,7 @@ from unittest.mock import call, patch
 
 import pytest
 
-from django.db.models import signals
+from django.db.models.signals import m2m_changed
 from factory.django import mute_signals
 
 from datahub.company.test.factories import AdviserFactory
@@ -12,7 +12,7 @@ from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactor
 
 @pytest.mark.django_db
 class TestDeleteInvestmentProjectTask:
-    @mute_signals(signals.m2m_changed)
+    @mute_signals(m2m_changed)
     def test_delete_investment_project_task__without_linked_tasks_does_nothing(self):
         task = TaskFactory()
         task_id = task.id
@@ -24,7 +24,7 @@ class TestDeleteInvestmentProjectTask:
         obj = Task.objects.filter(pk=task_id).first()
         assert obj is None
 
-    @mute_signals(signals.m2m_changed)
+    @mute_signals(m2m_changed)
     def test_delete_investment_project_task_deletes_linked_task(self):
         task = TaskFactory()
         task_id = task.id
