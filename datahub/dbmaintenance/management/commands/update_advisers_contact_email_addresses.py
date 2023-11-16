@@ -1,6 +1,6 @@
 import reversion
 
-from datahub.company.models import Contact
+from datahub.company.models import Advisor
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_email, parse_uuid
 
@@ -11,17 +11,17 @@ class Command(CSVBaseCommand):
     def _process_row(self, row, simulate=False, **options):
         """Process one row"""
         pk = parse_uuid(row['id'])
-        email = parse_email(row['new_email'])
-        contact = Contact.objects.get(pk=pk)
+        contact_email = parse_email(row['new_email'])
+        adviser = Advisor.objects.get(pk=pk)
 
-        if '@trade' not in contact.email:
+        if '@trade' not in adviser.contact_email:
             return
 
-        contact.email = email
+        adviser.contact_email = contact_email
 
         if simulate:
             return
 
         with reversion.create_revision():
-            contact.save(update_fields=('email',))
+            adviser.save(update_fields=('contact_email',))
             reversion.set_comment('Loaded email from spreadsheet.')
