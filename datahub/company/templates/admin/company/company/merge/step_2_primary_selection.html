@@ -26,6 +26,17 @@
 {% block content %}
   <p>{% blocktrans %}Which company should be kept as the active record?{% endblocktrans %}</p>
 
+  {% if invalid_objects %}
+    <div class="errornote">
+        <p>Invalid Objects:</p>
+        <ul>
+            {% for obj in invalid_objects %}
+                <li>{{ obj }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+  {% endif %}
+
   <form action="" method="post">
     {% csrf_token %}
 
