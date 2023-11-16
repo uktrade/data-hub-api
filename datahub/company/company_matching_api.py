@@ -161,7 +161,9 @@ def bulk_match_not_matched_companies(length=100):
             companies_to_match.append(transferred_from_company)
         matching_response = match_company(companies_to_match)
         match_ids = extract_match_ids(matching_response.json().get('matches', []))
+        to_update = {}
         if len(match_ids):
-            company.export_win_match_id = match_ids[0]
-        company.export_win_last_matched_on = now()
-        company.save()
+            to_update['export_win_match_id'] = match_ids[0]
+        to_update['export_win_last_matched_on'] = now()
+        # using update to avoid triggering OpenSearch synchronisation
+        Company.objects.filter(id=company.pk).update(**to_update)
