@@ -1042,7 +1042,8 @@ class TestCompleteProposition(APITestMixin):
         response = self.api_client.post(url)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
-        assert response_data['non_field_errors'] == ['Proposition has no documents uploaded.']
+        assert response_data['non_field_errors'] == ["A supporting document hasn't yet \
+                            been uploaded, please upload one to continue"]
         proposition.refresh_from_db()
         assert proposition.status == PropositionStatus.ONGOING
 
