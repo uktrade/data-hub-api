@@ -24,7 +24,7 @@ def delete_investment_project_task_delete(sender, instance, **kwargs):
 @receiver(
     m2m_changed,
     sender=Task.advisers.through,
-    dispatch_uid='send_task_assigned_from_others_email',
+    dispatch_uid='set_task_subscriptions_and_schedule_notifications',
 )
 def set_task_subscriptions_and_schedule_notifications(sender, **kwargs):
     """
