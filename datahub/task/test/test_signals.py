@@ -66,3 +66,15 @@ class TestTaskAdviserChangedSubscriptions:
             [call(adviser.id) for adviser in advisers],
             any_order=True,
         )
+
+    def test_modifications_to_task_advisers(self):
+        pass
+
+    def test_pk_set_none(self):
+        pass
+
+    def test_task_none(self):
+        pass
+
+    def test_removing_adviser_does_not_trigger_signals(self):
+        pass
