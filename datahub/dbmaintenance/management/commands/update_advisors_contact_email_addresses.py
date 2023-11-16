@@ -10,8 +10,8 @@ class Command(CSVBaseCommand):
 
     def _process_row(self, row, simulate=False, **options):
         """Process one row"""
-        pk = parse_uuid(row['Adviser ID'])
-        email = parse_email(row['New Contact email'])
+        pk = parse_uuid(row['id'])
+        email = parse_email(row['new_email'])
         contact = Contact.objects.get(pk=pk)
 
         if '@trade' not in contact.email:
