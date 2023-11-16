@@ -28,7 +28,6 @@ from datahub.reminder.test.factories import (
 from datahub.task.emails import TaskAssignedToOthersEmailTemplate, UpcomingTaskEmailTemplate
 
 from datahub.task.tasks import (
-    create_task_assigned_to_me_from_others_subscription,
     create_task_reminder_subscription_task,
     generate_reminders_upcoming_tasks,
     notify_adviser_added_to_task,
@@ -442,100 +441,10 @@ def mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_i
         reminders=[reminder],
     )
 
-    # class TaskRemindersSubscriptionsMixin:
-    def test_creation_of_adviser_subscription_on_task_creation_where_adviser_has_no_subscription(
-        self,
-    ):
-        adviser1 = AdviserFactory()
-        AdviserFactory()
-        TaskFactory(advisers=[adviser1])
-        subscriptions = self.subscription.objects.filter(adviser=adviser1)
-        assert subscriptions.count() == 1
-
-    def test_creation_of_multiple_adviser_subscriptions_on_task_creation(self):
-        TaskFactory()
-        adviser1 = AdviserFactory()
-        adviser2 = AdviserFactory()
-        AdviserFactory()
-        AdviserFactory()
-        TaskFactory(advisers=[adviser1, adviser2])
-        subscriptions = self.subscription.objects.filter(
-            adviser__in=[adviser1, adviser2],
-        )
-
-        assert subscriptions.count() == 2
-
-        adviser3 = AdviserFactory()
-        TaskFactory(advisers=[adviser1, adviser2, adviser3])
-        subscriptions = self.subscription.objects.filter(
-            adviser__in=[adviser1, adviser2, adviser3],
-        )
-
-        assert subscriptions.count() == 3
-
-    def test_removal_of_adviser_from_task_that_subscription_remains(self):
-        TaskFactory()
-        adviser1 = AdviserFactory()
-        adviser2 = AdviserFactory()
-        AdviserFactory()
-        AdviserFactory()
-        TaskFactory(advisers=[adviser1, adviser2])
-        subscriptions = self.subscription.objects.filter(
-            adviser__in=[adviser1, adviser2],
-        )
-
-        assert subscriptions.count() == 2
-
-        TaskFactory(advisers=[adviser1])
-        subscriptions = self.subscription.objects.filter(
-            adviser__in=[adviser1, adviser2],
-        )
-
-        assert subscriptions.count() == 2
-
-    def test_notification_created_when_single_adviser_assigned_to_task(self):
-        adviser = AdviserFactory()
-        TaskFactory(advisers=[adviser])
-        reminders = self.reminder.objects.filter(adviser=adviser)
-
-        assert reminders.count() == 1
-
-        TaskFactory(advisers=[adviser])
-        reminders = self.reminder.objects.filter(adviser=adviser)
-
-        assert reminders.count() == 2
-
-    def test_notification_not_sent_when_single_adviser_removed_from_task(self):
-        # create a single task and assign to an adviser
-        adviser1 = AdviserFactory()
-        adviser2 = AdviserFactory()
-        task = TaskFactory(advisers=[adviser1, adviser2])
-        reminders = self.reminder.objects.filter(adviser=adviser1)
-
-        assert reminders.count() == 1
-
-        # remove the adviser from the task
-        task.advisers.remove(adviser1)
-        reminders_adviser1 = self.reminder.objects.filter(adviser=adviser1)
-        reminders_adviser2 = self.reminder.objects.filter(adviser=adviser2)
-
-        assert reminders_adviser1.count() == 1
-        assert reminders_adviser2.count() == 1
-
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures('mute_signals')
 class TestTasksAssignedToMeFromOthers:
-    # Removed as a duplicate
-    # def test_creation_of_adviser_subscription_on_task_creation_where_adviser_has_no_subscription(
-    #     self,
-    # ):
-    #     adviser1 = AdviserFactory()
-    #     AdviserFactory()
-    #     TaskFactory(advisers=[adviser1])
-    #     subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(adviser=adviser1)
-    #     assert subscriptions.count() == 1
-
     def test_creation_of_multiple_adviser_subscriptions_on_task_creation(self):
         TaskFactory()
 
@@ -559,27 +468,6 @@ class TestTasksAssignedToMeFromOthers:
 
         assert subscriptions.count() == 3
 
-    # Removed due to not being needed
-    # def test_removal_of_adviser_from_task_that_subscription_remains(self):
-    #     TaskFactory()
-    #     adviser1 = AdviserFactory()
-    #     adviser2 = AdviserFactory()
-    #     AdviserFactory()
-    #     AdviserFactory()
-    #     TaskFactory(advisers=[adviser1, adviser2])
-    #     subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(
-    #         adviser__in=[adviser1, adviser2],
-    #     )
-
-    #     assert subscriptions.count() == 2
-
-    #     TaskFactory(advisers=[adviser1])
-    #     subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(
-    #         adviser__in=[adviser1, adviser2],
-    #     )
-
-    #     assert subscriptions.count() == 2
-
     def test_notification_created_when_single_adviser_assigned_to_task(self):
         adviser = AdviserFactory()
         task1 = TaskFactory(advisers=[adviser])
@@ -593,26 +481,6 @@ class TestTasksAssignedToMeFromOthers:
         reminders = TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser)
 
         assert reminders.count() == 2
-
-    # Deleted due to test moving to the signals test file
-    # def test_notification_not_sent_when_single_adviser_removed_from_task(self):
-    #     # create a single task and assign to an adviser
-    #     adviser1 = AdviserFactory()
-    #     adviser2 = AdviserFactory()
-    #     task = TaskFactory(advisers=[adviser1, adviser2])
-    #     notify_adviser_added_to_task(task, adviser1.id)
-    #     notify_adviser_added_to_task(task, adviser2.id)
-
-    #     assert TaskAssignedToMeFromOthersReminder.objects.count() == 2
-
-    #     # remove the adviser from the task
-    #     task.advisers.remove(adviser1)
-    #     # notify_adviser_added_to_task(task, adviser2.id)
-    #     reminders_adviser1 = TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser1)
-    #     reminders_adviser2 = TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser2)
-
-    #     assert reminders_adviser1.count() == 1
-    #     assert reminders_adviser2.count() == 1
 
     def test_email_sent_for_adviser_with_no_subscription_set(
         self,
