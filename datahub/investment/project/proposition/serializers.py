@@ -41,10 +41,10 @@ class CompletePropositionSerializer(serializers.ModelSerializer):
         return self.instance
 
     def validate_doc(self):
-        message_document = 'A supporting document hasn\'t yet been uploaded, \
-                            please upload one to continue'
-        message_scanning = 'A supporting document hasn\'t finished scanning, \
-                            please try again in a few moments.'
+        message_document = "A supporting document hasn't yet been uploaded, \
+                            please upload one to continue"
+        message_scanning = "A supporting document hasn't finished scanning, \
+                            please try again in a few moments."
         if self.instance.documents.filter(
                 document__status=UploadStatus.VIRUS_SCANNED).count() == 0:
             raise ValidationError({
