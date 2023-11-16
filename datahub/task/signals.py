@@ -39,4 +39,4 @@ def set_task_subscriptions_and_schedule_notifications(sender, **kwargs):
             schedule_create_task_reminder_subscription_task(adviser_id)
             schedule_create_task_assigned_to_me_from_others_subscription_task(task, adviser_id)
             schedule_create_task_overdue_subscription_task(adviser_id)
-            schedule_create_task_completed_subscription_task(task, adviser_id)
+            schedule_create_task_completed_subscription_task(adviser_id)

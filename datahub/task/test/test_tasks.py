@@ -35,6 +35,7 @@ from datahub.task.emails import (
 )
 
 from datahub.task.tasks import (
+    create_task_completed_subscription,
     create_task_reminder_subscription_task,
     generate_reminders_upcoming_tasks,
     notify_adviser_added_to_task,
@@ -431,6 +432,15 @@ class TestTaskReminders:
         module.forwards_func(apps, None)
 
         assert task.reminder_date == task.due_date - datetime.timedelta(days=task.reminder_days)
+
+    def test_subscription_is_created_when_subscription_does_not_exist_for_adviser(self):
+        adviser = AdviserFactory()
+        TaskFactory(advisers=[adviser])
+
+        create_task_reminder_subscription_task(adviser.id)
+
+        subscription = UpcomingTaskReminderSubscription.objects.filter(adviser=adviser).first()
+        assert subscription is not None
 
 
 def mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_id):
@@ -870,3 +880,12 @@ class TestTaskCompleted:
         response = notify_adviser_completed_task(task, random_id)
 
         assert response is None
+
+    def test_subscription_is_created_when_subscription_does_not_exist_for_adviser(self):
+        adviser = AdviserFactory()
+        TaskFactory(advisers=[adviser])
+
+        create_task_completed_subscription(adviser.id)
+
+        subscription = TaskCompletedSubscription.objects.filter(adviser=adviser).first()
+        assert subscription is not None

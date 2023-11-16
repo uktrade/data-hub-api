@@ -80,7 +80,7 @@ class TestTaskAdviserChangedSubscriptions:
             any_order=True,
         )
         schedule_create_task_completed_subscription_task.assert_has_calls(
-            [call(task, adviser.id) for adviser in advisers],
+            [call(adviser.id) for adviser in advisers],
             any_order=True,
         )
 

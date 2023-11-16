@@ -247,31 +247,29 @@ def create_task_overdue_subscription_task(adviser_id):
         )
 
 
-def schedule_create_task_completed_subscription_task(task, adviser_id):
+def schedule_create_task_completed_subscription_task(adviser_id):
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
-        function=notify_adviser_completed_task,
-        function_args=(task, adviser_id),
+        function=create_task_completed_subscription,
+        function_args=(adviser_id,),
     )
     logger.info(
         f'Task {job.id} create_task_completed_subscription_task',
     )
 
 
-def create_task_completed_subscription(adviser):
+def create_task_completed_subscription(adviser_id):
     """
     Creates a task reminder subscription for an adviser if the adviser doesn't have
     a subscription already.
     """
-    current_subscription = TaskCompletedSubscription.objects.filter(
-        adviser_id=adviser.id,
-    ).first()
-    if not current_subscription:
-        return TaskCompletedSubscription.objects.create(
-            adviser=adviser,
+    if not TaskCompletedSubscription.objects.filter(
+        adviser_id=adviser_id,
+    ).first():
+        TaskCompletedSubscription.objects.create(
+            adviser_id=adviser_id,
             email_reminders_enabled=True,
         )
-    return current_subscription
 
 
 def notify_adviser_completed_task(task, adviser_id):
