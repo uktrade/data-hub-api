@@ -211,11 +211,6 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
         company_2 = (company_1_factory if swap else company_2_factory)()
         selected_company = 2 if swap else 1
 
-        is_company_a_valid_merge_source_mock.return_value = (
-            False,
-            disallowed_fields,
-        ) if disallowed_fields else (True, [])
-
         select_primary_route_name = admin_urlname(Company._meta, 'merge-select-primary-company')
         select_primary_query_args = {
             'company_1': str(company_1.pk),
@@ -239,6 +234,11 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
         assert form.errors == {
             NON_FIELD_ERRORS: [expected_error_message],
         }
+
+        if disallowed_fields:
+            assert form.invalid_objects == disallowed_fields
+        else:
+            assert form.invalid_objects == []
 
 
 def _get_radio_html(index, disabled):
