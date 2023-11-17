@@ -3,10 +3,12 @@ from django.dispatch import receiver
 
 from datahub.task.models import Task
 from datahub.task.tasks import (
+    schedule_create_task_amended_by_others_subscription_task,
     schedule_create_task_assigned_to_me_from_others_subscription_task,
     schedule_create_task_completed_subscription_task,
     schedule_create_task_overdue_subscription_task,
     schedule_create_task_reminder_subscription_task,
+    schedule_notify_advisers_task_amended_by_others,
     schedule_notify_advisers_task_completed,
 )
 
@@ -30,6 +32,7 @@ def set_task_subscriptions_and_schedule_notifications(sender, **kwargs):
             schedule_create_task_assigned_to_me_from_others_subscription_task(task, adviser_id)
             schedule_create_task_overdue_subscription_task(adviser_id)
             schedule_create_task_completed_subscription_task(adviser_id)
+            schedule_create_task_amended_by_others_subscription_task(adviser_id)
 
 
 @receiver(
@@ -42,3 +45,4 @@ def save_task(sender, instance, created, **kwargs):
     Triggers when a task is saved
     """
     schedule_notify_advisers_task_completed(instance, created)
+    schedule_notify_advisers_task_amended_by_others(instance, created)
