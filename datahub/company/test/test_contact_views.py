@@ -1287,7 +1287,7 @@ class ContactListBase(APITestMixin):
             (
                 ('aaa@aaa.aaa', 'bbb@bbb.bbb', 'aaa@aaa.aaa'),
                 'aaa@aaa.aaa',
-                {'aaa@aaa.aaa', 'aaa@aaa.aaa'},
+                {'aaa@aaa.aaa'},
             ),
             (
                 ('aaa@aaa.aaa', 'bbb@bbb.bbb', 'aaa@aaa.aaa'),
