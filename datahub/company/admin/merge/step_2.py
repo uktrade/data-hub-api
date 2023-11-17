@@ -44,6 +44,7 @@ class SelectPrimaryCompanyForm(forms.Form):
 
         self._company_1 = company_1
         self._company_2 = company_2
+        self.invalid_objects = []
 
     def clean(self):
         """
@@ -69,6 +70,7 @@ class SelectPrimaryCompanyForm(forms.Form):
         if not is_source_valid:
             error_msg = f'{self.INVALID_SOURCE_COMPANY_MSG}: Invalid object: {disallowed_objects}'
             logger.error(error_msg)
+            self.invalid_objects = disallowed_objects
             raise ValidationError(error_msg)
 
         cleaned_data['target_company'] = target_company
@@ -127,6 +129,10 @@ def select_primary_company(model_admin, request):
         'opts': model_admin.model._meta,
         'title': title,
     }
+
+    if is_post and not form.is_valid():
+        context['invalid_objects'] = form.invalid_objects
+
     return TemplateResponse(request, template_name, context)
 
 
