@@ -143,8 +143,8 @@ class CompanyAddressResolver:
             self.postcode_replacement.postcode_pattern,
             self.postcode_replacement.postcode_replacement,
             postcode,
-            0,
-            re.MULTILINE,
+            count=0,
+            flags=re.MULTILINE,
         )
 
     def is_valid_postcode_format(self, postcode):
