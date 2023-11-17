@@ -20,6 +20,7 @@ from datahub.reminder.models import (
     NoRecentExportInteractionReminder,
     NoRecentInvestmentInteractionReminder,
     TaskAssignedToMeFromOthersReminder,
+    TaskCompletedReminder,
     TaskOverdueReminder,
     UpcomingEstimatedLandDateReminder,
     UpcomingTaskReminder,
@@ -30,6 +31,7 @@ from datahub.reminder.test.factories import (
     NoRecentInvestmentInteractionReminderFactory,
     TaskAmendedByOthersReminderFactory,
     TaskAssignedToMeFromOthersReminderFactory,
+    TaskCompletedReminderFactory,
     TaskOverdueReminderFactory,
     UpcomingEstimatedLandDateReminderFactory,
     UpcomingTaskReminderFactory,
@@ -155,7 +157,6 @@ class ReminderTestMixin:
 
 
 class TaskReminderMixin:
-
     def test_get_generic_task_reminders(self):
         """
         Given some reminders for generic tasks, these should be returned without any references to
@@ -573,7 +574,9 @@ class TestUpcomingTaskDueDateReminderViewset(APITestMixin, ReminderTestMixin, Ta
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestTaskAssignedToMeFromOthersReminderViewset(
-    APITestMixin, ReminderTestMixin, TaskReminderMixin,
+    APITestMixin,
+    ReminderTestMixin,
+    TaskReminderMixin,
 ):
     """
     Tests for the task assigned to me from others reminder view.
@@ -595,6 +598,22 @@ class TestTaskOverdueReminderViewset(APITestMixin, ReminderTestMixin, TaskRemind
     detail_url_name = 'api-v4:reminder:my-tasks-task-overdue-reminder-detail'
     factory = TaskOverdueReminderFactory
     tested_model = TaskOverdueReminder
+
+
+@freeze_time('2022-05-05T17:00:00.000000Z')
+class TestTaskCompletedReminderViewset(
+    APITestMixin,
+    ReminderTestMixin,
+    TaskReminderMixin,
+):
+    """
+    Tests for the task completed reminder view.
+    """
+
+    url_name = 'api-v4:reminder:my-tasks-task-completed-reminder'
+    detail_url_name = 'api-v4:reminder:my-tasks-task-completed-reminder-detail'
+    factory = TaskCompletedReminderFactory
+    tested_model = TaskCompletedReminder
 
 
 class TestGetReminderSummaryView(APITestMixin):
@@ -624,7 +643,7 @@ class TestGetReminderSummaryView(APITestMixin):
             ],
         )
         reminder_count = 3
-        reminder_categories = 9  # used for finding the total number of reminders in this test
+        reminder_categories = 10  # used for finding the total number of reminders in this test
         UpcomingEstimatedLandDateReminderFactory.create_batch(
             reminder_count,
             adviser=self.user,
@@ -671,6 +690,10 @@ class TestGetReminderSummaryView(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
+        TaskCompletedReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
 
         total_reminders = reminder_count * reminder_categories
         url = reverse(self.url_name)
@@ -694,6 +717,7 @@ class TestGetReminderSummaryView(APITestMixin):
                 'task_amended_by_others': reminder_count,
                 'task_assigned_to_me_from_others': reminder_count,
                 'task_overdue': reminder_count,
+                'task_completed': reminder_count,
             },
         }
 
@@ -719,6 +743,7 @@ class TestGetReminderSummaryView(APITestMixin):
                 'task_amended_by_others': 0,
                 'task_assigned_to_me_from_others': 0,
                 'task_overdue': 0,
+                'task_completed': 0,
             },
         }
 
@@ -786,6 +811,10 @@ class TestGetReminderSummaryView(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
+        TaskCompletedReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
 
         expected_data = {
             'count': 0,
@@ -803,6 +832,7 @@ class TestGetReminderSummaryView(APITestMixin):
                 'task_amended_by_others': reminder_count,
                 'task_assigned_to_me_from_others': reminder_count,
                 'task_overdue': reminder_count,
+                'task_completed': reminder_count,
             },
         }
 
