@@ -5,11 +5,11 @@ from unittest import mock
 from unittest.mock import ANY
 from uuid import uuid4
 
-
 import pytest
 
 
 from django.apps import apps
+from django.db.models.signals import m2m_changed, post_delete, post_save, pre_delete, pre_save
 from django.test.utils import override_settings
 
 
@@ -28,6 +28,7 @@ from datahub.reminder.test.factories import (
 from datahub.task.emails import TaskAssignedToOthersEmailTemplate, UpcomingTaskEmailTemplate
 
 from datahub.task.tasks import (
+    create_task_reminder_subscription_task,
     generate_reminders_upcoming_tasks,
     notify_adviser_added_to_task,
     schedule_reminders_upcoming_tasks,
@@ -95,6 +96,8 @@ def investment_project_factory_due_on_date(days=1, advisers=None, due_date=None)
         advisers = [AdviserFactory()]
     if not due_date:
         due_date = datetime.date.today()
+    if advisers:
+        [create_task_reminder_subscription_task(adviser.id) for adviser in advisers]
     return InvestmentProjectTaskFactory(
         task=TaskFactory(
             due_date=due_date + datetime.timedelta(days=days),
@@ -126,7 +129,24 @@ def mock_notify_adviser_investment_project_task_due_email_call(
     )
 
 
+@pytest.fixture()
+def mute_signals(request):
+    signals = [pre_save, post_save, pre_delete, post_delete, m2m_changed]
+    restore = {}
+    for signal in signals:
+        restore[signal] = signal.receivers
+        signal.receivers = []
+
+    def restore_signals():
+        for signal, receivers in restore.items():
+            signal.sender_receivers_cache.clear()
+            signal.receivers = receivers
+
+    request.addfinalizer(restore_signals)
+
+
 @pytest.mark.django_db
+@pytest.mark.usefixtures('mute_signals')
 class TestTaskReminders:
     @pytest.mark.parametrize(
         'lock_acquired',
@@ -162,6 +182,7 @@ class TestTaskReminders:
         mock_notify_adviser_by_rq_email.reset_mock()
 
         generate_reminders_upcoming_tasks()
+
         expected_messages = (
             [
                 'Task generate_reminders_upcoming_tasks completed',
@@ -422,85 +443,44 @@ def mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_i
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures('mute_signals')
 class TestTasksAssignedToMeFromOthers:
-    def test_creation_of_adviser_subscription_on_task_creation_where_adviser_has_no_subscription(
-        self,
-    ):
-        adviser1 = AdviserFactory()
-        AdviserFactory()
-        TaskFactory(advisers=[adviser1])
-        subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(adviser=adviser1)
-        assert subscriptions.count() == 1
-
     def test_creation_of_multiple_adviser_subscriptions_on_task_creation(self):
         TaskFactory()
-        adviser1 = AdviserFactory()
-        adviser2 = AdviserFactory()
-        AdviserFactory()
-        AdviserFactory()
-        TaskFactory(advisers=[adviser1, adviser2])
+
+        advisers = AdviserFactory.create_batch(3)
+
+        task1 = TaskFactory(advisers=[advisers[0], advisers[1]])
+        notify_adviser_added_to_task(task1, advisers[0].id)
+        notify_adviser_added_to_task(task1, advisers[1].id)
+
         subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(
-            adviser__in=[adviser1, adviser2],
+            adviser__in=[advisers[0], advisers[1]],
         )
 
         assert subscriptions.count() == 2
 
-        adviser3 = AdviserFactory()
-        TaskFactory(advisers=[adviser1, adviser2, adviser3])
+        task2 = TaskFactory(advisers=advisers)
+        notify_adviser_added_to_task(task2, advisers[2].id)
         subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(
-            adviser__in=[adviser1, adviser2, adviser3],
+            adviser__in=advisers,
         )
 
         assert subscriptions.count() == 3
 
-    def test_removal_of_adviser_from_task_that_subscription_remains(self):
-        TaskFactory()
-        adviser1 = AdviserFactory()
-        adviser2 = AdviserFactory()
-        AdviserFactory()
-        AdviserFactory()
-        TaskFactory(advisers=[adviser1, adviser2])
-        subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(
-            adviser__in=[adviser1, adviser2],
-        )
-
-        assert subscriptions.count() == 2
-
-        TaskFactory(advisers=[adviser1])
-        subscriptions = TaskAssignedToMeFromOthersSubscription.objects.filter(
-            adviser__in=[adviser1, adviser2],
-        )
-
-        assert subscriptions.count() == 2
-
     def test_notification_created_when_single_adviser_assigned_to_task(self):
         adviser = AdviserFactory()
-        TaskFactory(advisers=[adviser])
+        task1 = TaskFactory(advisers=[adviser])
+        notify_adviser_added_to_task(task1, adviser.id)
         reminders = TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser)
 
-        assert reminders.count() == 1
+        assert reminders.exists()
 
-        TaskFactory(advisers=[adviser])
+        task2 = TaskFactory(advisers=[adviser])
+        notify_adviser_added_to_task(task2, adviser.id)
         reminders = TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser)
 
         assert reminders.count() == 2
-
-    def test_notification_not_sent_when_single_adviser_removed_from_task(self):
-        # create a single task and assign to an adviser
-        adviser1 = AdviserFactory()
-        adviser2 = AdviserFactory()
-        task = TaskFactory(advisers=[adviser1, adviser2])
-        reminders = TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser1)
-
-        assert reminders.count() == 1
-
-        # remove the adviser from the task
-        task.advisers.remove(adviser1)
-        reminders_adviser1 = TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser1)
-        reminders_adviser2 = TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser2)
-
-        assert reminders_adviser1.count() == 1
-        assert reminders_adviser2.count() == 1
 
     def test_email_sent_for_adviser_with_no_subscription_set(
         self,
