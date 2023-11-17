@@ -272,31 +272,64 @@ def create_task_completed_subscription(adviser_id):
         )
 
 
-def notify_adviser_completed_task(task, adviser_id):
+def notify_adviser_completed_task(task, created):
     """
-    Send a notification to the adviser when task completed
+    Send a notification to all advisers, excluding the adviser who marked the task as completed,
+    when task completed
     """
-    adviser = Advisor.objects.filter(id=str(adviser_id)).first()
-    if not adviser:
+    if created:
         return
-    reminder = TaskCompletedReminder.objects.create(
-        adviser=adviser,
-        event=f'{task} completed by {task.modified_by.name}',
-        task=task,
-    )
-    task_subscription = create_task_completed_subscription(adviser)
 
-    if task_subscription.email_reminders_enabled is True and is_user_feature_flag_active(
-        ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
-        adviser,
-    ):
-        send_task_email(
-            adviser=adviser,
+    if not task.archived:
+        return
+
+    advisers_to_notify = task.advisers.exclude(id=task.modified_by.id)
+
+    if not advisers_to_notify.exists():
+        return
+
+    for adviser in advisers_to_notify:
+        existing_reminder = TaskCompletedReminder.objects.filter(
             task=task,
-            reminders=[reminder],
-            update_task=update_task_completed_email_status,
-            email_template_class=TaskCompletedEmailTemplate,
+            adviser=adviser,
+        ).first()
+        if existing_reminder:
+            continue
+
+        reminder = TaskCompletedReminder.objects.create(
+            adviser=adviser,
+            event=f'{task} completed by {task.modified_by.name}',
+            task=task,
         )
+
+        adviser_subscription = TaskCompletedSubscription.objects.filter(
+            adviser=adviser,
+        ).first()
+        if not adviser_subscription:
+            return
+
+        if adviser_subscription.email_reminders_enabled is True and is_user_feature_flag_active(
+            ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
+            adviser,
+        ):
+            send_task_email(
+                adviser=adviser,
+                task=task,
+                reminders=[reminder],
+                update_task=update_task_completed_email_status,
+                email_template_class=TaskCompletedEmailTemplate,
+            )
+
+
+def schedule_notify_advisers_task_completed(task, created):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=notify_adviser_completed_task,
+        function_args=(task, created),
+    )
+    logger.info(
+        f'Task {job.id} schedule_notify_advisers_task_completed',
+    )
 
 
 def send_task_email(adviser, task, reminders, update_task, email_template_class):

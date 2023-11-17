@@ -138,3 +138,39 @@ class TestTaskAdviserChangedSubscriptions:
         schedule_create_task_assigned_to_me_from_others_subscription_task.assert_not_called()
         schedule_create_task_overdue_subscription_task.assert_not_called()
         schedule_create_task_completed_subscription_task.assert_not_called()
+
+
+@pytest.mark.django_db
+class TestTaskAdviserCompletedSubscriptions:
+    @mute_signals(m2m_changed)
+    @patch('datahub.task.signals.schedule_notify_advisers_task_completed')
+    def test_creating_task_triggers_notify_adviser_completed_scheduled_task(
+        self,
+        schedule_notify_advisers_task_completed,
+    ):
+        task = TaskFactory(advisers=[AdviserFactory()])
+
+        schedule_notify_advisers_task_completed.assert_has_calls(
+            [
+                call(task, True),
+                call(task, False),
+            ],
+        )
+
+    @mute_signals(m2m_changed)
+    @patch('datahub.task.signals.schedule_notify_advisers_task_completed')
+    def test_modifying_task_triggers_notify_adviser_completed_scheduled_task(
+        self,
+        schedule_notify_advisers_task_completed,
+    ):
+        task = TaskFactory(archived=False)
+        task.archived = True
+        task.save()
+
+        schedule_notify_advisers_task_completed.assert_has_calls(
+            [
+                call(task, True),
+                call(task, False),
+                call(task, False),
+            ],
+        )

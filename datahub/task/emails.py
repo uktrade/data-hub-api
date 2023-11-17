@@ -34,6 +34,10 @@ class EmailTemplate(ABC):
         )
 
     @property
+    def adviser_completing_task(self):
+        return f'Completed by: {self.task.modified_by.name}'
+
+    @property
     def task_due_date(self):
         return (
             f'Date due: {self.task.due_date.strftime("%-d %B %Y")}' if self.task.due_date else None
@@ -121,6 +125,7 @@ class TaskCompletedEmailTemplate(EmailTemplate):
     def fields_to_include(self):
         return [
             self.investment_project,
+            self.adviser_completing_task,
             self.company_name,
             self.task_due_date,
         ]

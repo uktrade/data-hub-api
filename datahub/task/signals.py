@@ -1,4 +1,4 @@
-from django.db.models.signals import m2m_changed, post_delete
+from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
 
 from datahub.task.models import InvestmentProjectTask, Task
@@ -7,6 +7,7 @@ from datahub.task.tasks import (
     schedule_create_task_completed_subscription_task,
     schedule_create_task_overdue_subscription_task,
     schedule_create_task_reminder_subscription_task,
+    schedule_notify_advisers_task_completed,
 )
 
 
@@ -40,3 +41,15 @@ def set_task_subscriptions_and_schedule_notifications(sender, **kwargs):
             schedule_create_task_assigned_to_me_from_others_subscription_task(task, adviser_id)
             schedule_create_task_overdue_subscription_task(adviser_id)
             schedule_create_task_completed_subscription_task(adviser_id)
+
+
+@receiver(
+    post_save,
+    sender=Task,
+    dispatch_uid='save_task',
+)
+def save_task(sender, instance, created, **kwargs):
+    """
+    Triggers when a task is saved
+    """
+    schedule_notify_advisers_task_completed(instance, created)
