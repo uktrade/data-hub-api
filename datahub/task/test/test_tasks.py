@@ -18,21 +18,31 @@ from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
+    TaskCompletedReminder,
+    TaskCompletedSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
 )
 from datahub.reminder.test.factories import (
     TaskAssignedToMeFromOthersReminderFactory,
+    TaskCompletedReminderFactory,
     UpcomingTaskReminderFactory,
 )
-from datahub.task.emails import TaskAssignedToOthersEmailTemplate, UpcomingTaskEmailTemplate
+from datahub.task.emails import (
+    TaskAssignedToOthersEmailTemplate,
+    TaskCompletedEmailTemplate,
+    UpcomingTaskEmailTemplate,
+)
 
 from datahub.task.tasks import (
+    create_task_completed_subscription,
     create_task_reminder_subscription_task,
     generate_reminders_upcoming_tasks,
     notify_adviser_added_to_task,
+    notify_adviser_completed_task,
     schedule_reminders_upcoming_tasks,
     update_task_assigned_to_me_from_others_email_status,
+    update_task_completed_email_status,
     update_task_reminder_email_status,
 )
 from datahub.task.test.factories import AdviserFactory, InvestmentProjectTaskFactory, TaskFactory
@@ -423,6 +433,15 @@ class TestTaskReminders:
 
         assert task.reminder_date == task.due_date - datetime.timedelta(days=task.reminder_days)
 
+    def test_subscription_is_created_when_subscription_does_not_exist_for_adviser(self):
+        adviser = AdviserFactory()
+        TaskFactory(advisers=[adviser])
+
+        create_task_reminder_subscription_task(adviser.id)
+
+        subscription = UpcomingTaskReminderSubscription.objects.filter(adviser=adviser).first()
+        assert subscription is not None
+
 
 def mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_id):
     reminder = TaskAssignedToMeFromOthersReminderFactory(
@@ -438,6 +457,24 @@ def mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_i
         template_identifier=template_id,
         context=TaskAssignedToOthersEmailTemplate(task).get_context(),
         update_task=update_task_assigned_to_me_from_others_email_status,
+        reminders=[reminder],
+    )
+
+
+def mock_notify_adviser_task_completed_call(task, adviser, template_id):
+    reminder = TaskCompletedReminderFactory(
+        adviser=adviser,
+        task=task,
+        event=f'{task} completed by {task.modified_by.name}',
+    )
+    reminder.id = ANY
+    reminder.pk = ANY
+
+    return mock.call(
+        adviser=adviser,
+        template_identifier=template_id,
+        context=TaskCompletedEmailTemplate(task).get_context(),
+        update_task=update_task_completed_email_status,
         reminders=[reminder],
     )
 
@@ -641,3 +678,236 @@ class TestTasksAssignedToMeFromOthers:
         response = notify_adviser_added_to_task(task, random_id)
 
         assert response is None
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures('mute_signals')
+class TestTaskCompleted:
+    def test_creation_of_multiple_adviser_subscriptions_on_task_creation(self):
+        TaskFactory()
+
+        advisers = AdviserFactory.create_batch(3)
+
+        TaskFactory(advisers=[advisers[0], advisers[1]])
+        create_task_completed_subscription(advisers[0].id)
+        create_task_completed_subscription(advisers[1].id)
+
+        subscriptions = TaskCompletedSubscription.objects.filter(
+            adviser__in=[advisers[0], advisers[1]],
+        )
+
+        assert subscriptions.count() == 2
+
+        TaskFactory(advisers=advisers)
+        create_task_completed_subscription(advisers[2].id)
+        subscriptions = TaskCompletedSubscription.objects.filter(
+            adviser__in=advisers,
+        )
+
+        assert subscriptions.count() == 3
+
+    def test_no_reminders_created_when_a_task_is_created(self):
+        task = TaskFactory()
+        notify_adviser_completed_task(task, False)
+        assert TaskCompletedReminder.objects.exists() is False
+
+    def test_no_reminders_created_when_a_task_is_not_archived(self):
+        task = TaskFactory(archived=False)
+        notify_adviser_completed_task(task, True)
+        assert TaskCompletedReminder.objects.exists() is False
+
+    def test_no_reminders_created_when_adviser_that_completes_task_is_the_only_adviser(
+        self,
+    ):
+        adviser = AdviserFactory()
+        task = TaskFactory(archived=True, modified_by=adviser, advisers=[adviser])
+
+        notify_adviser_completed_task(task, False)
+
+        assert TaskCompletedReminder.objects.exists() is False
+
+    def test_adviser_that_completes_task_does_not_receive_notification_about_that_task_completion(
+        self,
+    ):
+        modified_by_adviser = AdviserFactory()
+        adviser = AdviserFactory()
+        task = TaskFactory(
+            archived=True,
+            modified_by=modified_by_adviser,
+            advisers=[
+                modified_by_adviser,
+                adviser,
+            ],
+        )
+
+        notify_adviser_completed_task(task, False)
+
+        assert TaskCompletedReminder.objects.filter(adviser=modified_by_adviser).exists() is False
+        assert TaskCompletedReminder.objects.filter(adviser=adviser).exists() is True
+
+    def test_adviser_that_has_received_notification_for_this_task_does_not_receive_another(
+        self,
+    ):
+        adviser_existing_notification = AdviserFactory()
+        adviser_no_notification = AdviserFactory()
+        task = TaskFactory(
+            archived=True,
+            advisers=[
+                adviser_existing_notification,
+                adviser_no_notification,
+            ],
+        )
+
+        TaskCompletedReminder.objects.create(
+            task=task,
+            adviser=adviser_existing_notification,
+            event='Test duplicates not received',
+        )
+
+        notify_adviser_completed_task(task, False)
+
+        assert (
+            TaskCompletedReminder.objects.filter(adviser=adviser_existing_notification).count()
+            == 1
+        )
+
+        assert TaskCompletedReminder.objects.filter(adviser=adviser_no_notification).count() == 1
+
+    def test_notification_received_but_no_email_sent_to_adviser_without_subscription(
+        self,
+        mock_notify_adviser_by_rq_email,
+    ):
+        adviser = AdviserFactory()
+        task = TaskFactory(
+            archived=True,
+            advisers=[
+                adviser,
+            ],
+        )
+
+        notify_adviser_completed_task(task, False)
+
+        assert TaskCompletedReminder.objects.filter(adviser=adviser).count() == 1
+        mock_notify_adviser_by_rq_email.assert_not_called()
+
+    def test_notification_received_but_no_email_sent_to_adviser_with_email_off(
+        self,
+        mock_notify_adviser_by_rq_email,
+    ):
+        adviser = AdviserFactory()
+        task = TaskFactory(
+            archived=True,
+            advisers=[
+                adviser,
+            ],
+        )
+
+        TaskCompletedSubscription.objects.create(
+            adviser_id=adviser.id,
+            email_reminders_enabled=False,
+        )
+
+        notify_adviser_completed_task(task, False)
+
+        assert TaskCompletedReminder.objects.filter(adviser=adviser).count() == 1
+        mock_notify_adviser_by_rq_email.assert_not_called()
+
+    def test_notification_received_but_no_email_sent_to_adviser_with_email_on_with_no_feature_flag(
+        self,
+        mock_notify_adviser_by_rq_email,
+    ):
+        adviser = AdviserFactory()
+        task = TaskFactory(
+            archived=True,
+            advisers=[
+                adviser,
+            ],
+        )
+
+        create_task_completed_subscription(adviser_id=adviser.id)
+
+        notify_adviser_completed_task(task, False)
+
+        assert TaskCompletedReminder.objects.filter(adviser=adviser).count() == 1
+        mock_notify_adviser_by_rq_email.assert_not_called()
+
+    def test_notification_received_but_no_email_for_adviser_with_email_off_with_feature_flag_on(
+        self,
+        adviser_tasks_user_feature_flag,
+        mock_notify_adviser_by_rq_email,
+    ):
+        adviser = AdviserFactory()
+        add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
+        task = TaskFactory(
+            archived=True,
+            advisers=[
+                adviser,
+            ],
+        )
+
+        TaskCompletedSubscription.objects.create(
+            adviser_id=adviser.id,
+            email_reminders_enabled=False,
+        )
+
+        notify_adviser_completed_task(task, False)
+
+        assert TaskCompletedReminder.objects.filter(adviser=adviser).count() == 1
+        mock_notify_adviser_by_rq_email.assert_not_called()
+
+    def test_email_sent_for_adviser_with_email_on_with_feature_flag_on(
+        self,
+        adviser_tasks_user_feature_flag,
+        mock_notify_adviser_by_rq_email,
+    ):
+        adviser = AdviserFactory()
+        add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
+        create_task_completed_subscription(adviser.id)
+
+        template_id = str(uuid4())
+        with override_settings(
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
+        ):
+            task = TaskFactory(
+                advisers=[adviser],
+                archived=True,
+            )
+
+            notify_adviser_completed_task(
+                task,
+                False,
+            )
+
+            mock_notify_adviser_by_rq_email.assert_has_calls(
+                [
+                    mock_notify_adviser_task_completed_call(
+                        task,
+                        adviser,
+                        template_id,
+                    ),
+                ],
+            )
+
+    def test_task_completed_assigns_email_notification_id_to_all_reminders(
+        self,
+    ):
+        """
+        Test it updates reminder data with the connected email notification information.
+        """
+        task = TaskFactory()
+        reminder_number = 3
+        notification_id = str(uuid4())
+        reminders = TaskCompletedReminderFactory.create_batch(
+            reminder_number,
+            task_id=task.id,
+        )
+
+        update_task_completed_email_status(
+            notification_id,
+            [reminder.id for reminder in reminders],
+        )
+
+        linked_reminders = TaskCompletedReminder.objects.filter(
+            email_notification_id=notification_id,
+        )
+        assert linked_reminders.count() == (reminder_number)

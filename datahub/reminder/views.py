@@ -29,6 +29,8 @@ from datahub.reminder.models import (
     TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
+    TaskCompletedReminder,
+    TaskCompletedSubscription,
     TaskOverdueReminder,
     TaskOverdueSubscription,
     UpcomingEstimatedLandDateReminder,
@@ -46,6 +48,8 @@ from datahub.reminder.serializers import (
     TaskAmendedByOthersSubscriptionSerializer,
     TaskAssignedToMeFromOthersReminderSerializer,
     TaskAssignedToMeFromOthersSubscriptionSerializer,
+    TaskCompletedReminderSerializer,
+    TaskCompletedSubscriptionSerializer,
     TaskOverdueReminderSerializer,
     TaskOverdueSubscriptionSerializer,
     UpcomingEstimatedLandDateReminderSerializer,
@@ -112,6 +116,11 @@ class TaskAmendedByOthersSubscriptionViewset(BaseSubscriptionViewset):
     queryset = TaskAmendedByOthersSubscription.objects.all()
 
 
+class TaskCompletedSubscriptionViewset(BaseSubscriptionViewset):
+    serializer_class = TaskCompletedSubscriptionSerializer
+    queryset = TaskCompletedSubscription.objects.all()
+
+
 @transaction.non_atomic_requests
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -153,6 +162,9 @@ def reminder_subscription_summary_view(request):
     task_amended_by_others = TaskAmendedByOthersSubscriptionSerializer(
         get_object(TaskAmendedByOthersSubscription.objects.all()),
     ).data
+    task_completed = TaskCompletedSubscriptionSerializer(
+        get_object(TaskCompletedSubscription.objects.all()),
+    ).data
 
     return Response(
         {
@@ -164,6 +176,7 @@ def reminder_subscription_summary_view(request):
             'task_assigned_to_me_from_others': task_assigned_to_me_from_others,
             'task_amended_by_others': task_amended_by_others,
             'task_overdue': task_overdue,
+            'task_completed': task_completed,
         },
     )
 
@@ -218,6 +231,11 @@ class TaskOverdueReminderViewset(BaseReminderViewset):
     model_class = TaskOverdueReminder
 
 
+class TaskCompletedReminderViewset(BaseReminderViewset):
+    serializer_class = TaskCompletedReminderSerializer
+    model_class = TaskCompletedReminder
+
+
 @transaction.non_atomic_requests
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -269,6 +287,9 @@ def reminder_summary_view(request):
     task_overdue = TaskOverdueReminder.objects.filter(
         adviser=request.user,
     ).count()
+    task_completed = TaskCompletedReminder.objects.filter(
+        adviser=request.user,
+    ).count()
 
     total_count = sum(
         [
@@ -281,6 +302,7 @@ def reminder_summary_view(request):
             task_assigned_to_me_from_others,
             task_amended_by_others,
             task_overdue,
+            task_completed,
         ],
     )
 
@@ -301,6 +323,7 @@ def reminder_summary_view(request):
                 'task_assigned_to_me_from_others': task_assigned_to_me_from_others,
                 'task_amended_by_others': task_amended_by_others,
                 'task_overdue': task_overdue,
+                'task_completed': task_completed,
             },
         },
     )

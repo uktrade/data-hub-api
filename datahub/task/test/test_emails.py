@@ -6,6 +6,7 @@ from datahub.core.test_utils import (
 )
 from datahub.task.emails import (
     TaskAssignedToOthersEmailTemplate,
+    TaskCompletedEmailTemplate,
     TaskOverdueEmailTemplate,
     UpcomingTaskEmailTemplate,
 )
@@ -21,30 +22,55 @@ class BaseTaskEmailTemplateTests(APITestMixin):
         email = self.email_template_class(task)
         assert email.get_task_subject() == f'{email.subject}: {task.title}'
 
-    def test_task_fields_on_generic_tasks(self):
-        task = TaskFactory(due_date=datetime.date.today())
-        email = self.email_template_class(task)
-        assert email.get_task_fields() == f'Date due: {task.due_date.strftime("%-d %B %Y")}'
-
-    def test_task_fields_on_investment_project_tasks(self):
-        task = InvestmentProjectTaskFactory(task=TaskFactory(due_date=datetime.date.today()))
-
-        email = self.email_template_class(task.task)
-        labels = [
-            f'Investment project: {task.investment_project.name}',
-            f'Company name: {task.get_company().name}',
-            f'Date due: {task.task.due_date.strftime("%-d %B %Y")}',
+    def get_investment_project_common_fields(self, investment_project_task):
+        return [
+            f'Investment project: {investment_project_task.investment_project.name}',
+            f'Company name: {investment_project_task.get_company().name}',
+            f'Date due: {investment_project_task.task.due_date.strftime("%-d %B %Y")}',
         ]
-        assert email.get_task_fields() == '\n'.join(labels)
 
 
 class TestUpcomingTaskEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = UpcomingTaskEmailTemplate
 
+    def test_task_fields_on_investment_project_tasks(self):
+        task = InvestmentProjectTaskFactory(task=TaskFactory(due_date=datetime.date.today()))
+
+        email = self.email_template_class(task.task)
+        labels = self.get_investment_project_common_fields(task)
+        assert email.get_task_fields() == '\n'.join(labels)
+
 
 class TestTaskAssignedToOthersEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = TaskAssignedToOthersEmailTemplate
 
+    def test_task_fields_on_investment_project_tasks(self):
+        task = InvestmentProjectTaskFactory(task=TaskFactory(due_date=datetime.date.today()))
+
+        email = self.email_template_class(task.task)
+        labels = self.get_investment_project_common_fields(task)
+        assert email.get_task_fields() == '\n'.join(labels)
+
 
 class TestTaskOverdueEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = TaskOverdueEmailTemplate
+
+    def test_task_fields_on_investment_project_tasks(self):
+        task = InvestmentProjectTaskFactory(task=TaskFactory(due_date=datetime.date.today()))
+
+        email = self.email_template_class(task.task)
+        labels = self.get_investment_project_common_fields(task)
+        assert email.get_task_fields() == '\n'.join(labels)
+
+
+class TestTaskCompletedEmailTemplate(BaseTaskEmailTemplateTests):
+    email_template_class = TaskCompletedEmailTemplate
+
+    def test_task_fields_on_investment_project_tasks(self):
+        task = InvestmentProjectTaskFactory(task=TaskFactory(due_date=datetime.date.today()))
+
+        email = self.email_template_class(task.task)
+        labels = self.get_investment_project_common_fields(task) + [
+            f'Completed by: {task.task.modified_by.name}',
+        ]
+        assert email.get_task_fields() == '\n'.join(labels)

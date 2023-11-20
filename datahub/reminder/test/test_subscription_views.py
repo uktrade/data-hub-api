@@ -17,6 +17,7 @@ from datahub.reminder.test.factories import (
     NoRecentInvestmentInteractionSubscriptionFactory,
     TaskAmendedByOthersSubscriptionFactory,
     TaskAssignedToMeFromOthersSubscriptionFactory,
+    TaskCompletedSubscriptionFactory,
     TaskOverdueSubscriptionFactory,
     UpcomingEstimatedLandDateSubscriptionFactory,
     UpcomingTaskReminderSubscriptionFactory,
@@ -227,11 +228,16 @@ class TestTaskOverdueReminderSubscriptionViewset(
             'api-v4:reminder:task-amended-by-others-subscription',
             TaskAmendedByOthersSubscriptionFactory,
         ),
+        (
+            'api-v4:reminder:my-tasks-task-completed-subscription',
+            TaskCompletedSubscriptionFactory,
+        ),
     ],
 )
 class TestTaskSubscriptionViewset(APITestMixin):
     """
-    Tests for the task assigned to me from others subscription view.
+    Tests for the task assigned to me from others,
+    task amended by others, task completed subscription views.
     """
 
     def test_not_authed(self, url_name, factory):
@@ -346,6 +352,10 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             reminder_days=reminder_days,
             email_reminders_enabled=email_reminders_enabled,
         )
+        TaskCompletedSubscriptionFactory(
+            adviser=self.user,
+            email_reminders_enabled=email_reminders_enabled,
+        )
 
         url = reverse(self.url_name)
         response = self.api_client.get(url)
@@ -381,6 +391,9 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             'task_overdue': {
                 'email_reminders_enabled': True,
                 'reminder_days': [10, 20, 40],
+            },
+            'task_completed': {
+                'email_reminders_enabled': True,
             },
         }
 
@@ -420,5 +433,8 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             'task_overdue': {
                 'email_reminders_enabled': False,
                 'reminder_days': [],
+            },
+            'task_completed': {
+                'email_reminders_enabled': False,
             },
         }

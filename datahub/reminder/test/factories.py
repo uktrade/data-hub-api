@@ -14,6 +14,8 @@ from datahub.reminder.models import (
     TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
+    TaskCompletedReminder,
+    TaskCompletedSubscription,
     TaskOverdueReminder,
     TaskOverdueSubscription,
     UpcomingEstimatedLandDateReminder,
@@ -61,6 +63,11 @@ class TaskAssignedToMeFromOthersSubscriptionFactory(BaseSubscriptionFactory):
 class TaskOverdueSubscriptionFactory(BaseSubscriptionFactory):
     class Meta:
         model = TaskOverdueSubscription
+
+
+class TaskCompletedSubscriptionFactory(BaseSubscriptionFactory):
+    class Meta:
+        model = TaskCompletedSubscription
 
 
 class TaskAmendedByOthersSubscriptionFactory(BaseSubscriptionFactory):
@@ -128,3 +135,10 @@ class TaskOverdueReminderFactory(BaseReminderFactory):
 
     class Meta:
         model = TaskOverdueReminder
+
+
+class TaskCompletedReminderFactory(BaseReminderFactory):
+    task = factory.SubFactory(TaskFactory)
+
+    class Meta:
+        model = TaskCompletedReminder
