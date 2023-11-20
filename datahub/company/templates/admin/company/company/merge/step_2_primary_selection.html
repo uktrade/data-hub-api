@@ -29,15 +29,6 @@
   <form action="" method="post">
     {% csrf_token %}
 
-    <div>
-      <p>Invalid Objects:</p>
-      <ul>
-        {% for obj in invalid_objects %}
-            <li>{{ obj }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-
     {{ form.non_field_errors }}
     <div class="fieldWrapper">
       {{ form.selected_company.errors }}
