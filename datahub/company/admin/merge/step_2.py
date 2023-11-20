@@ -138,7 +138,7 @@ def _build_option_context(source_company, target_company):
     merge_results, _ = get_planned_changes(target_company)
     merge_entries = transform_merge_results_to_merge_entry_summaries(merge_results)
 
-    is_source_valid, _ = is_company_a_valid_merge_source(source_company)
+    is_source_valid, invalid_objects = is_company_a_valid_merge_source(source_company)
     is_target_valid = is_company_a_valid_merge_target(target_company)
 
     return {
@@ -147,4 +147,5 @@ def _build_option_context(source_company, target_company):
         'is_source_valid': is_source_valid,
         'is_target_valid': is_target_valid,
         'is_valid': is_source_valid and is_target_valid,
+        'invalid_objects': invalid_objects,
     }
