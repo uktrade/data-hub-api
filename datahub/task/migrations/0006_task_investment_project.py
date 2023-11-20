@@ -4,6 +4,21 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+def forwards_func(apps, schema_editor):
+    InvestmentProjectTask = apps.get_model("task", "InvestmentProjectTask")
+    if InvestmentProjectTask is not None:
+        investment_project_tasks = InvestmentProjectTask.objects.all()
+        for investment_project_task in investment_project_tasks:
+            investment_project_task.task.investment_project = (
+                investment_project_task.investment_project
+            )
+            investment_project_task.task.save()
+
+
+def reverse_func(apps, schema_editor):
+    print("This migration removes the investment_project column, so no data rollback is required")
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ('investment', '0013_update_specific_programmes'),
@@ -22,4 +37,5 @@ class Migration(migrations.Migration):
                 to='investment.investmentproject',
             ),
         ),
+        migrations.RunPython(forwards_func, reverse_func),
     ]

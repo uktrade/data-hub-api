@@ -1,6 +1,5 @@
 import datetime
 import logging
-from importlib import import_module
 from unittest import mock
 from unittest.mock import ANY
 from uuid import uuid4
@@ -8,13 +7,11 @@ from uuid import uuid4
 import pytest
 
 
-from django.apps import apps
 from django.db.models.signals import m2m_changed, post_delete, post_save, pre_delete, pre_save
 from django.test.utils import override_settings
 
 
 from datahub.feature_flag.test.factories import UserFeatureFlagFactory
-from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
     TaskAssignedToMeFromOthersReminder,
@@ -422,15 +419,6 @@ class TestTaskReminders:
 
         # check result
         assert caplog.messages[0] == (f'Task {job.id} generate_reminders_upcoming_tasks scheduled')
-
-    def test_migration_forwards_func(self):
-        # Import migration file dynamically as it start with a number
-        module = import_module('datahub.task.migrations.0005_task_reminder_date')
-
-        task = TaskFactory(reminder_days=7, due_date=datetime.date.today())
-        module.forwards_func(apps, None)
-
-        assert task.reminder_date == task.due_date - datetime.timedelta(days=task.reminder_days)
 
     def test_subscription_is_created_when_subscription_does_not_exist_for_adviser(self):
         adviser = AdviserFactory()

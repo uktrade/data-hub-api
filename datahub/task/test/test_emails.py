@@ -54,8 +54,6 @@ class TestTaskAssignedToOthersEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = TaskAssignedToOthersEmailTemplate
 
     def test_task_fields_on_investment_project_tasks(self, investment_project_task):
-        # task = InvestmentProjectTaskFactory(task=TaskFactory(due_date=datetime.date.today()))
-
         email = self.email_template_class(investment_project_task)
         labels = self.get_investment_project_common_fields(investment_project_task)
         assert email.get_task_fields() == '\n'.join(labels)
@@ -65,8 +63,6 @@ class TestTaskOverdueEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = TaskOverdueEmailTemplate
 
     def test_task_fields_on_investment_project_tasks(self, investment_project_task):
-        # task = InvestmentProjectTaskFactory(task=TaskFactory(due_date=datetime.date.today()))
-
         email = self.email_template_class(investment_project_task)
         labels = self.get_investment_project_common_fields(investment_project_task)
         assert email.get_task_fields() == '\n'.join(labels)
@@ -76,8 +72,6 @@ class TestTaskCompletedEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = TaskCompletedEmailTemplate
 
     def test_task_fields_on_investment_project_tasks(self, investment_project_task):
-        # task = InvestmentProjectTaskFactory(task=TaskFactory(due_date=datetime.date.today()))
-        print(investment_project_task)
         email = self.email_template_class(investment_project_task)
         labels = self.get_investment_project_common_fields(investment_project_task) + [
             f'Completed by: {investment_project_task.modified_by.name}',
