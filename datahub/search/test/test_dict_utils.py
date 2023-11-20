@@ -446,7 +446,7 @@ def test_task_investment_project_dict_returns_none_when_task_investment_project_
 
 def test_task_investment_project_dict_returns_none_when_task_investmentprojecttask_is_none():
     task = mock.MagicMock()
-    task.task_investmentprojecttask = None
+    task.investment_project = None
 
     assert dict_utils.task_investment_project_dict(task) is None
 
@@ -454,7 +454,7 @@ def test_task_investment_project_dict_returns_none_when_task_investmentprojectta
 def test_task_investment_project_dict_returns_investment_project_task():
     task = mock.MagicMock()
     investment_project = mock.MagicMock()
-    task.task_investmentprojecttask.investment_project = investment_project
+    task.investment_project = investment_project
 
     assert dict_utils.task_investment_project_dict(task) == dict_utils.investment_project_dict(
         investment_project,
