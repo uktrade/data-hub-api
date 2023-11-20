@@ -128,10 +128,8 @@ def select_primary_company(model_admin, request):
         'media': model_admin.media,
         'opts': model_admin.model._meta,
         'title': title,
+        'invalid_objects': form.invalid_objects,
     }
-
-    if is_post and not form.is_valid():
-        context['invalid_objects'] = form.invalid_objects
 
     return TemplateResponse(request, template_name, context)
 
