@@ -60,7 +60,7 @@ from datahub.omis.payment.test.factories import (
 )
 from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model
-from datahub.task.test.factories import InvestmentProjectTaskFactory
+from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
 from datahub.user.company_list.test.factories import (
     CompanyListItemFactory,
     PipelineItemFactory,
@@ -580,6 +580,12 @@ MAPPING = {
             },
             {
                 'factory': InvestmentProjectTaskFactory,
+                'field': 'investment_project',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
+            {
+                'factory': TaskFactory,
                 'field': 'investment_project',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [{}],

@@ -6,7 +6,8 @@ from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test.factories import to_many_field
-from datahub.task.models import Task
+from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.task.models import InvestmentProjectTask, Task
 
 
 class TaskFactory(factory.django.DjangoModelFactory):
@@ -29,3 +30,17 @@ class TaskFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Task
+
+
+class InvestmentProjectTaskFactory(factory.django.DjangoModelFactory):
+    """Factory for creating investment project tasks"""
+
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SelfAttribute('created_by')
+    created_on = now()
+
+    task = factory.SubFactory(TaskFactory)
+    investment_project = factory.SubFactory(InvestmentProjectFactory)
+
+    class Meta:
+        model = InvestmentProjectTask
