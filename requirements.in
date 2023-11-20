@@ -9,7 +9,7 @@ django-filter==23.3
 django-log-formatter-ecs==0.0.5
 django-mptt==0.15.0
 django-pglocks==1.0.4
-django-reversion==5.0.6
+django-reversion==5.0.8
 uritemplate==4.1.1  # required for DRF schema features
 whitenoise==6.6.0
 
@@ -21,7 +21,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.9
 psycogreen==1.0.2
 
-boto3==1.28.78
+boto3==1.28.84
 
 notifications-python-client==8.1.0
 
