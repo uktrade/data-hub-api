@@ -1,7 +1,7 @@
-from django.db.models.signals import m2m_changed, post_delete, post_save
+from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 
-from datahub.task.models import InvestmentProjectTask, Task
+from datahub.task.models import Task
 from datahub.task.tasks import (
     schedule_create_task_assigned_to_me_from_others_subscription_task,
     schedule_create_task_completed_subscription_task,
@@ -9,17 +9,6 @@ from datahub.task.tasks import (
     schedule_create_task_reminder_subscription_task,
     schedule_notify_advisers_task_completed,
 )
-
-
-@receiver(
-    post_delete,
-    sender=InvestmentProjectTask,
-)
-def delete_investment_project_task_delete(sender, instance, **kwargs):
-    associated_task = Task.objects.filter(pk=instance.task.id).first()
-    if instance.task.id:
-        if associated_task:
-            associated_task.delete()
 
 
 @receiver(

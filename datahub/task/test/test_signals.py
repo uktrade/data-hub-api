@@ -7,9 +7,8 @@ from django.db.models.signals import m2m_changed
 from factory.django import mute_signals
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.task.models import Task
 from datahub.task.signals import set_task_subscriptions_and_schedule_notifications
-from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
+from datahub.task.test.factories import TaskFactory
 
 
 def patch_all_task_subscription_functions(f):
@@ -26,32 +25,6 @@ def patch_all_task_subscription_functions(f):
         return f(*args, **kwargs)
 
     return functor
-
-
-@pytest.mark.django_db
-class TestDeleteInvestmentProjectTask:
-    @mute_signals(m2m_changed)
-    def test_delete_investment_project_task__without_linked_tasks_does_nothing(self):
-        task = TaskFactory()
-        task_id = task.id
-
-        investment_project_task = InvestmentProjectTaskFactory(task=task)
-        task.delete()
-        investment_project_task.delete()
-
-        obj = Task.objects.filter(pk=task_id).first()
-        assert obj is None
-
-    @mute_signals(m2m_changed)
-    def test_delete_investment_project_task_deletes_linked_task(self):
-        task = TaskFactory()
-        task_id = task.id
-
-        investment_project_task = InvestmentProjectTaskFactory(task=task)
-        investment_project_task.delete()
-
-        obj = Task.objects.filter(pk=task_id).first()
-        assert obj is None
 
 
 @pytest.mark.django_db

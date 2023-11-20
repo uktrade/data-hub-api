@@ -14,6 +14,7 @@ from django.test.utils import override_settings
 
 
 from datahub.feature_flag.test.factories import UserFeatureFlagFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
     TaskAssignedToMeFromOthersReminder,
@@ -45,7 +46,7 @@ from datahub.task.tasks import (
     update_task_completed_email_status,
     update_task_reminder_email_status,
 )
-from datahub.task.test.factories import AdviserFactory, InvestmentProjectTaskFactory, TaskFactory
+from datahub.task.test.factories import AdviserFactory, TaskFactory
 
 
 @pytest.fixture()
@@ -101,31 +102,29 @@ def mock_statsd(monkeypatch):
     return mock_statsd
 
 
-def investment_project_factory_due_on_date(days=1, advisers=None, due_date=None):
+def task_factory_due_on_date(days=1, advisers=None, due_date=None):
     if not advisers:
         advisers = [AdviserFactory()]
     if not due_date:
         due_date = datetime.date.today()
     if advisers:
         [create_task_reminder_subscription_task(adviser.id) for adviser in advisers]
-    return InvestmentProjectTaskFactory(
-        task=TaskFactory(
-            due_date=due_date + datetime.timedelta(days=days),
-            reminder_days=days,
-            advisers=advisers,
-        ),
+    return TaskFactory(
+        due_date=due_date + datetime.timedelta(days=days),
+        reminder_days=days,
+        advisers=advisers,
     )
 
 
-def mock_notify_adviser_investment_project_task_due_email_call(
-    investment_project_task_due,
+def mock_notify_adviser_task_due_email_call(
+    task_due,
     matching_adviser,
     template_id,
 ):
     reminder = UpcomingTaskReminderFactory(
         adviser=matching_adviser,
-        task=investment_project_task_due.task,
-        event=f'{investment_project_task_due.task.reminder_days} days left to task due',
+        task=task_due,
+        event=f'{task_due.reminder_days} days left to task due',
     )
     reminder.id = ANY
     reminder.pk = ANY
@@ -133,7 +132,7 @@ def mock_notify_adviser_investment_project_task_due_email_call(
     return mock.call(
         adviser=matching_adviser,
         template_identifier=template_id,
-        context=UpcomingTaskEmailTemplate(investment_project_task_due.task).get_context(),
+        context=UpcomingTaskEmailTemplate(task_due).get_context(),
         update_task=update_task_reminder_email_status,
         reminders=[reminder],
     )
@@ -179,7 +178,7 @@ class TestTaskReminders:
         """
         adviser = AdviserFactory()
         add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
-        investment_project_factory_due_on_date(1, advisers=[adviser])
+        task_factory_due_on_date(1, advisers=[adviser])
 
         caplog.set_level(logging.INFO, logger='datahub.task.tasks')
 
@@ -216,7 +215,7 @@ class TestTaskReminders:
         mock_statsd,
     ):
         # create a few tasks with and without due reminders
-        tasks = InvestmentProjectTaskFactory.create_batch(4)
+        tasks = TaskFactory.create_batch(4)
         tasks_due = []
         matching_advisers = AdviserFactory.create_batch(3)
         matching_advisers = [
@@ -224,18 +223,18 @@ class TestTaskReminders:
             for adviser in matching_advisers
         ]
         tasks_due.append(
-            investment_project_factory_due_on_date(
+            task_factory_due_on_date(
                 1,
                 advisers=[matching_advisers[0]],
             ),
         )
         tasks_due.append(
-            investment_project_factory_due_on_date(
+            task_factory_due_on_date(
                 7,
                 advisers=[matching_advisers[1]],
             ),
         )
-        tasks_due.append(investment_project_factory_due_on_date(30, advisers=matching_advisers))
+        tasks_due.append(task_factory_due_on_date(30, advisers=matching_advisers))
 
         template_id = str(uuid4())
         with override_settings(
@@ -247,27 +246,27 @@ class TestTaskReminders:
 
         mock_notify_adviser_by_rq_email.assert_has_calls(
             [
-                mock_notify_adviser_investment_project_task_due_email_call(
+                mock_notify_adviser_task_due_email_call(
                     tasks_due[0],
                     matching_advisers[0],
                     template_id,
                 ),
-                mock_notify_adviser_investment_project_task_due_email_call(
+                mock_notify_adviser_task_due_email_call(
                     tasks_due[1],
                     matching_advisers[1],
                     template_id,
                 ),
-                mock_notify_adviser_investment_project_task_due_email_call(
+                mock_notify_adviser_task_due_email_call(
                     tasks_due[2],
                     matching_advisers[0],
                     template_id,
                 ),
-                mock_notify_adviser_investment_project_task_due_email_call(
+                mock_notify_adviser_task_due_email_call(
                     tasks_due[2],
                     matching_advisers[1],
                     template_id,
                 ),
-                mock_notify_adviser_investment_project_task_due_email_call(
+                mock_notify_adviser_task_due_email_call(
                     tasks_due[2],
                     matching_advisers[2],
                     template_id,
@@ -288,7 +287,7 @@ class TestTaskReminders:
             add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
             for adviser in matching_advisers
         ]
-        task_due = investment_project_factory_due_on_date(1, advisers=matching_advisers)
+        task_due = task_factory_due_on_date(1, advisers=matching_advisers)
         subscription = UpcomingTaskReminderSubscription.objects.filter(
             adviser=matching_advisers[1],
         ).first()
@@ -304,7 +303,7 @@ class TestTaskReminders:
 
         mock_notify_adviser_by_rq_email.assert_has_calls(
             [
-                mock_notify_adviser_investment_project_task_due_email_call(
+                mock_notify_adviser_task_due_email_call(
                     task_due,
                     matching_advisers[0],
                     template_id,
@@ -326,7 +325,7 @@ class TestTaskReminders:
             matching_advisers[0],
         )
 
-        task_due = investment_project_factory_due_on_date(1, advisers=matching_advisers)
+        task_due = task_factory_due_on_date(1, advisers=matching_advisers)
         subscription = UpcomingTaskReminderSubscription.objects.filter(
             adviser=matching_advisers[1],
         ).first()
@@ -342,7 +341,7 @@ class TestTaskReminders:
 
         mock_notify_adviser_by_rq_email.assert_has_calls(
             [
-                mock_notify_adviser_investment_project_task_due_email_call(
+                mock_notify_adviser_task_due_email_call(
                     task_due,
                     matching_advisers[0],
                     template_id,
@@ -362,7 +361,7 @@ class TestTaskReminders:
             adviser_tasks_user_feature_flag,
             adviser,
         )
-        task_due = investment_project_factory_due_on_date(1, advisers=[adviser])
+        task_due = task_factory_due_on_date(1, advisers=[adviser])
         mock_notify_adviser_by_rq_email.reset_mock()
 
         template_id = str(uuid4())
@@ -374,7 +373,7 @@ class TestTaskReminders:
 
         mock_notify_adviser_by_rq_email.assert_has_calls(
             [
-                mock_notify_adviser_investment_project_task_due_email_call(
+                mock_notify_adviser_task_due_email_call(
                     task_due,
                     adviser,
                     template_id,
@@ -532,18 +531,17 @@ class TestTasksAssignedToMeFromOthers:
         with override_settings(
             TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
         ):
-            investment_project_task = InvestmentProjectTaskFactory(
-                task=TaskFactory(advisers=[adviser], due_date=datetime.date.today()),
-            )
+            task = TaskFactory(advisers=[adviser], due_date=datetime.date.today())
+
             notify_adviser_added_to_task(
-                investment_project_task.task,
+                task,
                 adviser.id,
             )
 
             mock_notify_adviser_by_rq_email.assert_has_calls(
                 [
                     mock_notify_adviser_task_assigned_from_others_call(
-                        investment_project_task.task,
+                        task,
                         adviser,
                         template_id,
                     ),
@@ -563,19 +561,17 @@ class TestTasksAssignedToMeFromOthers:
         with override_settings(
             TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
         ):
-            investment_project_task = InvestmentProjectTaskFactory(
-                task=TaskFactory(advisers=[adviser], due_date=datetime.date.today()),
-            )
+            task = TaskFactory(advisers=[adviser], due_date=datetime.date.today())
 
             notify_adviser_added_to_task(
-                investment_project_task.task,
+                task,
                 adviser.id,
             )
 
             mock_notify_adviser_by_rq_email.assert_has_calls(
                 [
                     mock_notify_adviser_task_assigned_from_others_call(
-                        investment_project_task.task,
+                        task,
                         adviser,
                         template_id,
                     ),
@@ -597,19 +593,17 @@ class TestTasksAssignedToMeFromOthers:
         with override_settings(
             TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
         ):
-            investment_project_task = InvestmentProjectTaskFactory(
-                task=TaskFactory(advisers=[adviser], due_date=datetime.date.today()),
-            )
+            task = TaskFactory(advisers=[adviser], due_date=datetime.date.today())
 
             notify_adviser_added_to_task(
-                investment_project_task.task,
+                task,
                 adviser.id,
             )
 
             mock_notify_adviser_by_rq_email.assert_has_calls(
                 [
                     mock_notify_adviser_task_assigned_from_others_call(
-                        investment_project_task.task,
+                        task,
                         adviser,
                         template_id,
                     ),

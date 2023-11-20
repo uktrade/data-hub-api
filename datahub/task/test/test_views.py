@@ -2,6 +2,9 @@ import datetime
 
 from uuid import uuid4
 
+import pytest
+
+
 from django.utils.timezone import now
 
 from faker import Faker
@@ -15,6 +18,7 @@ from datahub.core.test_utils import (
     APITestMixin,
     format_date_or_datetime,
 )
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 from datahub.task.test.factories import TaskFactory
 from datahub.task.test.utils import BaseEditTaskTests, BaseListTaskTests, BaseTaskTests
@@ -96,7 +100,7 @@ class TestGetTask(APITestMixin):
             },
             'created_on': format_date_or_datetime(task.created_on),
             'modified_on': format_date_or_datetime(task.modified_on),
-            'investment_project_task': None,
+            'investment_project': None,
         }
         assert response == expected_response
 
@@ -203,9 +207,107 @@ class TestAddTask(APITestMixin):
             },
             'created_on': post_response_json['created_on'],
             'modified_on': post_response_json['modified_on'],
-            'investment_project_task': None,
+            'investment_project': None,
         }
         assert get_response.json() == expected_response
+
+
+class TestTaskForInvestmentProject(APITestMixin):
+    """Test the POST task endpoint creating an investment project"""
+
+    @pytest.mark.parametrize('investment_project_id', ('abc', '', uuid4()))
+    def test_create_task_with_invalid_investment_project_id_returns_bad_request(
+        self,
+        investment_project_id,
+    ):
+        faker = Faker()
+
+        url = reverse('api-v4:task:collection')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'title': faker.word(),
+                'advisers': [AdviserFactory().id],
+                'investment_project': investment_project_id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+        assert list(response.json().keys()) == ['investment_project']
+
+    def test_create_task_with_valid_investment_project_id_returns_success(
+        self,
+    ):
+        faker = Faker()
+
+        url = reverse('api-v4:task:collection')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'title': faker.word(),
+                'advisers': [AdviserFactory().id],
+                'investment_project': InvestmentProjectFactory().id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+    def test_get_task_with_investment_project_when_task_id_valid(self):
+        investment_project = InvestmentProjectFactory()
+        task = TaskFactory(investment_project=investment_project)
+
+        url = reverse(
+            'api-v4:task:item',
+            kwargs={'pk': task.id},
+        )
+        response = self.api_client.get(url).json()
+        expected_response = {
+            'id': str(task.id),
+            'title': task.title,
+            'description': task.description,
+            'due_date': task.due_date,
+            'reminder_days': task.reminder_days,
+            'email_reminders_enabled': task.email_reminders_enabled,
+            'advisers': [
+                {
+                    'id': str(adviser.id),
+                    'name': adviser.name,
+                    'first_name': adviser.first_name,
+                    'last_name': adviser.last_name,
+                }
+                for adviser in task.advisers.all()
+            ],
+            'archived': task.archived,
+            'archived_by': task.archived_by,
+            'archived_reason': task.archived_reason,
+            'created_by': {
+                'name': task.created_by.name,
+                'first_name': task.created_by.first_name,
+                'last_name': task.created_by.last_name,
+                'id': str(task.created_by.id),
+            },
+            'modified_by': {
+                'name': task.modified_by.name,
+                'first_name': task.modified_by.first_name,
+                'last_name': task.modified_by.last_name,
+                'id': str(task.modified_by.id),
+            },
+            'created_on': format_date_or_datetime(task.created_on),
+            'modified_on': format_date_or_datetime(task.modified_on),
+            'investment_project': {
+                'name': investment_project.name,
+                'id': str(investment_project.id),
+                'investor_company': {
+                    'name': investment_project.investor_company.name,
+                    'id': str(investment_project.investor_company.id),
+                },
+                'project_code': investment_project.project_code,
+            },
+        }
+        assert response == expected_response
 
 
 class TestEditTask(BaseEditTaskTests):
