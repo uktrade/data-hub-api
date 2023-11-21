@@ -7,7 +7,12 @@ def get_env_variables():
     api_key = os.getenv('API_KEY')
     email_address = os.getenv('SENDER_EMAIL_ADDRESS')
     template_id = os.getenv('TEMPLATE_ID')
-    return api_key, email_address, template_id
+    goods_services = os.getenv('GOODS_SERVICES')
+    country_destination = os.getenv('COUNTRY_DESTINATION')
+    client_firstname = os.getenv('CLIENT_FIRSTNAME')
+    lead_officer_fullname = os.getenv('LEAD_OFFICER_FULLNAME')
+    url_link= = os.getenv('URL')
+    return api_key, email_address, template_id, goods_services, country_destination,client_firstname,lead_officer_fullname, url_link
 
 def send_email():
     try:
@@ -19,9 +24,19 @@ def send_email():
 
         notifications_client = NotificationsAPIClient(api_key)
         
+        # personalisation info
+        personalisation_data={
+            'goods_services': goods_services,
+            'country_destination': country_destination,
+            'client_firstname': client_firstname,
+            'lead_officer_fullname': lead_officer_fullname,
+            'url': url_link,
+        }
+
         response = notifications_client.send_email_notification(
             email_address=email_address,
             template_id=template_id,
+            personalisation=personalisation_data,
         )
         
         # Handle the response as needed
