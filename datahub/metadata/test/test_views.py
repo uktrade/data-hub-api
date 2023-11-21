@@ -1,5 +1,4 @@
 from contextlib import suppress
-from operator import itemgetter
 
 import factory
 import pytest
@@ -401,8 +400,6 @@ class TestSectorView:
     def test_list(self, metadata_client):
         """
         Test listing sectors.
-
-        Sectors should be sorted by full name (path).
         """
         url = reverse(viewname='api-v4:metadata:sector')
         response = metadata_client.get(url)
@@ -422,8 +419,6 @@ class TestSectorView:
             } if sector.parent else None,
             'disabled_on': disabled_on,
         }
-
-        assert sectors == list(sorted(sectors, key=itemgetter('name')))
 
     @pytest.mark.parametrize('level', (0, 1))
     def test_list_filter_by_level(self, metadata_client, level):

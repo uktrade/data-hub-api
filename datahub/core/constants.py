@@ -104,11 +104,11 @@ class Sector(Enum):
     """Sectors (not all of them!)."""
 
     aerospace_assembly_aircraft = Constant(
-        'Aerospace : Manufacturing and Assembly : Aircraft',
+        'Aerospace : Manufacturing and assembly : Aircraft',
         'b422c9d2-5f95-e211-a939-e4115bead28a',
     )
     renewable_energy_wind = Constant(
-        'Renewable Energy : Wind',
+        'Energy : Renewable energy : Fixed-bottom offshore wind',
         'a4959812-6095-e211-a939-e4115bead28a',
     )
 
