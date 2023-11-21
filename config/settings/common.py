@@ -683,6 +683,11 @@ ALLOW_TEST_FIXTURE_SETUP = env('ALLOW_TEST_FIXTURE_SETUP', default=False)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 IS_TEST = env('IS_TEST', default=False)
 
+# For use with Sector migrations
+# when set to "production", migration affecting production should be skipped
+# Check for Sector environment needs to be added manually to a given migration
+SECTOR_ENVIRONMENT = env('SECTOR_ENVIRONMENT', default='')
+
 # Content Security Policy
 CSP_DEFAULT_SRC = ("'self'",)
 CSP_STYLE_SRC = (
