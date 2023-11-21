@@ -11,12 +11,12 @@ def get_env_variables():
     country_destination = os.getenv('COUNTRY_DESTINATION')
     client_firstname = os.getenv('CLIENT_FIRSTNAME')
     lead_officer_fullname = os.getenv('LEAD_OFFICER_FULLNAME')
-    url_link= = os.getenv('URL')
-    return api_key, email_address, template_id, goods_services, country_destination,client_firstname,lead_officer_fullname, url_link
+    url_link = os.getenv('URL')
+    return api_key, email_address, template_id, goods_services, country_destination, client_firstname, lead_officer_fullname, url_link
 
 def send_email():
     try:
-        api_key, email_address, template_id = get_env_variables()
+        api_key, email_address, template_id, goods_services, country_destination, client_firstname, lead_officer_fullname, url_link= get_env_variables()
 
         if not (api_key and email_address and template_id):
             print("Missing environment variables")
