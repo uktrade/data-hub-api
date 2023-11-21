@@ -45,6 +45,18 @@ class TestListTask(BaseListTaskTests):
             str(latest_task.id),
         ]
 
+    def test_returns_only_tasks_with_investment_project_when_param_is_used(self):
+        investment_projects = InvestmentProjectFactory.create_batch(2)
+        TaskFactory.create_batch(3)
+        TaskFactory.create_batch(2, investment_project=investment_projects[0])
+        TaskFactory.create_batch(3, investment_project=investment_projects[1])
+
+        url = f'{reverse(self.reverse_url)}?investment_project={investment_projects[0].id}'
+
+        response = self.api_client.get(url).json()
+
+        assert response.get('count') == 2
+
 
 class TestGetTask(APITestMixin):
     """Test the GET task endpoint"""
