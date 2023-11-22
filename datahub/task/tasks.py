@@ -374,6 +374,11 @@ def update_task_amended_by_others_email_status(email_notification_id, reminder_i
         reminder.email_notification_id = email_notification_id
         reminder.save()
 
+    logger.info(
+        'Task update_task_amended_by_others_email_status completed'
+        f'email_notification_id to {email_notification_id} and reminder_ids set to {reminder_ids}',
+    )
+
 
 def create_task_amended_by_others_subscription(adviser_id):
     """
@@ -451,10 +456,13 @@ def schedule_notify_advisers_task_amended_by_others(task, created):
     logger.info(
         f'Task {job.id} notify_adviser_task_amended_by_others',
     )
-    return
 
 
 def send_task_email(adviser, task, reminder, update_task, email_template_class):
+    logger.info(
+        f'Sending an email for Task {task.id} and reminder {reminder.id} to adviser {adviser.id}',
+    )
+
     notify_adviser_by_rq_email(
         adviser=adviser,
         template_identifier=settings.TASK_REMINDER_EMAIL_TEMPLATE_ID,
