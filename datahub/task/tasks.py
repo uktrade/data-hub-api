@@ -132,7 +132,7 @@ def create_upcoming_task_reminder(
         send_task_email(
             adviser=adviser,
             task=task,
-            reminders=[reminder],
+            reminder=reminder,
             update_task=update_task_reminder_email_status,
             email_template_class=UpcomingTaskEmailTemplate,
         )
@@ -155,12 +155,22 @@ def update_task_reminder_email_status(email_notification_id, reminder_ids):
         reminder.email_notification_id = email_notification_id
         reminder.save()
 
+    logger.info(
+        'Task update_task_reminder_email_status completed, setting '
+        f'email_notification_id to {email_notification_id} for reminder_ids {reminder_ids}',
+    )
+
 
 def update_task_assigned_to_me_from_others_email_status(email_notification_id, reminder_ids):
     reminders = TaskAssignedToMeFromOthersReminder.all_objects.filter(id__in=reminder_ids)
     for reminder in reminders:
         reminder.email_notification_id = email_notification_id
         reminder.save()
+
+    logger.info(
+        'Task update_task_assigned_to_me_from_others_email_status completed, setting '
+        f'email_notification_id to {email_notification_id} for reminder_ids {reminder_ids}',
+    )
 
 
 def schedule_create_task_assigned_to_me_from_others_subscription_task(task, adviser_id):
@@ -211,7 +221,7 @@ def notify_adviser_added_to_task(task, adviser_id):
         send_task_email(
             adviser=adviser,
             task=task,
-            reminders=[reminder],
+            reminder=reminder,
             update_task=update_task_assigned_to_me_from_others_email_status,
             email_template_class=TaskAssignedToOthersEmailTemplate,
         )
@@ -245,6 +255,11 @@ def update_task_completed_email_status(email_notification_id, reminder_ids):
     for reminder in reminders:
         reminder.email_notification_id = email_notification_id
         reminder.save()
+
+    logger.info(
+        'Task update_task_completed_email_status completed, setting '
+        f'email_notification_id to {email_notification_id} for reminder_ids {reminder_ids}',
+    )
 
 
 def schedule_create_task_completed_subscription_task(adviser_id):
@@ -315,7 +330,7 @@ def notify_adviser_completed_task(task, created):
             send_task_email(
                 adviser=adviser,
                 task=task,
-                reminders=[reminder],
+                reminder=reminder,
                 update_task=update_task_completed_email_status,
                 email_template_class=TaskCompletedEmailTemplate,
             )
@@ -332,11 +347,11 @@ def schedule_notify_advisers_task_completed(task, created):
     )
 
 
-def send_task_email(adviser, task, reminders, update_task, email_template_class):
+def send_task_email(adviser, task, reminder, update_task, email_template_class):
     notify_adviser_by_rq_email(
         adviser=adviser,
         template_identifier=settings.TASK_REMINDER_EMAIL_TEMPLATE_ID,
         context=email_template_class(task).get_context(),
         update_task=update_task,
-        reminders=reminders,
+        reminders=[reminder],
     )

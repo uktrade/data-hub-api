@@ -1,5 +1,6 @@
 from logging import getLogger
 
+
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db.models import Q
@@ -825,11 +826,20 @@ def send_email_notification_via_rq(
     Email notification function to be scheduled by RQ,
     setting up a second task to update the email delivery status.
     """
+    logger.info(
+        f'send_email_notification_via_rq attempting to send email to recipient {recipient_email},'
+        f'using template identifier {template_identifier}',
+    )
     response = notify_gateway.send_email_notification(
         recipient_email,
         template_identifier,
         context,
         notify_service_name,
+    )
+
+    logger.info(
+        f'send_email_notification_via_rq email sent to recipient {recipient_email},'
+        f'received response {response}',
     )
 
     job_scheduler(
