@@ -125,6 +125,11 @@ class TaskAssignedToMeFromOthersReminderAdmin(admin.ModelAdmin):
     """Task assigned to me from others admin."""
 
     raw_id_fields = ('adviser',)
+    list_display = [
+        'event',
+        'adviser',
+        'task',
+    ]
 
 
 @admin.register(TaskAmendedByOthersReminder)
@@ -132,6 +137,11 @@ class TaskAmendedByOthersReminderAdmin(admin.ModelAdmin):
     """Task amended by others admin."""
 
     raw_id_fields = ('adviser',)
+    list_display = [
+        'event',
+        'adviser',
+        'task',
+    ]
 
 
 @admin.register(TaskOverdueReminder)
@@ -139,6 +149,11 @@ class TaskOverdueReminderAdmin(admin.ModelAdmin):
     """Task overdue admin."""
 
     raw_id_fields = ('adviser',)
+    list_display = [
+        'event',
+        'adviser',
+        'task',
+    ]
 
 
 @admin.register(TaskCompletedReminder)
@@ -146,3 +161,8 @@ class TaskCompletedReminderAdmin(admin.ModelAdmin):
     """Task completed admin."""
 
     raw_id_fields = ('adviser',)
+    list_display = [
+        'event',
+        'adviser',
+        'task',
+    ]
