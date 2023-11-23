@@ -38,6 +38,13 @@ class Task(ArchivableModel, BaseModel):
         related_name='+',
     )
     reminder_date = models.DateField(null=True, blank=True, editable=False)
+    investment_project = models.ForeignKey(
+        InvestmentProject,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='task_investment_project',
+    )
 
     # override the save method and calculate reminder_date
     def save(self, *args, **kwargs):
@@ -53,28 +60,26 @@ class Task(ArchivableModel, BaseModel):
         """URL to the object in the Data Hub internal front end."""
         return get_front_end_url(self)
 
-    def get_related_task_type(self):
-        """
-        If this task has a linked BaseTaskType model, return that task type
-        """
-        task_fields = [
-            getattr(self, field.name)
-            for field in self._meta.get_fields()
-            if (
-                field.related_model
-                and issubclass(field.related_model, BaseTaskType)
-                and hasattr(self, field.name)
-            )
-        ]
-        return task_fields[0] if len(task_fields) > 0 else None
+    # def get_related_task_type(self):
+    #     """
+    #     If this task has a linked BaseTaskType model, return that task type
+    #     """
+    #     task_fields = [
+    #         getattr(self, field.name)
+    #         for field in self._meta.get_fields()
+    #         if (
+    #             field.related_model
+    #             and issubclass(field.related_model, BaseTaskType)
+    #             and hasattr(self, field.name)
+    #         )
+    #     ]
+    #     return task_fields[0] if len(task_fields) > 0 else None
 
     def get_company(self):
         """
         Return the company from the related BaseTaskType model implementation.
         """
-        related_model = self.get_related_task_type()
-
-        return related_model.get_company() if related_model else None
+        return self.investment_project.investor_company if self.investment_project else None
 
 
 class BaseTaskType(BaseModel):

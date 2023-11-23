@@ -44,16 +44,6 @@ def id_type_dict(obj):
     }
 
 
-def task_type(obj):
-    """Returns the name of the class of the related task type"""
-    if obj is None:
-        return None
-    related_task_type = obj.get_related_task_type()
-    if related_task_type is None:
-        return obj.__class__.__name__
-    return related_task_type.__class__.__name__
-
-
 def id_uri_dict(obj):
     """Creates dictionary with selected field from supplied object."""
     if obj is None:
@@ -219,12 +209,10 @@ def task_company(obj):
 
 def task_investment_project_dict(obj):
     """Creates dictionary from a task investment project containing id, name and project_code."""
-    if not hasattr(obj, 'task_investmentprojecttask'):
-        return None
-    if obj.task_investmentprojecttask is None:
+    if not hasattr(obj, 'investment_project'):
         return None
 
-    return investment_project_dict(obj.task_investmentprojecttask.investment_project)
+    return investment_project_dict(obj.investment_project)
 
 
 def sector_dict(obj):

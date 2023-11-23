@@ -28,8 +28,8 @@ class EmailTemplate(ABC):
     @property
     def investment_project(self):
         return (
-            f'Investment project: {self.task.task_investmentprojecttask.investment_project.name}'
-            if hasattr(self.task, 'task_investmentprojecttask')
+            f'Investment project: {self.task.investment_project.name}'
+            if self.task.investment_project
             else None
         )
 

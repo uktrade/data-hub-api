@@ -17,7 +17,6 @@ class Task(BaseSearchModel):
     email_reminders_enabled = Boolean()
     advisers = fields.contact_or_adviser_field()
     reminder_date = Date()
-    task_type = Text()
     investment_project = fields.investment_project_field()
     company = fields.id_name_field()
 
@@ -27,7 +26,6 @@ class Task(BaseSearchModel):
     }
 
     COMPUTED_MAPPINGS = {
-        'task_type': dict_utils.task_type,
         'investment_project': dict_utils.task_investment_project_dict,
         'company': dict_utils.task_company,
     }
