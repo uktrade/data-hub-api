@@ -1,5 +1,6 @@
 from datahub.company.models import CompanyExportCountry
 from datahub.dataset.core.views import BaseDatasetView
+from datahub.dbmaintenance.utils import parse_date
 
 
 class CompanyExportCountryDatasetView(BaseDatasetView):
@@ -10,9 +11,17 @@ class CompanyExportCountryDatasetView(BaseDatasetView):
     then be queried to create custom reports for users.
     """
 
-    def get_dataset(self):
+    def get(self, request):
+        """Endpoint which serves all records for Company Export country Dataset"""
+        dataset = self.get_dataset(request)
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(dataset, request, view=self)
+        self._enrich_data(page)
+        return paginator.get_paginated_response(page)
+
+    def get_dataset(self, request):
         """Returns list of company_export_country records"""
-        return CompanyExportCountry.objects.values(
+        queryset = CompanyExportCountry.objects.values(
             'id',
             'company_id',
             'country__name',
@@ -21,3 +30,10 @@ class CompanyExportCountryDatasetView(BaseDatasetView):
             'modified_on',
             'status',
         )
+        updated_since = request.GET.get('updated_since')
+        if updated_since:
+            updated_since_date = parse_date(updated_since)
+            if updated_since_date:
+                queryset = queryset.filter(modified_on__gt=updated_since_date)
+
+        return queryset
