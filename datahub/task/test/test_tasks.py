@@ -627,7 +627,9 @@ class TestTasksAssignedToMeFromOthers:
             )
 
     def test_notification_received_but_no_email_sent_to_adviser_when_email_subscription_disabled(
-        self, adviser_tasks_user_feature_flag, caplog
+        self,
+        adviser_tasks_user_feature_flag,
+        caplog,
     ):
         caplog.set_level(logging.INFO)
 
@@ -642,7 +644,8 @@ class TestTasksAssignedToMeFromOthers:
 
         response = notify_adviser_added_to_task(task, adviser.id)
         reminder = TaskAssignedToMeFromOthersReminder.objects.filter(
-            adviser=adviser, task=task
+            adviser=adviser,
+            task=task,
         ).first()
         assert reminder is not None
 
