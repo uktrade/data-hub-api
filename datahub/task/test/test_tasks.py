@@ -6,9 +6,9 @@ from uuid import uuid4
 
 import pytest
 
-
 from django.db.models.signals import m2m_changed, post_delete, post_save, pre_delete, pre_save
 from django.test.utils import override_settings
+from django.utils import timezone
 
 
 from datahub.feature_flag.test.factories import UserFeatureFlagFactory
@@ -35,6 +35,7 @@ from datahub.task.emails import (
 from datahub.task.tasks import (
     create_task_completed_subscription,
     create_task_reminder_subscription_task,
+    create_upcoming_task_reminder,
     generate_reminders_upcoming_tasks,
     notify_adviser_added_to_task,
     notify_adviser_completed_task,
@@ -308,6 +309,33 @@ class TestTaskReminders:
             ],
         )
         mock_notify_adviser_by_rq_email.assert_called_once()
+
+    def test_notification_received_but_no_email_sent_to_adviser_when_email_subscription_disabled(
+        self,
+        adviser_tasks_user_feature_flag,
+        mock_notify_adviser_by_rq_email,
+        mock_statsd,
+        caplog,
+    ):
+        caplog.set_level(logging.INFO)
+
+        # Create two advisers one with and one without an task reminder email subscription
+        adviser = AdviserFactory()
+        add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
+        task_due = task_factory_due_on_date(1, advisers=[adviser])
+
+        create_upcoming_task_reminder(task_due, adviser, False, timezone.now())
+
+        reminder = UpcomingTaskReminder.objects.filter(adviser=adviser, task=task_due).first()
+        assert reminder is not None
+
+        mock_notify_adviser_by_rq_email.assert_not_called()
+
+        assert caplog.messages == [
+            f'No email for UpcomingTaskReminder with id {reminder.id} sent to adviser '
+            f'{adviser.id} for task {task_due.id}, as email reminders are turned off in their '
+            'subscription',
+        ]
 
     def test_task_reminder_emails_only_sent_if_feature_flag_set(
         self,
@@ -598,10 +626,13 @@ class TestTasksAssignedToMeFromOthers:
                 ],
             )
 
-    def test_task_assigned_to_me_from_others_email_not_sent_if_email_reminders_enabled_not_enabled(
+    def test_notification_received_but_no_email_sent_to_adviser_when_email_subscription_disabled(
         self,
         adviser_tasks_user_feature_flag,
+        caplog,
     ):
+        caplog.set_level(logging.INFO)
+
         # create a task and assign an adviser
         adviser = AdviserFactory()
         adviser = add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
@@ -612,8 +643,19 @@ class TestTasksAssignedToMeFromOthers:
         task = TaskFactory(advisers=[adviser])
 
         response = notify_adviser_added_to_task(task, adviser.id)
+        reminder = TaskAssignedToMeFromOthersReminder.objects.filter(
+            adviser=adviser,
+            task=task,
+        ).first()
+        assert reminder is not None
 
         assert response is None
+
+        assert caplog.messages == [
+            f'No email for TaskAssignedToMeFromOthersReminder with id {reminder.id} sent to '
+            f'adviser {adviser.id} for task {task.id}, as email reminders are turned off in their '
+            'subscription',
+        ]
 
     def test_task_assigned_to_me_from_others_email_not_sent_if_feature_flag_not_enabled(
         self,
@@ -772,10 +814,13 @@ class TestTaskCompleted:
         assert TaskCompletedReminder.objects.filter(adviser=adviser).count() == 1
         mock_notify_adviser_by_rq_email.assert_not_called()
 
-    def test_notification_received_but_no_email_sent_to_adviser_with_email_off(
+    def test_notification_received_but_no_email_sent_to_adviser_when_email_subscription_disabled(
         self,
         mock_notify_adviser_by_rq_email,
+        caplog,
     ):
+        caplog.set_level(logging.INFO)
+
         adviser = AdviserFactory()
         task = TaskFactory(
             archived=True,
@@ -791,8 +836,15 @@ class TestTaskCompleted:
 
         notify_adviser_completed_task(task, False)
 
-        assert TaskCompletedReminder.objects.filter(adviser=adviser).count() == 1
+        reminder = TaskCompletedReminder.objects.filter(adviser=adviser).first()
+        assert reminder is not None
+
         mock_notify_adviser_by_rq_email.assert_not_called()
+        assert caplog.messages == [
+            f'No email for TaskCompletedReminder with id {reminder.id} sent to adviser '
+            f'{adviser.id} for task {task.id}, as email reminders are turned off in their '
+            'subscription',
+        ]
 
     def test_notification_received_but_no_email_sent_to_adviser_with_email_on_with_no_feature_flag(
         self,
