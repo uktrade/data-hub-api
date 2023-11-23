@@ -5,6 +5,7 @@ from datahub.core.query_utils import (
     get_array_agg_subquery,
 )
 from datahub.dataset.core.views import BaseDatasetView
+from datahub.dbmaintenance.utils import parse_date
 from datahub.event.models import Event
 from datahub.metadata.query_utils import get_service_name_subquery
 
@@ -16,9 +17,17 @@ class EventsDatasetView(BaseDatasetView):
     response result to insert data into Dataworkspace through its defined API endpoints.
     """
 
-    def get_dataset(self):
+    def get(self, request):
+        """Endpoint which serves all records for Event Dataset"""
+        dataset = self.get_dataset(request)
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(dataset, request, view=self)
+        self._enrich_data(page)
+        return paginator.get_paginated_response(page)
+
+    def get_dataset(self, request):
         """Returns a list of all interaction records"""
-        return Event.objects.annotate(
+        queryset = Event.objects.annotate(
             service_name=get_service_name_subquery('service'),
             team_ids=get_aggregate_subquery(
                 Event,
@@ -54,3 +63,10 @@ class EventsDatasetView(BaseDatasetView):
             'uk_region__name',
             'related_programme_names',
         )
+        updated_since = request.GET.get('updated_since')
+        if updated_since:
+            updated_since_date = parse_date(updated_since)
+            if updated_since_date:
+                queryset = queryset.filter(modified_on__gt=updated_since_date)
+
+        return queryset

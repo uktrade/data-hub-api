@@ -1,5 +1,6 @@
 from datahub.dataset.core.views import BaseDatasetView
 from datahub.dataset.team.pagination import TeamsDatasetViewCursorPagination
+from datahub.dbmaintenance.utils import parse_date
 from datahub.metadata.models import Team
 
 
@@ -12,9 +13,17 @@ class TeamsDatasetView(BaseDatasetView):
 
     pagination_class = TeamsDatasetViewCursorPagination
 
-    def get_dataset(self):
+    def get(self, request):
+        """Endpoint which serves all records for Teams Dataset"""
+        dataset = self.get_dataset(request)
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(dataset, request, view=self)
+        self._enrich_data(page)
+        return paginator.get_paginated_response(page)
+
+    def get_dataset(self, request):
         """Returns list of Teams Dataset records"""
-        return Team.objects.values(
+        queryset = Team.objects.values(
             'country__name',
             'disabled_on',
             'id',
@@ -22,3 +31,11 @@ class TeamsDatasetView(BaseDatasetView):
             'role__name',
             'uk_region__name',
         )
+        updated_since = request.GET.get('updated_since')
+
+        if updated_since:
+            updated_since_date = parse_date(updated_since)
+            if updated_since_date:
+                queryset = queryset.filter(modified_on__gt=updated_since_date)
+
+        return queryset

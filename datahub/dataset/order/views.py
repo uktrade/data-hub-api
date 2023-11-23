@@ -3,6 +3,7 @@ from django.db.models.functions import Cast
 
 from datahub.core.query_utils import get_aggregate_subquery, get_string_agg_subquery
 from datahub.dataset.core.views import BaseDatasetView
+from datahub.dbmaintenance.utils import parse_date
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.omis.order.models import Order
 
@@ -16,9 +17,17 @@ class OMISDatasetView(BaseDatasetView):
     more meaningful insight.
     """
 
-    def get_dataset(self):
+    def get(self, request):
+        """Endpoint which serves all records for Orders Dataset"""
+        dataset = self.get_dataset(request)
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(dataset, request, view=self)
+        self._enrich_data(page)
+        return paginator.get_paginated_response(page)
+
+    def get_dataset(self, request):
         """Returns list of OMIS Dataset records"""
-        return Order.objects.annotate(
+        queryset = Order.objects.annotate(
             refund_created=get_aggregate_subquery(Order, Max('refunds__created_on')),
             refund_total_amount=get_aggregate_subquery(Order, Sum('refunds__total_amount')),
             sector_name=get_sector_name_subquery('sector'),
@@ -50,3 +59,10 @@ class OMISDatasetView(BaseDatasetView):
             'uk_region__name',
             'vat_cost',
         )
+        updated_since = request.GET.get('updated_since')
+        if updated_since:
+            updated_since_date = parse_date(updated_since)
+            if updated_since_date:
+                queryset = queryset.filter(modified_on__gt=updated_since_date)
+
+        return queryset
