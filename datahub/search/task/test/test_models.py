@@ -1,8 +1,10 @@
 import pytest
 
+from datahub.investment.project.test.factories import InvestmentProjectFactory
+
 from datahub.search.task.apps import TaskSearchApp
 from datahub.search.task.models import Task
-from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
+from datahub.task.test.factories import TaskFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -27,7 +29,6 @@ def test_task_to_dict(opensearch):
         'reminder_days': task.reminder_days,
         'email_reminders_enabled': task.email_reminders_enabled,
         'reminder_date': task.reminder_date,
-        'task_type': task.__class__.__name__,
         'investment_project': None,
         'company': None,
         'advisers': [
@@ -44,11 +45,12 @@ def test_task_to_dict(opensearch):
 
 def test_investment_project_task_to_dict(opensearch):
     """Test for investment project task fields to search model"""
-    investment_project_task = InvestmentProjectTaskFactory()
+    investment_project = InvestmentProjectFactory()
 
-    task = investment_project_task.task
+    task = TaskFactory(
+        investment_project=investment_project,
+    )
     company = task.get_company()
-    investment_project = investment_project_task.investment_project
 
     result = Task.db_object_to_dict(task)
 
@@ -57,5 +59,4 @@ def test_investment_project_task_to_dict(opensearch):
         'name': investment_project.name,
         'project_code': investment_project.project_code,
     }
-    assert result['task_type'] == investment_project_task.__class__.__name__
     assert result['company'] == {'id': str(company.id), 'name': company.name}

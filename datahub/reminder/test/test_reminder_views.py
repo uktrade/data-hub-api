@@ -11,6 +11,7 @@ from datahub.feature_flag.test.factories import UserFeatureFlagGroupFactory
 from datahub.interaction.test.factories import CompaniesInteractionFactory
 from datahub.investment.project.proposition.models import PropositionStatus
 from datahub.investment.project.proposition.test.factories import PropositionFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.reminder import (
     EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
     INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
@@ -36,7 +37,7 @@ from datahub.reminder.test.factories import (
     UpcomingEstimatedLandDateReminderFactory,
     UpcomingTaskReminderFactory,
 )
-from datahub.task.test.factories import InvestmentProjectTaskFactory
+from datahub.task.test.factories import TaskFactory
 
 
 @pytest.fixture()
@@ -184,22 +185,22 @@ class TaskReminderMixin:
             'task': {
                 'id': str(reminders[0].task.id),
                 'due_date': None,
-                'investment_project_task': None,
+                'investment_project': None,
             },
         }
 
     def test_get_investment_project_task_reminders(self):
         """
-        Given some reminders for investment project tasks, these should be returned with the
-        correct investment project task data
+        Given some reminders for tasks with an investment project, these should be returned with
+        the correct investment project data
         """
-        investment_project_task = InvestmentProjectTaskFactory()
-        investment_project = investment_project_task.investment_project
+        investment_project = InvestmentProjectFactory()
+        task = TaskFactory(investment_project=investment_project)
 
         reminders = self.factory.create_batch(
             3,
             adviser=self.user,
-            task=investment_project_task.task,
+            task=task,
         )
         response = self.get_response
         data = response.json()
@@ -213,19 +214,16 @@ class TaskReminderMixin:
             'task': {
                 'id': str(reminders[0].task.id),
                 'due_date': None,
-                'investment_project_task': {
-                    'id': str(investment_project_task.id),
-                    'investment_project': {
-                        'name': investment_project.name,
-                        'project_code': investment_project.project_code,
-                        'investor_company': {
-                            'name': investment_project.investor_company.name,
-                            'id': str(
-                                investment_project.investor_company.id,
-                            ),
-                        },
-                        'id': str(investment_project.id),
+                'investment_project': {
+                    'name': investment_project.name,
+                    'project_code': investment_project.project_code,
+                    'investor_company': {
+                        'name': investment_project.investor_company.name,
+                        'id': str(
+                            investment_project.investor_company.id,
+                        ),
                     },
+                    'id': str(investment_project.id),
                 },
             },
         }

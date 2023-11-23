@@ -17,6 +17,7 @@ class TaskFactory(factory.django.DjangoModelFactory):
     modified_by = factory.SelfAttribute('created_by')
     created_on = now()
     title = factory.Faker('company')
+    investment_project = None
 
     archived = False
 
