@@ -6,7 +6,6 @@ from datahub.core.models import BaseOrderedConstantModel
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
-
 class BaseExportWinOrderedConstantModel(BaseOrderedConstantModel):
     """Base class for an Export Win."""
 
@@ -31,7 +30,6 @@ class HQTeamRegionOrPost(BaseExportWinOrderedConstantModel):
         related_name='hq_team_region_or_post',
         on_delete=models.CASCADE,
     )
-
 
 class WinType(BaseExportWinOrderedConstantModel):
     """Win type"""
@@ -112,3 +110,14 @@ class HVC(BaseExportWinOrderedConstantModel):
     @classmethod
     def get_by_charcode(cls, charcode):
         return cls.objects.get(campaign_id=charcode[:-2])
+
+class CustomerResponseToken(BaseOrderedConstantModel):
+    expiry = models.DateTimeField()
+    token = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    customer_response_id = models.ForeignKey('CustomerResponse', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'Token: {self.token}'
+
+class CustomerResponse(BaseExportWinOrderedConstantModel):
+    # This is for customer response model?
