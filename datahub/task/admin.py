@@ -18,6 +18,10 @@ class TaskAdmin(BaseModelAdminMixin, VersionAdmin):
         'id',
         'created',
     )
+    list_display = [
+        'title',
+        'due_date',
+    ]
 
 
 @admin.register(InvestmentProjectTask)
