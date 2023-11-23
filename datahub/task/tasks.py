@@ -136,6 +136,12 @@ def create_upcoming_task_reminder(
             update_task=update_task_reminder_email_status,
             email_template_class=UpcomingTaskEmailTemplate,
         )
+    else:
+        logger.info(
+            f'No email for UpcomingTaskReminder with id {reminder.id} sent to adviser '
+            f'{adviser.id} for task {task.id}, as email reminders are turned off in their '
+            'subscription',
+        )
 
     return reminder
 
@@ -224,6 +230,12 @@ def notify_adviser_added_to_task(task, adviser_id):
             reminder=reminder,
             update_task=update_task_assigned_to_me_from_others_email_status,
             email_template_class=TaskAssignedToOthersEmailTemplate,
+        )
+    else:
+        logger.info(
+            f'No email for TaskAssignedToMeFromOthersReminder with id {reminder.id} sent to '
+            f'adviser {adviser.id} for task {task.id}, as email reminders are turned off in their '
+            'subscription',
         )
 
 
@@ -333,6 +345,12 @@ def notify_adviser_completed_task(task, created):
                 reminder=reminder,
                 update_task=update_task_completed_email_status,
                 email_template_class=TaskCompletedEmailTemplate,
+            )
+        else:
+            logger.info(
+                f'No email for TaskCompletedReminder with id {reminder.id} sent to adviser '
+                f'{adviser.id} for task {task.id}, as email reminders are turned off in their '
+                'subscription',
             )
 
 
