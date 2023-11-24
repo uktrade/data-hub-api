@@ -170,12 +170,13 @@ class TestTaskAmededByOthersSubscriptions:
         self,
         schedule_notify_advisers_task_amended_by_others,
     ):
-        task = TaskFactory(advisers=[AdviserFactory()])
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser])
 
         schedule_notify_advisers_task_amended_by_others.assert_has_calls(
             [
-                call(task, True),
-                call(task, False),
+                call(task, True, []),
+                call(task, False, [adviser.id]),
             ],
         )
 
@@ -185,14 +186,15 @@ class TestTaskAmededByOthersSubscriptions:
         self,
         schedule_notify_advisers_task_amended_by_others,
     ):
-        task = TaskFactory(archived=False)
+        adviser = AdviserFactory()
+        task = TaskFactory(archived=False, advisers=[adviser])
         task.archived = True
         task.save()
 
         schedule_notify_advisers_task_amended_by_others.assert_has_calls(
             [
-                call(task, True),
-                call(task, False),
-                call(task, False),
+                call(task, True, []),
+                call(task, False, [adviser.id]),
+                call(task, False, [adviser.id]),
             ],
         )

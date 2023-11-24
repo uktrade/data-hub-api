@@ -394,7 +394,11 @@ def create_task_amended_by_others_subscription(adviser_id):
         )
 
 
-def notify_adviser_task_amended_by_others(task, created):
+def notify_adviser_task_amended_by_others(
+    task,
+    created,
+    adviser_ids_pre_m2m_change,
+):
     """
     Send a notification to all advisers, excluding the adviser who marked the task as completed,
     when task is amended
@@ -405,7 +409,9 @@ def notify_adviser_task_amended_by_others(task, created):
     if task.archived:
         return
 
-    advisers_to_notify = task.advisers.exclude(id=task.modified_by.id)
+    advisers_to_notify = task.advisers.filter(id__in=adviser_ids_pre_m2m_change).exclude(
+        id=task.modified_by.id,
+    )
 
     if not advisers_to_notify.exists():
         return
@@ -447,11 +453,19 @@ def schedule_create_task_amended_by_others_subscription_task(adviser_id):
     )
 
 
-def schedule_notify_advisers_task_amended_by_others(task, created):
+def schedule_notify_advisers_task_amended_by_others(
+    task,
+    created,
+    adviser_ids_pre_m2m_change,
+):
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
         function=notify_adviser_task_amended_by_others,
-        function_args=(task, created),
+        function_args=(
+            task,
+            created,
+            adviser_ids_pre_m2m_change,
+        ),
     )
     logger.info(
         f'Task {job.id} notify_adviser_task_amended_by_others',

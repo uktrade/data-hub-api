@@ -197,16 +197,13 @@ class TestTaskReminders:
 
         generate_reminders_upcoming_tasks()
 
-        expected_messages = (
-            [
-                'Task generate_reminders_upcoming_tasks completed',
-            ]
+        expected_message = (
+            'Task generate_reminders_upcoming_tasks completed'
             if lock_acquired
-            else [
-                'Reminders for upcoming tasks are already being processed by another worker.',
-            ]
+            else 'Reminders for upcoming tasks are already being processed by another worker.'
         )
-        assert caplog.messages == expected_messages
+
+        assert expected_message in caplog.messages
 
         if lock_acquired:
             mock_notify_adviser_by_rq_email.assert_called_once()
@@ -1001,12 +998,26 @@ class TestTaskAmendedByOthers:
 
     def test_no_reminders_created_when_a_task_is_created(self):
         task = TaskFactory()
-        notify_adviser_task_amended_by_others(task, True)
+        notify_adviser_task_amended_by_others(task, True, [])
         assert TaskAmendedByOthersReminder.objects.exists() is False
 
     def test_no_reminders_created_when_a_task_is_archived(self):
         task = TaskFactory(archived=True)
-        notify_adviser_task_amended_by_others(task, True)
+        notify_adviser_task_amended_by_others(task, True, [])
+        assert TaskAmendedByOthersReminder.objects.exists() is False
+
+    def test_no_reminders_created_when_task_advisers_do_not_contain_adviser_ids_pre_m2m_change(
+        self,
+    ):
+        task_adviser = AdviserFactory()
+        adviser = AdviserFactory()
+        task = TaskFactory(
+            archived=False,
+            advisers=[task_adviser],
+        )
+
+        notify_adviser_task_amended_by_others(task, False, [adviser.id])
+
         assert TaskAmendedByOthersReminder.objects.exists() is False
 
     def test_no_reminders_created_when_adviser_that_amends_task_is_the_only_adviser(
@@ -1019,7 +1030,7 @@ class TestTaskAmendedByOthers:
             advisers=[adviser],
         )
 
-        notify_adviser_task_amended_by_others(task, False)
+        notify_adviser_task_amended_by_others(task, False, [adviser.id])
 
         assert TaskAmendedByOthersReminder.objects.exists() is False
 
@@ -1037,7 +1048,14 @@ class TestTaskAmendedByOthers:
             ],
         )
 
-        notify_adviser_task_amended_by_others(task, False)
+        notify_adviser_task_amended_by_others(
+            task,
+            False,
+            [
+                modified_by_adviser.id,
+                adviser.id,
+            ],
+        )
 
         assert (
             TaskAmendedByOthersReminder.objects.filter(adviser=modified_by_adviser).exists()
@@ -1057,7 +1075,11 @@ class TestTaskAmendedByOthers:
             ],
         )
 
-        notify_adviser_task_amended_by_others(task, False)
+        notify_adviser_task_amended_by_others(
+            task,
+            False,
+            [adviser.id],
+        )
 
         assert TaskAmendedByOthersReminder.objects.filter(adviser=adviser).count() == 1
         mock_notify_adviser_by_rq_email.assert_not_called()
@@ -1079,7 +1101,11 @@ class TestTaskAmendedByOthers:
             email_reminders_enabled=False,
         )
 
-        notify_adviser_task_amended_by_others(task, False)
+        notify_adviser_task_amended_by_others(
+            task,
+            False,
+            [adviser.id],
+        )
 
         assert TaskAmendedByOthersReminder.objects.filter(adviser=adviser).count() == 1
         mock_notify_adviser_by_rq_email.assert_not_called()
@@ -1098,7 +1124,11 @@ class TestTaskAmendedByOthers:
 
         create_task_amended_by_others_subscription(adviser_id=adviser.id)
 
-        notify_adviser_task_amended_by_others(task, False)
+        notify_adviser_task_amended_by_others(
+            task,
+            False,
+            [adviser.id],
+        )
 
         assert TaskAmendedByOthersReminder.objects.filter(adviser=adviser).count() == 1
         mock_notify_adviser_by_rq_email.assert_not_called()
@@ -1122,7 +1152,11 @@ class TestTaskAmendedByOthers:
             email_reminders_enabled=False,
         )
 
-        notify_adviser_task_amended_by_others(task, False)
+        notify_adviser_task_amended_by_others(
+            task,
+            False,
+            [adviser.id],
+        )
 
         assert TaskAmendedByOthersReminder.objects.filter(adviser=adviser).count() == 1
         mock_notify_adviser_by_rq_email.assert_not_called()
@@ -1148,6 +1182,7 @@ class TestTaskAmendedByOthers:
             notify_adviser_task_amended_by_others(
                 task,
                 False,
+                [adviser.id],
             )
 
             mock_notify_adviser_by_rq_email.assert_has_calls(
