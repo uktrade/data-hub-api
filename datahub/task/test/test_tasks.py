@@ -6,13 +6,13 @@ from uuid import uuid4
 
 import pytest
 
-from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 
 from django.db.models.signals import m2m_changed, post_delete, post_save, pre_delete, pre_save
 from django.test.utils import override_settings
 from django.utils import timezone
 
 
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.feature_flag.test.factories import UserFeatureFlagFactory
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
