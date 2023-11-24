@@ -4,26 +4,18 @@ from datahub.core.query_utils import (
     get_aggregate_subquery,
     get_array_agg_subquery,
 )
-from datahub.dataset.core.views import BaseDatasetView
+from datahub.dataset.core.views import BaseFilterDatasetView
 from datahub.dbmaintenance.utils import parse_date
 from datahub.event.models import Event
 from datahub.metadata.query_utils import get_service_name_subquery
 
 
-class EventsDatasetView(BaseDatasetView):
+class EventsDatasetView(BaseFilterDatasetView):
     """
     An APIView that provides 'get' action to return desired fields for
     Events Dataset to be consumed by Data-flow periodically. Data-flow uses
     response result to insert data into Dataworkspace through its defined API endpoints.
     """
-
-    def get(self, request):
-        """Endpoint which serves all records for Event Dataset"""
-        dataset = self.get_dataset(request)
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(dataset, request, view=self)
-        self._enrich_data(page)
-        return paginator.get_paginated_response(page)
 
     def get_dataset(self, request):
         """Returns a list of all interaction records"""
