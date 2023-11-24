@@ -143,7 +143,7 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         assert [a['id'] for a in response.json()['results']] == [
-            str(a.task.id) for a in sorted(tasks_for_assert, key=lambda x: x.task.id)
+            str(a.id) for a in sorted(tasks_for_assert, key=lambda x: x.id)
         ]
 
         assert response.data['count'] == len(
