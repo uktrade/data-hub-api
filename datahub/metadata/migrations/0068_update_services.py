@@ -1,6 +1,7 @@
 from pathlib import PurePath
 
 import mptt
+
 from django.db import migrations
 
 from datahub.core.migration_utils import load_yaml_data_in_migration
@@ -9,7 +10,7 @@ from datahub.core.migration_utils import load_yaml_data_in_migration
 def load_services(apps, _):
     load_yaml_data_in_migration(
         apps,
-        PurePath(__file__).parent / '0017_update_services.yaml'
+        PurePath(__file__).parent / '0068_update_services.yaml'
     )
 
 
