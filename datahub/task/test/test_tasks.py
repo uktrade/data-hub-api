@@ -3,9 +3,10 @@ import logging
 from unittest import mock
 from unittest.mock import ANY, call
 from uuid import uuid4
-from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 
 import pytest
+
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 
 from django.db.models.signals import m2m_changed, post_delete, post_save, pre_delete, pre_save
 from django.test.utils import override_settings
@@ -48,7 +49,6 @@ from datahub.task.tasks import (
     notify_adviser_completed_task,
     notify_adviser_task_amended_by_others,
     schedule_advisers_added_to_task,
-    schedule_create_task_reminder_subscription_task,
     schedule_reminders_upcoming_tasks,
     update_task_amended_by_others_email_status,
     update_task_assigned_to_me_from_others_email_status,

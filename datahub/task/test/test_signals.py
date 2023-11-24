@@ -26,7 +26,7 @@ class TestTaskAdviserChangedSubscriptions:
                 call(
                     adviser_ids=adviser_ids,
                     task=task,
-                )
+                ),
             ],
         )
 
@@ -42,7 +42,8 @@ class TestTaskAdviserChangedSubscriptions:
 
     @patch('datahub.task.signals.schedule_advisers_added_to_task')
     def test_instance_set_to_none_does_not_trigger_scheduled_tasks(
-        self, schedule_advisers_added_to_task
+        self,
+        schedule_advisers_added_to_task,
     ):
         myargs = {'action': 'post_add', 'pk_set': 'some advisers'}
         set_task_subscriptions_and_schedule_notifications(sender=None, **myargs)
@@ -51,7 +52,8 @@ class TestTaskAdviserChangedSubscriptions:
 
     @patch('datahub.task.signals.schedule_advisers_added_to_task')
     def test_removing_adviser_does_not_trigger_scheduled_tasks(
-        self, schedule_advisers_added_to_task
+        self,
+        schedule_advisers_added_to_task,
     ):
         advisers = AdviserFactory.create_batch(2)
         task = TaskFactory(advisers=advisers)
