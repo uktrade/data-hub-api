@@ -30,6 +30,7 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     # These relations are moved to the target company on merge
     Company._meta.get_field('company_list_items').remote_field,
     Company._meta.get_field('pipeline_list_items').remote_field,
+    Company._meta.get_field('wins').remote_field,
     CompanyReferral.company.field,
     Contact.company.field,
     Interaction.company.field,
