@@ -40,3 +40,35 @@ class BaseDatasetView(HawkResponseSigningMixin, APIView):
     def get_dataset(self):
         """Return a list of records"""
         raise NotImplementedError
+
+
+class BaseFilterDatasetView(HawkResponseSigningMixin, APIView):
+    """
+    Base API view to be used for creating endpoints for consumption
+    by Data Flow and insertion into Data Workspace.
+    """
+
+    authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
+    permission_classes = (HawkScopePermission, )
+    required_hawk_scope = HawkScope.data_flow_api
+    pagination_class = DatasetCursorPagination
+
+    def get(self, request):
+        """Endpoint which serves all records for a specific Dataset"""
+        dataset = self.get_dataset(request=request)
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(dataset, request, view=self)
+        self._enrich_data(page)
+        return paginator.get_paginated_response(page)
+
+    def _enrich_data(self, dataset):
+        """
+        Hook for enriching the paged dataset before returning a response.
+        By default it does nothing but can be changed in subclasses to make
+        calls to external APIs if required.
+        """
+        return dataset
+
+    def get_dataset(self, request=None):
+        """Return a list of records"""
+        raise NotImplementedError

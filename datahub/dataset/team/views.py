@@ -1,10 +1,10 @@
-from datahub.dataset.core.views import BaseDatasetView
+from datahub.dataset.core.views import BaseFilterDatasetView
 from datahub.dataset.team.pagination import TeamsDatasetViewCursorPagination
 from datahub.dbmaintenance.utils import parse_date
 from datahub.metadata.models import Team
 
 
-class TeamsDatasetView(BaseDatasetView):
+class TeamsDatasetView(BaseFilterDatasetView):
     """
     An APIView that provides 'get' action which queries and returns desired fields for
     Teams Dataset to be consumed by Data-flow periodically. Data-flow uses response result
@@ -12,14 +12,6 @@ class TeamsDatasetView(BaseDatasetView):
     """
 
     pagination_class = TeamsDatasetViewCursorPagination
-
-    def get(self, request):
-        """Endpoint which serves all records for Teams Dataset"""
-        dataset = self.get_dataset(request)
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(dataset, request, view=self)
-        self._enrich_data(page)
-        return paginator.get_paginated_response(page)
 
     def get_dataset(self, request):
         """Returns list of Teams Dataset records"""

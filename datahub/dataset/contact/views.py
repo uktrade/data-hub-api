@@ -1,10 +1,10 @@
 from datahub.company.models.contact import Contact
 from datahub.core.query_utils import get_full_name_expression
-from datahub.dataset.core.views import BaseDatasetView
+from datahub.dataset.core.views import BaseFilterDatasetView
 from datahub.dbmaintenance.utils import parse_date
 
 
-class ContactsDatasetView(BaseDatasetView):
+class ContactsDatasetView(BaseFilterDatasetView):
     """
     An APIView that provides 'get' action which queries and returns desired fields for
     Contacts Dataset to be consumed by Data-flow periodically. Data-flow uses response result
@@ -12,14 +12,6 @@ class ContactsDatasetView(BaseDatasetView):
     various reports to the users out of flattened table and let analyst to work on denormalized
     table to get more meaningful insight.
     """
-
-    def get(self, request):
-        """Endpoint which serves all records for Contacts Dataset"""
-        dataset = self.get_dataset(request)
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(dataset, request, view=self)
-        self._enrich_data(page)
-        return paginator.get_paginated_response(page)
 
     def get_dataset(self, request):
         """Returns list of Contacts Dataset records"""

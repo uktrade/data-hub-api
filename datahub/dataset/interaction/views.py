@@ -5,26 +5,18 @@ from datahub.core.query_utils import (
     get_array_agg_subquery,
     get_front_end_url_expression,
 )
-from datahub.dataset.core.views import BaseDatasetView
+from datahub.dataset.core.views import BaseFilterDatasetView
 from datahub.dbmaintenance.utils import parse_date
 from datahub.interaction.models import Interaction
 from datahub.interaction.queryset import get_base_interaction_queryset
 from datahub.metadata.query_utils import get_sector_name_subquery, get_service_name_subquery
 
 
-class InteractionsDatasetView(BaseDatasetView):
+class InteractionsDatasetView(BaseFilterDatasetView):
     """
     A GET API view to return all interaction data as required for syncing by
     Data-flow periodically.
     """
-
-    def get(self, request):
-        """Endpoint which serves all records for Interactions Dataset"""
-        dataset = self.get_dataset(request)
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(dataset, request, view=self)
-        self._enrich_data(page)
-        return paginator.get_paginated_response(page)
 
     def get_dataset(self, request):
         """Returns a list of all interaction records"""
