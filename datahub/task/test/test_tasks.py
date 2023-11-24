@@ -1,8 +1,9 @@
 import datetime
 import logging
 from unittest import mock
-from unittest.mock import ANY
+from unittest.mock import ANY, call
 from uuid import uuid4
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 
 import pytest
 
@@ -39,12 +40,15 @@ from datahub.task.emails import (
 from datahub.task.tasks import (
     create_task_amended_by_others_subscription,
     create_task_completed_subscription,
+    create_task_overdue_subscription_task,
     create_task_reminder_subscription_task,
     create_upcoming_task_reminder,
     generate_reminders_upcoming_tasks,
     notify_adviser_added_to_task,
     notify_adviser_completed_task,
     notify_adviser_task_amended_by_others,
+    schedule_advisers_added_to_task,
+    schedule_create_task_reminder_subscription_task,
     schedule_reminders_upcoming_tasks,
     update_task_amended_by_others_email_status,
     update_task_assigned_to_me_from_others_email_status,
@@ -1215,3 +1219,51 @@ class TestTaskAmendedByOthers:
             email_notification_id=notification_id,
         )
         assert linked_reminders.count() == (reminder_number)
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures('mute_signals')
+class TestTaskScheduler:
+    def test_schedule_advisers_added_to_task_adds_job_to_queue_for_each_adviser(
+        self,
+        mock_job_scheduler,
+    ):
+        task = TaskFactory()
+        advisers = AdviserFactory.create_batch(2)
+        schedule_advisers_added_to_task(task, [adviser.id for adviser in advisers])
+
+        adviser_calls = [
+            [
+                call(
+                    queue_name=LONG_RUNNING_QUEUE,
+                    function=create_task_reminder_subscription_task,
+                    function_args=(adviser.id,),
+                ),
+                call(
+                    queue_name=LONG_RUNNING_QUEUE,
+                    function=notify_adviser_added_to_task,
+                    function_args=(
+                        task,
+                        adviser.id,
+                    ),
+                ),
+                call(
+                    queue_name=LONG_RUNNING_QUEUE,
+                    function=create_task_overdue_subscription_task,
+                    function_args=(adviser.id,),
+                ),
+                call(
+                    queue_name=LONG_RUNNING_QUEUE,
+                    function=create_task_completed_subscription,
+                    function_args=(adviser.id,),
+                ),
+                call(
+                    queue_name=LONG_RUNNING_QUEUE,
+                    function=create_task_amended_by_others_subscription,
+                    function_args=(adviser.id,),
+                ),
+            ]
+            for adviser in advisers
+        ]
+        expected_calls = [item for sublist in adviser_calls for item in sublist]
+        mock_job_scheduler.assert_has_calls(expected_calls)
