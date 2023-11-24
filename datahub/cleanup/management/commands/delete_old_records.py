@@ -6,6 +6,7 @@ from django.utils.timezone import utc
 from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelCleanupConfig
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
 from datahub.company.models import Company, Contact
+from datahub.export_win.models import Win
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 from datahub.omis.order.models import Order
@@ -24,6 +25,8 @@ INVESTOR_PROFILE_EXPIRY_PERIOD = relativedelta(years=10)
 COMPANY_EXPORT_EXPIRY_PERIOD = relativedelta(years=10)
 OBJECTIVE_EXPIRY_PERIOD = relativedelta(years=10)
 TASK_EXPIRY_PERIOD = relativedelta(years=10)
+WIN_EXPIRY_PERIOD = relativedelta(years=10)
+CUSTOMER_RESPONSE_EXPIRY_PERIOD = relativedelta(years=10)
 
 
 class Command(BaseCleanupCommand):
@@ -72,6 +75,7 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('opportunities'): (),
                 Company._meta.get_field('company_exports'): (),
                 Company._meta.get_field('company_objectives'): (),
+                Company._meta.get_field('win'): (),
             },
             # We want to delete the relations below along with any expired companies
             excluded_relations=(
@@ -245,6 +249,23 @@ class Command(BaseCleanupCommand):
             ),
         ),
         'task.InvestmentProjectTask': ModelCleanupConfig(
+            (
+                DatetimeLessThanCleanupFilter('created_on', TASK_EXPIRY_PERIOD),
+                DatetimeLessThanCleanupFilter('modified_on', TASK_EXPIRY_PERIOD),
+            ),
+        ),
+        'export_win.Win': ModelCleanupConfig(
+            (
+                DatetimeLessThanCleanupFilter('created_on', TASK_EXPIRY_PERIOD),
+                DatetimeLessThanCleanupFilter('modified_on', TASK_EXPIRY_PERIOD),
+            ),
+            relation_filter_mapping={
+                Win._meta.get_field('confirmation'): (),
+                Win._meta.get_field('breakdowns'): (),
+                Win._meta.get_field('advisers'): (),
+            },
+        ),
+        'export_win.CustomerResponse': ModelCleanupConfig(
             (
                 DatetimeLessThanCleanupFilter('created_on', TASK_EXPIRY_PERIOD),
                 DatetimeLessThanCleanupFilter('modified_on', TASK_EXPIRY_PERIOD),

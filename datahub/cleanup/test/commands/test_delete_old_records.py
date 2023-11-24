@@ -41,6 +41,12 @@ from datahub.company_referral.test.factories import (
 )
 from datahub.core.exceptions import DataHubError
 from datahub.core.model_helpers import get_related_fields
+from datahub.export_win.test.factories import (
+    BreakdownFactory,
+    CustomerResponseFactory,
+    WinAdviserFactory,
+    WinFactory,
+)
 from datahub.interaction.test.factories import (
     CompaniesInteractionFactory,
     CompanyInteractionFactory,
@@ -78,6 +84,8 @@ INVESTOR_PROFILE_DELETE_BEFORE_DATETIME = FROZEN_TIME - INVESTOR_PROFILE_EXPIRY_
 COMPANY_EXPORT_DELETE_BEFORE_DATETIME = FROZEN_TIME - COMPANY_EXPORT_EXPIRY_PERIOD
 OBJECTIVE_DELETE_BEFORE_DATETIME = FROZEN_TIME - OBJECTIVE_EXPIRY_PERIOD
 TASK_DELETE_BEFORE_DATETIME = FROZEN_TIME - OBJECTIVE_EXPIRY_PERIOD
+WIN_DELETE_BEFORE_DATETIME = FROZEN_TIME - OBJECTIVE_EXPIRY_PERIOD
+CUSTOMER_RESPONSE_DELETE_BEFORE_DATETIME = FROZEN_TIME - OBJECTIVE_EXPIRY_PERIOD
 
 MAPPING = {
     'company.Company': {
@@ -278,6 +286,17 @@ MAPPING = {
             },
             {
                 'factory': ObjectiveFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME,
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME,
+                    },
+                ],
+            },
+            {
+                'factory': WinFactory,
                 'field': 'company',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
@@ -763,6 +782,69 @@ MAPPING = {
         ],
         'relations': [],
     },
+    'export_win.Win': {
+        'factory': WinFactory,
+        'implicitly_deletable_models': set(),
+        'has_no_search_app': True,
+        'expired_objects_kwargs': [
+            {
+                'created_on': WIN_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': WIN_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+        ],
+        'unexpired_objects_kwargs': [
+            {
+                'created_on': WIN_DELETE_BEFORE_DATETIME,
+                'modified_on': WIN_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+            {
+                'created_on': WIN_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': WIN_DELETE_BEFORE_DATETIME,
+            },
+        ],
+        'relations': [
+            {
+                'factory': WinAdviserFactory,
+                'field': 'win',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
+            {
+                'factory': CustomerResponseFactory,
+                'field': 'win',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
+            {
+                'factory': BreakdownFactory,
+                'field': 'win',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
+        ],
+    },
+    'export_win.CustomerResponse': {
+        'factory': CustomerResponseFactory,
+        'implicitly_deletable_models': set(),
+        'has_no_search_app': True,
+        'expired_objects_kwargs': [
+            {
+                'created_on': CUSTOMER_RESPONSE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': CUSTOMER_RESPONSE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+        ],
+        'unexpired_objects_kwargs': [
+            {
+                'created_on': CUSTOMER_RESPONSE_DELETE_BEFORE_DATETIME,
+                'modified_on': CUSTOMER_RESPONSE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+            },
+            {
+                'created_on': CUSTOMER_RESPONSE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'modified_on': CUSTOMER_RESPONSE_DELETE_BEFORE_DATETIME,
+            },
+        ],
+        'relations': [],
+    },
 }
 
 
@@ -944,7 +1026,6 @@ def test_simulate(
     # Set up the state before running the command
     delete_return_value_tracker = track_return_values(QuerySet, 'delete')
     command = delete_old_records.Command()
-
     mapping = MAPPING[model_name]
     model_factory = mapping['factory']
     has_search_app = not mapping.get('has_no_search_app')
