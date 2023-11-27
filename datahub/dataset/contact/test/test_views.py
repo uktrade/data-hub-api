@@ -1,9 +1,13 @@
+from datetime import datetime
+
 from unittest.mock import Mock
 
 import pytest
+
+from django.urls import reverse
+from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
-from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import (
     ArchivedContactFactory,
@@ -98,3 +102,22 @@ class TestContactsDatasetViewSet(BaseDatasetViewTest):
                                        key=lambda item: item.pk) + [contact_1, contact_2]
         for index, contact in enumerate(expected_contact_list):
             assert contact.email == response_results[index]['email']
+
+    def test_with_updated_since_filter(self, data_flow_api_client):
+        with freeze_time('2021-01-01 12:30:00'):
+            ContactFactory()
+        with freeze_time('2022-01-01 12:30:00'):
+            contact_after = ContactFactory()
+        # Define the `updated_since` date
+        updated_since_date = datetime(2021, 2, 1, tzinfo=utc).strftime('%Y-%m-%d')
+
+        # Make the request with the `updated_since` parameter
+        response = data_flow_api_client.get(self.view_url, {'updated_since': updated_since_date})
+
+        assert response.status_code == status.HTTP_200_OK
+
+        # Check that only contact created after the `updated_since` date are returned
+        expected_ids = [str(contact_after.id)]
+        response_ids = [contact['id'] for contact in response.json()['results']]
+
+        assert response_ids == expected_ids

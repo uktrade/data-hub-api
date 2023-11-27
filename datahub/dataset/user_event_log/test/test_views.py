@@ -5,6 +5,7 @@ from uuid import UUID
 import pytest
 from django.urls import reverse
 from django.utils.timezone import utc
+from freezegun import freeze_time
 from rest_framework import status
 
 from datahub.company.test.factories import AdviserFactory
@@ -64,3 +65,22 @@ class TestUserEventsViewSet:
         result = response_results[0]
         expected_result = get_expected_data_from_user_log(event)
         assert result == expected_result
+
+    def test_with_updated_since_filter(self, data_flow_api_client):
+        with freeze_time('2021-01-01 12:30:00'):
+            self.factory()
+        with freeze_time('2022-01-01 12:30:00'):
+            user_event_log_after = self.factory()
+        # Define the `updated_since` date
+        updated_since_date = datetime(2021, 2, 1, tzinfo=utc).strftime('%Y-%m-%d')
+
+        # Make the request with the `updated_since` parameter
+        response = data_flow_api_client.get(self.view_url, {'updated_since': updated_since_date})
+
+        assert response.status_code == status.HTTP_200_OK
+
+        # Check that only contact created after the `updated_since` date are returned
+        expected_ids = [str(user_event_log_after.id)]
+        response_ids = [user_event_log['id'] for user_event_log in response.json()['results']]
+
+        assert response_ids == expected_ids
