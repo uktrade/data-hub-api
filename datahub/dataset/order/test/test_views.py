@@ -1,7 +1,11 @@
+from datetime import datetime
+
 import pytest
+
+from django.urls import reverse
+from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
-from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import (
     format_date_or_datetime,
@@ -147,3 +151,22 @@ class TestOMISDatasetViewSet(BaseDatasetViewTest):
         result = response_results[0]
         expected_result = get_expected_data_from_order(order)
         assert result == expected_result
+
+    def test_with_updated_since_filter(self, data_flow_api_client):
+        with freeze_time('2021-01-01 12:30:00'):
+            OrderFactory()
+        with freeze_time('2022-01-01 12:30:00'):
+            order_after = OrderFactory()
+        # Define the `updated_since` date
+        updated_since_date = datetime(2021, 2, 1, tzinfo=utc).strftime('%Y-%m-%d')
+
+        # Make the request with the `updated_since` parameter
+        response = data_flow_api_client.get(self.view_url, {'updated_since': updated_since_date})
+
+        assert response.status_code == status.HTTP_200_OK
+
+        # Check that only contact created after the `updated_since` date are returned
+        expected_ids = [str(order_after.id)]
+        response_ids = [order['id'] for order in response.json()['results']]
+
+        assert response_ids == expected_ids
