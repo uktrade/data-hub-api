@@ -11,6 +11,8 @@ from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.feature_flag.utils import is_user_feature_flag_active
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
+    TaskAmendedByOthersReminder,
+    TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     TaskCompletedReminder,
@@ -21,6 +23,7 @@ from datahub.reminder.models import (
 )
 from datahub.reminder.tasks import notify_adviser_by_rq_email
 from datahub.task.emails import (
+    TaskAmendedByOthersEmailTemplate,
     TaskAssignedToOthersEmailTemplate,
     TaskCompletedEmailTemplate,
     UpcomingTaskEmailTemplate,
@@ -365,7 +368,115 @@ def schedule_notify_advisers_task_completed(task, created):
     )
 
 
+def update_task_amended_by_others_email_status(email_notification_id, reminder_ids):
+    reminders = TaskAmendedByOthersReminder.all_objects.filter(id__in=reminder_ids)
+    for reminder in reminders:
+        reminder.email_notification_id = email_notification_id
+        reminder.save()
+
+    logger.info(
+        'Task update_task_amended_by_others_email_status completed'
+        f'email_notification_id to {email_notification_id} and reminder_ids set to {reminder_ids}',
+    )
+
+
+def create_task_amended_by_others_subscription(adviser_id):
+    """
+    Creates a task amended by others subscription for an adviser if the adviser doesn't have
+    a subscription already.
+    """
+    if not TaskAmendedByOthersSubscription.objects.filter(
+        adviser_id=adviser_id,
+    ).first():
+        TaskAmendedByOthersSubscription.objects.create(
+            adviser_id=adviser_id,
+            email_reminders_enabled=True,
+        )
+
+
+def notify_adviser_task_amended_by_others(
+    task,
+    created,
+    adviser_ids_pre_m2m_change,
+):
+    """
+    Send a notification to all advisers, excluding the adviser who marked the task as completed,
+    when task is amended
+    """
+    if created:
+        return
+
+    if task.archived:
+        return
+
+    advisers_to_notify = task.advisers.filter(id__in=adviser_ids_pre_m2m_change).exclude(
+        id=task.modified_by.id,
+    )
+
+    if not advisers_to_notify.exists():
+        return
+
+    for adviser in advisers_to_notify:
+        reminder = TaskAmendedByOthersReminder.objects.create(
+            adviser=adviser,
+            event=f'{task} amended by {task.modified_by.name}',
+            task=task,
+        )
+
+        adviser_subscription = TaskAmendedByOthersSubscription.objects.filter(
+            adviser=adviser,
+        ).first()
+        if not adviser_subscription:
+            return
+
+        if adviser_subscription.email_reminders_enabled is True and is_user_feature_flag_active(
+            ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
+            adviser,
+        ):
+            send_task_email(
+                adviser=adviser,
+                task=task,
+                reminder=reminder,
+                update_task=update_task_amended_by_others_email_status,
+                email_template_class=TaskAmendedByOthersEmailTemplate,
+            )
+
+
+def schedule_create_task_amended_by_others_subscription_task(adviser_id):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=create_task_amended_by_others_subscription,
+        function_args=(adviser_id,),
+    )
+    logger.info(
+        f'Task {job.id} create_task_amended_by_others_subscription',
+    )
+
+
+def schedule_notify_advisers_task_amended_by_others(
+    task,
+    created,
+    adviser_ids_pre_m2m_change,
+):
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=notify_adviser_task_amended_by_others,
+        function_args=(
+            task,
+            created,
+            adviser_ids_pre_m2m_change,
+        ),
+    )
+    logger.info(
+        f'Task {job.id} notify_adviser_task_amended_by_others',
+    )
+
+
 def send_task_email(adviser, task, reminder, update_task, email_template_class):
+    logger.info(
+        f'Sending an email for Task {task.id} and reminder {reminder.id} to adviser {adviser.id}',
+    )
+
     notify_adviser_by_rq_email(
         adviser=adviser,
         template_identifier=settings.TASK_REMINDER_EMAIL_TEMPLATE_ID,

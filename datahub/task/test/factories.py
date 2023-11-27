@@ -18,6 +18,7 @@ class TaskFactory(factory.django.DjangoModelFactory):
     created_on = now()
     title = factory.Faker('company')
     investment_project = None
+    reminder_days = factory.Faker('random_int', max=90)
 
     archived = False
 

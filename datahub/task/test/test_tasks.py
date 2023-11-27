@@ -14,6 +14,8 @@ from django.utils import timezone
 from datahub.feature_flag.test.factories import UserFeatureFlagFactory
 from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
+    TaskAmendedByOthersReminder,
+    TaskAmendedByOthersSubscription,
     TaskAssignedToMeFromOthersReminder,
     TaskAssignedToMeFromOthersSubscription,
     TaskCompletedReminder,
@@ -22,24 +24,29 @@ from datahub.reminder.models import (
     UpcomingTaskReminderSubscription,
 )
 from datahub.reminder.test.factories import (
+    TaskAmendedByOthersReminderFactory,
     TaskAssignedToMeFromOthersReminderFactory,
     TaskCompletedReminderFactory,
     UpcomingTaskReminderFactory,
 )
 from datahub.task.emails import (
+    TaskAmendedByOthersEmailTemplate,
     TaskAssignedToOthersEmailTemplate,
     TaskCompletedEmailTemplate,
     UpcomingTaskEmailTemplate,
 )
 
 from datahub.task.tasks import (
+    create_task_amended_by_others_subscription,
     create_task_completed_subscription,
     create_task_reminder_subscription_task,
     create_upcoming_task_reminder,
     generate_reminders_upcoming_tasks,
     notify_adviser_added_to_task,
     notify_adviser_completed_task,
+    notify_adviser_task_amended_by_others,
     schedule_reminders_upcoming_tasks,
+    update_task_amended_by_others_email_status,
     update_task_assigned_to_me_from_others_email_status,
     update_task_completed_email_status,
     update_task_reminder_email_status,
@@ -190,16 +197,13 @@ class TestTaskReminders:
 
         generate_reminders_upcoming_tasks()
 
-        expected_messages = (
-            [
-                'Task generate_reminders_upcoming_tasks completed',
-            ]
+        expected_message = (
+            'Task generate_reminders_upcoming_tasks completed'
             if lock_acquired
-            else [
-                'Reminders for upcoming tasks are already being processed by another worker.',
-            ]
+            else 'Reminders for upcoming tasks are already being processed by another worker.'
         )
-        assert caplog.messages == expected_messages
+
+        assert expected_message in caplog.messages
 
         if lock_acquired:
             mock_notify_adviser_by_rq_email.assert_called_once()
@@ -494,6 +498,24 @@ def mock_notify_adviser_task_completed_call(task, adviser, template_id):
     )
 
 
+def mock_notify_adviser_task_amended_by_others_call(task, adviser, template_id):
+    reminder = TaskAmendedByOthersReminderFactory(
+        adviser=adviser,
+        task=task,
+        event=f'{task} amended by {task.modified_by.name}',
+    )
+    reminder.id = ANY
+    reminder.pk = ANY
+
+    return mock.call(
+        adviser=adviser,
+        template_identifier=template_id,
+        context=TaskAmendedByOthersEmailTemplate(task).get_context(),
+        update_task=update_task_amended_by_others_email_status,
+        reminders=[reminder],
+    )
+
+
 @pytest.mark.django_db
 @pytest.mark.usefixtures('mute_signals')
 class TestTasksAssignedToMeFromOthers:
@@ -732,7 +754,7 @@ class TestTaskCompleted:
 
     def test_no_reminders_created_when_a_task_is_created(self):
         task = TaskFactory()
-        notify_adviser_completed_task(task, False)
+        notify_adviser_completed_task(task, True)
         assert TaskCompletedReminder.objects.exists() is False
 
     def test_no_reminders_created_when_a_task_is_not_archived(self):
@@ -744,7 +766,11 @@ class TestTaskCompleted:
         self,
     ):
         adviser = AdviserFactory()
-        task = TaskFactory(archived=True, modified_by=adviser, advisers=[adviser])
+        task = TaskFactory(
+            archived=True,
+            modified_by=adviser,
+            advisers=[adviser],
+        )
 
         notify_adviser_completed_task(task, False)
 
@@ -925,9 +951,6 @@ class TestTaskCompleted:
     def test_task_completed_assigns_email_notification_id_to_all_reminders(
         self,
     ):
-        """
-        Test it updates reminder data with the connected email notification information.
-        """
         task = TaskFactory()
         reminder_number = 3
         notification_id = str(uuid4())
@@ -942,6 +965,253 @@ class TestTaskCompleted:
         )
 
         linked_reminders = TaskCompletedReminder.objects.filter(
+            email_notification_id=notification_id,
+        )
+        assert linked_reminders.count() == (reminder_number)
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures('mute_signals')
+class TestTaskAmendedByOthers:
+    def test_creation_of_multiple_adviser_subscriptions_on_task_creation(self):
+        TaskFactory()
+
+        advisers = AdviserFactory.create_batch(3)
+
+        TaskFactory(advisers=[advisers[0], advisers[1]])
+        create_task_amended_by_others_subscription(advisers[0].id)
+        create_task_amended_by_others_subscription(advisers[1].id)
+
+        subscriptions = TaskAmendedByOthersSubscription.objects.filter(
+            adviser__in=[advisers[0], advisers[1]],
+        )
+
+        assert subscriptions.count() == 2
+
+        TaskFactory(advisers=advisers)
+        create_task_amended_by_others_subscription(advisers[2].id)
+        subscriptions = TaskAmendedByOthersSubscription.objects.filter(
+            adviser__in=advisers,
+        )
+
+        assert subscriptions.count() == 3
+
+    def test_no_reminders_created_when_a_task_is_created(self):
+        task = TaskFactory()
+        notify_adviser_task_amended_by_others(task, True, [])
+        assert TaskAmendedByOthersReminder.objects.exists() is False
+
+    def test_no_reminders_created_when_a_task_is_archived(self):
+        task = TaskFactory(archived=True)
+        notify_adviser_task_amended_by_others(task, True, [])
+        assert TaskAmendedByOthersReminder.objects.exists() is False
+
+    def test_no_reminders_created_when_task_advisers_do_not_contain_adviser_ids_pre_m2m_change(
+        self,
+    ):
+        task_adviser = AdviserFactory()
+        adviser = AdviserFactory()
+        task = TaskFactory(
+            archived=False,
+            advisers=[task_adviser],
+        )
+
+        notify_adviser_task_amended_by_others(task, False, [adviser.id])
+
+        assert TaskAmendedByOthersReminder.objects.exists() is False
+
+    def test_no_reminders_created_when_adviser_that_amends_task_is_the_only_adviser(
+        self,
+    ):
+        adviser = AdviserFactory()
+        task = TaskFactory(
+            archived=False,
+            modified_by=adviser,
+            advisers=[adviser],
+        )
+
+        notify_adviser_task_amended_by_others(task, False, [adviser.id])
+
+        assert TaskAmendedByOthersReminder.objects.exists() is False
+
+    def test_adviser_that_amends_task_does_not_receive_notification_about_that_task_amends(
+        self,
+    ):
+        modified_by_adviser = AdviserFactory()
+        adviser = AdviserFactory()
+        task = TaskFactory(
+            archived=False,
+            modified_by=modified_by_adviser,
+            advisers=[
+                modified_by_adviser,
+                adviser,
+            ],
+        )
+
+        notify_adviser_task_amended_by_others(
+            task,
+            False,
+            [
+                modified_by_adviser.id,
+                adviser.id,
+            ],
+        )
+
+        assert (
+            TaskAmendedByOthersReminder.objects.filter(adviser=modified_by_adviser).exists()
+            is False
+        )
+        assert TaskAmendedByOthersReminder.objects.filter(adviser=adviser).exists() is True
+
+    def test_notification_received_but_no_email_sent_to_adviser_without_subscription(
+        self,
+        mock_notify_adviser_by_rq_email,
+    ):
+        adviser = AdviserFactory()
+        task = TaskFactory(
+            archived=False,
+            advisers=[
+                adviser,
+            ],
+        )
+
+        notify_adviser_task_amended_by_others(
+            task,
+            False,
+            [adviser.id],
+        )
+
+        assert TaskAmendedByOthersReminder.objects.filter(adviser=adviser).count() == 1
+        mock_notify_adviser_by_rq_email.assert_not_called()
+
+    def test_notification_received_but_no_email_sent_to_adviser_with_email_off(
+        self,
+        mock_notify_adviser_by_rq_email,
+    ):
+        adviser = AdviserFactory()
+        task = TaskFactory(
+            archived=False,
+            advisers=[
+                adviser,
+            ],
+        )
+
+        TaskAmendedByOthersSubscription.objects.create(
+            adviser_id=adviser.id,
+            email_reminders_enabled=False,
+        )
+
+        notify_adviser_task_amended_by_others(
+            task,
+            False,
+            [adviser.id],
+        )
+
+        assert TaskAmendedByOthersReminder.objects.filter(adviser=adviser).count() == 1
+        mock_notify_adviser_by_rq_email.assert_not_called()
+
+    def test_notification_received_but_no_email_sent_to_adviser_with_email_on_with_no_feature_flag(
+        self,
+        mock_notify_adviser_by_rq_email,
+    ):
+        adviser = AdviserFactory()
+        task = TaskFactory(
+            archived=False,
+            advisers=[
+                adviser,
+            ],
+        )
+
+        create_task_amended_by_others_subscription(adviser_id=adviser.id)
+
+        notify_adviser_task_amended_by_others(
+            task,
+            False,
+            [adviser.id],
+        )
+
+        assert TaskAmendedByOthersReminder.objects.filter(adviser=adviser).count() == 1
+        mock_notify_adviser_by_rq_email.assert_not_called()
+
+    def test_notification_received_but_no_email_for_adviser_with_email_off_with_feature_flag_on(
+        self,
+        adviser_tasks_user_feature_flag,
+        mock_notify_adviser_by_rq_email,
+    ):
+        adviser = AdviserFactory()
+        add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
+        task = TaskFactory(
+            archived=False,
+            advisers=[
+                adviser,
+            ],
+        )
+
+        TaskAmendedByOthersSubscription.objects.create(
+            adviser_id=adviser.id,
+            email_reminders_enabled=False,
+        )
+
+        notify_adviser_task_amended_by_others(
+            task,
+            False,
+            [adviser.id],
+        )
+
+        assert TaskAmendedByOthersReminder.objects.filter(adviser=adviser).count() == 1
+        mock_notify_adviser_by_rq_email.assert_not_called()
+
+    def test_email_sent_for_adviser_with_email_on_with_feature_flag_on(
+        self,
+        adviser_tasks_user_feature_flag,
+        mock_notify_adviser_by_rq_email,
+    ):
+        adviser = AdviserFactory()
+        add_user_feature_flag(adviser_tasks_user_feature_flag, adviser)
+        create_task_amended_by_others_subscription(adviser.id)
+
+        template_id = str(uuid4())
+        with override_settings(
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
+        ):
+            task = TaskFactory(
+                advisers=[adviser],
+                archived=False,
+            )
+
+            notify_adviser_task_amended_by_others(
+                task,
+                False,
+                [adviser.id],
+            )
+
+            mock_notify_adviser_by_rq_email.assert_has_calls(
+                [
+                    mock_notify_adviser_task_amended_by_others_call(
+                        task,
+                        adviser,
+                        template_id,
+                    ),
+                ],
+            )
+
+    def test_task_amended_assigns_email_notification_id_to_all_reminders(
+        self,
+    ):
+        task = TaskFactory()
+        reminder_number = 3
+        notification_id = str(uuid4())
+        reminders = TaskAmendedByOthersReminderFactory.create_batch(
+            reminder_number,
+            task_id=task.id,
+        )
+
+        update_task_amended_by_others_email_status(
+            notification_id,
+            [reminder.id for reminder in reminders],
+        )
+
+        linked_reminders = TaskAmendedByOthersReminder.objects.filter(
             email_notification_id=notification_id,
         )
         assert linked_reminders.count() == (reminder_number)
