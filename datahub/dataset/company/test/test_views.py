@@ -235,11 +235,13 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
     def test_with_updated_since_filter(self, data_flow_api_client):
         """Test that the endpoint returns only companies created after a certain date"""
         # Create companies with different `created_on` dates
-        CompanyFactory(created_on=datetime(2020, 1, 1, tzinfo=utc))
-        company_after = CompanyFactory(created_on=datetime(2020, 6, 1, tzinfo=utc))
+        with freeze_time('2021-01-01 12:30:00'):
+            CompanyFactory()
+        with freeze_time('2022-01-01 12:30:00'):
+            company_after = CompanyFactory()
 
         # Define the `updated_since` date
-        updated_since_date = datetime(2020, 2, 1, tzinfo=utc).strftime('%Y-%m-%d')
+        updated_since_date = datetime(2021, 2, 1, tzinfo=utc).strftime('%Y-%m-%d')
 
         # Make the request with the `updated_since` parameter
         response = data_flow_api_client.get(self.view_url, {'updated_since': updated_since_date})
