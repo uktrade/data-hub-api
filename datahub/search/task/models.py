@@ -20,6 +20,7 @@ class Task(BaseSearchModel):
     reminder_date = Date()
     investment_project = fields.investment_project_field()
     company = fields.id_name_field()
+    modified_on = Date()
 
     MAPPINGS = {
         'created_by': dict_utils.contact_or_adviser_dict,
