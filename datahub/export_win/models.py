@@ -346,6 +346,7 @@ class WinAdviser(BaseModel):
 
 @reversion.register_base_model()
 class CustomerResponse(BaseModel):
+
     """Customer response."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -467,3 +468,11 @@ class CustomerResponse(BaseModel):
         default='',
         blank=True,
     )
+
+class CustomerResponseToken(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    expires_on = models.DateTimeField()
+    customer_response = models.ForeignKey(CustomerResponse, related_name='tokens', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'Token: {self.id} ({self.expires_on})'
