@@ -25,3 +25,8 @@ class SearchTaskQuerySerializer(EntitySearchQuerySerializer):
     )
     investment_project = SingleOrListField(child=StringUUIDField(), required=False)
     company = SingleOrListField(child=StringUUIDField(), required=False)
+
+    SORT_BY_FIELDS = (
+        'modified_on',
+        'due_date',
+    )

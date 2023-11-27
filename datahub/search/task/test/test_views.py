@@ -1,5 +1,7 @@
 import pytest
 
+from datetime import datetime, timedelta
+
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -82,6 +84,28 @@ class TestTaskSearch(APITestMixin):
 
         assert response.data['count'] == 1
         assert response.data['results'][0]['id'] == str(task.id)
+
+    def test_search_task_due_date_ordering(self, opensearch_with_collector):
+        """Tests task search ordering on due date"""
+
+        yesterday_task = TaskFactory(due_date=datetime.today() - timedelta(days=1))
+        today_task = TaskFactory(due_date=datetime.today())
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:task')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'sortby': 'due_date',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data['results'][0]['id'] == str(yesterday_task.id)
+        assert response.data['results'][1]['id'] == str(today_task.id)
 
 
 class TestTaskInvestmentProjectSearch(APITestMixin):
