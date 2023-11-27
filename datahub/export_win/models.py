@@ -132,13 +132,14 @@ class Win(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     adviser = models.ForeignKey(Advisor, related_name='wins', on_delete=models.PROTECT)
-    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    company = models.ForeignKey(Company, related_name='wins', on_delete=models.PROTECT)
 
     customer_name = models.CharField(max_length=128, verbose_name='Contact name')
     customer_job_title = models.CharField(max_length=128, verbose_name='Job title')
     customer_email_address = models.EmailField(verbose_name='Contact email')
     customer_location = models.ForeignKey(
         UKRegion,
+        related_name='wins',
         verbose_name='HQ location',
         on_delete=models.PROTECT,
     )
@@ -161,28 +162,40 @@ class Win(BaseModel):
 
     type = models.ForeignKey(
         WinType,
+        related_name='wins',
         verbose_name='Type of win',
         null=True,
+        blank=True,
         on_delete=models.PROTECT,
     )
     date = models.DateField(verbose_name='Date business won [MM/YY]')
-    country = models.ForeignKey(Country, on_delete=models.PROTECT)
+    country = models.ForeignKey(
+        Country,
+        related_name='wins',
+        on_delete=models.PROTECT,
+    )
 
     total_expected_export_value = models.BigIntegerField()
     goods_vs_services = models.ForeignKey(
         ExpectedValueRelation,
+        related_name='wins',
         verbose_name='Does the expected value relate to',
         on_delete=models.PROTECT,
     )
     total_expected_non_export_value = models.BigIntegerField()
     total_expected_odi_value = models.BigIntegerField()
 
-    sector = models.ForeignKey(Sector, on_delete=models.PROTECT)
+    sector = models.ForeignKey(
+        Sector,
+        related_name='wins',
+        on_delete=models.PROTECT,
+    )
     is_prosperity_fund_related = models.BooleanField(verbose_name='Prosperity Fund', default=False)
     # note, this consists of first 4 chars hvc code, final 2 chars the
     # financial year it applies to, see HVC.choices
     hvc = models.ForeignKey(
         HVC,
+        related_name='wins',
         verbose_name='HVC code, if applicable',
         blank=True,
         null=True,
@@ -190,6 +203,7 @@ class Win(BaseModel):
     )
     hvo_programme = models.ForeignKey(
         HVOProgrammes,
+        related_name='wins',
         verbose_name='HVO Programme, if applicable',
         blank=True,
         null=True,
@@ -203,7 +217,10 @@ class Win(BaseModel):
 
     type_of_support = models.ManyToManyField(SupportType)
 
-    associated_programme = models.ManyToManyField(AssociatedProgramme, blank=True)
+    associated_programme = models.ManyToManyField(
+        AssociatedProgramme,
+        blank=True,
+    )
 
     is_personally_confirmed = models.BooleanField(
         verbose_name='I confirm that this information is complete and accurate',
@@ -214,7 +231,7 @@ class Win(BaseModel):
 
     lead_officer = models.ForeignKey(
         Advisor,
-        related_name='lead_officer',
+        related_name='lead_officer_wins',
         on_delete=models.PROTECT,
     )
 
@@ -235,7 +252,7 @@ class Win(BaseModel):
 
     line_manager = models.ForeignKey(
         Advisor,
-        related_name='line_manager',
+        related_name='line_manager_wins',
         on_delete=models.PROTECT,
     )
 
@@ -248,19 +265,24 @@ class Win(BaseModel):
     team_type = models.ForeignKey(TeamType, on_delete=models.PROTECT)
     hq_team = models.ForeignKey(
         HQTeamRegionOrPost,
+        related_name='wins',
         verbose_name='HQ team, Region or Post',
         on_delete=models.PROTECT,
     )
 
     business_potential = models.ForeignKey(
         BusinessPotential,
+        related_name='wins',
         verbose_name='Medium-sized and high potential companies',
         null=True,
+        blank=True,
         on_delete=models.PROTECT,
     )
     export_experience = models.ForeignKey(
         ExperienceCategories,
+        related_name='wins',
         null=True,
+        blank=True,
         on_delete=models.PROTECT,
     )
     location = models.CharField(max_length=128, blank=True)
@@ -285,7 +307,11 @@ class Breakdown(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     win = models.ForeignKey(Win, related_name='breakdowns', on_delete=models.CASCADE)
-    type = models.ForeignKey(BreakdownType, on_delete=models.PROTECT)
+    type = models.ForeignKey(
+        BreakdownType,
+        related_name='breakdowns',
+        on_delete=models.PROTECT,
+    )
     year = models.PositiveIntegerField()
     value = models.BigIntegerField()
 
@@ -294,11 +320,20 @@ class WinAdviser(BaseModel):
     """Win adviser."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    adviser = models.ForeignKey(Advisor, on_delete=models.PROTECT)
+    adviser = models.ForeignKey(
+        Advisor,
+        related_name='win_advisers',
+        on_delete=models.PROTECT,
+    )
     win = models.ForeignKey(Win, related_name='advisers', on_delete=models.CASCADE)
-    team_type = models.ForeignKey(TeamType, on_delete=models.PROTECT)
+    team_type = models.ForeignKey(
+        TeamType,
+        related_name='win_advisers',
+        on_delete=models.PROTECT,
+    )
     hq_team = models.ForeignKey(
         HQTeamRegionOrPost,
+        related_name='win_advisers',
         verbose_name='HQ team, Region or Post',
         on_delete=models.PROTECT,
     )
@@ -319,43 +354,44 @@ class CustomerResponse(BaseModel):
     win = models.OneToOneField(Win, related_name='confirmation', on_delete=models.CASCADE)
     our_support = models.ForeignKey(
         Rating,
+        related_name='our_support_customer_responses',
         verbose_name='Securing the win overall?',
         on_delete=models.PROTECT,
     )
     access_to_contacts = models.ForeignKey(
         Rating,
+        related_name='access_to_contacts_customer_responses',
         verbose_name='Gaining access to contacts?',
-        related_name='access_to_contacts',
         on_delete=models.PROTECT,
     )
     access_to_information = models.ForeignKey(
         Rating,
+        related_name='access_to_information_customer_responses',
         verbose_name='Getting information or improved understanding of the country?',
-        related_name='access_to_information',
         on_delete=models.PROTECT,
     )
     improved_profile = models.ForeignKey(
         Rating,
+        related_name='improved_profile_customer_responses',
         verbose_name='Improving your profile or credibility in the country?',
-        related_name='improved_profile',
         on_delete=models.PROTECT,
     )
     gained_confidence = models.ForeignKey(
         Rating,
+        related_name='gained_confidence_customer_responses',
         verbose_name='Having confidence to explore or expand in the country?',
-        related_name='gained_confidence',
         on_delete=models.PROTECT,
     )
     developed_relationships = models.ForeignKey(
         Rating,
+        related_name='developed_relationships_customer_responses',
         verbose_name='Developing or nurturing critical relationships?',
-        related_name='developed_relationships',
         on_delete=models.PROTECT,
     )
     overcame_problem = models.ForeignKey(
         Rating,
+        related_name='overcame_problem_customer_responses',
         verbose_name='Overcoming a problem in the country (eg legal, regulatory, commercial)?',
-        related_name='overcame_problem',
         on_delete=models.PROTECT,
     )
     involved_state_enterprise = models.BooleanField(
@@ -374,11 +410,13 @@ class CustomerResponse(BaseModel):
     )
     expected_portion_without_help = models.ForeignKey(
         WithoutOurSupport,
+        related_name='customer_responses',
         verbose_name='What value do you estimate you would have achieved without our support?',
         on_delete=models.PROTECT,
     )
     last_export = models.ForeignKey(
         Experience,
+        related_name='customer_responses',
         verbose_name='Apart from this win, when did your company last export goods or services?',
         on_delete=models.PROTECT,
     )
@@ -413,12 +451,14 @@ class CustomerResponse(BaseModel):
     )
     comments = models.TextField(
         blank=True,
+        default='',
         verbose_name='Other comments or changes to the win details',
     )
     name = models.CharField(max_length=256, verbose_name='Your name')
     # should default to "Don't know"
     marketing_source = models.ForeignKey(
         MarketingSource,
+        related_name='customer_responses',
         verbose_name='How did you first hear about DBT (or its predecessor, DIT)?',
         on_delete=models.PROTECT,
     )
@@ -426,6 +466,6 @@ class CustomerResponse(BaseModel):
     other_marketing_source = models.CharField(
         max_length=256,
         verbose_name='Other marketing source',
-        null=True,
+        default='',
         blank=True,
     )
