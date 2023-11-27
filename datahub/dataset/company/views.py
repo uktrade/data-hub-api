@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.contrib.postgres.aggregates import ArrayAgg
 
@@ -10,7 +10,8 @@ from datahub.metadata.utils import convert_usd_to_gbp
 
 def parse_date(value):
     try:
-        return datetime.fromisoformat(value)
+        dt = datetime.fromisoformat(value)
+        return dt.replace(tzinfo=timezone.utc)
     except ValueError:
         return None
 
