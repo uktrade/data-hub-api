@@ -8,14 +8,14 @@ from datahub.core.migration_utils import load_yaml_data_in_migration
 def load_services(apps, schema_editor):
     load_yaml_data_in_migration(
         apps,
-        PurePath(__file__).parent / '0069_disable_unused_services.yaml'
+        PurePath(__file__).parent / '0071_disable_unused_services.yaml'
     )
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0068_update_services'),
+        ('metadata', '0070_update_services'),
     ]
 
     operations = [
