@@ -34,6 +34,15 @@ from datahub.task.models import Task
 logger = logging.getLogger(__name__)
 
 
+def schedule_advisers_added_to_task(task, adviser_ids):
+    for adviser_id in adviser_ids:
+        schedule_create_task_reminder_subscription_task(adviser_id)
+        schedule_create_task_assigned_to_me_from_others_subscription_task(task, adviser_id)
+        schedule_create_task_overdue_subscription_task(adviser_id)
+        schedule_create_task_completed_subscription_task(adviser_id)
+        schedule_create_task_amended_by_others_subscription_task(adviser_id)
+
+
 def schedule_create_task_reminder_subscription_task(adviser_id):
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
