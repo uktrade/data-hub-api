@@ -1,6 +1,6 @@
-import pytest
-
 from datetime import datetime, timedelta
+
+import pytest
 
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -87,7 +87,6 @@ class TestTaskSearch(APITestMixin):
 
     def test_search_task_due_date_ordering(self, opensearch_with_collector):
         """Tests task search ordering on due date"""
-
         yesterday_task = TaskFactory(due_date=datetime.today() - timedelta(days=1))
         today_task = TaskFactory(due_date=datetime.today())
 
