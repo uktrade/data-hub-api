@@ -9,6 +9,7 @@ class Task(BaseSearchModel):
     """Task model"""
 
     id = Keyword()
+    archived = Boolean()
     created_by = fields.contact_or_adviser_field()
     title = Text()
     description = Text()
@@ -36,4 +37,5 @@ class Task(BaseSearchModel):
         'due_date',
         'created_by',
         'advisers',
+        'archived',
     )
