@@ -3,11 +3,7 @@ from django.dispatch import receiver
 
 from datahub.task.models import Task
 from datahub.task.tasks import (
-    schedule_create_task_amended_by_others_subscription_task,
-    schedule_create_task_assigned_to_me_from_others_subscription_task,
-    schedule_create_task_completed_subscription_task,
-    schedule_create_task_overdue_subscription_task,
-    schedule_create_task_reminder_subscription_task,
+    schedule_advisers_added_to_task,
     schedule_notify_advisers_task_amended_by_others,
     schedule_notify_advisers_task_completed,
 )
@@ -28,12 +24,10 @@ def set_task_subscriptions_and_schedule_notifications(sender, **kwargs):
     action = kwargs.pop('action', None)
 
     if action == 'post_add' and pk_set is not None and task is not None:
-        for adviser_id in pk_set:
-            schedule_create_task_reminder_subscription_task(adviser_id)
-            schedule_create_task_assigned_to_me_from_others_subscription_task(task, adviser_id)
-            schedule_create_task_overdue_subscription_task(adviser_id)
-            schedule_create_task_completed_subscription_task(adviser_id)
-            schedule_create_task_amended_by_others_subscription_task(adviser_id)
+        schedule_advisers_added_to_task(
+            adviser_ids=pk_set,
+            task=task,
+        )
 
 
 @receiver(
