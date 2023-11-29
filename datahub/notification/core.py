@@ -1,3 +1,4 @@
+from uuid import uuid4
 import warnings
 from unittest import mock
 
@@ -33,7 +34,7 @@ class NotifyGateway:
                 #    execution path when the API key is unset.
 
                 client = mock.Mock(spec_set=NotificationsAPIClient)
-                client.send_email_notification.return_value = {'id': 'abc123'}
+                client.send_email_notification.return_value = {'id': uuid4()}
                 clients[service_name] = client
                 warnings.warn(
                     f'`settings.{api_key_setting_name}` not specified therefore notifications '
