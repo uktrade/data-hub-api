@@ -11,9 +11,12 @@ from datahub.core.query_utils import (
     get_array_agg_subquery,
 )
 from datahub.dataset.core.views import BaseDatasetView
+from datahub.dataset.core.views import BaseFilterDatasetView
+
 from datahub.dataset.investment_project.pagination import (
     InvestmentProjectActivityDatasetViewCursorPagination,
 )
+from datahub.dbmaintenance.utils import parse_date
 from datahub.investment.project.models import (
     InvestmentProject,
     InvestmentProjectStageLog,
@@ -23,7 +26,7 @@ from datahub.investment.project.report.spi import get_spi_report_queryset
 from datahub.metadata.query_utils import get_sector_name_subquery
 
 
-class InvestmentProjectsDatasetView(BaseDatasetView):
+class InvestmentProjectsDatasetView(BaseFilterDatasetView):
     """
     An APIView that provides 'get' action which queries and returns desired fields for
     Investment Projects Dataset to be consumed by Data-flow periodically.
@@ -32,9 +35,9 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
     and let analyst to work on denormalized table to get more meaningful insight.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of Investment Projects Dataset records"""
-        return InvestmentProject.objects.annotate(
+        queryset = InvestmentProject.objects.annotate(
             actual_uk_region_names=get_array_agg_subquery(
                 InvestmentProject.actual_uk_regions.through,
                 'investmentproject',
@@ -149,6 +152,14 @@ class InvestmentProjectsDatasetView(BaseDatasetView):
             'uk_company_sector',
             'uk_region_location_names',
         )
+        updated_since = request.GET.get('updated_since')
+
+        if updated_since:
+            updated_since_date = parse_date(updated_since)
+            if updated_since_date:
+                queryset = queryset.filter(modified_on__gt=updated_since_date)
+
+        return queryset
 
 
 class InvestmentProjectsActivityDatasetView(BaseDatasetView):
