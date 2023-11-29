@@ -1,17 +1,18 @@
 from datahub.company.models import CompanyExport
 from datahub.core.query_utils import get_array_agg_subquery
-from datahub.dataset.core.views import BaseDatasetView
+from datahub.dataset.core.views import BaseFilterDatasetView
+from datahub.dbmaintenance.utils import parse_date
 from datahub.metadata.query_utils import get_sector_name_subquery
 
 
-class CompanyExportDatasetView(BaseDatasetView):
+class CompanyExportDatasetView(BaseFilterDatasetView):
     """
     A GET API view to return pipeline item data for syncing by data-flow periodically.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of CompanyExport records"""
-        return CompanyExport.objects.annotate(
+        queryset = CompanyExport.objects.annotate(
             sector_name=get_sector_name_subquery('sector'),
             contact_ids=get_array_agg_subquery(
                 CompanyExport.contacts.through,
@@ -51,3 +52,11 @@ class CompanyExportDatasetView(BaseDatasetView):
             'contact_ids',
             'team_member_ids',
         )
+
+        updated_since = request.GET.get('updated_since')
+        if updated_since:
+            updated_since_date = parse_date(updated_since)
+            if updated_since_date:
+                queryset = queryset.filter(modified_on__gt=updated_since_date)
+
+        return queryset
