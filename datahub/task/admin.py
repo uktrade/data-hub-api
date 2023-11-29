@@ -3,7 +3,7 @@ from django.contrib import admin
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin
-from datahub.task.models import InvestmentProjectTask, Task
+from datahub.task.models import Task
 
 
 @admin.register(Task)
@@ -22,14 +22,3 @@ class TaskAdmin(BaseModelAdminMixin, VersionAdmin):
         'title',
         'due_date',
     ]
-
-
-@admin.register(InvestmentProjectTask)
-class InvestmentProjectTaskAdmin(BaseModelAdminMixin, VersionAdmin):
-    """Admin form for investment project tasks"""
-
-    search_fields = ('pk',)
-    readonly_fields = (
-        'id',
-        'created',
-    )

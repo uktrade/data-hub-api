@@ -5,7 +5,7 @@ from datahub.company.serializers import NestedAdviserField
 from datahub.investment.project.serializers import (
     NestedInvestmentProjectInvestorCompanyField,
 )
-from datahub.task.models import InvestmentProjectTask, Task
+from datahub.task.models import Task
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -44,26 +44,3 @@ class TaskSerializer(serializers.ModelSerializer):
             'modified_on',
             'investment_project',
         )
-
-
-class InvestmentProjectTaskSerializer(serializers.ModelSerializer):
-    # task = BasicTaskSerializer()
-    modified_by = NestedAdviserField(read_only=True)
-    created_by = NestedAdviserField(read_only=True)
-    investment_project = NestedInvestmentProjectInvestorCompanyField()
-
-    class Meta:
-        model = InvestmentProjectTask
-        fields = (
-            'id',
-            'investment_project',
-            'task',
-            'created_by',
-            'modified_by',
-            'created_on',
-            'modified_on',
-        )
-
-
-class InvestmentProjectTaskQueryParamSerializer(serializers.Serializer):
-    investment_project = serializers.UUIDField(required=False)

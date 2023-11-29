@@ -249,12 +249,6 @@ class Command(BaseCleanupCommand):
                 DatetimeLessThanCleanupFilter('modified_on', OBJECTIVE_EXPIRY_PERIOD),
             ),
         ),
-        'task.InvestmentProjectTask': ModelCleanupConfig(
-            (
-                DatetimeLessThanCleanupFilter('created_on', TASK_EXPIRY_PERIOD),
-                DatetimeLessThanCleanupFilter('modified_on', TASK_EXPIRY_PERIOD),
-            ),
-        ),
         'export_win.Win': ModelCleanupConfig(
             (
                 DatetimeLessThanCleanupFilter('created_on', WIN_EXPIRY_PERIOD),
