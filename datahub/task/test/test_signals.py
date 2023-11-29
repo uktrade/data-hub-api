@@ -10,7 +10,7 @@ from datahub.task.signals import set_task_subscriptions_and_schedule_notificatio
 from datahub.task.test.factories import TaskFactory
 
 
-pytestmark = [pytest.mark.django_db, pytest.mark.enable_signal_mock_functions]
+pytestmark = [pytest.mark.django_db, pytest.mark.enable_task_signals]
 
 
 class TestTaskAdviserChangedSubscriptions:
