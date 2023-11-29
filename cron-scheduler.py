@@ -50,6 +50,10 @@ from datahub.reminder.tasks import (
     update_notify_email_delivery_status_for_no_recent_export_interaction,
     update_notify_email_delivery_status_for_no_recent_interaction,
 )
+from datahub.export_win.tasks import (
+    update_customer_response_token_for_email_notification_id,
+    update_notify_email_delivery_status_for_customer_response_token,
+)
 from datahub.search.tasks import sync_all_models
 from datahub.task.tasks import schedule_reminders_tasks_overdue, schedule_reminders_upcoming_tasks
 
