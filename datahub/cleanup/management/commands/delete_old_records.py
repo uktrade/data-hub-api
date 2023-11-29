@@ -6,7 +6,7 @@ from django.utils.timezone import utc
 from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelCleanupConfig
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
 from datahub.company.models import Company, Contact
-from datahub.export_win.models import Win
+from datahub.export_win.models import CustomerResponse, Win
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 from datahub.omis.order.models import Order
@@ -271,5 +271,8 @@ class Command(BaseCleanupCommand):
                 DatetimeLessThanCleanupFilter('created_on', CUSTOMER_RESPONSE_EXPIRY_PERIOD),
                 DatetimeLessThanCleanupFilter('modified_on', CUSTOMER_RESPONSE_EXPIRY_PERIOD),
             ),
+            relation_filter_mapping={
+                CustomerResponse._meta.get_field('tokens'): (),
+            },
         ),
     }

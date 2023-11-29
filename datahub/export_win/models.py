@@ -18,6 +18,7 @@ from datahub.metadata.models import (
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
+
 class BaseExportWinOrderedConstantModel(BaseOrderedConstantModel):
     """Base class for an Export Win."""
 
@@ -42,6 +43,7 @@ class HQTeamRegionOrPost(BaseExportWinOrderedConstantModel):
         related_name='hq_team_region_or_post',
         on_delete=models.CASCADE,
     )
+
 
 class WinType(BaseExportWinOrderedConstantModel):
     """Win type."""
@@ -471,10 +473,14 @@ class CustomerResponse(BaseModel):
         blank=True,
     )
 
+
 class CustomerResponseToken(models.Model):
+    """Customer Response Token"""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     expires_on = models.DateTimeField()
-    customer_response = models.ForeignKey(CustomerResponse, related_name='tokens', on_delete=models.CASCADE)
+    customer_response = models.ForeignKey(
+        CustomerResponse, related_name='tokens', on_delete=models.CASCADE)
 
     def __str__(self):
         return f'Token: {self.id} ({self.expires_on})'
