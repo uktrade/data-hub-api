@@ -1,5 +1,6 @@
-from uuid import uuid4
 import warnings
+
+from uuid import uuid4
 from unittest import mock
 
 from django.conf import settings
