@@ -34,7 +34,7 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('pipeline_list_items'),
                 Company._meta.get_field('new_export_interaction_reminders'),
                 Company._meta.get_field('no_recent_export_interaction_reminders'),
-                Company._meta.get_field('win'),
+                Company._meta.get_field('wins'),
             ),
         ),
         'event.Event': ModelCleanupConfig(

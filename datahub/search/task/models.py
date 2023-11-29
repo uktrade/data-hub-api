@@ -9,6 +9,7 @@ class Task(BaseSearchModel):
     """Task model"""
 
     id = Keyword()
+    archived = Boolean()
     created_by = fields.contact_or_adviser_field()
     title = Text()
     description = Text()
@@ -19,6 +20,7 @@ class Task(BaseSearchModel):
     reminder_date = Date()
     investment_project = fields.investment_project_field()
     company = fields.id_name_field()
+    modified_on = Date()
 
     MAPPINGS = {
         'created_by': dict_utils.contact_or_adviser_dict,
@@ -36,4 +38,5 @@ class Task(BaseSearchModel):
         'due_date',
         'created_by',
         'advisers',
+        'archived',
     )

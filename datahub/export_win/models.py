@@ -260,7 +260,11 @@ class Win(BaseModel):
         verbose_name='Line manager',
     )
 
-    team_type = models.ForeignKey(TeamType, on_delete=models.PROTECT)
+    team_type = models.ForeignKey(
+        TeamType,
+        related_name='wins',
+        on_delete=models.PROTECT,
+    )
     hq_team = models.ForeignKey(
         HQTeamRegionOrPost,
         related_name='wins',
@@ -286,7 +290,7 @@ class Win(BaseModel):
     location = models.CharField(max_length=128, blank=True)
 
     complete = models.BooleanField()  # has an email been sent to the customer?
-    audit = models.TextField(null=True)
+    audit = models.TextField(default='', blank=True)
 
     # Legacy data
     match_id = models.PositiveIntegerField(null=True, blank=True)
@@ -346,7 +350,6 @@ class WinAdviser(BaseModel):
 
 @reversion.register_base_model()
 class CustomerResponse(BaseModel):
-
     """Customer response."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -454,7 +457,6 @@ class CustomerResponse(BaseModel):
         verbose_name='Other comments or changes to the win details',
     )
     name = models.CharField(max_length=256, verbose_name='Your name')
-    # should default to "Don't know"
     marketing_source = models.ForeignKey(
         MarketingSource,
         related_name='customer_responses',

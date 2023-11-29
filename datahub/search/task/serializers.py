@@ -12,6 +12,7 @@ class SearchTaskQuerySerializer(EntitySearchQuerySerializer):
     """Serialiser used to validate task search POST bodies."""
 
     id = SingleOrListField(child=StringUUIDField(), required=False)
+    archived = serializers.BooleanField(required=False)
     title = serializers.CharField(required=False)
     due_date = serializers.DateField(required=False)
     advisers = SingleOrListField(
@@ -24,3 +25,8 @@ class SearchTaskQuerySerializer(EntitySearchQuerySerializer):
     )
     investment_project = SingleOrListField(child=StringUUIDField(), required=False)
     company = SingleOrListField(child=StringUUIDField(), required=False)
+
+    SORT_BY_FIELDS = (
+        'modified_on',
+        'due_date',
+    )

@@ -30,6 +30,8 @@ def test_task_to_dict(opensearch):
         'email_reminders_enabled': task.email_reminders_enabled,
         'reminder_date': task.reminder_date,
         'investment_project': None,
+        'modified_on': task.modified_on,
+        'archived': False,
         'company': None,
         'advisers': [
             {

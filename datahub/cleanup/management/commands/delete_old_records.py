@@ -75,7 +75,7 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('opportunities'): (),
                 Company._meta.get_field('company_exports'): (),
                 Company._meta.get_field('company_objectives'): (),
-                Company._meta.get_field('win'): (),
+                Company._meta.get_field('wins'): (),
             },
             # We want to delete the relations below along with any expired companies
             excluded_relations=(
@@ -257,8 +257,8 @@ class Command(BaseCleanupCommand):
         ),
         'export_win.Win': ModelCleanupConfig(
             (
-                DatetimeLessThanCleanupFilter('created_on', TASK_EXPIRY_PERIOD),
-                DatetimeLessThanCleanupFilter('modified_on', TASK_EXPIRY_PERIOD),
+                DatetimeLessThanCleanupFilter('created_on', WIN_EXPIRY_PERIOD),
+                DatetimeLessThanCleanupFilter('modified_on', WIN_EXPIRY_PERIOD),
             ),
             relation_filter_mapping={
                 Win._meta.get_field('confirmation'): (),
@@ -268,8 +268,8 @@ class Command(BaseCleanupCommand):
         ),
         'export_win.CustomerResponse': ModelCleanupConfig(
             (
-                DatetimeLessThanCleanupFilter('created_on', TASK_EXPIRY_PERIOD),
-                DatetimeLessThanCleanupFilter('modified_on', TASK_EXPIRY_PERIOD),
+                DatetimeLessThanCleanupFilter('created_on', CUSTOMER_RESPONSE_EXPIRY_PERIOD),
+                DatetimeLessThanCleanupFilter('modified_on', CUSTOMER_RESPONSE_EXPIRY_PERIOD),
             ),
         ),
     }

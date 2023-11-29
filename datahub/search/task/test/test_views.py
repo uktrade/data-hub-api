@@ -1,4 +1,7 @@
+from datetime import datetime, timedelta
+
 import pytest
+
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -82,6 +85,27 @@ class TestTaskSearch(APITestMixin):
         assert response.data['count'] == 1
         assert response.data['results'][0]['id'] == str(task.id)
 
+    def test_search_task_due_date_ordering(self, opensearch_with_collector):
+        """Tests task search ordering on due date"""
+        yesterday_task = TaskFactory(due_date=datetime.today() - timedelta(days=1))
+        today_task = TaskFactory(due_date=datetime.today())
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:task')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'sortby': 'due_date',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data['results'][0]['id'] == str(yesterday_task.id)
+        assert response.data['results'][1]['id'] == str(today_task.id)
+
 
 class TestTaskInvestmentProjectSearch(APITestMixin):
     def test_search_task_by_created_by_id(self, opensearch_with_collector):
@@ -118,3 +142,33 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
             'name': investment_project.investor_company.name,
             'id': str(investment_project.investor_company.id),
         }
+
+    @pytest.mark.parametrize('archived', (True, False))
+    def test_search_task_by_archived(self, opensearch_with_collector, archived):
+        """Tests task search by archived."""
+        archived_tasks = TaskFactory.create_batch(3, archived=True)
+
+        not_archived_tasks = TaskFactory.create_batch(2, archived=False)
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:task')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'archived': archived,
+            },
+        )
+
+        tasks_for_assert = archived_tasks if archived else not_archived_tasks
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert [a['id'] for a in response.json()['results']] == [
+            str(a.id) for a in sorted(tasks_for_assert, key=lambda x: x.id)
+        ]
+
+        assert response.data['count'] == len(
+            tasks_for_assert,
+        )

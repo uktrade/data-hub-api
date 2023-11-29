@@ -10,6 +10,7 @@ class NotifyServiceName(StrEnum):
     investment = 'investment'
     reminder = 'reminder'
     interaction = 'interaction'
+    export_win = 'export_win'
 
 
 DEFAULT_SERVICE_NAME = NotifyServiceName.datahub
@@ -23,4 +24,5 @@ NOTIFY_KEYS = {
     NotifyServiceName.omis: 'OMIS_NOTIFICATION_API_KEY',
     NotifyServiceName.investment: 'INVESTMENT_NOTIFICATION_API_KEY',
     NotifyServiceName.interaction: 'INTERACTION_NOTIFICATION_API_KEY',
+    NotifyServiceName.export_win: 'EXPORT_WIN_NOTIFICATION_API_KEY',
 }

@@ -1,0 +1,13 @@
+- model: metadata.service
+  pk: c010e25f-641c-41ce-9ffa-8880321a165f
+  fields:
+    disabled_on: ~
+    order: 516.0
+    segment: Global Investment Summit (2023)
+    parent:
+    contexts:
+      ["event", "investment_interaction", "investment_project_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0

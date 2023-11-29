@@ -38,6 +38,10 @@ class EmailTemplate(ABC):
         return f'Completed by: {self.task.modified_by.name}'
 
     @property
+    def adviser_amending_task(self):
+        return f'Amended by: {self.task.modified_by.name}'
+
+    @property
     def task_due_date(self):
         return (
             f'Date due: {self.task.due_date.strftime("%-d %B %Y")}' if self.task.due_date else None
@@ -128,4 +132,22 @@ class TaskCompletedEmailTemplate(EmailTemplate):
             self.company_name,
             self.task_due_date,
             self.adviser_completing_task,
+        ]
+
+
+class TaskAmendedByOthersEmailTemplate(EmailTemplate):
+    def __init__(self, task: Task):
+        super().__init__(task)
+
+    @property
+    def subject(self):
+        return 'Task amended'
+
+    @property
+    def fields_to_include(self):
+        return [
+            self.investment_project,
+            self.company_name,
+            self.task_due_date,
+            self.adviser_amending_task,
         ]

@@ -17,6 +17,7 @@ class SearchTaskAPIViewMixin:
     fields_to_exclude = ()
 
     FILTER_FIELDS = (
+        'archived',
         'id',
         'title',
         'due_date',

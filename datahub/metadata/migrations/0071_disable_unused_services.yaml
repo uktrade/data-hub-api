@@ -1,0 +1,4 @@
+- model: metadata.service
+  pk: 4e1daab0-7ad5-4a8d-bf45-3a83880e1323
+  fields:
+    disabled_on: "2023-11-27T12:33:03Z"
