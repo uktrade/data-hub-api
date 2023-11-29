@@ -1,7 +1,7 @@
 import warnings
 
-from uuid import uuid4
 from unittest import mock
+from uuid import uuid4
 
 from django.conf import settings
 from notifications_python_client.notifications import NotificationsAPIClient
