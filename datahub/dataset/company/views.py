@@ -1,36 +1,19 @@
-from datetime import datetime, timezone
-
 from django.contrib.postgres.aggregates import ArrayAgg
 
 from datahub.company.models import Company
-from datahub.dataset.core.views import BaseDatasetView
+from datahub.dataset.core.views import BaseFilterDatasetView
+from datahub.dbmaintenance.utils import parse_date
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.metadata.utils import convert_usd_to_gbp
 
 
-def parse_date(value):
-    try:
-        dt = datetime.fromisoformat(value)
-        return dt.replace(tzinfo=timezone.utc)
-    except ValueError:
-        return None
-
-
-class CompaniesDatasetView(BaseDatasetView):
+class CompaniesDatasetView(BaseFilterDatasetView):
     """
     A GET API view to return the data for all companies as required
     for syncing by Data-flow periodically.
     Data-flow uses the resulting response to insert data into Data workspace which can
     then be queried to create custom reports for users.
     """
-
-    def get(self, request):
-        """Endpoint which serves all records for Company Dataset"""
-        dataset = self.get_dataset(request)
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(dataset, request, view=self)
-        self._enrich_data(page)
-        return paginator.get_paginated_response(page)
 
     def get_dataset(self, request):
         """Returns list of Company records"""

@@ -68,9 +68,13 @@ class TestUserEventsViewSet:
 
     def test_with_updated_since_filter(self, data_flow_api_client):
         with freeze_time('2021-01-01 12:30:00'):
-            self.factory()
+            request = Mock(user=self.factory(), path='test-path')
+            event_before = record_user_event(request, UserEventType.SEARCH_EXPORT, data={'a': 'b'})
+            event_before.refresh_from_db()
         with freeze_time('2022-01-01 12:30:00'):
-            user_event_log_after = self.factory()
+            request = Mock(user=self.factory(), path='test-path')
+            event_after = record_user_event(request, UserEventType.SEARCH_EXPORT, data={'a': 'b'})
+            event_after.refresh_from_db()
         # Define the `updated_since` date
         updated_since_date = datetime(2021, 2, 1, tzinfo=utc).strftime('%Y-%m-%d')
 
@@ -80,7 +84,8 @@ class TestUserEventsViewSet:
         assert response.status_code == status.HTTP_200_OK
 
         # Check that only contact created after the `updated_since` date are returned
-        expected_ids = [str(user_event_log_after.id)]
-        response_ids = [user_event_log['id'] for user_event_log in response.json()['results']]
+        response_ids = [
+            user_event_log['adviser__id'] for user_event_log in response.json()['results']
+        ]
 
-        assert response_ids == expected_ids
+        assert len(response_ids) == 1

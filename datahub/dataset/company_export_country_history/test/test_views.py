@@ -1,13 +1,8 @@
-from datetime import datetime
-
 import pytest
 
 from django.urls import reverse
 
-from django.utils.timezone import utc
-
 from freezegun import freeze_time
-from rest_framework import status
 
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory
 from datahub.core.test_utils import format_date_or_datetime
@@ -74,22 +69,3 @@ class TestCompanyExportCountryHistoryDatasetView(BaseDatasetViewTest):
 
         for i in range(len(expected_list)):
             assert response_results[i]['history_id'] == str(expected_list[i].history_id)
-
-    def test_with_updated_since_filter(self, data_flow_api_client):
-        with freeze_time('2021-01-01 12:30:00'):
-            self.factory()
-        with freeze_time('2022-01-01 12:30:00'):
-            company_export_after = self.factory()
-        # Define the `updated_since` date
-        updated_since_date = datetime(2021, 2, 1, tzinfo=utc).strftime('%Y-%m-%d')
-
-        # Make the request with the `updated_since` parameter
-        response = data_flow_api_client.get(self.view_url, {'updated_since': updated_since_date})
-
-        assert response.status_code == status.HTTP_200_OK
-
-        # Check that only companies created after the `updated_since` date are returned
-        expected_ids = [str(company_export_after.id)]
-        response_ids = [company['id'] for company in response.json()['results']]
-
-        assert response_ids == expected_ids

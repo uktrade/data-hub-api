@@ -2,11 +2,10 @@ from datahub.company.models import CompanyExportCountryHistory
 from datahub.dataset.company_export_country_history.pagination import (
     CompanyExportCountryHistoryDatasetViewCursorPagination,
 )
-from datahub.dataset.core.views import BaseFilterDatasetView
-from datahub.dbmaintenance.utils import parse_date
+from datahub.dataset.core.views import BaseDatasetView
 
 
-class CompanyExportCountryHistoryDatasetView(BaseFilterDatasetView):
+class CompanyExportCountryHistoryDatasetView(BaseDatasetView):
     """
     A GET API view to return the data for all company export_country_history
     as required for syncing by Data-flow periodically.
@@ -16,9 +15,9 @@ class CompanyExportCountryHistoryDatasetView(BaseFilterDatasetView):
 
     pagination_class = CompanyExportCountryHistoryDatasetViewCursorPagination
 
-    def get_dataset(self, request):
+    def get_dataset(self):
         """Returns list of company_export_country_history records"""
-        queryset = CompanyExportCountryHistory.objects.values(
+        return CompanyExportCountryHistory.objects.values(
             'id',
             'company_id',
             'country__name',
@@ -28,10 +27,3 @@ class CompanyExportCountryHistoryDatasetView(BaseFilterDatasetView):
             'history_type',
             'status',
         )
-        updated_since = request.GET.get('updated_since')
-        if updated_since:
-            updated_since_date = parse_date(updated_since)
-            if updated_since_date:
-                queryset = queryset.filter(modified_on__gt=updated_since_date)
-
-        return queryset

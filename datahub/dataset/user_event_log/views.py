@@ -24,6 +24,6 @@ class UserEventsView(BaseFilterDatasetView):
         if updated_since:
             updated_since_date = parse_date(updated_since)
             if updated_since_date:
-                queryset = queryset.filter(modified_on__gt=updated_since_date)
+                queryset = queryset.filter(created_on__gt=updated_since_date)
 
         return queryset
