@@ -7,7 +7,6 @@ from uuid import uuid4
 import pytest
 
 
-from django.db.models.signals import m2m_changed, post_delete, post_save, pre_delete, pre_save
 from django.test.utils import override_settings
 from django.utils import timezone
 
@@ -55,6 +54,8 @@ from datahub.task.tasks import (
     update_task_reminder_email_status,
 )
 from datahub.task.test.factories import AdviserFactory, TaskFactory
+
+pytestmark = [pytest.mark.django_db]
 
 
 @pytest.fixture()
@@ -129,24 +130,60 @@ def mock_notify_adviser_task_due_email_call(
     )
 
 
-@pytest.fixture()
-def mute_signals(request):
-    signals = [pre_save, post_save, pre_delete, post_delete, m2m_changed]
-    restore = {}
-    for signal in signals:
-        restore[signal] = signal.receivers
-        signal.receivers = []
+def mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_id):
+    reminder = TaskAssignedToMeFromOthersReminderFactory(
+        adviser=adviser,
+        task=task,
+        event=f'{task} assigned to me by {task.modified_by.name}',
+    )
+    reminder.id = ANY
+    reminder.pk = ANY
 
-    def restore_signals():
-        for signal, receivers in restore.items():
-            signal.sender_receivers_cache.clear()
-            signal.receivers = receivers
+    return mock.call(
+        adviser=adviser,
+        template_identifier=template_id,
+        context=TaskAssignedToOthersEmailTemplate(task).get_context(),
+        update_task=update_task_assigned_to_me_from_others_email_status,
+        reminders=[reminder],
+    )
 
-    request.addfinalizer(restore_signals)
+
+def mock_notify_adviser_task_completed_call(task, adviser, template_id):
+    reminder = TaskCompletedReminderFactory(
+        adviser=adviser,
+        task=task,
+        event=f'{task} completed by {task.modified_by.name}',
+    )
+    reminder.id = ANY
+    reminder.pk = ANY
+
+    return mock.call(
+        adviser=adviser,
+        template_identifier=template_id,
+        context=TaskCompletedEmailTemplate(task).get_context(),
+        update_task=update_task_completed_email_status,
+        reminders=[reminder],
+    )
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures('mute_signals')
+def mock_notify_adviser_task_amended_by_others_call(task, adviser, template_id):
+    reminder = TaskAmendedByOthersReminderFactory(
+        adviser=adviser,
+        task=task,
+        event=f'{task} amended by {task.modified_by.name}',
+    )
+    reminder.id = ANY
+    reminder.pk = ANY
+
+    return mock.call(
+        adviser=adviser,
+        template_identifier=template_id,
+        context=TaskAmendedByOthersEmailTemplate(task).get_context(),
+        update_task=update_task_amended_by_others_email_status,
+        reminders=[reminder],
+    )
+
+
 class TestTaskReminders:
     @pytest.mark.parametrize(
         'lock_acquired',
@@ -394,64 +431,11 @@ class TestTaskReminders:
         assert subscription is not None
 
 
-def mock_notify_adviser_task_assigned_from_others_call(task, adviser, template_id):
-    reminder = TaskAssignedToMeFromOthersReminderFactory(
-        adviser=adviser,
-        task=task,
-        event=f'{task} assigned to me by {task.modified_by.name}',
-    )
-    reminder.id = ANY
-    reminder.pk = ANY
-
-    return mock.call(
-        adviser=adviser,
-        template_identifier=template_id,
-        context=TaskAssignedToOthersEmailTemplate(task).get_context(),
-        update_task=update_task_assigned_to_me_from_others_email_status,
-        reminders=[reminder],
-    )
-
-
-def mock_notify_adviser_task_completed_call(task, adviser, template_id):
-    reminder = TaskCompletedReminderFactory(
-        adviser=adviser,
-        task=task,
-        event=f'{task} completed by {task.modified_by.name}',
-    )
-    reminder.id = ANY
-    reminder.pk = ANY
-
-    return mock.call(
-        adviser=adviser,
-        template_identifier=template_id,
-        context=TaskCompletedEmailTemplate(task).get_context(),
-        update_task=update_task_completed_email_status,
-        reminders=[reminder],
-    )
-
-
-def mock_notify_adviser_task_amended_by_others_call(task, adviser, template_id):
-    reminder = TaskAmendedByOthersReminderFactory(
-        adviser=adviser,
-        task=task,
-        event=f'{task} amended by {task.modified_by.name}',
-    )
-    reminder.id = ANY
-    reminder.pk = ANY
-
-    return mock.call(
-        adviser=adviser,
-        template_identifier=template_id,
-        context=TaskAmendedByOthersEmailTemplate(task).get_context(),
-        update_task=update_task_amended_by_others_email_status,
-        reminders=[reminder],
-    )
-
-
-@pytest.mark.django_db
-@pytest.mark.usefixtures('mute_signals')
 class TestTasksAssignedToMeFromOthers:
-    def test_creation_of_multiple_adviser_subscriptions_on_task_creation(self):
+    def test_creation_of_multiple_adviser_subscriptions_on_task_creation(
+        self,
+        mock_notify_adviser_by_rq_email,
+    ):
         TaskFactory()
 
         advisers = AdviserFactory.create_batch(3)
@@ -474,12 +458,16 @@ class TestTasksAssignedToMeFromOthers:
 
         assert subscriptions.count() == 3
 
-    def test_notification_created_when_single_adviser_assigned_to_task(self):
+    def test_notification_created_when_single_adviser_assigned_to_task(
+        self,
+        mock_notify_adviser_by_rq_email,
+    ):
         adviser = AdviserFactory()
         task1 = TaskFactory(advisers=[adviser])
-        notify_adviser_added_to_task(task1, adviser.id)
-        reminders = TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser)
 
+        notify_adviser_added_to_task(task1, adviser.id)
+
+        reminders = TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser)
         assert reminders.exists()
 
         task2 = TaskFactory(advisers=[adviser])
@@ -640,8 +628,6 @@ class TestTasksAssignedToMeFromOthers:
         assert response is None
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures('mute_signals')
 class TestTaskCompleted:
     def test_creation_of_multiple_adviser_subscriptions_on_task_creation(self):
         TaskFactory()
@@ -839,8 +825,6 @@ class TestTaskCompleted:
         assert linked_reminders.count() == (reminder_number)
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures('mute_signals')
 class TestTaskAmendedByOthers:
     def test_creation_of_multiple_adviser_subscriptions_on_task_creation(self):
         TaskFactory()
@@ -1033,8 +1017,6 @@ class TestTaskAmendedByOthers:
         assert linked_reminders.count() == (reminder_number)
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures('mute_signals')
 class TestTaskScheduler:
     def test_schedule_advisers_added_to_task_adds_job_to_queue_for_each_adviser(
         self,

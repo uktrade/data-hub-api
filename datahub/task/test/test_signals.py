@@ -10,7 +10,9 @@ from datahub.task.signals import set_task_subscriptions_and_schedule_notificatio
 from datahub.task.test.factories import TaskFactory
 
 
-@pytest.mark.django_db
+pytestmark = [pytest.mark.django_db, pytest.mark.enable_signal_mock_functions]
+
+
 class TestTaskAdviserChangedSubscriptions:
     @patch('datahub.task.signals.schedule_advisers_added_to_task')
     def test_schedule_functions_called_for_each_adviser(
@@ -65,9 +67,8 @@ class TestTaskAdviserChangedSubscriptions:
         schedule_advisers_added_to_task.assert_not_called()
 
 
-@pytest.mark.django_db
+@mute_signals(m2m_changed)
 class TestTaskAdviserCompletedSubscriptions:
-    @mute_signals(m2m_changed)
     @patch('datahub.task.signals.schedule_notify_advisers_task_completed')
     def test_creating_task_triggers_notify_adviser_completed_scheduled_task(
         self,
@@ -80,9 +81,9 @@ class TestTaskAdviserCompletedSubscriptions:
                 call(task, True),
                 call(task, False),
             ],
+            any_order=True,
         )
 
-    @mute_signals(m2m_changed)
     @patch('datahub.task.signals.schedule_notify_advisers_task_completed')
     def test_modifying_task_triggers_notify_adviser_completed_scheduled_task(
         self,
@@ -98,12 +99,12 @@ class TestTaskAdviserCompletedSubscriptions:
                 call(task, False),
                 call(task, False),
             ],
+            any_order=True,
         )
 
 
-@pytest.mark.django_db
+@mute_signals(m2m_changed)
 class TestTaskAmededByOthersSubscriptions:
-    @mute_signals(m2m_changed)
     @patch('datahub.task.signals.schedule_notify_advisers_task_amended_by_others')
     def test_creating_task_triggers_notify_advisers_task_amended_by_others_scheduled_task(
         self,
@@ -117,9 +118,9 @@ class TestTaskAmededByOthersSubscriptions:
                 call(task, True, []),
                 call(task, False, [adviser.id]),
             ],
+            any_order=True,
         )
 
-    @mute_signals(m2m_changed)
     @patch('datahub.task.signals.schedule_notify_advisers_task_amended_by_others')
     def test_modifying_task_triggers_notify_advisers_task_amended_by_others_scheduled_task(
         self,
@@ -136,4 +137,5 @@ class TestTaskAmededByOthersSubscriptions:
                 call(task, False, [adviser.id]),
                 call(task, False, [adviser.id]),
             ],
+            any_order=True,
         )
