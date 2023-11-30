@@ -44,6 +44,7 @@ from datahub.core.model_helpers import get_related_fields
 from datahub.export_win.test.factories import (
     BreakdownFactory,
     CustomerResponseFactory,
+    CustomerResponseTokenFactory,
     WinAdviserFactory,
     WinFactory,
 )
@@ -849,7 +850,14 @@ MAPPING = {
                 'modified_on': CUSTOMER_RESPONSE_DELETE_BEFORE_DATETIME,
             },
         ],
-        'relations': [],
+        'relations': [
+            {
+                'factory': CustomerResponseTokenFactory,
+                'field': 'customer_response',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
+        ],
     },
 }
 

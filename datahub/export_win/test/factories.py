@@ -149,3 +149,13 @@ class BreakdownFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'export_win.Breakdown'
+
+
+class CustomerResponseTokenFactory(factory.django.DjangoModelFactory):
+    """CustomerResponseToken factory."""
+
+    expires_on = factory.Faker('date_time_this_year', after_now=True)
+    customer_response = factory.SubFactory(CustomerResponseFactory)
+
+    class Meta:
+        model = 'export_win.CustomerResponseToken'
