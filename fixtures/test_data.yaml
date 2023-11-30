@@ -2162,3 +2162,18 @@
     modified_on: "2021-01-01T11:27:48.064811+00:00"
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
+
+- model: task.Task
+  pk: 867db13e-9594-4a7a-b0cf-f61d7490158a
+  fields:    
+    title: "Task assigned to a company"
+    description: "Some company task description"
+    due_date: "2025-01-01"
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    reminder_days: 1
+    email_reminders_enabled: False
+    advisers: [7bad8082-4978-4fe8-a018-740257f01637]
+    created_on: "2020-12-03T11:26:22.243842+00:00"
+    modified_on: "2021-01-01T11:27:48.064811+00:00"
+    created_by: 7bad8082-4978-4fe8-a018-740257f01637
+    modified_by: 7bad8082-4978-4fe8-a018-740257f01637
