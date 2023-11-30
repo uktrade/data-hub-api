@@ -1,6 +1,5 @@
 import uuid
 
-from abc import abstractmethod
 from datetime import timedelta
 
 from django.conf import settings
@@ -60,65 +59,8 @@ class Task(ArchivableModel, BaseModel):
         """URL to the object in the Data Hub internal front end."""
         return get_front_end_url(self)
 
-    # def get_related_task_type(self):
-    #     """
-    #     If this task has a linked BaseTaskType model, return that task type
-    #     """
-    #     task_fields = [
-    #         getattr(self, field.name)
-    #         for field in self._meta.get_fields()
-    #         if (
-    #             field.related_model
-    #             and issubclass(field.related_model, BaseTaskType)
-    #             and hasattr(self, field.name)
-    #         )
-    #     ]
-    #     return task_fields[0] if len(task_fields) > 0 else None
-
     def get_company(self):
         """
         Return the company from the related BaseTaskType model implementation.
         """
         return self.investment_project.investor_company if self.investment_project else None
-
-
-class BaseTaskType(BaseModel):
-    """
-    Base task model for task types to have a FK to task
-    """
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-
-    task = models.OneToOneField(
-        to=Task,
-        on_delete=models.CASCADE,
-        related_name='%(app_label)s_%(class)s',
-    )
-
-    class Meta:
-        abstract = True
-
-    @abstractmethod
-    def get_company(self):
-        """
-        Return the company associated with this task
-        """
-        raise NotImplementedError()
-
-
-@reversion.register_base_model()
-class InvestmentProjectTask(BaseTaskType):
-    """Representation as an investment project task"""
-
-    investment_project = models.ForeignKey(
-        InvestmentProject,
-        on_delete=models.CASCADE,
-        related_name='investment_project_task',
-    )
-
-    def __str__(self):
-        """Admin displayed human readable name."""
-        return f'Investment project - {self.task.title}'
-
-    def get_company(self):
-        return self.investment_project.investor_company

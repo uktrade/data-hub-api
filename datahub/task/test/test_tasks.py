@@ -463,14 +463,8 @@ class TestTasksAssignedToMeFromOthers:
     ):
         adviser = AdviserFactory()
         task1 = TaskFactory(advisers=[adviser])
-        # from django.db import transaction
 
-        # connection = transaction.get_connection()
-        # print('in_atomic_block', connection.in_atomic_block)
-        # print('needs_rollback', connection.needs_rollback)
         notify_adviser_added_to_task(task1, adviser.id)
-        # print('in_atomic_block', connection.in_atomic_block)
-        # print('needs_rollback', connection.needs_rollback)
 
         reminders = TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser)
         assert reminders.exists()

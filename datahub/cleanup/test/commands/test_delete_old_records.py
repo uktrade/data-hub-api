@@ -67,7 +67,7 @@ from datahub.omis.payment.test.factories import (
 )
 from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model
-from datahub.task.test.factories import InvestmentProjectTaskFactory, TaskFactory
+from datahub.task.test.factories import TaskFactory
 from datahub.user.company_list.test.factories import (
     CompanyListItemFactory,
     PipelineItemFactory,
@@ -599,12 +599,6 @@ MAPPING = {
                 'unexpired_objects_kwargs': [{}],
             },
             {
-                'factory': InvestmentProjectTaskFactory,
-                'field': 'investment_project',
-                'expired_objects_kwargs': [],
-                'unexpired_objects_kwargs': [{}],
-            },
-            {
                 'factory': TaskFactory,
                 'field': 'investment_project',
                 'expired_objects_kwargs': [],
@@ -763,28 +757,6 @@ MAPPING = {
             {
                 'created_on': OBJECTIVE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                 'modified_on': OBJECTIVE_DELETE_BEFORE_DATETIME,
-            },
-        ],
-        'relations': [],
-    },
-    'task.InvestmentProjectTask': {
-        'factory': InvestmentProjectTaskFactory,
-        'implicitly_deletable_models': set(),
-        'has_no_search_app': True,
-        'expired_objects_kwargs': [
-            {
-                'created_on': TASK_DELETE_BEFORE_DATETIME - relativedelta(days=1),
-                'modified_on': TASK_DELETE_BEFORE_DATETIME - relativedelta(days=1),
-            },
-        ],
-        'unexpired_objects_kwargs': [
-            {
-                'created_on': TASK_DELETE_BEFORE_DATETIME,
-                'modified_on': TASK_DELETE_BEFORE_DATETIME - relativedelta(days=1),
-            },
-            {
-                'created_on': TASK_DELETE_BEFORE_DATETIME - relativedelta(days=1),
-                'modified_on': TASK_DELETE_BEFORE_DATETIME,
             },
         ],
         'relations': [],

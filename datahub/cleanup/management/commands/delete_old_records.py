@@ -175,7 +175,6 @@ class Command(BaseCleanupCommand):
                     'associated_non_fdi_r_and_d_project',
                 ).remote_field: (),
                 InvestmentProject._meta.get_field('opportunities'): (),
-                InvestmentProject._meta.get_field('investment_project_task'): (),
                 InvestmentProject._meta.get_field('task_investment_project'): (),
             },
             # These relations do not have any datetime fields to check – we just want them to be
@@ -247,12 +246,6 @@ class Command(BaseCleanupCommand):
             (
                 DatetimeLessThanCleanupFilter('created_on', OBJECTIVE_EXPIRY_PERIOD),
                 DatetimeLessThanCleanupFilter('modified_on', OBJECTIVE_EXPIRY_PERIOD),
-            ),
-        ),
-        'task.InvestmentProjectTask': ModelCleanupConfig(
-            (
-                DatetimeLessThanCleanupFilter('created_on', TASK_EXPIRY_PERIOD),
-                DatetimeLessThanCleanupFilter('modified_on', TASK_EXPIRY_PERIOD),
             ),
         ),
         'export_win.Win': ModelCleanupConfig(
