@@ -8,8 +8,6 @@ from datahub.company.models import Advisor
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
-from datahub.feature_flag.utils import is_user_feature_flag_active
-from datahub.reminder import ADVISER_TASKS_USER_FEATURE_FLAG_NAME
 from datahub.reminder.models import (
     TaskAmendedByOthersReminder,
     TaskAmendedByOthersSubscription,
@@ -137,10 +135,7 @@ def create_upcoming_task_reminder(
         task=task,
     )
 
-    if send_email and is_user_feature_flag_active(
-        ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
-        adviser,
-    ):
+    if send_email:
         send_task_email(
             adviser=adviser,
             task=task,
@@ -232,10 +227,7 @@ def notify_adviser_added_to_task(task, adviser_id):
     )
     task_subscription = create_task_assigned_to_me_from_others_subscription(adviser)
 
-    if task_subscription.email_reminders_enabled is True and is_user_feature_flag_active(
-        ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
-        adviser,
-    ):
+    if task_subscription.email_reminders_enabled:
         send_task_email(
             adviser=adviser,
             task=task,
@@ -347,10 +339,7 @@ def notify_adviser_completed_task(task, created):
         if not adviser_subscription:
             return
 
-        if adviser_subscription.email_reminders_enabled is True and is_user_feature_flag_active(
-            ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
-            adviser,
-        ):
+        if adviser_subscription.email_reminders_enabled:
             send_task_email(
                 adviser=adviser,
                 task=task,
@@ -438,10 +427,7 @@ def notify_adviser_task_amended_by_others(
         if not adviser_subscription:
             return
 
-        if adviser_subscription.email_reminders_enabled is True and is_user_feature_flag_active(
-            ADVISER_TASKS_USER_FEATURE_FLAG_NAME,
-            adviser,
-        ):
+        if adviser_subscription.email_reminders_enabled:
             send_task_email(
                 adviser=adviser,
                 task=task,
