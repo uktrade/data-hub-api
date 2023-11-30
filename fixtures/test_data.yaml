@@ -2108,7 +2108,7 @@
 - model: task.Task
   pk: 270e48ae-248a-4c5f-ad87-d09a2c7417f7
   fields:    
-    title: "Dummy task with multiple advisers"
+    title: "Generic task with multiple advisers"
     description: "Some generic task description"
     due_date: "2025-01-01"
     reminder_days: 1
@@ -2122,7 +2122,7 @@
 - model: task.Task
   pk: 401bba4f-45bd-4eee-a924-a607661fbe6a
   fields:    
-    title: "Dummy task with single adviser"
+    title: "Generic task with single adviser"
     description: "Some generic task description"
     due_date: "2025-01-01"
     reminder_days: 1
@@ -2152,7 +2152,7 @@
   pk: 68940083-9c06-4699-b2cb-ed69b0d256e7
   fields:    
     archived: True
-    title: "Dummy completed task"
+    title: "Generic completed task"
     description: "Description about a completed task"
     due_date: "2025-01-01"
     reminder_days: 1

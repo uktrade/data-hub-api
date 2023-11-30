@@ -85,6 +85,7 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('new_export_interaction_reminders'),
                 Company._meta.get_field('no_recent_export_interaction_reminders'),
                 Company._meta.get_field('pipeline_list_items'),
+                Company._meta.get_field('task_company'),
             ),
         ),
         # There were multiple large bulk updates of contacts in the legacy system on and just
