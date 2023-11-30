@@ -459,7 +459,6 @@ class CustomerResponse(BaseModel):
         verbose_name='Other comments or changes to the win details',
     )
     name = models.CharField(max_length=256, verbose_name='Your name')
-
     marketing_source = models.ForeignKey(
         MarketingSource,
         related_name='customer_responses',
@@ -473,3 +472,15 @@ class CustomerResponse(BaseModel):
         default='',
         blank=True,
     )
+
+
+class CustomerResponseToken(models.Model):
+    """Customer Response Token"""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    expires_on = models.DateTimeField()
+    customer_response = models.ForeignKey(
+        CustomerResponse, related_name='tokens', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'Token: {self.id} ({self.expires_on})'
