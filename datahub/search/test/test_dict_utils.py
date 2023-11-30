@@ -444,7 +444,7 @@ def test_task_investment_project_dict_returns_none_when_task_investment_project_
     assert dict_utils.task_investment_project_dict(task) is None
 
 
-def test_task_investment_project_dict_returns_none_when_task_investmentprojecttask_is_none():
+def test_task_investment_project_dict_returns_none_when_task_investment_project_is_none():
     task = mock.MagicMock()
     task.investment_project = None
 
