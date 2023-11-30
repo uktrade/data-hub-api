@@ -69,6 +69,10 @@ class Task(ArchivableModel, BaseModel):
 
     def get_company(self):
         """
-        Return the company from the related BaseTaskType model implementation.
+        Get the company from the available foreign keys
         """
-        return self.investment_project.investor_company if self.investment_project else None
+        if self.investment_project:
+            return self.investment_project.investor_company
+        if self.company:
+            return self.company
+        return None
