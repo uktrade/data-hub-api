@@ -48,6 +48,15 @@ class TaskSerializer(serializers.ModelSerializer):
         )
         return data
 
+    def validate(self, data):
+        """
+        Check that start is before finish.
+        """
+        print('*****validate', data)
+        # if data['start'] > data['finish']:
+        #     raise serializers.ValidationError("finish must occur after start")
+        return data
+
     class Meta:
         model = Task
         fields = (
