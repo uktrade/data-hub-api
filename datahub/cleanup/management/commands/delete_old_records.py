@@ -107,6 +107,7 @@ class Command(BaseCleanupCommand):
                 Contact._meta.get_field('pipeline_items_m2m'): (),
                 Quote._meta.get_field('accepted_by').remote_field: (),
                 Contact._meta.get_field('contact_exports'): (),
+                Contact._meta.get_field('tokens'): (),
             },
         ),
         'company_referral.CompanyReferral': ModelCleanupConfig(

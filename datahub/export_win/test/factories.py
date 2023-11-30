@@ -1,8 +1,10 @@
 import factory
+
 from django.utils.timezone import now
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import UKRegion as UKRegionConstant
+from datahub.export_win.models import EmailDeliveryStatus
 from datahub.metadata.test.factories import CountryFactory, SectorFactory
 
 
@@ -156,6 +158,10 @@ class CustomerResponseTokenFactory(factory.django.DjangoModelFactory):
 
     expires_on = factory.Faker('date_time_this_year', after_now=True)
     customer_response = factory.SubFactory(CustomerResponseFactory)
+    email_notification_id = factory.Faker('uuid4')  # Adjust based on your requirements
+    email_delivery_status = factory.Faker(
+        'random_element', elements=[choice[0] for choice in EmailDeliveryStatus.choices])
+    company_contact = factory.SubFactory(ContactFactory)
 
     class Meta:
         model = 'export_win.CustomerResponseToken'
