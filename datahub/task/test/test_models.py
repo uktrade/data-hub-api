@@ -1,7 +1,8 @@
 import datetime
-from datahub.company.test.factories import CompanyFactory
 
 import pytest
+
+from datahub.company.test.factories import CompanyFactory
 
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 

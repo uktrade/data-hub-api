@@ -1,11 +1,15 @@
 from django.conf import settings
 from rest_framework import serializers
 
+from datahub.company.models.company import Company
+
 from datahub.company.serializers import NestedAdviserField
+from datahub.core.serializers import NestedRelatedField
 from datahub.investment.project.serializers import (
     NestedInvestmentProjectInvestorCompanyField,
 )
 from datahub.task.models import Task
+from datahub.task.validators import validate_single_task_relationship
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -24,6 +28,25 @@ class TaskSerializer(serializers.ModelSerializer):
     investment_project = NestedInvestmentProjectInvestorCompanyField(
         required=False,
     )
+    company = NestedRelatedField(
+        Company,
+        required=False,
+    )
+
+    def to_representation(self, instance):
+        company = instance.get_company()
+        ret = super().to_representation(instance)
+        if company:
+            ret['company'] = {'id': company.id, 'name': company.name}
+        return ret
+
+    def validate(self, data):
+        validate_single_task_relationship(
+            data.get('investment_project', None),
+            data.get('company', None),
+            serializers.ValidationError,
+        )
+        return data
 
     class Meta:
         model = Task
@@ -43,4 +66,5 @@ class TaskSerializer(serializers.ModelSerializer):
             'created_on',
             'modified_on',
             'investment_project',
+            'company',
         )
