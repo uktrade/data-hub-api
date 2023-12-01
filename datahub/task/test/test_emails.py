@@ -2,10 +2,10 @@ import datetime
 
 from pytest import fixture
 
+from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import (
     APITestMixin,
 )
-from datahub.company.test.factories import CompanyFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.task.emails import (
     TaskAmendedByOthersEmailTemplate,
