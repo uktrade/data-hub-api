@@ -104,6 +104,9 @@
     - - export_largecapitalopportunity
       - opportunity
       - largecapitalopportunity
+    - - view_task
+      - task
+      - task
   model: auth.group
 - fields:
     name: DA
@@ -261,6 +264,9 @@
     - - export_largecapitalopportunity
       - opportunity
       - largecapitalopportunity
+    - - view_task
+      - task
+      - task
   model: auth.group
 - fields:
     name: DIT_staff
