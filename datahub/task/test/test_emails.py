@@ -1,12 +1,11 @@
 import datetime
-from datahub.company.test.factories import CompanyFactory
 
 from pytest import fixture
-
 
 from datahub.core.test_utils import (
     APITestMixin,
 )
+from datahub.company.test.factories import CompanyFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.task.emails import (
     TaskAmendedByOthersEmailTemplate,
@@ -47,7 +46,7 @@ class BaseTaskEmailTemplateTests(APITestMixin):
         return task.investment_project.name
 
     def due_date(self, task):
-        return task.due_date.strftime("%-d %B %Y")
+        return task.due_date.strftime('%-d %B %Y')
 
     def company(self, task):
         return task.get_company().name
@@ -97,13 +96,6 @@ class BaseTaskEmailTemplateTests(APITestMixin):
             for field in self.default_company_fields + self.additional_company_fields
         ]
         assert email.get_task_fields() == '\n'.join(labels)
-
-    def get_investment_project_common_fields(self, investment_project_task):
-        return [
-            f'Investment project: {investment_project_task.investment_project.name}',
-            f'Company name: {investment_project_task.get_company().name}',
-            f'Date due: {investment_project_task.due_date.strftime("%-d %B %Y")}',
-        ]
 
 
 class TestUpcomingTaskEmailTemplate(BaseTaskEmailTemplateTests):
