@@ -1,10 +1,8 @@
 import pytest
 
 from datahub.company.test.factories import CompanyFactory
-from datahub.task.admin import TaskAdminForm
-
-
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.task.admin import TaskAdminForm
 
 
 pytestmark = pytest.mark.django_db
