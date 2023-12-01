@@ -1,5 +1,4 @@
 import datetime
-from datahub.company.test.factories import CompanyFactory
 
 import pytest
 
