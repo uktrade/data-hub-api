@@ -1,0 +1,59 @@
+{% block extrahead %}
+  {{ block.super }}
+  {{ media }}
+{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {% trans 'Merge duplicate contacts' %}
+</div>
+{% endblock %}
+
+{% block content %}
+{% admin_change_link source_contact target_blank=True as source_contact_link %}
+{% admin_change_link target_contact target_blank=True as target_contact_link %}
+<p>
+  {% blocktrans %}
+  You are about to merge {{ source_contact_link }} into {{ target_contact_link }}.
+  {% endblocktrans %}
+</p>
+<p>{% trans 'This will make the following changes:' %}</p>
+<!-- <ul>
+  {% for merge_entry in merge_entries %}
+  <li>
+    {% verbose_name_for_count merge_entry.count merge_entry.model_meta as verbose_name %}
+    {% blocktrans with count=merge_entry.count description=merge_entry.description %}
+      {{ count }} {{ verbose_name }}{{ description }}  will be moved from {{ source_contact_link }} to {{ target_contact_link }}.
+    {% endblocktrans %}
+  </li>
+  {% endfor %}
+
+  <li>
+    {% if should_archive_source %}
+      {% blocktrans %}{{ source_contact_link }} will be archived and marked as a duplicate record.{% endblocktrans %}
+    {% else %}
+      {% blocktrans %}{{ source_contact_link }} will be marked as a duplicate record.{% endblocktrans %}
+    {% endif %}
+  </li>
+</ul> -->
+
+<p><strong>{% trans 'Once complete, this operation can&rsquo;t be reversed.' %}</strong></p>
+
+<form action="" method="post">
+  {% csrf_token %}
+
+  <div>
+    <input type="submit" value="{% trans 'Merge contacts' %}">
+  </div>
+</form>
+{% endblock %}

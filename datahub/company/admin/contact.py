@@ -6,6 +6,8 @@ from reversion.admin import VersionAdmin
 
 from datahub.company.models import Contact
 from datahub.company.admin.merge_contact.step_1 import merge_select_other_contact
+from datahub.company.admin.merge_contact.step_2 import select_primary_contact
+from datahub.company.admin.merge_contact.step_3 import confirm_merge
 from datahub.core.admin import BaseModelAdminMixin
 
 
@@ -53,6 +55,17 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
                 self.admin_site.admin_view(partial(merge_select_other_contact, self)),
                 name=f'{model_meta.app_label}_'
                 f'{model_meta.model_name}_merge-select-other-contact',
+            ),
+            path(
+                'merge/step-2-select-primary-contact/',
+                self.admin_site.admin_view(partial(select_primary_contact, self)),
+                name=f'{model_meta.app_label}_'
+                f'{model_meta.model_name}_merge-select-primary-contact',
+            ),
+            path(
+                'merge/step-3-confirm/',
+                self.admin_site.admin_view(partial(confirm_merge, self)),
+                name=f'{model_meta.app_label}_' f'{model_meta.model_name}_merge-confirm',
             ),
             *super().get_urls(),
         ]
