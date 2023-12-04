@@ -1,6 +1,9 @@
+import logging
+
 from collections import namedtuple
 from typing import Callable, NamedTuple, Sequence, Type
 
+import reversion
 from django.db import models
 
 from datahub.company_referral.models import CompanyReferral
@@ -10,16 +13,22 @@ from datahub.investment.project.models import InvestmentProject
 from datahub.omis.order.models import Order, Quote
 from datahub.user.company_list.models import CompanyListItem, PipelineItem
 from datahub.core.model_helpers import get_related_fields, get_self_referential_relations
+from datahub.core.exceptions import DataHubError
+
+logger = logging.getLogger(__name__)
 
 ALLOWED_RELATIONS_FOR_MERGING = {
     # These relations are moved to the target company on merge
-    Company._meta.get_field('pipeline_list_items').remote_field,
+    Contact._meta.get_field('pipeline_items_m2m').remote_field,
     CompanyReferral.contact.field,
     Interaction.contacts.field,
     InvestmentProject.client_contacts.field,
     Order.contact.field,
-    Quote.accepted_by.field,
     CompanyExport.contacts.field,
+
+    # Merging is allowed if the source contact has quotes, but note that
+    # they aren't moved to the target contact
+    Quote.accepted_by.field,
 }
 
 MergeEntrySummary = namedtuple(
@@ -43,22 +52,6 @@ def _default_object_updater(obj, field, target_contact, source_contact):
     setattr(obj, field, target_contact)
     obj.save(update_fields=(field, 'modified_on'))
 
-def _contact_list_item_updater(list_item, field, target_contact, source_contact):
-    # If there is already a list item for the target contact, delete this list item instead
-    # as duplicates are not allowed
-    if CompanyListItem.objects.filter(list_id=list_item.list_id, contact=target_contact).exists():
-        list_item.delete()
-    else:
-        _default_object_updater(list_item, field, target_contact, source_contact)
-
-def _pipeline_item_updater(pipeline_item, field, target_contact, source_contact):
-    # If there is already a pipeline item for the adviser for the target contact
-    # delete this item instead as the same contact can't be added for the same adviser again
-    if PipelineItem.objects.filter(adviser=pipeline_item.adviser, contact=target_contact).exists():
-        pipeline_item.delete()
-    else:
-        _default_object_updater(pipeline_item, field, target_contact, source_contact)
-
 class MergeConfiguration(NamedTuple):
     """Specifies how contct merging should be handled for a particular related model."""
 
@@ -71,12 +64,12 @@ MERGE_CONFIGURATION = [
     MergeConfiguration(CompanyReferral, ('contact',)),
     MergeConfiguration(InvestmentProject, ('client_contacts',) ),
     MergeConfiguration(Order, ('contact',)),
-    MergeConfiguration(Quote, ('accepted_by',)),
     MergeConfiguration(CompanyExport, ('contacts',)),
-    # MergeConfiguration(CompanyListItem, ('contacts',), _contact_list_item_updater),
-    MergeConfiguration(PipelineItem, ('contacts',), _pipeline_item_updater),
-
+    MergeConfiguration(PipelineItem, ('contacts',)),
 ]
+
+class MergeNotAllowedError(DataHubError):
+    """Merging the specified source company into the specified target company is not allowed."""
 
 def transform_merge_results_to_merge_entry_summaries(results, skip_zeroes=False):
     """Transforms merge results into move entries to aid the presentation template."""
@@ -89,7 +82,7 @@ def transform_merge_results_to_merge_entry_summaries(results, skip_zeroes=False)
 
             merge_entry = MergeEntrySummary(
                 num_objects_updated,
-                "This is a contact",
+                "",
                 # FIELD_TO_DESCRIPTION_MAPPING.get(field, ''),
                 model._meta,
             )
@@ -98,13 +91,11 @@ def transform_merge_results_to_merge_entry_summaries(results, skip_zeroes=False)
     return merge_entries
 
 def get_planned_changes(contact: Contact):
-    print("/////////////")
     """Gets information about the changes that would be made if merge proceeds."""
     results = {
         configuration.model: _count_objects(configuration, contact)
         for configuration in MERGE_CONFIGURATION
     }
-    print(results)
 
     should_archive = not contact.archived
 
@@ -121,8 +112,6 @@ def _count_objects(configuration: MergeConfiguration, contact):
 
 def _get_objects_from_configuration(configuration: MergeConfiguration, source: Contact):
     """Gets objects for each configured field."""
-    print(configuration)
-
     for field in configuration.fields:
         yield field, configuration.model.objects.filter(**{field: source})
 
@@ -157,3 +146,55 @@ def is_contact_a_valid_merge_target(contact: Contact):
     This checks that the target contact isn't archived.
     """
     return not contact.archived
+
+
+def merge_contacts(source_contact: Contact, target_contact: Contact, user):
+    """
+    Merges the source contact into the target contact.
+
+    MergeNotAllowedError will be raised if the merge is not allowed.
+    """
+    is_source_valid, invalid_obj = is_contact_a_valid_merge_source(source_contact)
+    is_target_valid = is_contact_a_valid_merge_target(target_contact)
+
+    if not (is_source_valid and is_target_valid):
+        logger.error(
+            f"""MergeNotAllowedError {source_contact.id}
+            for contact {target_contact.id}.
+            Invalid bojects: {invalid_obj}""",
+        )
+        raise MergeNotAllowedError()
+
+    with reversion.create_revision():
+        reversion.set_comment('contact merged')
+        try:
+            results = {
+                configuration.model: _update_objects(configuration, source_contact, target_contact)
+                for configuration in MERGE_CONFIGURATION
+            }
+        except Exception as e:
+            logger.exception(f'An error occurred while merging companies: {e}')
+            raise
+
+        source_contact.mark_as_transferred(
+            target_contact,
+            Contact.TransferReason.DUPLICATE,
+            user,
+        )
+        logger.info(f'Merge completed {source_contact.id} for contact {target_contact.id}.')
+        return results
+
+
+def _update_objects(configuration: MergeConfiguration, source, target):
+    """Update fields of objects from given model with the target value."""
+    logger.info(f'Updating from {configuration.model.__name__} to source contact {source.id}.')
+    objects_updated = {field: 0 for field in configuration.fields}
+    
+    for field, filtered_objects in _get_objects_from_configuration(configuration, source):
+        for obj in filtered_objects.iterator():
+            try:
+                configuration.object_updater(obj, field, target, source)
+                objects_updated[field] += 1
+            except Exception as e:
+                logger.exception(f'Failed {configuration.model.__name__} object {obj.pk}: {e}')
+    return objects_updated

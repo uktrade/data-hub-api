@@ -1,5 +1,6 @@
 import django.contrib.messages as django_messages
 import reversion
+
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import HttpResponseRedirect
@@ -10,9 +11,9 @@ from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
-from datahub.company.merge import (
+from datahub.company.merge_contact import (
     get_planned_changes,
-    merge_companies,
+    merge_contacts,
     MergeNotAllowedError,
     transform_merge_results_to_merge_entry_summaries,
 )
@@ -48,9 +49,6 @@ def confirm_merge(model_admin, request):
     target_contact = model_admin.get_object(request, request.GET.get('target_contact'))
     source_contact = model_admin.get_object(request, request.GET.get('source_contact'))
 
-    print(target_contact)
-    print(source_contact)
-
     if not (source_contact and target_contact):
         raise SuspiciousOperation()
 
@@ -64,18 +62,18 @@ def confirm_merge(model_admin, request):
     template_name = 'admin/company/contact/merge/step_3_confirm_selection.html'
     title = gettext_lazy('Confirm merge')
 
-    # planned_merge_results, should_archive_source = get_planned_changes(source_contact)
-    # merge_entries = transform_merge_results_to_merge_entry_summaries(
-    #     planned_merge_results,
-    #     skip_zeroes=True,
-    # )
+    planned_merge_results, should_archive_source = get_planned_changes(source_contact)
+    merge_entries = transform_merge_results_to_merge_entry_summaries(
+        planned_merge_results,
+        skip_zeroes=True,
+    )
 
     context = {
         **model_admin.admin_site.each_context(request),
         'source_contact': source_contact,
         'target_contact': target_contact,
-        # 'merge_entries': merge_entries,
-        # 'should_archive_source': should_archive_source,
+        'merge_entries': merge_entries,
+        'should_archive_source': should_archive_source,
         'media': model_admin.media,
         'opts': model_admin.model._meta,
         'title': title,
@@ -84,19 +82,19 @@ def confirm_merge(model_admin, request):
 
 
 def _perform_merge(request, source_contact, target_contact, model_admin):
-    # try:
-    #     merge_results = merge_companies(source_contact, target_contact, request.user)
-    # except MergeNotAllowedError:
-    #     failure_msg = MERGE_FAILURE_MSG.format(
-    #         source_contact=source_contact,
-    #         target_contact=target_contact,
-    #     )
-    #     model_admin.message_user(request, failure_msg, django_messages.ERROR)
-    #     return False
+    try:
+        merge_results = merge_contacts(source_contact, target_contact, request.user)
+    except MergeNotAllowedError:
+        failure_msg = MERGE_FAILURE_MSG.format(
+            source_contact=source_contact,
+            target_contact=target_contact,
+        )
+        model_admin.message_user(request, failure_msg, django_messages.ERROR)
+        return False
 
-    # reversion.set_comment(REVERSION_REVISION_COMMENT)
-    # success_msg = _build_success_msg(source_contact, target_contact, merge_results)
-    # model_admin.message_user(request, success_msg, django_messages.SUCCESS)
+    reversion.set_comment(REVERSION_REVISION_COMMENT)
+    success_msg = _build_success_msg(source_contact, target_contact, merge_results)
+    model_admin.message_user(request, success_msg, django_messages.SUCCESS)
     return True
 
 

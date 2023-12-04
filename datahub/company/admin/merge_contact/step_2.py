@@ -47,33 +47,33 @@ class SelectPrimaryContactForm(forms.Form):
         self._contact_2 = contact_2
         self.invalid_objects = []
 
-    # def clean(self):
-    #     """
-    #     Checks that the selection made is allowed.
-    #     """
-    #     cleaned_data = super().clean()
-    #     contact_index = cleaned_data.get('selected_contact')
+    def clean(self):
+        """
+        Checks that the selection made is allowed.
+        """
+        cleaned_data = super().clean()
+        contact_index = cleaned_data.get('selected_contact')
 
-    #     if not contact_index:
-    #         return
+        if not contact_index:
+            return
 
-    #     target_contact = self._contact_1 if contact_index == '1' else self._contact_2
-    #     source_contact = self._contact_1 if contact_index != '1' else self._contact_2
+        target_contact = self._contact_1 if contact_index == '1' else self._contact_2
+        source_contact = self._contact_1 if contact_index != '1' else self._contact_2
 
-    #     if not is_contact_a_valid_merge_target(target_contact):
-    #         raise ValidationError(self.INVALID_TARGET_CONTACT_MSG)
+        if not is_contact_a_valid_merge_target(target_contact):
+            raise ValidationError(self.INVALID_TARGET_CONTACT_MSG)
 
-    #     is_source_valid, disallowed_objects = is_contact_a_valid_merge_source(source_contact)
-    #     if not is_source_valid:
-    #         error_msg = f'{self.INVALID_SOURCE_CONTACT_MSG}: Invalid object: {disallowed_objects}'
-    #         logger.error(error_msg)
-    #         self.invalid_objects = disallowed_objects
-    #         raise ValidationError(error_msg)
+        is_source_valid, disallowed_objects = is_contact_a_valid_merge_source(source_contact)
+        if not is_source_valid:
+            error_msg = f'{self.INVALID_SOURCE_CONTACT_MSG}: Invalid object: {disallowed_objects}'
+            logger.error(error_msg)
+            self.invalid_objects = disallowed_objects
+            raise ValidationError(error_msg)
 
-    #     cleaned_data['target_contact'] = target_contact
-    #     cleaned_data['source_contact'] = source_contact
+        cleaned_data['target_contact'] = target_contact
+        cleaned_data['source_contact'] = source_contact
 
-    #     return cleaned_data
+        return cleaned_data
 
 @method_decorator(csrf_protect)
 def select_primary_contact(model_admin, request):
@@ -93,9 +93,6 @@ def select_primary_contact(model_admin, request):
 
     contact_1 = model_admin.get_object(request, request.GET.get('contact_1'))
     contact_2 = model_admin.get_object(request, request.GET.get('contact_2'))
-
-    print(contact_1)
-    print(contact_2)
 
     if not (contact_1 and contact_2):
         raise SuspiciousOperation()

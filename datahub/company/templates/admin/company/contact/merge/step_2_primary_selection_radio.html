@@ -1,11 +1,11 @@
 {% load i18n datahub_extras %}
 <li>
   <input name="selected_contact" value="{{ index }}" required="" id="id_selected_contact_radio_{{ index }}" type="radio"
-    
+  {% if not option.is_valid %}disabled{% endif %}
   >
   <label for="id_selected_contact_radio_{{ index }}">
     <strong>{{ option.target.name }}</strong>
-    <!-- {% if not option.is_target_valid %}
+    {% if not option.is_target_valid %}
       <br>
       <span class="error">{% trans 'This contact can&rsquo;t be selected as the active record as it&rsquo;s been archived.' %}</span>
     {% endif %}
@@ -27,7 +27,7 @@
     {{ option.target.pk }}
     <br>
     {% blocktrans with created_on=option.target.created_on %}Created on {{ created_on }}{% endblocktrans %}
-    <br> -->
+    <br>
     {% for merge_entry in option.merge_entries %}
       {% verbose_name_for_count merge_entry.count merge_entry.model_meta as verbose_name %}
       {% blocktrans with count=merge_entry.count description=merge_entry.description %}
