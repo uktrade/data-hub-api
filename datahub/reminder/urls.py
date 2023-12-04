@@ -169,32 +169,32 @@ urlpatterns = [
         name='my-tasks-due-date-approaching-subscription',
     ),
     path(
-        'reminder/task-assigned-to-me-from-others',
+        'reminder/my-tasks-task-assigned-to-me-from-others',
         TaskAssignedToMeFromOthersReminderViewset.as_view(
             {
                 'get': 'list',
             },
         ),
-        name='task-assigned-to-me-from-others-reminder',
+        name='my-tasks-task-assigned-to-me-from-others-reminder',
     ),
     path(
-        'reminder/task-assigned-to-me-from-others/<uuid:pk>',
+        'reminder/my-tasks-task-assigned-to-me-from-others/<uuid:pk>',
         TaskAssignedToMeFromOthersReminderViewset.as_view(
             {
                 'delete': 'destroy',
             },
         ),
-        name='task-assigned-to-me-from-others-reminder-detail',
+        name='my-tasks-task-assigned-to-me-from-others-reminder-detail',
     ),
     path(
-        'reminder/subscription/task-assigned-to-me-from-others',
+        'reminder/subscription/my-tasks-task-assigned-to-me-from-others',
         TaskAssignedToMeFromOthersSubscriptionViewset.as_view(
             {
                 'get': 'retrieve',
                 'patch': 'partial_update',
             },
         ),
-        name='task-assigned-to-me-from-others-subscription',
+        name='my-tasks-task-assigned-to-me-from-others-subscription',
     ),
     path(
         'reminder/my-tasks-task-overdue',
@@ -225,14 +225,14 @@ urlpatterns = [
         name='my-tasks-task-overdue-subscription',
     ),
     path(
-        'reminder/subscription/task-amended-by-others',
+        'reminder/subscription/my-tasks-task-amended-by-others',
         TaskAmendedByOthersSubscriptionViewset.as_view(
             {
                 'get': 'retrieve',
                 'patch': 'partial_update',
             },
         ),
-        name='task-amended-by-others-subscription',
+        name='my-tasks-task-amended-by-others-subscription',
     ),
     path(
         'reminder/my-tasks-task-completed',
@@ -266,5 +266,44 @@ urlpatterns = [
         'reminder/summary',
         reminder_summary_view,
         name='summary',
+    ),
+    # Legacy urls to be removed once the FE is pointed at the new urls starting with 'my-tasks'
+    path(
+        'reminder/subscription/task-amended-by-others',
+        TaskAmendedByOthersSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
+        name='task-amended-by-others-subscription',
+    ),
+    path(
+        'reminder/subscription/task-assigned-to-me-from-others',
+        TaskAssignedToMeFromOthersSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
+        name='task-assigned-to-me-from-others-subscription',
+    ),
+    path(
+        'reminder/task-assigned-to-me-from-others',
+        TaskAssignedToMeFromOthersReminderViewset.as_view(
+            {
+                'get': 'list',
+            },
+        ),
+        name='task-assigned-to-me-from-others-reminder',
+    ),
+    path(
+        'reminder/task-assigned-to-me-from-others/<uuid:pk>',
+        TaskAssignedToMeFromOthersReminderViewset.as_view(
+            {
+                'delete': 'destroy',
+            },
+        ),
+        name='task-assigned-to-me-from-others-reminder-detail',
     ),
 ]

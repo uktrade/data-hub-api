@@ -221,11 +221,11 @@ class TestTaskOverdueReminderSubscriptionViewset(
     'url_name,factory',
     [
         (
-            'api-v4:reminder:task-assigned-to-me-from-others-subscription',
+            'api-v4:reminder:my-tasks-task-assigned-to-me-from-others-subscription',
             TaskAssignedToMeFromOthersSubscriptionFactory,
         ),
         (
-            'api-v4:reminder:task-amended-by-others-subscription',
+            'api-v4:reminder:my-tasks-task-amended-by-others-subscription',
             TaskAmendedByOthersSubscriptionFactory,
         ),
         (
