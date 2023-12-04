@@ -224,15 +224,10 @@ def rollback_merge_companies(former_source_company: Company):
 
 def get_planned_changes(company: Company):
     """Gets information about the changes that would be made if merge proceeds."""
-    print("***********")
-    print(Company)
-
     results = {
         configuration.model: _count_objects(configuration, company)
         for configuration in MERGE_CONFIGURATION
     }
-
-    print(results)
 
     should_archive = not company.archived
 
