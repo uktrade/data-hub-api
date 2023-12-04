@@ -580,8 +580,8 @@ class TestTaskAssignedToMeFromOthersReminderViewset(
     Tests for the task assigned to me from others reminder view.
     """
 
-    url_name = 'api-v4:reminder:task-assigned-to-me-from-others-reminder'
-    detail_url_name = 'api-v4:reminder:task-assigned-to-me-from-others-reminder-detail'
+    url_name = 'api-v4:reminder:my-tasks-task-assigned-to-me-from-others-reminder'
+    detail_url_name = 'api-v4:reminder:my-tasks-task-assigned-to-me-from-others-reminder-detail'
     factory = TaskAssignedToMeFromOthersReminderFactory
     tested_model = TaskAssignedToMeFromOthersReminder
 
