@@ -7,6 +7,7 @@ from django.db import models
 
 
 from datahub.company.models import Advisor
+from datahub.company.models.company import Company
 
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
@@ -43,6 +44,13 @@ class Task(ArchivableModel, BaseModel):
         null=True,
         on_delete=models.CASCADE,
         related_name='task_investment_project',
+    )
+    company = models.ForeignKey(
+        Company,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='task_company',
     )
 
     # override the save method and calculate reminder_date
