@@ -20,6 +20,7 @@ from datahub.reminder.models import (
     NewExportInteractionReminder,
     NoRecentExportInteractionReminder,
     NoRecentInvestmentInteractionReminder,
+    TaskAmendedByOthersReminder,
     TaskAssignedToMeFromOthersReminder,
     TaskCompletedReminder,
     TaskOverdueReminder,
@@ -612,6 +613,22 @@ class TestTaskCompletedReminderViewset(
     detail_url_name = 'api-v4:reminder:my-tasks-task-completed-reminder-detail'
     factory = TaskCompletedReminderFactory
     tested_model = TaskCompletedReminder
+
+
+@freeze_time('2022-05-05T17:00:00.000000Z')
+class TestTaskAmendedByOthersReminderViewset(
+    APITestMixin,
+    ReminderTestMixin,
+    TaskReminderMixin,
+):
+    """
+    Tests for the task amended by others reminder view.
+    """
+
+    url_name = 'api-v4:reminder:my-tasks-task-amended-by-others-reminder'
+    detail_url_name = 'api-v4:reminder:my-tasks-task-amended-by-others-reminder-detail'
+    factory = TaskAmendedByOthersReminderFactory
+    tested_model = TaskAmendedByOthersReminder
 
 
 class TestGetReminderSummaryView(APITestMixin):

@@ -274,3 +274,18 @@ class TaskCompletedReminderSerializer(serializers.ModelSerializer):
             'created_on',
             'task',
         )
+
+
+class TaskAmendedByOthersReminderSerializer(serializers.ModelSerializer):
+    """Serializer for task completed"""
+
+    task = ReminderTaskSerializer()
+
+    class Meta:
+        model = TaskCompletedReminder
+        fields = (
+            'id',
+            'event',
+            'created_on',
+            'task',
+        )
