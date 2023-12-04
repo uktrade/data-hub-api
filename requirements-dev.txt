@@ -167,7 +167,7 @@ idna==3.4
     #   yarl
 iniconfig==1.1.1
     # via pytest
-ipython==8.17.2
+ipython==8.18.1
     # via -r requirements-dev.in
 isort==5.11.4
     # via pylint
@@ -236,7 +236,7 @@ pluggy==1.0.0
     # via pytest
 pre-commit==3.5.0
     # via -r requirements-dev.in
-prompt-toolkit==3.0.36
+prompt-toolkit==3.0.41
     # via ipython
 psycogreen==1.0.2
     # via -r requirements.in
