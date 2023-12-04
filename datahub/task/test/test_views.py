@@ -13,7 +13,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test_utils import (
     APITestMixin,
     format_date_or_datetime,
@@ -57,8 +57,21 @@ class TestListTask(BaseListTaskTests):
 
         assert response.get('count') == 2
 
+    def test_returns_only_tasks_with_company_when_param_is_used(self):
+        companies = CompanyFactory.create_batch(2)
 
-class TestGetTask(APITestMixin):
+        TaskFactory.create_batch(3)
+        TaskFactory.create_batch(2, company=companies[0])
+        TaskFactory.create_batch(3, company=companies[1])
+
+        url = f'{reverse(self.reverse_url)}?company={companies[0].id}'
+
+        response = self.api_client.get(url).json()
+
+        assert response.get('count') == 2
+
+
+class TestGetGenericTask(APITestMixin):
     """Test the GET task endpoint"""
 
     def test_get_task_return_404_when_task_id_unknown(self):
@@ -113,11 +126,12 @@ class TestGetTask(APITestMixin):
             'created_on': format_date_or_datetime(task.created_on),
             'modified_on': format_date_or_datetime(task.modified_on),
             'investment_project': None,
+            'company': None,
         }
         assert response == expected_response
 
 
-class TestAddTask(APITestMixin):
+class TestAddGenericTask(APITestMixin):
     """Test the POST task endpoint"""
 
     def test_create_task_with_missing_mandatory_fields_returns_bad_request(self):
@@ -155,6 +169,27 @@ class TestAddTask(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert list(response.json().keys()) == ['advisers']
+
+    def test_create_task_with_multiple_relationships_returns_error(self):
+        url = reverse('api-v4:task:collection')
+        faker = Faker()
+
+        company = CompanyFactory()
+        investment_project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
+
+        response = self.api_client.post(
+            url,
+            data={
+                'title': faker.word(),
+                'advisers': [adviser.id],
+                'company': company.id,
+                'investment_project': investment_project.id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert list(response.json().keys()) == ['non_field_errors']
 
     def test_create_task_with_valid_mandatory_fields_returns_success_created(self):
         faker = Faker()
@@ -220,13 +255,41 @@ class TestAddTask(APITestMixin):
             'created_on': post_response_json['created_on'],
             'modified_on': post_response_json['modified_on'],
             'investment_project': None,
+            'company': None,
         }
         assert get_response.json() == expected_response
 
 
-class TestTaskForInvestmentProject(APITestMixin):
-    """Test the POST task endpoint creating an investment project"""
+class TestEditGenericTask(BaseEditTaskTests):
+    reverse_url = 'api-v4:task:item'
 
+    """Test the PATCH task endpoint"""
+
+    def test_edit_task_return_404_when_task_id_unknown(self):
+        url = reverse('api-v4:task:item', kwargs={'pk': uuid4()})
+
+        response = self.api_client.patch(
+            url,
+            data={'title': 'abc'},
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_edit_task_with_valid_fields_returns_success(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(created_by=adviser)
+        new_adviser = AdviserFactory()
+
+        url = reverse('api-v4:task:item', kwargs={'pk': task.id})
+
+        response = self.adviser_api_client(adviser).patch(
+            url,
+            data={'advisers': [new_adviser.id]},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['advisers'][0]['id'] == str(new_adviser.id)
+
+
+class TestTaskForInvestmentProject(APITestMixin):
     @pytest.mark.parametrize('investment_project_id', ('abc', '', uuid4()))
     def test_create_task_with_invalid_investment_project_id_returns_bad_request(
         self,
@@ -318,37 +381,104 @@ class TestTaskForInvestmentProject(APITestMixin):
                 },
                 'project_code': investment_project.project_code,
             },
+            'company': {
+                'id': str(investment_project.investor_company.id),
+                'name': investment_project.investor_company.name,
+            },
         }
         assert response == expected_response
 
 
-class TestEditTask(BaseEditTaskTests):
-    reverse_url = 'api-v4:task:item'
+class TestTaskForCompany(APITestMixin):
+    @pytest.mark.parametrize('company_id', ('abc', '', uuid4()))
+    def test_create_task_with_invalid_company_id_returns_bad_request(
+        self,
+        company_id,
+    ):
+        faker = Faker()
 
-    """Test the PATCH task endpoint"""
+        url = reverse('api-v4:task:collection')
 
-    def test_edit_task_return_404_when_task_id_unknown(self):
-        url = reverse('api-v4:task:item', kwargs={'pk': uuid4()})
-
-        response = self.api_client.patch(
+        response = self.api_client.post(
             url,
-            data={'title': 'abc'},
+            data={
+                'title': faker.word(),
+                'advisers': [AdviserFactory().id],
+                'company': company_id,
+            },
         )
-        assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_edit_task_with_valid_fields_returns_success(self):
-        adviser = AdviserFactory()
-        task = TaskFactory(created_by=adviser)
-        new_adviser = AdviserFactory()
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-        url = reverse('api-v4:task:item', kwargs={'pk': task.id})
+        assert list(response.json().keys()) == ['company']
 
-        response = self.adviser_api_client(adviser).patch(
+    def test_create_task_with_valid_company_id_returns_success(
+        self,
+    ):
+        faker = Faker()
+
+        url = reverse('api-v4:task:collection')
+
+        response = self.api_client.post(
             url,
-            data={'advisers': [new_adviser.id]},
+            data={
+                'title': faker.word(),
+                'advisers': [AdviserFactory().id],
+                'company': CompanyFactory().id,
+            },
         )
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['advisers'][0]['id'] == str(new_adviser.id)
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+    def test_get_task_with_company_when_task_id_valid(self):
+        company = CompanyFactory()
+        task = TaskFactory(company=company)
+
+        url = reverse(
+            'api-v4:task:item',
+            kwargs={'pk': task.id},
+        )
+        response = self.api_client.get(url).json()
+        expected_response = {
+            'id': str(task.id),
+            'title': task.title,
+            'description': task.description,
+            'due_date': task.due_date,
+            'reminder_days': task.reminder_days,
+            'email_reminders_enabled': task.email_reminders_enabled,
+            'advisers': [
+                {
+                    'id': str(adviser.id),
+                    'name': adviser.name,
+                    'first_name': adviser.first_name,
+                    'last_name': adviser.last_name,
+                }
+                for adviser in task.advisers.all()
+            ],
+            'archived': task.archived,
+            'archived_by': task.archived_by,
+            'archived_reason': task.archived_reason,
+            'created_by': {
+                'name': task.created_by.name,
+                'first_name': task.created_by.first_name,
+                'last_name': task.created_by.last_name,
+                'id': str(task.created_by.id),
+            },
+            'modified_by': {
+                'name': task.modified_by.name,
+                'first_name': task.modified_by.first_name,
+                'last_name': task.modified_by.last_name,
+                'id': str(task.modified_by.id),
+            },
+            'created_on': format_date_or_datetime(task.created_on),
+            'modified_on': format_date_or_datetime(task.modified_on),
+            'investment_project': None,
+            'company': {
+                'id': str(company.id),
+                'name': company.name,
+            },
+        }
+        assert response == expected_response
 
 
 class TestArchiveTask(BaseTaskTests):

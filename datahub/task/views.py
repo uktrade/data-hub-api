@@ -21,7 +21,10 @@ class TasksMixin(CoreViewSet):
         Get the task queryset that is filtered using common filters from the query params
         """
         queryset = (
-            Task.objects.all().prefetch_related('advisers').select_related('investment_project')
+            Task.objects.all()
+            .prefetch_related('advisers')
+            .select_related('investment_project')
+            .select_related('company')
         )
 
         archived = request.query_params.get('archived')
@@ -41,7 +44,7 @@ class TaskV4ViewSet(ArchivableViewSetMixin, TasksMixin):
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     permission_classes = [IsAuthenticated]
     ordering_fields = ['title', 'due_date', 'created_on']
-    filterset_fields = ['investment_project']
+    filterset_fields = ['investment_project', 'company']
 
     serializer_class = TaskSerializer
 

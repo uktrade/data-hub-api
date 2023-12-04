@@ -2,6 +2,8 @@ import datetime
 
 import pytest
 
+from datahub.company.test.factories import CompanyFactory
+
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 from datahub.task.models import Task
@@ -43,9 +45,18 @@ class TestTaskModel:
         obj.save()
         assert obj.reminder_date == datetime.date(2030, 10, 2)
 
-    def test_task_get_company_for_investment_project(self):
+    def test_task_get_company_for_investment_project_task(self):
         investment_project_task = TaskFactory(investment_project=InvestmentProjectFactory())
         assert (
             investment_project_task.get_company()
             == investment_project_task.investment_project.investor_company
         )
+
+    def test_task_get_company_for_company_task(self):
+        company = CompanyFactory()
+        company_task = TaskFactory(company=company)
+        assert company_task.get_company() == company
+
+    def test_task_get_company_for_generic_task(self):
+        generic_task = TaskFactory()
+        assert generic_task.get_company() is None
