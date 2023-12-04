@@ -45,6 +45,7 @@ from datahub.reminder.serializers import (
     NoRecentExportInteractionSubscriptionSerializer,
     NoRecentInvestmentInteractionReminderSerializer,
     NoRecentInvestmentInteractionSubscriptionSerializer,
+    TaskAmendedByOthersReminderSerializer,
     TaskAmendedByOthersSubscriptionSerializer,
     TaskAssignedToMeFromOthersReminderSerializer,
     TaskAssignedToMeFromOthersSubscriptionSerializer,
@@ -234,6 +235,11 @@ class TaskOverdueReminderViewset(BaseReminderViewset):
 class TaskCompletedReminderViewset(BaseReminderViewset):
     serializer_class = TaskCompletedReminderSerializer
     model_class = TaskCompletedReminder
+
+
+class TaskAmendedByOthersReminderViewset(BaseReminderViewset):
+    serializer_class = TaskAmendedByOthersReminderSerializer
+    model_class = TaskAmendedByOthersReminder
 
 
 @transaction.non_atomic_requests

@@ -9,6 +9,7 @@ from datahub.reminder.views import (
     NoRecentInvestmentInteractionSubscriptionViewset,
     reminder_subscription_summary_view,
     reminder_summary_view,
+    TaskAmendedByOthersReminderViewset,
     TaskAmendedByOthersSubscriptionViewset,
     TaskAssignedToMeFromOthersReminderViewset,
     TaskAssignedToMeFromOthersSubscriptionViewset,
@@ -233,6 +234,24 @@ urlpatterns = [
             },
         ),
         name='my-tasks-task-amended-by-others-subscription',
+    ),
+    path(
+        'reminder/my-tasks-task-amended-by-others',
+        TaskAmendedByOthersReminderViewset.as_view(
+            {
+                'get': 'list',
+            },
+        ),
+        name='my-tasks-task-amended-by-others-reminder',
+    ),
+    path(
+        'reminder/my-tasks-task-amended-by-others/<uuid:pk>',
+        TaskAmendedByOthersReminderViewset.as_view(
+            {
+                'delete': 'destroy',
+            },
+        ),
+        name='my-tasks-task-amended-by-others-reminder-detail',
     ),
     path(
         'reminder/my-tasks-task-completed',
