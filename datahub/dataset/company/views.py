@@ -2,7 +2,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 
 from datahub.company.models import Company
 from datahub.dataset.core.views import BaseFilterDatasetView
-from datahub.dbmaintenance.utils import parse_date
+from datahub.dataset.utils import filter_data_by_date
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.metadata.utils import convert_usd_to_gbp
 
@@ -70,12 +70,9 @@ class CompaniesDatasetView(BaseFilterDatasetView):
             'strategy',
         )
         updated_since = request.GET.get('updated_since')
-        if updated_since:
-            updated_since_date = parse_date(updated_since)
-            if updated_since_date:
-                queryset = queryset.filter(created_on__gt=updated_since_date)
+        filtered_queryset = filter_data_by_date(updated_since, queryset)
 
-        return queryset
+        return filtered_queryset
 
     def _enrich_data(self, dataset):
         for data in dataset:

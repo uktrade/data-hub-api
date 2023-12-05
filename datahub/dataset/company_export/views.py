@@ -1,7 +1,7 @@
 from datahub.company.models import CompanyExport
 from datahub.core.query_utils import get_array_agg_subquery
 from datahub.dataset.core.views import BaseFilterDatasetView
-from datahub.dbmaintenance.utils import parse_date
+from datahub.dataset.utils import filter_data_by_date
 from datahub.metadata.query_utils import get_sector_name_subquery
 
 
@@ -54,9 +54,6 @@ class CompanyExportDatasetView(BaseFilterDatasetView):
         )
 
         updated_since = request.GET.get('updated_since')
-        if updated_since:
-            updated_since_date = parse_date(updated_since)
-            if updated_since_date:
-                queryset = queryset.filter(modified_on__gt=updated_since_date)
+        filtered_queryset = filter_data_by_date(updated_since, queryset)
 
-        return queryset
+        return filtered_queryset
