@@ -1,7 +1,7 @@
 from datahub.company.models.contact import Contact
 from datahub.core.query_utils import get_full_name_expression
 from datahub.dataset.core.views import BaseFilterDatasetView
-from datahub.dbmaintenance.utils import parse_date
+from datahub.dataset.utils import filter_data_by_date
 
 
 class ContactsDatasetView(BaseFilterDatasetView):
@@ -44,9 +44,6 @@ class ContactsDatasetView(BaseFilterDatasetView):
         )
         updated_since = request.GET.get('updated_since')
 
-        if updated_since:
-            updated_since_date = parse_date(updated_since)
-            if updated_since_date:
-                queryset = queryset.filter(modified_on__gt=updated_since_date)
+        filtered_queryset = filter_data_by_date(updated_since, queryset)
 
-        return queryset
+        return filtered_queryset

@@ -6,7 +6,7 @@ from datahub.core.query_utils import (
     get_front_end_url_expression,
 )
 from datahub.dataset.core.views import BaseFilterDatasetView
-from datahub.dbmaintenance.utils import parse_date
+from datahub.dataset.utils import filter_data_by_date
 from datahub.interaction.models import Interaction
 from datahub.interaction.queryset import get_base_interaction_queryset
 from datahub.metadata.query_utils import get_sector_name_subquery, get_service_name_subquery
@@ -87,9 +87,6 @@ class InteractionsDatasetView(BaseFilterDatasetView):
             'export_barrier_notes',
         )
         updated_since = request.GET.get('updated_since')
-        if updated_since:
-            updated_since_date = parse_date(updated_since)
-            if updated_since_date:
-                queryset = queryset.filter(modified_on__gt=updated_since_date)
+        filtered_queryset = filter_data_by_date(updated_since, queryset)
 
-        return queryset
+        return filtered_queryset
