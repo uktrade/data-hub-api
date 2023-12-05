@@ -1,16 +1,17 @@
 from datahub.company_referral.models import CompanyReferral
-from datahub.dataset.core.views import BaseDatasetView
+from datahub.dataset.core.views import BaseFilterDatasetView
+from datahub.dataset.utils import filter_data_by_date
 
 
-class CompanyReferralDatasetView(BaseDatasetView):
+class CompanyReferralDatasetView(BaseFilterDatasetView):
     """
     A GET API view to return the data for all company referrals for syncing
     by data flow periodically.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of CompanyReferral records"""
-        return CompanyReferral.objects.values(
+        queryset = CompanyReferral.objects.values(
             'company_id',
             'completed_by_id',
             'completed_on',
@@ -24,3 +25,7 @@ class CompanyReferralDatasetView(BaseDatasetView):
             'status',
             'subject',
         )
+        updated_since = request.GET.get('updated_since')
+        filtered_queryset = filter_data_by_date(updated_since, queryset)
+
+        return filtered_queryset
