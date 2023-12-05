@@ -19,6 +19,7 @@ from datahub.core.queues.constants import (
     EVERY_EIGHT_THIRTY_AM_ON_FIRST_EACH_MONTH,
     EVERY_ELEVEN_PM,
     EVERY_HOUR,
+    EVERY_TWO_HOURS,
     EVERY_MIDNIGHT,
     EVERY_NINE_THIRTY_AM_ON_FIRST_SECOND_THIRD_FOURTH_OF_EACH_MONTH,
     EVERY_ONE_AM,
@@ -223,6 +224,7 @@ def schedule_jobs():
         )
     schedule_email_ingestion_tasks()
     schedule_new_export_interaction_jobs()
+    schedule_export_win_jobs()
 
     schedule_user_reminder_migration()
 
@@ -280,6 +282,29 @@ def schedule_user_reminder_migration():
         retry_intervals=30,
         cron=EVERY_ELEVEN_PM,
         description='Daily migrate post users to receive notifications',
+    )
+
+
+def schedule_export_win_jobs():
+    """Schedule export win jobs."""
+    job_scheduler(
+        function=update_customer_response_token_for_email_notification_id,
+        max_retries=5,
+        queue_name=LONG_RUNNING_QUEUE,
+        retry_backoff=True,
+        retry_intervals=30,
+        cron=EVERY_TWO_HOURS,  # Arbitrary choice
+        description='Scheduled update of export win customer response email notification id',
+    )
+
+    job_scheduler(
+        function=update_notify_email_delivery_status_for_customer_response_token,
+        max_retries=5,
+        queue_name=LONG_RUNNING_QUEUE,
+        retry_backoff=True,
+        retry_intervals=30,
+        cron=EVERY_TWO_HOURS,  # Arbitrary choice
+        description='Scheduled update of export win customer response email delivery status',
     )
 
 

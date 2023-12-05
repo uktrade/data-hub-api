@@ -2,6 +2,7 @@ EVERY_MINUTE = '* * * * *'
 EVERY_TEN_MINUTES = '*/10 * * * *'
 
 EVERY_HOUR = '0 * * * *'
+EVERY_TWO_HOURS = '0 */2 * * *'
 
 EVERY_ONE_AM = '0 1 * * *'
 EVERY_EIGHT_AM = '0 8 * * *'
