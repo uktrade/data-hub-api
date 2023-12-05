@@ -1,8 +1,9 @@
 from datahub.company.models import CompanyExportCountry
-from datahub.dataset.core.views import BaseDatasetView
+from datahub.dataset.core.views import BaseFilterDatasetView
+from datahub.dataset.utils import filter_data_by_date
 
 
-class CompanyExportCountryDatasetView(BaseDatasetView):
+class CompanyExportCountryDatasetView(BaseFilterDatasetView):
     """
     A GET API view to return the data for all company export_country
     as required for syncing by Data-flow periodically.
@@ -10,9 +11,9 @@ class CompanyExportCountryDatasetView(BaseDatasetView):
     then be queried to create custom reports for users.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of company_export_country records"""
-        return CompanyExportCountry.objects.values(
+        queryset = CompanyExportCountry.objects.values(
             'id',
             'company_id',
             'country__name',
@@ -21,3 +22,7 @@ class CompanyExportCountryDatasetView(BaseDatasetView):
             'modified_on',
             'status',
         )
+        updated_since = request.GET.get('updated_since')
+        filtered_queryset = filter_data_by_date(updated_since, queryset)
+
+        return filtered_queryset

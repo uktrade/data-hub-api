@@ -2,12 +2,13 @@ from django.db.models import CharField, Max, Sum
 from django.db.models.functions import Cast
 
 from datahub.core.query_utils import get_aggregate_subquery, get_string_agg_subquery
-from datahub.dataset.core.views import BaseDatasetView
+from datahub.dataset.core.views import BaseFilterDatasetView
+from datahub.dataset.utils import filter_data_by_date
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.omis.order.models import Order
 
 
-class OMISDatasetView(BaseDatasetView):
+class OMISDatasetView(BaseFilterDatasetView):
     """
     An APIView that provides 'get' action which queries and returns desired fields for OMIS Dataset
     to be consumed by Data-flow periodically. Data-flow uses response result to insert data into
@@ -16,9 +17,9 @@ class OMISDatasetView(BaseDatasetView):
     more meaningful insight.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns list of OMIS Dataset records"""
-        return Order.objects.annotate(
+        queryset = Order.objects.annotate(
             refund_created=get_aggregate_subquery(Order, Max('refunds__created_on')),
             refund_total_amount=get_aggregate_subquery(Order, Sum('refunds__total_amount')),
             sector_name=get_sector_name_subquery('sector'),
@@ -50,3 +51,7 @@ class OMISDatasetView(BaseDatasetView):
             'uk_region__name',
             'vat_cost',
         )
+        updated_since = request.GET.get('updated_since')
+        filtered_queryset = filter_data_by_date(updated_since, queryset)
+
+        return filtered_queryset

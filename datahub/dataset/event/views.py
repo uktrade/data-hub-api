@@ -4,21 +4,22 @@ from datahub.core.query_utils import (
     get_aggregate_subquery,
     get_array_agg_subquery,
 )
-from datahub.dataset.core.views import BaseDatasetView
+from datahub.dataset.core.views import BaseFilterDatasetView
+from datahub.dataset.utils import filter_data_by_date
 from datahub.event.models import Event
 from datahub.metadata.query_utils import get_service_name_subquery
 
 
-class EventsDatasetView(BaseDatasetView):
+class EventsDatasetView(BaseFilterDatasetView):
     """
     An APIView that provides 'get' action to return desired fields for
     Events Dataset to be consumed by Data-flow periodically. Data-flow uses
     response result to insert data into Dataworkspace through its defined API endpoints.
     """
 
-    def get_dataset(self):
+    def get_dataset(self, request):
         """Returns a list of all interaction records"""
-        return Event.objects.annotate(
+        queryset = Event.objects.annotate(
             service_name=get_service_name_subquery('service'),
             team_ids=get_aggregate_subquery(
                 Event,
@@ -54,3 +55,7 @@ class EventsDatasetView(BaseDatasetView):
             'uk_region__name',
             'related_programme_names',
         )
+        updated_since = request.GET.get('updated_since')
+        filtered_queryset = filter_data_by_date(updated_since, queryset)
+
+        return filtered_queryset
