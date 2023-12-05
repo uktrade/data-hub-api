@@ -25,6 +25,7 @@ from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.core.exceptions import DataHubError
 from datahub.core.model_helpers import get_related_fields
 from datahub.event.test.factories import EventFactory
+from datahub.export_win.test.factories import CustomerResponseTokenFactory
 from datahub.interaction.test.factories import (
     CompaniesInteractionFactory,
     CompanyInteractionFactory,
@@ -61,6 +62,7 @@ MAPPINGS = {
             (InvestmentProjectFactory, 'client_contacts'),
             (PipelineItemFactory, 'contacts'),
             (ExportFactory, 'contacts'),
+            (CustomerResponseTokenFactory, 'company_contact'),
         ),
         'implicit_related_models': (),
         'ignored_models': (),

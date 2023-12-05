@@ -4,9 +4,11 @@ from django.conf import settings
 
 from django.db import models
 
+
 from datahub.company.models import (
     Advisor,
     Company,
+
 )
 from datahub.core import reversion
 from datahub.core.models import BaseModel, BaseOrderedConstantModel
@@ -15,6 +17,7 @@ from datahub.metadata.models import (
     Sector,
     UKRegion,
 )
+from datahub.reminder.models import EmailDeliveryStatus
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -481,6 +484,20 @@ class CustomerResponseToken(models.Model):
     expires_on = models.DateTimeField()
     customer_response = models.ForeignKey(
         CustomerResponse, related_name='tokens', on_delete=models.CASCADE)
+    email_notification_id = models.UUIDField(null=True, blank=True)
+    email_delivery_status = models.CharField(
+        max_length=MAX_LENGTH,
+        blank=True,
+        choices=EmailDeliveryStatus.choices,
+        help_text='Email delivery status',
+        default=EmailDeliveryStatus.UNKNOWN)
+    company_contact = models.ForeignKey(
+        'company.Contact',
+        related_name='tokens',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE)
+    times_used = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f'Token: {self.id} ({self.expires_on})'

@@ -423,6 +423,13 @@ MAPPING = {
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [{}],
             },
+            {
+                'factory': CustomerResponseTokenFactory,
+                'field': 'company_contact',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
+
         ],
     },
     'interaction.Interaction': {
