@@ -1,5 +1,12 @@
 from functools import reduce
 
+from opensearch_dsl.query import (
+    Bool,
+    # Exists,
+    # Range,
+    Term,
+)
+
 from datahub.search.task import TaskSearchApp
 from datahub.search.task.serializers import (
     SearchTaskQuerySerializer,
@@ -62,11 +69,13 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         filters = self.deep_get(raw_query, 'query|bool|filter')
         if not filters:
             return base_query
-        from pprint import pprint
 
-        pprint(raw_query)
+        # from pprint import pprint
+
+        # pprint(raw_query)
 
         if request.data.get('not_created_by'):
+            # pprint('##### must_not.append')
             must_not.append(
                 {
                     'match': {
@@ -85,6 +94,7 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         #         break
 
         # if filter_index is None:
+        #     pprint("return base_query")
         #     return base_query
 
         # must_filters = filters[filter_index]['bool']['must']
@@ -121,22 +131,42 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         # base_query.update_from_dict(raw_query)
 
         # base_query.filter('terms', tags=['search', 'python'])
-        if must_not:
-            filters = [
-                {
-                    'bool': {
-                        'must_not': [
-                            {
-                                'bool': {
-                                    'minimum_should_match': 1,
-                                    'should': must_not,
-                                },
-                            },
-                        ],
+        if len(must_not) > 0:
+            # pprint("###### if must_not")
+            must_not_filters = Bool(
+                must_not=Term(
+                    **{
+                        'minimum_should_match': 1,
+                        'should': must_not,
                     },
-                },
-            ]
-            raw_query['query']['bool']['filter'] = filters
+                ),
+            )
+            # pprint("raw_query")
+            # pprint(raw_query)
+            # pprint("raw_query['query']['bool']['filter']['bool']")
+            # pprint(raw_query['query']['bool']['filter'][0])
+
+            filter_index = None
+            for index, filter in enumerate(raw_query['query']['bool']):
+                if filter.get('bool'):
+                    filter_index = index
+                    break
+
+            if filter_index is None:
+                # pprint("return base_query")
+                return base_query
+
+            # raw_query['query']['bool']['filter'].append('bool')
+            # pprint(raw_query)
+            # filter_bool = raw_query['query']['bool']['filter']
+            # filter_bool.must_not = must_not_filters
+            # pprint("filter_bool")
+            # pprint(filter_bool)
+
+            raw_query['query']['bool']['filter'][filter_index] = must_not_filters
+
+            # pprint("final raw_query")
+            # pprint(raw_query)
             base_query.update_from_dict(raw_query)
 
         return base_query
