@@ -177,6 +177,18 @@ def update_task_reminder_email_status(email_notification_id, reminder_ids):
     )
 
 
+def update_task_overdue_reminder_email_status(email_notification_id, reminder_ids):
+    reminders = TaskOverdueReminder.all_objects.filter(id__in=reminder_ids)
+    for reminder in reminders:
+        reminder.email_notification_id = email_notification_id
+        reminder.save()
+
+    logger.info(
+        'Task update_task_overdue_reminder_email_status completed, setting '
+        f'email_notification_id to {email_notification_id} for reminder_ids {reminder_ids}',
+    )
+
+
 def update_task_assigned_to_me_from_others_email_status(email_notification_id, reminder_ids):
     reminders = TaskAssignedToMeFromOthersReminder.all_objects.filter(id__in=reminder_ids)
     for reminder in reminders:
@@ -513,8 +525,6 @@ def generate_reminders_tasks_overdue():
             )
             return
         now = timezone.now()
-        # When adding additional tasks this query will need to be moved to Open Search to return
-        # all task types.
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         tasks = Task.objects.filter(due_date=yesterday)
         for task in tasks:
@@ -555,7 +565,7 @@ def create_tasks_overdue_reminder(
 
     reminder = TaskOverdueReminder.objects.create(
         adviser=adviser,
-        event=f'{task.name} is now over due',
+        event=f'{task.title} is now overdue',
         task=task,
     )
 
