@@ -55,40 +55,28 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         )
 
     def get_base_query(self, request, validated_data):
+        must_not = []
         base_query = super().get_base_query(request, validated_data)
 
         raw_query = base_query.to_dict()
         filters = self.deep_get(raw_query, 'query|bool|filter')
         if not filters:
             return base_query
-        # from pprint import pprint
+        from pprint import pprint
+
+        pprint(raw_query)
 
         if request.data.get('not_created_by'):
-            filters = [
+            must_not.append(
                 {
-                    'bool': {
-                        'must_not': [
-                            {
-                                'bool': {
-                                    'minimum_should_match': 1,
-                                    'should': [
-                                        {
-                                            'match': {
-                                                'created_by.id': {
-                                                    'operator': 'and',
-                                                    'query': request.data['not_created_by'],
-                                                },
-                                            },
-                                        },
-                                    ],
-                                },
-                            },
-                        ],
+                    'match': {
+                        'created_by.id': {
+                            'operator': 'and',
+                            'query': request.data['not_created_by'],
+                        },
                     },
                 },
-            ]
-            raw_query['query']['bool']['filter'] = filters
-            base_query.update_from_dict(raw_query)
+            )
 
         # filter_index = None
         # for index, filter in enumerate(filters):
@@ -133,4 +121,22 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         # base_query.update_from_dict(raw_query)
 
         # base_query.filter('terms', tags=['search', 'python'])
+        if must_not:
+            filters = [
+                {
+                    'bool': {
+                        'must_not': [
+                            {
+                                'bool': {
+                                    'minimum_should_match': 1,
+                                    'should': must_not,
+                                },
+                            },
+                        ],
+                    },
+                },
+            ]
+            raw_query['query']['bool']['filter'] = filters
+            base_query.update_from_dict(raw_query)
+
         return base_query
