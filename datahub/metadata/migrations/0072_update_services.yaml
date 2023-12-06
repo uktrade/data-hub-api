@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: d2969a7e-0909-4b49-976c-bb732319d01e
+  fields:
+    disabled_on: ~
+    order: 1324
+    segment: Women's International Network (WIN Programme)
+    parent:
+    contexts: ["interaction", "service_delivery", "trade_agreement_interaction", "investment_interaction",]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
