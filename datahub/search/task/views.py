@@ -16,7 +16,7 @@ class SearchTaskAPIViewMixin:
     search_app = TaskSearchApp
     serializer_class = SearchTaskQuerySerializer
     es_sort_by_remappings = {}
-    fields_to_exclude = ()
+    fields_to_exclude = ('not_created_by',)
 
     FILTER_FIELDS = (
         'archived',
@@ -24,7 +24,6 @@ class SearchTaskAPIViewMixin:
         'title',
         'due_date',
         'created_by',
-        'not_created_by',
         'advisers',
         'company',
         'investment_project',
@@ -36,8 +35,6 @@ class SearchTaskAPIViewMixin:
         'company': 'company.id',
         'investment_project': 'investment_project.id',
     }
-
-    COMPOSITE_FILTERS = {}
 
 
 @register_v4_view()
