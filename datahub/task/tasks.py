@@ -1,6 +1,6 @@
+import datetime
 import logging
 
-import datetime
 from django.conf import settings
 from django.utils import timezone
 from django_pglocks import advisory_lock
