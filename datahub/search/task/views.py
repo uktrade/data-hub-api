@@ -1,12 +1,5 @@
 from functools import reduce
 
-from opensearch_dsl.query import (
-    Bool,
-    # Exists,
-    # Range,
-    # Term,
-)
-
 from datahub.search.task import TaskSearchApp
 from datahub.search.task.serializers import (
     SearchTaskQuerySerializer,
@@ -70,16 +63,7 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         if not filters:
             return base_query
 
-        # from pprint import pprint
-
-        # pprint("raw_query")
-        # pprint(raw_query)
-
-        # pprint("filters")
-        # pprint(filters)
-
         if request.data.get('not_created_by'):
-            # pprint('##### must_not.append')
             must_not.append(
                 {
                     'match': {
@@ -101,9 +85,7 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
             if filter_index is None:
                 return base_query
 
-            # TODO Merge existing filters and must_not filters into single Bool "object"
-            filters[filter_index] = Bool(filters[filter_index]['bool'], must_not=must_not)
-            # pprint(filters)
+            filters[filter_index]['bool']['must_not'] = must_not
             raw_query['query']['bool']['filter'] = filters
 
             base_query.update_from_dict(raw_query)
