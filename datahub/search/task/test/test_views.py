@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from unittest import mock
 
 import pytest
 
@@ -109,7 +110,6 @@ class TestTaskSearch(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-
         assert response.data['count'] == 1
         assert response.data['results'][0]['id'] == str(task.id)
         assert response.data['results'][0]['created_by']['id'] == str(created_by_adviser.id)
@@ -156,9 +156,60 @@ class TestTaskSearch(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-
         assert response.data['count'] == 1
         assert response.data['results'][0]['id'] == str(task.id)
+
+    @mock.patch('datahub.search.task.views.SearchTaskAPIView.deep_get')
+    def test_search_task_without_filters(
+        self,
+        deep_get,
+        opensearch_with_collector,
+    ):
+        """
+        Tests edge case where no filter returned from raw_query
+        """
+        deep_get.return_value = None
+        TaskFactory()
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:task')
+
+        response = self.api_client.post(
+            url,
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data['count'] == 1
+
+    @mock.patch('datahub.search.task.views.SearchTaskAPIView.deep_get')
+    def test_search_task_without_filter_index(
+        self,
+        deep_get,
+        opensearch_with_collector,
+    ):
+        """
+        Test edge case where no filter_index found in raw_query filter
+        """
+        not_created_by_adviser = AdviserFactory()
+        deep_get.return_value = [{'result': 'testing'}]
+        TaskFactory()
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:task')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'not_created_by': not_created_by_adviser.id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data['count'] == 1
 
     def test_search_task_due_date_ordering(self, opensearch_with_collector):
         """Tests task search ordering on due date"""
