@@ -55,6 +55,10 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         )
 
     def get_base_query(self, request, validated_data):
+        """
+        Check for filters that filter for not_* parameters and extend the open search base query
+        with the must_not filters.
+        """
         must_not = []
         base_query = super().get_base_query(request, validated_data)
 
