@@ -1,4 +1,3 @@
-import datetime
 import uuid
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
@@ -10,7 +9,7 @@ from unittest import mock
 from unittest.mock import MagicMock, patch
 
 import pytest
-from dateutil.relativedelta import relativedelta
+import pytz
 from django.conf import settings
 
 from freezegun import freeze_time
@@ -29,17 +28,12 @@ from datahub.export_win.test.factories import (
 from datahub.export_win.tasks import get_all_fields_for_client_email_receipt
 
 from datahub.export_win.tasks import (
-    notify_export_win_contact_by_rq_email,
-    send_export_win_email_notification_via_rq,
-    update_customer_response_token_for_email_notification_id,
-    update_notify_email_delivery_status_for_customer_response_token,
-)
+    create_token_for_contact,
+    get_all_fields_for_client_email_receipt,
+    get_all_fields_for_lead_officer_email_receipt_no,
+    get_all_fields_for_lead_officer_email_receipt_yes)
 from datahub.export_win.test.factories import (
-    CustomerResponseFactory,
-    CustomerResponseTokenFactory,
-)
-from datahub.notification.constants import NotifyServiceName
-from datahub.reminder.models import EmailDeliveryStatus
+    CustomerResponseFactory, CustomerResponseTokenFactory, WinFactory)
 
 
 @pytest.fixture
@@ -250,7 +244,6 @@ def test_get_all_fields_for_client_email_receipt_success(
     mock_win.goods_vs_services.name = 'Goods and Services'
     with patch('datahub.export_win.models.CustomerResponse.objects.get') as mock_response_get, \
             patch('datahub.export_win.models.CustomerResponseToken.objects.get') as mock_token_get:
-        # Set up return values for the mocked methods
         mock_response_get.return_value = mock_customer_response_instance
         mock_token_get.return_value = mock_customer_response_token_instance
         mock_token_id = uuid.uuid4()

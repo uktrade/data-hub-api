@@ -19,7 +19,6 @@ from datahub.core.queues.constants import (
     EVERY_EIGHT_THIRTY_AM_ON_FIRST_EACH_MONTH,
     EVERY_ELEVEN_PM,
     EVERY_HOUR,
-    EVERY_TWO_HOURS,
     EVERY_MIDNIGHT,
     EVERY_NINE_THIRTY_AM_ON_FIRST_SECOND_THIRD_FOURTH_OF_EACH_MONTH,
     EVERY_ONE_AM,
@@ -28,6 +27,7 @@ from datahub.core.queues.constants import (
     EVERY_TEN_MINUTES,
     EVERY_TEN_PM,
     EVERY_THREE_AM_ON_TWENTY_THIRD_EACH_MONTH,
+    EVERY_TWO_AM,
     HALF_DAY_IN_SECONDS,
 )
 from datahub.core.queues.health_check import queue_health_check
@@ -36,6 +36,9 @@ from datahub.core.queues.scheduler import DataHubScheduler, LONG_RUNNING_QUEUE
 from datahub.dnb_api.tasks.sync import schedule_sync_outdated_companies_with_dnb
 from datahub.dnb_api.tasks.update import schedule_get_company_updates
 from datahub.email_ingestion.tasks import process_mailbox_emails
+from datahub.export_win.tasks import (
+    update_notify_email_delivery_status_for_customer_response_token,
+)
 from datahub.investment.project.tasks import (
     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
 )
@@ -50,10 +53,6 @@ from datahub.reminder.tasks import (
     update_notify_email_delivery_status_for_new_export_interaction,
     update_notify_email_delivery_status_for_no_recent_export_interaction,
     update_notify_email_delivery_status_for_no_recent_interaction,
-)
-from datahub.export_win.tasks import (
-    update_customer_response_token_for_email_notification_id,
-    update_notify_email_delivery_status_for_customer_response_token,
 )
 from datahub.search.tasks import sync_all_models
 from datahub.task.tasks import schedule_reminders_tasks_overdue, schedule_reminders_upcoming_tasks
@@ -224,7 +223,7 @@ def schedule_jobs():
         )
     schedule_email_ingestion_tasks()
     schedule_new_export_interaction_jobs()
-    schedule_export_win_jobs()
+    schedule_export_win_customer_response_token_jobs()
 
     schedule_user_reminder_migration()
 
@@ -285,25 +284,15 @@ def schedule_user_reminder_migration():
     )
 
 
-def schedule_export_win_jobs():
-    """Schedule export win jobs."""
-    job_scheduler(
-        function=update_customer_response_token_for_email_notification_id,
-        max_retries=5,
-        queue_name=LONG_RUNNING_QUEUE,
-        retry_backoff=True,
-        retry_intervals=30,
-        cron=EVERY_TWO_HOURS,  # Arbitrary choice
-        description='Scheduled update of export win customer response email notification id',
-    )
-
+def schedule_export_win_customer_response_token_jobs():
+    """Schedule update export win customer response token jobs."""
     job_scheduler(
         function=update_notify_email_delivery_status_for_customer_response_token,
         max_retries=5,
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,
         retry_intervals=30,
-        cron=EVERY_TWO_HOURS,  # Arbitrary choice
+        cron=EVERY_TWO_AM,
         description='Scheduled update of export win customer response email delivery status',
     )
 
