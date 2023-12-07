@@ -59,11 +59,6 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         must_not = []
         base_query = super().get_base_query(request, validated_data)
 
-        raw_query = base_query.to_dict()
-        filters = self.deep_get(raw_query, 'query|bool|filter')
-        if not filters:
-            return base_query
-
         if request.data.get('not_created_by'):
             must_not.append(
                 {
@@ -77,6 +72,11 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
             )
 
         if len(must_not) > 0:
+            raw_query = base_query.to_dict()
+            filters = self.deep_get(raw_query, 'query|bool|filter')
+            if not filters:
+                return base_query
+
             filter_index = None
             for index, filter in enumerate(filters):
                 if filter.get('bool') or filter.get('bool') == {}:
