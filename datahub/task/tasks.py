@@ -574,7 +574,7 @@ def create_tasks_overdue_reminder(
             adviser=adviser,
             task=task,
             reminder=reminder,
-            update_task=update_task_reminder_email_status,
+            update_task=update_task_overdue_reminder_email_status,
             email_template_class=TaskOverdueEmailTemplate,
         )
     else:
