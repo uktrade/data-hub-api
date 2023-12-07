@@ -169,7 +169,7 @@ def mock_notify_adviser_overdue_task_email_call(
         adviser=matching_adviser,
         template_identifier=template_id,
         context=TaskOverdueEmailTemplate(overdue_task).get_context(),
-        update_task=update_task_reminder_email_status,
+        update_task=update_task_overdue_reminder_email_status,
         reminders=[reminder],
     )
 
