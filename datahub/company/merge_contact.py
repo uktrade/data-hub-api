@@ -175,7 +175,8 @@ def merge_contacts(source_contact: Contact, target_contact: Contact, user):
         except Exception as e:
             logger.exception(f'An error occurred while merging companies: {e}')
             raise
-
+        
+        target_contact.merge_contact_fields(source_contact)
         source_contact.mark_as_transferred(
             target_contact,
             Contact.TransferReason.DUPLICATE,

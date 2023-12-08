@@ -110,3 +110,9 @@ class CountryFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'metadata.Country'
+
+class AdministrativeAreasFactory(factory.django.DjangoModelFactory):
+    """Administrative Area factory."""
+    country=factory.SubFactory(CountryFactory)
+    class Meta:
+        model = 'metadata.AdministrativeArea'
