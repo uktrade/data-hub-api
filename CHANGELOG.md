@@ -3908,7 +3908,7 @@ Please see the [release notes](https://github.com/uktrade/data-hub-api/releases)
 
 - **Companies** A tool was added to django admin to allow administrators to "unarchive" archived
   companies.
-- A configurable blacklist was added so that we can specifically prohibit certain
+- A configurable blocklist was added so that we can specifically prohibit certain
   email addresses from the email ingestion feature.
 - Email ingestion was adjusted so that emails are deleted after they are ingested.
   Previously, email ingestion would mark the emails as "seen" but now that we are

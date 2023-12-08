@@ -204,9 +204,9 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
             True,
             None,
         ),
-        # Blacklisted email
+        # Blocklisted email
         (
-            'blacklisted@trade.gov.uk',
+            'blocklisted@trade.gov.uk',
             None,
             False,
             None,

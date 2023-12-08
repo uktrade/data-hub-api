@@ -127,8 +127,8 @@ DOCUMENT_BUCKETS = {
     }
 }
 
-DIT_EMAIL_INGEST_BLACKLIST = [
-    'blacklisted@trade.gov.uk',
+DIT_EMAIL_INGEST_BLOCKLIST = [
+    'blocklisted@trade.gov.uk',
 ]
 
 DIT_EMAIL_DOMAINS = {
