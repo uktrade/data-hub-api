@@ -63,8 +63,6 @@ from datahub.task.tasks import (
 )
 from datahub.task.test.factories import AdviserFactory, TaskFactory
 
-from datahub.task.models import Task
-
 pytestmark = [pytest.mark.django_db]
 
 
