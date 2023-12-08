@@ -2,7 +2,6 @@ from datetime import datetime
 from unittest.mock import patch
 
 import pytest
-import reversion
 from django.utils.timezone import utc
 from freezegun import freeze_time
 
@@ -10,10 +9,10 @@ from datahub.company.merge_contact import (
     get_planned_changes,
     merge_contacts,
     MergeNotAllowedError,
-    ALLOWED_RELATIONS_FOR_MERGING
 )
+from datahub.core import constants
 from datahub.company.models import Contact, CompanyExport
-from datahub.company.test.factories import ContactFactory, ArchivedContactFactory, AdviserFactory, ExportFactory
+from datahub.company.test.factories import ContactFactory, ArchivedContactFactory, AdviserFactory, ContactWithOwnAreaFactory, ExportFactory
 from datahub.company_referral.models import CompanyReferral
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.models import Interaction
@@ -22,12 +21,8 @@ from datahub.investment.project.models import InvestmentProject
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import OrderFactory
-from datahub.user.company_list.models import CompanyListItem, PipelineItem
-from datahub.user.company_list.test.factories import (
-    CompanyListFactory,
-    CompanyListItemFactory,
-    PipelineItemFactory,
-)
+from datahub.user.company_list.models import PipelineItem
+from datahub.user.company_list.test.factories import PipelineItemFactory
 
 
 @pytest.fixture
@@ -82,8 +77,8 @@ def contact_with_exports_factory():
 
 
 @pytest.mark.django_db
-class TestDuplicateCompanyMerger:
-    """Tests DuplicateCompanyMerger."""
+class TestDuplicateContactMerger:
+    """Tests DuplicateContactMerger."""
 
     @pytest.mark.parametrize(
         'source_contact_factory,expected_result,expected_should_archive',
@@ -202,7 +197,272 @@ class TestDuplicateCompanyMerger:
 
         expected_planned_merge_results = (expected_result, expected_should_archive)
         assert merge_results == expected_planned_merge_results
-    
+
+    def test_merge_succeeds_when_target_contact_has_minimal_info_and_source_contact_has_complete_info(self):
+        """
+        Tests that source contact values get transferred to target contact values
+        when the target contact doesn't have values that the source contact does
+        """
+
+        target_contact = ContactFactory(
+            job_title=None,
+            title=None,
+            full_telephone_number="",
+            archived_documents_url_path="",
+            company=None,
+            address_same_as_company=False
+        )
+        
+        source_contact = ContactFactory(
+            notes='This is a string',
+            valid_email=True,
+            adviser=AdviserFactory(),
+        )
+
+        user=AdviserFactory()
+        
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+
+        with freeze_time(merge_time):
+            merge_contacts(source_contact, target_contact, user)
+
+        assert source_contact.archived
+        assert source_contact.archived_by == user
+        assert source_contact.archived_on == merge_time
+        assert source_contact.archived_reason == (
+            f'This record is no longer in use and its data has been transferred '
+            f'to {target_contact} for the following reason: Duplicate record.'
+        )
+        assert source_contact.modified_by == user
+        assert source_contact.modified_on == merge_time
+        assert source_contact.transfer_reason == Contact.TransferReason.DUPLICATE
+        assert source_contact.transferred_by == user
+        assert source_contact.transferred_on == merge_time
+        assert source_contact.transferred_to == target_contact
+
+        assert target_contact.job_title == source_contact.job_title
+        assert target_contact.title == source_contact.title
+        assert target_contact.full_telephone_number == source_contact.full_telephone_number
+        assert target_contact.notes == source_contact.notes
+        assert target_contact.archived_documents_url_path == source_contact.archived_documents_url_path
+        assert target_contact.valid_email == source_contact.valid_email
+        assert target_contact.adviser == source_contact.adviser
+        assert target_contact.company == source_contact.company
+
+    def test_merge_succeeds_when_target_contact_and_source_contact_have_complete_info(self):
+        """
+        Tests that source contact values don't get transferred to target contact values
+        when the target contact and source contact have values for the same fields
+        """
+
+        target_contact = ContactFactory(
+            notes='This is the target\'s string',
+            valid_email=True,
+            adviser=AdviserFactory(),
+            title_id = constants.Title.mr.value.id,
+            full_telephone_number = '+44 987654321'
+        )
+        
+        source_contact = ContactFactory(
+            notes='This is the contact\'s string',
+            adviser=AdviserFactory(),
+            title_id = constants.Title.mrs.value.id,
+        )
+
+        user=AdviserFactory()
+        
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+
+        with freeze_time(merge_time):
+            merge_contacts(source_contact, target_contact, user)
+
+        assert source_contact.archived
+        assert source_contact.archived_by == user
+        assert source_contact.archived_on == merge_time
+        assert source_contact.archived_reason == (
+            f'This record is no longer in use and its data has been transferred '
+            f'to {target_contact} for the following reason: Duplicate record.'
+        )
+        assert source_contact.modified_by == user
+        assert source_contact.modified_on == merge_time
+        assert source_contact.transfer_reason == Contact.TransferReason.DUPLICATE
+        assert source_contact.transferred_by == user
+        assert source_contact.transferred_on == merge_time
+        assert source_contact.transferred_to == target_contact
+
+        assert target_contact.job_title != source_contact.job_title
+        assert target_contact.title != source_contact.title
+        assert target_contact.full_telephone_number != source_contact.full_telephone_number
+        assert target_contact.notes != source_contact.notes
+        assert target_contact.archived_documents_url_path != source_contact.archived_documents_url_path
+        assert target_contact.valid_email != source_contact.valid_email
+        assert target_contact.adviser != source_contact.adviser
+        assert target_contact.company != source_contact.company
+
+    def test_merge_succeeds_when_target_contact_and_source_contact_have_incomplete_info(self):
+        """
+        Tests that source contact values only get transferred to target contact values
+        when the target contact has no corresponding value in that field
+        """
+
+        target_contact = ContactFactory(
+            notes='This is the target\'s string',
+            valid_email=True,
+            adviser=AdviserFactory(),
+            full_telephone_number = '',
+            archived_documents_url_path = '',
+            title_id = constants.Title.mr.value.id,
+        )
+        
+        source_contact = ContactFactory(
+            notes='This is the contact\'s string',
+            adviser=AdviserFactory(),
+            job_title = None,
+            company = None,
+            title_id = constants.Title.mrs.value.id,
+        )
+
+        user=AdviserFactory()
+        
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+
+        with freeze_time(merge_time):
+            merge_contacts(source_contact, target_contact, user)
+
+        assert source_contact.archived
+        assert source_contact.archived_by == user
+        assert source_contact.archived_on == merge_time
+        assert source_contact.archived_reason == (
+            f'This record is no longer in use and its data has been transferred '
+            f'to {target_contact} for the following reason: Duplicate record.'
+        )
+        assert source_contact.modified_by == user
+        assert source_contact.modified_on == merge_time
+        assert source_contact.transfer_reason == Contact.TransferReason.DUPLICATE
+        assert source_contact.transferred_by == user
+        assert source_contact.transferred_on == merge_time
+        assert source_contact.transferred_to == target_contact
+
+        assert target_contact.archived_documents_url_path == source_contact.archived_documents_url_path
+        assert target_contact.full_telephone_number == source_contact.full_telephone_number
+
+        assert target_contact.job_title != source_contact.job_title
+        assert target_contact.title != source_contact.title
+        assert target_contact.notes != source_contact.notes
+        assert target_contact.valid_email != source_contact.valid_email
+        assert target_contact.adviser != source_contact.adviser
+        assert target_contact.company != source_contact.company
+
+    def test_merge_succeeds_when_source_contact_has_an_address_and_target_contact_does_not(self):
+        """
+        Tests that source contact values for the address get transferred to the target contact
+        when the target contact doesn't have an address or a address_same_as_company value
+        """
+
+        target_contact = ContactFactory(address_same_as_company=False)
+        source_contact = ContactWithOwnAreaFactory()
+
+        user=AdviserFactory()
+        
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+
+        with freeze_time(merge_time):
+            merge_contacts(source_contact, target_contact, user)
+
+        assert source_contact.archived
+        assert source_contact.archived_by == user
+        assert source_contact.archived_on == merge_time
+        assert source_contact.archived_reason == (
+            f'This record is no longer in use and its data has been transferred '
+            f'to {target_contact} for the following reason: Duplicate record.'
+        )
+        assert source_contact.modified_by == user
+        assert source_contact.modified_on == merge_time
+        assert source_contact.transfer_reason == Contact.TransferReason.DUPLICATE
+        assert source_contact.transferred_by == user
+        assert source_contact.transferred_on == merge_time
+        assert source_contact.transferred_to == target_contact
+        
+        assert not target_contact.address_same_as_company
+        assert target_contact.address_1 == source_contact.address_1
+        assert target_contact.address_town == source_contact.address_town
+        assert target_contact.address_country == source_contact.address_country
+        assert target_contact.address_area == source_contact.address_area
+        assert target_contact.address_postcode == source_contact.address_postcode
+
+    def test_merge_succeeds_when_target_contact_has_address_same_as_company_set_to_true(self):
+        """
+        Tests that target contact address fields don't get overwritten by the source contact address fields
+        when the target contact has address_same_as_company set to True
+        """
+
+        target_contact = ContactFactory(address_same_as_company=True)
+        source_contact = ContactWithOwnAreaFactory()
+
+        user=AdviserFactory()
+        
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+
+        with freeze_time(merge_time):
+            merge_contacts(source_contact, target_contact, user)
+
+        assert source_contact.archived
+        assert source_contact.archived_by == user
+        assert source_contact.archived_on == merge_time
+        assert source_contact.archived_reason == (
+            f'This record is no longer in use and its data has been transferred '
+            f'to {target_contact} for the following reason: Duplicate record.'
+        )
+        assert source_contact.modified_by == user
+        assert source_contact.modified_on == merge_time
+        assert source_contact.transfer_reason == Contact.TransferReason.DUPLICATE
+        assert source_contact.transferred_by == user
+        assert source_contact.transferred_on == merge_time
+        assert source_contact.transferred_to == target_contact
+        
+        assert target_contact.address_same_as_company
+        assert target_contact.address_1 != source_contact.address_1
+        assert target_contact.address_town != source_contact.address_town
+        assert target_contact.address_country != source_contact.address_country
+        assert target_contact.address_area != source_contact.address_area
+        assert target_contact.address_postcode != source_contact.address_postcode
+
+    def test_merge_succeeds_when_target_contact_has_an_address(self):
+        """
+        Tests that target contact address fields don't get overwritten when 
+        the source contact has address_same_as_company set to True
+        """
+
+        target_contact = ContactWithOwnAreaFactory()
+        source_contact = ContactFactory(address_same_as_company=True)
+
+        user=AdviserFactory()
+        
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+
+        with freeze_time(merge_time):
+            merge_contacts(source_contact, target_contact, user)
+
+        assert source_contact.archived
+        assert source_contact.archived_by == user
+        assert source_contact.archived_on == merge_time
+        assert source_contact.archived_reason == (
+            f'This record is no longer in use and its data has been transferred '
+            f'to {target_contact} for the following reason: Duplicate record.'
+        )
+        assert source_contact.modified_by == user
+        assert source_contact.modified_on == merge_time
+        assert source_contact.transfer_reason == Contact.TransferReason.DUPLICATE
+        assert source_contact.transferred_by == user
+        assert source_contact.transferred_on == merge_time
+        assert source_contact.transferred_to == target_contact
+        
+        assert not target_contact.address_same_as_company
+        assert target_contact.address_1 != source_contact.address_1
+        assert target_contact.address_town != source_contact.address_town
+        assert target_contact.address_country != source_contact.address_country
+        assert target_contact.address_area != source_contact.address_area
+        assert target_contact.address_postcode != source_contact.address_postcode
 
     @pytest.mark.parametrize(
         'factory_relation_kwarg',

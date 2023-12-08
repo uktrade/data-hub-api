@@ -161,3 +161,41 @@ class Contact(ArchivableModel, BaseModel):
 
         # Note: archive() saves the model instance
         self.archive(user, archived_reason)
+
+    def merge_contact_fields(self, contact):
+
+        fields=[
+            'job_title',
+            'title',
+            'full_telephone_number',
+            'notes',
+            'archived_documents_url_path',
+            'valid_email',
+            'company',
+            'adviser',
+        ]
+
+        for field in fields:
+            contact_field_value=getattr(contact, field)
+            source_field_value=getattr(self, field)
+
+            if not source_field_value and contact_field_value:
+                setattr(self, field, contact_field_value)
+
+        address_fields=[
+            'address_1',
+            'address_2',
+            'address_town',
+            'address_postcode',
+            'address_county',
+            'address_country',
+            'address_area',
+        ]
+        
+        if not self.address_1 and not self.address_same_as_company:
+            if contact.address_1:
+                for field in address_fields:
+                    contact_address_value=getattr(contact, field)
+                    setattr(self, field, contact_address_value)
+            elif contact.address_same_as_company:
+                self.address_same_as_company=contact.address_same_as_company
