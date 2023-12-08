@@ -632,8 +632,8 @@ DOCUMENT_BUCKETS = {
     },
 }
 
-DIT_EMAIL_INGEST_BLACKLIST = [
-    email.lower() for email in env.list('DIT_EMAIL_INGEST_BLACKLIST', default=[])
+DIT_EMAIL_INGEST_BLOCKLIST = [
+    email.lower() for email in env.list('DIT_EMAIL_INGEST_BLOCKLIST', default=[])
 ]
 
 DIT_EMAIL_DOMAINS = {}
