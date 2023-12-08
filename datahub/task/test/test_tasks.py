@@ -63,6 +63,8 @@ from datahub.task.tasks import (
 )
 from datahub.task.test.factories import AdviserFactory, TaskFactory
 
+from datahub.task.models import Task
+
 pytestmark = [pytest.mark.django_db]
 
 
@@ -1158,11 +1160,20 @@ class TestTasksOverdue:
         mock_notify_adviser_by_rq_email,
         mock_statsd,
     ):
-        # create a few tasks with and without due reminders
-        tasks = TaskFactory.create_batch(4)
+        # create a few tasks with and without due reminders with some that are archived
+        TaskFactory.create_batch(4)
         tasks_due = []
         matching_advisers = AdviserFactory.create_batch(3)
-
+        TaskFactory(
+            due_date=datetime.date.today() - datetime.timedelta(1),
+            archived=True,
+            advisers=[matching_advisers[0]],
+        )
+        TaskFactory(
+            due_date=datetime.date.today() - datetime.timedelta(1),
+            archived=True,
+            advisers=[matching_advisers[1]],
+        )
         tasks_due.append(
             task_factory_overdue_date(
                 1,

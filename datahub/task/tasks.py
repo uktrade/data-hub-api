@@ -496,9 +496,6 @@ def send_task_email(adviser, task, reminder, update_task, email_template_class):
     )
 
 
-# start here
-
-
 def schedule_reminders_overdue_tasks():
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
@@ -526,7 +523,7 @@ def generate_reminders_tasks_overdue():
             return
         now = timezone.now()
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
-        tasks = Task.objects.filter(due_date=yesterday)
+        tasks = Task.objects.filter(due_date=yesterday).exclude(archived=True)
         for task in tasks:
             # Get all active advisers assigned to the task
             active_advisers = task.advisers.filter(is_active=True)
