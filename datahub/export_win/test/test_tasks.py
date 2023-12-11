@@ -1,10 +1,22 @@
 import uuid
+from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
+import pytz
 from django.conf import settings
 
-from datahub.export_win.tasks import get_all_fields_for_client_email_receipt
+from freezegun import freeze_time
+
+from datahub.company.test.factories import ContactFactory
+from datahub.export_win.models import CustomerResponseToken
+
+from datahub.export_win.tasks import (
+    create_token_for_contact,
+    get_all_fields_for_client_email_receipt,
+    has_unexpired_token_for_contact,
+)
+from datahub.export_win.test.factories import CustomerResponseFactory, CustomerResponseTokenFactory
 
 
 @pytest.fixture
@@ -57,3 +69,72 @@ def test_get_all_fields_for_client_email_receipt_success(
         assert result['goods_services'] == 'Goods and Services'
         # Compare the generated URL with the expected URL using the specific ID
         assert result['url'] == f'{settings.EXPORT_WIN_CLIENT_REVIEW_WIN_URL}/{mock_token_id}'
+
+
+@pytest.mark.django_db
+@freeze_time('2023-12-11')
+def test_create_token_for_contact_without_existing_unexpired_token():
+    # Create instances for CustomerResponse and Contact
+    mock_customer_response = CustomerResponseFactory()
+    mock_contact = ContactFactory()
+    # Call the function being tested
+    new_token = create_token_for_contact(mock_contact, mock_customer_response)
+    # Check if a token was created for the given contact and customer response
+    assert new_token.id is not None  # Assert that the token ID is not None
+    token_exists = CustomerResponseToken.objects.filter(
+        id=new_token.id,
+        company_contact=mock_contact,
+        customer_response=mock_customer_response,
+    ).exists()
+    # Assert that a token was created with new id for the given contact and customer response
+    assert token_exists is True
+    # Validate the expiry time without formatting
+    expected_time = datetime.utcnow() + timedelta(days=7)
+    assert expected_time == new_token.expires_on
+
+
+@pytest.mark.django_db
+@freeze_time('2023-12-11')
+def test_create_token_with_existing_unexpired_token():
+    # Create instances for CustomerResponse and Contact
+    mock_customer_response = CustomerResponseFactory()
+    mock_contact = ContactFactory()
+    # Create an existing unexpired token for the contact and customer response
+    with freeze_time('2023-12-10'):  # Freeze time for creating the existing token
+        existing_token = CustomerResponseTokenFactory(
+            company_contact=mock_contact,
+            customer_response=mock_customer_response,
+            expires_on=datetime.utcnow() + timedelta(days=1),  # Assuming 1 day from now
+        )
+    # Call the function being tested
+    new_token = create_token_for_contact(mock_contact, mock_customer_response)
+    # Check if a new token was created for the given contact and customer response
+    assert new_token.id is not None
+    # Assert that a new token was created with a different ID
+    assert new_token.id != existing_token.id
+    # Validate the expiry time of the new token (7 days from now)
+    expected_time = datetime.utcnow() + timedelta(days=7)
+    assert expected_time == new_token.expires_on
+    # Check if the existing token is set to expire (set to current time)
+    existing_token.refresh_from_db()
+    # Make datetime.utcnow() timezone-aware
+    utc_now = datetime.utcnow().replace(tzinfo=pytz.UTC)
+    assert existing_token.expires_on <= utc_now
+
+
+@pytest.mark.django_db
+def test_has_unexpired_token_for_contact():
+    # Create instances for CustomerResponse and Contact
+    mock_customer_response = CustomerResponseFactory()
+    mock_contact = ContactFactory()
+    # Initially, there should be no unexpired token for this contact
+    assert not has_unexpired_token_for_contact(mock_contact)
+    # Create a new token that will expire 2 days from now
+    expires_on = datetime.utcnow() + timedelta(days=2)
+    CustomerResponseToken.objects.create(
+        expires_on=expires_on,
+        company_contact=mock_contact,
+        customer_response=mock_customer_response,
+    )
+    # Now, there should be an unexpired token for this contact
+    assert has_unexpired_token_for_contact(mock_contact)
