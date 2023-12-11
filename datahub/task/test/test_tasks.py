@@ -1216,6 +1216,43 @@ class TestTasksOverdue:
             any_order=True,
         )
 
+    def test_notifications_not_sent_to_archived_tasks_when_due_date_yeaterday(
+        self,
+        mock_notify_adviser_by_rq_email,
+        mock_statsd,
+    ):
+        # create a few tasks with and without due reminders with some that are archived
+        TaskFactory.create_batch(4)
+        matching_advisers = AdviserFactory.create_batch(3)
+        TaskFactory(
+            due_date=datetime.date.today() - datetime.timedelta(1),
+            archived=True,
+            advisers=[matching_advisers[0]],
+        )
+        TaskFactory(
+            due_date=datetime.date.today() - datetime.timedelta(1),
+            archived=True,
+            advisers=[matching_advisers[1]],
+        )
+        TaskFactory(
+            due_date=datetime.date.today() - datetime.timedelta(1),
+            archived=True,
+            advisers=[matching_advisers[2]],
+        )
+
+        template_id = str(uuid4())
+        with override_settings(
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
+        ):
+            tasks = generate_reminders_tasks_overdue()
+
+            assert tasks.count() == 0
+
+        mock_notify_adviser_by_rq_email.assert_has_calls(
+            [],
+            any_order=True,
+        )
+
     def test_emails_only_send_when_email_subscription_enabled_by_adviser(
         self,
         mock_notify_adviser_by_rq_email,
