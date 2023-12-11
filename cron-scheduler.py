@@ -81,7 +81,7 @@ def schedule_jobs():
     job_scheduler(
         function=schedule_reminders_tasks_overdue,
         cron=EVERY_EIGHT_AM,
-        description='Schedule reminders overdue tasks',
+        description='Schedule reminders tasks overdue',
     )
     job_scheduler(
         function=schedule_automatic_company_archive,

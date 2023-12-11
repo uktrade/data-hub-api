@@ -84,7 +84,7 @@ class TaskAssignedToMeFromOthersSubscription(BaseSubscription):
 
 class TaskOverdueSubscription(BaseSubscription, ScheduledSubscription):
     """
-    Subscription to get reminders about overdue tasks.
+    Subscription to get reminders about tasks overdue.
     """
 
 

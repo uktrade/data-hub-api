@@ -1369,7 +1369,7 @@ class TestTasksOverdue:
         mock_job_scheduler,
     ):
         """
-        Generate reminders overdue tasks should be called from
+        Generate reminders tasks overdue should be called from
         scheduler.
         """
         caplog.set_level(logging.INFO)
