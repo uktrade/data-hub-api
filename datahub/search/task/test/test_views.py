@@ -159,6 +159,37 @@ class TestTaskSearch(APITestMixin):
         assert response.data['count'] == 1
         assert response.data['results'][0]['id'] == str(task.id)
 
+    def test_search_task_not_advisers(self, opensearch_with_collector):
+        """Tests task search by not advisers id."""
+        advisers = AdviserFactory.create_batch(2)
+        not_advisers = AdviserFactory.create_batch(3)
+
+        task = TaskFactory(
+            advisers=advisers,
+        )
+        TaskFactory(
+            advisers=not_advisers,
+        )
+        TaskFactory(
+            advisers=not_advisers + advisers,
+        )
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:task')
+
+        response = self.api_client.post(
+            url,
+            data={'not_advisers': [not_adviser.id for not_adviser in not_advisers]},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['results'][0]['id'] == str(task.id)
+        assert len(response.data['results'][0]['advisers']) == 2
+        assert response.data['results'][0]['advisers'][0]['id'] == str(advisers[0].id)
+        assert response.data['results'][0]['advisers'][1]['id'] == str(advisers[1].id)
+
     @mock.patch('datahub.search.task.views.SearchTaskAPIView.deep_get')
     def test_search_task_without_filters(
         self,
