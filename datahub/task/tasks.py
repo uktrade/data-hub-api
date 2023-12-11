@@ -496,7 +496,7 @@ def send_task_email(adviser, task, reminder, update_task, email_template_class):
     )
 
 
-def schedule_reminders_overdue_tasks():
+def schedule_reminders_tasks_overdue():
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
         function=generate_reminders_tasks_overdue,

@@ -51,7 +51,7 @@ from datahub.reminder.tasks import (
     update_notify_email_delivery_status_for_no_recent_interaction,
 )
 from datahub.search.tasks import sync_all_models
-from datahub.task.tasks import schedule_reminders_overdue_tasks, schedule_reminders_upcoming_tasks
+from datahub.task.tasks import schedule_reminders_tasks_overdue, schedule_reminders_upcoming_tasks
 
 env = environ.Env()
 logger = getLogger(__name__)
@@ -79,7 +79,7 @@ def schedule_jobs():
         description='Schedule reminders upcoming tasks',
     )
     job_scheduler(
-        function=schedule_reminders_overdue_tasks,
+        function=schedule_reminders_tasks_overdue,
         cron=EVERY_EIGHT_AM,
         description='Schedule reminders overdue tasks',
     )

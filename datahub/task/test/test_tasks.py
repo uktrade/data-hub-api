@@ -53,7 +53,7 @@ from datahub.task.tasks import (
     notify_adviser_completed_task,
     notify_adviser_task_amended_by_others,
     schedule_advisers_added_to_task,
-    schedule_reminders_overdue_tasks,
+    schedule_reminders_tasks_overdue,
     schedule_reminders_upcoming_tasks,
     update_task_amended_by_others_email_status,
     update_task_assigned_to_me_from_others_email_status,
@@ -152,15 +152,15 @@ def mock_notify_adviser_task_due_email_call(
     )
 
 
-def mock_notify_adviser_overdue_task_email_call(
-    overdue_task,
+def mock_notify_adviser_task_overdue_email_call(
+    task_overdue,
     matching_adviser,
     template_id,
 ):
     reminder = TaskOverdueReminderFactory(
         adviser=matching_adviser,
-        task=overdue_task,
-        event=f'{overdue_task.title} is now overdue',
+        task=task_overdue,
+        event=f'{task_overdue.title} is now overdue',
     )
     reminder.id = ANY
     reminder.pk = ANY
@@ -168,7 +168,7 @@ def mock_notify_adviser_overdue_task_email_call(
     return mock.call(
         adviser=matching_adviser,
         template_identifier=template_id,
-        context=TaskOverdueEmailTemplate(overdue_task).get_context(),
+        context=TaskOverdueEmailTemplate(task_overdue).get_context(),
         update_task=update_task_overdue_reminder_email_status,
         reminders=[reminder],
     )
@@ -1153,7 +1153,7 @@ class TestTasksOverdue:
         else:
             mock_notify_adviser_by_rq_email.assert_not_called()
 
-    def test_generate_reminders_for_overdue_tasks(
+    def test_generate_reminders_for_tasks_overdue(
         self,
         mock_notify_adviser_by_rq_email,
         mock_statsd,
@@ -1202,12 +1202,12 @@ class TestTasksOverdue:
 
         mock_notify_adviser_by_rq_email.assert_has_calls(
             [
-                mock_notify_adviser_overdue_task_email_call(
+                mock_notify_adviser_task_overdue_email_call(
                     tasks_due[0],
                     matching_advisers[0],
                     template_id,
                 ),
-                mock_notify_adviser_overdue_task_email_call(
+                mock_notify_adviser_task_overdue_email_call(
                     tasks_due[2],
                     matching_advisers[1],
                     template_id,
@@ -1277,7 +1277,7 @@ class TestTasksOverdue:
 
         mock_notify_adviser_by_rq_email.assert_has_calls(
             [
-                mock_notify_adviser_overdue_task_email_call(
+                mock_notify_adviser_task_overdue_email_call(
                     task_due,
                     matching_advisers[0],
                     template_id,
@@ -1330,7 +1330,7 @@ class TestTasksOverdue:
 
         mock_notify_adviser_by_rq_email.assert_has_calls(
             [
-                mock_notify_adviser_overdue_task_email_call(
+                mock_notify_adviser_task_overdue_email_call(
                     task_due,
                     adviser,
                     template_id,
@@ -1363,7 +1363,7 @@ class TestTasksOverdue:
         )
         assert linked_reminders.count() == (reminder_number)
 
-    def test_schedule_reminders_overdue_tasks(
+    def test_schedule_reminders_tasks_overdue(
         self,
         caplog,
         mock_job_scheduler,
@@ -1374,7 +1374,7 @@ class TestTasksOverdue:
         """
         caplog.set_level(logging.INFO)
 
-        job = schedule_reminders_overdue_tasks()
+        job = schedule_reminders_tasks_overdue()
         mock_job_scheduler.assert_called_once()
 
         # check result
