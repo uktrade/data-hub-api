@@ -27,10 +27,12 @@ class TaskSerializer(serializers.ModelSerializer):
     archived = serializers.BooleanField(read_only=True)
     investment_project = NestedInvestmentProjectInvestorCompanyField(
         required=False,
+        allow_null=True,
     )
     company = NestedRelatedField(
         Company,
         required=False,
+        allow_null=True,
     )
 
     def to_representation(self, instance):
