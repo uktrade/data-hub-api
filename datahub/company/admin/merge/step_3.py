@@ -12,10 +12,15 @@ from django.views.decorators.csrf import csrf_protect
 
 from datahub.company.merge import (
     get_planned_changes,
-    merge_companies,
     MergeNotAllowedError,
     transform_merge_results_to_merge_entry_summaries,
 )
+
+from datahub.company.merge_company import (
+    MERGE_CONFIGURATION,
+)
+
+from datahub.company.merge_company import merge_companies
 from datahub.core.templatetags.datahub_extras import verbose_name_for_count
 
 REVERSION_REVISION_COMMENT = 'Company marked as a duplicate and related records transferred.'
@@ -61,7 +66,8 @@ def confirm_merge(model_admin, request):
     template_name = 'admin/company/company/merge/step_3_confirm_selection.html'
     title = gettext_lazy('Confirm merge')
 
-    planned_merge_results, should_archive_source = get_planned_changes(source_company)
+    planned_merge_results, should_archive_source = get_planned_changes(source_company, MERGE_CONFIGURATION)
+    # planned_merge_results, should_archive_source = get_planned_changes(source_company)
     merge_entries = transform_merge_results_to_merge_entry_summaries(
         planned_merge_results,
         skip_zeroes=True,
@@ -100,7 +106,7 @@ def _perform_merge(request, source_company, target_company, model_admin):
 def _build_success_msg(source_company, target_company, merge_results):
     merge_entries = transform_merge_results_to_merge_entry_summaries(
         merge_results,
-        skip_zeroes=True,
+        skip_zeroes=True
     )
 
     messages = (

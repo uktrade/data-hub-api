@@ -262,7 +262,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         ),
     )
     @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
-    @patch('datahub.company.merge_contact.is_contact_a_valid_merge_source')
+    @patch('datahub.company.merge_contact.is_model_a_valid_merge_source')
     def test_merge_fails(
         self,
         is_contact_a_valid_merge_source_mock,
