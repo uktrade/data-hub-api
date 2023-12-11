@@ -31,7 +31,6 @@ class SearchTaskAPIViewMixin:
 
     REMAP_FIELDS = {
         'advisers': 'advisers.id',
-        'not_advisers': 'advisers.id',
         'created_by': 'created_by.id',
         'company': 'company.id',
         'investment_project': 'investment_project.id',

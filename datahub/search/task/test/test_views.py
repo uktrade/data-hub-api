@@ -187,8 +187,17 @@ class TestTaskSearch(APITestMixin):
         assert response.data['count'] == 1
         assert response.data['results'][0]['id'] == str(task.id)
         assert len(response.data['results'][0]['advisers']) == 2
-        assert response.data['results'][0]['advisers'][0]['id'] == str(advisers[0].id)
-        assert response.data['results'][0]['advisers'][1]['id'] == str(advisers[1].id)
+        assert set(
+            [
+                response.data['results'][0]['advisers'][0]['id'],
+                response.data['results'][0]['advisers'][1]['id'],
+            ],
+        ) == set(
+            [
+                str(advisers[0].id),
+                str(advisers[1].id),
+            ],
+        )
 
     @mock.patch('datahub.search.task.views.SearchTaskAPIView.deep_get')
     def test_search_task_without_filters(
@@ -260,9 +269,12 @@ class TestTaskSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
 
-        assert set([
-            response.data['results'][0]['id'], response.data['results'][1]['id'],
-        ]) == set([str(yesterday_task.id), str(today_task.id)])
+        assert set(
+            [
+                response.data['results'][0]['id'],
+                response.data['results'][1]['id'],
+            ]
+        ) == set([str(yesterday_task.id), str(today_task.id)])
 
 
 class TestTaskInvestmentProjectSearch(APITestMixin):
