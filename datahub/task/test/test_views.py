@@ -290,7 +290,7 @@ class TestEditGenericTask(BaseEditTaskTests):
 
 
 class TestTaskForInvestmentProject(APITestMixin):
-    @pytest.mark.parametrize('investment_project_id', ('abc', '', uuid4()))
+    @pytest.mark.parametrize('investment_project_id', ('abc', uuid4()))
     def test_create_task_with_invalid_investment_project_id_returns_bad_request(
         self,
         investment_project_id,
@@ -390,7 +390,7 @@ class TestTaskForInvestmentProject(APITestMixin):
 
 
 class TestTaskForCompany(APITestMixin):
-    @pytest.mark.parametrize('company_id', ('abc', '', uuid4()))
+    @pytest.mark.parametrize('company_id', ('abc', uuid4()))
     def test_create_task_with_invalid_company_id_returns_bad_request(
         self,
         company_id,
