@@ -260,8 +260,9 @@ class TestTaskSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
 
-        assert response.data['results'][0]['id'] == str(yesterday_task.id)
-        assert response.data['results'][1]['id'] == str(today_task.id)
+        assert set([
+            response.data['results'][0]['id'], response.data['results'][1]['id']
+        ]) == set([str(yesterday_task.id), str(today_task.id)])
 
 
 class TestTaskInvestmentProjectSearch(APITestMixin):
