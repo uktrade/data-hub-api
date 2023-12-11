@@ -12,8 +12,11 @@ from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
 from datahub.company.merge_contact import (
-    get_planned_changes,
     merge_contacts,
+    MERGE_CONFIGURATION,
+)
+from datahub.company.merge import (
+    get_planned_changes,
     MergeNotAllowedError,
     transform_merge_results_to_merge_entry_summaries,
 )
@@ -62,7 +65,7 @@ def confirm_merge(model_admin, request):
     template_name = 'admin/company/contact/merge/step_3_confirm_selection.html'
     title = gettext_lazy('Confirm merge')
 
-    planned_merge_results, should_archive_source = get_planned_changes(source_contact)
+    planned_merge_results, should_archive_source = get_planned_changes(source_contact, MERGE_CONFIGURATION)
     merge_entries = transform_merge_results_to_merge_entry_summaries(
         planned_merge_results,
         skip_zeroes=True,

@@ -14,7 +14,7 @@ from rest_framework import status
 from reversion.models import Version
 
 from datahub.company.admin.merge.step_3 import REVERSION_REVISION_COMMENT
-from datahub.company.merge import FIELD_TO_DESCRIPTION_MAPPING, INVESTMENT_PROJECT_COMPANY_FIELDS
+from datahub.company.merge_company import FIELD_TO_DESCRIPTION_MAPPING, INVESTMENT_PROJECT_COMPANY_FIELDS
 from datahub.company.models import Company, Contact
 from datahub.company.test.factories import (
     ArchivedCompanyFactory,
@@ -232,6 +232,14 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         ):
             obj.refresh_from_db()
 
+        # for obj in source_non_project_related_objects:
+        #     print('*************************************')
+        #     print(source_non_project_related_objects)
+        #     print(target_company)
+        #     print(source_company)
+            # print(obj.company)
+        
+
         assert all(obj.company == target_company for obj in source_non_project_related_objects)
         assert all(obj.modified_on == merge_time for obj in source_non_project_related_objects)
 
@@ -307,7 +315,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             ),
         ),
     )
-    @patch('datahub.company.merge.is_company_a_valid_merge_source')
+    @patch('datahub.company.merge.is_model_a_valid_merge_source')
     def test_merge_fails(
         self,
         is_company_a_valid_merge_source_mock,

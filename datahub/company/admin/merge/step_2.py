@@ -1,6 +1,7 @@
 import logging
 
 from django import forms
+from datahub.company.models import Company
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import PermissionDenied, SuspiciousOperation, ValidationError
 from django.http import HttpResponseRedirect
@@ -11,9 +12,13 @@ from django.views.decorators.csrf import csrf_protect
 
 from datahub.company.merge import (
     get_planned_changes,
-    is_company_a_valid_merge_source,
-    is_company_a_valid_merge_target,
+    is_model_a_valid_merge_source,
+    is_model_a_valid_merge_target,
     transform_merge_results_to_merge_entry_summaries,
+)
+from datahub.company.merge_company import ( 
+    MERGE_CONFIGURATION, 
+    ALLOWED_RELATIONS_FOR_MERGING
 )
 from datahub.core.utils import reverse_with_query_string
 
@@ -63,10 +68,10 @@ class SelectPrimaryCompanyForm(forms.Form):
         target_company = self._company_1 if company_index == '1' else self._company_2
         source_company = self._company_1 if company_index != '1' else self._company_2
 
-        if not is_company_a_valid_merge_target(target_company):
+        if not is_model_a_valid_merge_target(target_company):
             raise ValidationError(self.INVALID_TARGET_COMPANY_MSG)
 
-        is_source_valid, disallowed_objects = is_company_a_valid_merge_source(source_company)
+        is_source_valid, disallowed_objects = is_model_a_valid_merge_source(source_company, ALLOWED_RELATIONS_FOR_MERGING, Company)
         if not is_source_valid:
             error_msg = f'{self.INVALID_SOURCE_COMPANY_MSG}: Invalid object: {disallowed_objects}'
             logger.error(error_msg)
@@ -135,11 +140,11 @@ def select_primary_company(model_admin, request):
 
 
 def _build_option_context(source_company, target_company):
-    merge_results, _ = get_planned_changes(target_company)
+    merge_results, _ = get_planned_changes(target_company, MERGE_CONFIGURATION)
     merge_entries = transform_merge_results_to_merge_entry_summaries(merge_results)
 
-    is_source_valid, invalid_objects = is_company_a_valid_merge_source(source_company)
-    is_target_valid = is_company_a_valid_merge_target(target_company)
+    is_source_valid, invalid_objects = is_model_a_valid_merge_source(source_company, ALLOWED_RELATIONS_FOR_MERGING, Company)
+    is_target_valid = is_model_a_valid_merge_target(target_company)
 
     return {
         'target': target_company,

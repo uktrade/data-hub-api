@@ -192,7 +192,7 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
             ),
         ),
     )
-    @patch('datahub.company.merge.is_company_a_valid_merge_source')
+    @patch('datahub.company.merge.is_model_a_valid_merge_source')
     def test_error_displayed_if_invalid_selection_made(
         self,
         is_company_a_valid_merge_source_mock,

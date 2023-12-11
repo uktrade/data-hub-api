@@ -6,8 +6,11 @@ from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.company.merge_contact import (
-    get_planned_changes,
     merge_contacts,
+    MERGE_CONFIGURATION,
+)
+from datahub.company.merge import (
+    get_planned_changes,
     MergeNotAllowedError,
 )
 from datahub.core import constants
@@ -193,7 +196,7 @@ class TestDuplicateContactMerger:
         cases.
         """
         source_contact = source_contact_factory()
-        merge_results = get_planned_changes(source_contact)
+        merge_results = get_planned_changes(source_contact, MERGE_CONFIGURATION)
 
         expected_planned_merge_results = (expected_result, expected_should_archive)
         assert merge_results == expected_planned_merge_results
@@ -560,8 +563,8 @@ class TestDuplicateContactMerger:
             ((False, ['field']), False),
         )
     )
-    @patch('datahub.company.merge_contact.is_contact_a_valid_merge_target')
-    @patch('datahub.company.merge_contact.is_contact_a_valid_merge_source')
+    @patch('datahub.company.merge_contact.is_model_a_valid_merge_target')
+    @patch('datahub.company.merge_contact.is_model_a_valid_merge_source')
     def test_merge_fails_when_not_allowed(
         self,
         is_contact_a_valid_merge_source_mock,

@@ -4,7 +4,7 @@ import pytest
 import reversion
 from django.core.management import call_command
 
-from datahub.company.merge import merge_companies
+from datahub.company.merge_company import merge_companies
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import create_test_user
 

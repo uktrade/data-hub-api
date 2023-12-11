@@ -162,10 +162,10 @@ class TestSelectPrimaryContactViewPost(AdminTestMixin):
             ),
         ),
     )
-    @patch('datahub.company.merge_contact.is_contact_a_valid_merge_source')
+    @patch('datahub.company.merge_contact.is_model_a_valid_merge_source')
     def test_error_displayed_if_invalid_selection_made(
         self,
-        is_contact_a_valid_merge_source_mock,
+        is_model_a_valid_merge_source_mock,
         swap,
         contact_1_factory,
         contact_2_factory,

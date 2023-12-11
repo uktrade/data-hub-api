@@ -10,9 +10,14 @@ from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
 from datahub.company.merge_contact import (
+    MERGE_CONFIGURATION,
+    ALLOWED_RELATIONS_FOR_MERGING
+)
+
+from datahub.company.merge import (
     get_planned_changes,
-    is_contact_a_valid_merge_source,
-    is_contact_a_valid_merge_target,
+    is_model_a_valid_merge_source,
+    is_model_a_valid_merge_target,
     transform_merge_results_to_merge_entry_summaries,
 )
 
@@ -60,10 +65,10 @@ class SelectPrimaryContactForm(forms.Form):
         target_contact = self._contact_1 if contact_index == '1' else self._contact_2
         source_contact = self._contact_1 if contact_index != '1' else self._contact_2
 
-        if not is_contact_a_valid_merge_target(target_contact):
+        if not is_model_a_valid_merge_target(target_contact):
             raise ValidationError(self.INVALID_TARGET_CONTACT_MSG)
 
-        is_source_valid, disallowed_objects = is_contact_a_valid_merge_source(source_contact)
+        is_source_valid, disallowed_objects = is_model_a_valid_merge_source(source_contact, ALLOWED_RELATIONS_FOR_MERGING)
         if not is_source_valid:
             error_msg = f'{self.INVALID_SOURCE_CONTACT_MSG}: Invalid object: {disallowed_objects}'
             logger.error(error_msg)
@@ -130,10 +135,10 @@ def select_primary_contact(model_admin, request):
     return TemplateResponse(request, template_name, context)
 
 def _build_option_context(source_contact, target_contact):
-    merge_results, _ = get_planned_changes(target_contact)
+    merge_results, _ = get_planned_changes(target_contact, MERGE_CONFIGURATION)
     merge_entries = transform_merge_results_to_merge_entry_summaries(merge_results)
-    is_source_valid, invalid_objects = is_contact_a_valid_merge_source(source_contact)
-    is_target_valid = is_contact_a_valid_merge_target(target_contact)
+    is_source_valid, invalid_objects = is_model_a_valid_merge_source(source_contact, ALLOWED_RELATIONS_FOR_MERGING)
+    is_target_valid = is_model_a_valid_merge_target(target_contact)
 
     return {
         'target': target_contact,
