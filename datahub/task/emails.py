@@ -84,7 +84,7 @@ class UpcomingTaskEmailTemplate(EmailTemplate):
 
 
 class TaskOverdueEmailTemplate(EmailTemplate):
-    def __init__(self, task):
+    def __init__(self, task: Task):
         super().__init__(task)
 
     @property
