@@ -20,6 +20,8 @@ from datahub.reminder.models import (
     TaskAssignedToMeFromOthersSubscription,
     TaskCompletedReminder,
     TaskCompletedSubscription,
+    TaskOverdueReminder,
+    TaskOverdueSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
 )
@@ -27,12 +29,14 @@ from datahub.reminder.test.factories import (
     TaskAmendedByOthersReminderFactory,
     TaskAssignedToMeFromOthersReminderFactory,
     TaskCompletedReminderFactory,
+    TaskOverdueReminderFactory,
     UpcomingTaskReminderFactory,
 )
 from datahub.task.emails import (
     TaskAmendedByOthersEmailTemplate,
     TaskAssignedToOthersEmailTemplate,
     TaskCompletedEmailTemplate,
+    TaskOverdueEmailTemplate,
     UpcomingTaskEmailTemplate,
 )
 
@@ -41,16 +45,20 @@ from datahub.task.tasks import (
     create_task_completed_subscription,
     create_task_overdue_subscription_task,
     create_task_reminder_subscription_task,
+    create_tasks_overdue_reminder,
     create_upcoming_task_reminder,
+    generate_reminders_tasks_overdue,
     generate_reminders_upcoming_tasks,
     notify_adviser_added_to_task,
     notify_adviser_completed_task,
     notify_adviser_task_amended_by_others,
     schedule_advisers_added_to_task,
+    schedule_reminders_tasks_overdue,
     schedule_reminders_upcoming_tasks,
     update_task_amended_by_others_email_status,
     update_task_assigned_to_me_from_others_email_status,
     update_task_completed_email_status,
+    update_task_overdue_reminder_email_status,
     update_task_reminder_email_status,
 )
 from datahub.task.test.factories import AdviserFactory, TaskFactory
@@ -108,6 +116,20 @@ def task_factory_due_on_date(days=1, advisers=None, due_date=None):
     )
 
 
+def task_factory_overdue_date(days, advisers=None, due_date=None):
+    if not advisers:
+        advisers = [AdviserFactory()]
+    if not due_date:
+        due_date = datetime.date.today()
+    if advisers:
+        [create_task_overdue_subscription_task(adviser.id) for adviser in advisers]
+    return TaskFactory(
+        due_date=datetime.date.today() - datetime.timedelta(days),
+        reminder_days=days,
+        advisers=advisers,
+    )
+
+
 def mock_notify_adviser_task_due_email_call(
     task_due,
     matching_adviser,
@@ -126,6 +148,28 @@ def mock_notify_adviser_task_due_email_call(
         template_identifier=template_id,
         context=UpcomingTaskEmailTemplate(task_due).get_context(),
         update_task=update_task_reminder_email_status,
+        reminders=[reminder],
+    )
+
+
+def mock_notify_adviser_task_overdue_email_call(
+    task_overdue,
+    matching_adviser,
+    template_id,
+):
+    reminder = TaskOverdueReminderFactory(
+        adviser=matching_adviser,
+        task=task_overdue,
+        event=f'{task_overdue.title} is now overdue',
+    )
+    reminder.id = ANY
+    reminder.pk = ANY
+
+    return mock.call(
+        adviser=matching_adviser,
+        template_identifier=template_id,
+        context=TaskOverdueEmailTemplate(task_overdue).get_context(),
+        update_task=update_task_overdue_reminder_email_status,
         reminders=[reminder],
     )
 
@@ -1060,3 +1104,278 @@ class TestTaskScheduler:
         ]
         expected_calls = [item for sublist in adviser_calls for item in sublist]
         mock_job_scheduler.assert_has_calls(expected_calls)
+
+
+class TestTasksOverdue:
+    @pytest.mark.parametrize(
+        'lock_acquired',
+        (
+            False,
+            True,
+        ),
+    )
+    def test_lock(
+        self,
+        caplog,
+        monkeypatch,
+        lock_acquired,
+        mock_notify_adviser_by_rq_email,
+    ):
+        """
+        Test that the task doesn't run if it cannot acquire
+        the advisory_lock.
+        """
+        adviser = AdviserFactory()
+        task_factory_overdue_date(1, advisers=[adviser])
+
+        caplog.set_level(logging.INFO, logger='datahub.task.tasks')
+
+        mock_advisory_lock = mock.MagicMock()
+        mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
+        monkeypatch.setattr(
+            'datahub.task.tasks.advisory_lock',
+            mock_advisory_lock,
+        )
+        mock_notify_adviser_by_rq_email.reset_mock()
+
+        generate_reminders_tasks_overdue()
+
+        expected_message = (
+            'Task generate_reminders_tasks_overdue completed'
+            if lock_acquired
+            else 'Reminders for tasks overdue are already being processed by another worker.'
+        )
+
+        assert expected_message in caplog.messages
+
+        if lock_acquired:
+            mock_notify_adviser_by_rq_email.assert_called_once()
+        else:
+            mock_notify_adviser_by_rq_email.assert_not_called()
+
+    def test_generate_reminders_for_tasks_overdue(
+        self,
+        mock_notify_adviser_by_rq_email,
+        mock_statsd,
+    ):
+        # create a few tasks with and without due reminders with some that are archived
+        TaskFactory.create_batch(4)
+        tasks_due = []
+        matching_advisers = AdviserFactory.create_batch(3)
+        TaskFactory(
+            due_date=datetime.date.today() - datetime.timedelta(1),
+            archived=True,
+            advisers=[matching_advisers[0]],
+        )
+        TaskFactory(
+            due_date=datetime.date.today() - datetime.timedelta(1),
+            archived=True,
+            advisers=[matching_advisers[1]],
+        )
+        tasks_due.append(
+            task_factory_overdue_date(
+                1,
+                advisers=[matching_advisers[0]],
+            ),
+        )
+        tasks_due.append(
+            task_factory_overdue_date(
+                7,
+                advisers=[matching_advisers[1]],
+            ),
+        )
+        tasks_due.append(
+            task_factory_overdue_date(
+                1,
+                advisers=[matching_advisers[1]],
+            ),
+        )
+        tasks_due.append(task_factory_overdue_date(30, advisers=matching_advisers))
+
+        template_id = str(uuid4())
+        with override_settings(
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
+        ):
+            tasks = generate_reminders_tasks_overdue()
+
+            assert tasks.count() == 2
+
+        mock_notify_adviser_by_rq_email.assert_has_calls(
+            [
+                mock_notify_adviser_task_overdue_email_call(
+                    tasks_due[0],
+                    matching_advisers[0],
+                    template_id,
+                ),
+                mock_notify_adviser_task_overdue_email_call(
+                    tasks_due[2],
+                    matching_advisers[1],
+                    template_id,
+                ),
+            ],
+            any_order=True,
+        )
+
+    def test_notifications_not_sent_to_archived_tasks_when_due_date_yeaterday(
+        self,
+        mock_notify_adviser_by_rq_email,
+        mock_statsd,
+    ):
+        # create a few tasks with and without due reminders with some that are archived
+        TaskFactory.create_batch(4)
+        matching_advisers = AdviserFactory.create_batch(3)
+        TaskFactory(
+            due_date=datetime.date.today() - datetime.timedelta(1),
+            archived=True,
+            advisers=[matching_advisers[0]],
+        )
+        TaskFactory(
+            due_date=datetime.date.today() - datetime.timedelta(1),
+            archived=True,
+            advisers=[matching_advisers[1]],
+        )
+        TaskFactory(
+            due_date=datetime.date.today() - datetime.timedelta(1),
+            archived=True,
+            advisers=[matching_advisers[2]],
+        )
+
+        template_id = str(uuid4())
+        with override_settings(
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
+        ):
+            tasks = generate_reminders_tasks_overdue()
+
+            assert tasks.count() == 0
+
+        mock_notify_adviser_by_rq_email.assert_has_calls(
+            [],
+            any_order=True,
+        )
+
+    def test_emails_only_send_when_email_subscription_enabled_by_adviser(
+        self,
+        mock_notify_adviser_by_rq_email,
+        mock_statsd,
+    ):
+        # Create two advisers one with and one without an task reminder email subscription
+        matching_advisers = AdviserFactory.create_batch(2)
+
+        task_due = task_factory_overdue_date(1, advisers=matching_advisers)
+        subscription = TaskOverdueSubscription.objects.filter(
+            adviser=matching_advisers[1],
+        ).first()
+        subscription.email_reminders_enabled = False
+        subscription.save()
+        mock_notify_adviser_by_rq_email.reset_mock()
+
+        template_id = str(uuid4())
+        with override_settings(
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
+        ):
+            generate_reminders_tasks_overdue()
+
+        mock_notify_adviser_by_rq_email.assert_has_calls(
+            [
+                mock_notify_adviser_task_overdue_email_call(
+                    task_due,
+                    matching_advisers[0],
+                    template_id,
+                ),
+            ],
+        )
+        mock_notify_adviser_by_rq_email.assert_called_once()
+
+    def test_notification_received_but_no_email_sent_to_adviser_when_email_subscription_disabled(
+        self,
+        mock_notify_adviser_by_rq_email,
+        mock_statsd,
+        caplog,
+    ):
+        caplog.set_level(logging.INFO)
+
+        # Create two advisers one with and one without an task reminder email subscription
+        adviser = AdviserFactory()
+        task_due = task_factory_overdue_date(1, advisers=[adviser])
+
+        create_tasks_overdue_reminder(task_due, adviser, False, timezone.now())
+
+        reminder = TaskOverdueReminder.objects.filter(adviser=adviser, task=task_due).first()
+        assert reminder is not None
+
+        mock_notify_adviser_by_rq_email.assert_not_called()
+
+        assert caplog.messages == [
+            f'No email for TaskOverdueReminder with id {reminder.id} sent to adviser '
+            f'{adviser.id} for task {task_due.id}, as email reminders are turned off in their '
+            'subscription',
+        ]
+
+    def test_if_reminder_already_sent_the_same_day_do_nothing(
+        self,
+        mock_notify_adviser_by_rq_email,
+        mock_statsd,
+    ):
+        adviser = AdviserFactory()
+
+        task_due = task_factory_overdue_date(1, advisers=[adviser])
+        mock_notify_adviser_by_rq_email.reset_mock()
+
+        template_id = str(uuid4())
+        with override_settings(
+            TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
+        ):
+            generate_reminders_tasks_overdue()
+            generate_reminders_tasks_overdue()
+
+        mock_notify_adviser_by_rq_email.assert_has_calls(
+            [
+                mock_notify_adviser_task_overdue_email_call(
+                    task_due,
+                    adviser,
+                    template_id,
+                ),
+            ],
+        )
+        mock_notify_adviser_by_rq_email.assert_called_once()
+
+    def test_update_task_reminder_email_status(
+        self,
+    ):
+        """
+        Test it updates reminder data with the connected email notification information.
+        """
+        task1 = TaskFactory()
+        reminder_number = 3
+        notification_id = str(uuid4())
+        reminders = TaskOverdueReminderFactory.create_batch(reminder_number, task_id=task1.id)
+
+        update_task_overdue_reminder_email_status(
+            notification_id,
+            [reminder.id for reminder in reminders],
+        )
+
+        task2 = TaskFactory()
+        TaskOverdueReminderFactory.create_batch(2, task_id=task2.id)
+
+        linked_reminders = TaskOverdueReminder.objects.filter(
+            email_notification_id=notification_id,
+        )
+        assert linked_reminders.count() == (reminder_number)
+
+    def test_schedule_reminders_tasks_overdue(
+        self,
+        caplog,
+        mock_job_scheduler,
+    ):
+        """
+        Generate reminders tasks overdue should be called from
+        scheduler.
+        """
+        caplog.set_level(logging.INFO)
+
+        job = schedule_reminders_tasks_overdue()
+        mock_job_scheduler.assert_called_once()
+
+        # check result
+        assert caplog.messages[0] == (f'Task {job.id} generate_reminders_tasks_overdue scheduled')

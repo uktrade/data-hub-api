@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from django.conf import settings
@@ -15,6 +16,7 @@ from datahub.reminder.models import (
     TaskAssignedToMeFromOthersSubscription,
     TaskCompletedReminder,
     TaskCompletedSubscription,
+    TaskOverdueReminder,
     TaskOverdueSubscription,
     UpcomingTaskReminder,
     UpcomingTaskReminderSubscription,
@@ -24,6 +26,7 @@ from datahub.task.emails import (
     TaskAmendedByOthersEmailTemplate,
     TaskAssignedToOthersEmailTemplate,
     TaskCompletedEmailTemplate,
+    TaskOverdueEmailTemplate,
     UpcomingTaskEmailTemplate,
 )
 from datahub.task.models import Task
@@ -170,6 +173,18 @@ def update_task_reminder_email_status(email_notification_id, reminder_ids):
 
     logger.info(
         'Task update_task_reminder_email_status completed, setting '
+        f'email_notification_id to {email_notification_id} for reminder_ids {reminder_ids}',
+    )
+
+
+def update_task_overdue_reminder_email_status(email_notification_id, reminder_ids):
+    reminders = TaskOverdueReminder.all_objects.filter(id__in=reminder_ids)
+    for reminder in reminders:
+        reminder.email_notification_id = email_notification_id
+        reminder.save()
+
+    logger.info(
+        'Task update_task_overdue_reminder_email_status completed, setting '
         f'email_notification_id to {email_notification_id} for reminder_ids {reminder_ids}',
     )
 
@@ -479,3 +494,100 @@ def send_task_email(adviser, task, reminder, update_task, email_template_class):
         update_task=update_task,
         reminders=[reminder],
     )
+
+
+def schedule_reminders_tasks_overdue():
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=generate_reminders_tasks_overdue,
+        job_timeout=HALF_DAY_IN_SECONDS,
+        max_retries=5,
+        retry_backoff=True,
+        retry_intervals=30,
+    )
+    logger.info(
+        f'Task {job.id} generate_reminders_tasks_overdue scheduled',
+    )
+    return job
+
+
+def generate_reminders_tasks_overdue():
+    with advisory_lock(
+        'generate_reminders_tasks_overdue',
+        wait=False,
+    ) as acquired:
+        if not acquired:
+            logger.info(
+                'Reminders for tasks overdue are already being processed by another worker.',
+            )
+            return
+        now = timezone.now()
+        yesterday = datetime.date.today() - datetime.timedelta(days=1)
+        tasks = Task.objects.filter(due_date=yesterday).exclude(archived=True)
+        for task in tasks:
+            # Get all active advisers assigned to the task
+            active_advisers = task.advisers.filter(is_active=True)
+            for adviser in active_advisers:
+                # Get subscription to know if emails are needed
+                adviser_subscription = TaskOverdueSubscription.objects.filter(
+                    adviser=adviser,
+                ).first()
+                if adviser_subscription:
+                    create_tasks_overdue_reminder(
+                        task,
+                        adviser,
+                        adviser_subscription.email_reminders_enabled,
+                        now,
+                    )
+
+        logger.info(
+            'Task generate_reminders_tasks_overdue completed',
+        )
+        return tasks
+
+
+def create_tasks_overdue_reminder(
+    task,
+    adviser,
+    send_email,
+    current_date,
+):
+    """
+    Creates a reminder and sends an email if required.
+
+    If a reminder has already been sent on the same day, then do nothing.
+    """
+    if _has_existing_tasks_overdue_reminder(task, adviser, current_date):
+        return
+
+    reminder = TaskOverdueReminder.objects.create(
+        adviser=adviser,
+        event=f'{task.title} is now overdue',
+        task=task,
+    )
+
+    if send_email:
+        send_task_email(
+            adviser=adviser,
+            task=task,
+            reminder=reminder,
+            update_task=update_task_overdue_reminder_email_status,
+            email_template_class=TaskOverdueEmailTemplate,
+        )
+    else:
+        logger.info(
+            f'No email for TaskOverdueReminder with id {reminder.id} sent to adviser '
+            f'{adviser.id} for task {task.id}, as email reminders are turned off in their '
+            'subscription',
+        )
+
+    return reminder
+
+
+def _has_existing_tasks_overdue_reminder(task, adviser, current_date):
+    return TaskOverdueReminder.objects.filter(
+        task=task,
+        adviser=adviser,
+        created_on__month=current_date.month,
+        created_on__year=current_date.year,
+    ).exists()
