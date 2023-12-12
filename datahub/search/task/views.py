@@ -16,7 +16,7 @@ class SearchTaskAPIViewMixin:
     search_app = TaskSearchApp
     serializer_class = SearchTaskQuerySerializer
     es_sort_by_remappings = {}
-    fields_to_exclude = ('not_created_by',)
+    fields_to_exclude = ('not_created_by', 'not_advisers')
 
     FILTER_FIELDS = (
         'archived',
@@ -71,6 +71,21 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
                 },
             )
 
+        if request.data.get('not_advisers'):
+            must_not.append(
+                {
+                    'bool': {
+                        'minimum_should_match': 1,
+                        'should': [
+                            {
+                                'match': {'advisers.id': {'operator': 'and', 'query': adviser}},
+                            }
+                            for adviser in request.data['not_advisers']
+                        ],
+                    },
+                },
+            )
+
         if len(must_not) > 0:
             raw_query = base_query.to_dict()
             filters = self.deep_get(raw_query, 'query|bool|filter')
@@ -90,5 +105,4 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
             raw_query['query']['bool']['filter'] = filters
 
             base_query.update_from_dict(raw_query)
-
         return base_query
