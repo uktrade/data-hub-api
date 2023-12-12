@@ -187,17 +187,13 @@ class TestTaskSearch(APITestMixin):
         assert response.data['count'] == 1
         assert response.data['results'][0]['id'] == str(task.id)
         assert len(response.data['results'][0]['advisers']) == 2
-        assert set(
-            [
-                response.data['results'][0]['advisers'][0]['id'],
-                response.data['results'][0]['advisers'][1]['id'],
-            ],
-        ) == set(
-            [
-                str(advisers[0].id),
-                str(advisers[1].id),
-            ],
-        )
+        assert {
+            response.data['results'][0]['advisers'][0]['id'],
+            response.data['results'][0]['advisers'][1]['id'],
+        } == {
+            str(advisers[0].id),
+            str(advisers[1].id),
+        }
 
     @mock.patch('datahub.search.task.views.SearchTaskAPIView.deep_get')
     def test_search_task_without_filters(
