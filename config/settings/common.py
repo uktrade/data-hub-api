@@ -529,7 +529,7 @@ GOVUK_PAY_TIMEOUT = 15  # seconds
 GOVUK_PAY_PAYMENT_DESCRIPTION = 'Overseas Market Introduction Service order {reference}'
 GOVUK_PAY_RETURN_URL = f'{OMIS_PUBLIC_ORDER_URL}/payment/card/{{session_id}}'
 
-PAAS_IP_WHITELIST = env.list('PAAS_IP_WHITELIST', default=[])
+PAAS_IP_ALLOWLIST = env.list('PAAS_IP_ALLOWLIST', default=[])
 DISABLE_PAAS_IP_CHECK = env.bool('DISABLE_PAAS_IP_CHECK', default=False)
 
 # Hawk

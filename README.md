@@ -472,7 +472,7 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 | `OPENSEARCH_SEARCH_REQUEST_TIMEOUT`                                   | No                                          | Timeout (in seconds) for searches (default=20).                                                                                                                                  |
 | `OPENSEARCH_SEARCH_REQUEST_WARNING_THRESHOLD`                         | No                                          | Threshold (in seconds) for emitting warnings about slow searches (default=10).                                                                                                   |
 | `OPENSEARCH_VERIFY_CERTS`                                             | No                                          |                                                                                                                                                                                  |
-| `PAAS_IP_WHITELIST`                                                   | No                                          | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints.                                                                                                 |
+| `PAAS_IP_ALLOWLIST`                                                   | No                                          | IP addresses (comma-separated) that can access the Hawk-authenticated endpoints.                                                                                                 |
 | `REDIS_BASE_URL`                                                      | No                                          | redis base URL without the db                                                                                                                                                    |
 | `REDIS_CACHE_DB`                                                      | No                                          | redis db for django cache (default 0)                                                                                                                                            |
 | `REPORT_AWS_ACCESS_KEY_ID`                                            | No                                          | Same use as AWS_ACCESS_KEY_ID, but for reports.                                                                                                                                  |
@@ -572,13 +572,13 @@ adding and upgrading dependencies.
 
 The `/v3/activity-stream/*` endpoints are protected by two mechanisms:
 
-- IP address whitelisting via the `X-Forwarded-For` header, with a comma separated list of whitelisted IPs in the environment variable `PAAS_IP_WHITELIST`.
+- IP address allowlisting via the `X-Forwarded-For` header, with a comma separated list of allowlisted IPs in the environment variable `PAAS_IP_ALLOWLIST`.
 
 - Hawk authentication via the `Authorization` header, with the credentials in the environment variables `ACTIVITY_STREAM_ACCESS_KEY_ID` and `ACTIVITY_STREAM_SECRET_ACCESS_KEY`.
 
-### IP address whitelisting
+### IP address allowlisted
 
-The authentication blocks requests that do not have a whitelisted IP in the second-from-the-end IP in `X-Forwarded-For` header. In general, this cannot be trusted. However, in PaaS, this can be, and this is the only production environment. Ideally, this would be done at a lower level than HTTP, but this is not possible with the current architecture.
+The authentication blocks requests that do not have a allowlisteded IP in the second-from-the-end IP in `X-Forwarded-For` header. In general, this cannot be trusted. However, in PaaS, this can be, and this is the only production environment. Ideally, this would be done at a lower level than HTTP, but this is not possible with the current architecture.
 
 If making requests to this endpoint locally, you must manually add this header or disable the check using `DISABLE_PAAS_IP_CHECK` environment variable.
 

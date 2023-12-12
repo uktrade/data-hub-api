@@ -40,8 +40,8 @@ class TestViewPublicOrderDetails(APITestMixin):
         response = hawk_api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_without_whitelisted_ip(self, public_omis_api_client):
-        """Test that making a request without the whitelisted client IP returns an error."""
+    def test_without_allowlisted_ip(self, public_omis_api_client):
+        """Test that making a request without the allowlisted client IP returns an error."""
         order = OrderFactory()
 
         url = reverse(
