@@ -47,8 +47,8 @@ class TestPublicCompanyViewSet:
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_without_whitelisted_ip(self, public_company_api_client):
-        """Test that making a request without the whitelisted IP returns an error."""
+    def test_without_allowlisted_ip(self, public_company_api_client):
+        """Test that making a request without the allowlisted IP returns an error."""
         company = CompanyFactory()
         url = reverse('api-v4:company:public-item', kwargs={'pk': company.pk})
         public_company_api_client.set_http_x_forwarded_for('1.1.1.1')

@@ -34,7 +34,7 @@ job_defaults: &job_defaults
     ES5_URL: http://localhost:9200
     OPENSEARCH_URL: http://localhost:9200
     OPENSEARCH_INDEX_PREFIX: test_index
-    PAAS_IP_WHITELIST: 1.2.3.4
+    PAAS_IP_ALLOWLIST: 1.2.3.4
     AWS_DEFAULT_REGION: eu-west-2
     AWS_ACCESS_KEY_ID: foo
     AWS_SECRET_ACCESS_KEY: bar
