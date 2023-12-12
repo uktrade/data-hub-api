@@ -16,35 +16,35 @@ class TestPaaSIPAuthentication:
         'get_kwargs,expected_json',
         (
             (
-                # If second-to-last X-Forwarded-For header isn't whitelisted
+                # If second-to-last X-Forwarded-For header isn't allowlisted
                 {
                     'HTTP_X_FORWARDED_FOR': '9.9.9.9, 123.123.123.123',
                 },
                 {'detail': 'Incorrect authentication credentials.'},
             ),
             (
-                # If the only IP address in X-Forwarded-For is whitelisted
+                # If the only IP address in X-Forwarded-For is allowlisted
                 {
                     'HTTP_X_FORWARDED_FOR': '1.2.3.4',
                 },
                 {'detail': 'Incorrect authentication credentials.'},
             ),
             (
-                # If the only IP address in X-Forwarded-For isn't whitelisted
+                # If the only IP address in X-Forwarded-For isn't allowlisted
                 {
                     'HTTP_X_FORWARDED_FOR': '123.123.123.123',
                 },
                 {'detail': 'Incorrect authentication credentials.'},
             ),
             (
-                # If third-to-last IP in X-Forwarded-For header is whitelisted
+                # If third-to-last IP in X-Forwarded-For header is allowlisted
                 {
                     'HTTP_X_FORWARDED_FOR': '1.2.3.4, 124.124.124, 123.123.123.123',
                 },
                 {'detail': 'Incorrect authentication credentials.'},
             ),
             (
-                # If last of 3 IPs in X-Forwarded-For header is whitelisted
+                # If last of 3 IPs in X-Forwarded-For header is allowlisted
                 {
                     'HTTP_X_FORWARDED_FOR': '124.124.124, 123.123.123.123, 1.2.3.4',
                 },
@@ -85,8 +85,8 @@ class TestPaaSIPAuthentication:
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {'content': 'paas-ip-test-view'}
 
-    def test_empty_object_returned_with_whitelisted_ip(self, api_client):
-        """If X-Forwarded-For header contains whitelisted IP, then the correct data is returned."""
+    def test_empty_object_returned_with_allowlisted_ip(self, api_client):
+        """If X-Forwarded-For header contains allowlisted IP, then the correct data is returned."""
         response = api_client.get(
             _url(),
             HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
