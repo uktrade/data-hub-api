@@ -177,7 +177,7 @@ def investment_project_field():
     return Object(
         properties={
             'id': Keyword(),
-            'name': Text(index=False),
+            'name': NormalizedKeyword(),
             'project_code': Text(index=False),
             'investor_company': id_unindexed_name_field(),
         },

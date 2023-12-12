@@ -444,7 +444,7 @@ def _apply_sorting_to_query(query, ordering):
 
     sort_params = {
         'order': ordering.direction,
-        'missing': '_last' if ordering.is_descending else '_first',
+        'missing': '_first' if ordering.is_descending else '_last',
     }
 
     return query.sort(
