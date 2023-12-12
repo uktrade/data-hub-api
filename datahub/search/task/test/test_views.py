@@ -6,7 +6,7 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
@@ -267,6 +267,54 @@ class TestTaskSearch(APITestMixin):
 
         assert response.data['results'][0]['id'] == str(yesterday_task.id)
         assert response.data['results'][1]['id'] == str(today_task.id)
+
+    def test_search_task_company_name_ordering(self, opensearch_with_collector):
+        """Tests task search ordering on company name"""
+        company1 = CompanyFactory(name='Zebra')
+        company2 = CompanyFactory(name='Apple')
+
+        second_task = TaskFactory(company=company1)
+        first_task = TaskFactory(company=company2)
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:task')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'sortby': 'company.name',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data['results'][0]['id'] == str(first_task.id)
+        assert response.data['results'][1]['id'] == str(second_task.id)
+
+    def test_search_task_investment_project_name_ordering(self, opensearch_with_collector):
+        """Tests task search ordering on investment project name"""
+        investment_project1 = InvestmentProjectFactory(name='Zebra')
+        investment_project2 = InvestmentProjectFactory(name='Apple')
+
+        second_task = TaskFactory(investment_project=investment_project1)
+        first_task = TaskFactory(investment_project=investment_project2)
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:task')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'sortby': 'investment_project.name',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data['results'][0]['id'] == str(first_task.id)
+        assert response.data['results'][1]['id'] == str(second_task.id)
 
 
 class TestTaskInvestmentProjectSearch(APITestMixin):
