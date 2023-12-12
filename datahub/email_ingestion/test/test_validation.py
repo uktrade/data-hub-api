@@ -16,7 +16,7 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
             True,
             None,
         ),
-        # Valid digital.trade.gov.uk email, ensure whitelist is case insensitive
+        # Valid digital.trade.gov.uk email, ensure allowlist is case insensitive
         (
             'bill.Adama@digital.trade.gov.uk',
             '\n'.join([
@@ -175,7 +175,7 @@ from datahub.email_ingestion.validation import was_email_sent_by_dit
                 'Domain "gmail.com" not present in DIT_EMAIL_DOMAINS setting.'
             ),
         ),
-        # Valid digital.trade.gov.uk email, ensure whitelist is case insensitive
+        # Valid digital.trade.gov.uk email, ensure allowlist is case insensitive
         # multiple auth methods
         (
             'bill.Adama@digital.trade.gov.uk',

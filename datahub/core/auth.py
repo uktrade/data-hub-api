@@ -99,10 +99,10 @@ class PaaSIPAuthentication(BaseAuthentication):
 
         # PaaS appends 2 IPs, where the IP connected from is the first
         remote_address = ip_addresses[-PAAS_ADDED_X_FORWARDED_FOR_IPS].strip()
-        if remote_address not in settings.PAAS_IP_WHITELIST:
+        if remote_address not in settings.PAAS_IP_ALLOWLIST:
             logger.warning(
                 'Failed access requirement: the X-Forwarded-For header was not '
-                f'produced by a whitelisted IP - found {remote_address}',
+                f'produced by a allowlisted IP - found {remote_address}',
             )
             raise AuthenticationFailed()
 
