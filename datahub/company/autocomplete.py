@@ -1,9 +1,11 @@
 # from django_filters import CharFilter
-from django.db.models import BooleanField, Case, Count, Value, When, Q
+from django.db.models import BooleanField, Case, Count, Value, When, Q, Exists
+
 # from traitlets import Bool
 
 from datahub.core.autocomplete import AutocompleteFilter, _apply_autocomplete_filter_to_queryset
 from datahub.company.models.adviser import Advisor as Adviser
+
 
 class WithListAutocompleteFilter(AutocompleteFilter):
     """
@@ -32,27 +34,32 @@ class WithListAutocompleteFilter(AutocompleteFilter):
         # adviser = request.user
         # Get current adviser
         # Limit list items to current adviser
-        adviser = Adviser.objects.get(pk='674e031e-bb03-40dc-a9b5-d8297b6aaaac')
-        # from pprint import pprint
+        adviser = Adviser.objects.get(pk='6e786ddd-1f57-4b38-a3fe-04092194382a')
+        from pprint import pprint
+
         # pprint("queryset")
         # pprint(queryset)
-        
+
         result = _apply_autocomplete_filter_to_queryset(queryset, self.search_fields, value)
 
         queryset = queryset.annotate(
             in_adviser_list=Case(
-                When(Q(Count('company_list_items')), then=Value(True), output_field=BooleanField()),
+                When(
+                    Q(company_list_items=None),
+                    then=Value(True),
+                ),
+                output_field=BooleanField(),
             ),
         )
 
-        # for query in queryset:
-        #     pprint("query.company_list_items")
-        #     pprint(query.company_list_items.all())
+        for query in queryset:
+            pprint("query.company_list_items")
+            pprint(query.company_list_items.all())
 
-        #     pprint("query.in_adviser_list")
-        #     pprint(query.in_adviser_list)
+            # pprint("query.in_adviser_list")
+            # pprint(query.in_adviser_list)
 
-        result.filter(company_list_items__list__adviser=adviser)
+        # result.filter(company_list_items__list__adviser=adviser)
         # from pprint import pprint
         # pprint("result")
         # pprint(result._query.__dict__)
@@ -64,5 +71,3 @@ class WithListAutocompleteFilter(AutocompleteFilter):
         # pprint("value")
         # pprint(value)
         return result
-    
-        
