@@ -31,8 +31,8 @@
 
     {{ form.non_field_errors }}
     <div class="fieldWrapper">
-      {{ form.selected_company.errors }}
-      <ul id="id_selected_company">
+      {{ form.selected_model.errors }}
+      <ul id="id_selected_model">
         {% include 'admin/company/company/merge/step_2_primary_selection_radio.html' with option=option_1 index='1' opts=opts only %}
         {% include 'admin/company/company/merge/step_2_primary_selection_radio.html' with option=option_2 index='2' opts=opts only %}
       </ul>

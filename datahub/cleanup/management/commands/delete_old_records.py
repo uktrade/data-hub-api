@@ -108,6 +108,7 @@ class Command(BaseCleanupCommand):
                 Quote._meta.get_field('accepted_by').remote_field: (),
                 Contact._meta.get_field('contact_exports'): (),
                 Contact._meta.get_field('tokens'): (),
+                Contact._meta.get_field('transferred_from'): (),
             },
         ),
         'company_referral.CompanyReferral': ModelCleanupConfig(

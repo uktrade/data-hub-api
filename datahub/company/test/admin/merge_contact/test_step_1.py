@@ -24,7 +24,7 @@ class TestMergeWithAnotherContactLink(AdminTestMixin):
 
         select_other_route_name = admin_urlname(Contact._meta, 'merge-select-other-contact')
         select_other_query_args = {
-            'contact_1': contact.pk,
+            'id_1': contact.pk,
         }
         select_other_url = reverse_with_query_string(
             select_other_route_name,
@@ -32,7 +32,6 @@ class TestMergeWithAnotherContactLink(AdminTestMixin):
         )
 
         assert select_other_url in response.rendered_content
-
 
     def test_link_does_not_exist_with_only_view_permission(self):
         """Test that the link does not exist for a user with only the view contact permission."""
@@ -54,6 +53,7 @@ class TestMergeWithAnotherContactLink(AdminTestMixin):
         select_other_url = reverse(select_other_route_name)
 
         assert select_other_url not in response.rendered_content
+
 
 class TestMergeWithAnotherContactViewGet(AdminTestMixin):
     """Tests GET requests for the 'Merge with another contact' view."""
@@ -83,7 +83,6 @@ class TestMergeWithAnotherContactViewGet(AdminTestMixin):
         response = self.client.get(select_other_url, data=data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-
     def test_returns_200_if_valid_contacts_passed(self):
         """Tests that a 200 is returned if a valid company is passed in the query string."""
         contact_1 = ContactFactory()
@@ -94,17 +93,17 @@ class TestMergeWithAnotherContactViewGet(AdminTestMixin):
         response = self.client.get(
             select_other_url,
             data={
-                'contact_1': str(contact_1.pk),
+                'id_1': str(contact_1.pk),
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
 
+
 class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
     """Tests form submission for the 'Merge with another company' view."""
 
     SAME_CONTACT = object()
-
 
     def test_proceeds_if_valid_contact_provided(self):
         """Test the view redirects if a valid contact is provided."""
@@ -113,7 +112,7 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
 
         select_other_route_name = admin_urlname(Contact._meta, 'merge-select-other-contact')
         select_other_query_args = {
-            'contact_1': main_contact.pk,
+            'id_1': main_contact.pk,
         }
         select_other_url = reverse_with_query_string(
             select_other_route_name,
@@ -124,7 +123,7 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
             select_other_url,
             follow=True,
             data={
-                'contact_2': str(other_contact.pk),
+                'id_2': str(other_contact.pk),
             },
         )
 
@@ -133,8 +132,8 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
 
         select_primary_route_name = admin_urlname(Contact._meta, 'merge-select-primary-contact')
         select_primary_query_args = {
-            'contact_1': main_contact.pk,
-            'contact_2': other_contact.pk,
+            'id_1': main_contact.pk,
+            'id_2': other_contact.pk,
         }
         select_primary_url = reverse_with_query_string(
             select_primary_route_name,
@@ -167,7 +166,7 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
 
         select_other_route_name = admin_urlname(Contact._meta, 'merge-select-other-contact')
         select_other_query_args = {
-            'contact_1': contact.pk,
+            'id_1': contact.pk,
         }
         select_other_url = reverse_with_query_string(
             select_other_route_name,
@@ -179,7 +178,7 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
         response = self.client.post(
             select_other_url,
             data={
-                'contact_2': value,
+                'id_2': value,
             },
         )
 
@@ -187,5 +186,5 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
 
         form = response.context['form']
 
-        assert 'contact_2' in form.errors
-        assert form.errors['contact_2'] == [expected_error]
+        assert 'id_2' in form.errors
+        assert form.errors['id_2'] == [expected_error]

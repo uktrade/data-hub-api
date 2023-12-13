@@ -2,19 +2,19 @@ import logging
 
 import reversion
 
+from datahub.company.merge import (
+    is_model_a_valid_merge_source,
+    is_model_a_valid_merge_target,
+    MergeConfiguration,
+    MergeNotAllowedError,
+    update_objects,
+)
+from datahub.company.models import CompanyExport, Contact
 from datahub.company_referral.models import CompanyReferral
-from datahub.company.models import Contact, CompanyExport
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 from datahub.omis.order.models import Order, Quote
 from datahub.user.company_list.models import PipelineItem
-from datahub.company.merge import (
-    MergeConfiguration,
-    MergeNotAllowedError,
-    is_model_a_valid_merge_source,
-    is_model_a_valid_merge_target,
-    update_objects,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ ALLOWED_RELATIONS_FOR_MERGING = {
 MERGE_CONFIGURATION = [
     MergeConfiguration(Interaction, ('contacts',), Contact),
     MergeConfiguration(CompanyReferral, ('contact',), Contact),
-    MergeConfiguration(InvestmentProject, ('client_contacts',), Contact ),
+    MergeConfiguration(InvestmentProject, ('client_contacts',), Contact),
     MergeConfiguration(Order, ('contact',), Contact),
     MergeConfiguration(CompanyExport, ('contacts',), Contact),
     MergeConfiguration(PipelineItem, ('contacts',), Contact),
@@ -49,7 +49,8 @@ def merge_contacts(source_contact: Contact, target_contact: Contact, user):
 
     MergeNotAllowedError will be raised if the merge is not allowed.
     """
-    is_source_valid, invalid_obj = is_model_a_valid_merge_source(source_contact, ALLOWED_RELATIONS_FOR_MERGING)
+    is_source_valid, invalid_obj = is_model_a_valid_merge_source(
+        source_contact, ALLOWED_RELATIONS_FOR_MERGING, Contact)
     is_target_valid = is_model_a_valid_merge_target(target_contact)
 
     if not (is_source_valid and is_target_valid):
@@ -70,7 +71,7 @@ def merge_contacts(source_contact: Contact, target_contact: Contact, user):
         except Exception as e:
             logger.exception(f'An error occurred while merging companies: {e}')
             raise
-        
+
         target_contact.merge_contact_fields(source_contact)
         source_contact.mark_as_transferred(
             target_contact,

@@ -13,8 +13,11 @@ from freezegun import freeze_time
 from rest_framework import status
 from reversion.models import Version
 
-from datahub.company.admin.merge.step_3 import REVERSION_REVISION_COMMENT
-from datahub.company.merge_company import FIELD_TO_DESCRIPTION_MAPPING, INVESTMENT_PROJECT_COMPANY_FIELDS
+from datahub.company.admin.merge.step_3 import COMPANY_REVERSION_REVISION_COMMENT
+from datahub.company.merge_company import (
+    FIELD_TO_DESCRIPTION_MAPPING,
+    INVESTMENT_PROJECT_COMPANY_FIELDS,
+)
 from datahub.company.models import Company, Contact
 from datahub.company.test.factories import (
     ArchivedCompanyFactory,
@@ -33,10 +36,7 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.user.company_list.models import CompanyListItem
-from datahub.user.company_list.test.factories import (
-    CompanyListItemFactory,
-    PipelineItemFactory,
-)
+from datahub.user.company_list.test.factories import CompanyListItemFactory, PipelineItemFactory
 
 
 class TestConfirmMergeViewGet(AdminTestMixin):
@@ -95,8 +95,8 @@ class TestConfirmMergeViewGet(AdminTestMixin):
         response = self.client.get(
             confirm_merge_url,
             data={
-                'source_company': str(source_company.pk),
-                'target_company': str(target_company.pk),
+                'source': str(source_company.pk),
+                'target': str(target_company.pk),
             },
         )
 
@@ -232,14 +232,6 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         ):
             obj.refresh_from_db()
 
-        # for obj in source_non_project_related_objects:
-        #     print('*************************************')
-        #     print(source_non_project_related_objects)
-        #     print(target_company)
-        #     print(source_company)
-            # print(obj.company)
-        
-
         assert all(obj.company == target_company for obj in source_non_project_related_objects)
         assert all(obj.modified_on == merge_time for obj in source_non_project_related_objects)
 
@@ -284,7 +276,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
 
         reversion = source_company_versions[0].revision
         assert reversion.date_created == frozen_time
-        assert reversion.get_comment() == REVERSION_REVISION_COMMENT
+        assert reversion.get_comment() == COMPANY_REVERSION_REVISION_COMMENT
         assert reversion.user == self.user
 
         contact_0_versions = Version.objects.get_for_object(source_contacts[0])
@@ -393,8 +385,8 @@ def _company_factory(
 def _make_confirm_merge_url(source_company, target_company):
     confirm_merge_route_name = admin_urlname(Company._meta, 'merge-confirm')
     confirm_merge_query_args = {
-        'source_company': str(source_company.pk),
-        'target_company': str(target_company.pk),
+        'source': str(source_company.pk),
+        'target': str(target_company.pk),
     }
     return reverse_with_query_string(confirm_merge_route_name, confirm_merge_query_args)
 

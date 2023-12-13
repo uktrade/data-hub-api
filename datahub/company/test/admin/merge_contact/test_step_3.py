@@ -1,33 +1,30 @@
 import re
 from datetime import datetime
-from itertools import chain, cycle, islice
 from unittest.mock import patch
 
 import pytest
 from django.contrib import messages as django_messages
-from django.utils.html import escape
-
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.urls import reverse
+from django.utils.html import escape
 from django.utils.timezone import utc
-from datahub.company_referral.test.factories import CompanyReferralFactory
-from datahub.interaction.test.factories import CompanyInteractionFactory
-from datahub.investment.project.test.factories import InvestmentProjectFactory
-from datahub.omis.order.test.factories import OrderFactory
-from datahub.interaction.test.factories import CompanyInteractionFactory
 from freezegun import freeze_time
 from rest_framework import status
-from datahub.omis.order.models import Order
-from datahub.core.utils import reverse_with_query_string
 from reversion.models import Version
 
-from datahub.company.admin.merge_contact.step_3 import REVERSION_REVISION_COMMENT
-from datahub.company_referral.models import CompanyReferral
-from datahub.core.test_utils import AdminTestMixin
+from datahub.company.admin.merge.step_3 import CONTACT_REVERSION_REVISION_COMMENT
+from datahub.company.models import CompanyExport, Contact
 from datahub.company.test.factories import ArchivedContactFactory, ContactFactory, ExportFactory
-from datahub.company.models import Contact, CompanyExport
-from datahub.investment.project.models import InvestmentProject
+from datahub.company_referral.models import CompanyReferral
+from datahub.company_referral.test.factories import CompanyReferralFactory
+from datahub.core.test_utils import AdminTestMixin
+from datahub.core.utils import reverse_with_query_string
 from datahub.interaction.models import Interaction
+from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.investment.project.models import InvestmentProject
+from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.omis.order.models import Order
+from datahub.omis.order.test.factories import OrderFactory
 
 
 class TestConfirmMergeViewGet(AdminTestMixin):
@@ -75,7 +72,6 @@ class TestConfirmMergeViewGet(AdminTestMixin):
         response = self.client.get(confirm_merge_url, data=data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-
     def test_returns_200_if_valid_contacts_passed(self):
         """Tests that a 200 is returned if valid contacts are passed in the query string."""
         source_contact = ContactFactory()
@@ -87,8 +83,8 @@ class TestConfirmMergeViewGet(AdminTestMixin):
         response = self.client.get(
             confirm_merge_url,
             data={
-                'source_contact': str(source_contact.pk),
-                'target_contact': str(target_contact.pk),
+                'source': str(source_contact.pk),
+                'target': str(target_contact.pk),
             },
         )
 
@@ -150,7 +146,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             (source_investments, InvestmentProject, '{num} {noun}'),
             (source_orders, Order, '{num} {noun}'),
             (source_referrals, CompanyReferral, '{num} {noun}'),
-            (source_exports, CompanyExport, '{num} {noun}')
+            (source_exports, CompanyExport, '{num} {noun}'),
         ]
 
         merge_entries = []
@@ -191,10 +187,12 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             obj.refresh_from_db()
 
         if (len(source_related_objects) > 0 and hasattr(obj, 'contacts')):
-            assert all([*list(obj.contacts.all())][0] == target_contact for obj in source_related_objects)
-        elif(len(source_related_objects) > 0 and hasattr(obj, 'client_contacts')):
-            assert all([*list(obj.client_contacts.all())][0] == target_contact for obj in source_related_objects)
-        else: 
+            assert all([*list(obj.contacts.all())][0]
+                       == target_contact for obj in source_related_objects)
+        elif (len(source_related_objects) > 0 and hasattr(obj, 'client_contacts')):
+            assert all([*list(obj.client_contacts.all())][0]
+                       == target_contact for obj in source_related_objects)
+        else:
             assert all(obj.contact == target_contact for obj in source_related_objects)
             assert all(obj.modified_on == merge_time for obj in source_related_objects)
 
@@ -204,7 +202,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert source_contact.archived_by == self.user
         assert source_contact.archived_on == merge_time
         assert source_contact.archived_reason == (
-            f'This record is no longer in use and its data has been transferred '
+            'This record is no longer in use and its data has been transferred '
             f'to {target_contact} for the following reason: Duplicate record.'
         )
         assert source_contact.modified_by == self.user
@@ -234,7 +232,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
 
         reversion = source_contact_versions[0].revision
         assert reversion.date_created == frozen_time
-        assert reversion.get_comment() == REVERSION_REVISION_COMMENT
+        assert reversion.get_comment() == CONTACT_REVERSION_REVISION_COMMENT
         assert reversion.user == self.user
 
     @pytest.mark.parametrize(
@@ -250,7 +248,6 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             ),
         ),
     )
-
     @pytest.mark.parametrize(
         'factory_relation_kwarg',
         (
@@ -312,10 +309,12 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             obj.refresh_from_db()
 
         if (len(source_related_objects) > 0 and hasattr(obj, 'contacts')):
-            assert all([*list(obj.contacts.all())][0] == source_contact for obj in source_related_objects)
-        elif(len(source_related_objects) > 0 and hasattr(obj, 'client_contacts')):
-            assert all([*list(obj.client_contacts.all())][0] == source_contact for obj in source_related_objects)
-        else: 
+            assert all([*list(obj.contacts.all())][0]
+                       == source_contact for obj in source_related_objects)
+        elif (len(source_related_objects) > 0 and hasattr(obj, 'client_contacts')):
+            assert all([*list(obj.client_contacts.all())][0]
+                       == source_contact for obj in source_related_objects)
+        else:
             assert all(obj.contact == source_contact for obj in source_related_objects)
 
         source_contact.refresh_from_db()
@@ -334,7 +333,10 @@ def _contact_factory(
         num_referrals=0,
         num_export=0,
 ):
-    """Factory for a contact that has company referrals, orders, company exports, interactions and OMIS orders."""
+    """
+    Factory for a contact that has company referrals, orders, company
+    exports, interactions and OMIS orders.
+    """
     contact = ContactFactory()
 
     CompanyInteractionFactory.create_batch(num_interactions, contacts=[contact])
@@ -345,17 +347,20 @@ def _contact_factory(
 
     return contact
 
+
 def _make_confirm_merge_url(source_contact, target_contact):
     confirm_merge_route_name = admin_urlname(Contact._meta, 'merge-confirm')
     confirm_merge_query_args = {
-        'source_contact': str(source_contact.pk),
-        'target_contact': str(target_contact.pk),
+        'source': str(source_contact.pk),
+        'target': str(target_contact.pk),
     }
     return reverse_with_query_string(confirm_merge_route_name, confirm_merge_query_args)
+
 
 def _get_changelist_url():
     changelist_route_name = admin_urlname(Contact._meta, 'changelist')
     return reverse(changelist_route_name)
+
 
 def _get_verbose_name(count, model):
     return model._meta.verbose_name if count == 1 else model._meta.verbose_name_plural

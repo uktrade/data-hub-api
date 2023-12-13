@@ -3,13 +3,13 @@ from unittest.mock import patch
 import pytest
 
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
-from django.urls import reverse
-from django.test.html import parse_html
 from django.core.exceptions import NON_FIELD_ERRORS
+from django.test.html import parse_html
+from django.urls import reverse
 from rest_framework import status
 
 from datahub.company.models import Contact
-from datahub.company.test.factories import ContactFactory, ArchivedContactFactory
+from datahub.company.test.factories import ArchivedContactFactory, ContactFactory
 from datahub.core.test_utils import AdminTestMixin
 from datahub.core.utils import reverse_with_query_string
 
@@ -94,8 +94,8 @@ class TestSelectPrimaryContactViewGet(AdminTestMixin):
         response = self.client.get(
             select_primary_url,
             data={
-                'contact_1': str(contact_1.pk),
-                'contact_2': str(contact_2.pk),
+                'id_1': str(contact_1.pk),
+                'id_2': str(contact_2.pk),
             },
         )
 
@@ -119,8 +119,8 @@ class TestSelectPrimaryContactViewPost(AdminTestMixin):
 
         select_primary_route_name = admin_urlname(Contact._meta, 'merge-select-primary-contact')
         select_primary_query_args = {
-            'contact_1': str(contact_1.pk),
-            'contact_2': str(contact_2.pk),
+            'id_1': str(contact_1.pk),
+            'id_2': str(contact_2.pk),
         }
         select_primary_url = reverse_with_query_string(
             select_primary_route_name,
@@ -131,7 +131,7 @@ class TestSelectPrimaryContactViewPost(AdminTestMixin):
             select_primary_url,
             follow=True,
             data={
-                'selected_contact': selected_contact,
+                'selected_model': selected_contact,
             },
         )
 
@@ -140,8 +140,8 @@ class TestSelectPrimaryContactViewPost(AdminTestMixin):
 
         confirm_merge_route_name = admin_urlname(Contact._meta, 'merge-confirm')
         confirm_merge_query_args = {
-            'source_contact': (contact_1 if selected_contact != '1' else contact_2).pk,
-            'target_contact': (contact_1 if selected_contact == '1' else contact_2).pk,
+            'source': (contact_1 if selected_contact != '1' else contact_2).pk,
+            'target': (contact_1 if selected_contact == '1' else contact_2).pk,
         }
         confirm_merge_url = reverse_with_query_string(
             confirm_merge_route_name,
@@ -183,8 +183,8 @@ class TestSelectPrimaryContactViewPost(AdminTestMixin):
 
         select_primary_route_name = admin_urlname(Contact._meta, 'merge-select-primary-contact')
         select_primary_query_args = {
-            'contact_1': str(contact_1.pk),
-            'contact_2': str(contact_2.pk),
+            'id_1': str(contact_1.pk),
+            'id_2': str(contact_2.pk),
         }
         select_primary_url = reverse_with_query_string(
             select_primary_route_name,
@@ -194,9 +194,9 @@ class TestSelectPrimaryContactViewPost(AdminTestMixin):
         response = self.client.post(
             select_primary_url,
             data={
-                'contact_1': str(contact_1.pk),
-                'contact_2': str(contact_2.pk),
-                'selected_contact': selected_contact,
+                'model_1': str(contact_1.pk),
+                'model_2': str(contact_2.pk),
+                'selected_model': selected_contact,
             },
         )
         assert response.status_code == status.HTTP_200_OK
@@ -208,8 +208,8 @@ class TestSelectPrimaryContactViewPost(AdminTestMixin):
 
 def _get_radio_html(index, disabled):
     extra_attrs = ' disabled' if disabled else ''
-    return f"""<input name="selected_contact" value="{index}" required="" \
-id="id_selected_contact_radio_{index}" type="radio" {extra_attrs}>"""
+    return f"""<input name="selected_model" value="{index}" required="" \
+id="id_selected_model_radio_{index}" type="radio" {extra_attrs}>"""
 
 
 def _html_count_occurrences(needle, haystack):
