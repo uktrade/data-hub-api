@@ -6,7 +6,7 @@ from datahub.task.models import Task
 
 class EmailTemplate(ABC):
     UTM_URL_BASE = '?utm_source=individual&utm_medium=email_notify' +\
-                   '&utm_campaign={}&utm_content=task'
+                   '&utm_campaign={0}&utm_content=task'
 
     @abstractmethod
     def __init__(self, task: Task):
@@ -56,7 +56,7 @@ class EmailTemplate(ABC):
 
     def get_utm_url(self) -> str:
         utm_campaign = self._to_snake_case(
-            self.__class__.__name__.replace('EmailTemplate', '')
+            self.__class__.__name__.replace('EmailTemplate', ''),
         )
         return self.UTM_URL_BASE.format(utm_campaign)
 

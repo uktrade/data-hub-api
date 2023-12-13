@@ -100,7 +100,7 @@ class BaseTaskEmailTemplateTests(APITestMixin):
 
     def test_email_utm_url(self):
         test_utm_url = self.email_template_class.UTM_URL_BASE.format(
-            self.expected_utm_campaign
+            self.expected_utm_campaign,
         )
 
         task = TaskFactory(due_date=datetime.date.today())
