@@ -5,7 +5,7 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.merge import merge_companies
+from datahub.company.merge_company import merge_companies
 from datahub.company.models import CompanyPermission
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import (

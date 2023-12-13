@@ -24,7 +24,7 @@ class TestMergeWithAnotherCompanyLink(AdminTestMixin):
 
         select_other_route_name = admin_urlname(Company._meta, 'merge-select-other-company')
         select_other_query_args = {
-            'company_1': company.pk,
+            'id_1': company.pk,
         }
         select_other_url = reverse_with_query_string(
             select_other_route_name,
@@ -93,7 +93,7 @@ class TestMergeWithAnotherCompanyViewGet(AdminTestMixin):
         response = self.client.get(
             select_other_url,
             data={
-                'company_1': str(company_1.pk),
+                'id_1': str(company_1.pk),
             },
         )
 
@@ -112,7 +112,7 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
 
         select_other_route_name = admin_urlname(Company._meta, 'merge-select-other-company')
         select_other_query_args = {
-            'company_1': main_company.pk,
+            'id_1': main_company.pk,
         }
         select_other_url = reverse_with_query_string(
             select_other_route_name,
@@ -123,7 +123,7 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
             select_other_url,
             follow=True,
             data={
-                'company_2': str(other_company.pk),
+                'id_2': str(other_company.pk),
             },
         )
 
@@ -132,8 +132,8 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
 
         select_primary_route_name = admin_urlname(Company._meta, 'merge-select-primary-company')
         select_primary_query_args = {
-            'company_1': main_company.pk,
-            'company_2': other_company.pk,
+            'id_1': main_company.pk,
+            'id_2': other_company.pk,
         }
         select_primary_url = reverse_with_query_string(
             select_primary_route_name,
@@ -166,7 +166,7 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
 
         select_other_route_name = admin_urlname(Company._meta, 'merge-select-other-company')
         select_other_query_args = {
-            'company_1': company.pk,
+            'id_1': company.pk,
         }
         select_other_url = reverse_with_query_string(
             select_other_route_name,
@@ -178,13 +178,13 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
         response = self.client.post(
             select_other_url,
             data={
-                'company_2': value,
+                'id_2': value,
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
 
         form = response.context['form']
-        
-        assert 'company_2' in form.errors
-        assert form.errors['company_2'] == [expected_error]
+
+        assert 'id_2' in form.errors
+        assert form.errors['id_2'] == [expected_error]

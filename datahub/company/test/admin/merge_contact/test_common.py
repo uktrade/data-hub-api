@@ -4,8 +4,9 @@ from django.test import Client
 from django.urls import reverse
 from rest_framework import status
 
-from datahub.company.models import Contact, CompanyPermission
+from datahub.company.models import CompanyPermission, Contact
 from datahub.core.test_utils import AdminTestMixin, create_test_user
+
 
 class TestContactAdminPermissions(AdminTestMixin):
     """Test permission handling in various views."""
@@ -131,6 +132,3 @@ class TestContactAdminPermissions(AdminTestMixin):
         response = request_func(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-    
-
-        

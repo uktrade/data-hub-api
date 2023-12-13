@@ -23,11 +23,11 @@
 {% endblock %}
 
 {% block content %}
-{% admin_change_link source_company target_blank=True as source_company_link %}
-{% admin_change_link target_company target_blank=True as target_company_link %}
+{% admin_change_link source target_blank=True as source_link %}
+{% admin_change_link target target_blank=True as target_link %}
 <p>
   {% blocktrans %}
-  You are about to merge {{ source_company_link }} into {{ target_company_link }}.
+  You are about to merge {{ source_link }} into {{ target_link }}.
   {% endblocktrans %}
 </p>
 <p>{% trans 'This will make the following changes:' %}</p>
@@ -36,16 +36,16 @@
   <li>
     {% verbose_name_for_count merge_entry.count merge_entry.model_meta as verbose_name %}
     {% blocktrans with count=merge_entry.count description=merge_entry.description %}
-      {{ count }} {{ verbose_name }}{{ description }}  will be moved from {{ source_company_link }} to {{ target_company_link }}.
+      {{ count }} {{ verbose_name }}{{ description }}  will be moved from {{ source_link }} to {{ target_link }}.
     {% endblocktrans %}
   </li>
   {% endfor %}
 
   <li>
     {% if should_archive_source %}
-      {% blocktrans %}{{ source_company_link }} will be archived and marked as a duplicate record.{% endblocktrans %}
+      {% blocktrans %}{{ source_link }} will be archived and marked as a duplicate record.{% endblocktrans %}
     {% else %}
-      {% blocktrans %}{{ source_company_link }} will be marked as a duplicate record.{% endblocktrans %}
+      {% blocktrans %}{{ source_link }} will be marked as a duplicate record.{% endblocktrans %}
     {% endif %}
   </li>
 </ul>

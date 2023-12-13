@@ -55,6 +55,7 @@ MAPPINGS = {
     'company.Contact': {
         'factory': ContactFactory,
         'dependent_models': (
+            (ContactFactory, 'transferred_to'),
             (CompanyReferralFactory, 'contact'),
             (CompanyInteractionFactory, 'contacts'),
             (OrderFactory, 'contact'),

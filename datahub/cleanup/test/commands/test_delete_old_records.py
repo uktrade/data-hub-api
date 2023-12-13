@@ -429,7 +429,12 @@ MAPPING = {
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [{}],
             },
-
+            {
+                'factory': ContactFactory,
+                'field': 'transferred_to',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
         ],
     },
     'interaction.Interaction': {
@@ -869,7 +874,6 @@ def test_mappings(model_label, config):
 def test_configs(model_label, config):
     """
     Test that configs for delete_old_records cover all relations for the model.
-
     This is to make sure any new relations that are added are not missed from the
     configurations.
     """

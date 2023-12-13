@@ -1,9 +1,9 @@
 {% load i18n datahub_extras %}
 <li>
-  <input name="selected_company" value="{{ index }}" required="" id="id_selected_company_radio_{{ index }}" type="radio"
+  <input name="selected_model" value="{{ index }}" required="" id="id_selected_model_radio_{{ index }}" type="radio"
     {% if not option.is_valid %}disabled{% endif %}
   >
-  <label for="id_selected_company_radio_{{ index }}">
+  <label for="id_selected_model_radio_{{ index }}">
     <strong>{{ option.target.name }}</strong>
     {% if not option.is_target_valid %}
       <br>

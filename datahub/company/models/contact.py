@@ -27,6 +27,7 @@ class Contact(ArchivableModel, BaseModel):
     """
     Contact (a person at a company that DIT has had contact with).
     """
+
     class TransferReason(models.TextChoices):
         DUPLICATE = ('duplicate', 'Duplicate record')
 
@@ -109,7 +110,6 @@ class Contact(ArchivableModel, BaseModel):
         related_name='+',
     )
 
-
     def get_absolute_url(self):
         """URL to the object in the Data Hub internal front end."""
         return get_front_end_url(self)
@@ -138,12 +138,10 @@ class Contact(ArchivableModel, BaseModel):
     def name_with_title(self):
         """Full name with title."""
         return join_truthy_strings(getattr(self.title, 'name', None), self.name)
-    
 
     def mark_as_transferred(self, to, reason, user):
         """
         Marks a contact record as having been transferred to another contact record.
-
         This is used, for example, for marking a contact as a duplicate record.
         """
         self.modified_by = user
@@ -164,7 +162,7 @@ class Contact(ArchivableModel, BaseModel):
 
     def merge_contact_fields(self, contact):
 
-        fields=[
+        fields = [
             'job_title',
             'title',
             'full_telephone_number',
@@ -176,13 +174,13 @@ class Contact(ArchivableModel, BaseModel):
         ]
 
         for field in fields:
-            contact_field_value=getattr(contact, field)
-            source_field_value=getattr(self, field)
+            contact_field_value = getattr(contact, field)
+            source_field_value = getattr(self, field)
 
             if not source_field_value and contact_field_value:
                 setattr(self, field, contact_field_value)
 
-        address_fields=[
+        address_fields = [
             'address_1',
             'address_2',
             'address_town',
@@ -191,11 +189,11 @@ class Contact(ArchivableModel, BaseModel):
             'address_country',
             'address_area',
         ]
-        
+
         if not self.address_1 and not self.address_same_as_company:
             if contact.address_1:
                 for field in address_fields:
-                    contact_address_value=getattr(contact, field)
+                    contact_address_value = getattr(contact, field)
                     setattr(self, field, contact_address_value)
             elif contact.address_same_as_company:
-                self.address_same_as_company=contact.address_same_as_company
+                self.address_same_as_company = contact.address_same_as_company

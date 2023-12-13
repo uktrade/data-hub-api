@@ -23,32 +23,32 @@
 {% endblock %}
 
 {% block content %}
-{% admin_change_link source_contact target_blank=True as source_contact_link %}
-{% admin_change_link target_contact target_blank=True as target_contact_link %}
+{% admin_change_link source target_blank=True as source_link %}
+{% admin_change_link target target_blank=True as target_link %}
 <p>
   {% blocktrans %}
-  You are about to merge {{ source_contact_link }} into {{ target_contact_link }}.
+  You are about to merge {{ source_link }} into {{ target_link }}.
   {% endblocktrans %}
 </p>
 <p>{% trans 'This will make the following changes:' %}</p>
-<!-- <ul>
+<ul>
   {% for merge_entry in merge_entries %}
   <li>
     {% verbose_name_for_count merge_entry.count merge_entry.model_meta as verbose_name %}
     {% blocktrans with count=merge_entry.count description=merge_entry.description %}
-      {{ count }} {{ verbose_name }}{{ description }}  will be moved from {{ source_contact_link }} to {{ target_contact_link }}.
+      {{ count }} {{ verbose_name }}{{ description }}  will be moved from {{ source_link }} to {{ target_link }}.
     {% endblocktrans %}
   </li>
   {% endfor %}
 
   <li>
     {% if should_archive_source %}
-      {% blocktrans %}{{ source_contact_link }} will be archived and marked as a duplicate record.{% endblocktrans %}
+      {% blocktrans %}{{ source_link }} will be archived and marked as a duplicate record.{% endblocktrans %}
     {% else %}
-      {% blocktrans %}{{ source_contact_link }} will be marked as a duplicate record.{% endblocktrans %}
+      {% blocktrans %}{{ source_link }} will be marked as a duplicate record.{% endblocktrans %}
     {% endif %}
   </li>
-</ul> -->
+</ul>
 
 <p><strong>{% trans 'Once complete, this operation can&rsquo;t be reversed.' %}</strong></p>
 

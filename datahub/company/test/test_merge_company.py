@@ -6,28 +6,17 @@ import reversion
 from django.utils.timezone import utc
 from freezegun import freeze_time
 
-# from datahub.company.merge import (
-#     ALLOWED_RELATIONS_FOR_MERGING,
-#     get_planned_changes,
-#     INVESTMENT_PROJECT_COMPANY_FIELDS,
-#     merge_companies,
-#     MergeNotAllowedError,
-#     rollback_merge_companies,
-# )
-
-from datahub.company.merge_company import (
-    merge_companies,
-    MERGE_CONFIGURATION,
-    INVESTMENT_PROJECT_COMPANY_FIELDS,
-    ALLOWED_RELATIONS_FOR_MERGING,
-    rollback_merge_companies
-)
-
 from datahub.company.merge import (
     get_planned_changes,
     MergeNotAllowedError,
 )
-
+from datahub.company.merge_company import (
+    ALLOWED_RELATIONS_FOR_MERGING,
+    INVESTMENT_PROJECT_COMPANY_FIELDS,
+    merge_companies,
+    MERGE_CONFIGURATION,
+    rollback_merge_companies,
+)
 from datahub.company.models import Company, Contact
 from datahub.company.test.factories import (
     AdviserFactory,
@@ -368,7 +357,7 @@ class TestDuplicateCompanyMerger:
         assert source_company.archived_by == user
         assert source_company.archived_on == merge_time
         assert source_company.archived_reason == (
-            f'This record is no longer in use and its data has been transferred '
+            'This record is no longer in use and its data has been transferred '
             f'to {target_company} for the following reason: Duplicate record.'
         )
         assert source_company.modified_by == user
@@ -451,7 +440,7 @@ class TestDuplicateCompanyMerger:
         assert source_company.archived_by == user
         assert source_company.archived_on == merge_time
         assert source_company.archived_reason == (
-            f'This record is no longer in use and its data has been transferred '
+            'This record is no longer in use and its data has been transferred '
             f'to {target_company} for the following reason: Duplicate record.'
         )
         assert source_company.modified_by == user
@@ -583,7 +572,7 @@ class TestDuplicateCompanyMerger:
         assert source_company.archived_by == user
         assert source_company.archived_on == merge_time
         assert source_company.archived_reason == (
-            f'This record is no longer in use and its data has been transferred '
+            'This record is no longer in use and its data has been transferred '
             f'to {target_company} for the following reason: Duplicate record.'
         )
         assert source_company.modified_by == user
