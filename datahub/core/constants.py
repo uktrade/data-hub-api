@@ -482,3 +482,118 @@ class ExportBarrierType(Enum):
     other = Constant(
         'Other', '8ef83315-2b0f-4d5e-98da-a16f8b2217a6',
     )
+
+
+class AssociatedProgramme(Enum):
+    """Export win associated programme."""
+
+    afterburner = Constant(
+        'Afterburner',
+        'b6f5c31a-aa45-4ae0-89bd-2eb3ab943f76',
+    )
+
+
+class ExpectedValueRelation(Enum):
+    """Export win expected value relation."""
+
+    both = Constant(
+        'Both goods and services',
+        '8711e3dd-3a2c-4b47-aea7-9a53c135efb6',
+    )
+
+
+class BreakdownType(Enum):
+    """Export win breakdown type."""
+
+    export = Constant(
+        'Export',
+        'cecb1f61-abd2-4715-a0c9-b196b52671d9',
+    )
+    non_export = Constant(
+        'Business success',
+        '07fbb895-8e04-48f8-bedb-f7054dbdb85f',
+    )
+    odi = Constant(
+        'Outward Direct Investment',
+        '833e7aad-912b-4b93-89b4-64b05222c958',
+    )
+
+
+class SupportType(Enum):
+    """Export win type of support."""
+
+    political_and_economic_briefing = Constant(
+        'Political and economic briefing',
+        '1ed7f465-1461-4d66-b4a2-8d704ea239a8',
+    )
+
+
+class WinType(Enum):
+    """Export win type."""
+
+    both = Constant(
+        'Both export and business success',
+        'd44b7b86-d5ea-4963-9c83-41660bae0da3',
+    )
+
+
+class HVC(Enum):
+    """Export win HVC."""
+
+    western_europe_aid_funded_business = Constant(
+        'Western Europe Aid Funded Business: E161',
+        '311a10f0-e7e4-46c6-833d-2310f00f9e83',
+    )
+
+
+class TeamType(Enum):
+    """Export win team type."""
+
+    itt = Constant(
+        'International Trade Team',
+        '1f6eccf9-289a-450b-a4af-b75600ea521b',
+    )
+    other = Constant(
+        'Other HQ Team',
+        'bbb7fad4-417c-411e-a40a-11184b0c635d',
+    )
+
+
+class HQTeamRegionOrPost(Enum):
+    """Export win HQ team region or post."""
+
+    td_events_services = Constant(
+        'TD - Events - Services',
+        'b9afc253-5aa1-498f-b5d7-d43dad1ced82',
+    )
+    td_events_retail = Constant(
+        'TD - Events - Retail',
+        '2f608479-8871-447f-9aab-334520b432c6',
+    )
+
+
+class BusinessPotential(Enum):
+    """Export win business potential."""
+
+    high_export_potential = Constant(
+        'The company is an exporter with High Export Potential',
+        '0e6f1d69-e9c3-4460-a74b-3881930fe3e9',
+    )
+
+
+class Experience(Enum):
+    """Export win experience."""
+
+    not_started = Constant(
+        'We had not started exporting before this win',
+        '28e72562-b9cf-492a-9687-c343517087e4',
+    )
+
+
+class ExperienceCategories(Enum):
+    """Export win experience categories."""
+
+    never_exported = Constant(
+        'Has never exported before',
+        '42c06fd9-728c-4b6f-bbe1-608a96021e57',
+    )

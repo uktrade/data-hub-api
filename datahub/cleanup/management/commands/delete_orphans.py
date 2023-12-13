@@ -2,7 +2,7 @@ from dateutil.relativedelta import relativedelta
 
 from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelCleanupConfig
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
-from datahub.company.models import Company
+from datahub.company.models import Company, Contact
 
 
 ORPHAN_AGE_THRESHOLD = relativedelta(months=6)
@@ -23,6 +23,9 @@ class Command(BaseCleanupCommand):
     CONFIGS = {
         'company.Contact': ModelCleanupConfig(
             (DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),),
+            excluded_relations=(
+                Contact._meta.get_field('wins'),
+            ),
         ),
         'company.Company': ModelCleanupConfig(
             (DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),),

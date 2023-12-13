@@ -8,7 +8,7 @@ from django.db import models
 from datahub.company.models import (
     Advisor,
     Company,
-
+    Contact,
 )
 from datahub.core import reversion
 from datahub.core.models import BaseModel, BaseOrderedConstantModel
@@ -137,9 +137,14 @@ class Win(BaseModel):
     adviser = models.ForeignKey(Advisor, related_name='wins', on_delete=models.PROTECT)
     company = models.ForeignKey(Company, related_name='wins', on_delete=models.PROTECT)
 
+    # customers
+    company_contacts = models.ManyToManyField(Contact, blank=True, related_name='wins')
+
+    # legacy fields
     customer_name = models.CharField(max_length=128, verbose_name='Contact name')
     customer_job_title = models.CharField(max_length=128, verbose_name='Job title')
     customer_email_address = models.EmailField(verbose_name='Contact email')
+
     customer_location = models.ForeignKey(
         UKRegion,
         related_name='wins',
@@ -158,6 +163,8 @@ class Win(BaseModel):
         verbose_name='Summarise the support provided to help achieve this win',
     )
     name_of_customer = models.CharField(max_length=128, verbose_name='Overseas customer')
+    name_of_customer_confidential = models.BooleanField(null=True)
+    # type of business deal
     name_of_export = models.CharField(
         max_length=128,
         verbose_name='What are the goods or services?',
@@ -237,25 +244,35 @@ class Win(BaseModel):
         related_name='lead_officer_wins',
         on_delete=models.PROTECT,
     )
+    team_members = models.ManyToManyField(
+        Advisor,
+        blank=True,
+        related_name='team_export_wins',
+    )
 
-    # Legacy fields
+    # Legacy field
     lead_officer_name = models.CharField(
         max_length=128,
         verbose_name='Lead officer name',
         help_text='This is the name that will be included in the email to the customer',
     )
+    # Legacy field
     lead_officer_email_address = models.EmailField(
         verbose_name='Lead officer email address',
         blank=True,
     )
+    # Legacy field
     other_official_email_address = models.EmailField(
         verbose_name='Secondary email address',
         blank=True,
     )
 
+    # Legacy field
     line_manager = models.ForeignKey(
         Advisor,
         related_name='line_manager_wins',
+        null=True,
+        blank=True,
         on_delete=models.PROTECT,
     )
 
@@ -294,7 +311,7 @@ class Win(BaseModel):
     )
     location = models.CharField(max_length=128, blank=True)
 
-    complete = models.BooleanField()  # has an email been sent to the customer?
+    complete = models.BooleanField(default=False)  # has an email been sent to the customer?
     audit = models.TextField(default='', blank=True)
 
     # Legacy data
@@ -358,7 +375,7 @@ class CustomerResponse(BaseModel):
     """Customer response."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    win = models.OneToOneField(Win, related_name='confirmation', on_delete=models.CASCADE)
+    win = models.OneToOneField(Win, related_name='customer_response', on_delete=models.CASCADE)
     our_support = models.ForeignKey(
         Rating,
         related_name='our_support_customer_responses',

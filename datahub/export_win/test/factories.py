@@ -1,10 +1,17 @@
+import random
+
 import factory
 
-from django.utils.timezone import now
-
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.core.constants import UKRegion as UKRegionConstant
-from datahub.export_win.models import EmailDeliveryStatus
+from datahub.core.constants import (
+    BreakdownType as BreakdownTypeConstant,
+    BusinessPotential as BusinessPotentialConstant,
+    HVC as HVCConstant,
+    UKRegion as UKRegionConstant,
+    WinType as WinTypeConstant,
+)
+from datahub.core.test.factories import to_many_field
+from datahub.export_win.models import BreakdownType, EmailDeliveryStatus
 from datahub.metadata.test.factories import CountryFactory, SectorFactory
 
 
@@ -33,6 +40,15 @@ class ExperienceFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'export_win.Experience'
+
+
+class ExperienceCategoriesFactory(factory.django.DjangoModelFactory):
+    """Experience Categories factory."""
+
+    name = factory.Sequence(lambda n: f'name {n}')
+
+    class Meta:
+        model = 'export_win.ExperienceCategories'
 
 
 class MarketingSourceFactory(factory.django.DjangoModelFactory):
@@ -97,10 +113,9 @@ class WinFactory(factory.django.DjangoModelFactory):
 
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
-    date = now()
+    date = factory.Faker('date_object')
     total_expected_export_value = factory.fuzzy.FuzzyInteger(1000, 100000, 10)
     goods_vs_services = factory.SubFactory(ExpectedValueRelationFactory)
-
     total_expected_non_export_value = factory.fuzzy.FuzzyInteger(1000, 100000, 10)
     total_expected_odi_value = factory.fuzzy.FuzzyInteger(1000, 100000, 10)
     is_personally_confirmed = True
@@ -115,6 +130,39 @@ class WinFactory(factory.django.DjangoModelFactory):
     line_manager = factory.SubFactory(AdviserFactory)
     sector = factory.SubFactory(SectorFactory)
     team_type = factory.SubFactory(TeamTypeFactory)
+    hvc_id = HVCConstant.western_europe_aid_funded_business.value.id
+    export_experience = factory.SubFactory(ExperienceCategoriesFactory)
+    name_of_customer_confidential = False
+    business_potential_id = BusinessPotentialConstant.high_export_potential.value.id
+    type_id = WinTypeConstant.both.value.id
+
+    @to_many_field
+    def associated_programme(self):  # noqa: D102
+        """
+        Add support for setting `associated_programme`.
+        """
+        return []
+
+    @to_many_field
+    def type_of_support(self):  # noqa: D102
+        """
+        Add support for setting `type_of_support`.
+        """
+        return []
+
+    @to_many_field
+    def company_contacts(self):  # noqa: D102
+        """
+        Add support for setting `company_contacts`.
+        """
+        return []
+
+    @to_many_field
+    def team_members(self):  # noqa: D102
+        """
+        Add support for setting `team_members`.
+        """
+        return []
 
     class Meta:
         model = 'export_win.Win'
@@ -145,12 +193,17 @@ class CustomerResponseFactory(factory.django.DjangoModelFactory):
 class BreakdownFactory(factory.django.DjangoModelFactory):
     """Breakdown factory."""
 
-    type = factory.SubFactory(BreakdownTypeFactory)
     year = factory.fuzzy.FuzzyInteger(2022, 2050, 1)
     value = factory.fuzzy.FuzzyInteger(1000, 100000, 10)
 
     class Meta:
         model = 'export_win.Breakdown'
+
+    @factory.lazy_attribute
+    def type(self):
+        breakdown_types = [breakdown_type.value.id for breakdown_type in BreakdownTypeConstant]
+        selected_id = random.choice(breakdown_types)
+        return BreakdownType.objects.get(id=selected_id)
 
 
 class CustomerResponseTokenFactory(factory.django.DjangoModelFactory):

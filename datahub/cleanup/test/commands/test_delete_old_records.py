@@ -435,6 +435,12 @@ MAPPING = {
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [{}],
             },
+            {
+                'factory': WinFactory,
+                'field': 'company_contacts',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
         ],
     },
     'interaction.Interaction': {

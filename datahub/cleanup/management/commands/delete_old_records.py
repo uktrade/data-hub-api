@@ -109,6 +109,7 @@ class Command(BaseCleanupCommand):
                 Contact._meta.get_field('contact_exports'): (),
                 Contact._meta.get_field('tokens'): (),
                 Contact._meta.get_field('transferred_from'): (),
+                Contact._meta.get_field('wins'): (),
             },
         ),
         'company_referral.CompanyReferral': ModelCleanupConfig(
@@ -257,7 +258,7 @@ class Command(BaseCleanupCommand):
                 DatetimeLessThanCleanupFilter('modified_on', WIN_EXPIRY_PERIOD),
             ),
             relation_filter_mapping={
-                Win._meta.get_field('confirmation'): (),
+                Win._meta.get_field('customer_response'): (),
                 Win._meta.get_field('breakdowns'): (),
                 Win._meta.get_field('advisers'): (),
             },
