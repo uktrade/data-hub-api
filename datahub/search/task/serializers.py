@@ -29,4 +29,6 @@ class SearchTaskQuerySerializer(EntitySearchQuerySerializer):
     SORT_BY_FIELDS = (
         'modified_on',
         'due_date',
+        'company.name',
+        'investment_project.name',
     )
