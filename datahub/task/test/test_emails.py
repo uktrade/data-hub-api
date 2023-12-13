@@ -106,8 +106,6 @@ class BaseTaskEmailTemplateTests(APITestMixin):
         task = TaskFactory(due_date=datetime.date.today())
         email = self.email_template_class(task)
         task_url = email.get_context()['task_url']
-
-        
         assert test_utm_url in task_url
 
 
