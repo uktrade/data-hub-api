@@ -111,12 +111,12 @@ class BaseTaskEmailTemplateTests(APITestMixin):
 
 class TestUpcomingTaskEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = UpcomingTaskEmailTemplate
-    expected_utm_campaign = 'upcoming_task'
+    expected_utm_campaign = 'task_due_date_approaching'
 
 
 class TestTaskAssignedToOthersEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = TaskAssignedToOthersEmailTemplate
-    expected_utm_campaign = 'task_assigned_to_others'
+    expected_utm_campaign = 'task_assigned_by_others'
 
 
 class TestTaskOverdueEmailTemplate(BaseTaskEmailTemplateTests):
@@ -138,7 +138,7 @@ class TestTaskCompletedEmailTemplate(BaseTaskEmailTemplateTests):
 
 class TestTaskAmendedByOthersEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = TaskAmendedByOthersEmailTemplate
-    expected_utm_campaign = 'task_amended_by_others'
+    expected_utm_campaign = 'task_amended'
 
     def amended_by(self, task):
         return task.modified_by.name
