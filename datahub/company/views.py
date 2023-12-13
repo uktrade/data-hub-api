@@ -66,6 +66,7 @@ from datahub.company.serializers import (
     UpdateExportDetailsSerializer,
     UpdateOneListCoreTeamMembersSerializer,
 )
+from datahub.company.autocomplete import WithListAutocompleteFilter
 from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
 from datahub.core.auth import PaaSIPAuthentication
@@ -86,8 +87,8 @@ from datahub.investment.project.queryset import get_slim_investment_project_quer
 class CompanyFilterSet(FilterSet):
     """Company filter."""
 
-    autocomplete = AutocompleteFilter(search_fields=('name',))
-
+    autocomplete = WithListAutocompleteFilter(search_fields=('name',))
+    
     class Meta:
         model = Company
         fields = ['global_headquarters_id', 'global_ultimate_duns_number']
@@ -132,6 +133,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         'sector__parent',
         'sector',
         Prefetch('export_countries', queryset=get_export_country_queryset()),
+        # 'company_list_items__list__adviser',
     )
 
     @action(
