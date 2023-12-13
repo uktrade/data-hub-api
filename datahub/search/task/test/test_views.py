@@ -6,7 +6,7 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
@@ -247,7 +247,13 @@ class TestTaskSearch(APITestMixin):
 
         assert response.data['count'] == 1
 
-    def test_search_task_due_date_ordering(self, opensearch_with_collector):
+    @pytest.mark.parametrize('sort_order, expected_order', [('asc', [0, 1]), ('desc', [1, 0])])
+    def test_search_task_due_date_ordering(
+        self,
+        opensearch_with_collector,
+        sort_order,
+        expected_order,
+    ):
         """Tests task search ordering on due date"""
         yesterday_task = TaskFactory(due_date=datetime.today() - timedelta(days=1))
         today_task = TaskFactory(due_date=datetime.today())
@@ -259,14 +265,73 @@ class TestTaskSearch(APITestMixin):
         response = self.api_client.post(
             url,
             data={
-                'sortby': 'due_date',
+                'sortby': f'due_date:{sort_order}',
             },
         )
 
         assert response.status_code == status.HTTP_200_OK
 
-        assert response.data['results'][0]['id'] == str(yesterday_task.id)
-        assert response.data['results'][1]['id'] == str(today_task.id)
+        assert response.data['results'][expected_order[0]]['id'] == str(yesterday_task.id)
+        assert response.data['results'][expected_order[1]]['id'] == str(today_task.id)
+
+    @pytest.mark.parametrize('sort_order, expected_order', [('asc', [0, 1]), ('desc', [1, 0])])
+    def test_search_task_company_name_ordering(
+        self,
+        opensearch_with_collector,
+        sort_order,
+        expected_order,
+    ):
+        """Tests task search ordering on company name"""
+        company1 = CompanyFactory(name='Apple')
+        company2 = CompanyFactory(name='Zebra')
+
+        first_task = TaskFactory(company=company1)
+        second_task = TaskFactory(company=company2)
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:task')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'sortby': f'company.name:{sort_order}',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['results'][expected_order[0]]['id'] == str(first_task.id)
+        assert response.data['results'][expected_order[1]]['id'] == str(second_task.id)
+
+    @pytest.mark.parametrize('sort_order, expected_order', [('asc', [0, 1]), ('desc', [1, 0])])
+    def test_search_task_investment_project_name_ordering(
+        self,
+        opensearch_with_collector,
+        sort_order,
+        expected_order,
+    ):
+        """Tests task search ordering on investment project name"""
+        investment_project1 = InvestmentProjectFactory(name='Apple')
+        investment_project2 = InvestmentProjectFactory(name='Zebra')
+
+        first_task = TaskFactory(investment_project=investment_project1)
+        second_task = TaskFactory(investment_project=investment_project2)
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:task')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'sortby': f'investment_project.name:{sort_order}',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data['results'][expected_order[0]]['id'] == str(first_task.id)
+        assert response.data['results'][expected_order[1]]['id'] == str(second_task.id)
 
 
 class TestTaskInvestmentProjectSearch(APITestMixin):
