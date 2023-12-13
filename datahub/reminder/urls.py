@@ -286,43 +286,4 @@ urlpatterns = [
         reminder_summary_view,
         name='summary',
     ),
-    # Legacy urls to be removed once the FE is pointed at the new urls starting with 'my-tasks'
-    path(
-        'reminder/subscription/task-amended-by-others',
-        TaskAmendedByOthersSubscriptionViewset.as_view(
-            {
-                'get': 'retrieve',
-                'patch': 'partial_update',
-            },
-        ),
-        name='task-amended-by-others-subscription',
-    ),
-    path(
-        'reminder/subscription/task-assigned-to-me-from-others',
-        TaskAssignedToMeFromOthersSubscriptionViewset.as_view(
-            {
-                'get': 'retrieve',
-                'patch': 'partial_update',
-            },
-        ),
-        name='task-assigned-to-me-from-others-subscription',
-    ),
-    path(
-        'reminder/task-assigned-to-me-from-others',
-        TaskAssignedToMeFromOthersReminderViewset.as_view(
-            {
-                'get': 'list',
-            },
-        ),
-        name='task-assigned-to-me-from-others-reminder',
-    ),
-    path(
-        'reminder/task-assigned-to-me-from-others/<uuid:pk>',
-        TaskAssignedToMeFromOthersReminderViewset.as_view(
-            {
-                'delete': 'destroy',
-            },
-        ),
-        name='task-assigned-to-me-from-others-reminder-detail',
-    ),
 ]
