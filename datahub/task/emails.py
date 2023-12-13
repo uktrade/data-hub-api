@@ -5,6 +5,8 @@ from datahub.task.models import Task
 
 
 class EmailTemplate(ABC):
+    UTM_URL_BASE = "?utm_source=individual&utm_medium=email_notify&utm_campaign={}&utm_content=task"
+
     @abstractmethod
     def __init__(self, task: Task):
         self.task = task
@@ -46,6 +48,16 @@ class EmailTemplate(ABC):
         return (
             f'Date due: {self.task.due_date.strftime("%-d %B %Y")}' if self.task.due_date else None
         )
+    
+    def _to_snake_case(self, str) -> str:
+        return ''.join(['_'+i.lower() if i.isupper() 
+               else i for i in str]).lstrip('_')
+
+    def get_utm_url(self) -> str:
+        utm_campaign = self._to_snake_case(
+            self.__class__.__name__.replace('EmailTemplate', '')
+        )
+        return self.UTM_URL_BASE.format(utm_campaign)
 
     def get_task_fields(self) -> str:
         """Return a list of all the fields to include, separated by new line"""
@@ -62,7 +74,7 @@ class EmailTemplate(ABC):
             'email_subject': self.get_task_subject(),
             'body_heading': self.get_body_heading(),
             'task_fields': self.get_task_fields(),
-            'task_url': self.task.get_absolute_url(),
+            'task_url': self.task.get_absolute_url() + self.get_utm_url(),
         }
 
 
