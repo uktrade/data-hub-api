@@ -5,6 +5,10 @@ from datahub.task.models import Task
 
 
 class EmailTemplate(ABC):
+    UTM_URL_BASE = '?utm_source=individual&utm_medium=email_notify' +\
+                   '&utm_campaign={0}&utm_content=task'
+    UTM_CAMPAIGN = None
+
     @abstractmethod
     def __init__(self, task: Task):
         self.task = task
@@ -47,6 +51,9 @@ class EmailTemplate(ABC):
             f'Date due: {self.task.due_date.strftime("%-d %B %Y")}' if self.task.due_date else None
         )
 
+    def get_utm_url(self) -> str:
+        return self.UTM_URL_BASE.format(self.UTM_CAMPAIGN)
+
     def get_task_fields(self) -> str:
         """Return a list of all the fields to include, separated by new line"""
         return '\n'.join(list(filter(lambda item: item is not None, self.fields_to_include)))
@@ -62,11 +69,13 @@ class EmailTemplate(ABC):
             'email_subject': self.get_task_subject(),
             'body_heading': self.get_body_heading(),
             'task_fields': self.get_task_fields(),
-            'task_url': self.task.get_absolute_url(),
+            'task_url': self.task.get_absolute_url() + self.get_utm_url(),
         }
 
 
 class UpcomingTaskEmailTemplate(EmailTemplate):
+    UTM_CAMPAIGN = 'task_due_date_approaching'
+
     def __init__(self, task: Task):
         super().__init__(task)
 
@@ -84,6 +93,8 @@ class UpcomingTaskEmailTemplate(EmailTemplate):
 
 
 class TaskOverdueEmailTemplate(EmailTemplate):
+    UTM_CAMPAIGN = 'task_overdue'
+
     def __init__(self, task: Task):
         super().__init__(task)
 
@@ -101,6 +112,8 @@ class TaskOverdueEmailTemplate(EmailTemplate):
 
 
 class TaskAssignedToOthersEmailTemplate(EmailTemplate):
+    UTM_CAMPAIGN = 'task_assigned_by_others'
+
     def __init__(self, task: Task):
         super().__init__(task)
 
@@ -118,6 +131,8 @@ class TaskAssignedToOthersEmailTemplate(EmailTemplate):
 
 
 class TaskCompletedEmailTemplate(EmailTemplate):
+    UTM_CAMPAIGN = 'task_completed'
+
     def __init__(self, task: Task):
         super().__init__(task)
 
@@ -136,6 +151,8 @@ class TaskCompletedEmailTemplate(EmailTemplate):
 
 
 class TaskAmendedByOthersEmailTemplate(EmailTemplate):
+    UTM_CAMPAIGN = 'task_amended'
+
     def __init__(self, task: Task):
         super().__init__(task)
 
