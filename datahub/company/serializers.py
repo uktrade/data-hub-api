@@ -6,7 +6,6 @@ from uuid import UUID
 
 from django.conf import settings
 from django.db import models, transaction
-from django.forms import IntegerField
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
@@ -484,9 +483,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         models.URLField: RelaxedURLField,
     }
 
-    in_adviser_list_count = serializers.IntegerField(read_only=True)
     in_adviser_list = serializers.BooleanField(read_only=True)
-
 
     def __init__(self, *args, **kwargs):
         """
@@ -657,8 +654,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'global_ultimate_country',
             'strategy',
             'is_out_of_business',
-            'in_adviser_list_count',
-            'in_adviser_list',            
+            'in_adviser_list',
         )
         read_only_fields = (
             'archived',
@@ -683,7 +679,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'is_global_headquarters',
             'global_ultimate_country',
             'is_out_of_business',
-            'in_adviser_list_count',
             'in_adviser_list',
         )
         dnb_read_only_fields = (
@@ -696,7 +691,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'turnover_range',
             'address',
             'registered_address',
-            # 'in_adviser_list_count',
         )
         validators = (
             RequiredUnlessAlreadyBlankValidator('sector', 'business_type'),
