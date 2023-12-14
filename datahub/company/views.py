@@ -22,6 +22,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from config.settings.types import HawkScope
+from datahub.company.autocomplete import WithListAutocompleteFilter
 from datahub.company.company_matching_api import (
     CompanyMatchingServiceConnectionError,
     CompanyMatchingServiceHTTPError,
@@ -86,7 +87,7 @@ from datahub.investment.project.queryset import get_slim_investment_project_quer
 class CompanyFilterSet(FilterSet):
     """Company filter."""
 
-    autocomplete = AutocompleteFilter(search_fields=('name',))
+    autocomplete = WithListAutocompleteFilter(search_fields=('name',))
 
     class Meta:
         model = Company
