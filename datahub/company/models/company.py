@@ -26,7 +26,6 @@ from datahub.core.models import (
 )
 from datahub.core.utils import get_front_end_url, StrEnum
 from datahub.metadata import models as metadata_models
-from datahub.user.company_list.models import CompanyList
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 

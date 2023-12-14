@@ -41,7 +41,7 @@ def _apply_autocomplete_filter_to_queryset(
     queryset,
     autocomplete_fields,
     search_string,
-    priority_order_by=[],
+    priority_order_by=None,
 ):
     """
     Performs an autocomplete search.
@@ -71,6 +71,9 @@ def _apply_autocomplete_filter_to_queryset(
     the gin_trgm_ops operator class from the pg_trgm PostgreSQL extension. However, this will
     typically only work if all search fields are on the same table.
     """
+    if priority_order_by is None:
+        priority_order_by = []
+
     escaped_tokens = [re.escape(token) for token in search_string.split()]
 
     # Skip the remainder of the logic if an empty string or only spaces were entered

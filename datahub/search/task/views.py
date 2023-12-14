@@ -105,6 +105,4 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
             raw_query['query']['bool']['filter'] = filters
 
             base_query.update_from_dict(raw_query)
-        from pprint import pprint
-        pprint(base_query.__dict__)
         return base_query

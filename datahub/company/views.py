@@ -22,6 +22,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from config.settings.types import HawkScope
+from datahub.company.autocomplete import WithListAutocompleteFilter
 from datahub.company.company_matching_api import (
     CompanyMatchingServiceConnectionError,
     CompanyMatchingServiceHTTPError,
@@ -66,7 +67,6 @@ from datahub.company.serializers import (
     UpdateExportDetailsSerializer,
     UpdateOneListCoreTeamMembersSerializer,
 )
-from datahub.company.autocomplete import WithListAutocompleteFilter
 from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
 from datahub.core.auth import PaaSIPAuthentication
@@ -88,7 +88,7 @@ class CompanyFilterSet(FilterSet):
     """Company filter."""
 
     autocomplete = WithListAutocompleteFilter(search_fields=('name',))
-    
+
     class Meta:
         model = Company
         fields = ['global_headquarters_id', 'global_ultimate_duns_number']
