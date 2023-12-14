@@ -133,7 +133,6 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         'sector__parent',
         'sector',
         Prefetch('export_countries', queryset=get_export_country_queryset()),
-        # 'company_list_items__list__adviser',
     )
 
     @action(

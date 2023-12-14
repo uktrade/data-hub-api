@@ -15,9 +15,6 @@ class WithListAutocompleteFilter(AutocompleteFilter):
         if self.field_name not in self.parent.form.data:
             return queryset
 
-        if not self.parent.request.user:
-            return _apply_autocomplete_filter_to_queryset(queryset, self.search_fields, value)
-
         adviser = self.parent.request.user
 
         queryset = queryset.annotate(
