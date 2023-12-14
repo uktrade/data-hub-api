@@ -483,6 +483,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         models.URLField: RelaxedURLField,
     }
 
+    is_in_adviser_list = serializers.BooleanField(read_only=True)
+
     def __init__(self, *args, **kwargs):
         """
         Make some of the fields read_only if the instance has a duns_number set.
@@ -652,6 +654,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'global_ultimate_country',
             'strategy',
             'is_out_of_business',
+            'is_in_adviser_list',
         )
         read_only_fields = (
             'archived',
@@ -676,6 +679,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'is_global_headquarters',
             'global_ultimate_country',
             'is_out_of_business',
+            'is_in_adviser_list',
         )
         dnb_read_only_fields = (
             'name',

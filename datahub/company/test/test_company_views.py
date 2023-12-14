@@ -37,6 +37,7 @@ from datahub.feature_flag.test.factories import FeatureFlagFactory
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 from datahub.metadata.utils import convert_usd_to_gbp
+from datahub.user.company_list.test.factories import CompanyListFactory, CompanyListItemFactory
 
 
 class TestListCompanies(APITestMixin):
@@ -59,7 +60,7 @@ class TestListCompanies(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['count'] == 2
 
-    def test_autocomplete_companies(self):
+    def test_autocomplete_companies_without_lists(self):
         """Test that the companies viewset can autocomplete."""
         CompanyFactory(name='Apple')
         CompanyFactory(name='Auburn')
@@ -72,6 +73,58 @@ class TestListCompanies(APITestMixin):
         assert len(companies) == 2
         assert companies[0]['name'] == 'Apple'
         assert companies[1]['name'] == 'Auburn'
+
+    def test_autocomplete_companies_in_adviser_list(self):
+        """Test that the companies from a adviser's list are ordered at the top."""
+        in_adviser_list_company1 = CompanyFactory(name='Apple')
+        CompanyFactory(name='Auburn')
+        in_adviser_list_company2 = CompanyFactory(name='Average')
+        CompanyFactory(name='Amber')
+        in_adviser_list_company_no_search_match = CompanyFactory(name='Boom')
+
+        list = CompanyListFactory(adviser=self.user)
+        CompanyListItemFactory(company=in_adviser_list_company1, list=list)
+        CompanyListItemFactory(company=in_adviser_list_company2, list=list)
+        CompanyListItemFactory(company=in_adviser_list_company_no_search_match, list=list)
+
+        url = reverse(viewname='api-v4:company:collection')
+        response = self.api_client.get(url, data={'autocomplete': 'A'})
+        assert response.status_code == status.HTTP_200_OK
+        companies = response.json()['results']
+        assert len(companies) == 4
+        assert companies[0]['name'] == 'Apple'
+        assert companies[0]['is_in_adviser_list'] is True
+        assert companies[1]['name'] == 'Average'
+        assert companies[1]['is_in_adviser_list'] is True
+        assert companies[2]['name'] == 'Amber'
+        assert companies[2]['is_in_adviser_list'] is False
+        assert companies[3]['name'] == 'Auburn'
+        assert companies[3]['is_in_adviser_list'] is False
+
+    def test_autocomplete_companies_in_another_adviser_list(self):
+        """Test that the companies from another adviser's list are ignored."""
+        in_adviser_list_company1 = CompanyFactory(name='Apple')
+        CompanyFactory(name='Auburn')
+        in_adviser_list_company2 = CompanyFactory(name='Average')
+        CompanyFactory(name='Amber')
+
+        list = CompanyListFactory()
+        CompanyListItemFactory(company=in_adviser_list_company1, list=list)
+        CompanyListItemFactory(company=in_adviser_list_company2, list=list)
+
+        url = reverse(viewname='api-v4:company:collection')
+        response = self.api_client.get(url, data={'autocomplete': 'A'})
+        assert response.status_code == status.HTTP_200_OK
+        companies = response.json()['results']
+        assert len(companies) == 4
+        assert companies[0]['name'] == 'Amber'
+        assert companies[0]['is_in_adviser_list'] is False
+        assert companies[1]['name'] == 'Apple'
+        assert companies[1]['is_in_adviser_list'] is False
+        assert companies[2]['name'] == 'Auburn'
+        assert companies[2]['is_in_adviser_list'] is False
+        assert companies[3]['name'] == 'Average'
+        assert companies[3]['is_in_adviser_list'] is False
 
     def test_filter_by_global_headquarters(self):
         """Test filtering by global_headquarters_id."""
