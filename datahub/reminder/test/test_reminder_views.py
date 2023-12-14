@@ -185,7 +185,9 @@ class TaskReminderMixin:
             'event': reminders[0].event,
             'task': {
                 'id': str(reminders[0].task.id),
+                'title': str(reminders[0].task.title),
                 'due_date': None,
+                'company': None,
                 'investment_project': None,
             },
         }
@@ -214,7 +216,14 @@ class TaskReminderMixin:
             'event': reminders[0].event,
             'task': {
                 'id': str(reminders[0].task.id),
+                'title': str(reminders[0].task.title),
                 'due_date': None,
+                'company': {
+                    'name': investment_project.investor_company.name,
+                    'id': str(
+                        investment_project.investor_company.id,
+                    ),
+                },
                 'investment_project': {
                     'name': investment_project.name,
                     'project_code': investment_project.project_code,
@@ -226,6 +235,42 @@ class TaskReminderMixin:
                     },
                     'id': str(investment_project.id),
                 },
+            },
+        }
+
+    def test_get_company_task_reminders(self):
+        """
+        Given some reminders for tasks with a company, these should be returned with
+        the correct company data
+        """
+        company = CompanyFactory()
+        task = TaskFactory(company=company)
+
+        reminders = self.factory.create_batch(
+            3,
+            adviser=self.user,
+            task=task,
+        )
+        response = self.get_response
+        data = response.json()
+        results = data.get('results', [])
+        reminders = sorted(reminders, key=lambda x: x.pk)
+
+        assert results[0] == {
+            'id': str(reminders[0].id),
+            'created_on': '2022-05-05T17:00:00Z',
+            'event': reminders[0].event,
+            'task': {
+                'id': str(reminders[0].task.id),
+                'title': str(reminders[0].task.title),
+                'due_date': None,
+                'company': {
+                    'name': company.name,
+                    'id': str(
+                        company.id,
+                    ),
+                },
+                'investment_project': None,
             },
         }
 
