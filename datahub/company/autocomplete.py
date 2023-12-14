@@ -41,9 +41,7 @@ class WithListAutocompleteFilter(AutocompleteFilter):
         # pprint("queryset")
         # pprint(queryset)
 
-        result = _apply_autocomplete_filter_to_queryset(queryset, self.search_fields, value)
-
-        result = result.annotate(
+        result = queryset.annotate(
             in_adviser_list_count=Count('company_list_items', output_field=IntegerField()),
         )
 
@@ -57,15 +55,19 @@ class WithListAutocompleteFilter(AutocompleteFilter):
                 output_field=BooleanField(),
             ),
         )
+
+        result = _apply_autocomplete_filter_to_queryset(
+            result, self.search_fields, value, priority_order_by=['-in_adviser_list']
+        )
         # result.order_fields('in_adviser_list')
         pprint("result.query.order_by")
         pprint(result.order_by)
-        order_by = result.order_by
+        # order_by = result.order_by
 
-        result.order_by(
-            'in_adviser_list',
-            order_by,
-        )
+        # result.order_by(
+        #     'in_adviser_list',
+        #     order_by,
+        # )
         # result.order_by.prepend('in_adviser_list')
 
         # for query in queryset:

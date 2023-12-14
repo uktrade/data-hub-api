@@ -41,7 +41,7 @@ def _apply_autocomplete_filter_to_queryset(
     queryset,
     autocomplete_fields,
     search_string,
-    # priority_order_by=(None,),
+    priority_order_by=[],
 ):
     """
     Performs an autocomplete search.
@@ -102,7 +102,7 @@ def _apply_autocomplete_filter_to_queryset(
             *filter_q_objects_for_tokens,
         )
         .order_by(
-            # *priority_order_by,
+            *priority_order_by,
             '_matched_group_index',
             '_matched_field',
             *autocomplete_fields,
