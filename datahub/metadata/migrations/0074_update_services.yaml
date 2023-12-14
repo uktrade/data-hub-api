@@ -5,7 +5,7 @@
     order: 1324
     segment: Women's International Network (WIN Programme)
     parent:
-    contexts: ["interaction", "service_delivery", "trade_agreement_interaction", "investment_interaction"]
+    contexts: ["export_service_delivery", "export_interaction"]
     lft: 0
     rght: 0
     tree_id: 0
