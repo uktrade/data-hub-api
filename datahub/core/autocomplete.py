@@ -37,7 +37,12 @@ class AutocompleteFilter(CharFilter):
         return _apply_autocomplete_filter_to_queryset(queryset, self.search_fields, value)
 
 
-def _apply_autocomplete_filter_to_queryset(queryset, autocomplete_fields, search_string):
+def _apply_autocomplete_filter_to_queryset(
+    queryset,
+    autocomplete_fields,
+    search_string,
+    # priority_order_by=(None,),
+):
     """
     Performs an autocomplete search.
 
@@ -80,24 +85,29 @@ def _apply_autocomplete_filter_to_queryset(queryset, autocomplete_fields, search
         for escaped_token in escaped_tokens
     )
 
-    return queryset.annotate(
-        _matched_group_index=_make_ordering_case_expression(
-            enumerate(autocomplete_fields),
-            escaped_tokens,
-            IntegerField(),
-        ),
-        _matched_field=_make_ordering_case_expression(
-            zip(autocomplete_fields, autocomplete_fields),
-            escaped_tokens,
-            CharField(),
-        ),
-    ).filter(
-        *filter_q_objects_for_tokens,
-    ).order_by(
-        '_matched_group_index',
-        '_matched_field',
-        *autocomplete_fields,
-        'pk',
+    return (
+        queryset.annotate(
+            _matched_group_index=_make_ordering_case_expression(
+                enumerate(autocomplete_fields),
+                escaped_tokens,
+                IntegerField(),
+            ),
+            _matched_field=_make_ordering_case_expression(
+                zip(autocomplete_fields, autocomplete_fields),
+                escaped_tokens,
+                CharField(),
+            ),
+        )
+        .filter(
+            *filter_q_objects_for_tokens,
+        )
+        .order_by(
+            # *priority_order_by,
+            '_matched_group_index',
+            '_matched_field',
+            *autocomplete_fields,
+            'pk',
+        )
     )
 
 
@@ -116,10 +126,7 @@ def _make_ordering_q_for_field(field, escaped_tokens):
     """
     return reduce(
         or_,
-        (
-            Q(_make_prefix_match_q(field, escaped_token))
-            for escaped_token in escaped_tokens
-        ),
+        (Q(_make_prefix_match_q(field, escaped_token)) for escaped_token in escaped_tokens),
     )
 
 
@@ -137,10 +144,7 @@ def _make_filter_q_for_token(fields, escaped_token):
     """
     return reduce(
         or_,
-        (
-            Q(_make_prefix_match_q(field, escaped_token))
-            for field in fields
-        ),
+        (Q(_make_prefix_match_q(field, escaped_token)) for field in fields),
     )
 
 

@@ -1,5 +1,5 @@
 # from django_filters import CharFilter
-from django.db.models import BooleanField, Case, Count, Value, When, Q, Exists
+from django.db.models import BooleanField, IntegerField, Case, Count, F, Value, When, Q, Exists
 
 # from traitlets import Bool
 
@@ -34,7 +34,8 @@ class WithListAutocompleteFilter(AutocompleteFilter):
         # adviser = request.user
         # Get current adviser
         # Limit list items to current adviser
-        adviser = Adviser.objects.get(pk='6e786ddd-1f57-4b38-a3fe-04092194382a')
+        # adviser = Adviser.objects.get(pk='6e786ddd-1f57-4b38-a3fe-04092194382a')
+        adviser = Adviser.objects.get(pk='80ecf4f4-82f0-45d0-b6f1-913b1d27293d')
         from pprint import pprint
 
         # pprint("queryset")
@@ -42,22 +43,37 @@ class WithListAutocompleteFilter(AutocompleteFilter):
 
         result = _apply_autocomplete_filter_to_queryset(queryset, self.search_fields, value)
 
-        queryset = queryset.annotate(
+        result = result.annotate(
+            in_adviser_list_count=Count('company_list_items', output_field=IntegerField()),
+        )
+
+        result = result.annotate(
             in_adviser_list=Case(
                 When(
-                    Q(company_list_items=None),
+                    Q(company_list_items__list__adviser=adviser),
                     then=Value(True),
                 ),
+                default=Value(False),
                 output_field=BooleanField(),
             ),
         )
+        # result.order_fields('in_adviser_list')
+        pprint("result.query.order_by")
+        pprint(result.order_by)
+        order_by = result.order_by
 
-        for query in queryset:
-            pprint("query.company_list_items")
-            pprint(query.company_list_items.all())
+        result.order_by(
+            'in_adviser_list',
+            order_by,
+        )
+        # result.order_by.prepend('in_adviser_list')
 
-            # pprint("query.in_adviser_list")
-            # pprint(query.in_adviser_list)
+        # for query in queryset:
+        #     pprint("query.company_list_items")
+        #     pprint(query.company_list_items.all())
+
+        # pprint("query.in_adviser_list")
+        # pprint(query.in_adviser_list)
 
         # result.filter(company_list_items__list__adviser=adviser)
         # from pprint import pprint
@@ -70,4 +86,6 @@ class WithListAutocompleteFilter(AutocompleteFilter):
         # pprint(self)
         # pprint("value")
         # pprint(value)
+        # pprint("str(result.query)")
+        # pprint(str(result.query))
         return result
