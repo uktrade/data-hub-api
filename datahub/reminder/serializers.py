@@ -7,7 +7,6 @@ from datahub.company.serializers import NestedAdviserWithTeamField
 from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import BaseInteractionSerializer
 from datahub.investment.project.models import InvestmentProject
-from datahub.investment.project.serializers import NestedInvestmentProjectInvestorCompanyField
 from datahub.reminder.models import (
     NewExportInteractionReminder,
     NewExportInteractionSubscription,
@@ -28,6 +27,7 @@ from datahub.reminder.models import (
     UpcomingTaskReminderSubscription,
 )
 from datahub.task.models import Task
+from datahub.task.serializers import TaskSerializer
 
 
 class NoRecentExportInteractionSubscriptionSerializer(serializers.ModelSerializer):
@@ -200,18 +200,16 @@ class NoRecentExportInteractionReminderSerializer(serializers.ModelSerializer):
         fields = ('id', 'created_on', 'last_interaction_date', 'event', 'company', 'interaction')
 
 
-class ReminderTaskSerializer(serializers.ModelSerializer):
+class ReminderTaskSerializer(TaskSerializer):
     """Serializer for the task in a reminder"""
-
-    investment_project = NestedInvestmentProjectInvestorCompanyField(
-        read_only=True,
-    )
 
     class Meta:
         model = Task
         fields = (
             'id',
+            'title',
             'investment_project',
+            'company',
             'due_date',
         )
 
