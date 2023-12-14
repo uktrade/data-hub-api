@@ -93,13 +93,13 @@ class TestListCompanies(APITestMixin):
         companies = response.json()['results']
         assert len(companies) == 4
         assert companies[0]['name'] == 'Apple'
-        assert companies[0]['in_adviser_list'] is True
+        assert companies[0]['is_in_adviser_list'] is True
         assert companies[1]['name'] == 'Average'
-        assert companies[1]['in_adviser_list'] is True
+        assert companies[1]['is_in_adviser_list'] is True
         assert companies[2]['name'] == 'Amber'
-        assert companies[2]['in_adviser_list'] is False
+        assert companies[2]['is_in_adviser_list'] is False
         assert companies[3]['name'] == 'Auburn'
-        assert companies[3]['in_adviser_list'] is False
+        assert companies[3]['is_in_adviser_list'] is False
 
     def test_autocomplete_companies_in_another_adviser_list(self):
         """Test that the companies from another adviser's list are ignored."""
@@ -118,13 +118,13 @@ class TestListCompanies(APITestMixin):
         companies = response.json()['results']
         assert len(companies) == 4
         assert companies[0]['name'] == 'Amber'
-        assert companies[0]['in_adviser_list'] is False
+        assert companies[0]['is_in_adviser_list'] is False
         assert companies[1]['name'] == 'Apple'
-        assert companies[1]['in_adviser_list'] is False
+        assert companies[1]['is_in_adviser_list'] is False
         assert companies[2]['name'] == 'Auburn'
-        assert companies[2]['in_adviser_list'] is False
+        assert companies[2]['is_in_adviser_list'] is False
         assert companies[3]['name'] == 'Average'
-        assert companies[3]['in_adviser_list'] is False
+        assert companies[3]['is_in_adviser_list'] is False
 
     def test_filter_by_global_headquarters(self):
         """Test filtering by global_headquarters_id."""

@@ -18,7 +18,7 @@ class WithListAutocompleteFilter(AutocompleteFilter):
         adviser = self.parent.request.user
 
         queryset = queryset.annotate(
-            in_adviser_list=Case(
+            is_in_adviser_list=Case(
                 When(
                     Q(company_list_items__list__adviser=adviser),
                     then=Value(True),
@@ -32,5 +32,5 @@ class WithListAutocompleteFilter(AutocompleteFilter):
             queryset,
             self.search_fields,
             value,
-            priority_order_by=['-in_adviser_list'],
+            priority_order_by=['-is_in_adviser_list'],
         )
