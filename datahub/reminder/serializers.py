@@ -7,7 +7,6 @@ from datahub.company.serializers import NestedAdviserWithTeamField
 from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import BaseInteractionSerializer
 from datahub.investment.project.models import InvestmentProject
-from datahub.investment.project.serializers import NestedInvestmentProjectInvestorCompanyField
 from datahub.reminder.models import (
     NewExportInteractionReminder,
     NewExportInteractionSubscription,
