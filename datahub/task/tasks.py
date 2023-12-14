@@ -232,9 +232,15 @@ def notify_adviser_added_to_task(task, adviser_id):
     """
     Send a notification to the adviser added to the task
     """
+    if adviser_id == task.created_by.id:
+        return
+    if adviser_id == task.modified_by.id:
+        return
     adviser = Advisor.objects.filter(id=str(adviser_id)).first()
+
     if not adviser:
         return
+
     reminder = TaskAssignedToMeFromOthersReminder.objects.create(
         adviser=adviser,
         event=f'{task} assigned to me by {task.modified_by.name}',

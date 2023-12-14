@@ -476,6 +476,38 @@ class TestTaskReminders:
 
 
 class TestTasksAssignedToMeFromOthers:
+    def test_no_notification_created_for_the_adviser_who_created_task(
+        self,
+    ):
+        adviser1 = AdviserFactory()
+        adviser2 = AdviserFactory()
+        task1 = TaskFactory(advisers=[adviser1, adviser2], created_by=adviser1)
+
+        notify_adviser_added_to_task(task1, adviser1.id)
+        notify_adviser_added_to_task(task1, adviser2.id)
+
+        assert (
+            TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser1).exists() is False
+        )
+        assert TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser2).count() == 1
+
+    def test_no_notification_created_for_the_adviser_who_modified_task(
+        self,
+    ):
+        adviser1 = AdviserFactory()
+        adviser2 = AdviserFactory()
+        task1 = TaskFactory(advisers=[adviser1], created_by=adviser2, modified_by=adviser1)
+
+        notify_adviser_added_to_task(task1, adviser1.id)
+        notify_adviser_added_to_task(task1, adviser2.id)
+
+        assert (
+            TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser1).exists() is False
+        )
+        assert (
+            TaskAssignedToMeFromOthersReminder.objects.filter(adviser=adviser2).exists() is False
+        )
+
     def test_creation_of_multiple_adviser_subscriptions_on_task_creation(
         self,
         mock_notify_adviser_by_rq_email,
