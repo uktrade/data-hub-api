@@ -52,6 +52,7 @@ class BaseTaskEmailTemplateTests(APITestMixin):
         return task.get_company().name
 
     email_template_class = None
+    utm_url_snake_case = None
 
     default_generic_fields = [('Date due', due_date)]
     additional_generic_fields = []
@@ -97,21 +98,35 @@ class BaseTaskEmailTemplateTests(APITestMixin):
         ]
         assert email.get_task_fields() == '\n'.join(labels)
 
+    def test_email_utm_url(self):
+        test_utm_url = self.email_template_class.UTM_URL_BASE.format(
+            self.expected_utm_campaign,
+        )
+
+        task = TaskFactory(due_date=datetime.date.today())
+        email = self.email_template_class(task)
+        task_url = email.get_context()['task_url']
+        assert test_utm_url in task_url
+
 
 class TestUpcomingTaskEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = UpcomingTaskEmailTemplate
+    expected_utm_campaign = 'task_due_date_approaching'
 
 
 class TestTaskAssignedToOthersEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = TaskAssignedToOthersEmailTemplate
+    expected_utm_campaign = 'task_assigned_by_others'
 
 
 class TestTaskOverdueEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = TaskOverdueEmailTemplate
+    expected_utm_campaign = 'task_overdue'
 
 
 class TestTaskCompletedEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = TaskCompletedEmailTemplate
+    expected_utm_campaign = 'task_completed'
 
     def completed_by(self, task):
         return task.modified_by.name
@@ -123,6 +138,7 @@ class TestTaskCompletedEmailTemplate(BaseTaskEmailTemplateTests):
 
 class TestTaskAmendedByOthersEmailTemplate(BaseTaskEmailTemplateTests):
     email_template_class = TaskAmendedByOthersEmailTemplate
+    expected_utm_campaign = 'task_amended'
 
     def amended_by(self, task):
         return task.modified_by.name
