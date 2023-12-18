@@ -38,7 +38,7 @@ _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('advi
 
 
 class InvestmentFilter(FilterSet):
-    """Adviser filter."""
+    """Investment project filter that allows autocomplete"""
 
     autocomplete = AutocompleteFilter(
         search_fields=('name',),
