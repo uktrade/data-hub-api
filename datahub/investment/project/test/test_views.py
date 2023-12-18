@@ -358,7 +358,6 @@ class TestListView(APITestMixin):
 
     def test_autocomplete_with_only_name(self):
         """Test the autocomplete with only a name includes projects from all investor companies"""
-
         project_1 = InvestmentProjectFactory(name='a1')
         project_2 = InvestmentProjectFactory(name='a2')
         InvestmentProjectFactory(name='b1')
@@ -411,7 +410,7 @@ class TestListView(APITestMixin):
 
         url = reverse('api-v3:investment:investment-collection')
         response = self.api_client.get(
-            f'{url}?autocomplete=a&investor_company_id={investor_company_1.id}'
+            f'{url}?autocomplete=a&investor_company_id={investor_company_1.id}',
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -538,13 +537,13 @@ class TestCreateView(APITestMixin):
         ) == Counter(activity['id'] for activity in activities)
         assert response_data['other_business_activity'] == request_data['other_business_activity']
         assert response_data['project_manager_request_status']['id'] == str(
-            project_manager_request_status_id
+            project_manager_request_status_id,
         )
         # GVA Multiplier for Retail & wholesale trade - 2019 - 0.0581 * 1000
         assert response_data['gross_value_added'] == '58'
 
         assert response_data['country_investment_originates_from']['id'] == str(
-            investor_company.address_country.id
+            investor_company.address_country.id,
         )
 
     def test_create_project_fail(self):
@@ -671,7 +670,7 @@ class TestCreateView(APITestMixin):
             'business_activities': [
                 {
                     'id': retail_business_activity_id,
-                }
+                },
             ],
             'client_contacts': [
                 {
@@ -892,19 +891,19 @@ class TestRetrieveView(APITestMixin):
             {
                 'id': str(actual_uk_regions[0].pk),
                 'name': actual_uk_regions[0].name,
-            }
+            },
         ]
         assert response_data['delivery_partners'] == [
             {
                 'id': str(delivery_partners[0].pk),
                 'name': delivery_partners[0].name,
-            }
+            },
         ]
         assert sorted(
             country['id'] for country in response_data['competitor_countries']
         ) == sorted(countries)
         assert sorted(driver['id'] for driver in response_data['strategic_drivers']) == sorted(
-            strategic_drivers
+            strategic_drivers,
         )
 
     def test_get_team_success(self):
@@ -1287,7 +1286,7 @@ class TestPartialUpdateView(APITestMixin):
             'client_contacts': [
                 {
                     'id': str(new_contact.id),
-                }
+                },
             ],
         }
         response = self.api_client.patch(url, data=request_data)
@@ -2292,7 +2291,7 @@ class TestInvestmentProjectActivities(APITestMixin):
             'business_activities': [
                 {
                     'id': constants.InvestmentBusinessActivity.retail.value.id,
-                }
+                },
             ],
             'other_business_activity': 'New innovation centre',
             'client_contacts': [{'id': str(ContactFactory().id)}],
@@ -2440,7 +2439,7 @@ class TestInvestmentProjectVersioning(APITestMixin):
                 'business_activities': [
                     {
                         'id': constants.InvestmentBusinessActivity.retail.value.id,
-                    }
+                    },
                 ],
                 'other_business_activity': 'New innovation centre',
                 'client_contacts': [{'id': str(ContactFactory().id)}],
@@ -2889,7 +2888,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
                     'id': str(adviser.pk),
                 },
                 'role': 'Sector adviser',
-            }
+            },
         ]
         response = api_client.put(url, data=request_data)
 
@@ -2908,7 +2907,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
                     'name': project.name,
                 },
                 'role': 'Sector adviser',
-            }
+            },
         ]
 
     def test_restricted_user_cannot_replace_team_members_for_non_associated_project(self):
@@ -2960,7 +2959,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
                     'id': str(adviser.pk),
                 },
                 'role': 'Sector adviser',
-            }
+            },
         ]
         response = api_client.put(url, data=request_data)
 
@@ -2979,7 +2978,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
                     'name': project.name,
                 },
                 'role': 'Sector adviser',
-            }
+            },
         ]
 
     def test_replace_all_team_members_doesnt_affect_other_projects(self):
@@ -3781,7 +3780,7 @@ class TestAuditLogView(APITestMixin):
         assert entry['user']['name'] == user.name, 'Valid user captured'
         assert entry['comment'] == 'Changed', 'Comments can be set manually'
         assert entry['timestamp'] == format_date_or_datetime(
-            changed_datetime
+            changed_datetime,
         ), 'TS can be set manually'
         assert entry['changes']['description'] == [
             'Initial desc',
@@ -3841,7 +3840,7 @@ class TestAuditLogView(APITestMixin):
         assert entry['user']['name'] == user.name, 'Valid user captured'
         assert entry['comment'] == 'Changed', 'Comments can be set manually'
         assert entry['timestamp'] == format_date_or_datetime(
-            changed_datetime
+            changed_datetime,
         ), 'TS can be set manually'
         assert entry['changes']['description'] == [
             'Initial desc',
