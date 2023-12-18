@@ -2932,7 +2932,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
                     'id': str(adviser.pk),
                 },
                 'role': 'Sector adviser',
-            }
+            },
         ]
         response = api_client.put(url, data=request_data)
 
