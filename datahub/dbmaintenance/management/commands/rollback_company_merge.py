@@ -1,4 +1,4 @@
-from datahub.company.merge import rollback_merge_companies
+from datahub.company.merge_company import rollback_merge_companies
 from datahub.company.models import Company
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid

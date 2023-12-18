@@ -15,7 +15,7 @@ from datahub.company.admin.dnb_link.review_changes import dnb_link_review_change
 from datahub.company.admin.dnb_link.select_ids import dnb_link_select_ids
 from datahub.company.admin.merge.step_1 import merge_select_other_company
 from datahub.company.admin.merge.step_2 import select_primary_company
-from datahub.company.admin.merge.step_3 import confirm_merge
+from datahub.company.admin.merge.step_3 import confirm_merge_companies
 from datahub.company.admin.update_from_dnb import update_from_dnb
 from datahub.company.models import Company, OneListCoreTeamMember
 from datahub.core.admin import BaseModelAdminMixin, get_change_link
@@ -258,7 +258,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
             ),
             path(
                 'merge/step-3-confirm/',
-                self.admin_site.admin_view(partial(confirm_merge, self)),
+                self.admin_site.admin_view(partial(confirm_merge_companies, self)),
                 name=f'{model_meta.app_label}_' f'{model_meta.model_name}_merge-confirm',
             ),
             path(
