@@ -1,18 +1,18 @@
 {% load i18n datahub_extras %}
 <li>
   <input name="selected_model" value="{{ index }}" required="" id="id_selected_model_radio_{{ index }}" type="radio"
-    {% if not option.is_valid %}disabled{% endif %}
+  {% if not option.is_valid %}disabled{% endif %}
   >
   <label for="id_selected_model_radio_{{ index }}">
     <strong>{{ option.target.name }}</strong>
     {% if not option.is_target_valid %}
       <br>
-      <span class="error">{% trans 'This company can&rsquo;t be selected as the active record as it&rsquo;s been archived.' %}</span>
+      <span class="error">{% trans 'This contact can&rsquo;t be selected as the active record as it&rsquo;s been archived.' %}</span>
     {% endif %}
 
     {% if not option.is_source_valid %}
       <br>
-      <span class="error">{% trans 'This company can&rsquo;t be selected as the active record as there are related records that can&rsquo;t be moved from the other company.' %}</span>
+      <span class="error">{% trans 'This contact can&rsquo;t be selected as the active record as there are related records that can&rsquo;t be moved from the other contact.' %}</span>
 
       <div>
         <p>Invalid Objects:</p>
@@ -37,7 +37,7 @@
     {% endfor %}
 
     {% blocktrans with obj_change_url=option.target|admin_change_url site_url=option.target.get_absolute_url %}
-    <a href="{{ obj_change_url }}" target="_blank">View company on admin site</a> or <a href="{{ site_url }}" target="_blank">view on Data Hub</a>
+    <a href="{{ obj_change_url }}" target="_blank">View contact on admin site</a> or <a href="{{ site_url }}" target="_blank">view on Data Hub</a>
     {% endblocktrans %}
   </label>
 </li>

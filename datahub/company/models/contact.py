@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from django.utils.timezone import now
 
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
@@ -26,6 +27,9 @@ class Contact(ArchivableModel, BaseModel):
     """
     Contact (a person at a company that DIT has had contact with).
     """
+
+    class TransferReason(models.TextChoices):
+        DUPLICATE = ('duplicate', 'Duplicate record')
 
     ADDRESS_VALIDATION_MAPPING = {
         'address_1': {'required': True},
@@ -83,6 +87,28 @@ class Contact(ArchivableModel, BaseModel):
         help_text='Legacy field. File browser path to the archived documents for this contact.',
     )
     valid_email = models.BooleanField(null=True, blank=True)
+    transferred_to = models.ForeignKey(
+        'self',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='transferred_from',
+        help_text='Where data about this company was transferred to.',
+    )
+    transfer_reason = models.CharField(
+        max_length=MAX_LENGTH,
+        blank=True,
+        choices=TransferReason.choices,
+        help_text='The reason data for this company was transferred.',
+    )
+    transferred_on = models.DateTimeField(blank=True, null=True)
+    transferred_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
 
     def get_absolute_url(self):
         """URL to the object in the Data Hub internal front end."""
@@ -112,3 +138,62 @@ class Contact(ArchivableModel, BaseModel):
     def name_with_title(self):
         """Full name with title."""
         return join_truthy_strings(getattr(self.title, 'name', None), self.name)
+
+    def mark_as_transferred(self, to, reason, user):
+        """
+        Marks a contact record as having been transferred to another contact record.
+        This is used, for example, for marking a contact as a duplicate record.
+        """
+        self.modified_by = user
+        self.transfer_reason = reason
+        self.transferred_by = user
+        self.transferred_on = now()
+        self.transferred_to = to
+
+        display_reason = self.get_transfer_reason_display()
+
+        archived_reason = (
+            f'This record is no longer in use and its data has been transferred to {to} for the '
+            f'following reason: {display_reason}.'
+        )
+
+        # Note: archive() saves the model instance
+        self.archive(user, archived_reason)
+
+    def merge_contact_fields(self, contact):
+
+        fields = [
+            'job_title',
+            'title',
+            'full_telephone_number',
+            'notes',
+            'archived_documents_url_path',
+            'valid_email',
+            'company',
+            'adviser',
+        ]
+
+        for field in fields:
+            contact_field_value = getattr(contact, field)
+            source_field_value = getattr(self, field)
+
+            if not source_field_value and contact_field_value:
+                setattr(self, field, contact_field_value)
+
+        address_fields = [
+            'address_1',
+            'address_2',
+            'address_town',
+            'address_postcode',
+            'address_county',
+            'address_country',
+            'address_area',
+        ]
+
+        if not self.address_1 and not self.address_same_as_company:
+            if contact.address_1:
+                for field in address_fields:
+                    contact_address_value = getattr(contact, field)
+                    setattr(self, field, contact_address_value)
+            elif contact.address_same_as_company:
+                self.address_same_as_company = contact.address_same_as_company

@@ -7,11 +7,14 @@ from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.company.merge import (
-    ALLOWED_RELATIONS_FOR_MERGING,
     get_planned_changes,
+    MergeNotAllowedError,
+)
+from datahub.company.merge_company import (
+    ALLOWED_RELATIONS_FOR_MERGING,
     INVESTMENT_PROJECT_COMPANY_FIELDS,
     merge_companies,
-    MergeNotAllowedError,
+    MERGE_CONFIGURATION,
     rollback_merge_companies,
 )
 from datahub.company.models import Company, Contact
@@ -266,7 +269,7 @@ class TestDuplicateCompanyMerger:
         cases.
         """
         source_company = source_company_factory()
-        merge_results = get_planned_changes(source_company)
+        merge_results = get_planned_changes(source_company, MERGE_CONFIGURATION)
 
         expected_planned_merge_results = (expected_result, expected_should_archive)
         assert merge_results == expected_planned_merge_results
@@ -354,7 +357,7 @@ class TestDuplicateCompanyMerger:
         assert source_company.archived_by == user
         assert source_company.archived_on == merge_time
         assert source_company.archived_reason == (
-            f'This record is no longer in use and its data has been transferred '
+            'This record is no longer in use and its data has been transferred '
             f'to {target_company} for the following reason: Duplicate record.'
         )
         assert source_company.modified_by == user
@@ -437,7 +440,7 @@ class TestDuplicateCompanyMerger:
         assert source_company.archived_by == user
         assert source_company.archived_on == merge_time
         assert source_company.archived_reason == (
-            f'This record is no longer in use and its data has been transferred '
+            'This record is no longer in use and its data has been transferred '
             f'to {target_company} for the following reason: Duplicate record.'
         )
         assert source_company.modified_by == user
@@ -569,7 +572,7 @@ class TestDuplicateCompanyMerger:
         assert source_company.archived_by == user
         assert source_company.archived_on == merge_time
         assert source_company.archived_reason == (
-            f'This record is no longer in use and its data has been transferred '
+            'This record is no longer in use and its data has been transferred '
             f'to {target_company} for the following reason: Duplicate record.'
         )
         assert source_company.modified_by == user
@@ -587,8 +590,8 @@ class TestDuplicateCompanyMerger:
             ((False, ['field1']), False),
         ),
     )
-    @patch('datahub.company.merge.is_company_a_valid_merge_target')
-    @patch('datahub.company.merge.is_company_a_valid_merge_source')
+    @patch('datahub.company.merge_company.is_model_a_valid_merge_target')
+    @patch('datahub.company.merge_company.is_model_a_valid_merge_source')
     def test_merge_fails_when_not_allowed(
         self,
         is_company_a_valid_merge_source_mock,

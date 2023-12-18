@@ -112,8 +112,8 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
         response = self.client.get(
             select_primary_url,
             data={
-                'company_1': str(company_1.pk),
-                'company_2': str(company_2.pk),
+                'id_1': str(company_1.pk),
+                'id_2': str(company_2.pk),
             },
         )
 
@@ -137,8 +137,8 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
 
         select_primary_route_name = admin_urlname(Company._meta, 'merge-select-primary-company')
         select_primary_query_args = {
-            'company_1': str(company_1.pk),
-            'company_2': str(company_2.pk),
+            'id_1': str(company_1.pk),
+            'id_2': str(company_2.pk),
         }
         select_primary_url = reverse_with_query_string(
             select_primary_route_name,
@@ -149,7 +149,7 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
             select_primary_url,
             follow=True,
             data={
-                'selected_company': selected_company,
+                'selected_model': selected_company,
             },
         )
 
@@ -158,8 +158,8 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
 
         confirm_merge_route_name = admin_urlname(Company._meta, 'merge-confirm')
         confirm_merge_query_args = {
-            'source_company': (company_1 if selected_company != '1' else company_2).pk,
-            'target_company': (company_1 if selected_company == '1' else company_2).pk,
+            'source': (company_1 if selected_company != '1' else company_2).pk,
+            'target': (company_1 if selected_company == '1' else company_2).pk,
         }
         confirm_merge_url = reverse_with_query_string(
             confirm_merge_route_name,
@@ -192,10 +192,10 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
             ),
         ),
     )
-    @patch('datahub.company.merge.is_company_a_valid_merge_source')
+    @patch('datahub.company.merge_company.is_model_a_valid_merge_source')
     def test_error_displayed_if_invalid_selection_made(
         self,
-        is_company_a_valid_merge_source_mock,
+        is_model_a_valid_merge_source_mock,
         swap,
         company_1_factory,
         company_2_factory,
@@ -213,8 +213,8 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
 
         select_primary_route_name = admin_urlname(Company._meta, 'merge-select-primary-company')
         select_primary_query_args = {
-            'company_1': str(company_1.pk),
-            'company_2': str(company_2.pk),
+            'id_1': str(company_1.pk),
+            'id_2': str(company_2.pk),
         }
         select_primary_url = reverse_with_query_string(
             select_primary_route_name,
@@ -224,9 +224,9 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
         response = self.client.post(
             select_primary_url,
             data={
-                'company_1': str(company_1.pk),
-                'company_2': str(company_2.pk),
-                'selected_company': selected_company,
+                'model_1': str(company_1.pk),
+                'model_2': str(company_2.pk),
+                'selected_model': selected_company,
             },
         )
         assert response.status_code == status.HTTP_200_OK
@@ -243,8 +243,8 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
 
 def _get_radio_html(index, disabled):
     extra_attrs = ' disabled' if disabled else ''
-    return f"""<input name="selected_company" value="{index}" required="" \
-id="id_selected_company_radio_{index}" type="radio" {extra_attrs}>"""
+    return f"""<input name="selected_model" value="{index}" required="" \
+id="id_selected_model_radio_{index}" type="radio" {extra_attrs}>"""
 
 
 def _html_count_occurrences(needle, haystack):
