@@ -230,10 +230,9 @@ class TestListView(APITestMixin):
         team = TeamFactory()
 
         _, api_client = _create_user_and_api_client(
-            self, team,
-            (
-                InvestmentProjectPermission.view_associated,
-            ),
+            self,
+            team,
+            (InvestmentProjectPermission.view_associated,),
         )
         advisers = AdviserFactory.create_batch(3, dit_team_id=team.id)
 
@@ -303,7 +302,9 @@ class TestListView(APITestMixin):
         adviser_same_team = AdviserFactory(dit_team_id=team.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.view_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.view_associated],
         )
 
         project_other = InvestmentProjectFactory()
@@ -325,8 +326,11 @@ class TestListView(APITestMixin):
 
         results = response_data['results']
         expected_ids = {
-            str(project_1.id), str(project_2.id), str(project_3.id),
-            str(project_4.id), str(project_5.id),
+            str(project_1.id),
+            str(project_2.id),
+            str(project_3.id),
+            str(project_4.id),
+            str(project_5.id),
         }
 
         assert {result['id'] for result in results} == expected_ids
@@ -351,6 +355,71 @@ class TestListView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == 0
+
+    def test_autocomplete_with_only_name(self):
+        """Test the autocomplete with only a name includes projects from all investor companies"""
+        project_1 = InvestmentProjectFactory(name='a1')
+        project_2 = InvestmentProjectFactory(name='a2')
+        InvestmentProjectFactory(name='b1')
+
+        url = reverse('api-v3:investment:investment-collection')
+        response = self.api_client.get(f'{url}?autocomplete=a')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        results = response.json()['results']
+        expected_ids = {
+            str(project_1.id),
+            str(project_2.id),
+        }
+        assert {result['id'] for result in results} == expected_ids
+
+    def test_autocomplete_with_only_investor_company(self):
+        """
+        Test the autocomplete with only an investor company only returns projects matching the
+        investor company requested
+        """
+        investor_company_1 = CompanyFactory()
+        investor_company_2 = CompanyFactory()
+        project_1 = InvestmentProjectFactory(investor_company=investor_company_1)
+        project_2 = InvestmentProjectFactory(investor_company=investor_company_1)
+        InvestmentProjectFactory(investor_company=investor_company_2)
+
+        url = reverse('api-v3:investment:investment-collection')
+        response = self.api_client.get(f'{url}?investor_company_id={investor_company_1.id}')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        results = response.json()['results']
+        expected_ids = {
+            str(project_1.id),
+            str(project_2.id),
+        }
+        assert {result['id'] for result in results} == expected_ids
+
+    def test_autocomplete_with_name_and_investor_company(self):
+        """
+        Test the autocomplete with a name and an investor company only returns projects matching
+        both the name and investor company
+        """
+        investor_company_1 = CompanyFactory()
+        investor_company_2 = CompanyFactory()
+        project_1 = InvestmentProjectFactory(investor_company=investor_company_1, name='a1')
+        InvestmentProjectFactory(investor_company=investor_company_1, name='b1')
+        InvestmentProjectFactory(investor_company=investor_company_2, name='a1')
+
+        url = reverse('api-v3:investment:investment-collection')
+        response = self.api_client.get(
+            f'{url}?autocomplete=a&investor_company_id={investor_company_1.id}',
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        results = response.json()['results']
+        expected_ids = {
+            str(project_1.id),
+        }
+        assert {result['id'] for result in results} == expected_ids
 
 
 class TestCreateView(APITestMixin):
@@ -446,8 +515,7 @@ class TestCreateView(APITestMixin):
             == request_data['quotable_as_public_case_study']
         )
         assert (
-            response_data['likelihood_to_land']['id']
-            == request_data['likelihood_to_land']['id']
+            response_data['likelihood_to_land']['id'] == request_data['likelihood_to_land']['id']
         )
         assert response_data['priority'] == request_data['priority']
         assert re.match(r'^DHP-\d+$', response_data['project_code'])
@@ -461,21 +529,21 @@ class TestCreateView(APITestMixin):
         assert response_data['stage']['id'] == request_data['stage']['id']
         assert response_data['status'] == InvestmentProject.Status.ONGOING  # default status
         assert len(response_data['client_contacts']) == 2
-        assert Counter(contact['id'] for contact in response_data[
-            'client_contacts']) == Counter(str(contact.id) for contact in contacts)
-        assert Counter(activity['id'] for activity in response_data[
-            'business_activities']) == Counter(activity['id'] for activity in activities)
+        assert Counter(contact['id'] for contact in response_data['client_contacts']) == Counter(
+            str(contact.id) for contact in contacts
+        )
+        assert Counter(
+            activity['id'] for activity in response_data['business_activities']
+        ) == Counter(activity['id'] for activity in activities)
         assert response_data['other_business_activity'] == request_data['other_business_activity']
-        assert (
-            response_data['project_manager_request_status']['id']
-            == str(project_manager_request_status_id)
+        assert response_data['project_manager_request_status']['id'] == str(
+            project_manager_request_status_id,
         )
         # GVA Multiplier for Retail & wholesale trade - 2019 - 0.0581 * 1000
         assert response_data['gross_value_added'] == '58'
 
-        assert (
-            response_data['country_investment_originates_from']['id']
-            == str(investor_company.address_country.id)
+        assert response_data['country_investment_originates_from']['id'] == str(
+            investor_company.address_country.id,
         )
 
     def test_create_project_fail(self):
@@ -540,7 +608,8 @@ class TestCreateView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data.keys() >= {
-            'business_activities', 'client_contacts',
+            'business_activities',
+            'client_contacts',
         }
         assert response_data['business_activities'] == ['This list may not be empty.']
         assert response_data['client_contacts'] == ['This list may not be empty.']
@@ -598,9 +667,11 @@ class TestCreateView(APITestMixin):
             'stage': {
                 'id': constants.InvestmentProjectStage.prospect.value.id,
             },
-            'business_activities': [{
-                'id': retail_business_activity_id,
-            }],
+            'business_activities': [
+                {
+                    'id': retail_business_activity_id,
+                },
+            ],
             'client_contacts': [
                 {
                     'id': str(contacts[0].id),
@@ -624,8 +695,6 @@ class TestCreateView(APITestMixin):
             'sector': {
                 'id': str(aerospace_id),
             },
-
-
         }
         return request_data
 
@@ -655,7 +724,7 @@ class TestRetrieveView(APITestMixin):
         assert response_data['project_code'] == project.project_code
         assert response_data['estimated_land_date'] == str(project.estimated_land_date)
         assert response_data['investment_type']['id'] == str(project.investment_type.id)
-        assert (response_data['stage']['id'] == str(project.stage.id))
+        assert response_data['stage']['id'] == str(project.stage.id)
         investor_company = project.investor_company
         assert response_data['investor_company'] == {
             'id': str(investor_company.id),
@@ -679,8 +748,10 @@ class TestRetrieveView(APITestMixin):
         expected_client_contact_ids = sorted(
             [str(contact.id) for contact in project.client_contacts.all()],
         )
-        assert sorted(contact['id'] for contact in response_data[
-            'client_contacts']) == expected_client_contact_ids
+        assert (
+            sorted(contact['id'] for contact in response_data['client_contacts'])
+            == expected_client_contact_ids
+        )
         assert response_data['created_by'] == {
             'contact_email': project.created_by.contact_email,
             'dit_team': {
@@ -816,18 +887,24 @@ class TestRetrieveView(APITestMixin):
         assert response_data['requirements_complete'] is True
         assert response_data['uk_company_decided'] is False
         assert response_data['address_1'] == 'address 1'
-        assert response_data['actual_uk_regions'] == [{
-            'id': str(actual_uk_regions[0].pk),
-            'name': actual_uk_regions[0].name,
-        }]
-        assert response_data['delivery_partners'] == [{
-            'id': str(delivery_partners[0].pk),
-            'name': delivery_partners[0].name,
-        }]
-        assert sorted(country['id'] for country in response_data[
-            'competitor_countries']) == sorted(countries)
-        assert sorted(driver['id'] for driver in response_data[
-            'strategic_drivers']) == sorted(strategic_drivers)
+        assert response_data['actual_uk_regions'] == [
+            {
+                'id': str(actual_uk_regions[0].pk),
+                'name': actual_uk_regions[0].name,
+            },
+        ]
+        assert response_data['delivery_partners'] == [
+            {
+                'id': str(delivery_partners[0].pk),
+                'name': delivery_partners[0].name,
+            },
+        ]
+        assert sorted(
+            country['id'] for country in response_data['competitor_countries']
+        ) == sorted(countries)
+        assert sorted(driver['id'] for driver in response_data['strategic_drivers']) == sorted(
+            strategic_drivers,
+        )
 
     def test_get_team_success(self):
         """Test successfully getting a project requirements object."""
@@ -914,7 +991,9 @@ class TestRetrieveView(APITestMixin):
         adviser_1 = AdviserFactory(dit_team_id=team_associated.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team_requester, [InvestmentProjectPermission.view_associated],
+            self,
+            team_requester,
+            [InvestmentProjectPermission.view_associated],
         )
 
         iproject_1 = InvestmentProjectFactory()
@@ -953,7 +1032,9 @@ class TestRetrieveView(APITestMixin):
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.view_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.view_associated],
         )
 
         iproject_1 = InvestmentProjectFactory()
@@ -979,7 +1060,9 @@ class TestRetrieveView(APITestMixin):
         adviser_1 = AdviserFactory(dit_team_id=team.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.view_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.view_associated],
         )
 
         iproject_1 = InvestmentProjectFactory(**{field: adviser_1})
@@ -1016,9 +1099,7 @@ class TestRetrieveView(APITestMixin):
             archived_documents_url_path='path/to/document',
         )
         user = create_test_user(
-            permission_codenames=(
-                InvestmentProjectPermission.view_all,
-            ),
+            permission_codenames=(InvestmentProjectPermission.view_all,),
         )
         api_client = self.create_api_client(user=user)
 
@@ -1177,8 +1258,7 @@ class TestPartialUpdateView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert (
-            response_data['likelihood_to_land']['id']
-            == request_data['likelihood_to_land']['id']
+            response_data['likelihood_to_land']['id'] == request_data['likelihood_to_land']['id']
         )
 
     def test_patch_priority_invalid_value(self):
@@ -1203,9 +1283,11 @@ class TestPartialUpdateView(APITestMixin):
         request_data = {
             'name': 'new name',
             'description': 'new description',
-            'client_contacts': [{
-                'id': str(new_contact.id),
-            }],
+            'client_contacts': [
+                {
+                    'id': str(new_contact.id),
+                },
+            ],
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
@@ -1393,7 +1475,9 @@ class TestPartialUpdateView(APITestMixin):
     def test_change_stage_verify_win_failure(self):
         """Tests moving a partially complete project to the 'Verify win' stage."""
         project_manager, api_client = _create_user_and_api_client(
-            self, TeamFactory(), [InvestmentProjectPermission.change_associated],
+            self,
+            TeamFactory(),
+            [InvestmentProjectPermission.change_associated],
         )
         project = ActiveInvestmentProjectFactory(
             number_new_jobs=1,
@@ -1436,7 +1520,9 @@ class TestPartialUpdateView(APITestMixin):
             constants.InvestmentStrategicDriver.access_to_market.value.id,
         ]
         adviser, api_client = _create_user_and_api_client(
-            self, TeamFactory(), [InvestmentProjectPermission.change_associated],
+            self,
+            TeamFactory(),
+            [InvestmentProjectPermission.change_associated],
         )
         extra = {field: adviser}
         project = ActiveInvestmentProjectFactory(
@@ -1899,8 +1985,7 @@ class TestPartialUpdateView(APITestMixin):
 
         project.refresh_from_db()
         assert (
-            str(project.country_investment_originates_from_id)
-            == constants.Country.japan.value.id
+            str(project.country_investment_originates_from_id) == constants.Country.japan.value.id
         )
 
     def test_patch_won_project_investor_company_doesnt_update_country_of_origin(self):
@@ -2077,7 +2162,9 @@ class TestPartialUpdateView(APITestMixin):
         adviser = AdviserFactory(dit_team_id=team_associated.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team_requester, [InvestmentProjectPermission.change_associated],
+            self,
+            team_requester,
+            [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory(name='old name')
@@ -2133,7 +2220,9 @@ class TestPartialUpdateView(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory(name='old name')
@@ -2166,7 +2255,9 @@ class TestPartialUpdateView(APITestMixin):
         adviser = AdviserFactory(dit_team_id=team.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory(name='old name', **{field: adviser})
@@ -2197,9 +2288,11 @@ class TestInvestmentProjectActivities(APITestMixin):
             'investment_type': {
                 'id': constants.InvestmentType.fdi.value.id,
             },
-            'business_activities': [{
-                'id': constants.InvestmentBusinessActivity.retail.value.id,
-            }],
+            'business_activities': [
+                {
+                    'id': constants.InvestmentBusinessActivity.retail.value.id,
+                },
+            ],
             'other_business_activity': 'New innovation centre',
             'client_contacts': [{'id': str(ContactFactory().id)}],
             'client_relationship_manager': {'id': str(adviser.id)},
@@ -2300,7 +2393,10 @@ class TestInvestmentProjectActivities(APITestMixin):
         ),
     )
     def test_patch_project_with_a_note_failures_returns_400(
-        self, note_request, expected_field_error, expected_error_message,
+        self,
+        note_request,
+        expected_field_error,
+        expected_error_message,
     ):
         """Tests failure conditions for adding a note to a project."""
         project = InvestmentProjectFactory()
@@ -2340,9 +2436,11 @@ class TestInvestmentProjectVersioning(APITestMixin):
                 'investment_type': {
                     'id': constants.InvestmentType.fdi.value.id,
                 },
-                'business_activities': [{
-                    'id': constants.InvestmentBusinessActivity.retail.value.id,
-                }],
+                'business_activities': [
+                    {
+                        'id': constants.InvestmentBusinessActivity.retail.value.id,
+                    },
+                ],
                 'other_business_activity': 'New innovation centre',
                 'client_contacts': [{'id': str(ContactFactory().id)}],
                 'client_relationship_manager': {'id': str(adviser.id)},
@@ -2458,7 +2556,9 @@ class TestInvestmentProjectVersioning(APITestMixin):
     def test_unarchive_creates_a_new_version(self):
         """Test that unarchiving an investment project creates a new version."""
         project = InvestmentProjectFactory(
-            archived=True, archived_on=now(), archived_reason='foo',
+            archived=True,
+            archived_on=now(),
+            archived_reason='foo',
         )
         assert Version.objects.get_for_object(project).count() == 0
 
@@ -2591,7 +2691,9 @@ class TestAddTeamMemberView(APITestMixin):
         team = TeamFactory()
 
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.change_associated],
         )
 
         url = reverse(
@@ -2615,7 +2717,9 @@ class TestAddTeamMemberView(APITestMixin):
         project = InvestmentProjectFactory(created_by=creator)
 
         _, api_client = _create_user_and_api_client(
-            self, creator.dit_team, [InvestmentProjectPermission.change_associated],
+            self,
+            creator.dit_team,
+            [InvestmentProjectPermission.change_associated],
         )
         url = reverse(
             'api-v3:investment:team-member-collection',
@@ -2669,37 +2773,44 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         advisers = AdviserFactory.create_batch(2)
         advisers.sort(key=attrgetter('id'))
         InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project,
+            2,
+            investment_project=project,
         )
 
         url = reverse(
             'api-v3:investment:team-member-collection',
             kwargs={'project_pk': project.pk},
         )
-        request_data = [{
-            'adviser': {
-                'id': str(adviser.pk),
-            },
-            'role': 'Sector adviser',
-        } for adviser in advisers]
+        request_data = [
+            {
+                'adviser': {
+                    'id': str(adviser.pk),
+                },
+                'role': 'Sector adviser',
+            }
+            for adviser in advisers
+        ]
         response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         response_data.sort(key=_get_adviser_id)
-        assert response_data == [{
-            'adviser': {
-                'id': str(adviser.pk),
-                'first_name': adviser.first_name,
-                'last_name': adviser.last_name,
-                'name': adviser.name,
-            },
-            'investment_project': {
-                'id': str(project.pk),
-                'name': project.name,
-            },
-            'role': 'Sector adviser',
-        } for adviser in advisers]
+        assert response_data == [
+            {
+                'adviser': {
+                    'id': str(adviser.pk),
+                    'first_name': adviser.first_name,
+                    'last_name': adviser.last_name,
+                    'name': adviser.name,
+                },
+                'investment_project': {
+                    'id': str(project.pk),
+                    'name': project.name,
+                },
+                'role': 'Sector adviser',
+            }
+            for adviser in advisers
+        ]
 
         # Make sure old advisers have been removed
         assert {team_member.adviser.id for team_member in project.team_members.all()} == {
@@ -2710,7 +2821,9 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         """Test that existing team members can be updated."""
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project, role='Old role',
+            2,
+            investment_project=project,
+            role='Old role',
         )
 
         url = reverse(
@@ -2723,25 +2836,29 @@ class TestReplaceAllTeamMembersView(APITestMixin):
                     'id': str(team_member.adviser.pk),
                 },
                 'role': 'New role',
-            } for team_member in team_members
+            }
+            for team_member in team_members
         ]
         response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data == [{
-            'adviser': {
-                'id': str(team_member.adviser.pk),
-                'first_name': team_member.adviser.first_name,
-                'last_name': team_member.adviser.last_name,
-                'name': team_member.adviser.name,
-            },
-            'investment_project': {
-                'id': str(project.pk),
-                'name': project.name,
-            },
-            'role': 'New role',
-        } for team_member in team_members]
+        assert response_data == [
+            {
+                'adviser': {
+                    'id': str(team_member.adviser.pk),
+                    'first_name': team_member.adviser.first_name,
+                    'last_name': team_member.adviser.last_name,
+                    'name': team_member.adviser.name,
+                },
+                'investment_project': {
+                    'id': str(project.pk),
+                    'name': project.name,
+                },
+                'role': 'New role',
+            }
+            for team_member in team_members
+        ]
 
     @pytest.mark.parametrize(
         'permissions',
@@ -2765,29 +2882,33 @@ class TestReplaceAllTeamMembersView(APITestMixin):
             'api-v3:investment:team-member-collection',
             kwargs={'project_pk': project.pk},
         )
-        request_data = [{
-            'adviser': {
-                'id': str(adviser.pk),
+        request_data = [
+            {
+                'adviser': {
+                    'id': str(adviser.pk),
+                },
+                'role': 'Sector adviser',
             },
-            'role': 'Sector adviser',
-        }]
+        ]
         response = api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data == [{
-            'adviser': {
-                'id': str(adviser.pk),
-                'first_name': adviser.first_name,
-                'last_name': adviser.last_name,
-                'name': adviser.name,
+        assert response_data == [
+            {
+                'adviser': {
+                    'id': str(adviser.pk),
+                    'first_name': adviser.first_name,
+                    'last_name': adviser.last_name,
+                    'name': adviser.name,
+                },
+                'investment_project': {
+                    'id': str(project.pk),
+                    'name': project.name,
+                },
+                'role': 'Sector adviser',
             },
-            'investment_project': {
-                'id': str(project.pk),
-                'name': project.name,
-            },
-            'role': 'Sector adviser',
-        }]
+        ]
 
     def test_restricted_user_cannot_replace_team_members_for_non_associated_project(self):
         """Test that a restricted user cannot replace team members for a non-associated project."""
@@ -2796,19 +2917,23 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         team = TeamFactory()
 
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.change_associated],
         )
 
         url = reverse(
             'api-v3:investment:team-member-collection',
             kwargs={'project_pk': project.pk},
         )
-        request_data = [{
-            'adviser': {
-                'id': str(adviser.pk),
+        request_data = [
+            {
+                'adviser': {
+                    'id': str(adviser.pk),
+                },
+                'role': 'Sector adviser',
             },
-            'role': 'Sector adviser',
-        }]
+        ]
         response = api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -2820,35 +2945,41 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         project = InvestmentProjectFactory(created_by=creator)
 
         _, api_client = _create_user_and_api_client(
-            self, creator.dit_team, [InvestmentProjectPermission.change_associated],
+            self,
+            creator.dit_team,
+            [InvestmentProjectPermission.change_associated],
         )
         url = reverse(
             'api-v3:investment:team-member-collection',
             kwargs={'project_pk': project.pk},
         )
-        request_data = [{
-            'adviser': {
-                'id': str(adviser.pk),
+        request_data = [
+            {
+                'adviser': {
+                    'id': str(adviser.pk),
+                },
+                'role': 'Sector adviser',
             },
-            'role': 'Sector adviser',
-        }]
+        ]
         response = api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data == [{
-            'adviser': {
-                'id': str(adviser.pk),
-                'first_name': adviser.first_name,
-                'last_name': adviser.last_name,
-                'name': adviser.name,
+        assert response_data == [
+            {
+                'adviser': {
+                    'id': str(adviser.pk),
+                    'first_name': adviser.first_name,
+                    'last_name': adviser.last_name,
+                    'name': adviser.name,
+                },
+                'investment_project': {
+                    'id': str(project.pk),
+                    'name': project.name,
+                },
+                'role': 'Sector adviser',
             },
-            'investment_project': {
-                'id': str(project.pk),
-                'name': project.name,
-            },
-            'role': 'Sector adviser',
-        }]
+        ]
 
     def test_replace_all_team_members_doesnt_affect_other_projects(self):
         """Test that replacing team members only affects the specified project."""
@@ -2973,7 +3104,8 @@ class TestDeleteAllTeamMembersView(APITestMixin):
         """Test that a non-restricted user can remove all team members from a project."""
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project,
+            2,
+            investment_project=project,
         )
         InvestmentProjectTeamMemberFactory()
 
@@ -2998,13 +3130,16 @@ class TestDeleteAllTeamMembersView(APITestMixin):
         """
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project,
+            2,
+            investment_project=project,
         )
         InvestmentProjectTeamMemberFactory()
 
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.change_associated],
         )
 
         url = reverse(
@@ -3024,12 +3159,15 @@ class TestDeleteAllTeamMembersView(APITestMixin):
         creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=creator)
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project,
+            2,
+            investment_project=project,
         )
         InvestmentProjectTeamMemberFactory()
 
         _, api_client = _create_user_and_api_client(
-            self, creator.dit_team, [InvestmentProjectPermission.change_associated],
+            self,
+            creator.dit_team,
+            [InvestmentProjectPermission.change_associated],
         )
 
         url = reverse(
@@ -3085,7 +3223,9 @@ class TestGetTeamMemberView(APITestMixin):
         )
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.view_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.view_associated],
         )
         response = api_client.get(url)
 
@@ -3104,7 +3244,9 @@ class TestGetTeamMemberView(APITestMixin):
             },
         )
         _, api_client = _create_user_and_api_client(
-            self, creator.dit_team, [InvestmentProjectPermission.view_associated],
+            self,
+            creator.dit_team,
+            [InvestmentProjectPermission.view_associated],
         )
         response = api_client.get(url)
 
@@ -3190,7 +3332,9 @@ class TestUpdateTeamMemberView(APITestMixin):
         }
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.change_associated],
         )
         response = api_client.patch(url, data=request_data)
 
@@ -3212,7 +3356,9 @@ class TestUpdateTeamMemberView(APITestMixin):
             'role': 'updated role',
         }
         _, api_client = _create_user_and_api_client(
-            self, creator.dit_team, [InvestmentProjectPermission.change_associated],
+            self,
+            creator.dit_team,
+            [InvestmentProjectPermission.change_associated],
         )
         response = api_client.patch(url, data=request_data)
 
@@ -3238,7 +3384,8 @@ class TestDeleteTeamMemberView(APITestMixin):
         """Test that a non-restricted user can remove a team member from a project."""
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project,
+            2,
+            investment_project=project,
         )
         url = reverse(
             'api-v3:investment:team-member-item',
@@ -3263,7 +3410,8 @@ class TestDeleteTeamMemberView(APITestMixin):
         """
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project,
+            2,
+            investment_project=project,
         )
         url = reverse(
             'api-v3:investment:team-member-item',
@@ -3274,7 +3422,9 @@ class TestDeleteTeamMemberView(APITestMixin):
         )
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.change_associated],
         )
         response = api_client.delete(url)
 
@@ -3288,7 +3438,8 @@ class TestDeleteTeamMemberView(APITestMixin):
         creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=creator)
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project,
+            2,
+            investment_project=project,
         )
         url = reverse(
             'api-v3:investment:team-member-item',
@@ -3298,7 +3449,9 @@ class TestDeleteTeamMemberView(APITestMixin):
             },
         )
         _, api_client = _create_user_and_api_client(
-            self, creator.dit_team, [InvestmentProjectPermission.change_associated],
+            self,
+            creator.dit_team,
+            [InvestmentProjectPermission.change_associated],
         )
         response = api_client.delete(url)
 
@@ -3373,36 +3526,43 @@ class TestTeamMemberVersioning(APITestMixin):
         advisers = AdviserFactory.create_batch(2)
         advisers.sort(key=attrgetter('id'))
         InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project,
+            2,
+            investment_project=project,
         )
 
         url = reverse(
             'api-v3:investment:team-member-collection',
             kwargs={'project_pk': project.pk},
         )
-        request_data = [{
-            'adviser': {
-                'id': str(adviser.pk),
-            },
-            'role': 'Sector adviser',
-        } for adviser in advisers]
+        request_data = [
+            {
+                'adviser': {
+                    'id': str(adviser.pk),
+                },
+                'role': 'Sector adviser',
+            }
+            for adviser in advisers
+        ]
         response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response.data.sort(key=_get_adviser_id)
-        assert response.data == [{
-            'adviser': {
-                'id': str(adviser.pk),
-                'first_name': adviser.first_name,
-                'last_name': adviser.last_name,
-                'name': adviser.name,
-            },
-            'investment_project': {
-                'id': str(project.pk),
-                'name': project.name,
-            },
-            'role': 'Sector adviser',
-        } for adviser in advisers]
+        assert response.data == [
+            {
+                'adviser': {
+                    'id': str(adviser.pk),
+                    'first_name': adviser.first_name,
+                    'last_name': adviser.last_name,
+                    'name': adviser.name,
+                },
+                'investment_project': {
+                    'id': str(project.pk),
+                    'name': project.name,
+                },
+                'role': 'Sector adviser',
+            }
+            for adviser in advisers
+        ]
 
         assert project.team_members.count() == 2
 
@@ -3421,7 +3581,9 @@ class TestTeamMemberVersioning(APITestMixin):
 
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project, role='Old role',
+            2,
+            investment_project=project,
+            role='Old role',
         )
 
         url = reverse(
@@ -3434,7 +3596,8 @@ class TestTeamMemberVersioning(APITestMixin):
                     'id': str(team_member.adviser.pk),
                 },
                 'role': 'New role',
-            } for team_member in team_members
+            }
+            for team_member in team_members
         ]
         response = self.api_client.put(url, data=request_data)
 
@@ -3452,7 +3615,8 @@ class TestTeamMemberVersioning(APITestMixin):
                     'name': project.name,
                 },
                 'role': 'New role',
-            } for team_member in team_members
+            }
+            for team_member in team_members
         ]
 
         # check version created
@@ -3503,7 +3667,8 @@ class TestTeamMemberVersioning(APITestMixin):
 
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project,
+            2,
+            investment_project=project,
         )
         InvestmentProjectTeamMemberFactory()
 
@@ -3614,10 +3779,13 @@ class TestAuditLogView(APITestMixin):
         assert entry['id'] == version_id
         assert entry['user']['name'] == user.name, 'Valid user captured'
         assert entry['comment'] == 'Changed', 'Comments can be set manually'
-        assert entry['timestamp'] == format_date_or_datetime(changed_datetime), \
-            'TS can be set manually'
-        assert entry['changes']['description'] == ['Initial desc', 'New desc'], \
-            'Changes are reflected'
+        assert entry['timestamp'] == format_date_or_datetime(
+            changed_datetime,
+        ), 'TS can be set manually'
+        assert entry['changes']['description'] == [
+            'Initial desc',
+            'New desc',
+        ], 'Changes are reflected'
         assert not set(EXCLUDED_BASE_MODEL_FIELDS) & entry['changes'].keys()
         if expected_note_text:
             assert entry['note']['text'] == expected_note_text
@@ -3629,7 +3797,9 @@ class TestAuditLogView(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         user, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.view_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.view_associated],
         )
 
         initial_datetime = now()
@@ -3669,17 +3839,22 @@ class TestAuditLogView(APITestMixin):
         assert entry['id'] == version_id
         assert entry['user']['name'] == user.name, 'Valid user captured'
         assert entry['comment'] == 'Changed', 'Comments can be set manually'
-        assert entry['timestamp'] == format_date_or_datetime(changed_datetime), \
-            'TS can be set manually'
-        assert entry['changes']['description'] == ['Initial desc', 'New desc'], \
-            'Changes are reflected'
+        assert entry['timestamp'] == format_date_or_datetime(
+            changed_datetime,
+        ), 'TS can be set manually'
+        assert entry['changes']['description'] == [
+            'Initial desc',
+            'New desc',
+        ], 'Changes are reflected'
         assert not set(EXCLUDED_BASE_MODEL_FIELDS) & entry['changes'].keys()
 
     def test_audit_log_restricted_user_non_associated_project(self):
         """Test retrieval of audit log for a restricted user and a non-associated project."""
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.view_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.view_associated],
         )
 
         iproject = InvestmentProjectFactory(
@@ -3732,7 +3907,9 @@ class TestArchiveViews(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         user, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory(created_by=adviser)
@@ -3757,7 +3934,9 @@ class TestArchiveViews(APITestMixin):
         """Test that a restricted user cannot archive a non-associated project."""
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory()
@@ -3842,7 +4021,8 @@ class TestArchiveViews(APITestMixin):
         _, api_client = _create_user_and_api_client(self, team, permissions)
 
         project = InvestmentProjectFactory(
-            archived=True, archived_reason='reason',
+            archived=True,
+            archived_reason='reason',
         )
         url = reverse(
             'api-v3:investment:unarchive-item',
@@ -3861,7 +4041,9 @@ class TestArchiveViews(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory(
@@ -3886,7 +4068,9 @@ class TestArchiveViews(APITestMixin):
         team = TeamFactory()
         AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated],
+            self,
+            team,
+            [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory(

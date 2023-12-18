@@ -2,13 +2,14 @@
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import Http404
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
+from datahub.core.autocomplete import AutocompleteFilter
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.permissions import HasPermissions
 from datahub.core.schemas import StubSchema
@@ -34,6 +35,18 @@ from datahub.investment.project.serializers import (
 
 
 _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
+
+
+class InvestmentFilter(FilterSet):
+    """Investment project filter that allows autocomplete"""
+
+    autocomplete = AutocompleteFilter(
+        search_fields=('name',),
+    )
+
+    class Meta:
+        model = InvestmentProject
+        fields = ['investor_company_id']
 
 
 class IProjectAuditViewSet(AuditViewSet):
@@ -121,7 +134,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
         OrderingFilter,
         IsAssociatedToInvestmentProjectFilter,
     )
-    filterset_fields = ('investor_company_id',)
+    filterset_class = InvestmentFilter
     ordering = ('-created_on',)
 
     def get_view_name(self):
