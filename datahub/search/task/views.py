@@ -92,7 +92,11 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
             base_query.update_from_dict(
                 self.add_must_and_must_not_to_filters(base_query, must, must_not)
             )
+        # from pprint import pprint
 
+        # raw_query = base_query.to_dict()
+        # pprint("raw_query")
+        # pprint(raw_query)
         return base_query
 
     def add_must_and_must_not_to_filters(self, base_query, must, must_not):
@@ -109,14 +113,19 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
 
         if filter_index is None:
             return base_query
-
+        # (status == 'xyx' AND (created_by = user.id OR user.id in advisers))
         if len(must_not) > 0:
             filters[filter_index]['bool']['must_not'] = must_not
         if len(must) > 0:
             if 'must' not in filters[filter_index]['bool']:
                 filters[filter_index]['bool']['must'] = []
 
-            filters[filter_index]['bool']['must'] = filters[filter_index]['bool']['must'] + must
+            ## TODO Fix this with some magic. (existing must filters AND (our new shiny 'must'))
+            filters[filter_index]['bool']['must'] = filters[filter_index]['bool']['must'] + list(
+                {
+                    'bool': [] + must,
+                },
+            )
 
         raw_query['query']['bool']['filter'] = filters
         return raw_query
