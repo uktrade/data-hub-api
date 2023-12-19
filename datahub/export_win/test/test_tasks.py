@@ -123,6 +123,44 @@ def test_create_token_with_existing_unexpired_token():
 
 
 @pytest.mark.django_db
+@freeze_time('2023-12-11')
+def test_create_token_with_existing_expired_and_unexpired_tokens():
+    # Create instances for CustomerResponse and Contact
+    mock_customer_response = CustomerResponseFactory()
+    mock_contact = ContactFactory()
+    # Create an existing expired token for the contact and customer response
+    with freeze_time('2023-12-09'):  # Freeze time for creating the expired token
+        expired_token = CustomerResponseTokenFactory(
+            company_contact=mock_contact,
+            customer_response=mock_customer_response,
+            expires_on=datetime.utcnow() - timedelta(days=1),  # Expired 1 day ago
+        )
+    # Create an existing unexpired token for the contact and customer response
+    with freeze_time('2023-12-10'):  # Freeze time for creating the unexpired token
+        existing_token = CustomerResponseTokenFactory(
+            company_contact=mock_contact,
+            customer_response=mock_customer_response,
+            expires_on=datetime.utcnow() + timedelta(days=1),  # Expires 1 day from now
+        )
+    # Call the function being tested
+    new_token = create_token_for_contact(mock_contact, mock_customer_response)
+    # Check if a new token was created for the given contact and customer response
+    assert new_token.id is not None
+    # Assert that a new token was created with a different ID than the existing token
+    assert new_token.id != existing_token.id
+    # Validate the expiry time of the new token (7 days from now)
+    expected_time = datetime.utcnow() + timedelta(days=7)
+    assert expected_time == new_token.expires_on
+    # Check if the existing expired token is still expired
+    expired_token.refresh_from_db()
+    utc_now = datetime.utcnow().replace(tzinfo=pytz.UTC)
+    assert expired_token.expires_on <= utc_now
+    # Check if the existing unexpired token is set to expire (set to current time)
+    existing_token.refresh_from_db()
+    assert existing_token.expires_on <= utc_now
+
+
+@pytest.mark.django_db
 def test_has_unexpired_token_for_contact():
     # Create instances for CustomerResponse and Contact
     mock_customer_response = CustomerResponseFactory()
