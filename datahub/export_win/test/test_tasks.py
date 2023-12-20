@@ -14,7 +14,6 @@ from datahub.export_win.models import CustomerResponseToken
 from datahub.export_win.tasks import (
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
-    has_unexpired_token_for_contact,
 )
 from datahub.export_win.test.factories import CustomerResponseFactory, CustomerResponseTokenFactory
 
@@ -158,21 +157,3 @@ def test_create_token_with_existing_expired_and_unexpired_tokens():
     # Check if the existing unexpired token is set to expire (set to current time)
     existing_token.refresh_from_db()
     assert existing_token.expires_on <= utc_now
-
-
-@pytest.mark.django_db
-def test_has_unexpired_token_for_contact():
-    # Create instances for CustomerResponse and Contact
-    mock_customer_response = CustomerResponseFactory()
-    mock_contact = ContactFactory()
-    # Initially, there should be no unexpired token for this contact
-    assert not has_unexpired_token_for_contact(mock_contact)
-    # Create a new token that will expire 2 days from now
-    expires_on = datetime.utcnow() + timedelta(days=2)
-    CustomerResponseToken.objects.create(
-        expires_on=expires_on,
-        company_contact=mock_contact,
-        customer_response=mock_customer_response,
-    )
-    # Now, there should be an unexpired token for this contact
-    assert has_unexpired_token_for_contact(mock_contact)
