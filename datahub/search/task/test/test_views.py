@@ -38,7 +38,8 @@ class TestTaskSearch(APITestMixin):
 
         task = TaskFactory(
             advisers=[
-                adviser1,
+                adviser1.id,
+                self.user.id,
             ],
         )
 
@@ -63,6 +64,7 @@ class TestTaskSearch(APITestMixin):
     def test_search_task_by_created_by_id(self, opensearch_with_collector):
         """Tests task search by created by id."""
         adviser1 = AdviserFactory()
+        adviser1.id = self.user.id
 
         task = TaskFactory(
             created_by=adviser1,
@@ -93,9 +95,11 @@ class TestTaskSearch(APITestMixin):
 
         task = TaskFactory(
             created_by=created_by_adviser,
+            advisers=[self.user.id],
         )
         TaskFactory(
             created_by=not_created_by_adviser,
+            advisers=[self.user.id],
         )
 
         opensearch_with_collector.flush_and_refresh()
@@ -125,6 +129,7 @@ class TestTaskSearch(APITestMixin):
         created_by_adviser = AdviserFactory()
         not_created_by_adviser = AdviserFactory()
         adviser1 = AdviserFactory()
+        adviser1.id = self.user.id
 
         task = TaskFactory(
             created_by=created_by_adviser,
@@ -163,13 +168,22 @@ class TestTaskSearch(APITestMixin):
         """Tests task search by not advisers id."""
         advisers = AdviserFactory.create_batch(2)
         not_advisers = AdviserFactory.create_batch(3)
+        current_adviser = AdviserFactory()
+        current_adviser.id = self.user.id
 
         task = TaskFactory(
+            created_by=current_adviser,
             advisers=advisers,
         )
         TaskFactory(
+            created_by=current_adviser,
             advisers=not_advisers,
         )
+        TaskFactory(
+            created_by=current_adviser,
+            advisers=not_advisers + advisers,
+        )
+        # Task not assigned to or created by current adviser shouldn't be returned.
         TaskFactory(
             advisers=not_advisers + advisers,
         )
@@ -205,7 +219,11 @@ class TestTaskSearch(APITestMixin):
         Tests edge case where no filter returned from raw_query
         """
         deep_get.return_value = None
-        TaskFactory()
+
+        current_adviser = AdviserFactory()
+        current_adviser.id = self.user.id
+
+        TaskFactory(created_by=current_adviser)
 
         opensearch_with_collector.flush_and_refresh()
 
@@ -229,8 +247,10 @@ class TestTaskSearch(APITestMixin):
         Test edge case where no filter_index found in raw_query filter
         """
         not_created_by_adviser = AdviserFactory()
-        deep_get.return_value = [{'result': 'testing'}]
-        TaskFactory()
+        deep_get.return_value = [dict()]
+        TaskFactory(
+            advisers=[self.user.id],
+        )
 
         opensearch_with_collector.flush_and_refresh()
 
@@ -255,8 +275,13 @@ class TestTaskSearch(APITestMixin):
         expected_order,
     ):
         """Tests task search ordering on due date"""
-        yesterday_task = TaskFactory(due_date=datetime.today() - timedelta(days=1))
-        today_task = TaskFactory(due_date=datetime.today())
+        current_adviser = AdviserFactory()
+        current_adviser.id = self.user.id
+
+        yesterday_task = TaskFactory(
+            due_date=datetime.today() - timedelta(days=1), created_by=current_adviser,
+        )
+        today_task = TaskFactory(due_date=datetime.today(), created_by=current_adviser)
 
         opensearch_with_collector.flush_and_refresh()
 
@@ -285,8 +310,11 @@ class TestTaskSearch(APITestMixin):
         company1 = CompanyFactory(name='Apple')
         company2 = CompanyFactory(name='Zebra')
 
-        first_task = TaskFactory(company=company1)
-        second_task = TaskFactory(company=company2)
+        current_adviser = AdviserFactory()
+        current_adviser.id = self.user.id
+
+        first_task = TaskFactory(company=company1, created_by=current_adviser)
+        second_task = TaskFactory(company=company2, created_by=current_adviser)
 
         opensearch_with_collector.flush_and_refresh()
 
@@ -314,8 +342,15 @@ class TestTaskSearch(APITestMixin):
         investment_project1 = InvestmentProjectFactory(name='Apple')
         investment_project2 = InvestmentProjectFactory(name='Zebra')
 
-        first_task = TaskFactory(investment_project=investment_project1)
-        second_task = TaskFactory(investment_project=investment_project2)
+        current_adviser = AdviserFactory()
+        current_adviser.id = self.user.id
+
+        first_task = TaskFactory(
+            investment_project=investment_project1, created_by=current_adviser,
+        )
+        second_task = TaskFactory(
+            investment_project=investment_project2, created_by=current_adviser,
+        )
 
         opensearch_with_collector.flush_and_refresh()
 
@@ -373,9 +408,63 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
     @pytest.mark.parametrize('archived', (True, False))
     def test_search_task_by_archived(self, opensearch_with_collector, archived):
         """Tests task search by archived."""
+        current_adviser = AdviserFactory()
+        current_adviser.id = self.user.id
+
+        archived_tasks = TaskFactory.create_batch(3, archived=True, created_by=current_adviser)
+
+        not_archived_tasks = TaskFactory.create_batch(
+            2, archived=False, created_by=current_adviser,
+        )
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:task')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'archived': archived,
+            },
+        )
+
+        tasks_for_assert = archived_tasks if archived else not_archived_tasks
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert [a['id'] for a in response.json()['results']] == [
+            str(a.id) for a in sorted(tasks_for_assert, key=lambda x: x.id)
+        ]
+
+        assert response.data['count'] == len(
+            tasks_for_assert,
+        )
+
+    @pytest.mark.parametrize('archived', (True, False))
+    def test_search_task_by_archived_for_current_adviser(
+        self, opensearch_with_collector, archived,
+    ):
+        """
+        Only return tasks created by the current adviser or where they have been assigned as an
+        adviser even if there additional filters added. This tests uses archived for this.
+        """
+        current_adviser = AdviserFactory()
+        current_adviser.id = self.user.id
+
+        TaskFactory.create_batch(2, archived=True)
+        TaskFactory.create_batch(2, archived=False)
+
         archived_tasks = TaskFactory.create_batch(3, archived=True)
+        archived_tasks[0].created_by = current_adviser
+        archived_tasks[1].created_by = current_adviser
+        archived_tasks[1].advisers.add(current_adviser)
+        archived_tasks[2].advisers.add(current_adviser)
+        [archived_task.save() for archived_task in archived_tasks]
 
         not_archived_tasks = TaskFactory.create_batch(2, archived=False)
+        not_archived_tasks[0].created_by = current_adviser
+        not_archived_tasks[1].advisers.add(current_adviser)
+        [not_archived_task.save() for not_archived_task in not_archived_tasks]
 
         opensearch_with_collector.flush_and_refresh()
 
