@@ -54,33 +54,27 @@ class TaskV4ViewSet(ArchivableViewSetMixin, TasksMixin):
         return super().get_tasks(self.request)
 
 
-    @transaction.non_atomic_requests
-    @api_view(['GET'])
-    @permission_classes([IsAuthenticated])
-    def get_tasks_companies_and_projects(request):
-        """
-        Get the list of companies and projects that have tasks
-        """
-        # queryset = (
-        #     Task.objects.all()
-        #     .select_related('investment_project')
-        #     .select_related('company')
-        # )
+@transaction.non_atomic_requests
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_tasks_companies_and_projects(request):
+    """
+    Get the list of companies and projects that have tasks
+    """
+    print("helloooooooooooooooo", request.user.id)
+    queryset = (
+        Task.objects.all(advisers=str(request.user.id))
+        .prefetch_related('advisers')
+        .select_related('investment_project')
+        .select_related('company')
+    )
 
-        # archived = request.query_params.get('archived')
-        # advisers = request.query_params.get('advisers')
+    companies = queryset.values_list('company__id', flat=True).distinct()
+    projects = queryset.values_list('investment_project__id', flat=True).distinct()
 
-        # if archived is not None:
-        #     queryset = queryset.filter(archived=archived == 'true')
-        # if advisers is not None:
-        #     queryset = queryset.filter(advisers__in=[advisers])
-
-        # companies = queryset.values_list('company__id', flat=True).distinct()
-        # projects = queryset.values_list('investment_project__id', flat=True).distinct()
-
-        return Response(
-            {
-                'companies': [],
-                'projects': [],
-            },
-        )
+    return Response(
+        {
+            'companies': companies,
+            'projects': projects,
+        },
+    )
