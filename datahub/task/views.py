@@ -1,10 +1,12 @@
 from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
+from rest_framework.decorators import api_view, permission_classes
 
-
+from django.db import transaction
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 
 from datahub.core.mixins import ArchivableViewSetMixin
@@ -50,3 +52,35 @@ class TaskV4ViewSet(ArchivableViewSetMixin, TasksMixin):
 
     def get_queryset(self):
         return super().get_tasks(self.request)
+
+
+    @transaction.non_atomic_requests
+    @api_view(['GET'])
+    @permission_classes([IsAuthenticated])
+    def get_tasks_companies_and_projects(request):
+        """
+        Get the list of companies and projects that have tasks
+        """
+        # queryset = (
+        #     Task.objects.all()
+        #     .select_related('investment_project')
+        #     .select_related('company')
+        # )
+
+        # archived = request.query_params.get('archived')
+        # advisers = request.query_params.get('advisers')
+
+        # if archived is not None:
+        #     queryset = queryset.filter(archived=archived == 'true')
+        # if advisers is not None:
+        #     queryset = queryset.filter(advisers__in=[advisers])
+
+        # companies = queryset.values_list('company__id', flat=True).distinct()
+        # projects = queryset.values_list('investment_project__id', flat=True).distinct()
+
+        return Response(
+            {
+                'companies': [],
+                'projects': [],
+            },
+        )
