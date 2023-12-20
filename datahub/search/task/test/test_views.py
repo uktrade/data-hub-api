@@ -247,7 +247,7 @@ class TestTaskSearch(APITestMixin):
         Test edge case where no filter_index found in raw_query filter
         """
         not_created_by_adviser = AdviserFactory()
-        deep_get.return_value = [dict()]
+        deep_get.return_value = [{}]
         TaskFactory(
             advisers=[self.user.id],
         )
