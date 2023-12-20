@@ -373,6 +373,8 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
     def test_search_task_by_created_by_id(self, opensearch_with_collector):
         """Tests task search by created by id."""
         adviser1 = AdviserFactory()
+        adviser1.id = self.user.id
+
         investment_project = InvestmentProjectFactory()
         TaskFactory(
             created_by=adviser1,
