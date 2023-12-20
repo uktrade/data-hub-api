@@ -92,11 +92,7 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
             base_query.update_from_dict(
                 self.add_must_and_must_not_to_filters(base_query, must, must_not),
             )
-        # from pprint import pprint
 
-        # raw_query = base_query.to_dict()
-        # pprint("raw_query")
-        # pprint(raw_query)
         return base_query
 
     def add_must_and_must_not_to_filters(self, base_query, must, must_not):
@@ -113,17 +109,14 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
 
         if filter_index is None:
             return base_query
-        # (status == 'xyx' AND (created_by = user.id OR user.id in advisers))
+
         if len(must_not) > 0:
             filters[filter_index]['bool']['must_not'] = must_not
         if len(must) > 0:
-            if 'should' not in filters[filter_index]['bool']:
-                filters[filter_index]['bool']['should'] = []
+            if 'must' not in filters[filter_index]['bool']:
+                filters[filter_index]['bool']['must'] = []
 
-            # TODO Fix this with some magic. (existing must filters AND (our new shiny 'must'))
-            filters[filter_index]['bool']['should'] = (
-                filters[filter_index]['bool']['should'] + must
-            )
+            filters[filter_index]['bool']['must'].append(must)
 
         raw_query['query']['bool']['filter'] = filters
         return raw_query
@@ -134,7 +127,9 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
             not request.data.get('advisers')
             or str(request.user.id) not in request.data.get('advisers')
         ) and (not request.data.get('created_by') == str(request.user.id)):
-            must.append(
+            must = {'bool': {'minimum_should_match': 1, 'should': []}}
+
+            must['bool']['should'].append(
                 {
                     'match': {
                         'created_by.id': {
@@ -144,20 +139,13 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
                     },
                 },
             )
-            must.append(
+            must['bool']['should'].append(
                 {
-                    'bool': {
-                        'minimum_should_match': 1,
-                        'should': [
-                            {
-                                'match': {
-                                    'advisers.id': {
-                                        'operator': 'or',
-                                        'query': str(request.user.id),
-                                    },
-                                },
-                            },
-                        ],
+                    'match': {
+                        'advisers.id': {
+                            'operator': 'or',
+                            'query': str(request.user.id),
+                        },
                     },
                 },
             )
