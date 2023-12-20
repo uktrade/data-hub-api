@@ -4,6 +4,7 @@ from django_filters.rest_framework import (
 from rest_framework.decorators import api_view, permission_classes
 
 from django.db import transaction
+from django.db.models import Q
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -61,16 +62,16 @@ def get_tasks_companies_and_projects(request):
     """
     Get the list of companies and projects that have tasks
     """
-    print("helloooooooooooooooo", request.user.id)
+    user_id = request.user.id
     queryset = (
-        Task.objects.all(advisers=str(request.user.id))
+        Task.objects.filter(Q(advisers__in=[user_id]) | Q(created_by=user_id))
         .prefetch_related('advisers')
         .select_related('investment_project')
         .select_related('company')
     )
 
-    companies = queryset.values_list('company__id', flat=True).distinct()
-    projects = queryset.values_list('investment_project__id', flat=True).distinct()
+    companies = queryset.values_list('company__name', flat=True).distinct()
+    projects = queryset.values_list('investment_project__name', flat=True).distinct()
 
     return Response(
         {
