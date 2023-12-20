@@ -59,6 +59,7 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         must_not = []
         base_query = super().get_base_query(request, validated_data)
 
+        must = self.must_limit_query_to_created_by_or_advisers(request)
         if request.data.get('not_created_by'):
             must_not.append(
                 {
@@ -86,23 +87,73 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
                 },
             )
 
-        if len(must_not) > 0:
-            raw_query = base_query.to_dict()
-            filters = self.deep_get(raw_query, 'query|bool|filter')
-            if not filters:
-                return base_query
+        if len(must_not) > 0 or len(must) > 0:
+            base_query.update_from_dict(self.add_must_and_must_not_to_filters(
+                base_query, must, must_not,
+            ))
 
-            filter_index = None
-            for index, filter in enumerate(filters):
-                if filter.get('bool') or filter.get('bool') == {}:
-                    filter_index = index
-                    break
-
-            if filter_index is None:
-                return base_query
-
-            filters[filter_index]['bool']['must_not'] = must_not
-            raw_query['query']['bool']['filter'] = filters
-
-            base_query.update_from_dict(raw_query)
         return base_query
+
+    def must_limit_query_to_created_by_or_advisers(self, request):
+        """
+        Create filter that limits results to tasks that have been either created by or assigned to
+        the current user.
+        """
+        must = []
+        if (
+            not request.data.get('advisers')
+            or str(request.user.id) not in request.data.get('advisers')
+        ) and (not request.data.get('created_by') == str(request.user.id)):
+            must = {'bool': {'minimum_should_match': 1, 'should': []}}
+
+            must['bool']['should'].append(
+                {
+                    'match': {
+                        'created_by.id': {
+                            'operator': 'or',
+                            'query': str(request.user.id),
+                        },
+                    },
+                },
+            )
+            must['bool']['should'].append(
+                {
+                    'match': {
+                        'advisers.id': {
+                            'operator': 'or',
+                            'query': str(request.user.id),
+                        },
+                    },
+                },
+            )
+        return must
+
+    def add_must_and_must_not_to_filters(self, base_query, must, must_not):
+        """
+        Merge the must and must not filters into single query.
+        """
+        raw_query = base_query.to_dict()
+        filters = self.deep_get(raw_query, 'query|bool|filter')
+        if not filters:
+            return raw_query
+
+        filter_index = None
+        for index, filter in enumerate(filters):
+            if filter.get('bool') or filter.get('bool') == {}:
+                filter_index = index
+                break
+
+        if filter_index is None:
+            return raw_query
+
+        if len(must_not) > 0:
+            filters[filter_index]['bool']['must_not'] = must_not
+        if len(must) > 0:
+            if 'must' not in filters[filter_index]['bool']:
+                filters[filter_index]['bool']['must'] = []
+
+            filters[filter_index]['bool']['must'].append(must)
+
+        raw_query['query']['bool']['filter'] = filters
+
+        return raw_query
