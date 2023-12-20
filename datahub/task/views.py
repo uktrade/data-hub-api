@@ -62,16 +62,16 @@ def get_tasks_companies_and_projects(request):
     """
     Get the list of companies and projects that have tasks
     """
+   
     user_id = request.user.id
     queryset = (
         Task.objects.filter(Q(advisers__in=[user_id]) | Q(created_by=user_id))
-        .prefetch_related('advisers')
         .select_related('investment_project')
         .select_related('company')
     )
 
-    companies = queryset.values_list('company__name', flat=True).distinct()
-    projects = queryset.values_list('investment_project__name', flat=True).distinct()
+    companies = queryset.values('company__name', 'company__id').distinct()
+    projects = queryset.values('investment_project__name', 'investment_project__id').distinct()
 
     return Response(
         {

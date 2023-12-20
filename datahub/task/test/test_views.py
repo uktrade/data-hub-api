@@ -23,6 +23,10 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.task.test.factories import TaskFactory
 from datahub.task.test.utils import BaseEditTaskTests, BaseListTaskTests, BaseTaskTests
 
+from datahub.task.views import (
+
+    get_tasks_companies_and_projects,
+)
 
 class TestListTask(BaseListTaskTests):
     """Test the LIST task endpoint"""
@@ -555,3 +559,22 @@ class TestArchiveTask(BaseTaskTests):
         }
         assert response.data['archived_reason'] == 'completed'
         assert response.data['id'] == str(task.id)
+
+class TestAssociatedCompanyAndProject(APITestMixin):
+    ""
+    reverse_url = 'api-v4:task:companies-and-projects'
+    def test_return_empty_companies_and_projects(self):
+        adviser = AdviserFactory()
+        TaskFactory(created_by=adviser)
+
+        url = reverse(self.reverse_url)
+        print('This is the url', url)
+        response = self.api_client.get(url).json()
+        expected_response = {
+            'company': [],
+            'investment_project': [],
+        }
+
+        assert response == expected_response
+    
+
