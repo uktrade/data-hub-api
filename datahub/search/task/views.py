@@ -90,7 +90,7 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
 
         if len(must_not) > 0 or len(must) > 0:
             base_query.update_from_dict(
-                self.add_must_and_must_not_to_filters(base_query, must, must_not)
+                self.add_must_and_must_not_to_filters(base_query, must, must_not),
             )
         # from pprint import pprint
 
@@ -117,14 +117,12 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         if len(must_not) > 0:
             filters[filter_index]['bool']['must_not'] = must_not
         if len(must) > 0:
-            if 'must' not in filters[filter_index]['bool']:
-                filters[filter_index]['bool']['must'] = []
+            if 'should' not in filters[filter_index]['bool']:
+                filters[filter_index]['bool']['should'] = []
 
-            ## TODO Fix this with some magic. (existing must filters AND (our new shiny 'must'))
-            filters[filter_index]['bool']['must'] = filters[filter_index]['bool']['must'] + list(
-                {
-                    'bool': [] + must,
-                },
+            # TODO Fix this with some magic. (existing must filters AND (our new shiny 'must'))
+            filters[filter_index]['bool']['should'] = (
+                filters[filter_index]['bool']['should'] + must
             )
 
         raw_query['query']['bool']['filter'] = filters
