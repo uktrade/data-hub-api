@@ -2,8 +2,8 @@ from django.urls import path
 
 
 from datahub.task.views import (
-    TaskV4ViewSet,
     get_tasks_companies_and_projects,
+    TaskV4ViewSet,
 )
 
 
@@ -30,7 +30,7 @@ urls_v4 = [
     path(
         'task/companies-and-projects',
         get_tasks_companies_and_projects,
-        name='companies-and-projects'
+        name='companies-and-projects',
     ),
 
 ]

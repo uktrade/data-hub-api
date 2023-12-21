@@ -23,10 +23,6 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.task.test.factories import TaskFactory
 from datahub.task.test.utils import BaseEditTaskTests, BaseListTaskTests, BaseTaskTests
 
-from datahub.task.views import (
-
-    get_tasks_companies_and_projects,
-)
 
 class TestListTask(BaseListTaskTests):
     """Test the LIST task endpoint"""
@@ -560,21 +556,89 @@ class TestArchiveTask(BaseTaskTests):
         assert response.data['archived_reason'] == 'completed'
         assert response.data['id'] == str(task.id)
 
-class TestAssociatedCompanyAndProject(APITestMixin):
-    ""
-    reverse_url = 'api-v4:task:companies-and-projects'
-    def test_return_empty_companies_and_projects(self):
-        adviser = AdviserFactory()
-        TaskFactory(created_by=adviser)
 
-        url = reverse(self.reverse_url)
-        print('This is the url', url)
-        response = self.api_client.get(url).json()
+class TestAssociatedCompanyAndProject(APITestMixin):
+    """Test the GET companies-and-projects endpoint for task"""
+
+    url = reverse('api-v4:task:companies-and-projects')
+
+    def test_returns_empty_when_no_companies_or_projects(self):
+        TaskFactory()
+
+        response = self.api_client.get(self.url).json()
         expected_response = {
-            'company': [],
-            'investment_project': [],
+            'companies': [],
+            'projects': [],
         }
 
         assert response == expected_response
-    
 
+    def test_returns_company_once_when_multiple_tasks_with_same_company(self):
+        company = CompanyFactory()
+        TaskFactory.create_batch(2, created_by=self.user, company=company)
+
+        response = self.api_client.get(self.url).json()
+        expected_response = {
+            'companies': [
+                {
+                    'company_id': str(company.id),
+                    'company_name': company.name,
+                },
+            ],
+            'projects': [],
+        }
+
+        assert response == expected_response
+
+    def test_returns_project_once_when_multiple_tasks_with_same_project(self):
+        project = InvestmentProjectFactory()
+        TaskFactory.create_batch(2, created_by=self.user, investment_project=project)
+
+        response = self.api_client.get(self.url).json()
+        expected_response = {
+            'companies': [],
+            'projects': [
+                {
+                    'project_id': str(project.id),
+                    'project_name': project.name,
+                },
+            ],
+        }
+
+        assert response == expected_response
+
+    # TODO this test is flakey as the order of companies/projects is not guaranteed
+    def test_returns_multiple_companies_and_projects_for_tasks(self):
+        company_1, company_2 = CompanyFactory.create_batch(2)
+        project_1, project_2 = InvestmentProjectFactory.create_batch(2)
+        TaskFactory(created_by=self.user, company=company_1)
+        TaskFactory(created_by=self.user, company=company_2)
+        TaskFactory(created_by=self.user, investment_project=project_1)
+        TaskFactory(created_by=self.user, investment_project=project_2)
+
+        response = self.api_client.get(self.url).json()
+
+        expected_response = {
+            'companies': [
+                {
+                    'company_id': str(company_1.id),
+                    'company_name': company_1.name,
+                },
+                {
+                    'company_id': str(company_2.id),
+                    'company_name': company_2.name,
+                },
+            ],
+            'projects': [
+                {
+                    'project_id': str(project_1.id),
+                    'project_name': project_1.name,
+                },
+                {
+                    'project_id': str(project_2.id),
+                    'project_name': project_2.name,
+                },
+            ],
+        }
+
+        assert response == expected_response
