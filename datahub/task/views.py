@@ -70,8 +70,11 @@ def get_tasks_companies_and_projects(request):
         .select_related('company')
     )
 
-    companies = queryset.values('company__name', 'company__id').distinct()
-    projects = queryset.values('investment_project__name', 'investment_project__id').distinct()
+    companies_queryset = queryset.values('company__name', 'company__id').distinct()
+    projects_queryset = queryset.values('investment_project__name', 'investment_project__id').distinct()
+
+    companies = [{'name': c['company__name'], 'id': c['company__id']} for c in companies_queryset] if companies_queryset.exists() else []
+    projects = [{'name': p['investment_project__name'], 'id': p['investment_project__id']} for p in projects_queryset] if projects_queryset.exists() else []
 
     return Response(
         {
