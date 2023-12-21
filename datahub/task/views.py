@@ -1,10 +1,11 @@
+from django.db import transaction
+from django.db.models import F, Q
+
 from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
 from rest_framework.decorators import api_view, permission_classes
 
-from django.db import transaction
-from django.db.models import Q
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -62,7 +63,6 @@ def get_tasks_companies_and_projects(request):
     """
     Get the list of companies and projects that have tasks
     """
-   
     user_id = request.user.id
     queryset = (
         Task.objects.filter(Q(advisers__in=[user_id]) | Q(created_by=user_id))
@@ -70,15 +70,32 @@ def get_tasks_companies_and_projects(request):
         .select_related('company')
     )
 
-    companies_queryset = queryset.values('company__name', 'company__id').distinct()
-    projects_queryset = queryset.values('investment_project__name', 'investment_project__id').distinct()
+    companies = (
+        queryset
+        .values('company__name', 'company__id')
+        .annotate(company_name=F('company__name'), company_id=F('company__id'))
+        .values('company_name', 'company_id')
+        .exclude(company_name__isnull=True)
+        .distinct()
+    )
 
-    companies = [{'name': c['company__name'], 'id': c['company__id']} for c in companies_queryset] if companies_queryset.exists() else []
-    projects = [{'name': p['investment_project__name'], 'id': p['investment_project__id']} for p in projects_queryset] if projects_queryset.exists() else []
+    projects = (
+        queryset
+        .values('investment_project__name', 'investment_project__id')
+        .annotate(
+            project_name=F('investment_project__name'),
+            project_id=F('investment_project__id'),
+        )
+        .values('project_name', 'project_id')
+        .exclude(project_name__isnull=True)
+        .distinct()
+    )
 
-    return Response(
+    response = Response(
         {
             'companies': companies,
             'projects': projects,
         },
     )
+
+    return response
