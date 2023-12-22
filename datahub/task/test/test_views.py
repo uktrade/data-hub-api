@@ -2,12 +2,16 @@ import datetime
 
 from uuid import uuid4
 
-import pytest
+import factory
 
+import pytest
 
 from django.utils.timezone import now
 
+from operator import attrgetter
+
 from faker import Faker
+
 
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -573,6 +577,35 @@ class TestAssociatedCompanyAndProject(APITestMixin):
 
         assert response == expected_response
 
+    def test_returns_project_investor_company_in_company_field(self):
+        company = CompanyFactory()
+        project = InvestmentProjectFactory()
+        TaskFactory(created_by=self.user, company=company)
+        TaskFactory(created_by=self.user, investment_project=project)
+
+        response = self.api_client.get(self.url).json()
+
+        sorted_companies = [company, project.investor_company]
+        sorted_companies.sort(key=attrgetter('name'))
+
+        expected_response = {
+            'companies': [
+                {
+                    'id': str(company.id),
+                    'name': company.name,
+                }
+                for company in sorted_companies
+            ],
+            'projects': [
+                {
+                    'id': str(project.id),
+                    'name': project.name,
+                },
+            ],
+        }
+
+        assert response == expected_response
+
     def test_returns_company_once_when_multiple_tasks_with_same_company(self):
         company = CompanyFactory()
         TaskFactory.create_batch(2, created_by=self.user, company=company)
@@ -581,8 +614,8 @@ class TestAssociatedCompanyAndProject(APITestMixin):
         expected_response = {
             'companies': [
                 {
-                    'company_id': str(company.id),
-                    'company_name': company.name,
+                    'id': str(company.id),
+                    'name': company.name,
                 },
             ],
             'projects': [],
@@ -596,48 +629,67 @@ class TestAssociatedCompanyAndProject(APITestMixin):
 
         response = self.api_client.get(self.url).json()
         expected_response = {
-            'companies': [],
+            'companies': [
+                {
+                    'id': str(project.investor_company.id),
+                    'name': project.investor_company.name,
+                },
+            ],
             'projects': [
                 {
-                    'project_id': str(project.id),
-                    'project_name': project.name,
+                    'id': str(project.id),
+                    'name': project.name,
                 },
             ],
         }
 
         assert response == expected_response
 
-    # TODO this test is flakey as the order of companies/projects is not guaranteed
     def test_returns_multiple_companies_and_projects_for_tasks(self):
-        company_1, company_2 = CompanyFactory.create_batch(2)
-        project_1, project_2 = InvestmentProjectFactory.create_batch(2)
-        TaskFactory(created_by=self.user, company=company_1)
-        TaskFactory(created_by=self.user, company=company_2)
-        TaskFactory(created_by=self.user, investment_project=project_1)
-        TaskFactory(created_by=self.user, investment_project=project_2)
+        companies = CompanyFactory.create_batch(
+            2,
+            name=factory.Iterator(
+                ('Company A', 'Company B'),
+            ),
+        )
+
+        projects = InvestmentProjectFactory.create_batch(
+            2,
+            name=factory.Iterator(
+                ('Project A', 'Project B'),
+            ),
+        )
+
+        TaskFactory.create_batch(
+            2,
+            created_by=self.user,
+            company=factory.Iterator(companies),
+        )
+        TaskFactory.create_batch(
+            2,
+            created_by=self.user,
+            investment_project=factory.Iterator(projects),
+        )
 
         response = self.api_client.get(self.url).json()
+
+        sorted_companies = companies + [project.investor_company for project in projects]
+        sorted_companies.sort(key=attrgetter('name'))
 
         expected_response = {
             'companies': [
                 {
-                    'company_id': str(company_1.id),
-                    'company_name': company_1.name,
-                },
-                {
-                    'company_id': str(company_2.id),
-                    'company_name': company_2.name,
-                },
+                    'id': str(company.id),
+                    'name': company.name,
+                }
+                for company in sorted_companies
             ],
             'projects': [
                 {
-                    'project_id': str(project_1.id),
-                    'project_name': project_1.name,
-                },
-                {
-                    'project_id': str(project_2.id),
-                    'project_name': project_2.name,
-                },
+                    'id': str(project.id),
+                    'name': project.name,
+                }
+                for project in projects
             ],
         }
 

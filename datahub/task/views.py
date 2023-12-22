@@ -1,5 +1,5 @@
 from django.db import transaction
-from django.db.models import F, Q
+from django.db.models import Q
 
 from django_filters.rest_framework import (
     DjangoFilterBackend,
@@ -10,9 +10,12 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from datahub.company.models.company import Company
+
 
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSet
+from datahub.investment.project.models import InvestmentProject
 from datahub.task.models import Task
 from datahub.task.serializers import (
     TaskSerializer,
@@ -64,37 +67,59 @@ def get_tasks_companies_and_projects(request):
     Get the list of companies and projects that have tasks
     """
     user_id = request.user.id
-    queryset = (
-        Task.objects.filter(Q(advisers__in=[user_id]) | Q(created_by=user_id))
-        .select_related('investment_project')
-        .select_related('company')
+
+    adviser_tasks = Task.objects.filter(
+        Q(advisers__in=[user_id]) | Q(created_by=user_id),
+    ).exclude(
+        company__id__isnull=True,
+        investment_project__id__isnull=True,
     )
 
-    companies = (
-        queryset
-        .values('company__name', 'company__id')
-        .annotate(company_name=F('company__name'), company_id=F('company__id'))
-        .values('company_name', 'company_id')
-        .exclude(company_name__isnull=True)
-        .distinct()
-    )
-
-    projects = (
-        queryset
-        .values('investment_project__name', 'investment_project__id')
-        .annotate(
-            project_name=F('investment_project__name'),
-            project_id=F('investment_project__id'),
+    projects_queryset = (
+        InvestmentProject.objects.filter(
+            pk__in=adviser_tasks.values_list(
+                'investment_project__id',
+                flat=True,
+            ),
         )
-        .values('project_name', 'project_id')
-        .exclude(project_name__isnull=True)
         .distinct()
+        .values(
+            'id',
+            'name',
+            'investor_company__id',
+        )
+        .order_by('name')
+    )
+
+    companies_queryset = (
+        Company.objects.filter(
+            pk__in=adviser_tasks.values_list(
+                'company__id',
+                flat=True,
+            ),
+        )
+        # We dont store the company for an investment project task in the task model, as this is
+        # available via the investor_company FK. We need to append any investor_company values to
+        # this list
+        .union(
+            Company.objects.filter(
+                pk__in=projects_queryset.values_list(
+                    'investor_company__id',
+                    flat=True,
+                )
+            ),
+        )
+        .values('id', 'name')
+        .order_by('name')
     )
 
     response = Response(
         {
-            'companies': companies,
-            'projects': projects,
+            'companies': companies_queryset,
+            'projects': projects_queryset.values(
+                'id',
+                'name',
+            ),
         },
     )
 
