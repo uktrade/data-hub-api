@@ -106,7 +106,7 @@ def get_tasks_companies_and_projects(request):
                 pk__in=projects_queryset.values_list(
                     'investor_company__id',
                     flat=True,
-                )
+                ),
             ),
         )
         .values('id', 'name')

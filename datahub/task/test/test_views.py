@@ -6,12 +6,11 @@ import factory
 
 import pytest
 
-from django.utils.timezone import now
-
 from operator import attrgetter
 
-from faker import Faker
+from django.utils.timezone import now
 
+from faker import Faker
 
 from rest_framework import status
 from rest_framework.reverse import reverse
