@@ -1,12 +1,12 @@
 import datetime
 
+from operator import attrgetter
+
 from uuid import uuid4
 
 import factory
 
 import pytest
-
-from operator import attrgetter
 
 from django.utils.timezone import now
 
