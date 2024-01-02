@@ -3,7 +3,6 @@ import datetime
 from operator import attrgetter
 
 from uuid import uuid4
-from datahub.interaction.test.factories import InteractionFactoryBase
 
 import factory
 
@@ -22,6 +21,7 @@ from datahub.core.test_utils import (
     APITestMixin,
     format_date_or_datetime,
 )
+from datahub.interaction.test.factories import InteractionFactoryBase
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 from datahub.task.test.factories import TaskFactory
