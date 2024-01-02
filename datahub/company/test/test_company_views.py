@@ -126,6 +126,29 @@ class TestListCompanies(APITestMixin):
         assert companies[3]['name'] == 'Average'
         assert companies[3]['is_in_adviser_list'] is False
 
+    def test_autocomplete_companies_in_multiple_lists(self):
+        """Test that a company in multiple lists is only returned once"""
+        company1 = CompanyFactory(name='Apple')
+        CompanyFactory(name='Aardvark')
+        CompanyFactory(name='Banana')
+
+        list1 = CompanyListFactory(adviser=self.user)
+        CompanyListItemFactory(company=company1, list=list1)
+
+        list2 = CompanyListFactory()
+        CompanyListItemFactory(company=company1, list=list2)
+
+        url = reverse(viewname='api-v4:company:collection')
+        response = self.api_client.get(url, data={'autocomplete': 'A'})
+
+        assert response.status_code == status.HTTP_200_OK
+
+        companies = response.json()['results']
+
+        assert len(companies) == 2
+        assert companies[0]['name'] == 'Apple'
+        assert companies[1]['name'] == 'Aardvark'
+
     def test_filter_by_global_headquarters(self):
         """Test filtering by global_headquarters_id."""
         ghq = CompanyFactory()
