@@ -6,6 +6,7 @@ from datahub.search.signals import SignalReceiver
 from datahub.search.sync_object import sync_object_async
 from datahub.search.task import TaskSearchApp
 from datahub.task.models import Task as DBTask
+from datahub.search.task.models import Task as SearchDBTask
 
 
 def sync_task_to_opensearch(instance):
@@ -18,7 +19,7 @@ def sync_task_to_opensearch(instance):
 def remove_task_from_opensearch(instance):
     """Remove task from es."""
     transaction.on_commit(
-        lambda pk=instance.pk: delete_document(DBTask, pk),
+        lambda pk=instance.pk: delete_document(SearchDBTask, pk),
     )
 
 
