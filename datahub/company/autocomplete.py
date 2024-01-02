@@ -1,4 +1,5 @@
 from django.db.models import Exists, OuterRef
+
 from datahub.core.autocomplete import _apply_autocomplete_filter_to_queryset, AutocompleteFilter
 from datahub.user.company_list.models import CompanyListItem
 
@@ -19,8 +20,11 @@ class WithListAutocompleteFilter(AutocompleteFilter):
 
         queryset = queryset.annotate(
             is_in_adviser_list=Exists(
-                CompanyListItem.objects.filter(company=OuterRef('pk'), list__adviser=adviser)
-            )
+                CompanyListItem.objects.filter(
+                    company=OuterRef('pk'),
+                    list__adviser=adviser,
+                ),
+            ),
         )
 
         return _apply_autocomplete_filter_to_queryset(
