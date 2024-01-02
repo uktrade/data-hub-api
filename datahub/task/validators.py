@@ -9,5 +9,5 @@ def validate_single_task_relationship(investment_project, company, interaction, 
 
     if relationship_count > 1:
         raise exception_class(
-            'You can assign either a company, investment project or interaction to a task'
+            'You can assign either a company, investment project or interaction to a task',
         )

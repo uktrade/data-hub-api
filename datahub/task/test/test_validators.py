@@ -1,10 +1,9 @@
-from datahub.interaction.test.factories import InteractionFactoryBase
 import pytest
 
 from django.core.exceptions import ValidationError
 
 from datahub.company.test.factories import CompanyFactory
-
+from datahub.interaction.test.factories import InteractionFactoryBase
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.task.validators import validate_single_task_relationship
 

@@ -1,7 +1,7 @@
-from datahub.interaction.test.factories import InteractionFactoryBase
 import pytest
 
 from datahub.company.test.factories import CompanyFactory
+from datahub.interaction.test.factories import InteractionFactoryBase
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.task.admin import TaskAdminForm
 
