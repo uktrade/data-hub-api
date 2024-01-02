@@ -5,8 +5,8 @@ from datahub.search.deletion import delete_document
 from datahub.search.signals import SignalReceiver
 from datahub.search.sync_object import sync_object_async
 from datahub.search.task import TaskSearchApp
-from datahub.task.models import Task as DBTask
 from datahub.search.task.models import Task as SearchDBTask
+from datahub.task.models import Task as DBTask
 
 
 def sync_task_to_opensearch(instance):
