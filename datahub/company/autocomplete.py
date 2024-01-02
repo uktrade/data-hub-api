@@ -1,6 +1,6 @@
-from django.db.models import BooleanField, Case, Q, Value, When
-
+from django.db.models import Exists, OuterRef
 from datahub.core.autocomplete import _apply_autocomplete_filter_to_queryset, AutocompleteFilter
+from datahub.user.company_list.models import CompanyListItem
 
 
 class WithListAutocompleteFilter(AutocompleteFilter):
@@ -18,14 +18,9 @@ class WithListAutocompleteFilter(AutocompleteFilter):
         adviser = self.parent.request.user
 
         queryset = queryset.annotate(
-            is_in_adviser_list=Case(
-                When(
-                    Q(company_list_items__list__adviser=adviser),
-                    then=Value(True),
-                ),
-                default=Value(False),
-                output_field=BooleanField(),
-            ),
+            is_in_adviser_list=Exists(
+                CompanyListItem.objects.filter(company=OuterRef('pk'), list__adviser=adviser)
+            )
         )
 
         return _apply_autocomplete_filter_to_queryset(
