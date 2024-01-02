@@ -16,7 +16,7 @@ def sync_task_to_opensearch(instance):
 
 
 def remove_task_from_opensearch(instance):
-    """Remove investor profile from es."""
+    """Remove task from es."""
     transaction.on_commit(
         lambda pk=instance.pk: delete_document(DBTask, pk),
     )
