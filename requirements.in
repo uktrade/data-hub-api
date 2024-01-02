@@ -1,7 +1,7 @@
 # Django and django related
 django==3.2.23
 djangorestframework==3.14.0
-django-axes==6.2.0
+django-axes==6.3.0
 django-csp==3.7
 django-environ==0.11.2
 django-extensions==3.2.3
@@ -9,7 +9,7 @@ django-filter==23.5
 django-log-formatter-ecs==0.0.5
 django-mptt==0.15.0
 django-pglocks==1.0.4
-django-reversion==5.0.8
+django-reversion==5.0.10
 uritemplate==4.1.1  # required for DRF schema features
 whitenoise==6.6.0
 
@@ -21,9 +21,9 @@ python-dateutil==2.8.2
 psycopg2==2.9.9
 psycogreen==1.0.2
 
-boto3==1.34.2
+boto3==1.34.11
 
-notifications-python-client==8.1.0
+notifications-python-client==8.2.0
 
 # Prometheus
 statsd==4.0.1
