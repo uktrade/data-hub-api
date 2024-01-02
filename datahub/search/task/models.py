@@ -20,6 +20,7 @@ class Task(BaseSearchModel):
     reminder_date = Date()
     investment_project = fields.investment_project_field()
     company = fields.id_name_field()
+    interaction = fields.interaction_field()
     modified_on = Date()
 
     MAPPINGS = {
@@ -30,6 +31,7 @@ class Task(BaseSearchModel):
     COMPUTED_MAPPINGS = {
         'investment_project': dict_utils.task_investment_project_dict,
         'company': dict_utils.task_company,
+        'interaction': dict_utils.task_interaction_dict,
     }
 
     SEARCH_FIELDS = (
