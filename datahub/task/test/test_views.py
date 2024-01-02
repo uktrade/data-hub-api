@@ -1,9 +1,12 @@
 import datetime
 
+from operator import attrgetter
+
 from uuid import uuid4
 
-import pytest
+import factory
 
+import pytest
 
 from django.utils.timezone import now
 
@@ -555,3 +558,138 @@ class TestArchiveTask(BaseTaskTests):
         }
         assert response.data['archived_reason'] == 'completed'
         assert response.data['id'] == str(task.id)
+
+
+class TestAssociatedCompanyAndProject(APITestMixin):
+    """Test the GET companies-and-projects endpoint for task"""
+
+    url = reverse('api-v4:task:companies-and-projects')
+
+    def test_returns_empty_when_no_companies_or_projects(self):
+        TaskFactory()
+
+        response = self.api_client.get(self.url).json()
+        expected_response = {
+            'companies': [],
+            'projects': [],
+        }
+
+        assert response == expected_response
+
+    def test_returns_project_investor_company_in_company_field(self):
+        company = CompanyFactory()
+        project = InvestmentProjectFactory()
+        TaskFactory(created_by=self.user, company=company)
+        TaskFactory(created_by=self.user, investment_project=project)
+
+        response = self.api_client.get(self.url).json()
+
+        sorted_companies = [company, project.investor_company]
+        sorted_companies.sort(key=attrgetter('name'))
+
+        expected_response = {
+            'companies': [
+                {
+                    'id': str(company.id),
+                    'name': company.name,
+                }
+                for company in sorted_companies
+            ],
+            'projects': [
+                {
+                    'id': str(project.id),
+                    'name': project.name,
+                },
+            ],
+        }
+
+        assert response == expected_response
+
+    def test_returns_company_once_when_multiple_tasks_with_same_company(self):
+        company = CompanyFactory()
+        TaskFactory.create_batch(2, created_by=self.user, company=company)
+
+        response = self.api_client.get(self.url).json()
+        expected_response = {
+            'companies': [
+                {
+                    'id': str(company.id),
+                    'name': company.name,
+                },
+            ],
+            'projects': [],
+        }
+
+        assert response == expected_response
+
+    def test_returns_project_once_when_multiple_tasks_with_same_project(self):
+        project = InvestmentProjectFactory()
+        TaskFactory.create_batch(2, created_by=self.user, investment_project=project)
+
+        response = self.api_client.get(self.url).json()
+        expected_response = {
+            'companies': [
+                {
+                    'id': str(project.investor_company.id),
+                    'name': project.investor_company.name,
+                },
+            ],
+            'projects': [
+                {
+                    'id': str(project.id),
+                    'name': project.name,
+                },
+            ],
+        }
+
+        assert response == expected_response
+
+    def test_returns_multiple_companies_and_projects_for_tasks(self):
+        companies = CompanyFactory.create_batch(
+            2,
+            name=factory.Iterator(
+                ('Company A', 'Company B'),
+            ),
+        )
+
+        projects = InvestmentProjectFactory.create_batch(
+            2,
+            name=factory.Iterator(
+                ('Project A', 'Project B'),
+            ),
+        )
+
+        TaskFactory.create_batch(
+            2,
+            created_by=self.user,
+            company=factory.Iterator(companies),
+        )
+        TaskFactory.create_batch(
+            2,
+            created_by=self.user,
+            investment_project=factory.Iterator(projects),
+        )
+
+        response = self.api_client.get(self.url).json()
+
+        sorted_companies = companies + [project.investor_company for project in projects]
+        sorted_companies.sort(key=attrgetter('name'))
+
+        expected_response = {
+            'companies': [
+                {
+                    'id': str(company.id),
+                    'name': company.name,
+                }
+                for company in sorted_companies
+            ],
+            'projects': [
+                {
+                    'id': str(project.id),
+                    'name': project.name,
+                }
+                for project in projects
+            ],
+        }
+
+        assert response == expected_response
