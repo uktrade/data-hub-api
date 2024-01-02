@@ -55,7 +55,7 @@ def test_delete_from_opensearch(
             assert _get_documents(opensearch_with_signals, task.pk) is None
 
     with mock.patch(
-        'datahub.search.tasks.signals.delete_document',
+        'datahub.search.task.signals.delete_document',
     ) as mock_delete_document:
         task.delete()
         opensearch_with_signals.indices.refresh()

@@ -15,7 +15,7 @@ def sync_task_to_opensearch(instance):
     )
 
 
-def removetask_from_opensearch(instance):
+def remove_task_from_opensearch(instance):
     """Remove investor profile from es."""
     transaction.on_commit(
         lambda pk=instance.pk: delete_document(DBTask, pk),
@@ -25,6 +25,6 @@ def removetask_from_opensearch(instance):
 receivers = (
     SignalReceiver(post_save, DBTask, sync_task_to_opensearch),
     SignalReceiver(
-        post_delete, DBTask, removetask_from_opensearch,
+        post_delete, DBTask, remove_task_from_opensearch,
     ),
 )
