@@ -1,6 +1,7 @@
 from django.db import transaction
-from django.db.models.signals import post_save
+from django.db.models.signals import post_delete, post_save
 
+from datahub.search.deletion import delete_document
 from datahub.search.signals import SignalReceiver
 from datahub.search.sync_object import sync_object_async
 from datahub.search.task import TaskSearchApp
@@ -14,4 +15,16 @@ def sync_task_to_opensearch(instance):
     )
 
 
-receivers = (SignalReceiver(post_save, DBTask, sync_task_to_opensearch),)
+def removetask_from_opensearch(instance):
+    """Remove investor profile from es."""
+    transaction.on_commit(
+        lambda pk=instance.pk: delete_document(DBTask, pk),
+    )
+
+
+receivers = (
+    SignalReceiver(post_save, DBTask, sync_task_to_opensearch),
+    SignalReceiver(
+        post_delete, DBTask, removetask_from_opensearch,
+    ),
+)
