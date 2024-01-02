@@ -83,4 +83,6 @@ class Task(ArchivableModel, BaseModel):
             return self.investment_project.investor_company
         if self.company:
             return self.company
+        if self.interaction:
+            return self.interaction.company
         return None

@@ -32,6 +32,7 @@ class TasksMixin(CoreViewSet):
             .prefetch_related('advisers')
             .select_related('investment_project')
             .select_related('company')
+            .select_related('interaction')
         )
 
         archived = request.query_params.get('archived')
@@ -51,7 +52,7 @@ class TaskV4ViewSet(ArchivableViewSetMixin, TasksMixin):
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     permission_classes = [IsAuthenticated]
     ordering_fields = ['title', 'due_date', 'created_on']
-    filterset_fields = ['investment_project', 'company']
+    filterset_fields = ['investment_project', 'company', 'interaction']
 
     serializer_class = TaskSerializer
 

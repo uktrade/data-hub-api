@@ -211,6 +211,7 @@ class ReminderTaskSerializer(TaskSerializer):
             'investment_project',
             'company',
             'due_date',
+            'interaction',
         )
 
 
