@@ -473,6 +473,12 @@ MAPPING = {
                 # (the referrals have to expired and be deleted first).
                 'unexpired_objects_kwargs': [{}],
             },
+            {
+                'factory': TaskFactory,
+                'field': 'interaction',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
         ],
     },
     'investment.InvestmentProject': {
