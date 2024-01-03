@@ -5,6 +5,7 @@ from datahub.company.models.company import Company
 
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
+from datahub.interaction.models import Interaction
 from datahub.investment.project.serializers import (
     NestedInvestmentProjectInvestorCompanyField,
 )
@@ -34,6 +35,12 @@ class TaskSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True,
     )
+    interaction = NestedRelatedField(
+        Interaction,
+        required=False,
+        allow_null=True,
+        extra_fields=('subject',),
+    )
 
     def to_representation(self, instance):
         company = instance.get_company()
@@ -46,6 +53,7 @@ class TaskSerializer(serializers.ModelSerializer):
         validate_single_task_relationship(
             data.get('investment_project', None),
             data.get('company', None),
+            data.get('interaction', None),
             serializers.ValidationError,
         )
         return data
@@ -69,4 +77,5 @@ class TaskSerializer(serializers.ModelSerializer):
             'modified_on',
             'investment_project',
             'company',
+            'interaction',
         )

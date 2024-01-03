@@ -1,5 +1,6 @@
 import pytest
 
+from datahub.interaction.test.factories import InteractionFactoryBase
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 from datahub.search.task.apps import TaskSearchApp
@@ -33,6 +34,7 @@ def test_task_to_dict(opensearch):
         'modified_on': task.modified_on,
         'archived': False,
         'company': None,
+        'interaction': None,
         'advisers': [
             {
                 'id': str(adviser.id),
@@ -60,5 +62,24 @@ def test_investment_project_task_to_dict(opensearch):
         'id': str(investment_project.id),
         'name': investment_project.name,
         'project_code': investment_project.project_code,
+    }
+    assert result['company'] == {'id': str(company.id), 'name': company.name}
+
+
+def test_interaction_task_to_dict(opensearch):
+    """Test for interaction task fields to search model"""
+    interaction = InteractionFactoryBase()
+
+    task = TaskFactory(
+        interaction=interaction,
+    )
+    company = task.get_company()
+
+    result = Task.db_object_to_dict(task)
+
+    assert result['interaction'] == {
+        'id': str(interaction.id),
+        'subject': interaction.subject,
+        'date': interaction.date,
     }
     assert result['company'] == {'id': str(company.id), 'name': company.name}

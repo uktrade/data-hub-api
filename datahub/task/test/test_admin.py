@@ -1,6 +1,7 @@
 import pytest
 
 from datahub.company.test.factories import CompanyFactory
+from datahub.interaction.test.factories import InteractionFactoryBase
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.task.admin import TaskAdminForm
 
@@ -9,16 +10,17 @@ pytestmark = pytest.mark.django_db
 
 
 class TestTaskAdminModel:
-    def test_admin_form_throws_validation_error_when_task_has_company_and_investment_project(
+    def test_admin_form_validation_error_when_task_has_company__investment_project__interaction(
         self,
     ):
         data = {
             'company': CompanyFactory().id,
             'investment_project': InvestmentProjectFactory().id,
+            'interaction': InteractionFactoryBase().id,
         }
         form = TaskAdminForm(data=data)
 
         assert form.is_valid() is False
         assert form.non_field_errors() == [
-            'You cannot assign both a company and investment project to a task',
+            'You can assign either a company, investment project or interaction to a task',
         ]

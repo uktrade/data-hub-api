@@ -215,6 +215,14 @@ def task_investment_project_dict(obj):
     return investment_project_dict(obj.investment_project)
 
 
+def task_interaction_dict(obj):
+    """Creates dictionary from a task interaction containing id, subject and date."""
+    if not hasattr(obj, 'interaction'):
+        return None
+
+    return interaction_dict(obj.interaction)
+
+
 def sector_dict(obj):
     """Creates a dictionary for a sector."""
     if obj is None:
