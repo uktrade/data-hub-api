@@ -30,9 +30,11 @@ class TasksMixin(CoreViewSet):
         queryset = (
             Task.objects.all()
             .prefetch_related('advisers')
-            .select_related('investment_project')
-            .select_related('company')
-            .select_related('interaction')
+            .select_related(
+                'investment_project',
+                'company',
+                'interaction',
+            )
         )
 
         archived = request.query_params.get('archived')
