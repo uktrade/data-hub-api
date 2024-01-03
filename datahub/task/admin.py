@@ -16,6 +16,7 @@ class TaskAdminForm(forms.ModelForm):
         validate_single_task_relationship(
             self.cleaned_data.get('investment_project'),
             self.cleaned_data.get('company'),
+            self.cleaned_data.get('interaction'),
             ValidationError,
         )
 

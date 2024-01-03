@@ -8,7 +8,7 @@ from rest_framework.test import APIClient
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.feature_flag.test.factories import UserFeatureFlagGroupFactory
-from datahub.interaction.test.factories import CompaniesInteractionFactory
+from datahub.interaction.test.factories import CompaniesInteractionFactory, InteractionFactoryBase
 from datahub.investment.project.proposition.models import PropositionStatus
 from datahub.investment.project.proposition.test.factories import PropositionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -189,6 +189,7 @@ class TaskReminderMixin:
                 'due_date': None,
                 'company': None,
                 'investment_project': None,
+                'interaction': None,
             },
         }
 
@@ -235,6 +236,7 @@ class TaskReminderMixin:
                     },
                     'id': str(investment_project.id),
                 },
+                'interaction': None,
             },
         }
 
@@ -271,6 +273,44 @@ class TaskReminderMixin:
                     ),
                 },
                 'investment_project': None,
+                'interaction': None,
+            },
+        }
+
+    def test_get_interaction_task_reminders(self):
+        """
+        Given some reminders for tasks with an interaction, these should be returned with
+        the correct interaction data
+        """
+        interaction = InteractionFactoryBase()
+        task = TaskFactory(interaction=interaction)
+
+        reminders = self.factory.create_batch(
+            3,
+            adviser=self.user,
+            task=task,
+        )
+        response = self.get_response
+        data = response.json()
+        results = data.get('results', [])
+        reminders = sorted(reminders, key=lambda x: x.pk)
+
+        assert results[0] == {
+            'id': str(reminders[0].id),
+            'created_on': '2022-05-05T17:00:00Z',
+            'event': reminders[0].event,
+            'task': {
+                'id': str(reminders[0].task.id),
+                'title': str(reminders[0].task.title),
+                'due_date': None,
+                'company': {
+                    'name': interaction.company.name,
+                    'id': str(
+                        interaction.company.id,
+                    ),
+                },
+                'investment_project': None,
+                'interaction': {'id': str(interaction.id), 'subject': interaction.subject},
             },
         }
 

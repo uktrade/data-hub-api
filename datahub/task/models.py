@@ -12,6 +12,7 @@ from datahub.company.models.company import Company
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.core.utils import get_front_end_url, StrEnum
+from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -52,6 +53,13 @@ class Task(ArchivableModel, BaseModel):
         on_delete=models.CASCADE,
         related_name='task_company',
     )
+    interaction = models.ForeignKey(
+        Interaction,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='task_interaction',
+    )
 
     # override the save method and calculate reminder_date
     def save(self, *args, **kwargs):
@@ -75,4 +83,6 @@ class Task(ArchivableModel, BaseModel):
             return self.investment_project.investor_company
         if self.company:
             return self.company
+        if self.interaction:
+            return self.interaction.company
         return None

@@ -4,6 +4,7 @@ import pytest
 
 from datahub.company.test.factories import CompanyFactory
 
+from datahub.interaction.test.factories import InteractionFactoryBase
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 from datahub.task.models import Task
@@ -60,3 +61,8 @@ class TestTaskModel:
     def test_task_get_company_for_generic_task(self):
         generic_task = TaskFactory()
         assert generic_task.get_company() is None
+
+    def test_task_get_company_for_interaction_task(self):
+        interaction = InteractionFactoryBase()
+        interaction_task = TaskFactory(interaction=interaction)
+        assert interaction_task.get_company() == interaction.company

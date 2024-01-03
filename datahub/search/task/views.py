@@ -27,6 +27,7 @@ class SearchTaskAPIViewMixin:
         'advisers',
         'company',
         'investment_project',
+        'interaction',
     )
 
     REMAP_FIELDS = {
@@ -34,6 +35,7 @@ class SearchTaskAPIViewMixin:
         'created_by': 'created_by.id',
         'company': 'company.id',
         'investment_project': 'investment_project.id',
+        'interaction': 'interaction.id',
     }
 
 
@@ -88,9 +90,13 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
             )
 
         if len(must_not) > 0 or len(must) > 0:
-            base_query.update_from_dict(self.add_must_and_must_not_to_filters(
-                base_query, must, must_not,
-            ))
+            base_query.update_from_dict(
+                self.add_must_and_must_not_to_filters(
+                    base_query,
+                    must,
+                    must_not,
+                ),
+            )
 
         return base_query
 
