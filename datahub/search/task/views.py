@@ -95,7 +95,7 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
                     base_query,
                     must,
                     must_not,
-                )
+                ),
             )
 
         return base_query
