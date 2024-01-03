@@ -459,3 +459,27 @@ def test_task_investment_project_dict_returns_investment_project_task():
     assert dict_utils.task_investment_project_dict(task) == dict_utils.investment_project_dict(
         investment_project,
     )
+
+
+def test_task_interaction_dict_returns_none_when_task_interaction_prop_missing():
+    task = mock.MagicMock()
+    del task.interaction
+
+    assert dict_utils.task_interaction_dict(task) is None
+
+
+def test_task_interaction_dict_returns_none_when_task_interaction_is_none():
+    task = mock.MagicMock()
+    task.interaction = None
+
+    assert dict_utils.task_interaction_dict(task) is None
+
+
+def test_task_interaction_dict_returns_interaction_task():
+    task = mock.MagicMock()
+    interaction = mock.MagicMock()
+    task.interaction = interaction
+
+    assert dict_utils.task_interaction_dict(task) == dict_utils.interaction_dict(
+        interaction,
+    )
