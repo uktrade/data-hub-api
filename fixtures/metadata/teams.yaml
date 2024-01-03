@@ -107,6 +107,15 @@
     - - view_task
       - task
       - task
+    - - view_win
+      - export_win
+      - win
+    - - add_win
+      - export_win
+      - win
+    - - change_win
+      - export_win
+      - win
   model: auth.group
 - fields:
     name: DA
@@ -267,6 +276,15 @@
     - - view_task
       - task
       - task
+    - - view_win
+      - export_win
+      - win
+    - - add_win
+      - export_win
+      - win
+    - - change_win
+      - export_win
+      - win
   model: auth.group
 - fields:
     name: DIT_staff
@@ -532,6 +550,15 @@
     - - view_task
       - task
       - task
+    - - view_win
+      - export_win
+      - win
+    - - add_win
+      - export_win
+      - win
+    - - change_win
+      - export_win
+      - win
   model: auth.group
 - fields:
     name: Global account managers

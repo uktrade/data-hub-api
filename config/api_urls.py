@@ -14,6 +14,7 @@ from datahub.company_referral import urls as company_referral_urls
 from datahub.dataset import urls as dataset_urls
 from datahub.dnb_api import urls as dnb_api_urls
 from datahub.event import urls as event_urls
+from datahub.export_win import urls as export_win_urls
 from datahub.feature_flag import urls as feature_flag_urls
 from datahub.interaction import urls as interaction_urls
 from datahub.investment.investor_profile import urls as investor_profile_urls
@@ -96,6 +97,7 @@ v4_urls = [
     path('', include((interaction_urls.urls_v4, 'interaction'), namespace='interaction')),
     path('', include((reminder_urls, 'reminder'), namespace='reminder')),
     path('', include((export_urls.urls_v4, 'export'), namespace='export')),
+    path('', include((export_win_urls.urls, 'export-win'), namespace='export-win')),
     path('', include((objective_urls.urls_v4, 'objective'), namespace='objective')),
     path('', include((task_urls.urls_v4, 'task'), namespace='task')),
 ]
