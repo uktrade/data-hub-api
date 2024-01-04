@@ -1,34 +1,25 @@
+
+
 from datetime import datetime, timedelta
 
-from django.conf import settings
-from django.db.models import Sum
-
-from datahub.export_win.models import Breakdown
-
-from datahub.export_win.models import CustomerResponseToken
 from logging import getLogger
 
+from dateutil.relativedelta import relativedelta
+
 from django.conf import settings
-from django.db.models import Sum
+from django.db.models import (Q, Sum)
+from django.utils.timezone import now
 
-from datahub.export_win.models import Breakdown
+from django_pglocks import advisory_lock
 
-from datahub.export_win.models import CustomerResponseToken
+from datahub.core.queues.job_scheduler import job_scheduler
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
+from datahub.export_win.models import (Breakdown, CustomerResponseToken)
+from datahub.notification.constants import NotifyServiceName
+from datahub.notification.core import notify_gateway
+from datahub.reminder.models import EmailDeliveryStatus
 
-
-def get_all_fields_for_client_email_receipt(token, customer_response):
-    win = customer_response.win
-    win_token = token.company_contact
-    details = {
-        'customer_email': win_token.email,
-        'country_destination': win.country,
-        'client_firstname': win_token.first_name,
-        'lead_officer_name': win.lead_officer.name,
-        'goods_services': win.goods_vs_services.name,
-        'url': f'{settings.EXPORT_WIN_CLIENT_REVIEW_WIN_URL}/{token.id}',
-    }
-
-    return details
+logger = getLogger(__name__)
 
 
 def create_token_for_contact(contact, customer_response):
@@ -46,6 +37,21 @@ def create_token_for_contact(contact, customer_response):
         customer_response=customer_response,
     )
     return new_token
+
+
+def get_all_fields_for_client_email_receipt(token, customer_response):
+    win = customer_response.win
+    win_token = token.company_contact
+    details = {
+        'customer_email': win_token.email,
+        'country_destination': win.country,
+        'client_firstname': win_token.first_name,
+        'lead_officer_name': win.lead_officer.name,
+        'goods_services': win.goods_vs_services.name,
+        'url': f'{settings.EXPORT_WIN_CLIENT_REVIEW_WIN_URL}/{token.id}',
+    }
+
+    return details
 
 
 def get_all_fields_for_lead_officer_email_receipt_no(token, customer_response):
@@ -81,3 +87,130 @@ def get_all_fields_for_lead_officer_email_receipt_yes(token, customer_response):
     }
 
     return details
+
+
+def notify_export_win_contact_by_rq_email(
+        contact_email_address,
+        template_identifier,
+        context,
+        update_task,
+        token_id=None,
+):
+    """
+    Notify Export win contact, using GOVUK notify and some template context.
+    """
+    job = job_scheduler(
+        function=send_export_win_email_notification_via_rq,
+        function_args=(
+            contact_email_address,
+            template_identifier,
+            context,
+            update_task,
+            token_id,
+            NotifyServiceName.export_win,
+        ),
+        retry_backoff=True,
+        max_retries=5,
+    )
+
+    return job
+
+
+def send_export_win_email_notification_via_rq(
+        recipient_email,
+        template_identifier,
+        context=None,
+        update_delivery_status_task=None,
+        token_id=None,
+        notify_service_name=None,
+):
+    """
+    Email notification function to be scheduled by RQ,
+    setting up a second task to update the email delivery status.
+
+    Logged notification_id and response so it is possible to track the status of
+    email delivery.
+    """
+    logger.info(
+        'send_export_win_email_notification_via_rq attempting to send email '
+        f'to recipient {recipient_email}, using template identifier {template_identifier}',
+    )
+    response = notify_gateway.send_email_notification(
+        recipient_email,
+        template_identifier,
+        context,
+        notify_service_name,
+    )
+
+    logger.info(
+        f'send_export_win_email_notification_via_rq email sent to recipient {recipient_email}, '
+        f'received response {response}',
+    )
+
+    job_scheduler(
+        function=update_delivery_status_task,
+        function_args=(
+            response['id'],
+            token_id,
+        ),
+        queue_name=LONG_RUNNING_QUEUE,
+        max_retries=5,
+        retry_backoff=True,
+        retry_intervals=30,
+    )
+
+    logger.info(
+        'Task send_export_win_email_notification_via_rq completed '
+        f'email_notification_id to {response["id"]} and token_id set to {token_id}',
+    )
+
+    return response['id'], token_id
+
+
+def update_customer_response_token_for_email_notification_id(email_notification_id, token_id):
+    token = CustomerResponseToken.objects.get(id=token_id)
+    token.email_notification_id = email_notification_id
+    token.save()
+
+    logger.info(
+        'Task update_customer_response_token_email_status completed '
+        f'email_response_status to {email_notification_id} and customer_response_id '
+        f'set to {token_id}',
+    )
+
+
+def update_notify_email_delivery_status_for_customer_response_token():
+    with advisory_lock(
+        'update_notify_email_delivery_status_for_customer_response_token',
+        wait=False,
+    ) as acquired:
+        if not acquired:
+            logger.info(
+                'Email status checks for customer response token are already being '
+                'processed by another worker.',
+            )
+            return
+        current_date = now()
+        date_threshold = current_date - relativedelta(days=4)
+        notification_ids = (
+            CustomerResponseToken.objects.filter(
+                Q(email_delivery_status=EmailDeliveryStatus.UNKNOWN)
+                | Q(email_delivery_status=EmailDeliveryStatus.SENDING),
+                created_on__gte=date_threshold,
+                email_notification_id__isnull=False,
+            )
+            .values_list('email_notification_id', flat=True)
+            .distinct()
+        )
+
+        for notification_id in notification_ids:
+            result = notify_gateway.get_notification_by_id(
+                notification_id,
+                notify_service_name=NotifyServiceName.export_win,
+            )
+            if 'status' in result:
+                CustomerResponseToken.objects.filter(
+                    email_notification_id=notification_id,
+                ).update(
+                    email_delivery_status=result['status'],
+                )

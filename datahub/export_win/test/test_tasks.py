@@ -1,39 +1,33 @@
 import uuid
-from datetime import datetime, timedelta
-from unittest.mock import MagicMock, patch
-
-import pytest
-import pytz
+from datetime import date, datetime, timedelta
 
 from unittest import mock
 from unittest.mock import MagicMock, patch
 
 import pytest
 import pytz
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 
 from freezegun import freeze_time
 
 from datahub.company.test.factories import ContactFactory
 from datahub.export_win.models import CustomerResponseToken
-
 from datahub.export_win.tasks import (
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
     get_all_fields_for_lead_officer_email_receipt_no,
-    get_all_fields_for_lead_officer_email_receipt_yes)
+    get_all_fields_for_lead_officer_email_receipt_yes,
+    notify_export_win_contact_by_rq_email,
+    send_export_win_email_notification_via_rq,
+    update_customer_response_token_for_email_notification_id,
+    update_notify_email_delivery_status_for_customer_response_token,
+)
 from datahub.export_win.test.factories import (
-    CustomerResponseFactory, CustomerResponseTokenFactory, WinFactory)
-
-from datahub.export_win.tasks import get_all_fields_for_client_email_receipt
-
-from datahub.export_win.tasks import (
-    create_token_for_contact,
-    get_all_fields_for_client_email_receipt,
-    get_all_fields_for_lead_officer_email_receipt_no,
-    get_all_fields_for_lead_officer_email_receipt_yes)
-from datahub.export_win.test.factories import (
-    CustomerResponseFactory, CustomerResponseTokenFactory, WinFactory)
+    CustomerResponseFactory, CustomerResponseTokenFactory, WinFactory,
+)
+from datahub.notification.constants import NotifyServiceName
+from datahub.reminder.models import EmailDeliveryStatus
 
 
 @pytest.fixture
@@ -99,24 +93,34 @@ def mock_update_notify_email_delivery_status_for_customer_response_token(monkeyp
 @pytest.mark.django_db
 @freeze_time('2023-07-01T10:00:00')
 class TestUpdateEmailDeliveryStatusTask:
-    current_date = datetime.date(year=2023, month=7, day=17)
+    current_date = date(year=2023, month=7, day=17)
 
     def test_update_customer_response_token_for_email_notification_id(
         self,
+        mock_export_win_tasks_notify_gateway,
     ):
         """
-        Test email notification id being save into customer response model
+        Test email notification id being saved into customer response model
         """
-        token_id = uuid.uuid4()
+        notification_id = uuid.uuid4()
+        mock_export_win_tasks_notify_gateway.send_email_notification = mock.Mock(
+            return_value={'id': notification_id},
+        )
         customer_response = CustomerResponseFactory()
         customer_response_token = CustomerResponseTokenFactory(
             customer_response=customer_response,
-            email_notification_id=token_id,
         )
-
+        send_export_win_email_notification_via_rq(
+            customer_response_token.company_contact.email,
+            uuid.uuid4(),
+            {},
+            update_customer_response_token_for_email_notification_id,
+            customer_response_token.id,
+            NotifyServiceName.export_win,
+        )
         customer_response_token.refresh_from_db()
 
-        assert customer_response_token.email_notification_id == token_id
+        assert customer_response_token.email_notification_id == notification_id
 
     def test_customer_response_token_no_email_notification_id(
         self,
