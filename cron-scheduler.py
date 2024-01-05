@@ -27,6 +27,7 @@ from datahub.core.queues.constants import (
     EVERY_TEN_MINUTES,
     EVERY_TEN_PM,
     EVERY_THREE_AM_ON_TWENTY_THIRD_EACH_MONTH,
+    EVERY_TWO_AM,
     HALF_DAY_IN_SECONDS,
 )
 from datahub.core.queues.health_check import queue_health_check
@@ -35,6 +36,9 @@ from datahub.core.queues.scheduler import DataHubScheduler, LONG_RUNNING_QUEUE
 from datahub.dnb_api.tasks.sync import schedule_sync_outdated_companies_with_dnb
 from datahub.dnb_api.tasks.update import schedule_get_company_updates
 from datahub.email_ingestion.tasks import process_mailbox_emails
+from datahub.export_win.tasks import (
+    update_notify_email_delivery_status_for_customer_response_token,
+)
 from datahub.investment.project.tasks import (
     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
 )
@@ -219,6 +223,7 @@ def schedule_jobs():
         )
     schedule_email_ingestion_tasks()
     schedule_new_export_interaction_jobs()
+    schedule_export_win_customer_response_token_jobs()
 
     schedule_user_reminder_migration()
 
@@ -276,6 +281,19 @@ def schedule_user_reminder_migration():
         retry_intervals=30,
         cron=EVERY_ELEVEN_PM,
         description='Daily migrate post users to receive notifications',
+    )
+
+
+def schedule_export_win_customer_response_token_jobs():
+    """Schedule update export win customer response token jobs."""
+    job_scheduler(
+        function=update_notify_email_delivery_status_for_customer_response_token,
+        max_retries=5,
+        queue_name=LONG_RUNNING_QUEUE,
+        retry_backoff=True,
+        retry_intervals=30,
+        cron=EVERY_TWO_AM,
+        description='Scheduled update of export win customer response email delivery status',
     )
 
 
