@@ -1,5 +1,7 @@
 import datetime
 
+from unittest.mock import patch
+
 from operator import attrgetter
 
 from uuid import uuid4
@@ -266,6 +268,30 @@ class TestAddGenericTask(APITestMixin):
             'interaction': None,
         }
         assert get_response.json() == expected_response
+
+    @patch('datahub.task.views.record_user_event')
+    def test_create_task_records_user_event(self, mock_record_user_event):
+        faker = Faker()
+
+        adviser = AdviserFactory()
+
+        url = reverse('api-v4:task:collection')
+
+        new_task = {
+            'title': faker.word(),
+            'description': faker.word(),
+            'due_date': now().date(),
+            'reminder_days': 3,
+            'email_reminders_enabled': True,
+            'advisers': [adviser.id],
+        }
+
+        self.api_client.post(
+            url,
+            data=new_task,
+        )
+
+        mock_record_user_event.assert_called()
 
 
 class TestEditGenericTask(BaseEditTaskTests):

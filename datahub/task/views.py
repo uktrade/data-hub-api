@@ -20,6 +20,8 @@ from datahub.task.models import Task
 from datahub.task.serializers import (
     TaskSerializer,
 )
+from datahub.user_event_log.constants import UserEventType
+from datahub.user_event_log.utils import record_user_event
 
 
 class TasksMixin(CoreViewSet):
@@ -60,6 +62,14 @@ class TaskV4ViewSet(ArchivableViewSetMixin, TasksMixin):
 
     def get_queryset(self):
         return super().get_tasks(self.request)
+
+    def perform_create(self, serializer):
+        extra_data = self.get_additional_data(True)
+        result = serializer.save(**extra_data)
+
+        record_data = self.request.data
+        record_data['id'] = result.id
+        record_user_event(self.request, type_=UserEventType.TASK_CREATED, data=record_data)
 
 
 @transaction.non_atomic_requests
