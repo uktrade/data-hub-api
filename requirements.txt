@@ -116,7 +116,7 @@ multidict==6.0.4
     # via
     #   aiohttp
     #   yarl
-notifications-python-client==8.2.0
+notifications-python-client==9.0.0
     # via -r requirements.in
 numpy==1.24.3
     # via pandas
