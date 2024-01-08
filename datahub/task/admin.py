@@ -41,5 +41,10 @@ class TaskAdmin(BaseModelAdminMixin, VersionAdmin):
         'title',
         'due_date',
     ]
+    raw_id_fields = (
+        'investment_project',
+        'company',
+        'interaction',
+    )
 
     form = TaskAdminForm
