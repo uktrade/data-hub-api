@@ -9,6 +9,7 @@ from datahub.company.models import (
     Advisor,
     Company,
     Contact,
+    ExportExperience,
 )
 from datahub.core import reversion
 from datahub.core.models import BaseModel, BaseOrderedConstantModel
@@ -303,6 +304,13 @@ class Win(BaseModel):
         on_delete=models.PROTECT,
     )
     export_experience = models.ForeignKey(
+        ExportExperience,
+        related_name='wins',
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+    )
+    export_wins_export_experience = models.ForeignKey(
         ExperienceCategories,
         related_name='wins',
         null=True,
