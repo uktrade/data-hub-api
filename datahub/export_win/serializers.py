@@ -5,7 +5,7 @@ from rest_framework.serializers import (
     ModelSerializer,
 )
 
-from datahub.company.models import Company, Contact
+from datahub.company.models import Company, Contact, ExportExperience
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.export_win.models import (
@@ -16,7 +16,6 @@ from datahub.export_win.models import (
     CustomerResponse,
     ExpectedValueRelation,
     Experience,
-    ExperienceCategories,
     HQTeamRegionOrPost,
     HVC,
     HVOProgrammes,
@@ -134,7 +133,7 @@ class WinSerializer(ModelSerializer):
     team_type = NestedRelatedField(TeamType)
     hq_team = NestedRelatedField(HQTeamRegionOrPost)
     business_potential = NestedRelatedField(BusinessPotential)
-    export_experience = NestedRelatedField(ExperienceCategories)
+    export_experience = NestedRelatedField(ExportExperience)
     associated_programme = NestedRelatedField(AssociatedProgramme, many=True)
     customer_response = CustomerResponseSerializer(read_only=True)
     advisers = WinAdviserSerializer(many=True, required=False)

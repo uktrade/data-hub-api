@@ -2,7 +2,12 @@ import random
 
 import factory
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyFactory,
+    ContactFactory,
+    ExportExperienceFactory,
+)
 from datahub.core.constants import (
     BreakdownType as BreakdownTypeConstant,
     BusinessPotential as BusinessPotentialConstant,
@@ -131,7 +136,7 @@ class WinFactory(factory.django.DjangoModelFactory):
     sector = factory.SubFactory(SectorFactory)
     team_type = factory.SubFactory(TeamTypeFactory)
     hvc_id = HVCConstant.western_europe_aid_funded_business.value.id
-    export_experience = factory.SubFactory(ExperienceCategoriesFactory)
+    export_experience = factory.SubFactory(ExportExperienceFactory)
     name_of_customer_confidential = False
     business_potential_id = BusinessPotentialConstant.high_export_potential.value.id
     type_id = WinTypeConstant.both.value.id
