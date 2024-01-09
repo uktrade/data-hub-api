@@ -9,6 +9,7 @@ from datahub.company.test.factories import (
     AdviserFactory,
     CompanyFactory,
     ContactFactory,
+    ExportExperienceFactory,
 )
 from datahub.core.constants import (
     AssociatedProgramme as AssociatedProgrammeConstant,
@@ -16,7 +17,6 @@ from datahub.core.constants import (
     BusinessPotential as BusinessPotentialConstant,
     Country as CountryConstant,
     ExpectedValueRelation as ExpectedValueRelationConstant,
-    ExperienceCategories as ExperienceCategoriesConstant,
     HQTeamRegionOrPost as HQTeamRegionOrPostConstant,
     Sector as SectorConstant,
     SupportType as SupportTypeConstant,
@@ -55,6 +55,7 @@ class TestGetWinView(APITestMixin):
     def test_get(self):
         """Test getting a single win."""
         contact = ContactFactory()
+        export_experience = ExportExperienceFactory()
         win = WinFactory(
             company_contacts=[contact],
             associated_programme=[
@@ -63,6 +64,7 @@ class TestGetWinView(APITestMixin):
             type_of_support=[
                 SupportTypeConstant.political_and_economic_briefing.value.id,
             ],
+            export_experience=export_experience,
         )
         breakdowns = BreakdownFactory.create_batch(3, win=win)
         customer_response = CustomerResponseFactory(win=win)
@@ -135,8 +137,8 @@ class TestGetWinView(APITestMixin):
             'date': format_date_or_datetime(win.date),
             'description': win.description,
             'export_experience': {
-                'id': str(win.export_experience.id),
-                'name': win.export_experience.name,
+                'id': str(export_experience.id),
+                'name': export_experience.name,
             },
             'goods_vs_services': {
                 'id': str(win.goods_vs_services.id),
@@ -289,6 +291,7 @@ class TestCreateWinView(APITestMixin):
         company = CompanyFactory()
         contact = ContactFactory(company=company)
         date_won = now().date()
+        export_experience = ExportExperienceFactory()
 
         request_data = {
             'adviser': {
@@ -349,7 +352,7 @@ class TestCreateWinView(APITestMixin):
             'name_of_customer': 'Overseas Customer',
             'name_of_customer_confidential': True,
             'export_experience': {
-                'id': ExperienceCategoriesConstant.never_exported.value.id,
+                'id': str(export_experience.id),
             },
             'breakdowns': [
                 {
@@ -422,8 +425,8 @@ class TestCreateWinView(APITestMixin):
             'date': format_date_or_datetime(win.date),
             'description': win.description,
             'export_experience': {
-                'id': str(win.export_experience_id),
-                'name': win.export_experience.name,
+                'id': str(export_experience.id),
+                'name': export_experience.name,
             },
             'goods_vs_services': {
                 'id': str(win.goods_vs_services_id),
@@ -475,6 +478,7 @@ class TestCreateWinView(APITestMixin):
         company = CompanyFactory()
         contact = ContactFactory(company=company)
         date_won = now().date()
+        export_experience = ExportExperienceFactory()
 
         request_data = {
             'adviser': {
@@ -535,7 +539,7 @@ class TestCreateWinView(APITestMixin):
             'name_of_customer': 'Overseas Customer',
             'name_of_customer_confidential': True,
             'export_experience': {
-                'id': ExperienceCategoriesConstant.never_exported.value.id,
+                'id': str(export_experience.id),
             },
             'breakdowns': [
                 {
@@ -635,8 +639,8 @@ class TestCreateWinView(APITestMixin):
             'date': format_date_or_datetime(win.date),
             'description': win.description,
             'export_experience': {
-                'id': str(win.export_experience_id),
-                'name': win.export_experience.name,
+                'id': str(export_experience.id),
+                'name': export_experience.name,
             },
             'goods_vs_services': {
                 'id': str(win.goods_vs_services_id),
