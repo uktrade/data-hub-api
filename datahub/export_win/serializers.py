@@ -122,7 +122,7 @@ class WinSerializer(ModelSerializer):
     )
     team_members = NestedAdviserField(many=True, required=False)
     customer_location = NestedRelatedField(UKRegion)
-    type = NestedRelatedField(WinType)
+    type = NestedRelatedField(WinType, required=False)
     country = NestedRelatedField(Country)
     goods_vs_services = NestedRelatedField(ExpectedValueRelation)
     sector = NestedRelatedField(Sector)

@@ -325,9 +325,6 @@ class TestCreateWinView(APITestMixin):
             'name_of_export': 'Sand',
             'date': date_won,
             'country': CountryConstant.canada.value.id,
-            'type': {
-                'id': WinTypeConstant.both.value.id,
-            },
             'total_expected_export_value': 1000000,
             'total_expected_non_export_value': 1000000,
             'total_expected_odi_value': 1000000,
@@ -459,7 +456,7 @@ class TestCreateWinView(APITestMixin):
             'total_expected_export_value': win.total_expected_export_value,
             'total_expected_non_export_value': win.total_expected_non_export_value,
             'total_expected_odi_value': win.total_expected_odi_value,
-            'type': {'id': str(win.type_id), 'name': win.type.name},
+            'type': None,
             'type_of_support': [{'id': str(type_of_support.id), 'name': type_of_support.name}],
             'team_members': [],
             'advisers': [],
