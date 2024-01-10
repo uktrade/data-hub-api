@@ -163,3 +163,6 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         raw_query['query']['bool']['filter'] = filters
 
         return raw_query
+
+    def get_missing_sort_behaviour(self, ordering):
+        return '_last'

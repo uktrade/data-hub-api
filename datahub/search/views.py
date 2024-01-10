@@ -224,7 +224,7 @@ class SearchAPIView(APIView):
             filter_data=filter_data,
             composite_field_mapping=self.COMPOSITE_FILTERS,
             permission_filters=permission_filters,
-            ordering=ordering,
+            ordering=self.get_sort(ordering),
             fields_to_include=self.fields_to_include,
             fields_to_exclude=fields_to_exclude,
         )
@@ -233,6 +233,18 @@ class SearchAPIView(APIView):
         if extra_filters:
             return query.filter(extra_filters)
         return query
+
+    def get_sort(self, ordering):
+        if ordering is None:
+            return None
+        sort_params = {
+            'order': ordering.direction,
+            'missing': self.get_missing_sort_behaviour(ordering),
+        }
+        return {ordering.field: sort_params}
+
+    def get_missing_sort_behaviour(self, ordering):
+        return '_last' if ordering.is_descending else '_first'
 
     def get_extra_filters(self, validated_data):
         """Get any extra filters to apply to the base query."""

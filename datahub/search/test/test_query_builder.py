@@ -508,7 +508,7 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                     UUID('00000000-0000-0000-0000-000000000000'),
                 ),
             ],
-            SearchOrdering('id', SortDirection.desc),
+            {'id': {'order': SortDirection.desc, 'missing': '_last'}},
             ['id'],
             ['name'],
             {
