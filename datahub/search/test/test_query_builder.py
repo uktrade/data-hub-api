@@ -15,7 +15,7 @@ from datahub.search.query_builder import (
 )
 from datahub.search.test.search_support.relatedmodel.apps import RelatedModelSearchApp
 from datahub.search.test.search_support.simplemodel.apps import SimpleModelSearchApp
-from datahub.search.utils import SearchOrdering, SortDirection
+from datahub.search.utils import SortDirection
 
 
 @pytest.mark.parametrize(
