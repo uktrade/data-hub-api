@@ -19,6 +19,7 @@ from datahub.reminder.models import (
     TaskAssignedToMeFromOthersSubscription,
     TaskCompletedReminder,
     TaskCompletedSubscription,
+    TaskDeletedByOthersSubscription,
     TaskOverdueReminder,
     TaskOverdueSubscription,
     UpcomingEstimatedLandDateReminder,
@@ -129,6 +130,14 @@ class TaskCompletedSubscriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskCompletedSubscription
+        fields = ('email_reminders_enabled',)
+
+
+class TaskDeletedByOthersSubscriptionSerializer(serializers.ModelSerializer):
+    """Serializer for Task Deleted Subscription."""
+
+    class Meta:
+        model = TaskDeletedByOthersSubscription
         fields = ('email_reminders_enabled',)
 
 
