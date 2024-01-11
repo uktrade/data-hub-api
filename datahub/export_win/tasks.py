@@ -44,7 +44,7 @@ def get_all_fields_for_client_email_receipt(token, customer_response):
     win_token = token.company_contact
     details = {
         'customer_email': win_token.email,
-        'country_destination': win.country,
+        'country_destination': win.country.name,
         'client_firstname': win_token.first_name,
         'lead_officer_name': win.lead_officer.name,
         'goods_services': win.goods_vs_services.name,
@@ -59,7 +59,7 @@ def get_all_fields_for_lead_officer_email_receipt_no(token, customer_response):
     win_token = token.company_contact
     details = {
         'lead_officer_email': win.lead_officer.email,
-        'country_destination': win.country,
+        'country_destination': win.country.name,
         'client_fullname': win_token.first_name + ' ' + win_token.last_name,
         'lead_officer_first_name': win.lead_officer.first_name,
         'goods_services': win.goods_vs_services.name,
@@ -77,7 +77,7 @@ def get_all_fields_for_lead_officer_email_receipt_yes(token, customer_response):
         Sum('value'))['value__sum'] or 0
     details = {
         'lead_officer_email': win.lead_officer.email,
-        'country_destination': win.country,
+        'country_destination': win.country.name,
         'client_fullname': win_token.first_name + ' ' + win_token.last_name,
         'lead_officer_first_name': win.lead_officer.first_name,
         'total_export_win_value': total_export_win_value,

@@ -29,6 +29,8 @@ from datahub.export_win.test.factories import (
 from datahub.notification.constants import NotifyServiceName
 from datahub.reminder.models import EmailDeliveryStatus
 
+pytestmark = pytest.mark.django_db
+
 
 @pytest.fixture
 def mock_customer_response():
@@ -230,36 +232,25 @@ class TestUpdateEmailDeliveryStatusTask:
         )
 
 
-def test_get_all_fields_for_client_email_receipt_success(
-    mock_customer_response: MagicMock,
-    mock_customer_response_token: MagicMock,
-    mock_win: MagicMock,
-):
+def test_get_all_fields_for_client_email_receipt_success():
+    customer_response = CustomerResponseFactory()
+    token = CustomerResponseTokenFactory(customer_response=customer_response)
+    result = get_all_fields_for_client_email_receipt(
+        token,
+        customer_response,
+    )
     """
     Testing to get all fields for client email receipt
     """
-    mock_customer_response_instance = MagicMock()
-    mock_customer_response_token_instance = MagicMock()
-    mock_customer_response_instance.win = mock_win
-    mock_customer_response_token_instance.company_contact.email = 'test@example.com'
-    mock_customer_response_token_instance.company_contact.first_name = 'John'
-    mock_win.country = 'Country'
-    mock_win.lead_officer.name = 'Adviser Name'
-    mock_win.goods_vs_services.name = 'Goods and Services'
-    with patch('datahub.export_win.models.CustomerResponse.objects.get') as mock_response_get, \
-            patch('datahub.export_win.models.CustomerResponseToken.objects.get') as mock_token_get:
-        mock_response_get.return_value = mock_customer_response_instance
-        mock_token_get.return_value = mock_customer_response_token_instance
-        mock_token_id = uuid.uuid4()
-        mock_customer_response_token_instance.id = mock_token_id
-        result = get_all_fields_for_client_email_receipt(
-            mock_customer_response_token_instance, mock_customer_response_instance)
-        assert result['customer_email'] == 'test@example.com'
-        assert result['country_destination'] == 'Country'
-        assert result['client_firstname'] == 'John'
-        assert result['lead_officer_name'] == 'Adviser Name'
-        assert result['goods_services'] == 'Goods and Services'
-        assert result['url'] == f'{settings.EXPORT_WIN_CLIENT_REVIEW_WIN_URL}/{mock_token_id}'
+    # Assertions for the expected values
+    win = customer_response.win
+    assert result['customer_email'] == token.company_contact.email
+    assert result['country_destination'] == win.country.name
+    assert result['client_firstname'] == token.company_contact.first_name
+    assert result['lead_officer_name'] == win.lead_officer.name
+    assert result['goods_services'] == win.goods_vs_services.name
+    # Compare the generated URL with the expected URL using the specific ID
+    assert result['url'] == f'{settings.EXPORT_WIN_CLIENT_REVIEW_WIN_URL}/{str(token.id)}'
 
 
 @pytest.mark.django_db
@@ -355,7 +346,7 @@ def test_get_all_fields_for_lead_officer_email_receipt_no_success(
     mock_customer_response_token_instance.company_contact.first_name = 'John'
     mock_customer_response_token_instance.company_contact.last_name = 'Doe'
     mock_customer_response_token_instance.company_contact.company.name = 'Company Name'
-    mock_win.country = 'Country'
+    mock_win.country.name = 'Country'
     mock_win.goods_vs_services.name = 'Goods and Services'
     mock_win.lead_officer.email = 'lead_officer@example.com'
     mock_win.lead_officer.first_name = 'Sarah'
@@ -393,7 +384,7 @@ def test_get_all_fields_for_lead_officer_email_receipt_yes_success(
     mock_customer_response_token_instance.company_contact.first_name = 'John'
     mock_customer_response_token_instance.company_contact.last_name = 'Doe'
     mock_customer_response_token_instance.company_contact.company.name = 'Company Name'
-    mock_win_instance.country = 'Country'
+    mock_win_instance.country.name = 'Country'
     mock_win_instance.goods_vs_services.name = 'Goods and Services'
     mock_win_instance.lead_officer.email = 'lead_officer@example.com'
     mock_win_instance.lead_officer.first_name = 'Sarah'
