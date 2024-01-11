@@ -46,6 +46,10 @@ class EmailTemplate(ABC):
         return f'Amended by: {self.task.modified_by.name}'
 
     @property
+    def adviser_deleting_task(self):
+        return f'Deleted by: {self.task.modified_by.name}'
+
+    @property
     def task_due_date(self):
         return (
             f'Date due: {self.task.due_date.strftime("%-d %B %Y")}' if self.task.due_date else None
@@ -186,5 +190,5 @@ class TaskDeletedByOthersEmailTemplate(EmailTemplate):
             self.investment_project,
             self.company_name,
             self.task_due_date,
-            self.adviser_completing_task,
+            self.adviser_deleting_task,
         ]
