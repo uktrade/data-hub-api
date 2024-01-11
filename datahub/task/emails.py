@@ -168,3 +168,23 @@ class TaskAmendedByOthersEmailTemplate(EmailTemplate):
             self.task_due_date,
             self.adviser_amending_task,
         ]
+
+
+class TaskDeletedByOthersEmailTemplate(EmailTemplate):
+    UTM_CAMPAIGN = 'task_deleted_by_others'
+
+    def __init__(self, task: Task):
+        super().__init__(task)
+
+    @property
+    def subject(self):
+        return 'Task deleted by others'
+
+    @property
+    def fields_to_include(self):
+        return [
+            self.investment_project,
+            self.company_name,
+            self.task_due_date,
+            self.adviser_completing_task,
+        ]
