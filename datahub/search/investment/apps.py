@@ -51,6 +51,7 @@ class InvestmentSearchApp(SearchApp):
         'specific_programme',
         'stage',
         'uk_company',
+        'investor_company__one_list_account_owner',
     ).prefetch_related(
         'actual_uk_regions',
         'delivery_partners',
