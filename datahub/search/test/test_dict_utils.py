@@ -483,3 +483,11 @@ def test_task_interaction_dict_returns_interaction_task():
     assert dict_utils.task_interaction_dict(task) == dict_utils.interaction_dict(
         interaction,
     )
+
+
+def test_nested_company_global_account_manager_raises_error_when_prop_missing():
+    investment_project = mock.MagicMock()
+
+    investment_project.investor_company = None
+    with raises(ValueError):
+        dict_utils.nested_company_global_account_manager(investment_project, 'investor_company')
