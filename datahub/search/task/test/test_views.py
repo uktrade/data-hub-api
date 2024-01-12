@@ -279,7 +279,8 @@ class TestTaskSearch(APITestMixin):
         current_adviser.id = self.user.id
 
         yesterday_task = TaskFactory(
-            due_date=datetime.today() - timedelta(days=1), created_by=current_adviser,
+            due_date=datetime.today() - timedelta(days=1),
+            created_by=current_adviser,
         )
         today_task = TaskFactory(due_date=datetime.today(), created_by=current_adviser)
 
@@ -331,6 +332,38 @@ class TestTaskSearch(APITestMixin):
         assert response.data['results'][expected_order[0]]['id'] == str(first_task.id)
         assert response.data['results'][expected_order[1]]['id'] == str(second_task.id)
 
+    def test_search_task_company_name_ordering_puts_tasks_without_company_name_at_end(
+        self,
+        opensearch_with_collector,
+    ):
+        """Tests task search ordering on company name puts companies with a name first"""
+        company1 = CompanyFactory(name='Apple')
+        company2 = CompanyFactory(name='Zebra')
+
+        current_adviser = AdviserFactory()
+        current_adviser.id = self.user.id
+
+        company_task_1 = TaskFactory(company=company1, created_by=current_adviser)
+        company_task_2 = TaskFactory(company=company2, created_by=current_adviser)
+        generic_task = TaskFactory(created_by=current_adviser)
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:task')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'sortby': 'company.name:asc',
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data['results'][0]['id'] == str(company_task_1.id)
+        assert response.data['results'][1]['id'] == str(company_task_2.id)
+        assert response.data['results'][2]['id'] == str(generic_task.id)
+
     @pytest.mark.parametrize('sort_order, expected_order', [('asc', [0, 1]), ('desc', [1, 0])])
     def test_search_task_investment_project_name_ordering(
         self,
@@ -346,10 +379,12 @@ class TestTaskSearch(APITestMixin):
         current_adviser.id = self.user.id
 
         first_task = TaskFactory(
-            investment_project=investment_project1, created_by=current_adviser,
+            investment_project=investment_project1,
+            created_by=current_adviser,
         )
         second_task = TaskFactory(
-            investment_project=investment_project2, created_by=current_adviser,
+            investment_project=investment_project2,
+            created_by=current_adviser,
         )
 
         opensearch_with_collector.flush_and_refresh()
@@ -416,7 +451,9 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
         archived_tasks = TaskFactory.create_batch(3, archived=True, created_by=current_adviser)
 
         not_archived_tasks = TaskFactory.create_batch(
-            2, archived=False, created_by=current_adviser,
+            2,
+            archived=False,
+            created_by=current_adviser,
         )
 
         opensearch_with_collector.flush_and_refresh()
@@ -444,7 +481,9 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
 
     @pytest.mark.parametrize('archived', (True, False))
     def test_search_task_by_archived_for_current_adviser(
-        self, opensearch_with_collector, archived,
+        self,
+        opensearch_with_collector,
+        archived,
     ):
         """
         Only return tasks created by the current adviser or where they have been assigned as an
