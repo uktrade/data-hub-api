@@ -304,15 +304,3 @@ class TaskCompletedReminder(BaseReminder):
         on_delete=models.CASCADE,
         related_name='task_completed_reminder',
     )
-
-
-class TaskDeletedByOthersReminder(BaseReminder):
-    """
-    Task deleted by others generic task reminder.
-    """
-
-    task = models.ForeignKey(
-        'task.Task',
-        on_delete=models.CASCADE,
-        related_name='task_deleted_by_others_reminder',
-    )
