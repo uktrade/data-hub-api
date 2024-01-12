@@ -442,13 +442,8 @@ def _apply_sorting_to_query(query, ordering):
     if ordering is None:
         return query.sort('_score', 'id')
 
-    sort_params = {
-        'order': ordering.direction,
-        'missing': '_last' if ordering.is_descending else '_first',
-    }
-
     return query.sort(
-        {ordering.field: sort_params},
+        ordering,
         'id',
     )
 
