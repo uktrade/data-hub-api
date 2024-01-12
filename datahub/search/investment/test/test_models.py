@@ -147,6 +147,7 @@ def test_investment_project_to_dict(opensearch):
         'country_investment_originates_from',
         'level_of_involvement_simplified',
         'latest_interaction',
+        'one_list_group_global_account_manager',
     }
 
     assert set(result.keys()) == keys

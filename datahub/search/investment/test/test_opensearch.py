@@ -677,6 +677,30 @@ def test_mapping(opensearch):
                 'type': 'object',
             },
             'will_new_jobs_last_two_years': {'type': 'boolean'},
+            'one_list_group_global_account_manager': {
+                'properties': {
+                    'first_name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                    'id': {'type': 'keyword'},
+                    'last_name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                    'name': {
+                        'fields': {
+                            'keyword': {
+                                'normalizer': 'lowercase_asciifolding_normalizer',
+                                'type': 'keyword',
+                            },
+                            'trigram': {'analyzer': 'trigram_analyzer', 'type': 'text'},
+                        },
+                        'type': 'text',
+                    },
+                },
+                'type': 'object',
+            },
         },
     }
 
