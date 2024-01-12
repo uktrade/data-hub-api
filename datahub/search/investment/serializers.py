@@ -52,6 +52,10 @@ class SearchInvestmentProjectQuerySerializer(EntitySearchQuerySerializer):
     show_summary = serializers.BooleanField(required=False, default=False)
     include_parent_companies = serializers.BooleanField(required=False, default=False)
     include_subsidiary_companies = serializers.BooleanField(required=False, default=False)
+    one_list_group_global_account_manager = SingleOrListField(
+        child=StringUUIDField(),
+        required=False,
+    )
 
     SORT_BY_FIELDS = (
         'created_on',
