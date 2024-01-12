@@ -1,4 +1,5 @@
 from functools import partial
+
 from opensearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Object, Text
 
 from datahub.search import dict_utils
@@ -13,7 +14,7 @@ def _related_investment_project_field():
             'id': Keyword(),
             'name': fields.NormalizedKeyword(),
             'project_code': fields.NormalizedKeyword(),
-        }
+        },
     )
 
 
@@ -134,7 +135,8 @@ class InvestmentProject(BaseSearchModel):
 
     COMPUTED_MAPPINGS = {
         'one_list_group_global_account_manager': partial(
-            dict_utils.nested_company_global_account_manager, company_prop_name='investor_company'
+            dict_utils.nested_company_global_account_manager,
+            company_prop_name='investor_company',
         ),
     }
 
