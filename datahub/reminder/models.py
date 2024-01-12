@@ -100,6 +100,12 @@ class TaskCompletedSubscription(BaseSubscription):
     """
 
 
+class TaskDeletedByOthersSubscription(BaseSubscription):
+    """
+    Subscription to get reminders about task deleted by others.
+    """
+
+
 class EmailDeliveryStatus(models.TextChoices):
     SENDING = ('sending', 'Sending')
     DELIVERED = ('delivered', 'Delivered')

@@ -7,6 +7,7 @@ from datahub.reminder.views import (
     NoRecentExportInteractionSubscriptionViewset,
     NoRecentInvestmentInteractionReminderViewset,
     NoRecentInvestmentInteractionSubscriptionViewset,
+    TaskDeletedByOthersSubscriptionViewset,
     reminder_subscription_summary_view,
     reminder_summary_view,
     TaskAmendedByOthersReminderViewset,
@@ -280,6 +281,16 @@ urlpatterns = [
             },
         ),
         name='my-tasks-task-completed-subscription',
+    ),
+    path(
+        'reminder/subscription/my-tasks-task-deleted-by-others',
+        TaskDeletedByOthersSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
+        name='my-tasks-task-deleted-by-others-subscription',
     ),
     path(
         'reminder/summary',

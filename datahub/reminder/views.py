@@ -31,6 +31,7 @@ from datahub.reminder.models import (
     TaskAssignedToMeFromOthersSubscription,
     TaskCompletedReminder,
     TaskCompletedSubscription,
+    TaskDeletedByOthersSubscription,
     TaskOverdueReminder,
     TaskOverdueSubscription,
     UpcomingEstimatedLandDateReminder,
@@ -51,6 +52,7 @@ from datahub.reminder.serializers import (
     TaskAssignedToMeFromOthersSubscriptionSerializer,
     TaskCompletedReminderSerializer,
     TaskCompletedSubscriptionSerializer,
+    TaskDeletedByOthersSubscriptionSerializer,
     TaskOverdueReminderSerializer,
     TaskOverdueSubscriptionSerializer,
     UpcomingEstimatedLandDateReminderSerializer,
@@ -166,6 +168,9 @@ def reminder_subscription_summary_view(request):
     task_completed = TaskCompletedSubscriptionSerializer(
         get_object(TaskCompletedSubscription.objects.all()),
     ).data
+    task_deleted_by_others = TaskDeletedByOthersSubscriptionSerializer(
+        get_object(TaskDeletedByOthersSubscription.objects.all()),
+    ).data
 
     return Response(
         {
@@ -178,6 +183,7 @@ def reminder_subscription_summary_view(request):
             'task_amended_by_others': task_amended_by_others,
             'task_overdue': task_overdue,
             'task_completed': task_completed,
+            'task_deleted_by_others': task_deleted_by_others,
         },
     )
 
@@ -240,6 +246,11 @@ class TaskCompletedReminderViewset(BaseReminderViewset):
 class TaskAmendedByOthersReminderViewset(BaseReminderViewset):
     serializer_class = TaskAmendedByOthersReminderSerializer
     model_class = TaskAmendedByOthersReminder
+
+
+class TaskDeletedByOthersSubscriptionViewset(BaseSubscriptionViewset):
+    serializer_class = TaskDeletedByOthersSubscriptionSerializer
+    queryset = TaskDeletedByOthersSubscription.objects.all()
 
 
 @transaction.non_atomic_requests
