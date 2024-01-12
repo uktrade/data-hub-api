@@ -1,3 +1,4 @@
+from functools import partial
 from opensearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Object, Text
 
 from datahub.search import dict_utils
@@ -7,11 +8,13 @@ from datahub.search.models import BaseSearchModel
 
 def _related_investment_project_field():
     """Field for a related investment project."""
-    return Object(properties={
-        'id': Keyword(),
-        'name': fields.NormalizedKeyword(),
-        'project_code': fields.NormalizedKeyword(),
-    })
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': fields.NormalizedKeyword(),
+            'project_code': fields.NormalizedKeyword(),
+        }
+    )
 
 
 class InvestmentProject(BaseSearchModel):
@@ -127,11 +130,16 @@ class InvestmentProject(BaseSearchModel):
     latest_interaction = fields.interaction_field()
 
     gross_value_added = Double()
+    one_list_group_global_account_manager = fields.contact_or_adviser_field()
+
+    COMPUTED_MAPPINGS = {
+        'one_list_group_global_account_manager': partial(
+            dict_utils.nested_company_global_account_manager, company_prop_name='investor_company'
+        ),
+    }
 
     MAPPINGS = {
-        'actual_uk_regions': lambda col: [
-            dict_utils.id_name_dict(c) for c in col.all()
-        ],
+        'actual_uk_regions': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'archived_by': dict_utils.contact_or_adviser_dict,
         'associated_non_fdi_r_and_d_project': dict_utils.investment_project_dict,
         'average_salary': dict_utils.id_name_dict,
@@ -141,9 +149,7 @@ class InvestmentProject(BaseSearchModel):
         'country_lost_to': dict_utils.id_name_dict,
         'country_investment_originates_from': dict_utils.id_name_dict,
         'created_by': dict_utils.adviser_dict_with_team,
-        'delivery_partners': lambda col: [
-            dict_utils.id_name_dict(c) for c in col.all()
-        ],
+        'delivery_partners': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'fdi_type': dict_utils.id_name_dict,
         'fdi_value': dict_utils.id_name_dict,
         'intermediate_company': dict_utils.id_name_dict,
@@ -168,9 +174,7 @@ class InvestmentProject(BaseSearchModel):
             dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()
         ],
         'uk_company': dict_utils.id_name_dict,
-        'uk_region_locations': lambda col: [
-            dict_utils.id_name_dict(c) for c in col.all()
-        ],
+        'uk_region_locations': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
     }
 
     SEARCH_FIELDS = (
