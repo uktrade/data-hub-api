@@ -18,6 +18,7 @@ from datahub.reminder.test.factories import (
     TaskAmendedByOthersSubscriptionFactory,
     TaskAssignedToMeFromOthersSubscriptionFactory,
     TaskCompletedSubscriptionFactory,
+    TaskDeletedByOthersSubscriptionFactory,
     TaskOverdueSubscriptionFactory,
     UpcomingEstimatedLandDateSubscriptionFactory,
     UpcomingTaskReminderSubscriptionFactory,
@@ -232,6 +233,10 @@ class TestTaskOverdueReminderSubscriptionViewset(
             'api-v4:reminder:my-tasks-task-completed-subscription',
             TaskCompletedSubscriptionFactory,
         ),
+        (
+            'api-v4:reminder:my-tasks-task-deleted-by-others-subscription',
+            TaskDeletedByOthersSubscriptionFactory,
+        ),
     ],
 )
 class TestTaskSubscriptionViewset(APITestMixin):
@@ -356,6 +361,10 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
             adviser=self.user,
             email_reminders_enabled=email_reminders_enabled,
         )
+        TaskDeletedByOthersSubscriptionFactory(
+            adviser=self.user,
+            email_reminders_enabled=email_reminders_enabled,
+        )
 
         url = reverse(self.url_name)
         response = self.api_client.get(url)
@@ -393,6 +402,9 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
                 'reminder_days': [10, 20, 40],
             },
             'task_completed': {
+                'email_reminders_enabled': True,
+            },
+            'task_deleted_by_others': {
                 'email_reminders_enabled': True,
             },
         }
@@ -435,6 +447,9 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
                 'reminder_days': [],
             },
             'task_completed': {
+                'email_reminders_enabled': False,
+            },
+            'task_deleted_by_others': {
                 'email_reminders_enabled': False,
             },
         }
