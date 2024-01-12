@@ -28,7 +28,6 @@ from datahub.task.emails import (
     TaskAmendedByOthersEmailTemplate,
     TaskAssignedToOthersEmailTemplate,
     TaskCompletedEmailTemplate,
-    TaskDeletedByOthersEmailTemplate,
     TaskOverdueEmailTemplate,
     UpcomingTaskEmailTemplate,
 )
@@ -45,6 +44,7 @@ def schedule_advisers_added_to_task(task, adviser_ids):
         schedule_create_task_overdue_subscription_task(adviser_id)
         schedule_create_task_completed_subscription_task(adviser_id)
         schedule_create_task_amended_by_others_subscription_task(adviser_id)
+        schedule_create_task_deleted_by_others_subscription_task(adviser_id)
 
 
 def schedule_create_task_reminder_subscription_task(adviser_id):
@@ -619,60 +619,14 @@ def create_task_deleted_by_others_subscription(adviser_id):
         )
 
 
-def notify_adviser_deleted_by_others_task(task):
-    """
-    Send a notification to all advisers, excluding the adviser who deleted the task,
-    when task deleted.
-    """
-    advisers_to_notify = task.advisers.exclude(id=task.modified_by.id)
-
-    if not advisers_to_notify.exists():
-        return
-
-    for adviser in advisers_to_notify:
-        existing_reminder = TaskDeletedByOthersReminder.objects.filter(
-            task=task,
-            adviser=adviser,
-        ).first()
-        if existing_reminder:
-            continue
-
-        reminder = TaskDeletedByOthersReminder.objects.create(
-            adviser=adviser,
-            event=f'{task} deleted by {task.modified_by.name}',
-            task=task,
-        )
-
-        adviser_subscription = TaskDeletedByOthersSubscription.objects.filter(
-            adviser=adviser,
-        ).first()
-        if not adviser_subscription:
-            return
-
-        if adviser_subscription.email_reminders_enabled:
-            send_task_email(
-                adviser=adviser,
-                task=task,
-                reminder=reminder,
-                update_task=update_task_deleted_by_others_email_status,
-                email_template_class=TaskDeletedByOthersEmailTemplate,
-            )
-        else:
-            logger.info(
-                f'No email for TaskDeletedByOthersReminder with id {reminder.id} sent to adviser '
-                f'{adviser.id} for task {task.id}, as email reminders are turned off in their '
-                'subscription',
-            )
-
-
-def schedule_notify_advisers_task_deleted_by_others(task, created):
+def schedule_create_task_deleted_by_others_subscription_task(adviser_id):
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
-        function=notify_adviser_deleted_by_others_task,
-        function_args=(task, created),
+        function=create_task_deleted_by_others_subscription,
+        function_args=(adviser_id,),
     )
     logger.info(
-        f'Task {job.id} schedule_notify_advisers_task_deleted_by_others',
+        f'Task {job.id} create_task_deleted_by_others_subscription',
     )
 
 
