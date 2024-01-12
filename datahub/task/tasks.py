@@ -16,7 +16,6 @@ from datahub.reminder.models import (
     TaskAssignedToMeFromOthersSubscription,
     TaskCompletedReminder,
     TaskCompletedSubscription,
-    TaskDeletedByOthersReminder,
     TaskDeletedByOthersSubscription,
     TaskOverdueReminder,
     TaskOverdueSubscription,
