@@ -260,6 +260,5 @@ def _list_of_dicts(dict_factory, manager):
 def nested_company_global_account_manager(obj, company_prop_name):
     field = getattr(obj, company_prop_name, None)
     if field is None:
-        raise ValueError(f'The company prop "{company_prop_name}" does not exist.')
-
+        return None
     return contact_or_adviser_dict(field.get_one_list_group_global_account_manager())
