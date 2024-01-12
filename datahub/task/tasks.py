@@ -16,7 +16,6 @@ from datahub.reminder.models import (
     TaskAssignedToMeFromOthersSubscription,
     TaskCompletedReminder,
     TaskCompletedSubscription,
-    TaskDeletedByOthersReminder,
     TaskDeletedByOthersSubscription,
     TaskOverdueReminder,
     TaskOverdueSubscription,
@@ -591,18 +590,6 @@ def create_tasks_overdue_reminder(
         )
 
     return reminder
-
-
-def update_task_deleted_by_others_email_status(email_notification_id, reminder_ids):
-    reminders = TaskDeletedByOthersReminder.all_objects.filter(id__in=reminder_ids)
-    for reminder in reminders:
-        reminder.email_notification_id = email_notification_id
-        reminder.save()
-
-    logger.info(
-        'Task update_task_deleted_by_others_email_status completed, setting '
-        f'email_notification_id to {email_notification_id} for reminder_ids {reminder_ids}',
-    )
 
 
 def create_task_deleted_by_others_subscription(adviser_id):
