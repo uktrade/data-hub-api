@@ -21,7 +21,7 @@ python-dateutil==2.8.2
 psycopg2==2.9.9
 psycogreen==1.0.2
 
-boto3==1.34.14
+boto3==1.34.19
 
 notifications-python-client==9.0.0
 
