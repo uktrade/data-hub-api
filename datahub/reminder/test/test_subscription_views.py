@@ -237,12 +237,16 @@ class TestTaskOverdueReminderSubscriptionViewset(
             'api-v4:reminder:my-tasks-task-deleted-by-others-subscription',
             TaskDeletedByOthersSubscriptionFactory,
         ),
+        (
+            'api-v4:reminder:my-tasks-task-deleted-by-others-subscription',
+            TaskDeletedByOthersSubscriptionFactory,
+        ),
     ],
 )
 class TestTaskSubscriptionViewset(APITestMixin):
     """
     Tests for the task assigned to me from others,
-    task amended by others, task completed subscription views.
+    task amended by others, task completed subscription views, task deleted by others.
     """
 
     def test_not_authed(self, url_name, factory):

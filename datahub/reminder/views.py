@@ -31,6 +31,7 @@ from datahub.reminder.models import (
     TaskAssignedToMeFromOthersSubscription,
     TaskCompletedReminder,
     TaskCompletedSubscription,
+    TaskDeletedByOthersReminder,
     TaskDeletedByOthersSubscription,
     TaskOverdueReminder,
     TaskOverdueSubscription,
@@ -52,6 +53,7 @@ from datahub.reminder.serializers import (
     TaskAssignedToMeFromOthersSubscriptionSerializer,
     TaskCompletedReminderSerializer,
     TaskCompletedSubscriptionSerializer,
+    TaskDeletedByOthersReminderSerializer,
     TaskDeletedByOthersSubscriptionSerializer,
     TaskOverdueReminderSerializer,
     TaskOverdueSubscriptionSerializer,
@@ -122,6 +124,11 @@ class TaskAmendedByOthersSubscriptionViewset(BaseSubscriptionViewset):
 class TaskCompletedSubscriptionViewset(BaseSubscriptionViewset):
     serializer_class = TaskCompletedSubscriptionSerializer
     queryset = TaskCompletedSubscription.objects.all()
+
+
+class TaskDeletedByOthersSubscriptionViewset(BaseSubscriptionViewset):
+    serializer_class = TaskDeletedByOthersSubscriptionSerializer
+    queryset = TaskDeletedByOthersSubscription.objects.all()
 
 
 @transaction.non_atomic_requests
@@ -248,9 +255,9 @@ class TaskAmendedByOthersReminderViewset(BaseReminderViewset):
     model_class = TaskAmendedByOthersReminder
 
 
-class TaskDeletedByOthersSubscriptionViewset(BaseSubscriptionViewset):
-    serializer_class = TaskDeletedByOthersSubscriptionSerializer
-    queryset = TaskDeletedByOthersSubscription.objects.all()
+class TaskDeletedByOthersReminderViewset(BaseReminderViewset):
+    serializer_class = TaskDeletedByOthersReminderSerializer
+    model_class = TaskDeletedByOthersReminder
 
 
 @transaction.non_atomic_requests
@@ -307,6 +314,9 @@ def reminder_summary_view(request):
     task_completed = TaskCompletedReminder.objects.filter(
         adviser=request.user,
     ).count()
+    task_deleted_by_others = TaskDeletedByOthersReminder.objects.filter(
+        adviser=request.user,
+    ).count()
 
     total_count = sum(
         [
@@ -320,6 +330,7 @@ def reminder_summary_view(request):
             task_amended_by_others,
             task_overdue,
             task_completed,
+            task_deleted_by_others,
         ],
     )
 
@@ -341,6 +352,7 @@ def reminder_summary_view(request):
                 'task_amended_by_others': task_amended_by_others,
                 'task_overdue': task_overdue,
                 'task_completed': task_completed,
+                'task_deleted_by_others': task_deleted_by_others,
             },
         },
     )
