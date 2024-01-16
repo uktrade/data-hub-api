@@ -761,7 +761,10 @@ class TestGetReminderSummaryView(APITestMixin):
             ],
         )
         reminder_count = 3
-        reminder_categories = 10  # used for finding the total number of reminders in this test
+
+        # Update reminder_categoryies after adding/removing additional reminder types.
+        reminder_categories = 11
+
         UpcomingEstimatedLandDateReminderFactory.create_batch(
             reminder_count,
             adviser=self.user,
@@ -867,6 +870,7 @@ class TestGetReminderSummaryView(APITestMixin):
                 'task_assigned_to_me_from_others': 0,
                 'task_overdue': 0,
                 'task_completed': 0,
+                'task_deleted_by_others': 0,
             },
         }
 
