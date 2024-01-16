@@ -8,11 +8,12 @@ import pytest
 import pytz
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.db.models import (Sum)
 
 from freezegun import freeze_time
 
 from datahub.company.test.factories import ContactFactory
-from datahub.export_win.models import CustomerResponseToken
+from datahub.export_win.models import CustomerResponseToken, Breakdown
 from datahub.export_win.tasks import (
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
@@ -24,7 +25,8 @@ from datahub.export_win.tasks import (
     update_notify_email_delivery_status_for_customer_response_token,
 )
 from datahub.export_win.test.factories import (
-    CustomerResponseFactory, CustomerResponseTokenFactory, WinFactory,
+    CustomerResponseFactory, CustomerResponseTokenFactory,
+    BreakdownFactory,
 )
 from datahub.notification.constants import NotifyServiceName
 from datahub.reminder.models import EmailDeliveryStatus
@@ -367,39 +369,34 @@ def test_get_all_fields_for_lead_officer_email_receipt_no_success(
             uuid=mock_customer_response_instance.win.id)
 
 
-def test_get_all_fields_for_lead_officer_email_receipt_yes_success(
-    mock_customer_response: MagicMock,
-    mock_customer_response_token: MagicMock,
-    mock_win: MagicMock,
-    mock_breakdown_model: MagicMock,
-):
+def test_get_all_fields_for_lead_officer_email_receipt_yes_success():
+    customer_response = CustomerResponseFactory()
+    token = CustomerResponseTokenFactory(customer_response=customer_response)
+    company_contact = token.company_contact
+    win = customer_response.win
+
+    # Create breakdown values of win in batch
+    BreakdownFactory.create_batch(5, win=win, value=10000)
+
+    result = get_all_fields_for_lead_officer_email_receipt_yes(
+        token,
+        customer_response,
+    )
+
+    breakdowns = Breakdown.objects.filter(win=win)
+    expected_total_export_win_value = breakdowns.aggregate(total_value=Sum('value'))[
+        'total_value']
+
     """
     Testing to get all fields for lead officer approved email receipt (with total_export_win_value)
     """
-    mock_customer_response_instance = MagicMock(spec=CustomerResponseFactory)
-    mock_customer_response_token_instance = MagicMock(spec=CustomerResponseTokenFactory)
-    mock_win_instance = MagicMock(spec=WinFactory)
-    mock_customer_response_instance.win = mock_win_instance
-    mock_customer_response_instance.win.id = uuid.uuid4()
-    mock_customer_response_token_instance.company_contact.first_name = 'John'
-    mock_customer_response_token_instance.company_contact.last_name = 'Doe'
-    mock_customer_response_token_instance.company_contact.company.name = 'Company Name'
-    mock_win_instance.country.name = 'Country'
-    mock_win_instance.goods_vs_services.name = 'Goods and Services'
-    mock_win_instance.lead_officer.email = 'lead_officer@example.com'
-    mock_win_instance.lead_officer.first_name = 'Sarah'
-    expected_total_export_win_value = 50000
-    with patch('datahub.export_win.models.Breakdown.objects.filter') as mock_filter:
-        mock_filter.return_value.aggregate.return_value = {
-            'value__sum': expected_total_export_win_value}
-        result = get_all_fields_for_lead_officer_email_receipt_yes(
-            mock_customer_response_token_instance, mock_customer_response_instance)
-        assert result['lead_officer_email'] == 'lead_officer@example.com'
-        assert result['country_destination'] == 'Country'
-        assert result['client_fullname'] == 'John Doe'
-        assert result['lead_officer_first_name'] == 'Sarah'
-        assert result['total_export_win_value'] == expected_total_export_win_value
-        assert result['goods_services'] == 'Goods and Services'
-        assert result['client_company_name'] == 'Company Name'
-        assert result['url'] == settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(
-            uuid=mock_customer_response_instance.win.id)
+    # Assertions for the expected values
+    assert result['lead_officer_email_address'] == win.lead_officer_email_address
+    assert result['country_destination'] == win.country.name
+    assert result['client_fullname'] == company_contact.name
+    assert result['lead_officer_first_name'] == win.lead_officer.first_name
+    assert result['total_export_win_value'] == expected_total_export_win_value
+    assert result['goods_services'] == win.goods_vs_services.name
+    assert result['client_company_name'] == company_contact.company.name
+    assert result['url'] == settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(
+        uuid=win.id)
