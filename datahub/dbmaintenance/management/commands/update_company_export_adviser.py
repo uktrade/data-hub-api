@@ -6,10 +6,11 @@ from datahub.dbmaintenance.utils import parse_limited_string, parse_uuid
 
 
 class Command(CSVBaseCommand):
-    """Process one single row."""
+    """Command to update export project owner."""
 
     def _process_row(self, row, simulate=False, **options):
-        pk = parse_uuid(row['company_id'])
+        """Process one single row."""
+        pk = parse_uuid(row['export_project_id'])
         company_export = CompanyExport.objects.get(pk=pk)
         old_adviser = parse_limited_string(row['old_adviser_id'])
         new_adviser = parse_limited_string(row['new_adviser_id'])
