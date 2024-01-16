@@ -194,7 +194,7 @@ class WinSerializer(ModelSerializer):
         )
 
     def create(self, validated_data):
-        """Create win and corresponding breakdowns."""
+        """Create win, corresponding breakdowns and advisers."""
         breakdowns = validated_data.pop('breakdowns')
         advisers = validated_data.pop('advisers', [])
         company_contacts = validated_data.pop('company_contacts')
@@ -215,3 +215,36 @@ class WinSerializer(ModelSerializer):
             win.associated_programme.set(associated_programme)
             win.team_members.set(team_members)
         return win
+
+    def update(self, instance, validated_data):
+        """Update win, corresponding breakdowns and advisers."""
+        breakdowns = validated_data.pop('breakdowns', None)
+        advisers = validated_data.pop('advisers', None)
+        company_contacts = validated_data.pop('company_contacts', None)
+        type_of_support = validated_data.pop('type_of_support', None)
+        associated_programme = validated_data.pop('associated_programme', None)
+        team_members = validated_data.pop('team_members', None)
+        with transaction.atomic():
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+            instance.save()
+
+            if breakdowns is not None:
+                Breakdown.objects.filter(win=instance).delete()
+                for breakdown in breakdowns:
+                    Breakdown.objects.create(win=instance, **breakdown)
+
+            if advisers is not None:
+                WinAdviser.objects.filter(win=instance).delete()
+                for win_adviser in advisers:
+                    WinAdviser.objects.create(win=instance, **win_adviser)
+
+            if company_contacts is not None:
+                instance.company_contacts.set(company_contacts)
+            if type_of_support is not None:
+                instance.type_of_support.set(type_of_support)
+            if associated_programme is not None:
+                instance.associated_programme.set(associated_programme)
+            if team_members is not None:
+                instance.team_members.set(team_members)
+        return instance

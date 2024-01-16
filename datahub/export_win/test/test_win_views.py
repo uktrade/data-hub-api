@@ -4,6 +4,7 @@ from django.utils.timezone import now
 
 from rest_framework import status
 from rest_framework.reverse import reverse
+from reversion.models import Version
 
 from datahub.company.test.factories import (
     AdviserFactory,
@@ -33,6 +34,7 @@ from datahub.export_win.models import Win
 from datahub.export_win.test.factories import (
     BreakdownFactory,
     CustomerResponseFactory,
+    WinAdviserFactory,
     WinFactory,
 )
 from datahub.metadata.test.factories import TeamFactory
@@ -466,6 +468,8 @@ class TestCreateWinView(APITestMixin):
 
     def test_create_win_all_fields(self):
         """Tests successfully creating an export win with all fields only."""
+        assert Version.objects.count() == 0
+
         url = reverse('api-v4:export-win:collection')
 
         adviser = AdviserFactory()
@@ -708,3 +712,449 @@ class TestCreateWinView(APITestMixin):
         }
 
         assert response_data == expected_response_data
+
+        # check version created
+        assert Version.objects.get_for_object(win).count() == 1
+        version = Version.objects.get_for_object(win).first()
+        assert version.revision.user == self.user
+
+
+class TestUpdateWinView(APITestMixin):
+    """Update export win view tests."""
+
+    def test_update_win_all_fields(self):
+        """Tests successfully creating an export win with all fields only."""
+        win = WinFactory()
+
+        assert Version.objects.count() == 0
+
+        url = reverse('api-v4:export-win:item', kwargs={'pk': win.pk})
+        BreakdownFactory.create_batch(3, win=win)
+        WinAdviserFactory.create_batch(2, win=win)
+        adviser = AdviserFactory()
+        additional_team_member = AdviserFactory()
+        team_member = AdviserFactory()
+        lead_officer = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        date_won = now().date()
+        export_experience = ExportExperienceFactory()
+
+        request_data = {
+            'adviser': {
+                'id': str(adviser.id),
+            },
+            'lead_officer': {
+                'id': str(lead_officer.id),
+            },
+            'hq_team': {
+                'id': HQTeamRegionOrPostConstant.td_events_services.value.id,
+            },
+            'team_type': {
+                'id': TeamTypeConstant.itt.value.id,
+            },
+            'business_potential': {
+                'id': BusinessPotentialConstant.high_export_potential.value.id,
+            },
+            'company': {
+                'id': str(company.id),
+            },
+            'company_contacts': [
+                {
+                    'id': str(contact.id),
+                },
+            ],
+            'customer_location': {
+                'id': UKRegionConstant.england.value.id,
+            },
+            'business_type': 'The best type',
+            'description': 'Description',
+            'name_of_export': 'Sand',
+            'date': date_won,
+            'country': CountryConstant.canada.value.id,
+            'type': {
+                'id': WinTypeConstant.both.value.id,
+            },
+            'total_expected_export_value': 1000000,
+            'total_expected_non_export_value': 1000000,
+            'total_expected_odi_value': 1000000,
+            'goods_vs_services': {
+                'id': ExpectedValueRelationConstant.both.value.id,
+            },
+            'sector': {
+                'id': SectorConstant.aerospace_assembly_aircraft.value.id,
+            },
+            'type_of_support': [
+                {
+                    'id': SupportTypeConstant.political_and_economic_briefing.value.id,
+                },
+            ],
+            'associated_programme': [
+                {
+                    'id': AssociatedProgrammeConstant.afterburner.value.id,
+                },
+            ],
+            'is_personally_confirmed': False,
+            'is_line_manager_confirmed': False,
+            'name_of_customer': 'Overseas Customer',
+            'name_of_customer_confidential': True,
+            'export_experience': {
+                'id': str(export_experience.id),
+            },
+            'location': 'Park',
+            'breakdowns': [
+                {
+                    'type': {
+                        'id': BreakdownTypeConstant.export.value.id,
+                    },
+                    'value': 1000,
+                    'year': 2023,
+                },
+            ],
+            'team_members': [
+                {
+                    'id': str(team_member.id),
+                },
+            ],
+            'advisers': [
+                {
+                    'adviser': {
+                        'id': str(additional_team_member.id),
+                    },
+                    'hq_team': {
+                        'id': HQTeamRegionOrPostConstant.td_events_services.value.id,
+                    },
+                    'team_type': {
+                        'id': TeamTypeConstant.itt.value.id,
+                    },
+                },
+            ],
+        }
+        assert win.breakdowns.count() == 3
+        assert win.advisers.count() == 2
+        response = self.api_client.patch(url, data=request_data)
+        response_data = response.json()
+        assert response.status_code == status.HTTP_200_OK
+        win.refresh_from_db()
+        associated_programme = win.associated_programme.first()
+        type_of_support = win.type_of_support.first()
+
+        response_breakdowns = response_data.pop('breakdowns')
+        assert len(response_breakdowns) == 1
+
+        expected_breakdown = {
+            'id': response_breakdowns[0]['id'],
+            'type': {
+                'id': BreakdownTypeConstant.export.value.id,
+                'name': BreakdownTypeConstant.export.value.name,
+            },
+            'value': 1000,
+            'year': 2023,
+        }
+
+        assert response_breakdowns[0] == expected_breakdown
+
+        win_adviser = win.advisers.first()
+        expected_team_member = win.team_members.first()
+
+        expected_response_data = {
+            'id': str(win.id),
+            'adviser': {
+                'id': str(adviser.id),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name,
+            },
+            'company': {
+                'id': str(company.id),
+                'name': company.name,
+            },
+            'country': {
+                'id': str(CountryConstant.canada.value.id),
+                'name': CountryConstant.canada.value.name,
+            },
+            'associated_programme': [
+                {
+                    'id': str(associated_programme.id),
+                    'name': associated_programme.name,
+                },
+            ],
+            'company_contacts': [
+                {
+                    'id': str(contact.id),
+                    'name': contact.name,
+                    'email': contact.email,
+                },
+            ],
+            'audit': win.audit,
+            'business_potential': {
+                'id': str(win.business_potential_id),
+                'name': win.business_potential.name,
+            },
+            'business_type': 'The best type',
+            'complete': win.complete,
+            'created_on': format_date_or_datetime(win.created_on),
+            'customer_location': {
+                'id': UKRegionConstant.england.value.id,
+                'name': UKRegionConstant.england.value.name,
+            },
+            'customer_response': None,
+            'date': format_date_or_datetime(date_won),
+            'description': 'Description',
+            'export_experience': {
+                'id': str(export_experience.id),
+                'name': export_experience.name,
+            },
+            'goods_vs_services': {
+                'id': ExpectedValueRelationConstant.both.value.id,
+                'name': ExpectedValueRelationConstant.both.value.name,
+            },
+            'has_hvo_specialist_involvement': win.has_hvo_specialist_involvement,
+            'hq_team': {
+                'id': HQTeamRegionOrPostConstant.td_events_services.value.id,
+                'name': HQTeamRegionOrPostConstant.td_events_services.value.name,
+            },
+            'hvc': {
+                'id': str(win.hvc.id),
+                'name': win.hvc.name,
+            },
+            'hvo_programme': None,
+            'is_e_exported': win.is_e_exported,
+            'is_line_manager_confirmed': False,
+            'is_personally_confirmed': False,
+            'is_prosperity_fund_related': win.is_prosperity_fund_related,
+            'lead_officer': {
+                'id': str(lead_officer.id),
+                'first_name': lead_officer.first_name,
+                'last_name': lead_officer.last_name,
+                'name': lead_officer.name,
+            },
+            'location': 'Park',
+            'modified_on': format_date_or_datetime(win.modified_on),
+            'name_of_customer': win.name_of_customer,
+            'name_of_customer_confidential': win.name_of_customer_confidential,
+            'name_of_export': win.name_of_export,
+            'sector': {'id': str(win.sector_id), 'name': win.sector.name},
+            'team_type': {'id': str(win.team_type_id), 'name': win.team_type.name},
+            'total_expected_export_value': win.total_expected_export_value,
+            'total_expected_non_export_value': win.total_expected_non_export_value,
+            'total_expected_odi_value': win.total_expected_odi_value,
+            'type': {'id': WinTypeConstant.both.value.id, 'name': WinTypeConstant.both.value.name},
+            'type_of_support': [
+                {
+                    'id': str(type_of_support.id),
+                    'name': type_of_support.name,
+                },
+            ],
+            'team_members': [
+                {
+                    'id': str(expected_team_member.id),
+                    'first_name': expected_team_member.first_name,
+                    'last_name': expected_team_member.last_name,
+                    'name': expected_team_member.name,
+                },
+            ],
+            'advisers': [
+                {
+                    'id': str(win_adviser.id),
+                    'adviser': {
+                        'id': str(win_adviser.adviser.id),
+                        'first_name': win_adviser.adviser.first_name,
+                        'last_name': win_adviser.adviser.last_name,
+                        'name': win_adviser.adviser.name,
+                    },
+                    'location': win_adviser.location,
+                    'team_type': {
+                        'id': str(win_adviser.team_type.id),
+                        'name': win_adviser.team_type.name,
+                    },
+                    'hq_team': {
+                        'id': str(win_adviser.hq_team.id),
+                        'name': win_adviser.hq_team.name,
+                    },
+                },
+            ],
+        }
+
+        assert response_data == expected_response_data
+
+        # check version created
+        assert Version.objects.get_for_object(win).count() == 1
+        version = Version.objects.get_for_object(win).first()
+        assert version.revision.user == self.user
+
+    def test_doesnt_update_related_fields_when_not_supplied(self):
+        """Tests related fields don't get updated when not supplied."""
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+
+        win = WinFactory(
+            company=company,
+            company_contacts=[contact],
+            type_of_support=[
+                SupportTypeConstant.political_and_economic_briefing.value.id,
+            ],
+            associated_programme=[
+                AssociatedProgrammeConstant.afterburner.value.id,
+            ],
+        )
+
+        breakdown = BreakdownFactory(win=win)
+        win_adviser = WinAdviserFactory(win=win)
+
+        assert Version.objects.count() == 0
+
+        url = reverse('api-v4:export-win:item', kwargs={'pk': win.pk})
+        request_data = {
+            'business_type': 'The best type',
+            'description': 'Description',
+        }
+        assert win.breakdowns.count() == 1
+        assert win.advisers.count() == 1
+        response = self.api_client.patch(url, data=request_data)
+        response_data = response.json()
+        assert response.status_code == status.HTTP_200_OK
+        win.refresh_from_db()
+
+        response_breakdowns = response_data.pop('breakdowns')
+        assert len(response_breakdowns) == 1
+
+        expected_breakdown = {
+            'id': str(breakdown.id),
+            'type': {
+                'id': str(breakdown.type.id),
+                'name': breakdown.type.name,
+            },
+            'value': breakdown.value,
+            'year': breakdown.year,
+        }
+
+        assert response_breakdowns[0] == expected_breakdown
+
+        expected_response_data = {
+            'id': str(win.id),
+            'adviser': {
+                'id': str(win.adviser.id),
+                'first_name': win.adviser.first_name,
+                'last_name': win.adviser.last_name,
+                'name': win.adviser.name,
+            },
+            'company': {
+                'id': str(win.company.id),
+                'name': win.company.name,
+            },
+            'country': {
+                'id': str(win.country.id),
+                'name': win.country.name,
+            },
+            'associated_programme': [
+                {
+                    'id': AssociatedProgrammeConstant.afterburner.value.id,
+                    'name': AssociatedProgrammeConstant.afterburner.value.name,
+                },
+            ],
+            'company_contacts': [
+                {
+                    'id': str(contact.id),
+                    'name': contact.name,
+                    'email': contact.email,
+                },
+            ],
+            'audit': win.audit,
+            'business_potential': {
+                'id': str(win.business_potential.id),
+                'name': win.business_potential.name,
+            },
+            'business_type': win.business_type,
+            'complete': win.complete,
+            'created_on': format_date_or_datetime(win.created_on),
+            'customer_location': {
+                'id': str(win.customer_location.id),
+                'name': win.customer_location.name,
+            },
+            'date': format_date_or_datetime(win.date),
+            'description': win.description,
+            'export_experience': {
+                'id': str(win.export_experience.id),
+                'name': win.export_experience.name,
+            },
+            'goods_vs_services': {
+                'id': str(win.goods_vs_services.id),
+                'name': win.goods_vs_services.name,
+            },
+            'has_hvo_specialist_involvement': win.has_hvo_specialist_involvement,
+            'hq_team': {
+                'id': str(win.hq_team.id),
+                'name': win.hq_team.name,
+            },
+            'hvc': {
+                'id': str(win.hvc.id),
+                'name': win.hvc.name,
+            },
+            'hvo_programme': None,
+            'is_e_exported': win.is_e_exported,
+            'is_line_manager_confirmed': win.is_line_manager_confirmed,
+            'is_personally_confirmed': win.is_personally_confirmed,
+            'is_prosperity_fund_related': win.is_prosperity_fund_related,
+            'lead_officer': {
+                'id': str(win.lead_officer.id),
+                'first_name': win.lead_officer.first_name,
+                'last_name': win.lead_officer.last_name,
+                'name': win.lead_officer.name,
+            },
+            'location': win.location,
+            'modified_on': format_date_or_datetime(win.modified_on),
+            'name_of_customer': win.name_of_customer,
+            'name_of_customer_confidential': win.name_of_customer_confidential,
+            'name_of_export': win.name_of_export,
+            'sector': {
+                'id': str(win.sector.id),
+                'name': win.sector.name,
+            },
+            'team_type': {
+                'id': str(win.team_type.id),
+                'name': win.team_type.name,
+            },
+            'total_expected_export_value': win.total_expected_export_value,
+            'total_expected_non_export_value': win.total_expected_non_export_value,
+            'total_expected_odi_value': win.total_expected_odi_value,
+            'type': {
+                'id': str(win.type.id),
+                'name': win.type.name,
+            },
+            'type_of_support': [
+                {
+                    'id': SupportTypeConstant.political_and_economic_briefing.value.id,
+                    'name': SupportTypeConstant.political_and_economic_briefing.value.name,
+                },
+            ],
+            'team_members': [],
+            'advisers': [
+                {
+                    'id': str(win_adviser.id),
+                    'adviser': {
+                        'id': str(win_adviser.adviser.id),
+                        'first_name': win_adviser.adviser.first_name,
+                        'last_name': win_adviser.adviser.last_name,
+                        'name': win_adviser.adviser.name,
+                    },
+                    'location': win_adviser.location,
+                    'team_type': {
+                        'id': str(win_adviser.team_type.id),
+                        'name': win_adviser.team_type.name,
+                    },
+                    'hq_team': {
+                        'id': str(win_adviser.hq_team.id),
+                        'name': win_adviser.hq_team.name,
+                    },
+                },
+            ],
+            'customer_response': None,
+        }
+
+        assert response_data == expected_response_data
+
+        # check version created
+        assert Version.objects.get_for_object(win).count() == 1
+        version = Version.objects.get_for_object(win).first()
+        assert version.revision.user == self.user
