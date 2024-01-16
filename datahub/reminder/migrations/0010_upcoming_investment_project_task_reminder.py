@@ -26,7 +26,6 @@ class Migration(migrations.Migration):
                 ('email_notification_id', models.UUIDField(blank=True, null=True)),
                 ('email_delivery_status', models.CharField(blank=True, choices=[('sending', 'Sending'), ('delivered', 'Delivered'), ('permanent-failure', 'Permanent failure'), ('temporary-failure', 'Temporary failure'), ('technical-failure', 'Technical failure'), ('unknown', 'Unknown')], default='unknown', help_text='Email delivery status', max_length=255)),
                 ('adviser', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('investment_project_task', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='upcoming_investment_project_task_reminders', to='task.investmentprojecttask')),
             ],
             options={
                 'abstract': False,
