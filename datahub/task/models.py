@@ -27,6 +27,9 @@ class TaskPermission(StrEnum):
 @reversion.register_base_model()
 class Task(ArchivableModel, BaseModel):
     """Representation of a task."""
+    class Status(models.TextChoices):
+        ACTIVE = ('active', 'Active')
+        COMPLETE = ('complete', 'Complete')
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     title = models.CharField(max_length=MAX_LENGTH)
@@ -59,6 +62,11 @@ class Task(ArchivableModel, BaseModel):
         null=True,
         on_delete=models.CASCADE,
         related_name='task_interaction',
+    )
+    status = models.CharField(
+        max_length=MAX_LENGTH,
+        choices=Status.choices,
+        default=Status.ACTIVE,
     )
 
     # override the save method and calculate reminder_date
