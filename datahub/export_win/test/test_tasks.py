@@ -2,7 +2,6 @@ import uuid
 from datetime import date, datetime, timedelta
 
 from unittest import mock
-from unittest.mock import MagicMock, patch
 
 import pytest
 import pytz
@@ -13,7 +12,7 @@ from django.db.models import (Sum)
 from freezegun import freeze_time
 
 from datahub.company.test.factories import ContactFactory
-from datahub.export_win.models import CustomerResponseToken, Breakdown
+from datahub.export_win.models import Breakdown, CustomerResponseToken
 from datahub.export_win.tasks import (
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
@@ -25,33 +24,12 @@ from datahub.export_win.tasks import (
     update_notify_email_delivery_status_for_customer_response_token,
 )
 from datahub.export_win.test.factories import (
-    CustomerResponseFactory, CustomerResponseTokenFactory,
-    BreakdownFactory,
+    BreakdownFactory, CustomerResponseFactory, CustomerResponseTokenFactory,
 )
 from datahub.notification.constants import NotifyServiceName
 from datahub.reminder.models import EmailDeliveryStatus
 
 pytestmark = pytest.mark.django_db
-
-
-@pytest.fixture
-def mock_customer_response():
-    return MagicMock()
-
-
-@pytest.fixture
-def mock_customer_response_token():
-    return MagicMock()
-
-
-@pytest.fixture
-def mock_win():
-    return MagicMock()
-
-
-@pytest.fixture
-def mock_breakdown_model():
-    return MagicMock()
 
 
 @pytest.fixture()
@@ -332,41 +310,28 @@ def test_create_token_with_existing_expired_and_unexpired_tokens():
     assert existing_token.expires_on <= utc_now
 
 
-def test_get_all_fields_for_lead_officer_email_receipt_no_success(
-    mock_customer_response: MagicMock,
-    mock_customer_response_token: MagicMock,
-    mock_win: MagicMock,
-):
+def test_get_all_fields_for_lead_officer_email_receipt_no_success():
+    customer_response = CustomerResponseFactory()
+    token = CustomerResponseTokenFactory(customer_response=customer_response)
+    company_contact = token.company_contact
+    win = customer_response.win
+
+    result = get_all_fields_for_lead_officer_email_receipt_no(
+        token,
+        customer_response,
+    )
     """
     Testing to get all fields for lead officer rejected email receipt
     """
-    mock_customer_response_instance = MagicMock()
-    mock_customer_response_token_instance = MagicMock()
-    mock_customer_response_instance.win = mock_win
-    mock_customer_response_instance.win.id = uuid.uuid4()
-    mock_customer_response_token_instance.company_contact.email = 'test@example.com'
-    mock_customer_response_token_instance.company_contact.first_name = 'John'
-    mock_customer_response_token_instance.company_contact.last_name = 'Doe'
-    mock_customer_response_token_instance.company_contact.company.name = 'Company Name'
-    mock_win.country.name = 'Country'
-    mock_win.goods_vs_services.name = 'Goods and Services'
-    mock_win.lead_officer.email = 'lead_officer@example.com'
-    mock_win.lead_officer.first_name = 'Sarah'
-    mock_win.lead_officer.last_name = 'Smith'
-    with patch('datahub.export_win.models.CustomerResponse.objects.get') as mock_response_get, \
-            patch('datahub.export_win.models.CustomerResponseToken.objects.get') as mock_token_get:
-        mock_response_get.return_value = mock_customer_response_instance
-        mock_token_get.return_value = mock_customer_response_token_instance
-        result = get_all_fields_for_lead_officer_email_receipt_no(
-            mock_customer_response_token_instance, mock_customer_response_instance)
-        assert result['lead_officer_email'] == 'lead_officer@example.com'
-        assert result['country_destination'] == 'Country'
-        assert result['client_fullname'] == 'John Doe'
-        assert result['lead_officer_first_name'] == 'Sarah'
-        assert result['goods_services'] == 'Goods and Services'
-        assert result['client_company_name'] == 'Company Name'
-        assert result['url'] == settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(
-            uuid=mock_customer_response_instance.win.id)
+    # Assertions for the expected values
+    assert result['lead_officer_email'] == win.lead_officer.email
+    assert result['country_destination'] == win.country.name
+    assert result['client_fullname'] == company_contact.name
+    assert result['lead_officer_first_name'] == win.lead_officer.first_name
+    assert result['goods_services'] == win.goods_vs_services.name
+    assert result['client_company_name'] == company_contact.company.name
+    assert result['url'] == settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(
+        uuid=win.id)
 
 
 def test_get_all_fields_for_lead_officer_email_receipt_yes_success():
@@ -391,7 +356,7 @@ def test_get_all_fields_for_lead_officer_email_receipt_yes_success():
     Testing to get all fields for lead officer approved email receipt (with total_export_win_value)
     """
     # Assertions for the expected values
-    assert result['lead_officer_email_address'] == win.lead_officer_email_address
+    assert result['lead_officer_email'] == win.lead_officer.email
     assert result['country_destination'] == win.country.name
     assert result['client_fullname'] == company_contact.name
     assert result['lead_officer_first_name'] == win.lead_officer.first_name

@@ -76,7 +76,7 @@ def get_all_fields_for_lead_officer_email_receipt_yes(token, customer_response):
     total_export_win_value = Breakdown.objects.filter(win=win).aggregate(
         Sum('value'))['value__sum'] or 0
     details = {
-        'lead_officer_email_address': win.lead_officer_email_address,
+        'lead_officer_email': win.lead_officer.email,
         'country_destination': win.country.name,
         'client_fullname': company_contact.name,
         'lead_officer_first_name': win.lead_officer.first_name,
