@@ -368,6 +368,7 @@ def test_get_basic_search_query():
                                 'service.name',
                                 'service.name.trigram',
                                 'simpleton.name',
+                                'status',
                                 'subject',
                                 'subject.english',
                                 'subject.trigram',

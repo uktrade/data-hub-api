@@ -27,6 +27,7 @@ class TaskPermission(StrEnum):
 @reversion.register_base_model()
 class Task(ArchivableModel, BaseModel):
     """Representation of a task."""
+
     class Status(models.TextChoices):
         ACTIVE = ('active', 'Active')
         COMPLETE = ('complete', 'Complete')

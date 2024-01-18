@@ -5,6 +5,7 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 from datahub.search.task.apps import TaskSearchApp
 from datahub.search.task.models import Task
+from datahub.task.models import Task as TaskModel
 from datahub.task.test.factories import TaskFactory
 
 pytestmark = pytest.mark.django_db
@@ -35,7 +36,7 @@ def test_task_to_dict(opensearch):
         'archived': False,
         'company': None,
         'interaction': None,
-        'status': None,
+        'status': TaskModel.Status.ACTIVE,
         'advisers': [
             {
                 'id': str(adviser.id),

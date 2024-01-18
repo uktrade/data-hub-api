@@ -487,12 +487,10 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
 
         status_tasks = TaskFactory.create_batch(3, status='Active', created_by=current_adviser)
 
-        status_tasks_completed = TaskFactory.create_batch(3, status='Completed', created_by=current_adviser)
-        # not_archived_tasks = TaskFactory.create_batch(
-        #     2,
-        #     archived=False,
-        #     created_by=current_adviser,
-        # )
+        status_tasks_completed = TaskFactory.create_batch(
+            3, status='Completed',
+            created_by=current_adviser,
+        )
 
         opensearch_with_collector.flush_and_refresh()
 
@@ -501,12 +499,13 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
         response = self.api_client.post(
             url,
             data={
-                'archived': status,
+                'status': status,
             },
         )
 
-        tasks_for_assert = status_tasks if status else status_tasks_completed
-
+        tasks_for_assert = status_tasks if (status == 'Active') else status_tasks_completed
+        from pprint import pprint
+        pprint(response)
         assert response.status_code == status.HTTP_200_OK
 
         assert [a['id'] for a in response.json()['results']] == [
