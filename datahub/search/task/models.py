@@ -1,4 +1,4 @@
-from opensearch_dsl import Boolean, Date, Integer, Keyword, Text
+from opensearch_dsl import Boolean, Date, Integer, Keyword, Text, CharField
 
 
 from datahub.search import dict_utils, fields
@@ -22,6 +22,7 @@ class Task(BaseSearchModel):
     company = fields.id_name_field()
     interaction = fields.interaction_field()
     modified_on = Date()
+    status = CharField()
 
     MAPPINGS = {
         'created_by': dict_utils.contact_or_adviser_dict,
@@ -41,4 +42,5 @@ class Task(BaseSearchModel):
         'created_by',
         'advisers',
         'archived',
+        'status',
     )

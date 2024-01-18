@@ -13,6 +13,7 @@ class SearchTaskQuerySerializer(EntitySearchQuerySerializer):
 
     id = SingleOrListField(child=StringUUIDField(), required=False)
     archived = serializers.BooleanField(required=False)
+    status = serializers.CharField(required=False)
     title = serializers.CharField(required=False)
     due_date = serializers.DateField(required=False)
     advisers = SingleOrListField(

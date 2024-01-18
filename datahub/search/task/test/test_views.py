@@ -479,6 +479,44 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
             tasks_for_assert,
         )
 
+    @pytest.mark.parametrize('status', ('Active', 'Completed'))
+    def test_search_task_by_status(self, opensearch_with_collector, status):
+        """Tests task search by status."""
+        current_adviser = AdviserFactory()
+        current_adviser.id = self.user.id
+
+        status_tasks = TaskFactory.create_batch(3, status='Active', created_by=current_adviser)
+
+        status_tasks_completed = TaskFactory.create_batch(3, status='Completed', created_by=current_adviser)
+        # not_archived_tasks = TaskFactory.create_batch(
+        #     2,
+        #     archived=False,
+        #     created_by=current_adviser,
+        # )
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:task')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'archived': status,
+            },
+        )
+
+        tasks_for_assert = status_tasks if status else status_tasks_completed
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert [a['id'] for a in response.json()['results']] == [
+            str(a.id) for a in sorted(tasks_for_assert, key=lambda x: x.id)
+        ]
+
+        assert response.data['count'] == len(
+            tasks_for_assert,
+        )
+
     @pytest.mark.parametrize('archived', (True, False))
     def test_search_task_by_archived_for_current_adviser(
         self,

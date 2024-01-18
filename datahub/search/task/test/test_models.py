@@ -35,6 +35,7 @@ def test_task_to_dict(opensearch):
         'archived': False,
         'company': None,
         'interaction': None,
+        'status': None,
         'advisers': [
             {
                 'id': str(adviser.id),
