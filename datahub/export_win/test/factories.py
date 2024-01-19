@@ -132,6 +132,7 @@ class WinFactory(factory.django.DjangoModelFactory):
     customer_location_id = UKRegionConstant.north_west.value.id
     hq_team = factory.SubFactory(HQTeamRegionOrPostFactory)
     lead_officer = factory.SubFactory(AdviserFactory)
+    lead_officer_email_address = factory.Faker('email')
     line_manager = factory.SubFactory(AdviserFactory)
     sector = factory.SubFactory(SectorFactory)
     team_type = factory.SubFactory(TeamTypeFactory)
