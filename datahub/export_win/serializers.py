@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import transaction
 
 from rest_framework.serializers import (
@@ -27,6 +28,12 @@ from datahub.export_win.models import (
     WinAdviser,
     WinType,
     WithoutOurSupport,
+)
+from datahub.export_win.tasks import (
+    create_token_for_contact,
+    get_all_fields_for_client_email_receipt,
+    notify_export_win_contact_by_rq_email,
+    update_customer_response_token_for_email_notification_id,
 )
 from datahub.metadata.models import Country, Sector, UKRegion
 
@@ -214,6 +221,28 @@ class WinSerializer(ModelSerializer):
             win.type_of_support.set(type_of_support)
             win.associated_programme.set(associated_programme)
             win.team_members.set(team_members)
+
+            customer_response = CustomerResponse.objects.create(
+                win=win,
+            )
+            for company_contact in company_contacts:
+                token = create_token_for_contact(
+                    company_contact,
+                    customer_response,
+                )
+                context = get_all_fields_for_client_email_receipt(
+                    token,
+                    customer_response,
+                )
+                template_id = settings.EXPORT_WIN_CLIENT_RECEIPT_TEMPLATE_ID
+                notify_export_win_contact_by_rq_email(
+                    company_contact.email,
+                    template_id,
+                    context,
+                    update_customer_response_token_for_email_notification_id,
+                    token.id,
+                )
+
         return win
 
     def update(self, instance, validated_data):
