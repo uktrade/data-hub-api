@@ -504,8 +504,7 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
         )
 
         tasks_for_assert = status_tasks if (status == 'Active') else status_tasks_completed
-        from pprint import pprint
-        pprint(response)
+
         assert response.status_code == status.HTTP_200_OK
 
         assert [a['id'] for a in response.json()['results']] == [
