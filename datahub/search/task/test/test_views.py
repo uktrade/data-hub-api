@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 
-from rest_framework import status
+from rest_framework import status as status_codes
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
@@ -30,7 +30,7 @@ class TestTaskSearch(APITestMixin):
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:search:task')
         response = api_client.get(url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status_codes.HTTP_403_FORBIDDEN
 
     def test_search_task_by_advisor_id(self, opensearch_with_collector):
         """Tests task search by advisor id."""
@@ -56,7 +56,7 @@ class TestTaskSearch(APITestMixin):
             },
         )
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
 
         assert response.data['count'] == 1
         assert response.data['results'][0]['id'] == str(task.id)
@@ -83,7 +83,7 @@ class TestTaskSearch(APITestMixin):
             },
         )
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
 
         assert response.data['count'] == 1
         assert response.data['results'][0]['id'] == str(task.id)
@@ -113,7 +113,7 @@ class TestTaskSearch(APITestMixin):
             },
         )
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
         assert response.data['count'] == 1
         assert response.data['results'][0]['id'] == str(task.id)
         assert response.data['results'][0]['created_by']['id'] == str(created_by_adviser.id)
@@ -160,7 +160,7 @@ class TestTaskSearch(APITestMixin):
             },
         )
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
         assert response.data['count'] == 1
         assert response.data['results'][0]['id'] == str(task.id)
 
@@ -197,7 +197,7 @@ class TestTaskSearch(APITestMixin):
             data={'not_advisers': [not_adviser.id for not_adviser in not_advisers]},
         )
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
         assert response.data['count'] == 1
         assert response.data['results'][0]['id'] == str(task.id)
         assert len(response.data['results'][0]['advisers']) == 2
@@ -233,7 +233,7 @@ class TestTaskSearch(APITestMixin):
             url,
         )
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
 
         assert response.data['count'] == 1
 
@@ -263,7 +263,7 @@ class TestTaskSearch(APITestMixin):
             },
         )
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
 
         assert response.data['count'] == 1
 
@@ -295,7 +295,7 @@ class TestTaskSearch(APITestMixin):
             },
         )
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
 
         assert response.data['results'][expected_order[0]]['id'] == str(yesterday_task.id)
         assert response.data['results'][expected_order[1]]['id'] == str(today_task.id)
@@ -328,7 +328,7 @@ class TestTaskSearch(APITestMixin):
             },
         )
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
         assert response.data['results'][expected_order[0]]['id'] == str(first_task.id)
         assert response.data['results'][expected_order[1]]['id'] == str(second_task.id)
 
@@ -358,7 +358,7 @@ class TestTaskSearch(APITestMixin):
             },
         )
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
 
         assert response.data['results'][0]['id'] == str(company_task_1.id)
         assert response.data['results'][1]['id'] == str(company_task_2.id)
@@ -398,7 +398,7 @@ class TestTaskSearch(APITestMixin):
             },
         )
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
 
         assert response.data['results'][expected_order[0]]['id'] == str(first_task.id)
         assert response.data['results'][expected_order[1]]['id'] == str(second_task.id)
@@ -429,7 +429,7 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
             },
         )
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
 
         assert response.data['count'] == 1
         assert response.data['results'][0]['investment_project'] == {
@@ -469,7 +469,7 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
 
         tasks_for_assert = archived_tasks if archived else not_archived_tasks
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
 
         assert [a['id'] for a in response.json()['results']] == [
             str(a.id) for a in sorted(tasks_for_assert, key=lambda x: x.id)
@@ -505,7 +505,7 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
 
         tasks_for_assert = status_tasks if (status == 'Active') else status_tasks_completed
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
 
         assert [a['id'] for a in response.json()['results']] == [
             str(a.id) for a in sorted(tasks_for_assert, key=lambda x: x.id)
@@ -556,7 +556,7 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
 
         tasks_for_assert = archived_tasks if archived else not_archived_tasks
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status_codes.HTTP_200_OK
 
         assert [a['id'] for a in response.json()['results']] == [
             str(a.id) for a in sorted(tasks_for_assert, key=lambda x: x.id)
