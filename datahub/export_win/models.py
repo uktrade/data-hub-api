@@ -389,48 +389,64 @@ class CustomerResponse(BaseModel):
         related_name='our_support_customer_responses',
         verbose_name='Securing the win overall?',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     access_to_contacts = models.ForeignKey(
         Rating,
         related_name='access_to_contacts_customer_responses',
         verbose_name='Gaining access to contacts?',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     access_to_information = models.ForeignKey(
         Rating,
         related_name='access_to_information_customer_responses',
         verbose_name='Getting information or improved understanding of the country?',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     improved_profile = models.ForeignKey(
         Rating,
         related_name='improved_profile_customer_responses',
         verbose_name='Improving your profile or credibility in the country?',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     gained_confidence = models.ForeignKey(
         Rating,
         related_name='gained_confidence_customer_responses',
         verbose_name='Having confidence to explore or expand in the country?',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     developed_relationships = models.ForeignKey(
         Rating,
         related_name='developed_relationships_customer_responses',
         verbose_name='Developing or nurturing critical relationships?',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     overcame_problem = models.ForeignKey(
         Rating,
         related_name='overcame_problem_customer_responses',
         verbose_name='Overcoming a problem in the country (eg legal, regulatory, commercial)?',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     involved_state_enterprise = models.BooleanField(
         verbose_name=(
             'The win involved a foreign government or state-owned enterprise (eg as an '
             'intermediary or facilitator)'),
         default=False,
+        null=True,
+        blank=True,
     )
     interventions_were_prerequisite = models.BooleanField(
         verbose_name='Our support was a prerequisite to generate this export value',
@@ -445,12 +461,16 @@ class CustomerResponse(BaseModel):
         related_name='customer_responses',
         verbose_name='What value do you estimate you would have achieved without our support?',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     last_export = models.ForeignKey(
         Experience,
         related_name='customer_responses',
         verbose_name='Apart from this win, when did your company last export goods or services?',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     has_enabled_expansion_into_new_market = models.BooleanField(
         verbose_name='It enabled you to expand into a new market',
@@ -480,6 +500,7 @@ class CustomerResponse(BaseModel):
     case_study_willing = models.BooleanField(
         verbose_name=('Would you be willing for DBT/Exporting is GREAT to feature your success '
                       'in marketing materials?'),
+        default=False,
     )
     comments = models.TextField(
         blank=True,
@@ -492,6 +513,8 @@ class CustomerResponse(BaseModel):
         related_name='customer_responses',
         verbose_name='How did you first hear about DBT (or its predecessor, DIT)?',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
 
     other_marketing_source = models.CharField(

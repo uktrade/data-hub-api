@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 
 from django.utils.timezone import now
@@ -30,7 +32,7 @@ from datahub.core.test_utils import (
     create_test_user,
     format_date_or_datetime,
 )
-from datahub.export_win.models import Win
+from datahub.export_win.models import CustomerResponseToken, Win
 from datahub.export_win.test.factories import (
     BreakdownFactory,
     CustomerResponseFactory,
@@ -40,6 +42,16 @@ from datahub.export_win.test.factories import (
 from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture()
+def mock_export_win_notify_export_win_contact(monkeypatch):
+    mock_notify = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.export_win.serializers.notify_export_win_contact_by_rq_email',
+        mock_notify,
+    )
+    return mock_notify
 
 
 class TestGetWinView(APITestMixin):
@@ -284,7 +296,7 @@ class TestListWinView(APITestMixin):
 class TestCreateWinView(APITestMixin):
     """Create export win view tests."""
 
-    def test_create_win_required_only(self):
+    def test_create_win_required_only(self, mock_export_win_notify_export_win_contact):
         """Tests successfully creating an export win with required fields only."""
         url = reverse('api-v4:export-win:collection')
 
@@ -420,7 +432,31 @@ class TestCreateWinView(APITestMixin):
                 'id': str(win.customer_location_id),
                 'name': win.customer_location.name,
             },
-            'customer_response': None,
+            'customer_response': {
+                'access_to_contacts': None,
+                'access_to_information': None,
+                'agree_with_win': None,
+                'case_study_willing': False,
+                'comments': '',
+                'company_was_at_risk_of_not_exporting': False,
+                'developed_relationships': None,
+                'expected_portion_without_help': None,
+                'gained_confidence': None,
+                'has_enabled_expansion_into_existing_market': False,
+                'has_enabled_expansion_into_new_market': False,
+                'has_explicit_export_plans': False,
+                'has_increased_exports_as_percent_of_turnover': False,
+                'id': str(win.customer_response.id),
+                'improved_profile': None,
+                'involved_state_enterprise': False,
+                'last_export': None,
+                'marketing_source': None,
+                'name': '',
+                'other_marketing_source': '',
+                'our_support': None,
+                'overcame_problem': None,
+                'support_improved_speed': False,
+            },
             'date': format_date_or_datetime(win.date),
             'description': win.description,
             'export_experience': {
@@ -465,8 +501,13 @@ class TestCreateWinView(APITestMixin):
         }
 
         assert response_data == expected_response_data
+        assert CustomerResponseToken.objects.filter(
+            customer_response_id=win.customer_response.id,
+            company_contact=win.company_contacts.first(),
+        ).exists()
+        mock_export_win_notify_export_win_contact.assert_called_once()
 
-    def test_create_win_all_fields(self):
+    def test_create_win_all_fields(self, mock_export_win_notify_export_win_contact):
         """Tests successfully creating an export win with all fields only."""
         assert Version.objects.count() == 0
 
@@ -636,7 +677,31 @@ class TestCreateWinView(APITestMixin):
                 'id': str(win.customer_location_id),
                 'name': win.customer_location.name,
             },
-            'customer_response': None,
+            'customer_response': {
+                'access_to_contacts': None,
+                'access_to_information': None,
+                'agree_with_win': None,
+                'case_study_willing': False,
+                'comments': '',
+                'company_was_at_risk_of_not_exporting': False,
+                'developed_relationships': None,
+                'expected_portion_without_help': None,
+                'gained_confidence': None,
+                'has_enabled_expansion_into_existing_market': False,
+                'has_enabled_expansion_into_new_market': False,
+                'has_explicit_export_plans': False,
+                'has_increased_exports_as_percent_of_turnover': False,
+                'id': str(win.customer_response.id),
+                'improved_profile': None,
+                'involved_state_enterprise': False,
+                'last_export': None,
+                'marketing_source': None,
+                'name': '',
+                'other_marketing_source': '',
+                'our_support': None,
+                'overcame_problem': None,
+                'support_improved_speed': False,
+            },
             'date': format_date_or_datetime(win.date),
             'description': win.description,
             'export_experience': {
@@ -717,6 +782,12 @@ class TestCreateWinView(APITestMixin):
         assert Version.objects.get_for_object(win).count() == 1
         version = Version.objects.get_for_object(win).first()
         assert version.revision.user == self.user
+
+        assert CustomerResponseToken.objects.filter(
+            customer_response_id=win.customer_response.id,
+            company_contact=win.company_contacts.first(),
+        ).exists()
+        mock_export_win_notify_export_win_contact.assert_called_once()
 
 
 class TestUpdateWinView(APITestMixin):
