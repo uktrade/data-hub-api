@@ -75,11 +75,11 @@ class Task(ArchivableModel, BaseModel):
         if self.due_date and self.reminder_days:
             self.reminder_date = self.due_date - timedelta(days=self.reminder_days)
 
-        # Synchronise archive and status until task deletion feature is released.
-        if self.archive:
-            self.status = self.Status.ACTIVE
-        else:
+        # Set status value from archive if status is empty or archive has changed.
+        if self.archived:
             self.status = self.Status.COMPLETE
+        else:
+            self.status = self.Status.ACTIVE
 
         super().save(*args, **kwargs)
 

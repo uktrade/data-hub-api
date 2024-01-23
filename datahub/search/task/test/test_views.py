@@ -479,16 +479,18 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
             tasks_for_assert,
         )
 
-    @pytest.mark.parametrize('status', ('Active', 'Completed'))
+    @pytest.mark.parametrize('status', ('Active', 'Complete'))
     def test_search_task_by_status(self, opensearch_with_collector, status):
         """Tests task search by status."""
         current_adviser = AdviserFactory()
         current_adviser.id = self.user.id
 
-        status_tasks = TaskFactory.create_batch(3, status='Active', created_by=current_adviser)
+        status_tasks = TaskFactory.create_batch(
+            3, status='Active', archived=False, created_by=current_adviser,
+        )
 
         status_tasks_completed = TaskFactory.create_batch(
-            3, status='Completed',
+            3, status='Completed', archived=True,
             created_by=current_adviser,
         )
 
