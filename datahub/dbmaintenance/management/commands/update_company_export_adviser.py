@@ -15,10 +15,10 @@ class Command(CSVBaseCommand):
         old_adviser = parse_limited_string(row['old_adviser_id'])
         new_adviser = parse_limited_string(row['new_adviser_id'])
 
-        if company_export.owner != old_adviser:
+        if str(company_export.owner_id) != old_adviser:
             return
 
-        company_export.owner = new_adviser
+        company_export.owner_id = new_adviser
 
         if simulate:
             return
