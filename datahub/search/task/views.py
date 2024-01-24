@@ -28,6 +28,7 @@ class SearchTaskAPIViewMixin:
         'company',
         'investment_project',
         'interaction',
+        'status',
     )
 
     REMAP_FIELDS = {
