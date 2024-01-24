@@ -28,6 +28,10 @@ class TaskPermission(StrEnum):
 class Task(ArchivableModel, BaseModel):
     """Representation of a task."""
 
+    class Status(models.TextChoices):
+        ACTIVE = ('active', 'Active')
+        COMPLETE = ('complete', 'Complete')
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     title = models.CharField(max_length=MAX_LENGTH)
     description = models.TextField(blank=True, default='')
@@ -60,11 +64,23 @@ class Task(ArchivableModel, BaseModel):
         on_delete=models.CASCADE,
         related_name='task_interaction',
     )
+    status = models.CharField(
+        max_length=MAX_LENGTH,
+        choices=Status.choices,
+        default=Status.ACTIVE,
+    )
 
     # override the save method and calculate reminder_date
     def save(self, *args, **kwargs):
         if self.due_date and self.reminder_days:
             self.reminder_date = self.due_date - timedelta(days=self.reminder_days)
+
+        # Set status value from archive if status is empty.
+        if self.archived:
+            self.status = self.Status.COMPLETE
+        else:
+            self.status = self.Status.ACTIVE
+
         super().save(*args, **kwargs)
 
     def __str__(self):
