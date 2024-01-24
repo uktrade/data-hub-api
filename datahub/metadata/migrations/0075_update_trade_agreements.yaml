@@ -1,0 +1,3 @@
+- model: metadata.tradeagreement
+  pk: 0b812d68-1d02-44bb-a02c-a628538ad694
+  fields: { disabled_on: null, name: "CARIFORUM-UK economic partnership agreement"}
