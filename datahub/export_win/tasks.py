@@ -7,19 +7,78 @@ from logging import getLogger
 from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
-from django.db.models import (Q, Sum)
+from django.db.models import (Count, Q, Sum)
 from django.utils.timezone import now
 
 from django_pglocks import advisory_lock
 
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
+from datahub.export_win.constants import (
+    EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD,
+    EMAIL_MAX_TOKEN_ISSUED_WITHIN_RESPONSE_THRESHOLD,
+    EMAIL_MAX_WEEKS_AUTO_RESEND_THRESHOLD)
 from datahub.export_win.models import (Breakdown, CustomerResponse, CustomerResponseToken)
 from datahub.notification.constants import NotifyServiceName
 from datahub.notification.core import notify_gateway
 from datahub.reminder.models import EmailDeliveryStatus
 
 logger = getLogger(__name__)
+
+
+def auto_resend_client_email_from_unconfirmed_win():
+    with advisory_lock(
+        'auto_resend_client_email_from_unconfirmed_win',
+        wait=False,
+    ) as acquired:
+        if not acquired:
+            logger.info(
+                'Win unconfirmed status checks from customer response are already being '
+                'processed by another worker.',
+            )
+            return
+
+        current_date = datetime.utcnow()
+        win_max_days_threshold = \
+            EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD * EMAIL_MAX_WEEKS_AUTO_RESEND_THRESHOLD
+
+        win_maturity_days_threshold = current_date - timedelta(days=win_max_days_threshold + 1)
+
+        win_email_response_threshold = \
+            current_date - timedelta(days=EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD - 1)
+
+        customer_response_tokens = (
+            CustomerResponse.objects.filter(
+                agreed_with_win__isnull=True,
+                created_on__gte=win_maturity_days_threshold,
+            )
+            .annotate(num_tokens=Count('tokens'))
+            .filter(num_tokens__lt=EMAIL_MAX_TOKEN_ISSUED_WITHIN_RESPONSE_THRESHOLD)
+            .exclude(tokens__created_on__gt=win_email_response_threshold)
+        )
+
+        for customer_response_token in customer_response_tokens:
+            customer_response = customer_response_token['customer_response']
+            win = customer_response_token['win']
+            company_contacts = win['company_contacts']
+
+            for company_contact in company_contacts:
+                token = create_token_for_contact(
+                    company_contact,
+                    customer_response,
+                )
+                context = get_all_fields_for_client_email_receipt(
+                    token,
+                    customer_response,
+                )
+                template_id = settings.EXPORT_WIN_CLIENT_RECEIPT_TEMPLATE_ID
+                notify_export_win_email_by_rq_email(
+                    company_contact.email,
+                    template_id,
+                    context,
+                    update_customer_response_token_for_email_notification_id,
+                    token.id,
+                )
 
 
 def create_token_for_contact(contact, customer_response):
