@@ -228,7 +228,7 @@ platformdirs==2.6.0
     # via
     #   pylint
     #   virtualenv
-pluggy==1.0.0
+pluggy==1.4.0
     # via pytest
 pre-commit==3.6.0
     # via -r requirements-dev.in
@@ -270,7 +270,7 @@ pylint-plugin-utils==0.8.2
     # via pylint-django
 pylint-pytest==1.1.2
     # via -r requirements-dev.in
-pytest==7.4.4
+pytest==8.0.0
     # via
     #   -r requirements-dev.in
     #   pylint-pytest
