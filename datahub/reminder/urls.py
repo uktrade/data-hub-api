@@ -15,6 +15,8 @@ from datahub.reminder.views import (
     TaskAssignedToMeFromOthersSubscriptionViewset,
     TaskCompletedReminderViewset,
     TaskCompletedSubscriptionViewset,
+    TaskDeletedByOthersReminderViewset,
+    TaskDeletedByOthersSubscriptionViewset,
     TaskOverdueReminderViewset,
     TaskOverdueSubscriptionViewset,
     UpcomingEstimatedLandDateReminderViewset,
@@ -280,6 +282,34 @@ urlpatterns = [
             },
         ),
         name='my-tasks-task-completed-subscription',
+    ),
+    path(
+        'reminder/subscription/my-tasks-task-deleted-by-others',
+        TaskDeletedByOthersSubscriptionViewset.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
+        name='my-tasks-task-deleted-by-others-subscription',
+    ),
+    path(
+        'reminder/my-tasks-task-deleted-by-others',
+        TaskDeletedByOthersReminderViewset.as_view(
+            {
+                'get': 'list',
+            },
+        ),
+        name='my-tasks-task-deleted-by-others-reminder',
+    ),
+    path(
+        'reminder/my-tasks-task-deleted-by-others/<uuid:pk>',
+        TaskDeletedByOthersReminderViewset.as_view(
+            {
+                'delete': 'destroy',
+            },
+        ),
+        name='my-tasks-task-deleted-by-others-reminder-detail',
     ),
     path(
         'reminder/summary',
