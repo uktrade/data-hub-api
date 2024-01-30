@@ -23,6 +23,7 @@ from datahub.reminder.models import (
     TaskAmendedByOthersReminder,
     TaskAssignedToMeFromOthersReminder,
     TaskCompletedReminder,
+    TaskDeletedByOthersReminder,
     TaskOverdueReminder,
     UpcomingEstimatedLandDateReminder,
     UpcomingTaskReminder,
@@ -34,6 +35,7 @@ from datahub.reminder.test.factories import (
     TaskAmendedByOthersReminderFactory,
     TaskAssignedToMeFromOthersReminderFactory,
     TaskCompletedReminderFactory,
+    TaskDeletedByOthersReminderFactory,
     TaskOverdueReminderFactory,
     UpcomingEstimatedLandDateReminderFactory,
     UpcomingTaskReminderFactory,
@@ -716,6 +718,22 @@ class TestTaskAmendedByOthersReminderViewset(
     tested_model = TaskAmendedByOthersReminder
 
 
+@freeze_time('2022-05-05T17:00:00.000000Z')
+class TestTaskDeletedByOthersReminderViewset(
+    APITestMixin,
+    ReminderTestMixin,
+    TaskReminderMixin,
+):
+    """
+    Tests for the task deleted by others reminder view.
+    """
+
+    url_name = 'api-v4:reminder:my-tasks-task-deleted-by-others-reminder'
+    detail_url_name = 'api-v4:reminder:my-tasks-task-deleted-by-others-reminder-detail'
+    factory = TaskDeletedByOthersReminderFactory
+    tested_model = TaskDeletedByOthersReminder
+
+
 class TestGetReminderSummaryView(APITestMixin):
     """
     Tests for the reminder summary view.
@@ -743,7 +761,10 @@ class TestGetReminderSummaryView(APITestMixin):
             ],
         )
         reminder_count = 3
-        reminder_categories = 10  # used for finding the total number of reminders in this test
+
+        # Update reminder_categoryies after adding/removing additional reminder types.
+        reminder_categories = 11
+
         UpcomingEstimatedLandDateReminderFactory.create_batch(
             reminder_count,
             adviser=self.user,
@@ -794,6 +815,10 @@ class TestGetReminderSummaryView(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
+        TaskDeletedByOthersReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
 
         total_reminders = reminder_count * reminder_categories
         url = reverse(self.url_name)
@@ -818,6 +843,7 @@ class TestGetReminderSummaryView(APITestMixin):
                 'task_assigned_to_me_from_others': reminder_count,
                 'task_overdue': reminder_count,
                 'task_completed': reminder_count,
+                'task_deleted_by_others': reminder_count,
             },
         }
 
@@ -844,6 +870,7 @@ class TestGetReminderSummaryView(APITestMixin):
                 'task_assigned_to_me_from_others': 0,
                 'task_overdue': 0,
                 'task_completed': 0,
+                'task_deleted_by_others': 0,
             },
         }
 
@@ -915,6 +942,10 @@ class TestGetReminderSummaryView(APITestMixin):
             reminder_count,
             adviser=self.user,
         )
+        TaskDeletedByOthersReminderFactory.create_batch(
+            reminder_count,
+            adviser=self.user,
+        )
 
         expected_data = {
             'count': 0,
@@ -933,6 +964,7 @@ class TestGetReminderSummaryView(APITestMixin):
                 'task_assigned_to_me_from_others': reminder_count,
                 'task_overdue': reminder_count,
                 'task_completed': reminder_count,
+                'task_deleted_by_others': reminder_count,
             },
         }
 
