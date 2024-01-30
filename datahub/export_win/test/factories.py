@@ -1,6 +1,9 @@
 import random
+from datetime import datetime
 
 import factory
+
+from dateutil.relativedelta import relativedelta
 
 from datahub.company.test.factories import (
     AdviserFactory,
@@ -215,7 +218,7 @@ class BreakdownFactory(factory.django.DjangoModelFactory):
 class CustomerResponseTokenFactory(factory.django.DjangoModelFactory):
     """CustomerResponseToken factory."""
 
-    expires_on = factory.Faker('date_time_this_year', after_now=True)
+    expires_on = factory.LazyFunction(lambda: datetime.utcnow() + relativedelta(days=7))
     customer_response = factory.SubFactory(CustomerResponseFactory)
     email_notification_id = factory.Faker('uuid4')  # Adjust based on your requirements
     email_delivery_status = factory.Faker(

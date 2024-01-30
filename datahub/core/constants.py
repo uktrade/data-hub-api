@@ -588,12 +588,42 @@ class Experience(Enum):
         'We had not started exporting before this win',
         '28e72562-b9cf-492a-9687-c343517087e4',
     )
+    we_last_exported = Constant(
+        'We last exported 1 to 2 years ago',
+        'a30c77d7-62bc-475e-add8-68d49d9f6975',
+    )
 
 
-class ExperienceCategories(Enum):
-    """Export win experience categories."""
+class Rating(Enum):
+    """Export win rating."""
 
-    never_exported = Constant(
-        'Has never exported before',
-        '42c06fd9-728c-4b6f-bbe1-608a96021e57',
+    n_a = Constant(
+        'N/A',
+        'dbfc571c-ffbe-4ef8-8840-16364ed46824',
+    )
+    rating_5 = Constant(
+        '5',
+        '7efd335d-f963-4c34-8a4f-2ae57419d632',
+    )
+
+
+class MarketingSource(Enum):
+    """Export win marketing source."""
+
+    articles = Constant(
+        'Articles/information I saw or read',
+        '5001e2e8-2d3b-433e-9c1a-bbb2e7b3bfd5',
+    )
+    other = Constant(
+        'Other (please specify)',
+        '391ad3b8-e028-48f1-9cf6-ac7149fb3756',
+    )
+
+
+class WithoutOurSupport(Enum):
+    """Export win without our support."""
+
+    no_value = Constant(
+        'No value without our help',
+        '9a23de5e-6961-4cb0-a8a1-03c31b7ee4b3',
     )
