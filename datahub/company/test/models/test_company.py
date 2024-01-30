@@ -1,10 +1,12 @@
+from typing import Literal
 from unittest.mock import Mock
+
 import pytest
 
 from django.db.utils import IntegrityError
 
 from datahub.company.models import Company
-from datahub.company.test.factories import CompanyFactory, AdviserFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test_utils import APITestMixin
 
 
@@ -45,7 +47,11 @@ class TestPendingDNBInvestigation(APITestMixin):
         ('999999999', '123456789', False),
     ),
 )
-def test_is_global_ultimate(duns_number, global_ultimate_duns_number, expected_is_global_ultimate):
+def test_is_global_ultimate(
+    duns_number: Literal['', '123456789', '999999999'] | None,
+    global_ultimate_duns_number: Literal['', '123456789'],
+    expected_is_global_ultimate: bool,
+):
     """
     Test that the `Company.is_global_ultimate` property returns the correct response
     for a variety of scenarios.
@@ -63,14 +69,16 @@ class TestOneListAccountOwner():
     one_list_account_owner has changed.
     """
 
-    def test_one_list_account_owner_changed(self, monkeypatch):
+    mock_schedule_sync_investment_projects_of_subsidiary_companies_target = \
+        'datahub.search.company.tasks.schedule_sync_investment_projects_of_subsidiary_companies'
+
+    def test_one_list_account_owner_changed(self, monkeypatch: pytest.MonkeyPatch):
         one_list_account_owner = AdviserFactory()
         company = CompanyFactory()
 
         mock_schedule_sync_investment_projects_of_subsidiary_companies = Mock()
         monkeypatch.setattr(
-            'datahub.search.company.tasks.' +
-            'schedule_sync_investment_projects_of_subsidiary_companies',
+            self.mock_schedule_sync_investment_projects_of_subsidiary_companies_target,
             mock_schedule_sync_investment_projects_of_subsidiary_companies,
         )
 
@@ -81,13 +89,12 @@ class TestOneListAccountOwner():
             company,
         )
 
-    def test_one_list_account_owner_not_changed(self, monkeypatch):
+    def test_one_list_account_owner_not_changed(self, monkeypatch: pytest.MonkeyPatch):
         company = CompanyFactory()
 
         mock_schedule_sync_investment_projects_of_subsidiary_companies = Mock()
         monkeypatch.setattr(
-            ('datahub.search.company.tasks.' +
-                'schedule_sync_investment_projects_of_subsidiary_companies'),
+            self.mock_schedule_sync_investment_projects_of_subsidiary_companies_target,
             mock_schedule_sync_investment_projects_of_subsidiary_companies,
         )
 
