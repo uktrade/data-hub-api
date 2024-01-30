@@ -68,6 +68,6 @@ def test_sync_investment_projects_of_subsidiary_companies(
 
     # Map UUID to str for correct comparison
     investment_project_ids = map(attrgetter('id'), investment_projects)
-    investment_project_ids = map(lambda x: str(x), investment_project_ids)
+    investment_project_ids = map(str, investment_project_ids)
 
     assert set(map(attrgetter('id'), result.hits)) == set(investment_project_ids)
