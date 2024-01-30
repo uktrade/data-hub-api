@@ -409,10 +409,6 @@ class Company(ArchivableModel, BaseModel):
     # subsidiary company's investment projects on each save.
     __original_one_list_account_owner_id = None
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__original_one_list_account_owner_id = self.one_list_account_owner_id
-
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         # Only run sync when one_list_acocunt_owner_id has changed.
@@ -421,6 +417,10 @@ class Company(ArchivableModel, BaseModel):
                 schedule_sync_investment_projects_of_subsidiary_companies,
             )
             schedule_sync_investment_projects_of_subsidiary_companies(self)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_one_list_account_owner_id = self.one_list_account_owner_id
 
     def __str__(self):
         """Admin displayed human readable name."""
