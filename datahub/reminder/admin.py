@@ -13,6 +13,8 @@ from datahub.reminder.models import (
     TaskAssignedToMeFromOthersSubscription,
     TaskCompletedReminder,
     TaskCompletedSubscription,
+    TaskDeletedByOthersReminder,
+    TaskDeletedByOthersSubscription,
     TaskOverdueReminder,
     TaskOverdueSubscription,
     UpcomingEstimatedLandDateReminder,
@@ -120,6 +122,13 @@ class UpcomingTaskReminderAdmin(admin.ModelAdmin):
     raw_id_fields = ('adviser',)
 
 
+@admin.register(TaskDeletedByOthersSubscription)
+class TaskDeletedByOthersSubscriptionAdmin(admin.ModelAdmin):
+    """Task Deleted By Others Subscription admin."""
+
+    raw_id_fields = ('adviser',)
+
+
 @admin.register(TaskAssignedToMeFromOthersReminder)
 class TaskAssignedToMeFromOthersReminderAdmin(admin.ModelAdmin):
     """Task assigned to me from others admin."""
@@ -159,6 +168,18 @@ class TaskOverdueReminderAdmin(admin.ModelAdmin):
 @admin.register(TaskCompletedReminder)
 class TaskCompletedReminderAdmin(admin.ModelAdmin):
     """Task completed admin."""
+
+    raw_id_fields = ('adviser',)
+    list_display = [
+        'event',
+        'adviser',
+        'task',
+    ]
+
+
+@admin.register(TaskDeletedByOthersReminder)
+class TaskDeletedByOthersReminderAdmin(admin.ModelAdmin):
+    """Task deleted by others admin."""
 
     raw_id_fields = ('adviser',)
     list_display = [

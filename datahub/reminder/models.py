@@ -100,6 +100,12 @@ class TaskCompletedSubscription(BaseSubscription):
     """
 
 
+class TaskDeletedByOthersSubscription(BaseSubscription):
+    """
+    Subscription to get reminders about task deleted by others.
+    """
+
+
 class EmailDeliveryStatus(models.TextChoices):
     SENDING = ('sending', 'Sending')
     DELIVERED = ('delivered', 'Delivered')
@@ -297,4 +303,16 @@ class TaskCompletedReminder(BaseReminder):
         'task.Task',
         on_delete=models.CASCADE,
         related_name='task_completed_reminder',
+    )
+
+
+class TaskDeletedByOthersReminder(BaseReminder):
+    """
+    Task deleted by others generic task reminder.
+    """
+
+    task = models.ForeignKey(
+        'task.Task',
+        on_delete=models.CASCADE,
+        related_name='task_deleted_by_others_reminder',
     )
