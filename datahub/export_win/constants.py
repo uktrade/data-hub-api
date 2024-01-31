@@ -18,11 +18,3 @@ class TeamType(Enum):
     itt = Constant('International Trade Team', '1f6eccf9-289a-450b-a4af-b75600ea521b')
     post = Constant('Overseas Post', '6e798633-83da-4597-8e9a-9bb033ca06a4')
     tcp = Constant('Trade Challenge Partners (TCP)', 'f7006548-9ef0-4c4e-bc60-1b7ca40ff75b')
-
-
-class AutoResendClientEmailValues(Enum):
-    """Auto resend client email values"""
-
-    EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD = 7
-    EMAIL_MAX_WEEKS_AUTO_RESEND_THRESHOLD = 3
-    EMAIL_MAX_NUMBER_TOKEN_ISSUED = 4
