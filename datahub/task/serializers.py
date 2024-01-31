@@ -78,4 +78,5 @@ class TaskSerializer(serializers.ModelSerializer):
             'investment_project',
             'company',
             'interaction',
+            'status',
         )

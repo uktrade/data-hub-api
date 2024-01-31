@@ -134,6 +134,7 @@ class TestGetGenericTask(APITestMixin):
             'investment_project': None,
             'company': None,
             'interaction': None,
+            'status': 'active',
         }
         assert response == expected_response
 
@@ -266,6 +267,7 @@ class TestAddGenericTask(APITestMixin):
             'investment_project': None,
             'company': None,
             'interaction': None,
+            'status': 'active',
         }
         assert get_response.json() == expected_response
 
@@ -420,6 +422,7 @@ class TestTaskForInvestmentProject(APITestMixin):
                 'name': investment_project.investor_company.name,
             },
             'interaction': None,
+            'status': 'active',
         }
         assert response == expected_response
 
@@ -513,6 +516,7 @@ class TestTaskForCompany(APITestMixin):
                 'name': company.name,
             },
             'interaction': None,
+            'status': 'active',
         }
         assert response == expected_response
 
@@ -606,6 +610,7 @@ class TestTaskForInteraction(APITestMixin):
                 'name': interaction.company.name,
             },
             'interaction': {'id': str(interaction.id), 'subject': interaction.subject},
+            'status': 'active',
         }
         assert response == expected_response
 
