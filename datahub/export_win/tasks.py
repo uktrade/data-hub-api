@@ -33,7 +33,7 @@ def auto_resend_client_email_from_unconfirmed_win():
     ) as acquired:
         if not acquired:
             logger.info(
-                'Win unconfirmed status checks from customer response are already being '
+                'Unconfirmed export win checks from customer response are already being '
                 'processed by another worker.',
             )
             return
@@ -47,9 +47,9 @@ def auto_resend_client_email_from_unconfirmed_win():
         win_email_response_threshold = \
             current_date - timedelta(days=EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD - 1)
 
-        customer_response_tokens = (
+        customer_responses = (
             CustomerResponse.objects.filter(
-                agreed_with_win__isnull=True,
+                agree_with_win__isnull=True,
                 created_on__gte=win_maturity_days_threshold,
             )
             .annotate(num_tokens=Count('tokens'))
@@ -57,12 +57,16 @@ def auto_resend_client_email_from_unconfirmed_win():
             .exclude(tokens__created_on__gt=win_email_response_threshold)
         )
 
-        for customer_response_token in customer_response_tokens:
-            customer_response = customer_response_token['customer_response']
-            win = customer_response_token['win']
-            company_contacts = win['company_contacts']
+        logger.info(
+            'auto_resend_client_email_from_unconfirmed_win attempting to resend unconfirmed '
+            f'wins, with {len(customer_responses)} of line(s)',
+        )
 
-            for company_contact in company_contacts:
+        for customer_response in customer_responses:
+            win = customer_response.win
+            company_contacts = win.company_contacts
+
+            for company_contact in company_contacts.all():
                 token = create_token_for_contact(
                     company_contact,
                     customer_response,
