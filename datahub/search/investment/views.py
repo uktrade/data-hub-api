@@ -1,5 +1,4 @@
 import datetime
-from functools import reduce
 
 from django.db.models import Case, Max, When
 from django.db.models import CharField
@@ -267,48 +266,6 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
                     },
                 )
         return must
-
-    # TODO MK: If code below hasn't changed refactor to generic (==search/task/views.py)
-    def deep_get(self, dictionary, keys, default=None):
-        """
-        Perform a deep search on a dictionary to find the item at the location provided in the keys
-        """
-        return reduce(
-            lambda d, key: d.get(key, default) if isinstance(d, dict) else default,
-            keys.split('|'),
-            dictionary,
-        )
-
-    # TODO MK: If code below hasn't changed refactor to generic (==search/task/views.py)
-    def add_must_and_must_not_to_filters(self, base_query, must, must_not):
-        """
-        Merge the must and must not filters into single query.
-        """
-        raw_query = base_query.to_dict()
-        filters = self.deep_get(raw_query, 'query|bool|filter')
-        if not filters:
-            return raw_query
-
-        filter_index = None
-        for index, filter in enumerate(filters):
-            if filter.get('bool') or filter.get('bool') == {}:
-                filter_index = index
-                break
-
-        if filter_index is None:
-            return raw_query
-
-        if len(must_not) > 0:
-            filters[filter_index]['bool']['must_not'] = must_not
-        if len(must) > 0:
-            if 'must' not in filters[filter_index]['bool']:
-                filters[filter_index]['bool']['must'] = []
-
-            filters[filter_index]['bool']['must'].append(must)
-
-        raw_query['query']['bool']['filter'] = filters
-
-        return raw_query
 
     def get_sibling_company_ids(self, investor_companies):
         """Get a list of all sibling company id's"""

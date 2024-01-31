@@ -1,5 +1,3 @@
-from functools import reduce
-
 from datahub.search.task import TaskSearchApp
 from datahub.search.task.serializers import (
     SearchTaskQuerySerializer,
@@ -43,16 +41,6 @@ class SearchTaskAPIViewMixin:
 @register_v4_view()
 class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
-
-    def deep_get(self, dictionary, keys, default=None):
-        """
-        Perform a deep search on a dictionary to find the item at the location provided in the keys
-        """
-        return reduce(
-            lambda d, key: d.get(key, default) if isinstance(d, dict) else default,
-            keys.split('|'),
-            dictionary,
-        )
 
     def get_base_query(self, request, validated_data):
         """
@@ -98,7 +86,6 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
                     must_not,
                 ),
             )
-
         return base_query
 
     def must_limit_query_to_created_by_or_advisers(self, request):
@@ -134,36 +121,6 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
                 },
             )
         return must
-
-    def add_must_and_must_not_to_filters(self, base_query, must, must_not):
-        """
-        Merge the must and must not filters into single query.
-        """
-        raw_query = base_query.to_dict()
-        filters = self.deep_get(raw_query, 'query|bool|filter')
-        if not filters:
-            return raw_query
-
-        filter_index = None
-        for index, filter in enumerate(filters):
-            if filter.get('bool') or filter.get('bool') == {}:
-                filter_index = index
-                break
-
-        if filter_index is None:
-            return raw_query
-
-        if len(must_not) > 0:
-            filters[filter_index]['bool']['must_not'] = must_not
-        if len(must) > 0:
-            if 'must' not in filters[filter_index]['bool']:
-                filters[filter_index]['bool']['must'] = []
-
-            filters[filter_index]['bool']['must'].append(must)
-
-        raw_query['query']['bool']['filter'] = filters
-
-        return raw_query
 
     def get_missing_sort_behaviour(self, ordering):
         return '_last'
