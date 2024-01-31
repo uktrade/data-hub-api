@@ -1,6 +1,6 @@
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import CharField, OuterRef, Subquery
-from django.db.models.functions import Cast
+from django.db.models import CharField, OuterRef, Subquery, Value
+from django.db.models.functions import Cast, Concat
 
 from datahub.core.constants import InvestmentProjectStage as Stage
 from datahub.core.query_utils import (
@@ -88,6 +88,22 @@ class InvestmentProjectsDatasetView(BaseFilterDatasetView):
                 'ukregion__name',
                 ordering=('ukregion__name',),
             ),
+            client_contact_ids=ArrayAgg(
+                'client_contacts__id',
+                ordering=('client_contacts__id',),
+            ),
+            client_contact_names=ArrayAgg(
+                Concat(
+                    'client_contacts__first_name',
+                    Value(' '),
+                    'client_contacts__last_name',
+                ),
+                ordering=('client_contacts__first_name', 'client_contacts__last_name'),
+            ),
+            client_contact_emails=ArrayAgg(
+                'client_contacts__email',
+                ordering=('client_contacts__email',),
+            ),
         ).values(
             'actual_land_date',
             'actual_uk_region_names',
@@ -101,6 +117,9 @@ class InvestmentProjectsDatasetView(BaseFilterDatasetView):
             'business_activity_names',
             'client_relationship_manager_id',
             'client_requirements',
+            'client_contact_ids',
+            'client_contact_names',
+            'client_contact_emails',
             'competing_countries',
             'country_investment_originates_from_id',
             'country_investment_originates_from__name',
