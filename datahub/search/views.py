@@ -1,8 +1,8 @@
 """Search views."""
 from collections import namedtuple
 from enum import auto, Enum
-from itertools import islice
 from functools import reduce
+from itertools import islice
 
 from django.conf import settings
 from django.utils.text import capfirst
