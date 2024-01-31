@@ -87,6 +87,7 @@ def propositions(ist_adviser):
 
 def get_expected_data_from_project(project, won_date=None):
     """Returns expected dictionary based on given project"""
+    client_contacts = list(project.client_contacts.order_by('first_name')[:2])
     return {
         'actual_land_date': format_date_or_datetime(project.actual_land_date),
         'actual_uk_region_names': (
@@ -104,6 +105,10 @@ def get_expected_data_from_project(project, won_date=None):
         'business_activity_names': (
             [activity.name for activity in project.business_activities.order_by('name')]
         ) if project.business_activities.exists() else None,
+        'client_contact_ids': [str(contact.id) for contact in client_contacts],
+        'client_contact_names': [f'{contact.first_name} {contact.last_name}'
+                                 for contact in client_contacts],
+        'client_contact_emails': [contact.email for contact in client_contacts],
         'client_relationship_manager_id': str_or_none(project.client_relationship_manager_id),
         'client_requirements': project.client_requirements,
         'competing_countries': (
@@ -233,6 +238,17 @@ class TestInvestmentProjectsDatasetViewSet(BaseDatasetViewTest):
             project,
             won_date=won_date,
         )
+
+        # Compare fields where order does not matter using set or sorted
+        for field in ['client_contact_ids', 'client_contact_names', 'client_contact_emails']:
+            assert set(result[field]) == set(expected_result[field]), f'Mismatch in {field}'
+
+        # Remove the compared fields to avoid re-comparing them
+        for field in ['client_contact_ids', 'client_contact_names', 'client_contact_emails']:
+            del result[field]
+            del expected_result[field]
+
+        # Compare the rest of the fields normally
         assert result == expected_result
 
     def test_with_team_members(self, data_flow_api_client):
@@ -244,6 +260,16 @@ class TestInvestmentProjectsDatasetViewSet(BaseDatasetViewTest):
         assert len(response_results) == 1
         result = response_results[0]
         expected_result = get_expected_data_from_project(project)
+        # Compare fields where order does not matter using set or sorted
+        for field in ['client_contact_ids', 'client_contact_names', 'client_contact_emails']:
+            assert set(result[field]) == set(expected_result[field]), f'Mismatch in {field}'
+
+        # Remove the compared fields to avoid re-comparing them
+        for field in ['client_contact_ids', 'client_contact_names', 'client_contact_emails']:
+            del result[field]
+            del expected_result[field]
+
+        # Compare the rest of the fields normally
         assert result == expected_result
 
     def test_with_multiple_projects(self, data_flow_api_client):
