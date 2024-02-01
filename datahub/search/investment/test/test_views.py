@@ -288,6 +288,11 @@ class TestSearch(APITestMixin):
         )
         InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project_6)
 
+        # Investment Project for project where its head quarters has the adviser listed as its one
+        # list account owner
+        hq = CompanyFactory(one_list_account_owner=adviser)
+        project_7 = InvestmentProjectFactory(investor_company__global_headquarters=hq)
+
         opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v3:search:investment_project')
@@ -301,7 +306,7 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data['count'] == 5
+        assert response_data['count'] == 6
         results = response_data['results']
         expected_ids = {
             str(project_1.pk),
@@ -309,6 +314,7 @@ class TestSearch(APITestMixin):
             str(project_4.pk),
             str(project_5.pk),
             str(project_6.pk),
+            str(project_7.pk),
         }
         assert {result['id'] for result in results} == expected_ids
 

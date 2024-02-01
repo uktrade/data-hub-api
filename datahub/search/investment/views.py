@@ -40,7 +40,6 @@ class SearchInvestmentProjectAPIViewMixin:
     es_sort_by_remappings = {
         'name': 'name.keyword',
     }
-    fields_to_exclude = ('adviser_in_team')
 
     FILTER_FIELDS = (
         'adviser',
@@ -84,6 +83,7 @@ class SearchInvestmentProjectAPIViewMixin:
     COMPOSITE_FILTERS = {
         'adviser': [
             'client_relationship_manager.id',
+            'one_list_group_global_account_manager.id',
             'project_assurance_adviser.id',
             'project_manager.id',
             'team_members.id',
@@ -226,46 +226,7 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
         if validated_data.get('show_summary'):
             base_query.aggs.bucket('stage', 'terms', field='stage.id')
 
-        if request.data.get('adviser_in_team'):
-            must = self.must_limit_query_to_current_adviser_in_team(request)
-            if len(must) > 0:
-                base_query.update_from_dict(
-                    self.add_must_and_must_not_to_filters(
-                        base_query,
-                        must,
-                        [],
-                    ),
-                )
-
         return base_query
-
-    def must_limit_query_to_current_adviser_in_team(self, request):
-        """
-        Create filter that limits results to investment projects that have the current adviser in
-        its team.
-        """
-        must = []
-        if str(request.user.id):
-            must = {'bool': {'minimum_should_match': 1, 'should': []}}
-            relationships = [
-                'client_relationship_manager',
-                'one_list_group_global_account_manager',
-                'project_assurance_adviser',
-                'project_manager',
-                'team_members',
-            ]
-            for relationship in relationships:
-                must['bool']['should'].append(
-                    {
-                        'match': {
-                            f'{relationship}.id': {
-                                'operator': 'or',
-                                'query': str(request.user.id),
-                            },
-                        },
-                    },
-                )
-        return must
 
     def get_sibling_company_ids(self, investor_companies):
         """Get a list of all sibling company id's"""
