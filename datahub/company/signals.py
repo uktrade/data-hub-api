@@ -1,6 +1,6 @@
 import logging
 
-from django.db.models.signals import post_migrate
+from django.db.models.signals import post_migrate, pre_save
 from django.dispatch import receiver
 
 from datahub.company.constants import BusinessTypeConstant
@@ -8,14 +8,27 @@ from datahub.company.models import (
     CompanyExportCountry,
     CompanyExportCountryHistory,
 )
+from datahub.company.models.company import Company
 from datahub.company.signal_receivers import (
     export_country_delete_signal,
     export_country_update_signal,
 )
 from datahub.core.utils import load_constants_to_database
 from datahub.metadata.models import BusinessType
+from datahub.search.company.tasks import schedule_sync_investment_projects_of_subsidiary_companies
 
 logger = logging.getLogger(__name__)
+
+
+@receiver(pre_save, sender=Company)
+def company_one_list_acount_owner_changed(sender, instance, **kwargs):
+    try:
+        original = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        pass
+    else:
+        if (original.one_list_account_owner_id is not instance.one_list_account_owner_id):
+            schedule_sync_investment_projects_of_subsidiary_companies(instance)
 
 
 @receiver(

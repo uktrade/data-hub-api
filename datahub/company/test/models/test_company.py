@@ -70,7 +70,7 @@ class TestOneListAccountOwner():
     """
 
     mock_schedule_sync_investment_projects_of_subsidiary_companies_target = \
-        'datahub.search.company.tasks.schedule_sync_investment_projects_of_subsidiary_companies'
+        'datahub.company.signals.schedule_sync_investment_projects_of_subsidiary_companies'
 
     def test_one_list_account_owner_changed(self, monkeypatch: pytest.MonkeyPatch):
         one_list_account_owner = AdviserFactory()

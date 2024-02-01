@@ -405,22 +405,9 @@ class Company(ArchivableModel, BaseModel):
         db_index=True,
     )
 
-    # Stores one list account owner id before change to avoid calling sync of
-    # subsidiary company's investment projects on each save.
-    __original_one_list_account_owner_id = None
-
+    @transaction.atomic()
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # Only run sync when one_list_acocunt_owner_id has changed.
-        if (self.__original_one_list_account_owner_id is not self.one_list_account_owner_id):
-            from datahub.search.company.tasks import (
-                schedule_sync_investment_projects_of_subsidiary_companies,
-            )
-            schedule_sync_investment_projects_of_subsidiary_companies(self)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__original_one_list_account_owner_id = self.one_list_account_owner_id
 
     def __str__(self):
         """Admin displayed human readable name."""
