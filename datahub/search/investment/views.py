@@ -208,9 +208,7 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
     """Filtered investment project search view."""
 
     def get_base_query(self, request, validated_data):
-        """
-        Add aggregations to show the number of projects at each stage.
-        """
+        """Add aggregations to show the number of projects at each stage."""
         investor_company_ids = validated_data.get('investor_company')
         if investor_company_ids:
             related_company_ids = get_datahub_ids_for_dnb_service_company_hierarchy(
@@ -225,7 +223,6 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
         base_query = super().get_base_query(request, validated_data)
         if validated_data.get('show_summary'):
             base_query.aggs.bucket('stage', 'terms', field='stage.id')
-
         return base_query
 
     def get_sibling_company_ids(self, investor_companies):
