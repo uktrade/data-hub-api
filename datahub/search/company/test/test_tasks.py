@@ -1,10 +1,10 @@
 import logging
 from operator import attrgetter
-from unittest.mock import Mock
 
 import pytest
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, SubsidiaryFactory
+from datahub.core.test.queues.test_scheduler import PickleableMock
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 from datahub.search.company.tasks import (
@@ -17,24 +17,40 @@ from datahub.search.query_builder import get_search_by_entities_query
 pytestmark = pytest.mark.django_db
 
 
-def test_schedule_sync_investment_projects_of_subsidiary_companies(caplog, monkeypatch):
+@pytest.fixture
+def mock_sync_investment_projects_of_subsidiary_companies(monkeypatch):
+    """
+    Mocks the sync_investment_projects_of_subsidiary_companies function.
+    """
+    mock_sync_investment_projects_of_subsidiary_companies = PickleableMock()
+    monkeypatch.setattr(
+        'datahub.search.company.tasks.sync_investment_projects_of_subsidiary_companies',
+        mock_sync_investment_projects_of_subsidiary_companies.queue_handler,
+    )
+    return mock_sync_investment_projects_of_subsidiary_companies
+
+
+def test_schedule_sync_investment_projects_of_subsidiary_companies(
+    caplog,
+    mock_sync_investment_projects_of_subsidiary_companies,
+):
     """
     Test that the sync_investment_projects_of_subsidiary_companies function is called from the
     scheduler.
     """
     caplog.set_level(logging.INFO, logger='datahub.search.company.tasks')
     subsidiary = SubsidiaryFactory()
+
     job = schedule_sync_investment_projects_of_subsidiary_companies(subsidiary.global_headquarters)
+
     assert caplog.messages == [
         f'Task {job.id} schedule_sync_investment_projects_of_subsidiary_companies '
         f'scheduled company {subsidiary.global_headquarters}',
     ]
-
-    mock_schedule_sync_investment_projects_of_subsidiary_companies = Mock()
-    monkeypatch.setattr(
-        'datahub.search.company.tasks.sync_investment_projects_of_subsidiary_companies',
-        mock_schedule_sync_investment_projects_of_subsidiary_companies,
-    )
+    assert mock_sync_investment_projects_of_subsidiary_companies.called is True
+    assert mock_sync_investment_projects_of_subsidiary_companies.keywords[0] == {
+        'company': subsidiary.global_headquarters,
+    }
 
 
 def test_sync_investment_projects_of_subsidiary_companies(
