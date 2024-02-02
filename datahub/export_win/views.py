@@ -47,6 +47,8 @@ class WinViewSet(CoreViewSet):
 class CustomerResponseViewSet(CoreViewSet):
     """Views for Customer response."""
 
+    # this endpoint is publicly accessible
+    authentication_classes = ()
     permission_classes = (AllowAny,)
     serializer_class = CustomerResponseSerializer
     queryset = CustomerResponse.objects.all()
