@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.db import transaction
 
@@ -15,6 +17,7 @@ from datahub.export_win.models import (
     BreakdownType,
     BusinessPotential,
     CustomerResponse,
+    CustomerResponseToken,
     ExpectedValueRelation,
     Experience,
     HQTeamRegionOrPost,
@@ -196,7 +199,6 @@ class WinSerializer(ModelSerializer):
             'type',
             'export_experience',
             'audit',
-            'customer_response',
             'team_members',
         )
 
@@ -277,3 +279,81 @@ class WinSerializer(ModelSerializer):
             if team_members is not None:
                 instance.team_members.set(team_members)
         return instance
+
+
+class LimitedExportWinSerializer(ModelSerializer):
+    """Limited export win serializer."""
+
+    country = NestedRelatedField(Country)
+    goods_vs_services = NestedRelatedField(ExpectedValueRelation)
+    lead_officer = NestedAdviserField()
+    breakdowns = BreakdownSerializer(many=True)
+
+    class Meta:
+        model = Win
+        fields = (
+            'date',
+            'country',
+            'goods_vs_services',
+            'lead_officer',
+            'breakdowns',
+            'description',
+        )
+
+
+class CustomerResponseSerializer(ModelSerializer):
+    """Customer response serializer."""
+
+    win = LimitedExportWinSerializer(read_only=True)
+    our_support = NestedRelatedField(Rating)
+    access_to_contacts = NestedRelatedField(Rating)
+    access_to_information = NestedRelatedField(Rating)
+    improved_profile = NestedRelatedField(Rating)
+    gained_confidence = NestedRelatedField(Rating)
+    developed_relationships = NestedRelatedField(Rating)
+    overcame_problem = NestedRelatedField(Rating)
+    expected_portion_without_help = NestedRelatedField(WithoutOurSupport)
+    last_export = NestedRelatedField(Experience)
+    marketing_source = NestedRelatedField(MarketingSource)
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        """
+        Update the customer response and invalidate token.
+        """
+        instance = super().update(instance, validated_data)
+
+        CustomerResponseToken.objects.filter(
+            id=self.context.get('token_pk'),
+        ).update(
+            expires_on=datetime.utcnow(),
+        )
+        return instance
+
+    class Meta:
+        model = CustomerResponse
+        fields = (
+            'win',
+            'agree_with_win',
+            'comments',
+            'our_support',
+            'access_to_contacts',
+            'access_to_information',
+            'improved_profile',
+            'gained_confidence',
+            'developed_relationships',
+            'overcame_problem',
+            'involved_state_enterprise',
+            'interventions_were_prerequisite',
+            'support_improved_speed',
+            'expected_portion_without_help',
+            'last_export',
+            'company_was_at_risk_of_not_exporting',
+            'has_explicit_export_plans',
+            'has_enabled_expansion_into_new_market',
+            'has_increased_exports_as_percent_of_turnover',
+            'has_enabled_expansion_into_existing_market',
+            'case_study_willing',
+            'marketing_source',
+            'other_marketing_source',
+        )
