@@ -28,7 +28,10 @@ def company_one_list_acount_owner_changed(sender, instance, **kwargs):
         pass
     else:
         if (original.one_list_account_owner_id is not instance.one_list_account_owner_id):
-            schedule_sync_investment_projects_of_subsidiary_companies(instance)
+            schedule_sync_investment_projects_of_subsidiary_companies(
+                instance,
+                original.modified_on,
+            )
 
 
 @receiver(
