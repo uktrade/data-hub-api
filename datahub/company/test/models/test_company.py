@@ -84,9 +84,12 @@ class TestOneListAccountOwner():
 
         # Mock call to schedule_sync_investment_projects_of_subsidiary_companies
         company.one_list_account_owner = one_list_account_owner
+        modified_on = company.modified_on
         company.save()
+
         mock_schedule_sync_investment_projects_of_subsidiary_companies.assert_called_once_with(
             company,
+            modified_on,
         )
 
     def test_one_list_account_owner_not_changed(self, monkeypatch: pytest.MonkeyPatch):
