@@ -1,5 +1,3 @@
-from logging import getLogger
-
 import reversion
 
 from datahub.dbmaintenance.management.base import CSVBaseCommand
@@ -14,9 +12,9 @@ class Command(CSVBaseCommand):
         """Process one single row."""
         pk = parse_uuid(row['id'])
         order = Order.objects.get(pk=pk)
-        newVatNumber = parse_limited_string(row['new_vat_number'])
+        new_vat_number = parse_limited_string(row['new_vat_number'])
 
-        order.vat_number = newVatNumber
+        order.vat_number = new_vat_number
 
         if simulate:
             return
