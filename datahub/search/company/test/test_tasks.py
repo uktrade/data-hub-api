@@ -121,9 +121,9 @@ def test_race_condition_sync_investment_projects_of_subsidiary_companies(
     assert mock_sync_investment_projects_of_subsidiary_companies.called is True
     hq = subsidiary.global_headquarters
     assert exception_info.value.extra_info == (
-        f"Company id: {hq.id}, "
-        f"Company modified_on: {hq.modified_on}, "
-        f"original_modified_on: {original_modified_on}."
+        f'Company id: {hq.id}, '
+        f'Company modified_on: {hq.modified_on}, '
+        f'original_modified_on: {original_modified_on}.'
     )
     # Due to error investment projects shouldn't have been updated
     result = get_search_by_entities_query(
