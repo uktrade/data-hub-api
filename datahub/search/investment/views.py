@@ -83,6 +83,7 @@ class SearchInvestmentProjectAPIViewMixin:
     COMPOSITE_FILTERS = {
         'adviser': [
             'client_relationship_manager.id',
+            'one_list_group_global_account_manager.id',
             'project_assurance_adviser.id',
             'project_manager.id',
             'team_members.id',
