@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 @receiver(pre_save, sender=Company)
-def company_one_list_acount_owner_changed(sender, instance, **kwargs):
+def company_one_list_account_owner_changed(sender, instance, **kwargs):
     try:
         original = sender.objects.get(pk=instance.pk)
     except sender.DoesNotExist:
