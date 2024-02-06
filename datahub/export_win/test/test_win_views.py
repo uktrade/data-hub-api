@@ -1333,8 +1333,8 @@ class TestResendExportWinView(APITestMixin):
 
     def test_resend_export_win_success(
             self,
-            mock_notify_export_win_contact_by_rq_email,
     ):
+        """Test to resend win to the right contact"""
         mock_contact = ContactFactory()
         win = WinFactory(company_contacts=[mock_contact])
         customer_response = CustomerResponseFactory(win=win)
@@ -1352,8 +1352,10 @@ class TestResendExportWinView(APITestMixin):
             new_token.id,
         )
         url = reverse('api-v4:export-win:win-resend', kwargs={'pk': win.pk})
-
         response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {'message': 'Email has successfully been resent'}
+        created_token = CustomerResponseToken.objects.get(id=new_token.id)
+        assert created_token.company_contact == mock_contact
+        assert created_token.customer_response == customer_response
