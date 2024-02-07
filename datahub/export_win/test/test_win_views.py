@@ -1355,7 +1355,7 @@ class TestResendExportWinView(APITestMixin):
         response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data == {'message': 'Email has successfully been resent'}
+        assert response.data == {'message': 'Email has successfully been re-sent'}
         created_token = CustomerResponseToken.objects.get(id=new_token.id)
         assert created_token.company_contact == mock_contact
         assert created_token.customer_response == customer_response

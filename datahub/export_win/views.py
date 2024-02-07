@@ -114,7 +114,7 @@ class WinViewSet(CoreViewSet):
             new_token.id,
         )
         data = {
-            'message': 'Email has successfully been resent',
+            'message': 'Email has successfully been re-sent',
         }
         return Response(data, status=status.HTTP_200_OK)
 
