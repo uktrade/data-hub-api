@@ -685,7 +685,9 @@ class TestEntitySearch(APITestMixin):
         opensearch_with_collector,
     ):
         """
-        Test that the sector_descends filter excludes ancestor sectors (where a child sector already exists) for interactions.
+        Test that the sector_descends filter excludes ancestor sectors
+        (where a child sector already exists) for interactions.
+        
         """
         num_sectors = len(hierarchical_sectors)
         sectors_ids = [sector.pk for sector in hierarchical_sectors]
@@ -744,7 +746,9 @@ class TestEntitySearch(APITestMixin):
         opensearch_with_collector,
     ):
         """
-        Test that the sector_descends filter excludes ancestor sectors (where a child sector already exists) for companies.
+        Test that the sector_descends filter excludes ancestor sectors
+        (where a child sector already exists) for companies.
+        
         """
         num_sectors = len(hierarchical_sectors)
         sectors_ids = [sector.pk for sector in hierarchical_sectors]
