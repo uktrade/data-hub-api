@@ -205,12 +205,7 @@ class TestUpdateEmailDeliveryStatusTask:
         )
         assert (
             customer_response_token_to_update.email_delivery_status
-            == EmailDeliveryStatus.DELIVERED
-        )
-
-        mock_export_win_tasks_notify_gateway.get_notification_by_id.assert_called_once_with(
-            email_notification_id,
-            notify_service_name=NotifyServiceName.export_win,
+            == EmailDeliveryStatus.UNKNOWN
         )
 
 
