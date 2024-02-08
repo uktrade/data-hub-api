@@ -1,4 +1,6 @@
 """Search views."""
+import uuid
+
 from collections import namedtuple
 from enum import auto, Enum
 from itertools import islice
@@ -12,6 +14,7 @@ from rest_framework.schemas.openapi import AutoSchema
 from rest_framework.views import APIView
 
 from datahub.core.csv import create_csv_response
+from datahub.metadata.models import Sector
 from datahub.search.apps import get_global_search_apps_as_mapping
 from datahub.search.execute_query import execute_search_query
 from datahub.search.permissions import (
@@ -209,6 +212,21 @@ class SearchAPIView(APIView):
     def get_base_query(self, request, validated_data):
         """Gets a filtered OpenSearch query for the provided search parameters."""
         filter_data = self._get_filter_data(validated_data)
+
+        # Handle sector filtering...
+        if 'sector_descends' in filter_data.keys():
+            sector_ids = filter_data['sector_descends']
+            sector_objects = Sector.objects.filter(id__in=sector_ids)
+            # Pre-fetch all ancestors to avoid additional db calls
+            ancestors = sector_objects.get_ancestors()
+            ancestor_uuids = set(ancestors.values_list('id', flat=True))
+            # Remove ancestors from sector list, leaving only the youngest descendants
+            filter_data['sector_descends'] = [
+                sector_id
+                for sector_id in sector_ids
+                if uuid.UUID(sector_id) not in ancestor_uuids
+            ]
+
         entities = self.get_entities()
         permission_filters = self.search_app.get_permission_filters(request)
         ordering = _map_opensearch_ordering(validated_data['sortby'], self.es_sort_by_remappings)
