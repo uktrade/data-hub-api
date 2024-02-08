@@ -687,7 +687,7 @@ class TestEntitySearch(APITestMixin):
         """
         Test that the sector_descends filter excludes ancestor sectors
         (where a child sector already exists) for interactions.
-        
+
         """
         num_sectors = len(hierarchical_sectors)
         sectors_ids = [sector.pk for sector in hierarchical_sectors]
@@ -748,7 +748,7 @@ class TestEntitySearch(APITestMixin):
         """
         Test that the sector_descends filter excludes ancestor sectors
         (where a child sector already exists) for companies.
-        
+
         """
         num_sectors = len(hierarchical_sectors)
         sectors_ids = [sector.pk for sector in hierarchical_sectors]
