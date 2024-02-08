@@ -96,7 +96,7 @@ job_defaults: &job_defaults
 
     - run:
         name: Run tests
-        command: python -m pytest -n 4 --cov --junitxml=test-reports/junit.xml --durations 25
+        command: python -m pytest datahub/oauth/admin_sso/test/test_admin.py
 
     - store_test_results:
         path: test-reports

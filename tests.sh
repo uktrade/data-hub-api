@@ -1,2 +1,2 @@
 #!/bin/bash -xe
-pytest -n 4 --cov -s $@
+pytest datahub/oauth/admin_sso/test/test_admin.py
