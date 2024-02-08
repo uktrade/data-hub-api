@@ -1,6 +1,10 @@
 import datetime
 
+from uuid import UUID
+
+import factory
 import pytest
+
 from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
@@ -674,6 +678,115 @@ class TestEntitySearch(APITestMixin):
             ('Ether 1', '2010-01-01'),
             ('Ether 2', None),
         ] == [(obj['name'], obj['date']) for obj in response_data['results']]
+
+    def test_sector_descends_filter_excludes_ancestors_for_interactions(
+        self,
+        hierarchical_sectors,
+        opensearch_with_collector,
+    ):
+        """
+        Test that the sector_descends filter excludes ancestor sectors (where a child sector already exists) for interactions.
+        """
+        num_sectors = len(hierarchical_sectors)
+        sectors_ids = [sector.pk for sector in hierarchical_sectors]
+
+        # Create companies in each sector
+        companies = CompanyFactory.create_batch(
+            num_sectors,
+            sector_id=factory.Iterator(sectors_ids),
+        )
+
+        # Create interactions for each company
+        company_interactions = CompanyInteractionFactory.create_batch(
+            num_sectors,
+            company=factory.Iterator(companies),
+        )
+
+        # Make sure all sectors and interactions are in OpenSearch
+        opensearch_with_collector.flush_and_refresh()
+
+        # Retrieve youngest descendant sector
+        youngest_descendant_sector_id = hierarchical_sectors[-1].pk
+        # Pre-fetch all ancestors
+        ancestors = hierarchical_sectors[-1].get_ancestors()
+        ancestor_uuids = set(ancestors.values_list('id', flat=True))
+
+        # Test API endpoint with youngest descendant sector
+        url = reverse('api-v3:search:interaction')
+        body = {
+            'sector_descends': sectors_ids,
+        }
+        response = self.api_client.post(url, body)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        # Expecting interactions associated with the youngest descendant sector
+        expected_ids = {
+            interaction.pk
+            for interaction in company_interactions
+            if interaction.company.sector_id == youngest_descendant_sector_id
+        }
+
+        actual_ids = {
+            UUID(interaction['id']) for interaction in response_data['results']
+        }
+
+        # Assert that no ancestor sectors' interactions are in the results
+        assert response_data['count'] == 1
+        assert actual_ids == expected_ids
+        assert all(ancestor_id not in actual_ids for ancestor_id in ancestor_uuids)
+
+    def test_sector_descends_filter_excludes_ancestors_for_companies(
+        self,
+        hierarchical_sectors,
+        opensearch_with_collector,
+    ):
+        """
+        Test that the sector_descends filter excludes ancestor sectors (where a child sector already exists) for companies.
+        """
+        num_sectors = len(hierarchical_sectors)
+        sectors_ids = [sector.pk for sector in hierarchical_sectors]
+
+        # Create companies in each sector
+        companies = CompanyFactory.create_batch(
+            num_sectors,
+            sector_id=factory.Iterator(sectors_ids),
+        )
+
+        # Make sure all sectors and interactions are in OpenSearch
+        opensearch_with_collector.flush_and_refresh()
+
+        # Retrieve youngest descendant sector
+        youngest_descendant_sector_id = hierarchical_sectors[-1].pk
+        # Pre-fetch all ancestors
+        ancestors = hierarchical_sectors[-1].get_ancestors()
+        ancestor_uuids = set(ancestors.values_list('id', flat=True))
+
+        # Test API endpoint with youngest descendant sector
+        url = reverse('api-v4:search:company')
+        body = {
+            'sector_descends': sectors_ids,
+        }
+        response = self.api_client.post(url, body)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        # Expecting companies associated with the youngest descendant sector
+        expected_ids = {
+            company.pk
+            for company in companies
+            if company.sector_id == youngest_descendant_sector_id
+        }
+
+        actual_ids = {UUID(company['id']) for company in response_data['results']}
+
+        # Assert that no ancestor sectors' companies are in the results
+        assert response_data['count'] == 1
+        assert actual_ids == expected_ids
+        assert all(ancestor_id not in actual_ids for ancestor_id in ancestor_uuids)
 
 
 class TestSearchExportAPIView(APITestMixin):
