@@ -54,6 +54,18 @@ def mock_export_win_notify_export_win_contact(monkeypatch):
     return mock_notify
 
 
+@pytest.fixture()
+def export_wins():
+    confirmed = CustomerResponseFactory.create_batch(2, agree_with_win=True)
+    unconfirmed = CustomerResponseFactory.create_batch(3, agree_with_win=False)
+    awaiting = CustomerResponseFactory(agree_with_win=None)
+    yield [
+        confirmed,
+        unconfirmed,
+        awaiting,
+    ]
+
+
 class TestGetWinView(APITestMixin):
     """Get single win view tests."""
 
@@ -291,6 +303,46 @@ class TestListWinView(APITestMixin):
         response_data = response.json()
 
         assert response_data['count'] == 2
+
+    @pytest.mark.parametrize(
+        'confirmed,results_length',
+        (
+            (
+                'true',
+                2,
+            ),
+            (
+                'false',
+                3,
+            ),
+            (
+                'null',
+                1,
+            ),
+        ),
+    )
+    def test_list_filtered_by_agree_with_win(self, export_wins, confirmed, results_length):
+        """Test the HVC view when filtered by financial year"""
+        url = reverse('api-v4:export-win:collection')
+
+        response = self.api_client.get(url, data={
+            'confirmed': confirmed,
+        })
+        assert response.status_code == status.HTTP_200_OK
+        results = response.json()
+
+        assert len(results['results']) == results_length
+
+        expected = {
+            'true': True,
+            'false': False,
+            'null': None,
+        }
+
+        assert all(
+            result['customer_response']['agree_with_win'] == expected[confirmed]
+            for result in results['results']
+        ) is True
 
 
 class TestCreateWinView(APITestMixin):
