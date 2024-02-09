@@ -183,6 +183,7 @@ class CustomerResponseFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     win = factory.SubFactory(WinFactory)
+    agree_with_win = None
     case_study_willing = False
     our_support = factory.SubFactory(RatingFactory)
     access_to_contacts = factory.SubFactory(RatingFactory)
