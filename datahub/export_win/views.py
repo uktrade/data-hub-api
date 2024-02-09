@@ -2,6 +2,11 @@ from datetime import datetime
 
 from django.http import Http404
 
+from django_filters.rest_framework import (
+    DjangoFilterBackend,
+    Filter,
+    FilterSet,
+)
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.views import Response
@@ -16,6 +21,36 @@ from datahub.export_win.serializers import (
     CustomerResponseSerializer,
     WinSerializer,
 )
+
+
+class NullBooleanFieldFilter(Filter):
+    """Null boolean field filter."""
+
+    def filter(self, qs, value):
+        """Filter query"""
+        if value is not None:
+            sanitised_value = value.strip().lower()
+            if sanitised_value == 'null':
+                return qs.filter(
+                    **{f'{self.field_name}__isnull': True},
+                )
+            elif sanitised_value == 'true':
+                return qs.filter(
+                    **{self.field_name: True},
+                )
+            elif sanitised_value == 'false':
+                return qs.filter(
+                    **{self.field_name: False},
+                )
+        return qs
+
+
+class ConfirmedFilterSet(FilterSet):
+    """Filter set for confirmed, unconfirmed, unanswered wins."""
+
+    confirmed = NullBooleanFieldFilter(
+        field_name='customer_response__agree_with_win',
+    )
 
 
 class WinViewSet(CoreViewSet):
@@ -36,12 +71,15 @@ class WinViewSet(CoreViewSet):
         'hq_team',
         'business_potential',
         'export_experience',
+        'customer_response',
     ).prefetch_related(
         'type_of_support',
         'associated_programme',
         'team_members',
         'advisers',
     )
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ConfirmedFilterSet
 
 
 class CustomerResponseViewSet(CoreViewSet):
