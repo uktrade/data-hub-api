@@ -602,7 +602,7 @@ class Rating(Enum):
         'dbfc571c-ffbe-4ef8-8840-16364ed46824',
     )
     rating_5 = Constant(
-        '5',
+        'Completely',
         '7efd335d-f963-4c34-8a4f-2ae57419d632',
     )
 
