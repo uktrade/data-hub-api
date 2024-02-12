@@ -12,8 +12,13 @@ from django.db.models import (Sum)
 from freezegun import freeze_time
 
 from datahub.company.test.factories import ContactFactory
+from datahub.export_win.constants import (
+    EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD,
+    EMAIL_MAX_TOKEN_ISSUED_WITHIN_RESPONSE_THRESHOLD,
+)
 from datahub.export_win.models import Breakdown, CustomerResponseToken
 from datahub.export_win.tasks import (
+    auto_resend_client_email_from_unconfirmed_win,
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
     get_all_fields_for_lead_officer_email_receipt_no,
@@ -25,6 +30,7 @@ from datahub.export_win.tasks import (
 )
 from datahub.export_win.test.factories import (
     BreakdownFactory, CustomerResponseFactory, CustomerResponseTokenFactory,
+    WinFactory,
 )
 from datahub.notification.constants import NotifyServiceName
 from datahub.reminder.models import EmailDeliveryStatus
@@ -209,6 +215,90 @@ class TestUpdateEmailDeliveryStatusTask:
         mock_export_win_tasks_notify_gateway.get_notification_by_id.assert_called_once_with(
             email_notification_id,
             notify_service_name=NotifyServiceName.export_win,
+        )
+
+
+@pytest.mark.django_db
+@freeze_time('2023-07-17T00:00:00')
+class TestAutoResendClientEmailFromUnconfirmedWinTask:
+    current_date = date(year=2023, month=7, day=17)
+
+    def test_auto_resend_client_email_when_less_than_max_token_threshold(
+        self,
+    ):
+        """
+        Test auto resend email to client with less than max token threshold.
+        """
+        contact = ContactFactory()
+        win = WinFactory(company_contacts=[contact])
+        customer_response = CustomerResponseFactory(win=win)
+
+        created_on_last_5days = self.current_date - timedelta(days=5)
+        with freeze_time(created_on_last_5days):
+            create_token_for_contact(contact, customer_response)
+
+        created_on_last_3days = self.current_date - timedelta(days=3)
+        with freeze_time(created_on_last_3days):
+            create_token_for_contact(contact, customer_response)
+
+        created_on_last_2days = self.current_date - timedelta(days=2)
+        with freeze_time(created_on_last_2days):
+            create_token_for_contact(contact, customer_response)
+
+        auto_resend_client_email_from_unconfirmed_win()
+        customer_response.refresh_from_db()
+
+        assert (
+            customer_response.tokens.count() < EMAIL_MAX_TOKEN_ISSUED_WITHIN_RESPONSE_THRESHOLD
+        )
+
+    def test_auto_resend_client_email_when_less_than_win_email_response_threshold(self):
+        """
+        Test auto resend email to client with less than win maturity days threshold.
+        """
+        contact = ContactFactory()
+        win = WinFactory(company_contacts=[contact])
+        customer_response = CustomerResponseFactory(win=win)
+        win_email_response_threshold = datetime.utcnow() - \
+            timedelta(days=EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD - 1)
+
+        created_on_last_25days = datetime.utcnow() - timedelta(days=25)
+        with freeze_time(created_on_last_25days):
+            token_25_days = create_token_for_contact(contact, customer_response)
+
+        created_on_last_21days = datetime.utcnow() - timedelta(days=21)
+        with freeze_time(created_on_last_21days):
+            token_21_days = create_token_for_contact(contact, customer_response)
+
+        created_on_last_14days = datetime.utcnow() - timedelta(days=14)
+        with freeze_time(created_on_last_14days):
+            token_14_days = create_token_for_contact(contact, customer_response)
+
+        created_on_last_7days = datetime.utcnow() - timedelta(days=7)
+        with freeze_time(created_on_last_7days):
+            token_7_days = create_token_for_contact(contact, customer_response)
+
+        created_on_last_5days = datetime.utcnow() - timedelta(days=5)
+        with freeze_time(created_on_last_5days):
+            token_5_days = create_token_for_contact(contact, customer_response)
+
+        auto_resend_client_email_from_unconfirmed_win()
+        customer_response.refresh_from_db()
+
+        assert (
+            win_email_response_threshold > token_25_days.expires_on
+        )
+        assert (
+            win_email_response_threshold > token_21_days.expires_on
+        )
+        assert (
+            win_email_response_threshold > token_14_days.expires_on
+        )
+        assert (
+            win_email_response_threshold < token_7_days.expires_on
+        )
+        assert (
+            win_email_response_threshold < token_5_days.expires_on
         )
 
 
