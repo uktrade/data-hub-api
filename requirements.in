@@ -60,7 +60,7 @@ sentry_sdk==1.40.3
 rq==1.15.1
 rq-scheduler==0.13.1
 
-python-redis-rate-limit==0.0.8
+python-redis-rate-limit==0.0.9
 
 #Tree related
 bigtree
