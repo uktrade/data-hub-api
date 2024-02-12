@@ -127,7 +127,9 @@ opensearch-py==2.4.2
     #   -r requirements.in
     #   opensearch-dsl
 packaging==22.0
-    # via marshmallow
+    # via
+    #   marshmallow
+    #   python-redis-rate-limit
 pandas==2.2.0
     # via -r requirements.in
 psycogreen==1.0.2
@@ -146,7 +148,7 @@ python-dateutil==2.8.2
     #   opensearch-py
     #   pandas
     #   rq-scheduler
-python-redis-rate-limit==0.0.8
+python-redis-rate-limit==0.0.9
     # via -r requirements.in
 pytz==2022.7
     # via
