@@ -1,15 +1,20 @@
 from datetime import datetime
 
-from django.http import Http404
+from django.conf import settings
 
+from django.http import Http404
 from django_filters.rest_framework import (
     DjangoFilterBackend,
     Filter,
     FilterSet,
 )
+
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.views import Response
+
+from datahub.core.schemas import StubSchema
 
 from datahub.core.viewsets import CoreViewSet
 from datahub.export_win.models import (
@@ -20,6 +25,12 @@ from datahub.export_win.models import (
 from datahub.export_win.serializers import (
     CustomerResponseSerializer,
     WinSerializer,
+)
+from datahub.export_win.tasks import (
+    create_token_for_contact,
+    get_all_fields_for_client_email_receipt,
+    notify_export_win_contact_by_rq_email,
+    update_customer_response_token_for_email_notification_id,
 )
 
 
@@ -80,6 +91,32 @@ class WinViewSet(CoreViewSet):
     )
     filter_backends = [DjangoFilterBackend]
     filterset_class = ConfirmedFilterSet
+
+    @action(methods=['post'], detail=True, schema=StubSchema())
+    def resend_export_win(self, request, *args, **kwargs):
+        """
+        Resend email manually via ITA dashboard
+        """
+        win = self.get_object()
+        contact = win.company_contacts.first()
+        customer_response = win.customer_response
+        new_token = create_token_for_contact(contact, customer_response)
+        context = get_all_fields_for_client_email_receipt(
+            new_token,
+            customer_response,
+        )
+        template_id = settings.EXPORT_WIN_CLIENT_RECEIPT_TEMPLATE_ID
+        notify_export_win_contact_by_rq_email(
+            contact.email,
+            template_id,
+            context,
+            update_customer_response_token_for_email_notification_id,
+            new_token.id,
+        )
+        data = {
+            'message': 'Email has successfully been re-sent',
+        }
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class CustomerResponseViewSet(CoreViewSet):
