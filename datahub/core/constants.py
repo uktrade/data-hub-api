@@ -108,15 +108,15 @@ class Sector(Enum):
         'b422c9d2-5f95-e211-a939-e4115bead28a',
     )
     defence_air = Constant(
-        'Defence: Air',
+        'Defence : Air',
         '03dbd3fb-24e4-421e-bcc1-1dfcd63b2eeb',
     )
     defence_land = Constant(
-        'Defence: Land',
+        'Defence : Land',
         '7c432bdc-77e0-49ac-8d5f-1eece499ae2a',
     )
     mining_mining_vehicles_transport_equipment = Constant(
-        'Mining: Mining vehicles, transport and equipment',
+        'Mining : Mining vehicles, transport and equipment',
         'e17c69f9-8c65-457e-9a65-fd7c52a45700',
     )
     renewable_energy_wind = Constant(
