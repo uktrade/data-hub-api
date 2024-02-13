@@ -68,7 +68,9 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     registered_address_country_id = constants.Country.united_kingdom.value.id
 
     business_type_id = BusinessTypeConstant.private_limited_company.value.id
-    sector_id = constants.Sector.aerospace_assembly_aircraft.value.id
+    sector_id = factory.LazyFunction(
+        lambda: choice(list(constants.Sector)).value.id,
+    )
     archived = False
     uk_region_id = constants.UKRegion.england.value.id
     export_experience_category = factory.LazyFunction(
