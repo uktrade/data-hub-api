@@ -38,3 +38,18 @@ class TestTaskMigrations(APITestMixin):
         updated_task = Task.objects.filter(id=task.id).first()
 
         assert updated_task.investment_project is None
+    
+    def test_archive_task_status_migration_forwards_func(self):
+        # Import migration file dynamically as it start with a number
+        module = import_module('datahub.task.migrations.0011_archive_task_status')
+
+        task_archived = TaskFactory(archived=True)
+        module.forwards_func(apps, None)
+
+        task = TaskFactory(archived=False)
+        module.forwards_func(apps, None)
+
+        assert task_archived.status == 'active'
+        assert task.status == 'complete'
+
+
