@@ -42,8 +42,10 @@ class TestTaskMigrations(APITestMixin):
         # Import migration file dynamically as it start with a number
         module = import_module('datahub.task.migrations.0011_archive_task_status')
 
-        task_archived = TaskFactory(archived=True, archived_by=AdviserFactory())
-        task = TaskFactory(archived=False)
+        archived_by = AdviserFactory()
+
+        task_archived = TaskFactory(archived=True, archived_by=archived_by)
+        task = TaskFactory(archived=False, archived_by=None)
 
         module.forwards_func(apps, None)
 
@@ -52,7 +54,7 @@ class TestTaskMigrations(APITestMixin):
 
         assert task_archived.status == Task.Status.COMPLETE
         assert task_archived.archived is False
-        assert task_archived.archived_by is None
+        assert task_archived.archived_by == archived_by
         assert task.status == Task.Status.ACTIVE
         assert task.archived is False
         assert task.archived_by is None
