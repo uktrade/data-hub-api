@@ -5,11 +5,9 @@ from unittest.mock import MagicMock
 
 from django.apps import apps
 
+from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin
 from datahub.task.models import Task
-
-
-from datahub.company.test.factories import AdviserFactory
 from datahub.task.test.factories import TaskFactory
 
 
