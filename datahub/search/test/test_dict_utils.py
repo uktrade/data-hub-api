@@ -3,6 +3,7 @@ from unittest import mock
 import pytest
 from pytest import raises
 
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test_utils import construct_mock
 from datahub.search import dict_utils
 
@@ -482,4 +483,29 @@ def test_task_interaction_dict_returns_interaction_task():
 
     assert dict_utils.task_interaction_dict(task) == dict_utils.interaction_dict(
         interaction,
+    )
+
+
+@pytest.mark.django_db
+def test_nested_company_global_account_manager_returns_expected_value():
+    investment_project = mock.MagicMock()
+    one_list_account_owner = AdviserFactory()
+    investment_project.investor_company = CompanyFactory(
+        one_list_account_owner=one_list_account_owner,
+    )
+
+    assert dict_utils.nested_company_global_account_manager(
+        investment_project,
+        'investor_company',
+    ) == dict_utils.contact_or_adviser_dict(one_list_account_owner)
+
+
+def test_nested_company_global_account_manager_returns_none_when_prop_missing():
+    investment_project = mock.MagicMock()
+
+    investment_project.investor_company = None
+
+    assert (
+        dict_utils.nested_company_global_account_manager(investment_project, 'investor_company')
+        is None
     )
