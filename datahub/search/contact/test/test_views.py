@@ -705,14 +705,16 @@ class TestBasicSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
 
-        sector_name = Sector.aerospace_assembly_aircraft.value.name
-        assert sector_name == response.data['results'][0]['company_sector']['name']
+        # company sector is randomly assigned so need to assert if value is valid
+        valid_sector_names = [sector.value.name for sector in Sector]
+        company_sector_name = response.data['results'][0]['company_sector']['name']
+        assert company_sector_name in valid_sector_names
 
     def test_search_contact_has_sector_updated(self, opensearch_with_collector):
         """Tests if contact has a correct sector after company update."""
         contact = ContactFactory(first_name='sector_update')
 
-        # by default company has aerospace_assembly_aircraft sector assigned
+        # company sector is randomly assigned so need to override with fixed value
         company = contact.company
         company.sector_id = Sector.renewable_energy_wind.value.id
         company.save()
