@@ -3,13 +3,15 @@ from datetime import timedelta
 
 from django.db import migrations, models
 
+from datahub.task.models import Task
+
 
 def forwards_func(apps, schema_editor):
     Task = apps.get_model("task", "Task")
 
     tasks = Task.objects.all()
     for task in tasks:
-        task.status = 'complete' if task.archived else 'active'
+        task.status = Task.Status.COMPLETE if task.archived else Task.Status.ACTIVE
         task.archived_by = None
         task.archived = False
         task.save()
@@ -22,8 +24,9 @@ def reverse_func(apps, schema_editor):
 
     tasks = Task.objects.all()
     for task in tasks:
-        task.archived = True if task.status == 'complete' else False
-    print("This migration updates status to archived state from status state and archived_by will not be restored")
+        task.archived = True if (task.status == Task.Status.COMPLETE) else False
+        task.save()
+    print("The migration reverse does not restore archived_by")
 
 
 class Migration(migrations.Migration):
