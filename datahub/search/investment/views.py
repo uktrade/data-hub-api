@@ -65,6 +65,7 @@ class SearchInvestmentProjectAPIViewMixin:
         'gross_value_added_end',
         'name',
         'project_code',
+        'one_list_group_global_account_manager',
     )
 
     REMAP_FIELDS = {
@@ -76,11 +77,13 @@ class SearchInvestmentProjectAPIViewMixin:
         'likelihood_to_land': 'likelihood_to_land.id',
         'uk_region_location': 'uk_region_locations.id',
         'country_investment_originates_from': 'country_investment_originates_from.id',
+        'one_list_group_global_account_manager': 'one_list_group_global_account_manager.id',
     }
 
     COMPOSITE_FILTERS = {
         'adviser': [
             'client_relationship_manager.id',
+            'one_list_group_global_account_manager.id',
             'project_assurance_adviser.id',
             'project_manager.id',
             'team_members.id',
