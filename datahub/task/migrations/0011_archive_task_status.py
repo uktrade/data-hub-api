@@ -12,21 +12,17 @@ def forwards_func(apps, schema_editor):
     tasks = Task.objects.all()
     for task in tasks:
         task.status = Task.Status.COMPLETE if task.archived else Task.Status.ACTIVE
-        task.archived_by = None
         task.archived = False
         task.save()
 
 
 def reverse_func(apps, schema_editor):
-    '''Archived_by will not be recovered'''
-
     Task = apps.get_model("task", "Task")
 
     tasks = Task.objects.all()
     for task in tasks:
         task.archived = True if (task.status == Task.Status.COMPLETE) else False
         task.save()
-    print("The migration reverse does not restore archived_by")
 
 
 class Migration(migrations.Migration):
