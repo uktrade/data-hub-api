@@ -33,6 +33,12 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
 )
 from datahub.export_win.models import CustomerResponseToken, Win
+from datahub.export_win.tasks import (
+    create_token_for_contact,
+    get_all_fields_for_client_email_receipt,
+    notify_export_win_contact_by_rq_email,
+    update_customer_response_token_for_email_notification_id,
+)
 from datahub.export_win.test.factories import (
     BreakdownFactory,
     CustomerResponseFactory,
@@ -52,6 +58,47 @@ def mock_export_win_notify_export_win_contact(monkeypatch):
         mock_notify,
     )
     return mock_notify
+
+
+@pytest.fixture()
+def export_wins():
+    confirmed = CustomerResponseFactory.create_batch(2, agree_with_win=True)
+    unconfirmed = CustomerResponseFactory.create_batch(3, agree_with_win=False)
+    awaiting = CustomerResponseFactory(agree_with_win=None)
+    yield [
+        confirmed,
+        unconfirmed,
+        awaiting,
+    ]
+
+
+def mock_export_win_create_token(monkeypatch):
+    mock_create_token = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.export_win.tasks.create_token_for_contact',
+        mock_create_token,
+    )
+    return mock_create_token
+
+
+@pytest.fixture()
+def mock_export_win_get_all_fields(monkeypatch):
+    mock_get_all_fields = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.export_win.tasks.get_all_fields_for_client_email_receipt',
+        mock_get_all_fields,
+    )
+    return mock_get_all_fields
+
+
+@pytest.fixture()
+def mock_notify_export_win_contact_by_rq_email(monkeypatch):
+    mock_contact_by_rq_email = mock.Mock()
+    monkeypatch.setattr(
+        'datahub.export_win.tasks.notify_export_win_contact_by_rq_email',
+        mock_contact_by_rq_email,
+    )
+    return mock_contact_by_rq_email
 
 
 class TestGetWinView(APITestMixin):
@@ -291,6 +338,46 @@ class TestListWinView(APITestMixin):
         response_data = response.json()
 
         assert response_data['count'] == 2
+
+    @pytest.mark.parametrize(
+        'confirmed,results_length',
+        (
+            (
+                'true',
+                2,
+            ),
+            (
+                'false',
+                3,
+            ),
+            (
+                'null',
+                1,
+            ),
+        ),
+    )
+    def test_list_filtered_by_agree_with_win(self, export_wins, confirmed, results_length):
+        """Test the HVC view when filtered by financial year"""
+        url = reverse('api-v4:export-win:collection')
+
+        response = self.api_client.get(url, data={
+            'confirmed': confirmed,
+        })
+        assert response.status_code == status.HTTP_200_OK
+        results = response.json()
+
+        assert len(results['results']) == results_length
+
+        expected = {
+            'true': True,
+            'false': False,
+            'null': None,
+        }
+
+        assert all(
+            result['customer_response']['agree_with_win'] == expected[confirmed]
+            for result in results['results']
+        ) is True
 
 
 class TestCreateWinView(APITestMixin):
@@ -1229,3 +1316,46 @@ class TestUpdateWinView(APITestMixin):
         assert Version.objects.get_for_object(win).count() == 1
         version = Version.objects.get_for_object(win).first()
         assert version.revision.user == self.user
+
+
+class TestResendExportWinView(APITestMixin):
+    """Tests for the resend_export_win view."""
+
+    def test_resend_export_win_no_permissions(self, api_client):
+        """Test attempting to resend without the required permissions."""
+        user = create_test_user(dit_team=TeamFactory())
+        api_client = self.create_api_client(user=user)
+        win = WinFactory()
+        url = reverse('api-v4:export-win:win-resend', kwargs={'pk': win.pk})
+        response = api_client.post(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert 'You do not have permission to perform this action.' in response.data['detail']
+
+    def test_resend_export_win_success(
+            self,
+    ):
+        """Test to resend win to the right contact"""
+        mock_contact = ContactFactory()
+        win = WinFactory(company_contacts=[mock_contact])
+        customer_response = CustomerResponseFactory(win=win)
+        new_token = create_token_for_contact(mock_contact, customer_response)
+        context = get_all_fields_for_client_email_receipt(
+            new_token,
+            customer_response,
+        )
+        template_id = 'mock_template_id'
+        notify_export_win_contact_by_rq_email(
+            mock_contact.email,
+            template_id,
+            context,
+            update_customer_response_token_for_email_notification_id,
+            new_token.id,
+        )
+        url = reverse('api-v4:export-win:win-resend', kwargs={'pk': win.pk})
+        response = self.api_client.post(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {'message': 'Email has successfully been re-sent'}
+        created_token = CustomerResponseToken.objects.get(id=new_token.id)
+        assert created_token.company_contact == mock_contact
+        assert created_token.customer_response == customer_response

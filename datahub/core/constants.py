@@ -107,6 +107,18 @@ class Sector(Enum):
         'Aerospace : Manufacturing and assembly : Aircraft',
         'b422c9d2-5f95-e211-a939-e4115bead28a',
     )
+    defence_air = Constant(
+        'Defence : Air',
+        '03dbd3fb-24e4-421e-bcc1-1dfcd63b2eeb',
+    )
+    defence_land = Constant(
+        'Defence : Land',
+        '7c432bdc-77e0-49ac-8d5f-1eece499ae2a',
+    )
+    mining_mining_vehicles_transport_equipment = Constant(
+        'Mining : Mining vehicles, transport and equipment',
+        'e17c69f9-8c65-457e-9a65-fd7c52a45700',
+    )
     renewable_energy_wind = Constant(
         'Energy : Renewable energy : Fixed-bottom offshore wind',
         'a4959812-6095-e211-a939-e4115bead28a',
@@ -602,7 +614,7 @@ class Rating(Enum):
         'dbfc571c-ffbe-4ef8-8840-16364ed46824',
     )
     rating_5 = Constant(
-        '5',
+        'Completely',
         '7efd335d-f963-4c34-8a4f-2ae57419d632',
     )
 

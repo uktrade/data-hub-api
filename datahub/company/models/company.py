@@ -405,6 +405,10 @@ class Company(ArchivableModel, BaseModel):
         db_index=True,
     )
 
+    @transaction.atomic()
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
     def __str__(self):
         """Admin displayed human readable name."""
         return self.name

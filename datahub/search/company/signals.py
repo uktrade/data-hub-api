@@ -22,6 +22,13 @@ def company_subsidiaries_sync_search(instance):
     )
 
 
+def company_investment_projects_sync_search(instance):
+    """Sync investment projects to OpenSearch."""
+    transaction.on_commit(
+        lambda: sync_related_objects_async(instance, 'investor_investment_projects'),
+    )
+
+
 def sync_related_company_to_opensearch(instance):
     """Sync related company."""
     transaction.on_commit(
@@ -32,5 +39,6 @@ def sync_related_company_to_opensearch(instance):
 receivers = (
     SignalReceiver(post_save, DBCompany, company_sync_search),
     SignalReceiver(post_save, DBCompany, company_subsidiaries_sync_search),
+    SignalReceiver(post_save, DBCompany, company_investment_projects_sync_search),
     SignalReceiver(post_save, DBInteraction, sync_related_company_to_opensearch),
 )
