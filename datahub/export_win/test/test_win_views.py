@@ -36,7 +36,7 @@ from datahub.export_win.models import CustomerResponseToken, Win
 from datahub.export_win.tasks import (
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
-    notify_export_win_contact_by_rq_email,
+    notify_export_win_email_by_rq_email,
     update_customer_response_token_for_email_notification_id,
 )
 from datahub.export_win.test.factories import (
@@ -48,16 +48,6 @@ from datahub.export_win.test.factories import (
 from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
-
-
-@pytest.fixture()
-def mock_export_win_notify_export_win_contact(monkeypatch):
-    mock_notify = mock.Mock()
-    monkeypatch.setattr(
-        'datahub.export_win.serializers.notify_export_win_contact_by_rq_email',
-        mock_notify,
-    )
-    return mock_notify
 
 
 @pytest.fixture()
@@ -92,10 +82,10 @@ def mock_export_win_get_all_fields(monkeypatch):
 
 
 @pytest.fixture()
-def mock_notify_export_win_contact_by_rq_email(monkeypatch):
+def mock_notify_export_win_email_by_rq_email(monkeypatch):
     mock_contact_by_rq_email = mock.Mock()
     monkeypatch.setattr(
-        'datahub.export_win.tasks.notify_export_win_contact_by_rq_email',
+        'datahub.export_win.tasks.notify_export_win_email_by_rq_email',
         mock_contact_by_rq_email,
     )
     return mock_contact_by_rq_email
@@ -383,7 +373,7 @@ class TestListWinView(APITestMixin):
 class TestCreateWinView(APITestMixin):
     """Create export win view tests."""
 
-    def test_create_win_required_only(self, mock_export_win_notify_export_win_contact):
+    def test_create_win_required_only(self, mock_export_win_serializer_notify):
         """Tests successfully creating an export win with required fields only."""
         url = reverse('api-v4:export-win:collection')
 
@@ -592,9 +582,9 @@ class TestCreateWinView(APITestMixin):
             customer_response_id=win.customer_response.id,
             company_contact=win.company_contacts.first(),
         ).exists()
-        mock_export_win_notify_export_win_contact.assert_called_once()
+        mock_export_win_serializer_notify.assert_called_once()
 
-    def test_create_win_all_fields(self, mock_export_win_notify_export_win_contact):
+    def test_create_win_all_fields(self, mock_export_win_serializer_notify):
         """Tests successfully creating an export win with all fields only."""
         assert Version.objects.count() == 0
 
@@ -874,7 +864,7 @@ class TestCreateWinView(APITestMixin):
             customer_response_id=win.customer_response.id,
             company_contact=win.company_contacts.first(),
         ).exists()
-        mock_export_win_notify_export_win_contact.assert_called_once()
+        mock_export_win_serializer_notify.assert_called_once()
 
 
 class TestUpdateWinView(APITestMixin):
@@ -1344,7 +1334,7 @@ class TestResendExportWinView(APITestMixin):
             customer_response,
         )
         template_id = 'mock_template_id'
-        notify_export_win_contact_by_rq_email(
+        notify_export_win_email_by_rq_email(
             mock_contact.email,
             template_id,
             context,

@@ -7,39 +7,32 @@ import pytest
 import pytz
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.db.models import (Sum)
 
 from freezegun import freeze_time
 
 from datahub.company.test.factories import ContactFactory
-from datahub.export_win.models import Breakdown, CustomerResponseToken
+from datahub.export_win.models import CustomerResponseToken
 from datahub.export_win.tasks import (
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
     get_all_fields_for_lead_officer_email_receipt_no,
     get_all_fields_for_lead_officer_email_receipt_yes,
-    notify_export_win_contact_by_rq_email,
+    notify_export_win_email_by_rq_email,
     send_export_win_email_notification_via_rq,
     update_customer_response_token_for_email_notification_id,
+    update_notify_email_delivery_status_for_customer_response,
     update_notify_email_delivery_status_for_customer_response_token,
 )
 from datahub.export_win.test.factories import (
-    BreakdownFactory, CustomerResponseFactory, CustomerResponseTokenFactory,
+    BreakdownFactory,
+    CustomerResponseFactory,
+    CustomerResponseTokenFactory,
+    WinFactory,
 )
 from datahub.notification.constants import NotifyServiceName
 from datahub.reminder.models import EmailDeliveryStatus
 
 pytestmark = pytest.mark.django_db
-
-
-@pytest.fixture()
-def mock_export_win_tasks_notify_gateway(monkeypatch):
-    mock_notify_gateway = mock.Mock()
-    monkeypatch.setattr(
-        'datahub.export_win.tasks.notify_gateway',
-        mock_notify_gateway,
-    )
-    return mock_notify_gateway
 
 
 @pytest.fixture()
@@ -109,7 +102,7 @@ class TestUpdateEmailDeliveryStatusTask:
         mock_job_scheduler,
     ):
         """
-        Tests the notify_export_win_contact_by_rq_email.
+        Tests the notify_export_win_email_by_rq_email.
 
         It should schedule a task to:
             * notify a client
@@ -120,7 +113,7 @@ class TestUpdateEmailDeliveryStatusTask:
         context = {}
         token_id = uuid.uuid4()
 
-        notify_export_win_contact_by_rq_email(
+        notify_export_win_email_by_rq_email(
             contact_email_address,
             template_id,
             context,
@@ -142,7 +135,7 @@ class TestUpdateEmailDeliveryStatusTask:
         )
 
         mock_job_scheduler.reset_mock()
-        notify_export_win_contact_by_rq_email(
+        notify_export_win_email_by_rq_email(
             contact_email_address,
             template_id,
             context,
@@ -162,6 +155,36 @@ class TestUpdateEmailDeliveryStatusTask:
             retry_backoff=True,
             max_retries=5,
         )
+
+    @pytest.mark.parametrize(
+        'lock_acquired,call_count',
+        (
+            (False, 0),
+            (True, 1),
+        ),
+    )
+    def test_lock_for_customer_response_token_email_delivery_status(
+        self,
+        monkeypatch,
+        lock_acquired,
+        call_count,
+    ):
+        """
+        Test that the task doesn't run if it cannot acquire the advisory_lock
+        """
+        mock_advisory_lock = mock.MagicMock()
+        mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
+        monkeypatch.setattr(
+            'datahub.export_win.tasks.advisory_lock',
+            mock_advisory_lock,
+        )
+        mock_now = mock.Mock(wraps=datetime.now)
+        monkeypatch.setattr(
+            'datahub.export_win.tasks.now',
+            mock_now,
+        )
+        update_notify_email_delivery_status_for_customer_response_token()
+        assert mock_now.call_count == call_count
 
     def test_update_notify_email_delivery_status_for_customer_response_token(
         self,
@@ -203,6 +226,81 @@ class TestUpdateEmailDeliveryStatusTask:
         )
         assert (
             customer_response_token_to_update.email_delivery_status
+            == EmailDeliveryStatus.DELIVERED
+        )
+
+        mock_export_win_tasks_notify_gateway.get_notification_by_id.assert_called_once_with(
+            email_notification_id,
+            notify_service_name=NotifyServiceName.export_win,
+        )
+
+    @pytest.mark.parametrize(
+        'lock_acquired,call_count',
+        (
+            (False, 0),
+            (True, 1),
+        ),
+    )
+    def test_lock_for_customer_response_email_delivery_status(
+        self,
+        monkeypatch,
+        lock_acquired,
+        call_count,
+    ):
+        """
+        Test that the task doesn't run if it cannot acquire the advisory_lock
+        """
+        mock_advisory_lock = mock.MagicMock()
+        mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
+        monkeypatch.setattr(
+            'datahub.export_win.tasks.advisory_lock',
+            mock_advisory_lock,
+        )
+        mock_now = mock.Mock(wraps=datetime.now)
+        monkeypatch.setattr(
+            'datahub.export_win.tasks.now',
+            mock_now,
+        )
+        update_notify_email_delivery_status_for_customer_response()
+        assert mock_now.call_count == call_count
+
+    def test_update_notify_email_delivery_status_for_customer_response(
+        self,
+        mock_export_win_tasks_notify_gateway,
+    ):
+        """
+        Test email delivery status being updated into customer response model
+        """
+        mock_export_win_tasks_notify_gateway.get_notification_by_id = mock.Mock(
+            return_value={'status': 'delivered'},
+        )
+        email_notification_id = uuid.uuid4()
+        customer_response_too_old = CustomerResponseFactory(
+            lead_officer_email_delivery_status=EmailDeliveryStatus.UNKNOWN,
+            lead_officer_email_notification_id=uuid.uuid4(),
+            lead_officer_email_sent_on=self.current_date - relativedelta(days=6),
+        )
+        customer_response_to_update = CustomerResponseFactory(
+            lead_officer_email_delivery_status=EmailDeliveryStatus.UNKNOWN,
+            lead_officer_email_notification_id=email_notification_id,
+            lead_officer_email_sent_on=self.current_date - relativedelta(days=3),
+        )
+
+        status_updated_on = self.current_date - relativedelta(days=1)
+
+        with freeze_time(status_updated_on):
+            update_notify_email_delivery_status_for_customer_response()
+        with freeze_time(self.current_date):
+            update_notify_email_delivery_status_for_customer_response()
+        customer_response_too_old.refresh_from_db()
+        customer_response_to_update.refresh_from_db()
+
+        assert (
+            customer_response_too_old.lead_officer_email_delivery_status
+            == EmailDeliveryStatus.UNKNOWN
+        )
+        assert (
+            customer_response_to_update.lead_officer_email_delivery_status
             == EmailDeliveryStatus.DELIVERED
         )
 
@@ -311,57 +409,52 @@ def test_create_token_with_existing_expired_and_unexpired_tokens():
 
 
 def test_get_all_fields_for_lead_officer_email_receipt_no_success():
-    customer_response = CustomerResponseFactory()
-    token = CustomerResponseTokenFactory(customer_response=customer_response)
-    company_contact = token.company_contact
-    win = customer_response.win
+    win = WinFactory()
+    contact = ContactFactory(company=win.company)
+    win.company_contacts.add(contact)
+    customer_response = CustomerResponseFactory(win=win)
 
     result = get_all_fields_for_lead_officer_email_receipt_no(
-        token,
         customer_response,
     )
     """
     Testing to get all fields for lead officer rejected email receipt
     """
-    # Assertions for the expected values
     assert result['lead_officer_email'] == win.lead_officer.email
     assert result['country_destination'] == win.country.name
-    assert result['client_fullname'] == company_contact.name
+    assert result['client_fullname'] == contact.name
     assert result['lead_officer_first_name'] == win.lead_officer.first_name
     assert result['goods_services'] == win.goods_vs_services.name
-    assert result['client_company_name'] == company_contact.company.name
+    assert result['client_company_name'] == contact.company.name
     assert result['url'] == settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(
         uuid=win.id)
 
 
 def test_get_all_fields_for_lead_officer_email_receipt_yes_success():
-    customer_response = CustomerResponseFactory()
-    token = CustomerResponseTokenFactory(customer_response=customer_response)
-    company_contact = token.company_contact
-    win = customer_response.win
+    win = WinFactory()
+    contact = ContactFactory(company=win.company)
+    win.company_contacts.add(contact)
+    customer_response = CustomerResponseFactory(win=win)
 
-    # Create breakdown values of win in batch
-    BreakdownFactory.create_batch(5, win=win, value=10000)
+    num_breakdowns = 5
+    breakdown_value = 10000
+
+    BreakdownFactory.create_batch(num_breakdowns, win=win, value=breakdown_value)
 
     result = get_all_fields_for_lead_officer_email_receipt_yes(
-        token,
         customer_response,
     )
-
-    breakdowns = Breakdown.objects.filter(win=win)
-    expected_total_export_win_value = breakdowns.aggregate(total_value=Sum('value'))[
-        'total_value']
+    expected_total_export_win_value = num_breakdowns * breakdown_value
 
     """
     Testing to get all fields for lead officer approved email receipt (with total_export_win_value)
     """
-    # Assertions for the expected values
     assert result['lead_officer_email'] == win.lead_officer.email
     assert result['country_destination'] == win.country.name
-    assert result['client_fullname'] == company_contact.name
+    assert result['client_fullname'] == contact.name
     assert result['lead_officer_first_name'] == win.lead_officer.first_name
     assert result['total_export_win_value'] == expected_total_export_win_value
     assert result['goods_services'] == win.goods_vs_services.name
-    assert result['client_company_name'] == company_contact.company.name
+    assert result['client_company_name'] == contact.company.name
     assert result['url'] == settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(
         uuid=win.id)

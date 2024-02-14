@@ -1,5 +1,8 @@
 import uuid
 
+from datetime import datetime
+from unittest import mock
+
 import pytest
 
 from dateutil.relativedelta import relativedelta
@@ -8,6 +11,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 
+from datahub.company.test.factories import ContactFactory
 from datahub.core.constants import (
     Experience as ExperienceConstant,
     MarketingSource as MarketingSourceConstant,
@@ -19,10 +23,40 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
 )
 from datahub.export_win.test.factories import (
+    CustomerResponseFactory,
     CustomerResponseTokenFactory,
+    WinFactory,
 )
+from datahub.reminder.models import EmailDeliveryStatus
 
 pytestmark = pytest.mark.django_db
+
+
+class TaskMock(mock.MagicMock):
+    """MagicMock that can be pickled."""
+
+    def __reduce__(self):
+        return (mock.MagicMock, ())
+
+
+@pytest.fixture()
+def mock_lead_officer_email_receipt_yes(monkeypatch):
+    mock_get_all_fields = TaskMock()
+    monkeypatch.setattr(
+        'datahub.export_win.serializers.get_all_fields_for_lead_officer_email_receipt_yes',
+        mock_get_all_fields,
+    )
+    return mock_get_all_fields
+
+
+@pytest.fixture()
+def mock_lead_officer_email_receipt_no(monkeypatch):
+    mock_get_all_fields = TaskMock()
+    monkeypatch.setattr(
+        'datahub.export_win.serializers.get_all_fields_for_lead_officer_email_receipt_no',
+        mock_get_all_fields,
+    )
+    return mock_get_all_fields
 
 
 class TestGetCustomerResponseView(APITestMixin):
@@ -117,6 +151,11 @@ class TestGetCustomerResponseView(APITestMixin):
                 'name': customer_response.marketing_source.name,
             },
             'other_marketing_source': customer_response.other_marketing_source,
+            'company_contact': {
+                'id': str(token.company_contact.id),
+                'name': token.company_contact.name,
+                'email': token.company_contact.email,
+            },
         }
         assert response.json() == expected_response
 
@@ -149,9 +188,32 @@ class TestGetCustomerResponseView(APITestMixin):
 class TestUpdateCustomerResponseView(APITestMixin):
     """Update single customer response view tests."""
 
-    def test_update_customer_response(self):
+    @pytest.mark.parametrize(
+        'agree_with_win',
+        (
+            True,
+            False,
+        ),
+    )
+    def test_update_customer_response(
+        self,
+        agree_with_win,
+        mock_export_win_tasks_notify_gateway,
+        mock_lead_officer_email_receipt_yes,
+        mock_lead_officer_email_receipt_no,
+    ):
         """Tests successfully updating customer response."""
-        token = CustomerResponseTokenFactory()
+        notification_id = uuid.uuid4()
+        mock_export_win_tasks_notify_gateway.send_email_notification = mock.Mock(
+            return_value={'id': notification_id},
+        )
+
+        win = WinFactory()
+        contact = ContactFactory(company=win.company)
+        win.company_contacts.add(contact)
+        customer_response = CustomerResponseFactory(win=win)
+        token = CustomerResponseTokenFactory(customer_response=customer_response)
+
         assert token.times_used == 0
         api_client = self.create_api_client(user=None)
 
@@ -163,7 +225,7 @@ class TestUpdateCustomerResponseView(APITestMixin):
         marketing_source = MarketingSourceConstant.other.value
         without_our_support = WithoutOurSupportConstant.no_value.value
         request_data = {
-            'agree_with_win': True,
+            'agree_with_win': agree_with_win,
             'comments': 'Comment',
             'our_support': {
                 'id': rating_5.id,
@@ -206,12 +268,28 @@ class TestUpdateCustomerResponseView(APITestMixin):
             },
             'other_marketing_source': 'Friend',
         }
-        response = api_client.patch(url, data=request_data)
+        current_date = datetime.utcnow()
+        with freeze_time(current_date):
+            response = api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
 
         customer_response = token.customer_response
         customer_response.refresh_from_db()
         win = customer_response.win
+
+        if agree_with_win:
+            mock_lead_officer_email_receipt_yes.assert_called_once()
+            mock_lead_officer_email_receipt_no.assert_not_called()
+        else:
+            mock_lead_officer_email_receipt_no.assert_called_once()
+            mock_lead_officer_email_receipt_yes.assert_not_called()
+
+        assert customer_response.agree_with_win is agree_with_win
+        assert customer_response.lead_officer_email_delivery_status == EmailDeliveryStatus.UNKNOWN
+        assert customer_response.lead_officer_email_notification_id == notification_id
+        assert customer_response.lead_officer_email_sent_on.replace(
+            tzinfo=None,
+        ) == current_date
 
         expected_response = {
             'win': {
@@ -285,6 +363,11 @@ class TestUpdateCustomerResponseView(APITestMixin):
                 'name': marketing_source.name,
             },
             'other_marketing_source': 'Friend',
+            'company_contact': {
+                'id': str(token.company_contact.id),
+                'name': token.company_contact.name,
+                'email': token.company_contact.email,
+            },
         }
         assert response.json() == expected_response
 
