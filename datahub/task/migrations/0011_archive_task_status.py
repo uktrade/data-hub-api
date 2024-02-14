@@ -7,8 +7,6 @@ from datahub.task.models import Task
 
 
 def forwards_func(apps, schema_editor):
-    Task = apps.get_model("task", "Task")
-
     tasks = Task.objects.all()
     for task in tasks:
         task.status = Task.Status.COMPLETE if task.archived else Task.Status.ACTIVE
@@ -17,8 +15,6 @@ def forwards_func(apps, schema_editor):
 
 
 def reverse_func(apps, schema_editor):
-    Task = apps.get_model("task", "Task")
-
     tasks = Task.objects.all()
     for task in tasks:
         task.archived = True if (task.status == Task.Status.COMPLETE) else False
