@@ -618,7 +618,7 @@ class TestTaskForInteraction(APITestMixin):
 class TestStatusCompleteTask(BaseTaskTests):
     """Test the status_complete and status_active POST endpoints for task"""
 
-    @pytest.mark.parametrize("url", ['task_status_complete', 'task_status_active'])
+    @pytest.mark.parametrize('url', ['task_status_complete', 'task_status_active'])
     def test_status_task_calls_returns_unauthorized_when_user_not_authenticated(self, url):
         adviser = AdviserFactory()
         task = TaskFactory(advisers=[adviser])
