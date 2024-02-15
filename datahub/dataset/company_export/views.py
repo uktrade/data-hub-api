@@ -1,3 +1,5 @@
+from django.db.models import F
+
 from datahub.company.models import CompanyExport
 from datahub.core.query_utils import get_array_agg_subquery
 from datahub.dataset.core.views import BaseFilterDatasetView
@@ -26,6 +28,7 @@ class CompanyExportDatasetView(BaseFilterDatasetView):
                 'advisor_id',
                 ordering=('advisor__date_joined',),
             ),
+            company_name=F('company__name'),
         ).values(
             'created_on',
             'modified_on',
@@ -37,6 +40,7 @@ class CompanyExportDatasetView(BaseFilterDatasetView):
             'archived_by_id',
             'id',
             'company_id',
+            'company_name',
             'title',
             'owner_id',
             'estimated_export_value_years__name',
