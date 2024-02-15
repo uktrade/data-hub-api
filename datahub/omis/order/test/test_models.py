@@ -41,7 +41,7 @@ class OrderWithRandomPublicTokenFactory(OrderFactory):
 class OrderWithRandomReferenceFactory(OrderFactory):
     """OrderFactory with an already populated reference field."""
 
-    reference = factory.LazyFunction(get_random_string)
+    reference = factory.fuzzy.FuzzyChoice(get_random_string(length=4))
 
 
 class TestGetLeadAssignee:
