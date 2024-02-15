@@ -24,6 +24,7 @@ def get_expected_data_from_company_export(export):
         ),
         'archived_reason': export.archived_reason,
         'company_id': str(export.company_id),
+        'company_name': str(export.company.name),
         'contact_ids': [str(contact.id) for contact in export.contacts.all()] or None,
         'created_on': format_date_or_datetime(export.created_on),
         'created_by_id': export.created_by_id,
