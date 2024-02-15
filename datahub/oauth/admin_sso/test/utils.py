@@ -9,9 +9,9 @@ def get_request_with_session(path):
     """Get request with attached session."""
     request_factory = RequestFactory()
     request = request_factory.get(path)
-    session_middleware = SessionMiddleware()
+    session_middleware = SessionMiddleware(get_response=request)
     session_middleware.process_request(request)
-    authentication_middleware = AuthenticationMiddleware()
+    authentication_middleware = AuthenticationMiddleware(get_response=request)
     authentication_middleware.process_request(request)
     return request
 
