@@ -20,5 +20,5 @@ class Command(CSVBaseCommand):
             return
 
         with reversion.create_revision():
-            invoice.save(update_fields=('vat_number',))
+            invoice.save(update_fields=('invoice_vat_number',))
             reversion.set_comment('Invoice VAT Number updated.')
