@@ -42,14 +42,11 @@ class TasksMixin(CoreViewSet):
 
         archived = request.query_params.get('archived')
         advisers = request.query_params.get('advisers')
-        # status = request.query_params.get('status')
 
         if archived is not None:
             queryset = queryset.filter(archived=archived == 'true')
         if advisers is not None:
             queryset = queryset.filter(advisers__in=[advisers])
-        # if status is not None:
-        #     queryset = queryset.filter(status=status == status)
 
         return queryset
 
