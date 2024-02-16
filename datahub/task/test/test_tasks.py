@@ -925,14 +925,23 @@ class TestTaskAmendedByOthers:
 
         assert subscriptions.count() == 3
 
+    # TODO MK: Fix the below tests. Make sure they fail before they success
     def test_no_reminders_created_when_a_task_is_created(self):
-        task = TaskFactory()
-        notify_adviser_task_amended_by_others(task, True, [])
+        advisers = AdviserFactory.create_batch(2)
+        task = TaskFactory(advisers=[advisers[0], advisers[1]])
+        notify_adviser_task_amended_by_others(task, True, [advisers[0].id, advisers[1].id])
         assert TaskAmendedByOthersReminder.objects.exists() is False
 
     def test_no_reminders_created_when_a_task_is_archived(self):
-        task = TaskFactory(archived=True)
-        notify_adviser_task_amended_by_others(task, True, [])
+        advisers = AdviserFactory.create_batch(2)
+        task = TaskFactory(archived=True, advisers=[advisers[0], advisers[1]])
+        notify_adviser_task_amended_by_others(task, False, [advisers[0].id, advisers[1].id])
+        assert TaskAmendedByOthersReminder.objects.exists() is False
+
+    def test_no_reminders_created_when_a_task_status_is_complete(self):
+        advisers = AdviserFactory.create_batch(2)
+        task = TaskFactory(status=Task.Status.COMPLETE, advisers=[advisers[0], advisers[1]])
+        notify_adviser_task_amended_by_others(task, False, [advisers[0].id, advisers[1].id])
         assert TaskAmendedByOthersReminder.objects.exists() is False
 
     def test_no_reminders_created_when_task_advisers_do_not_contain_adviser_ids_pre_m2m_change(
@@ -1195,11 +1204,19 @@ class TestTasksOverdue:
         TaskFactory.create_batch(4)
         tasks_due = []
         matching_advisers = AdviserFactory.create_batch(3)
+        # Task due today but archived shouldn't trigger reminders
         TaskFactory(
             due_date=datetime.date.today() - datetime.timedelta(1),
             archived=True,
             advisers=[matching_advisers[0]],
         )
+        # Task due today but completed shouldn't trigger reminders
+        TaskFactory(
+            due_date=datetime.date.today() - datetime.timedelta(1),
+            status=Task.Status.COMPLETE,
+            advisers=[matching_advisers[0]],
+        )
+        # Task due today but archived shouldn't trigger reminders
         TaskFactory(
             due_date=datetime.date.today() - datetime.timedelta(1),
             archived=True,
