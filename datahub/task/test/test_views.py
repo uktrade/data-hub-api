@@ -25,6 +25,7 @@ from datahub.core.test_utils import (
 )
 from datahub.interaction.test.factories import InteractionFactoryBase
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.task.models import Task
 
 from datahub.task.test.factories import TaskFactory
 from datahub.task.test.utils import BaseEditTaskTests, BaseListTaskTests, BaseTaskTests
@@ -615,21 +616,32 @@ class TestTaskForInteraction(APITestMixin):
         assert response == expected_response
 
 
-class TestStatusCompleteTask(BaseTaskTests):
-    """Test the status_complete and status_active POST endpoints for task"""
+class TestArchiveTask(BaseTaskTests):
+    """Test the archive POST endpoint for task"""
 
-    @pytest.mark.parametrize('url', ['task_status_complete', 'task_status_active'])
-    def test_status_task_calls_returns_unauthorized_when_user_not_authenticated(self, url):
+    def test_archive_task_without_reason_returns_bad_request(self):
+        adviser = AdviserFactory()
+        task = TaskFactory(created_by=adviser)
+
+        url = reverse('api-v4:task:task_archive', kwargs={'pk': task.id})
+
+        response = self.adviser_api_client(adviser).post(url, data={})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'reason': ['This field is required.'],
+        }
+
+    def test_archive_task_returns_unauthorized_when_user_not_authenticated(self):
         adviser = AdviserFactory()
         task = TaskFactory(advisers=[adviser])
 
-        url = reverse(f'api-v4:task:{url}', kwargs={'pk': task.id})
+        url = reverse('api-v4:task:task_archive', kwargs={'pk': task.id})
 
-        response = APIClient().post(url)
+        response = APIClient().post(url, data={'reason': 'completed'})
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    # TODO: Carry on with fixing tests!!!
     def test_archive_task_returns_success_when_user_is_creator_but_not_assigned_to_task(self):
         adviser = AdviserFactory()
         task = TaskFactory(created_by=adviser)
@@ -678,6 +690,48 @@ class TestStatusCompleteTask(BaseTaskTests):
         }
         assert response.data['archived_reason'] == 'completed'
         assert response.data['id'] == str(task.id)
+
+    def test_archive_task_returns_success_when_user_is_not_creator_or_is_assigned_to_task(
+        self,
+    ):
+        adviser = AdviserFactory()
+        task = TaskFactory()
+
+        url = reverse('api-v4:task:task_archive', kwargs={'pk': task.id})
+
+        response = self.adviser_api_client(adviser).post(url, data={'reason': 'completed'})
+
+        assert response.status_code == status.HTTP_200_OK
+
+
+class TestStatusCompleteTask(BaseTaskTests):
+    """Test the status_complete and status_active POST endpoints for task"""
+
+    @pytest.mark.parametrize('action', ['task_status_complete', 'task_status_active'])
+    def test_status_task_calls_returns_unauthorized_when_user_not_authenticated(self, action):
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser])
+
+        url = reverse(f'api-v4:task:{action}', kwargs={'pk': task.id})
+
+        response = APIClient().post(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize('action', ['task_status_complete', 'task_status_active'])
+    def test_status_task_returns_success_when_changed(
+        self,
+        action,
+    ):
+        task = TaskFactory()
+        expected_task_status = 'complete' if (action == 'task_status_complete') else 'active'
+        url = reverse(f'api-v4:task:{action}', kwargs={'pk': task.id})
+
+        response = self.api_client.post(url).json()
+
+        assert response['status'] == expected_task_status
+        task_saved = Task.objects.get(pk=task.id)
+        assert task_saved.status == expected_task_status
 
 
 class TestAssociatedCompanyAndProject(APITestMixin):

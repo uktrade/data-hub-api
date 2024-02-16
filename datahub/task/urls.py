@@ -30,7 +30,7 @@ urls_v4 = [
     path('task/<uuid:pk>', Task_v4_item, name='item'),
     path('task/<uuid:pk>/archive', task_archive, name='task_archive'),
     path('task/<uuid:pk>/status_complete', task_status_complete, name='task_status_complete'),
-    path('task/<uuid:pk>/status_active', task_status_complete, name='task_status_active'),
+    path('task/<uuid:pk>/status_active', task_status_active, name='task_status_active'),
     path(
         'task/companies-and-projects',
         get_tasks_companies_and_projects,
