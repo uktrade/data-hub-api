@@ -332,7 +332,7 @@ def notify_adviser_completed_task(task, created):
     if created:
         return
 
-    if not task.archived:
+    if task.status is not Task.Status.COMPLETE:
         return
 
     advisers_to_notify = task.advisers.exclude(id=task.modified_by.id)

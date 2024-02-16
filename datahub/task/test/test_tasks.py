@@ -39,6 +39,7 @@ from datahub.task.emails import (
     TaskOverdueEmailTemplate,
     UpcomingTaskEmailTemplate,
 )
+from datahub.task.models import Task
 
 from datahub.task.tasks import (
     create_task_amended_by_others_subscription,
@@ -757,7 +758,7 @@ class TestTaskCompleted:
         modified_by_adviser = AdviserFactory()
         adviser = AdviserFactory()
         task = TaskFactory(
-            archived=True,
+            status=Task.Status.COMPLETE,
             modified_by=modified_by_adviser,
             advisers=[
                 modified_by_adviser,
@@ -776,7 +777,7 @@ class TestTaskCompleted:
         adviser_existing_notification = AdviserFactory()
         adviser_no_notification = AdviserFactory()
         task = TaskFactory(
-            archived=True,
+            status=Task.Status.COMPLETE,
             advisers=[
                 adviser_existing_notification,
                 adviser_no_notification,
@@ -804,7 +805,7 @@ class TestTaskCompleted:
     ):
         adviser = AdviserFactory()
         task = TaskFactory(
-            archived=True,
+            status=Task.Status.COMPLETE,
             advisers=[
                 adviser,
             ],
@@ -824,7 +825,7 @@ class TestTaskCompleted:
 
         adviser = AdviserFactory()
         task = TaskFactory(
-            archived=True,
+            status=Task.Status.COMPLETE,
             advisers=[
                 adviser,
             ],
@@ -860,7 +861,7 @@ class TestTaskCompleted:
         ):
             task = TaskFactory(
                 advisers=[adviser],
-                archived=True,
+                status=Task.Status.COMPLETE,
             )
 
             notify_adviser_completed_task(
