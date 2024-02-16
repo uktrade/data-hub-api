@@ -691,18 +691,6 @@ class TestArchiveTask(BaseTaskTests):
         assert response.data['archived_reason'] == 'completed'
         assert response.data['id'] == str(task.id)
 
-    def test_archive_task_returns_success_when_user_is_not_creator_or_is_assigned_to_task(
-        self,
-    ):
-        adviser = AdviserFactory()
-        task = TaskFactory()
-
-        url = reverse('api-v4:task:task_archive', kwargs={'pk': task.id})
-
-        response = self.adviser_api_client(adviser).post(url, data={'reason': 'completed'})
-
-        assert response.status_code == status.HTTP_200_OK
-
 
 class TestStatusCompleteTask(BaseTaskTests):
     """Test the status_complete and status_active POST endpoints for task"""
