@@ -24,7 +24,10 @@ from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
 )
 from datahub.event.test.factories import EventFactory
-from datahub.export_win.test.factories import CustomerResponseFactory, WinFactory
+from datahub.export_win.test.factories import (
+    CustomerResponseFactory,
+    WinFactory,
+)
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     InteractionExportCountryFactory,
