@@ -569,3 +569,16 @@ class CustomerResponseToken(models.Model):
 
     def __str__(self):
         return f'Token: {self.id} ({self.expires_on})'
+
+
+class LegacyExportWinsToDataHubCompany(models.Model):
+    """Maps legacy export win to data hub company."""
+
+    id = models.UUIDField(primary_key=True)
+    company = models.ForeignKey(
+        Company,
+        related_name='legacy_wins',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )

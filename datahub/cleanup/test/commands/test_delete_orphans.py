@@ -25,7 +25,10 @@ from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.core.exceptions import DataHubError
 from datahub.core.model_helpers import get_related_fields
 from datahub.event.test.factories import EventFactory
-from datahub.export_win.test.factories import CustomerResponseTokenFactory
+from datahub.export_win.test.factories import (
+    CustomerResponseTokenFactory,
+    LegacyExportWinsToDataHubCompanyFactory,
+)
 from datahub.interaction.test.factories import (
     CompaniesInteractionFactory,
     CompanyInteractionFactory,
@@ -84,6 +87,7 @@ MAPPINGS = {
             (OneListCoreTeamMemberFactory, 'company'),
             (LargeCapitalInvestorProfileFactory, 'investor_company'),
             (LargeCapitalOpportunityFactory, 'promoters'),
+            (LegacyExportWinsToDataHubCompanyFactory, 'company'),
             (ExportFactory, 'company'),
             (ObjectiveFactory, 'company'),
         ),
