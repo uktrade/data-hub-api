@@ -733,9 +733,24 @@ class TestTaskCompleted:
         notify_adviser_completed_task(task, True)
         assert TaskCompletedReminder.objects.exists() is False
 
-    def test_no_reminders_created_when_a_task_is_not_archived(self):
-        task = TaskFactory(archived=False)
-        notify_adviser_completed_task(task, True)
+    def test_only_reminders_created_when_a_task_is_completed(self):
+        task_complete_has_reminder = TaskFactory(status=Task.Status.COMPLETE)
+        task_active_has_no_reminder = TaskFactory()
+
+        notify_adviser_completed_task(task_active_has_no_reminder, False)
+        notify_adviser_completed_task(task_complete_has_reminder, False)
+
+        assert TaskCompletedReminder.objects.count() == 1
+        task_completed_reminder = TaskCompletedReminder.objects.first()
+        assert task_completed_reminder.task.id == task_complete_has_reminder.id
+
+    def test_no_reminders_created_when_a_task_is_archived(self):
+        task_complete_has_no_reminder = TaskFactory(archived=True, status=Task.Status.COMPLETE)
+        task_active_has_no_reminder = TaskFactory(archived=True)
+
+        notify_adviser_completed_task(task_active_has_no_reminder, False)
+        notify_adviser_completed_task(task_complete_has_no_reminder, False)
+
         assert TaskCompletedReminder.objects.exists() is False
 
     def test_no_reminders_created_when_adviser_that_completes_task_is_the_only_adviser(
@@ -925,7 +940,6 @@ class TestTaskAmendedByOthers:
 
         assert subscriptions.count() == 3
 
-    # TODO MK: Fix the below tests. Make sure they fail before they success
     def test_no_reminders_created_when_a_task_is_created(self):
         advisers = AdviserFactory.create_batch(2)
         task = TaskFactory(advisers=[advisers[0], advisers[1]])
@@ -951,6 +965,7 @@ class TestTaskAmendedByOthers:
         adviser = AdviserFactory()
         task = TaskFactory(
             archived=False,
+            status=Task.Status.ACTIVE,
             advisers=[task_adviser],
         )
 
@@ -964,6 +979,7 @@ class TestTaskAmendedByOthers:
         adviser = AdviserFactory()
         task = TaskFactory(
             archived=False,
+            status=Task.Status.ACTIVE,
             modified_by=adviser,
             advisers=[adviser],
         )
@@ -979,6 +995,7 @@ class TestTaskAmendedByOthers:
         adviser = AdviserFactory()
         task = TaskFactory(
             archived=False,
+            status=Task.Status.ACTIVE,
             modified_by=modified_by_adviser,
             advisers=[
                 modified_by_adviser,
@@ -1008,6 +1025,7 @@ class TestTaskAmendedByOthers:
         adviser = AdviserFactory()
         task = TaskFactory(
             archived=False,
+            status=Task.Status.ACTIVE,
             advisers=[
                 adviser,
             ],
@@ -1029,6 +1047,7 @@ class TestTaskAmendedByOthers:
         adviser = AdviserFactory()
         task = TaskFactory(
             archived=False,
+            status=Task.Status.ACTIVE,
             advisers=[
                 adviser,
             ],
@@ -1060,8 +1079,9 @@ class TestTaskAmendedByOthers:
             TASK_REMINDER_EMAIL_TEMPLATE_ID=template_id,
         ):
             task = TaskFactory(
-                advisers=[adviser],
                 archived=False,
+                status=Task.Status.ACTIVE,
+                advisers=[adviser],
             )
 
             notify_adviser_task_amended_by_others(
@@ -1216,10 +1236,11 @@ class TestTasksOverdue:
             status=Task.Status.COMPLETE,
             advisers=[matching_advisers[0]],
         )
-        # Task due today but archived shouldn't trigger reminders
+        # Task due today but completed and archived shouldn't trigger reminders
         TaskFactory(
             due_date=datetime.date.today() - datetime.timedelta(1),
             archived=True,
+            status=Task.Status.COMPLETE,
             advisers=[matching_advisers[1]],
         )
         tasks_due.append(
@@ -1266,7 +1287,7 @@ class TestTasksOverdue:
             any_order=True,
         )
 
-    def test_notifications_not_sent_to_archived_tasks_when_due_date_yeaterday(
+    def test_notifications_not_sent_to_archived_or_completed_tasks_when_due_date_yesterday(
         self,
         mock_notify_adviser_by_rq_email,
         mock_statsd,
@@ -1281,12 +1302,13 @@ class TestTasksOverdue:
         )
         TaskFactory(
             due_date=datetime.date.today() - datetime.timedelta(1),
-            archived=True,
+            status=Task.Status.COMPLETE,
             advisers=[matching_advisers[1]],
         )
         TaskFactory(
             due_date=datetime.date.today() - datetime.timedelta(1),
             archived=True,
+            status=Task.Status.COMPLETE,
             advisers=[matching_advisers[2]],
         )
 

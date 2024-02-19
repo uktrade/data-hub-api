@@ -423,7 +423,8 @@ def notify_adviser_task_amended_by_others(
 ):
     """
     Send a notification to all advisers, excluding the adviser who marked the task as completed,
-    when task is amended. Do not send a notification when the task is deleted (archived).
+    when task is amended. Do not send a notification when the task status is set to Complete or
+    marked as deleted (archived).
     """
     if created:
         return
@@ -524,6 +525,10 @@ def schedule_reminders_tasks_overdue():
 
 
 def generate_reminders_tasks_overdue():
+    """
+    Generate reminders for all advisers on overdue tasks.
+    Do not send reminders if task is archived or status is complete.
+    """
     with advisory_lock(
         'generate_reminders_tasks_overdue',
         wait=False,
