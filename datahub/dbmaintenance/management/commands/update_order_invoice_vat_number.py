@@ -14,7 +14,7 @@ class Command(CSVBaseCommand):
         invoice = Invoice.objects.get(pk=pk)
         new_vat_number = parse_limited_string(row['new_vat_number'])
 
-        invoice.vat_number = new_vat_number
+        invoice.invoice_vat_number = new_vat_number
 
         if simulate:
             return
