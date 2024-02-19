@@ -6,6 +6,7 @@ from django.db import transaction
 from rest_framework.serializers import (
     BooleanField,
     ModelSerializer,
+    SerializerMethodField,
 )
 
 from datahub.company.models import Company, Contact, ExportExperience
@@ -35,7 +36,10 @@ from datahub.export_win.models import (
 from datahub.export_win.tasks import (
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
-    notify_export_win_contact_by_rq_email,
+    get_all_fields_for_lead_officer_email_receipt_no,
+    get_all_fields_for_lead_officer_email_receipt_yes,
+    notify_export_win_email_by_rq_email,
+    update_customer_response_for_lead_officer_notification_id,
     update_customer_response_token_for_email_notification_id,
 )
 from datahub.metadata.models import Country, Sector, UKRegion
@@ -237,7 +241,7 @@ class WinSerializer(ModelSerializer):
                     customer_response,
                 )
                 template_id = settings.EXPORT_WIN_CLIENT_RECEIPT_TEMPLATE_ID
-                notify_export_win_contact_by_rq_email(
+                notify_export_win_email_by_rq_email(
                     company_contact.email,
                     template_id,
                     context,
@@ -315,6 +319,18 @@ class CustomerResponseSerializer(ModelSerializer):
     expected_portion_without_help = NestedRelatedField(WithoutOurSupport)
     last_export = NestedRelatedField(Experience)
     marketing_source = NestedRelatedField(MarketingSource)
+    company_contact = SerializerMethodField()
+
+    def get_company_contact(self, obj):
+        token = self.context.get('token')
+        field = NestedRelatedField(
+            Contact,
+            extra_fields=(
+                'name',
+                'email',
+            ),
+        )
+        return field.to_representation(token.company_contact)
 
     @transaction.atomic
     def update(self, instance, validated_data):
@@ -328,6 +344,22 @@ class CustomerResponseSerializer(ModelSerializer):
         ).update(
             expires_on=datetime.utcnow(),
         )
+
+        if instance.agree_with_win:
+            template_id = settings.EXPORT_WIN_LEAD_OFFICER_APPROVED_TEMPLATE_ID
+            context = get_all_fields_for_lead_officer_email_receipt_yes(instance)
+        else:
+            template_id = settings.EXPORT_WIN_LEAD_OFFICER_REJECTED_TEMPLATE_ID
+            context = get_all_fields_for_lead_officer_email_receipt_no(instance)
+
+        notify_export_win_email_by_rq_email(
+            instance.win.lead_officer.email,
+            template_id,
+            context,
+            update_customer_response_for_lead_officer_notification_id,
+            instance.id,
+        )
+
         return instance
 
     class Meta:
@@ -356,4 +388,5 @@ class CustomerResponseSerializer(ModelSerializer):
             'case_study_willing',
             'marketing_source',
             'other_marketing_source',
+            'company_contact',
         )
