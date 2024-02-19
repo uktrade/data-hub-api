@@ -523,6 +523,15 @@ class CustomerResponse(BaseModel):
         default='',
         blank=True,
     )
+    lead_officer_email_notification_id = models.UUIDField(null=True, blank=True)
+    lead_officer_email_delivery_status = models.CharField(
+        max_length=MAX_LENGTH,
+        blank=True,
+        choices=EmailDeliveryStatus.choices,
+        help_text='Email delivery status',
+        default=EmailDeliveryStatus.UNKNOWN,
+    )
+    lead_officer_email_sent_on = models.DateTimeField(null=True, blank=True)
 
 
 class CustomerResponseToken(models.Model):

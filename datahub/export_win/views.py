@@ -29,7 +29,7 @@ from datahub.export_win.serializers import (
 from datahub.export_win.tasks import (
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
-    notify_export_win_contact_by_rq_email,
+    notify_export_win_email_by_rq_email,
     update_customer_response_token_for_email_notification_id,
 )
 
@@ -106,7 +106,7 @@ class WinViewSet(CoreViewSet):
             customer_response,
         )
         template_id = settings.EXPORT_WIN_CLIENT_RECEIPT_TEMPLATE_ID
-        notify_export_win_contact_by_rq_email(
+        notify_export_win_email_by_rq_email(
             contact.email,
             template_id,
             context,
@@ -140,6 +140,7 @@ class CustomerResponseViewSet(CoreViewSet):
             )
             token.times_used += 1
             token.save()
+            self.token = token
             return self.queryset.get(
                 id=token.customer_response_id,
             )
@@ -150,6 +151,7 @@ class CustomerResponseViewSet(CoreViewSet):
         """Add token_pk to serializer context."""
         context = super().get_serializer_context()
         context['token_pk'] = self.kwargs.get('token_pk')
+        context['token'] = getattr(self, 'token', None)
         return context
 
     def put(self, request, *args, **kwargs):

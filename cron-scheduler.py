@@ -26,6 +26,7 @@ from datahub.core.queues.constants import (
     EVERY_TEN_AM,
     EVERY_TEN_MINUTES,
     EVERY_TEN_PM,
+    EVERY_THREE_AM,
     EVERY_THREE_AM_ON_TWENTY_THIRD_EACH_MONTH,
     EVERY_TWO_AM,
     HALF_DAY_IN_SECONDS,
@@ -37,6 +38,7 @@ from datahub.dnb_api.tasks.sync import schedule_sync_outdated_companies_with_dnb
 from datahub.dnb_api.tasks.update import schedule_get_company_updates
 from datahub.email_ingestion.tasks import process_mailbox_emails
 from datahub.export_win.tasks import (
+    update_notify_email_delivery_status_for_customer_response,
     update_notify_email_delivery_status_for_customer_response_token,
 )
 from datahub.investment.project.tasks import (
@@ -294,6 +296,16 @@ def schedule_export_win_customer_response_token_jobs():
         retry_intervals=30,
         cron=EVERY_TWO_AM,
         description='Scheduled update of export win customer response email delivery status',
+    )
+
+    job_scheduler(
+        function=update_notify_email_delivery_status_for_customer_response,
+        max_retries=5,
+        queue_name=LONG_RUNNING_QUEUE,
+        retry_backoff=True,
+        retry_intervals=30,
+        cron=EVERY_THREE_AM,
+        description='Scheduled update of export win lead officer email delivery status',
     )
 
 
