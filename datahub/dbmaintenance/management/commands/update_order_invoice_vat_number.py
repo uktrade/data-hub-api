@@ -15,10 +15,12 @@ class Command(CSVBaseCommand):
         new_vat_number = parse_limited_string(row['new_vat_number'])
 
         invoice.invoice_vat_number = new_vat_number
+        invoice.vat_number = new_vat_number
 
         if simulate:
             return
 
         with reversion.create_revision():
             invoice.save(update_fields=('invoice_vat_number',))
+            invoice.save(update_fields=('vat_number',))
             reversion.set_comment('Invoice VAT Number updated.')
