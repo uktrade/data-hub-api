@@ -1215,7 +1215,14 @@ class CompanyExportSerializer(serializers.ModelSerializer):
         many=True,
         required=False,
     )
-    contacts = NestedRelatedField(Contact, many=True)
+    contacts = NestedRelatedField(
+        Contact,
+        many=True,
+        extra_fields=(
+            'name',
+            'email',
+        ),
+    )
     destination_country = NestedRelatedField(meta_models.Country)
     sector = NestedRelatedField(meta_models.Sector)
     exporter_experience = NestedRelatedField(
