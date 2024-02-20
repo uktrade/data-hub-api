@@ -9,7 +9,7 @@ from rest_framework.serializers import (
     SerializerMethodField,
 )
 
-from datahub.company.models import Company, Contact, ExportExperience
+from datahub.company.models import Company, CompanyExport, Contact, ExportExperience
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.export_win.models import (
@@ -156,6 +156,12 @@ class WinSerializer(ModelSerializer):
 
     complete = BooleanField(read_only=True)
 
+    company_export = NestedRelatedField(
+        CompanyExport,
+        extra_fields=('title',),
+        required=False,
+    )
+
     class Meta:
         model = Win
         fields = (
@@ -204,6 +210,7 @@ class WinSerializer(ModelSerializer):
             'export_experience',
             'audit',
             'team_members',
+            'company_export',
         )
 
     def create(self, validated_data):
