@@ -155,7 +155,8 @@ class TestGetExport(APITestMixin):
             'archived_reason': None,
             'company': {'id': str(export.company.id), 'name': export.company.name},
             'contacts': [
-                {'id': str(contact.id), 'name': contact.name} for contact in export.contacts.all()
+                {'id': str(contact.id), 'name': contact.name, 'email': contact.email}
+                for contact in export.contacts.all()
             ],
             'created_by': None,
             'created_on': format_date_or_datetime(export.created_on),
