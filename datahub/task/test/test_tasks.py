@@ -742,7 +742,7 @@ class TestTaskCompleted:
 
         assert TaskCompletedReminder.objects.count() == 1
         task_completed_reminder = TaskCompletedReminder.objects.first()
-        assert task_completed_reminder.task.id == task_complete_has_reminder.id
+        assert task_completed_reminder.task_id == task_complete_has_reminder.id
 
     def test_no_reminders_created_when_a_task_is_archived(self):
         task_complete_has_no_reminder = TaskFactory(archived=True, status=Task.Status.COMPLETE)
