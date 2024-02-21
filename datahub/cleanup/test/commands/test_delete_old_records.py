@@ -761,7 +761,14 @@ MAPPING = {
                 'modified_on': COMPANY_EXPORT_DELETE_BEFORE_DATETIME,
             },
         ],
-        'relations': [],
+        'relations': [
+            {
+                'factory': WinFactory,
+                'field': 'company_export',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
+        ],
     },
     'company.Objective': {
         'factory': ObjectiveFactory,

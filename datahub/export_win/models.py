@@ -333,6 +333,16 @@ class Win(BaseModel):
         verbose_name='Data Hub (Companies House) or CDMS reference number',
     )
 
+    # Company export project ID, if Win has been converted from Export project
+    company_export = models.ForeignKey(
+        'company.CompanyExport',
+        related_name='wins',
+        verbose_name='Related company export project',
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+    )
+
 
 class Breakdown(BaseModel):
     """Win breakdown."""
