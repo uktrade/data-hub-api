@@ -1,12 +1,12 @@
-from unittest.mock import call, patch
+from unittest.mock import ANY, call, patch
 
 import pytest
 
-from django.db.models.signals import m2m_changed
-from factory.django import mute_signals
-
 from datahub.company.test.factories import AdviserFactory
+from datahub.task.emails import TaskCompletedEmailTemplate
+from datahub.task.models import Task
 from datahub.task.signals import set_task_subscriptions_and_schedule_notifications
+from datahub.task.tasks import update_task_completed_email_status
 from datahub.task.test.factories import TaskFactory
 
 
@@ -67,30 +67,16 @@ class TestTaskAdviserChangedSubscriptions:
         schedule_advisers_added_to_task.assert_not_called()
 
 
-@mute_signals(m2m_changed)
 class TestTaskAdviserCompletedSubscriptions:
     @patch('datahub.task.signals.schedule_notify_advisers_task_completed')
-    def test_creating_task_triggers_notify_adviser_completed_scheduled_task(
+    def test_creating_and_updating_task_triggers_notify_adviser_completed_scheduled_task(
         self,
         schedule_notify_advisers_task_completed,
     ):
+        """
+        Note: only the triggering of the schedule is tested not the processing of it.
+        """
         task = TaskFactory(advisers=[AdviserFactory()])
-
-        schedule_notify_advisers_task_completed.assert_has_calls(
-            [
-                call(task, True),
-                call(task, False),
-            ],
-            any_order=True,
-        )
-
-    @patch('datahub.task.signals.schedule_notify_advisers_task_completed')
-    def test_modifying_task_triggers_notify_adviser_completed_scheduled_task(
-        self,
-        schedule_notify_advisers_task_completed,
-    ):
-        task = TaskFactory(archived=False)
-        task.archived = True
         task.save()
 
         schedule_notify_advisers_task_completed.assert_has_calls(
@@ -102,8 +88,28 @@ class TestTaskAdviserCompletedSubscriptions:
             any_order=True,
         )
 
+    @patch('datahub.task.tasks.send_task_email')
+    def test_setting_status_complete_triggers_send_task_email(
+        self,
+        send_task_email,
+    ):
+        """
+        Calling with adviser completed should result in sending of TaskCompletedReminder
+        """
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser])
+        task.status = Task.Status.COMPLETE
+        task.save()
 
-@mute_signals(m2m_changed)
+        send_task_email.assert_any_call(
+            adviser=adviser,
+            task=task,
+            reminder=ANY,
+            update_task=update_task_completed_email_status,
+            email_template_class=TaskCompletedEmailTemplate,
+        )
+
+
 class TestTaskAmededByOthersSubscriptions:
     @patch('datahub.task.signals.schedule_notify_advisers_task_amended_by_others')
     def test_creating_task_triggers_notify_advisers_task_amended_by_others_scheduled_task(
@@ -127,8 +133,7 @@ class TestTaskAmededByOthersSubscriptions:
         schedule_notify_advisers_task_amended_by_others,
     ):
         adviser = AdviserFactory()
-        task = TaskFactory(archived=False, advisers=[adviser])
-        task.archived = True
+        task = TaskFactory(advisers=[adviser])
         task.save()
 
         schedule_notify_advisers_task_amended_by_others.assert_has_calls(

@@ -25,7 +25,7 @@ from datahub.core.test_utils import (
 )
 from datahub.interaction.test.factories import InteractionFactoryBase
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-
+from datahub.task.models import Task
 from datahub.task.test.factories import TaskFactory
 from datahub.task.test.utils import BaseEditTaskTests, BaseListTaskTests, BaseTaskTests
 
@@ -134,7 +134,7 @@ class TestGetGenericTask(APITestMixin):
             'investment_project': None,
             'company': None,
             'interaction': None,
-            'status': 'active',
+            'status': task.status,
         }
         assert response == expected_response
 
@@ -267,7 +267,7 @@ class TestAddGenericTask(APITestMixin):
             'investment_project': None,
             'company': None,
             'interaction': None,
-            'status': 'active',
+            'status': post_response_json['status'],
         }
         assert get_response.json() == expected_response
 
@@ -422,7 +422,7 @@ class TestTaskForInvestmentProject(APITestMixin):
                 'name': investment_project.investor_company.name,
             },
             'interaction': None,
-            'status': 'active',
+            'status': task.status,
         }
         assert response == expected_response
 
@@ -516,7 +516,7 @@ class TestTaskForCompany(APITestMixin):
                 'name': company.name,
             },
             'interaction': None,
-            'status': 'active',
+            'status': task.status,
         }
         assert response == expected_response
 
@@ -610,7 +610,7 @@ class TestTaskForInteraction(APITestMixin):
                 'name': interaction.company.name,
             },
             'interaction': {'id': str(interaction.id), 'subject': interaction.subject},
-            'status': 'active',
+            'status': task.status,
         }
         assert response == expected_response
 
@@ -689,6 +689,36 @@ class TestArchiveTask(BaseTaskTests):
         }
         assert response.data['archived_reason'] == 'completed'
         assert response.data['id'] == str(task.id)
+
+
+class TestStatusCompleteTask(BaseTaskTests):
+    """Test the status_complete and status_active POST endpoints for task"""
+
+    @pytest.mark.parametrize('action', ['task_status_complete', 'task_status_active'])
+    def test_status_task_calls_returns_unauthorized_when_user_not_authenticated(self, action):
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser])
+
+        url = reverse(f'api-v4:task:{action}', kwargs={'pk': task.id})
+
+        response = APIClient().post(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize('action', ['task_status_complete', 'task_status_active'])
+    def test_status_task_returns_success_when_changed(
+        self,
+        action,
+    ):
+        task = TaskFactory()
+        expected_task_status = 'complete' if (action == 'task_status_complete') else 'active'
+        url = reverse(f'api-v4:task:{action}', kwargs={'pk': task.id})
+
+        response = self.api_client.post(url).json()
+
+        assert response['status'] == expected_task_status
+        task_saved = Task.objects.get(pk=task.id)
+        assert task_saved.status == expected_task_status
 
 
 class TestAssociatedCompanyAndProject(APITestMixin):
