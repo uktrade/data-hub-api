@@ -327,12 +327,15 @@ def create_task_completed_subscription(adviser_id):
 def notify_adviser_completed_task(task, created):
     """
     Send a notification to all advisers, excluding the adviser who marked the task as completed,
-    when task completed
+    when task completed. Do not send a notification when task is deleted (archived).
     """
     if created:
         return
 
-    if not task.archived:
+    if task.archived:
+        return
+
+    if task.status is not Task.Status.COMPLETE:
         return
 
     advisers_to_notify = task.advisers.exclude(id=task.modified_by.id)
@@ -420,12 +423,16 @@ def notify_adviser_task_amended_by_others(
 ):
     """
     Send a notification to all advisers, excluding the adviser who marked the task as completed,
-    when task is amended
+    when task is amended. Do not send a notification when the task status is set to Complete or
+    marked as deleted (archived).
     """
     if created:
         return
 
     if task.archived:
+        return
+
+    if task.status is Task.Status.COMPLETE:
         return
 
     advisers_to_notify = task.advisers.filter(id__in=adviser_ids_pre_m2m_change).exclude(
@@ -518,6 +525,10 @@ def schedule_reminders_tasks_overdue():
 
 
 def generate_reminders_tasks_overdue():
+    """
+    Generate reminders for all advisers on overdue tasks.
+    Do not send reminders if task is archived or status is complete.
+    """
     with advisory_lock(
         'generate_reminders_tasks_overdue',
         wait=False,
@@ -529,7 +540,9 @@ def generate_reminders_tasks_overdue():
             return
         now = timezone.now()
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
-        tasks = Task.objects.filter(due_date=yesterday).exclude(archived=True)
+        tasks = Task.objects.filter(due_date=yesterday).exclude(archived=True).exclude(
+            status=Task.Status.COMPLETE,
+        )
         for task in tasks:
             # Get all active advisers assigned to the task
             active_advisers = task.advisers.filter(is_active=True)
