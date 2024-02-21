@@ -13,6 +13,7 @@ from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
     ExportExperienceFactory,
+    ExportFactory,
 )
 from datahub.core.constants import (
     AssociatedProgramme as AssociatedProgrammeConstant,
@@ -106,6 +107,7 @@ class TestGetWinView(APITestMixin):
     def test_get(self):
         """Test getting a single win."""
         contact = ContactFactory()
+        export = ExportFactory()
         export_experience = ExportExperienceFactory()
         win = WinFactory(
             company_contacts=[contact],
@@ -116,6 +118,7 @@ class TestGetWinView(APITestMixin):
                 SupportTypeConstant.political_and_economic_briefing.value.id,
             ],
             export_experience=export_experience,
+            company_export=export,
         )
         breakdowns = BreakdownFactory.create_batch(3, win=win)
         customer_response = CustomerResponseFactory(win=win)
@@ -301,6 +304,10 @@ class TestGetWinView(APITestMixin):
                 'name': customer_response.name,
                 'other_marketing_source': customer_response.other_marketing_source,
                 'support_improved_speed': customer_response.support_improved_speed,
+            },
+            'company_export': {
+                'id': str(export.id),
+                'title': export.title,
             },
         }
 
@@ -575,6 +582,7 @@ class TestCreateWinView(APITestMixin):
             'type_of_support': [{'id': str(type_of_support.id), 'name': type_of_support.name}],
             'team_members': [],
             'advisers': [],
+            'company_export': None,
         }
 
         assert response_data == expected_response_data
@@ -597,6 +605,7 @@ class TestCreateWinView(APITestMixin):
         company = CompanyFactory()
         contact = ContactFactory(company=company)
         date_won = now().date()
+        export = ExportFactory()
         export_experience = ExportExperienceFactory()
 
         request_data = {
@@ -687,6 +696,9 @@ class TestCreateWinView(APITestMixin):
                     },
                 },
             ],
+            'company_export': {
+                'id': str(export.id),
+            },
         }
         response = self.api_client.post(url, data=request_data)
         response_data = response.json()
@@ -851,6 +863,10 @@ class TestCreateWinView(APITestMixin):
                     },
                 },
             ],
+            'company_export': {
+                'id': str(export.id),
+                'title': export.title,
+            },
         }
 
         assert response_data == expected_response_data
@@ -871,7 +887,7 @@ class TestUpdateWinView(APITestMixin):
     """Update export win view tests."""
 
     def test_update_win_all_fields(self):
-        """Tests successfully creating an export win with all fields only."""
+        """Tests successfully updating an export win with all fields only."""
         win = WinFactory()
 
         assert Version.objects.count() == 0
@@ -886,6 +902,7 @@ class TestUpdateWinView(APITestMixin):
         company = CompanyFactory()
         contact = ContactFactory(company=company)
         date_won = now().date()
+        export = ExportFactory()
         export_experience = ExportExperienceFactory()
 
         request_data = {
@@ -977,9 +994,13 @@ class TestUpdateWinView(APITestMixin):
                     },
                 },
             ],
+            'company_export': {
+                'id': str(export.id),
+            },
         }
         assert win.breakdowns.count() == 3
         assert win.advisers.count() == 2
+        assert win.company_export is None
         response = self.api_client.patch(url, data=request_data)
         response_data = response.json()
         assert response.status_code == status.HTTP_200_OK
@@ -1122,6 +1143,10 @@ class TestUpdateWinView(APITestMixin):
                     },
                 },
             ],
+            'company_export': {
+                'id': str(export.id),
+                'title': export.title,
+            },
         }
 
         assert response_data == expected_response_data
@@ -1298,6 +1323,7 @@ class TestUpdateWinView(APITestMixin):
                 },
             ],
             'customer_response': None,
+            'company_export': None,
         }
 
         assert response_data == expected_response_data
