@@ -98,6 +98,7 @@ class Contact(ArchivableModel, BaseModel):
     transfer_reason = models.CharField(
         max_length=MAX_LENGTH,
         blank=True,
+        null=True,
         choices=TransferReason.choices,
         help_text='The reason data for this company was transferred.',
     )
