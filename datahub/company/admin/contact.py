@@ -32,6 +32,9 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified',
         'archived_documents_url_path',
         'transferred_to',
+        'transfer_reason',
+        'transferred_on',
+        'transferred_by',
     )
     list_display = (
         'name',

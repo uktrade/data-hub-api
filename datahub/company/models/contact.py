@@ -93,14 +93,14 @@ class Contact(ArchivableModel, BaseModel):
         null=True,
         on_delete=models.SET_NULL,
         related_name='transferred_from',
-        help_text='Where data about this company was transferred to.',
+        help_text='Where data about this contact was transferred to.',
     )
     transfer_reason = models.CharField(
         max_length=MAX_LENGTH,
         blank=True,
         null=True,
         choices=TransferReason.choices,
-        help_text='The reason data for this company was transferred.',
+        help_text='The reason data for this contact was transferred.',
     )
     transferred_on = models.DateTimeField(blank=True, null=True)
     transferred_by = models.ForeignKey(
