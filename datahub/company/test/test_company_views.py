@@ -428,6 +428,7 @@ class TestGetCompany(APITestMixin):
             'turnover': company.turnover,
             'turnover_gbp': convert_usd_to_gbp(company.turnover),
             'is_turnover_estimated': company.is_turnover_estimated,
+            'last_modified_potential': None,
             'website': company.website,
             'global_headquarters': {
                 'id': str(ghq.id),

@@ -351,6 +351,11 @@ class Company(ArchivableModel, BaseModel):
         choices=ExportPotentialScore.choices,
         help_text='Score that signifies export potential, imported from Data Science',
     )
+    last_modified_potential = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text='Timestamp of the last modification for export potential.',
+    )
     great_profile_status = models.CharField(
         max_length=MAX_LENGTH,
         null=True,
