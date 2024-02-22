@@ -643,6 +643,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'registered_address',
             'pending_dnb_investigation',
             'export_potential',
+            'last_modified_potential',
             'great_profile_status',
             'is_global_ultimate',
             'global_ultimate_duns_number',

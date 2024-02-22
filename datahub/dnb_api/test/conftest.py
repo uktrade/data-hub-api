@@ -144,6 +144,7 @@ def base_company_dict():
         'headquarter_type': None,
         'is_number_of_employees_estimated': None,
         'is_turnover_estimated': None,
+        'last_modified_potential': None,
         'number_of_employees': None,
         'one_list_account_owner': None,
         'one_list_tier': None,
