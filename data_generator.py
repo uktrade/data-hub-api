@@ -1,14 +1,17 @@
 import os
+import random
+import time
+
+from collections import defaultdict
+from datetime import timedelta
+
 import django
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
 django.setup()
 
-from datetime import timedelta
-from random import random
-from pprint import pprint
-import time
 from django.db.models.signals import (
+    m2m_changed,
     post_delete,
     post_init,
     post_migrate,
@@ -25,12 +28,8 @@ from datahub.company.test.factories import (
     CompanyFactory,
     CompanyWithAreaFactory,
     ContactFactory,
-    OneListCoreTeamMemberFactory,
     SubsidiaryFactory,
 )
-from collections import defaultdict
-from django.db.models.signals import *
-import random
 
 
 class DisableSignals(object):
@@ -72,34 +71,42 @@ with DisableSignals():
     # In February 2024 there where 18,000 advisers, 500,000 companies, and 950,000 contacts.
     # Alter number of adivsers below to create larger or smaller data set.
     advisers = AdviserFactory.create_batch(200)
-    print(f"Generated {len(advisers)} advisers")
+    print(f'Generated {len(advisers)} advisers')  # noqa
     for index, adviser in enumerate(advisers):
         companies = CompanyFactory.create_batch(
-            random.randint(1, 25), created_by=adviser, modified_by=adviser
+            random.randint(1, 25),
+            created_by=adviser,
+            modified_by=adviser,
         )
 
         # The ratios of the below types of companies do not reflect the live database.
         companies.extend(
             SubsidiaryFactory.create_batch(
-                random.randint(1, 5), created_by=adviser, modified_by=adviser
-            )
+                random.randint(1, 5),
+                created_by=adviser,
+                modified_by=adviser,
+            ),
         )
         companies.extend(
             CompanyWithAreaFactory.create_batch(
-                random.randint(0, 1), created_by=adviser, modified_by=adviser
-            )
+                random.randint(0, 1),
+                created_by=adviser,
+                modified_by=adviser,
+            ),
         )
         companies.extend(
             ArchivedCompanyFactory.create_batch(
-                random.randint(0, 1), created_by=adviser, modified_by=adviser
-            )
+                random.randint(0, 1),
+                created_by=adviser,
+                modified_by=adviser,
+            ),
         )
         # Show a sign of life every now and then
         if index % 10 == 0:
-            print(".", end="")
+            print('.', end='')  # noqa
 
         # The below ratio of contacts to companies does not reflect the live database.
-        for index, company in enumerate(companies):
+        for company in companies:
             ContactFactory.create_batch(
                 random.randint(1, 2),
                 company=company,
@@ -107,4 +114,4 @@ with DisableSignals():
             )
 
     elapsed = time.time() - start_time
-    print(str(f"{timedelta(seconds=elapsed)}"))
+    print(str(f'{timedelta(seconds=elapsed)}'))  # noqa
