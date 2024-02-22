@@ -20,6 +20,7 @@ from datahub.reminder.models import (
     TaskAssignedToMeFromOthersSubscription,
     TaskCompletedReminder,
     TaskCompletedSubscription,
+    TaskDeletedByOthersReminder,
     TaskOverdueReminder,
     TaskOverdueSubscription,
     UpcomingTaskReminder,
@@ -29,6 +30,7 @@ from datahub.reminder.test.factories import (
     TaskAmendedByOthersReminderFactory,
     TaskAssignedToMeFromOthersReminderFactory,
     TaskCompletedReminderFactory,
+    TaskDeletedByOthersReminderFactory,
     TaskOverdueReminderFactory,
     UpcomingTaskReminderFactory,
 )
@@ -59,6 +61,7 @@ from datahub.task.tasks import (
     update_task_amended_by_others_email_status,
     update_task_assigned_to_me_from_others_email_status,
     update_task_completed_email_status,
+    update_task_deleted_email_status,
     update_task_overdue_reminder_email_status,
     update_task_reminder_email_status,
 )
@@ -690,6 +693,33 @@ class TestTasksAssignedToMeFromOthers:
         TaskAssignedToMeFromOthersReminderFactory.create_batch(2, task_id=task2.id)
 
         linked_reminders = TaskAssignedToMeFromOthersReminder.objects.filter(
+            email_notification_id=notification_id,
+        )
+        assert linked_reminders.count() == (reminder_number)
+
+    def test_update_task_deleted_email_status(
+        self,
+    ):
+        """
+        Test it updates reminder data with the connected email notification information.
+        """
+        task = TaskFactory()
+        reminder_number = 3
+        notification_id = str(uuid4())
+        reminders = TaskDeletedByOthersReminderFactory.create_batch(
+            reminder_number,
+            task_id=task.id,
+        )
+
+        update_task_deleted_email_status(
+            notification_id,
+            [reminder.id for reminder in reminders],
+        )
+
+        task2 = TaskFactory()
+        TaskDeletedByOthersReminderFactory.create_batch(2, task_id=task2.id)
+
+        linked_reminders = TaskDeletedByOthersReminder.objects.filter(
             email_notification_id=notification_id,
         )
         assert linked_reminders.count() == (reminder_number)
