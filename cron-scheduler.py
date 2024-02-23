@@ -38,6 +38,7 @@ from datahub.dnb_api.tasks.sync import schedule_sync_outdated_companies_with_dnb
 from datahub.dnb_api.tasks.update import schedule_get_company_updates
 from datahub.email_ingestion.tasks import process_mailbox_emails
 from datahub.export_win.tasks import (
+    auto_resend_client_email_from_unconfirmed_win,
     update_notify_email_delivery_status_for_customer_response,
     update_notify_email_delivery_status_for_customer_response_token,
 )
@@ -226,6 +227,7 @@ def schedule_jobs():
     schedule_email_ingestion_tasks()
     schedule_new_export_interaction_jobs()
     schedule_export_win_customer_response_token_jobs()
+    schedule_export_win_auto_resend_client_email()
 
     schedule_user_reminder_migration()
 
@@ -306,6 +308,19 @@ def schedule_export_win_customer_response_token_jobs():
         retry_intervals=30,
         cron=EVERY_THREE_AM,
         description='Scheduled update of export win lead officer email delivery status',
+    )
+
+
+def schedule_export_win_auto_resend_client_email():
+    """Schedule auto resend client email from unconfirmed win"""
+    job_scheduler(
+        function=auto_resend_client_email_from_unconfirmed_win,
+        max_retries=5,
+        queue_name=LONG_RUNNING_QUEUE,
+        retry_backoff=True,
+        retry_intervals=30,
+        cron=EVERY_TWO_AM,
+        description='Scheduled auto resend client email from unconfirmed win',
     )
 
 
