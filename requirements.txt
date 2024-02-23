@@ -224,6 +224,7 @@ zope-event==4.6
     # via gevent
 zope-interface==5.5.2
     # via gevent
+tqdm==4.66.2
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
