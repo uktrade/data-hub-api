@@ -11,8 +11,13 @@ from django.conf import settings
 from freezegun import freeze_time
 
 from datahub.company.test.factories import ContactFactory
+from datahub.export_win.constants import (
+    EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD,
+    EMAIL_MAX_TOKEN_ISSUED_WITHIN_RESPONSE_THRESHOLD,
+)
 from datahub.export_win.models import CustomerResponseToken
 from datahub.export_win.tasks import (
+    auto_resend_client_email_from_unconfirmed_win,
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
     get_all_fields_for_lead_officer_email_receipt_no,
@@ -24,9 +29,7 @@ from datahub.export_win.tasks import (
     update_notify_email_delivery_status_for_customer_response_token,
 )
 from datahub.export_win.test.factories import (
-    BreakdownFactory,
-    CustomerResponseFactory,
-    CustomerResponseTokenFactory,
+    BreakdownFactory, CustomerResponseFactory, CustomerResponseTokenFactory,
     WinFactory,
 )
 from datahub.notification.constants import NotifyServiceName
@@ -308,6 +311,178 @@ class TestUpdateEmailDeliveryStatusTask:
             email_notification_id,
             notify_service_name=NotifyServiceName.export_win,
         )
+
+
+@pytest.mark.django_db
+@freeze_time('2023-07-17T00:00:00')
+class TestAutoResendClientEmailFromUnconfirmedWinTask:
+    current_date = date(year=2023, month=7, day=17)
+
+    def test_auto_resend_client_email_when_less_than_max_token_issued_threshold(
+        self,
+    ):
+        """
+        Test auto resend email to client with less than max token issued threshold.
+        """
+        contact = ContactFactory()
+        win = WinFactory(company_contacts=[contact])
+        customer_response = CustomerResponseFactory(win=win)
+
+        def set_time_delta(days):
+            return datetime.utcnow() - timedelta(days=days)
+
+        with freeze_time(set_time_delta(5)):
+            create_token_for_contact(contact, customer_response)
+
+        with freeze_time(set_time_delta(3)):
+            create_token_for_contact(contact, customer_response)
+
+        with freeze_time(set_time_delta(2)):
+            create_token_for_contact(contact, customer_response)
+
+        auto_resend_client_email_from_unconfirmed_win()
+        customer_response.refresh_from_db()
+
+        assert (
+            customer_response.tokens.count() < EMAIL_MAX_TOKEN_ISSUED_WITHIN_RESPONSE_THRESHOLD
+        )
+
+    def test_auto_resend_client_email_when_less_than_win_email_response_threshold(self):
+        """
+        Test auto resend email to client with less than win maturity days threshold.
+        """
+        contact = ContactFactory()
+        win = WinFactory(company_contacts=[contact])
+        customer_response = CustomerResponseFactory(win=win)
+
+        def set_time_zone_to_none(created_on):
+            return created_on.replace(tzinfo=None)
+
+        def set_time_delta(days):
+            return datetime.utcnow() - timedelta(days=days)
+
+        win_email_response_threshold = set_time_delta(EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD - 1)
+
+        with freeze_time(set_time_delta(25)):
+            token_25_days = create_token_for_contact(contact, customer_response)
+
+        with freeze_time(set_time_delta(21)):
+            token_21_days = create_token_for_contact(contact, customer_response)
+
+        with freeze_time(set_time_delta(14)):
+            token_14_days = create_token_for_contact(contact, customer_response)
+
+        with freeze_time(set_time_delta(7)):
+            token_7_days = create_token_for_contact(contact, customer_response)
+
+        with freeze_time(set_time_delta(5)):
+            token_5_days = create_token_for_contact(contact, customer_response)
+
+        with freeze_time(set_time_delta(3)):
+            token_3_days = create_token_for_contact(contact, customer_response)
+
+        auto_resend_client_email_from_unconfirmed_win()
+        customer_response.refresh_from_db()
+
+        assert (
+            win_email_response_threshold > set_time_zone_to_none(token_25_days.created_on))
+        assert (
+            win_email_response_threshold > set_time_zone_to_none(token_21_days.created_on))
+        assert (
+            win_email_response_threshold > set_time_zone_to_none(token_14_days.created_on))
+        assert (
+            win_email_response_threshold > set_time_zone_to_none(token_7_days.created_on))
+        assert (
+            win_email_response_threshold < set_time_zone_to_none(token_5_days.created_on))
+        assert (
+            win_email_response_threshold < set_time_zone_to_none(token_3_days.created_on))
+
+    def test_auto_resend_client_email_using_notify_export_win_email_by_rq_email(
+        self,
+        mock_job_scheduler,
+    ):
+        """
+        Tests auto resend client email using notify_export_win_email_by_rq_email.
+
+        It should schedule a task to:
+            * notify a client
+            * trigger a second task to store the notification_id
+        """
+        contact = ContactFactory()
+        win = WinFactory(company_contacts=[contact])
+        customer_response = CustomerResponseFactory(win=win)
+
+        def set_time_delta(days):
+            return datetime.utcnow() - timedelta(days=days)
+
+        with freeze_time(set_time_delta(6)):
+            CustomerResponseTokenFactory(customer_response=customer_response)
+
+        with freeze_time(set_time_delta(4)):
+            CustomerResponseTokenFactory(customer_response=customer_response)
+
+        with freeze_time(set_time_delta(2)):
+            CustomerResponseTokenFactory(customer_response=customer_response)
+
+        customer_response.refresh_from_db()
+        win = customer_response.win
+        company_contacts = win.company_contacts
+
+        for company_contact in company_contacts.all():
+            token = create_token_for_contact(
+                company_contact,
+                customer_response,
+            )
+            context = get_all_fields_for_client_email_receipt(
+                token,
+                customer_response,
+            )
+            template_id = settings.EXPORT_WIN_CLIENT_RECEIPT_TEMPLATE_ID
+
+            notify_export_win_email_by_rq_email(
+                company_contact.email,
+                template_id,
+                context,
+                update_customer_response_token_for_email_notification_id,
+                token.id,
+            )
+
+            mock_job_scheduler.assert_called_once_with(
+                function=send_export_win_email_notification_via_rq,
+                function_args=(
+                    company_contact.email,
+                    template_id,
+                    context,
+                    update_customer_response_token_for_email_notification_id,
+                    token.id,
+                    NotifyServiceName.export_win,
+                ),
+                retry_backoff=True,
+                max_retries=5,
+            )
+
+            mock_job_scheduler.reset_mock()
+            notify_export_win_email_by_rq_email(
+                company_contact.email,
+                template_id,
+                context,
+                update_customer_response_token_for_email_notification_id,
+                token.id,
+            )
+
+            mock_job_scheduler.assert_called_once_with(
+                function=send_export_win_email_notification_via_rq,
+                function_args=(
+                    company_contact.email,
+                    template_id,
+                    context,
+                    update_customer_response_token_for_email_notification_id,
+                    token.id,
+                    NotifyServiceName.export_win,
+                ),
+                retry_backoff=True,
+                max_retries=5,
+            )
 
 
 def test_get_all_fields_for_client_email_receipt_success():
