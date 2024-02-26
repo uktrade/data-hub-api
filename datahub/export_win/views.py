@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.conf import settings
+from django.db.models import Max, Min
 
 from django.http import Http404
 from django_filters.rest_framework import (
@@ -88,9 +89,20 @@ class WinViewSet(CoreViewSet):
         'associated_programme',
         'team_members',
         'advisers',
+    ).annotate(
+        first_sent=Min('customer_response__tokens__created_on'),
+        last_sent=Max('customer_response__tokens__created_on'),
     )
     filter_backends = [DjangoFilterBackend]
     filterset_class = ConfirmedFilterSet
+
+    def perform_create(self, serializer):
+        """
+        Ensure instance with first sent and last sent dates
+        is available to serializer.
+        """
+        instance = serializer.save()
+        serializer.instance = self.get_queryset().get(pk=instance.pk)
 
     @action(methods=['post'], detail=True, schema=StubSchema())
     def resend_export_win(self, request, *args, **kwargs):
