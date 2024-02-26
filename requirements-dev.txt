@@ -163,7 +163,7 @@ idna==3.4
     #   yarl
 iniconfig==1.1.1
     # via pytest
-ipython==8.21.0
+ipython==8.22.1
     # via -r requirements-dev.in
 isort==5.11.4
     # via pylint
@@ -369,7 +369,7 @@ statsd==4.0.1
     # via -r requirements.in
 tomlkit==0.11.6
     # via pylint
-traitlets==5.8.0
+traitlets==5.14.1
     # via
     #   ipython
     #   matplotlib-inline
