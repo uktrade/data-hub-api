@@ -228,3 +228,13 @@ class CustomerResponseTokenFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'export_win.CustomerResponseToken'
+
+
+class LegacyExportWinsToDataHubCompanyFactory(factory.django.DjangoModelFactory):
+    """LegacyExportWinsToDataHubCompany factory."""
+
+    id = factory.Faker('uuid4')
+    company = factory.SubFactory(CompanyFactory)
+
+    class Meta:
+        model = 'export_win.LegacyExportWinsToDataHubCompany'

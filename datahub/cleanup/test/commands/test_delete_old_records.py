@@ -45,6 +45,7 @@ from datahub.export_win.test.factories import (
     BreakdownFactory,
     CustomerResponseFactory,
     CustomerResponseTokenFactory,
+    LegacyExportWinsToDataHubCompanyFactory,
     WinAdviserFactory,
     WinFactory,
 )
@@ -306,6 +307,12 @@ MAPPING = {
                         'modified_on': COMPANY_DELETE_BEFORE_DATETIME,
                     },
                 ],
+            },
+            {
+                'factory': LegacyExportWinsToDataHubCompanyFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
             },
         ],
     },
