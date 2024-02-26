@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.http.multipartparser import parse_header_parameters
-from rest_framework import HTTP_HEADER_ENCODING, status
+from rest_framework import status
 
 
 def enforce_request_content_type(content_type):
