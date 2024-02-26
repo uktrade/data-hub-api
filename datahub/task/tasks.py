@@ -405,7 +405,7 @@ def notify_adviser_archived_completed_or_amended_task(
         )
         return
 
-    if Task.Status.COMPLETE:
+    if task.status is Task.Status.COMPLETE:
         notify_advisers_of_task(
             task,
             None,
