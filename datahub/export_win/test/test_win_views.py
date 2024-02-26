@@ -1,8 +1,10 @@
+import datetime
 from unittest import mock
 
 import pytest
 
 from django.utils.timezone import now
+from freezegun import freeze_time
 
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -33,7 +35,11 @@ from datahub.core.test_utils import (
     create_test_user,
     format_date_or_datetime,
 )
-from datahub.export_win.models import CustomerResponseToken, Win
+from datahub.export_win.models import (
+    CustomerResponse,
+    CustomerResponseToken,
+    Win,
+)
 from datahub.export_win.tasks import (
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
@@ -43,6 +49,7 @@ from datahub.export_win.tasks import (
 from datahub.export_win.test.factories import (
     BreakdownFactory,
     CustomerResponseFactory,
+    CustomerResponseTokenFactory,
     WinAdviserFactory,
     WinFactory,
 )
@@ -122,6 +129,18 @@ class TestGetWinView(APITestMixin):
         )
         breakdowns = BreakdownFactory.create_batch(3, win=win)
         customer_response = CustomerResponseFactory(win=win)
+
+        first_sent = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+        with freeze_time(first_sent):
+            CustomerResponseTokenFactory(
+                customer_response=win.customer_response,
+            )
+        last_sent = datetime.datetime(year=2012, month=7, day=19, hour=15, minute=6, second=3)
+        with freeze_time(last_sent):
+            CustomerResponseTokenFactory(
+                customer_response=win.customer_response,
+            )
+
         url = reverse('api-v4:export-win:item', kwargs={'pk': win.pk})
 
         response = self.api_client.get(url)
@@ -309,6 +328,8 @@ class TestGetWinView(APITestMixin):
                 'id': str(export.id),
                 'title': export.title,
             },
+            'first_sent': format_date_or_datetime(first_sent),
+            'last_sent': format_date_or_datetime(last_sent),
         }
 
         assert response_data == expected_response_data
@@ -459,7 +480,9 @@ class TestCreateWinView(APITestMixin):
                 },
             ],
         }
-        response = self.api_client.post(url, data=request_data)
+        first_sent = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+        with freeze_time(first_sent):
+            response = self.api_client.post(url, data=request_data)
         response_data = response.json()
         assert response.status_code == status.HTTP_201_CREATED
         win = Win.objects.get(id=response_data['id'])
@@ -582,6 +605,8 @@ class TestCreateWinView(APITestMixin):
             'type_of_support': [{'id': str(type_of_support.id), 'name': type_of_support.name}],
             'team_members': [],
             'advisers': [],
+            'first_sent': format_date_or_datetime(first_sent),
+            'last_sent': format_date_or_datetime(first_sent),
             'company_export': None,
         }
 
@@ -700,9 +725,12 @@ class TestCreateWinView(APITestMixin):
                 'id': str(export.id),
             },
         }
-        response = self.api_client.post(url, data=request_data)
+        first_sent = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+        with freeze_time(first_sent):
+            response = self.api_client.post(url, data=request_data)
         response_data = response.json()
         assert response.status_code == status.HTTP_201_CREATED
+
         win = Win.objects.get(id=response_data['id'])
         associated_programme = win.associated_programme.first()
         type_of_support = win.type_of_support.first()
@@ -867,6 +895,8 @@ class TestCreateWinView(APITestMixin):
                 'id': str(export.id),
                 'title': export.title,
             },
+            'first_sent': format_date_or_datetime(first_sent),
+            'last_sent': format_date_or_datetime(first_sent),
         }
 
         assert response_data == expected_response_data
@@ -889,6 +919,8 @@ class TestUpdateWinView(APITestMixin):
     def test_update_win_all_fields(self):
         """Tests successfully updating an export win with all fields only."""
         win = WinFactory()
+        customer_response = CustomerResponse(win=win)
+        customer_response.save()
 
         assert Version.objects.count() == 0
 
@@ -904,6 +936,11 @@ class TestUpdateWinView(APITestMixin):
         date_won = now().date()
         export = ExportFactory()
         export_experience = ExportExperienceFactory()
+        first_sent = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+        with freeze_time(first_sent):
+            CustomerResponseTokenFactory(
+                customer_response=win.customer_response,
+            )
 
         request_data = {
             'adviser': {
@@ -1067,7 +1104,31 @@ class TestUpdateWinView(APITestMixin):
                 'id': UKRegionConstant.england.value.id,
                 'name': UKRegionConstant.england.value.name,
             },
-            'customer_response': None,
+            'customer_response': {
+                'access_to_contacts': None,
+                'access_to_information': None,
+                'agree_with_win': None,
+                'case_study_willing': False,
+                'comments': '',
+                'company_was_at_risk_of_not_exporting': False,
+                'developed_relationships': None,
+                'expected_portion_without_help': None,
+                'gained_confidence': None,
+                'has_enabled_expansion_into_existing_market': False,
+                'has_enabled_expansion_into_new_market': False,
+                'has_explicit_export_plans': False,
+                'has_increased_exports_as_percent_of_turnover': False,
+                'id': str(win.customer_response.id),
+                'improved_profile': None,
+                'involved_state_enterprise': False,
+                'last_export': None,
+                'marketing_source': None,
+                'name': '',
+                'other_marketing_source': '',
+                'our_support': None,
+                'overcame_problem': None,
+                'support_improved_speed': False,
+            },
             'date': format_date_or_datetime(date_won),
             'description': 'Description',
             'export_experience': {
@@ -1147,6 +1208,8 @@ class TestUpdateWinView(APITestMixin):
                 'id': str(export.id),
                 'title': export.title,
             },
+            'first_sent': format_date_or_datetime(first_sent),
+            'last_sent': format_date_or_datetime(first_sent),
         }
 
         assert response_data == expected_response_data
@@ -1171,9 +1234,15 @@ class TestUpdateWinView(APITestMixin):
                 AssociatedProgrammeConstant.afterburner.value.id,
             ],
         )
-
+        customer_response = CustomerResponse(win=win)
+        customer_response.save()
         breakdown = BreakdownFactory(win=win)
         win_adviser = WinAdviserFactory(win=win)
+        first_sent = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+        with freeze_time(first_sent):
+            CustomerResponseTokenFactory(
+                customer_response=win.customer_response,
+            )
 
         assert Version.objects.count() == 0
 
@@ -1322,8 +1391,34 @@ class TestUpdateWinView(APITestMixin):
                     },
                 },
             ],
-            'customer_response': None,
+            'customer_response': {
+                'access_to_contacts': None,
+                'access_to_information': None,
+                'agree_with_win': None,
+                'case_study_willing': False,
+                'comments': '',
+                'company_was_at_risk_of_not_exporting': False,
+                'developed_relationships': None,
+                'expected_portion_without_help': None,
+                'gained_confidence': None,
+                'has_enabled_expansion_into_existing_market': False,
+                'has_enabled_expansion_into_new_market': False,
+                'has_explicit_export_plans': False,
+                'has_increased_exports_as_percent_of_turnover': False,
+                'id': str(win.customer_response.id),
+                'improved_profile': None,
+                'involved_state_enterprise': False,
+                'last_export': None,
+                'marketing_source': None,
+                'name': '',
+                'other_marketing_source': '',
+                'our_support': None,
+                'overcame_problem': None,
+                'support_improved_speed': False,
+            },
             'company_export': None,
+            'first_sent': format_date_or_datetime(first_sent),
+            'last_sent': format_date_or_datetime(first_sent),
         }
 
         assert response_data == expected_response_data

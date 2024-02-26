@@ -5,6 +5,7 @@ from django.db import transaction
 
 from rest_framework.serializers import (
     BooleanField,
+    DateTimeField,
     ModelSerializer,
     SerializerMethodField,
 )
@@ -155,6 +156,8 @@ class WinSerializer(ModelSerializer):
     breakdowns = BreakdownSerializer(many=True)
 
     complete = BooleanField(read_only=True)
+    first_sent = DateTimeField(read_only=True)
+    last_sent = DateTimeField(read_only=True)
 
     company_export = NestedRelatedField(
         CompanyExport,
@@ -211,6 +214,8 @@ class WinSerializer(ModelSerializer):
             'audit',
             'team_members',
             'company_export',
+            'first_sent',
+            'last_sent',
         )
 
     def create(self, validated_data):
