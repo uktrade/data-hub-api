@@ -372,7 +372,7 @@ def notify_adviser_archived_completed_or_amended_task(
     adviser_ids_pre_m2m_change=None,
 ):
     """
-    Send a notification to all advisers, excluding the adviser who ammended,
+    Send a notification to all advisers, excluding the adviser who amended,
     archived/deleted or completed the task.
     After a task status has been set to completed:
     - it can no longer be edited
@@ -383,6 +383,8 @@ def notify_adviser_archived_completed_or_amended_task(
     - it **can** be undeleted/unarchived
     - The TaskDeletedByOthersReminder should be send.
     - No other notifications should be send once a Task has been archived/deleted.
+    After a task has been amended:
+    - The TaskAmmendedByOthersReminder should be send.
 
     task: Task
     created: true or false depending on whether the task has been created or updated.
