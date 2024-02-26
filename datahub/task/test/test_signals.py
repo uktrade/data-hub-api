@@ -68,22 +68,23 @@ class TestTaskAdviserChangedSubscriptions:
 
 
 class TestTaskAdviserCompletedSubscriptions:
-    @patch('datahub.task.signals.schedule_notify_advisers_task_completed')
+    @patch('datahub.task.signals.schedule_notify_advisers_task_archived_completed_or_amended')
     def test_creating_and_updating_task_triggers_notify_adviser_completed_scheduled_task(
         self,
-        schedule_notify_advisers_task_completed,
+        schedule_notify_advisers_task_archived_completed_or_amended,
     ):
         """
         Note: only the triggering of the schedule is tested not the processing of it.
         """
-        task = TaskFactory(advisers=[AdviserFactory()])
+        adviser = AdviserFactory()
+        task = TaskFactory(advisers=[adviser])
         task.save()
 
-        schedule_notify_advisers_task_completed.assert_has_calls(
+        schedule_notify_advisers_task_archived_completed_or_amended.assert_has_calls(
             [
-                call(task, True),
-                call(task, False),
-                call(task, False),
+                call(task, True, []),
+                call(task, False, [adviser.id]),
+                call(task, False, [adviser.id]),
             ],
             any_order=True,
         )
@@ -97,8 +98,7 @@ class TestTaskAdviserCompletedSubscriptions:
         Calling with adviser completed should result in sending of TaskCompletedReminder
         """
         adviser = AdviserFactory()
-        task = TaskFactory(advisers=[adviser])
-        task.status = Task.Status.COMPLETE
+        task = TaskFactory(advisers=[adviser], status=Task.Status.COMPLETE)
         task.save()
 
         send_task_email.assert_any_call(
@@ -111,15 +111,15 @@ class TestTaskAdviserCompletedSubscriptions:
 
 
 class TestTaskAmededByOthersSubscriptions:
-    @patch('datahub.task.signals.schedule_notify_advisers_task_amended_by_others')
+    @patch('datahub.task.signals.schedule_notify_advisers_task_archived_completed_or_amended')
     def test_creating_task_triggers_notify_advisers_task_amended_by_others_scheduled_task(
         self,
-        schedule_notify_advisers_task_amended_by_others,
+        schedule_notify_advisers_task_archived_completed_or_amended,
     ):
         adviser = AdviserFactory()
         task = TaskFactory(advisers=[adviser])
 
-        schedule_notify_advisers_task_amended_by_others.assert_has_calls(
+        schedule_notify_advisers_task_archived_completed_or_amended.assert_has_calls(
             [
                 call(task, True, []),
                 call(task, False, [adviser.id]),
@@ -127,16 +127,16 @@ class TestTaskAmededByOthersSubscriptions:
             any_order=True,
         )
 
-    @patch('datahub.task.signals.schedule_notify_advisers_task_amended_by_others')
+    @patch('datahub.task.signals.schedule_notify_advisers_task_archived_completed_or_amended')
     def test_modifying_task_triggers_notify_advisers_task_amended_by_others_scheduled_task(
         self,
-        schedule_notify_advisers_task_amended_by_others,
+        schedule_notify_advisers_task_archived_completed_or_amended,
     ):
         adviser = AdviserFactory()
         task = TaskFactory(advisers=[adviser])
         task.save()
 
-        schedule_notify_advisers_task_amended_by_others.assert_has_calls(
+        schedule_notify_advisers_task_archived_completed_or_amended.assert_has_calls(
             [
                 call(task, True, []),
                 call(task, False, [adviser.id]),
