@@ -65,7 +65,14 @@ CACHES = {
 # Stop WhiteNoise emitting warnings when running tests without running collectstatic first
 WHITENOISE_AUTOREFRESH = True
 WHITENOISE_USE_FINDERS = True
-STATICFILES_STORAGE = None
+# STORAGES = {
+#     "default": {
+#         "BACKEND": "django.core.files.storage.FileSystemStorage",
+#     },
+#     "staticfiles": {
+#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+#     }
+# }
 
 PAAS_IP_ALLOWLIST = ['1.2.3.4']
 
