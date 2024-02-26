@@ -593,7 +593,6 @@ class InvestmentProject(
         """Keep the original stage value so that we can see if it changes when saving."""
         super().__init__(*args, **kwargs)
         self.__stage_id = self.stage_id
-        self.__project_manager_id = self.project_manager_id
 
     def get_absolute_url(self):
         """URL to the object in the Data Hub internal front end."""
