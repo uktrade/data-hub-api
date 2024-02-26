@@ -393,16 +393,6 @@ def notify_adviser_archived_completed_or_amended_task(
     """
     if created:
         return
-    if not task.archived and task.status is not Task.Status.COMPLETE:
-        notify_advisers_of_task(
-            task,
-            adviser_ids_pre_m2m_change,
-            TaskAmendedByOthersReminder,
-            TaskAmendedByOthersSubscription,
-            TaskAmendedByOthersEmailTemplate,
-            update_task_amended_by_others_email_status,
-        )
-        return
 
     if task.archived:
         notify_advisers_of_task(
@@ -413,7 +403,9 @@ def notify_adviser_archived_completed_or_amended_task(
             TaskDeletedByOthersEmailTemplate,
             update_task_completed_email_status,
         )
-    else:
+        return
+
+    if Task.Status.COMPLETE:
         notify_advisers_of_task(
             task,
             None,
@@ -422,6 +414,17 @@ def notify_adviser_archived_completed_or_amended_task(
             TaskCompletedEmailTemplate,
             update_task_completed_email_status,
         )
+        return
+
+    notify_advisers_of_task(
+        task,
+        adviser_ids_pre_m2m_change,
+        TaskAmendedByOthersReminder,
+        TaskAmendedByOthersSubscription,
+        TaskAmendedByOthersEmailTemplate,
+        update_task_amended_by_others_email_status,
+    )
+    return
 
 
 def notify_advisers_of_task(
