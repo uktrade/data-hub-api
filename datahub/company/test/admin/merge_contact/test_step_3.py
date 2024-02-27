@@ -320,7 +320,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         source_contact.refresh_from_db()
 
         assert not source_contact.archived
-        assert source_contact.transfer_reason == ''
+        assert source_contact.transfer_reason is None
         assert not source_contact.transferred_by
         assert not source_contact.transferred_on
         assert not source_contact.transferred_to
