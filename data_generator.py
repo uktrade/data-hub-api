@@ -32,7 +32,7 @@ from datahub.company.test.factories import (
 )
 
 
-class DisableSignals(object):
+class DisableSignals:
     def __init__(self, disabled_signals=None):
         self.stashed_signals = defaultdict(list)
         self.disabled_signals = disabled_signals or [
@@ -68,7 +68,7 @@ class DisableSignals(object):
 with DisableSignals():
     start_time = time.time()
 
-    # In February 2024 there where 18,000 advisers, 500,000 companies, and 950,000 contacts.
+    # In February 2024 there were 18,000 advisers, 500,000 companies, and 950,000 contacts.
     # Alter number of adivsers below to create larger or smaller data set.
     advisers = AdviserFactory.create_batch(200)
     print(f'Generated {len(advisers)} advisers')  # noqa
@@ -114,4 +114,4 @@ with DisableSignals():
             )
 
     elapsed = time.time() - start_time
-    print(str(f'{timedelta(seconds=elapsed)}'))  # noqa
+    print(f'{timedelta(seconds=elapsed)}')  # noqa
