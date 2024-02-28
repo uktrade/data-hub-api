@@ -94,7 +94,7 @@ def perform_delete_document(document_pk):
             f'Document with ID {document_pk} is not pending deletion.',
         )
 
-    if document.uploaded_on:
+    if document.path:
         bucket_id = document.bucket_id
 
         client = get_s3_client_for_bucket(bucket_id)
