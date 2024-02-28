@@ -5,10 +5,9 @@ from unittest.mock import MagicMock
 
 from django.apps import apps
 
+from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin
 from datahub.task.models import Task
-
-
 from datahub.task.test.factories import TaskFactory
 
 
@@ -38,3 +37,39 @@ class TestTaskMigrations(APITestMixin):
         updated_task = Task.objects.filter(id=task.id).first()
 
         assert updated_task.investment_project is None
+
+    def test_archive_task_status_migration_forwards_func(self):
+        # Import migration file dynamically as it start with a number
+        module = import_module('datahub.task.migrations.0011_archive_task_status')
+
+        archived_by = AdviserFactory()
+
+        task_archived = TaskFactory(archived=True, archived_by=archived_by)
+        task = TaskFactory(archived=False, archived_by=None)
+
+        module.forwards_func(apps, None)
+
+        task_archived = Task.objects.get(pk=task_archived.id)
+        task = Task.objects.get(pk=task.id)
+
+        assert task_archived.status == Task.Status.COMPLETE
+        assert task_archived.archived is False
+        assert task_archived.archived_by == archived_by
+        assert task.status == Task.Status.ACTIVE
+        assert task.archived is False
+        assert task.archived_by is None
+
+    def test_archive_task_status_migration_reverse_func(self):
+        # Import migration file dynamically as it start with a number
+        module = import_module('datahub.task.migrations.0011_archive_task_status')
+
+        task_archived = TaskFactory(status=Task.Status.COMPLETE)
+        task = TaskFactory(status=Task.Status.ACTIVE)
+
+        module.reverse_func(apps, None)
+
+        task_archived = Task.objects.get(pk=task_archived.id)
+        task = Task.objects.get(pk=task.id)
+
+        assert task_archived.archived is True
+        assert task.archived is False

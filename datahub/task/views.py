@@ -4,7 +4,7 @@ from django.db.models import Q
 from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import action, api_view, permission_classes
 
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
@@ -14,6 +14,7 @@ from datahub.company.models.company import Company
 
 
 from datahub.core.mixins import ArchivableViewSetMixin
+from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet
 from datahub.investment.project.models import InvestmentProject
 from datahub.task.models import Task
@@ -70,6 +71,24 @@ class TaskV4ViewSet(ArchivableViewSetMixin, TasksMixin):
         record_data = self.request.data
         record_data['id'] = result.id
         record_user_event(self.request, type_=UserEventType.TASK_CREATED, data=record_data)
+
+    @action(methods=['post'], detail=True, schema=StubSchema())
+    def status_complete(self, request, pk):
+        """Set status to complete."""
+        obj = self.get_object()
+        obj.status = Task.Status.COMPLETE
+        obj.save()
+        obj_serializer = self.get_serializer_class()(obj)
+        return Response(data=obj_serializer.data)
+
+    @action(methods=['post'], detail=True, schema=StubSchema())
+    def status_active(self, request, pk):
+        """Set status to active."""
+        obj = self.get_object()
+        obj.status = Task.Status.ACTIVE
+        obj.save()
+        obj_serializer = self.get_serializer_class()(obj)
+        return Response(data=obj_serializer.data)
 
 
 @transaction.non_atomic_requests
