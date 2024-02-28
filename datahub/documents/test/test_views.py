@@ -173,22 +173,31 @@ class TestDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert any('schedule_virus_scan_document' in message for message in caplog.messages)
 
-    def mock_document_upload(self):
+    def mock_document_upload(self, s3_stubber):
         entity_document = MyEntityDocument.objects.create(
             original_filename='test.txt',
             my_field='cats can recognise human voices',
         )
         entity_document.document.uploaded_on = now()
         url = reverse('test-document-item', kwargs={'entity_document_pk': entity_document.pk})
+
+        s3_stubber.add_response(
+            'delete_object',
+            {
+                'ResponseMetadata': {
+                    'HTTPStatusCode': 204,
+                },
+            },
+        )
         response = self.api_client.delete(url)
 
         return response, entity_document
 
-    def test_document_delete(self, caplog, monkeypatch, test_urls):
+    def test_document_delete(self, caplog, s3_stubber, monkeypatch, test_urls):
         """Tests document deletion."""
         caplog.set_level(logging.INFO, 'datahub.documents.tasks')
 
-        response, entity_document = self.mock_document_upload()
+        response, entity_document = self.mock_document_upload(s3_stubber)
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
@@ -197,7 +206,7 @@ class TestDocumentViews(APITestMixin):
         with pytest.raises(Document.DoesNotExist):
             entity_document.document.refresh_from_db()
 
-    def test_schedule_document_delete(self, monkeypatch, test_urls):
+    def test_schedule_document_delete(self, monkeypatch, s3_stubber, test_urls):
         """Tests schedule of document deletion."""
         mock_schedule_delete_document = Mock()
         monkeypatch.setattr(
@@ -205,7 +214,7 @@ class TestDocumentViews(APITestMixin):
             mock_schedule_delete_document,
         )
 
-        response, entity_document = self.mock_document_upload()
+        response, entity_document = self.mock_document_upload(s3_stubber)
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
         mock_schedule_delete_document.assert_called_once_with(entity_document.document.pk)
