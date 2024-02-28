@@ -4,8 +4,7 @@ from django.dispatch import receiver
 from datahub.task.models import Task
 from datahub.task.tasks import (
     schedule_advisers_added_to_task,
-    schedule_notify_advisers_task_amended_by_others,
-    schedule_notify_advisers_task_completed,
+    schedule_notify_advisers_task_archived_completed_or_amended,
 )
 
 
@@ -46,5 +45,8 @@ def save_task(sender, instance, created, **kwargs):
     # any m2m changes are triggered by the m2m signal
     adviser_ids_pre_m2m_change = list(instance.advisers.all().values_list('id', flat=True))
 
-    schedule_notify_advisers_task_completed(instance, created)
-    schedule_notify_advisers_task_amended_by_others(instance, created, adviser_ids_pre_m2m_change)
+    schedule_notify_advisers_task_archived_completed_or_amended(
+        instance,
+        created,
+        adviser_ids_pre_m2m_change,
+    )

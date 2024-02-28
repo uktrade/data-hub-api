@@ -486,11 +486,11 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
         current_adviser.id = self.user.id
 
         status_tasks = TaskFactory.create_batch(
-            3, status='Active', archived=False, created_by=current_adviser,
+            3, status='Active', created_by=current_adviser,
         )
 
         status_tasks_completed = TaskFactory.create_batch(
-            3, status='Completed', archived=True,
+            3, status='Complete',
             created_by=current_adviser,
         )
 
