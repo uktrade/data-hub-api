@@ -24,7 +24,7 @@ from datahub.export_win.models import (
     Win,
 )
 from datahub.export_win.serializers import (
-    CustomerResponseSerializer,
+    PublicCustomerResponseSerializer,
     WinSerializer,
 )
 from datahub.export_win.tasks import (
@@ -137,7 +137,7 @@ class CustomerResponseViewSet(CoreViewSet):
     # this endpoint is publicly accessible
     authentication_classes = ()
     permission_classes = (AllowAny,)
-    serializer_class = CustomerResponseSerializer
+    serializer_class = PublicCustomerResponseSerializer
     queryset = CustomerResponse.objects.all()
     lookup_field = 'token_pk'
     lookup_url_kwarg = 'token_pk'
