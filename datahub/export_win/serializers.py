@@ -92,6 +92,7 @@ class CustomerResponseSerializer(ModelSerializer):
     expected_portion_without_help = NestedRelatedField(WithoutOurSupport)
     last_export = NestedRelatedField(Experience)
     marketing_source = NestedRelatedField(MarketingSource)
+    responded_on = DateTimeField(read_only=True)
 
     class Meta:
         model = CustomerResponse
@@ -119,6 +120,7 @@ class CustomerResponseSerializer(ModelSerializer):
             'name',
             'marketing_source',
             'other_marketing_source',
+            'responded_on',
         )
 
 
@@ -317,8 +319,8 @@ class LimitedExportWinSerializer(ModelSerializer):
         )
 
 
-class CustomerResponseSerializer(ModelSerializer):
-    """Customer response serializer."""
+class PublicCustomerResponseSerializer(ModelSerializer):
+    """Public customer response serializer."""
 
     win = LimitedExportWinSerializer(read_only=True)
     our_support = NestedRelatedField(Rating)
@@ -350,6 +352,9 @@ class CustomerResponseSerializer(ModelSerializer):
         Update the customer response and invalidate token.
         """
         instance = super().update(instance, validated_data)
+
+        instance.responded_on = datetime.utcnow()
+        instance.save(update_fields=('responded_on',))
 
         CustomerResponseToken.objects.filter(
             id=self.context.get('token_pk'),

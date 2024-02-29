@@ -212,6 +212,8 @@ class TestUpdateCustomerResponseView(APITestMixin):
         contact = ContactFactory(company=win.company)
         win.company_contacts.add(contact)
         customer_response = CustomerResponseFactory(win=win)
+        assert customer_response.responded_on is None
+
         token = CustomerResponseTokenFactory(customer_response=customer_response)
 
         assert token.times_used == 0
@@ -284,6 +286,9 @@ class TestUpdateCustomerResponseView(APITestMixin):
             mock_lead_officer_email_receipt_no.assert_called_once()
             mock_lead_officer_email_receipt_yes.assert_not_called()
 
+        assert customer_response.responded_on.replace(
+            tzinfo=None,
+        ) == current_date
         assert customer_response.agree_with_win is agree_with_win
         assert customer_response.lead_officer_email_delivery_status == EmailDeliveryStatus.UNKNOWN
         assert customer_response.lead_officer_email_notification_id == notification_id
