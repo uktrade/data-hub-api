@@ -184,6 +184,7 @@ class CustomerResponseFactory(factory.django.DjangoModelFactory):
     modified_by = factory.SelfAttribute('created_by')
     win = factory.SubFactory(WinFactory)
     agree_with_win = None
+    responded_on = None
     case_study_willing = False
     our_support = factory.SubFactory(RatingFactory)
     access_to_contacts = factory.SubFactory(RatingFactory)

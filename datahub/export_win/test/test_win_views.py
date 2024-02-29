@@ -60,8 +60,16 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture()
 def export_wins():
-    confirmed = CustomerResponseFactory.create_batch(2, agree_with_win=True)
-    unconfirmed = CustomerResponseFactory.create_batch(3, agree_with_win=False)
+    confirmed = CustomerResponseFactory.create_batch(
+        2,
+        agree_with_win=True,
+        responded_on=datetime.datetime.utcnow(),
+    )
+    unconfirmed = CustomerResponseFactory.create_batch(
+        3,
+        agree_with_win=False,
+        responded_on=datetime.datetime.utcnow(),
+    )
     awaiting = CustomerResponseFactory(agree_with_win=None)
     yield [
         confirmed,
@@ -308,6 +316,7 @@ class TestGetWinView(APITestMixin):
                     'name': customer_response.overcame_problem.name,
                 },
                 'agree_with_win': customer_response.agree_with_win,
+                'responded_on': customer_response.responded_on,
                 'case_study_willing': customer_response.case_study_willing,
                 'comments': customer_response.comments,
                 'company_was_at_risk_of_not_exporting':
@@ -543,6 +552,7 @@ class TestCreateWinView(APITestMixin):
                 'access_to_contacts': None,
                 'access_to_information': None,
                 'agree_with_win': None,
+                'responded_on': None,
                 'case_study_willing': False,
                 'comments': '',
                 'company_was_at_risk_of_not_exporting': False,
@@ -798,6 +808,7 @@ class TestCreateWinView(APITestMixin):
                 'access_to_contacts': None,
                 'access_to_information': None,
                 'agree_with_win': None,
+                'responded_on': None,
                 'case_study_willing': False,
                 'comments': '',
                 'company_was_at_risk_of_not_exporting': False,
@@ -1108,6 +1119,7 @@ class TestUpdateWinView(APITestMixin):
                 'access_to_contacts': None,
                 'access_to_information': None,
                 'agree_with_win': None,
+                'responded_on': None,
                 'case_study_willing': False,
                 'comments': '',
                 'company_was_at_risk_of_not_exporting': False,
@@ -1395,6 +1407,7 @@ class TestUpdateWinView(APITestMixin):
                 'access_to_contacts': None,
                 'access_to_information': None,
                 'agree_with_win': None,
+                'responded_on': None,
                 'case_study_willing': False,
                 'comments': '',
                 'company_was_at_risk_of_not_exporting': False,

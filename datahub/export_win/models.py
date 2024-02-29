@@ -394,6 +394,7 @@ class CustomerResponse(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     win = models.OneToOneField(Win, related_name='customer_response', on_delete=models.CASCADE)
+    responded_on = models.DateTimeField(null=True, blank=True)
     our_support = models.ForeignKey(
         Rating,
         related_name='our_support_customer_responses',
