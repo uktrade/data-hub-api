@@ -12,6 +12,7 @@ from django_filters.rest_framework import (
 
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny
 from rest_framework.views import Response
 
@@ -93,8 +94,10 @@ class WinViewSet(CoreViewSet):
         first_sent=Min('customer_response__tokens__created_on'),
         last_sent=Max('customer_response__tokens__created_on'),
     )
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ConfirmedFilterSet
+    ordering_fields = ('customer_response__responded_on', 'created_on')
+    ordering = ('-customer_response__responded_on', '-created_on')
 
     def perform_create(self, serializer):
         """
