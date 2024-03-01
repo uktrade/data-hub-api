@@ -356,7 +356,7 @@ class TestListWinView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_list(self):
-        """Tests listing events."""
+        """Tests listing wins."""
         WinFactory.create_batch(2)
         url = reverse('api-v4:export-win:collection')
 
@@ -365,6 +365,33 @@ class TestListWinView(APITestMixin):
         response_data = response.json()
 
         assert response_data['count'] == 2
+
+    def test_list_default_sorting(self):
+        """Tests wins are sorted."""
+        responded_on1 = datetime.datetime(2022, 4, 1)
+        responded_on2 = datetime.datetime(2022, 5, 1)
+        created_on1 = datetime.datetime(2022, 6, 1)
+        created_on2 = datetime.datetime(2022, 7, 1)
+
+        win1 = WinFactory()
+        CustomerResponseFactory(win=win1, responded_on=responded_on1)
+        win2 = WinFactory()
+        CustomerResponseFactory(win=win2, responded_on=responded_on2)
+        with freeze_time(created_on1):
+            win3 = WinFactory()
+            CustomerResponseFactory(win=win3)
+        with freeze_time(created_on2):
+            win4 = WinFactory()
+            CustomerResponseFactory(win=win4)
+
+        url = reverse('api-v4:export-win:collection')
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        result_ids = [result['id'] for result in response_data['results']]
+        assert result_ids == [str(win4.id), str(win3.id), str(win2.id), str(win1.id)]
 
     @pytest.mark.parametrize(
         'confirmed,results_length',
