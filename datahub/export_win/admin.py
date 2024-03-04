@@ -11,7 +11,14 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     """Admin for Wins."""
 
     list_display = (
-        'company',
+        'id',
+        'get_adviser',
+        'get_company',
+        'get_contact_names',
+        'lead_officer',
+        'country',
+        'sector',
+        'get_date_confirmed',
         'created_on',
     )
     list_filter = (
@@ -35,3 +42,23 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'adviser',
         'company',
     )
+
+    def get_adviser(self, obj):
+        """Return adviser as user with email."""
+        return f'{obj.adviser} <{obj.adviser.email}>'
+    get_adviser.short_description = 'User'
+
+    def get_company(self, obj):
+        """Return company name."""
+        return obj.company
+    get_company.short_description = 'Organisation or Company name'
+
+    def get_date_confirmed(self, obj):
+        """Return wins being confirmed."""
+        return obj.customer_response.responded_on
+    get_date_confirmed.short_description = 'Date win confirmed'
+
+    def get_contact_names(self, obj):
+        """Return a comma separated list of company contact names."""
+        return ', '.join(contact.name for contact in obj.company_contacts.all())
+    get_contact_names.short_description = 'Contact name'
