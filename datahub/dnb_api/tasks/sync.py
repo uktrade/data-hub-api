@@ -26,7 +26,6 @@ def _sync_company_with_dnb(
 ):
     dh_company = Company.objects.get(id=company_id)
     dnb_company = get_company(dh_company.duns_number)
-
     update_company_from_dnb(
         dh_company,
         dnb_company,
@@ -99,7 +98,7 @@ def sync_company_with_dnb_rate_limited(
         return
 
     try:
-        client = socket.gethostbyaddr(socket.gethostname())
+        client = socket.gethostbyaddr('localhost')
         expire_in_seconds = 1
         logger.info(
             f'Rate limiting client {client} for company id {company_id} '
