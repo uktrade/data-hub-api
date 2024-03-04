@@ -2,7 +2,7 @@
 django==3.2.24
 djangorestframework==3.14.0
 django-axes==6.3.0
-django-csp==3.7
+django-csp==3.8
 django-environ==0.11.2
 django-extensions==3.2.3
 django-filter==23.5
@@ -15,13 +15,13 @@ whitenoise==6.6.0
 
 chardet==5.2.0
 pyyaml==6.0.1
-python-dateutil==2.8.2
+python-dateutil==2.9.0.post0
 
 # Persistency layer
 psycopg2==2.9.9
 psycogreen==1.0.2
 
-boto3==1.34.49
+boto3==1.34.54
 
 notifications-python-client==9.0.0
 
@@ -54,7 +54,7 @@ gevent==24.2.1
 mohawk==1.1.0
 requests==2.31.0
 requests_toolbelt==1.0.0
-sentry_sdk==1.40.5
+sentry_sdk==1.40.6
 
 # RQ and associated helpers
 rq==1.16.0
