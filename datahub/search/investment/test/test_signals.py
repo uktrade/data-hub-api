@@ -95,6 +95,22 @@ def test_investment_project_auto_updates_to_opensearch(opensearch_with_signals):
     assert result.hits.total.value == 1
 
 
+def test_investment_project_delete_from_opensearch(opensearch_with_signals):
+    """
+    Test that when an investment project is deleted from the db it also
+    calls delete document to delete from OpenSearch
+    """
+    project = InvestmentProjectFactory()
+
+    opensearch_with_signals.indices.refresh()
+    assert search_investment_project_by_id(project.pk)
+
+    with mock.patch('datahub.search.investment.signals.delete_document') as mock_delete_document:
+        project.delete()
+        opensearch_with_signals.indices.refresh()
+        assert mock_delete_document.called
+
+
 @pytest.fixture
 def team_member():
     """Team member fixture"""

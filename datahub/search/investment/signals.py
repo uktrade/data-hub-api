@@ -9,7 +9,9 @@ from datahub.investment.project.models import (
     InvestmentProject as DBInvestmentProject,
     InvestmentProjectTeamMember,
 )
+from datahub.search.deletion import delete_document
 from datahub.search.investment import InvestmentSearchApp
+from datahub.search.investment.models import InvestmentProject as SearchInvestmentProject
 from datahub.search.signals import SignalReceiver
 from datahub.search.sync_object import sync_object_async
 
@@ -25,6 +27,13 @@ def investment_project_sync_search(instance):
         sync_object_async(InvestmentSearchApp, pk)
 
     transaction.on_commit(sync_search_wrapper)
+
+
+def remove_investment_project_from_opensearch(instance):
+    """Remove task from es"""
+    transaction.on_commit(
+        lambda pk=instance.pk: delete_document(SearchInvestmentProject, pk),
+    )
 
 
 def investment_project_sync_search_interaction_change(instance):
@@ -113,6 +122,7 @@ investment_project_m2m_receivers = (
 receivers = (
     SignalReceiver(post_save, DBInvestmentProject, investment_project_sync_search),
     *investment_project_m2m_receivers,
+    SignalReceiver(post_delete, DBInvestmentProject, remove_investment_project_from_opensearch),
     SignalReceiver(post_save, Interaction, investment_project_sync_search_interaction_change),
     SignalReceiver(post_delete, Interaction, investment_project_sync_search_interaction_change),
     SignalReceiver(post_save, InvestmentProjectTeamMember, investment_project_sync_search),
