@@ -1,6 +1,6 @@
 from django.http import HttpResponse
-from django.http.multipartparser import parse_header
-from rest_framework import HTTP_HEADER_ENCODING, status
+from django.http.multipartparser import parse_header_parameters
+from rest_framework import status
 
 
 def enforce_request_content_type(content_type):
@@ -15,7 +15,7 @@ def enforce_request_content_type(content_type):
         def wrapper(request, *args, **kwargs):
             content_type = request.content_type or ''
             # check that the content type of the request is json
-            base_media_type, _ = parse_header(content_type.encode(HTTP_HEADER_ENCODING))
+            base_media_type, _ = parse_header_parameters(content_type)
             if base_media_type != 'application/json':
                 return HttpResponse(
                     'Please set Content-Type header value to application/json',

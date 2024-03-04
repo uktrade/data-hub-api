@@ -95,6 +95,10 @@ job_defaults: &job_defaults
         command: python -m flake8
 
     - run:
+        name: Run collectstatic
+        command: python manage.py collectstatic --noinput
+
+    - run:
         name: Run tests
         command: python -m pytest -n 4 --cov --junitxml=test-reports/junit.xml --durations 25
 

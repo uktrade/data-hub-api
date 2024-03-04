@@ -3,7 +3,7 @@ import logging
 from tempfile import NamedTemporaryFile
 
 from django.conf import settings
-from django.core.management import call_command
+from django.core import management
 from django.db import transaction
 from django.http import Http404
 from rest_framework import status
@@ -74,7 +74,7 @@ def reset_fixtures(request):
         Interaction.objects.all().delete()
         OneListCoreTeamMember.objects.all().delete()
 
-    call_command('loaddata', str(E2E_FIXTURE_DIR))
+    management.call_command('loaddata', str(E2E_FIXTURE_DIR))
 
     logger.info('Reset fixtures completed.')
 
@@ -184,6 +184,6 @@ def load_fixture(request):
         tmp_file.write(json.dumps(fixture).encode())
         tmp_file.seek(0)
 
-        call_command('loaddata', tmp_file.name)
+        management.call_command('loaddata', tmp_file.name)
 
     return Response(status=status.HTTP_201_CREATED)
