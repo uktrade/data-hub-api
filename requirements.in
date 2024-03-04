@@ -1,5 +1,5 @@
 # Django and django related
-django==4.2
+django==4.2.10
 djangorestframework==3.14.0
 django-axes==6.3.0
 django-csp==3.8
