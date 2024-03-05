@@ -3,13 +3,61 @@ from django.contrib.admin import DateFieldListFilter
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin
-from datahub.export_win.models import Win
+from datahub.export_win.models import Breakdown, CustomerResponse, Win, WinAdviser
+
+
+class BaseTabularInLine(admin.TabularInline):
+    """Baseline tabular in line."""
+
+    extra = 0
+    can_delete = False
+
+
+class BreakdownInLine(BaseTabularInLine):
+    """Breakdown model."""
+
+    model = Breakdown
+    min_num = 1
+    extra = 0
+
+    fields = ('type', 'year', 'value')
+    verbose_name_plural = 'Breakdowns'
+
+
+class AdvisorInLine(BaseTabularInLine):
+    """Advisor model."""
+
+    model = WinAdviser
+    min_num = 1
+    extra = 0
+
+    fields = ('name', 'team_type', 'hq_team', 'location')
+    verbose_name_plural = 'Contributing Advisors'
+
+
+class BaseStackedInLine(admin.StackedInline):
+    """Base stacked in line."""
+
+    classes = ('grp-collapse grp-open',)
+    inline_classes = ('grp-collapse grp-open',)
+    extra = 0
+    can_delete = False
+
+
+class CustomerResponseInLine(BaseStackedInLine):
+    """Customer response in line."""
+
+    model = CustomerResponse
+
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(Win)
 class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     """Admin for Wins."""
 
+    actions = ('soft_delete',)
     list_display = (
         'id',
         'get_adviser',
@@ -19,28 +67,82 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'country',
         'sector',
         'get_date_confirmed',
-        'created_on',
+        'created_on'
+    )
+    search_fields = (
+        'id',
+    )
+    search_fields = (
+        'id',
+    )
+    search_fields = (
+        'id',
+    )
+    search_fields = (
+        'id',
     )
     list_filter = (
         ('created_on', DateFieldListFilter),
     )
     readonly_fields = (
         'id',
+        'adviser',
+        'updated',
         'created_on',
         'modified_on',
+        'total_expected_export_value',
+        'total_expected_non_export_value',
+        'total_expected_odi_value',
     )
-    search_fields = (
-        'adviser__name',
-        'company__name',
-        'pk',
+    fieldsets = (
+        ('Overview', {'fields': (
+            'id',
+            'adviser',
+            'company',
+            'company_contacts',
+            'created_on',
+            'updated',
+            'audit',
+            'total_expected_export_value',
+            'total_expected_non_export_value',
+            'total_expected_odi_value',
+
+        )}),
+        ('Win details', {'fields': (
+            'country',
+            'date',
+            'description',
+            'name_of_customer',
+            'goods_vs_services',
+            'name_of_export',
+            'sector',
+            'hvc',
+        )}),
+        ('Customer details', {'fields': (
+            'cdms_reference',  # Legacy field
+            'customer_email_address',  # Legacy field
+            'customer_job_title',  # Legacy field
+            'customer_location',
+            'business_potential',
+            'export_experience',
+        )}),
+        ('DBT Officer', {'fields': (
+            'lead_officer',
+            'team_type',
+            'hq_team',
+            'line_manager_name',  # Legacy field
+            'lead_officer_email_address',  # Legacy field
+            'other_official_email_address',  # Legacy field
+        )}),
+        ('DBT Support', {'fields': (
+            'type_of_support',
+            'associated_programme',
+        )}),
     )
-    list_select_related = (
-        'adviser',
-        'company',
-    )
-    raw_id_fields = (
-        'adviser',
-        'company',
+    inlines = (
+        BreakdownInLine,
+        CustomerResponseInLine,
+        AdvisorInLine,
     )
 
     def get_adviser(self, obj):
