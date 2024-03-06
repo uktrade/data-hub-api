@@ -13,6 +13,7 @@ from pytz import utc
 
 from datahub.company.tasks.adviser import schedule_automatic_adviser_deactivate
 from datahub.company.tasks.company import schedule_automatic_company_archive
+from datahub.company.tasks.company import schedule_update_company_export_potential_from_csv
 from datahub.company.tasks.contact import schedule_automatic_contact_archive
 from datahub.core.queues.constants import (
     EVERY_EIGHT_AM,
@@ -98,6 +99,15 @@ def schedule_jobs():
         },
         cron=EVERY_SEVEN_PM,
         description='Automatic Company Archive',
+    )
+    job_scheduler(
+        function=schedule_update_company_export_potential_from_csv,
+        function_kwargs={
+            'csv_file_path': f'export_propensity_{datetime.now().strftime("%Y_%m_%d")}.csv',
+            'simulate': False,
+        },
+        cron=EVERY_SEVEN_PM,
+        description='Schedule to consume export potential from S3',
     )
     job_scheduler(
         function=schedule_automatic_adviser_deactivate,
