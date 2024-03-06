@@ -342,7 +342,6 @@ class Win(BaseModel):
         blank=True,
         on_delete=models.PROTECT,
     )
-    updated = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     is_deleted = models.BooleanField(default=False)
 
 
