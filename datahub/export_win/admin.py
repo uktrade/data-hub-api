@@ -67,16 +67,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'country',
         'sector',
         'get_date_confirmed',
-        'created_on'
-    )
-    search_fields = (
-        'id',
-    )
-    search_fields = (
-        'id',
-    )
-    search_fields = (
-        'id',
+        'created_on',
     )
     search_fields = (
         'id',
@@ -163,3 +154,10 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         """Return a comma separated list of company contact names."""
         return ', '.join(contact.name for contact in obj.company_contacts.all())
     get_contact_names.short_description = 'Contact name'
+
+    def soft_delete(self, request, queryset):
+        """Soft delete action for django admin."""
+        for win in queryset.all():
+            win.is_deleted = True
+            win.modified_by = request.user
+            win.save()
