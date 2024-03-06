@@ -78,7 +78,6 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     readonly_fields = (
         'id',
         'adviser',
-        'updated',
         'created_on',
         'modified_on',
         'total_expected_export_value',
@@ -92,7 +91,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
             'company',
             'company_contacts',
             'created_on',
-            'updated',
+            'modified_on',
             'audit',
             'total_expected_export_value',
             'total_expected_non_export_value',
