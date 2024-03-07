@@ -135,6 +135,13 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         AdvisorInLine,
     )
 
+    def get_actions(self, request):
+        """Remove the delete selected action."""
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
     def get_adviser(self, obj):
         """Return adviser as user with email."""
         return f'{obj.adviser} <{obj.adviser.email}>'
