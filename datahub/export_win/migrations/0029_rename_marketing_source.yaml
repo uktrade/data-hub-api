@@ -1,0 +1,7 @@
+- model: export_win.marketingsource
+  pk: 5001e2e8-2d3b-433e-9c1a-bbb2e7b3bfd5
+  fields:
+    disabled_on: null
+    name: 'Articles / information I saw or read'
+    export_win_id: 3
+    order: 300
