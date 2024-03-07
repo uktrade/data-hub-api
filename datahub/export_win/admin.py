@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter
+from django.forms import ModelForm
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin
@@ -24,10 +25,26 @@ class BreakdownInLine(BaseTabularInLine):
     verbose_name_plural = 'Breakdowns'
 
 
+class AdvisorInLineForm(ModelForm):
+    """Advisor inline form."""
+
+    class Meta:
+        model = WinAdviser
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['name'].required = False
+            self.fields['team_type'].required = False
+            self.fields['hq_team'].required = False
+
+
 class AdvisorInLine(BaseTabularInLine):
     """Advisor model."""
 
     model = WinAdviser
+    form = AdvisorInLineForm
     min_num = 1
     extra = 0
 
@@ -44,19 +61,52 @@ class BaseStackedInLine(admin.StackedInline):
     can_delete = False
 
 
+class CustomerResponseInLineForm(ModelForm):
+    """Customer response inline form."""
+
+    class Meta:
+        model = CustomerResponse
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['name'].required = False
+
+
 class CustomerResponseInLine(BaseStackedInLine):
     """Customer response in line."""
 
     model = CustomerResponse
+    form = CustomerResponseInLineForm
 
     def has_add_permission(self, request, obj=None):
         return False
+
+
+class WinAdminForm(ModelForm):
+    """Win admin form."""
+
+    class Meta:
+        model = Win
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['cdms_reference'].required = False
+            self.fields['customer_email_address'].required = False
+            self.fields['customer_job_title'].required = False
+            self.fields['line_manager_name'].required = False
+            self.fields['lead_officer_email_address'].required = False
+            self.fields['other_official_email_address'].required = False
 
 
 @admin.register(Win)
 class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     """Admin for Wins."""
 
+    form = WinAdminForm
     actions = ('soft_delete',)
     list_display = (
         'id',
