@@ -106,6 +106,7 @@ class CustomerResponseSerializer(ModelSerializer):
             'developed_relationships',
             'overcame_problem',
             'involved_state_enterprise',
+            'interventions_were_prerequisite',
             'support_improved_speed',
             'expected_portion_without_help',
             'last_export',
