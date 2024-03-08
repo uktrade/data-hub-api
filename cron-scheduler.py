@@ -13,7 +13,7 @@ from pytz import utc
 
 from datahub.company.tasks.adviser import schedule_automatic_adviser_deactivate
 from datahub.company.tasks.company import schedule_automatic_company_archive
-from datahub.company.tasks.company import schedule_update_company_export_potential_from_csv
+from datahub.company.tasks.company import update_company_export_potential_from_csv
 from datahub.company.tasks.contact import schedule_automatic_contact_archive
 from datahub.core.queues.constants import (
     EVERY_EIGHT_AM,
@@ -99,15 +99,6 @@ def schedule_jobs():
         },
         cron=EVERY_SEVEN_PM,
         description='Automatic Company Archive',
-    )
-    job_scheduler(
-        function=schedule_update_company_export_potential_from_csv,
-        function_kwargs={
-            'csv_file_path': f'export_propensity_{datetime.now().strftime("%Y_%m_%d")}.csv',
-            'simulate': False,
-        },
-        cron=EVERY_SEVEN_PM,
-        description='Schedule to consume export potential from S3',
     )
     job_scheduler(
         function=schedule_automatic_adviser_deactivate,
@@ -238,8 +229,8 @@ def schedule_jobs():
     schedule_new_export_interaction_jobs()
     schedule_export_win_customer_response_token_jobs()
     schedule_export_win_auto_resend_client_email()
-
     schedule_user_reminder_migration()
+    schedule_update_company_export_potential_from_csv()
 
 
 def schedule_email_ingestion_tasks():
@@ -331,6 +322,20 @@ def schedule_export_win_auto_resend_client_email():
         retry_intervals=30,
         cron=EVERY_TWO_AM,
         description='Scheduled auto resend client email from unconfirmed win',
+    )
+
+
+def schedule_update_company_export_potential_from_csv():
+    """Schedule ingestion of export potential data"""
+    job_scheduler(
+        function=update_company_export_potential_from_csv,
+        function_kwargs={
+            'bucket': 'upload.datahub.trade.gov.uk',
+            'object_key': f'export_propensity_{datetime.now().strftime("%Y_%m_%d")}.csv',
+        },
+        queue_name=LONG_RUNNING_QUEUE,
+        cron=EVERY_ELEVEN_PM,
+        description='Scheduled ingestion of export potential data',
     )
 
 
