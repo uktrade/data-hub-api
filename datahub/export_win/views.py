@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.conf import settings
-from django.db.models import Max, Min
+from django.db.models import Max, Min, Q
 
 from django.http import Http404
 from django_filters.rest_framework import (
@@ -99,6 +99,22 @@ class WinViewSet(CoreViewSet):
     ordering_fields = ('customer_response__responded_on', 'created_on')
     ordering = ('-customer_response__responded_on', '-created_on')
 
+    def get_queryset(self):
+        """Filter the queryset to the authenticated user."""
+        return (
+            super()
+            .get_queryset()
+            .exclude(
+                ~Q(adviser=self.request.user),
+                ~Q(team_members=self.request.user),
+                ~Q(lead_officer=self.request.user),
+                ~(
+                    Q(advisers__adviser=self.request.user)
+                    & Q(customer_response__agree_with_win=True)
+                ),
+            )
+        )
+
     def perform_create(self, serializer):
         """
         Ensure instance with first sent and last sent dates
@@ -115,6 +131,9 @@ class WinViewSet(CoreViewSet):
         win = self.get_object()
         contact = win.company_contacts.first()
         customer_response = win.customer_response
+        if customer_response.agree_with_win is not None:
+            # Customer already responded to win
+            raise Http404
         new_token = create_token_for_contact(contact, customer_response)
         context = get_all_fields_for_client_email_receipt(
             new_token,
