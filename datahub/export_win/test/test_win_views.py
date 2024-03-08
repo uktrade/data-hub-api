@@ -3,6 +3,7 @@ from unittest import mock
 
 import pytest
 
+from django.conf import settings
 from django.utils.timezone import now
 from freezegun import freeze_time
 
@@ -41,9 +42,6 @@ from datahub.export_win.models import (
     Win,
 )
 from datahub.export_win.tasks import (
-    create_token_for_contact,
-    get_all_fields_for_client_email_receipt,
-    notify_export_win_email_by_rq_email,
     update_customer_response_token_for_email_notification_id,
 )
 from datahub.export_win.test.factories import (
@@ -101,7 +99,7 @@ def mock_export_win_get_all_fields(monkeypatch):
 def mock_notify_export_win_email_by_rq_email(monkeypatch):
     mock_contact_by_rq_email = mock.Mock()
     monkeypatch.setattr(
-        'datahub.export_win.tasks.notify_export_win_email_by_rq_email',
+        'datahub.export_win.views.notify_export_win_email_by_rq_email',
         mock_contact_by_rq_email,
     )
     return mock_contact_by_rq_email
@@ -125,6 +123,7 @@ class TestGetWinView(APITestMixin):
         export = ExportFactory()
         export_experience = ExportExperienceFactory()
         win = WinFactory(
+            adviser=self.user,
             company_contacts=[contact],
             associated_programme=[
                 AssociatedProgrammeConstant.afterburner.value.id,
@@ -345,6 +344,74 @@ class TestGetWinView(APITestMixin):
 
         assert response_data == expected_response_data
 
+    @pytest.mark.parametrize(
+        'params,related_objects,status_code',
+        (
+            (
+                lambda self: {'adviser': self.user},
+                lambda self, win: None,
+                status.HTTP_200_OK,
+            ),
+            (
+                lambda self: {'lead_officer': self.user},
+                lambda self, win: None,
+                status.HTTP_200_OK,
+            ),
+            (
+                lambda self: {'team_members': [self.user]},
+                lambda self, win: None,
+                status.HTTP_200_OK,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win, adviser=self.user),
+                    CustomerResponseFactory(win=win, agree_with_win=True),
+                ],
+                status.HTTP_200_OK,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win, adviser=self.user),
+                    CustomerResponseFactory(win=win, agree_with_win=False),
+                ],
+                status.HTTP_404_NOT_FOUND,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win, adviser=self.user),
+                    CustomerResponseFactory(win=win, agree_with_win=None),
+                ],
+                status.HTTP_404_NOT_FOUND,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win),
+                    CustomerResponseFactory(win=win, agree_with_win=True),
+                ],
+                status.HTTP_404_NOT_FOUND,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: None,
+                status.HTTP_404_NOT_FOUND,
+            ),
+        ),
+    )
+    def test_get_visibility(self, params, related_objects, status_code):
+        """Test getting a single win for different users."""
+        resolved_params = params(self)
+        win = WinFactory(**resolved_params)
+        related_objects(self, win)
+        url = reverse('api-v4:export-win:item', kwargs={'pk': win.pk})
+
+        response = self.api_client.get(url)
+
+        assert response.status_code == status_code
+
 
 class TestListWinView(APITestMixin):
     """List export wins view tests."""
@@ -359,7 +426,7 @@ class TestListWinView(APITestMixin):
 
     def test_list(self):
         """Tests listing wins."""
-        WinFactory.create_batch(2)
+        WinFactory.create_batch(2, adviser=self.user)
         url = reverse('api-v4:export-win:collection')
 
         response = self.api_client.get(url)
@@ -375,15 +442,15 @@ class TestListWinView(APITestMixin):
         created_on1 = datetime.datetime(2022, 6, 1)
         created_on2 = datetime.datetime(2022, 7, 1)
 
-        win1 = WinFactory()
+        win1 = WinFactory(adviser=self.user)
         CustomerResponseFactory(win=win1, responded_on=responded_on1)
-        win2 = WinFactory()
+        win2 = WinFactory(adviser=self.user)
         CustomerResponseFactory(win=win2, responded_on=responded_on2)
         with freeze_time(created_on1):
-            win3 = WinFactory()
+            win3 = WinFactory(adviser=self.user)
             CustomerResponseFactory(win=win3)
         with freeze_time(created_on2):
-            win4 = WinFactory()
+            win4 = WinFactory(adviser=self.user)
             CustomerResponseFactory(win=win4)
 
         url = reverse('api-v4:export-win:collection')
@@ -414,6 +481,7 @@ class TestListWinView(APITestMixin):
     )
     def test_list_filtered_by_agree_with_win(self, export_wins, confirmed, results_length):
         """Test the HVC view when filtered by financial year"""
+        Win.objects.update(adviser=self.user)
         url = reverse('api-v4:export-win:collection')
 
         response = self.api_client.get(url, data={
@@ -435,6 +503,79 @@ class TestListWinView(APITestMixin):
             for result in results['results']
         ) is True
 
+    @pytest.mark.parametrize(
+        'params,related_objects,results_length',
+        (
+            (
+                lambda self: {'adviser': self.user},
+                lambda self, win: None,
+                1,
+            ),
+            (
+                lambda self: {'lead_officer': self.user},
+                lambda self, win: None,
+                1,
+            ),
+            (
+                lambda self: {'team_members': [self.user]},
+                lambda self, win: None,
+                1,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win, adviser=self.user),
+                    CustomerResponseFactory(win=win, agree_with_win=True),
+                ],
+                1,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win, adviser=self.user),
+                    CustomerResponseFactory(win=win, agree_with_win=False),
+                ],
+                0,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win, adviser=self.user),
+                    CustomerResponseFactory(win=win, agree_with_win=None),
+                ],
+                0,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win),
+                    CustomerResponseFactory(win=win, agree_with_win=True),
+                ],
+                0,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: None,
+                0,
+            ),
+        ),
+    )
+    def test_list_visibility(self, params, related_objects, results_length):
+        """Test getting a list of wins for different users."""
+        resolved_params = params(self)
+        WinFactory()
+        win = WinFactory(**resolved_params)
+        related_objects(self, win)
+        url = reverse('api-v4:export-win:collection')
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        results = response.json()
+
+        assert len(results['results']) == results_length
+        if results_length == 1:
+            assert results['results'][0]['id'] == str(win.id)
+
 
 class TestCreateWinView(APITestMixin):
     """Create export win view tests."""
@@ -443,7 +584,7 @@ class TestCreateWinView(APITestMixin):
         """Tests successfully creating an export win with required fields only."""
         url = reverse('api-v4:export-win:collection')
 
-        adviser = AdviserFactory()
+        adviser = self.user
         lead_officer = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory(company=company)
@@ -663,7 +804,7 @@ class TestCreateWinView(APITestMixin):
 
         url = reverse('api-v4:export-win:collection')
 
-        adviser = AdviserFactory()
+        adviser = self.user
         additional_team_member = AdviserFactory()
         team_member = AdviserFactory()
         lead_officer = AdviserFactory()
@@ -960,7 +1101,7 @@ class TestUpdateWinView(APITestMixin):
 
     def test_update_win_all_fields(self):
         """Tests successfully updating an export win with all fields only."""
-        win = WinFactory()
+        win = WinFactory(adviser=self.user)
         customer_response = CustomerResponse(win=win)
         customer_response.save()
 
@@ -1269,6 +1410,7 @@ class TestUpdateWinView(APITestMixin):
         contact = ContactFactory(company=company)
 
         win = WinFactory(
+            adviser=self.user,
             company=company,
             company_contacts=[contact],
             type_of_support=[
@@ -1488,31 +1630,104 @@ class TestResendExportWinView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert 'You do not have permission to perform this action.' in response.data['detail']
 
+    @pytest.mark.parametrize(
+        'params,related_objects,resent',
+        (
+            (
+                lambda self: {'adviser': self.user},
+                lambda self, win: [
+                    CustomerResponseFactory(win=win, agree_with_win=None),
+                ],
+                True,
+            ),
+            (
+                lambda self: {'lead_officer': self.user},
+                lambda self, win: [
+                    CustomerResponseFactory(win=win, agree_with_win=None),
+                ],
+                True,
+            ),
+            (
+                lambda self: {'team_members': [self.user]},
+                lambda self, win: [
+                    CustomerResponseFactory(win=win, agree_with_win=None),
+                ],
+                True,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win, adviser=self.user),
+                    CustomerResponseFactory(win=win, agree_with_win=True),
+                ],
+                False,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win, adviser=self.user),
+                    CustomerResponseFactory(win=win, agree_with_win=False),
+                ],
+                False,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win, adviser=self.user),
+                    CustomerResponseFactory(win=win, agree_with_win=None),
+                ],
+                False,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win),
+                    CustomerResponseFactory(win=win, agree_with_win=True),
+                ],
+                False,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: None,
+                False,
+            ),
+        ),
+    )
     def test_resend_export_win_success(
             self,
+            mock_notify_export_win_email_by_rq_email,
+            params,
+            related_objects,
+            resent,
     ):
         """Test to resend win to the right contact"""
-        mock_contact = ContactFactory()
-        win = WinFactory(company_contacts=[mock_contact])
-        customer_response = CustomerResponseFactory(win=win)
-        new_token = create_token_for_contact(mock_contact, customer_response)
-        context = get_all_fields_for_client_email_receipt(
-            new_token,
-            customer_response,
-        )
-        template_id = 'mock_template_id'
-        notify_export_win_email_by_rq_email(
-            mock_contact.email,
-            template_id,
-            context,
-            update_customer_response_token_for_email_notification_id,
-            new_token.id,
-        )
+        contact = ContactFactory()
+        resolved_params = params(self)
+        win = WinFactory(**resolved_params, company_contacts=[contact])
+        related_objects(self, win)
+
         url = reverse('api-v4:export-win:win-resend', kwargs={'pk': win.pk})
         response = self.api_client.post(url)
 
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data == {'message': 'Email has successfully been re-sent'}
-        created_token = CustomerResponseToken.objects.get(id=new_token.id)
-        assert created_token.company_contact == mock_contact
-        assert created_token.customer_response == customer_response
+        if resent:
+            assert response.status_code == status.HTTP_200_OK
+            assert response.data == {'message': 'Email has successfully been re-sent'}
+            token = CustomerResponseToken.objects.first()
+            assert token.company_contact == contact
+            mock_notify_export_win_email_by_rq_email.assert_called_once_with(
+                contact.email,
+                settings.EXPORT_WIN_CLIENT_RECEIPT_TEMPLATE_ID,
+                {
+                    'client_firstname': contact.first_name,
+                    'country_destination': str(win.country.name),
+                    'customer_email': contact.email,
+                    'goods_services': win.goods_vs_services.name,
+                    'lead_officer_name': win.lead_officer.name,
+                    'url': f'{settings.EXPORT_WIN_CLIENT_REVIEW_WIN_URL}/{token.id}',
+                },
+                update_customer_response_token_for_email_notification_id,
+                token.id,
+            )
+        else:
+            assert response.status_code == status.HTTP_404_NOT_FOUND
+            mock_notify_export_win_email_by_rq_email.assert_not_called()
