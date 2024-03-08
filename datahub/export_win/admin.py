@@ -4,7 +4,7 @@ from django.forms import ModelForm
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin
-from datahub.export_win.models import Breakdown, CustomerResponse, Win, WinAdviser
+from datahub.export_win.models import Breakdown, CustomerResponse, DeletedWin, Win, WinAdviser
 
 
 class BaseTabularInLine(admin.TabularInline):
@@ -202,3 +202,27 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         """Return a comma separated list of company contact names."""
         return ', '.join(contact.name for contact in obj.company_contacts.all())
     get_contact_names.short_description = 'Contact name'
+
+    def get_actions(self, request):
+        """Remove the delete selected action."""
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+    def soft_delete(self, request, queryset):
+        """Soft delete action for django admin."""
+        for win in queryset.all():
+            win.is_deleted = True
+            win.modified_by = request.user
+            win.save()
+
+
+@admin.register(DeletedWin)
+class DeletedWinAdmin(WinAdmin):
+    inlines = tuple()
+    actions = ('undelete',)
+
+    def undelete(self, request, queryset):
+        for win in queryset.all():
+            win.is_deleted = True
