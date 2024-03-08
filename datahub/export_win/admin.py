@@ -4,7 +4,7 @@ from django.forms import ModelForm
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin
-from datahub.export_win.models import Breakdown, CustomerResponse, DeletedWin, Win, WinAdviser
+from datahub.export_win.models import Breakdown, CustomerResponse, Win, WinAdviser
 
 
 class BaseTabularInLine(admin.TabularInline):
@@ -128,9 +128,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified_on',
     )
     search_fields = (
-        'adviser__name',
-        'company__name',
-        'pk',
+        'id',
     )
     fieldsets = (
         ('Overview', {'fields': (
@@ -139,7 +137,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
             'company',
             'company_contacts',
             'created_on',
-            # 'modified_on', TODO: Added later
+            'modified_on',
             'audit',
             'total_expected_export_value',
             'total_expected_non_export_value',
@@ -216,13 +214,3 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
             win.is_deleted = True
             win.modified_by = request.user
             win.save()
-
-
-@admin.register(DeletedWin)
-class DeletedWinAdmin(WinAdmin):
-    inlines = tuple()
-    actions = ('undelete',)
-
-    def undelete(self, request, queryset):
-        for win in queryset.all():
-            win.is_deleted = True
