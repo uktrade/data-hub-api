@@ -47,7 +47,9 @@ click==8.1.3
     #   pip-tools
     #   rq
 coverage[toml]==7.0.1
-    # via pytest-cov
+    # via
+    #   coverage
+    #   pytest-cov
 crontab==1.0.0
     # via rq-scheduler
 decorator==5.1.1
@@ -329,7 +331,7 @@ requests-mock==1.11.0
     # via -r requirements-dev.in
 requests-toolbelt==1.0.0
     # via -r requirements.in
-rq==1.16.0
+rq==1.16.1
     # via
     #   -r requirements.in
     #   rq-scheduler
@@ -366,6 +368,8 @@ statsd==4.0.1
     # via -r requirements.in
 tomlkit==0.11.6
     # via pylint
+tqdm==4.66.2
+    # via -r requirements.in
 traitlets==5.14.1
     # via
     #   ipython

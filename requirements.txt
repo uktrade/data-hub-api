@@ -170,7 +170,7 @@ requests==2.31.0
     #   requests-toolbelt
 requests-toolbelt==1.0.0
     # via -r requirements.in
-rq==1.16.0
+rq==1.16.1
     # via
     #   -r requirements.in
     #   rq-scheduler
@@ -198,6 +198,8 @@ sqlparse==0.4.4
     #   django-debug-toolbar
 statsd==4.0.1
     # via -r requirements.in
+tqdm==4.66.2
+    # via -r requirements.in
 tzdata==2023.3
     # via pandas
 uritemplate==4.1.1
@@ -223,7 +225,6 @@ zope-event==4.6
     # via gevent
 zope-interface==5.5.2
     # via gevent
-tqdm==4.66.2
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
