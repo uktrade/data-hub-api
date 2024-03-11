@@ -14,8 +14,12 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
 from datahub.core.test_utils import AdminTestMixin
 from datahub.investment.project.admin import InvestmentProjectAdmin
-from datahub.investment.project.constants import FDISICGrouping
-from datahub.investment.project.models import GVAMultiplier, InvestmentProject
+from datahub.investment.project.constants import FDISICGrouping as FDISICGroupingConstant
+
+from datahub.investment.project.models import (
+    GVAMultiplier,
+    InvestmentProject,
+)
 from datahub.investment.project.test.factories import (
     GVAMultiplierFactory,
     InvestmentProjectFactory,
@@ -27,7 +31,7 @@ def get_gva_multiplier():
     """Get a GVA Multiplier for the year 3010"""
     yield GVAMultiplierFactory(
         financial_year=3010,
-        fdi_sic_grouping_id=FDISICGrouping.retail.value.id,
+        fdi_sic_grouping_id=FDISICGroupingConstant.retail.value.id,
         multiplier=2,
     )
 
@@ -41,13 +45,30 @@ class TestGVAMultiplierAdmin(AdminTestMixin):
         response = self.client.get(url)
         assert response.status_code == status.HTTP_200_OK
 
-        multiplier_value = '0.12345'
+        multiplier = 0.5
         financial_year = 3015
+        sector_id = constants.Sector.renewable_energy_wind.value.id
+        sector_classification_gva_multiplier = GVAMultiplier.SectorClassificationChoices.LABOUR
+        sector_classification_value_band = GVAMultiplier.SectorClassificationChoices.CAPITAL
+        value_band_a_minimum = 1
+        value_band_b_minimum = 2
+        value_band_c_minimum = 3
+        value_band_d_minimum = 4
+        value_band_e_minimum = 5
+        fdi_sic_grouping_id = FDISICGroupingConstant.retail.value.id
 
         data = {
+            'multiplier': multiplier,
             'financial_year': financial_year,
-            'multiplier': multiplier_value,
-            'fdi_sic_grouping': str(FDISICGrouping.retail.value.id),
+            'sector': sector_id,
+            'sector_classification_gva_multiplier': sector_classification_gva_multiplier,
+            'sector_classification_value_band': sector_classification_value_band,
+            'value_band_a_minimum': value_band_a_minimum,
+            'value_band_b_minimum': value_band_b_minimum,
+            'value_band_c_minimum': value_band_c_minimum,
+            'value_band_d_minimum': value_band_d_minimum,
+            'value_band_e_minimum': value_band_e_minimum,
+            'fdi_sic_grouping': fdi_sic_grouping_id,
         }
 
         response = self.client.post(url, data, follow=True)
@@ -55,22 +76,51 @@ class TestGVAMultiplierAdmin(AdminTestMixin):
 
         actual_multiplier = GVAMultiplier.objects.get(
             financial_year=financial_year,
-            fdi_sic_grouping_id=FDISICGrouping.retail.value.id,
+            sector=sector_id,
         )
-        assert actual_multiplier.multiplier == Decimal(multiplier_value)
+        assert actual_multiplier.multiplier == Decimal(multiplier)
 
     @pytest.mark.parametrize(
         'data',
         (
             {
+                'multiplier': 0.5,
+            },
+            {
                 'financial_year': 3011,
             },
             {
-                'fdi_sic_grouping': str(FDISICGrouping.electric.value.id),
+                'sector': 0.5,
+            },
+            {
+                'sector_classification_gva_multiplier':
+                    GVAMultiplier.SectorClassificationChoices.LABOUR,
+            },
+            {
+                'sector_classification_value_band':
+                    GVAMultiplier.SectorClassificationChoices.LABOUR,
+            },
+            {
+                'value_band_a_minimum': 1,
+            },
+            {
+                'value_band_b_minimum': 2,
+            },
+            {
+                'value_band_c_minimum': 3,
+            },
+            {
+                'value_band_d_minimum': 4,
+            },
+            {
+                'value_band_e_minimum': 5,
+            },
+            {
+                'fdi_sic_grouping': str(FDISICGroupingConstant.electric.value.id),
             },
         ),
     )
-    def test_updating_gva_multiplier_group_and_year_not_allowed(self, get_gva_multiplier, data):
+    def test_updating_gva_multiplier_not_allowed(self, get_gva_multiplier, data):
         """Test updating financial year and fdi sic grouping not allowed."""
         gva_multiplier = get_gva_multiplier
         url = reverse('admin:investment_gvamultiplier_change', args=(gva_multiplier.pk,))
@@ -82,42 +132,7 @@ class TestGVAMultiplierAdmin(AdminTestMixin):
 
         gva_multiplier.refresh_from_db()
         assert gva_multiplier.financial_year == 3010
-        assert gva_multiplier.fdi_sic_grouping_id == UUID(FDISICGrouping.retail.value.id)
-
-    def test_updating_gva_multiplier_value(self, get_gva_multiplier):
-        """Test updating GVA Multiplier value updates any associated investment projects."""
-        gva_multiplier = get_gva_multiplier
-        with mock.patch(
-            'datahub.investment.project.gva_utils.'
-            'GrossValueAddedCalculator._get_gva_multiplier',
-        ) as mock_get_multiplier:
-            mock_get_multiplier.return_value = gva_multiplier
-            project = InvestmentProjectFactory(
-                foreign_equity_investment=1000,
-                investment_type_id=constants.InvestmentType.fdi.value.id,
-            )
-
-        url = reverse('admin:investment_gvamultiplier_change', args=(gva_multiplier.pk,))
-        response = self.client.get(url, follow=True)
-        assert response.status_code == status.HTTP_200_OK
-
-        with mock.patch(
-            'datahub.investment.project.gva_utils.'
-            'GrossValueAddedCalculator._get_gva_multiplier_financial_year',
-        ) as mock_get_financial_year:
-            mock_get_financial_year.return_value = 3010
-
-            data = {
-                'multiplier': 3,
-            }
-            response = self.client.post(url, data, follow=True)
-            assert response.status_code == status.HTTP_200_OK
-
-        gva_multiplier.refresh_from_db()
-        assert gva_multiplier.multiplier == 3
-
-        project.refresh_from_db()
-        assert project.gross_value_added == 3000
+        assert gva_multiplier.fdi_sic_grouping_id == UUID(FDISICGroupingConstant.retail.value.id)
 
 
 class TestInvestmentProjectAdmin(AdminTestMixin):
@@ -263,7 +278,7 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
         response = self.client.post(url, data, follow=True)
         assert response.status_code == 200
         investment_project = InvestmentProject.objects.get(pk=investment_project_pk)
-        assert investment_project.gross_value_added == Decimal('6210')
+        assert investment_project.gross_value_added == Decimal('20965')
 
-        # GVA Multiplier - Transportation & storage - 2019
-        assert investment_project.gva_multiplier.multiplier == Decimal('0.0621')
+        # GVA Multiplier - Aircraft - 2022
+        assert investment_project.gva_multiplier.multiplier == Decimal('0.209650945')

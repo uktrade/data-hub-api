@@ -6,7 +6,11 @@ from decimal import Decimal
 import factory
 from django.utils.timezone import now
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyFactory,
+    ContactFactory,
+)
 from datahub.core.constants import (
     InvestmentBusinessActivity,
     InvestmentProjectStage,
@@ -27,6 +31,7 @@ from datahub.investment.project.constants import (
     SpecificProgramme,
 )
 from datahub.investment.project.models import (
+    GVAMultiplier,
     InvestmentDeliveryPartner,
     InvestmentProject,
 )
@@ -220,6 +225,8 @@ class InvestmentActivityFactory(factory.django.DjangoModelFactory):
 class GVAMultiplierFactory(factory.django.DjangoModelFactory):
     """GVA Multiplier factory."""
 
+    sector = factory.SubFactory(SectorFactory)
+    sector_classification_gva_multiplier = GVAMultiplier.SectorClassificationChoices.CAPITAL
     fdi_sic_grouping_id = FDISICGrouping.retail.value.id
     financial_year = 2019
     multiplier = Decimal('0.1250')
