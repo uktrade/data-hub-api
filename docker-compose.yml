@@ -50,7 +50,7 @@ services:
     command: python cron-scheduler.py
 
   postgres:
-    image: postgres:12
+    image: postgres:16
     restart: always
     ports:
       - "5432:5432"
@@ -70,7 +70,7 @@ services:
       - "9200:9200"
 
   redis:
-    image: redis:6.2.6
+    image: redis:7.2.4
     restart: always
     ports:
       - "6379:6379"
@@ -86,4 +86,3 @@ services:
       RQ_REDIS_HOST: "redis"
     depends_on:
       - redis
-
