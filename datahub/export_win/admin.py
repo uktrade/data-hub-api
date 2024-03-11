@@ -7,25 +7,41 @@ from datahub.core.admin import BaseModelAdminMixin
 from datahub.export_win.models import Breakdown, CustomerResponse, Win, WinAdviser
 
 
-class BaseTabularInLine(admin.TabularInline):
+class BaseTabularInline(admin.TabularInline):
     """Baseline tabular in line."""
 
     extra = 0
     can_delete = False
+    exclude = ('is_deleted',)
 
 
-class BreakdownInLine(BaseTabularInLine):
+class BreakdownInlineForm(ModelForm):
+    """Breakdown inline form."""
+
+    class Meta:
+        model = Breakdown
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['type'].required = False
+            self.fields['year'].required = False
+            self.fields['value'].required = False
+
+
+class BreakdownInline(BaseTabularInline):
     """Breakdown model."""
 
     model = Breakdown
-    min_num = 1
-    extra = 0
+    form = BreakdownInlineForm
+    fk_name = 'win'
 
     fields = ('type', 'year', 'value')
     verbose_name_plural = 'Breakdowns'
 
 
-class AdvisorInLineForm(ModelForm):
+class AdvisorInlineForm(ModelForm):
     """Advisor inline form."""
 
     class Meta:
@@ -40,28 +56,28 @@ class AdvisorInLineForm(ModelForm):
             self.fields['hq_team'].required = False
 
 
-class AdvisorInLine(BaseTabularInLine):
+class AdvisorInline(BaseTabularInline):
     """Advisor model."""
 
     model = WinAdviser
-    form = AdvisorInLineForm
-    min_num = 1
-    extra = 0
+    form = AdvisorInlineForm
+    fk_name = 'win'
 
     fields = ('name', 'team_type', 'hq_team', 'location')
     verbose_name_plural = 'Contributing Advisors'
 
 
-class BaseStackedInLine(admin.StackedInline):
+class BaseStackedInline(admin.StackedInline):
     """Base stacked in line."""
 
     classes = ('grp-collapse grp-open',)
     inline_classes = ('grp-collapse grp-open',)
     extra = 0
     can_delete = False
+    exclude = ('is_deleted',)
 
 
-class CustomerResponseInLineForm(ModelForm):
+class CustomerResponseInlineForm(ModelForm):
     """Customer response inline form."""
 
     class Meta:
@@ -74,11 +90,12 @@ class CustomerResponseInLineForm(ModelForm):
             self.fields['name'].required = False
 
 
-class CustomerResponseInLine(BaseStackedInLine):
+class CustomerResponseInline(BaseStackedInline):
     """Customer response in line."""
 
     model = CustomerResponse
-    form = CustomerResponseInLineForm
+    form = CustomerResponseInlineForm
+    fk_name = 'win'
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -176,9 +193,9 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         )}),
     )
     inlines = (
-        BreakdownInLine,
-        CustomerResponseInLine,
-        AdvisorInLine,
+        # TODO: BreakdownInline,
+        CustomerResponseInline,
+        AdvisorInline,
     )
 
     def get_adviser(self, obj):
@@ -214,3 +231,11 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
             win.is_deleted = True
             win.modified_by = request.user
             win.save()
+
+    def has_add_permission(self, request, obj=None):
+        """Add permision set to false."""
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """Delete permission set to false."""
+        return False
