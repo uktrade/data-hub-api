@@ -107,6 +107,10 @@ class Sector(Enum):
         'Aerospace : Manufacturing and assembly : Aircraft',
         'b422c9d2-5f95-e211-a939-e4115bead28a',
     )
+    consumer_and_retail = Constant(
+        'Consumer and retail',
+        '355f977b-8ac3-e211-a646-e4115bead28a',
+    )
     defence_air = Constant(
         'Defence : Air',
         '03dbd3fb-24e4-421e-bcc1-1dfcd63b2eeb',
