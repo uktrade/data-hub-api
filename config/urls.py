@@ -24,7 +24,7 @@ unversioned_urls = [
     path('', include('datahub.oauth.admin.urls')),
     *admin_oauth2_urls,
     path('admin/', admin.site.urls),
-    path('ping.xml', ping, name='ping'),
+    path('pingdom/ping.xml', ping, name='ping'),
     path('whoami/', who_am_i, name='who_am_i'),
 ]
 
