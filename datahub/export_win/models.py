@@ -597,3 +597,8 @@ class LegacyExportWinsToDataHubCompany(models.Model):
         blank=True,
         on_delete=models.CASCADE,
     )
+
+
+class DeletedWin(Win):
+    class Meta:
+        proxy = True

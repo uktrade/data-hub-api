@@ -180,22 +180,40 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         CustomerResponseInLine,
         AdvisorInLine,
     )
+
     def get_adviser(self, obj):
         """Return adviser as user with email."""
         return f'{obj.adviser} <{obj.adviser.email}>'
     get_adviser.short_description = 'User'
+
     def get_company(self, obj):
         """Return company name."""
         return obj.company
     get_company.short_description = 'Organisation or Company name'
+
     def get_date_confirmed(self, obj):
         """Return wins being confirmed."""
         return obj.customer_response.responded_on
     get_date_confirmed.short_description = 'Date win confirmed'
+
     def get_contact_names(self, obj):
         """Return a comma separated list of company contact names."""
         return ', '.join(contact.name for contact in obj.company_contacts.all())
     get_contact_names.short_description = 'Contact name'
+
+    def get_actions(self, request):
+        """Remove the delete selected action."""
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+    def soft_delete(self, request, queryset):
+        """Soft delete action for django admin."""
+        for win in queryset.all():
+            win.is_deleted = True
+            win.modified_by = request.user
+            win.save()
 
 
 @admin.register(DeletedWin)
@@ -204,7 +222,7 @@ class DeletedWinAdmin(WinAdmin):
 
     def get_actions(self, request):
         actions = super().get_actions(request)
-        del actions['delete_selected']
+        del actions['reinstate']
         return actions
 
     actions = ('reinstate',)
