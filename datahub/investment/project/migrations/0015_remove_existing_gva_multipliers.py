@@ -1,0 +1,23 @@
+from pathlib import PurePath
+
+from django.core.management import call_command
+from django.db import migrations
+
+
+def clear_gva_multiplier_data(apps, schema_editor):
+    GVAMultiplier = apps.get_model('investment', 'GVAMultiplier')
+    GVAMultiplier.objects.all().delete()
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('investment', '0014_update_specific_programmes'),
+    ]
+
+    operations = [
+        migrations.RunPython(
+            clear_gva_multiplier_data,
+            migrations.RunPython.noop,
+        ),
+    ]

@@ -837,27 +837,55 @@ class GVAMultiplier(models.Model):
     The multiplier value is linked to an fdi sic grouping.
     """
 
+    class SectorClassificationChoices(models.TextChoices):
+        LABOUR = ('labour', 'Labour intensive')
+        CAPITAL = ('capital', 'Capital intensive')
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    sector = models.ForeignKey(
+        'metadata.Sector',
+        on_delete=models.PROTECT,
+    )
+    sector_classification_gva_multiplier = models.CharField(
+        max_length=MAX_LENGTH,
+        choices=SectorClassificationChoices.choices,
+        default=SectorClassificationChoices.CAPITAL,
+    )
+    sector_classification_value_band = models.CharField(
+        max_length=MAX_LENGTH,
+        choices=SectorClassificationChoices.choices,
+        default=SectorClassificationChoices.CAPITAL,
+    )
     fdi_sic_grouping = models.ForeignKey(
         'investment.FDISICGrouping',
         related_name='gva_multipliers',
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
     multiplier = models.DecimalField(
-        max_digits=7,
-        decimal_places=6,
+        max_digits=18,
+        decimal_places=9,
     )
     financial_year = models.IntegerField(
         help_text='The year from which the gva multiplier should apply from.',
     )
+    value_band_a_minimum = models.IntegerField(null=True)
+    value_band_b_minimum = models.IntegerField(null=True)
+    value_band_c_minimum = models.IntegerField(null=True)
+    value_band_d_minimum = models.IntegerField(null=True)
+    value_band_e_minimum = models.IntegerField(null=True)
 
     class Meta:
         verbose_name = 'GVA Multiplier'
-        unique_together = (('fdi_sic_grouping', 'financial_year'),)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['financial_year', 'sector'],
+                name='unique_year_sector_multiplier',
+            ),
+        ]
 
     def __str__(self):
         """Human-readable representation"""
-        return f'GVA Multiplier for {self.fdi_sic_grouping} - {self.financial_year}'
+        return f'GVA Multiplier for {self.sector} - {self.financial_year}'
 
 
 class SpecificProgramme(BaseConstantModel):

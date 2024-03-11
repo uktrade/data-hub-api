@@ -109,14 +109,63 @@ class InvestmentProjectTeamMemberAdmin(VersionAdmin):
 class GVAMultiplierAdmin(admin.ModelAdmin):
     """Investor profile admin."""
 
-    list_display = ('fdi_sic_grouping', 'financial_year', 'multiplier')
-    search_fields = ('fdi_sic_grouping__name', 'financial_year', 'id')
-    list_filter = ('financial_year', 'fdi_sic_grouping')
+    list_display = ('sector', 'fdi_sic_grouping', 'financial_year', 'multiplier')
+    search_fields = ('sector__segment', 'fdi_sic_grouping__name', 'financial_year', 'id')
+    list_filter = ('fdi_sic_grouping', 'financial_year')
+
+    fieldsets = (
+        (
+            None,
+            {
+                'fields': (
+                    'id',
+                    'multiplier',
+                    'financial_year',
+                ),
+            },
+        ),
+        (
+            'SECTOR INFORMATION',
+            {
+                'fields': (
+                    'sector',
+                    'sector_classification_gva_multiplier',
+                    'sector_classification_value_band',
+                    'fdi_sic_grouping',
+                ),
+            },
+        ),
+        (
+            'VALUE BANDS',
+            {
+                'fields': (
+                    'value_band_a_minimum',
+                    'value_band_b_minimum',
+                    'value_band_c_minimum',
+                    'value_band_d_minimum',
+                    'value_band_e_minimum',
+                ),
+            },
+        ),
+    )
 
     def get_readonly_fields(self, request, obj=None):
-        """Get readonly fields. If updating a GVA Multiplier only the multiplier can be updated."""
+        """Get readonly fields. No fields can be updated via the admin due to be reference data."""
         if obj:
-            return ['id', 'fdi_sic_grouping', 'financial_year']
+            return [
+                'id',
+                'multiplier',
+                'financial_year',
+                'sector',
+                'sector_classification_gva_multiplier',
+                'sector_classification_value_band',
+                'value_band_a_minimum',
+                'value_band_b_minimum',
+                'value_band_c_minimum',
+                'value_band_d_minimum',
+                'value_band_e_minimum',
+                'fdi_sic_grouping',
+            ]
         else:
             return ['id']
 
