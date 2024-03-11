@@ -220,3 +220,26 @@ class DeletedWinAdmin(WinAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+@admin.register(DeletedWin)
+class DeletedWinAdmin(WinAdmin):
+    inlines = tuple()
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        del actions['delete_selected']
+        return actions
+
+    actions = ('reinstate',)
+
+    def reinstate(self, request, queryset):
+        for win in queryset.all():
+            win.is_deleted = False
+            win.modified_by = request.user
+            win.save()
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(is_deleted=True)
+
+    def has_change_permission(self, request, obj=None):
+        return False
