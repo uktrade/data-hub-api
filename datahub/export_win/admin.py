@@ -23,10 +23,6 @@ class BreakdownInLineForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            self.fields['type'].required = False
-            self.fields['year'].required = False
-            self.fields['value'].required = False
 
 
 class BreakdownInLine(BaseTabularInLine):
@@ -50,10 +46,6 @@ class AdvisorInLineForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            self.fields['name'].required = False
-            self.fields['team_type'].required = False
-            self.fields['hq_team'].required = False
 
 
 class AdvisorInLine(BaseTabularInLine):
@@ -86,8 +78,6 @@ class CustomerResponseInLineForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            self.fields['name'].required = False
 
 
 class CustomerResponseInLine(BaseStackedInLine):
@@ -109,13 +99,6 @@ class WinAdminForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            self.fields['cdms_reference'].required = False
-            self.fields['customer_email_address'].required = False
-            self.fields['customer_job_title'].required = False
-            self.fields['line_manager_name'].required = False
-            self.fields['lead_officer_email_address'].required = False
-            self.fields['other_official_email_address'].required = False
 
 
 @admin.register(Win)
@@ -252,29 +235,6 @@ class DeletedWinAdmin(WinAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-@admin.register(DeletedWin)
-class DeletedWinAdmin(WinAdmin):
-    inlines = tuple()
-
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        del actions['delete_selected']
-        return actions
-
-    actions = ('reinstate',)
-
-    def reinstate(self, request, queryset):
-        for win in queryset.all():
-            win.is_deleted = False
-            win.modified_by = request.user
-            win.save()
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(is_deleted=True)
 
     def has_change_permission(self, request, obj=None):
         return False
