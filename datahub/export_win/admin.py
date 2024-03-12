@@ -14,10 +14,26 @@ class BaseTabularInLine(admin.TabularInline):
     can_delete = False
 
 
+class BreakdownInLineForm(ModelForm):
+    """Breakdown inline form."""
+
+    class Meta:
+        model = Breakdown
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['type'].required = False
+            self.fields['year'].required = False
+            self.fields['value'].required = False
+
+
 class BreakdownInLine(BaseTabularInLine):
     """Breakdown model."""
 
     model = Breakdown
+    form = BreakdownInLineForm
     min_num = 1
     extra = 0
 
@@ -218,14 +234,12 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
 
 @admin.register(DeletedWin)
 class DeletedWinAdmin(WinAdmin):
-    inlines = tuple()
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        del actions['reinstate']
-        return actions
-
+    inlines = (BreakdownInLine, CustomerResponseInLine, AdvisorInLine)
     actions = ('reinstate',)
+
+    def get_queryset(self, request):
+        return self.model.objects.reinstate()
 
     def reinstate(self, request, queryset):
         for win in queryset.all():
@@ -233,8 +247,11 @@ class DeletedWinAdmin(WinAdmin):
             win.modified_by = request.user
             win.save()
 
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(is_deleted=True)
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     def has_change_permission(self, request, obj=None):
         return False
