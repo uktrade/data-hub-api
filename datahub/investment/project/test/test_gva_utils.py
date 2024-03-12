@@ -166,6 +166,17 @@ class TestGrossValueAddedCalculator:
             f'Unable to find GVA multiplier for sector {sector.id}'
         )
 
+    def test_no_investment_project_sector_returns_none(self):
+        """
+        Tests when an investment project has no sector that the GVA multiplier returned is none.
+        """
+        project = InvestmentProjectFactory(
+            business_activities=[],
+            investment_type_id=InvestmentTypeConstant.fdi.value.id,
+            sector_id=None,
+        )
+        assert project.gva_multiplier is None
+
     def test_no_foreign_equity_investment_on_capital_intensive_project_returns_none(self):
         """
         Tests when an investment project has no foreign equity investment,

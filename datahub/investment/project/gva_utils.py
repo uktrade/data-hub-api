@@ -106,10 +106,8 @@ class GrossValueAddedCalculator:
         return self._get_gva_multiplier(SectorConstant.consumer_and_retail.value.id)
 
     def _get_sector_gva_multiplier(self):
-        """:returns the GVA Multiplier for a sector if one found else returns None."""
-        if self.investment_project.sector:
-            return self._get_gva_multiplier(self.investment_project.sector.id)
-        return None
+        """:returns the GVA Multiplier for a sector."""
+        return self._get_gva_multiplier(self.investment_project.sector.id)
 
     def _get_gva_multiplier(self, sector_id):
         """:returns a GVA Multiplier or None.
