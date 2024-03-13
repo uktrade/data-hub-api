@@ -12,7 +12,7 @@ class BaseTabularInline(admin.TabularInline):
 
     extra = 0
     can_delete = False
-    exclude = ('is_deleted',)
+    exclude = ('is_deleted', 'id')
 
 
 class BreakdownInlineForm(ModelForm):
@@ -35,9 +35,8 @@ class BreakdownInline(BaseTabularInline):
 
     model = Breakdown
     form = BreakdownInlineForm
-    fk_name = 'win'
 
-    fields = ('type', 'year', 'value')
+    fields = ('id', 'type', 'year', 'value')
     verbose_name_plural = 'Breakdowns'
 
 
@@ -51,7 +50,7 @@ class AdvisorInlineForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
-            self.fields['name'].required = False
+            self.fields['adviser'].required = False
             self.fields['team_type'].required = False
             self.fields['hq_team'].required = False
 
@@ -61,9 +60,8 @@ class AdvisorInline(BaseTabularInline):
 
     model = WinAdviser
     form = AdvisorInlineForm
-    fk_name = 'win'
 
-    fields = ('name', 'team_type', 'hq_team', 'location')
+    fields = ('id', 'adviser', 'team_type', 'hq_team', 'location')
     verbose_name_plural = 'Contributing Advisors'
 
 
@@ -95,10 +93,7 @@ class CustomerResponseInline(BaseStackedInline):
 
     model = CustomerResponse
     form = CustomerResponseInlineForm
-    fk_name = 'win'
-
-    def has_add_permission(self, request, obj=None):
-        return False
+    extra = 0
 
 
 class WinAdminForm(ModelForm):
@@ -111,12 +106,18 @@ class WinAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
-            self.fields['cdms_reference'].required = False
-            self.fields['customer_email_address'].required = False
-            self.fields['customer_job_title'].required = False
-            self.fields['line_manager_name'].required = False
-            self.fields['lead_officer_email_address'].required = False
-            self.fields['other_official_email_address'].required = False
+            if 'cdms_reference' in self.fields:
+                self.fields['cdms_reference'].required = False
+            if 'customer_email_address' in self.fields:
+                self.fields['customer_email_address'].required = False
+            if 'customer_job_title' in self.fields:
+                self.fields['customer_job_title'].required = False
+            if 'line_manager_name' in self.fields:
+                self.fields['line_manager_name'].required = False
+            if 'lead_officer_email_address' in self.fields:
+                self.fields['lead_officer_email_address'].required = False
+            if 'other_official_email_address' in self.fields:
+                self.fields['other_official_email_address'].required = False
 
 
 @admin.register(Win)
@@ -192,11 +193,11 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
             'associated_programme',
         )}),
     )
-    inlines = (
+    inlines = [
         BreakdownInline,
         CustomerResponseInline,
         AdvisorInline,
-    )
+    ]
 
     def get_adviser(self, obj):
         """Return adviser as user with email."""
@@ -236,9 +237,6 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         return False
 
     def has_delete_permission(self, request, obj=None):
-        return False
-
-    def has_change_permission(self, request, obj=None):
         return False
 
 
