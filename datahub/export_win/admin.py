@@ -214,6 +214,15 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
             win.modified_by = request.user
             win.save()
 
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(DeletedWin)
 class DeletedWinAdmin(WinAdmin):
