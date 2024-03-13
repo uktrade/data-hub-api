@@ -33,6 +33,13 @@ class BaseExportWinSoftDeleteManager(models.Manager):
             .filter(is_deleted=False)
         )
 
+    def reinstate(self, *args, **kwargs):
+        return (
+            super()
+            .get_queryset(*args, **kwargs)
+            .filter(is_deleted=True)
+        )
+
 
 class BaseExportWinOrderedConstantModel(BaseOrderedConstantModel):
     """Base class for an Export Win."""
@@ -597,3 +604,8 @@ class LegacyExportWinsToDataHubCompany(models.Model):
         blank=True,
         on_delete=models.CASCADE,
     )
+
+
+class DeletedWin(Win):
+    class Meta:
+        proxy = True

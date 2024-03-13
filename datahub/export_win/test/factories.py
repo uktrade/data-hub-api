@@ -105,17 +105,6 @@ class HQTeamRegionOrPostFactory(factory.django.DjangoModelFactory):
         model = 'export_win.HQTeamRegionOrPost'
 
 
-class WinAdviserFactory(factory.django.DjangoModelFactory):
-    """WinAdviser factory."""
-
-    adviser = factory.SubFactory(AdviserFactory)
-    team_type = factory.SubFactory(TeamTypeFactory)
-    hq_team = factory.SubFactory(HQTeamRegionOrPostFactory)
-
-    class Meta:
-        model = 'export_win.WinAdviser'
-
-
 class WinFactory(factory.django.DjangoModelFactory):
     """Win factory."""
 
@@ -177,6 +166,18 @@ class WinFactory(factory.django.DjangoModelFactory):
         model = 'export_win.Win'
 
 
+class WinAdviserFactory(factory.django.DjangoModelFactory):
+    """WinAdviser factory."""
+
+    win = factory.SubFactory(WinFactory)
+    adviser = factory.SubFactory(AdviserFactory)
+    team_type = factory.SubFactory(TeamTypeFactory)
+    hq_team = factory.SubFactory(HQTeamRegionOrPostFactory)
+
+    class Meta:
+        model = 'export_win.WinAdviser'
+
+
 class CustomerResponseFactory(factory.django.DjangoModelFactory):
     """Customer response factory."""
 
@@ -204,6 +205,7 @@ class CustomerResponseFactory(factory.django.DjangoModelFactory):
 class BreakdownFactory(factory.django.DjangoModelFactory):
     """Breakdown factory."""
 
+    win = factory.SubFactory(WinFactory)
     year = factory.fuzzy.FuzzyInteger(2022, 2050, 1)
     value = factory.fuzzy.FuzzyInteger(1000, 100000, 10)
 
@@ -239,3 +241,36 @@ class LegacyExportWinsToDataHubCompanyFactory(factory.django.DjangoModelFactory)
 
     class Meta:
         model = 'export_win.LegacyExportWinsToDataHubCompany'
+
+
+class DeletedWinFactory(factory.django.DjangoModelFactory):
+    """DeletedWin factory."""
+
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SelfAttribute('created_by')
+    date = factory.Faker('date_object')
+    total_expected_export_value = factory.fuzzy.FuzzyInteger(1000, 100000, 10)
+    goods_vs_services = factory.SubFactory(ExpectedValueRelationFactory)
+    total_expected_non_export_value = factory.fuzzy.FuzzyInteger(1000, 100000, 10)
+    total_expected_odi_value = factory.fuzzy.FuzzyInteger(1000, 100000, 10)
+    is_personally_confirmed = True
+    is_line_manager_confirmed = True
+    complete = False
+    adviser = factory.SubFactory(AdviserFactory)
+    company = factory.SubFactory(CompanyFactory)
+    country = factory.SubFactory(CountryFactory)
+    customer_location_id = UKRegionConstant.north_west.value.id
+    hq_team = factory.SubFactory(HQTeamRegionOrPostFactory)
+    lead_officer = factory.SubFactory(AdviserFactory)
+    lead_officer_email_address = factory.Faker('email')
+    line_manager = factory.SubFactory(AdviserFactory)
+    sector = factory.SubFactory(SectorFactory)
+    team_type = factory.SubFactory(TeamTypeFactory)
+    hvc_id = HVCConstant.western_europe_aid_funded_business.value.id
+    export_experience = factory.SubFactory(ExportExperienceFactory)
+    name_of_customer_confidential = False
+    business_potential_id = BusinessPotentialConstant.high_export_potential.value.id
+    type_id = WinTypeConstant.both.value.id
+
+    class Meta:
+        model = 'export_win.DeletedWin'

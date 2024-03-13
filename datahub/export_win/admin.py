@@ -4,7 +4,7 @@ from django.forms import ModelForm
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin
-from datahub.export_win.models import Breakdown, CustomerResponse, Win, WinAdviser
+from datahub.export_win.models import Breakdown, CustomerResponse, DeletedWin, Win, WinAdviser
 
 
 class BaseTabularInline(admin.TabularInline):
@@ -238,4 +238,29 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
 
     def has_delete_permission(self, request, obj=None):
         """Delete permission set to false."""
+        return False
+
+
+@admin.register(DeletedWin)
+class DeletedWinAdmin(WinAdmin):
+
+    inlines = (BreakdownInline, CustomerResponseInline, AdvisorInline)
+    actions = ('reinstate',)
+
+    def get_queryset(self, request):
+        return self.model.objects.reinstate()
+
+    def reinstate(self, request, queryset):
+        for win in queryset.all():
+            win.is_deleted = False
+            win.modified_by = request.user
+            win.save()
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
         return False

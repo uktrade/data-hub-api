@@ -25,7 +25,10 @@ from datahub.company_referral.test.factories import (
 )
 from datahub.event.test.factories import EventFactory
 from datahub.export_win.test.factories import (
+    BreakdownFactory,
     CustomerResponseFactory,
+    DeletedWinFactory,
+    WinAdviserFactory,
     WinFactory,
 )
 from datahub.interaction.test.factories import (
@@ -74,6 +77,9 @@ MAPPINGS = {
     'task.Task': TaskFactory,
     'export_win.Win': WinFactory,
     'export_win.CustomerResponse': CustomerResponseFactory,
+    'export_win.Breakdown': BreakdownFactory,
+    'export_win.WinAdviser': WinAdviserFactory,
+    'export_win.DeletedWin': DeletedWinFactory,
 }
 
 
