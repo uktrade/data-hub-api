@@ -271,6 +271,7 @@ class DeletedWinFactory(factory.django.DjangoModelFactory):
     name_of_customer_confidential = False
     business_potential_id = BusinessPotentialConstant.high_export_potential.value.id
     type_id = WinTypeConstant.both.value.id
+    is_deleted = False
 
     class Meta:
         model = 'export_win.DeletedWin'
