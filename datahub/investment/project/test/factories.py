@@ -23,7 +23,6 @@ from datahub.core.constants import (
 from datahub.core.test.factories import to_many_field
 from datahub.core.test_utils import random_obj_for_model
 from datahub.investment.project.constants import (
-    FDISICGrouping,
     InvestmentActivityType,
     InvestorType,
     Involvement,
@@ -227,9 +226,15 @@ class GVAMultiplierFactory(factory.django.DjangoModelFactory):
 
     sector = factory.SubFactory(SectorFactory)
     sector_classification_gva_multiplier = GVAMultiplier.SectorClassificationChoices.CAPITAL
-    fdi_sic_grouping_id = FDISICGrouping.retail.value.id
-    financial_year = 2019
-    multiplier = Decimal('0.1250')
+    sector_classification_value_band = GVAMultiplier.SectorClassificationChoices.CAPITAL
+    fdi_sic_grouping = factory.SubFactory(FDISICGroupingFactory)
+    financial_year = 2024
+    multiplier = Decimal('0.125')
+    value_band_a_minimum = 2
+    value_band_b_minimum = 4
+    value_band_c_minimum = 8
+    value_band_d_minimum = 16
+    value_band_e_minimum = 32
 
     class Meta:
         model = 'investment.GVAMultiplier'
