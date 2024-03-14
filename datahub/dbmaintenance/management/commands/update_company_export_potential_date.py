@@ -1,3 +1,8 @@
+import codecs
+import csv
+
+from contextlib import closing
+
 from logging import getLogger
 
 import reversion
@@ -8,6 +13,7 @@ from django.utils.timezone import now
 from datahub.company.models import Company
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_limited_string
+from datahub.documents.utils import get_s3_client_for_bucket
 from datahub.search.signals import disable_search_signal_receivers
 
 logger = getLogger(__name__)
@@ -52,8 +58,35 @@ class Command(CSVBaseCommand):
     @disable_search_signal_receivers(Company)
     def _handle(self, *args, **options):
         """
-        Disables search signal receivers for companies.
-        Avoid queuing huge number of RQ scheduled tasks for syncing companies to OpenSearch.
-        (Syncing can be manually performed afterwards using sync_search if required.)
+        Internal version of the `handle` method, adapted for streaming and batching from S3.
+
+        :returns: dict with count of records successful and failed updates
         """
-        return super()._handle(*args, **options)
+        result = {True: 0, False: 0}
+        batch_size = options.get('batch_size', 5000)
+
+        s3_client = get_s3_client_for_bucket('default')
+        response = s3_client.get_object(
+            Bucket=options['bucket'],
+            Key=options['object_key'],
+        )['Body']
+
+        with closing(response):
+            csvfile = codecs.getreader('utf-8')(response)
+            reader = csv.DictReader(csvfile)
+            batch = []
+
+            for row in reader:
+                batch.append(row)
+                if len(batch) >= batch_size:
+                    for row in batch:
+                        succeeded = self.process_row(row, **options)
+                        result[succeeded] += 1
+                    batch = []
+
+            if batch:
+                for row in batch:
+                    succeeded = self.process_row(row, **options)
+                    result[succeeded] += 1
+
+        return result
