@@ -51,7 +51,7 @@ def test_reinstate():
 
     admin = DeletedWinAdmin(model=DeletedWin, admin_site=None)
 
-    admin.reinstate(request, queryset=DeletedWin.objects.all())
+    admin.undelete(request, queryset=DeletedWin.objects.all())
 
     deleted_win1.refresh_from_db()
     deleted_win2.refresh_from_db()
