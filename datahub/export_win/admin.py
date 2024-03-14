@@ -228,12 +228,12 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
 class DeletedWinAdmin(WinAdmin):
 
     inlines = (BreakdownInLine, CustomerResponseInLine, AdvisorInLine)
-    actions = ('reinstate',)
+    actions = ('undelete',)
 
     def get_queryset(self, request):
         return self.model.objects.reinstate()
 
-    def reinstate(self, request, queryset):
+    def undelete(self, request, queryset):
         for win in queryset.all():
             win.is_deleted = False
             win.modified_by = request.user

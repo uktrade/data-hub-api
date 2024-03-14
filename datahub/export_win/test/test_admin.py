@@ -10,6 +10,7 @@ from datahub.export_win.test.factories import DeletedWinFactory
 
 @pytest.mark.django_db
 def test_get_actions_removes_delete_selected():
+    """Test remove delete selected"""
     user = AdviserFactory()
     admin = WinAdmin(Win, admin_site)
     request = RequestFactory().get('/')
@@ -20,6 +21,7 @@ def test_get_actions_removes_delete_selected():
 
 @pytest.mark.django_db
 def test_soft_delete():
+    """Return adviser as user with email."""
     user = AdviserFactory()
     win1 = DeletedWinFactory()
     win2 = DeletedWinFactory()
