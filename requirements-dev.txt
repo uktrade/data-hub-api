@@ -22,9 +22,9 @@ attrs==22.2.0
     #   flake8-bugbear
 bigtree==0.16.2
     # via -r requirements.in
-boto3==1.34.54
+boto3==1.34.59
     # via -r requirements.in
-botocore==1.34.54
+botocore==1.34.59
     # via
     #   boto3
     #   s3transfer
@@ -47,7 +47,9 @@ click==8.1.3
     #   pip-tools
     #   rq
 coverage[toml]==7.0.1
-    # via pytest-cov
+    # via
+    #   coverage
+    #   pytest-cov
 crontab==1.0.0
     # via rq-scheduler
 decorator==5.1.1
@@ -68,7 +70,7 @@ django==4.2.10
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==6.3.0
+django-axes==6.4.0
     # via -r requirements.in
 django-csp==3.8
     # via -r requirements.in
@@ -100,7 +102,7 @@ docopt==0.6.2
     # via notifications-python-client
 ecs-logging==2.0.2
     # via elastic-apm
-elastic-apm==6.20.0
+elastic-apm==6.21.3
     # via -r requirements.in
 execnet==1.9.0
     # via pytest-xdist
@@ -123,7 +125,7 @@ flake8==7.0.0
     #   flake8-quotes
     #   flake8-string-format
     #   pep8-naming
-flake8-bugbear==23.9.16
+flake8-bugbear==24.2.6
     # via -r requirements-dev.in
 flake8-commas==2.1.0
     # via -r requirements-dev.in
@@ -161,7 +163,7 @@ idna==3.4
     #   yarl
 iniconfig==1.1.1
     # via pytest
-ipython==8.22.1
+ipython==8.22.2
     # via -r requirements-dev.in
 isort==5.11.4
     # via pylint
@@ -271,7 +273,7 @@ pyproject-hooks==1.0.0
     # via
     #   build
     #   pip-tools
-pytest==8.1.0
+pytest==8.1.1
     # via
     #   -r requirements-dev.in
     #   pylint-pytest
@@ -329,7 +331,7 @@ requests-mock==1.11.0
     # via -r requirements-dev.in
 requests-toolbelt==1.0.0
     # via -r requirements.in
-rq==1.16.0
+rq==1.16.1
     # via
     #   -r requirements.in
     #   rq-scheduler
@@ -366,6 +368,8 @@ statsd==4.0.1
     # via -r requirements.in
 tomlkit==0.11.6
     # via pylint
+tqdm==4.66.2
+    # via -r requirements.in
 traitlets==5.14.1
     # via
     #   ipython
