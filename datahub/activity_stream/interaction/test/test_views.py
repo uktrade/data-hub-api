@@ -47,7 +47,7 @@ def test_interaction_activity(api_client, factory):
         expected.update(
             {
                 'dit:exportBarrierTypes': [
-                    {'name': barrier.name for barrier in interaction.export_barrier_types.all()},
+                    {'name': barrier.name} for barrier in interaction.export_barrier_types.all()
                 ],
                 **({'dit:exportBarrierNotes': interaction.export_barrier_notes}
                     if interaction.export_barrier_notes else {}),
