@@ -24,10 +24,6 @@ class BreakdownInlineForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            self.fields['type'].required = False
-            self.fields['year'].required = False
-            self.fields['value'].required = False
 
 
 class BreakdownInline(BaseTabularInline):
@@ -49,10 +45,6 @@ class AdvisorInlineForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            self.fields['adviser'].required = False
-            self.fields['team_type'].required = False
-            self.fields['hq_team'].required = False
 
 
 class AdvisorInline(BaseTabularInline):
@@ -60,7 +52,6 @@ class AdvisorInline(BaseTabularInline):
 
     model = WinAdviser
     form = AdvisorInlineForm
-
     fields = ('id', 'adviser', 'team_type', 'hq_team', 'location')
     verbose_name_plural = 'Contributing Advisors'
 
@@ -72,7 +63,7 @@ class BaseStackedInline(admin.StackedInline):
     inline_classes = ('grp-collapse grp-open',)
     extra = 0
     can_delete = False
-    exclude = ('is_deleted',)
+    exclude = ('is_deleted', 'created_by', 'modified_by')
 
 
 class CustomerResponseInlineForm(ModelForm):
@@ -82,7 +73,7 @@ class CustomerResponseInlineForm(ModelForm):
         model = CustomerResponse
         fields = '__all__'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, obj=None, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
             self.fields['name'].required = False
@@ -94,6 +85,7 @@ class CustomerResponseInline(BaseStackedInline):
     model = CustomerResponse
     form = CustomerResponseInlineForm
     extra = 0
+    readonly_fields = ('id',)
 
 
 class WinAdminForm(ModelForm):
@@ -262,4 +254,10 @@ class DeletedWinAdmin(WinAdmin):
         return False
 
     def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_view_permission(self, request, obj=None):
+        # Check if the user belongs to the desired user group
+        if request.user.is_superuser or request.user.groups.filter(name='ExportWinAdmin').exists():
+            return True
         return False
