@@ -417,7 +417,8 @@ class IProjectValueAbstract(models.Model):
         blank=True,
         help_text=(
             'Denormalised GVA value which is automatically populated using '
-            'the gva multiplier and the foreign equity investment value.'
+            'the gva multiplier and either the foreign equity investment value '
+            'or number of new jobs.'
         ),
     )
 
