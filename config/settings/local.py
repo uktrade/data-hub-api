@@ -30,7 +30,7 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'root': {
-        'level': 'DEBUG',
+        'level': 'INFO',
         'handlers': ['console'],
     },
     'formatters': {
@@ -48,18 +48,18 @@ LOGGING = {
     'loggers': {
         'werkzeug': {
             'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True
+            'level': 'INFO',
+            'propagate': False
         },
         'django': {
             'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True
+            'level': 'INFO',
+            'propagate': False
         },
         'django.server': {
             'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
+            'level': 'INFO',
+            'propagate': False,
         },
     },
 }
