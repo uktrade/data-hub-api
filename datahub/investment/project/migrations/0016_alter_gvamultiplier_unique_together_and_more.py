@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0076_alter_sector_sector_cluster_alter_team_country_and_more'),
+        ('metadata', '0077_alter_sector_sector_cluster_alter_team_country_and_more'),
         ('investment', '0015_remove_existing_gva_multipliers'),
     ]
 

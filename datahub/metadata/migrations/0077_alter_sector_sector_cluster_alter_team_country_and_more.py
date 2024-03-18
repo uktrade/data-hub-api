@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0075_update_trade_agreements'),
+        ('metadata', '0076_update_trade_agreement'),
     ]
 
     operations = [
