@@ -47,9 +47,7 @@ click==8.1.3
     #   pip-tools
     #   rq
 coverage[toml]==7.0.1
-    # via
-    #   coverage
-    #   pytest-cov
+    # via pytest-cov
 crontab==1.0.0
     # via rq-scheduler
 decorator==5.1.1
@@ -80,7 +78,7 @@ django-environ==0.11.2
     # via -r requirements.in
 django-extensions==3.2.3
     # via -r requirements.in
-django-filter==23.5
+django-filter==24.1
     # via -r requirements.in
 django-ipware==3.0.7
     # via django-log-formatter-ecs
