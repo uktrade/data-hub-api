@@ -1,6 +1,7 @@
 from django.db import DatabaseError
 
 from datahub.company.models import Company
+from datahub.core.queues.health_check import CheckRQWorkers
 
 
 class CheckDatabase:
@@ -17,4 +18,4 @@ class CheckDatabase:
             return False, e
 
 
-services_to_check = (CheckDatabase, )
+services_to_check = (CheckDatabase, CheckRQWorkers)
