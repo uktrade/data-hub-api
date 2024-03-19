@@ -2,7 +2,7 @@ import uuid
 
 from django.conf import settings
 
-from django.db import models
+from django.db import models, transaction
 
 
 from datahub.company.models import (
@@ -13,6 +13,7 @@ from datahub.company.models import (
 )
 from datahub.core import reversion
 from datahub.core.models import BaseModel, BaseOrderedConstantModel
+from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.metadata.models import (
     Country,
     Sector,
@@ -348,6 +349,7 @@ class Breakdown(BaseModel):
     """Win breakdown."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    # legacy_id=models.AutoField(primary_key=False) # TODO start at 2 million
     win = models.ForeignKey(Win, related_name='breakdowns', on_delete=models.CASCADE)
     type = models.ForeignKey(
         BreakdownType,
@@ -384,8 +386,25 @@ class WinAdviser(BaseModel):
         verbose_name='Location (if applicable)',
         blank=True,
     )
-    # Legacy field
+    # Legacy fields
     name = models.CharField(max_length=128)
+    legacy_id = models.IntegerField(null=True, unique=True)  # TODO start at 2 million
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        # This means that the model isn't saved to the database yet and has no legacy_id set
+        if self._state.adding and self.legacy_id is None:
+            # Get the maximum legacy_id value from the database
+            from django.db.models import Max
+            last_id = WinAdviser.objects.all().aggregate(Max('legacy_id'))['legacy_id__max']
+
+            # If there is a legacy_id, just use the last value and add 1 to it
+            if last_id is not None:
+                self.legacy_id = last_id + 1
+            else:
+                self.legacy_id = EXPORT_WINS_LEGACY_ID_START_VALUE
+
+        super().save(*args, **kwargs)
 
 
 @reversion.register_base_model()
