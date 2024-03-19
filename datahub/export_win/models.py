@@ -3,7 +3,7 @@ import uuid
 from django.conf import settings
 
 from django.db import models, transaction
-
+from django.db.models import Max
 
 from datahub.company.models import (
     Advisor,
@@ -395,11 +395,11 @@ class WinAdviser(BaseModel):
         # This means that the model isn't saved to the database yet and has no legacy_id set
         if self._state.adding and self.legacy_id is None:
             # Get the maximum legacy_id value from the database
-            from django.db.models import Max
+
             last_id = WinAdviser.objects.all().aggregate(Max('legacy_id'))['legacy_id__max']
 
             # If there is a legacy_id, just use the last value and add 1 to it
-            if last_id is not None:
+            if last_id is not None and last_id >= EXPORT_WINS_LEGACY_ID_START_VALUE:
                 self.legacy_id = last_id + 1
             else:
                 self.legacy_id = EXPORT_WINS_LEGACY_ID_START_VALUE
