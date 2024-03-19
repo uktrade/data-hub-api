@@ -9,18 +9,7 @@ from datahub.core.constants import (
 
 def unlink_gva_multiplier_from_investment_projects(apps, schema_editor):
     InvestmentProject = apps.get_model('investment', 'InvestmentProject')
-    queryset = InvestmentProject.objects.filter(
-        investment_type_id=InvestmentTypeConstant.fdi.value.id,
-    ).filter(
-        Q(
-            sector__isnull=False,
-        ) | Q(
-            business_activities__in=[
-                InvestmentBusinessActivityConstant.retail.value.id,
-                InvestmentBusinessActivityConstant.sales.value.id,
-            ],
-        ),
-    )
+    queryset = InvestmentProject.objects.all()
     queryset.update(
         gva_multiplier=None,
         gross_value_added=None,
