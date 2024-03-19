@@ -193,9 +193,9 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         )}),
     )
     inlines = (
-        BreakdownInLine,
-        CustomerResponseInLine,
-        AdvisorInLine,
+        BreakdownInline,
+        CustomerResponseInline,
+        AdvisorInline,
     )
 
     def get_adviser(self, obj):
@@ -245,7 +245,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
 @admin.register(DeletedWin)
 class DeletedWinAdmin(WinAdmin):
 
-    inlines = (BreakdownInLine, CustomerResponseInLine, AdvisorInLine)
+    inlines = (BreakdownInline, CustomerResponseInline, AdvisorInline)
     actions = ('undelete',)
 
     def get_queryset(self, request):
