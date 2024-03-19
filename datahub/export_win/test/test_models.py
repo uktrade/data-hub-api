@@ -16,6 +16,15 @@ class TestWinAdviserModel:
         load_adviser = WinAdviser.objects.filter(id=win_adviser.id).first()
         assert load_adviser.legacy_id == win_adviser.legacy_id
 
+    def test_edited_win_adviser_with_auto_incremented_legacy_id_not_auto_incremented_again(self):
+        win_adviser = WinAdviserFactory()
+        win_adviser.save()
+        win_adviser.location = 'UPDATED'
+        win_adviser.save()
+
+        load_adviser = WinAdviser.objects.filter(id=win_adviser.id).first()
+        assert load_adviser.legacy_id == EXPORT_WINS_LEGACY_ID_START_VALUE
+
     def test_new_win_adviser_with_no_legacy_id_is_auto_incremented(self):
 
         win_adviser = WinAdviserFactory()

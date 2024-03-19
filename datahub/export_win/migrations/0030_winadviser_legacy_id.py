@@ -5,15 +5,15 @@ from django.db import migrations, models
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 
 
-def populate_legacy_id(apps, schema_editor):
+def forwards_func(apps, schema_editor):
     WinAdviserModel = apps.get_model('export_win', 'WinAdviser')
     default_id = EXPORT_WINS_LEGACY_ID_START_VALUE
-    for obj in WinAdviserModel.objects.all():
+    for obj in WinAdviserModel.objects.all().filter(legacy_id = None):
         obj.legacy_id = default_id
         obj.save()
         default_id = default_id + 1
 
-def reverse_populate_legacy_id(apps, schema_editor):
+def reverse_func(apps, schema_editor):
     # No need to do anything, as the legacy_id column will be removed
     pass
 
@@ -29,5 +29,5 @@ class Migration(migrations.Migration):
             name='legacy_id',
             field=models.IntegerField(null=True, unique=True),
         ),
-        migrations.RunPython(populate_legacy_id, reverse_populate_legacy_id),
+        migrations.RunPython(forwards_func, reverse_func),
     ]

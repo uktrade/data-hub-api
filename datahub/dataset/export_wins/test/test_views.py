@@ -14,6 +14,19 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
     view_url = reverse('api-v4:dataset:export-wins-advisers-dataset')
     factory = WinAdviserFactory
 
+    def _assert_win_adviser_matches_result(self, win_adviser, result):
+        assert result == {
+            'created_on': format_date_or_datetime(win_adviser.created_on),
+            'id': win_adviser.legacy_id,
+            'location': win_adviser.location,
+            'name': win_adviser.name,
+            'win__id': str(win_adviser.win.id),
+            'hq_team_display': win_adviser.hq_team.name,
+            'team_type_display': win_adviser.team_type.name,
+            'hq_team': win_adviser.hq_team.export_win_id,
+            'team_type': win_adviser.team_type.export_win_id,
+        }
+
     def test_response_for_empty_dataset(self, data_flow_api_client):
         response = data_flow_api_client.get(self.view_url).json()
 
@@ -27,16 +40,15 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
 
         response = data_flow_api_client.get(self.view_url).json()
 
-        assert response['results'][0] == {
-            'created_on': format_date_or_datetime(win_adviser.created_on),
-            'id': win_adviser.legacy_id,
-            'location': win_adviser.location,
-            'name': win_adviser.name,
-            'win__id': str(win_adviser.win.id),
-            'hq_team_display': win_adviser.hq_team.name,
-            'team_type_display': win_adviser.team_type.name,
-            'hq_team': win_adviser.hq_team.export_win_id,
-            'team_type': win_adviser.team_type.export_win_id,
-        }
-        assert response['next'] is None
-        assert response['previous'] is None
+        assert len(response['results']) == 1
+        self._assert_win_adviser_matches_result(win_adviser, response['results'][0])
+
+    def test_response_for_multiple_datasets(self, data_flow_api_client):
+
+        win_advisers = WinAdviserFactory.create_batch(3)
+
+        response = data_flow_api_client.get(self.view_url).json()
+
+        assert len(response['results']) == 3
+        for i, result in enumerate(response['results']):
+            self._assert_win_adviser_matches_result(win_advisers[i], result)
