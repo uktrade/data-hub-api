@@ -349,7 +349,6 @@ class Breakdown(BaseModel):
     """Win breakdown."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    # legacy_id=models.AutoField(primary_key=False) # TODO start at 2 million
     win = models.ForeignKey(Win, related_name='breakdowns', on_delete=models.CASCADE)
     type = models.ForeignKey(
         BreakdownType,
@@ -388,7 +387,7 @@ class WinAdviser(BaseModel):
     )
     # Legacy fields
     name = models.CharField(max_length=128)
-    legacy_id = models.IntegerField(null=True, unique=True)  # TODO start at 2 million
+    legacy_id = models.IntegerField(null=True, unique=True, blank=True)
 
     @transaction.atomic
     def save(self, *args, **kwargs):

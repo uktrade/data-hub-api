@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='winadviser',
             name='legacy_id',
-            field=models.IntegerField(null=True, unique=True),
+            field=models.IntegerField(blank=True, null=True, unique=True),
         ),
         migrations.RunPython(forwards_func, reverse_func),
     ]
