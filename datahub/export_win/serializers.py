@@ -32,6 +32,7 @@ from datahub.export_win.models import (
     Win,
     WinAdviser,
     WinType,
+    WinUKRegion,
     WithoutOurSupport,
 )
 from datahub.export_win.tasks import (
@@ -43,7 +44,7 @@ from datahub.export_win.tasks import (
     update_customer_response_for_lead_officer_notification_id,
     update_customer_response_token_for_email_notification_id,
 )
-from datahub.metadata.models import Country, Sector, UKRegion
+from datahub.metadata.models import Country, Sector
 
 
 class BreakdownSerializer(ModelSerializer):
@@ -139,7 +140,7 @@ class WinSerializer(ModelSerializer):
         ),
     )
     team_members = NestedAdviserField(many=True, required=False)
-    customer_location = NestedRelatedField(UKRegion)
+    customer_location = NestedRelatedField(WinUKRegion)
     type = NestedRelatedField(WinType, required=False)
     country = NestedRelatedField(Country)
     goods_vs_services = NestedRelatedField(ExpectedValueRelation)
