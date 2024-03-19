@@ -15,7 +15,7 @@ class TestWinAdviserMigrations():
     def test_legacy_id_forwards_func(self):
         module = import_module('datahub.export_win.migrations.0030_winadviser_legacy_id')
 
-        adviser = WinAdviserFactory()
+        new_adviser = WinAdviserFactory()
 
         module.forwards_func(apps, None)
-        assert adviser.legacy_id == EXPORT_WINS_LEGACY_ID_START_VALUE
+        assert new_adviser.legacy_id == EXPORT_WINS_LEGACY_ID_START_VALUE
