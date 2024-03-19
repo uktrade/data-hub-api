@@ -193,9 +193,9 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         )}),
     )
     inlines = (
-        # TODO: BreakdownInline,
-        CustomerResponseInline,
-        AdvisorInline,
+        BreakdownInLine,
+        CustomerResponseInLine,
+        AdvisorInLine,
     )
 
     def get_adviser(self, obj):
@@ -233,24 +233,25 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
             win.save()
 
     def has_add_permission(self, request, obj=None):
-        """Add permision set to false."""
         return False
 
     def has_delete_permission(self, request, obj=None):
-        """Delete permission set to false."""
+        return False
+
+    def has_change_permission(self, request, obj=None):
         return False
 
 
 @admin.register(DeletedWin)
 class DeletedWinAdmin(WinAdmin):
 
-    inlines = (BreakdownInline, CustomerResponseInline, AdvisorInline)
-    actions = ('reinstate',)
+    inlines = (BreakdownInLine, CustomerResponseInLine, AdvisorInLine)
+    actions = ('undelete',)
 
     def get_queryset(self, request):
         return self.model.objects.reinstate()
 
-    def reinstate(self, request, queryset):
+    def undelete(self, request, queryset):
         for win in queryset.all():
             win.is_deleted = False
             win.modified_by = request.user
