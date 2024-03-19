@@ -33,6 +33,7 @@ registry.register(
 )
 registry.register(metadata_id='business-type', model=models.BusinessType)
 registry.register(
+    filterset_fields=['is_export_win'],
     metadata_id='country',
     model=models.Country,
     queryset=models.Country.objects.select_related(

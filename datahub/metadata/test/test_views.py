@@ -203,6 +203,20 @@ def test_country_view(metadata_client):
     }
 
 
+def test_country_is_export_win_view(metadata_client):
+    """Test that the country view can be filtered by is_export_win."""
+    url = reverse(viewname='api-v4:metadata:country')
+    response = metadata_client.get(url, params={
+        'is_export_win': True,
+    })
+
+    assert response.status_code == status.HTTP_200_OK
+    country_ids = [result['id'] for result in response.json()]
+
+    countries = Country.objects.filter(is_export_win=True)
+    assert set(country_ids) == {str(country.id) for country in countries}
+
+
 def test_team_view(metadata_client):
     """Test that the team view returns role, uk_region and country as well."""
     url = reverse(viewname='api-v4:metadata:team')
