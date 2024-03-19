@@ -1,0 +1,91 @@
+- model: export_win.winukregion
+  pk: a63f2716-147e-46b2-870e-9b1581baf318
+  fields:
+    disabled_on: null
+    name: 'East Midlands'
+    export_win_id: '1'
+    order:  100
+- model: export_win.winukregion
+  pk: ae85ab4b-51bf-430f-911c-b0da1d85e34f
+  fields:
+    disabled_on: null
+    name: 'East of England'
+    export_win_id: '2'
+    order:  200
+- model: export_win.winukregion
+  pk: 946558e3-d4f4-420e-bf81-caa04f4844bf
+  fields:
+    disabled_on: null
+    name: 'London'
+    export_win_id: '3'
+    order:  300
+- model: export_win.winukregion
+  pk: 700eef47-a6b7-4444-ab72-a625569b55bf
+  fields:
+    disabled_on: null
+    name: 'North East'
+    export_win_id: '4'
+    order:  400
+- model: export_win.winukregion
+  pk: ba8c97db-c9a9-4911-b912-b1b6994343f2
+  fields:
+    disabled_on: null
+    name: 'North West'
+    export_win_id: '5'
+    order:  500
+- model: export_win.winukregion
+  pk: 8ac234b3-fc1b-46f8-81d0-786a513295b7
+  fields:
+    disabled_on: null
+    name: 'Northern Ireland'
+    export_win_id: '6'
+    order:  600
+- model: export_win.winukregion
+  pk: b4142059-13de-4915-a0e0-9365903816da
+  fields:
+    disabled_on: null
+    name: 'Scotland'
+    export_win_id: '7'
+    order:  700
+- model: export_win.winukregion
+  pk: 9dc5eb3f-49ab-4e61-9280-a81318f81f32
+  fields:
+    disabled_on: null
+    name: 'South East'
+    export_win_id: '8'
+    order:  800
+- model: export_win.winukregion
+  pk: 3205a2ae-994b-4bd3-a52e-ea3fb944c00f
+  fields:
+    disabled_on: null
+    name: 'South West'
+    export_win_id: '9'
+    order:  900
+- model: export_win.winukregion
+  pk: 44534def-0e33-43a9-bb0a-b0bd723159d9
+  fields:
+    disabled_on: null
+    name: 'Wales'
+    export_win_id: '10'
+    order:  1000
+- model: export_win.winukregion
+  pk: 3ef4afe8-1537-471f-8512-01edd86aa0b4
+  fields:
+    disabled_on: null
+    name: 'West Midlands'
+    export_win_id: '11'
+    order:  1100
+- model: export_win.winukregion
+  pk: 256a5a92-44a6-473e-adcb-6f9ec4d17c62
+  fields:
+    disabled_on: null
+    name: 'Yorkshire and The Humber'
+    export_win_id: '12'
+    order:  1200
+- model: export_win.winukregion
+  pk: d311cc62-ba9d-4932-966c-4d5708ba570e
+  fields:
+    disabled_on: null
+    name: 'Overseas'
+    export_win_id: '13'
+    order:  1300
