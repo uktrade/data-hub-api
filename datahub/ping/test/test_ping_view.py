@@ -57,6 +57,7 @@ def test_check_rq_workers_fail(client):
     response = client.get(url)
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
     assert '<status>FALSE</status>' in str(response.content)
-    assert "<!--RQ queue(s) not running: {\\\'long-running\\\', \\\'short-running\\\'}-->"\
-        in str(response.content)
+    assert '<!--RQ queue(s) not running:' in str(response.content)
+    assert 'long-running' in str(response.content)
+    assert 'short-running' in str(response.content)
     assert response.headers['content-type'] == 'text/xml'
