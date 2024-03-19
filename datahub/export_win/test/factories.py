@@ -182,6 +182,18 @@ class WinAdviserFactory(factory.django.DjangoModelFactory):
         model = 'export_win.WinAdviser'
 
 
+class WinAdviserFactory(factory.django.DjangoModelFactory):
+    """WinAdviser factory."""
+
+    win = factory.SubFactory(WinFactory)
+    adviser = factory.SubFactory(AdviserFactory)
+    team_type = factory.SubFactory(TeamTypeFactory)
+    hq_team = factory.SubFactory(HQTeamRegionOrPostFactory)
+
+    class Meta:
+        model = 'export_win.WinAdviser'
+
+
 class CustomerResponseFactory(factory.django.DjangoModelFactory):
     """Customer response factory."""
 
