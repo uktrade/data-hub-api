@@ -24,6 +24,24 @@ from datahub.reminder.models import EmailDeliveryStatus
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
+class BaseExportWinSoftDeleteManager(models.Manager):
+    """Base class for Export win soft delete manager."""
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(is_deleted=False)
+        )
+
+    def reinstate(self, *args, **kwargs):
+        return (
+            super()
+            .get_queryset(*args, **kwargs)
+            .filter(is_deleted=True)
+        )
+
+
 class BaseExportWinOrderedConstantModel(BaseOrderedConstantModel):
     """Base class for an Export Win."""
 
@@ -381,6 +399,9 @@ class Win(BaseModel):
         blank=True,
         on_delete=models.PROTECT,
     )
+    is_deleted = models.BooleanField(default=False)
+
+    objects = BaseExportWinSoftDeleteManager()
 
 
 class Breakdown(BaseModel, BaseLegacyModel):
@@ -620,3 +641,8 @@ class LegacyExportWinsToDataHubCompany(models.Model):
         blank=True,
         on_delete=models.CASCADE,
     )
+
+
+class DeletedWin(Win):
+    class Meta:
+        proxy = True
