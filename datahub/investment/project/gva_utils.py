@@ -124,7 +124,7 @@ class GrossValueAddedCalculator:
             '-financial_year',
         )
         if gva_multipliers_for_sector.first() is None:
-            logger.exception(
+            logger.warning(
                 f'Unable to find GVA multiplier for sector {sector_id}',
             )
         return gva_multipliers_for_sector.first()
