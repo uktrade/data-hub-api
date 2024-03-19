@@ -12,10 +12,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterUniqueTogether(
-            name='gvamultiplier',
-            unique_together=set(),
-        ),
+        # migrations.AlterUniqueTogether(
+        #     name='gvamultiplier',
+        #     unique_together=set(),
+        # ),
         migrations.AddField(
             model_name='gvamultiplier',
             name='sector',
@@ -92,8 +92,8 @@ class Migration(migrations.Migration):
             name='uk_region_locations',
             field=models.ManyToManyField(blank=True, related_name='+', to='metadata.ukregion', verbose_name='possible UK regions'),
         ),
-        migrations.AddConstraint(
-            model_name='gvamultiplier',
-            constraint=models.UniqueConstraint(fields=('financial_year', 'sector'), name='unique_year_sector_multiplier'),
-        ),
+        # migrations.AddConstraint(
+        #     model_name='gvamultiplier',
+        #     constraint=models.UniqueConstraint(fields=('financial_year', 'sector'), name='unique_year_sector_multiplier'),
+        # ),
     ]
