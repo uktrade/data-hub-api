@@ -1,0 +1,104 @@
+- model: metadata.country
+  pk: 98daa2d6-168f-4ad2-b2c4-a71fd9a59968
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 4de2a2ac-5d9c-4363-a6d2-c0939116d969
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 623c5905-2be3-4a98-9e5c-ee59da21717a
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 21a3b310-c284-4c7c-ac52-2c12deb2d23a
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: dc859cb8-23c4-4352-89cf-257fe9baaf34
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: e80f9cb5-bed2-436c-9a13-f37811eda3e6
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: bdf29ccb-f29a-4dab-b7a9-e1c729ce9a0b
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: f78c3de4-216c-4add-a373-62b589287785
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 719fdb2a-a63a-48e6-9fd5-e047f28f00fb
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: dac36e70-df27-47e3-af58-f7a0a812f229
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 8599557e-8aee-4a5c-b336-8983ae57c298
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: b8d2ff01-23d6-44f8-afc4-090760187448
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 77371ff2-de1f-4772-89f7-1cc2ebae24d2
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 87696be6-811d-47b9-959c-bc03295d6999
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 5907d551-e10e-4fd7-a30f-45bb2fbfe1a9
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 5a1becc0-c04c-49bf-bc0e-57aec271d4d1
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: f6ab164c-990f-4ca2-992f-107183fdd00a
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 2de266fa-6357-46ce-b80c-96da978ec37d
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 35c0c63d-444c-4ec6-8a5b-5cd41dda9f7b
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 3379961f-557e-4f1a-a8cf-7f9c5536156a
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: d9d59123-eaf3-4c56-9439-56d085ec7f6d
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 5c694f64-5106-4792-80f3-fa013e3cdf6b
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 80709853-22c4-49de-ba7a-4d5032b396ec
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: b14aece8-6f40-4eee-8c63-6cf360ed651a
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 80756b9a-5d95-e211-a939-e4115bead28a
+  fields:
+    is_export_win: False
+- model: metadata.country
+  pk: 8b31e9ed-4215-4082-83eb-a15c22423a6d
+  fields:
+    is_export_win: False
