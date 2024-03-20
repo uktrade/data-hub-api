@@ -48,7 +48,27 @@ class TestGVAMigrations(APITestMixin):
         assert project.gva_multiplier is None
         assert project.gross_value_added is None
 
-        module.clear_gva_multiplier_data(apps, None)
+        module.clear_gva_multiplier_data(
+            apps,
+            connection.schema_editor(),
+        )
+        assert GVAMultiplier.objects.count() == 0
+
+    def test_add_2022_gva_multipliers(self):
+        module = import_module(
+            'datahub.investment.project.migrations.0017_add_2022_gva_multipliers',
+        )
+        GVAMultiplier.objects.all().delete()
+        assert GVAMultiplier.objects.count() == 0
+        module.add_2022_gva_multipliers(
+            apps,
+            connection.schema_editor(),
+        )
+        assert GVAMultiplier.objects.count() != 0
+        module.reverse_add_2022_gva_multipliers(
+            apps,
+            connection.schema_editor(),
+        )
         assert GVAMultiplier.objects.count() == 0
 
     def test_relink_investment_projects_with_gva_multipliers(self):
@@ -79,3 +99,11 @@ class TestGVAMigrations(APITestMixin):
         project.refresh_from_db()
         assert project.gva_multiplier is not None
         assert project.gross_value_added is not None
+
+        module.reverse_relink_investment_projects_with_gva_multipliers(
+            apps,
+            connection.schema_editor(),
+        )
+        project.refresh_from_db()
+        assert project.gva_multiplier is None
+        assert project.gross_value_added is None

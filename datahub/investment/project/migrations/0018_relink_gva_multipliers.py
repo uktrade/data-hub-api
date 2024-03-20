@@ -26,6 +26,14 @@ def relink_investment_projects_with_gva_multipliers(apps, schema_editor):
         set_gross_value_added_for_investment_project(project)
         project.save()
 
+def reverse_relink_investment_projects_with_gva_multipliers(apps, schema_editor):
+    InvestmentProject = apps.get_model('investment', 'InvestmentProject')
+    queryset = InvestmentProject.objects.all()
+    queryset.update(
+        gva_multiplier=None,
+        gross_value_added=None,
+    )
+
 
 class Migration(migrations.Migration):
 
@@ -36,6 +44,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(
             relink_investment_projects_with_gva_multipliers,
-            migrations.RunPython.noop,
+            reverse_relink_investment_projects_with_gva_multipliers,
         ),
     ]

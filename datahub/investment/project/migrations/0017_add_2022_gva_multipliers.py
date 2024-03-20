@@ -10,6 +10,10 @@ def add_2022_gva_multipliers(apps, schema_editor):
         apps, PurePath(__file__).parent / '0017_add_2022_gva_multipliers.yaml'
     )
 
+def reverse_add_2022_gva_multipliers(apps, schema_editor):
+    GVAMultiplier = apps.get_model('investment', 'GVAMultiplier')
+    GVAMultiplier.objects.all().delete()
+
 
 class Migration(migrations.Migration):
 
@@ -20,6 +24,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(
             add_2022_gva_multipliers,
-            migrations.RunPython.noop,
+            reverse_add_2022_gva_multipliers,
         ),
     ]
