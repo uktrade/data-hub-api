@@ -131,7 +131,7 @@ class HVC(BaseExportWinOrderedConstantModel):
         return cls.objects.get(campaign_id=charcode[:-2])
 
 
-class BaseLegacyModel(BaseModel):
+class BaseLegacyModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     legacy_id = models.IntegerField(blank=True, null=True, unique=True)
 
@@ -369,10 +369,9 @@ class Win(BaseModel):
     )
 
 
-class Breakdown(BaseLegacyModel):
+class Breakdown(BaseModel, BaseLegacyModel):
     """Win breakdown."""
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     win = models.ForeignKey(Win, related_name='breakdowns', on_delete=models.CASCADE)
     type = models.ForeignKey(
         BreakdownType,
@@ -383,7 +382,7 @@ class Breakdown(BaseLegacyModel):
     value = models.BigIntegerField()
 
 
-class WinAdviser(BaseLegacyModel):
+class WinAdviser(BaseModel, BaseLegacyModel):
     """Win adviser."""
 
     adviser = models.ForeignKey(
