@@ -98,7 +98,31 @@ class AssociatedProgramme(BaseExportWinOrderedConstantModel):
     """Associated Programme."""
 
 
-class HVC(BaseExportWinOrderedConstantModel):
+class BaseLegacyModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    legacy_id = models.IntegerField(blank=True, null=True, unique=True)
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        # This means that the model isn't saved to the database yet and has no legacy_id set
+        if self._state.adding and self.legacy_id is None:
+            # Get the maximum legacy_id value from the database
+
+            last_id = self.__class__.objects.all().aggregate(Max('legacy_id'))['legacy_id__max']
+
+            # If there is a legacy_id, just use the last value and add 1 to it
+            if last_id is not None and last_id >= EXPORT_WINS_LEGACY_ID_START_VALUE:
+                self.legacy_id = last_id + 1
+            else:
+                self.legacy_id = EXPORT_WINS_LEGACY_ID_START_VALUE
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        abstract = True
+
+
+class HVC(BaseExportWinOrderedConstantModel, BaseLegacyModel):
     """HVC codes."""
 
     campaign_id = models.CharField(max_length=4)
@@ -129,30 +153,6 @@ class HVC(BaseExportWinOrderedConstantModel):
     @classmethod
     def get_by_charcode(cls, charcode):
         return cls.objects.get(campaign_id=charcode[:-2])
-
-
-class BaseLegacyModel(BaseModel):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    legacy_id = models.IntegerField(blank=True, null=True, unique=True)
-
-    @transaction.atomic
-    def save(self, *args, **kwargs):
-        # This means that the model isn't saved to the database yet and has no legacy_id set
-        if self._state.adding and self.legacy_id is None:
-            # Get the maximum legacy_id value from the database
-
-            last_id = self.__class__.objects.all().aggregate(Max('legacy_id'))['legacy_id__max']
-
-            # If there is a legacy_id, just use the last value and add 1 to it
-            if last_id is not None and last_id >= EXPORT_WINS_LEGACY_ID_START_VALUE:
-                self.legacy_id = last_id + 1
-            else:
-                self.legacy_id = EXPORT_WINS_LEGACY_ID_START_VALUE
-
-        super().save(*args, **kwargs)
-
-    class Meta:
-        abstract = True
 
 
 @reversion.register_base_model()
@@ -369,10 +369,9 @@ class Win(BaseModel):
     )
 
 
-class Breakdown(BaseLegacyModel):
+class Breakdown(BaseModel, BaseLegacyModel):
     """Win breakdown."""
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     win = models.ForeignKey(Win, related_name='breakdowns', on_delete=models.CASCADE)
     type = models.ForeignKey(
         BreakdownType,
@@ -383,7 +382,7 @@ class Breakdown(BaseLegacyModel):
     value = models.BigIntegerField()
 
 
-class WinAdviser(BaseLegacyModel):
+class WinAdviser(BaseModel, BaseLegacyModel):
     """Win adviser."""
 
     adviser = models.ForeignKey(

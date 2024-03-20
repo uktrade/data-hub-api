@@ -19,6 +19,7 @@ from datahub.dataset.event.views import EventsDatasetView
 from datahub.dataset.export_wins.views import (
     ExportWinsAdvisersDatasetView,
     ExportWinsBreakdownsDatasetView,
+    ExportWinsHVCDatasetView,
 )
 from datahub.dataset.interaction.views import InteractionsDatasetView
 from datahub.dataset.interaction_export_country.views import InteractionsExportCountryDatasetView
@@ -98,5 +99,10 @@ urlpatterns = [
         'export-wins-breakdowns-dataset',
         ExportWinsBreakdownsDatasetView.as_view(),
         name='export-wins-breakdowns-dataset',
+    ),
+    path(
+        'export-wins-hvc-dataset',
+        ExportWinsHVCDatasetView.as_view(),
+        name='export-wins-hvc-dataset',
     ),
 ]

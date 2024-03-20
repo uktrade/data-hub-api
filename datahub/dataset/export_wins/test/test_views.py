@@ -6,7 +6,8 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
 )
 from datahub.dataset.core.test import BaseDatasetViewTest
-from datahub.export_win.test.factories import BreakdownFactory, WinAdviserFactory
+from datahub.export_win.test.factories import BreakdownFactory, HVCFactory, WinAdviserFactory
+from datahub.export_win.models import HVC
 
 
 pytestmark = pytest.mark.django_db
@@ -53,7 +54,7 @@ class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
     view_url = reverse('api-v4:dataset:export-wins-breakdowns-dataset')
     factory = BreakdownFactory
 
-    def _assert_win_adviser_matches_result(self, breakdown, result):
+    def _assert_breakdown_matches_result(self, breakdown, result):
         assert result == {
             'created_on': format_date_or_datetime(breakdown.created_on),
             'id': breakdown.legacy_id,
@@ -65,19 +66,40 @@ class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
 
     def test_success(self, data_flow_api_client):
 
-        win_adviser = self.factory()
+        breakdown = self.factory()
 
         response = data_flow_api_client.get(self.view_url).json()
 
         assert len(response['results']) == 1
-        self._assert_win_adviser_matches_result(win_adviser, response['results'][0])
+        self._assert_breakdown_matches_result(breakdown, response['results'][0])
 
-    def test_with_multiple_win_adviser(self, data_flow_api_client):
+    def test_with_multiple_breakdowns(self, data_flow_api_client):
 
-        win_advisers = self.factory.create_batch(3)
+        breakdowns = self.factory.create_batch(3)
 
         response = data_flow_api_client.get(self.view_url).json()
 
         assert len(response['results']) == 3
         for i, result in enumerate(response['results']):
-            self._assert_win_adviser_matches_result(win_advisers[i], result)
+            self._assert_breakdown_matches_result(breakdowns[i], result)
+
+
+class TestExportWinsHVCDatasetView(BaseDatasetViewTest):
+    view_url = reverse('api-v4:dataset:export-wins-hvc-dataset')
+    factory = HVCFactory
+
+    def _assert_hvc_matches_result(self, hvc, result):
+        assert result == {
+            'id': hvc.legacy_id,
+            'campaign_id': hvc.campaign_id,
+            'financial_year': hvc.financial_year,
+            'name': hvc.export_win_id,
+        }
+
+    def test_success(self, data_flow_api_client):
+
+        hvc = HVC.objects.filter(legacy_id=1).first()
+
+        response = data_flow_api_client.get(self.view_url).json()
+
+        self._assert_hvc_matches_result(hvc, response['results'][0])

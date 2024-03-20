@@ -1,7 +1,8 @@
 from django.db.models import F
 
 from datahub.dataset.core.views import BaseDatasetView
-from datahub.export_win.models import Breakdown, WinAdviser
+from datahub.dataset.export_wins.pagination import HVCDatasetViewCursorPagination
+from datahub.export_win.models import HVC, Breakdown, WinAdviser
 
 
 class ExportWinsAdvisersDatasetView(BaseDatasetView):
@@ -45,16 +46,17 @@ class ExportWinsBreakdownsDatasetView(BaseDatasetView):
         )
 
 
-# class ExportWinsHVCDatasetView(BaseDatasetView):
-#     """
-#     A GET API view to return export win HVCs.
-#     """
+class ExportWinsHVCDatasetView(BaseDatasetView):
+    """
+    A GET API view to return export win HVCs.
+    """
+    pagination_class = HVCDatasetViewCursorPagination
 
-#     def get_dataset(self):
-#         return HVC.objects.select_related('win, breakdown_type').values(
-#             'id',
-#             'win__id',
-#             'year',
-#             'value',
-#             breakdown_type=F('type__name'),
-#         )
+    def get_dataset(self):
+        return HVC.objects.values(
+            'campaign_id',
+            'financial_year',
+        ).annotate(
+            name=F('export_win_id'),
+            id=F('legacy_id'),
+        )

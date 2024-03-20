@@ -3,7 +3,7 @@ from functools import partial
 
 from django.db import migrations, models
 
-from datahub.export_win.legacy_id_utils import forwards_func, reverse_func
+from datahub.export_win.legacy_id_utils import forwards_func
 
 class Migration(migrations.Migration):
 
@@ -17,5 +17,5 @@ class Migration(migrations.Migration):
             name='legacy_id',
             field=models.IntegerField(blank=True, null=True, unique=True),
         ),
-        migrations.RunPython(partial(forwards_func, model='WinAdviser'), reverse_func),
+        migrations.RunPython(partial(forwards_func, model='WinAdviser'), migrations.RunPython.noop),
     ]
