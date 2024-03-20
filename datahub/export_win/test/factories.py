@@ -247,3 +247,12 @@ class LegacyExportWinsToDataHubCompanyFactory(factory.django.DjangoModelFactory)
 
     class Meta:
         model = 'export_win.LegacyExportWinsToDataHubCompany'
+
+
+class HVCFactory(factory.django.DjangoModelFactory):
+    """HVC factory."""
+
+    financial_year = factory.fuzzy.FuzzyInteger(2013, 2050, 1)
+
+    class Meta:
+        model = 'export_win.HVC'

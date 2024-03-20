@@ -2,7 +2,7 @@ from django.db.models import F
 
 from datahub.dataset.core.views import BaseDatasetView
 from datahub.dataset.export_wins.pagination import HVCDatasetViewCursorPagination
-from datahub.export_win.models import HVC, Breakdown, WinAdviser
+from datahub.export_win.models import Breakdown, HVC, WinAdviser
 
 
 class ExportWinsAdvisersDatasetView(BaseDatasetView):
@@ -50,6 +50,7 @@ class ExportWinsHVCDatasetView(BaseDatasetView):
     """
     A GET API view to return export win HVCs.
     """
+
     pagination_class = HVCDatasetViewCursorPagination
 
     def get_dataset(self):

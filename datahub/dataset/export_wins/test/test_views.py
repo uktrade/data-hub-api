@@ -6,8 +6,8 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
 )
 from datahub.dataset.core.test import BaseDatasetViewTest
-from datahub.export_win.test.factories import BreakdownFactory, HVCFactory, WinAdviserFactory
 from datahub.export_win.models import HVC
+from datahub.export_win.test.factories import BreakdownFactory, HVCFactory, WinAdviserFactory
 
 
 pytestmark = pytest.mark.django_db
