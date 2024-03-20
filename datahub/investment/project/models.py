@@ -845,6 +845,7 @@ class GVAMultiplier(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     sector = models.ForeignKey(
         'metadata.Sector',
+        related_name='gva_multiplier',
         on_delete=models.PROTECT,
     )
     sector_classification_gva_multiplier = models.CharField(
@@ -869,11 +870,11 @@ class GVAMultiplier(models.Model):
     financial_year = models.IntegerField(
         help_text='The year from which the gva multiplier should apply from.',
     )
-    value_band_a_minimum = models.IntegerField(null=True)
-    value_band_b_minimum = models.IntegerField(null=True)
-    value_band_c_minimum = models.IntegerField(null=True)
-    value_band_d_minimum = models.IntegerField(null=True)
-    value_band_e_minimum = models.IntegerField(null=True)
+    value_band_a_minimum = models.IntegerField(null=True, blank=True)
+    value_band_b_minimum = models.IntegerField(null=True, blank=True)
+    value_band_c_minimum = models.IntegerField(null=True, blank=True)
+    value_band_d_minimum = models.IntegerField(null=True, blank=True)
+    value_band_e_minimum = models.IntegerField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'GVA Multiplier'

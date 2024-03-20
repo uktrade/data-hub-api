@@ -405,7 +405,6 @@ class TestGrossValueAddedCalculator:
             if not sector.disabled_on
         ]
         gva_multiplier_sector_ids = [
-            gva_multiplier.sector.id for gva_multiplier
-            in GVAMultiplier.objects.all()
+            gva_multiplier.sector_id for gva_multiplier in GVAMultiplier.objects.all()
         ]
         assert set(sector_ids) == set(gva_multiplier_sector_ids)
