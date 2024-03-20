@@ -18,11 +18,11 @@ class TestLegacyIdMigrations():
         (
             (
                 WinAdviserFactory,
-                'WinAdviser'
+                'WinAdviser',
             ),
             (
                 BreakdownFactory,
-                'Breakdown'
+                'Breakdown',
             ),
         ),
     )
