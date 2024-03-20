@@ -97,9 +97,10 @@ class AssociatedProgramme(BaseExportWinOrderedConstantModel):
     """Associated Programme."""
 
 
-class HVC(BaseExportWinOrderedConstantModel):
+class HVC(BaseModel, BaseExportWinOrderedConstantModel):
     """HVC codes."""
 
+    legacy_id = models.IntegerField(blank=True, null=True, unique=True)
     campaign_id = models.CharField(max_length=4)
     financial_year = models.PositiveIntegerField()
 
