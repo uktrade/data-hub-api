@@ -116,6 +116,9 @@ class Country(BaseConstantModel):
     )
     iso_alpha2_code = models.CharField(blank=True, max_length=5)
 
+    # If True, country is included in Export Wins drop downs
+    is_export_win = models.BooleanField(default=True)
+
     class Meta(BaseConstantModel.Meta):
         verbose_name_plural = 'countries'
 
