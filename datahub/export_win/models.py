@@ -102,6 +102,9 @@ class BaseLegacyModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     legacy_id = models.IntegerField(blank=True, null=True, unique=True)
 
+    class Meta:
+        abstract = True
+
     @transaction.atomic
     def save(self, *args, **kwargs):
         # This means that the model isn't saved to the database yet and has no legacy_id set
@@ -117,9 +120,6 @@ class BaseLegacyModel(models.Model):
                 self.legacy_id = EXPORT_WINS_LEGACY_ID_START_VALUE
 
         super().save(*args, **kwargs)
-
-    class Meta:
-        abstract = True
 
 
 class HVC(BaseExportWinOrderedConstantModel, BaseLegacyModel):
