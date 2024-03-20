@@ -51,6 +51,11 @@ class BaseDatasetViewTest:
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
 
+        response_body = response.json()
+        assert response_body['results'] == []
+        assert response_body['next'] is None
+        assert response_body['previous'] is None
+
     @mock.patch('datahub.dataset.core.pagination.DatasetCursorPagination.page_size', 2)
     def test_pagination(self, data_flow_api_client):
         """Test that when page size higher than threshold response returns with next page url"""

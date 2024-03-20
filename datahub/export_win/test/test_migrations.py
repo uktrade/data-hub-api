@@ -5,17 +5,31 @@ import pytest
 from django.apps import apps
 
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
-from datahub.export_win.test.factories import WinAdviserFactory
+from datahub.export_win.test.factories import BreakdownFactory, WinAdviserFactory
 
 
 pytestmark = pytest.mark.django_db
 
 
-class TestWinAdviserMigrations():
-    def test_legacy_id_forwards_func(self):
-        module = import_module('datahub.export_win.migrations.0030_winadviser_legacy_id')
+class TestLegacyIdMigrations():
 
-        new_adviser = WinAdviserFactory()
+    @pytest.mark.parametrize(
+        'factory,model',
+        (
+            (
+                WinAdviserFactory,
+                'WinAdviser'
+            ),
+            (
+                BreakdownFactory,
+                'Breakdown'
+            ),
+        ),
+    )
+    def test_legacy_id_forwards_func(self, factory, model):
+        module = import_module('datahub.export_win.legacy_id_utils')
 
-        module.forwards_func(apps, None)
+        new_adviser = factory()
+
+        module.forwards_func(apps, None, model)
         assert new_adviser.legacy_id == EXPORT_WINS_LEGACY_ID_START_VALUE

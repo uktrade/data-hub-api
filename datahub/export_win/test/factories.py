@@ -210,7 +210,7 @@ class CustomerResponseFactory(factory.django.DjangoModelFactory):
 
 class BreakdownFactory(factory.django.DjangoModelFactory):
     """Breakdown factory."""
-
+    win = factory.SubFactory(WinFactory)
     year = factory.fuzzy.FuzzyInteger(2022, 2050, 1)
     value = factory.fuzzy.FuzzyInteger(1000, 100000, 10)
 

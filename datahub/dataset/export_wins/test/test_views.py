@@ -6,10 +6,12 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
 )
 from datahub.dataset.core.test import BaseDatasetViewTest
-from datahub.export_win.test.factories import WinAdviserFactory
+from datahub.export_win.test.factories import BreakdownFactory, WinAdviserFactory
 
 
-@pytest.mark.django_db
+pytestmark = pytest.mark.django_db
+
+
 class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
     view_url = reverse('api-v4:dataset:export-wins-advisers-dataset')
     factory = WinAdviserFactory
@@ -27,25 +29,52 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
             'team_type': win_adviser.team_type.export_win_id,
         }
 
-    def test_response_for_empty_dataset(self, data_flow_api_client):
-        response = data_flow_api_client.get(self.view_url).json()
+    def test_success(self, data_flow_api_client):
 
-        assert response['results'] == []
-        assert response['next'] is None
-        assert response['previous'] is None
-
-    def test_response_for_single_dataset(self, data_flow_api_client):
-
-        win_adviser = WinAdviserFactory(location='Somewhere', name='bob')
+        win_adviser = self.factory(location='Somewhere', name='bob')
 
         response = data_flow_api_client.get(self.view_url).json()
 
         assert len(response['results']) == 1
         self._assert_win_adviser_matches_result(win_adviser, response['results'][0])
 
-    def test_response_for_multiple_datasets(self, data_flow_api_client):
+    def test_with_multiple_win_adviser(self, data_flow_api_client):
 
-        win_advisers = WinAdviserFactory.create_batch(3)
+        win_advisers = self.factory.create_batch(3)
+
+        response = data_flow_api_client.get(self.view_url).json()
+
+        assert len(response['results']) == 3
+        for i, result in enumerate(response['results']):
+            self._assert_win_adviser_matches_result(win_advisers[i], result)
+
+
+class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
+    view_url = reverse('api-v4:dataset:export-wins-breakdowns-dataset')
+    factory = BreakdownFactory
+
+    def _assert_win_adviser_matches_result(self, breakdown, result):
+        assert result == {
+            'created_on': format_date_or_datetime(breakdown.created_on),
+            'id': breakdown.legacy_id,
+            'win__id': str(breakdown.win.id),
+            'year': breakdown.year,
+            'value': breakdown.value,
+            'breakdown_type': breakdown.type.name,
+        }
+
+    def test_success(self, data_flow_api_client):
+
+        win_adviser = self.factory()
+
+        response = data_flow_api_client.get(self.view_url).json()
+
+        assert len(response['results']) == 1
+        self._assert_win_adviser_matches_result(win_adviser, response['results'][0])
+
+    def test_with_multiple_win_adviser(self, data_flow_api_client):
+
+        win_advisers = self.factory.create_batch(3)
 
         response = data_flow_api_client.get(self.view_url).json()
 

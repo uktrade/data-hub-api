@@ -1,7 +1,7 @@
 from django.db.models import F
 
 from datahub.dataset.core.views import BaseDatasetView
-from datahub.export_win.models import WinAdviser
+from datahub.export_win.models import Breakdown, WinAdviser
 
 
 class ExportWinsAdvisersDatasetView(BaseDatasetView):
@@ -26,3 +26,35 @@ class ExportWinsAdvisersDatasetView(BaseDatasetView):
                 team_type=F('team_type__export_win_id'),
             )
         )
+
+
+class ExportWinsBreakdownsDatasetView(BaseDatasetView):
+    """
+    A GET API view to return export win breakdowns.
+    """
+
+    def get_dataset(self):
+        return Breakdown.objects.select_related('win, breakdown_type').values(
+            'created_on',
+            'win__id',
+            'year',
+            'value',
+            breakdown_type=F('type__name'),
+        ).annotate(
+            id=F('legacy_id'),
+        )
+
+
+# class ExportWinsHVCDatasetView(BaseDatasetView):
+#     """
+#     A GET API view to return export win HVCs.
+#     """
+
+#     def get_dataset(self):
+#         return HVC.objects.select_related('win, breakdown_type').values(
+#             'id',
+#             'win__id',
+#             'year',
+#             'value',
+#             breakdown_type=F('type__name'),
+#         )

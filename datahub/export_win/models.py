@@ -131,6 +131,30 @@ class HVC(BaseExportWinOrderedConstantModel):
         return cls.objects.get(campaign_id=charcode[:-2])
 
 
+class BaseLegacyModel(BaseModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    legacy_id = models.IntegerField(blank=True, null=True, unique=True)
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        # This means that the model isn't saved to the database yet and has no legacy_id set
+        if self._state.adding and self.legacy_id is None:
+            # Get the maximum legacy_id value from the database
+
+            last_id = self.__class__.objects.all().aggregate(Max('legacy_id'))['legacy_id__max']
+
+            # If there is a legacy_id, just use the last value and add 1 to it
+            if last_id is not None and last_id >= EXPORT_WINS_LEGACY_ID_START_VALUE:
+                self.legacy_id = last_id + 1
+            else:
+                self.legacy_id = EXPORT_WINS_LEGACY_ID_START_VALUE
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        abstract = True
+
+
 @reversion.register_base_model()
 class Win(BaseModel):
     """Information about a given Export win, submitted by an officer."""
@@ -345,11 +369,10 @@ class Win(BaseModel):
     )
 
 
-class Breakdown(BaseModel):
+class Breakdown(BaseLegacyModel):
     """Win breakdown."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    # legacy_id=models.AutoField(primary_key=False) # TODO start at 2 million
     win = models.ForeignKey(Win, related_name='breakdowns', on_delete=models.CASCADE)
     type = models.ForeignKey(
         BreakdownType,
@@ -360,10 +383,9 @@ class Breakdown(BaseModel):
     value = models.BigIntegerField()
 
 
-class WinAdviser(BaseModel):
+class WinAdviser(BaseLegacyModel):
     """Win adviser."""
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     adviser = models.ForeignKey(
         Advisor,
         related_name='win_advisers',
@@ -388,23 +410,6 @@ class WinAdviser(BaseModel):
     )
     # Legacy fields
     name = models.CharField(max_length=128)
-    legacy_id = models.IntegerField(null=True, unique=True)  # TODO start at 2 million
-
-    @transaction.atomic
-    def save(self, *args, **kwargs):
-        # This means that the model isn't saved to the database yet and has no legacy_id set
-        if self._state.adding and self.legacy_id is None:
-            # Get the maximum legacy_id value from the database
-
-            last_id = WinAdviser.objects.all().aggregate(Max('legacy_id'))['legacy_id__max']
-
-            # If there is a legacy_id, just use the last value and add 1 to it
-            if last_id is not None and last_id >= EXPORT_WINS_LEGACY_ID_START_VALUE:
-                self.legacy_id = last_id + 1
-            else:
-                self.legacy_id = EXPORT_WINS_LEGACY_ID_START_VALUE
-
-        super().save(*args, **kwargs)
 
 
 @reversion.register_base_model()
