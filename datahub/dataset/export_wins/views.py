@@ -1,5 +1,5 @@
 from django.contrib.postgres.expressions import ArraySubquery
-from django.db.models import F, Count, Max
+from django.db.models import Count, F, Max
 from django.db.models import IntegerField, OuterRef, Value
 from django.db.models.functions import Cast, Concat
 
