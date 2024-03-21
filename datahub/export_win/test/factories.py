@@ -162,7 +162,6 @@ class WinFactory(factory.django.DjangoModelFactory):
     name_of_customer_confidential = False
     business_potential_id = BusinessPotentialConstant.high_export_potential.value.id
     type_id = WinTypeConstant.both.value.id
-    hvo_programme = factory.SubFactory(HVOProgrammesFactory)
 
     @to_many_field
     def associated_programme(self):  # noqa: D102

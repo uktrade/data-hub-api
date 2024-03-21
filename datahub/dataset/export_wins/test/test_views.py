@@ -13,6 +13,7 @@ from datahub.export_win.test.factories import (
     BreakdownFactory,
     CustomerResponseFactory,
     HVCFactory,
+    HVOProgrammesFactory,
     SupportTypeFactory,
     WinAdviserFactory,
     WinFactory,
@@ -217,6 +218,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
         win = self.factory(
             associated_programme=associated_programmes,
             type_of_support=types_of_support,
+            hvo_programme=HVOProgrammesFactory(),
         )
         CustomerResponseFactory(win=win)
 
