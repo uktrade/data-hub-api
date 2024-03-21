@@ -33,10 +33,10 @@ class Command(BaseCommand):
             missing_queues = set([queue]) - set(queue_names)
 
             if missing_queues:
-                print(f'RQ queue not running: {missing_queues}')
+                logger.error(f'RQ queue not running: {missing_queues}')
                 sys.exit(1)
-            print('OK')
+            logger.info('OK')
             sys.exit(0)
 
-        print('Nothing checked! Please provide --queue parameter')
+        logger.error('Nothing checked! Please provide --queue parameter')
         sys.exit(1)
