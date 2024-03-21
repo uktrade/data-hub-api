@@ -29,6 +29,7 @@ class RatingFactory(factory.django.DjangoModelFactory):
     """Rating factory."""
 
     name = factory.Sequence(lambda n: f'name {n}')
+    export_win_id = random.choice(range(0, 6, 1))
 
     class Meta:
         model = 'export_win.Rating'
@@ -109,6 +110,30 @@ class HQTeamRegionOrPostFactory(factory.django.DjangoModelFactory):
         model = 'export_win.HQTeamRegionOrPost'
 
 
+class HVOProgrammesFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = 'export_win.HVOProgrammes'
+
+
+class AssociatedProgrammeFactory(factory.django.DjangoModelFactory):
+    """AssociatedProgramme factory."""
+
+    name = factory.Sequence(lambda n: f'name {n}')
+
+    class Meta:
+        model = 'export_win.AssociatedProgramme'
+
+
+class SupportTypeFactory(factory.django.DjangoModelFactory):
+    """SupportType factory."""
+
+    name = factory.Sequence(lambda n: f'name {n}')
+
+    class Meta:
+        model = 'export_win.SupportType'
+
+
 class WinFactory(factory.django.DjangoModelFactory):
     """Win factory."""
 
@@ -137,6 +162,7 @@ class WinFactory(factory.django.DjangoModelFactory):
     name_of_customer_confidential = False
     business_potential_id = BusinessPotentialConstant.high_export_potential.value.id
     type_id = WinTypeConstant.both.value.id
+    hvo_programme = factory.SubFactory(HVOProgrammesFactory)
 
     @to_many_field
     def associated_programme(self):  # noqa: D102
