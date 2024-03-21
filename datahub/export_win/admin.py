@@ -63,7 +63,7 @@ class BaseStackedInline(admin.StackedInline):
     inline_classes = ('grp-collapse grp-open',)
     extra = 0
     can_delete = False
-    exclude = ('is_deleted', 'created_by', 'modified_by', 'id')
+    exclude = ('is_deleted', 'created_by', 'modified_by')
 
 
 class CustomerResponseInlineForm(ModelForm):
@@ -77,6 +77,7 @@ class CustomerResponseInlineForm(ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
             self.fields['name'].required = False
+            self.fields['id'].widget.attrs['disabled'] = True
 
 
 class CustomerResponseInline(BaseStackedInline):
@@ -106,8 +107,9 @@ class WinAdminForm(ModelForm):
                 'other_official_email_address',
             ]
             for field_name in fields_to_update:
-                if field_name in self.fields:
-                    self.fields[field_name].required = False
+                field = self.fields.get(field_name)
+                if field:
+                    field.required = False
 
 
 @admin.register(Win)
