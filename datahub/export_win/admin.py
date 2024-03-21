@@ -239,7 +239,7 @@ class DeletedWinAdmin(WinAdmin):
     actions = ('undelete',)
 
     def get_queryset(self, request):
-        return self.model.objects.reinstate()
+        return self.model.objects.soft_deleted()
 
     def undelete(self, request, queryset):
         for win in queryset.all():
@@ -257,7 +257,7 @@ class DeletedWinAdmin(WinAdmin):
         return False
 
     def has_view_permission(self, request, obj=None):
-        # Check if the user belongs to the desired user group
+        """Set the desired user group to access view deleted win"""
         if request.user.is_superuser or request.user.groups.filter(name='ExportWinAdmin').exists():
             return True
         return False

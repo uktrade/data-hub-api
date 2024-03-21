@@ -27,7 +27,6 @@ from datahub.event.test.factories import EventFactory
 from datahub.export_win.test.factories import (
     BreakdownFactory,
     CustomerResponseFactory,
-    DeletedWinFactory,
     WinAdviserFactory,
     WinFactory,
 )
@@ -79,7 +78,7 @@ MAPPINGS = {
     'export_win.CustomerResponse': CustomerResponseFactory,
     'export_win.Breakdown': BreakdownFactory,
     'export_win.WinAdviser': WinAdviserFactory,
-    'export_win.DeletedWin': DeletedWinFactory,
+    'export_win.DeletedWin': WinFactory,
 }
 
 
