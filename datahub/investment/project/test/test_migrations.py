@@ -5,7 +5,6 @@ from django.db import connection
 
 from datahub.core.constants import (
     InvestmentType,
-    Sector,
 )
 from datahub.core.test_utils import APITestMixin
 from datahub.investment.project.models import GVAMultiplier
@@ -13,6 +12,7 @@ from datahub.investment.project.test.factories import (
     GVAMultiplierFactory,
     InvestmentProjectFactory,
 )
+from datahub.metadata.test.factories import SectorFactory
 
 
 CAPITAL = GVAMultiplier.SectorClassificationChoices.CAPITAL
@@ -25,18 +25,17 @@ class TestGVAMigrations(APITestMixin):
         module = import_module(
             'datahub.investment.project.migrations.0015_remove_existing_gva_multipliers',
         )
-        sector_id = Sector.renewable_energy_wind.value.id
+        sector = SectorFactory()
         GVAMultiplierFactory(
-            financial_year=2042,
             multiplier=0.5,
-            sector_id=sector_id,
+            sector_id=sector.id,
             sector_classification_gva_multiplier=CAPITAL,
         )
         project = InvestmentProjectFactory(
             business_activities=[],
             foreign_equity_investment=1000,
             investment_type_id=InvestmentType.fdi.value.id,
-            sector_id=sector_id,
+            sector_id=sector.id,
         )
         assert project.gva_multiplier is not None
         assert project.gross_value_added is not None
@@ -57,7 +56,7 @@ class TestGVAMigrations(APITestMixin):
 
     def test_add_2022_gva_multipliers(self):
         module = import_module(
-            'datahub.investment.project.migrations.0017_add_2022_gva_multipliers',
+            'datahub.investment.project.migrations.0017_add_2022_gva_multipliers_and_relink',
         )
         GVAMultiplier.objects.all().delete()
         assert GVAMultiplier.objects.count() == 0
@@ -71,3 +70,40 @@ class TestGVAMigrations(APITestMixin):
             connection.schema_editor(),
         )
         assert GVAMultiplier.objects.count() == 0
+
+    def test_relink_investment_projects_with_gva_multipliers(self):
+        module = import_module(
+            'datahub.investment.project.migrations.0017_add_2022_gva_multipliers_and_relink',
+        )
+        sector = SectorFactory()
+        GVAMultiplierFactory(
+            multiplier=0.5,
+            sector_id=sector.id,
+            sector_classification_gva_multiplier=CAPITAL,
+        )
+        project = InvestmentProjectFactory(
+            business_activities=[],
+            foreign_equity_investment=1000,
+            investment_type_id=InvestmentType.fdi.value.id,
+            sector_id=sector.id,
+        )
+        project.gva_multiplier = None
+        project.gross_value_added = None
+        assert project.gva_multiplier is None
+        assert project.gross_value_added is None
+
+        module.relink_investment_projects_with_gva_multipliers(
+            apps,
+            connection.schema_editor(),
+        )
+        project.refresh_from_db()
+        assert project.gva_multiplier is not None
+        assert project.gross_value_added is not None
+
+        module.reverse_relink_investment_projects_with_gva_multipliers(
+            apps,
+            connection.schema_editor(),
+        )
+        project.refresh_from_db()
+        assert project.gva_multiplier is None
+        assert project.gross_value_added is None
