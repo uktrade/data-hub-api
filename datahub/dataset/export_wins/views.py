@@ -1,5 +1,5 @@
 from django.contrib.postgres.expressions import ArraySubquery
-from django.db.models import F
+from django.db.models import F, Count, Max
 from django.db.models import IntegerField, OuterRef, Value
 from django.db.models.functions import Cast, Concat
 
@@ -139,6 +139,8 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 hvo_programme_display=F('hvo_programme__name'),
                 sector_display=F('sector__segment'),
                 team_type_display=F('team_type__name'),
+                num_notifications=Count('customer_response__tokens'),
+                customer_email_date=Max('customer_response__tokens__created_on'),
             )
             .annotate(
                 company_name=F('company__name'),

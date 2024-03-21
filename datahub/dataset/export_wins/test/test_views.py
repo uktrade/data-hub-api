@@ -12,6 +12,7 @@ from datahub.export_win.test.factories import (
     AssociatedProgrammeFactory,
     BreakdownFactory,
     CustomerResponseFactory,
+    CustomerResponseTokenFactory,
     HVCFactory,
     HVOProgrammesFactory,
     SupportTypeFactory,
@@ -124,6 +125,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
         win,
         associated_programmes,
         types_of_support,
+        tokens,
         result,
     ):
         expected = {
@@ -204,6 +206,9 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'hvo_programme_display': win.hvo_programme.name,
             'sector_display': win.sector.segment,
             'team_type_display': win.team_type.name,
+            'num_notifications': len(tokens),
+            'customer_email_date':
+                format_date_or_datetime(max(tokens, key=lambda item: item.created_on).created_on),
         }
         for i, associated_programme in enumerate(associated_programmes):
             expected[f'associated_programme_{i+1}_display'] = associated_programme.name
@@ -220,7 +225,8 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             type_of_support=types_of_support,
             hvo_programme=HVOProgrammesFactory(),
         )
-        CustomerResponseFactory(win=win)
+        customer_response = CustomerResponseFactory(win=win)
+        tokens = CustomerResponseTokenFactory.create_batch(3, customer_response=customer_response)
 
         response = data_flow_api_client.get(self.view_url).json()
 
@@ -229,5 +235,6 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             win,
             associated_programmes,
             types_of_support,
+            tokens,
             response['results'][0],
         )
