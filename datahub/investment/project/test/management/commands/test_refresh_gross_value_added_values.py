@@ -13,7 +13,9 @@ from datahub.investment.project.management.commands import refresh_gross_value_a
 from datahub.investment.project.tasks import (
     refresh_gross_value_added_value_for_fdi_investment_projects,
 )
-from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.investment.project.test.factories import (
+    InvestmentProjectFactory,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -22,8 +24,8 @@ class TestRefreshGrossValueAddedCommand:
     """Test refreshing gross value added values command."""
 
     @pytest.mark.parametrize(
-        'investment_type,sector,business_activities,multiplier_value,foreign_equity_investment,'
-        'gross_value_added',
+        'investment_type,sector,business_activities,multiplier_value,'
+        'foreign_equity_investment,number_new_jobs,gross_value_added',
         (
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -32,16 +34,18 @@ class TestRefreshGrossValueAddedCommand:
                 None,
                 None,
                 None,
+                None,
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
-                None,
+                SectorConstant.renewable_energy_wind.value.id,
                 [
                     InvestmentBusinessActivityConstant.retail.value.id,
                 ],
-                '0.0581',
+                '51983.514030000',
                 1000,
-                '58',
+                200,
+                '51983514',  # will be 10396703
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -49,33 +53,37 @@ class TestRefreshGrossValueAddedCommand:
                 [
                     InvestmentBusinessActivityConstant.sales.value.id,
                 ],
-                '0.0581',
+                '51983.514030000',
                 1000,
-                '58',
+                200,
+                '51983514',  # will be 10396703
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.renewable_energy_wind.value.id,
                 [InvestmentBusinessActivityConstant.retail.value.id],
-                '0.0581',
+                '51983.514030000',
                 1000,
-                '58',
+                200,
+                '51983514',  # will be 10396703
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.renewable_energy_wind.value.id,
                 [],
-                '0.0325',
+                '0.093757195',
                 1000,
-                '33',
+                200,
+                '94',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.aerospace_assembly_aircraft.value.id,
                 [],
-                '0.0621',
+                '0.206470876',  # will be 0.209650945
                 1000,
-                '62',
+                200,
+                '206',  # will be 210
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -84,9 +92,10 @@ class TestRefreshGrossValueAddedCommand:
                     InvestmentBusinessActivityConstant.retail.value.id,
                     InvestmentBusinessActivityConstant.other.value.id,
                 ],
-                '0.0581',
+                '51983.514030000',
                 1000,
-                '58',
+                200,
+                '51983514',  # will be 10396703
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -95,9 +104,10 @@ class TestRefreshGrossValueAddedCommand:
                     InvestmentBusinessActivityConstant.retail.value.id,
                     InvestmentBusinessActivityConstant.other.value.id,
                 ],
-                '0.0581',
+                '51983.514030000',
                 None,
-                None,
+                200,
+                None,  # will be 10396703
             ),
             (
                 InvestmentTypeConstant.commitment_to_invest.value.id,
@@ -105,6 +115,7 @@ class TestRefreshGrossValueAddedCommand:
                 [],
                 None,
                 1000,
+                200,
                 None,
             ),
             (
@@ -115,6 +126,7 @@ class TestRefreshGrossValueAddedCommand:
                 ],
                 None,
                 1000,
+                200,
                 None,
             ),
         ),
@@ -127,6 +139,7 @@ class TestRefreshGrossValueAddedCommand:
         business_activities,
         multiplier_value,
         foreign_equity_investment,
+        number_new_jobs,
         gross_value_added,
     ):
         """Test populating Gross value added data."""
@@ -141,18 +154,19 @@ class TestRefreshGrossValueAddedCommand:
                 business_activities=business_activities,
                 investment_type_id=investment_type,
                 foreign_equity_investment=foreign_equity_investment,
+                number_new_jobs=number_new_jobs,
             )
 
-        assert not project.gva_multiplier
+        assert project.gva_multiplier is None
         refresh_gross_value_added_value_for_fdi_investment_projects()
         project.refresh_from_db()
-        if not multiplier_value:
-            assert not project.gva_multiplier
+        if multiplier_value is None:
+            assert project.gva_multiplier is None
         else:
             assert project.gva_multiplier.multiplier == Decimal(multiplier_value)
 
-        if not gross_value_added:
-            assert not project.gross_value_added
+        if gross_value_added is None:
+            assert project.gross_value_added is None
         else:
             assert project.gross_value_added == Decimal(gross_value_added)
 

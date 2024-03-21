@@ -126,6 +126,7 @@ def setup_data(opensearch_with_collector, project_with_max_gross_value_added):
             level_of_involvement_id=Involvement.hq_and_post_only.value.id,
             likelihood_to_land_id=LikelihoodToLand.high.value.id,
             foreign_equity_investment=100000,
+            business_activities=[],
         ),
         InvestmentProjectFactory(
             investment_type_id=constants.InvestmentType.fdi.value.id,
@@ -218,15 +219,15 @@ class TestSearch(APITestMixin):
                 {
                     'gross_value_added_end': 99999999999999,
                 },
-                ['5810'],
+                ['20647'],
                 ['abc defg'],
             ),
             (
                 {
-                    'gross_value_added_start': 0,
-                    'gross_value_added_end': 6000,
+                    'gross_value_added_start': 20000,
+                    'gross_value_added_end': 21000,
                 },
-                ['5810'],
+                ['20647'],
                 ['abc defg'],
             ),
             (

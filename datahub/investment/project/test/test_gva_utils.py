@@ -12,12 +12,19 @@ from datahub.core.constants import (
 )
 from datahub.investment.project.constants import FDISICGrouping as FDISICGroupingConstant
 from datahub.investment.project.gva_utils import GrossValueAddedCalculator
+from datahub.investment.project.models import GVAMultiplier
 from datahub.investment.project.test.factories import (
     GVAMultiplierFactory,
     InvestmentProjectFactory,
 )
 from datahub.metadata.test.factories import SectorFactory
 
+
+CAPITAL = GVAMultiplier.SectorClassificationChoices.CAPITAL
+LABOUR = GVAMultiplier.SectorClassificationChoices.LABOUR
+DEFAULT_MULTIPLIER = Decimal('0.5')
+DEFAULT_NUMBER_NEW_JOBS = 200
+DEFAULT_FOREIGN_EQUITY_INVESTMENT = 1000
 
 pytestmark = pytest.mark.django_db
 
@@ -40,7 +47,7 @@ class TestGrossValueAddedCalculator:
                 [
                     InvestmentBusinessActivityConstant.retail.value.id,
                 ],
-                '0.0581',
+                Decimal('51983.514030000'),
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -48,7 +55,7 @@ class TestGrossValueAddedCalculator:
                 [
                     InvestmentBusinessActivityConstant.sales.value.id,
                 ],
-                '0.0581',
+                Decimal('51983.514030000'),
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -59,19 +66,19 @@ class TestGrossValueAddedCalculator:
                     InvestmentBusinessActivityConstant.other.value.id,
 
                 ],
-                '0.0581',
+                Decimal('51983.514030000'),
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.renewable_energy_wind.value.id,
                 [],
-                '0.0325',
+                Decimal('0.093757195'),
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.aerospace_assembly_aircraft.value.id,
                 [],
-                '0.0621',
+                Decimal('0.206470876'),  # will be 0.209650945
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -80,7 +87,7 @@ class TestGrossValueAddedCalculator:
                     InvestmentBusinessActivityConstant.retail.value.id,
                     InvestmentBusinessActivityConstant.other.value.id,
                 ],
-                '0.0581',
+                Decimal('51983.514030000'),
             ),
             (
                 InvestmentTypeConstant.commitment_to_invest.value.id,
