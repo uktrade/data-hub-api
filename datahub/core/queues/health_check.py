@@ -1,42 +1,19 @@
 from datetime import datetime
-from functools import reduce
 from logging import getLogger
-from operator import concat
 from time import sleep
 
 from django.conf import settings
 from redis import Redis
 from redis_rate_limit import RateLimit
-from rq import Worker
 from rq.exceptions import NoSuchJobError
 
 from datahub.core.queues.errors import RetryError
 from datahub.core.queues.scheduler import (
     DataHubScheduler,
-    LONG_RUNNING_QUEUE,
-    SHORT_RUNNING_QUEUE,
 )
 
 
 logger = getLogger(__name__)
-
-
-class CheckRQWorkers:
-    """Check that RQs are up and running."""
-
-    name = 'running-queue-workers'
-    expected_worker_names = [SHORT_RUNNING_QUEUE, LONG_RUNNING_QUEUE]
-
-    def check(self):
-        """Perform the check."""
-        redis = Redis.from_url(settings.REDIS_BASE_URL)
-        workers = Worker.all(connection=redis)
-        queues = [worker.queue_names() for worker in workers]
-        queue_names = reduce(concat, queues, [])
-        missing_queues = set(self.expected_worker_names) - set(queue_names)
-        if missing_queues:
-            return False, f'RQ queue(s) not running: {missing_queues}'
-        return True, ''
 
 
 def queue_health_check():
