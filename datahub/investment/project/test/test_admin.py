@@ -301,8 +301,7 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
         response = self.client.post(url, data, follow=True)
         assert response.status_code == 200
         investment_project = InvestmentProject.objects.get(pk=investment_project_pk)
-        assert investment_project.gross_value_added == Decimal('20647')  # will be 20965
+        assert investment_project.gross_value_added == Decimal('20965')
 
         # GVA Multiplier - Aircraft - 2022
-        # will be 0.209650945
-        assert investment_project.gva_multiplier.multiplier == Decimal('0.206470876')
+        assert investment_project.gva_multiplier.multiplier == Decimal('0.209650945')
