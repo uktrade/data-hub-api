@@ -8,9 +8,7 @@ from redis_rate_limit import RateLimit
 from rq.exceptions import NoSuchJobError
 
 from datahub.core.queues.errors import RetryError
-from datahub.core.queues.scheduler import (
-    DataHubScheduler,
-)
+from datahub.core.queues.scheduler import DataHubScheduler
 
 
 logger = getLogger(__name__)
