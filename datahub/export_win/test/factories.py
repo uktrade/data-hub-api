@@ -5,6 +5,8 @@ import factory
 
 from dateutil.relativedelta import relativedelta
 
+from django.utils.timezone import now
+
 from datahub.company.test.factories import (
     AdviserFactory,
     CompanyFactory,
@@ -89,7 +91,8 @@ class ExpectedValueRelationFactory(factory.django.DjangoModelFactory):
 class TeamTypeFactory(factory.django.DjangoModelFactory):
     """TeamType factory."""
 
-    name = factory.Sequence(lambda n: f'name {n}')
+    name = factory.Faker('word')
+    export_win_id = factory.Sequence(lambda n: f'name {n}')
 
     class Meta:
         model = 'export_win.TeamType'
@@ -100,20 +103,10 @@ class HQTeamRegionOrPostFactory(factory.django.DjangoModelFactory):
 
     name = factory.Sequence(lambda n: f'name {n}')
     team_type = factory.SubFactory(TeamTypeFactory)
+    export_win_id = factory.Sequence(lambda n: f'name {n}')
 
     class Meta:
         model = 'export_win.HQTeamRegionOrPost'
-
-
-class WinAdviserFactory(factory.django.DjangoModelFactory):
-    """WinAdviser factory."""
-
-    adviser = factory.SubFactory(AdviserFactory)
-    team_type = factory.SubFactory(TeamTypeFactory)
-    hq_team = factory.SubFactory(HQTeamRegionOrPostFactory)
-
-    class Meta:
-        model = 'export_win.WinAdviser'
 
 
 class WinFactory(factory.django.DjangoModelFactory):
@@ -177,6 +170,20 @@ class WinFactory(factory.django.DjangoModelFactory):
         model = 'export_win.Win'
 
 
+class WinAdviserFactory(factory.django.DjangoModelFactory):
+    """WinAdviser factory."""
+
+    created_on = now()
+
+    adviser = factory.SubFactory(AdviserFactory)
+    team_type = factory.SubFactory(TeamTypeFactory)
+    hq_team = factory.SubFactory(HQTeamRegionOrPostFactory)
+    win = factory.SubFactory(WinFactory)
+
+    class Meta:
+        model = 'export_win.WinAdviser'
+
+
 class CustomerResponseFactory(factory.django.DjangoModelFactory):
     """Customer response factory."""
 
@@ -204,6 +211,7 @@ class CustomerResponseFactory(factory.django.DjangoModelFactory):
 class BreakdownFactory(factory.django.DjangoModelFactory):
     """Breakdown factory."""
 
+    win = factory.SubFactory(WinFactory)
     year = factory.fuzzy.FuzzyInteger(2022, 2050, 1)
     value = factory.fuzzy.FuzzyInteger(1000, 100000, 10)
 
@@ -239,3 +247,12 @@ class LegacyExportWinsToDataHubCompanyFactory(factory.django.DjangoModelFactory)
 
     class Meta:
         model = 'export_win.LegacyExportWinsToDataHubCompany'
+
+
+class HVCFactory(factory.django.DjangoModelFactory):
+    """HVC factory."""
+
+    financial_year = factory.fuzzy.FuzzyInteger(2013, 2050, 1)
+
+    class Meta:
+        model = 'export_win.HVC'
