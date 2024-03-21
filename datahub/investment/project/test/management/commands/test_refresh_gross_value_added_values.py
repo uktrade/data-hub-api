@@ -45,7 +45,7 @@ class TestRefreshGrossValueAddedCommand:
                 '51983.514030000',
                 1000,
                 200,
-                '51983514',  # will be 10396703
+                '10396703',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -56,7 +56,7 @@ class TestRefreshGrossValueAddedCommand:
                 '51983.514030000',
                 1000,
                 200,
-                '51983514',  # will be 10396703
+                '10396703',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -65,7 +65,7 @@ class TestRefreshGrossValueAddedCommand:
                 '51983.514030000',
                 1000,
                 200,
-                '51983514',  # will be 10396703
+                '10396703',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -80,10 +80,10 @@ class TestRefreshGrossValueAddedCommand:
                 InvestmentTypeConstant.fdi.value.id,
                 SectorConstant.aerospace_assembly_aircraft.value.id,
                 [],
-                '0.206470876',  # will be 0.209650945
+                '0.209650945',
                 1000,
                 200,
-                '206',  # will be 210
+                '210',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -95,7 +95,7 @@ class TestRefreshGrossValueAddedCommand:
                 '51983.514030000',
                 1000,
                 200,
-                '51983514',  # will be 10396703
+                '10396703',
             ),
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -107,7 +107,7 @@ class TestRefreshGrossValueAddedCommand:
                 '51983.514030000',
                 None,
                 200,
-                None,  # will be 10396703
+                '10396703',
             ),
             (
                 InvestmentTypeConstant.commitment_to_invest.value.id,
@@ -137,10 +137,10 @@ class TestRefreshGrossValueAddedCommand:
         investment_type,
         sector,
         business_activities,
-        multiplier_value,
+        multiplier_value: str | None,
         foreign_equity_investment,
         number_new_jobs,
-        gross_value_added,
+        gross_value_added: str | None,
     ):
         """Test populating Gross value added data."""
         caplog.set_level(logging.INFO)

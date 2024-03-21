@@ -543,7 +543,7 @@ class TestCreateView(APITestMixin):
         # GVA Multiplier for Consumer and retail - 2022
         # As sector is labour intensive value = multuplier * number of jobs
         assert response_data['number_new_jobs'] == request_data['number_new_jobs']
-        assert response_data['gross_value_added'] == '51983514'  # will be 10396703
+        assert response_data['gross_value_added'] == '10396703'
 
         assert response_data['country_investment_originates_from']['id'] == str(
             investor_company.address_country.id,
@@ -1148,15 +1148,15 @@ class TestPartialUpdateView(APITestMixin):
     @pytest.mark.parametrize(
         'foreign_equity_investment,expected_gross_value_added,expected_multiplier_value',
         (
-            (20000, '4129', '0.206470876'),  # will be 4193, 0.209650945
-            (None, None, '0.206470876'),  # will be 0.209650945
+            (20000, '4193', '0.209650945'),
+            (None, None, '0.209650945'),
         ),
     )
     def test_change_foreign_equity_investment_updates_gross_value_added(
         self,
         foreign_equity_investment,
-        expected_gross_value_added,
-        expected_multiplier_value,
+        expected_gross_value_added: str | None,
+        expected_multiplier_value: str | None,
     ):
         """Test that updating the foreign equity investment updated gross value added."""
         project = InvestmentProjectFactory(
@@ -1167,7 +1167,7 @@ class TestPartialUpdateView(APITestMixin):
             business_activities=[],
         )
         # GVA Multiplier - Aircraft - 2022 - 0.209650945
-        assert project.gross_value_added == 2065  # will be 2097
+        assert project.gross_value_added == 2097
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
@@ -1193,10 +1193,10 @@ class TestPartialUpdateView(APITestMixin):
         'business_activity,expected_gross_value_added',
         (
             # GVA Multiplier for Consumer and retail - 2022 - 51983.51403
-            (constants.InvestmentBusinessActivity.retail.value.id, '51983514'),  # will be 1039670
-            (constants.InvestmentBusinessActivity.sales.value.id, '51983514'),  # will be 1039670
+            (constants.InvestmentBusinessActivity.retail.value.id, '1039670'),
+            (constants.InvestmentBusinessActivity.sales.value.id, '1039670'),
             # No change - GVA Multiplier for Aircraft - 2022 - 0.209650945
-            (constants.InvestmentBusinessActivity.other.value.id, '206'),  # will be 210
+            (constants.InvestmentBusinessActivity.other.value.id, '210'),
         ),
     )
     def test_change_business_activity_to_retail_updated_gross_value_added(
@@ -1214,7 +1214,7 @@ class TestPartialUpdateView(APITestMixin):
             number_new_jobs=20,
         )
         # GVA Multiplier - Aircraft - 2022 - 0.209650945
-        assert project.gross_value_added == 206  # will be 210
+        assert project.gross_value_added == 210
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
