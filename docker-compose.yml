@@ -26,6 +26,16 @@ services:
     depends_on:
       - api
     command: python short-running-worker.py
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python ./manage.py rq_health_check --queue=short-running"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+      start_period: 5s
 
   rq_long:
     build:
@@ -37,6 +47,16 @@ services:
     depends_on:
       - api
     command: python long-running-worker.py
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python ./manage.py rq_health_check --queue=long-running"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+      start_period: 5s
 
   rq_sched:
     build:
