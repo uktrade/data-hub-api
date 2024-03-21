@@ -77,7 +77,7 @@ class CustomerResponseInlineForm(ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
             self.fields['name'].required = False
-            self.fields['id'].widget.attrs['disabled'] = True
+            self.fields['id'].widget.attrs['readonly'] = True
 
 
 class CustomerResponseInline(BaseStackedInline):
