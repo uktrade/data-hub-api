@@ -69,3 +69,7 @@ class FDISICGrouping(Enum):
         'Electricity, Gas, Water and waste',
         '3b847399-84a6-4d98-b135-104bfdb9f5fa',
     )
+    mining = Constant(
+        'Mining & quarrying',
+        '895d2227-0574-4038-93c6-3c5f375c8892',
+    )
