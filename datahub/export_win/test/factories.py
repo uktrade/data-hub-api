@@ -182,6 +182,20 @@ class WinAdviserFactory(factory.django.DjangoModelFactory):
         model = 'export_win.WinAdviser'
 
 
+class WinAdviserFactory(factory.django.DjangoModelFactory):
+    """WinAdviser factory."""
+
+    created_on = now()
+
+    adviser = factory.SubFactory(AdviserFactory)
+    team_type = factory.SubFactory(TeamTypeFactory)
+    hq_team = factory.SubFactory(HQTeamRegionOrPostFactory)
+    win = factory.SubFactory(WinFactory)
+
+    class Meta:
+        model = 'export_win.WinAdviser'
+
+
 class CustomerResponseFactory(factory.django.DjangoModelFactory):
     """Customer response factory."""
 
@@ -209,7 +223,6 @@ class CustomerResponseFactory(factory.django.DjangoModelFactory):
 class BreakdownFactory(factory.django.DjangoModelFactory):
     """Breakdown factory."""
 
-    win = factory.SubFactory(WinFactory)
     win = factory.SubFactory(WinFactory)
     year = factory.fuzzy.FuzzyInteger(2022, 2050, 1)
     value = factory.fuzzy.FuzzyInteger(1000, 100000, 10)

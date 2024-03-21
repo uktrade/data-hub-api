@@ -34,7 +34,7 @@ class BaseExportWinSoftDeleteManager(models.Manager):
             .filter(is_deleted=False)
         )
 
-    def reinstate(self, *args, **kwargs):
+    def soft_deleted(self, *args, **kwargs):
         return (
             super()
             .get_queryset(*args, **kwargs)
@@ -644,5 +644,7 @@ class LegacyExportWinsToDataHubCompany(models.Model):
 
 
 class DeletedWin(Win):
+    """Deleted win"""
+
     class Meta:
         proxy = True

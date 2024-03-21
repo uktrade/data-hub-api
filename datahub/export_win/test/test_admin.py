@@ -5,7 +5,7 @@ from django.test import RequestFactory
 from datahub.company.test.factories import AdviserFactory
 from datahub.export_win.admin import DeletedWinAdmin, WinAdmin
 from datahub.export_win.models import DeletedWin, Win
-from datahub.export_win.test.factories import DeletedWinFactory
+from datahub.export_win.test.factories import WinFactory
 
 
 @pytest.mark.django_db
@@ -21,10 +21,10 @@ def test_get_actions_removes_delete_selected():
 
 @pytest.mark.django_db
 def test_soft_delete():
-    """Return adviser as user with email."""
+    """Test Soft delete"""
     user = AdviserFactory()
-    win1 = DeletedWinFactory()
-    win2 = DeletedWinFactory()
+    win1 = WinFactory()
+    win2 = WinFactory()
     admin = WinAdmin(Win, None)
     request = RequestFactory().get('/')
     request.user = user
@@ -37,13 +37,12 @@ def test_soft_delete():
 
 
 @pytest.mark.django_db
-def test_reinstate():
+def test_undelete():
+    """Test Soft delete"""
     user = AdviserFactory()
 
-    deleted_win1 = DeletedWinFactory()
-    deleted_win2 = DeletedWinFactory()
-    deleted_win1.is_deleted = True
-    deleted_win2.is_deleted = True
+    deleted_win1 = WinFactory(is_deleted=True)
+    deleted_win2 = WinFactory(is_deleted=True)
 
     request_factory = RequestFactory()
     request = request_factory.get('/')
@@ -51,10 +50,10 @@ def test_reinstate():
 
     admin = DeletedWinAdmin(model=DeletedWin, admin_site=None)
 
-    admin.undelete(request, queryset=DeletedWin.objects.all())
+    admin.undelete(request, queryset=DeletedWin.objects.soft_deleted())
 
     deleted_win1.refresh_from_db()
     deleted_win2.refresh_from_db()
 
-    assert not deleted_win1.is_deleted
-    assert not deleted_win2.is_deleted
+    assert deleted_win1.is_deleted is False
+    assert deleted_win2.is_deleted is False
