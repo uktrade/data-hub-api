@@ -289,7 +289,7 @@ def test_investment_project_added_with_gva(api_client):
                         project.estimated_land_date,
                     ),
                     'dit:foreignEquityInvestment': 10000.0,
-                    'dit:grossValueAdded': 581.0,
+                    'dit:grossValueAdded': 519835140.0,
                     'attributedTo': [
                         {
                             'id': f'dit:DataHubCompany:{project.investor_company.pk}',
