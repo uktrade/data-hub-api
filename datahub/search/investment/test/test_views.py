@@ -219,7 +219,7 @@ class TestSearch(APITestMixin):
                 {
                     'gross_value_added_end': 99999999999999,
                 },
-                ['20647'],
+                ['20965'],
                 ['abc defg'],
             ),
             (
@@ -227,7 +227,7 @@ class TestSearch(APITestMixin):
                     'gross_value_added_start': 20000,
                     'gross_value_added_end': 21000,
                 },
-                ['20647'],
+                ['20965'],
                 ['abc defg'],
             ),
             (
