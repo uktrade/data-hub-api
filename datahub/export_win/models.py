@@ -342,6 +342,7 @@ class Win(BaseModel):
         blank=True,
         on_delete=models.PROTECT,
     )
+    is_deleted = models.BooleanField(default=False)
 
 
 class Breakdown(BaseModel):
