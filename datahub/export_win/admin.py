@@ -63,7 +63,7 @@ class BaseStackedInline(admin.StackedInline):
     inline_classes = ('grp-collapse grp-open',)
     extra = 0
     can_delete = False
-    exclude = ('is_deleted', 'created_by', 'modified_by')
+    exclude = ('is_deleted', 'created_by', 'modified_by', 'id')
 
 
 class CustomerResponseInlineForm(ModelForm):
@@ -85,7 +85,6 @@ class CustomerResponseInline(BaseStackedInline):
     model = CustomerResponse
     form = CustomerResponseInlineForm
     extra = 0
-    readonly_fields = ('id',)
 
 
 class WinAdminForm(ModelForm):
@@ -98,18 +97,17 @@ class WinAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
-            if 'cdms_reference' in self.fields:
-                self.fields['cdms_reference'].required = False
-            if 'customer_email_address' in self.fields:
-                self.fields['customer_email_address'].required = False
-            if 'customer_job_title' in self.fields:
-                self.fields['customer_job_title'].required = False
-            if 'line_manager_name' in self.fields:
-                self.fields['line_manager_name'].required = False
-            if 'lead_officer_email_address' in self.fields:
-                self.fields['lead_officer_email_address'].required = False
-            if 'other_official_email_address' in self.fields:
-                self.fields['other_official_email_address'].required = False
+            fields_to_update = [
+                'cdms_reference',
+                'customer_email_address',
+                'customer_job_title',
+                'line_manager_name',
+                'lead_officer_email_address',
+                'other_official_email_address',
+            ]
+            for field_name in fields_to_update:
+                if field_name in self.fields:
+                    self.fields[field_name].required = False
 
 
 @admin.register(Win)
