@@ -7,6 +7,7 @@ python /app/manage.py loadinitialmetadata --force
 # Load initial revisions - ignore errors as we may have already loaded it in to
 # this DB
 python /app/manage.py loaddata /app/fixtures/test_data.yaml || true
+python /app/manage.py add_quote_to_order
 python /app/manage.py createinitialrevisions
 python /app/manage.py collectstatic --noinput
 # Create superuser - ignore errors as we may have already loaded it in to
