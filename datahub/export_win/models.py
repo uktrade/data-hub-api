@@ -98,6 +98,10 @@ class AssociatedProgramme(BaseExportWinOrderedConstantModel):
     """Associated Programme."""
 
 
+class WinUKRegion(BaseExportWinOrderedConstantModel):
+    """Export Win UK Region."""
+
+
 class BaseLegacyModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     legacy_id = models.IntegerField(blank=True, null=True, unique=True)
@@ -172,10 +176,20 @@ class Win(BaseModel):
     customer_email_address = models.EmailField(verbose_name='Contact email')
 
     customer_location = models.ForeignKey(
+        WinUKRegion,
+        related_name='wins',
+        verbose_name='HQ location',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
+    customer_location_data_hub = models.ForeignKey(
         UKRegion,
         related_name='wins',
         verbose_name='HQ location',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
 
     business_type = models.CharField(

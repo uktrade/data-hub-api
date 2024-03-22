@@ -549,6 +549,19 @@ class WinType(Enum):
     )
 
 
+class WinUKRegion(Enum):
+    """Export win UK region."""
+
+    north_west = Constant(
+        'North West',
+        'ba8c97db-c9a9-4911-b912-b1b6994343f2',
+    )
+    overseas = Constant(
+        'Overseas',
+        'd311cc62-ba9d-4932-966c-4d5708ba570e',
+    )
+
+
 class HVC(Enum):
     """Export win HVC."""
 

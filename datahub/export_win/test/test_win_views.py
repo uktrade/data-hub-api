@@ -28,8 +28,8 @@ from datahub.core.constants import (
     Sector as SectorConstant,
     SupportType as SupportTypeConstant,
     TeamType as TeamTypeConstant,
-    UKRegion as UKRegionConstant,
     WinType as WinTypeConstant,
+    WinUKRegion as WinUKRegionConstant,
 )
 from datahub.core.test_utils import (
     APITestMixin,
@@ -616,7 +616,7 @@ class TestCreateWinView(APITestMixin):
                 },
             ],
             'customer_location': {
-                'id': UKRegionConstant.england.value.id,
+                'id': WinUKRegionConstant.overseas.value.id,
             },
             'business_type': 'The best type',
             'description': 'Description',
@@ -839,7 +839,7 @@ class TestCreateWinView(APITestMixin):
                 },
             ],
             'customer_location': {
-                'id': UKRegionConstant.england.value.id,
+                'id': WinUKRegionConstant.overseas.value.id,
             },
             'business_type': 'The best type',
             'description': 'Description',
@@ -1150,7 +1150,7 @@ class TestUpdateWinView(APITestMixin):
                 },
             ],
             'customer_location': {
-                'id': UKRegionConstant.england.value.id,
+                'id': WinUKRegionConstant.overseas.value.id,
             },
             'business_type': 'The best type',
             'description': 'Description',
@@ -1284,8 +1284,8 @@ class TestUpdateWinView(APITestMixin):
             'complete': win.complete,
             'created_on': format_date_or_datetime(win.created_on),
             'customer_location': {
-                'id': UKRegionConstant.england.value.id,
-                'name': UKRegionConstant.england.value.name,
+                'id': WinUKRegionConstant.overseas.value.id,
+                'name': WinUKRegionConstant.overseas.value.name,
             },
             'customer_response': {
                 'access_to_contacts': None,
