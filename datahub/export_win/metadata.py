@@ -25,6 +25,11 @@ registry.register(
 )
 
 registry.register(
+    metadata_id='winukregion',
+    model=models.WinUKRegion,
+)
+
+registry.register(
     metadata_id='business-potential',
     model=models.BusinessPotential,
 )
