@@ -94,7 +94,7 @@ django-redis==5.4.0
     # via -r requirements.in
 django-reversion==5.0.12
     # via -r requirements.in
-djangorestframework==3.14.0
+djangorestframework==3.15.1
     # via -r requirements.in
 docopt==0.6.2
     # via notifications-python-client
@@ -302,7 +302,6 @@ python-redis-rate-limit==0.0.9
     # via -r requirements.in
 pytz==2022.7
     # via
-    #   djangorestframework
     #   icalendar
     #   pandas
 pyyaml==6.0.1
