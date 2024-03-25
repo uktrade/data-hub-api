@@ -56,6 +56,7 @@ python /app/manage.py add_access_token --skip-checks --hours 24 --token ditStaff
 python /app/manage.py add_access_token --skip-checks --hours 24 --token daStaffToken da_staff@id.test
 python /app/manage.py add_access_token --skip-checks --hours 24 --token lepStaffToken lep_staff@id.test
 python /app/manage.py loaddata --ignorenonexistent /app/fixtures/test_data.yaml
+python /app/manage.py add_quote_to_order
 python /app/manage.py createinitialrevisions
 python /app/manage.py collectstatic --noinput
 DEBUG=False python app.py
