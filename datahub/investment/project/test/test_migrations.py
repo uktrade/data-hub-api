@@ -73,7 +73,7 @@ class TestGVAMigrations(APITestMixin):
 
     def test_relink_investment_projects_with_gva_multipliers(self):
         module = import_module(
-            'datahub.investment.project.migrations.0017_add_2022_gva_multipliers_and_relink',
+            'datahub.investment.project.migrations.0018_relink_investment_projects',
         )
         sector = SectorFactory()
         GVAMultiplierFactory(
