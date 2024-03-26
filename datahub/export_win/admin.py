@@ -1,9 +1,12 @@
+import reversion
 from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter
 from django.forms import ModelForm
 from reversion.admin import VersionAdmin
 
+
 from datahub.core.admin import BaseModelAdminMixin
+
 from datahub.export_win.models import Breakdown, CustomerResponse, DeletedWin, Win, WinAdviser
 
 
@@ -152,7 +155,6 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
             'total_expected_export_value',
             'total_expected_non_export_value',
             'total_expected_odi_value',
-
         )}),
         ('Win details', {'fields': (
             'country',
@@ -221,9 +223,11 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     def soft_delete(self, request, queryset):
         """Soft delete action for django admin."""
         for win in queryset.all():
-            win.is_deleted = True
-            win.modified_by = request.user
-            win.save()
+            with reversion.create_revision():
+                win.is_deleted = True
+                win.modified_by = request.user
+                win.save()
+                reversion.set_comment('Soft deleted')
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -243,9 +247,11 @@ class DeletedWinAdmin(WinAdmin):
 
     def undelete(self, request, queryset):
         for win in queryset.all():
-            win.is_deleted = False
-            win.modified_by = request.user
-            win.save()
+            with reversion.create_revision():
+                win.is_deleted = False
+                win.modified_by = request.user
+                win.save()
+                reversion.set_comment('Undelete')
 
     def has_add_permission(self, request, obj=None):
         return False
