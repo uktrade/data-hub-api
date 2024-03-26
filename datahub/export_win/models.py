@@ -3,7 +3,7 @@ import uuid
 from django.conf import settings
 
 from django.db import models, transaction
-from django.db.models import Max
+from django.db.models import Max, Sum
 
 from datahub.company.models import (
     Advisor,
@@ -11,7 +11,7 @@ from datahub.company.models import (
     Contact,
     ExportExperience,
 )
-from datahub.core import reversion
+from datahub.core import constants, reversion
 from datahub.core.models import BaseModel, BaseOrderedConstantModel
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.metadata.models import (
@@ -40,6 +40,28 @@ class BaseExportWinSoftDeleteManager(models.Manager):
             .get_queryset(*args, **kwargs)
             .filter(is_deleted=True)
         )
+
+
+class BaseExportWinTotalCalculation(models.Manager):
+    """Base class for Total Export, Non Export and ODI"""
+
+    def calculate_total_export_value(self, win_instance):
+        export_type_value = constants.BreakdownType.export.value
+        return win_instance.breakdowns.filter(
+            type_id=export_type_value.id).aggregate(
+                total_export_value=Sum('value'))['total_export_value'] or 0
+
+    def calculate_total_non_export_value(self, win_instance):
+        non_export_value = constants.BreakdownType.non_export.value
+        return win_instance.breakdowns.filter(
+            type_id=non_export_value.id).aggregate(
+                total_non_export_value=Sum('value'))['total_non_export_value'] or 0
+
+    def calculate_total_odi_value(self, win_instance):
+        odi_value = constants.BreakdownType.odi.value
+        return win_instance.breakdowns.filter(
+            type_id=odi_value.id).aggregate(
+                total_odi_value=Sum('value'))['total_odi_value'] or 0
 
 
 class BaseExportWinOrderedConstantModel(BaseOrderedConstantModel):
@@ -410,6 +432,7 @@ class Win(BaseModel):
     is_deleted = models.BooleanField(default=False)
 
     objects = BaseExportWinSoftDeleteManager()
+    total_calculation_objects = BaseExportWinTotalCalculation()
 
 
 class Breakdown(BaseModel, BaseLegacyModel):

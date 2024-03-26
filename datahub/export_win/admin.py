@@ -1,4 +1,6 @@
 import reversion
+from django import forms
+
 from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter
 from django.forms import ModelForm
@@ -6,7 +8,12 @@ from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin, EXPORT_WIN_GROUP_NAME
 
-from datahub.export_win.models import Breakdown, CustomerResponse, DeletedWin, Win, WinAdviser
+from datahub.export_win.models import (
+    Breakdown,
+    CustomerResponse,
+    DeletedWin,
+    Win,
+    WinAdviser)
 
 
 class BaseTabularInline(admin.TabularInline):
@@ -99,7 +106,18 @@ class WinAdminForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
+        instance = self.instance
+        if instance and instance.pk:
+            calc_objects = Win.total_calculation_objects
+            initial_values = {
+                'total_expected_export_value': calc_objects.calculate_total_export_value(instance),
+                'total_expected_non_export_value': calc_objects.calculate_total_non_export_value(
+                    instance),
+                'total_expected_odi_value': calc_objects.calculate_total_odi_value(self.instance),
+            }
+            for field_name, initial_value in initial_values.items():
+                self.initial[field_name] = initial_value
+                self.fields[field_name].widget = forms.TextInput(attrs={'readonly': 'readonly'})
             fields_to_update = [
                 'cdms_reference',
                 'customer_email_address',
@@ -236,9 +254,32 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         return False
 
 
+class WinSoftDeletedAdminForm(ModelForm):
+    """Win soft deleted admin form."""
+
+    class Meta:
+        model = DeletedWin
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = self.instance
+        if instance and instance.pk:
+            calc_objects = Win.total_calculation_objects
+            initial_values = {
+                'total_expected_export_value': calc_objects.calculate_total_export_value(instance),
+                'total_expected_non_export_value': calc_objects.calculate_total_non_export_value(
+                    instance),
+                'total_expected_odi_value': calc_objects.calculate_total_odi_value(self.instance),
+            }
+            for field_name, initial_value in initial_values.items():
+                if field_name in self.base_fields:
+                    self.initial[field_name] = initial_value
+
+
 @admin.register(DeletedWin)
 class DeletedWinAdmin(WinAdmin):
-
+    form = WinSoftDeletedAdminForm
     inlines = (BreakdownInline, CustomerResponseInline, AdvisorInline)
     actions = ('undelete',)
 
@@ -259,9 +300,6 @@ class DeletedWinAdmin(WinAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    def has_change_permission(self, request, obj=None):
-        return False
-
     def has_view_permission(self, request, obj=None):
         """Set the desired user group to access view deleted win"""
         if (
@@ -269,4 +307,7 @@ class DeletedWinAdmin(WinAdmin):
             or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
         ):
             return True
+        return False
+
+    def has_change_permission(self, request, obj=None):
         return False
