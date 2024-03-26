@@ -213,18 +213,13 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 associated_programmes=ArraySubquery(
                     AssociatedProgramme.objects.filter(
                         win=OuterRef('pk'),
-                    ).values('name'),
+                    ).order_by('order').values('name'),
                 ),
                 types_of_support=ArraySubquery(
                     SupportType.objects.filter(
                         win=OuterRef('pk'),
-                    ).values('name'),
+                    ).order_by('order').values('name'),
                 ),
-                # TODO 'customer_email_date': win.customer_email_date,
-                # MAPS TO Notification model in EW, we don't have this in DH
-                # TODO 'num_notifications': win.num_notifications,
-                # MAPS TO Notification model in EW, we don't have this in DH
-
             )
         )
 

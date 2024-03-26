@@ -119,7 +119,8 @@ class HVOProgrammesFactory(factory.django.DjangoModelFactory):
 class AssociatedProgrammeFactory(factory.django.DjangoModelFactory):
     """AssociatedProgramme factory."""
 
-    name = factory.Sequence(lambda n: f'name {n}')
+    name = factory.Sequence(lambda n: f'Associated programme name {n}')
+    order = factory.Sequence(lambda n: n)
 
     class Meta:
         model = 'export_win.AssociatedProgramme'
@@ -128,7 +129,8 @@ class AssociatedProgrammeFactory(factory.django.DjangoModelFactory):
 class SupportTypeFactory(factory.django.DjangoModelFactory):
     """SupportType factory."""
 
-    name = factory.Sequence(lambda n: f'name {n}')
+    name = factory.Sequence(lambda n: f'support type name {n}')
+    order = factory.Sequence(lambda n: n)
 
     class Meta:
         model = 'export_win.SupportType'
