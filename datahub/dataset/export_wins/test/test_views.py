@@ -7,7 +7,18 @@ from datahub.core.test_utils import (
 )
 from datahub.dataset.core.test import BaseDatasetViewTest
 from datahub.export_win.models import HVC
-from datahub.export_win.test.factories import BreakdownFactory, HVCFactory, WinAdviserFactory
+
+from datahub.export_win.test.factories import (
+    AssociatedProgrammeFactory,
+    BreakdownFactory,
+    CustomerResponseFactory,
+    CustomerResponseTokenFactory,
+    HVCFactory,
+    HVOProgrammesFactory,
+    SupportTypeFactory,
+    WinAdviserFactory,
+    WinFactory,
+)
 
 
 pytestmark = pytest.mark.django_db
@@ -103,3 +114,127 @@ class TestExportWinsHVCDatasetView(BaseDatasetViewTest):
         response = data_flow_api_client.get(self.view_url).json()
 
         self._assert_hvc_matches_result(hvc, response['results'][0])
+
+
+class TestExportWinsWinDatasetView(BaseDatasetViewTest):
+    view_url = reverse('api-v4:dataset:export-wins-win-dataset')
+    factory = WinFactory
+
+    def _assert_win_matches_result(
+        self,
+        win,
+        associated_programmes,
+        types_of_support,
+        tokens,
+        result,
+    ):
+        expected = {
+            'created_on': format_date_or_datetime(win.created_on),
+            'id': str(win.id),
+            'audit': win.audit,
+            'business_type': win.business_type,
+            'cdms_reference': win.cdms_reference,
+            'company_name': win.company.name,
+            'complete': win.complete,
+            'confirmation__access_to_contacts': win.customer_response.our_support.export_win_id,
+            'confirmation__access_to_information':
+                win.customer_response.access_to_information.export_win_id,
+            'confirmation__agree_with_win': win.customer_response.agree_with_win,
+            'confirmation__case_study_willing': win.customer_response.case_study_willing,
+            'confirmation__comments': win.customer_response.comments,
+            'confirmation__company_was_at_risk_of_not_exporting':
+                win.customer_response.company_was_at_risk_of_not_exporting,
+            'confirmation__created': format_date_or_datetime(
+                win.customer_response.created_on,
+            ),
+            'confirmation__developed_relationships':
+                win.customer_response.developed_relationships.export_win_id,
+            'confirmation__gained_confidence':
+                win.customer_response.gained_confidence.export_win_id,
+            'confirmation__has_enabled_expansion_into_existing_market':
+                win.customer_response.has_enabled_expansion_into_existing_market,
+            'confirmation__has_enabled_expansion_into_new_market':
+                win.customer_response.has_enabled_expansion_into_new_market,
+            'confirmation__has_explicit_export_plans':
+                win.customer_response.has_explicit_export_plans,
+            'confirmation__has_increased_exports_as_percent_of_turnover':
+                win.customer_response.has_increased_exports_as_percent_of_turnover,
+            'confirmation__improved_profile': win.customer_response.improved_profile.export_win_id,
+            'confirmation__interventions_were_prerequisite':
+                win.customer_response.interventions_were_prerequisite,
+            'confirmation__involved_state_enterprise':
+                win.customer_response.involved_state_enterprise,
+            'confirmation__name': win.customer_response.name,
+            'confirmation__other_marketing_source': win.customer_response.other_marketing_source,
+            'confirmation__our_support': win.customer_response.our_support.export_win_id,
+            'confirmation__overcame_problem': win.customer_response.overcame_problem.export_win_id,
+            'confirmation__support_improved_speed': win.customer_response.support_improved_speed,
+            'country': win.country.iso_alpha2_code,
+            'created': format_date_or_datetime(win.created_on),
+            'customer_email_address': win.customer_email_address,
+            'customer_job_title': win.customer_job_title,
+            'customer_name': win.customer_name,
+            'date': format_date_or_datetime(win.date),
+            'description': win.description,
+            'has_hvo_specialist_involvement': win.has_hvo_specialist_involvement,
+            'hvc': win.hvc.export_win_id,
+            'is_e_exported': win.is_e_exported,
+            'is_line_manager_confirmed': win.is_line_manager_confirmed,
+            'is_personally_confirmed': win.is_personally_confirmed,
+            'is_prosperity_fund_related': win.is_prosperity_fund_related,
+            'lead_officer_email_address': win.lead_officer_email_address,
+            'lead_officer_name': win.lead_officer_name,
+            'line_manager_name': win.line_manager_name,
+            'name_of_customer': win.name_of_customer,
+            'name_of_export': win.name_of_export,
+            'other_official_email_address': win.other_official_email_address,
+            'total_expected_export_value': win.total_expected_export_value,
+            'total_expected_non_export_value': win.total_expected_non_export_value,
+            'total_expected_odi_value': win.total_expected_odi_value,
+            'user__email': win.adviser.email,
+            'user__name': win.adviser.name,
+            'business_potential_display': win.business_potential.name,
+            'confirmation_last_export': win.customer_response.last_export.name,
+            'confirmation_marketing_source': win.customer_response.marketing_source.name,
+            'confirmation_portion_without_help':
+                win.customer_response.expected_portion_without_help.name,
+            'country_name': win.country.name,
+            'customer_location_display': win.customer_location.name,
+            'export_experience_display': win.export_experience.name,
+            'goods_vs_services_display': win.goods_vs_services.name,
+            'hq_team_display': win.hq_team.name,
+            'hvo_programme_display': win.hvo_programme.name,
+            'sector_display': win.sector.segment,
+            'team_type_display': win.team_type.name,
+            'num_notifications': len(tokens),
+            'customer_email_date':
+                format_date_or_datetime(max(tokens, key=lambda item: item.created_on).created_on),
+        }
+        for i, associated_programme in enumerate(associated_programmes):
+            expected[f'associated_programme_{i+1}_display'] = associated_programme.name
+        for i, type_of_support in enumerate(types_of_support):
+            expected[f'type_of_support_{i+1}_display'] = type_of_support.name
+
+        assert result == expected
+
+    def test_success(self, data_flow_api_client):
+        associated_programmes = AssociatedProgrammeFactory.create_batch(3)
+        types_of_support = SupportTypeFactory.create_batch(2)
+        win = self.factory(
+            associated_programme=associated_programmes,
+            type_of_support=types_of_support,
+            hvo_programme=HVOProgrammesFactory(),
+        )
+        customer_response = CustomerResponseFactory(win=win)
+        tokens = CustomerResponseTokenFactory.create_batch(3, customer_response=customer_response)
+
+        response = data_flow_api_client.get(self.view_url).json()
+
+        assert len(response['results']) == 1
+        self._assert_win_matches_result(
+            win,
+            associated_programmes,
+            types_of_support,
+            tokens,
+            response['results'][0],
+        )
