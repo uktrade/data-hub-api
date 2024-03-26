@@ -1,6 +1,6 @@
-import pytest
-
 from datetime import date, timedelta
+
+import pytest
 
 from django.urls import reverse
 
@@ -266,6 +266,6 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             )
 
         response = data_flow_api_client.get(self.view_url).json()
-        assert response["results"][0]["customer_email_date"] == format_date_or_datetime(
-            customer_response_token_today.created_on
+        assert response['results'][0]['customer_email_date'] == format_date_or_datetime(
+            customer_response_token_today.created_on,
         )
