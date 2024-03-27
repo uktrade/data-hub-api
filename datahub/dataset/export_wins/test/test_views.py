@@ -10,6 +10,7 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
 )
 from datahub.dataset.core.test import BaseDatasetViewTest
+from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.models import HVC
 
 from datahub.export_win.test.factories import (
@@ -117,6 +118,30 @@ class TestExportWinsHVCDatasetView(BaseDatasetViewTest):
 
         response = data_flow_api_client.get(self.view_url).json()
 
+        self._assert_hvc_matches_result(hvc, response['results'][0])
+
+    def test_success_includes_legacy_hvc_items(self, data_flow_api_client):
+
+        hvc = HVC.objects.create(legacy_id=EXPORT_WINS_LEGACY_ID_START_VALUE, financial_year=2024)
+        hvc.save()
+
+        legacy_hvc = HVC.objects.filter(legacy_id=1).first()
+
+        response = data_flow_api_client.get(f'{self.view_url}?exclude_legacy=false&page_size=10000').json()
+
+        legacy_ids = [result['id'] for result in response['results']]
+
+        assert hvc.legacy_id in legacy_ids
+        assert legacy_hvc.legacy_id in legacy_ids
+
+    def test_success_excludes_legacy_hvc_items(self, data_flow_api_client):
+
+        hvc = HVC.objects.create(legacy_id=EXPORT_WINS_LEGACY_ID_START_VALUE, financial_year=2024)
+        hvc.save()
+
+        response = data_flow_api_client.get(f'{self.view_url}?exclude_legacy=true').json()
+
+        assert len(response['results']) == 1
         self._assert_hvc_matches_result(hvc, response['results'][0])
 
 
