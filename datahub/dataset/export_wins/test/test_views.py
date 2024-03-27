@@ -126,8 +126,8 @@ class TestExportWinsHVCDatasetView(BaseDatasetViewTest):
         hvc.save()
 
         legacy_hvc = HVC.objects.filter(legacy_id=1).first()
-
-        response = data_flow_api_client.get(f'{self.view_url}?exclude_legacy=false&page_size=10000').json()
+        url = f'{self.view_url}?exclude_legacy=false&page_size=10000'
+        response = data_flow_api_client.get(url).json()
 
         legacy_ids = [result['id'] for result in response['results']]
 
