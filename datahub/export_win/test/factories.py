@@ -255,7 +255,7 @@ class BreakdownFactory(factory.django.DjangoModelFactory):
 class CustomerResponseTokenFactory(factory.django.DjangoModelFactory):
     """CustomerResponseToken factory."""
 
-    created_on = now()
+    created_on = factory.LazyFunction(now)
     expires_on = factory.LazyFunction(lambda: datetime.utcnow() + relativedelta(days=7))
     customer_response = factory.SubFactory(CustomerResponseFactory)
     email_notification_id = factory.Faker('uuid4')  # Adjust based on your requirements
