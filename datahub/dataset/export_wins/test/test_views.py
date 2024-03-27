@@ -256,7 +256,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             frozen_time.move_to(created_on - timedelta(days=1))
             CustomerResponseTokenFactory(
                 customer_response=customer_response,
-                created_on=created_on - timedelta(days=1),
+                created_on=created_on,
             )
 
             frozen_time.move_to(created_on - timedelta(days=7))
