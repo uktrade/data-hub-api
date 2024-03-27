@@ -372,7 +372,7 @@ class PublicCustomerResponseSerializer(ModelSerializer):
             context = get_all_fields_for_lead_officer_email_receipt_no(instance)
 
         notify_export_win_email_by_rq_email(
-            instance.win.lead_officer.email,
+            instance.win.lead_officer.contact_email,
             template_id,
             context,
             update_customer_response_for_lead_officer_notification_id,
