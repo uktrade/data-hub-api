@@ -121,6 +121,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
 
     form = WinAdminForm
     actions = ('soft_delete',)
+    list_per_page = 10
     list_display = (
         'id',
         'get_adviser',
