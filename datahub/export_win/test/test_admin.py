@@ -1,6 +1,8 @@
 import pytest
 from django.contrib.admin.sites import site as admin_site
 from django.test import RequestFactory
+from reversion.models import Version
+
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.export_win.admin import (
@@ -45,6 +47,11 @@ def test_soft_delete():
     win2.refresh_from_db()
     assert win1.is_deleted is True
     assert win2.is_deleted is True
+
+    for win in queryset:
+        versions = Version.objects.get_for_object(win)
+        assert len(versions) == 1
+        assert versions[0].revision.comment == 'Soft deleted'
 
 
 @pytest.mark.django_db
