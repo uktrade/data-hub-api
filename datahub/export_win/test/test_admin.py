@@ -74,7 +74,7 @@ def test_undelete():
     for win in queryset:
         versions = Version.objects.get_for_object(win)
         assert len(versions) == 1
-        assert versions[0].revision.comment == 'Undelete'
+        assert versions[0].revision.comment == 'Undeleted'
 
 
 @pytest.mark.django_db

@@ -252,7 +252,7 @@ class DeletedWinAdmin(WinAdmin):
                 win.is_deleted = False
                 win.modified_by = request.user
                 win.save()
-                reversion.set_comment('Undelete')
+                reversion.set_comment('Undeleted')
 
     def has_add_permission(self, request, obj=None):
         return False
