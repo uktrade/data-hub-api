@@ -7,7 +7,7 @@ from datahub.dataset.core.views import BaseDatasetView
 from datahub.dataset.export_wins.pagination import HVCDatasetViewCursorPagination
 from datahub.dataset.export_wins.utils import (
     create_columns_with_index,
-    use_nulls_on_empty_string_fields
+    use_nulls_on_empty_string_fields,
 )
 from datahub.export_win.models import (
     AssociatedProgramme,
