@@ -3,8 +3,9 @@ from django.db.models import Count, F, Max
 from django.db.models import IntegerField, OuterRef, Value
 from django.db.models.functions import Cast, Concat
 
-from datahub.dataset.core.views import BaseDatasetView
+from datahub.dataset.core.views import BaseDatasetView, BaseFilterDatasetView
 from datahub.dataset.export_wins.pagination import HVCDatasetViewCursorPagination
+from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.models import (
     AssociatedProgramme,
     Breakdown,
@@ -60,21 +61,26 @@ class ExportWinsBreakdownsDatasetView(BaseDatasetView):
         )
 
 
-class ExportWinsHVCDatasetView(BaseDatasetView):
+class ExportWinsHVCDatasetView(BaseFilterDatasetView):
     """
     A GET API view to return export win HVCs.
     """
 
     pagination_class = HVCDatasetViewCursorPagination
 
-    def get_dataset(self):
-        return HVC.objects.values(
+    def get_dataset(self, request):
+        exclude_legacy = request.query_params.get('exclude_legacy', 'false')
+
+        hvcs = HVC.objects.values(
             'campaign_id',
             'financial_year',
         ).annotate(
             name=F('export_win_id'),
             id=F('legacy_id'),
         )
+        if exclude_legacy == 'true':
+            hvcs = hvcs.filter(id__gte=EXPORT_WINS_LEGACY_ID_START_VALUE)
+        return hvcs
 
 
 class ExportWinsWinDatasetView(BaseDatasetView):
