@@ -968,7 +968,7 @@ class TestDeleteCompanyListItemAPIView(APITestMixin):
         response = self.api_client.delete(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert response.content == b'{"detail":"Not found."}'
+        assert response.content == b'{"detail":"No Company matches the given query."}'
 
     def test_with_archived_company(self):
         """Test that no error is returned when removing an archived company."""
@@ -1011,7 +1011,7 @@ class TestDeleteCompanyListItemAPIView(APITestMixin):
         response = self.api_client.delete(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert response.content == b'{"detail":"Not found."}'
+        assert response.content == b'{"detail":"No CompanyList matches the given query."}'
 
         # company has not been deleted from another user list
         assert CompanyListItem.objects.filter(list=company_list, company=company).exists()
@@ -1024,7 +1024,7 @@ class TestDeleteCompanyListItemAPIView(APITestMixin):
         response = self.api_client.delete(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert response.content == b'{"detail":"Not found."}'
+        assert response.content == b'{"detail":"No CompanyList matches the given query."}'
 
     def test_with_multiple_lists(self):
         """Test that deleting company from one list will not delete it from the other lists."""
