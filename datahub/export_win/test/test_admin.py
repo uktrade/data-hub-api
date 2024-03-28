@@ -1,6 +1,8 @@
 import pytest
 from django.contrib.admin.sites import site as admin_site
 from django.test import RequestFactory
+from reversion.models import Version
+
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.export_win.admin import (
@@ -46,6 +48,11 @@ def test_soft_delete():
     assert win1.is_deleted is True
     assert win2.is_deleted is True
 
+    for win in queryset:
+        versions = Version.objects.get_for_object(win)
+        assert len(versions) == 1
+        assert versions[0].revision.comment == 'Soft deleted'
+
 
 @pytest.mark.django_db
 def test_undelete():
@@ -57,11 +64,17 @@ def test_undelete():
     request = request_factory.get('/')
     request.user = user
     admin = DeletedWinAdmin(model=DeletedWin, admin_site=None)
-    admin.undelete(request, queryset=DeletedWin.objects.soft_deleted())
+    queryset = DeletedWin.objects.soft_deleted()
+    admin.undelete(request, queryset)
     deleted_win1.refresh_from_db()
     deleted_win2.refresh_from_db()
     assert deleted_win1.is_deleted is False
     assert deleted_win2.is_deleted is False
+
+    for win in queryset:
+        versions = Version.objects.get_for_object(win)
+        assert len(versions) == 1
+        assert versions[0].revision.comment == 'Undeleted'
 
 
 @pytest.mark.django_db
