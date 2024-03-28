@@ -160,7 +160,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
         expected = {
             'created_on': format_date_or_datetime(win.created_on),
             'id': str(win.id),
-            'audit': win.audit,
+            'audit': None,
             'business_type': win.business_type,
             'cdms_reference': win.cdms_reference,
             'company_name': win.company.name,

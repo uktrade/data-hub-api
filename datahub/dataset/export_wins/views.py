@@ -5,6 +5,11 @@ from django.db.models.functions import Cast, Concat
 
 from datahub.dataset.core.views import BaseDatasetView, BaseFilterDatasetView
 from datahub.dataset.export_wins.pagination import HVCDatasetViewCursorPagination
+from datahub.dataset.export_wins.utils import (
+    create_columns_with_index,
+    use_nulls_on_empty_string_fields,
+)
+
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.models import (
     AssociatedProgramme,
@@ -231,11 +236,6 @@ class ExportWinsWinDatasetView(BaseDatasetView):
 
     def _enrich_data(self, dataset):
         for data in dataset:
-            self._create_columns_with_index(data, 'associated_programmes', 'associated_programme')
-            self._create_columns_with_index(data, 'types_of_support', 'type_of_support')
-
-    def _create_columns_with_index(self, data, key, new_key):
-        if data.get(key) is not None:
-            for i, associated_programme in enumerate(data[key]):
-                data[f'{new_key}_{i+1}_display'] = associated_programme
-            del data[key]
+            create_columns_with_index(data, 'associated_programmes', 'associated_programme')
+            create_columns_with_index(data, 'types_of_support', 'type_of_support')
+            use_nulls_on_empty_string_fields(data)
