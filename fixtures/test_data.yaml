@@ -2259,33 +2259,41 @@
     line_manager_name: "Dave"
     company_name: "Test company name"
     cdms_reference: "1234"
+    created_on: "2024-03-27T11:00:00Z"
+    modified_on: "2024-03-27T11:00:00Z"
 
 - model: export_win.Breakdown
   pk: ab38d245-331e-49e9-96a1-904a984bf477
   fields:
     win: c26c750d-1a56-4be0-b01c-e2f2c1a45edd
     type: cecb1f61-abd2-4715-a0c9-b196b52671d9
-    year: 2020
+    year: 1
     value: 83632
     legacy_id: 2100000
+    created_on: "2024-03-27T11:00:00Z"
+    modified_on: "2024-03-27T11:00:00Z"
 
 - model: export_win.Breakdown
   pk: d72c19bc-9bcc-4c85-9e14-17a8106924f8
   fields:
     win: c26c750d-1a56-4be0-b01c-e2f2c1a45edd
     type: 07fbb895-8e04-48f8-bedb-f7054dbdb85f
-    year: 2022
+    year: 1
     value: 56323
     legacy_id: 2100001
+    created_on: "2024-03-27T11:00:00Z"
+    modified_on: "2024-03-27T11:00:00Z"
 
 - model: export_win.Breakdown
   pk: 01f1744a-5db5-4fcf-9396-34aabfd2776e
   fields:
     win: c26c750d-1a56-4be0-b01c-e2f2c1a45edd
     type: 833e7aad-912b-4b93-89b4-64b05222c958
-    year: 2024
+    year: 1
     value: 223543
     legacy_id: 2100002
+    created_on: "2024-03-27T11:00:00Z"
+    modified_on: "2024-03-27T11:00:00Z"
 
 - model: export_win.WinAdviser
   pk: c923e331-5cf4-4d6d-9e0d-5af192912d08
@@ -2296,12 +2304,16 @@
     hq_team: 2f883a06-5811-4668-878f-92a1e3de548d
     name: "Sarah Gates"
     legacy_id: 2100000
+    created_on: "2024-03-27T11:00:00Z"
+    modified_on: "2024-03-27T11:00:00Z"
 
 - model: export_win.CustomerResponse
   pk: 4a0f2781-35d5-4813-907b-820f4e2afa64
   fields:
     win: c26c750d-1a56-4be0-b01c-e2f2c1a45edd
     name: "Sarah Gates"
+    created_on: "2024-03-27T11:00:00Z"
+    modified_on: "2024-03-27T11:00:00Z"
 
 - model: export_win.CustomerResponseToken
   pk: a6fa06c5-7cec-4188-9490-4102f80bf27a
@@ -2309,3 +2321,4 @@
     customer_response: 4a0f2781-35d5-4813-907b-820f4e2afa64
     times_used: 7
     expires_on: "2028-06-15T10:00:00Z"
+    created_on: "2024-03-27T11:00:00Z"
