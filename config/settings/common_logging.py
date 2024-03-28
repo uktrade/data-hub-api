@@ -16,7 +16,7 @@ LOGGING = {
         },
         "asim_formatter": {
             "()": ASIMFormatter,
-        },        
+        },
     },
     'handlers': {
         'asim': {
