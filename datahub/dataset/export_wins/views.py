@@ -232,7 +232,9 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                         win=OuterRef('pk'),
                     ).order_by('order').values('name'),
                 ),
-                export_experience_id=F('export_experience__id'),
+                export_wins_export_experience_display=F(
+                    'export_experience__export_wins_export_experience__name'
+                ),
             )
         )
 
