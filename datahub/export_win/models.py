@@ -4,6 +4,8 @@ from django.conf import settings
 
 from django.db import models, transaction
 from django.db.models import Max, Sum
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from datahub.company.models import (
     Advisor,
@@ -434,6 +436,13 @@ class Win(BaseModel):
     objects = BaseExportWinSoftDeleteManager()
     total_calculation_objects = BaseExportWinTotalCalculation()
 
+    def save(self, *args, **kwargs):
+        calc_total = BaseExportWinTotalCalculation()
+        self.total_expected_export_value = calc_total.calculate_total_export_value(self)
+        self.total_expected_non_export_value = calc_total.calculate_total_non_export_value(self)
+        self.total_expected_odi_value = calc_total.calculate_total_odi_value(self)
+        super().save(*args, **kwargs)
+
 
 class Breakdown(BaseModel, BaseLegacyModel):
     """Win breakdown."""
@@ -679,3 +688,14 @@ class DeletedWin(Win):
 
     class Meta:
         proxy = True
+
+
+@receiver(post_save, sender=Breakdown)
+def update_total_values(sender, instance, **kwargs):
+    """Save the right total values"""
+    win = instance.win
+    calc_total = BaseExportWinTotalCalculation()
+    win.total_expected_export_value = calc_total.calculate_total_export_value(win)
+    win.total_expected_non_export_value = calc_total.calculate_total_non_export_value(win)
+    win.total_expected_odi_value = calc_total.calculate_total_odi_value(win)
+    win.save()

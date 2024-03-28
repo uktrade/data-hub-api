@@ -108,15 +108,12 @@ class WinAdminForm(ModelForm):
         super().__init__(*args, **kwargs)
         instance = self.instance
         if instance and instance.pk:
-            calc_objects = Win.total_calculation_objects
             initial_values = {
-                'total_expected_export_value': calc_objects.calculate_total_export_value(instance),
-                'total_expected_non_export_value': calc_objects.calculate_total_non_export_value(
-                    instance),
-                'total_expected_odi_value': calc_objects.calculate_total_odi_value(self.instance),
+                'total_expected_export_value',
+                'total_expected_non_export_value',
+                'total_expected_odi_value',
             }
-            for field_name, initial_value in initial_values.items():
-                self.initial[field_name] = initial_value
+            for field_name in initial_values:
                 self.fields[field_name].widget = forms.TextInput(attrs={'readonly': 'readonly'})
             fields_to_update = [
                 'cdms_reference',
@@ -263,18 +260,6 @@ class WinSoftDeletedAdminForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        instance = self.instance
-        if instance and instance.pk:
-            calc_objects = Win.total_calculation_objects
-            initial_values = {
-                'total_expected_export_value': calc_objects.calculate_total_export_value(instance),
-                'total_expected_non_export_value': calc_objects.calculate_total_non_export_value(
-                    instance),
-                'total_expected_odi_value': calc_objects.calculate_total_odi_value(self.instance),
-            }
-            for field_name, initial_value in initial_values.items():
-                if field_name in self.base_fields:
-                    self.initial[field_name] = initial_value
 
 
 @admin.register(DeletedWin)
