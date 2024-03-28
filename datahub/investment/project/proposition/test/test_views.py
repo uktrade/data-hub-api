@@ -174,7 +174,7 @@ class TestCreateProposition(APITestMixin):
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
         response_data = response.json()
-        assert response_data == {'detail': 'Not found.'}
+        assert response_data == {'detail': 'Specified investment project does not exist'}
 
     def test_restricted_user_can_create_associated_investment_project_proposition(self):
         """Test restricted user can create associated invesment project proposition."""
@@ -388,7 +388,7 @@ class TestListPropositions(APITestMixin):
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         response_data = response.json()
-        assert response_data == {'detail': 'Not found.'}
+        assert response_data == {'detail': 'Specified investment project does not exist'}
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_filter_by_non_existent_investment_project(self, permissions):
@@ -751,7 +751,7 @@ class TestGetProposition(APITestMixin):
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         response_data = response.json()
-        assert response_data == {'detail': 'Not found.'}
+        assert response_data == {'detail': 'Specified investment project does not exist'}
 
 
 class TestDeleteProposition(APITestMixin):
@@ -876,7 +876,7 @@ class TestCompleteProposition(APITestMixin):
         response = api_client.post(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
         response_data = response.json()
-        assert response_data == {'detail': 'Not found.'}
+        assert response_data == {'detail': 'Specified investment project does not exist'}
 
     def test_restricted_user_can_complete_proposition(self):
         """Test completing proposition by a restricted user."""
@@ -1132,7 +1132,7 @@ class TestAbandonProposition(APITestMixin):
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
         response_data = response.json()
-        assert response_data == {'detail': 'Not found.'}
+        assert response_data == {'detail': 'Specified investment project does not exist'}
 
     def test_restricted_user_can_abandon_proposition(self):
         """Test abandoning proposition by restricted user."""
