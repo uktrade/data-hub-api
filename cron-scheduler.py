@@ -28,7 +28,7 @@ from datahub.core.queues.constants import (
     EVERY_TEN_MINUTES,
     EVERY_TEN_PM,
     EVERY_THREE_AM,
-    EVERY_THREE_AM_ON_TWENTY_THIRD_EACH_MONTH,
+    EVERY_THREE_AM_ON_TWENTY_EIGHTH_EACH_MONTH,
     EVERY_TWO_AM,
     HALF_DAY_IN_SECONDS,
 )
@@ -133,7 +133,7 @@ def schedule_jobs():
 
     job_scheduler(
         function=schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
-        cron=EVERY_THREE_AM_ON_TWENTY_THIRD_EACH_MONTH,
+        cron=EVERY_THREE_AM_ON_TWENTY_EIGHTH_EACH_MONTH,
         description='schedule_refresh_gross_value_added_value_for_fdi_investment_projects',
     )
 

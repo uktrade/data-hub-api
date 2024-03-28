@@ -1,7 +1,11 @@
+from decimal import Decimal
 from unittest import mock
 
 import pytest
 
+from datahub.core.constants import Sector as SectorConstant
+from datahub.investment.project.constants import FDISICGrouping as FDISICGroupingConstant
+from datahub.investment.project.models import GVAMultiplier
 from datahub.investment.project.tasks import (
     _update_investment_projects_for_gva_multiplier,
     update_investment_projects_for_gva_multiplier_task,
@@ -10,6 +14,10 @@ from datahub.investment.project.test.factories import (
     FDIInvestmentProjectFactory,
     GVAMultiplierFactory,
 )
+
+
+CAPITAL = GVAMultiplier.SectorClassificationChoices.CAPITAL
+LABOUR = GVAMultiplier.SectorClassificationChoices.LABOUR
 
 pytestmark = pytest.mark.django_db
 
@@ -51,9 +59,9 @@ class TestInvestmentProjectTasks:
         Tests update investment projects for gva multiplier task updates
         calls update_investment_projects_for_gva.
         """
-        gva = GVAMultiplierFactory(financial_year=3010)
+        gva_multipler = GVAMultiplierFactory()
         mock_update_investment_projects_for_gva_multiplier.return_value = None
-        update_investment_projects_for_gva_multiplier_task(gva.pk)
+        update_investment_projects_for_gva_multiplier_task(gva_multipler.pk)
         assert mock_update_investment_projects_for_gva_multiplier.called
 
     def test_update_investment_projects_for_gva_multiplier(self):
@@ -62,8 +70,12 @@ class TestInvestmentProjectTasks:
         all related investment projects.
         """
         gva_multiplier = GVAMultiplierFactory(
-            multiplier=1,
-            financial_year=1980,
+            multiplier=Decimal('1'),
+            financial_year=3010,
+            sector_id=SectorConstant.renewable_energy_wind.value.id,
+            sector_classification_gva_multiplier=CAPITAL,
+            sector_classification_value_band=CAPITAL,
+            fdi_sic_grouping_id=FDISICGroupingConstant.electric.value.id,
         )
 
         with mock.patch(

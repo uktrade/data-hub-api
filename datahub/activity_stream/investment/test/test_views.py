@@ -252,6 +252,7 @@ def test_investment_project_added_with_gva(api_client):
             foreign_equity_investment=10000,
             sector_id=constants.Sector.aerospace_assembly_aircraft.value.id,
             investment_type_id=constants.InvestmentType.fdi.value.id,
+            business_activities=[],
         )
         frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(api_client, get_url('api-v3:activity-stream:investment-project-added'))
@@ -289,7 +290,7 @@ def test_investment_project_added_with_gva(api_client):
                         project.estimated_land_date,
                     ),
                     'dit:foreignEquityInvestment': 10000.0,
-                    'dit:grossValueAdded': 581.0,
+                    'dit:grossValueAdded': 2097.0,
                     'attributedTo': [
                         {
                             'id': f'dit:DataHubCompany:{project.investor_company.pk}',

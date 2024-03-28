@@ -29,6 +29,7 @@ class RatingFactory(factory.django.DjangoModelFactory):
     """Rating factory."""
 
     name = factory.Sequence(lambda n: f'name {n}')
+    export_win_id = random.choice(range(0, 6, 1))
 
     class Meta:
         model = 'export_win.Rating'
@@ -107,6 +108,32 @@ class HQTeamRegionOrPostFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'export_win.HQTeamRegionOrPost'
+
+
+class HVOProgrammesFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = 'export_win.HVOProgrammes'
+
+
+class AssociatedProgrammeFactory(factory.django.DjangoModelFactory):
+    """AssociatedProgramme factory."""
+
+    name = factory.Sequence(lambda n: f'Associated programme name {n}')
+    order = factory.Sequence(lambda n: n)
+
+    class Meta:
+        model = 'export_win.AssociatedProgramme'
+
+
+class SupportTypeFactory(factory.django.DjangoModelFactory):
+    """SupportType factory."""
+
+    name = factory.Sequence(lambda n: f'support type name {n}')
+    order = factory.Sequence(lambda n: n)
+
+    class Meta:
+        model = 'export_win.SupportType'
 
 
 class WinFactory(factory.django.DjangoModelFactory):
@@ -228,6 +255,7 @@ class BreakdownFactory(factory.django.DjangoModelFactory):
 class CustomerResponseTokenFactory(factory.django.DjangoModelFactory):
     """CustomerResponseToken factory."""
 
+    created_on = factory.LazyFunction(now)
     expires_on = factory.LazyFunction(lambda: datetime.utcnow() + relativedelta(days=7))
     customer_response = factory.SubFactory(CustomerResponseFactory)
     email_notification_id = factory.Faker('uuid4')  # Adjust based on your requirements
@@ -252,7 +280,7 @@ class LegacyExportWinsToDataHubCompanyFactory(factory.django.DjangoModelFactory)
 class HVCFactory(factory.django.DjangoModelFactory):
     """HVC factory."""
 
-    financial_year = factory.fuzzy.FuzzyInteger(2013, 2050, 1)
+    financial_year = factory.Sequence(lambda n: n)
 
     class Meta:
         model = 'export_win.HVC'
