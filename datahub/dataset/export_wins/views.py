@@ -233,7 +233,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                     ).order_by('order').values('name'),
                 ),
                 export_wins_export_experience_display=F(
-                    'export_experience__export_wins_export_experience__name'
+                    'export_experience__export_wins_export_experience__name',
                 ),
             )
         )
