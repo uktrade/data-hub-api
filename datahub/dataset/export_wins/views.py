@@ -1,7 +1,12 @@
 from django.contrib.postgres.expressions import ArraySubquery
-from django.db.models import Count, F, Max
+from django.db.models import Case, Count, ExpressionWrapper, F, Max, When
 from django.db.models import IntegerField, OuterRef, Value
-from django.db.models.functions import Cast, Concat
+from django.db.models.functions import (
+    Cast,
+    Concat,
+    ExtractMonth,
+    ExtractYear,
+)
 
 from datahub.dataset.core.views import BaseDatasetView, BaseFilterDatasetView
 from datahub.dataset.export_wins.pagination import HVCDatasetViewCursorPagination
@@ -53,15 +58,31 @@ class ExportWinsBreakdownsDatasetView(BaseDatasetView):
     def get_dataset(self):
         return (
             Breakdown.objects.select_related('win, breakdown_type')
+            .annotate(
+                created_year=ExtractYear('win__created_on'),
+                created_month=ExtractMonth('win__created_on'),
+                provisional_financial_year=Case(
+                    When(created_month__gte=4, then=F('created_year')),
+                    default=ExpressionWrapper(
+                        F('created_year') - 1,
+                        output_field=IntegerField(),
+                    ),
+                    output_field=IntegerField(),
+                ),
+                financial_year=ExpressionWrapper(
+                    F('provisional_financial_year') + (F('year') - 1),
+                    output_field=IntegerField(),
+                ),
+            )
             .values(
                 'created_on',
                 'win__id',
-                'year',
                 'value',
                 breakdown_type=F('type__name'),
             )
             .annotate(
                 id=F('legacy_id'),
+                year=F('financial_year'),
             )
         )
 
