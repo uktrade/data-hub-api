@@ -68,3 +68,11 @@ class TeamRoleID(Enum):
     """Team role IDs."""
 
     post = UUID('62329c18-6095-e211-a939-e4115bead28a')
+
+
+class ExportExperience(Enum):
+    never_exported = UUID('051a0362-d1a9-41c0-8a58-3171e5f59a8e')
+    exported_before = UUID('41b37ec7-0e4d-4f2b-aeae-b5752e1fb79a')
+    exported_last_12_months = UUID('8937c359-157e-41dd-8520-679383847ea0')
+    new_export_win = UUID('587928e3-cab1-45cb-ba49-0656b6d2f867')
+    growing_exports = UUID('02a063e3-dab8-40ca-92d3-8e9c2d9f812d')

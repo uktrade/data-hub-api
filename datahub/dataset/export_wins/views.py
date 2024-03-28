@@ -6,6 +6,7 @@ from django.db.models.functions import Cast, Concat
 from datahub.dataset.core.views import BaseDatasetView, BaseFilterDatasetView
 from datahub.dataset.export_wins.pagination import HVCDatasetViewCursorPagination
 from datahub.dataset.export_wins.utils import (
+    convert_datahub_export_experience_to_export_wins,
     create_columns_with_index,
     use_nulls_on_empty_string_fields,
 )
@@ -231,6 +232,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                         win=OuterRef('pk'),
                     ).order_by('order').values('name'),
                 ),
+                export_experience_id=F('export_experience__id'),
             )
         )
 
@@ -239,3 +241,4 @@ class ExportWinsWinDatasetView(BaseDatasetView):
             create_columns_with_index(data, 'associated_programmes', 'associated_programme')
             create_columns_with_index(data, 'types_of_support', 'type_of_support')
             use_nulls_on_empty_string_fields(data)
+            convert_datahub_export_experience_to_export_wins(data)
