@@ -239,7 +239,8 @@ class BreakdownFactory(factory.django.DjangoModelFactory):
     """Breakdown factory."""
 
     win = factory.SubFactory(WinFactory)
-    year = factory.fuzzy.FuzzyInteger(2022, 2050, 1)
+    # currently we store relative year to Win created date
+    year = factory.fuzzy.FuzzyInteger(1, 5, 1)
     value = factory.fuzzy.FuzzyInteger(1000, 100000, 10)
 
     class Meta:

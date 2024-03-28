@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 import pytest
+from dateutil.relativedelta import relativedelta
 
 from django.urls import reverse
 
@@ -9,6 +10,7 @@ from freezegun import freeze_time
 from datahub.core.test_utils import (
     format_date_or_datetime,
 )
+from datahub.core.utils import get_financial_year
 from datahub.dataset.core.test import BaseDatasetViewTest
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.models import HVC
@@ -71,11 +73,14 @@ class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
     factory = BreakdownFactory
 
     def _assert_breakdown_matches_result(self, breakdown, result):
+        financial_year = get_financial_year(
+            breakdown.win.created_on + relativedelta(years=breakdown.year - 1),
+        )
         assert result == {
             'created_on': format_date_or_datetime(breakdown.created_on),
             'id': breakdown.legacy_id,
             'win__id': str(breakdown.win.id),
-            'year': breakdown.year,
+            'year': financial_year,
             'value': breakdown.value,
             'breakdown_type': breakdown.type.name,
         }
