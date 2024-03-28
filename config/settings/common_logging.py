@@ -1,6 +1,7 @@
 import sys
 import sentry_sdk
-from django_log_formatter_ecs import ECSFormatter
+from django_log_formatter_asim import ASIMFormatter
+
 from sentry_sdk.integrations.django import DjangoIntegration
 
 from config.settings.common import *
@@ -13,30 +14,30 @@ LOGGING = {
         'verbose': {
             'format': '%(asctime)s [%(levelname)s] [%(name)s] %(message)s'
         },
-        'ecs_formatter': {
-            '()': ECSFormatter,
-        },
+        "asim_formatter": {
+            "()": ASIMFormatter,
+        },        
     },
     'handlers': {
-        'ecs': {
+        'asim': {
             'class': 'logging.StreamHandler',
-            'formatter': 'ecs_formatter',
+            'formatter': 'asim_formatter',
             'stream': sys.stdout,
         },
     },
     'root': {
         'level': 'INFO',
-        'handlers': ['ecs'],
+        'handlers': ['asim'],
     },
     'loggers': {
         'django': {
             'level': 'INFO',
-            'handlers': ['ecs'],
+            'handlers': ['asim'],
             'propagate': False,
         },
         'django.db.backends': {
             'level': 'ERROR',
-            'handlers': ['ecs'],
+            'handlers': ['asim'],
             'propagate': False,
         },
     },
