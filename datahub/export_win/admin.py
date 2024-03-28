@@ -1,10 +1,18 @@
+from django import forms
+
 from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter
 from django.forms import ModelForm
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin
-from datahub.export_win.models import Breakdown, CustomerResponse, DeletedWin, Win, WinAdviser
+
+from datahub.export_win.models import (
+    Breakdown,
+    CustomerResponse,
+    DeletedWin,
+    Win,
+    WinAdviser)
 
 
 class BaseTabularInline(admin.TabularInline):
@@ -97,7 +105,18 @@ class WinAdminForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
+        instance = self.instance
+        if instance and instance.pk:
+            calc_objects = Win.total_calculation_objects
+            initial_values = {
+                'total_expected_export_value': calc_objects.calculate_total_export_value(instance),
+                'total_expected_non_export_value': calc_objects.calculate_total_non_export_value(
+                    instance),
+                'total_expected_odi_value': calc_objects.calculate_total_odi_value(self.instance),
+            }
+            for field_name, initial_value in initial_values.items():
+                self.initial[field_name] = initial_value
+                self.fields[field_name].widget = forms.TextInput(attrs={'readonly': 'readonly'})
             fields_to_update = [
                 'cdms_reference',
                 'customer_email_address',
@@ -110,6 +129,28 @@ class WinAdminForm(ModelForm):
                 field = self.fields.get(field_name)
                 if field:
                     field.required = False
+
+
+class WinSoftDeletedAdminForm(ModelForm):
+    """Win soft deleted admin form."""
+
+    class Meta:
+        model = Win
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            calculation_objects = Win.total_calculation_objects
+            self.initial['total_expected_export_value'] = (
+                calculation_objects.calculate_total_export_value(self.instance)
+            )
+            self.initial['total_expected_non_export_value'] = (
+                calculation_objects.calculate_total_non_export_value(self.instance)
+            )
+            self.initial['total_expected_odi_value'] = (
+                calculation_objects.calculate_total_odi_value(self.instance)
+            )
 
 
 @admin.register(Win)
@@ -234,7 +275,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
 
 @admin.register(DeletedWin)
 class DeletedWinAdmin(WinAdmin):
-
+    form = WinSoftDeletedAdminForm
     inlines = (BreakdownInline, CustomerResponseInline, AdvisorInline)
     actions = ('undelete',)
 
