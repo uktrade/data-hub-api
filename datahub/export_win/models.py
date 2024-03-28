@@ -87,6 +87,14 @@ class ExpectedValueRelation(BaseExportWinOrderedConstantModel):
 class ExperienceCategories(BaseExportWinOrderedConstantModel):
     """Experience categories."""
 
+    export_experience = models.ForeignKey(
+        ExportExperience,
+        related_name='export_wins_export_experience',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
 
 class BreakdownType(BaseExportWinOrderedConstantModel):
     """Breakdown type."""
