@@ -1,6 +1,6 @@
-import pytest
-
 from uuid import UUID
+
+import pytest
 
 from datahub.dataset.export_wins.utils import (
     convert_datahub_export_experience_to_export_wins,
@@ -66,7 +66,7 @@ class TestUtils():
         ),
     )
     def test_convert_datahub_export_experience_to_export_wins_with_match_export_id_updates_field(
-        self, export_experience_id, expected_replaced_name
+        self, export_experience_id, expected_replaced_name,
     ):
         data = {
             'export_experience_id': export_experience_id,

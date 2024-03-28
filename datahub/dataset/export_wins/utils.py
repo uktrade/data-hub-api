@@ -31,10 +31,10 @@ def convert_datahub_export_experience_to_export_wins(data):
         export_wins_legacy_id = mapping_ids.get(export_experience_id)
         if export_wins_legacy_id:
             export_wins_export_experience = ExperienceCategories.objects.filter(
-                export_win_id=export_wins_legacy_id
+                export_win_id=export_wins_legacy_id,
             ).first()
             if export_wins_export_experience:
-                data["export_experience_display"] = export_wins_export_experience.name
+                data['export_experience_display'] = export_wins_export_experience.name
 
     if 'export_experience_id' in data:
         del data['export_experience_id']
