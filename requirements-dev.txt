@@ -161,7 +161,7 @@ idna==3.4
     #   yarl
 iniconfig==1.1.1
     # via pytest
-ipython==8.22.2
+ipython==8.23.0
     # via -r requirements-dev.in
 isort==5.11.4
     # via pylint
@@ -371,6 +371,8 @@ traitlets==5.14.1
     # via
     #   ipython
     #   matplotlib-inline
+typing-extensions==4.10.0
+    # via ipython
 tzdata==2023.3
     # via pandas
 uritemplate==4.1.1
