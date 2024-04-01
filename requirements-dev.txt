@@ -325,7 +325,7 @@ requests==2.31.0
     #   requests-toolbelt
 requests-futures==1.0.0
     # via piprot
-requests-mock==1.11.0
+requests-mock==1.12.1
     # via -r requirements-dev.in
 requests-toolbelt==1.0.0
     # via -r requirements.in
@@ -351,7 +351,6 @@ six==1.16.0
     #   opensearch-py
     #   piprot
     #   python-dateutil
-    #   requests-mock
 slackclient==2.9.4
     # via -r requirements.in
 snowballstemmer==2.2.0
