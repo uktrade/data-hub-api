@@ -6,7 +6,7 @@ pytest-django==4.8.0
 pytest-cov==5.0.0
 pytest-mock==3.14.0
 pytest-xdist==3.5.0
-ipython==8.22.2
+ipython==8.23.0
 factory-boy==3.3.0
 freezegun==1.4.0
 requests-mock==1.12.1
