@@ -23,12 +23,13 @@ def win():
 
 
 @pytest.fixture
-def customer_response(win):
+def customer_response(win: WinFactory):
     return CustomerResponseFactory(name='Test Customer Response', win_id=win.id)
 
 
 @pytest.mark.django_db
 def test_get_actions():
+    """Test for actions"""
     user = AdviserFactory()
     admin = WinAdmin(Win, AdminSite())
     request_factory = RequestFactory()
@@ -85,6 +86,7 @@ def test_undelete():
 
 @pytest.mark.django_db
 def test_get_queryset_soft_deleted():
+    """Test for get softdeleted queryset"""
     WinFactory(is_deleted=True)
     WinFactory(is_deleted=True)
     WinFactory(is_deleted=False)
@@ -101,6 +103,7 @@ def test_get_queryset_soft_deleted():
 
 @pytest.mark.django_db
 def test_get_company():
+    """Test for get company"""
     company = CompanyFactory()
     admin = WinAdmin(model=Win, admin_site=AdminSite())
     obj = WinFactory(company=company)
@@ -111,6 +114,7 @@ def test_get_company():
 
 @pytest.mark.django_db
 def test_get_adviser():
+    """Test for get adviser"""
     adviser = AdviserFactory()
     admin = WinAdmin(model=Win, admin_site=AdminSite())
     obj = WinFactory(adviser=adviser)
@@ -122,6 +126,7 @@ def test_get_adviser():
 
 @pytest.mark.django_db
 def test_get_date_confirmed():
+    """Test for get date confirmed"""
     customer_response = CustomerResponseFactory(responded_on='2024-04-01')
     admin = WinAdmin(model=Win, admin_site=AdminSite())
     obj = WinFactory(customer_response=customer_response)
@@ -133,6 +138,7 @@ def test_get_date_confirmed():
 
 @pytest.mark.django_db
 def test_get_contact_names():
+    """Test for get contact names"""
     contact1 = ContactFactory(first_name='John', last_name='Doe')
     contact2 = ContactFactory(first_name='Jane', last_name='Smith')
     obj = WinFactory()
@@ -147,6 +153,7 @@ def test_get_contact_names():
 
 @pytest.mark.django_db
 def test_has_view_permission():
+    """Test for has view permission in deleted win"""
     regular_user = AdviserFactory()
     export_win_admin_group = Group.objects.create(name='ExportWinAdmin')
     regular_user.groups.add(export_win_admin_group)
@@ -167,6 +174,8 @@ def test_has_view_permission():
 
 @pytest.mark.django_db
 class TestWinSoftDeletedAdminForm:
+    """Test for WinSoftDeletedAdminForm"""
+
     def test_init_method(self):
         form = WinSoftDeletedAdminForm()
         assert form is not None
@@ -174,6 +183,8 @@ class TestWinSoftDeletedAdminForm:
 
 @pytest.mark.django_db
 class TestWinAdminForm:
+    """Test for WinAdminForm"""
+
     def test_init_method(self):
         form = WinAdminForm()
         assert form is not None
@@ -199,6 +210,8 @@ class TestWinAdminForm:
 
 @pytest.mark.django_db
 class TestWinBreakdownInlineForm:
+    """Test for Breakdown in line form"""
+
     def test_init_method(self):
         form = BreakdownInlineForm()
         assert form is not None
@@ -206,6 +219,8 @@ class TestWinBreakdownInlineForm:
 
 @pytest.mark.django_db
 class TestAdvisorInlineForm:
+    """Test for Adviser in line form"""
+
     def test_init_method(self):
         form = AdvisorInlineForm()
         assert form is not None
@@ -226,6 +241,11 @@ class InstanceMock:
 
 @pytest.mark.django_db
 class TestCustomerResponseInlineForm:
+    """
+    Test for Customer Response in line form
+    Field name is not required and field id should be read-only
+    """
+
     def test_init_method(self):
         instance_mock = InstanceMock(pk=1)
         form = CustomerResponseInlineForm(instance=instance_mock)

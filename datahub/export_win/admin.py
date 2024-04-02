@@ -76,7 +76,10 @@ class BaseStackedInline(admin.StackedInline):
 
 
 class CustomerResponseInlineForm(ModelForm):
-    """Customer response inline form."""
+    """
+    Customer Response in line form.
+    Field name is not required and field id should be read-only
+    """
 
     class Meta:
         model = CustomerResponse
@@ -84,6 +87,7 @@ class CustomerResponseInlineForm(ModelForm):
 
     def __init__(self, *args, obj=None, **kwargs):
         super().__init__(*args, **kwargs)
+
         instance = getattr(self, 'instance', None)
         is_instance_and_pk_exist = getattr(instance, 'pk', None) is not None
         self.fields['name'].required = not is_instance_and_pk_exist
@@ -252,7 +256,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
 
 
 class WinSoftDeletedAdminForm(ModelForm):
-    """Win soft deleted admin form."""
+    """Win soft deleted admin form"""
 
     class Meta:
         model = DeletedWin
@@ -264,6 +268,8 @@ class WinSoftDeletedAdminForm(ModelForm):
 
 @admin.register(DeletedWin)
 class DeletedWinAdmin(WinAdmin):
+    """Admin for Deleted Wins."""
+
     form = WinSoftDeletedAdminForm
     inlines = (BreakdownInline, CustomerResponseInline, AdvisorInline)
     actions = ('undelete',)
