@@ -1,3 +1,5 @@
+Test that the action is working and not complaining about NodeJS
+
 # Data Hub API
 
 [![CircleCI](https://circleci.com/gh/uktrade/data-hub-api.svg?style=svg)](https://circleci.com/gh/uktrade/data-hub-api)
