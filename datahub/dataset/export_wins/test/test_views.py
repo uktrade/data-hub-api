@@ -114,7 +114,7 @@ class TestExportWinsHVCDatasetView(BaseDatasetViewTest):
             'id': hvc.legacy_id,
             'campaign_id': hvc.campaign_id,
             'financial_year': hvc.financial_year,
-            'name': hvc.export_win_id,
+            'name': hvc.name,
         }
 
     def test_success(self, data_flow_api_client):
