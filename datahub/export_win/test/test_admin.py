@@ -1,6 +1,7 @@
 import pytest
 
 from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.models import Group
 from django.test import RequestFactory
 from reversion.models import Version
 
@@ -83,18 +84,6 @@ def test_undelete():
 
 
 @pytest.mark.django_db
-def test_fields_not_required_when_instance_has_pk(win):
-    """Test fields not required within WinFormTest"""
-    form = WinAdminForm(instance=win)
-    assert form.fields['cdms_reference'].required is False
-    assert form.fields['customer_email_address'].required is False
-    assert form.fields['customer_job_title'].required is False
-    assert form.fields['line_manager_name'].required is False
-    assert form.fields['lead_officer_email_address'].required is False
-    assert form.fields['other_official_email_address'].required is False
-
-
-@pytest.mark.django_db
 def test_get_queryset_soft_deleted():
     WinFactory(is_deleted=True)
     WinFactory(is_deleted=True)
@@ -157,6 +146,26 @@ def test_get_contact_names():
 
 
 @pytest.mark.django_db
+def test_has_view_permission():
+    regular_user = AdviserFactory()
+    export_win_admin_group = Group.objects.create(name='ExportWinAdmin')
+    regular_user.groups.add(export_win_admin_group)
+
+    superuser = AdviserFactory(is_superuser=True)
+    admin = DeletedWinAdmin(Win, AdminSite())
+    request = RequestFactory().get('/')
+
+    request.user = regular_user
+    assert admin.has_view_permission(request) is True
+
+    request.user = AdviserFactory()
+    assert admin.has_view_permission(request) is False
+
+    request.user = superuser
+    assert admin.has_view_permission(request) is True
+
+
+@pytest.mark.django_db
 class TestWinSoftDeletedAdminForm:
     def test_init_method(self):
         form = WinSoftDeletedAdminForm()
@@ -168,6 +177,24 @@ class TestWinAdminForm:
     def test_init_method(self):
         form = WinAdminForm()
         assert form is not None
+
+    def test_init_method_with_instance_pk(self):
+        instance_mock = InstanceMock(pk=1)
+        form = WinAdminForm(instance=instance_mock)
+        assert form is not None
+        if instance_mock.pk is not None:
+            field_attrs = form.fields['total_expected_export_value'].widget.attrs
+            assert field_attrs['readonly'] == 'readonly'
+            field_attrs = form.fields['total_expected_non_export_value'].widget.attrs
+            assert field_attrs['readonly'] == 'readonly'
+            field_attrs = form.fields['total_expected_odi_value'].widget.attrs
+            assert field_attrs['readonly'] == 'readonly'
+            assert form.fields['cdms_reference'].required is False
+            assert form.fields['customer_email_address'].required is False
+            assert form.fields['customer_job_title'].required is False
+            assert form.fields['line_manager_name'].required is False
+            assert form.fields['lead_officer_email_address'].required is False
+            assert form.fields['other_official_email_address'].required is False
 
 
 @pytest.mark.django_db

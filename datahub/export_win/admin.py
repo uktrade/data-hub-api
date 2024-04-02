@@ -84,9 +84,10 @@ class CustomerResponseInlineForm(ModelForm):
 
     def __init__(self, *args, obj=None, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            self.fields['name'].required = False
-            self.fields['id'].widget.attrs['readonly'] = True
+        instance = getattr(self, 'instance', None)
+        is_instance_and_pk_exist = getattr(instance, 'pk', None) is not None
+        self.fields['name'].required = not is_instance_and_pk_exist
+        self.fields['id'].widget.attrs['readonly'] = is_instance_and_pk_exist
 
 
 class CustomerResponseInline(BaseStackedInline):
