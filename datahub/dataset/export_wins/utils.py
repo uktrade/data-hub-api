@@ -11,3 +11,11 @@ def create_columns_with_index(data, key, new_key):
         for i, value in enumerate(data[key]):
             data[f'{new_key}_{i+1}_display'] = value
         del data[key]
+
+
+def convert_datahub_export_experience_to_export_wins(data):
+    export_wins_export_experience_display = data.get('export_wins_export_experience_display', None)
+    if export_wins_export_experience_display:
+        data['export_experience_display'] = export_wins_export_experience_display
+
+    del data['export_wins_export_experience_display']
