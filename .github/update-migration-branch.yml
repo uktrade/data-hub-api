@@ -1,0 +1,32 @@
+name: Update Migration Branch
+
+on:
+  push:
+    branches: [chore/github-action-main]
+
+permissions: 
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+        
+      - name: Setup Git User
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "<EMAIL>"
+      
+
+      - name: Update Migration Branch
+        run: |
+          git checkout main
+          git fetch origin
+          git checkout chore/github-action-mig
+          git pull
+          git merge origin/main
+          git push origin chore/github-action-mig
