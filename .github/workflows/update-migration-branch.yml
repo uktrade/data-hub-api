@@ -24,9 +24,9 @@ jobs:
 
       - name: Update Migration Branch
         run: |
-          git checkout main
+          git checkout chore/github-action-main
           git fetch origin
           git checkout chore/github-action-mig
           git pull
-          git merge origin/main
+          git merge origin/chore/github-action-main
           git push origin chore/github-action-mig
