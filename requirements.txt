@@ -32,6 +32,8 @@ certifi==2023.7.22
     #   opensearch-py
     #   requests
     #   sentry-sdk
+cfgv==3.4.0
+    # via pre-commit
 chardet==5.2.0
     # via -r requirements.in
 charset-normalizer==2.1.1
@@ -40,6 +42,8 @@ click==8.1.3
     # via rq
 crontab==1.0.0
     # via rq-scheduler
+distlib==0.3.8
+    # via virtualenv
 django==4.2.11
     # via
     #   -r requirements.in
@@ -49,6 +53,7 @@ django==4.2.11
     #   django-extensions
     #   django-filter
     #   django-js-asset
+    #   django-log-formatter-asim
     #   django-redis
     #   django-reversion
     #   djangorestframework
@@ -64,11 +69,9 @@ django-extensions==3.2.3
     # via -r requirements.in
 django-filter==24.2
     # via -r requirements.in
-django-ipware==3.0.7
-    # via django-log-formatter-ecs
 django-js-asset==2.0.0
     # via django-mptt
-django-log-formatter-ecs==0.0.5
+django-log-formatter-asim==0.0.4
     # via -r requirements.in
 django-mptt==0.16.0
     # via -r requirements.in
@@ -88,6 +91,8 @@ elastic-apm==6.22.3
     # via -r requirements.in
 events==0.5
     # via opensearch-py
+filelock==3.13.3
+    # via virtualenv
 freezegun==1.5.1
     # via rq-scheduler
 frozenlist==1.3.3
@@ -100,6 +105,8 @@ greenlet==3.0.1
     # via gevent
 icalendar==5.0.13
     # via -r requirements.in
+identify==2.5.35
+    # via pre-commit
 idna==3.7
     # via
     #   requests
@@ -110,20 +117,18 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
-kubi-ecs-logger==0.1.2
-    # via django-log-formatter-ecs
 mail-parser==3.15.0
     # via -r requirements.in
 markupsafe==2.1.2
     # via werkzeug
-marshmallow==3.19.0
-    # via kubi-ecs-logger
 mohawk==1.1.0
     # via -r requirements.in
 multidict==6.0.4
     # via
     #   aiohttp
     #   yarl
+nodeenv==1.8.0
+    # via pre-commit
 notifications-python-client==9.1.0
     # via -r requirements.in
 numpy==1.24.3
@@ -135,11 +140,14 @@ opensearch-py==2.6.0
     #   -r requirements.in
     #   opensearch-dsl
 packaging==22.0
-    # via
     #   marshmallow
     #   python-redis-rate-limit
 pandas==2.2.2
     # via -r requirements.in
+platformdirs==4.2.0
+    # via virtualenv
+pre-commit==3.7.0
+    # via django-log-formatter-asim
 psycogreen==1.0.2
     # via -r requirements.in
 psycopg2-binary==2.9.9
@@ -163,7 +171,9 @@ pytz==2022.7
     #   icalendar
     #   pandas
 pyyaml==6.0.1
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   pre-commit
 redis==4.5.4
     # via
     #   django-redis
@@ -218,6 +228,8 @@ urllib3==1.26.19
     #   opensearch-py
     #   requests
     #   sentry-sdk
+virtualenv==20.25.1
+    # via pre-commit
 werkzeug==3.0.3
     # via -r requirements.in
 whitenoise==6.7.0
