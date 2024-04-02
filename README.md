@@ -1,4 +1,4 @@
-Test that the action is working and not complaining about NodeJS
+Don't run on closed PR
 
 # Data Hub API
 
