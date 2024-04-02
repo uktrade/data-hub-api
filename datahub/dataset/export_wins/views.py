@@ -101,8 +101,8 @@ class ExportWinsHVCDatasetView(BaseFilterDatasetView):
         hvcs = HVC.objects.values(
             'campaign_id',
             'financial_year',
+            'name',
         ).annotate(
-            name=F('export_win_id'),
             id=F('legacy_id'),
         )
         if exclude_legacy == 'true':
