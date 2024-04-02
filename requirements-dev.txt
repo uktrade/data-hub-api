@@ -69,6 +69,7 @@ django==4.2.14
     #   django-extensions
     #   django-filter
     #   django-js-asset
+    #   django-log-formatter-asim
     #   django-redis
     #   django-reversion
     #   djangorestframework
@@ -84,11 +85,9 @@ django-extensions==3.2.3
     # via -r requirements.in
 django-filter==24.2
     # via -r requirements.in
-django-ipware==3.0.7
-    # via django-log-formatter-ecs
 django-js-asset==2.0.0
     # via django-mptt
-django-log-formatter-ecs==0.0.5
+django-log-formatter-asim==0.0.4
     # via -r requirements.in
 django-mptt==0.16.0
     # via -r requirements.in
@@ -183,14 +182,10 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
-kubi-ecs-logger==0.1.2
-    # via django-log-formatter-ecs
 mail-parser==3.15.0
     # via -r requirements.in
 markupsafe==2.1.2
     # via werkzeug
-marshmallow==3.19.0
-    # via kubi-ecs-logger
 matplotlib-inline==0.1.6
     # via ipython
 mccabe==0.7.0
@@ -218,7 +213,6 @@ opensearch-py==2.6.0
 packaging==22.0
     # via
     #   build
-    #   marshmallow
     #   pytest
     #   python-redis-rate-limit
 pandas==2.2.2
@@ -240,7 +234,9 @@ platformdirs==2.6.0
 pluggy==1.5.0
     # via pytest
 pre-commit==3.7.1
-    # via -r requirements-dev.in
+    # via
+    #   -r requirements-dev.in
+    #   django-log-formatter-asim
 prompt-toolkit==3.0.41
     # via ipython
 psycogreen==1.0.2
