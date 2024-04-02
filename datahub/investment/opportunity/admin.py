@@ -1,10 +1,11 @@
 from django.contrib import admin
+from datahub.core.admin import ExportWinsAdminMixin
 
 from datahub.investment.opportunity import models
 
 
 @admin.register(models.LargeCapitalOpportunity)
-class LargeCapitalOpportunityAdmin(admin.ModelAdmin):
+class LargeCapitalOpportunityAdmin(ExportWinsAdminMixin, admin.ModelAdmin):
     """Large capital opportunity admin."""
 
     autocomplete_fields = (

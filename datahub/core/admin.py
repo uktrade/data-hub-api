@@ -75,7 +75,74 @@ class ViewOnlyAdmin(ViewAndChangeOnlyAdmin):
         return False
 
 
-class BaseModelAdminMixin:
+class ExportWinsAdminMixin:
+    def has_module_permission(self, request):
+        user = request.user
+        if user.groups.filter(name='ExportWinAdmin').exists():
+            # print('self.opts', self.opts)
+            if self.opts.app_label == 'export_win':
+                return True
+            return False
+        return super().has_module_permission(request)
+
+    def has_view_permission(self, request, obj=None):
+        # print('******has_view_permission, request.user', request.user)
+        user = request.user
+
+        return self._handle_export_wins_admin_permissions(request, self.opts.model_name, super().has_view_permission(request, obj))
+
+        if user.groups.filter(name='ExportWinAdmin').exists():
+            print('self.opts.model_name', self.opts.model_name)
+            if self.opts.model_name == 'win':
+                return True
+            return False
+        return super().has_view_permission(request, obj)
+
+    def has_add_permission(self, request):
+        # print('******has_add_permission, request.user', request.user)
+        user = request.user
+        return self._handle_export_wins_admin_permissions(request, self.opts.model_name, super().has_add_permission(request))
+        if user.groups.filter(name='ExportWinAdmin').exists():
+            print('self.opts.model_name', self.opts.model_name)
+            if self.opts.model_name == 'win':
+                return True
+            return False
+        return super().has_add_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        # print('******has_delete_permission, request.user', request.user)
+        user = request.user
+        return self._handle_export_wins_admin_permissions(request, self.opts.model_name, super().has_delete_permission(request, obj))
+        if user.groups.filter(name='ExportWinAdmin').exists():
+            print('self.opts.model_name', self.opts.model_name)
+            if self.opts.model_name == 'win':
+                return True
+            return False
+        return super().has_delete_permission(request, obj)
+
+    def has_change_permission(self, request, obj=None):
+        # print('******has_change_permission, request.user', request.user)
+        user = request.user
+        return self._handle_export_wins_admin_permissions(request, self.opts.model_name, super().has_change_permission(request, obj))
+        if user.groups.filter(name='ExportWinAdmin').exists():
+            print('self.opts.model_name', self.opts.model_name)
+            if self.opts.model_name == 'win':
+                return True
+            return False
+        return super().has_change_permission(request, obj)
+
+    def _handle_export_wins_admin_permissions(self, request, model_name, function):
+        user = request.user
+        # print('self.opts.model_name', model_name)
+        if user.groups.filter(name='ExportWinAdmin').exists():
+            if model_name == 'win':
+                return True
+            return False
+
+        return function
+
+
+class BaseModelAdminMixin(ExportWinsAdminMixin):
     """
     Mixin for ModelAdmins which adds extra functionalities.
     Useful when the model extends core.BaseModel
@@ -355,6 +422,11 @@ def format_json_as_html(value):
 
 def _make_admin_permission_getter(codename):
     def _has_permission(self, request, obj=None):
+        if request.user.groups.filter(name='ExportWinAdmin').exists():
+            return False
+            print('****self.opts', self.opts)
+        print('****_make_admin_permission_getter._has_permission')
+        print('****_make_admin_permission_getter._has_permission.request.user', request.user)
         app_label = self.opts.app_label
         qualified_name = f'{app_label}.{codename}'
         return request.user.has_perm(qualified_name)
