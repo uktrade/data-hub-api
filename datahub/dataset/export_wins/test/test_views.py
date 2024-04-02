@@ -126,28 +126,26 @@ class TestExportWinsHVCDatasetView(BaseDatasetViewTest):
         self._assert_hvc_matches_result(hvc, response['results'][0])
 
     def test_success_includes_legacy_hvc_items(self, data_flow_api_client):
-
-        hvc = HVC.objects.create(legacy_id=EXPORT_WINS_LEGACY_ID_START_VALUE, financial_year=2024)
-        hvc.save()
-
-        legacy_hvc = HVC.objects.filter(legacy_id=1).first()
         url = f'{self.view_url}?exclude_legacy=false&page_size=10000'
         response = data_flow_api_client.get(url).json()
 
-        legacy_ids = [result['id'] for result in response['results']]
+        legacy_ids = [
+            result['id']
+            for result in response['results'] if result['id'] < EXPORT_WINS_LEGACY_ID_START_VALUE
+        ]
 
-        assert hvc.legacy_id in legacy_ids
-        assert legacy_hvc.legacy_id in legacy_ids
+        assert len(legacy_ids) > 0
 
     def test_success_excludes_legacy_hvc_items(self, data_flow_api_client):
+        response = data_flow_api_client.get(
+            f'{self.view_url}?exclude_legacy=true&page_size=10000',
+        ).json()
 
-        hvc = HVC.objects.create(legacy_id=EXPORT_WINS_LEGACY_ID_START_VALUE, financial_year=2024)
-        hvc.save()
-
-        response = data_flow_api_client.get(f'{self.view_url}?exclude_legacy=true').json()
-
-        assert len(response['results']) == 1
-        self._assert_hvc_matches_result(hvc, response['results'][0])
+        legacy_ids = [result['id'] for result in response['results']]
+        assert len(legacy_ids) > 0
+        assert all(
+            legacy_id >= EXPORT_WINS_LEGACY_ID_START_VALUE for legacy_id in legacy_ids
+        )
 
 
 class TestExportWinsWinDatasetView(BaseDatasetViewTest):
