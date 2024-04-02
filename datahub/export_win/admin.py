@@ -231,8 +231,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     def get_actions(self, request):
         """Remove the delete selected action."""
         actions = super().get_actions(request)
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
+        actions.pop('delete_selected', None)
         return actions
 
     def soft_delete(self, request, queryset):
