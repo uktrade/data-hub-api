@@ -90,6 +90,10 @@ class TestGetCustomerResponseView(APITestMixin):
                     'id': str(win.goods_vs_services.id),
                     'name': win.goods_vs_services.name,
                 },
+                'export_experience': {
+                    'id': str(win.export_experience.id),
+                    'name': win.export_experience.name,
+                },
                 'lead_officer': {
                     'id': str(win.lead_officer.id),
                     'name': win.lead_officer.name,
@@ -306,6 +310,10 @@ class TestUpdateCustomerResponseView(APITestMixin):
                 'goods_vs_services': {
                     'id': str(win.goods_vs_services.id),
                     'name': win.goods_vs_services.name,
+                },
+                'export_experience': {
+                    'id': str(win.export_experience.id),
+                    'name': win.export_experience.name,
                 },
                 'lead_officer': {
                     'id': str(win.lead_officer.id),
