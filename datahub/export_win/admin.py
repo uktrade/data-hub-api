@@ -142,6 +142,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     )
     search_fields = (
         'id',
+        'company__name'
     )
     fieldsets = (
         ('Overview', {'fields': (
