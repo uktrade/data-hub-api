@@ -15,6 +15,8 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext, gettext_lazy
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
+EXPORT_WIN_GROUP_NAME = 'ExportWinAdmin'
+
 
 class DisabledOnFilter(admin.SimpleListFilter):
     """This filter allows us to filter values that have disabled_on value."""
@@ -391,7 +393,7 @@ def format_json_as_html(value):
 
 
 def handle_export_wins_admin_permissions(user, app_label, function):
-    if not user.is_superuser and user.groups.filter(name='ExportWinAdmin').exists():
+    if not user.is_superuser and user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists():
         if app_label == 'export_win':
             return True
         return False
