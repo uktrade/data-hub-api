@@ -4,8 +4,7 @@ from django.contrib.admin import DateFieldListFilter
 from django.forms import ModelForm
 from reversion.admin import VersionAdmin
 
-
-from datahub.core.admin import BaseModelAdminMixin
+from datahub.core.admin import BaseModelAdminMixin, EXPORT_WIN_GROUP_NAME
 
 from datahub.export_win.models import Breakdown, CustomerResponse, DeletedWin, Win, WinAdviser
 
@@ -143,6 +142,10 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     )
     search_fields = (
         'id',
+        'company__pk',
+        'company__name',
+        'country__name',
+        'sector__segment',
     )
     fieldsets = (
         ('Overview', {'fields': (
@@ -265,6 +268,9 @@ class DeletedWinAdmin(WinAdmin):
 
     def has_view_permission(self, request, obj=None):
         """Set the desired user group to access view deleted win"""
-        if request.user.is_superuser or request.user.groups.filter(name='ExportWinAdmin').exists():
+        if (
+            request.user.is_superuser
+            or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
+        ):
             return True
         return False
