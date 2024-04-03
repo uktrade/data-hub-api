@@ -5,10 +5,11 @@ from reversion.admin import VersionAdmin
 
 from datahub.company.admin.adviser_forms import AddAdviserFromSSOForm
 from datahub.company.models import Advisor
+from datahub.core.admin import ExportWinsAdminMixin
 
 
 @admin.register(Advisor)
-class AdviserAdmin(VersionAdmin, UserAdmin):
+class AdviserAdmin(ExportWinsAdminMixin, VersionAdmin, UserAdmin):
     """Adviser admin."""
 
     fieldsets = (
