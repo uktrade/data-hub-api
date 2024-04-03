@@ -16,7 +16,6 @@ from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.export_win.models import (
     AssociatedProgramme,
-    BaseExportWinTotalCalculation,
     Breakdown,
     BreakdownType,
     BusinessPotential,
@@ -234,6 +233,7 @@ class WinSerializer(ModelSerializer):
         team_members = validated_data.pop('team_members', [])
         with transaction.atomic(), reversion.create_revision():
             win = Win.objects.create(**validated_data)
+
             for breakdown in breakdowns:
                 Breakdown.objects.create(win=win, **breakdown)
 
@@ -265,14 +265,7 @@ class WinSerializer(ModelSerializer):
                     update_customer_response_token_for_email_notification_id,
                     token.id,
                 )
-            calc_total = BaseExportWinTotalCalculation()
-            total_export_value = calc_total.calculate_total_export_value(win)
-            total_non_export_value = calc_total.calculate_total_non_export_value(win)
-            total_odi_value = calc_total.calculate_total_odi_value(win)
-            win.total_expected_export_value = total_export_value
-            win.total_expected_non_export_value = total_non_export_value
-            win.total_expected_odi_value = total_odi_value
-            win.save()
+            reversion.set_comment('Win created')
         return win
 
     def update(self, instance, validated_data):
