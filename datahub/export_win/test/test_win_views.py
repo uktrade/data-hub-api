@@ -790,6 +790,11 @@ class TestCreateWinView(APITestMixin):
             'last_sent': format_date_or_datetime(first_sent),
             'company_export': None,
         }
+        # check version created
+        assert Version.objects.get_for_object(win).count() == 1
+        version = Version.objects.get_for_object(win).first()
+        assert version.revision.user == self.user
+        assert version.revision.comment == 'Win created'
 
         assert response_data == expected_response_data
         assert CustomerResponseToken.objects.filter(
@@ -1088,6 +1093,7 @@ class TestCreateWinView(APITestMixin):
         assert Version.objects.get_for_object(win).count() == 1
         version = Version.objects.get_for_object(win).first()
         assert version.revision.user == self.user
+        assert version.revision.comment == 'Win created'
 
         assert CustomerResponseToken.objects.filter(
             customer_response_id=win.customer_response.id,
@@ -1403,6 +1409,7 @@ class TestUpdateWinView(APITestMixin):
         assert Version.objects.get_for_object(win).count() == 1
         version = Version.objects.get_for_object(win).first()
         assert version.revision.user == self.user
+        assert version.revision.comment == 'Win updated'
 
     def test_doesnt_update_related_fields_when_not_supplied(self):
         """Tests related fields don't get updated when not supplied."""
@@ -1615,6 +1622,7 @@ class TestUpdateWinView(APITestMixin):
         assert Version.objects.get_for_object(win).count() == 1
         version = Version.objects.get_for_object(win).first()
         assert version.revision.user == self.user
+        assert version.revision.comment == 'Win updated'
 
 
 class TestResendExportWinView(APITestMixin):
