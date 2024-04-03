@@ -308,6 +308,7 @@ class LimitedExportWinSerializer(ModelSerializer):
 
     country = NestedRelatedField(Country)
     goods_vs_services = NestedRelatedField(ExpectedValueRelation)
+    export_experience = NestedRelatedField(ExportExperience)
     lead_officer = NestedAdviserField()
     breakdowns = BreakdownSerializer(many=True)
 
@@ -317,6 +318,7 @@ class LimitedExportWinSerializer(ModelSerializer):
             'date',
             'country',
             'goods_vs_services',
+            'export_experience',
             'lead_officer',
             'breakdowns',
             'description',
