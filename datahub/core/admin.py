@@ -77,69 +77,39 @@ class ViewOnlyAdmin(ViewAndChangeOnlyAdmin):
 
 class ExportWinsAdminMixin:
     def has_module_permission(self, request):
-        user = request.user
-        print(user.is_superuser)
-        if not user.is_superuser and user.groups.filter(name='ExportWinAdmin').exists():
-            # print('self.opts', self.opts)
-            if self.opts.app_label == 'export_win':
-                return True
-            print('******hiding permission in has_module_permission for ', self.opts)
-            return False
-        return super().has_module_permission(request)
+        return self._handle_export_wins_admin_permissions(
+            request.user, self.opts.app_label, super().has_module_permission(request),
+        )
 
     def has_view_permission(self, request, obj=None):
-        # print('******has_view_permission, request.user', request.user)
-        user = request.user
 
-        return self._handle_export_wins_admin_permissions(request, self.opts.model_name, super().has_view_permission(request, obj))
-
-        if user.groups.filter(name='ExportWinAdmin').exists():
-            print('self.opts.model_name', self.opts.model_name)
-            if self.opts.model_name == 'win':
-                return True
-            return False
-        return super().has_view_permission(request, obj)
+        return self._handle_export_wins_admin_permissions(
+            request.user, self.opts.app_label, super().has_view_permission(request, obj),
+        )
 
     def has_add_permission(self, request):
-        # print('******has_add_permission, request.user', request.user)
-        user = request.user
-        return self._handle_export_wins_admin_permissions(request, self.opts.model_name, super().has_add_permission(request))
-        if user.groups.filter(name='ExportWinAdmin').exists():
-            print('self.opts.model_name', self.opts.model_name)
-            if self.opts.model_name == 'win':
-                return True
-            return False
-        return super().has_add_permission(request)
+        return self._handle_export_wins_admin_permissions(
+            request.user, self.opts.app_label, super().has_add_permission(request),
+        )
 
     def has_delete_permission(self, request, obj=None):
-        # print('******has_delete_permission, request.user', request.user)
-        user = request.user
-        return self._handle_export_wins_admin_permissions(request, self.opts.model_name, super().has_delete_permission(request, obj))
-        if user.groups.filter(name='ExportWinAdmin').exists():
-            print('self.opts.model_name', self.opts.model_name)
-            if self.opts.model_name == 'win':
-                return True
-            return False
-        return super().has_delete_permission(request, obj)
+        return self._handle_export_wins_admin_permissions(
+            request.user,
+            self.opts.app_label,
+            super().has_delete_permission(request, obj),
+        )
 
     def has_change_permission(self, request, obj=None):
-        # print('******has_change_permission, request.user', request.user)
-        user = request.user
-        return self._handle_export_wins_admin_permissions(request, self.opts.model_name, super().has_change_permission(request, obj))
-        if user.groups.filter(name='ExportWinAdmin').exists():
-            print('self.opts.model_name', self.opts.model_name)
-            if self.opts.model_name == 'win':
-                return True
-            return False
-        return super().has_change_permission(request, obj)
+        return self._handle_export_wins_admin_permissions(
+            request.user,
+            self.opts.app_label,
+            super().has_change_permission(request, obj),
+        )
 
-    def _handle_export_wins_admin_permissions(self, request, model_name, function):
-        user = request.user
-        # print('self.opts.model_name', model_name)
+    def _handle_export_wins_admin_permissions(self, user, app_label, function):
         if not user.is_superuser and user.groups.filter(name='ExportWinAdmin').exists():
-            if model_name == 'win':
+            if app_label == 'export_win':
                 return True
-            print('******hiding permission in _handle_export_wins_admin_permissions for ', model_name)
             return False
 
         return function
@@ -428,10 +398,12 @@ def _make_admin_permission_getter(codename):
 
         app_label = self.opts.app_label
         qualified_name = f'{app_label}.{codename}'
-        if not request.user.is_superuser and request.user.groups.filter(name='ExportWinAdmin').exists():
+        if (
+            not request.user.is_superuser
+            and request.user.groups.filter(name='ExportWinAdmin').exists()
+        ):
             if self.opts.app_label == 'export_win':
                 return True
-            print('******hiding permission in _make_admin_permission_getter for ', app_label)
             return False
         return request.user.has_perm(qualified_name)
 
