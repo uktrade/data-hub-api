@@ -159,6 +159,8 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'id',
         'created_on',
         'modified_on',
+        'company',
+        'company_contacts',
     )
     search_fields = (
         'id',
