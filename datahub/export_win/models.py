@@ -44,28 +44,6 @@ class BaseExportWinSoftDeleteManager(models.Manager):
         )
 
 
-class BaseExportWinTotalCalculation(models.Manager):
-    """Base class for Total Export, Non Export and ODI"""
-
-    def calculate_total_export_value(self, win_instance):
-        export_type_value = constants.BreakdownType.export.value
-        return win_instance.breakdowns.filter(
-            type_id=export_type_value.id).aggregate(
-                total_export_value=Sum('value'))['total_export_value'] or 0
-
-    def calculate_total_non_export_value(self, win_instance):
-        non_export_value = constants.BreakdownType.non_export.value
-        return win_instance.breakdowns.filter(
-            type_id=non_export_value.id).aggregate(
-                total_non_export_value=Sum('value'))['total_non_export_value'] or 0
-
-    def calculate_total_odi_value(self, win_instance):
-        odi_value = constants.BreakdownType.odi.value
-        return win_instance.breakdowns.filter(
-            type_id=odi_value.id).aggregate(
-                total_odi_value=Sum('value'))['total_odi_value'] or 0
-
-
 class BaseExportWinOrderedConstantModel(BaseOrderedConstantModel):
     """Base class for an Export Win."""
 
@@ -434,13 +412,12 @@ class Win(BaseModel):
     is_deleted = models.BooleanField(default=False)
 
     objects = BaseExportWinSoftDeleteManager()
-    total_calculation_objects = BaseExportWinTotalCalculation()
 
     def save(self, *args, **kwargs):
-        calc_total = BaseExportWinTotalCalculation()
-        self.total_expected_export_value = calc_total.calculate_total_export_value(self)
-        self.total_expected_non_export_value = calc_total.calculate_total_non_export_value(self)
-        self.total_expected_odi_value = calc_total.calculate_total_odi_value(self)
+        calc_total = _calculate_totals_for_export_win(self)
+        self.total_expected_export_value = calc_total['total_export_value']
+        self.total_expected_non_export_value = calc_total['total_non_export_value']
+        self.total_expected_odi_value = calc_total['total_odi_value']
         super().save(*args, **kwargs)
 
 
@@ -690,12 +667,34 @@ class DeletedWin(Win):
         proxy = True
 
 
+def _calculate_totals_for_export_win(win_instance):
+    """Base class for Total Export, Non Export and ODI"""
+    export_type_value = constants.BreakdownType.export.value
+    non_export_value = constants.BreakdownType.non_export.value
+    odi_value = constants.BreakdownType.odi.value
+    return {
+        'total_export_value': win_instance.breakdowns.filter(
+            type_id=export_type_value.id).aggregate(
+            total_export_value=Sum('value'),
+        )['total_export_value'] or 0,
+        'total_non_export_value': win_instance.breakdowns.filter(
+            type_id=non_export_value.id).aggregate(
+            total_non_export_value=Sum('value'),
+        )['total_non_export_value'] or 0,
+        'total_odi_value': win_instance.breakdowns.filter(
+            type_id=odi_value.id).aggregate(
+            total_odi_value=Sum('value'),
+        )['total_odi_value'] or 0,
+    }
+
+
 @receiver(post_save, sender=Breakdown)
 def update_total_values(sender, instance, **kwargs):
     """Save the right total values"""
     win = instance.win
-    calc_total = BaseExportWinTotalCalculation()
-    win.total_expected_export_value = calc_total.calculate_total_export_value(win)
-    win.total_expected_non_export_value = calc_total.calculate_total_non_export_value(win)
-    win.total_expected_odi_value = calc_total.calculate_total_odi_value(win)
+
+    calc_total = _calculate_totals_for_export_win(win)
+    win.total_expected_export_value = calc_total['total_export_value']
+    win.total_expected_non_export_value = calc_total['total_non_export_value']
+    win.total_expected_odi_value = calc_total['total_odi_value']
     win.save()

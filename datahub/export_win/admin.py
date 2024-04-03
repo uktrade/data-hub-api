@@ -112,7 +112,7 @@ class WinAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         instance = self.instance
-        if instance and instance.pk:
+        if (instance and instance.pk):
             initial_values = {
                 'total_expected_export_value',
                 'total_expected_non_export_value',

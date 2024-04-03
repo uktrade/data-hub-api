@@ -3,15 +3,13 @@ import pytest
 from datahub.company.test.factories import AdviserFactory
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.models import (
-    BaseExportWinTotalCalculation,
+    _calculate_totals_for_export_win,
     Breakdown,
     update_total_values,
     WinAdviser)
 from datahub.export_win.test.factories import BreakdownFactory, WinAdviserFactory, WinFactory
 
-
 pytestmark = pytest.mark.django_db
-calc_total = BaseExportWinTotalCalculation()
 
 
 @pytest.fixture
@@ -98,19 +96,20 @@ class TestBreakdownModel(BaseLegacyModelTests):
 
 def test_win_save(win_factory):
     win = win_factory
+    calc_total = _calculate_totals_for_export_win(win)
     win.save()
-    assert win.total_expected_export_value == calc_total.calculate_total_export_value(win)
-    assert win.total_expected_non_export_value == calc_total.calculate_total_non_export_value(win)
-    assert win.total_expected_odi_value == calc_total.calculate_total_odi_value(win)
+    assert win.total_expected_export_value == calc_total['total_export_value']
+    assert win.total_expected_non_export_value == calc_total['total_non_export_value']
+    assert win.total_expected_odi_value == calc_total['total_odi_value']
 
 
 def test_update_total_values(adviser_factory, win_factory, breakdown_factory):
     win = win_factory
     breakdown = breakdown_factory
-    calc_total = BaseExportWinTotalCalculation()
-    expected_export_value = calc_total.calculate_total_export_value(win)
-    expected_non_export_value = calc_total.calculate_total_non_export_value(win)
-    expected_odi_value = calc_total.calculate_total_odi_value(win)
+    calc_total = _calculate_totals_for_export_win(win)
+    expected_export_value = calc_total['total_export_value']
+    expected_non_export_value = calc_total['total_non_export_value']
+    expected_odi_value = calc_total['total_odi_value']
     update_total_values(sender=adviser_factory, instance=breakdown)
     win.refresh_from_db()
     assert win.total_expected_export_value == expected_export_value
