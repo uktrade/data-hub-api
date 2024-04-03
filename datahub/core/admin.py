@@ -75,7 +75,7 @@ class ViewOnlyAdmin(ViewAndChangeOnlyAdmin):
         return False
 
 
-class ExportWinsAdminMixin:
+class ExportWinsAdminMixin(admin.ModelAdmin):
     def has_module_permission(self, request):
         return handle_export_wins_admin_permissions(
             request.user,
