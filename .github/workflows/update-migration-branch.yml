@@ -1,0 +1,34 @@
+name: Update Migration Branch
+
+on:
+  pull_request:
+    types:
+      - closed
+
+permissions: 
+  contents: write
+
+jobs:
+  sync:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        
+      - name: Setup Git User
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "<EMAIL>"
+      
+
+      - name: Update Migration Branch
+        run: |
+          git checkout main
+          git fetch origin
+          git checkout migration-deploy
+          git pull
+          git merge origin/main
+          git push origin migration-deploy

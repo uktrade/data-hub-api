@@ -11,6 +11,7 @@ from django.db.models.functions import (
 from datahub.dataset.core.views import BaseDatasetView, BaseFilterDatasetView
 from datahub.dataset.export_wins.pagination import HVCDatasetViewCursorPagination
 from datahub.dataset.export_wins.utils import (
+    convert_datahub_export_experience_to_export_wins,
     create_columns_with_index,
     use_nulls_on_empty_string_fields,
 )
@@ -100,8 +101,8 @@ class ExportWinsHVCDatasetView(BaseFilterDatasetView):
         hvcs = HVC.objects.values(
             'campaign_id',
             'financial_year',
+            'name',
         ).annotate(
-            name=F('export_win_id'),
             id=F('legacy_id'),
         )
         if exclude_legacy == 'true':
@@ -252,6 +253,9 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                         win=OuterRef('pk'),
                     ).order_by('order').values('name'),
                 ),
+                export_wins_export_experience_display=F(
+                    'export_experience__export_wins_export_experience__name',
+                ),
             )
         )
 
@@ -260,3 +264,4 @@ class ExportWinsWinDatasetView(BaseDatasetView):
             create_columns_with_index(data, 'associated_programmes', 'associated_programme')
             create_columns_with_index(data, 'types_of_support', 'type_of_support')
             use_nulls_on_empty_string_fields(data)
+            convert_datahub_export_experience_to_export_wins(data)

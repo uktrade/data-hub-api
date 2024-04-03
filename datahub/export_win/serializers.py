@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import reversion
 from django.conf import settings
 from django.db import transaction
 
@@ -230,7 +231,7 @@ class WinSerializer(ModelSerializer):
         type_of_support = validated_data.pop('type_of_support')
         associated_programme = validated_data.pop('associated_programme')
         team_members = validated_data.pop('team_members', [])
-        with transaction.atomic():
+        with transaction.atomic(), reversion.create_revision():
             win = Win.objects.create(**validated_data)
 
             for breakdown in breakdowns:
@@ -264,7 +265,7 @@ class WinSerializer(ModelSerializer):
                     update_customer_response_token_for_email_notification_id,
                     token.id,
                 )
-
+            reversion.set_comment('Win created')
         return win
 
     def update(self, instance, validated_data):
@@ -275,7 +276,7 @@ class WinSerializer(ModelSerializer):
         type_of_support = validated_data.pop('type_of_support', None)
         associated_programme = validated_data.pop('associated_programme', None)
         team_members = validated_data.pop('team_members', None)
-        with transaction.atomic():
+        with transaction.atomic(), reversion.create_revision():
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
             instance.save()
@@ -298,6 +299,7 @@ class WinSerializer(ModelSerializer):
                 instance.associated_programme.set(associated_programme)
             if team_members is not None:
                 instance.team_members.set(team_members)
+            reversion.set_comment('Win updated')
         return instance
 
 
@@ -306,6 +308,7 @@ class LimitedExportWinSerializer(ModelSerializer):
 
     country = NestedRelatedField(Country)
     goods_vs_services = NestedRelatedField(ExpectedValueRelation)
+    export_experience = NestedRelatedField(ExportExperience)
     lead_officer = NestedAdviserField()
     breakdowns = BreakdownSerializer(many=True)
 
@@ -315,6 +318,7 @@ class LimitedExportWinSerializer(ModelSerializer):
             'date',
             'country',
             'goods_vs_services',
+            'export_experience',
             'lead_officer',
             'breakdowns',
             'description',
