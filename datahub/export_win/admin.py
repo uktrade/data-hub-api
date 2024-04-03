@@ -53,6 +53,10 @@ class AdvisorInlineForm(ModelForm):
 class AdvisorInline(BaseTabularInline):
     """Advisor model."""
 
+    autocomplete_fields = (
+        'adviser',
+    )
+
     model = WinAdviser
     form = AdvisorInlineForm
     fields = ('id', 'adviser', 'team_type', 'hq_team', 'location')
@@ -135,6 +139,12 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     )
     list_filter = (
         ('created_on', DateFieldListFilter),
+    )
+    autocomplete_fields = (
+        'adviser',
+        'company',
+        'company_contacts',
+        'lead_officer',
     )
     readonly_fields = (
         'id',
