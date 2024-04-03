@@ -146,6 +146,8 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'company__name',
         'country__name',
         'sector__segment',
+        'customer_response__responded_on',
+        'created_on',
     )
     fieldsets = (
         ('Overview', {'fields': (
