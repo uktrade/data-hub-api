@@ -2,6 +2,7 @@ import io
 from unittest.mock import Mock
 
 import pytest
+
 from django.conf import settings
 from django.contrib import auth, messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
@@ -11,6 +12,7 @@ from django.urls import reverse
 from faker import Faker
 from rest_framework import status
 
+from datahub.company.test.factories import AdviserFactory
 from datahub.core.admin import (
     custom_add_permission,
     custom_change_permission,
@@ -19,8 +21,10 @@ from datahub.core.admin import (
     format_json_as_html,
     get_change_link,
     get_change_url,
+    handle_export_wins_admin_permissions,
     RawIdWidget,
 )
+from datahub.core.test.factories import GroupFactory
 from datahub.core.test.support.factories import BookFactory
 from datahub.core.test.support.models import Book
 from datahub.core.test.support.views import MAX_UPLOAD_SIZE
@@ -338,3 +342,44 @@ class TestAdminAccountLockout:
                 status.HTTP_403_FORBIDDEN
             ), (attempt, settings.AXES_FAILURE_LIMIT)
             assert auth.get_user(client).is_authenticated is False
+
+
+@pytest.mark.django_db
+class TestHandleExportWinsAdminPermissions:
+    def test_user_is_not_superuser_not_in_export_wins_group(self):
+        permission_group = GroupFactory(name='Group')
+        user = AdviserFactory(is_superuser=False)
+        user.groups.add(permission_group)
+        expected_response = 'ABC'
+
+        result = handle_export_wins_admin_permissions(user, '', function=expected_response)
+
+        assert result == expected_response
+
+    def test_user_is_superuser_in_export_wins_group(self):
+        permission_group = GroupFactory(name='ExportWinAdmin')
+        user = AdviserFactory(is_superuser=True)
+        user.groups.add(permission_group)
+        expected_response = 'ABC'
+
+        result = handle_export_wins_admin_permissions(user, '', function=expected_response)
+
+        assert result == expected_response
+
+    def test_user_is_not_superuser_in_export_wins_group_accessing_export_win_module(self):
+        permission_group = GroupFactory(name='ExportWinAdmin')
+        user = AdviserFactory(is_superuser=False)
+        user.groups.add(permission_group)
+
+        result = handle_export_wins_admin_permissions(user, 'export_win', function=None)
+
+        assert result is True
+
+    def test_user_is_not_superuser_in_export_wins_group_accessing_company_module(self):
+        permission_group = GroupFactory(name='ExportWinAdmin')
+        user = AdviserFactory(is_superuser=False)
+        user.groups.add(permission_group)
+
+        result = handle_export_wins_admin_permissions(user, 'company', function=None)
+
+        assert result is False
