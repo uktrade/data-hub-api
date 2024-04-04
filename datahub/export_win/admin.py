@@ -179,6 +179,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'lead_officer_adviser_name',
         'company__name',
         'country__name',
+        'contact_name',
         'sector__segment',
         'customer_response__responded_on',
         'created_on',
@@ -275,14 +276,18 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         return False
 
     def get_search_results(self, request, queryset, search_term):
-        queryset = queryset.annotate(
-            adviser_name=Concat(
-                'adviser__first_name', Value(' '), 'adviser__last_name',
-            ),
-            lead_officer_adviser_name=Concat(
-                'lead_officer__first_name', Value(' '), 'lead_officer__last_name',
-            ),
-        )
+        if search_term:
+            queryset = queryset.annotate(
+                adviser_name=Concat(
+                    'adviser__first_name', Value(' '), 'adviser__last_name',
+                ),
+                lead_officer_adviser_name=Concat(
+                    'lead_officer__first_name', Value(' '), 'lead_officer__last_name',
+                ),
+                contact_name=Concat(
+                    'company_contacts__first_name', Value(' '), 'company_contacts__last_name',
+                ),
+            )
 
         return super().get_search_results(
             request,
