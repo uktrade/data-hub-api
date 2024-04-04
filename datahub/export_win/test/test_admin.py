@@ -1,12 +1,18 @@
 import pytest
-from django.contrib.admin.sites import site as admin_site
+
+from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.models import Group
 from django.test import RequestFactory
 from reversion.models import Version
 
-
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.export_win.admin import (
-    CustomerResponseInlineForm, DeletedWinAdmin, WinAdmin, WinAdminForm)
+    AdvisorInlineForm,
+    BreakdownInlineForm,
+    CustomerResponseInlineForm,
+    DeletedWinAdmin, WinAdmin,
+    WinAdminForm,
+    WinSoftDeletedAdminForm)
 from datahub.export_win.models import DeletedWin, Win
 from datahub.export_win.test.factories import CustomerResponseFactory, WinFactory
 
@@ -17,16 +23,17 @@ def win():
 
 
 @pytest.fixture
-def customer_response(win):
+def customer_response(win: WinFactory):
     return CustomerResponseFactory(name='Test Customer Response', win_id=win.id)
 
 
 @pytest.mark.django_db
-def test_get_actions_removes_delete_selected():
-    """Test remove delete selected"""
+def test_get_actions():
+    """Test for actions"""
     user = AdviserFactory()
-    admin = WinAdmin(Win, admin_site)
-    request = RequestFactory().get('/')
+    admin = WinAdmin(Win, AdminSite())
+    request_factory = RequestFactory()
+    request = request_factory.get('/')
     request.user = user
     actions = admin.get_actions(request)
     assert 'delete_selected' not in actions
@@ -78,20 +85,171 @@ def test_undelete():
 
 
 @pytest.mark.django_db
-def test_name_field_not_required_and_readonly_when_instance_has_pk(customer_response):
-    """Test fields not required and readonly within CustomerResponseInlineForm"""
-    form = CustomerResponseInlineForm(instance=customer_response)
-    assert form.fields['name'].required is False
-    assert form.fields['id'].widget.attrs['readonly'] is True
+def test_get_queryset_soft_deleted():
+    """Test for get softdeleted queryset"""
+    WinFactory(is_deleted=True)
+    WinFactory(is_deleted=True)
+    WinFactory(is_deleted=False)
+    WinFactory(is_deleted=False)
+
+    admin = DeletedWinAdmin(DeletedWin, AdminSite())
+    request_factory = RequestFactory()
+    request = request_factory.get('/admin/')
+    queryset = admin.get_queryset(request)
+
+    assert queryset.count() == 2
+    assert all(obj.is_deleted for obj in queryset)
 
 
 @pytest.mark.django_db
-def test_fields_not_required_when_instance_has_pk(win):
-    """Test fields not required within WinFormTest"""
-    form = WinAdminForm(instance=win)
-    assert form.fields['cdms_reference'].required is False
-    assert form.fields['customer_email_address'].required is False
-    assert form.fields['customer_job_title'].required is False
-    assert form.fields['line_manager_name'].required is False
-    assert form.fields['lead_officer_email_address'].required is False
-    assert form.fields['other_official_email_address'].required is False
+def test_get_company():
+    """Test for get company"""
+    company = CompanyFactory()
+    admin = WinAdmin(model=Win, admin_site=AdminSite())
+    obj = WinFactory(company=company)
+    result = admin.get_company(obj)
+
+    assert result == company
+
+
+@pytest.mark.django_db
+def test_get_adviser():
+    """Test for get adviser"""
+    adviser = AdviserFactory()
+    admin = WinAdmin(model=Win, admin_site=AdminSite())
+    obj = WinFactory(adviser=adviser)
+    result = admin.get_adviser(obj)
+
+    expected_result = f'{adviser} <{adviser.email}>'
+    assert result == expected_result
+
+
+@pytest.mark.django_db
+def test_get_date_confirmed():
+    """Test for get date confirmed"""
+    customer_response = CustomerResponseFactory(responded_on='2024-04-01')
+    admin = WinAdmin(model=Win, admin_site=AdminSite())
+    obj = WinFactory(customer_response=customer_response)
+    result = admin.get_date_confirmed(obj)
+
+    expected_result = '2024-04-01'
+    assert result == expected_result
+
+
+@pytest.mark.django_db
+def test_get_contact_names():
+    """Test for get contact names"""
+    contact1 = ContactFactory(first_name='John', last_name='Doe')
+    contact2 = ContactFactory(first_name='Jane', last_name='Smith')
+    obj = WinFactory()
+    obj.company_contacts.add(contact1, contact2)
+
+    admin = WinAdmin(model=Win, admin_site=AdminSite())
+    result = admin.get_contact_names(obj)
+
+    expected_result = 'John Doe, Jane Smith'
+    assert result == expected_result
+
+
+@pytest.mark.django_db
+def test_has_view_permission():
+    """Test for has view permission in deleted win"""
+    regular_user = AdviserFactory()
+    export_win_admin_group = Group.objects.create(name='ExportWinAdmin')
+    regular_user.groups.add(export_win_admin_group)
+
+    superuser = AdviserFactory(is_superuser=True)
+    admin = DeletedWinAdmin(Win, AdminSite())
+    request = RequestFactory().get('/')
+
+    request.user = regular_user
+    assert admin.has_view_permission(request) is True
+
+    request.user = AdviserFactory()
+    assert admin.has_view_permission(request) is False
+
+    request.user = superuser
+    assert admin.has_view_permission(request) is True
+
+
+@pytest.mark.django_db
+class TestWinSoftDeletedAdminForm:
+    """Test for WinSoftDeletedAdminForm"""
+
+    def test_init_method(self):
+        form = WinSoftDeletedAdminForm()
+        assert form is not None
+
+
+@pytest.mark.django_db
+class TestWinAdminForm:
+    """Test for WinAdminForm"""
+
+    def test_init_method(self):
+        form = WinAdminForm()
+        assert form is not None
+
+    def test_init_method_with_instance_pk(self):
+        instance_mock = InstanceMock(pk=1)
+        form = WinAdminForm(instance=instance_mock)
+        assert form is not None
+        if instance_mock.pk is not None:
+            field_attrs = form.fields['total_expected_export_value'].widget.attrs
+            assert field_attrs['readonly'] == 'readonly'
+            field_attrs = form.fields['total_expected_non_export_value'].widget.attrs
+            assert field_attrs['readonly'] == 'readonly'
+            field_attrs = form.fields['total_expected_odi_value'].widget.attrs
+            assert field_attrs['readonly'] == 'readonly'
+            assert form.fields['cdms_reference'].required is False
+            assert form.fields['customer_email_address'].required is False
+            assert form.fields['customer_job_title'].required is False
+            assert form.fields['line_manager_name'].required is False
+            assert form.fields['lead_officer_email_address'].required is False
+            assert form.fields['other_official_email_address'].required is False
+
+
+@pytest.mark.django_db
+class TestWinBreakdownInlineForm:
+    """Test for Breakdown in line form"""
+
+    def test_init_method(self):
+        form = BreakdownInlineForm()
+        assert form is not None
+
+
+@pytest.mark.django_db
+class TestAdvisorInlineForm:
+    """Test for Adviser in line form"""
+
+    def test_init_method(self):
+        form = AdvisorInlineForm()
+        assert form is not None
+
+
+class InstanceMock:
+    def __init__(self, pk):
+        self.pk = pk
+
+    @property
+    def _meta(self):
+        return type('Meta', (),
+                    {'fields': [],
+                     'exclude': [],
+                     'concrete_fields': [],
+                     'private_fields': [], 'many_to_many': []})
+
+
+@pytest.mark.django_db
+class TestCustomerResponseInlineForm:
+    """
+    Test for Customer Response in line form
+    Field name is not required and field id should be read-only
+    """
+
+    def test_init_method(self):
+        instance_mock = InstanceMock(pk=1)
+        form = CustomerResponseInlineForm(instance=instance_mock)
+        assert form is not None
+        if instance_mock and instance_mock.pk:
+            assert form.fields['name'].required is False
+            assert form.fields['id'].widget.attrs['readonly'] is True

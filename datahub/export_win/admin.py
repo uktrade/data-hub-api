@@ -1,4 +1,6 @@
 import reversion
+from django import forms
+
 from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter
 from django.forms import ModelForm
@@ -6,7 +8,12 @@ from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin, EXPORT_WIN_GROUP_NAME
 
-from datahub.export_win.models import Breakdown, CustomerResponse, DeletedWin, Win, WinAdviser
+from datahub.export_win.models import (
+    Breakdown,
+    CustomerResponse,
+    DeletedWin,
+    Win,
+    WinAdviser)
 
 
 class BaseTabularInline(admin.TabularInline):
@@ -73,7 +80,10 @@ class BaseStackedInline(admin.StackedInline):
 
 
 class CustomerResponseInlineForm(ModelForm):
-    """Customer response inline form."""
+    """
+    Customer Response in line form.
+    Field name is not required and field id should be read-only
+    """
 
     class Meta:
         model = CustomerResponse
@@ -81,9 +91,11 @@ class CustomerResponseInlineForm(ModelForm):
 
     def __init__(self, *args, obj=None, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            self.fields['name'].required = False
-            self.fields['id'].widget.attrs['readonly'] = True
+
+        instance = getattr(self, 'instance', None)
+        is_instance_and_pk_exist = getattr(instance, 'pk', None) is not None
+        self.fields['name'].required = not is_instance_and_pk_exist
+        self.fields['id'].widget.attrs['readonly'] = is_instance_and_pk_exist
 
 
 class CustomerResponseInline(BaseStackedInline):
@@ -103,7 +115,15 @@ class WinAdminForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
+        instance = self.instance
+        if (instance and instance.pk):
+            initial_values = {
+                'total_expected_export_value',
+                'total_expected_non_export_value',
+                'total_expected_odi_value',
+            }
+            for field_name in initial_values:
+                self.fields[field_name].widget = forms.TextInput(attrs={'readonly': 'readonly'})
             fields_to_update = [
                 'cdms_reference',
                 'customer_email_address',
@@ -232,8 +252,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     def get_actions(self, request):
         """Remove the delete selected action."""
         actions = super().get_actions(request)
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
+        actions.pop('delete_selected', None)
         return actions
 
     def soft_delete(self, request, queryset):
@@ -252,9 +271,22 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         return False
 
 
+class WinSoftDeletedAdminForm(ModelForm):
+    """Win soft deleted admin form"""
+
+    class Meta:
+        model = DeletedWin
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
 @admin.register(DeletedWin)
 class DeletedWinAdmin(WinAdmin):
+    """Admin for Deleted Wins."""
 
+    form = WinSoftDeletedAdminForm
     inlines = (BreakdownInline, CustomerResponseInline, AdvisorInline)
     actions = ('undelete',)
 
@@ -275,9 +307,6 @@ class DeletedWinAdmin(WinAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    def has_change_permission(self, request, obj=None):
-        return False
-
     def has_view_permission(self, request, obj=None):
         """Set the desired user group to access view deleted win"""
         if (
@@ -285,4 +314,7 @@ class DeletedWinAdmin(WinAdmin):
             or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
         ):
             return True
+        return False
+
+    def has_change_permission(self, request, obj=None):
         return False
