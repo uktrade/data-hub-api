@@ -1,5 +1,6 @@
-from unittest.mock import Mock
 import pytest
+
+from unittest.mock import Mock
 
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import Group
