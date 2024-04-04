@@ -302,7 +302,5 @@ class TestWinAdminSearchResults:
         admin = WinAdmin(Win, None)
         results = admin.get_search_results(Mock(), Win.objects.all(), 'John Doe')[0]
 
-        print(results)
-
         assert len(results) == 1
         assert results[0].id == win1.id
