@@ -1,7 +1,20 @@
 from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import JSONField
-from django.db.models import Case, Count, ExpressionWrapper, F, Func, Max, When
-from django.db.models import CharField, IntegerField, OuterRef, Subquery, Value
+from django.db.models import (
+    BooleanField,
+    Case,
+    CharField,
+    Count,
+    ExpressionWrapper,
+    F,
+    Func,
+    IntegerField,
+    Max,
+    OuterRef,
+    Subquery,
+    Value,
+    When,
+)
 from django.db.models.functions import (
     Cast,
     Concat,
@@ -27,6 +40,7 @@ from datahub.export_win.models import (
     Win,
     WinAdviser,
 )
+from datahub.metadata.query_utils import get_sector_name_subquery
 
 
 class ExportWinsAdvisersDatasetView(BaseDatasetView):
@@ -131,6 +145,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 'sector',
             )
             .annotate(
+                sector_name=get_sector_name_subquery('sector'),
                 # Subquery returns a JSONB document to avoid creating multiple subqueries
                 # to retrieve different properties of the same contact
                 customer_details=Subquery(
@@ -188,70 +203,99 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 goods_vs_services_display=F('goods_vs_services__name'),
                 hq_team_display=F('hq_team__name'),
                 hvo_programme_display=F('hvo_programme__name'),
-                sector_display=F('sector__segment'),
+                sector_display=F('sector_name'),
                 team_type_display=F('team_type__name'),
                 num_notifications=Count('customer_response__tokens'),
                 customer_email_date=Max('customer_response__tokens__created_on'),
             )
             .annotate(
                 company_name=F('company__name'),
-                confirmation__access_to_contacts=Cast(
-                    'customer_response__our_support__export_win_id', IntegerField(),
+                confirmation__access_to_contacts=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__our_support__export_win_id'),
+                    output_field=IntegerField(),
                 ),
-                confirmation__access_to_information=Cast(
-                    'customer_response__access_to_information__export_win_id',
-                    IntegerField(),
+                confirmation__access_to_information=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__access_to_information__export_win_id'),
+                    output_field=IntegerField(),
                 ),
                 confirmation__agree_with_win=F('customer_response__agree_with_win'),
-                confirmation__case_study_willing=F(
-                    'customer_response__case_study_willing',
+                confirmation__case_study_willing=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__case_study_willing'),
+                    output_field=BooleanField(),
                 ),
                 confirmation__comments=F('customer_response__comments'),
-                confirmation__company_was_at_risk_of_not_exporting=F(
-                    'customer_response__company_was_at_risk_of_not_exporting',
+                confirmation__company_was_at_risk_of_not_exporting=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__company_was_at_risk_of_not_exporting'),
+                    output_field=BooleanField(),
                 ),
-                confirmation__created=F('customer_response__created_on'),
-                confirmation__developed_relationships=Cast(
-                    'customer_response__developed_relationships__export_win_id',
-                    IntegerField(),
+                confirmation__created=F('customer_response__responded_on'),
+                confirmation__developed_relationships=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__developed_relationships__export_win_id'),
+                    output_field=IntegerField(),
                 ),
-                confirmation__gained_confidence=Cast(
-                    'customer_response__gained_confidence__export_win_id',
-                    IntegerField(),
+                confirmation__gained_confidence=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__gained_confidence__export_win_id'),
+                    output_field=IntegerField(),
                 ),
-                confirmation__has_enabled_expansion_into_existing_market=F(
-                    'customer_response__has_enabled_expansion_into_existing_market',
+                confirmation__has_enabled_expansion_into_existing_market=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__has_enabled_expansion_into_existing_market'),
+                    output_field=BooleanField(),
                 ),
-                confirmation__has_enabled_expansion_into_new_market=F(
-                    'customer_response__has_enabled_expansion_into_new_market',
+                confirmation__has_enabled_expansion_into_new_market=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__has_enabled_expansion_into_new_market'),
+                    output_field=BooleanField(),
                 ),
-                confirmation__has_explicit_export_plans=F(
-                    'customer_response__has_explicit_export_plans',
+                confirmation__has_explicit_export_plans=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__has_explicit_export_plans'),
+                    output_field=BooleanField(),
                 ),
-                confirmation__has_increased_exports_as_percent_of_turnover=F(
-                    'customer_response__has_increased_exports_as_percent_of_turnover',
+                confirmation__has_increased_exports_as_percent_of_turnover=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__has_increased_exports_as_percent_of_turnover'),
+                    output_field=BooleanField(),
                 ),
-                confirmation__improved_profile=Cast(
-                    'customer_response__improved_profile__export_win_id', IntegerField(),
+                confirmation__improved_profile=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__improved_profile__export_win_id'),
+                    output_field=IntegerField(),
                 ),
-                confirmation__interventions_were_prerequisite=F(
-                    'customer_response__interventions_were_prerequisite',
+                confirmation__interventions_were_prerequisite=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__interventions_were_prerequisite'),
+                    output_field=BooleanField(),
                 ),
-                confirmation__involved_state_enterprise=F(
-                    'customer_response__involved_state_enterprise',
+                confirmation__involved_state_enterprise=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__involved_state_enterprise'),
+                    output_field=BooleanField(),
                 ),
                 confirmation__name=F('customer_response__name'),
                 confirmation__other_marketing_source=F(
                     'customer_response__other_marketing_source',
                 ),
-                confirmation__our_support=Cast(
-                    'customer_response__our_support__export_win_id', IntegerField(),
+                confirmation__our_support=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__our_support__export_win_id'),
+                    output_field=IntegerField(),
                 ),
-                confirmation__overcame_problem=Cast(
-                    'customer_response__overcame_problem__export_win_id', IntegerField(),
+                confirmation__overcame_problem=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__overcame_problem__export_win_id'),
+                    output_field=IntegerField(),
                 ),
-                confirmation__support_improved_speed=F(
-                    'customer_response__support_improved_speed',
+                confirmation__support_improved_speed=Case(
+                    When(customer_response__responded_on__isnull=True, then=None),
+                    default=F('customer_response__support_improved_speed'),
+                    output_field=BooleanField(),
                 ),
                 country=F('country__iso_alpha2_code'),
                 hvc=F('hvc__export_win_id'),
