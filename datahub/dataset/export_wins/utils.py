@@ -1,5 +1,5 @@
 def use_nulls_on_empty_string_fields(data):
-    columns = ['audit']
+    columns = ['audit', 'confirmation__other_marketing_source']
     for column in columns:
         column_value = data.get(column)
         if column_value == '':
