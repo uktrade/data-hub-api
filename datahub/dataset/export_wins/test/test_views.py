@@ -7,6 +7,7 @@ from django.urls import reverse
 
 from freezegun import freeze_time
 
+from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.test_utils import (
     format_date_or_datetime,
 )
@@ -160,12 +161,13 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
         tokens,
         result,
     ):
+        contact = win.company_contacts.first()
         expected = {
             'created_on': format_date_or_datetime(win.created_on),
             'id': str(win.id),
             'audit': None,
             'business_type': win.business_type,
-            'cdms_reference': win.cdms_reference,
+            'cdms_reference': win.company.company_number,
             'company_name': win.company.name,
             'complete': win.complete,
             'confirmation__access_to_contacts': win.customer_response.our_support.export_win_id,
@@ -203,9 +205,9 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'confirmation__support_improved_speed': win.customer_response.support_improved_speed,
             'country': win.country.iso_alpha2_code,
             'created': format_date_or_datetime(win.created_on),
-            'customer_email_address': win.customer_email_address,
-            'customer_job_title': win.customer_job_title,
-            'customer_name': win.customer_name,
+            'customer_email_address': contact.email,
+            'customer_job_title': contact.job_title,
+            'customer_name': contact.name,
             'date': format_date_or_datetime(win.date),
             'description': win.description,
             'has_hvo_specialist_involvement': win.has_hvo_specialist_involvement,
@@ -252,10 +254,14 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
     def test_success(self, data_flow_api_client):
         associated_programmes = AssociatedProgrammeFactory.create_batch(3)
         types_of_support = SupportTypeFactory.create_batch(2)
+        company = CompanyFactory(company_number='012345')
+        contact = ContactFactory(company=company)
         win = self.factory(
             associated_programme=associated_programmes,
             type_of_support=types_of_support,
             hvo_programme=HVOProgrammesFactory(),
+            company=company,
+            company_contacts=[contact],
         )
         customer_response = CustomerResponseFactory(win=win)
         tokens = CustomerResponseTokenFactory.create_batch(3, customer_response=customer_response)

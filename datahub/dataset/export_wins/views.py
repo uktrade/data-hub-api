@@ -1,6 +1,7 @@
 from django.contrib.postgres.expressions import ArraySubquery
-from django.db.models import Case, Count, ExpressionWrapper, F, Max, When
-from django.db.models import IntegerField, OuterRef, Value
+from django.contrib.postgres.fields import JSONField
+from django.db.models import Case, Count, ExpressionWrapper, F, Func, Max, When
+from django.db.models import CharField, IntegerField, OuterRef, Subquery, Value
 from django.db.models.functions import (
     Cast,
     Concat,
@@ -8,6 +9,7 @@ from django.db.models.functions import (
     ExtractYear,
 )
 
+from datahub.company.models import Contact
 from datahub.dataset.core.views import BaseDatasetView, BaseFilterDatasetView
 from datahub.dataset.export_wins.pagination import HVCDatasetViewCursorPagination
 from datahub.dataset.export_wins.utils import (
@@ -128,17 +130,33 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 'hvo_programme',
                 'sector',
             )
+            .annotate(
+                # Subquery returns a JSONB document to avoid creating multiple subqueries
+                # to retrieve different properties of the same contact
+                customer_details=Subquery(
+                    Contact.objects.filter(
+                        wins=OuterRef('pk'),
+                    ).annotate(
+                        details=Func(
+                            Value('name'), Concat('first_name', Value(' '), 'last_name'),
+                            Value('email'), Cast('email', CharField()),
+                            Value('job_title'), 'job_title',
+                            function='jsonb_build_object',
+                        ),
+                    ).order_by(
+                        'pk',
+                    ).values('details')[:1],
+                    output_field=JSONField(),
+                ),
+                temp_cdms_reference=F('cdms_reference'),
+            )
             .prefetch_related('associated_programme', 'type_of_support')
             .values(
                 'created_on',
                 'id',
                 'audit',
                 'business_type',
-                'cdms_reference',
                 'complete',
-                'customer_email_address',
-                'customer_job_title',
-                'customer_name',
                 'date',
                 'description',
                 'has_hvo_specialist_involvement',
@@ -255,6 +273,17 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 ),
                 export_wins_export_experience_display=F(
                     'export_experience__export_wins_export_experience__name',
+                ),
+                customer_email_address=F('customer_details__email'),
+                customer_job_title=F('customer_details__job_title'),
+                customer_name=F('customer_details__name'),
+                cdms_reference=Case(
+                    When(
+                        temp_cdms_reference='',
+                        then=F('company__company_number'),
+                    ),
+                    default=F('temp_cdms_reference'),
+                    output_field=CharField(),
                 ),
             )
         )
