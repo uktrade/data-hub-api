@@ -3,7 +3,9 @@ import uuid
 from django.conf import settings
 
 from django.db import models, transaction
-from django.db.models import Max
+from django.db.models import Max, Sum
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from datahub.company.models import (
     Advisor,
@@ -11,7 +13,7 @@ from datahub.company.models import (
     Contact,
     ExportExperience,
 )
-from datahub.core import reversion
+from datahub.core import constants, reversion
 from datahub.core.models import BaseModel, BaseOrderedConstantModel
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.metadata.models import (
@@ -411,6 +413,13 @@ class Win(BaseModel):
 
     objects = BaseExportWinSoftDeleteManager()
 
+    def save(self, *args, **kwargs):
+        calc_total = _calculate_totals_for_export_win(self)
+        self.total_expected_export_value = calc_total['total_export_value']
+        self.total_expected_non_export_value = calc_total['total_non_export_value']
+        self.total_expected_odi_value = calc_total['total_odi_value']
+        super().save(*args, **kwargs)
+
 
 class Breakdown(BaseModel, BaseLegacyModel):
     """Win breakdown."""
@@ -656,3 +665,36 @@ class DeletedWin(Win):
 
     class Meta:
         proxy = True
+
+
+def _calculate_totals_for_export_win(win_instance):
+    """Base class for Total Export, Non Export and ODI"""
+    export_type_value = constants.BreakdownType.export.value
+    non_export_value = constants.BreakdownType.non_export.value
+    odi_value = constants.BreakdownType.odi.value
+    return {
+        'total_export_value': win_instance.breakdowns.filter(
+            type_id=export_type_value.id).aggregate(
+            total_export_value=Sum('value'),
+        )['total_export_value'] or 0,
+        'total_non_export_value': win_instance.breakdowns.filter(
+            type_id=non_export_value.id).aggregate(
+            total_non_export_value=Sum('value'),
+        )['total_non_export_value'] or 0,
+        'total_odi_value': win_instance.breakdowns.filter(
+            type_id=odi_value.id).aggregate(
+            total_odi_value=Sum('value'),
+        )['total_odi_value'] or 0,
+    }
+
+
+@receiver(post_save, sender=Breakdown)
+def update_total_values(sender, instance, **kwargs):
+    """Save the right total values"""
+    win = instance.win
+
+    calc_total = _calculate_totals_for_export_win(win)
+    win.total_expected_export_value = calc_total['total_export_value']
+    win.total_expected_non_export_value = calc_total['total_non_export_value']
+    win.total_expected_odi_value = calc_total['total_odi_value']
+    win.save()
