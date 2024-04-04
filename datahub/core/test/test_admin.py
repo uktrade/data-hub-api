@@ -346,13 +346,32 @@ class TestAdminAccountLockout:
 
 @pytest.mark.django_db
 class TestHandleExportWinsAdminPermissions:
+
+    def test_request_path_is_autocomplete(self):
+        expected_response = 'ABC'
+
+        request = Mock()
+        request.path = '/admin/autocomplete'
+
+        result = handle_export_wins_admin_permissions(
+            request, '', check_permission_function=expected_response,
+        )
+
+        assert result == expected_response
+
     def test_user_is_not_superuser_not_in_export_wins_group(self):
         permission_group = GroupFactory(name='Group')
         user = AdviserFactory(is_superuser=False)
         user.groups.add(permission_group)
         expected_response = 'ABC'
 
-        result = handle_export_wins_admin_permissions(user, '', function=expected_response)
+        request = Mock()
+        request.user = user
+        request.path = ''
+
+        result = handle_export_wins_admin_permissions(
+            request, '', check_permission_function=expected_response,
+        )
 
         assert result == expected_response
 
@@ -362,7 +381,13 @@ class TestHandleExportWinsAdminPermissions:
         user.groups.add(permission_group)
         expected_response = 'ABC'
 
-        result = handle_export_wins_admin_permissions(user, '', function=expected_response)
+        request = Mock()
+        request.user = user
+        request.path = ''
+
+        result = handle_export_wins_admin_permissions(
+            request, '', check_permission_function=expected_response,
+        )
 
         assert result == expected_response
 
@@ -371,7 +396,13 @@ class TestHandleExportWinsAdminPermissions:
         user = AdviserFactory(is_superuser=False)
         user.groups.add(permission_group)
 
-        result = handle_export_wins_admin_permissions(user, 'export_win', function=None)
+        request = Mock()
+        request.user = user
+        request.path = ''
+
+        result = handle_export_wins_admin_permissions(
+            request, 'export_win', check_permission_function=None,
+        )
 
         assert result is True
 
@@ -380,6 +411,12 @@ class TestHandleExportWinsAdminPermissions:
         user = AdviserFactory(is_superuser=False)
         user.groups.add(permission_group)
 
-        result = handle_export_wins_admin_permissions(user, 'company', function=None)
+        request = Mock()
+        request.user = user
+        request.path = ''
+
+        result = handle_export_wins_admin_permissions(
+            request, 'company', check_permission_function=None,
+        )
 
         assert result is False

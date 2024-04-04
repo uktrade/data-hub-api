@@ -80,35 +80,35 @@ class ViewOnlyAdmin(ViewAndChangeOnlyAdmin):
 class ExportWinsAdminMixin(admin.ModelAdmin):
     def has_module_permission(self, request):
         return handle_export_wins_admin_permissions(
-            request.user,
+            request,
             self.opts.app_label,
             super().has_module_permission(request),
         )
 
     def has_view_permission(self, request, obj=None):
         return handle_export_wins_admin_permissions(
-            request.user,
+            request,
             self.opts.app_label,
             super().has_view_permission(request, obj),
         )
 
     def has_add_permission(self, request):
         return handle_export_wins_admin_permissions(
-            request.user,
+            request,
             self.opts.app_label,
             super().has_add_permission(request),
         )
 
     def has_delete_permission(self, request, obj=None):
         return handle_export_wins_admin_permissions(
-            request.user,
+            request,
             self.opts.app_label,
             super().has_delete_permission(request, obj),
         )
 
     def has_change_permission(self, request, obj=None):
         return handle_export_wins_admin_permissions(
-            request.user,
+            request,
             self.opts.app_label,
             super().has_change_permission(request, obj),
         )
@@ -392,13 +392,24 @@ def format_json_as_html(value):
     return format_html('<pre>{0}</pre>', json.dumps(value, indent=2))
 
 
-def handle_export_wins_admin_permissions(user, app_label, function):
+def handle_export_wins_admin_permissions(request, app_label, check_permission_function):
+
+    # The autocomplete fields in django admin have their own permission check on the models
+    # referenced by that field. As we have explicitly denied export win admins permission to
+    # access anything other than export win models, they will receive errors using these
+    # autocomplete fields even though they do have permission via the team role they have been
+    # assigned
+    if request.path.startswith('/admin/autocomplete'):
+        return check_permission_function
+
+    user = request.user
+
     if not user.is_superuser and user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists():
         if app_label == 'export_win':
             return True
         return False
 
-    return function
+    return check_permission_function
 
 
 def _make_admin_permission_getter(codename):
@@ -408,7 +419,7 @@ def _make_admin_permission_getter(codename):
         qualified_name = f'{app_label}.{codename}'
 
         return handle_export_wins_admin_permissions(
-            request.user,
+            request,
             app_label,
             request.user.has_perm(qualified_name),
         )
