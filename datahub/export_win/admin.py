@@ -3,6 +3,8 @@ from django import forms
 
 from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter
+from django.db.models import Value
+from django.db.models.functions import Concat
 from django.forms import ModelForm
 from reversion.admin import VersionAdmin
 
@@ -171,10 +173,13 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified_on',
     )
     search_fields = (
-        'id',
-        'company__pk',
+        '=id',
+        'adviser_name',
+        '=company__pk',
+        'lead_officer_adviser_name',
         'company__name',
         'country__name',
+        'contact_name',
         'sector__segment',
         'customer_response__responded_on',
         'created_on',
@@ -269,6 +274,26 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def get_search_results(self, request, queryset, search_term):
+        if search_term:
+            queryset = queryset.annotate(
+                adviser_name=Concat(
+                    'adviser__first_name', Value(' '), 'adviser__last_name',
+                ),
+                lead_officer_adviser_name=Concat(
+                    'lead_officer__first_name', Value(' '), 'lead_officer__last_name',
+                ),
+                contact_name=Concat(
+                    'company_contacts__first_name', Value(' '), 'company_contacts__last_name',
+                ),
+            )
+
+        return super().get_search_results(
+            request,
+            queryset,
+            search_term,
+        )
 
 
 class WinSoftDeletedAdminForm(ModelForm):

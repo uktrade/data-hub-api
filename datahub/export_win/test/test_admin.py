@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 
 from django.contrib.admin.sites import AdminSite
@@ -253,3 +255,52 @@ class TestCustomerResponseInlineForm:
         if instance_mock and instance_mock.pk:
             assert form.fields['name'].required is False
             assert form.fields['id'].widget.attrs['readonly'] is True
+
+
+@pytest.mark.django_db
+class TestWinAdminSearchResults:
+
+    def test_admin_search_no_filters(self):
+        win1 = WinFactory()
+        contacts = ContactFactory.create_batch(4)
+        win1.company_contacts.set(contacts)
+        WinFactory()
+
+        admin = WinAdmin(Win, None)
+        results = admin.get_search_results(Mock(), Win.objects.all(), '')[0]
+
+        assert len(results) == 2
+
+    def test_admin_search_on_adviser_name(self):
+        adviser = AdviserFactory(first_name='FIRST', last_name='LAST')
+        win1 = WinFactory(adviser=adviser)
+        WinFactory.create_batch(3)
+        admin = WinAdmin(Win, None)
+        results = admin.get_search_results(Mock(), Win.objects.all(), 'FIRST LAST')[0]
+
+        assert len(results) == 1
+        assert results[0].id == win1.id
+
+    def test_admin_search_on_lead_officer_name(self):
+        lead_officer = AdviserFactory(first_name='LEAD', last_name='OFFICER')
+        win1 = WinFactory(lead_officer=lead_officer)
+        WinFactory.create_batch(3)
+        admin = WinAdmin(Win, None)
+        results = admin.get_search_results(Mock(), Win.objects.all(), 'LEAD OFFICER')[0]
+
+        assert len(results) == 1
+        assert results[0].id == win1.id
+
+    def test_admin_search_on_contact_name(self):
+        contact1 = ContactFactory(first_name='John', last_name='Doe')
+        contact2 = ContactFactory(first_name='Jane', last_name='Smith')
+
+        win1 = WinFactory()
+        win1.company_contacts.add(contact1, contact2)
+
+        WinFactory.create_batch(3)
+        admin = WinAdmin(Win, None)
+        results = admin.get_search_results(Mock(), Win.objects.all(), 'John Doe')[0]
+
+        assert len(results) == 1
+        assert results[0].id == win1.id
