@@ -179,7 +179,6 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'lead_officer_adviser_name',
         'company__name',
         'country__name',
-        'contact_name',
         'sector__segment',
         'customer_response__responded_on',
         'created_on',
