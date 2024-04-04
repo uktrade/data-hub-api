@@ -196,6 +196,7 @@ class TestWinAdminForm:
         form = WinAdminForm(instance=instance_mock)
         assert form is not None
         if instance_mock.pk is not None:
+            assert form.fields['audit'].required is True
             field_attrs = form.fields['total_expected_export_value'].widget.attrs
             assert field_attrs['readonly'] == 'readonly'
             field_attrs = form.fields['total_expected_non_export_value'].widget.attrs

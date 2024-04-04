@@ -109,35 +109,35 @@ class CustomerResponseInline(BaseStackedInline):
 
 
 class WinAdminForm(ModelForm):
-    """Win admin form."""
-
     class Meta:
         model = Win
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields['audit'].required = True
         instance = self.instance
-        if (instance and instance.pk):
-            initial_values = {
-                'total_expected_export_value',
-                'total_expected_non_export_value',
-                'total_expected_odi_value',
-            }
-            for field_name in initial_values:
-                self.fields[field_name].widget = forms.TextInput(attrs={'readonly': 'readonly'})
-            fields_to_update = [
-                'cdms_reference',
-                'customer_email_address',
-                'customer_job_title',
-                'line_manager_name',
-                'lead_officer_email_address',
-                'other_official_email_address',
-            ]
-            for field_name in fields_to_update:
-                field = self.fields.get(field_name)
-                if field:
-                    field.required = False
+
+        initial_values = {
+            'total_expected_export_value',
+            'total_expected_non_export_value',
+            'total_expected_odi_value',
+        }
+        fields_to_update = {
+            'cdms_reference',
+            'customer_email_address',
+            'customer_job_title',
+            'line_manager_name',
+            'lead_officer_email_address',
+            'other_official_email_address',
+        }
+
+        for field_name in initial_values | fields_to_update:
+            readonly = instance and instance.pk and field_name in initial_values
+            self.fields[field_name].widget = forms.TextInput(
+                attrs={'readonly': 'readonly'} if readonly else {})
+            self.fields[field_name].required = False
 
 
 @admin.register(Win)
