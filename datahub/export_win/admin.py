@@ -173,9 +173,9 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified_on',
     )
     search_fields = (
-        'id',
+        '=id',
         'adviser_name',
-        'company__pk',
+        '=company__pk',
         'lead_officer_adviser_name',
         'company__name',
         'country__name',
