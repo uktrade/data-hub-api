@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -8,6 +8,7 @@ from django.urls import reverse
 from freezegun import freeze_time
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.core.constants import Sector
 from datahub.core.test_utils import (
     format_date_or_datetime,
 )
@@ -162,6 +163,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
         result,
     ):
         contact = win.company_contacts.first()
+        has_responded = win.customer_response.responded_on is not None
         expected = {
             'created_on': format_date_or_datetime(win.created_on),
             'id': str(win.id),
@@ -170,39 +172,52 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'cdms_reference': win.company.company_number,
             'company_name': win.company.name,
             'complete': win.complete,
-            'confirmation__access_to_contacts': win.customer_response.our_support.export_win_id,
+            'confirmation__access_to_contacts':
+                win.customer_response.our_support.export_win_id if has_responded else None,
             'confirmation__access_to_information':
-                win.customer_response.access_to_information.export_win_id,
+                win.customer_response.access_to_information.export_win_id
+                if has_responded else None,
             'confirmation__agree_with_win': win.customer_response.agree_with_win,
-            'confirmation__case_study_willing': win.customer_response.case_study_willing,
+            'confirmation__case_study_willing':
+                win.customer_response.case_study_willing if has_responded else None,
             'confirmation__comments': win.customer_response.comments,
             'confirmation__company_was_at_risk_of_not_exporting':
-                win.customer_response.company_was_at_risk_of_not_exporting,
+                win.customer_response.company_was_at_risk_of_not_exporting
+                if has_responded else None,
             'confirmation__created': format_date_or_datetime(
-                win.customer_response.created_on,
+                win.customer_response.responded_on,
             ),
             'confirmation__developed_relationships':
-                win.customer_response.developed_relationships.export_win_id,
+                win.customer_response.developed_relationships.export_win_id
+                if has_responded else None,
             'confirmation__gained_confidence':
-                win.customer_response.gained_confidence.export_win_id,
+                win.customer_response.gained_confidence.export_win_id if has_responded else None,
             'confirmation__has_enabled_expansion_into_existing_market':
-                win.customer_response.has_enabled_expansion_into_existing_market,
+                win.customer_response.has_enabled_expansion_into_existing_market
+                if has_responded else None,
             'confirmation__has_enabled_expansion_into_new_market':
-                win.customer_response.has_enabled_expansion_into_new_market,
+                win.customer_response.has_enabled_expansion_into_new_market
+                if has_responded else None,
             'confirmation__has_explicit_export_plans':
-                win.customer_response.has_explicit_export_plans,
+                win.customer_response.has_explicit_export_plans if has_responded else None,
             'confirmation__has_increased_exports_as_percent_of_turnover':
-                win.customer_response.has_increased_exports_as_percent_of_turnover,
-            'confirmation__improved_profile': win.customer_response.improved_profile.export_win_id,
+                win.customer_response.has_increased_exports_as_percent_of_turnover
+                if has_responded else None,
+            'confirmation__improved_profile':
+                win.customer_response.improved_profile.export_win_id if has_responded else None,
             'confirmation__interventions_were_prerequisite':
-                win.customer_response.interventions_were_prerequisite,
+                win.customer_response.interventions_were_prerequisite if has_responded else None,
             'confirmation__involved_state_enterprise':
-                win.customer_response.involved_state_enterprise,
+                win.customer_response.involved_state_enterprise if has_responded else None,
             'confirmation__name': win.customer_response.name,
-            'confirmation__other_marketing_source': win.customer_response.other_marketing_source,
-            'confirmation__our_support': win.customer_response.our_support.export_win_id,
-            'confirmation__overcame_problem': win.customer_response.overcame_problem.export_win_id,
-            'confirmation__support_improved_speed': win.customer_response.support_improved_speed,
+            'confirmation__other_marketing_source':
+                win.customer_response.other_marketing_source if has_responded else None,
+            'confirmation__our_support':
+                win.customer_response.our_support.export_win_id if has_responded else None,
+            'confirmation__overcame_problem':
+                win.customer_response.overcame_problem.export_win_id if has_responded else None,
+            'confirmation__support_improved_speed':
+                win.customer_response.support_improved_speed if has_responded else None,
             'country': win.country.iso_alpha2_code,
             'created': format_date_or_datetime(win.created_on),
             'customer_email_address': contact.email,
@@ -238,7 +253,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'goods_vs_services_display': win.goods_vs_services.name,
             'hq_team_display': win.hq_team.name,
             'hvo_programme_display': win.hvo_programme.name,
-            'sector_display': win.sector.segment,
+            'sector_display': win.sector.name,
             'team_type_display': win.team_type.name,
             'num_notifications': len(tokens),
             'customer_email_date':
@@ -251,7 +266,11 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
 
         assert result == expected
 
-    def test_success(self, data_flow_api_client):
+    @pytest.mark.parametrize(
+        'responded',
+        (True, False),
+    )
+    def test_success(self, data_flow_api_client, responded):
         associated_programmes = AssociatedProgrammeFactory.create_batch(3)
         types_of_support = SupportTypeFactory.create_batch(2)
         company = CompanyFactory(company_number='012345')
@@ -262,8 +281,13 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             hvo_programme=HVOProgrammesFactory(),
             company=company,
             company_contacts=[contact],
+            sector_id=Sector.aerospace_assembly_aircraft.value.id,
         )
-        customer_response = CustomerResponseFactory(win=win)
+        customer_response = CustomerResponseFactory(
+            win=win,
+            other_marketing_source='marketing' if responded else '',
+            responded_on=datetime.now() if responded else None,
+        )
         tokens = CustomerResponseTokenFactory.create_batch(3, customer_response=customer_response)
 
         response = data_flow_api_client.get(self.view_url).json()
