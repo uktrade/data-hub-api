@@ -87,6 +87,14 @@ class TestWinAdviserModel(BaseLegacyModelTests):
     factory = WinAdviserFactory
     model_class = WinAdviser
 
+    def test_str_representation(self):
+        win_adviser = self.factory()
+
+        assert (
+            str(win_adviser)
+            == f'Name: {win_adviser.adviser}, Team {win_adviser.team_type} - {win_adviser.hq_team}'
+        )
+
 
 class TestBreakdownModel(BaseLegacyModelTests):
 

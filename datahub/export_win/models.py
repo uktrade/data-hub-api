@@ -469,6 +469,9 @@ class WinAdviser(BaseModel, BaseLegacyModel):
     class Meta:
         verbose_name = 'Adviser'
 
+    def __str__(self):
+        return f'Name: {self.adviser}, Team {self.team_type} - {self.hq_team}'
+
 
 @reversion.register_base_model()
 class CustomerResponse(BaseModel):
