@@ -420,6 +420,14 @@ class Win(BaseModel):
         self.total_expected_odi_value = calc_total['total_odi_value']
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return "Export win {}: {} <{}> - {}".format(
+            self.pk,
+            self.adviser,
+            self.adviser.email,
+            self.created_on.strftime("%Y-%m-%d %H:%M:%S") if self.created_on else '',
+        )
+
 
 class Breakdown(BaseModel, BaseLegacyModel):
     """Win breakdown."""
@@ -461,6 +469,9 @@ class WinAdviser(BaseModel, BaseLegacyModel):
     )
     # Legacy fields
     name = models.CharField(max_length=128)
+
+    class Meta:
+        verbose_name = 'Adviser'
 
 
 @reversion.register_base_model()
