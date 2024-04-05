@@ -421,11 +421,11 @@ class Win(BaseModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return 'Export win {}: {} <{}> - {}'.format(
-            self.pk,
-            self.adviser,
-            self.adviser.email,
-            self.created_on.strftime('%Y-%m-%d %H:%M:%S') if self.created_on else '',
+        return 'Export win {win_id}: {adviser} <{adviser_email}> - {created}'.format(
+            win_id=self.pk,
+            adviser=self.adviser,
+            adviser_email=self.adviser.email,
+            created=self.created_on.strftime('%Y-%m-%d %H:%M:%S') if self.created_on else '',
         )
 
 
