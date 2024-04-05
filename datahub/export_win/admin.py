@@ -367,5 +367,9 @@ class WinAdviserAdmin(BaseModelAdminMixin):
         )}),
     )
 
+    autocomplete_fields = (
+        'adviser',
+    )
+
     def has_change_permission(self, request, obj=None):
         return False
