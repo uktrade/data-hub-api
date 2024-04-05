@@ -94,24 +94,36 @@ class TestBreakdownModel(BaseLegacyModelTests):
     model_class = Breakdown
 
 
-def test_win_save(win_factory):
-    win = win_factory
-    calc_total = _calculate_totals_for_export_win(win)
-    win.save()
-    assert win.total_expected_export_value == calc_total['total_export_value']
-    assert win.total_expected_non_export_value == calc_total['total_non_export_value']
-    assert win.total_expected_odi_value == calc_total['total_odi_value']
+class TestWinModel():
 
+    def test_win_save(self, win_factory):
+        win = win_factory
+        calc_total = _calculate_totals_for_export_win(win)
+        win.save()
+        assert win.total_expected_export_value == calc_total['total_export_value']
+        assert win.total_expected_non_export_value == calc_total['total_non_export_value']
+        assert win.total_expected_odi_value == calc_total['total_odi_value']
 
-def test_update_total_values(adviser_factory, win_factory, breakdown_factory):
-    win = win_factory
-    breakdown = breakdown_factory
-    calc_total = _calculate_totals_for_export_win(win)
-    expected_export_value = calc_total['total_export_value']
-    expected_non_export_value = calc_total['total_non_export_value']
-    expected_odi_value = calc_total['total_odi_value']
-    update_total_values(sender=adviser_factory, instance=breakdown)
-    win.refresh_from_db()
-    assert win.total_expected_export_value == expected_export_value
-    assert win.total_expected_non_export_value == expected_non_export_value
-    assert win.total_expected_odi_value == expected_odi_value
+    def test_update_total_values(self, adviser_factory, win_factory, breakdown_factory):
+        win = win_factory
+        breakdown = breakdown_factory
+        calc_total = _calculate_totals_for_export_win(win)
+        expected_export_value = calc_total['total_export_value']
+        expected_non_export_value = calc_total['total_non_export_value']
+        expected_odi_value = calc_total['total_odi_value']
+        update_total_values(sender=adviser_factory, instance=breakdown)
+        win.refresh_from_db()
+        assert win.total_expected_export_value == expected_export_value
+        assert win.total_expected_non_export_value == expected_non_export_value
+        assert win.total_expected_odi_value == expected_odi_value
+
+    def test_str_representation_with_created_on(self, win_factory):
+        win = win_factory
+        assert str(win) == (f'Export win {win.pk}: {win.adviser} <{win.adviser.email}> - '
+                            f'{win.created_on.strftime("%Y-%m-%d %H:%M:%S")}')
+
+    def test_str_representation_without_created_on(self):
+        win = WinFactory(created_on=None)
+        win.created_on = None
+
+        assert str(win) == f'Export win {win.pk}: {win.adviser} <{win.adviser.email}> - '

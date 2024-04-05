@@ -413,20 +413,16 @@ class Win(BaseModel):
 
     objects = BaseExportWinSoftDeleteManager()
 
+    def __str__(self):
+        return (f'Export win {self.pk}: {self.adviser} <{self.adviser.email}> - '
+                f'{self.created_on.strftime("%Y-%m-%d %H:%M:%S") if self.created_on else ""}')
+
     def save(self, *args, **kwargs):
         calc_total = _calculate_totals_for_export_win(self)
         self.total_expected_export_value = calc_total['total_export_value']
         self.total_expected_non_export_value = calc_total['total_non_export_value']
         self.total_expected_odi_value = calc_total['total_odi_value']
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return 'Export win {win_id}: {adviser} <{adviser_email}> - {created}'.format(
-            win_id=self.pk,
-            adviser=self.adviser,
-            adviser_email=self.adviser.email,
-            created=self.created_on.strftime('%Y-%m-%d %H:%M:%S') if self.created_on else '',
-        )
 
 
 class Breakdown(BaseModel, BaseLegacyModel):
