@@ -100,7 +100,7 @@ docopt==0.6.2
     # via notifications-python-client
 ecs-logging==2.0.2
     # via elastic-apm
-elastic-apm==6.21.4.post8347027212
+elastic-apm==6.22.0
     # via -r requirements.in
 execnet==1.9.0
     # via pytest-xdist
