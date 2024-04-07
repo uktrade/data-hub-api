@@ -211,7 +211,7 @@ urllib3==1.26.18
     #   opensearch-py
     #   requests
     #   sentry-sdk
-werkzeug==3.0.1
+werkzeug==3.0.2
     # via -r requirements.in
 whitenoise==6.6.0
     # via -r requirements.in
