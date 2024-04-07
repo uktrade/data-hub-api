@@ -43,7 +43,7 @@ opensearch-py==2.4.2
 opensearch-dsl==2.1.0
 
 # ES APM
-elastic-apm==6.21.4.post8347027212
+elastic-apm==6.22.0
 
 # Testing and dev
 django-debug-toolbar==4.3.0
