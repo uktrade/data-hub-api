@@ -26,8 +26,11 @@ from datahub.company.models.adviser import Advisor
 from datahub.company.models.company import Company
 from datahub.company.test.factories import (
     AdviserFactory,
+    ArchivedCompanyFactory,
     # ArchivedCompanyFactory,
     CompanyFactory,
+    CompanyWithAreaFactory,
+    DuplicateCompanyFactory,
     # CompanyWithAreaFactory,
     # ContactFactory,
     SubsidiaryFactory,
@@ -86,8 +89,9 @@ with DisableSignals():
             print('.', end='')  # noqa        
     advisers = Advisor.objects.all()
 
-    # print(f'Generated {len(advisers)} advisers')  # noqa
-    # Generate base companies
+    print(f'Generated {len(advisers)} advisers')  # noqa
+
+    # # Generate base companies
     print('\nGenerating Companies')
     for index, adviser in enumerate(advisers):
         CompanyFactory.create_batch(
@@ -109,20 +113,24 @@ with DisableSignals():
             modified_by=random.choice(advisers),
             global_headquarters=random.choice(companies),
         )
-        # companies.extend(
-        #     CompanyWithAreaFactory.create_batch(
-        #         random.randint(0, 1),
-        #         created_by=adviser,
-        #         modified_by=adviser,
-        #     ),
-        # )
-        # companies.extend(
-        #     ArchivedCompanyFactory.create_batch(
-        #         random.randint(0, 1),
-        #         created_by=adviser,
-        #         modified_by=adviser,
-        #     ),
-        # )
+        CompanyWithAreaFactory.create_batch(
+            random.randint(0, 1),
+            created_by=adviser,
+            modified_by=random.choice(advisers),
+        ),
+        ArchivedCompanyFactory.create_batch(
+            random.randint(0, 1),
+            created_by=adviser,
+            modified_by=adviser,
+        ),
+        DuplicateCompanyFactory.create_batch(
+            random.randint(0, 1),
+            created_by=adviser,
+            modified_by=adviser,
+            transferred_by=random.choice(advisers),
+            transferred_to=random.choice(companies)
+        ),
+
         # Show a sign of life every now and then
         if index % 10 == 0:
             print('.', end='')  # noqa
