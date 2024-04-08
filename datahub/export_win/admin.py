@@ -1,5 +1,4 @@
 import reversion
-from django import forms
 
 from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter
@@ -109,6 +108,8 @@ class CustomerResponseInline(BaseStackedInline):
 
 
 class WinAdminForm(ModelForm):
+    """Admin for Wins."""
+
     class Meta:
         model = Win
         fields = '__all__'
@@ -117,13 +118,6 @@ class WinAdminForm(ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields['audit'].required = True
-        instance = self.instance
-
-        initial_values = {
-            'total_expected_export_value',
-            'total_expected_non_export_value',
-            'total_expected_odi_value',
-        }
         fields_to_update = {
             'cdms_reference',
             'customer_email_address',
@@ -133,10 +127,7 @@ class WinAdminForm(ModelForm):
             'other_official_email_address',
         }
 
-        for field_name in initial_values | fields_to_update:
-            readonly = instance and instance.pk and field_name in initial_values
-            self.fields[field_name].widget = forms.TextInput(
-                attrs={'readonly': 'readonly'} if readonly else {})
+        for field_name in fields_to_update:
             self.fields[field_name].required = False
 
 
@@ -171,6 +162,9 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'id',
         'created_on',
         'modified_on',
+        'total_expected_export_value',
+        'total_expected_non_export_value',
+        'total_expected_odi_value',
     )
     search_fields = (
         '=id',
