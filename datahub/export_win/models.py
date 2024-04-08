@@ -7,6 +7,8 @@ from django.db.models import Max, Sum
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from mptt.fields import TreeForeignKey
+
 from datahub.company.models import (
     Advisor,
     Company,
@@ -263,7 +265,7 @@ class Win(BaseModel):
     total_expected_non_export_value = models.BigIntegerField()
     total_expected_odi_value = models.BigIntegerField()
 
-    sector = models.ForeignKey(
+    sector = TreeForeignKey(
         Sector,
         related_name='wins',
         on_delete=models.PROTECT,
