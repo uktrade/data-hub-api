@@ -186,7 +186,7 @@ DATABASES = {
         'ATOMIC_REQUESTS': True,
         'CONN_MAX_AGE': env.int('DATABASE_CONN_MAX_AGE', 0),
         'DISABLE_SERVER_SIDE_CURSORS': False,
-    },    
+    },
 }
 
 FIXTURE_DIRS = [str(ROOT_DIR('fixtures'))]
