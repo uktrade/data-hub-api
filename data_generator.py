@@ -22,14 +22,17 @@ from django.db.models.signals import (
     pre_save,
 )
 
+from datahub.company.models.adviser import Advisor
+from datahub.company.models.company import Company
 from datahub.company.test.factories import (
     AdviserFactory,
-    ArchivedCompanyFactory,
+    # ArchivedCompanyFactory,
     CompanyFactory,
-    CompanyWithAreaFactory,
-    ContactFactory,
+    # CompanyWithAreaFactory,
+    # ContactFactory,
     SubsidiaryFactory,
 )
+from datahub.metadata.models import Team
 
 
 class DisableSignals:
@@ -68,50 +71,62 @@ class DisableSignals:
 with DisableSignals():
     start_time = time.time()
 
+    # Pre fetch Metadata
+    teams = list(Team.objects.all())
+
+    advisers = Advisor.objects.all()
+
     # In February 2024 there were 18,000 advisers, 500,000 companies, and 950,000 contacts.
     # Alter number of adivsers below to create larger or smaller data set.
-    advisers = AdviserFactory.create_batch(200)
-    print(f'Generated {len(advisers)} advisers')  # noqa
-    for index, adviser in enumerate(advisers):
-        companies = CompanyFactory.create_batch(
-            random.randint(1, 25),
+    # Generate Advisers
+    for _ in range(10):
+        AdviserFactory(dit_team=random.choice(teams))
+    advisers = Advisor.objects.all()
+
+    # print(f'Generated {len(advisers)} advisers')  # noqa
+    # Generate base companies
+    for _, adviser in enumerate(advisers):
+        CompanyFactory.create_batch(
+            random.randint(0, 25),
             created_by=adviser,
-            modified_by=adviser,
+            modified_by=random.choice(advisers),
         )
 
-        # The ratios of the below types of companies do not reflect the live database.
-        companies.extend(
-            SubsidiaryFactory.create_batch(
-                random.randint(1, 5),
-                created_by=adviser,
-                modified_by=adviser,
-            ),
+    companies = Company.objects.all()
+    # The ratios of the below types of companies do not reflect the live database.
+    # Generate different type of companies
+    for _, adviser in enumerate(advisers):
+        SubsidiaryFactory.create_batch(
+            random.randint(0, 25),
+            created_by=adviser,
+            modified_by=random.choice(advisers),
+            global_headquarters=random.choice(companies),
         )
-        companies.extend(
-            CompanyWithAreaFactory.create_batch(
-                random.randint(0, 1),
-                created_by=adviser,
-                modified_by=adviser,
-            ),
-        )
-        companies.extend(
-            ArchivedCompanyFactory.create_batch(
-                random.randint(0, 1),
-                created_by=adviser,
-                modified_by=adviser,
-            ),
-        )
+        # companies.extend(
+        #     CompanyWithAreaFactory.create_batch(
+        #         random.randint(0, 1),
+        #         created_by=adviser,
+        #         modified_by=adviser,
+        #     ),
+        # )
+        # companies.extend(
+        #     ArchivedCompanyFactory.create_batch(
+        #         random.randint(0, 1),
+        #         created_by=adviser,
+        #         modified_by=adviser,
+        #     ),
+        # )
         # Show a sign of life every now and then
-        if index % 10 == 0:
-            print('.', end='')  # noqa
+        # if index % 10 == 0:
+        #     print('.', end='')  # noqa
 
         # The below ratio of contacts to companies does not reflect the live database.
-        for company in companies:
-            ContactFactory.create_batch(
-                random.randint(1, 2),
-                company=company,
-                created_by=adviser,
-            )
+        # for company in companies:
+        #     ContactFactory.create_batch(
+        #         random.randint(1, 2),
+        #         company=company,
+        #         created_by=adviser,
+        # )
 
     elapsed = time.time() - start_time
     print(f'{timedelta(seconds=elapsed)}')  # noqa
