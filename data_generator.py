@@ -79,23 +79,30 @@ with DisableSignals():
     # In February 2024 there were 18,000 advisers, 500,000 companies, and 950,000 contacts.
     # Alter number of adivsers below to create larger or smaller data set.
     # Generate Advisers
-    for _ in range(10):
+    print('Generating advisers')
+    for index in range(100):
         AdviserFactory(dit_team=random.choice(teams))
+        if index % 10 == 0:
+            print('.', end='')  # noqa        
     advisers = Advisor.objects.all()
 
     # print(f'Generated {len(advisers)} advisers')  # noqa
     # Generate base companies
-    for _, adviser in enumerate(advisers):
+    print('\nGenerating Companies')
+    for index, adviser in enumerate(advisers):
         CompanyFactory.create_batch(
             random.randint(0, 25),
             created_by=adviser,
             modified_by=random.choice(advisers),
         )
+        if index % 10 == 0:
+            print('.', end='')  # noqa        
 
+    print('\nGenerating Company variations')
     companies = Company.objects.all()
     # The ratios of the below types of companies do not reflect the live database.
     # Generate different type of companies
-    for _, adviser in enumerate(advisers):
+    for index, adviser in enumerate(advisers):
         SubsidiaryFactory.create_batch(
             random.randint(0, 25),
             created_by=adviser,
@@ -117,8 +124,8 @@ with DisableSignals():
         #     ),
         # )
         # Show a sign of life every now and then
-        # if index % 10 == 0:
-        #     print('.', end='')  # noqa
+        if index % 10 == 0:
+            print('.', end='')  # noqa
 
         # The below ratio of contacts to companies does not reflect the live database.
         # for company in companies:
