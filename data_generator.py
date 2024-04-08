@@ -80,7 +80,7 @@ with DisableSignals():
     # Alter number of adivsers below to create larger or smaller data set.
     # Generate Advisers
     print('Generating advisers')
-    for index in range(100):
+    for index in range(10):
         AdviserFactory(dit_team=random.choice(teams))
         if index % 10 == 0:
             print('.', end='')  # noqa        
