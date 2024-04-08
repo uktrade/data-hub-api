@@ -26,11 +26,8 @@ from datahub.company.models.adviser import Advisor
 from datahub.company.models.company import Company
 from datahub.company.test.factories import (
     AdviserFactory,
-    ArchivedCompanyFactory,
     # ArchivedCompanyFactory,
     CompanyFactory,
-    CompanyWithAreaFactory,
-    DuplicateCompanyFactory,
     # CompanyWithAreaFactory,
     # ContactFactory,
     SubsidiaryFactory,
@@ -82,58 +79,46 @@ with DisableSignals():
     # In February 2024 there were 18,000 advisers, 500,000 companies, and 950,000 contacts.
     # Alter number of adivsers below to create larger or smaller data set.
     # Generate Advisers
-    print('Generating advisers')  # noqa
-    for index in range(10):
+    for _ in range(10):
         AdviserFactory(dit_team=random.choice(teams))
-        if index % 10 == 0:
-            print('.', end='')  # noqa        
     advisers = Advisor.objects.all()
 
-    print(f'Generated {advisers.count} advisers')  # noqa
-
-    # # Generate base companies
-    print('\nGenerating Companies')  # noqa
-    for index, adviser in enumerate(advisers):
+    # print(f'Generated {len(advisers)} advisers')  # noqa
+    # Generate base companies
+    for _, adviser in enumerate(advisers):
         CompanyFactory.create_batch(
             random.randint(0, 25),
             created_by=adviser,
             modified_by=random.choice(advisers),
         )
-        if index % 10 == 0:
-            print('.', end='')  # noqa        
 
-    print('\nGenerating Company variations')  # noqa
     companies = Company.objects.all()
     # The ratios of the below types of companies do not reflect the live database.
     # Generate different type of companies
-    for index, adviser in enumerate(advisers):
+    for _, adviser in enumerate(advisers):
         SubsidiaryFactory.create_batch(
             random.randint(0, 25),
             created_by=adviser,
             modified_by=random.choice(advisers),
             global_headquarters=random.choice(companies),
         )
-        CompanyWithAreaFactory.create_batch(
-            random.randint(0, 1),
-            created_by=adviser,
-            modified_by=random.choice(advisers),
-        )
-        ArchivedCompanyFactory.create_batch(
-            random.randint(0, 1),
-            created_by=adviser,
-            modified_by=adviser,
-        )
-        DuplicateCompanyFactory.create_batch(
-            random.randint(0, 1),
-            created_by=adviser,
-            modified_by=adviser,
-            transferred_by=random.choice(advisers),
-            transferred_to=random.choice(companies),
-        )
-
+        # companies.extend(
+        #     CompanyWithAreaFactory.create_batch(
+        #         random.randint(0, 1),
+        #         created_by=adviser,
+        #         modified_by=adviser,
+        #     ),
+        # )
+        # companies.extend(
+        #     ArchivedCompanyFactory.create_batch(
+        #         random.randint(0, 1),
+        #         created_by=adviser,
+        #         modified_by=adviser,
+        #     ),
+        # )
         # Show a sign of life every now and then
-        if index % 10 == 0:
-            print('.', end='')  # noqa
+        # if index % 10 == 0:
+        #     print('.', end='')  # noqa
 
         # The below ratio of contacts to companies does not reflect the live database.
         # for company in companies:
