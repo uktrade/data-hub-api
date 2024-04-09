@@ -89,7 +89,7 @@ with DisableSignals():
             print('.', end='')  # noqa        
     advisers = Advisor.objects.all()
 
-    print(f'Generated {len(advisers)} advisers')  # noqa
+    print(f'Generated {advisers.count} advisers')  # noqa
 
     # # Generate base companies
     print('\nGenerating Companies')
@@ -117,19 +117,19 @@ with DisableSignals():
             random.randint(0, 1),
             created_by=adviser,
             modified_by=random.choice(advisers),
-        ),
+        )
         ArchivedCompanyFactory.create_batch(
             random.randint(0, 1),
             created_by=adviser,
             modified_by=adviser,
-        ),
+        )
         DuplicateCompanyFactory.create_batch(
             random.randint(0, 1),
             created_by=adviser,
             modified_by=adviser,
             transferred_by=random.choice(advisers),
-            transferred_to=random.choice(companies)
-        ),
+            transferred_to=random.choice(companies),
+        )
 
         # Show a sign of life every now and then
         if index % 10 == 0:
