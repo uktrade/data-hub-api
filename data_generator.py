@@ -95,7 +95,10 @@ def create_omis_orders(companies, range_bottom, range_top):
             OrderCompleteFactory.create_batch(
                 random.randint(range_bottom, range_top),
                 company=company,
-                quote=AcceptedQuoteFactory(accepted_by=contact),
+                quote=AcceptedQuoteFactory(
+                    accepted_by=contact,
+                    created_by=company.created_by,
+                )
                 created_by=company.created_by,
                 completed_by=company.created_by,
             )
@@ -104,7 +107,10 @@ def create_omis_orders(companies, range_bottom, range_top):
             OrderCancelledFactory.create_batch(
                 random.randint(range_bottom, range_top),
                 company=company,
-                quote=AcceptedQuoteFactory(accepted_by=contact),
+                quote=AcceptedQuoteFactory(
+                    accepted_by=contact,
+                    created_by=company.created_by,
+                ),
                 created_by=company.created_by,
                 cancelled_by=company.created_by,
             )
@@ -113,7 +119,10 @@ def create_omis_orders(companies, range_bottom, range_top):
             OrderPaidFactory.create_batch(
                 random.randint(range_bottom, range_top),
                 company=company,
-                quote=AcceptedQuoteFactory(accepted_by=contact),
+                quote=AcceptedQuoteFactory(
+                    accepted_by=contact,
+                    created_by=company.created_by,
+                ),
                 created_by=company.created_by,
             )
 
@@ -121,7 +130,7 @@ def create_omis_orders(companies, range_bottom, range_top):
             OrderWithOpenQuoteFactory.create_batch(
                 random.randint(range_bottom, range_top),
                 company=company,
-                quote=QuoteFactory(),
+                quote=QuoteFactory(created_by=company.created_by),
                 created_by=company.created_by,
             )
 
