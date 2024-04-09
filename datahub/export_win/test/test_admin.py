@@ -187,27 +187,23 @@ class TestWinSoftDeletedAdminForm:
 class TestWinAdminForm:
     """Test for WinAdminForm"""
 
-    def test_init_method(self):
+    def test_win_admin_form(self):
         form = WinAdminForm()
         assert form is not None
 
-    def test_init_method_with_instance_pk(self):
-        instance_mock = InstanceMock(pk=1)
-        form = WinAdminForm(instance=instance_mock)
-        assert form is not None
-        if instance_mock.pk is not None:
-            field_attrs = form.fields['total_expected_export_value'].widget.attrs
-            assert field_attrs['readonly'] == 'readonly'
-            field_attrs = form.fields['total_expected_non_export_value'].widget.attrs
-            assert field_attrs['readonly'] == 'readonly'
-            field_attrs = form.fields['total_expected_odi_value'].widget.attrs
-            assert field_attrs['readonly'] == 'readonly'
-            assert form.fields['cdms_reference'].required is False
-            assert form.fields['customer_email_address'].required is False
-            assert form.fields['customer_job_title'].required is False
-            assert form.fields['line_manager_name'].required is False
-            assert form.fields['lead_officer_email_address'].required is False
-            assert form.fields['other_official_email_address'].required is False
+        assert form.fields['audit'].required is True
+
+        fields_to_update = {
+            'cdms_reference',
+            'customer_email_address',
+            'customer_job_title',
+            'line_manager_name',
+            'lead_officer_email_address',
+            'other_official_email_address',
+        }
+
+        for field_name in fields_to_update:
+            assert form.fields[field_name].required is False
 
 
 @pytest.mark.django_db
