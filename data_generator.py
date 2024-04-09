@@ -24,6 +24,7 @@ from django.db.models.signals import (
 
 from datahub.company.models.adviser import Advisor
 from datahub.company.models.company import Company
+from datahub.company.models.contact import Contact
 from datahub.company.test.factories import (
     AdviserFactory,
     ArchivedCompanyFactory,
@@ -32,7 +33,9 @@ from datahub.company.test.factories import (
     CompanyWithAreaFactory,
     DuplicateCompanyFactory,
     # CompanyWithAreaFactory,
-    # ContactFactory,
+    ContactFactory,
+    ContactWithOwnAddressFactory,
+    ContactWithOwnAreaFactory,
     SubsidiaryFactory,
 )
 from datahub.metadata.models import Team
@@ -79,6 +82,8 @@ with DisableSignals():
 
     advisers = Advisor.objects.all()
 
+    contact = Contact.objects.all()
+
     # In February 2024 there were 18,000 advisers, 500,000 companies, and 950,000 contacts.
     # Alter number of adivsers below to create larger or smaller data set.
     # Generate Advisers
@@ -86,7 +91,7 @@ with DisableSignals():
     for index in range(10):
         AdviserFactory(dit_team=random.choice(teams))
         if index % 10 == 0:
-            print('.', end='')  # noqa        
+            print('.', end='')  # noqa
     advisers = Advisor.objects.all()
 
     print(f'Generated {advisers.count} advisers')  # noqa
@@ -100,7 +105,34 @@ with DisableSignals():
             modified_by=random.choice(advisers),
         )
         if index % 10 == 0:
-            print('.', end='')  # noqa        
+            print('.', end='')  # noqa
+
+
+    def generateContacts(advisers, min, max):
+        print('\nGenerating contacts on advisers')
+        for index, adviser in enumerate(advisers):
+            ContactFactory.create_batch(
+                random.randint(min, max),
+                created_by=random.choice(advisers),
+                modified_by=random.choice(advisers),
+            )
+
+        print('\nGenerating contacts on advisers with a different address from company')
+        for index, adviser in enumerate(advisers):
+            ContactWithOwnAddressFactory.create_batch(
+                random.randint(min, max),
+                created_by=random.choice(advisers),
+                modified_by=random.choice(advisers),
+            )
+
+        print('\nGenerating contacts on advisers with a different address from the contact company that includes an '
+              'area')
+        for index, adviser in enumerate(advisers):
+            ContactWithOwnAreaFactory.create_batch(
+                random.randint(min, max),
+                created_by=random.choice(advisers),
+                modified_by=random.choice(advisers),
+            )
 
     print('\nGenerating Company variations')  # noqa
     companies = Company.objects.all()
