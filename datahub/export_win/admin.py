@@ -1,5 +1,4 @@
 import reversion
-from django import forms
 
 from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter
@@ -109,7 +108,7 @@ class CustomerResponseInline(BaseStackedInline):
 
 
 class WinAdminForm(ModelForm):
-    """Win admin form."""
+    """Admin for Wins."""
 
     class Meta:
         model = Win
@@ -117,27 +116,19 @@ class WinAdminForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        instance = self.instance
-        if (instance and instance.pk):
-            initial_values = {
-                'total_expected_export_value',
-                'total_expected_non_export_value',
-                'total_expected_odi_value',
-            }
-            for field_name in initial_values:
-                self.fields[field_name].widget = forms.TextInput(attrs={'readonly': 'readonly'})
-            fields_to_update = [
-                'cdms_reference',
-                'customer_email_address',
-                'customer_job_title',
-                'line_manager_name',
-                'lead_officer_email_address',
-                'other_official_email_address',
-            ]
-            for field_name in fields_to_update:
-                field = self.fields.get(field_name)
-                if field:
-                    field.required = False
+
+        self.fields['audit'].required = True
+        fields_to_update = {
+            'cdms_reference',
+            'customer_email_address',
+            'customer_job_title',
+            'line_manager_name',
+            'lead_officer_email_address',
+            'other_official_email_address',
+        }
+
+        for field_name in fields_to_update:
+            self.fields[field_name].required = False
 
 
 @admin.register(Win)
@@ -171,6 +162,9 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'id',
         'created_on',
         'modified_on',
+        'total_expected_export_value',
+        'total_expected_non_export_value',
+        'total_expected_odi_value',
     )
     search_fields = (
         '=id',
