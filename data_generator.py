@@ -82,7 +82,7 @@ with DisableSignals():
     # In February 2024 there were 18,000 advisers, 500,000 companies, and 950,000 contacts.
     # Alter number of adivsers below to create larger or smaller data set.
     # Generate Advisers
-    print('Generating advisers')
+    print('Generating advisers')  # noqa
     for index in range(10):
         AdviserFactory(dit_team=random.choice(teams))
         if index % 10 == 0:
@@ -92,7 +92,7 @@ with DisableSignals():
     print(f'Generated {advisers.count} advisers')  # noqa
 
     # # Generate base companies
-    print('\nGenerating Companies')
+    print('\nGenerating Companies')  # noqa
     for index, adviser in enumerate(advisers):
         CompanyFactory.create_batch(
             random.randint(0, 25),
@@ -102,7 +102,7 @@ with DisableSignals():
         if index % 10 == 0:
             print('.', end='')  # noqa        
 
-    print('\nGenerating Company variations')
+    print('\nGenerating Company variations')  # noqa
     companies = Company.objects.all()
     # The ratios of the below types of companies do not reflect the live database.
     # Generate different type of companies
