@@ -32,7 +32,9 @@ from datahub.company.test.factories import (
     CompanyWithAreaFactory,
     DuplicateCompanyFactory,
     # CompanyWithAreaFactory,
-    # ContactFactory,
+    ContactFactory,
+    ContactWithOwnAddressFactory,
+    ContactWithOwnAreaFactory,
     SubsidiaryFactory,
 )
 from datahub.metadata.models import Team
@@ -86,7 +88,7 @@ with DisableSignals():
     for index in range(10):
         AdviserFactory(dit_team=random.choice(teams))
         if index % 10 == 0:
-            print('.', end='')  # noqa        
+            print('.', end='')  # noqa
     advisers = Advisor.objects.all()
 
     print(f'Generated {advisers.count} advisers')  # noqa
@@ -100,7 +102,7 @@ with DisableSignals():
             modified_by=random.choice(advisers),
         )
         if index % 10 == 0:
-            print('.', end='')  # noqa        
+            print('.', end='')  # noqa
 
     print('\nGenerating Company variations')  # noqa
     companies = Company.objects.all()
@@ -130,6 +132,52 @@ with DisableSignals():
             transferred_by=random.choice(advisers),
             transferred_to=random.choice(companies),
         )
+
+
+        def generateContacts(advisers, min, max):
+            print('\nGenerating contacts on advisers')
+            for index, adviser in enumerate(advisers):
+                ContactFactory.create_batch(
+                    random.randint(min, max),
+                    created_by=random.choice(advisers),
+                    modified_by=random.choice(advisers),
+                )
+
+            print('\nGenerating contacts on advisers with a different address from company')
+            for index, adviser in enumerate(advisers):
+                ContactWithOwnAddressFactory.create_batch(
+                    random.randint(min, max),
+                    created_by=random.choice(advisers),
+                    modified_by=random.choice(advisers),
+                )
+
+            print(
+                '\nGenerating contacts on advisers with a different address from the contact company that includes an '
+                'area')
+            for index, adviser in enumerate(advisers):
+                ContactWithOwnAreaFactory.create_batch(
+                    random.randint(min, max),
+                    created_by=random.choice(advisers),
+                    modified_by=random.choice(advisers),
+                )
+
+
+        print('\nGenerating Company variations')  # noqa
+        companies = Company.objects.all()
+        # The ratios of the below types of companies do not reflect the live database.
+        # Generate different type of companies
+        for index, adviser in enumerate(advisers):
+            SubsidiaryFactory.create_batch(
+                random.randint(0, 25),
+                created_by=adviser,
+                modified_by=random.choice(advisers),
+                global_headquarters=random.choice(companies),
+            )
+            CompanyWithAreaFactory.create_batch(
+                random.randint(0, 1),
+                created_by=adviser,
+                modified_by=random.choice(advisers),
+            )
 
         # Show a sign of life every now and then
         if index % 10 == 0:
