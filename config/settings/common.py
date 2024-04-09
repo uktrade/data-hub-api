@@ -12,7 +12,8 @@ from urllib.parse import urlencode
 
 import environ
 from django.core.exceptions import ImproperlyConfigured
-
+import dj_database_url
+from dbt_copilot_python.database import database_url_from_env
 from config.settings.types import HawkScope
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -181,7 +182,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        **env.db('DATABASE_URL'),
+        **dj_database_url.config(default=database_url_from_env("DATABASE_CREDENTIALS")),
         'ATOMIC_REQUESTS': True,
         'CONN_MAX_AGE': env.int('DATABASE_CONN_MAX_AGE', 0),
         'DISABLE_SERVER_SIDE_CURSORS': False,
