@@ -621,9 +621,9 @@ ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY = env(
 DOCUMENT_BUCKETS = {
     'default': {
         'bucket': env('DEFAULT_BUCKET'),
-        'aws_access_key_id': env('AWS_ACCESS_KEY_ID', default=''),
-        'aws_secret_access_key': env('AWS_SECRET_ACCESS_KEY', default=''),
-        'aws_region': env('AWS_DEFAULT_REGION', default=''),
+        'aws_access_key_id': env('DEFAULT_BUCKET_AWS_ACCESS_KEY_ID', default=''),
+        'aws_secret_access_key': env('DEFAULT_BUCKET_AWS_SECRET_ACCESS_KEY', default=''),
+        'aws_region': env('DEFAULT_BUCKET_AWS_DEFAULT_REGION', default=''),
     },
     'investment': {
         'bucket': env('INVESTMENT_DOCUMENT_BUCKET', default=''),
