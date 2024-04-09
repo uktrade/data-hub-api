@@ -1,3 +1,6 @@
+import functools
+import logging
+
 from datetime import datetime
 
 from django.conf import settings
@@ -14,7 +17,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny
-from rest_framework.views import Response
+from rest_framework.views import exception_handler, Response
 
 from datahub.core.schemas import StubSchema
 
@@ -34,6 +37,27 @@ from datahub.export_win.tasks import (
     notify_export_win_email_by_rq_email,
     update_customer_response_token_for_email_notification_id,
 )
+
+logger = logging.getLogger(__name__)
+
+
+def log_bad_request(view_method):
+    @functools.wraps(view_method)
+    def wrapper(self, request, *args, **kwargs):
+        try:
+            return view_method(self, request, *args, **kwargs)
+        except Exception as e:
+            if getattr(e, 'status_code', None) == status.HTTP_400_BAD_REQUEST:
+                response = exception_handler(e, context={'request': request})
+                logger.error(
+                    'Export Wins API Bad Request',
+                    extra={
+                        'request_data': request.data,
+                        'response_data': response.data,
+                    },
+                )
+            raise
+    return wrapper
 
 
 class NullBooleanFieldFilter(Filter):
@@ -114,6 +138,14 @@ class WinViewSet(CoreViewSet):
                 ),
             )
         )
+
+    @log_bad_request
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @log_bad_request
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         """

@@ -1101,6 +1101,29 @@ class TestCreateWinView(APITestMixin):
         ).exists()
         mock_export_win_serializer_notify.assert_called_once()
 
+    @pytest.mark.parametrize(
+        'request_data',
+        (
+            'test',
+            {'abc': 'def'},
+        ),
+    )
+    def test_create_win_bad_request(self, request_data, caplog):
+        """Tests bad requests are being logged."""
+        caplog.set_level('ERROR')
+        url = reverse('api-v4:export-win:collection')
+
+        response = self.api_client.post(url, data=request_data)
+        response.json()
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'Export Wins API Bad Request' in caplog.text
+        assert caplog.records[0].request_data == request_data
+        response_text = str(caplog.records[0].response_data)
+        assert any([
+            'Invalid data' in response_text,
+            'This field is required' in response_text,
+        ])
+
 
 class TestUpdateWinView(APITestMixin):
     """Update export win view tests."""
@@ -1623,6 +1646,31 @@ class TestUpdateWinView(APITestMixin):
         version = Version.objects.get_for_object(win).first()
         assert version.revision.user == self.user
         assert version.revision.comment == 'Win updated'
+
+    @pytest.mark.parametrize(
+        'request_data',
+        (
+            'test',
+            {'adviser': 'def'},
+        ),
+    )
+    def test_update_win_bad_request(self, request_data, caplog):
+        """Tests bad requests are being logged."""
+        caplog.set_level('ERROR')
+        win = WinFactory(
+            adviser=self.user,
+        )
+        url = reverse('api-v4:export-win:item', kwargs={'pk': win.pk})
+        response = self.api_client.patch(url, data=request_data)
+        response.json()
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'Export Wins API Bad Request' in caplog.text
+        assert caplog.records[0].request_data == request_data
+        response_text = str(caplog.records[0].response_data)
+        assert any([
+            'Invalid data' in response_text,
+            'Must be a valid UUID' in response_text,
+        ])
 
 
 class TestResendExportWinView(APITestMixin):
