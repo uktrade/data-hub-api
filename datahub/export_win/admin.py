@@ -343,3 +343,33 @@ class DeletedWinAdmin(WinAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+@admin.register(WinAdviser)
+class WinAdviserAdmin(BaseModelAdminMixin):
+    """Admin for Win Adviser."""
+
+    list_display = ('win', 'adviser', 'team_type', 'hq_team', 'location')
+    search_fields = ('win__id',)
+
+    fieldsets = (
+        ('Overview', {'fields': (
+            'id',
+            'win',
+            'adviser',
+            'team_type',
+            'hq_team',
+            'location',
+        )}),
+        ('Legacy Fields', {'fields': (
+            'name',
+            'legacy_id',
+        )}),
+    )
+
+    autocomplete_fields = (
+        'adviser',
+    )
+
+    def has_change_permission(self, request, obj=None):
+        return False

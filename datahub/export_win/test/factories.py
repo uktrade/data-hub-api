@@ -139,6 +139,7 @@ class SupportTypeFactory(factory.django.DjangoModelFactory):
 class WinFactory(factory.django.DjangoModelFactory):
     """Win factory."""
 
+    created_on = factory.LazyFunction(now)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
     date = factory.Faker('date_object')
