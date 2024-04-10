@@ -105,6 +105,11 @@ class CustomerResponseInline(BaseStackedInline):
     model = CustomerResponse
     form = CustomerResponseInlineForm
     extra = 0
+    readonly_fields = (
+        'lead_officer_email_notification_id',
+        'lead_officer_email_delivery_status',
+        'lead_officer_email_sent_on',
+    )
 
 
 class WinAdminForm(ModelForm):
