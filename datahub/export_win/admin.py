@@ -22,7 +22,7 @@ class BaseTabularInline(admin.TabularInline):
 
     extra = 0
     can_delete = False
-    exclude = ('is_deleted', 'id')
+    exclude = ('id',)
 
 
 class BreakdownInlineForm(ModelForm):
@@ -77,7 +77,7 @@ class BaseStackedInline(admin.StackedInline):
     inline_classes = ('grp-collapse grp-open',)
     extra = 0
     can_delete = False
-    exclude = ('is_deleted', 'created_by', 'modified_by')
+    exclude = ('created_by', 'modified_by')
 
 
 class CustomerResponseInlineForm(ModelForm):
@@ -104,7 +104,6 @@ class CustomerResponseInline(BaseStackedInline):
 
     model = CustomerResponse
     form = CustomerResponseInlineForm
-    extra = 0
     readonly_fields = (
         'lead_officer_email_notification_id',
         'lead_officer_email_delivery_status',
