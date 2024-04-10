@@ -343,7 +343,7 @@ class DeletedWinAdmin(WinAdmin):
 class WinAdviserAdmin(BaseModelAdminMixin):
     """Admin for Win Adviser."""
 
-    list_display = ('win', 'adviser', 'team_type', 'hq_team', 'location')
+    list_display = ('win', 'get_adviser_name', 'team_type', 'hq_team', 'location')
     search_fields = ('win__id',)
 
     fieldsets = (
@@ -367,3 +367,10 @@ class WinAdviserAdmin(BaseModelAdminMixin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+    def get_adviser_name(self, obj):
+        return obj.adviser.name
+
+    get_adviser_name.short_description = 'Name'
+
+    WinAdviser._meta.verbose_name_plural = 'Team Members'
