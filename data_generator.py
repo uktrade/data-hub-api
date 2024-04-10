@@ -30,11 +30,11 @@ from datahub.company.test.factories import (
     # ArchivedCompanyFactory,
     CompanyFactory,
     CompanyWithAreaFactory,
-    DuplicateCompanyFactory,
     # CompanyWithAreaFactory,
     ContactFactory,
-    ContactWithOwnAreaFactory,
     ContactWithOwnAddressFactory,
+    ContactWithOwnAreaFactory,
+    DuplicateCompanyFactory,
     SubsidiaryFactory,
 )
 from datahub.metadata.models import Team
@@ -133,34 +133,31 @@ with DisableSignals():
             transferred_to=random.choice(companies),
         )
 
-
-        def generateContacts(advisers, min, max):
-            print('\nGenerating contacts on advisers')
-            for index, adviser in enumerate(advisers):
+        def generate_contacts(advisers, min, max):
+            print('\nGenerating contacts on advisers')  # noqa
+            for _ in advisers:
                 ContactFactory.create_batch(
                     random.randint(min, max),
                     created_by=random.choice(advisers),
                     modified_by=random.choice(advisers),
                 )
 
-            print('\nGenerating contacts on advisers with a different address from company')
-            for index, adviser in enumerate(advisers):
+            print('\nGenerating contacts on advisers with a different address from company')   # noqa
+            for _ in advisers:
                 ContactWithOwnAddressFactory.create_batch(
                     random.randint(min, max),
                     created_by=random.choice(advisers),
                     modified_by=random.choice(advisers),
                 )
 
-            print(
-                '\nGenerating contacts on advisers with a different address from the contact company that includes an '
-                'area')
-            for index, adviser in enumerate(advisers):
+            print('\nGenerating contacts on advisers with a different address from the contact company that includes an area')  # noqa
+            for _ in advisers:
                 ContactWithOwnAreaFactory.create_batch(
                     random.randint(min, max),
                     created_by=random.choice(advisers),
                     modified_by=random.choice(advisers),
                 )
-                
+
         # Show a sign of life every now and then
         if index % 10 == 0:
             print('.', end='')  # noqa
