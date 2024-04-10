@@ -605,6 +605,7 @@ class CustomerResponse(BaseModel):
         default='',
         verbose_name='Other comments or changes to the win details',
     )
+    # name is a legacy field. Should only be used when importing legacy data.
     name = models.CharField(max_length=256, verbose_name='Your name')
     marketing_source = models.ForeignKey(
         MarketingSource,

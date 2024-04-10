@@ -76,7 +76,7 @@ class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
 
     def _assert_breakdown_matches_result(self, breakdown, result):
         financial_year = get_financial_year(
-            breakdown.win.created_on + relativedelta(years=breakdown.year - 1),
+            breakdown.win.date + relativedelta(years=breakdown.year - 1),
         )
         assert result == {
             'created_on': format_date_or_datetime(breakdown.created_on),
@@ -209,7 +209,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
                 win.customer_response.interventions_were_prerequisite if has_responded else None,
             'confirmation__involved_state_enterprise':
                 win.customer_response.involved_state_enterprise if has_responded else None,
-            'confirmation__name': win.customer_response.name,
+            'confirmation__name': contact.name,
             'confirmation__other_marketing_source':
                 win.customer_response.other_marketing_source if has_responded else None,
             'confirmation__our_support':
