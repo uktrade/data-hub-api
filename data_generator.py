@@ -31,15 +31,15 @@ from datahub.company.test.factories import (
     # ArchivedCompanyFactory,
     CompanyFactory,
     CompanyWithAreaFactory,
-    DuplicateCompanyFactory,
     # CompanyWithAreaFactory,
     ContactFactory,
+    DuplicateCompanyFactory,
     SubsidiaryFactory,
 )
 from datahub.metadata.models import Team
 from datahub.omis.order.test.factories import (
-    OrderCompleteFactory,
     OrderCancelledFactory,
+    OrderCompleteFactory,
     OrderPaidFactory,
     OrderWithOpenQuoteFactory,
 )
@@ -47,6 +47,7 @@ from datahub.omis.quote.test.factories import (
     AcceptedQuoteFactory,
     QuoteFactory,
 )
+
 
 class DisableSignals:
     def __init__(self, disabled_signals=None):
@@ -98,7 +99,7 @@ def create_omis_orders(companies, range_bottom, range_top):
                 quote=AcceptedQuoteFactory(
                     accepted_by=contact,
                     created_by=company.created_by,
-                )
+                ),
                 created_by=company.created_by,
                 completed_by=company.created_by,
             )
