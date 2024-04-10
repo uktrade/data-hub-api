@@ -76,12 +76,12 @@ class ExportWinsBreakdownsDatasetView(BaseDatasetView):
         return (
             Breakdown.objects.select_related('win, breakdown_type')
             .annotate(
-                created_year=ExtractYear('win__created_on'),
-                created_month=ExtractMonth('win__created_on'),
+                won_year=ExtractYear('win__date'),
+                won_month=ExtractMonth('win__date'),
                 provisional_financial_year=Case(
-                    When(created_month__gte=4, then=F('created_year')),
+                    When(won_month__gte=4, then=F('won_year')),
                     default=ExpressionWrapper(
-                        F('created_year') - 1,
+                        F('won_year') - 1,
                         output_field=IntegerField(),
                     ),
                     output_field=IntegerField(),
@@ -278,7 +278,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                     default=F('customer_response__involved_state_enterprise'),
                     output_field=BooleanField(),
                 ),
-                confirmation__name=F('customer_response__name'),
+                confirmation__name=F('customer_details__name'),
                 confirmation__other_marketing_source=F(
                     'customer_response__other_marketing_source',
                 ),
