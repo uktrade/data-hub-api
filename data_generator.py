@@ -6,6 +6,7 @@ from collections import defaultdict
 from datetime import timedelta
 
 import django
+from django.db import transaction
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
 django.setup()
@@ -30,12 +31,22 @@ from datahub.company.test.factories import (
     # ArchivedCompanyFactory,
     CompanyFactory,
     CompanyWithAreaFactory,
-    DuplicateCompanyFactory,
     # CompanyWithAreaFactory,
-    # ContactFactory,
+    ContactFactory,
+    DuplicateCompanyFactory,
     SubsidiaryFactory,
 )
 from datahub.metadata.models import Team
+from datahub.omis.order.test.factories import (
+    OrderCancelledFactory,
+    OrderCompleteFactory,
+    OrderPaidFactory,
+    OrderWithOpenQuoteFactory,
+)
+from datahub.omis.quote.test.factories import (
+    AcceptedQuoteFactory,
+    QuoteFactory,
+)
 
 
 class DisableSignals:
@@ -68,6 +79,61 @@ class DisableSignals:
     def reconnect(self, signal):
         signal.receivers = self.stashed_signals.get(signal, [])
         del self.stashed_signals[signal]
+
+
+def create_omis_orders(companies, range_bottom, range_top):
+    if range_bottom > range_top:
+        return
+
+    for company in companies:
+        with transaction.atomic():
+
+            # Create contact to prevent one being created with a new company
+            # for quotes requiring a contact.
+            contact = ContactFactory(company=company)
+
+            # Generate Complete Orders
+            OrderCompleteFactory.create_batch(
+                random.randint(range_bottom, range_top),
+                company=company,
+                quote=AcceptedQuoteFactory(
+                    accepted_by=contact,
+                    created_by=company.created_by,
+                ),
+                created_by=company.created_by,
+                completed_by=company.created_by,
+            )
+
+            # Generate Cancelled Orders
+            OrderCancelledFactory.create_batch(
+                random.randint(range_bottom, range_top),
+                company=company,
+                quote=AcceptedQuoteFactory(
+                    accepted_by=contact,
+                    created_by=company.created_by,
+                ),
+                created_by=company.created_by,
+                cancelled_by=company.created_by,
+            )
+
+            # Generate Paid Orders
+            OrderPaidFactory.create_batch(
+                random.randint(range_bottom, range_top),
+                company=company,
+                quote=AcceptedQuoteFactory(
+                    accepted_by=contact,
+                    created_by=company.created_by,
+                ),
+                created_by=company.created_by,
+            )
+
+            # Generate order with open quote
+            OrderWithOpenQuoteFactory.create_batch(
+                random.randint(range_bottom, range_top),
+                company=company,
+                quote=QuoteFactory(created_by=company.created_by),
+                created_by=company.created_by,
+            )
 
 
 # Disable open search indexing
