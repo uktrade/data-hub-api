@@ -10,6 +10,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
 django.setup()
 
 from datagen.constants import MODEL_INFO
+from datagen.generators.adviser import generate_advisers
 from datagen.utils import DisableSignals
 
 
@@ -30,6 +31,14 @@ with DisableSignals():
     print('\nStarting counts of models:')  # noqa
     starting_model_counts = get_model_counts()
     pprint(starting_model_counts)  # noqa
+
+    # Specify quantities
+    NUMBER_OF_ADVISERS = 50
+    NUMBER_OF_COMPANIES = 200
+
+    # Generate Advisers
+    print('\nGenerating advisers...')  # noqa
+    generate_advisers(NUMBER_OF_ADVISERS)
 
     # End matter
     print('\nFinal counts of models:')  # noqa
