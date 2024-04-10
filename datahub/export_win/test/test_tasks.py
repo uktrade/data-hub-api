@@ -602,7 +602,9 @@ def test_get_all_fields_for_lead_officer_email_receipt_no_success():
     assert result['goods_services'] == win.goods_vs_services.name
     assert result['client_company_name'] == contact.company.name
     assert result['url'] == settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(
-        uuid=win.id)
+        company_id=win.company.id,
+        uuid=win.id,
+    )
 
 
 def test_get_all_fields_for_lead_officer_email_receipt_yes_success():
@@ -632,4 +634,6 @@ def test_get_all_fields_for_lead_officer_email_receipt_yes_success():
     assert result['goods_services'] == win.goods_vs_services.name
     assert result['client_company_name'] == contact.company.name
     assert result['url'] == settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(
-        uuid=win.id)
+        company_id=win.company.id,
+        uuid=win.id,
+    )

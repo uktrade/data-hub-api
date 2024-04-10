@@ -127,7 +127,10 @@ def get_all_fields_for_lead_officer_email_receipt_no(customer_response):
         'lead_officer_first_name': win.lead_officer.first_name,
         'goods_services': win.goods_vs_services.name,
         'client_company_name': win.company.name,
-        'url': settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(uuid=win.id),
+        'url': settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(
+            company_id=win.company.id,
+            uuid=win.id,
+        ),
     }
 
     return details
@@ -146,7 +149,10 @@ def get_all_fields_for_lead_officer_email_receipt_yes(customer_response):
         'total_export_win_value': total_export_win_value,
         'goods_services': win.goods_vs_services.name,
         'client_company_name': win.company.name,
-        'url': settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(uuid=win.id),
+        'url': settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(
+            company_id=win.company.id,
+            uuid=win.id,
+        ),
     }
 
     return details
