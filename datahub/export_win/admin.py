@@ -1,10 +1,10 @@
 import reversion
-
 from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter
 from django.db.models import Value
 from django.db.models.functions import Concat
 from django.forms import ModelForm
+from django.urls import reverse
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin, EXPORT_WIN_GROUP_NAME
@@ -63,7 +63,7 @@ class AdvisorInline(BaseTabularInline):
     autocomplete_fields = (
         'adviser',
     )
-
+    can_delete = True
     model = WinAdviser
     form = AdvisorInlineForm
     fields = ('id', 'adviser', 'team_type', 'hq_team', 'location')
@@ -369,12 +369,27 @@ class WinAdviserAdmin(BaseModelAdminMixin):
         'adviser',
     )
 
+    def get_queryset(self, request):
+        """Return winadviser queryset only for undeleted win."""
+        queryset = super().get_queryset(request)
+        return queryset.filter(win__is_deleted=False)
+
+    def get_adviser_name(self, obj):
+        """Return adviser name."""
+        return obj.adviser.name
+
+    def delete_view(self, request, object_id, extra_context=None):
+        """
+        Redirect to the winadviser list view after successful deletion.
+        """
+        response = super().delete_view(request, object_id, extra_context=extra_context)
+        if response.status_code == 302:  # Redirect status code
+            response['Location'] = reverse('admin:export_win_winadviser_changelist')
+        return response
+
     def has_change_permission(self, request, obj=None):
         return False
 
-    def get_adviser_name(self, obj):
-        return obj.adviser.name
-
     get_adviser_name.short_description = 'Name'
 
-    WinAdviser._meta.verbose_name_plural = 'Team Members'
+    WinAdviser._meta.verbose_name_plural = 'Advisors'

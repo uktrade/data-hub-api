@@ -14,9 +14,11 @@ from datahub.export_win.admin import (
     CustomerResponseInlineForm,
     DeletedWinAdmin, WinAdmin,
     WinAdminForm,
+    WinAdviserAdmin,
     WinSoftDeletedAdminForm)
-from datahub.export_win.models import DeletedWin, Win
-from datahub.export_win.test.factories import CustomerResponseFactory, WinFactory
+from datahub.export_win.models import DeletedWin, Win, WinAdviser
+from datahub.export_win.test.factories import (
+    CustomerResponseFactory, WinAdviserFactory, WinFactory)
 
 
 @pytest.fixture
@@ -172,6 +174,32 @@ def test_has_view_permission():
 
     request.user = superuser
     assert admin.has_view_permission(request) is True
+
+
+@pytest.mark.django_db
+def test_get_queryset():
+    """
+    Test to get winadviser
+    And only show winadviser where win is not deleted
+    """
+    deleted_win1 = WinFactory(is_deleted=False)
+    deleted_win2 = WinFactory(is_deleted=True)
+    win_adviser1 = WinAdviserFactory(win=deleted_win1)
+    win_adviser2 = WinAdviserFactory(win=deleted_win2)
+
+    win_adviser_admin = WinAdviserAdmin(model=WinAdviser, admin_site=AdminSite())
+    queryset = win_adviser_admin.get_queryset(request=None)
+    assert win_adviser1 in queryset
+    assert win_adviser2 not in queryset
+
+
+@pytest.mark.django_db
+def test_get_adviser_name():
+    """Test for get adviser name"""
+    adviser = AdviserFactory(first_name='John', last_name='Smith')
+    win_adviser = WinAdviserFactory(adviser=adviser)
+    admin_instance = WinAdviserAdmin(model=WinAdviser, admin_site=AdminSite())
+    assert admin_instance.get_adviser_name(win_adviser) == 'John Smith'
 
 
 @pytest.mark.django_db
