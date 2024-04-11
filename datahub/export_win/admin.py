@@ -369,6 +369,10 @@ class WinAdviserAdmin(BaseModelAdminMixin):
         'adviser',
     )
 
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.filter(win__is_deleted=False)
+
     def has_change_permission(self, request, obj=None):
         return False
 
