@@ -1,3 +1,4 @@
+from django.urls import reverse
 import reversion
 
 from django.contrib import admin
@@ -370,14 +371,25 @@ class WinAdviserAdmin(BaseModelAdminMixin):
     )
 
     def get_queryset(self, request):
+        """Return winadviser queryset only for undeleted win."""
         queryset = super().get_queryset(request)
         return queryset.filter(win__is_deleted=False)
 
+    def get_adviser_name(self, obj):
+        """Return adviser name."""
+        return obj.adviser.name
+
+    def delete_view(self, request, object_id, extra_context=None):
+        """
+        Redirect to the winadviser list view after successful deletion.
+        """
+        response = super().delete_view(request, object_id, extra_context=extra_context)
+        if response.status_code == 302:  # Redirect status code
+            response['Location'] = reverse('admin:export_win_winadviser_changelist')
+        return response
+
     def has_change_permission(self, request, obj=None):
         return False
-
-    def get_adviser_name(self, obj):
-        return obj.adviser.name
 
     get_adviser_name.short_description = 'Name'
 
