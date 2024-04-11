@@ -42,7 +42,7 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
             'created_on': format_date_or_datetime(win_adviser.created_on),
             'id': win_adviser.legacy_id,
             'location': win_adviser.location,
-            'name': win_adviser.name,
+            'name': win_adviser.adviser.name,
             'win__id': str(win_adviser.win.id),
             'hq_team_display': win_adviser.hq_team.name,
             'team_type_display': win_adviser.team_type.name,
@@ -52,7 +52,7 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
 
     def test_success(self, data_flow_api_client):
 
-        win_adviser = self.factory(location='Somewhere', name='bob')
+        win_adviser = self.factory(location='Somewhere')
 
         response = data_flow_api_client.get(self.view_url).json()
 

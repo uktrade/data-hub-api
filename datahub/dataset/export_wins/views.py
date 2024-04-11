@@ -50,17 +50,17 @@ class ExportWinsAdvisersDatasetView(BaseDatasetView):
 
     def get_dataset(self):
         return (
-            WinAdviser.objects.select_related('win, hq_team, team_type')
+            WinAdviser.objects.select_related('win', 'adviser', 'hq_team', 'team_type')
             .values(
                 'created_on',
                 'win__id',
                 'location',
-                'name',
                 hq_team_display=F('hq_team__name'),
                 team_type_display=F('team_type__name'),
             )
             .annotate(
                 id=F('legacy_id'),
+                name=Concat(F('adviser__first_name'), Value(' '), F('adviser__last_name')),
                 hq_team=F('hq_team__export_win_id'),
                 team_type=F('team_type__export_win_id'),
             )
