@@ -64,7 +64,7 @@ class AdvisorInline(BaseTabularInline):
     autocomplete_fields = (
         'adviser',
     )
-
+    can_delete = True
     model = WinAdviser
     form = AdvisorInlineForm
     fields = ('id', 'adviser', 'team_type', 'hq_team', 'location')
