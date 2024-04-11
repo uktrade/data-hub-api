@@ -1,11 +1,10 @@
-from django.urls import reverse
 import reversion
-
 from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter
 from django.db.models import Value
 from django.db.models.functions import Concat
 from django.forms import ModelForm
+from django.urls import reverse
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin, EXPORT_WIN_GROUP_NAME
