@@ -393,4 +393,4 @@ class WinAdviserAdmin(BaseModelAdminMixin):
 
     get_adviser_name.short_description = 'Name'
 
-    WinAdviser._meta.verbose_name_plural = 'Team Members'
+    WinAdviser._meta.verbose_name_plural = 'Advisors'
