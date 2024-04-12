@@ -155,7 +155,7 @@ icalendar==5.0.12
     # via -r requirements.in
 identify==2.5.11
     # via pre-commit
-idna==3.4
+idna==3.7
     # via
     #   requests
     #   yarl
