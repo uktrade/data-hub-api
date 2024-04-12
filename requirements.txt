@@ -94,7 +94,7 @@ greenlet==3.0.1
     # via gevent
 icalendar==5.0.12
     # via -r requirements.in
-idna==3.4
+idna==3.7
     # via
     #   requests
     #   yarl
