@@ -209,7 +209,7 @@ packaging==22.0
     #   marshmallow
     #   pytest
     #   python-redis-rate-limit
-pandas==2.2.1
+pandas==2.2.2
     # via -r requirements.in
 parso==0.8.3
     # via jedi
