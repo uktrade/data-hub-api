@@ -161,6 +161,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'company',
         'company_contacts',
         'lead_officer',
+        'team_members',
     )
     readonly_fields = (
         'id',
@@ -216,6 +217,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         ('DBT Officer', {'fields': (
             'lead_officer',
             'team_type',
+            'team_members',
             'hq_team',
             'line_manager_name',  # Legacy field
             'lead_officer_email_address',  # Legacy field
