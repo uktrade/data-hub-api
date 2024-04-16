@@ -142,6 +142,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 'export_experience',
                 'hvc',
                 'hvo_programme',
+                'lead_officer',
                 'sector',
             )
             .annotate(
@@ -179,8 +180,6 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 'is_line_manager_confirmed',
                 'is_personally_confirmed',
                 'is_prosperity_fund_related',
-                'lead_officer_email_address',
-                'lead_officer_name',
                 'line_manager_name',
                 'name_of_customer',
                 'name_of_export',
@@ -299,11 +298,17 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 ),
                 country=F('country__iso_alpha2_code'),
                 hvc=F('hvc__export_win_id'),
-                user__email=F('adviser__email'),
+                user__email=F('adviser__contact_email'),
                 user__name=Concat(
                     'adviser__first_name',
                     Value(' '),
                     'adviser__last_name',
+                ),
+                lead_officer_email_address=F('lead_officer__contact_email'),
+                lead_officer_name=Concat(
+                    'lead_officer__first_name',
+                    Value(' '),
+                    'lead_officer__last_name',
                 ),
                 associated_programmes=ArraySubquery(
                     AssociatedProgramme.objects.filter(
