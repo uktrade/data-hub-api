@@ -12,9 +12,11 @@ django.setup()
 from datagen.constants import MODEL_INFO
 from datagen.generators.adviser import generate_advisers
 from datagen.generators.company import generate_companies
+from datagen.generators.investment_project import generate_investment_projects
 from datagen.utils import DisableSignals
 
 from datahub.company.models.adviser import Advisor
+from datahub.company.models.company import Company
 
 
 def get_model_counts():
@@ -38,6 +40,7 @@ with DisableSignals():
     # Specify quantities
     NUMBER_OF_ADVISERS = 50
     NUMBER_OF_COMPANIES = 200
+    NUMBER_OF_INVESTMENT_PROJECTS = 300
 
     # Generate Advisers
     print('\nGenerating advisers...')  # noqa
@@ -47,6 +50,15 @@ with DisableSignals():
     # Generate Companies
     print('\nGenerating companies...')  # noqa
     generate_companies(NUMBER_OF_COMPANIES, advisers)
+    companies = Company.objects.all()
+
+    # Generate Investment Projects
+    print('\nGenerating investment projects...')  # noqa
+    generate_investment_projects(
+        NUMBER_OF_INVESTMENT_PROJECTS,
+        advisers,
+        companies,
+    )
 
     # End matter
     print('\nFinal counts of models:')  # noqa
