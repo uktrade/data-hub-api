@@ -1,6 +1,6 @@
 from datahub.company_referral.models import CompanyReferral
 from datahub.dataset.core.views import BaseFilterDatasetView
-from datahub.dataset.utils import filter_data_by_date
+from datahub.dataset.utils import filter_data_by_modified_date
 
 
 class CompanyReferralDatasetView(BaseFilterDatasetView):
@@ -26,6 +26,6 @@ class CompanyReferralDatasetView(BaseFilterDatasetView):
             'subject',
         )
         updated_since = request.GET.get('updated_since')
-        filtered_queryset = filter_data_by_date(updated_since, queryset)
+        filtered_queryset = filter_data_by_modified_date(updated_since, queryset)
 
         return filtered_queryset
