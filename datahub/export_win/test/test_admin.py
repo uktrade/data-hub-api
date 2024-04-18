@@ -221,17 +221,18 @@ class TestWinAdminForm:
 
         assert form.fields['audit'].required is True
 
-        fields_to_update = {
-            'cdms_reference',
-            'customer_email_address',
-            'customer_job_title',
-            'line_manager_name',
-            'lead_officer_email_address',
-            'other_official_email_address',
+        legacy_fields = {
+            'cdms_reference': 'Data Hub (Companies House) or CDMS reference number',
+            'customer_email_address': 'Contact email',
+            'customer_job_title': 'Job title',
+            'line_manager_name': 'Line manager:',
+            'lead_officer_email_address': 'Lead officer email address',
+            'other_official_email_address': 'Secondary email address',
         }
 
-        for field_name in fields_to_update:
+        for field_name, label in legacy_fields.items():
             assert form.fields[field_name].required is False
+            assert form.fields[field_name].label == f'{label} (legacy)'
 
 
 @pytest.mark.django_db
