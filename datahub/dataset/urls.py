@@ -29,6 +29,7 @@ from datahub.dataset.investment_project.views import (
     InvestmentProjectsDatasetView,
 )
 from datahub.dataset.order.views import OMISDatasetView
+from datahub.dataset.task.views import TasksDatasetView
 from datahub.dataset.team.views import TeamsDatasetView
 from datahub.dataset.user_event_log.views import UserEventsView
 
@@ -59,6 +60,7 @@ urlpatterns = [
         InteractionsExportCountryDatasetView.as_view(),
         name='interactions-export-country-dataset',
     ),
+    path('tasks-dataset', TasksDatasetView.as_view(), name='tasks-dataset'),
     path('teams-dataset', TeamsDatasetView.as_view(), name='teams-dataset'),
     path(
         'investment-projects-dataset',
