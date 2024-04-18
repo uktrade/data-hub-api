@@ -3,7 +3,7 @@ from django.db.models.functions import Cast
 
 from datahub.core.query_utils import get_aggregate_subquery, get_string_agg_subquery
 from datahub.dataset.core.views import BaseFilterDatasetView
-from datahub.dataset.utils import filter_data_by_date
+from datahub.dataset.utils import filter_data_by_modified_date
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.omis.order.models import Order
 
@@ -52,6 +52,6 @@ class OMISDatasetView(BaseFilterDatasetView):
             'vat_cost',
         )
         updated_since = request.GET.get('updated_since')
-        filtered_queryset = filter_data_by_date(updated_since, queryset)
+        filtered_queryset = filter_data_by_modified_date(updated_since, queryset)
 
         return filtered_queryset

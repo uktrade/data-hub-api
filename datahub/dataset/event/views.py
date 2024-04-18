@@ -5,7 +5,7 @@ from datahub.core.query_utils import (
     get_array_agg_subquery,
 )
 from datahub.dataset.core.views import BaseFilterDatasetView
-from datahub.dataset.utils import filter_data_by_date
+from datahub.dataset.utils import filter_data_by_modified_date
 from datahub.event.models import Event
 from datahub.metadata.query_utils import get_service_name_subquery
 
@@ -56,6 +56,6 @@ class EventsDatasetView(BaseFilterDatasetView):
             'related_programme_names',
         )
         updated_since = request.GET.get('updated_since')
-        filtered_queryset = filter_data_by_date(updated_since, queryset)
+        filtered_queryset = filter_data_by_modified_date(updated_since, queryset)
 
         return filtered_queryset
