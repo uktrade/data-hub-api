@@ -14,6 +14,9 @@ from datahub.core.test_utils import (
 )
 from datahub.core.utils import get_financial_year
 from datahub.dataset.core.test import BaseDatasetViewTest
+from datahub.dataset.export_wins import (
+    EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
+)
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.models import HVC
 
@@ -28,9 +31,22 @@ from datahub.export_win.test.factories import (
     WinAdviserFactory,
     WinFactory,
 )
+from datahub.feature_flag.test.factories import (
+    FeatureFlagFactory,
+)
 
 
 pytestmark = pytest.mark.django_db
+
+
+def get_export_wins_legacy_data_feature_flag():
+    """
+    Creates the Export wins legacy dataset feature flag.
+    """
+    return FeatureFlagFactory(
+        code=EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
+        is_active=True,
+    )
 
 
 class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
@@ -58,6 +74,31 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
 
         assert len(response['results']) == 1
         self._assert_win_adviser_matches_result(win_adviser, response['results'][0])
+
+    @pytest.mark.parametrize(
+        'list_legacy_data',
+        (
+            True,
+            False,
+        ),
+    )
+    def test_success_with_legacy_data(
+        self,
+        list_legacy_data,
+        data_flow_api_client,
+    ):
+        if list_legacy_data:
+            assert get_export_wins_legacy_data_feature_flag()
+
+        self.factory()
+        params = {
+            'win': WinFactory(migrated_on=datetime.now()),
+        }
+        self.factory(**params)
+
+        response = data_flow_api_client.get(self.view_url).json()
+
+        assert len(response['results']) == (2 if list_legacy_data else 1)
 
     def test_with_multiple_win_adviser(self, data_flow_api_client):
 
@@ -95,6 +136,30 @@ class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
 
         assert len(response['results']) == 1
         self._assert_breakdown_matches_result(breakdown, response['results'][0])
+
+    @pytest.mark.parametrize(
+        'list_legacy_data',
+        (
+            True,
+            False,
+        ),
+    )
+    def test_success_with_legacy_data(
+        self,
+        list_legacy_data,
+        data_flow_api_client,
+    ):
+        if list_legacy_data:
+            assert get_export_wins_legacy_data_feature_flag()
+
+        self.factory()
+        params = {
+            'win': WinFactory(migrated_on=datetime.now()),
+        }
+        self.factory(**params)
+
+        response = data_flow_api_client.get(self.view_url).json()
+        assert len(response['results']) == (2 if list_legacy_data else 1)
 
     def test_with_multiple_breakdowns(self, data_flow_api_client):
 
@@ -148,6 +213,21 @@ class TestExportWinsHVCDatasetView(BaseDatasetViewTest):
         assert all(
             legacy_id >= EXPORT_WINS_LEGACY_ID_START_VALUE for legacy_id in legacy_ids
         )
+
+    def test_success_with_feature_flag(
+        self,
+        data_flow_api_client,
+    ):
+        assert get_export_wins_legacy_data_feature_flag()
+        response = data_flow_api_client.get(
+            f'{self.view_url}?exclude_legacy=true&page_size=10000',
+        ).json()
+
+        legacy_ids = [
+            result['id']
+            for result in response['results'] if result['id'] < EXPORT_WINS_LEGACY_ID_START_VALUE
+        ]
+        assert len(legacy_ids) > 0
 
 
 class TestExportWinsWinDatasetView(BaseDatasetViewTest):
@@ -300,6 +380,28 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             tokens,
             response['results'][0],
         )
+
+    @pytest.mark.parametrize(
+        'list_legacy_data',
+        (
+            True,
+            False,
+        ),
+    )
+    def test_success_with_legacy_data(
+        self,
+        list_legacy_data,
+        data_flow_api_client,
+    ):
+        if list_legacy_data:
+            assert get_export_wins_legacy_data_feature_flag()
+
+        self.factory()
+        self.factory(migrated_on=datetime.now())
+
+        response = data_flow_api_client.get(self.view_url).json()
+
+        assert len(response['results']) == (2 if list_legacy_data else 1)
 
     def test_customer_email_date_uses_most_recent(self, data_flow_api_client):
         win = self.factory()
