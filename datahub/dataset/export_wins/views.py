@@ -24,6 +24,9 @@ from django.db.models.functions import (
 
 from datahub.company.models import Contact
 from datahub.dataset.core.views import BaseDatasetView, BaseFilterDatasetView
+from datahub.dataset.export_wins import (
+    EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
+)
 from datahub.dataset.export_wins.pagination import HVCDatasetViewCursorPagination
 from datahub.dataset.export_wins.utils import (
     convert_datahub_export_experience_to_export_wins,
@@ -40,6 +43,7 @@ from datahub.export_win.models import (
     Win,
     WinAdviser,
 )
+from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.metadata.query_utils import get_sector_name_subquery
 
 
@@ -49,8 +53,19 @@ class ExportWinsAdvisersDatasetView(BaseDatasetView):
     """
 
     def get_dataset(self):
+        if is_feature_flag_active(
+            EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
+        ):
+            migrated_filter = {}
+        else:
+            migrated_filter = {
+                'win__migrated_on__isnull': True,
+            }
         return (
             WinAdviser.objects.select_related('win', 'adviser', 'hq_team', 'team_type')
+            .filter(
+                **migrated_filter,
+            )
             .values(
                 'created_on',
                 'win__id',
@@ -73,8 +88,20 @@ class ExportWinsBreakdownsDatasetView(BaseDatasetView):
     """
 
     def get_dataset(self):
+        if is_feature_flag_active(
+            EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
+        ):
+            migrated_filter = {}
+        else:
+            migrated_filter = {
+                'win__migrated_on__isnull': True,
+            }
+
         return (
-            Breakdown.objects.select_related('win, breakdown_type')
+            Breakdown.objects.select_related('win', 'breakdown_type')
+            .filter(
+                **migrated_filter,
+            )
             .annotate(
                 won_year=ExtractYear('win__date'),
                 won_month=ExtractMonth('win__date'),
@@ -113,6 +140,10 @@ class ExportWinsHVCDatasetView(BaseFilterDatasetView):
 
     def get_dataset(self, request):
         exclude_legacy = request.query_params.get('exclude_legacy', 'false')
+        if is_feature_flag_active(
+            EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
+        ):
+            exclude_legacy = False
 
         hvcs = HVC.objects.values(
             'campaign_id',
@@ -132,6 +163,14 @@ class ExportWinsWinDatasetView(BaseDatasetView):
     """
 
     def get_dataset(self):
+        if is_feature_flag_active(
+            EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
+        ):
+            migrated_filter = {}
+        else:
+            migrated_filter = {
+                'migrated_on__isnull': True,
+            }
         return (
             Win.objects.select_related(
                 'adviser',
@@ -144,6 +183,9 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 'hvo_programme',
                 'lead_officer',
                 'sector',
+            )
+            .filter(
+                **migrated_filter,
             )
             .annotate(
                 sector_name=get_sector_name_subquery('sector'),
