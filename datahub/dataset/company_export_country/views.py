@@ -1,6 +1,6 @@
 from datahub.company.models import CompanyExportCountry
 from datahub.dataset.core.views import BaseFilterDatasetView
-from datahub.dataset.utils import filter_data_by_date
+from datahub.dataset.utils import filter_data_by_modified_date
 
 
 class CompanyExportCountryDatasetView(BaseFilterDatasetView):
@@ -23,6 +23,6 @@ class CompanyExportCountryDatasetView(BaseFilterDatasetView):
             'status',
         )
         updated_since = request.GET.get('updated_since')
-        filtered_queryset = filter_data_by_date(updated_since, queryset)
+        filtered_queryset = filter_data_by_modified_date(updated_since, queryset)
 
         return filtered_queryset
