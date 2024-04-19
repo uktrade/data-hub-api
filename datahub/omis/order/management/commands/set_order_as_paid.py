@@ -1,4 +1,5 @@
 from datetime import date
+
 from django.core.management import BaseCommand
 
 from datahub.company.models import Advisor, Contact
@@ -39,11 +40,11 @@ class Command(BaseCommand):
             {
                 'amount': 50000,
                 'method': 'bacs',
-                'received_on': date.today()
+                'received_on': date.today(),
             },
             {
                 'amount': 50000,
                 'method': 'manual',
-                'received_on': date.today()
+                'received_on': date.today(),
             }
         ])
