@@ -2227,6 +2227,35 @@
     billing_address_postcode: H4E 1A8
     billing_address_country: 5daf72a6-5d95-e211-a939-e4115bead28a # Canada
 
+- model: order.Order
+  pk: 00055b60-9bbe-4d59-8791-b2bceebf3881
+  fields:
+    reference: "RYM547/24"
+    status: draft
+    created_on: "2024-03-08T13:56:12.108209Z"
+    created_by: 7bad8082-4978-4fe8-a018-740257f01637
+    modified_on: "2024-03-08T13:58:53.690177Z"
+    modified_by: 7bad8082-4978-4fe8-a018-740257f01637
+    company: fc3530bc-383c-4b18-94c8-8fbe918bee31
+    contact: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
+    primary_market: 5daf72a6-5d95-e211-a939-e4115bead28a # Canada
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    service_types: [22fc9edd-41a5-4182-ba4e-baacc681d5f7]
+    description: "test order"
+    public_token: "XXMPH3b2185a7Vpe2f3RiI5HXT0Nshrck_6xGJuRp4UAsA6vkQ"
+    delivery_date: "2030-05-07"
+    discount_value: 0
+    vat_status: outside_eu
+    net_cost: 500000
+    subtotal_cost: 500000
+    vat_cost: 0
+    total_cost: 500000
+    billing_company_name: Motorleaf
+    billing_address_1: 5000 Rue Saint-Patrick,
+    billing_address_town: Montréal
+    billing_address_postcode: H4E 1A8
+    billing_address_country: 5daf72a6-5d95-e211-a939-e4115bead28a # Canada
+
 - model: export_win.Win
   pk: c26c750d-1a56-4be0-b01c-e2f2c1a45edd
   fields:
