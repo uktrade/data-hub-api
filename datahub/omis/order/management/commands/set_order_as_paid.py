@@ -46,5 +46,5 @@ class Command(BaseCommand):
                 'amount': 50000,
                 'method': 'manual',
                 'received_on': date.today(),
-            }
+            },
         ])
