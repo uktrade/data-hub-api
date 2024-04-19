@@ -412,6 +412,7 @@ class Win(BaseModel):
         on_delete=models.PROTECT,
     )
     is_deleted = models.BooleanField(default=False)
+    migrated_on = models.DateTimeField(null=True, blank=True)
 
     objects = BaseExportWinSoftDeleteManager()
 
