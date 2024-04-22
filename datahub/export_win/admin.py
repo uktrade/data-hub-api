@@ -127,7 +127,7 @@ class WinAdminForm(ModelForm):
             'cdms_reference': 'Data Hub (Companies House) or CDMS reference number',
             'customer_email_address': 'Contact email',
             'customer_job_title': 'Job title',
-            'line_manager_name': 'Line manager:',
+            'line_manager_name': 'Line manager',
             'lead_officer_email_address': 'Lead officer email address',
             'other_official_email_address': 'Secondary email address',
         }
