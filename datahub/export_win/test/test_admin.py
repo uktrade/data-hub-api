@@ -31,6 +31,11 @@ def customer_response(win: WinFactory):
     return CustomerResponseFactory(name='Test Customer Response', win_id=win.id)
 
 
+@pytest.fixture
+def admin():
+    return WinAdmin(model=Win, admin_site=AdminSite())
+
+
 @pytest.mark.django_db
 def test_get_actions():
     """Test for actions"""
@@ -106,10 +111,9 @@ def test_get_queryset_soft_deleted():
 
 
 @pytest.mark.django_db
-def test_get_company():
+def test_get_company(admin):
     """Test for get company"""
     company = CompanyFactory()
-    admin = WinAdmin(model=Win, admin_site=AdminSite())
     obj = WinFactory(company=company)
     result = admin.get_company(obj)
 
@@ -117,10 +121,9 @@ def test_get_company():
 
 
 @pytest.mark.django_db
-def test_get_adviser():
+def test_get_adviser(admin):
     """Test for get adviser"""
     adviser = AdviserFactory()
-    admin = WinAdmin(model=Win, admin_site=AdminSite())
     obj = WinFactory(adviser=adviser)
     result = admin.get_adviser(obj)
 
@@ -129,10 +132,9 @@ def test_get_adviser():
 
 
 @pytest.mark.django_db
-def test_get_date_confirmed():
+def test_get_date_confirmed(admin):
     """Test for get date confirmed"""
     customer_response = CustomerResponseFactory(responded_on='2024-04-01')
-    admin = WinAdmin(model=Win, admin_site=AdminSite())
     obj = WinFactory(customer_response=customer_response)
     result = admin.get_date_confirmed(obj)
 
@@ -141,14 +143,13 @@ def test_get_date_confirmed():
 
 
 @pytest.mark.django_db
-def test_get_contact_names():
+def test_get_contact_names(admin):
     """Test for get contact names"""
     contact1 = ContactFactory(first_name='John', last_name='Doe')
     contact2 = ContactFactory(first_name='Jane', last_name='Smith')
     obj = WinFactory()
     obj.company_contacts.add(contact1, contact2)
 
-    admin = WinAdmin(model=Win, admin_site=AdminSite())
     result = admin.get_contact_names(obj)
 
     expected_result = 'John Doe, Jane Smith'
@@ -156,14 +157,13 @@ def test_get_contact_names():
 
 
 @pytest.mark.django_db
-def test_has_view_permission():
+def test_has_view_permission(admin):
     """Test for has view permission in deleted win"""
     regular_user = AdviserFactory()
     export_win_admin_group = Group.objects.create(name='ExportWinAdmin')
     regular_user.groups.add(export_win_admin_group)
 
     superuser = AdviserFactory(is_superuser=True)
-    admin = DeletedWinAdmin(Win, AdminSite())
     request = RequestFactory().get('/')
 
     request.user = regular_user
@@ -221,17 +221,18 @@ class TestWinAdminForm:
 
         assert form.fields['audit'].required is True
 
-        fields_to_update = {
-            'cdms_reference',
-            'customer_email_address',
-            'customer_job_title',
-            'line_manager_name',
-            'lead_officer_email_address',
-            'other_official_email_address',
+        legacy_fields = {
+            'cdms_reference': 'Data Hub (Companies House) or CDMS reference number',
+            'customer_email_address': 'Contact email',
+            'customer_job_title': 'Job title',
+            'line_manager_name': 'Line manager',
+            'lead_officer_email_address': 'Lead officer email address',
+            'other_official_email_address': 'Secondary email address',
         }
 
-        for field_name in fields_to_update:
+        for field_name, label in legacy_fields.items():
             assert form.fields[field_name].required is False
+            assert form.fields[field_name].label == f'{label} (legacy)'
 
 
 @pytest.mark.django_db
