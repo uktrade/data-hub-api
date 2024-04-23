@@ -207,6 +207,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                     output_field=JSONField(),
                 ),
                 temp_cdms_reference=F('cdms_reference'),
+                temp_complete=F('complete'),
             )
             .prefetch_related('associated_programme', 'type_of_support')
             .values(
@@ -214,7 +215,6 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 'id',
                 'audit',
                 'business_type',
-                'complete',
                 'date',
                 'description',
                 'has_hvo_specialist_involvement',
@@ -250,6 +250,18 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 customer_email_date=Max('customer_response__tokens__created_on'),
             )
             .annotate(
+                complete=Case(
+                    When(
+                        migrated_on__isnull=True,
+                        then=Case(
+                            When(num_notifications__gt=0, then=True),
+                            default=False,
+                            output_field=BooleanField(),
+                        ),
+                    ),
+                    default=F('temp_complete'),
+                    output_field=BooleanField(),
+                ),
                 company_name=F('company__name'),
                 confirmation__access_to_contacts=Case(
                     When(customer_response__responded_on__isnull=True, then=None),
