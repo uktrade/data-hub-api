@@ -5,6 +5,7 @@ from unittest import mock
 import pytest
 
 from datahub.core.constants import (
+    FDIType as FDITypeConstant,
     InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
     InvestmentType as InvestmentTypeConstant,
     Sector as SectorConstant,
@@ -33,36 +34,50 @@ class TestGrossValueAddedCalculator:
     """Test for Gross Value Added Calculator."""
 
     @pytest.mark.parametrize(
-        'investment_type,sector,business_activities',
+        'business_activities,fdi_type,investment_type,sector',
         [
             # Non-FDI investment type
             (
+                [],
+                FDITypeConstant.creation_of_new_site_or_activity.value.id,
                 InvestmentTypeConstant.non_fdi.value.id,
                 SectorConstant.renewable_energy_wind.value.id,
+            ),
+            # FDI type is retention
+            (
                 [],
+                FDITypeConstant.retention.value.id,
+                InvestmentTypeConstant.fdi.value.id,
+                SectorConstant.renewable_energy_wind.value.id,
             ),
             # When sector is empty
             (
+                [],
+                FDITypeConstant.creation_of_new_site_or_activity.value.id,
                 InvestmentTypeConstant.fdi.value.id,
                 None,
-                [],
             ),
         ],
     )
     def test_get_gva_multiplier_returns_none_when_expected(
         self,
+        business_activities,
+        fdi_type,
         investment_type,
         sector,
-        business_activities,
     ):
-        """Test _get_gva_multiplier_for_investment_project returns none when:
-        a) investment type is non-FDI,
-        b) investment project sector is empty.
+        """Test _get_gva_multiplier_for_investment_project returns none when expected.
+
+        Expected scenarios:
+        - investment type is non-FDI,
+        - FDI type is retention,
+        - investment project sector is empty.
         """
         project = InvestmentProjectFactory(
-            sector_id=sector,
             business_activities=business_activities,
+            fdi_type_id=fdi_type,
             investment_type_id=investment_type,
+            sector_id=sector,
         )
         assert project.gva_multiplier is None
 
@@ -120,10 +135,12 @@ class TestGrossValueAddedCalculator:
         business_activities,
         expected_multiplier_value: Decimal,
     ):
-        """Test _get_gva_multiplier_for_investment_project returns value when:
-        a) investment type is FDI,
-        b) business activities are retail or sales,
-        c) investment project has a sector.
+        """Test _get_gva_multiplier_for_investment_project returns value when expected.
+
+        Expected scenarios:
+        - investment type is FDI (but not FDI retention),
+        - business activities are retail or sales,
+        - investment project has a sector.
         """
         project = InvestmentProjectFactory(
             sector_id=sector,
@@ -131,6 +148,19 @@ class TestGrossValueAddedCalculator:
             investment_type_id=investment_type,
         )
         assert project.gva_multiplier.multiplier == expected_multiplier_value
+
+    def test_fdi_retention_type_returns_multiplier_of_none(self):
+        """Test when it is an FDI retention project, it has a multiplier of None."""
+        project = InvestmentProjectFactory(
+            business_activities=[],
+            investment_type_id=InvestmentTypeConstant.fdi.value.id,
+            sector_id=SectorConstant.renewable_energy_wind.value.id,
+        )
+        assert project.gva_multiplier is not None
+        project.fdi_type_id = FDITypeConstant.retention.value.id
+        project.save()
+        project.refresh_from_db()
+        assert project.gva_multiplier is None
 
     def test_multiple_gva_multipliers_for_sector_returns_most_recent_multiplier(self):
         """
@@ -219,15 +249,16 @@ class TestGrossValueAddedCalculator:
         foreign_equity_investment,
         number_new_jobs,
     ):
-        """
-        Tests that GVA value is set to None when:
-        a) sector is capital intensive, there is no foreign equity investment value,
+        """Tests that GVA value is set to None when expected.
+
+        Expected scenarios:
+        - sector is capital intensive, there is no foreign equity investment value,
         and there is a value for number of new jobs;
-        b) sector is capital intensive, there is no foreign equity investment value,
+        - sector is capital intensive, there is no foreign equity investment value,
         and there is no value for number of new jobs;
-        c) sector is labour intensive, there is a foreign equity investment value,
+        - sector is labour intensive, there is a foreign equity investment value,
         and there is no value for number of new jobs;
-        d) sector is labour intensive, there is no foreign equity investment value,
+        - sector is labour intensive, there is no foreign equity investment value,
         and there is no value for number of new jobs;
         """
         sector = SectorFactory()
@@ -269,11 +300,12 @@ class TestGrossValueAddedCalculator:
         number_new_jobs,
         expected_gva_value: Decimal,
     ):
-        """
-        Tests that the correct gva value is set when:
-        a) Sector classification is capital, there is foreign equity investment,
+        """Tests that the correct gva value is set when expected:
+
+        Expected scenarios:
+        - Sector classification is capital, there is foreign equity investment,
         and there is no value for number of new jobs
-        b) Sector classification is labour, there is no foreign equity investment,
+        - Sector classification is labour, there is no foreign equity investment,
         value and there is a value for number of new jobs
         """
         sector = SectorFactory()

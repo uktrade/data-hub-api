@@ -4,11 +4,12 @@ from logging import getLogger
 from django.utils.functional import cached_property
 
 from datahub.core.constants import (
-    InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
-)
-from datahub.core.constants import (
+    FDIType as FDITypeConstant,
     InvestmentType as InvestmentTypeConstant,
     Sector as SectorConstant,
+)
+from datahub.core.constants import (
+    InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
 )
 from datahub.investment.project.models import GVAMultiplier
 
@@ -80,6 +81,9 @@ class GrossValueAddedCalculator:
             str(self.investment_project.investment_type_id)
             != InvestmentTypeConstant.fdi.value.id
         ):
+            return None
+
+        if str(self.investment_project.fdi_type_id) == FDITypeConstant.retention.value.id:
             return None
 
         if self._has_business_activity_of_retail_or_sales():
