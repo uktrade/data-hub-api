@@ -401,6 +401,10 @@ class FDIType(Enum):
         'Creation of new site or activity',
         'f8447013-cfdc-4f35-a146-6619665388b3',
     )
+    retention = Constant(
+        'Retention',
+        '0657168e-8a58-4f37-914f-ec541556fc28',
+    )
 
 
 class FDIValue(Enum):
