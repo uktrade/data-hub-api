@@ -18,7 +18,7 @@ from datahub.dataset.export_wins import (
     EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
 )
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
-from datahub.export_win.models import HVC
+from datahub.export_win.models import HVC, Win
 
 from datahub.export_win.test.factories import (
     AssociatedProgrammeFactory,
@@ -251,7 +251,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'business_type': win.business_type,
             'cdms_reference': win.company.company_number,
             'company_name': win.company.name,
-            'complete': win.complete,
+            'complete': len(tokens) > 0 if win.migrated_on is None else win.complete,
             'confirmation__access_to_contacts':
                 win.customer_response.our_support.export_win_id if has_responded else None,
             'confirmation__access_to_information':
@@ -397,11 +397,19 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             assert get_export_wins_legacy_data_feature_flag()
 
         self.factory()
-        self.factory(migrated_on=datetime.now())
+        self.factory(complete=False, migrated_on=datetime.now())
+        self.factory(complete=True, migrated_on=datetime.now())
 
         response = data_flow_api_client.get(self.view_url).json()
 
-        assert len(response['results']) == (2 if list_legacy_data else 1)
+        assert len(response['results']) == (3 if list_legacy_data else 1)
+        if list_legacy_data:
+            completes = [
+                result['complete']
+                for result in response['results']
+                if Win.objects.get(id=result['id']).migrated_on
+            ]
+            assert {True, False} == set(completes)
 
     def test_customer_email_date_uses_most_recent(self, data_flow_api_client):
         win = self.factory()
