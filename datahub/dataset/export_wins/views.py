@@ -9,7 +9,7 @@ from django.db.models import (
     F,
     Func,
     IntegerField,
-    Max,
+    Min,
     OuterRef,
     Subquery,
     Value,
@@ -247,7 +247,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 sector_display=F('sector_name'),
                 team_type_display=F('team_type__name'),
                 num_notifications=Count('customer_response__tokens'),
-                customer_email_date=Max('customer_response__tokens__created_on'),
+                customer_email_date=Min('customer_response__tokens__created_on'),
             )
             .annotate(
                 complete=Case(
