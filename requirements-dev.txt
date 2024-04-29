@@ -123,7 +123,7 @@ flake8==7.0.0
     #   flake8-quotes
     #   flake8-string-format
     #   pep8-naming
-flake8-bugbear==24.4.21
+flake8-bugbear==24.4.26
     # via -r requirements-dev.in
 flake8-commas==2.1.0
     # via -r requirements-dev.in
