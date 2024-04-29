@@ -102,7 +102,7 @@ ecs-logging==2.0.2
     # via elastic-apm
 elastic-apm==6.22.0
     # via -r requirements.in
-execnet==1.9.0
+execnet==2.1.1
     # via pytest-xdist
 executing==1.2.0
     # via stack-data
@@ -285,7 +285,7 @@ pytest-django==4.8.0
     # via -r requirements-dev.in
 pytest-mock==3.14.0
     # via -r requirements-dev.in
-pytest-xdist==3.5.0
+pytest-xdist==3.6.1
     # via -r requirements-dev.in
 python-dateutil==2.9.0.post0
     # via
