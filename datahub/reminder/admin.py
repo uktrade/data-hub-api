@@ -120,6 +120,18 @@ class UpcomingTaskReminderAdmin(admin.ModelAdmin):
     """Upcoming task reminder admin."""
 
     raw_id_fields = ('adviser',)
+    list_display = (
+        'id',
+        'task',
+        'event',
+        'status',
+        'adviser',
+    )
+    list_display_links = (
+        'id',
+        'adviser',
+        'task',
+    )
 
 
 @admin.register(TaskDeletedByOthersSubscription)
