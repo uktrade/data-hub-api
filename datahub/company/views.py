@@ -44,6 +44,7 @@ from datahub.company.models import (
     Contact,
     Objective,
 )
+from datahub.company.pagination import ContactPageSize
 from datahub.company.queryset import (
     get_contact_queryset,
     get_export_country_queryset,
@@ -426,6 +427,7 @@ class ContactV4ViewSet(ContactViewSet):
     """Contact ViewSet v4."""
 
     serializer_class = ContactV4Serializer
+    pagination_class = ContactPageSize
 
     def get_serializer_class(self):
         """
