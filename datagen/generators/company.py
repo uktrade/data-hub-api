@@ -11,7 +11,6 @@ from datahub.company.test.factories import (
 )
 
 from ..utils import (
-    random_object_from_queryset,
     send_heartbeat_every_10_iterations,
 )
 
@@ -21,7 +20,7 @@ COMPANY_TYPE_RATIOS = {
     'company_with_area': Decimal('0.1'),
     'subsidiary_company': Decimal('0.2'),
     'archived_company': Decimal('0.1'),
-    'duplicate_company': Decimal('0.1'),    
+    'duplicate_company': Decimal('0.1'),
 }
 
 
@@ -31,12 +30,12 @@ def generate_companies(
 ):
     if sum(COMPANY_TYPE_RATIOS.values()) > 1:
         raise ValueError('Company type ratios must add up to 1')
-    
+
     companies_per_adviser = number_of_companies // advisers.count()
 
     # Handle case when requested number is too small
     if number_of_companies < 10:
-        for index, adviser in enumerate(advisers[:number_of_companies]):
+        for adviser in advisers[:number_of_companies]:
             CompanyFactory(
                 created_by=adviser,
                 modified_by=adviser,
@@ -47,7 +46,9 @@ def generate_companies(
     # Determine ratios
     n_companies = round(companies_per_adviser * COMPANY_TYPE_RATIOS['company'])
     n_companies_with_area = round(companies_per_adviser * COMPANY_TYPE_RATIOS['company_with_area'])
-    n_subsidiary_companies = round(companies_per_adviser * COMPANY_TYPE_RATIOS['subsidiary_company'])
+    n_subsidiary_companies = round(
+        companies_per_adviser * COMPANY_TYPE_RATIOS['subsidiary_company'],
+    )
     n_archived_companies = round(companies_per_adviser * COMPANY_TYPE_RATIOS['archived_company'])
     n_duplicate_companies = round(companies_per_adviser * COMPANY_TYPE_RATIOS['duplicate_company'])
 
@@ -58,16 +59,16 @@ def generate_companies(
                 size=n_companies,
                 created_by=adviser,
                 modified_by=adviser,
-            )
+            ),
         )
         companies.extend(
             CompanyWithAreaFactory.create_batch(
                 size=n_companies_with_area,
                 created_by=adviser,
                 modified_by=adviser,
-            )
+            ),
         )
-        
+
         # Create subsidiaries
         for company in companies[:n_subsidiary_companies]:
             SubsidiaryFactory(

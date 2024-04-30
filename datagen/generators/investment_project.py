@@ -32,5 +32,5 @@ def generate_investment_projects(
             ],
         )
         send_heartbeat_every_10_iterations(index)
-    print(f'\nGenerated {number_of_investment_projects} investment projects')
+    print(f'\nGenerated {number_of_investment_projects} investment projects')  # noqa
     print(f'Also generated {len(companies)} contacts') # noqa
