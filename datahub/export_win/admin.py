@@ -321,9 +321,11 @@ class DeletedWinAdmin(WinAdmin):
     actions = ('undelete',)
 
     def get_queryset(self, request):
+        """Return win queryset only for deleted win."""
         return self.model.objects.soft_deleted()
 
     def undelete(self, request, queryset):
+        """Perform undelete action in django admin"""
         for win in queryset.all():
             with reversion.create_revision():
                 win.is_deleted = False
