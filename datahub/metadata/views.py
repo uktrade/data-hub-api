@@ -15,12 +15,22 @@ from datahub.metadata.registry import registry
 logger = logging.getLogger(__name__)
 
 
+class DBTPlatformFix:
+    def dispatch(self, request, *args, **kwargs):
+        logger.info("DISPATCH!!!!!!!!!!")
+        logger.info(request)
+        if len(request.GET) == 0:
+            request.GET._mutable = True
+            request.GET['dummy'] = True
+        return super().dispatch(request, *args, **kwargs)
+
+
 def _create_metadata_view(mapping):
     has_filters = mapping.filterset_fields or mapping.filterset_class
     model = mapping.queryset.model
-
     attrs = {
-        'authentication_classes': [PaaSIPAuthentication, HawkAuthentication],
+        # 'dispatch': (DBTPlatformFix,),
+        'authentication_classes': (PaaSIPAuthentication, HawkAuthentication),
         'permission_classes': (HawkScopePermission,),
         'required_hawk_scope': HawkScope.metadata,
         'filter_backends': (DjangoFilterBackend,) if has_filters else (),
@@ -34,7 +44,7 @@ def _create_metadata_view(mapping):
 
     view_set = type(
         f'{mapping.model.__name__}ViewSet',
-        (HawkResponseSigningMixin, GenericViewSet, ListModelMixin),
+        (DBTPlatformFix, HawkResponseSigningMixin, GenericViewSet, ListModelMixin),
         attrs,
     )
 
@@ -47,6 +57,5 @@ urls_args = []
 
 # programmatically generate metadata views
 for name, mapping in registry.mappings.items():
-    logger.info('Metadata:', name)
     view = _create_metadata_view(mapping)
     urls_args.append(((name, view), {'name': name}))
