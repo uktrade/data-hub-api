@@ -225,7 +225,7 @@ platformdirs==2.6.0
     # via
     #   pylint
     #   virtualenv
-pluggy==1.4.0
+pluggy==1.5.0
     # via pytest
 pre-commit==3.7.0
     # via -r requirements-dev.in
@@ -271,7 +271,7 @@ pyproject-hooks==1.0.0
     # via
     #   build
     #   pip-tools
-pytest==8.1.1
+pytest==8.2.0
     # via
     #   -r requirements-dev.in
     #   pylint-pytest
