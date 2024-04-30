@@ -160,7 +160,6 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         ('created_on', DateFieldListFilter),
     )
     autocomplete_fields = (
-        'adviser',
         'company',
         'company_contacts',
         'lead_officer',
@@ -168,6 +167,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     )
     readonly_fields = (
         'id',
+        'adviser',
         'created_on',
         'modified_on',
         'total_expected_export_value',
