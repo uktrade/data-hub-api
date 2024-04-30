@@ -19,9 +19,9 @@ class DBTPlatformFix:
     def dispatch(self, request, *args, **kwargs):
         logger.info("DISPATCH!!!!!!!!!!")
         logger.info(request)
-        if len(request.GET) == 0:
-            request.GET._mutable = True
-            request.GET['dummy'] = True
+        # if len(request.GET) == 0:
+        request.GET._mutable = True
+        request.GET['level__lte'] = 0
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -29,7 +29,7 @@ def _create_metadata_view(mapping):
     has_filters = mapping.filterset_fields or mapping.filterset_class
     model = mapping.queryset.model
     attrs = {
-        # 'dispatch': (DBTPlatformFix,),
+        'dispatch': (DBTPlatformFix,),
         'authentication_classes': (PaaSIPAuthentication, HawkAuthentication),
         'permission_classes': (HawkScopePermission,),
         'required_hawk_scope': HawkScope.metadata,
