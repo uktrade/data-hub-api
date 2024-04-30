@@ -29,7 +29,7 @@ def _create_metadata_view(mapping):
     has_filters = mapping.filterset_fields or mapping.filterset_class
     model = mapping.queryset.model
     attrs = {
-        'dispatch': (DBTPlatformFix,),
+        # 'dispatch': (DBTPlatformFix,),
         'authentication_classes': (PaaSIPAuthentication, HawkAuthentication),
         'permission_classes': (HawkScopePermission,),
         'required_hawk_scope': HawkScope.metadata,
