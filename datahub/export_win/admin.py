@@ -254,7 +254,9 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
 
     def get_contact_names(self, obj):
         """Return a comma separated list of company contact names."""
-        return ', '.join(contact.name for contact in obj.company_contacts.all())
+        return ', '.join(
+            contact.name for contact in obj.company_contacts.all().order_by('last_name')
+        )
     get_contact_names.short_description = 'Contact name'
 
     def get_actions(self, request):
