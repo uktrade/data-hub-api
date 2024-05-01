@@ -484,6 +484,35 @@ class TestAutoResendClientEmailFromUnconfirmedWinTask:
                 max_retries=5,
             )
 
+    @pytest.mark.parametrize(
+        'is_deleted',
+        (True, False),
+    )
+    def test_auto_resend_to_ensure_soft_deleted_win_excluded_when_generating_new_token(
+        self,
+        is_deleted,
+    ):
+        """
+        Test auto resend client email to ensure soft deleted win excluded when
+        generating new token.
+        """
+        contact = ContactFactory()
+        win = WinFactory(company_contacts=[contact], is_deleted=is_deleted)
+        customer_response = CustomerResponseFactory(win=win)
+
+        def set_time_delta(days):
+            return datetime.utcnow() - timedelta(days=days)
+
+        with freeze_time(set_time_delta(14)):
+            create_token_for_contact(contact, customer_response)
+
+        with freeze_time(set_time_delta(7)):
+            create_token_for_contact(contact, customer_response)
+
+        auto_resend_client_email_from_unconfirmed_win()
+
+        assert customer_response.tokens.count() == (2 if is_deleted else 3)
+
 
 def test_get_all_fields_for_client_email_receipt_success():
     customer_response = CustomerResponseFactory()
