@@ -125,8 +125,6 @@ def _seen_nonce(access_key_id, nonce, _):
 
 def _authorise(request):
     """Raises a HawkFail if the passed request cannot be authenticated"""
-    logger.info("_authorise request")
-    logger.info(request)
     return Receiver(
         _lookup_credentials,
         request.META['HTTP_AUTHORIZATION'],

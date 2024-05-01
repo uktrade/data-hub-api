@@ -15,21 +15,10 @@ from datahub.metadata.registry import registry
 logger = logging.getLogger(__name__)
 
 
-class DBTPlatformFix:
-    def dispatch(self, request, *args, **kwargs):
-        logger.info("DISPATCH!!!!!!!!!!")
-        logger.info(request)
-        # if len(request.GET) == 0:
-        request.GET._mutable = True
-        request.GET['level__lte'] = 0
-        return super().dispatch(request, *args, **kwargs)
-
-
 def _create_metadata_view(mapping):
     has_filters = mapping.filterset_fields or mapping.filterset_class
     model = mapping.queryset.model
     attrs = {
-        # 'dispatch': (DBTPlatformFix,),
         'authentication_classes': (PaaSIPAuthentication, HawkAuthentication),
         'permission_classes': (HawkScopePermission,),
         'required_hawk_scope': HawkScope.metadata,
@@ -44,7 +33,7 @@ def _create_metadata_view(mapping):
 
     view_set = type(
         f'{mapping.model.__name__}ViewSet',
-        (DBTPlatformFix, HawkResponseSigningMixin, GenericViewSet, ListModelMixin),
+        (HawkResponseSigningMixin, GenericViewSet, ListModelMixin),
         attrs,
     )
 
