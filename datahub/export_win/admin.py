@@ -160,7 +160,6 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         ('created_on', DateFieldListFilter),
     )
     autocomplete_fields = (
-        'adviser',
         'company',
         'company_contacts',
         'lead_officer',
@@ -168,6 +167,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     )
     readonly_fields = (
         'id',
+        'adviser',
         'created_on',
         'modified_on',
         'total_expected_export_value',
@@ -321,9 +321,11 @@ class DeletedWinAdmin(WinAdmin):
     actions = ('undelete',)
 
     def get_queryset(self, request):
+        """Return win queryset only for deleted win."""
         return self.model.objects.soft_deleted()
 
     def undelete(self, request, queryset):
+        """Perform undelete action in django admin"""
         for win in queryset.all():
             with reversion.create_revision():
                 win.is_deleted = False
