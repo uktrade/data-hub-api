@@ -1,0 +1,8 @@
+- model: export_win.hqteamregionorpost
+  pk: 37ed1910-e369-4311-a062-77a6d2951a96
+  fields:
+    disabled_on: null
+    name: 'Export Support Service – Exports Digital Enquiry Service'
+    export_win_id: 'team:73'
+    team_type_id: a4839e09-e30e-492c-93b5-8ab2ef90b891
+    order:  830
