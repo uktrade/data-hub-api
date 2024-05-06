@@ -380,7 +380,7 @@ tomli==2.0.1
     #   pytest
 tomlkit==0.11.6
     # via pylint
-tqdm==4.66.2
+tqdm==4.66.4
     # via -r requirements.in
 traitlets==5.14.1
     # via
