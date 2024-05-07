@@ -31,6 +31,7 @@ from datahub.investment.project.models import (
     LikelihoodToLand,
     ProjectManagerRequestStatus,
     SpecificProgramme,
+    GVAMultiplier,
 )
 from datahub.investment.project.validate import REQUIRED_MESSAGE, validate
 
@@ -93,6 +94,7 @@ CORE_FIELDS = (
     'level_of_involvement_simplified',
     'note',
     'gross_value_added',
+    'gva_multiplier',
 )
 
 VALUE_FIELDS = (
@@ -410,6 +412,9 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
     project_arrived_in_triage_on = serializers.DateField(required=False, allow_null=True)
     proposal_deadline = serializers.DateField(required=False, allow_null=True)
     stage_log = NestedInvestmentProjectStageLogSerializer(many=True, read_only=True)
+    gva_multiplier = NestedRelatedField(GVAMultiplier, required=False, allow_null=True,
+                                        extra_fields=(
+                                            'id', 'sector_classification_gva_multiplier'))
 
     def save(self, **kwargs):
         """Saves when and who assigned a project manager for the first time."""
