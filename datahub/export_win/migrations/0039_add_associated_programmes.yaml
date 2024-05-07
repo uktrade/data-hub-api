@@ -1,0 +1,7 @@
+- model: export_win.associatedprogramme
+  pk: c4a0744d-1f54-41d8-aa46-29951e0fa913
+  fields:
+    disabled_on: null
+    name: "GREAT Audacious Kingdom France"
+    export_win_id: "120"
+    order:  1219
