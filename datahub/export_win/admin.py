@@ -176,9 +176,13 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     )
     search_fields = (
         '=id',
+        'computed_adviser_name',
+        # legacy field
         'adviser_name',
         '=company__pk',
         'lead_officer_adviser_name',
+        # legacy field
+        'lead_officer_name',
         'company__name',
         'country__name',
         'contact_name',
@@ -239,7 +243,9 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
 
     def get_adviser(self, obj):
         """Return adviser as user with email."""
-        return f'{obj.adviser} <{obj.adviser.email}>'
+        return f'{obj.adviser} <{obj.adviser.email}>' if obj.adviser else \
+            f'{obj.adviser_name} <{obj.adviser_email_address}>'
+
     get_adviser.short_description = 'User'
 
     def get_company(self, obj):
@@ -283,7 +289,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     def get_search_results(self, request, queryset, search_term):
         if search_term:
             queryset = queryset.annotate(
-                adviser_name=Concat(
+                computed_adviser_name=Concat(
                     'adviser__first_name', Value(' '), 'adviser__last_name',
                 ),
                 lead_officer_adviser_name=Concat(
@@ -356,7 +362,7 @@ class DeletedWinAdmin(WinAdmin):
 class WinAdviserAdmin(BaseModelAdminMixin):
     """Admin for Win Adviser."""
 
-    list_display = ('win', 'get_adviser_name', 'team_type', 'hq_team', 'location')
+    list_display = ('win', 'get_computed_adviser_name', 'team_type', 'hq_team', 'location')
     search_fields = ('win__id',)
 
     fieldsets = (
@@ -383,9 +389,9 @@ class WinAdviserAdmin(BaseModelAdminMixin):
         queryset = super().get_queryset(request)
         return queryset.filter(win__is_deleted=False)
 
-    def get_adviser_name(self, obj):
-        """Return adviser name."""
-        return obj.adviser.name
+    def get_computed_adviser_name(self, obj):
+        """Return computed adviser name."""
+        return obj.adviser.name if obj.adviser else obj.name
 
     def delete_view(self, request, object_id, extra_context=None):
         """
@@ -399,6 +405,6 @@ class WinAdviserAdmin(BaseModelAdminMixin):
     def has_change_permission(self, request, obj=None):
         return False
 
-    get_adviser_name.short_description = 'Name'
+    get_computed_adviser_name.short_description = 'Name'
 
     WinAdviser._meta.verbose_name_plural = 'Advisors'

@@ -3,11 +3,11 @@ import pytest
 from datahub.company.test.factories import AdviserFactory
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.models import (
-    _calculate_totals_for_export_win,
     Breakdown,
     update_total_values,
     WinAdviser)
 from datahub.export_win.test.factories import BreakdownFactory, WinAdviserFactory, WinFactory
+from datahub.export_win.utils import calculate_totals_for_export_win
 
 pytestmark = pytest.mark.django_db
 
@@ -106,7 +106,7 @@ class TestWinModel():
 
     def test_win_save(self, win_factory):
         win = win_factory
-        calc_total = _calculate_totals_for_export_win(win)
+        calc_total = calculate_totals_for_export_win(win)
         win.save()
         assert win.total_expected_export_value == calc_total['total_export_value']
         assert win.total_expected_non_export_value == calc_total['total_non_export_value']
@@ -115,7 +115,7 @@ class TestWinModel():
     def test_update_total_values(self, adviser_factory, win_factory, breakdown_factory):
         win = win_factory
         breakdown = breakdown_factory
-        calc_total = _calculate_totals_for_export_win(win)
+        calc_total = calculate_totals_for_export_win(win)
         expected_export_value = calc_total['total_export_value']
         expected_non_export_value = calc_total['total_non_export_value']
         expected_odi_value = calc_total['total_odi_value']
