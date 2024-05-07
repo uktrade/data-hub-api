@@ -13,7 +13,7 @@ def load_team_types(apps, _):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('export_win', '0039_add_associated_programme'), # .py
+        ('export_win', '0039_win_adviser_email_address_win_adviser_name_and_more'), # .py
     ]
 
     operations = [
