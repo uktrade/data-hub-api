@@ -194,12 +194,20 @@ def test_get_queryset():
 
 
 @pytest.mark.django_db
-def test_get_adviser_name():
+def test_get_computed_adviser_name_adviser():
     """Test for get adviser name"""
     adviser = AdviserFactory(first_name='John', last_name='Smith')
     win_adviser = WinAdviserFactory(adviser=adviser)
     admin_instance = WinAdviserAdmin(model=WinAdviser, admin_site=AdminSite())
-    assert admin_instance.get_adviser_name(win_adviser) == 'John Smith'
+    assert admin_instance.get_computed_adviser_name(win_adviser) == 'John Smith'
+
+
+@pytest.mark.django_db
+def test_get_computed_adviser_name_legacy_adviser():
+    """Test for get legacy adviser name"""
+    win_adviser = WinAdviserFactory(adviser=None, name='John Smith')
+    admin_instance = WinAdviserAdmin(model=WinAdviser, admin_site=AdminSite())
+    assert admin_instance.get_computed_adviser_name(win_adviser) == 'John Smith'
 
 
 @pytest.mark.django_db
