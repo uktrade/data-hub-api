@@ -1,0 +1,3 @@
+- model: investment.specificprogramme
+  pk: 4420117f-b27c-4995-9a85-70a5c67fe90b
+  fields: { disabled_on: null, name: GREAT Audacious Kingdom France }
