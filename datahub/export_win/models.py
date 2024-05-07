@@ -47,6 +47,18 @@ class BaseExportWinSoftDeleteManager(models.Manager):
         )
 
 
+class BaseCustomerResponseSoftDeleteManager(models.Manager):
+    """Base class for Customer response soft delete manager."""
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related('win')
+            .exclude(win__is_deleted=True)
+        )
+
+
 class BaseExportWinOrderedConstantModel(BaseOrderedConstantModel):
     """Base class for an Export Win."""
 
@@ -668,6 +680,8 @@ class CustomerResponse(BaseModel):
         default=EmailDeliveryStatus.UNKNOWN,
     )
     lead_officer_email_sent_on = models.DateTimeField(null=True, blank=True)
+
+    objects = BaseCustomerResponseSoftDeleteManager()
 
 
 class CustomerResponseToken(models.Model):
