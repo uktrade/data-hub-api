@@ -444,7 +444,10 @@ def resolve_lead_officer(data, context=None):
 
 def resolve_line_manager(data, context=None):
     try:
-        first_name, last_name = data.get('line_manager_name').split(' ')
+        parts = data.get('line_manager_name').split()
+        # In case name is written as "Joe M. Doe"
+        first_name = parts[0]
+        last_name = parts[-1]
         adviser = Advisor.objects.get(
             first_name__iexact=first_name.strip(),
             last_name__iexact=last_name.strip(),
@@ -486,16 +489,16 @@ def resolve_company_contact(data, context=None):
 
 def migrate_all_legacy_wins():
     wins = 0
-    for page in get_legacy_export_wins_dataset('/data-hub-wins'):
+    for page in get_legacy_export_wins_dataset('/datasets/data-hub-wins'):
         for legacy_win in page:
             migrate_legacy_win(legacy_win)
             wins += 1
 
-    for page in get_legacy_export_wins_dataset('/data-hub-breakdowns'):
+    for page in get_legacy_export_wins_dataset('/datasets/data-hub-breakdowns'):
         for legacy_breakdown in page:
             migrate_legacy_win_breakdown(legacy_breakdown)
 
-    for page in get_legacy_export_wins_dataset('/data-hub-advisers'):
+    for page in get_legacy_export_wins_dataset('/datasets/data-hub-advisers'):
         for legacy_adviser in page:
             migrate_legacy_win_adviser(legacy_adviser)
 

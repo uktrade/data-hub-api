@@ -30,19 +30,19 @@ pytestmark = pytest.mark.django_db
 
 mock_legacy_wins_page_urls = {
     'wins': [
-        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/data-hub-wins',
-        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/data-hub-wins?cursor=1&source=L',
-        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/data-hub-wins?cursor=2&source=E',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-wins',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-wins?cursor=1&source=L',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-wins?cursor=2&source=E',
     ],
     'breakdowns': [
-        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/data-hub-breakdowns',
-        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/data-hub-breakdowns?cursor=1&source=L',
-        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/data-hub-breakdowns?cursor=2&source=E',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-breakdowns',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-breakdowns?cursor=1&source=L',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-breakdowns?cursor=2&source=E',
     ],
     'advisers': [
-        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/data-hub-advisers',
-        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/data-hub-advisers?cursor=1&source=L',
-        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/data-hub-advisers?cursor=2&source=E',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-advisers',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-advisers?cursor=1&source=L',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-advisers?cursor=2&source=E',
     ],
 }
 
