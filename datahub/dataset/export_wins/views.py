@@ -351,7 +351,10 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                     output_field=BooleanField(),
                 ),
                 country=F('country__iso_alpha2_code'),
-                hvc=F('hvc__export_win_id'),
+                hvc=Concat(
+                    Cast('hvc__campaign_id', CharField()),
+                    Cast('hvc__financial_year', CharField()),
+                ),
                 user__email=F('adviser__contact_email'),
                 user__name=Concat(
                     'adviser__first_name',
