@@ -306,7 +306,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'date': format_date_or_datetime(win.date),
             'description': win.description,
             'has_hvo_specialist_involvement': win.has_hvo_specialist_involvement,
-            'hvc': win.hvc.export_win_id,
+            'hvc': f'{win.hvc.campaign_id}{win.hvc.financial_year}',
             'is_e_exported': win.is_e_exported,
             'is_line_manager_confirmed': win.is_line_manager_confirmed,
             'is_personally_confirmed': win.is_personally_confirmed,
