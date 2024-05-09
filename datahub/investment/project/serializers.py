@@ -369,8 +369,12 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         allow_null=True,
     )
 
-    gva_multiplier = NestedRelatedField(GVAMultiplier, required=False, allow_null=False,
-        extra_fields=('id', 'sector_classification_gva_multiplier'))
+    gva_multiplier = NestedRelatedField(
+        GVAMultiplier,
+        required=False,
+        allow_null=False,
+        extra_fields=('id', 'sector_classification_gva_multiplier')
+    )
 
     # Value fields
     fdi_value = NestedRelatedField(meta_models.FDIValue, required=False, allow_null=True)
