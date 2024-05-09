@@ -373,7 +373,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         GVAMultiplier,
         required=False,
         allow_null=False,
-        extra_fields=('id', 'sector_classification_gva_multiplier')
+        extra_fields=('id', 'sector_classification_gva_multiplier'),
     )
 
     # Value fields
