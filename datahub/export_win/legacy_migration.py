@@ -83,12 +83,26 @@ def create_customer_response_from_legacy(win, item):
             'confirmation_portion_without_help',
             'name',
         ),
+        'confirmation__created': lambda item: {
+            'responded_on': item.get('confirmation__created', None),
+        },
+        'confirmation__comments': lambda item: {
+            'comments': item.get('confirmation__comments', ''),
+        },
+        'confirmation__name': lambda item: {
+            'name': item.get('confirmation__name', ''),
+        },
+        'confirmation__other_marketing_source': lambda item: {
+            'other_marketing_source': item.get(
+                'confirmation__other_marketing_source',
+                '',
+            ),
+        },
     }
 
     field_mappings = {
         'confirmation__agree_with_win': 'agree_with_win',
         'confirmation__case_study_willing': 'case_study_willing',
-        'confirmation__comments': 'comments',
         'confirmation__company_was_at_risk_of_not_exporting':
             'company_was_at_risk_of_not_exporting',
         'confirmation__has_enabled_expansion_into_existing_market':
@@ -103,12 +117,8 @@ def create_customer_response_from_legacy(win, item):
             'interventions_were_prerequisite',
         'confirmation__involved_state_enterprise':
             'involved_state_enterprise',
-        'confirmation__other_marketing_source':
-            'other_marketing_source',
         'confirmation__support_improved_speed':
             'support_improved_speed',
-        'confirmation__created': 'responded_on',
-        'confirmation__name': 'name',
     }
 
     customer_response = {}
@@ -124,7 +134,7 @@ def create_customer_response_from_legacy(win, item):
     for field, mapping in field_mappings.items():
         value = item.get(field)
         customer_response.update(
-            **{mapping: value if value is not None else ''},
+            **{mapping: value},
         )
 
     return customer_response
@@ -193,11 +203,11 @@ def create_export_win_from_legacy(item):
         'line_manager': resolve_line_manager,
         'migrated_on': lambda item, context: datetime.now(),
         'created_on': lambda item, context: parse(item['created']),
+        'audit': lambda item, context: '' if item['audit'] is None else item['audit'],
     }
 
     # fields to be copied over directly
     field_mappings = {
-        'audit': 'audit',
         'business_type': 'business_type',
         'cdms_reference': 'cdms_reference',
         'complete': 'complete',
@@ -228,7 +238,7 @@ def create_export_win_from_legacy(item):
     for field, mapping in field_mappings.items():
         value = item.get(field)
         win.update(
-            **{mapping: value if value is not None else ''},
+            **{mapping: value},
         )
 
     return win
