@@ -21,10 +21,10 @@ class InternationalTelephoneValidator(RegexValidator):
     Validator for international telephone numbers.
 
     Validates that phone number is composed of characters found in telephone numbers -
-    0-9, a space or open / close brackets - optionally preceded with a plus sign.
+    0-9, a space, hyphens, or open / close brackets - optionally preceded with a plus sign.
     """
 
-    regex = r'^\+?[\d() ]{1,}$'
+    regex = r'^\+?[\d() -]{1,}$'
     message = 'Phone number must be composed of numeric characters.'
 
 
