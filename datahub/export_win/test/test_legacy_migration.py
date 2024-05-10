@@ -141,7 +141,7 @@ legacy_wins = {
             'confirmation__case_study_willing': False,
             'confirmation__comments': '',
             'confirmation__company_was_at_risk_of_not_exporting': True,
-            'confirmation__created': '2024-02-25T01:12:48.111131Z',
+            'confirmation__created': None,
             'confirmation__developed_relationships': 1,
             'confirmation__gained_confidence': 3,
             'confirmation__has_enabled_expansion_into_existing_market': False,
@@ -193,6 +193,51 @@ legacy_wins = {
             'confirmation_marketing_source': 'Don’t know',
             'confirmation_portion_without_help': 'No value without our help',
             'country_name': 'Austria',
+        }, {
+            'associated_programme_1': None,
+            'associated_programme_2': None,
+            'associated_programme_3': None,
+            'associated_programme_4': None,
+            'associated_programme_5': None,
+            'audit': None,
+            'business_potential': None,
+            'business_type': '8',
+            'cdms_reference': 'cdms reference',
+            'company_name': 'company name',
+            'complete': False,
+            'country': 'AL',
+            'country_name': 'Albania',
+            'created': '2016-06-24T11:32:42.134323Z',
+            'customer_email_address': 'test@test.com',
+            'customer_job_title': 'customer job title',
+            'customer_location': 3,
+            'customer_name': 'customer name',
+            'date': '2016-01-01',
+            'description': 'asdf',
+            'export_experience': None,
+            'goods_vs_services': 1,
+            'has_hvo_specialist_involvement': False,
+            'hq_team': 'team:1',
+            'hvc': None,
+            'hvo_programme': 'AER-01',
+            'id': '1239d123-1123-4123-80d1-997054dd03f7',
+            'is_e_exported': True,
+            'is_line_manager_confirmed': True,
+            'is_personally_confirmed': True,
+            'is_prosperity_fund_related': True,
+            'lead_officer_email_address': '',
+            'lead_officer_name': 'Lead officer name',
+            'line_manager_name': 'line manager name',
+            'name_of_customer': '',
+            'name_of_export': '',
+            'other_official_email_address': '',
+            'sector_display': 'Advanced engineering',
+            'team_type': 'team',
+            'type_of_support_1': 1,
+            'type_of_support_2': None,
+            'type_of_support_3': None,
+            'user__email': 'abc@test',
+            'user__name': 'Abc Def',
         }],
     },
     mock_legacy_wins_page_urls['breakdowns'][0]: {
@@ -386,5 +431,24 @@ def test_legacy_migration(mock_legacy_wins_pages):
     win_2_created_on = parser.parse('2024-02-24T01:12:47.221126Z').astimezone(timezone.utc)
     assert win_2.created_on == win_2_created_on
     assert win_2.customer_response.created_on == win_2_created_on
-    win_2_responded_on = parser.parse('2024-02-25T01:12:48.111131Z').astimezone(timezone.utc)
-    assert win_2.customer_response.responded_on == win_2_responded_on
+    assert win_2.customer_response.responded_on is None
+
+    win_3 = Win.objects.get(id='1239d123-1123-4123-80d1-997054dd03f7')
+    assert win_3.company_contacts.count() == 0
+    assert win_3.company is None
+    assert win_3.company_name == 'company name'
+    assert win_3.customer_name == 'customer name'
+    assert win_3.lead_officer is None
+    assert win_3.lead_officer_name == 'Lead officer name'
+    assert win_3.adviser_email_address == 'abc@test'
+    assert win_3.adviser is None
+    assert win_3.total_expected_export_value == 0
+    assert win_3.total_expected_non_export_value == 0
+    assert win_3.total_expected_odi_value == 0
+    assert win_3.breakdowns.count() == 0
+    assert win_3.advisers.count() == 0
+    assert win_3.migrated_on == current_date
+    win_3_created_on = parser.parse('2016-06-24T11:32:42.134323Z').astimezone(timezone.utc)
+    assert win_3.created_on == win_3_created_on
+    assert win_3.customer_response.created_on == win_3_created_on
+    assert win_3.customer_response.responded_on is None
