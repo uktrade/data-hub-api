@@ -5,6 +5,7 @@ from django.core.management import BaseCommand
 from datahub.company.models import Advisor, Contact
 from datahub.omis.order.models import Order
 from datahub.omis.order.serializers import OrderAssigneeSerializer
+from datahub.omis.payment.models import Payment
 
 
 class Command(BaseCommand):
@@ -35,7 +36,10 @@ class Command(BaseCommand):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         order.generate_quote(user, True)
+
         order.accept_quote(by=contact)
+        Payment.objects.filter(order=order).delete()
+
         order.mark_as_paid(by=user, payments_data=[
             {
                 'amount': 50000,
