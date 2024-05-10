@@ -598,10 +598,14 @@ class CustomerResponse(BaseModel):
     interventions_were_prerequisite = models.BooleanField(
         verbose_name='Our support was a prerequisite to generate this export value',
         default=False,
+        null=True,
+        blank=True,
     )
     support_improved_speed = models.BooleanField(
         verbose_name='Our support helped you achieve this win more quickly',
         default=False,
+        null=True,
+        blank=True,
     )
     expected_portion_without_help = models.ForeignKey(
         WithoutOurSupport,
@@ -622,23 +626,33 @@ class CustomerResponse(BaseModel):
     has_enabled_expansion_into_new_market = models.BooleanField(
         verbose_name='It enabled you to expand into a new market',
         default=False,
+        null=True,
+        blank=True,
     )
     has_enabled_expansion_into_existing_market = models.BooleanField(
         verbose_name='It enabled you to maintain or expand in an existing market',
         default=False,
+        null=True,
+        blank=True,
     )
     has_increased_exports_as_percent_of_turnover = models.BooleanField(
         verbose_name='It enabled you to increase exports as a proportion of your turnover',
         default=False,
+        null=True,
+        blank=True,
     )
     company_was_at_risk_of_not_exporting = models.BooleanField(
         verbose_name="If you hadn't achieved this win, your company might have stopped exporting",
         default=False,
+        null=True,
+        blank=True,
     )
     has_explicit_export_plans = models.BooleanField(
         verbose_name=('Apart from this win, you already have specific plans to export in the next '
                       '12 months'),
         default=False,
+        null=True,
+        blank=True,
     )
     agree_with_win = models.BooleanField(
         null=True,
@@ -648,6 +662,8 @@ class CustomerResponse(BaseModel):
         verbose_name=('Would you be willing for DBT/Exporting is GREAT to feature your success '
                       'in marketing materials?'),
         default=False,
+        null=True,
+        blank=True,
     )
     comments = models.TextField(
         blank=True,
