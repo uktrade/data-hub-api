@@ -145,7 +145,7 @@ flake8-quotes==3.4.0
     # via -r requirements-dev.in
 flake8-string-format==0.3.0
     # via -r requirements-dev.in
-freezegun==1.5.0
+freezegun==1.5.1
     # via
     #   -r requirements-dev.in
     #   rq-scheduler
