@@ -306,6 +306,8 @@ class Win(BaseModel):
         Sector,
         related_name='wins',
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     is_prosperity_fund_related = models.BooleanField(verbose_name='Prosperity Fund', default=False)
     # note, this consists of first 4 chars hvc code, final 2 chars the

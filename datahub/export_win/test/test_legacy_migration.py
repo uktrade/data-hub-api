@@ -40,9 +40,9 @@ mock_legacy_wins_page_urls = {
         f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-breakdowns?cursor=2&source=E',
     ],
     'advisers': [
-        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-advisers',
-        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-advisers?cursor=1&source=L',
-        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-advisers?cursor=2&source=E',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-advisors',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-advisors?cursor=1&source=L',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-advisors?cursor=2&source=E',
     ],
 }
 
@@ -238,6 +238,55 @@ legacy_wins = {
             'type_of_support_3': None,
             'user__email': 'abc@test',
             'user__name': 'Abc Def',
+        }, {
+            'associated_programme_1': None,
+            'associated_programme_2': None,
+            'associated_programme_3': None,
+            'associated_programme_4': None,
+            'associated_programme_5': None,
+            'audit': None,
+            'business_potential': None,
+            'business_type': '8',
+            'cdms_reference': 'cdms reference',
+            'company_name': 'company name',
+            'complete': False,
+            'country': 'AL',
+            'country_name': 'Albania',
+            'created': '2016-06-24T11:32:42.134323Z',
+            'customer_email_address': 'test@test.com',
+            'customer_job_title': 'customer job title',
+            'customer_location': 3,
+            'customer_name': 'customer name',
+            'date': '2016-01-01',
+            'description': 'asdf',
+            'export_experience': None,
+            'goods_vs_services': 1,
+            'has_hvo_specialist_involvement': False,
+            'confirmation__comments': None,
+            'hq_team': 'team:1',
+            'hvc': None,
+            'hvo_programme': 'AER-01',
+            'id': '03458ea2-2804-4f9c-b9e0-389ca8fadf90',
+            'is_e_exported': True,
+            'is_line_manager_confirmed': True,
+            'is_personally_confirmed': True,
+            'is_prosperity_fund_related': True,
+            'lead_officer_email_address': '',
+            'lead_officer_name': 'Lead officer name',
+            'line_manager_name': 'line manager name',
+            'name_of_customer': '',
+            'name_of_export': '',
+            'other_official_email_address': '',
+            'sector_display': None,
+            'team_type': 'team',
+            'type_of_support_1': 1,
+            'type_of_support_2': None,
+            'type_of_support_3': None,
+            'user__email': 'abc@test',
+            'user__name': 'Abc Def',
+            'confirmation__comments': None,
+            'confirmation__name': None,
+            'confirmation__other_marketing_source': None,
         }],
     },
     mock_legacy_wins_page_urls['breakdowns'][0]: {
@@ -452,3 +501,27 @@ def test_legacy_migration(mock_legacy_wins_pages):
     assert win_3.created_on == win_3_created_on
     assert win_3.customer_response.created_on == win_3_created_on
     assert win_3.customer_response.responded_on is None
+
+    win_4 = Win.objects.get(id='03458ea2-2804-4f9c-b9e0-389ca8fadf90')
+    assert win_4.company_contacts.count() == 0
+    assert win_4.company is None
+    assert win_4.company_name == 'company name'
+    assert win_4.customer_name == 'customer name'
+    assert win_4.lead_officer is None
+    assert win_4.lead_officer_name == 'Lead officer name'
+    assert win_4.adviser_email_address == 'abc@test'
+    assert win_4.adviser is None
+    assert win_4.total_expected_export_value == 0
+    assert win_4.total_expected_non_export_value == 0
+    assert win_4.total_expected_odi_value == 0
+    assert win_4.breakdowns.count() == 0
+    assert win_4.advisers.count() == 0
+    assert win_4.migrated_on == current_date
+    win_4_created_on = parser.parse('2016-06-24T11:32:42.134323Z').astimezone(timezone.utc)
+    assert win_4.created_on == win_4_created_on
+    assert win_4.customer_response.created_on == win_4_created_on
+    assert win_4.customer_response.responded_on is None
+    assert win_4.sector_id is None
+    assert win_4.customer_response.name == ''
+    assert win_4.customer_response.comments == ''
+    assert win_4.customer_response.other_marketing_source == ''
