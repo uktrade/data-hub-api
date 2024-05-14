@@ -43,17 +43,14 @@ with DisableSignals():
     NUMBER_OF_INVESTMENT_PROJECTS = 300
 
     # Generate Advisers
-    print('\nGenerating advisers...')  # noqa
     generate_advisers(NUMBER_OF_ADVISERS)
     advisers = Advisor.objects.all()
 
     # Generate Companies
-    print('\nGenerating companies...')  # noqa
     generate_companies(NUMBER_OF_COMPANIES, advisers)
     companies = Company.objects.all()
 
     # Generate Investment Projects
-    print('\nGenerating investment projects...')  # noqa
     generate_investment_projects(
         NUMBER_OF_INVESTMENT_PROJECTS,
         advisers,
@@ -72,4 +69,4 @@ with DisableSignals():
         },
     )
     elapsed_time = time.time() - start_time
-    print(f'\nTotal run time: {timedelta(seconds=elapsed_time)}\n')  # noqa
+    print(f'\nTotal run time: {timedelta(seconds=elapsed_time)} (H:MM:SS.SSSSSS)\n')  # noqa
