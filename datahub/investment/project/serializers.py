@@ -19,6 +19,7 @@ from datahub.investment.project.constants import (
     ProjectManagerRequestStatus as ProjectManagerRequestStatusValue,
 )
 from datahub.investment.project.models import (
+    GVAMultiplier,
     InvestmentActivity,
     InvestmentActivityType,
     InvestmentDeliveryPartner,
@@ -93,6 +94,7 @@ CORE_FIELDS = (
     'level_of_involvement_simplified',
     'note',
     'gross_value_added',
+    'gva_multiplier',
 )
 
 VALUE_FIELDS = (
@@ -365,6 +367,13 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         ProjectManagerRequestStatus,
         required=False,
         allow_null=True,
+    )
+
+    gva_multiplier = NestedRelatedField(
+        GVAMultiplier,
+        required=False,
+        allow_null=False,
+        extra_fields=('id', 'sector_classification_gva_multiplier'),
     )
 
     # Value fields
