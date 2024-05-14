@@ -50,7 +50,20 @@ def random_object_from_queryset(queryset):
     return queryset.order_by('?').first()
 
 
-def send_heartbeat_every_10_iterations(iteration_number):
-    """Prints to console every 10 iterations to look alive."""
-    if iteration_number % 10 == 0:
-        print('.', end='')  # noqa
+def print_progress(
+    iteration, total, prefix='', suffix='', decimals=1, bar_length=50,
+):
+    """Call in a loop to create a progress bar in the console.
+
+    Args:
+        iteration (int): current iteration
+        total (int): total iterations
+        prefix (str, optional): prefix string. Defaults to ''.
+        suffix (str, optional): suffix string. Defaults to ''.
+        decimals (int, optional): positive number of decimals in % complete. Defaults to 1.
+        bar_length (int, optional): character length of bar. Defaults to 50.
+    """
+    percent = round(100 * (iteration / total), decimals)
+    filled_length = int(round(bar_length * iteration / total))
+    bar = '#' * filled_length + '-' * (bar_length - filled_length)
+    print(f'{prefix} |{bar}| {percent}% {suffix}')  # noqa

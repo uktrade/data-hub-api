@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.db import transaction
 from django.db.models.query import QuerySet
 
 from datahub.company.test.factories import (
@@ -11,7 +12,8 @@ from datahub.company.test.factories import (
 )
 
 from ..utils import (
-    send_heartbeat_every_10_iterations,
+    print_progress,
+    random_object_from_queryset,
 )
 
 
@@ -24,69 +26,96 @@ COMPANY_TYPE_RATIOS = {
 }
 
 
-def generate_companies(
+def generate_small_number_of_companies(
     number_of_companies: int,
     advisers: list[QuerySet],
 ):
-    if sum(COMPANY_TYPE_RATIOS.values()) > 1:
-        raise ValueError('Company type ratios must add up to 1')
-
-    companies_per_adviser = number_of_companies // advisers.count()
-
-    # Handle case when requested number is too small
-    if number_of_companies < 10:
-        for adviser in advisers[:number_of_companies]:
+    comapnies_to_create = []
+    for _ in range(number_of_companies):
+        adviser = random_object_from_queryset(advisers)
+        comapnies_to_create.append(
             CompanyFactory(
                 created_by=adviser,
                 modified_by=adviser,
-            )
-        print(f'Generated {number_of_companies} companies')  # noqa
+            ),
+        )
+    CompanyFactory._meta.model.objects.bulk_create(comapnies_to_create)
+    print(f'Generated {number_of_companies} companies')  # noqa
+
+
+def generate_companies(
+    number_of_companies: int,
+    advisers: QuerySet,
+):
+    print('\nGenerating companies...')  # noqa
+
+    # Handle case when requested number is too small
+    if number_of_companies < 10:
+        generate_small_number_of_companies(number_of_companies, advisers)
         return
 
-    # Determine ratios
-    n_companies = round(companies_per_adviser * COMPANY_TYPE_RATIOS['company'])
-    n_companies_with_area = round(companies_per_adviser * COMPANY_TYPE_RATIOS['company_with_area'])
-    n_subsidiary_companies = round(
-        companies_per_adviser * COMPANY_TYPE_RATIOS['subsidiary_company'],
-    )
-    n_archived_companies = round(companies_per_adviser * COMPANY_TYPE_RATIOS['archived_company'])
-    n_duplicate_companies = round(companies_per_adviser * COMPANY_TYPE_RATIOS['duplicate_company'])
+    # Calculate the numbers of each company type to generate
+    if sum(COMPANY_TYPE_RATIOS.values()) > 1:
+        raise ValueError('Company type ratios must add up to 1')
+    target_counts = {
+        company_type: round(number_of_companies * ratio)
+        for company_type, ratio in COMPANY_TYPE_RATIOS.items()
+    }
 
-    companies = []
-    for index, adviser in enumerate(advisers):
-        companies.extend(
-            CompanyFactory.create_batch(
-                size=n_companies,
+    # Adjust the counts if rounding affected the totals
+    total_target_count = sum(target_counts.values())
+    while total_target_count < number_of_companies:
+        target_counts['company'] += 1
+        total_target_count += 1
+    while total_target_count > number_of_companies:
+        target_counts['company'] -= 1
+        total_target_count -= 1
+
+    # Generate companies
+    with transaction.atomic():
+        created_so_far = 0
+        variants = {
+            'company': CompanyFactory,
+            'company_with_area': CompanyWithAreaFactory,
+            # 'subsidiary_company': SubsidiaryFactory,
+            'archived_company': ArchivedCompanyFactory,
+            # 'duplicate_company': DuplicateCompanyFactory,
+        }
+        for variant_name, variant_factory in variants.items():
+            # Update progress after adding each type
+            print_progress(iteration=created_so_far, total=total_target_count)
+            # Create companies, companies with area, and archived companies
+            adviser = random_object_from_queryset(advisers)
+            instances = variant_factory.create_batch(
+                size=target_counts[variant_name],
                 created_by=adviser,
                 modified_by=adviser,
-            ),
-        )
-        companies.extend(
-            CompanyWithAreaFactory.create_batch(
-                size=n_companies_with_area,
-                created_by=adviser,
-                modified_by=adviser,
-            ),
-        )
+            )
+            created_so_far += target_counts[variant_name]
+            if variant_name == 'company':
+                companies_list = instances
 
         # Create subsidiaries
-        for company in companies[:n_subsidiary_companies]:
-            SubsidiaryFactory(
-                created_by=adviser,
-                modified_by=adviser,
-                global_headquarters=company,
-            )
+        adviser = random_object_from_queryset(advisers)
+        SubsidiaryFactory.create_batch(
+            size=target_counts['subsidiary_company'],
+            created_by=adviser,
+            modified_by=adviser,
+            global_headquarters=companies_list[0],
+        )
+        created_so_far += target_counts['subsidiary_company']
+        print_progress(iteration=created_so_far, total=total_target_count)
 
-        # Create archived and duplicate companies
-        ArchivedCompanyFactory.create_batch(
-            size=n_archived_companies,
-            created_by=adviser,
-            modified_by=adviser,
-        )
+        # Create duplicate companies
+        adviser = random_object_from_queryset(advisers)
         DuplicateCompanyFactory.create_batch(
-            size=n_duplicate_companies,
+            size=target_counts['duplicate_company'],
             created_by=adviser,
             modified_by=adviser,
+            transferred_by=adviser,
+            transferred_to=companies_list[1],
         )
-        send_heartbeat_every_10_iterations(index)
-    print(f'\nGenerated {number_of_companies} companies')  # noqa
+        created_so_far += target_counts['duplicate_company']
+        print_progress(iteration=created_so_far, total=total_target_count)
+
+        print(f'\nGenerated {total_target_count} companies')  # noqa
