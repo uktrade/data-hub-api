@@ -87,16 +87,16 @@ def create_customer_response_from_legacy(win, item):
             'responded_on': item.get('confirmation__created', None),
         },
         'confirmation__comments': lambda item: {
-            'comments': item.get('confirmation__comments', ''),
+            'comments': item.get('confirmation__comments', '') or '',
         },
         'confirmation__name': lambda item: {
-            'name': item.get('confirmation__name', ''),
+            'name': item.get('confirmation__name', '') or '',
         },
         'confirmation__other_marketing_source': lambda item: {
             'other_marketing_source': item.get(
                 'confirmation__other_marketing_source',
                 '',
-            ),
+            ) or '',
         },
     }
 
@@ -508,7 +508,7 @@ def migrate_all_legacy_wins():
         for legacy_breakdown in page:
             migrate_legacy_win_breakdown(legacy_breakdown)
 
-    for page in get_legacy_export_wins_dataset('/datasets/data-hub-advisers'):
+    for page in get_legacy_export_wins_dataset('/datasets/data-hub-advisors'):
         for legacy_adviser in page:
             migrate_legacy_win_adviser(legacy_adviser)
 
