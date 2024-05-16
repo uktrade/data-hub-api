@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -273,7 +273,7 @@ legacy_wins = {
             'is_prosperity_fund_related': True,
             'lead_officer_email_address': '',
             'lead_officer_name': 'Lead officer name',
-            'line_manager_name': 'line manager name',
+            'line_manager_name': 'line manager',
             'name_of_customer': '',
             'name_of_export': '',
             'other_official_email_address': '',
@@ -423,19 +423,43 @@ def test_legacy_migration(mock_legacy_wins_pages):
     jane_doe = AdviserFactory(
         first_name='Jane',
         last_name='Doe',
+        is_active=True,
     )
     john_smith = AdviserFactory(
         first_name='John',
         last_name='Smith',
+        is_active=True,
+    )
+    AdviserFactory(
+        first_name='John',
+        last_name='Smith',
+        is_active=False,
+    )
+    line_manager = AdviserFactory(
+        first_name='line',
+        last_name='manager',
     )
     adviser = AdviserFactory(
         contact_email='user.email@trade.gov.uk',
+        is_active=True,
     )
-    contact = ContactFactory(
-        company=company,
-        first_name='John',
-        last_name='Doe',
+    AdviserFactory(
+        contact_email='user.email@trade.gov.uk',
+        is_active=False,
     )
+    current_date = datetime.utcnow()
+    with freeze_time(current_date):
+        contact = ContactFactory(
+            company=company,
+            first_name='John',
+            last_name='Doe',
+        )
+    with freeze_time(current_date - timedelta(days=1)):
+        ContactFactory(
+            company=company,
+            first_name='John',
+            last_name='Doe',
+        )
 
     current_date = datetime.now(tz=timezone.utc)
 
@@ -525,3 +549,4 @@ def test_legacy_migration(mock_legacy_wins_pages):
     assert win_4.customer_response.name == ''
     assert win_4.customer_response.comments == ''
     assert win_4.customer_response.other_marketing_source == ''
+    assert win_4.line_manager == line_manager
