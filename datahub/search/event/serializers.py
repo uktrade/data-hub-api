@@ -37,6 +37,7 @@ class SearchEventQuerySerializer(EntitySearchQuerySerializer):
     name = serializers.CharField(required=False)
     organiser = SingleOrListField(child=StringUUIDField(), required=False)
     organiser_name = serializers.CharField(required=False)
+    related_programmes = SingleOrListField(child=StringUUIDField(), required=False)
     start_date_after = RelaxedDateTimeField(required=False)
     start_date_before = RelaxedDateTimeField(required=False)
     teams = SingleOrListField(child=StringUUIDField(), required=False)

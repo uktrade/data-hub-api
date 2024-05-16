@@ -21,6 +21,7 @@ class SearchEventAPIViewMixin:
         'name',
         'organiser',
         'organiser_name',
+        'related_programmes',
         'start_date_after',
         'start_date_before',
         'teams',
@@ -32,6 +33,7 @@ class SearchEventAPIViewMixin:
         'event_type': 'event_type.id',
         'lead_team': 'lead_team.id',
         'organiser': 'organiser.id',
+        'related_programmes': 'related_programmes.id',
         'teams': 'teams.id',
         'uk_region': 'uk_region.id',
     }
