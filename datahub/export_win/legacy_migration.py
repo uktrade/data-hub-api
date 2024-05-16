@@ -339,15 +339,16 @@ def create_win_adviser_from_legacy(item):
     # In case name is written as "Joe M. Doe"
     first_name = parts[0]
     last_name = parts[-1]
-    try:
-        adviser = Advisor.objects.get(
-            first_name__iexact=first_name.strip(),
-            last_name__iexact=last_name.strip(),
-        )
+    adviser = Advisor.objects.filter(
+        first_name__iexact=first_name.strip(),
+        last_name__iexact=last_name.strip(),
+        is_active=True,
+    ).order_by('-date_joined').first()
+    if adviser:
         adviser_data.update({
             'adviser': adviser,
         })
-    except Advisor.DoesNotExist:
+    else:
         adviser_data.update({
             'name': item['name'],
         })
@@ -412,61 +413,60 @@ def resolve_company(data, context=None):
 
 
 def resolve_adviser(data, context=None):
-    try:
-        adviser = Advisor.objects.get(
-            contact_email__iexact=data.get('user__email').strip(),
-        )
-        return adviser
-    except Advisor.DoesNotExist:
+    adviser = Advisor.objects.filter(
+        contact_email__iexact=data.get('user__email').strip(),
+        is_active=True,
+    ).order_by('-date_joined').first()
+    if adviser is None:
         return {
             'adviser_name': data.get('user__name'),
             'adviser_email_address': data.get('user__email'),
         }
+    return adviser
 
 
 def resolve_lead_officer(data, context=None):
-    try:
-        criteria = {}
-        email = data.get('lead_officer_email_address').strip()
-        if email != '':
-            criteria.update({
-                'contact_email__iexact': email,
-            })
-        else:
-            parts = data.get('lead_officer_name').split()
-            # In case name is written as "Joe M. Doe"
-            first_name = parts[0]
-            last_name = parts[-1]
-            criteria.update({
-                'first_name__iexact': first_name.strip(),
-                'last_name__iexact': last_name.strip(),
-            })
-        adviser = Advisor.objects.get(
-            **criteria,
-        )
-        return adviser
-    except Advisor.DoesNotExist:
+    criteria = {'is_active': True}
+    email = data.get('lead_officer_email_address').strip()
+    if email != '':
+        criteria.update({
+            'contact_email__iexact': email,
+        })
+    else:
+        parts = data.get('lead_officer_name').split()
+        # In case name is written as "Joe M. Doe"
+        first_name = parts[0]
+        last_name = parts[-1]
+        criteria.update({
+            'first_name__iexact': first_name.strip(),
+            'last_name__iexact': last_name.strip(),
+        })
+    adviser = Advisor.objects.filter(
+        **criteria,
+    ).order_by('-date_joined').first()
+    if adviser is None:
         return {
             'lead_officer_name': data.get('lead_officer_name'),
             'lead_officer_email_address': data.get('lead_officer_email_address'),
         }
+    return adviser
 
 
 def resolve_line_manager(data, context=None):
-    try:
-        parts = data.get('line_manager_name').split()
-        # In case name is written as "Joe M. Doe"
-        first_name = parts[0]
-        last_name = parts[-1]
-        adviser = Advisor.objects.get(
-            first_name__iexact=first_name.strip(),
-            last_name__iexact=last_name.strip(),
-        )
-        return adviser
-    except Advisor.DoesNotExist:
+    parts = data.get('line_manager_name').split()
+    # In case name is written as "Joe M. Doe"
+    first_name = parts[0]
+    last_name = parts[-1]
+    adviser = Advisor.objects.filter(
+        first_name__iexact=first_name.strip(),
+        last_name__iexact=last_name.strip(),
+        is_active=True,
+    ).order_by('-date_joined').first()
+    if adviser is None:
         return {
             'line_manager_name': data.get('line_manager_name'),
         }
+    return adviser
 
 
 def _get_legacy_customer_info(data):
@@ -483,17 +483,16 @@ def resolve_company_contact(data, context=None):
         # In case name is written as "Joe M. Doe"
         first_name = parts[0]
         last_name = parts[-1]
-        try:
-            contact = Contact.objects.get(
-                first_name__iexact=first_name,
-                last_name__iexact=last_name,
-                company=context['company'],
-            )
+        contact = Contact.objects.filter(
+            first_name__iexact=first_name,
+            last_name__iexact=last_name,
+            company=context['company'],
+            transferred_to__isnull=True,
+        ).order_by('-created_on').first()
+        if contact:
             return {
                 'company_contacts': [contact],
             }
-        except Contact.DoesNotExist:
-            pass
     return _get_legacy_customer_info(data)
 
 
