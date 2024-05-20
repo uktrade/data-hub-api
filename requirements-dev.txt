@@ -221,7 +221,7 @@ pandas==2.2.2
     # via -r requirements.in
 parso==0.8.3
     # via jedi
-pep8-naming==0.13.3
+pep8-naming==0.14.1
     # via -r requirements-dev.in
 pexpect==4.8.0
     # via ipython
