@@ -239,6 +239,11 @@ class CustomerResponseViewSet(CoreViewSet):
         context['token'] = getattr(self, 'token', None)
         return context
 
+    @validate_script_and_html_tags
+    def partial_update(self, request, *args, **kwargs):
+        """Handle PATCH requests with HTML/script tags validation."""
+        return super().partial_update(request, *args, **kwargs)
+
     def put(self, request, *args, **kwargs):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
