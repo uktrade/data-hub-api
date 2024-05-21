@@ -287,11 +287,118 @@ legacy_wins = {
             'confirmation__comments': None,
             'confirmation__name': None,
             'confirmation__other_marketing_source': None,
+        }, {
+            'associated_programme_1': None,
+            'associated_programme_2': None,
+            'associated_programme_3': None,
+            'associated_programme_4': None,
+            'associated_programme_5': None,
+            'audit': None,
+            'business_potential': None,
+            'business_type': '8',
+            'cdms_reference': 'cdms reference',
+            'company_name': 'company name',
+            'complete': False,
+            'country': 'AL',
+            'country_name': 'abc',
+            'created': '2016-06-24T11:32:42.134323Z',
+            'customer_email_address': 'test@test.com',
+            'customer_job_title': 'customer job title',
+            'customer_location': 3,
+            'customer_name': 'customer name',
+            'date': '2016-01-01',
+            'description': 'asdf',
+            'export_experience': None,
+            'goods_vs_services': 1,
+            'has_hvo_specialist_involvement': False,
+            'confirmation__comments': None,
+            'hq_team': 'team:1',
+            'hvc': None,
+            'hvo_programme': 'AER-01',
+            'id': 'c84caade-4fae-4af0-816f-e27a8c5ded95',
+            'is_e_exported': True,
+            'is_line_manager_confirmed': True,
+            'is_personally_confirmed': True,
+            'is_prosperity_fund_related': True,
+            'lead_officer_email_address': '',
+            'lead_officer_name': 'Lead officer name',
+            'line_manager_name': 'line manager',
+            'name_of_customer': '',
+            'name_of_export': '',
+            'other_official_email_address': '',
+            'sector_display': None,
+            'team_type': 'team',
+            'type_of_support_1': 1,
+            'type_of_support_2': None,
+            'type_of_support_3': None,
+            'user__email': 'abc@test',
+            'user__name': 'Abc Def',
+            'confirmation__comments': None,
+            'confirmation__name': None,
+            'confirmation__other_marketing_source': None,
+        }, {
+            'associated_programme_1': None,
+            'associated_programme_2': None,
+            'associated_programme_3': None,
+            'associated_programme_4': None,
+            'associated_programme_5': None,
+            'audit': None,
+            'business_potential': None,
+            'business_type': '8',
+            'cdms_reference': 'cdms reference',
+            'company_name': 'company name',
+            'complete': False,
+            'country': 'AL',
+            'country_name': 'Albania',
+            'created': '2016-06-24T11:32:42.134323Z',
+            'customer_email_address': 'test@test.com',
+            'customer_job_title': 'customer job title',
+            'customer_location': 3,
+            'customer_name': 'customer name',
+            'date': '2016-01-01',
+            'description': 'asdf',
+            'export_experience': None,
+            'goods_vs_services': 1,
+            'has_hvo_specialist_involvement': False,
+            'confirmation__comments': None,
+            'hq_team': 'team:1',
+            'hvc': None,
+            'hvo_programme': 'AER-01',
+            'id': '5778b485-1060-46e2-b411-772cd0f76d79',
+            'is_e_exported': True,
+            'is_line_manager_confirmed': True,
+            'is_personally_confirmed': True,
+            'is_prosperity_fund_related': True,
+            'lead_officer_email_address': 'user.email2@trade.gov.uk',
+            'lead_officer_name': 'Lead officer name',
+            'line_manager_name': 'line manager',
+            'name_of_customer': '',
+            'name_of_export': '',
+            'other_official_email_address': '',
+            'sector_display': None,
+            'team_type': 'team',
+            'type_of_support_1': 1,
+            'type_of_support_2': None,
+            'type_of_support_3': None,
+            'user__email': 'abc@test',
+            'user__name': 'Abc Def',
+            'confirmation__comments': None,
+            'confirmation__name': None,
+            'confirmation__other_marketing_source': None,
+            'is_active': False,
         }],
     },
     mock_legacy_wins_page_urls['breakdowns'][0]: {
         'next': mock_legacy_wins_page_urls['breakdowns'][1],
         'results': [
+            {
+                'id': 11,
+                'win__id': '5778b485-1060-46e2-b411-772cd0f76d79',
+                'type': 1,
+                'year': 2016,
+                'value': 3000,
+                'is_active': False,
+            },
             {
                 'id': 5,
                 'win__id': '4c90a214-035f-4445-b6a1-ca7af3486f8c',
@@ -443,8 +550,8 @@ def test_legacy_migration(mock_legacy_wins_pages):
         contact_email='user.email@trade.gov.uk',
         is_active=True,
     )
-    AdviserFactory(
-        contact_email='user.email@trade.gov.uk',
+    adviser2 = AdviserFactory(
+        email='user.email2@trade.gov.uk',
         is_active=False,
     )
     current_date = datetime.utcnow()
@@ -550,3 +657,31 @@ def test_legacy_migration(mock_legacy_wins_pages):
     assert win_4.customer_response.comments == ''
     assert win_4.customer_response.other_marketing_source == ''
     assert win_4.line_manager == line_manager
+
+    assert Win.objects.filter(id='c84caade-4fae-4af0-816f-e27a8c5ded95').exists() is False
+
+    win_6 = Win.objects.all_wins().get(id='5778b485-1060-46e2-b411-772cd0f76d79')
+    assert win_6.company_contacts.count() == 0
+    assert win_6.company is None
+    assert win_6.company_name == 'company name'
+    assert win_6.customer_name == 'customer name'
+    assert win_6.lead_officer == adviser2
+    assert win_6.lead_officer_name == ''
+    assert win_6.adviser_email_address == 'abc@test'
+    assert win_6.adviser is None
+    assert win_6.total_expected_export_value == 3000
+    assert win_6.total_expected_non_export_value == 0
+    assert win_6.total_expected_odi_value == 0
+    assert win_6.breakdowns.count() == 1
+    assert win_6.advisers.count() == 0
+    assert win_6.migrated_on == current_date
+    win_6_created_on = parser.parse('2016-06-24T11:32:42.134323Z').astimezone(timezone.utc)
+    assert win_6.created_on == win_6_created_on
+    assert win_6.customer_response.created_on == win_6_created_on
+    assert win_6.customer_response.responded_on is None
+    assert win_6.sector_id is None
+    assert win_6.customer_response.name == ''
+    assert win_6.customer_response.comments == ''
+    assert win_6.customer_response.other_marketing_source == ''
+    assert win_6.line_manager == line_manager
+    assert win_6.is_deleted is True
