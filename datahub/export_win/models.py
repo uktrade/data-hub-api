@@ -46,6 +46,9 @@ class BaseExportWinSoftDeleteManager(models.Manager):
             .filter(is_deleted=True)
         )
 
+    def all_wins(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs)
+
 
 class BaseCustomerResponseSoftDeleteManager(models.Manager):
     """Base class for Customer response soft delete manager."""
