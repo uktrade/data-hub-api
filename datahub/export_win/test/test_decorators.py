@@ -20,7 +20,8 @@ class TestValidateScriptAndHtmlTags(unittest.TestCase):
         response = mock_view(None, request)
         self.assertEqual(response.status_code, 400)
         self.assertIn('error', response.data)
-        self.assertEqual(response.data['error'], 'Input contains script or HTML tags')
+        self.assertEqual(response.data['error'],
+                         'Input contains disallowed HTML or script tags or symbols')
 
     def test_input_without_html_tags(self):
         """Test the decorator with input without HTML/script tags."""

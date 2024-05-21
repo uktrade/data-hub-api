@@ -1212,7 +1212,7 @@ class TestCreateWinView(APITestMixin):
         assert 'error' in response_data
         error_message = response_data['error']
 
-        assert 'Input contains script or HTML tags' in error_message, \
+        assert 'Input contains disallowed HTML or script tags or symbols' in error_message, \
             'The error message should warn about script or HTML tags.'
 
         mock_export_win_serializer_notify.assert_not_called()
@@ -1885,7 +1885,7 @@ class TestUpdateWinView(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert 'error' in response_data
-        assert 'Input contains script or HTML tags' in response_data['error']
+        assert 'Input contains disallowed HTML or script tags or symbols' in response_data['error']
 
 
 class TestResendExportWinView(APITestMixin):
