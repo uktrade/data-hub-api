@@ -1,6 +1,10 @@
 from datetime import datetime
 
+from logging import getLogger
+
 from dateutil.parser import parse
+
+from django.db.models import Q
 
 from datahub.company.models import (
     Advisor,
@@ -36,6 +40,9 @@ from datahub.metadata.models import (
     Sector,
 )
 from datahub.metadata.query_utils import get_sector_name_subquery
+
+
+logger = getLogger(__name__)
 
 
 def create_customer_response_from_legacy(win, item):
@@ -204,6 +211,10 @@ def create_export_win_from_legacy(item):
         'migrated_on': lambda item, context: datetime.now(),
         'created_on': lambda item, context: parse(item['created']),
         'audit': lambda item, context: '' if item['audit'] is None else item['audit'],
+        'is_deleted': lambda item, context: False if item.get(
+            'is_active',
+            None,
+        ) is None else (not item['is_active']),
     }
 
     # fields to be copied over directly
@@ -226,7 +237,6 @@ def create_export_win_from_legacy(item):
     win = {
         'id': item.get('id'),
     }
-
     for field, resolver in must_resolvers.items():
         resolved = resolver(item, win)
         if isinstance(resolved, dict):
@@ -262,7 +272,11 @@ def migrate_legacy_win(item):
         for field in many_to_many_fields if field in win_data
     }
     win_id = win_data.pop('id')
-    win, created = Win.objects.update_or_create(
+    if win_data['country'] is None:
+        logger.warning(f'Country not found for {win_id}.')
+        return
+
+    win, created = Win.objects.all_wins().update_or_create(
         id=win_id,
         defaults=win_data,
     )
@@ -290,7 +304,7 @@ def migrate_legacy_win(item):
 
 
 def create_breakdown_from_legacy(item):
-    win = Win.objects.get(id=item['win__id'])
+    win = Win.objects.all_wins().get(id=item['win__id'])
     breakdown_type = BreakdownType.objects.get(export_win_id=item['type'])
     year = item['year'] - get_financial_year(win.date) + 1
     return {
@@ -366,16 +380,19 @@ def migrate_legacy_win_adviser(item):
     return adviser
 
 
-def resolve_legacy_field(model, source_field_name, lookup_field=None, annotate=None):
+def resolve_legacy_field(model, source_field_name, lookup_field=None, annotate=None, remap=None):
     if not lookup_field:
         lookup_field = 'export_win_id'
     if not annotate:
         annotate = {}
+    if not remap:
+        remap = {}
 
     def resolver(data, context=None):
-        field_value = data.get(source_field_name)
-        if field_value == '':
+        _field_value = data.get(source_field_name)
+        if _field_value == '':
             return None
+        field_value = remap.get(_field_value, _field_value)
         try:
             obj = model.objects.annotate(**annotate).get(**{lookup_field: field_value})
             return obj
@@ -413,9 +430,9 @@ def resolve_company(data, context=None):
 
 
 def resolve_adviser(data, context=None):
+    email = data.get('user__email').strip()
     adviser = Advisor.objects.filter(
-        contact_email__iexact=data.get('user__email').strip(),
-        is_active=True,
+        Q(contact_email__iexact=email) | Q(email__iexact=email),
     ).order_by('-date_joined').first()
     if adviser is None:
         return {
@@ -426,23 +443,22 @@ def resolve_adviser(data, context=None):
 
 
 def resolve_lead_officer(data, context=None):
-    criteria = {'is_active': True}
+    filters = Q()
     email = data.get('lead_officer_email_address').strip()
     if email != '':
-        criteria.update({
-            'contact_email__iexact': email,
-        })
+        filters = Q(email__iexact=email) | Q(contact_email__iexact=email)
     else:
         parts = data.get('lead_officer_name').split()
         # In case name is written as "Joe M. Doe"
         first_name = parts[0]
         last_name = parts[-1]
-        criteria.update({
-            'first_name__iexact': first_name.strip(),
-            'last_name__iexact': last_name.strip(),
-        })
+        filters = Q(
+            first_name__iexact=first_name.strip(),
+        ) & Q(
+            last_name__iexact=last_name.strip(),
+        )
     adviser = Advisor.objects.filter(
-        **criteria,
+        filters,
     ).order_by('-date_joined').first()
     if adviser is None:
         return {
@@ -460,7 +476,6 @@ def resolve_line_manager(data, context=None):
     adviser = Advisor.objects.filter(
         first_name__iexact=first_name.strip(),
         last_name__iexact=last_name.strip(),
-        is_active=True,
     ).order_by('-date_joined').first()
     if adviser is None:
         return {
