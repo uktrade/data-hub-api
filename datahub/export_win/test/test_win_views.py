@@ -1785,9 +1785,6 @@ class TestUpdateWinView(APITestMixin):
         date_won = now().date()
         export = ExportFactory()
         export_experience = ExportExperienceFactory()
-        first_sent = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
-        with freeze_time(first_sent):
-            CustomerResponseTokenFactory(customer_response=win.customer_response)
 
         malicious_script = '<script>alert("XSS");</script>'
         request_data = {
