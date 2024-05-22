@@ -61,6 +61,9 @@ class BaseCustomerResponseSoftDeleteManager(models.Manager):
             .exclude(win__is_deleted=True)
         )
 
+    def all_customer_responses(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs)
+
 
 class BaseExportWinOrderedConstantModel(BaseOrderedConstantModel):
     """Base class for an Export Win."""
