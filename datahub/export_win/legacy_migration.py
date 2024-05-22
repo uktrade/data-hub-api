@@ -294,7 +294,7 @@ def migrate_legacy_win(item):
         win,
         customer_response_item,
     )
-    customer_response, _ = CustomerResponse.objects.update_or_create(
+    customer_response, _ = CustomerResponse.objects.all_customer_responses().update_or_create(
         win_id=win_id,
         defaults=customer_response_data,
     )
