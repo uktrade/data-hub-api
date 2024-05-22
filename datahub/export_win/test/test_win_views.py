@@ -1160,6 +1160,63 @@ class TestCreateWinView(APITestMixin):
             'This field is required' in response_text,
         ])
 
+    def test_create_win_with_html_script_tags(self, mock_export_win_serializer_notify):
+        """Tests handling of HTML/script tags within submitted data."""
+        url = reverse('api-v4:export-win:collection')
+
+        # Setup basic data with HTML/script tags in potentially vulnerable fields
+        adviser = self.user
+        lead_officer = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        date_won = now().date()
+        export_experience = ExportExperienceFactory()
+
+        request_data = {
+            'adviser': {'id': str(adviser.id)},
+            'lead_officer': {'id': str(lead_officer.id)},
+            'hq_team': {'id': HQTeamRegionOrPostConstant.td_events_services.value.id},
+            'team_type': {'id': TeamTypeConstant.itt.value.id},
+            'business_potential': {'id': BusinessPotentialConstant.high_export_potential.value.id},
+            'company': {'id': str(company.id)},
+            'company_contacts': [{'id': str(contact.id)}],
+            'customer_location': {'id': WinUKRegionConstant.overseas.value.id},
+            'business_type': 'The best type',
+            'description': '<script>alert("XSS");</script>',
+            'name_of_export': '<div>Unsafe HTML content</div>',
+            'date': date_won,
+            'country': CountryConstant.canada.value.id,
+            'total_expected_export_value': 1000000,
+            'total_expected_non_export_value': 1000000,
+            'total_expected_odi_value': 1000000,
+            'goods_vs_services': {'id': ExpectedValueRelationConstant.both.value.id},
+            'sector': {'id': SectorConstant.aerospace_assembly_aircraft.value.id},
+            'type_of_support': [
+                {'id': SupportTypeConstant.political_and_economic_briefing.value.id}],
+            'associated_programme': [{'id': AssociatedProgrammeConstant.afterburner.value.id}],
+            'is_personally_confirmed': False,
+            'is_line_manager_confirmed': False,
+            'name_of_customer': 'Overseas Customer<script>alert("hack");</script>',
+            'name_of_customer_confidential': True,
+            'export_experience': {'id': str(export_experience.id)},
+            'breakdowns': [{'type': {'id': BreakdownTypeConstant.export.value.id},
+                            'value': 1000, 'year': 2023}],
+        }
+        first_sent = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+        with freeze_time(first_sent):
+            response = self.api_client.post(url, data=request_data)
+        response_data = response.json()
+
+        # Check that the system either cleansed the input or rejected the request
+        assert response.status_code == 400
+        assert 'error' in response_data
+        error_message = response_data['error']
+
+        assert 'Input contains disallowed HTML or script tags or symbols' in error_message, \
+            'The error message should warn about script or HTML tags.'
+
+        mock_export_win_serializer_notify.assert_not_called()
+
 
 class TestUpdateWinView(APITestMixin):
     """Update export win view tests."""
@@ -1707,6 +1764,125 @@ class TestUpdateWinView(APITestMixin):
             'Invalid data' in response_text,
             'Must be a valid UUID' in response_text,
         ])
+
+    def test_update_win_with_html_and_script_tags(self):
+        """Tests updating an export win with HTML and script tags"""
+        win = WinFactory(adviser=self.user)
+        customer_response = CustomerResponse(win=win)
+        customer_response.save()
+
+        assert Version.objects.count() == 0
+
+        url = reverse('api-v4:export-win:item', kwargs={'pk': win.pk})
+        BreakdownFactory.create_batch(3, win=win)
+        WinAdviserFactory.create_batch(2, win=win)
+        adviser = AdviserFactory()
+        additional_team_member = AdviserFactory()
+        team_member = AdviserFactory()
+        lead_officer = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        date_won = now().date()
+        export = ExportFactory()
+        export_experience = ExportExperienceFactory()
+
+        malicious_script = '<script>alert("XSS");</script>'
+        request_data = {
+            'adviser': {
+                'id': str(adviser.id),
+            },
+            'lead_officer': {
+                'id': str(lead_officer.id),
+            },
+            'hq_team': {
+                'id': HQTeamRegionOrPostConstant.td_events_services.value.id,
+            },
+            'team_type': {
+                'id': TeamTypeConstant.itt.value.id,
+            },
+            'business_potential': {
+                'id': BusinessPotentialConstant.high_export_potential.value.id,
+            },
+            'company': {
+                'id': str(company.id),
+            },
+            'company_contacts': [
+                {
+                    'id': str(contact.id),
+                },
+            ],
+            'customer_location': {
+                'id': WinUKRegionConstant.overseas.value.id,
+            },
+            'business_type': malicious_script,  # Injecting script into text field
+            'description': malicious_script,  # Another field injection
+            'name_of_export': malicious_script,
+            'date': date_won,
+            'country': CountryConstant.canada.value.id,
+            'total_expected_export_value': 1000000,
+            'total_expected_non_export_value': 1000000,
+            'total_expected_odi_value': 1000000,
+            'goods_vs_services': {
+                'id': ExpectedValueRelationConstant.both.value.id,
+            },
+            'sector': {
+                'id': SectorConstant.aerospace_assembly_aircraft.value.id,
+            },
+            'type_of_support': [
+                {
+                    'id': SupportTypeConstant.political_and_economic_briefing.value.id,
+                },
+            ],
+            'associated_programme': [
+                {
+                    'id': AssociatedProgrammeConstant.afterburner.value.id,
+                },
+            ],
+            'is_personally_confirmed': False,
+            'is_line_manager_confirmed': False,
+            'name_of_customer': malicious_script,  # Customer name script injection
+            'name_of_customer_confidential': True,
+            'export_experience': {
+                'id': str(export_experience.id),
+            },
+            'location': 'Park',
+            'breakdowns': [
+                {
+                    'type': {
+                        'id': BreakdownTypeConstant.export.value.id,
+                    },
+                    'value': 1000,
+                    'year': 2023,
+                },
+            ],
+            'team_members': [
+                {
+                    'id': str(team_member.id),
+                },
+            ],
+            'advisers': [
+                {
+                    'adviser': {
+                        'id': str(additional_team_member.id),
+                    },
+                    'hq_team': {
+                        'id': HQTeamRegionOrPostConstant.td_events_services.value.id,
+                    },
+                    'team_type': {
+                        'id': TeamTypeConstant.itt.value.id,
+                    },
+                },
+            ],
+            'company_export': {
+                'id': str(export.id),
+            },
+        }
+        response = self.api_client.patch(url, data=request_data)
+        response_data = response.json()
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'error' in response_data
+        assert 'Input contains disallowed HTML or script tags or symbols' in response_data['error']
 
 
 class TestResendExportWinView(APITestMixin):
