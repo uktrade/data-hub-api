@@ -404,6 +404,56 @@ class TestUpdateCustomerResponseView(APITestMixin):
             response = api_client.patch(url, data=request_data)
             assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    def test_update_customer_response_with_html_and_script_tags(self):
+        """Tests updating customer response with HTML and script tags in the comments field."""
+        win = WinFactory()
+        contact = ContactFactory(company=win.company)
+        win.company_contacts.add(contact)
+        customer_response = CustomerResponseFactory(win=win)
+        assert customer_response.responded_on is None
+
+        token = CustomerResponseTokenFactory(customer_response=customer_response)
+        assert token.times_used == 0
+        api_client = self.create_api_client(user=None)
+
+        url = reverse('api-v4:export-win:customer-response', kwargs={'token_pk': token.pk})
+
+        # Simulate malicious input only in the comments field
+        malicious_input = '<script>alert("XSS attack");</script>'
+        request_data = {
+            'agree_with_win': True,
+            'comments': malicious_input,
+            'our_support': {'id': RatingConstant.rating_5.value.id},
+            'access_to_contacts': {'id': RatingConstant.n_a.value.id},
+            'access_to_information': {'id': RatingConstant.rating_5.value.id},
+            'improved_profile': {'id': RatingConstant.rating_5.value.id},
+            'gained_confidence': {'id': RatingConstant.rating_5.value.id},
+            'developed_relationships': {'id': RatingConstant.n_a.value.id},
+            'overcame_problem': {'id': RatingConstant.rating_5.value.id},
+            'involved_state_enterprise': False,
+            'interventions_were_prerequisite': False,
+            'support_improved_speed': True,
+            'expected_portion_without_help': {'id': WithoutOurSupportConstant.no_value.value.id},
+            'last_export': {'id': ExperienceConstant.we_last_exported.value.id},
+            'company_was_at_risk_of_not_exporting': True,
+            'has_explicit_export_plans': False,
+            'has_enabled_expansion_into_new_market': False,
+            'has_increased_exports_as_percent_of_turnover': False,
+            'has_enabled_expansion_into_existing_market': False,
+            'case_study_willing': False,
+            'marketing_source': {'id': MarketingSourceConstant.other.value.id},
+            'other_marketing_source': 'Friend',
+        }
+        response = api_client.patch(url, data=request_data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert 'error' in response_data
+        assert 'Input contains disallowed HTML or script tags or symbols' in response_data['error']
+
+        customer_response.refresh_from_db()
+        assert customer_response.responded_on is None
+        assert token.times_used == 0
+
 
 class TestDisallowedCustomerResponseViews(APITestMixin):
     """Ensure we cannot use disallowed HTTP verbs."""
