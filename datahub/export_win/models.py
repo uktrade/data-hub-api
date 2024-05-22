@@ -408,6 +408,8 @@ class Win(BaseModel):
         HQTeamRegionOrPost,
         related_name='wins',
         verbose_name='HQ team, Region or Post',
+        null=True,
+        blank=True,
         on_delete=models.PROTECT,
     )
 

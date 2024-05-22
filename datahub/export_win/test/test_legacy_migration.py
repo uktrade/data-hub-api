@@ -361,7 +361,7 @@ legacy_wins = {
             'goods_vs_services': 1,
             'has_hvo_specialist_involvement': False,
             'confirmation__comments': None,
-            'hq_team': 'team:1',
+            'hq_team': '',
             'hvc': None,
             'hvo_programme': 'AER-01',
             'id': '5778b485-1060-46e2-b411-772cd0f76d79',
