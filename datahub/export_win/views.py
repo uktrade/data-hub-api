@@ -23,6 +23,7 @@ from datahub.core.schemas import StubSchema
 
 from datahub.core.viewsets import CoreViewSet
 from datahub.export_win import EXPORT_WINS_LEGACY_DATA_FEATURE_FLAG_NAME
+from datahub.export_win.decorators import validate_script_and_html_tags
 from datahub.export_win.models import (
     CustomerResponse,
     CustomerResponseToken,
@@ -156,10 +157,12 @@ class WinViewSet(CoreViewSet):
         )
 
     @log_bad_request
+    @validate_script_and_html_tags
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
     @log_bad_request
+    @validate_script_and_html_tags
     def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)
 
@@ -235,6 +238,11 @@ class CustomerResponseViewSet(CoreViewSet):
         context['token_pk'] = self.kwargs.get('token_pk')
         context['token'] = getattr(self, 'token', None)
         return context
+
+    @validate_script_and_html_tags
+    def partial_update(self, request, *args, **kwargs):
+        """Handle PATCH requests with HTML/script tags validation."""
+        return super().partial_update(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
         return Response(status=status.HTTP_404_NOT_FOUND)
