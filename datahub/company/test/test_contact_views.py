@@ -1308,6 +1308,38 @@ class ContactListBase(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert {res['email'] for res in response.data['results']} == expected
 
+    @pytest.mark.parametrize(
+        'contacts,filter_,expected',
+        (
+            (
+                (True, False),
+                True,
+                {True},
+            ),
+            (
+                (True, False),
+                False,
+                {False},
+            ),
+            (
+                (True, False),
+                None,
+                {True, False},
+            ),
+        ),
+    )
+    def test_filter_by_archived(self, contacts, filter_, expected):
+        """Test getting contacts by archived"""
+        ContactFactory.create_batch(len(contacts), archived=factory.Iterator(contacts))
+
+        response = self.api_client.get(
+            reverse(f'{self.endpoint_namespace}:contact:list'),
+            data={'archived': filter_} if filter_ is not None else {},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert {res['archived'] for res in response.data['results']} == expected
+
 
 class TestContactListV3(ContactListBase):
     """Tests for v3 list contacts endpoint"""
