@@ -691,7 +691,7 @@ class TestCreateWinView(APITestMixin):
                         'id': BreakdownTypeConstant.export.value.id,
                     },
                     'value': 1000,
-                    'year': 2023,
+                    'year': 2,
                 },
             ],
         }
@@ -714,7 +714,7 @@ class TestCreateWinView(APITestMixin):
                 'name': BreakdownTypeConstant.export.value.name,
             },
             'value': 1000,
-            'year': 2023,
+            'year': 2,
         }
 
         assert response_breakdowns[0] == expected_breakdown
@@ -922,7 +922,7 @@ class TestCreateWinView(APITestMixin):
                         'id': BreakdownTypeConstant.export.value.id,
                     },
                     'value': 1000,
-                    'year': 2023,
+                    'year': 5,
                 },
             ],
             'team_members': [
@@ -967,7 +967,7 @@ class TestCreateWinView(APITestMixin):
                 'name': BreakdownTypeConstant.export.value.name,
             },
             'value': 1000,
-            'year': 2023,
+            'year': 5,
         }
 
         assert response_breakdowns[0] == expected_breakdown
@@ -1200,7 +1200,7 @@ class TestCreateWinView(APITestMixin):
             'name_of_customer_confidential': True,
             'export_experience': {'id': str(export_experience.id)},
             'breakdowns': [{'type': {'id': BreakdownTypeConstant.export.value.id},
-                            'value': 1000, 'year': 2023}],
+                            'value': 1000, 'year': 3}],
         }
         first_sent = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
         with freeze_time(first_sent):
@@ -1315,7 +1315,7 @@ class TestUpdateWinView(APITestMixin):
                         'id': BreakdownTypeConstant.export.value.id,
                     },
                     'value': 1000,
-                    'year': 2023,
+                    'year': 3,
                 },
             ],
             'team_members': [
@@ -1360,7 +1360,7 @@ class TestUpdateWinView(APITestMixin):
                 'name': BreakdownTypeConstant.export.value.name,
             },
             'value': 1000,
-            'year': 2023,
+            'year': 3,
         }
 
         assert response_breakdowns[0] == expected_breakdown
@@ -1852,7 +1852,7 @@ class TestUpdateWinView(APITestMixin):
                         'id': BreakdownTypeConstant.export.value.id,
                     },
                     'value': 1000,
-                    'year': 2023,
+                    'year': 3,
                 },
             ],
             'team_members': [
