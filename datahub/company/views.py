@@ -403,7 +403,7 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
         DjangoFilterBackend,
         OrderingFilter,
     )
-    filterset_fields = ['company_id', 'email']
+    filterset_fields = ['company_id', 'email', 'archived']
     ordering = ('-created_on',)
 
     def get_serializer_class(self):
