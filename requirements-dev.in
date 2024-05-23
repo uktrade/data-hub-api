@@ -1,7 +1,7 @@
 -r requirements.in
 
 # Testing and dev
-pytest==8.2.0
+pytest==8.2.1
 pytest-django==4.8.0
 pytest-cov==5.0.0
 pytest-mock==3.14.0
@@ -17,15 +17,15 @@ pre-commit==3.7.1
 # Code static analysis
 flake8==7.0.0
 flake8-bugbear==24.4.26
-flake8-commas==2.1.0
+flake8-commas==4.0.0
 flake8-debugger==4.1.2
 flake8-import-order==0.18.2
 flake8-docstrings==1.7.0
 flake8-print==5.0.0
 flake8-quotes==3.4.0
 flake8-string-format==0.3.0
-pep8-naming==0.13.3
+pep8-naming==0.14.1
 pydocstyle==6.3.0
-pylint==3.1.0
+pylint==3.2.1
 pylint-django==2.5.5
 pylint-pytest==1.1.2
