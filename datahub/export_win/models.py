@@ -1,12 +1,11 @@
 import uuid
 
 from django.conf import settings
-
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
 from django.db.models import Max
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
 from mptt.fields import TreeForeignKey
 
 from datahub.company.models import (
@@ -24,7 +23,9 @@ from datahub.metadata.models import (
     Sector,
     UKRegion,
 )
+
 from datahub.reminder.models import EmailDeliveryStatus
+
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -493,7 +494,12 @@ class Breakdown(BaseModel, BaseLegacyModel):
         related_name='breakdowns',
         on_delete=models.PROTECT,
     )
-    year = models.IntegerField()
+    year = models.IntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5),
+        ],
+    )
     value = models.BigIntegerField()
 
 
