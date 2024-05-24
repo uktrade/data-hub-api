@@ -1,0 +1,12 @@
+- model: export_win.teamtype
+  pk: 24823128-f9e6-4877-a12f-4995f8b525d8
+  fields:
+    disabled_on: null
+    name: 'Export Support Services'
+    export_win_id: trade
+    order: 900
+- model: export_win.hqteamregionorpost
+  pk: 37ed1910-e369-4311-a062-77a6d2951a96
+  fields:
+    export_win_id: 'trade:1'
+    team_type_id: 24823128-f9e6-4877-a12f-4995f8b525d8
