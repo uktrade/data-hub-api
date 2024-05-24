@@ -1,0 +1,26 @@
+- model: export_win.associatedprogramme
+  pk: 4da1d272-6200-4785-af8c-263f3324c205
+  fields:
+    disabled_on: null
+    name: "Northern Ireland Investment Summit 2023"
+    export_win_id: "114"
+    order:  705
+- model: export_win.associatedprogramme
+  pk: 5a3307a0-757b-4789-a86f-272f17dfb798
+  fields:
+    disabled_on: null
+    name: "International Trade Week 2023"
+    export_win_id: "115"
+    order:  625
+- model: export_win.associatedprogramme
+  pk: 78e86747-5bf9-4ee6-ac82-e92e133ed991
+  fields:
+    disabled_on: null
+    name: "Women's International Network (WIN Programme)"
+    export_win_id: "116"
+    order:  865
+- model: export_win.associatedprogramme
+  pk: c4a0744d-1f54-41d8-aa46-29951e0fa913
+  fields:
+    export_win_id: "117"
+    order: 505
