@@ -14,7 +14,7 @@ pytestmark = pytest.mark.django_db
     (
         (
             TeamTypeConstant.team.value.id,
-            74,
+            73,
         ),
         (
             TeamTypeConstant.investment.value.id,
@@ -43,6 +43,10 @@ pytestmark = pytest.mark.django_db
         (
             TeamTypeConstant.tcp.value.id,
             73,
+        ),
+        (
+            TeamTypeConstant.trade.value.id,
+            1,
         ),
     ),
 )
