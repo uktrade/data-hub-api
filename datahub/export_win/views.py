@@ -125,7 +125,7 @@ class WinViewSet(CoreViewSet):
     )
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ConfirmedFilterSet
-    ordering_fields = ('customer_response__responded_on', 'created_on')
+    ordering_fields = ('customer_response__responded_on', 'created_on', 'company__name')
     ordering = ('-customer_response__responded_on', '-created_on')
 
     def get_queryset(self):
