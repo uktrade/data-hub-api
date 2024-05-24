@@ -20,3 +20,4 @@ class TeamType(Enum):
     itt = Constant('International Trade Team', '1f6eccf9-289a-450b-a4af-b75600ea521b')
     post = Constant('Overseas Post', '6e798633-83da-4597-8e9a-9bb033ca06a4')
     tcp = Constant('Trade Challenge Partners (TCP)', 'f7006548-9ef0-4c4e-bc60-1b7ca40ff75b')
+    trade = Constant('Export Support Services', '24823128-f9e6-4877-a12f-4995f8b525d8')
