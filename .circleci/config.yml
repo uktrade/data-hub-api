@@ -16,18 +16,18 @@ job_defaults: &job_defaults
       default: false
 
   environment:
-    ADMIN_OAUTH2_ENABLED: 'True'
-    ADMIN_OAUTH2_BASE_URL: ''
-    ADMIN_OAUTH2_TOKEN_FETCH_PATH: '/o/token/'
-    ADMIN_OAUTH2_USER_PROFILE_PATH: '/o/v1/user/me/'
-    ADMIN_OAUTH2_AUTH_PATH: '/o/authorize/'
-    ADMIN_OAUTH2_CLIENT_ID: 'client-id'
-    ADMIN_OAUTH2_CLIENT_SECRET: 'client-secret'
-    ADMIN_OAUTH2_LOGOUT_PATH: '/o/logout'
+    ADMIN_OAUTH2_ENABLED: "True"
+    ADMIN_OAUTH2_BASE_URL: ""
+    ADMIN_OAUTH2_TOKEN_FETCH_PATH: "/o/token/"
+    ADMIN_OAUTH2_USER_PROFILE_PATH: "/o/v1/user/me/"
+    ADMIN_OAUTH2_AUTH_PATH: "/o/authorize/"
+    ADMIN_OAUTH2_CLIENT_ID: "client-id"
+    ADMIN_OAUTH2_CLIENT_SECRET: "client-secret"
+    ADMIN_OAUTH2_LOGOUT_PATH: "/o/logout"
     ACTIVITY_STREAM_ACCESS_KEY_ID: some-id
     ACTIVITY_STREAM_SECRET_ACCESS_KEY: some-secret
     DATABASE_URL: postgresql://postgres:datahub@postgres/datahub
-    DEBUG: 'True'
+    DEBUG: "True"
     DJANGO_SECRET_KEY: changeme
     DJANGO_SETTINGS_MODULE: config.settings.local
     ES_INDEX_PREFIX: test_index
@@ -39,18 +39,18 @@ job_defaults: &job_defaults
     AWS_ACCESS_KEY_ID: foo
     AWS_SECRET_ACCESS_KEY: bar
     DEFAULT_BUCKET: baz
-    SSO_ENABLED: 'True'
+    SSO_ENABLED: "True"
     STAFF_SSO_BASE_URL: http://sso.invalid/
     STAFF_SSO_AUTH_TOKEN: sso-token
     DIT_EMAIL_DOMAINS: trade.gov.uk,digital.trade.gov.uk
     DATA_HUB_FRONTEND_ACCESS_KEY_ID: frontend-key-id
     DATA_HUB_FRONTEND_SECRET_ACCESS_KEY: frontend-key
-    ES_APM_ENABLED: 'False'
+    ES_APM_ENABLED: "False"
     ES_APM_SERVICE_NAME: datahub
     ES_APM_SECRET_TOKEN:
     ES_APM_SERVER_URL: http://localhost:8200
-    ES_APM_ENVIRONMENT: 'circleci'
-    REDIS_BASE_URL: 'redis://localhost:6379'
+    ES_APM_ENVIRONMENT: "circleci"
+    REDIS_BASE_URL: "redis://localhost:6379"
 
   working_directory: ~/app
 
@@ -60,7 +60,7 @@ job_defaults: &job_defaults
     - image: <<parameters.es_image>>
       environment:
         discovery.type: single-node
-        plugins.security.disabled: 'true'
+        plugins.security.disabled: "true"
         http.port: 9200
 
     - image: <<parameters.postgres_image>>
