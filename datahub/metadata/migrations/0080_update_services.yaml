@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: 1e52b463-dcb5-4d6f-9d07-f2020d6bbef9
+  fields:
+    disabled_on: ~
+    order: 1.0
+    segment: Investment enquiry - referred to EYB
+    parent:
+    contexts: ["investment_project_interaction", "investment_interaction"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
