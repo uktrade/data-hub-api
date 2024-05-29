@@ -16,6 +16,7 @@ from datahub.company.test.factories import (
 )
 from datahub.core.test_utils import HawkMockJSONResponse
 from datahub.export_win.legacy_migration import (
+    _email_mapping,
     migrate_all_legacy_wins,
 )
 from datahub.export_win.models import (
@@ -524,6 +525,13 @@ legacy_wins = {
                 'year': 2028,
                 'value': 3000,
             },
+            {  # For orphaned breakdown
+                'id': 24,
+                'win__id': '28065639-a538-4f0c-9fe7-bb39c39668c0',
+                'type': 1,
+                'year': 2028,
+                'value': 3000,
+            },
         ],
     },
     mock_legacy_wins_page_urls['advisers'][0]: {
@@ -597,7 +605,7 @@ def test_legacy_migration(mock_legacy_wins_pages):
         last_name='manager',
     )
     adviser = AdviserFactory(
-        contact_email='user.email@trade.gov.uk',
+        contact_email='user.email@businessandtrade.gov.uk',
         is_active=True,
     )
     adviser2 = AdviserFactory(
@@ -735,3 +743,20 @@ def test_legacy_migration(mock_legacy_wins_pages):
     assert win_6.customer_response.other_marketing_source == ''
     assert win_6.line_manager == line_manager
     assert win_6.is_deleted is True
+
+
+@pytest.mark.parametrize(
+    'email,expected',
+    (
+        ('test@trade.gov.uk', {'test@businessandtrade.gov.uk', 'test@trade.gov.uk'}),
+        ('test@mobile.trade.gov.uk', {
+            'test@mobile.trade.gov.uk',
+            'test@mobile.ukti.gov.uk',
+            'test@businessandtrade.gov.uk',
+        }),
+        ('test@ukti', {'test@trade', 'test@ukti'}),
+    ),
+)
+def test_email_mapping(email, expected):
+    result = _email_mapping(email)
+    assert result == expected
