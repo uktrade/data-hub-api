@@ -320,6 +320,7 @@ class TestServiceView:
         service = service_queryset.order_by('order')[0]
 
         assert response.status_code == status.HTTP_200_OK
+
         services = response.json()
         disabled_on = format_date_or_datetime(service.disabled_on) if service.disabled_on else None
         services[0]['contexts'] = sorted(services[0]['contexts'])
