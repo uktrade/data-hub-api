@@ -67,7 +67,7 @@ class AdvisorInline(BaseTabularInline):
     model = WinAdviser
     form = AdvisorInlineForm
     fields = ('id', 'adviser', 'team_type', 'hq_team', 'location')
-    verbose_name_plural = 'Contributing Advisors'
+    verbose_name_plural = 'Contributing Advisers'
 
 
 class BaseStackedInline(admin.StackedInline):
@@ -201,7 +201,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
             'audit',
             'total_expected_export_value',
             'total_expected_non_export_value',
-            'total_expected_odi_value',
+            ('total_expected_odi_value', 'Total expected ODI value'),
         )}),
         ('Win details', {'fields': (
             'country',
@@ -246,12 +246,12 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         return f'{obj.adviser} <{obj.adviser.email}>' if obj.adviser else \
             f'{obj.adviser_name} <{obj.adviser_email_address}>'
 
-    get_adviser.short_description = 'User'
+    get_adviser.short_description = 'Creator'
 
     def get_company(self, obj):
         """Return company name."""
         return obj.company
-    get_company.short_description = 'Organisation or Company name'
+    get_company.short_description = 'Company name'
 
     def get_date_confirmed(self, obj):
         """Return wins being confirmed."""
@@ -407,4 +407,4 @@ class WinAdviserAdmin(BaseModelAdminMixin):
 
     get_computed_adviser_name.short_description = 'Name'
 
-    WinAdviser._meta.verbose_name_plural = 'Advisors'
+    WinAdviser._meta.verbose_name_plural = 'Advisers'
