@@ -5,6 +5,7 @@ from logging import getLogger
 from dateutil.parser import parse
 
 from django.db.models import Q
+from django.db.models.functions import Lower
 
 from datahub.company.models import (
     Advisor,
@@ -304,7 +305,12 @@ def migrate_legacy_win(item):
 
 
 def create_breakdown_from_legacy(item):
-    win = Win.objects.all_wins().get(id=item['win__id'])
+    try:
+        win = Win.objects.all_wins().get(id=item['win__id'])
+    except Win.DoesNotExist:
+        logger.warning(f"Legacy Win {item['win__id']} does not exist.")
+        return None
+
     breakdown_type = BreakdownType.objects.get(export_win_id=item['type'])
     year = item['year'] - get_financial_year(win.date) + 1
     return {
@@ -320,7 +326,6 @@ def migrate_legacy_win_breakdown(item):
     breakdown_data = create_breakdown_from_legacy(item)
     if not breakdown_data:
         return None
-
     breakdown = Breakdown(**breakdown_data)
     breakdown.save()
     return breakdown
@@ -328,7 +333,7 @@ def migrate_legacy_win_breakdown(item):
 
 def update_legacy_win_totals():
     updated = 0
-    for win in Win.objects.filter(migrated_on__isnull=False):
+    for win in Win.objects.all_wins().filter(migrated_on__isnull=False):
         calc_total = calculate_totals_for_export_win(win)
         win.total_expected_export_value = calc_total['total_export_value']
         win.total_expected_non_export_value = calc_total['total_non_export_value']
@@ -349,15 +354,7 @@ def create_win_adviser_from_legacy(item):
         'location': item['location'],
     }
 
-    parts = item.get('name').split()
-    # In case name is written as "Joe M. Doe"
-    first_name = parts[0]
-    last_name = parts[-1]
-    adviser = Advisor.objects.filter(
-        first_name__iexact=first_name.strip(),
-        last_name__iexact=last_name.strip(),
-        is_active=True,
-    ).order_by('-date_joined').first()
+    adviser = _get_adviser_by_email_or_name('', item.get('name').strip())
     if adviser:
         adviser_data.update({
             'adviser': adviser,
@@ -429,11 +426,34 @@ def resolve_company(data, context=None):
         }
 
 
+def _get_adviser_by_email_or_name(email, name):
+    if email != '':
+        emails = [item.lower() for item in _email_mapping(email)]
+        filters = Q(email_lowercase__in=emails) | Q(contact_email_lowercase__in=emails)
+    elif name != '':
+        parts = name.split()
+        # In case name is written as "Joe M. Doe"
+        first_name = parts[0]
+        last_name = parts[-1]
+        filters = Q(
+            first_name__iexact=first_name.strip(),
+        ) & Q(
+            last_name__iexact=last_name.strip(),
+        )
+    else:
+        return None
+    adviser = Advisor.objects.annotate(
+        email_lowercase=Lower('email'),
+        contact_email_lowercase=Lower('contact_email'),
+    ).filter(
+        filters,
+    ).order_by('-date_joined').first()
+    return adviser
+
+
 def resolve_adviser(data, context=None):
     email = data.get('user__email').strip()
-    adviser = Advisor.objects.filter(
-        Q(contact_email__iexact=email) | Q(email__iexact=email),
-    ).order_by('-date_joined').first()
+    adviser = _get_adviser_by_email_or_name(email, '')
     if adviser is None:
         return {
             'adviser_name': data.get('user__name'),
@@ -443,23 +463,8 @@ def resolve_adviser(data, context=None):
 
 
 def resolve_lead_officer(data, context=None):
-    filters = Q()
     email = data.get('lead_officer_email_address').strip()
-    if email != '':
-        filters = Q(email__iexact=email) | Q(contact_email__iexact=email)
-    else:
-        parts = data.get('lead_officer_name').split()
-        # In case name is written as "Joe M. Doe"
-        first_name = parts[0]
-        last_name = parts[-1]
-        filters = Q(
-            first_name__iexact=first_name.strip(),
-        ) & Q(
-            last_name__iexact=last_name.strip(),
-        )
-    adviser = Advisor.objects.filter(
-        filters,
-    ).order_by('-date_joined').first()
+    adviser = _get_adviser_by_email_or_name(email, data.get('lead_officer_name').strip())
     if adviser is None:
         return {
             'lead_officer_name': data.get('lead_officer_name'),
@@ -469,14 +474,8 @@ def resolve_lead_officer(data, context=None):
 
 
 def resolve_line_manager(data, context=None):
-    parts = data.get('line_manager_name').split()
-    # In case name is written as "Joe M. Doe"
-    first_name = parts[0]
-    last_name = parts[-1]
-    adviser = Advisor.objects.filter(
-        first_name__iexact=first_name.strip(),
-        last_name__iexact=last_name.strip(),
-    ).order_by('-date_joined').first()
+    name = data.get('line_manager_name').strip()
+    adviser = _get_adviser_by_email_or_name('', name)
     if adviser is None:
         return {
             'line_manager_name': data.get('line_manager_name'),
@@ -529,3 +528,13 @@ def migrate_all_legacy_wins():
     update_legacy_win_totals()
 
     return wins
+
+
+def _email_mapping(email):
+    return {
+        email,
+        email.replace('@trade.gov.uk', '@businessandtrade.gov.uk'),
+        email.replace('ukti', 'trade'),
+        email.replace('@mobile.trade', '@mobile.ukti'),
+        email.replace('@mobile.trade', '@businessandtrade'),
+    }
