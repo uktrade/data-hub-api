@@ -52,6 +52,9 @@ class AdvisorInlineForm(ModelForm):
     class Meta:
         model = WinAdviser
         fields = '__all__'
+        labels = {
+            'adviser': 'Contributing Adviser',
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

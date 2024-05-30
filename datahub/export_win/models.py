@@ -217,6 +217,7 @@ class Win(BaseModel):
     adviser = models.ForeignKey(
         Advisor,
         related_name='wins',
+        verbose_name='Contributing Adviser',
         on_delete=models.PROTECT,
         null=True,
         blank=True,
@@ -598,7 +599,9 @@ class CustomerResponse(BaseModel):
     overcame_problem = models.ForeignKey(
         Rating,
         related_name='overcame_problem_customer_responses',
-        verbose_name='Overcoming a problem in the country (such as regulatory, commercial)?',
+        verbose_name=(
+            'Overcoming a problem in the country (such as '
+            'legal, regulatory, commercial)?'),
         on_delete=models.PROTECT,
         null=True,
         blank=True,
