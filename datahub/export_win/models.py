@@ -598,14 +598,16 @@ class CustomerResponse(BaseModel):
     overcame_problem = models.ForeignKey(
         Rating,
         related_name='overcame_problem_customer_responses',
-        verbose_name='Overcoming a problem in the country (eg legal, regulatory, commercial)?',
+        verbose_name=(
+            'Overcoming a problem in the country (such as '
+            'legal, regulatory, commercial)?'),
         on_delete=models.PROTECT,
         null=True,
         blank=True,
     )
     involved_state_enterprise = models.BooleanField(
         verbose_name=(
-            'The win involved a foreign government or state-owned enterprise (eg as an '
+            'The win involved a foreign government or state-owned enterprise (such as an '
             'intermediary or facilitator)'),
         default=False,
         null=True,

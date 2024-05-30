@@ -52,6 +52,9 @@ class AdvisorInlineForm(ModelForm):
     class Meta:
         model = WinAdviser
         fields = '__all__'
+        labels = {
+            'adviser': 'Contributing Adviser',
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -67,7 +70,7 @@ class AdvisorInline(BaseTabularInline):
     model = WinAdviser
     form = AdvisorInlineForm
     fields = ('id', 'adviser', 'team_type', 'hq_team', 'location')
-    verbose_name_plural = 'Contributing Advisors'
+    verbose_name_plural = 'Contributing Advisers'
 
 
 class BaseStackedInline(admin.StackedInline):
@@ -117,6 +120,11 @@ class WinAdminForm(ModelForm):
     class Meta:
         model = Win
         fields = '__all__'
+        labels = {
+            'adviser': 'Creator',
+            'company_contacts': 'Contact name',
+            'total_expected_odi_value': 'Total expected ODI value',
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -246,12 +254,12 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         return f'{obj.adviser} <{obj.adviser.email}>' if obj.adviser else \
             f'{obj.adviser_name} <{obj.adviser_email_address}>'
 
-    get_adviser.short_description = 'User'
+    get_adviser.short_description = 'Creator'
 
     def get_company(self, obj):
         """Return company name."""
         return obj.company
-    get_company.short_description = 'Organisation or Company name'
+    get_company.short_description = 'Company name'
 
     def get_date_confirmed(self, obj):
         """Return wins being confirmed."""
@@ -405,6 +413,6 @@ class WinAdviserAdmin(BaseModelAdminMixin):
     def has_change_permission(self, request, obj=None):
         return False
 
-    get_computed_adviser_name.short_description = 'Name'
+    get_computed_adviser_name.short_description = 'Contributing Adviser'
 
-    WinAdviser._meta.verbose_name_plural = 'Advisors'
+    WinAdviser._meta.verbose_name_plural = 'Advisers'
