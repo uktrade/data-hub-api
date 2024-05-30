@@ -318,6 +318,7 @@ def create_breakdown_from_legacy(item):
         'type': breakdown_type,
         'year': year,
         'value': int(item['value']),
+        'legacy_id': int(item['id']),
     }
 
 
@@ -352,6 +353,7 @@ def create_win_adviser_from_legacy(item):
         'hq_team': hq_team,
         'team_type': team_type,
         'location': item['location'],
+        'legacy_id': int(item['id']),
     }
 
     adviser = _get_adviser_by_email_or_name('', item.get('name').strip())
