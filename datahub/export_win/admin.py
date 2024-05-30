@@ -405,6 +405,6 @@ class WinAdviserAdmin(BaseModelAdminMixin):
     def has_change_permission(self, request, obj=None):
         return False
 
-    get_computed_adviser_name.short_description = 'Name'
+    get_computed_adviser_name.short_description = 'Contributing Adviser'
 
     WinAdviser._meta.verbose_name_plural = 'Advisers'
