@@ -117,6 +117,10 @@ class WinAdminForm(ModelForm):
     class Meta:
         model = Win
         fields = '__all__'
+        labels = {
+            'adviser': 'Creator',
+            'total_expected_odi_value': 'Total expected ODI value',
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -201,7 +205,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
             'audit',
             'total_expected_export_value',
             'total_expected_non_export_value',
-            ('total_expected_odi_value', 'Total expected ODI value'),
+            'total_expected_odi_value',
         )}),
         ('Win details', {'fields': (
             'country',
