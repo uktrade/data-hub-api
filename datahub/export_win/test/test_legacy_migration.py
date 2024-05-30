@@ -613,13 +613,27 @@ def test_legacy_migration(mock_legacy_wins_pages):
         is_active=False,
     )
     current_date = datetime.utcnow()
+    day_before = current_date - timedelta(days=1)
+
+    john_smith = AdviserFactory(
+        first_name='John',
+        last_name='Smith',
+        is_active=True,
+        date_joined=current_date,
+    )
+    AdviserFactory(
+        first_name='John',
+        last_name='Smith',
+        is_active=False,
+        date_joined=day_before,
+    )
     with freeze_time(current_date):
         contact = ContactFactory(
             company=company,
             first_name='John',
             last_name='Doe',
         )
-    with freeze_time(current_date - timedelta(days=1)):
+    with freeze_time(day_before):
         ContactFactory(
             company=company,
             first_name='John',
