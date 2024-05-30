@@ -443,7 +443,7 @@ legacy_wins = {
         'next': mock_legacy_wins_page_urls['breakdowns'][1],
         'results': [
             {
-                'id': 11,
+                'id': 1,
                 'win__id': '5778b485-1060-46e2-b411-772cd0f76d79',
                 'type': 1,
                 'year': 2016,
@@ -552,7 +552,7 @@ legacy_wins = {
         'results': [
             {
                 'hq_team': 'itt:The North West International Trade Team',
-                'id': 1,
+                'id': 2,
                 'location': 'London',
                 'name': 'John Smith',
                 'team_type': 'itt',
