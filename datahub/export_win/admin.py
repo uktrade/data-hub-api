@@ -122,6 +122,7 @@ class WinAdminForm(ModelForm):
         fields = '__all__'
         labels = {
             'adviser': 'Creator',
+            'company_contacts': 'Contact name',
             'total_expected_odi_value': 'Total expected ODI value',
         }
 
