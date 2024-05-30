@@ -217,7 +217,6 @@ class Win(BaseModel):
     adviser = models.ForeignKey(
         Advisor,
         related_name='wins',
-        verbose_name='Contributing Adviser',
         on_delete=models.PROTECT,
         null=True,
         blank=True,
