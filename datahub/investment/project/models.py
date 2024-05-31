@@ -93,6 +93,7 @@ class IProjectAbstract(models.Model):
         LOST = ('lost', 'Lost')
         ABANDONED = ('abandoned', 'Abandoned')
         WON = ('won', 'Won')
+        REFERRED = ('referred', 'Referred')
 
     class Involvement(models.TextChoices):
         UNSPECIFIED = ('unspecified', 'Unspecified')
@@ -293,7 +294,7 @@ class IProjectAbstract(models.Model):
     def financial_year_verbose(self):
         """Financial year in YYYY-YY format, for example 2021-22."""
         if self.financial_year:
-            output = f'{self.financial_year}-{str(self.financial_year+1)[-2:]}'
+            output = f'{self.financial_year}-{str(self.financial_year + 1)[-2:]}'
             if str(self.stage_id) == InvestmentProjectStage.prospect.value.id:
                 # Prospective projects are applicable to all future financial years
                 return f'{output} (onwards)'
