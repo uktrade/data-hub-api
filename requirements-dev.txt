@@ -323,7 +323,7 @@ redis==4.5.4
     #   django-redis
     #   python-redis-rate-limit
     #   rq
-requests==2.32.2
+requests==2.32.3
     # via
     #   -r requirements.in
     #   notifications-python-client
