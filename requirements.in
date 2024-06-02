@@ -40,7 +40,7 @@ slackclient==2.9.4
 django-redis==5.4.0
 
 # OpenSearch
-opensearch-py==2.5.0
+opensearch-py==2.6.0
 opensearch-dsl==2.1.0
 
 # ES APM
