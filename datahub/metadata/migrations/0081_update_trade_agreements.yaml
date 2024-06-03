@@ -1,0 +1,3 @@
+- model: metadata.tradeagreement
+  pk: 5aa73f74-e0f5-4872-ffaf-04c3133d1e11
+  fields: { disabled_on: null, name: "UK-Morocco Association Agreement" }
