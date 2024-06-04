@@ -13,6 +13,7 @@ from datahub.company.models import (
     ExportExperience,
 )
 from datahub.core.utils import get_financial_year
+from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.export_wins_api import get_legacy_export_wins_dataset
 from datahub.export_win.models import (
     AssociatedProgramme,
@@ -277,15 +278,10 @@ def migrate_legacy_win(item):
         logger.warning(f'Country not found for {win_id}.')
         return
 
-    win, created = Win.objects.all_wins().update_or_create(
+    win, _ = Win.objects.all_wins().update_or_create(
         id=win_id,
         defaults=win_data,
     )
-    if not created:
-        # The associated models need to be deleted
-        # to avoid duplicates when migrating them again
-        Breakdown.objects.filter(win_id=win.id).delete()
-        WinAdviser.objects.filter(win_id=win.id).delete()
     win.created_on = win_data['created_on']
     win.save()
 
@@ -327,8 +323,14 @@ def migrate_legacy_win_breakdown(item):
     breakdown_data = create_breakdown_from_legacy(item)
     if not breakdown_data:
         return None
-    breakdown = Breakdown(**breakdown_data)
-    breakdown.save()
+    legacy_id = breakdown_data.pop('legacy_id')
+    if legacy_id >= EXPORT_WINS_LEGACY_ID_START_VALUE:
+        raise ValueError(f'Invalid Breakdown legacy ID {legacy_id}')
+
+    breakdown, _ = Breakdown.objects.update_or_create(
+        legacy_id=legacy_id,
+        defaults=breakdown_data,
+    )
     return breakdown
 
 
@@ -374,8 +376,13 @@ def migrate_legacy_win_adviser(item):
     if not adviser_data:
         return None
 
-    adviser = WinAdviser(**adviser_data)
-    adviser.save()
+    legacy_id = adviser_data.pop('legacy_id')
+    if legacy_id >= EXPORT_WINS_LEGACY_ID_START_VALUE:
+        raise ValueError(f'Invalid WinAdviser legacy ID {legacy_id}')
+    adviser, _ = WinAdviser.objects.update_or_create(
+        legacy_id=legacy_id,
+        defaults=adviser_data,
+    )
     return adviser
 
 

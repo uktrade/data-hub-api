@@ -1,3 +1,5 @@
+import time
+
 from logging import getLogger
 
 from django.conf import settings
@@ -16,11 +18,19 @@ from datahub.core.exceptions import APIBadGatewayException
 logger = getLogger(__name__)
 
 
-def _fetch_page(api_client, source_url):
+def _fetch_page(api_client, source_url, max_retries=5, retry_delay=2):
     """
     Requests a page from given relative source_url.
     """
-    page = api_client.request('GET', source_url).json()
+    for attempt in range(max_retries):
+        try:
+            page = api_client.request('GET', source_url).json()
+            break
+        except (APIBadGatewayException, Timeout, HTTPError):
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+            else:
+                raise
     return page['results'], page['next']
 
 
@@ -43,6 +53,7 @@ def get_legacy_export_wins_dataset(start_url):
 
     source_url = start_url
     items = 0
+
     try:
         while True:
             results, next_url = _fetch_page(api_client, source_url)
