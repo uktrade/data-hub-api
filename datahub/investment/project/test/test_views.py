@@ -29,11 +29,11 @@ from datahub.core.test_utils import (
 from datahub.investment.project import views
 from datahub.investment.project.constants import (
     InvestmentActivityType,
+    InvestorType,
     LikelihoodToLand,
     ProjectManagerRequestStatus,
+    SpecificProgramme,
 )
-
-from datahub.investment.project.constants import SpecificProgramme
 
 from datahub.investment.project.models import (
     InvestmentActivity,
@@ -1514,6 +1514,7 @@ class TestPartialUpdateView(APITestMixin):
             'actual_land_date': ['This field is required.'],
             'specific_programme': ['This field is required.'],
             'uk_company': ['This field is required.'],
+            'investor_type': ['This field is required.'],
         }
 
     @pytest.mark.parametrize(
@@ -1556,7 +1557,8 @@ class TestPartialUpdateView(APITestMixin):
             uk_company=CompanyFactory(
                 address_country_id=constants.Country.united_kingdom.value.id,
             ),
-            **extra,
+            investor_type_id=InvestorType.new_investor.value.id,
+            ** extra,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {

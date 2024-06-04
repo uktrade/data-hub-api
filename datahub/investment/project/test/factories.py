@@ -57,7 +57,6 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     estimated_land_date = date(2020, 1, 1)
     investment_type_id = InvestmentType.commitment_to_invest.value.id
     referral_source_activity_id = ReferralSourceActivity.cold_call.value.id
-    investor_type_id = InvestorType.new_investor.value.id
     level_of_involvement_id = Involvement.no_involvement.value.id
     stage_id = InvestmentProjectStage.prospect.value.id
     sector_id = Sector.aerospace_assembly_aircraft.value.id
@@ -174,6 +173,7 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
         CompanyFactory,
         address_country_id=Country.united_kingdom.value.id,
     )
+    investor_type_id = InvestorType.new_investor.value.id
 
     @to_many_field
     def actual_uk_regions(self):
