@@ -58,7 +58,6 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     referral_source_activity_id = ReferralSourceActivity.cold_call.value.id
     investor_type_id = InvestorType.new_investor.value.id
     level_of_involvement_id = Involvement.no_involvement.value.id
-    specific_programme_id = SpecificProgramme.space.value.id
     stage_id = InvestmentProjectStage.prospect.value.id
     sector_id = Sector.aerospace_assembly_aircraft.value.id
     investor_company = factory.SubFactory(CompanyFactory)
@@ -169,6 +168,7 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
     address_town = factory.Faker('city')
     address_postcode = factory.Faker('postcode')
     average_salary_id = SalaryRange.below_25000.value.id
+    specific_programme_id = SpecificProgramme.space.value.id
 
     @to_many_field
     def actual_uk_regions(self):

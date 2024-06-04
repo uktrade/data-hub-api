@@ -5,6 +5,7 @@ import pytest
 from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import random_obj_for_model
+from datahub.investment.project.constants import SpecificProgramme
 from datahub.investment.project.models import InvestmentDeliveryPartner
 from datahub.investment.project.serializers import (
     CORE_FIELDS,
@@ -291,6 +292,7 @@ def test_validate_verify_win_instance_failure():
         'client_cannot_provide_foreign_investment': 'This field is required.',
         'foreign_equity_investment': 'This field is required.',
         'actual_land_date': 'This field is required.',
+        'specific_programme': 'This field is required.',
     }
 
 
@@ -356,6 +358,7 @@ def test_validate_verify_win_instance_with_cond_fields():
         delivery_partners=[random_obj_for_model(InvestmentDeliveryPartner)],
         average_salary_id=constants.SalaryRange.below_25000.value.id,
         actual_land_date=date.today(),
+        specific_programme_id=SpecificProgramme.space.value.id,
     )
     errors = validate(instance=project)
     assert not errors
