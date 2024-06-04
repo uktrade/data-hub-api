@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from datahub.company.test.factories import AdviserFactory, ContactFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import random_obj_for_model
 from datahub.investment.project.constants import SpecificProgramme
@@ -293,6 +293,7 @@ def test_validate_verify_win_instance_failure():
         'foreign_equity_investment': 'This field is required.',
         'actual_land_date': 'This field is required.',
         'specific_programme': 'This field is required.',
+        'uk_company': 'This field is required.',
     }
 
 
@@ -359,6 +360,7 @@ def test_validate_verify_win_instance_with_cond_fields():
         average_salary_id=constants.SalaryRange.below_25000.value.id,
         actual_land_date=date.today(),
         specific_programme_id=SpecificProgramme.space.value.id,
+        uk_company=CompanyFactory(address_country_id=constants.Country.united_kingdom.value.id),
     )
     errors = validate(instance=project)
     assert not errors
