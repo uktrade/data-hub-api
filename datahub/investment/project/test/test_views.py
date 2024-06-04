@@ -1518,6 +1518,7 @@ class TestPartialUpdateView(APITestMixin):
             'foreign_equity_investment': ['This field is required.'],
             'actual_land_date': ['This field is required.'],
             'specific_programme': ['This field is required.'],
+            'uk_company': ['This field is required.'],
         }
 
     @pytest.mark.parametrize(
@@ -1556,6 +1557,9 @@ class TestPartialUpdateView(APITestMixin):
             average_salary_id=constants.SalaryRange.below_25000.value.id,
             actual_land_date=factory.Faker('past_date'),
             specific_programme_id=SpecificProgramme.space.value.id,
+            uk_company=CompanyFactory(
+                address_country_id=constants.Country.united_kingdom.value.id,
+            ),
             **extra,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
