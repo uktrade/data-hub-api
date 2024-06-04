@@ -142,7 +142,6 @@ def test_validate_value_fail():
     assert errors == {
         'client_cannot_provide_total_investment': 'This field is required.',
         'total_investment': 'This field is required.',
-        'number_new_jobs': 'This field is required.',
     }
 
 
@@ -152,7 +151,6 @@ def test_validate_value_instance_success():
         stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
         client_cannot_provide_total_investment=False,
         total_investment=100,
-        number_new_jobs=0,
     )
     errors = validate(instance=project, fields=VALUE_FIELDS)
     assert not errors
@@ -266,7 +264,6 @@ def test_validate_verify_win_instance_failure():
         client_contacts=[ContactFactory().id, ContactFactory().id],
         client_cannot_provide_total_investment=False,
         total_investment=100,
-        number_new_jobs=10,
         client_considering_other_countries=False,
         client_requirements='client reqs',
         site_decided=False,
@@ -278,6 +275,7 @@ def test_validate_verify_win_instance_failure():
     errors = validate(instance=project)
     assert errors == {
         'government_assistance': 'This field is required.',
+        'number_new_jobs': 'This field is required.',
         'number_safeguarded_jobs': 'This field is required.',
         'r_and_d_budget': 'This field is required.',
         'non_fdi_r_and_d_budget': 'This field is required.',
@@ -288,7 +286,6 @@ def test_validate_verify_win_instance_failure():
         'address_postcode': 'This field is required.',
         'actual_uk_regions': 'This field is required.',
         'delivery_partners': 'This field is required.',
-        'average_salary': 'This field is required.',
         'client_cannot_provide_foreign_investment': 'This field is required.',
         'foreign_equity_investment': 'This field is required.',
         'actual_land_date': 'This field is required.',

@@ -41,7 +41,6 @@ class InvestmentProjectStageValidationConfig:
         """Mapping from field name to the stage the field becomes required."""
         return {
             'client_cannot_provide_total_investment': Stage.assign_pm.value,
-            'number_new_jobs': Stage.assign_pm.value,
             'strategic_drivers': Stage.assign_pm.value,
             'client_requirements': Stage.assign_pm.value,
             'client_considering_other_countries': Stage.assign_pm.value,
@@ -49,6 +48,7 @@ class InvestmentProjectStageValidationConfig:
             'project_assurance_adviser': Stage.active.value,
             'client_cannot_provide_foreign_investment': Stage.verify_win.value,
             'government_assistance': Stage.verify_win.value,
+            'number_new_jobs': Stage.verify_win.value,
             'number_safeguarded_jobs': Stage.verify_win.value,
             'r_and_d_budget': Stage.verify_win.value,
             'non_fdi_r_and_d_budget': Stage.verify_win.value,
