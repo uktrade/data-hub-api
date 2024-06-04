@@ -1555,7 +1555,7 @@ class TestPartialUpdateView(APITestMixin):
             delivery_partners=[random_obj_for_model(InvestmentDeliveryPartner)],
             average_salary_id=constants.SalaryRange.below_25000.value.id,
             actual_land_date=factory.Faker('past_date'),
-            specific_programme_id = SpecificProgramme.space.value.id,
+            specific_programme_id=SpecificProgramme.space.value.id,
             **extra,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
