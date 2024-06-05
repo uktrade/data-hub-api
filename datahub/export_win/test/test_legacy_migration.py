@@ -558,6 +558,14 @@ legacy_wins = {
                 'team_type': 'itt',
                 'win__id': '02ce5d82-5294-477a-ab9a-94782e7b2794',
             },
+            {  # For orphaned win adviser
+                'hq_team': 'itt:The North West International Trade Team',
+                'id': 3,
+                'location': 'London',
+                'name': 'John Smith',
+                'team_type': 'itt',
+                'win__id': 'a43f0333-f95e-4762-a258-0e9f4ed42b1c',
+            },
         ],
     },
 }

@@ -347,11 +347,17 @@ def update_legacy_win_totals():
 
 
 def create_win_adviser_from_legacy(item):
+    try:
+        win = Win.objects.all_wins().get(id=item['win__id'])
+    except Win.DoesNotExist:
+        logger.warning(f"Legacy Win {item['win__id']} does not exist.")
+        return None
+
     hq_team = HQTeamRegionOrPost.objects.get(export_win_id=item['hq_team'])
     team_type = TeamType.objects.get(export_win_id=item['team_type'])
 
     adviser_data = {
-        'win_id': item['win__id'],
+        'win': win,
         'hq_team': hq_team,
         'team_type': team_type,
         'location': item['location'],
