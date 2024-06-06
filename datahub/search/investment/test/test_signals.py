@@ -352,7 +352,6 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
     assert result.hits.total.value == 1
     assert result.hits[0]['incomplete_fields'] == [
         'client_cannot_provide_total_investment',
-        'number_new_jobs',
         'strategic_drivers',
         'client_requirements',
         'client_considering_other_countries',
@@ -360,6 +359,7 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
         'project_assurance_adviser',
         'client_cannot_provide_foreign_investment',
         'government_assistance',
+        'number_new_jobs',
         'number_safeguarded_jobs',
         'r_and_d_budget',
         'non_fdi_r_and_d_budget',
@@ -379,13 +379,13 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
     ]
 
     project.client_cannot_provide_total_investment = False
-    project.number_new_jobs = 3
     project.client_requirements = 'things'
     project.client_considering_other_countries = True
     project.project_manager = adviser
     project.project_assurance_adviser = adviser
     project.client_cannot_provide_foreign_investment = True
     project.government_assistance = True
+    project.number_new_jobs = 3
     project.number_safeguarded_jobs = 10
     project.r_and_d_budget = True
     project.non_fdi_r_and_d_budget = True
