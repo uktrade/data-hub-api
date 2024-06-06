@@ -12,6 +12,7 @@ from datahub.company.test.factories import (
     ContactFactory,
 )
 from datahub.core.constants import (
+    Country,
     InvestmentBusinessActivity,
     InvestmentProjectStage,
     InvestmentStrategicDriver,
@@ -169,6 +170,10 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
     address_postcode = factory.Faker('postcode')
     average_salary_id = SalaryRange.below_25000.value.id
     specific_programme_id = SpecificProgramme.space.value.id
+    uk_company = factory.SubFactory(
+        CompanyFactory,
+        address_country_id=Country.united_kingdom.value.id,
+    )
 
     @to_many_field
     def actual_uk_regions(self):
