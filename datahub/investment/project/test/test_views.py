@@ -32,6 +32,9 @@ from datahub.investment.project.constants import (
     LikelihoodToLand,
     ProjectManagerRequestStatus,
 )
+
+from datahub.investment.project.constants import SpecificProgramme
+
 from datahub.investment.project.models import (
     InvestmentActivity,
     InvestmentDeliveryPartner,
@@ -1514,6 +1517,7 @@ class TestPartialUpdateView(APITestMixin):
             'client_cannot_provide_foreign_investment': ['This field is required.'],
             'foreign_equity_investment': ['This field is required.'],
             'actual_land_date': ['This field is required.'],
+            'specific_programme': ['This field is required.'],
         }
 
     @pytest.mark.parametrize(
@@ -1551,6 +1555,7 @@ class TestPartialUpdateView(APITestMixin):
             delivery_partners=[random_obj_for_model(InvestmentDeliveryPartner)],
             average_salary_id=constants.SalaryRange.below_25000.value.id,
             actual_land_date=factory.Faker('past_date'),
+            specific_programme_id=SpecificProgramme.space.value.id,
             **extra,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
