@@ -60,6 +60,7 @@ class InvestmentProjectStageValidationConfig:
             'actual_uk_regions': Stage.verify_win.value,
             'delivery_partners': Stage.verify_win.value,
             'actual_land_date': Stage.verify_win.value,
+            'specific_programme': Stage.verify_win.value,
         }
 
     @classmethod
