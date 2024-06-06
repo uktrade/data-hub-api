@@ -210,6 +210,7 @@ def test_earliest_interactions_are_being_selected(spi_report, ist_adviser):
     """Tests that report contains earliest interaction dates."""
     investment_project = InvestmentProjectFactory(
         project_manager=ist_adviser,
+        investor_type_id=InvestorTypeConstant.new_investor.value.id,
     )
 
     service_dates = (
@@ -242,6 +243,7 @@ def test_only_ist_interactions_are_being_selected(spi_report, ist_adviser):
     """Tests that report takes into account IST interactions only."""
     investment_project = InvestmentProjectFactory(
         project_manager=ist_adviser,
+        investor_type_id=InvestorTypeConstant.new_investor.value.id,
     )
 
     service_dates = (
