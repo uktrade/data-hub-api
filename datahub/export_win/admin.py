@@ -101,6 +101,11 @@ class CustomerResponseInlineForm(ModelForm):
         self.fields['name'].required = not is_instance_and_pk_exist
         self.fields['id'].widget.attrs['readonly'] = is_instance_and_pk_exist
 
+        # Disabled responded on form field so that it will lock down to users.
+        # Even if a user tampers field values, it will be  ignored in favour
+        # to initial form value, rather than using readonly attrs.
+        self.fields['responded_on'].widget.attrs['disabled'] = True
+
 
 class CustomerResponseInline(BaseStackedInline):
     """Customer response in line."""
