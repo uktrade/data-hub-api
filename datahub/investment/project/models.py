@@ -205,12 +205,10 @@ class IProjectAbstract(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
-    specific_programme = models.ForeignKey(
+    specific_programme = models.ManyToManyField(
         'investment.SpecificProgramme',
-        related_name='+',
-        null=True,
+        related_name='investment_projects',
         blank=True,
-        on_delete=models.SET_NULL,
     )
     client_contacts = models.ManyToManyField(
         'company.Contact',
