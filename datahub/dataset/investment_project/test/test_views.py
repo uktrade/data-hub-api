@@ -9,6 +9,7 @@ from datahub.core.constants import InvestmentProjectStage as InvestmentProjectSt
 from datahub.core.constants import Service as ServiceConstant
 from datahub.core.test_utils import (
     format_date_or_datetime,
+    get_attr_or_default,
     get_attr_or_none,
     str_or_none,
 )
@@ -153,7 +154,7 @@ def get_expected_data_from_project(project, won_date=None):
             'investor_company.sector.name',
         ),
         'investor_type__name': get_attr_or_none(project, 'investor_type.name'),
-        'level_of_involvement_name': get_attr_or_none(project, 'level_of_involvement.name'),
+        'level_of_involvement_name': get_attr_or_default(project, 'level_of_involvement.name', ''),
         'likelihood_to_land__name': get_attr_or_none(project, 'likelihood_to_land.name'),
         'modified_by_id': str_or_none(project.modified_by_id),
         'modified_on': format_date_or_datetime(project.modified_on),
