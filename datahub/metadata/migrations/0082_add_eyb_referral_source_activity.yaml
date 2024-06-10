@@ -1,0 +1,3 @@
+- model: metadata.referralsourceactivity
+  pk: bf61318c-f468-4d58-b6be-24b059c78a74
+  fields: { disabled_on: null, name: Expand Your Business (EYB) }
