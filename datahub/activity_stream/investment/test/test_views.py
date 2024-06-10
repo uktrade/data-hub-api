@@ -92,8 +92,7 @@ def test_investment_project_with_pm_added(api_client):
     Get a list of investment project and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
 
-    Investment Project with PM will have fields such as totalInvestment and
-    numberNewJobs.
+    Investment Project with PM will have fields such as totalInvestment.
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
     with freeze_time(start) as frozen_datetime:
@@ -134,7 +133,6 @@ def test_investment_project_with_pm_added(api_client):
                         project.estimated_land_date,
                     ),
                     'dit:totalInvestment': project.total_investment,
-                    'dit:numberNewJobs': project.number_new_jobs,
                     'attributedTo': [
                         {
                             'id': f'dit:DataHubCompany:{project.investor_company.pk}',

@@ -12,6 +12,7 @@ from datahub.company.test.factories import (
     ContactFactory,
 )
 from datahub.core.constants import (
+    Country,
     InvestmentBusinessActivity,
     InvestmentProjectStage,
     InvestmentStrategicDriver,
@@ -56,9 +57,6 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     estimated_land_date = date(2020, 1, 1)
     investment_type_id = InvestmentType.commitment_to_invest.value.id
     referral_source_activity_id = ReferralSourceActivity.cold_call.value.id
-    investor_type_id = InvestorType.new_investor.value.id
-    level_of_involvement_id = Involvement.no_involvement.value.id
-    specific_programme_id = SpecificProgramme.space.value.id
     stage_id = InvestmentProjectStage.prospect.value.id
     sector_id = Sector.aerospace_assembly_aircraft.value.id
     investor_company = factory.SubFactory(CompanyFactory)
@@ -129,7 +127,6 @@ class AssignPMInvestmentProjectFactory(InvestmentProjectFactory):
     stage_id = InvestmentProjectStage.assign_pm.value.id
     client_cannot_provide_total_investment = False
     total_investment = Decimal('100.0')
-    number_new_jobs = 0
     client_considering_other_countries = False
     client_requirements = factory.Faker('text')
     site_decided = False
@@ -160,6 +157,7 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
     client_cannot_provide_foreign_investment = False
     foreign_equity_investment = Decimal('100.0')
     government_assistance = False
+    number_new_jobs = 0
     number_safeguarded_jobs = 0
     r_and_d_budget = True
     non_fdi_r_and_d_budget = False
@@ -169,6 +167,13 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
     address_town = factory.Faker('city')
     address_postcode = factory.Faker('postcode')
     average_salary_id = SalaryRange.below_25000.value.id
+    specific_programme_id = SpecificProgramme.space.value.id
+    uk_company = factory.SubFactory(
+        CompanyFactory,
+        address_country_id=Country.united_kingdom.value.id,
+    )
+    investor_type_id = InvestorType.new_investor.value.id
+    level_of_involvement_id = Involvement.no_involvement.value.id
 
     @to_many_field
     def actual_uk_regions(self):

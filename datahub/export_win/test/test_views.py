@@ -26,7 +26,7 @@ pytestmark = pytest.mark.django_db
         ),
         (
             TeamTypeConstant.obn.value.id,
-            41,
+            43,
         ),
         (
             TeamTypeConstant.other.value.id,

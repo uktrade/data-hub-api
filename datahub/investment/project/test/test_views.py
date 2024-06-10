@@ -29,9 +29,13 @@ from datahub.core.test_utils import (
 from datahub.investment.project import views
 from datahub.investment.project.constants import (
     InvestmentActivityType,
+    InvestorType,
+    Involvement,
     LikelihoodToLand,
     ProjectManagerRequestStatus,
+    SpecificProgramme,
 )
+
 from datahub.investment.project.models import (
     InvestmentActivity,
     InvestmentDeliveryPartner,
@@ -76,7 +80,7 @@ class TestListView(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(project.id)
-        assert response_data['results'][0]['level_of_involvement_simplified'] == 'not_involved'
+        assert response_data['results'][0]['level_of_involvement_simplified'] == 'unspecified'
         assert response_data['results'][0].keys() == {
             'id',
             'incomplete_fields',
@@ -980,7 +984,6 @@ class TestRetrieveView(APITestMixin):
         response_data = response.json()
         incomplete_fields = (
             'client_cannot_provide_total_investment',
-            'number_new_jobs',
             'total_investment',
             'client_considering_other_countries',
             'client_requirements',
@@ -1354,7 +1357,6 @@ class TestPartialUpdateView(APITestMixin):
             'client_cannot_provide_total_investment': [
                 'This field is required.',
             ],
-            'number_new_jobs': ['This field is required.'],
             'total_investment': ['This field is required.'],
             'client_considering_other_countries': ['This field is required.'],
             'client_requirements': ['This field is required.'],
@@ -1370,7 +1372,6 @@ class TestPartialUpdateView(APITestMixin):
         project = InvestmentProjectFactory(
             client_cannot_provide_total_investment=False,
             total_investment=100,
-            number_new_jobs=0,
             client_considering_other_countries=False,
             client_requirements='client reqs',
             site_decided=False,
@@ -1452,7 +1453,6 @@ class TestPartialUpdateView(APITestMixin):
             'client_cannot_provide_total_investment': [
                 'This field is required.',
             ],
-            'number_new_jobs': ['This field is required.'],
             'total_investment': ['This field is required.'],
             'client_considering_other_countries': ['This field is required.'],
             'client_requirements': ['This field is required.'],
@@ -1486,7 +1486,6 @@ class TestPartialUpdateView(APITestMixin):
             [InvestmentProjectPermission.change_associated],
         )
         project = ActiveInvestmentProjectFactory(
-            number_new_jobs=1,
             project_manager=project_manager,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
@@ -1500,6 +1499,7 @@ class TestPartialUpdateView(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'government_assistance': ['This field is required.'],
+            'number_new_jobs': ['This field is required.'],
             'number_safeguarded_jobs': ['This field is required.'],
             'r_and_d_budget': ['This field is required.'],
             'non_fdi_r_and_d_budget': ['This field is required.'],
@@ -1510,10 +1510,13 @@ class TestPartialUpdateView(APITestMixin):
             'address_postcode': ['This field is required.'],
             'actual_uk_regions': ['This field is required.'],
             'delivery_partners': ['This field is required.'],
-            'average_salary': ['This field is required.'],
             'client_cannot_provide_foreign_investment': ['This field is required.'],
             'foreign_equity_investment': ['This field is required.'],
             'actual_land_date': ['This field is required.'],
+            'specific_programme': ['This field is required.'],
+            'uk_company': ['This field is required.'],
+            'investor_type': ['This field is required.'],
+            'level_of_involvement': ['This field is required.'],
         }
 
     @pytest.mark.parametrize(
@@ -1539,6 +1542,7 @@ class TestPartialUpdateView(APITestMixin):
             uk_region_locations=[random_obj_for_model(UKRegion)],
             actual_uk_regions=[random_obj_for_model(UKRegion)],
             government_assistance=False,
+            number_new_jobs=0,
             number_safeguarded_jobs=0,
             r_and_d_budget=True,
             non_fdi_r_and_d_budget=True,
@@ -1551,7 +1555,13 @@ class TestPartialUpdateView(APITestMixin):
             delivery_partners=[random_obj_for_model(InvestmentDeliveryPartner)],
             average_salary_id=constants.SalaryRange.below_25000.value.id,
             actual_land_date=factory.Faker('past_date'),
-            **extra,
+            specific_programme_id=SpecificProgramme.space.value.id,
+            uk_company=CompanyFactory(
+                address_country_id=constants.Country.united_kingdom.value.id,
+            ),
+            investor_type_id=InvestorType.new_investor.value.id,
+            level_of_involvement_id=Involvement.no_involvement.value.id,
+            ** extra,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {

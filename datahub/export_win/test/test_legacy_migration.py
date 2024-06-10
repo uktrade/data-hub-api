@@ -558,6 +558,14 @@ legacy_wins = {
                 'team_type': 'itt',
                 'win__id': '02ce5d82-5294-477a-ab9a-94782e7b2794',
             },
+            {  # For orphaned win adviser
+                'hq_team': 'itt:The North West International Trade Team',
+                'id': 3,
+                'location': 'London',
+                'name': 'John Smith',
+                'team_type': 'itt',
+                'win__id': 'a43f0333-f95e-4762-a258-0e9f4ed42b1c',
+            },
         ],
     },
 }
@@ -654,6 +662,9 @@ def test_legacy_migration(mock_legacy_wins_pages):
     assert win_1.total_expected_non_export_value == 0
     assert win_1.total_expected_odi_value == 0
     assert win_1.breakdowns.count() == 5
+    assert {breakdown.legacy_id for breakdown in win_1.breakdowns.all()} == {
+        5, 6, 7, 8, 9,
+    }
     assert win_1.migrated_on == current_date
     win_1_created_on = parser.parse('2024-01-22T01:12:47.221126Z').astimezone(timezone.utc)
     assert win_1.created_on == win_1_created_on
@@ -661,6 +672,7 @@ def test_legacy_migration(mock_legacy_wins_pages):
     win_1_responded_on = parser.parse('2024-01-23T01:12:47.221146Z').astimezone(timezone.utc)
     assert win_1.customer_response.responded_on == win_1_responded_on
 
+    assert win_1.advisers.count() == 1
     win_1_adviser = win_1.advisers.first()
     assert win_1_adviser.adviser is None
     assert win_1_adviser.name == 'John Doe'
@@ -757,6 +769,16 @@ def test_legacy_migration(mock_legacy_wins_pages):
     assert win_6.customer_response.other_marketing_source == ''
     assert win_6.line_manager == line_manager
     assert win_6.is_deleted is True
+
+    with freeze_time(current_date):
+        migrate_all_legacy_wins()
+
+    # After running migration again, the number of breakdowns and advisers shouldn't change
+    assert win_1.breakdowns.count() == 5
+    assert {breakdown.legacy_id for breakdown in win_1.breakdowns.all()} == {
+        5, 6, 7, 8, 9,
+    }
+    assert win_1.advisers.count() == 1
 
 
 @pytest.mark.parametrize(
