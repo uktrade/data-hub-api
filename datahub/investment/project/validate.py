@@ -63,6 +63,7 @@ class InvestmentProjectStageValidationConfig:
             'specific_programme': Stage.verify_win.value,
             'uk_company': Stage.verify_win.value,
             'investor_type': Stage.verify_win.value,
+            'level_of_involvement': Stage.verify_win.value,
         }
 
     @classmethod

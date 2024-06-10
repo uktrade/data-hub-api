@@ -30,6 +30,7 @@ from datahub.investment.project import views
 from datahub.investment.project.constants import (
     InvestmentActivityType,
     InvestorType,
+    Involvement,
     LikelihoodToLand,
     ProjectManagerRequestStatus,
     SpecificProgramme,
@@ -79,7 +80,7 @@ class TestListView(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(project.id)
-        assert response_data['results'][0]['level_of_involvement_simplified'] == 'not_involved'
+        assert response_data['results'][0]['level_of_involvement_simplified'] == 'unspecified'
         assert response_data['results'][0].keys() == {
             'id',
             'incomplete_fields',
@@ -1515,6 +1516,7 @@ class TestPartialUpdateView(APITestMixin):
             'specific_programme': ['This field is required.'],
             'uk_company': ['This field is required.'],
             'investor_type': ['This field is required.'],
+            'level_of_involvement': ['This field is required.'],
         }
 
     @pytest.mark.parametrize(
@@ -1558,6 +1560,7 @@ class TestPartialUpdateView(APITestMixin):
                 address_country_id=constants.Country.united_kingdom.value.id,
             ),
             investor_type_id=InvestorType.new_investor.value.id,
+            level_of_involvement_id=Involvement.no_involvement.value.id,
             ** extra,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
