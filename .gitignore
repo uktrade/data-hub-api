@@ -79,7 +79,7 @@ import.sh
 # docker things
 docker-compose.override.yml
 docker-volumes/
-.env
+*.env
 
 # celery
 celerybeat-schedule

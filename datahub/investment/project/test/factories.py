@@ -101,6 +101,10 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     def delivery_partners(self):
         """Add support for setting delivery_partners."""
 
+    @to_many_field
+    def specific_programmes(self):
+        """Add support for setting specific_programmes."""
+
     class Meta:
         model = 'investment.InvestmentProject'
 
@@ -184,6 +188,11 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
     def delivery_partners(self):
         """Sets default delivery partners."""
         return [random_obj_for_model(InvestmentDeliveryPartner)]
+
+    @to_many_field
+    def specific_programmes(self):
+        """Sets default specific programmes"""
+        return [SpecificProgramme.space.value.id]
 
 
 class WonInvestmentProjectFactory(VerifyWinInvestmentProjectFactory):

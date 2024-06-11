@@ -60,6 +60,8 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
         'created',
         'modified',
         'financial_year_verbose',
+        # Remove when migration to specific_programmes is complete
+        'specific_programme',
     )
     list_display = (
         'name',
@@ -71,6 +73,8 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
         'created_by',
         'modified_on',
         'modified_by',
+        # Remove when migration to specific_programmes is complete
+        'specific_programmes',
     )
 
     def financial_year_verbose(self, obj):
