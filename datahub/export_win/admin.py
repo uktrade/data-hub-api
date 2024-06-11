@@ -132,7 +132,7 @@ class WinAdminForm(ModelForm):
         fields = '__all__'
         labels = {
             'adviser': 'Creator',
-            'company_contacts': 'Contact name',
+            'company_contacts': 'Contact names',
             'total_expected_odi_value': 'Total expected ODI value',
         }
 
@@ -281,7 +281,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         return ', '.join(
             contact.name for contact in obj.company_contacts.all().order_by('last_name')
         )
-    get_contact_names.short_description = 'Contact name'
+    get_contact_names.short_description = 'Contact names'
 
     def get_actions(self, request):
         """Remove the delete selected action."""
@@ -331,6 +331,11 @@ class WinSoftDeletedAdminForm(ModelForm):
     class Meta:
         model = DeletedWin
         fields = '__all__'
+        labels = {
+            'adviser': 'Creator',
+            'company_contacts': 'Contact names',
+            'total_expected_odi_value': 'Total expected ODI value',
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
