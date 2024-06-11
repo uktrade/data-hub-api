@@ -117,6 +117,7 @@ class TestListView(APITestMixin):
             'intermediate_company',
             'level_of_involvement',
             'specific_programme',
+            'specific_programmes',
             'client_contacts',
             'client_relationship_manager',
             'client_relationship_manager_team',

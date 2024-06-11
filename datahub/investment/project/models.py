@@ -205,12 +205,20 @@ class IProjectAbstract(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
+    # TODO: specific_programme is being replaced with specific_programmes, and specific_programme
+    # will be removed once the migration to a to-many field is complete
     specific_programme = models.ForeignKey(
         'investment.SpecificProgramme',
         related_name='+',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+    )
+    specific_programmes = models.ManyToManyField(
+        'investment.SpecificProgramme',
+        # TODO: change related_name to + once this field has fully replaced specific_programme
+        related_name='investment_projects_m2m',
+        blank=True,
     )
     client_contacts = models.ManyToManyField(
         'company.Contact',
