@@ -101,11 +101,6 @@ class CustomerResponseInlineForm(ModelForm):
         self.fields['name'].required = not is_instance_and_pk_exist
         self.fields['id'].widget.attrs['readonly'] = is_instance_and_pk_exist
 
-        # Disabled responded on form field so that it will lock down to users.
-        # Even if a user tampers field values, it will be  ignored in favour
-        # to initial form value, rather than using readonly attrs.
-        self.fields['responded_on'].widget.attrs['disabled'] = True
-
 
 class CustomerResponseInline(BaseStackedInline):
     """Customer response in line."""
@@ -113,10 +108,20 @@ class CustomerResponseInline(BaseStackedInline):
     model = CustomerResponse
     form = CustomerResponseInlineForm
     readonly_fields = (
+        'responded_on',
         'lead_officer_email_notification_id',
         'lead_officer_email_delivery_status',
         'lead_officer_email_sent_on',
     )
+
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj)
+        if 'id' in fields and 'responded_on' in fields:
+            fields = list(fields)
+            fields.remove('responded_on')
+            id_index = fields.index('id')
+            fields.insert(id_index + 1, 'responded_on')
+        return fields
 
 
 class WinAdminForm(ModelForm):
