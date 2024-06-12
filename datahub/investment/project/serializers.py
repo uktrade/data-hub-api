@@ -69,6 +69,7 @@ CORE_FIELDS = (
     'intermediate_company',
     'level_of_involvement',
     'specific_programme',
+    'specific_programmes',
     'client_contacts',
     'client_relationship_manager',
     'client_relationship_manager_team',
@@ -325,6 +326,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
     level_of_involvement = NestedRelatedField(Involvement, required=False, allow_null=True)
     likelihood_to_land = NestedRelatedField(LikelihoodToLand, required=False, allow_null=True)
     specific_programme = NestedRelatedField(SpecificProgramme, required=False, allow_null=True)
+    specific_programmes = NestedRelatedField(SpecificProgramme, many=True, required=False)
     client_contacts = NestedRelatedField(
         Contact,
         many=True,
@@ -457,6 +459,9 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         update_status = _get_updated_status(instance=self.instance, data=data)
         if update_status:
             data['status'] = update_status
+
+        if 'specific_programme' in data:
+            data['specific_programmes'] = [data['specific_programme']]
 
         self._track_project_manager_request(data)
         return data
