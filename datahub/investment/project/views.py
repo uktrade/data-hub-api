@@ -127,6 +127,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
         'sector',
         'strategic_drivers',
         'uk_region_locations',
+        'specific_programmes',
         Prefetch('team_members', queryset=_team_member_queryset),
     )
     filter_backends = (
