@@ -326,7 +326,6 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
     level_of_involvement = NestedRelatedField(Involvement, required=False, allow_null=True)
     likelihood_to_land = NestedRelatedField(LikelihoodToLand, required=False, allow_null=True)
     specific_programme = NestedRelatedField(SpecificProgramme, required=False, allow_null=True)
-    specific_programmes = NestedRelatedField(SpecificProgramme, many=True, required=False)
     client_contacts = NestedRelatedField(
         Contact,
         many=True,
