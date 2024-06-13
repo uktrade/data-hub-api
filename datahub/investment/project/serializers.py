@@ -459,7 +459,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         if update_status:
             data['status'] = update_status
 
-        if 'specific_programme' in data:
+        if 'specific_programme' in data and data['specific_programme'] is not None:
             data['specific_programmes'] = [data['specific_programme']]
 
         self._track_project_manager_request(data)
