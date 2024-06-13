@@ -143,6 +143,7 @@ class SearchInteractionExportAPIView(SearchInteractionAPIViewMixin, SearchExport
         'policy_issue_type_names': 'Policy issue types',
         'policy_area_names': 'Policy areas',
         'policy_feedback_notes': 'Policy feedback notes',
+        'notes': 'Notes',
     }
 
 
@@ -256,6 +257,7 @@ class SearchInteractionPolicyFeedbackExportAPIView(
         'policy_issue_type_names': 'Policy issue types',
         'policy_area_names': 'Policy areas',
         'policy_feedback_notes': 'Policy feedback notes',
+        'notes': 'Notes',
         'adviser_names': 'advisers',
         'adviser_emails': 'adviser_emails',
         'tag_1': 'tag_1',
