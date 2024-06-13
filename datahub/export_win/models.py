@@ -466,6 +466,8 @@ class Win(BaseModel):
 
     objects = BaseExportWinSoftDeleteManager()
 
+    is_anonymous_win = models.BooleanField(default=False)
+
     def __str__(self):
         if self.adviser:
             return (f'Export win {self.pk}: {self.adviser} <{self.adviser.email}> - '
@@ -775,3 +777,10 @@ def update_total_values(sender, instance, **kwargs):
     win.total_expected_non_export_value = calc_total['total_non_export_value']
     win.total_expected_odi_value = calc_total['total_odi_value']
     win.save()
+
+
+class AnonymousWin(Win):
+    """Anonymous win"""
+
+    class Meta:
+        proxy = True
