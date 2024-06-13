@@ -30,8 +30,15 @@ from datahub.reminder.models import EmailDeliveryStatus
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class BaseExportWinSoftDeleteManager(models.Manager):
-    """Base class for Export win soft delete manager."""
+class BaseExportWinManager(models.Manager):
+    """Base manager for common export win queries."""
+
+    def all_wins(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs)
+
+
+class BaseExportWinSoftDeleteManager(BaseExportWinManager):
+    """Manager for handling non-deleted export win queries."""
 
     def get_queryset(self):
         return (
@@ -47,15 +54,16 @@ class BaseExportWinSoftDeleteManager(models.Manager):
             .filter(is_deleted=True)
         )
 
+
+class AnonymousWinManager(BaseExportWinManager):
+    """Manager for handling anonymous export win queries."""
+
     def anonymous_win(self, *args, **kwargs):
         return (
             super()
             .get_queryset(*args, **kwargs)
             .filter(is_anonymous_win=True)
         )
-
-    def all_wins(self, *args, **kwargs):
-        return super().get_queryset(*args, **kwargs)
 
 
 class BaseCustomerResponseSoftDeleteManager(models.Manager):
@@ -470,10 +478,10 @@ class Win(BaseModel):
     )
     is_deleted = models.BooleanField(default=False)
     migrated_on = models.DateTimeField(null=True, blank=True)
+    is_anonymous_win = models.BooleanField(default=False)
 
     objects = BaseExportWinSoftDeleteManager()
-
-    is_anonymous_win = models.BooleanField(default=False)
+    anonymous_objects = AnonymousWinManager()
 
     def __str__(self):
         if self.adviser:
