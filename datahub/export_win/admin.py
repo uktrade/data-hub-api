@@ -10,6 +10,7 @@ from reversion.admin import VersionAdmin
 from datahub.core.admin import BaseModelAdminMixin, EXPORT_WIN_GROUP_NAME
 
 from datahub.export_win.models import (
+    AnonymousWin,
     Breakdown,
     CustomerResponse,
     DeletedWin,
@@ -364,6 +365,53 @@ class DeletedWinAdmin(WinAdmin):
 
     def has_add_permission(self, request, obj=None):
         return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_view_permission(self, request, obj=None):
+        """Set the desired user group to access view deleted win"""
+        if (
+            request.user.is_superuser
+            or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
+        ):
+            return True
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+class AnonymousWinAdminForm(ModelForm):
+    """Win soft deleted admin form"""
+
+    class Meta:
+        model = AnonymousWin
+        fields = '__all__'
+        labels = {
+            'adviser': 'Creator',
+            'company_contacts': 'Contact names',
+            'total_expected_odi_value': 'Total expected ODI value',
+            'customer_email_address': 'Company email',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+@admin.register(AnonymousWin)
+class AnonymousWinAdmin(WinAdmin):
+    """Admin for Anonymous Wins."""
+
+    form = AnonymousWinAdminForm
+    inlines = (BreakdownInline, CustomerResponseInline, AdvisorInline)
+
+    def get_queryset(self, request):
+        """Return win queryset only for anonymous win."""
+        return self.model.objects.anonymous_win()
+
+    def has_add_permission(self, request, obj=None):
+        return True
 
     def has_delete_permission(self, request, obj=None):
         return False

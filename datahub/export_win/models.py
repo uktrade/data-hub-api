@@ -47,6 +47,13 @@ class BaseExportWinSoftDeleteManager(models.Manager):
             .filter(is_deleted=True)
         )
 
+    def anonymous_win(self, *args, **kwargs):
+        return (
+            super()
+            .get_queryset(*args, **kwargs)
+            .filter(is_anonymous_win=True)
+        )
+
     def all_wins(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs)
 
