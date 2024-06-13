@@ -1082,6 +1082,7 @@ class TestInteractionExportView(APITestMixin):
                     separator='; ',
                 ),
                 'Policy feedback notes': interaction.policy_feedback_notes,
+                'Notes': interaction.notes,
             }
             for interaction in sorted_interactions
         ]
@@ -1228,6 +1229,7 @@ class TestInteractionExportView(APITestMixin):
                     separator='; ',
                 ),
                 'Policy feedback notes': interaction.policy_feedback_notes,
+                'Notes': interaction.notes,
                 'advisers': _format_expected_advisers(interaction),
                 'adviser_emails': _format_expected_adviser_emails(interaction),
                 'tag_1': '',
