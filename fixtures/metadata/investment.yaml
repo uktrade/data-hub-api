@@ -47,7 +47,7 @@
   fields: {name: "Retention"}
 - model: metadata.fditype
   pk: 840f62c1-bbcb-44e4-b6d4-a258d2ffa07d
-  fields: {name: "Capital only"}
+  fields: {name: "Capital only (minimum investment value is £15 million)"}
 
 # InvestmentBusinessActivity
 - model: metadata.investmentbusinessactivity
