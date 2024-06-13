@@ -397,6 +397,8 @@ class AnonymousWinAdminForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if 'customer_email_address' in self.fields:
+            self.fields['customer_email_address'].required = False
 
 
 @admin.register(AnonymousWin)
@@ -406,9 +408,17 @@ class AnonymousWinAdmin(WinAdmin):
     form = AnonymousWinAdminForm
     inlines = (BreakdownInline, CustomerResponseInline, AdvisorInline)
 
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.is_personally_confirmed = True
+            obj.is_line_manager_confirmed = True
+            obj.is_anonymous_win = True
+            obj.adviser = request.user
+        super().save_model(request, obj, form, change)
+
     def get_queryset(self, request):
         """Return win queryset only for anonymous win."""
-        return self.model.objects.anonymous_win()
+        return self.model.anonymous_objects.anonymous_win()
 
     def has_add_permission(self, request, obj=None):
         return True
