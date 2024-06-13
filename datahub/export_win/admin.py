@@ -382,7 +382,7 @@ class DeletedWinAdmin(WinAdmin):
         return False
 
 
-class AnonymousWinAdminForm(ModelForm):
+class AnonymousWinAdminForm(WinAdminForm):
     """Win soft deleted admin form"""
 
     class Meta:
@@ -427,7 +427,7 @@ class AnonymousWinAdmin(WinAdmin):
         return False
 
     def has_view_permission(self, request, obj=None):
-        """Set the desired user group to access view deleted win"""
+        """Set the desired user group to access view anonymous win"""
         if (
             request.user.is_superuser
             or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
