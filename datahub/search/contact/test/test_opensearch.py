@@ -320,6 +320,7 @@ def test_get_basic_search_query():
                                 'company_number',
                                 'contact.name',
                                 'contact.name.trigram',
+                                'contacts.id',
                                 'contacts.name',
                                 'contacts.name.trigram',
                                 'country.trigram',
