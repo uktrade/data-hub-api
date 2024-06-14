@@ -337,7 +337,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'team_type_display': win.team_type.name,
             'num_notifications': len(tokens),
             'customer_email_date':
-                format_date_or_datetime(max(tokens, key=lambda item: item.created_on).created_on),
+                format_date_or_datetime(min(tokens, key=lambda item: item.created_on).created_on),
         }
         for i, associated_programme in enumerate(associated_programmes):
             expected[f'associated_programme_{i+1}_display'] = associated_programme.name
@@ -411,12 +411,12 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             ]
             assert {True, False} == set(completes)
 
-    def test_customer_email_date_uses_most_recent(self, data_flow_api_client):
+    def test_customer_email_date_uses_oldest(self, data_flow_api_client):
         win = self.factory()
         customer_response = CustomerResponseFactory(win=win)
         created_on = date.today()
         with freeze_time(created_on) as frozen_time:
-            customer_response_token_today = CustomerResponseTokenFactory(
+            CustomerResponseTokenFactory(
                 customer_response=customer_response,
                 created_on=created_on,
             )
@@ -428,12 +428,12 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             )
 
             frozen_time.move_to(created_on - timedelta(days=7))
-            CustomerResponseTokenFactory(
+            customer_response_token_week_ago = CustomerResponseTokenFactory(
                 customer_response=customer_response,
                 created_on=created_on,
             )
 
         response = data_flow_api_client.get(self.view_url).json()
         assert response['results'][0]['customer_email_date'] == format_date_or_datetime(
-            customer_response_token_today.created_on,
+            customer_response_token_week_ago.created_on,
         )
