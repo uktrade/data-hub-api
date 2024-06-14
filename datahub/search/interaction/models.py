@@ -11,7 +11,7 @@ from datahub.search.models import BaseSearchModel
 def _contact_field():
     return Object(
         properties={
-            'id': Keyword(index=False),
+            'id': Keyword(),
             'first_name': Text(index=False),
             'last_name': Text(index=False),
             'name': Text(
@@ -139,6 +139,7 @@ class Interaction(BaseSearchModel):
         'company.name.trigram',
         'companies.name',
         'companies.name.trigram',
+        'contacts.id',
         'contacts.name',  # to find 2-letter words
         'contacts.name.trigram',
         'event.name',
