@@ -29,6 +29,7 @@ class SearchInteractionQuerySerializer(EntitySearchQuerySerializer):
     service = SingleOrListField(child=StringUUIDField(), required=False)
     sector_descends = SingleOrListField(child=StringUUIDField(), required=False)
     was_policy_feedback_provided = serializers.BooleanField(required=False)
+    contacts = SingleOrListField(child=StringUUIDField(), required=False)
 
     DEFAULT_ORDERING = SearchOrdering('date', SortDirection.desc)
 
