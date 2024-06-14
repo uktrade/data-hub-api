@@ -49,6 +49,7 @@ class SearchInteractionAPIViewMixin:
         'sector_descends',
         'service',
         'was_policy_feedback_provided',
+        'contacts',
     )
     REMAP_FIELDS = {
         'company': 'company.id',
@@ -60,6 +61,7 @@ class SearchInteractionAPIViewMixin:
         'policy_areas': 'policy_areas.id',
         'policy_issue_types': 'policy_issue_types.id',
         'service': 'service.id',
+        'contacts': 'contacts.id',
     }
 
     COMPOSITE_FILTERS = {
