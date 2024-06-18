@@ -14,7 +14,10 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
 from datahub.core.test_utils import AdminTestMixin
 from datahub.investment.project.admin import InvestmentProjectAdmin
-from datahub.investment.project.constants import FDISICGrouping as FDISICGroupingConstant
+from datahub.investment.project.constants import (
+    FDISICGrouping as FDISICGroupingConstant,
+    SpecificProgramme,
+)
 
 from datahub.investment.project.models import (
     GVAMultiplier,
@@ -305,3 +308,94 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
 
         # GVA Multiplier - Aircraft - 2022
         assert investment_project.gva_multiplier.multiplier == Decimal('0.209650945')
+
+    def test_add_specific_programmes(self):
+        """
+        Test that adding an investment project with specific_programmes values also sets the
+        specific_programme field.
+        """
+
+        url = reverse('admin:investment_investmentproject_add')
+
+        investment_project_pk = str(uuid4())
+        specific_programmes = [UUID(SpecificProgramme.innovation_gateway.value.id), UUID(
+            SpecificProgramme.space.value.id),]
+        data = {
+            'name': 'name 318',
+            'description': 'desc 318',
+            'investment_type': str(constants.InvestmentType.fdi.value.id),
+            'stage': str(constants.InvestmentProjectStage.active.value.id),
+            'status': 'ongoing',
+            'project_manager': str(AdviserFactory().pk),
+            'proposal_deadline': '2017-04-19',
+            'specific_programmes': specific_programmes,
+            'id': investment_project_pk,
+        }
+        response = self.client.post(url, data, follow=True)
+        assert response.status_code == status.HTTP_200_OK
+
+        investment_project = InvestmentProject.objects.get(pk=investment_project_pk)
+        assert set(investment_project.specific_programmes.all().values_list(
+            'id', flat=True)) == set(specific_programmes)
+
+        assert investment_project.specific_programme_id == specific_programmes[0]
+
+    def test_update_specific_programme_to_non_null(self):
+        """
+        Test that updating an investment project with a specific_programmes value also sets the
+        specific_programme field.
+        """
+
+        investment_project = InvestmentProjectFactory()
+        url = reverse('admin:investment_investmentproject_change', args=(investment_project.pk,))
+
+        specific_programmes = [UUID(SpecificProgramme.innovation_gateway.value.id), UUID(
+            SpecificProgramme.space.value.id)]
+
+        data = {
+            'name': 'name 318',
+            'description': 'desc 318',
+            'investment_type': str(constants.InvestmentType.fdi.value.id),
+            'stage': str(constants.InvestmentProjectStage.active.value.id),
+            'status': 'ongoing',
+            'project_manager': str(AdviserFactory().pk),
+            'proposal_deadline': '2017-04-19',
+            'id': investment_project.pk,
+            'specific_programmes': specific_programmes,
+        }
+
+        response = self.client.post(url, data, follow=True)
+        assert response.status_code == status.HTTP_200_OK
+
+        investment_project.refresh_from_db()
+        assert set(investment_project.specific_programmes.all().values_list(
+            'id', flat=True)) == set(specific_programmes)
+        assert investment_project.specific_programme_id == specific_programmes[0]
+
+    def test_update_specific_programme_to_null(self):
+        """
+        Test that removing all specific_programmes from an investment project clears
+        the specific_programme field.
+        """
+        investment_project = InvestmentProjectFactory()
+        url = reverse('admin:investment_investmentproject_change', args=(investment_project.pk,))
+
+        data = {
+            'name': 'name 318',
+            'description': 'desc 318',
+            'investment_type': str(constants.InvestmentType.fdi.value.id),
+            'stage': str(constants.InvestmentProjectStage.active.value.id),
+            'status': 'ongoing',
+            'project_manager': str(AdviserFactory().pk),
+            'proposal_deadline': '2017-04-19',
+            'id': investment_project.pk,
+            'specific_programmes': [],
+        }
+
+        response = self.client.post(url, data=data, follow=True)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        investment_project.refresh_from_db()
+        assert investment_project.specific_programme is None
+        assert investment_project.specific_programmes.count() == 0
