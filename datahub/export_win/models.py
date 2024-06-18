@@ -757,6 +757,13 @@ class CustomerResponseToken(models.Model):
         on_delete=models.CASCADE)
     times_used = models.PositiveIntegerField(default=0)
     created_on = models.DateTimeField(db_index=True, null=True, blank=True, auto_now_add=True)
+    adviser = models.ForeignKey(
+        Advisor,
+        related_name='admin_tokens',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return f'Token: {self.id} ({self.expires_on})'
