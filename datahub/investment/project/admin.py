@@ -91,6 +91,10 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
             obj.project_manager_first_assigned_on = now()
             obj.project_manager_first_assigned_by = request.user
 
+        if 'specific_programmes' in form.cleaned_data:
+            specific_programmes = form.cleaned_data['specific_programmes']
+            obj.specific_programme = specific_programmes[0] if specific_programmes else None
+
         super().save_model(request, obj, form, change)
 
 
