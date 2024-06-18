@@ -408,6 +408,8 @@ class AnonymousWinAdminForm(WinAdminForm):
         super().__init__(*args, **kwargs)
         if 'customer_email_address' in self.fields:
             self.fields['customer_email_address'].required = False
+        if 'lead_officer' in self.fields:
+            self.fields['lead_officer'].required = True
 
 
 @admin.register(AnonymousWin)
@@ -418,16 +420,20 @@ class AnonymousWinAdmin(WinAdmin):
     inlines = (BreakdownInline, CustomerResponseInline, AdvisorInline)
 
     def save_model(self, request, obj, form, change):
-        with transaction.atomic():
+        with transaction.atomic(), reversion.create_revision():
             if not change:
                 obj.is_personally_confirmed = True
                 obj.is_line_manager_confirmed = True
                 obj.is_anonymous_win = True
                 obj.adviser = request.user
             super().save_model(request, obj, form, change)
+
+            # Customer response will be created upon wins being saved
+            if not change:
+                customer_response = CustomerResponse.objects.create(win=obj)
+                self.notify_wins_company_contacts(request.user, customer_response)
+
             reversion.set_comment('Anonymous Win created')
-            # implements to create customer response instance
-            # call a function notify_wins_company_contacts(company_contacts, customer_response)
 
     def get_queryset(self, request):
         """Return win queryset only for anonymous win."""
@@ -451,26 +457,26 @@ class AnonymousWinAdmin(WinAdmin):
     def has_change_permission(self, request, obj=None):
         return False
 
-    def notify_wins_company_contacts(company_contacts, customer_response):
+    def notify_wins_company_contacts(self, adviser, customer_response):
         """Notify anonymous wins contacts"""
 
-        for company_contact in company_contacts:
-            token = create_token_for_contact(
-                company_contact,
-                customer_response,
-            )
-            context = get_all_fields_for_client_email_receipt(
-                token,
-                customer_response,
-            )
-            template_id = settings.EXPORT_WIN_CLIENT_RECEIPT_TEMPLATE_ID
-            notify_export_win_email_by_rq_email(
-                company_contact.email,
-                template_id,
-                context,
-                update_customer_response_token_for_email_notification_id,
-                token.id,
-            )
+        token = create_token_for_contact(
+            None,
+            customer_response,
+            adviser,
+        )
+        context = get_all_fields_for_client_email_receipt(
+            token,
+            customer_response,
+        )
+        template_id = settings.EXPORT_WIN_CLIENT_RECEIPT_TEMPLATE_ID
+        notify_export_win_email_by_rq_email(
+            adviser.contact_email,
+            template_id,
+            context,
+            update_customer_response_token_for_email_notification_id,
+            token.id,
+        )
 
 
 @admin.register(WinAdviser)
