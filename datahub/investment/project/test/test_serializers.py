@@ -1,5 +1,6 @@
 from unittest.mock import Mock
 from uuid import uuid4
+
 import pytest
 
 
@@ -205,8 +206,8 @@ class TestManyRelatedAsSingleItemField:
             (
                 MockQuerySet([MOCK_ITEM_1, MOCK_ITEM_2]),
                 {'id': str(MOCK_ITEM_1.pk), 'name': MOCK_ITEM_1.name},
-            )
-        )
+            ),
+        ),
     )
     def test_to_representation(self, value, expected):
         """Tests that to_representation() returns a single item as a dict."""
