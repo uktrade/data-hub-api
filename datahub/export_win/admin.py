@@ -391,8 +391,8 @@ class DeletedWinAdmin(WinAdmin):
         return False
 
 
-class AnonymousWinAdminForm(WinAdminForm):
-    """Win soft deleted admin form"""
+class AnonymousWinAdminForm(ModelForm):
+    """Admin form for Anonymous Wins."""
 
     class Meta:
         model = AnonymousWin
@@ -406,6 +406,7 @@ class AnonymousWinAdminForm(WinAdminForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         if 'customer_email_address' in self.fields:
             self.fields['customer_email_address'].required = False
         if 'lead_officer' in self.fields:
