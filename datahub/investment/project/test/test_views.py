@@ -562,7 +562,6 @@ class TestCreateView(APITestMixin):
 
         TODO: Remove once specific_programmes field has fully replace specific_programme field.
         """
-
         contacts = [ContactFactory(), ContactFactory()]
         investor_company = CompanyFactory(
             address_country_id=constants.Country.united_kingdom.value.id,
@@ -654,7 +653,6 @@ class TestCreateView(APITestMixin):
 
         TODO: Remove once specific_programmes field has fully replace specific_programme field.
         """
-
         contacts = [ContactFactory(), ContactFactory()]
         investor_company = CompanyFactory(
             address_country_id=constants.Country.united_kingdom.value.id,

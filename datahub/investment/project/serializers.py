@@ -338,7 +338,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         ),
         'one_specific_programme_field': gettext_lazy(
             'Only one of specific_programme and specific_programmes should be provided.',
-        )
+        ),
     }
 
     project_code = serializers.CharField(read_only=True)
@@ -360,7 +360,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         SpecificProgramme,
         source='specific_programmes',
         required=False,
-        allow_null=True
+        allow_null=True,
     )
     specific_programmes = NestedRelatedField(SpecificProgramme, many=True, required=False)
     client_contacts = NestedRelatedField(

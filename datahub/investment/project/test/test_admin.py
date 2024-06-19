@@ -314,12 +314,11 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
         Test that adding an investment project with specific_programmes values also sets the
         specific_programme field.
         """
-
         url = reverse('admin:investment_investmentproject_add')
 
         investment_project_pk = str(uuid4())
         specific_programmes = [UUID(SpecificProgramme.innovation_gateway.value.id), UUID(
-            SpecificProgramme.space.value.id),]
+            SpecificProgramme.space.value.id)]
         data = {
             'name': 'name 318',
             'description': 'desc 318',
@@ -345,7 +344,6 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
         Test that updating an investment project with a specific_programmes value also sets the
         specific_programme field.
         """
-
         investment_project = InvestmentProjectFactory()
         url = reverse('admin:investment_investmentproject_change', args=(investment_project.pk,))
 

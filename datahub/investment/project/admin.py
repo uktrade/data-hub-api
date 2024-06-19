@@ -62,7 +62,6 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
         'financial_year_verbose',
         # Remove when migration to specific_programmes is complete
         'specific_programme',
-        'specific_programmes',
     )
     list_display = (
         'name',
