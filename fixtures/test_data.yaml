@@ -127,6 +127,14 @@
     last_name: Greene
     dit_team: fc3a6667-cfe9-e511-8ffa-e4115bead28a # IST - Sector Advisory Services
 
+- model: company.advisor
+  pk: 8eefe6b4-2816-4e47-94b5-a13409dcef71
+  fields:
+    email: wins.admin@example.com
+    first_name: Wins
+    last_name: Admin
+    dit_team: fc3a6667-cfe9-e511-8ffa-e4115bead28a # Anonymous Export Wins Admin
+
 - model: company.company
   pk: a73efeba-8499-11e6-ae22-56b6b6499611
   fields:
@@ -2312,7 +2320,7 @@
     is_line_manager_confirmed: False
     name_of_customer: "Overseas Customer"
     name_of_customer_confidential: True
-    export_experience: 587928e3-cab1-45cb-ba49-0656b6d2f867    
+    export_experience: 587928e3-cab1-45cb-ba49-0656b6d2f867
     lead_officer_name: "Dave"
     line_manager_name: "Dave"
     company_name: "Test company name"
@@ -2347,7 +2355,7 @@
     is_line_manager_confirmed: False
     name_of_customer: "Overseas Customer"
     name_of_customer_confidential: True
-    export_experience: 587928e3-cab1-45cb-ba49-0656b6d2f867    
+    export_experience: 587928e3-cab1-45cb-ba49-0656b6d2f867
     lead_officer_name: "Dave"
     line_manager_name: "Dave"
     company_name: "Test company name"
@@ -2415,3 +2423,52 @@
     times_used: 7
     expires_on: "2028-06-15T10:00:00Z"
     created_on: "2024-03-27T11:00:00Z"
+
+- model: export_win.Win
+  pk: b3ebfa88-c1d7-4db3-822f-e8bafeaa72c0
+  fields:
+    adviser: 8eefe6b4-2816-4e47-94b5-a13409dcef71
+    lead_officer: 453a608e-84a4-11e6-ea22-56b6b6499622
+    hq_team: b9afc253-5aa1-498f-b5d7-d43dad1ced82
+    team_type: 1f6eccf9-289a-450b-a4af-b75600ea521b
+    business_potential: 0e6f1d69-e9c3-4460-a74b-3881930fe3e9
+    business_type: "The best type"
+    description: "Anonymous Description"
+    name_of_export: "Anonymous Sand"
+    date: "2024-06-21"
+    country: 9f5f66a0-5d95-e211-a939-e4115bead28a
+    total_expected_export_value: 158778
+    total_expected_non_export_value: 525478
+    total_expected_odi_value: 88987
+    goods_vs_services: 8711e3dd-3a2c-4b47-aea7-9a53c135efb6
+    sector: b422c9d2-5f95-e211-a939-e4115bead28a
+    type_of_support: [1ed7f465-1461-4d66-b4a2-8d704ea239a8]
+    associated_programme: [b6f5c31a-aa45-4ae0-89bd-2eb3ab943f76]
+    is_personally_confirmed: True
+    is_line_manager_confirmed: True
+    name_of_customer: "Overseas Customer"
+    name_of_customer_confidential: True
+    export_experience: 587928e3-cab1-45cb-ba49-0656b6d2f867
+    lead_officer_name: "John Doe"
+    line_manager_name: "JD LM"
+    company_name: "Test company name"
+    cdms_reference: "1234"
+    created_on: "2024-06-21T11:00:00Z"
+    modified_on: "2024-06-21T11:00:00Z"
+    is_anonymous_win: True
+
+- model: export_win.CustomerResponse
+  pk: cfc13695-f801-41e1-ab01-c3c1888abe53
+  fields:
+    win: b3ebfa88-c1d7-4db3-822f-e8bafeaa72c0
+    name: "Sarah Gates"
+    created_on: "2024-06-22T11:00:00Z"
+    modified_on: "2024-06-22T11:00:00Z"
+
+- model: export_win.CustomerResponseToken
+  pk: c6231b1e-5709-4e92-a1a6-9bb4c0c543a5
+  fields:
+    customer_response: cfc13695-f801-41e1-ab01-c3c1888abe53
+    times_used: 7
+    expires_on: "2028-06-21T10:00:00Z"
+    created_on: "2024-06-21T11:00:00Z"

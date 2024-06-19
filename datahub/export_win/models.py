@@ -62,7 +62,7 @@ class AnonymousWinManager(BaseExportWinManager):
         return (
             super()
             .get_queryset(*args, **kwargs)
-            .filter(is_anonymous_win=True)
+            .filter(is_anonymous_win=True, is_deleted=False)
         )
 
 
