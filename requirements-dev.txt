@@ -120,7 +120,7 @@ faker==15.3.4
     # via factory-boy
 filelock==3.8.2
     # via virtualenv
-flake8==7.0.0
+flake8==7.1.0
     # via
     #   -r requirements-dev.in
     #   flake8-bugbear
@@ -249,7 +249,7 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.2
     # via stack-data
-pycodestyle==2.11.0
+pycodestyle==2.12.0
     # via
     #   flake8
     #   flake8-debugger
