@@ -399,7 +399,8 @@ class AnonymousWinAdminForm(ModelForm):
         fields = '__all__'
         labels = {
             'adviser': 'Creator',
-            'company_contacts': 'Contact names',
+            'company': 'Company (Please keep it blank to make anonymous)',
+            'company_contacts': 'Contact names (Please keep it blank to make anonymous)',
             'total_expected_odi_value': 'Total expected ODI value',
             'customer_email_address': 'Company email',
         }
@@ -407,8 +408,17 @@ class AnonymousWinAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if 'customer_email_address' in self.fields:
-            self.fields['customer_email_address'].required = False
+        customer_details_fields = {
+            'cdms_reference': 'Data Hub (Companies House) or CDMS reference number',
+            'customer_email_address': 'Contact email',
+            'customer_job_title': 'Job title',
+        }
+
+        for field_name, label in customer_details_fields.items():
+            if field_name in self.fields:
+                self.fields[field_name].required = False
+                self.fields[field_name].label = f'{label} (legacy)'
+
         if 'lead_officer' in self.fields:
             self.fields['lead_officer'].required = True
 
@@ -432,7 +442,7 @@ class AnonymousWinAdmin(WinAdmin):
             # Customer response will be created upon wins being saved
             if not change:
                 customer_response = CustomerResponse.objects.create(win=obj)
-                self.notify_wins_company_contacts(request.user, customer_response)
+                self.notify_anonymous_wins_adviser_as_contact(request.user, customer_response)
 
             reversion.set_comment('Anonymous Win created')
 
@@ -458,8 +468,8 @@ class AnonymousWinAdmin(WinAdmin):
     def has_change_permission(self, request, obj=None):
         return False
 
-    def notify_wins_company_contacts(self, adviser, customer_response):
-        """Notify anonymous wins contacts"""
+    def notify_anonymous_wins_adviser_as_contact(self, adviser, customer_response):
+        """Notify anonymous wins adviser as contacts"""
 
         token = create_token_for_contact(
             None,
