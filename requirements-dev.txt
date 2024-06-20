@@ -9,7 +9,9 @@ aiohttp==3.9.4
 aiosignal==1.3.1
     # via aiohttp
 asgiref==3.6.0
-    # via django
+    # via
+    #   django
+    #   django-axes
 astroid==3.2.2
     # via pylint
 asttokens==2.2.1
@@ -22,11 +24,11 @@ attrs==22.2.0
     # via
     #   aiohttp
     #   flake8-bugbear
-bigtree==0.18.3
+bigtree==0.19.0
     # via -r requirements.in
-boto3==1.34.122
+boto3==1.34.127
     # via -r requirements.in
-botocore==1.34.122
+botocore==1.34.127
     # via
     #   boto3
     #   s3transfer
@@ -70,7 +72,7 @@ django==4.2.11
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==6.4.0
+django-axes==6.5.0
     # via -r requirements.in
 django-csp==3.8
     # via -r requirements.in
@@ -102,7 +104,7 @@ docopt==0.6.2
     # via notifications-python-client
 ecs-logging==2.0.2
     # via elastic-apm
-elastic-apm==6.22.2
+elastic-apm==6.22.3
     # via -r requirements.in
 events==0.5
     # via opensearch-py
@@ -120,7 +122,7 @@ faker==15.3.4
     # via factory-boy
 filelock==3.8.2
     # via virtualenv
-flake8==7.0.0
+flake8==7.1.0
     # via
     #   -r requirements-dev.in
     #   flake8-bugbear
@@ -249,7 +251,7 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.2
     # via stack-data
-pycodestyle==2.11.0
+pycodestyle==2.12.0
     # via
     #   flake8
     #   flake8-debugger
@@ -396,7 +398,7 @@ tzdata==2023.3
     # via pandas
 uritemplate==4.1.1
     # via -r requirements.in
-urllib3==1.26.18
+urllib3==1.26.19
     # via
     #   botocore
     #   elastic-apm
