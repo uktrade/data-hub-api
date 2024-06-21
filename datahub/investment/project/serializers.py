@@ -7,6 +7,7 @@ from django.db.transaction import atomic
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
+from rest_framework.settings import api_settings
 
 import datahub.metadata.models as meta_models
 from datahub.company.models import Company, Contact
@@ -68,6 +69,7 @@ CORE_FIELDS = (
     'investor_company_country',
     'intermediate_company',
     'level_of_involvement',
+    # TODO: Remove specific_programme following depracation
     'specific_programme',
     'specific_programmes',
     'client_contacts',
@@ -297,6 +299,32 @@ class NoteAwareModelSerializer(serializers.ModelSerializer):
         return activity.validated_data
 
 
+class _ManyRelatedAsSingleItemField(NestedRelatedField):
+    """
+    Serializer field that makes to-many field behave like a to-one field.
+
+    Use for temporary backwards compatibility when migrating a to-one field to be a to-many field
+    (so that a to-one field can emulated using a to-many field).
+
+    This isn't intended to be used in any other way as if the to-many field contains multiple
+    items, only one of them will be returned, and all of them will overwritten on updates.
+
+    TODO: Remove this once specific_programme has been removed from investment projects.
+    """
+
+    def run_validation(self, data=serializers.empty):
+        """Validate a user-provided value and return the internal value (converted to a list)"""
+        validated_value = super().run_validation(data)
+        return [validated_value] if validated_value else []
+
+    def to_representation(self, value):
+        """Converts a query set to a dict representation of the first item in the query set."""
+        if not value.exists():
+            return None
+
+        return super().to_representation(value.first())
+
+
 class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerializer):
     """Serialiser for investment project endpoints."""
 
@@ -307,6 +335,9 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         ),
         'only_ivt_can_move_to_won': gettext_lazy(
             'Only the Investment Verification Team can move the project to the ‘Won’ stage.',
+        ),
+        'one_specific_programme_field': gettext_lazy(
+            'Only one of specific_programme and specific_programmes should be provided.',
         ),
     }
 
@@ -325,7 +356,12 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
     intermediate_company = NestedRelatedField(Company, required=False, allow_null=True)
     level_of_involvement = NestedRelatedField(Involvement, required=False, allow_null=True)
     likelihood_to_land = NestedRelatedField(LikelihoodToLand, required=False, allow_null=True)
-    specific_programme = NestedRelatedField(SpecificProgramme, required=False, allow_null=True)
+    specific_programme = _ManyRelatedAsSingleItemField(
+        SpecificProgramme,
+        source='specific_programmes',
+        required=False,
+        allow_null=True,
+    )
     specific_programmes = NestedRelatedField(SpecificProgramme, many=True, required=False)
     client_contacts = NestedRelatedField(
         Contact,
@@ -422,6 +458,24 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
     proposal_deadline = serializers.DateField(required=False, allow_null=True)
     stage_log = NestedInvestmentProjectStageLogSerializer(many=True, read_only=True)
 
+    def to_internal_value(self, data):
+        """
+        Checks that specific_programme and specific_programmes haven't both been provided.
+
+        Note: On serializers, to_internal_value() is called before validate().
+
+        TODO: Remove once specific_programme is removed from the API.
+        """
+        if 'specific_programme' in data and 'specific_programmes' in data:
+            error = {
+                api_settings.NON_FIELD_ERRORS_KEY: [
+                    self.error_messages['one_specific_programme_field'],
+                ],
+            }
+            raise serializers.ValidationError(error, code='one_specific_programme_field')
+
+        return super().to_internal_value(data)
+
     def save(self, **kwargs):
         """Saves when and who assigned a project manager for the first time."""
         if 'project_manager' in self.validated_data and (
@@ -460,8 +514,9 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         if update_status:
             data['status'] = update_status
 
-        if 'specific_programme' in data and data['specific_programme'] is not None:
-            data['specific_programmes'] = [data['specific_programme']]
+        if 'specific_programmes' in data:
+            specific_programmes = data['specific_programmes']
+            data['specific_programme'] = specific_programmes[0] if specific_programmes else None
 
         self._track_project_manager_request(data)
         return data

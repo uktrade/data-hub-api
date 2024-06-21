@@ -112,7 +112,6 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
         'referral_source_activity_website',
         'referral_source_activity',
         'referral_source_adviser',
-        'specific_programme',
         'stage',
         'uk_company__address_country',
         'uk_company',
