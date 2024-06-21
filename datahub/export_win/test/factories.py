@@ -279,6 +279,16 @@ class LegacyExportWinsToDataHubCompanyFactory(factory.django.DjangoModelFactory)
         model = 'export_win.LegacyExportWinsToDataHubCompany'
 
 
+class LegacyExportWinsToDataHubAdminUserFactory(factory.django.DjangoModelFactory):
+    """LegacyExportWinsToDataHubAdminUser factory."""
+
+    email = factory.Faker('email')
+    adviser = factory.SubFactory(AdviserFactory)
+
+    class Meta:
+        model = 'export_win.LegacyExportWinsToDataHubAdminUser'
+
+
 class HVCFactory(factory.django.DjangoModelFactory):
     """HVC factory."""
 
