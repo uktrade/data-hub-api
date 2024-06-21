@@ -60,6 +60,7 @@ class InvestmentProjectStageValidationConfig:
             'actual_uk_regions': Stage.verify_win.value,
             'delivery_partners': Stage.verify_win.value,
             'actual_land_date': Stage.verify_win.value,
+            # TODO: Change this to specific_programmes when fully removing specific_programme
             'specific_programme': Stage.verify_win.value,
             'uk_company': Stage.verify_win.value,
             'investor_type': Stage.verify_win.value,

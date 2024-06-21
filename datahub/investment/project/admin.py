@@ -62,7 +62,6 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
         'financial_year_verbose',
         # Remove when migration to specific_programmes is complete
         'specific_programme',
-        'specific_programmes',
     )
     list_display = (
         'name',
@@ -90,6 +89,10 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
         if obj.project_manager and first_assigned:
             obj.project_manager_first_assigned_on = now()
             obj.project_manager_first_assigned_by = request.user
+
+        if 'specific_programmes' in form.cleaned_data:
+            specific_programmes = form.cleaned_data['specific_programmes']
+            obj.specific_programme = specific_programmes[0] if specific_programmes else None
 
         super().save_model(request, obj, form, change)
 

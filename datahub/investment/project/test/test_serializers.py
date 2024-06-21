@@ -1,9 +1,14 @@
+from unittest.mock import Mock
+from uuid import uuid4
+
 import pytest
 
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
+from datahub.core.test_utils import MockQuerySet
 from datahub.investment.project.serializers import (
+    _ManyRelatedAsSingleItemField,
     IProjectSerializer,
     IProjectTeamMemberListSerializer,
     IProjectTeamMemberSerializer,
@@ -166,3 +171,45 @@ class TestIProjectSerializer:
         assert str(
             serializer.validated_data['country_investment_originates_from'],
         ) == constants.Country.argentina.value.name
+
+
+class TestManyRelatedAsSingleItemField:
+    """Tests fo _ManyRelatedAsSingleItemField."""
+
+    MOCK_ITEM_1 = Mock(pk=uuid4())
+    MOCK_ITEM_2 = Mock(pk=uuid4())
+
+    @pytest.mark.parametrize(
+        'value,expected',
+        (
+            (None, []),
+            ({'id': str(MOCK_ITEM_1.pk)}, [MOCK_ITEM_1]),
+        ),
+    )
+    def test_run_validation(self, value, expected):
+        """Test that run_vlaidation() returns a list."""
+        model = Mock(objects=MockQuerySet([self.MOCK_ITEM_1]))
+        field = _ManyRelatedAsSingleItemField(model, allow_null=True)
+        assert field.run_validation(value) == expected
+
+    @pytest.mark.parametrize(
+        'value,expected',
+        (
+            (
+                MockQuerySet([]),
+                None,
+            ),
+            (
+                MockQuerySet([MOCK_ITEM_1]),
+                {'id': str(MOCK_ITEM_1.pk), 'name': MOCK_ITEM_1.name},
+            ),
+            (
+                MockQuerySet([MOCK_ITEM_1, MOCK_ITEM_2]),
+                {'id': str(MOCK_ITEM_1.pk), 'name': MOCK_ITEM_1.name},
+            ),
+        ),
+    )
+    def test_to_representation(self, value, expected):
+        """Tests that to_representation() returns a single item as a dict."""
+        field = _ManyRelatedAsSingleItemField(Mock())
+        assert field.to_representation(value) == expected
