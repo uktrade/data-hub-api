@@ -1,11 +1,17 @@
 from datetime import datetime
 
+from functools import lru_cache
 from logging import getLogger
 
 from dateutil.parser import parse
 
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
+from django.db import router
 from django.db.models import Q
 from django.db.models.functions import Lower
+
+from reversion.models import Revision, Version
 
 from datahub.company.models import (
     Advisor,
@@ -26,6 +32,7 @@ from datahub.export_win.models import (
     HQTeamRegionOrPost,
     HVC,
     HVOProgrammes,
+    LegacyExportWinsToDataHubAdminUser,
     LegacyExportWinsToDataHubCompany,
     MarketingSource,
     Rating,
@@ -543,6 +550,70 @@ def migrate_all_legacy_wins():
     update_legacy_win_totals()
 
     return wins
+
+
+def format_change_message(content_type_id, object_id, adviser_id, action_flag, change_message):
+    dummy_log_entry = LogEntry(
+        action_flag=action_flag,
+        change_message=change_message,
+        user_id=adviser_id,
+        content_type_id=content_type_id,
+        object_id=object_id,
+        object_repr='',
+    )
+    return dummy_log_entry.get_change_message()
+
+
+@lru_cache(maxsize=None)
+def legacy_user_email_to_data_hub_adviser_id(legacy_user_email):
+    return LegacyExportWinsToDataHubAdminUser.objects.get(
+        email=legacy_user_email,
+    ).adviser_id
+
+
+def migrate_legacy_edit_history(content_type_id, edit_history):
+    try:
+        win = Win.objects.get(pk=edit_history['object_id'])
+        adviser_id = legacy_user_email_to_data_hub_adviser_id(
+            edit_history['user__email'],
+        )
+        change_message = format_change_message(
+            content_type_id=content_type_id,
+            object_id=win.pk,
+            adviser_id=adviser_id,
+            action_flag=edit_history['action_flag'],
+            change_message=edit_history['change_message'],
+        )
+        action_time = parse(edit_history['action_time'])
+        revision = Revision.objects.create(
+            date_created=action_time,
+            user_id=adviser_id,
+            comment=change_message,
+        )
+        db = router.db_for_write(Win)
+        version = Version.objects.create(
+            revision=revision,
+            object_id=win.pk,
+            content_type_id=content_type_id,
+            format='json',
+            serialized_data='[]',
+            object_repr=str(win),
+            db=db,
+        )
+        return version
+
+    except Win.DoesNotExist:
+        logger.warning(f'Legacy Win {edit_history["id"]} does not exist.')
+        pass
+
+    return None
+
+
+def migrate_edit_history():
+    content_type_id = ContentType.objects.get_for_model(Win).pk
+    for page in get_legacy_export_wins_dataset('/datasets/data-hub-edit-history'):
+        for legacy_edit_history in page:
+            migrate_legacy_edit_history(content_type_id, legacy_edit_history)
 
 
 def _email_mapping(email):

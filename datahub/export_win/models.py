@@ -746,12 +746,25 @@ class CustomerResponseToken(models.Model):
 
 
 class LegacyExportWinsToDataHubCompany(models.Model):
-    """Maps legacy export win to data hub company."""
+    """Maps Legacy Export win to Data Hub company."""
 
     id = models.UUIDField(primary_key=True)
     company = models.ForeignKey(
         Company,
         related_name='legacy_wins',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
+
+
+class LegacyExportWinsToDataHubAdminUser(models.Model):
+    """Maps Legacy Export win admin user to Data Hub adviser."""
+
+    email = models.CharField(max_length=MAX_LENGTH)
+    adviser = models.ForeignKey(
+        Advisor,
+        related_name='legacy_admin_user',
         null=True,
         blank=True,
         on_delete=models.CASCADE,

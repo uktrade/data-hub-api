@@ -5,9 +5,11 @@ import pytest
 from dateutil import parser
 
 from django.conf import settings
+from django.contrib.admin.models import LogEntry
 from freezegun import freeze_time
 
 from rest_framework import status
+from reversion.models import Version
 
 from datahub.company.test.factories import (
     AdviserFactory,
@@ -18,13 +20,16 @@ from datahub.core.test_utils import HawkMockJSONResponse
 from datahub.export_win.legacy_migration import (
     _email_mapping,
     migrate_all_legacy_wins,
+    migrate_edit_history,
 )
 from datahub.export_win.models import (
     Win,
 )
 from datahub.export_win.test.factories import (
+    LegacyExportWinsToDataHubAdminUserFactory,
     LegacyExportWinsToDataHubCompanyFactory,
 )
+
 
 pytestmark = pytest.mark.django_db
 
@@ -44,6 +49,11 @@ mock_legacy_wins_page_urls = {
         f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-advisors',
         f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-advisors?cursor=1&source=L',
         f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-advisors?cursor=2&source=E',
+    ],
+    'edit-history': [
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-edit-history',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-edit-history'
+        '?cursor=1&source=L',
     ],
 }
 
@@ -568,6 +578,47 @@ legacy_wins = {
             },
         ],
     },
+    mock_legacy_wins_page_urls['edit-history'][0]: {
+        'next': mock_legacy_wins_page_urls['edit-history'][1],
+        'results': [
+            {
+                'id': 24,
+                'object_id': '4c90a214-035f-4445-b6a1-ca7af3486f8c',
+                'action_time': '2020-02-29T12:47:50.062940Z',
+                'user__name': 'John Doe',
+                'user__email': 'john.doe@test',
+                'action_flag': 2,
+                'change_message': '[{\"changed\": {\"fields\": [\"audit\"]}}]',
+            },
+        ],
+    },
+    mock_legacy_wins_page_urls['edit-history'][1]: {
+        'next': None,
+        'results': [
+            {
+                'id': 25,
+                'object_id': '4c90a214-035f-4445-b6a1-ca7af3486f8c',
+                'action_time': '2020-02-29T12:49:50.122120Z',
+                'user__name': 'User email',
+                'user__email': '!!!user.email@test',
+                'action_flag': 2,
+                'change_message': '[{\"changed\": {\"fields\": [\"audit\", \"export_experience\"]'
+                '}}, {\"changed\": {\"name\": \"customer response\", '
+                '\"object\": \"Export win 4c90a214-035f-4445-b6a1-ca7af3486f8c: '
+                'John Doe <foo-5@bar.com> - 2024-01-22 01:12:47\", \"fields\": '
+                '[\"other_marketing_source\"]}}]',
+            },
+            {  # For orphaned win
+                'id': 26,
+                'object_id': '1c90a214-035f-4445-b6a1-ca7af3486e8c',
+                'action_time': '2020-02-29T12:47:50.062940Z',
+                'user__name': 'John Doe',
+                'user__email': 'john.doe@test',
+                'action_flag': 2,
+                'change_message': '[{\"changed\": {\"fields\": [\"audit\"]}}]',
+            },
+        ],
+    },
 }
 
 
@@ -779,6 +830,36 @@ def test_legacy_migration(mock_legacy_wins_pages):
         5, 6, 7, 8, 9,
     }
     assert win_1.advisers.count() == 1
+
+    LegacyExportWinsToDataHubAdminUserFactory(
+        email='john.doe@test',
+        adviser=adviser,
+    )
+    LegacyExportWinsToDataHubAdminUserFactory(
+        email='!!!user.email@test',
+        adviser=adviser2,
+    )
+    migrate_edit_history()
+
+    versions = Version.objects.get_for_object(win_1)
+    assert versions.count() == 2
+    object_ids = {version.object_id for version in versions}
+    assert object_ids == {str(win_1.id)}
+    adviser_ids = {version.revision.user.id for version in versions}
+    assert adviser_ids == {adviser.id, adviser2.id}
+    messages = {version.revision.comment for version in versions}
+    assert messages == {
+        'Changed audit.',
+        'Changed audit and export_experience. Changed other_marketing_source for '
+        'customer response “Export win 4c90a214-035f-4445-b6a1-ca7af3486f8c: John '
+        'Doe <foo-5@bar.com> - 2024-01-22 01:12:47”.',
+    }
+    dates = {version.revision.date_created for version in versions}
+    assert dates == {
+        datetime(2020, 2, 29, 12, 47, 50, 62940, tzinfo=timezone.utc),
+        datetime(2020, 2, 29, 12, 49, 50, 122120, tzinfo=timezone.utc),
+    }
+    assert LogEntry.objects.count() == 0
 
 
 @pytest.mark.parametrize(
