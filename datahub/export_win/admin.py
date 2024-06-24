@@ -399,8 +399,8 @@ class AnonymousWinAdminForm(ModelForm):
         fields = '__all__'
         labels = {
             'adviser': 'Creator',
-            'company': 'Company (Please keep it blank to make anonymous)',
-            'company_contacts': 'Contact names (Please keep it blank to make anonymous)',
+            'company': 'Company (leave blank for an anonymous win)',
+            'company_contacts': 'Contact names (leave blank for an anonymous win)',
             'total_expected_odi_value': 'Total expected ODI value',
             'customer_email_address': 'Company email',
         }
@@ -466,11 +466,10 @@ class AnonymousWinAdmin(WinAdmin):
         return False
 
     def has_change_permission(self, request, obj=None):
-        return False
+        return True
 
     def notify_anonymous_wins_adviser_as_contact(self, adviser, customer_response):
-        """Notify anonymous wins adviser as contacts"""
-
+        """Notify anonymous wins adviser as contact"""
         token = create_token_for_contact(
             None,
             customer_response,
