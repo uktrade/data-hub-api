@@ -412,6 +412,10 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
             DBInvestmentProject,
             Cast('actual_uk_regions__name', CharField()),
         ),
+        specific_programme_names=get_string_agg_subquery(
+            DBInvestmentProject,
+            Cast('specific_programmes__name', CharField()),
+        ),
         investor_company_global_account_manager=Case(
             When(
                 investor_company__global_headquarters__isnull=False,
@@ -463,7 +467,7 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
                 'delivery_partner_names': 'Delivery partners',
                 'uk_region_location_names': 'Possible UK regions',
                 'actual_uk_region_names': 'Actual UK regions',
-                'specific_programme__name': 'Specific investment programme',
+                'specific_programme_names': 'Specific investment programmes',
                 'referral_source_activity__name': 'Referral source activity',
                 'referral_source_activity_website__name': 'Referral source activity website',
                 'total_investment': 'Total investment',

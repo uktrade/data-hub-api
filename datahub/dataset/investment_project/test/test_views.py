@@ -185,7 +185,10 @@ def get_expected_data_from_project(project, won_date=None):
             'referral_source_activity_website.name',
         ),
         'sector_name': get_attr_or_none(project, 'sector.name'),
-        'specific_programme__name': get_attr_or_none(project, 'specific_programme.name'),
+        'specific_programme_names': (
+            [specific_programme.name for specific_programme in
+             project.specific_programmes.order_by('name')]
+        )if project.specific_programmes.exists() else None,
         'stage__name': get_attr_or_none(project, 'stage.name'),
         'status': project.status,
         'strategic_driver_names': (

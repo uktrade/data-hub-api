@@ -108,7 +108,7 @@ def test_investment_project_to_dict(opensearch):
         'gross_value_added',
         'government_assistance',
         'some_new_jobs',
-        'specific_programme',
+        'specific_programmes',
         'number_new_jobs',
         'will_new_jobs_last_two_years',
         'average_salary',
