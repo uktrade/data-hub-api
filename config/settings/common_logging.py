@@ -49,4 +49,5 @@ sentry_sdk.init(
         DjangoIntegration(),
     ],
     in_app_include=['datahub'],
+    enable_tracing=True,
 )
