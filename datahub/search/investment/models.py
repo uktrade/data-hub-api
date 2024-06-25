@@ -118,7 +118,7 @@ class InvestmentProject(BaseSearchModel):
     sector = fields.sector_field()
     site_decided = Boolean()
     some_new_jobs = Boolean()
-    specific_programme = fields.id_name_field()
+    specific_programmes = fields.id_name_field()
     stage = fields.id_name_field()
     status = fields.NormalizedKeyword()
     team_members = fields.contact_or_adviser_field(include_dit_team=True)
@@ -170,7 +170,7 @@ class InvestmentProject(BaseSearchModel):
         'referral_source_activity_website': dict_utils.id_name_dict,
         'referral_source_adviser': dict_utils.contact_or_adviser_dict,
         'sector': dict_utils.sector_dict,
-        'specific_programme': dict_utils.id_name_dict,
+        'specific_programmes': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'stage': dict_utils.id_name_dict,
         'team_members': lambda col: [
             dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()

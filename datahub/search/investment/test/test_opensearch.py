@@ -584,7 +584,7 @@ def test_mapping(opensearch):
             },
             'site_decided': {'type': 'boolean'},
             'some_new_jobs': {'type': 'boolean'},
-            'specific_programme': {
+            'specific_programmes': {
                 'properties': {
                     'id': {'type': 'keyword'},
                     'name': {
