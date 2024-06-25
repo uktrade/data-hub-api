@@ -571,9 +571,12 @@ def legacy_user_email_to_data_hub_adviser_id(legacy_user_email):
     ).adviser_id
 
 
-def migrate_legacy_edit_history(content_type_id, edit_history):
+def migrate_legacy_edit_history(content_type_id, edit_history, soft_deleted=False):
     try:
-        win = Win.objects.get(pk=edit_history['object_id'])
+        if soft_deleted:
+            win = Win.objects.soft_deleted().get(pk=edit_history['object_id'])
+        else:
+            win = Win.objects.get(pk=edit_history['object_id'])
         adviser_id = legacy_user_email_to_data_hub_adviser_id(
             edit_history['user__email'],
         )
@@ -603,17 +606,17 @@ def migrate_legacy_edit_history(content_type_id, edit_history):
         return version
 
     except Win.DoesNotExist:
-        logger.warning(f'Legacy Win {edit_history["id"]} does not exist.')
+        logger.warning(f'Legacy Win {edit_history["object_id"]} does not exist.')
         pass
 
     return None
 
 
-def migrate_edit_history():
+def migrate_edit_history(soft_deleted=False):
     content_type_id = ContentType.objects.get_for_model(Win).pk
     for page in get_legacy_export_wins_dataset('/datasets/data-hub-edit-history'):
         for legacy_edit_history in page:
-            migrate_legacy_edit_history(content_type_id, legacy_edit_history)
+            migrate_legacy_edit_history(content_type_id, legacy_edit_history, soft_deleted)
 
 
 def _email_mapping(email):
