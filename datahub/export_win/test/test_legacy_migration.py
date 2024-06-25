@@ -617,6 +617,15 @@ legacy_wins = {
                 'action_flag': 2,
                 'change_message': '[{\"changed\": {\"fields\": [\"audit\"]}}]',
             },
+            {  # For soft deleted win
+                'id': 27,
+                'object_id': '5778b485-1060-46e2-b411-772cd0f76d79',
+                'action_time': '2020-02-29T12:47:50.062940Z',
+                'user__name': 'John Doe',
+                'user__email': 'john.doe@test',
+                'action_flag': 2,
+                'change_message': '[{\"changed\": {\"fields\": [\"audit\"]}}]',
+            },
         ],
     },
 }
@@ -841,6 +850,7 @@ def test_legacy_migration(mock_legacy_wins_pages):
     )
     migrate_edit_history()
 
+    assert Version.objects.all().count() == 2
     versions = Version.objects.get_for_object(win_1)
     assert versions.count() == 2
     object_ids = {version.object_id for version in versions}
@@ -858,6 +868,25 @@ def test_legacy_migration(mock_legacy_wins_pages):
     assert dates == {
         datetime(2020, 2, 29, 12, 47, 50, 62940, tzinfo=timezone.utc),
         datetime(2020, 2, 29, 12, 49, 50, 122120, tzinfo=timezone.utc),
+    }
+    assert LogEntry.objects.count() == 0
+
+    migrate_edit_history(soft_deleted=True)
+    assert Version.objects.all().count() == 3
+    assert Version.objects.get_for_object(win_1).count() == 2
+    versions = Version.objects.get_for_object(win_6)
+    assert versions.count() == 1
+    object_ids = {version.object_id for version in versions}
+    assert object_ids == {str(win_6.id)}
+    adviser_ids = {version.revision.user.id for version in versions}
+    assert adviser_ids == {adviser.id}
+    messages = {version.revision.comment for version in versions}
+    assert messages == {
+        'Changed audit.',
+    }
+    dates = {version.revision.date_created for version in versions}
+    assert dates == {
+        datetime(2020, 2, 29, 12, 47, 50, 62940, tzinfo=timezone.utc),
     }
     assert LogEntry.objects.count() == 0
 
