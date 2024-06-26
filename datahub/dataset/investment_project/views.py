@@ -104,6 +104,12 @@ class InvestmentProjectsDatasetView(BaseFilterDatasetView):
                 'client_contacts__email',
                 ordering=('client_contacts__email',),
             ),
+            specific_programme_names=get_array_agg_subquery(
+                InvestmentProject.specific_programmes.through,
+                'investmentproject',
+                'specificprogramme__name',
+                ordering=('specificprogramme__name',),
+            ),
         ).values(
             'actual_land_date',
             'actual_uk_region_names',
@@ -161,7 +167,7 @@ class InvestmentProjectsDatasetView(BaseFilterDatasetView):
             'referral_source_activity_marketing__name',
             'referral_source_activity_website__name',
             'sector_name',
-            'specific_programme__name',
+            'specific_programme_names',
             'stage__name',
             'status',
             'strategic_driver_names',

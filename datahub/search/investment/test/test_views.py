@@ -1739,9 +1739,8 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Actual UK regions': join_attr_values(
                     project.actual_uk_regions.order_by('name'),
                 ),  # noqa: E123
-                'Specific investment programme': get_attr_or_none(
-                    project,
-                    'specific_programme.name',
+                'Specific investment programmes': join_attr_values(
+                    project.specific_programmes.order_by('name'),
                 ),
                 'Referral source activity': get_attr_or_none(
                     project,
