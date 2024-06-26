@@ -48,7 +48,6 @@ class InvestmentSearchApp(SearchApp):
         'sector',
         'sector__parent',
         'sector__parent__parent',
-        'specific_programme',
         'stage',
         'uk_company',
         'investor_company__one_list_account_owner',
@@ -57,6 +56,7 @@ class InvestmentSearchApp(SearchApp):
         'delivery_partners',
         'uk_region_locations',
         'interactions',
+        'specific_programmes',
         Prefetch(
             'team_members',
             queryset=InvestmentProjectTeamMember.objects.select_related('adviser__dit_team'),

@@ -171,7 +171,6 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
     address_town = factory.Faker('city')
     address_postcode = factory.Faker('postcode')
     average_salary_id = SalaryRange.below_25000.value.id
-    specific_programme_id = SpecificProgramme.space.value.id
     uk_company = factory.SubFactory(
         CompanyFactory,
         address_country_id=Country.united_kingdom.value.id,

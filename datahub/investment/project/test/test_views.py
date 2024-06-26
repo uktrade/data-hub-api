@@ -116,7 +116,6 @@ class TestListView(APITestMixin):
             'investor_company_country',
             'intermediate_company',
             'level_of_involvement',
-            'specific_programme',
             'specific_programmes',
             'client_contacts',
             'client_relationship_manager',
@@ -554,187 +553,6 @@ class TestCreateView(APITestMixin):
         assert response_data['country_investment_originates_from']['id'] == str(
             investor_company.address_country.id,
         )
-
-    def test_specific_programmes_copied_to_specific_programme(self):
-        """
-        Test that the value provided in the specific_programmes field is copied to
-        specific_programme when an investment project is created
-
-        TODO: Remove once specific_programmes field has fully replace specific_programme field.
-        """
-        contacts = [ContactFactory(), ContactFactory()]
-        investor_company = CompanyFactory(
-            address_country_id=constants.Country.united_kingdom.value.id,
-        )
-        intermediate_company = CompanyFactory()
-        adviser = AdviserFactory()
-        url = reverse('api-v3:investment:investment-collection')
-        aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
-        new_site_id = constants.FDIType.creation_of_new_site_or_activity.value.id
-        retail_business_activity_id = constants.InvestmentBusinessActivity.retail.value.id
-        other_business_activity_id = constants.InvestmentBusinessActivity.other.value.id
-        project_manager_request_status_id = ProjectManagerRequestStatus.requested.value.id
-        activities = [
-            {
-                'id': retail_business_activity_id,
-            },
-            {
-                'id': other_business_activity_id,
-            },
-        ]
-        specific_programmes = [uuid.UUID(SpecificProgramme.innovation_gateway.value.id), uuid.UUID(
-            SpecificProgramme.space.value.id)]
-
-        request_data = {
-            'name': 'project name',
-            'description': 'project description',
-            'anonymous_description': 'project anon description',
-            'estimated_land_date': '2020-12-12',
-            'quotable_as_public_case_study': True,
-            'likelihood_to_land': {
-                'id': LikelihoodToLand.medium.value.id,
-            },
-            'priority': '1_low',
-            'investment_type': {
-                'id': constants.InvestmentType.fdi.value.id,
-            },
-            'stage': {
-                'id': constants.InvestmentProjectStage.prospect.value.id,
-            },
-            'business_activities': activities,
-            'other_business_activity': 'New innovation centre',
-            'client_contacts': [
-                {
-                    'id': str(contacts[0].id),
-                },
-                {
-                    'id': str(contacts[1].id),
-                },
-            ],
-            'client_relationship_manager': {
-                'id': str(adviser.id),
-            },
-            'fdi_type': {
-                'id': new_site_id,
-            },
-            'investor_company': {
-                'id': str(investor_company.id),
-            },
-            'intermediate_company': {
-                'id': str(intermediate_company.id),
-            },
-            'referral_source_activity': {
-                'id': constants.ReferralSourceActivity.cold_call.value.id,
-            },
-            'referral_source_adviser': {
-                'id': str(adviser.id),
-            },
-            'sector': {
-                'id': str(aerospace_id),
-            },
-            'project_manager_request_status': {
-                'id': str(project_manager_request_status_id),
-            },
-            'foreign_equity_investment': 1000,
-            'number_new_jobs': 200,
-            'specific_programmes': specific_programmes,
-        }
-        response = self.api_client.post(url, data=request_data)
-        assert response.status_code == status.HTTP_201_CREATED
-        investment_project = InvestmentProject.objects.get(pk=response.json()['id'])
-        assert investment_project.specific_programme_id == specific_programmes[0]
-        assert set(investment_project.specific_programmes.all().values_list(
-            'id', flat=True)) == set(specific_programmes)
-
-    def test_providing_specific_programmes_and_specific_programme_returns_an_error(self):
-        """
-        Test that if both specific_programmes and specific_programme are provided, an error is
-        returned.
-
-        TODO: Remove once specific_programmes field has fully replace specific_programme field.
-        """
-        contacts = [ContactFactory(), ContactFactory()]
-        investor_company = CompanyFactory(
-            address_country_id=constants.Country.united_kingdom.value.id,
-        )
-        intermediate_company = CompanyFactory()
-        adviser = AdviserFactory()
-        url = reverse('api-v3:investment:investment-collection')
-        aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
-        new_site_id = constants.FDIType.creation_of_new_site_or_activity.value.id
-        retail_business_activity_id = constants.InvestmentBusinessActivity.retail.value.id
-        other_business_activity_id = constants.InvestmentBusinessActivity.other.value.id
-        project_manager_request_status_id = ProjectManagerRequestStatus.requested.value.id
-        activities = [
-            {
-                'id': retail_business_activity_id,
-            },
-            {
-                'id': other_business_activity_id,
-            },
-        ]
-        specific_programmes = [uuid.UUID(SpecificProgramme.innovation_gateway.value.id), uuid.UUID(
-            SpecificProgramme.space.value.id)]
-
-        request_data = {
-            'name': 'project name',
-            'description': 'project description',
-            'anonymous_description': 'project anon description',
-            'estimated_land_date': '2020-12-12',
-            'quotable_as_public_case_study': True,
-            'likelihood_to_land': {
-                'id': LikelihoodToLand.medium.value.id,
-            },
-            'priority': '1_low',
-            'investment_type': {
-                'id': constants.InvestmentType.fdi.value.id,
-            },
-            'stage': {
-                'id': constants.InvestmentProjectStage.prospect.value.id,
-            },
-            'business_activities': activities,
-            'other_business_activity': 'New innovation centre',
-            'client_contacts': [
-                {
-                    'id': str(contacts[0].id),
-                },
-                {
-                    'id': str(contacts[1].id),
-                },
-            ],
-            'client_relationship_manager': {
-                'id': str(adviser.id),
-            },
-            'fdi_type': {
-                'id': new_site_id,
-            },
-            'investor_company': {
-                'id': str(investor_company.id),
-            },
-            'intermediate_company': {
-                'id': str(intermediate_company.id),
-            },
-            'referral_source_activity': {
-                'id': constants.ReferralSourceActivity.cold_call.value.id,
-            },
-            'referral_source_adviser': {
-                'id': str(adviser.id),
-            },
-            'sector': {
-                'id': str(aerospace_id),
-            },
-            'project_manager_request_status': {
-                'id': str(project_manager_request_status_id),
-            },
-            'foreign_equity_investment': 1000,
-            'number_new_jobs': 200,
-            'specific_programmes': specific_programmes,
-            'specific_programme': specific_programmes[0],
-        }
-        response = self.api_client.post(url, data=request_data)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {'non_field_errors': [
-            'Only one of specific_programme and specific_programmes should be provided.']}
 
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""
@@ -1695,7 +1513,7 @@ class TestPartialUpdateView(APITestMixin):
             'client_cannot_provide_foreign_investment': ['This field is required.'],
             'foreign_equity_investment': ['This field is required.'],
             'actual_land_date': ['This field is required.'],
-            'specific_programme': ['This field is required.'],
+            'specific_programmes': ['This field is required.'],
             'uk_company': ['This field is required.'],
             'investor_type': ['This field is required.'],
             'level_of_involvement': ['This field is required.'],
@@ -1737,7 +1555,7 @@ class TestPartialUpdateView(APITestMixin):
             delivery_partners=[random_obj_for_model(InvestmentDeliveryPartner)],
             average_salary_id=constants.SalaryRange.below_25000.value.id,
             actual_land_date=factory.Faker('past_date'),
-            specific_programme_id=SpecificProgramme.space.value.id,
+            specific_programmes=[SpecificProgramme.space.value.id],
             uk_company=CompanyFactory(
                 address_country_id=constants.Country.united_kingdom.value.id,
             ),
