@@ -29,6 +29,7 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
         child=StringUUIDField(),
         required=False,
     )
+    adviser = SingleOrListField(child=StringUUIDField(), required=False,)
     latest_interaction_date_after = RelaxedDateField(required=False)
     latest_interaction_date_before = RelaxedDateField(required=False)
     uk_postcode = SingleOrListField(child=serializers.CharField(), required=False)

@@ -50,6 +50,7 @@ class Company(BaseSearchModel):
     address = fields.address_field()
     registered_address = fields.address_field()
     one_list_group_global_account_manager = _adviser_field_with_indexed_id()
+    # adviser = _adviser_field_with_indexed_id()
     trading_names = fields.TextWithTrigram()
     turnover_range = fields.id_name_field()
     uk_region = fields.id_name_field()
@@ -72,6 +73,10 @@ class Company(BaseSearchModel):
         'registered_address': partial(dict_utils.address_dict, prefix='registered_address'),
         'one_list_group_global_account_manager': dict_utils.computed_field_function(
             'get_one_list_group_global_account_manager',
+            dict_utils.contact_or_adviser_dict,
+        ),
+        'adviser': dict_utils.computed_field_function(
+            'get_one_list_group_core_team',
             dict_utils.contact_or_adviser_dict,
         ),
         'export_to_countries': lambda obj: [

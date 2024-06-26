@@ -205,14 +205,21 @@ class SearchAPIView(APIView):
 
     def validate_data(self, data):
         """Validate and clean data."""
+        print("***** VALIDATE_DATA *******")
+        print(data)
+        print(self.serializer_class)
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
         return serializer.validated_data
 
     def get_base_query(self, request, validated_data):
         """Gets a filtered OpenSearch query for the provided search parameters."""
+        print('***** get_base_query search app *****')
+        print(request)
+        print(validated_data)
         filter_data = self._get_filter_data(validated_data)
-
+        print("*** FILTER DATA: ***")
+        print(filter_data)
         # Handle sector filtering...
         if 'sector_descends' in filter_data.keys():
             sector_ids = filter_data['sector_descends']
@@ -271,7 +278,9 @@ class SearchAPIView(APIView):
     def post(self, request, format=None):
         """Performs search."""
         data = request.data.copy()
-
+        print("**** post *****")
+        print(request)
+        # print(data)
         # to support legacy paging parameters that can be in query_string
         for legacy_query_param in ('limit', 'offset'):
             if (

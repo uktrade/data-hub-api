@@ -65,6 +65,7 @@ class SearchCompanyAPIViewMixin:
         'one_list_tier',
         'duns_number',
         'company_number',
+        # 'adviser',
     )
 
     REMAP_FIELDS = {
@@ -74,6 +75,7 @@ class SearchCompanyAPIViewMixin:
         'future_interest_countries': 'future_interest_countries.id',
         'one_list_group_global_account_manager': 'one_list_group_global_account_manager.id',
         'one_list_tier': 'one_list_tier.id',
+        'adviser': 'adviser.id',
     }
 
     COMPOSITE_FILTERS = {
@@ -117,6 +119,9 @@ class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
         )
 
     def get_base_query(self, request, validated_data):
+        print("######## HERE #########")
+        # print(vars(request))
+        print(validated_data)
         base_query = super().get_base_query(request, validated_data)
 
         raw_query = base_query.to_dict()
