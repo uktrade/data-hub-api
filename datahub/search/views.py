@@ -257,6 +257,8 @@ class SearchAPIView(APIView):
         extra_filters = self.get_extra_filters(validated_data)
         if extra_filters:
             return query.filter(extra_filters)
+        print('******** QUERY *******')
+        print(query.to_dict())
         return query
 
     def get_sort(self, ordering):
@@ -291,7 +293,8 @@ class SearchAPIView(APIView):
 
         validated_data = self.validate_data(data)
         query = self.get_base_query(request, validated_data)
-
+        print('**** QUERY IN POST ****')
+        print(query.to_dict())
         limited_query = limit_search_query(
             query,
             offset=validated_data['offset'],
@@ -299,7 +302,9 @@ class SearchAPIView(APIView):
         )
 
         results = execute_search_query(limited_query)
-
+        print('***** RESULTS *****')
+        print(results)
+        print(results.to_dict())
         response = {
             'count': results.hits.total.value,
             'results': [x.to_dict() for x in results.hits],

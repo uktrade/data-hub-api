@@ -584,6 +584,8 @@ class Company(ArchivableModel, BaseModel):
             }
             for team_member in team_members
         )
+        print('*** CORE TEAM ***')
+        print(core_team)
         return core_team
 
     def get_one_list_group_global_account_manager(self):

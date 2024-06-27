@@ -119,6 +119,14 @@ def contact_or_adviser_dict(obj, include_dit_team=False):
     return data
 
 
+def our_contact_or_adviser_list_of_dicts(list_of_obj):
+    print('***** LIST OF OBJECTS *****')
+    print(list_of_obj)
+    if list_of_obj is None:
+        return None
+    return [contact_or_adviser_dict(obj["adviser"]) for obj in list_of_obj]
+
+
 def contact_or_adviser_list_of_dicts(manager):
     """Creates a list of dicts from a manager for contacts or advisers."""
     return _list_of_dicts(contact_or_adviser_dict, manager)
@@ -161,7 +169,7 @@ def computed_field_function(function_name, dict_func):
             raise ValueError(f'"{function_name}" is not callable.')
 
         return dict_func(field())
-
+    print('********** IM IN THE COMPUTED FIELD FUNCTION *********')
     return get_dict
 
 

@@ -65,7 +65,7 @@ class SearchCompanyAPIViewMixin:
         'one_list_tier',
         'duns_number',
         'company_number',
-        # 'adviser',
+        'adviser',
     )
 
     REMAP_FIELDS = {

@@ -50,7 +50,7 @@ class Company(BaseSearchModel):
     address = fields.address_field()
     registered_address = fields.address_field()
     one_list_group_global_account_manager = _adviser_field_with_indexed_id()
-    # adviser = _adviser_field_with_indexed_id()
+    adviser = _adviser_field_with_indexed_id()
     trading_names = fields.TextWithTrigram()
     turnover_range = fields.id_name_field()
     uk_region = fields.id_name_field()
@@ -77,7 +77,7 @@ class Company(BaseSearchModel):
         ),
         'adviser': dict_utils.computed_field_function(
             'get_one_list_group_core_team',
-            dict_utils.contact_or_adviser_dict,
+            dict_utils.our_contact_or_adviser_list_of_dicts,
         ),
         'export_to_countries': lambda obj: [
             dict_utils.id_name_dict(o.country)
@@ -97,6 +97,9 @@ class Company(BaseSearchModel):
         'export_segment': lambda obj: obj.export_segment,
         'export_sub_segment': lambda obj: obj.export_sub_segment,
     }
+
+    print('****** COMPUTED MAPPINGS *****')
+    print(COMPUTED_MAPPINGS['export_to_countries'])
 
     MAPPINGS = {
         'archived_by': dict_utils.contact_or_adviser_dict,
