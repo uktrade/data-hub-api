@@ -122,7 +122,7 @@ def contact_or_adviser_dict(obj, include_dit_team=False):
 def our_contact_or_adviser_list_of_dicts(list_of_obj):
     if list_of_obj is None:
         return None
-    return [contact_or_adviser_dict(obj["adviser"]) for obj in list_of_obj]
+    return [contact_or_adviser_dict(obj['adviser']) for obj in list_of_obj]
 
 
 def contact_or_adviser_list_of_dicts(manager):

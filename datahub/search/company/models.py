@@ -98,9 +98,6 @@ class Company(BaseSearchModel):
         'export_sub_segment': lambda obj: obj.export_sub_segment,
     }
 
-    print('****** COMPUTED MAPPINGS *****')
-    print(COMPUTED_MAPPINGS['export_to_countries'])
-
     MAPPINGS = {
         'archived_by': dict_utils.contact_or_adviser_dict,
         'business_type': dict_utils.id_name_dict,

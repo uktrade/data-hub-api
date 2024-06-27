@@ -289,7 +289,7 @@ class SearchAPIView(APIView):
         )
 
         results = execute_search_query(limited_query)
-        
+
         response = {
             'count': results.hits.total.value,
             'results': [x.to_dict() for x in results.hits],
