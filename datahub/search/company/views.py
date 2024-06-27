@@ -119,9 +119,6 @@ class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
         )
 
     def get_base_query(self, request, validated_data):
-        print("######## HERE #########")
-        # print(vars(request))
-        print(validated_data)
         base_query = super().get_base_query(request, validated_data)
 
         raw_query = base_query.to_dict()
