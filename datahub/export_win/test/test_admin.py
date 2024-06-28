@@ -269,15 +269,30 @@ class TestAnonymousWinAdminForm:
         form = AnonymousWinAdminForm()
         assert form is not None
 
-        customer_details_fields = {
+        optional_legacy_fields = {
             'cdms_reference': 'Data Hub (Companies House) or CDMS reference number',
             'customer_email_address': 'Contact email',
             'customer_job_title': 'Job title',
+            'line_manager_name': 'Line manager',
+            'lead_officer_email_address': 'Lead officer email address',
+            'other_official_email_address': 'Secondary email address',
         }
 
-        for field_name, label in customer_details_fields.items():
+        for field_name, label in optional_legacy_fields.items():
             assert form.fields[field_name].required is False
             assert form.fields[field_name].label == f'{label} (legacy)'
+
+        mandatory_fields_for_anonymous_wins = {
+            'lead_officer': 'Lead officer',
+            'export_experience': 'Export experience',
+            'business_potential': 'Medium-sized and high potential companies',
+            'customer_location': 'HQ location',
+            'sector': 'Sector',
+        }
+
+        for field_name, label in mandatory_fields_for_anonymous_wins.items():
+            assert form.fields[field_name].required is True
+            assert form.fields[field_name].label == f'{label}'
 
     def notify_anonymous_wins_adviser_as_contact(
         self,
