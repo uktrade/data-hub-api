@@ -61,6 +61,9 @@ sentry_sdk==2.5.1
 rq==1.16.2
 rq-scheduler==0.13.1
 
+# For logging tables
+tabulate
+
 python-redis-rate-limit==0.0.9
 
 #Tree related
