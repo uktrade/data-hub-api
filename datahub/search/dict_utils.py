@@ -167,6 +167,7 @@ def computed_field_function(function_name, dict_func):
             raise ValueError(f'"{function_name}" is not callable.')
 
         return dict_func(field())
+    
     return get_dict
 
 

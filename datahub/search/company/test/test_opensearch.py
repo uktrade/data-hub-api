@@ -26,7 +26,7 @@ def test_mapping(opensearch):
             'adviser': {
                 'properties': {
                     'first_name': {
-                         'index': False,
+                        'index': False,
                         'type': 'text',
                     },
                     'id': {
