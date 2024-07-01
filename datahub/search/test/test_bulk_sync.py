@@ -1,12 +1,16 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 
-from datahub.company.models import Company
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.models import Advisor, Company
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test_utils import MockQuerySet
+from datahub.interaction.models import Interaction
+from datahub.interaction.test.factories import InteractionFactoryBase
+from datahub.search.adviser import AdviserSearchApp
 from datahub.search.bulk_sync import sync_app, sync_objects
 from datahub.search.company import CompanySearchApp
+from datahub.search.interaction import InteractionSearchApp
 from datahub.search.signals import disable_search_signal_receivers
 from datahub.search.test.utils import create_mock_search_app
 
@@ -92,3 +96,40 @@ def test_sync_app_uses_latest_data(monkeypatch, opensearch):
         id=company.pk,
     )
     assert fetched_company['_source']['name'] == 'new name'
+
+
+@pytest.mark.django_db
+@patch('datahub.search.bulk_sync.PROGRESS_INTERVAL', 1)
+@disable_search_signal_receivers(Interaction)
+def test_sync_app_log_messages__logs__modified_on(caplog):
+    """Test with model with modified_on (interaction)."""
+    interactions = InteractionFactoryBase.create_batch(2)
+
+    caplog.set_level('INFO')
+
+    sync_app(InteractionSearchApp, batch_size=1)
+
+    # Assert 'modified_on' is shown for fields which have it.
+    assert 'Processing Interaction records, using batch size 1' in caplog.text
+    assert f'Interaction rows processed: 1/2 50% modified_on: {interactions[1].modified_on}' \
+        in caplog.text
+    assert f'Interaction rows processed: 2/2 100% modified_on: {interactions[0].modified_on}' \
+        in caplog.text
+
+
+@pytest.mark.django_db
+@patch('datahub.search.bulk_sync.PROGRESS_INTERVAL', 1)
+@disable_search_signal_receivers(Advisor)
+def test_sync_app_log_messages__does_not_log__modified_on(caplog):
+    """Test with model without modified_on field (adviser)."""
+    AdviserFactory.create_batch(2)
+
+    caplog.set_level('INFO')
+
+    sync_app(AdviserSearchApp, batch_size=1)
+
+    # Assert 'modified_on' is NOT shown for fields which don't have it.
+    assert 'Processing Adviser records, using batch size 1' in caplog.text
+    assert 'Adviser rows processed: 1/2 50%'
+    assert 'modified_on:' not in caplog.text
+    assert 'Adviser rows processed: 2/2 100%'
