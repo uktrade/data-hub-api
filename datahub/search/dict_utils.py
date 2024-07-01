@@ -119,7 +119,8 @@ def contact_or_adviser_dict(obj, include_dit_team=False):
     return data
 
 
-def our_contact_or_adviser_list_of_dicts(list_of_obj):
+def adviser_list_of_dicts(list_of_obj):
+    """Creates a list of dicts for company advisers"""
     if list_of_obj is None:
         return None
     return [contact_or_adviser_dict(obj['adviser']) for obj in list_of_obj]
