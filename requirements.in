@@ -12,7 +12,7 @@ django-pglocks==1.0.4
 django-reversion==5.0.12
 inflection==0.5.1  # required for DRF shcema features
 uritemplate==4.1.1  # required for DRF schema features
-whitenoise==6.6.0
+whitenoise==6.7.0
 
 chardet==5.2.0
 pyyaml==6.0.1
