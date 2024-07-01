@@ -6,18 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link
         rel="stylesheet"
-        type="text/css"
-        href="{{ swagger_ui_css.url }}"
+        href="{{ swagger_ui_css.href }}"
         integrity="{{ swagger_ui_css.integrity }}"
         crossorigin="anonymous"
+        referrerpolicy="no-referrer"
     />
   </head>
   <body>
     <div id="swagger-ui"></div>
     <script
-        src="{{ swagger_ui_js.url }}"
+        src="{{ swagger_ui_js.src }}"
         integrity="{{ swagger_ui_js.integrity }}"
-        crossorigin="anonymous">
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer">
     </script>
     <script>
     const ui = SwaggerUIBundle({

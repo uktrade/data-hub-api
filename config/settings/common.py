@@ -6,7 +6,7 @@ https://docs.djangoproject.com/en/dev/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
-
+import os
 from datetime import timedelta
 from urllib.parse import urlencode
 
@@ -284,23 +284,24 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
-# Swagger UI resources used in the Swagger UI view
+# Swagger UI 5.15.0 resources used in the Swagger UI view
 # (used in config/api_docs_urls.py and datahub/core/templates/core/docs/swagger-ui.html)
 #
-# See https://unpkg.com/ for info on unpkg and if are updating these (the integrity value
-# can be obtained by adding ?meta to the URL of the resource).
+# Downloaded statifiles locally because of Content Security Policy inline violations.
+#
+# To generate a new 'integrity' hash, open your terminal and execute:
+# `openssl dgst -sha384 -binary FILENAME.css | openssl base64 -A`
 SWAGGER_UI_CSS = {
-    'url': 'https://unpkg.com/swagger-ui-dist@3.25.0/swagger-ui.css',
-    'integrity': 'sha384-WBdQ4nw0UWAWpf/c1u6DHcCmoT1wY63dk3fPmcb0vKhXP81/lK4GSIiU5nrA6qEs',
+    'href': os.path.join(STATIC_URL, 'core/css/swagger-ui_5.15.0.css'),
+    'integrity': 'sha384-/hHukNS+XqR9TI4ZSRNiSzG54wwXN/aka60dRJMGVDpSwjL0vkyOwRVR7L3f0xo+',
 }
 SWAGGER_UI_JS = {
-    'url': 'https://unpkg.com/swagger-ui-dist@3.25.0/swagger-ui-bundle.js',
-    'integrity': 'sha384-LayfYpTwEewV6vK80x7XxHevzp5lS9x3eH/rfMVR26RiPbwjOdH1r6CUTPfABavZ',
+    'src': os.path.join(STATIC_URL, 'core/js/swagger-ui-bundle_5.15.0.js'),
+    'integrity': 'sha384-3T0m2dlv/POl6bmr9ZuK8z2TYZ2zOjRxVAtkOxmYKEaCacswXm6i+BSXpAlstS4p',
 }
 
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
-
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
