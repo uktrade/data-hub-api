@@ -343,6 +343,12 @@ class MockQuerySet:
 
         return matches[0]
 
+    def order_by(self, *fields):
+        """
+        Mock order_by note: no actual ordering takes place.
+        """
+        return self.values_list(self, *fields)
+
     def filter(self, pk__in=()):
         """
         Filters the query set.
