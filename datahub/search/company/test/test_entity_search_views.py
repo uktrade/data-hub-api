@@ -331,12 +331,6 @@ class TestSearch(APITestMixin):
                     },
                     'adviser': [
                         {
-                            'id': str(one_list_account_owner.id),
-                            'first_name': one_list_account_owner.first_name,
-                            'last_name': one_list_account_owner.last_name,
-                            'name': one_list_account_owner.name,
-                        },
-                        {
                             'id': str(adviser.id),
                             'first_name': adviser.first_name,
                             'last_name': adviser.last_name,
