@@ -120,10 +120,14 @@ def contact_or_adviser_dict(obj, include_dit_team=False):
 
 
 def adviser_list_of_dicts(list_of_obj):
-    """Creates a list of dicts for company advisers"""
+    """
+    Creates a list of dicts for company advisers if they are
+    not global account managers.
+    """
     if list_of_obj is None:
         return None
-    return [contact_or_adviser_dict(obj['adviser']) for obj in list_of_obj]
+    return [contact_or_adviser_dict(obj['adviser']) for obj in list_of_obj
+            if not obj['is_global_account_manager']]
 
 
 def contact_or_adviser_list_of_dicts(manager):
