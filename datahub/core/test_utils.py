@@ -342,7 +342,7 @@ class MockQuerySet:
             raise MultipleObjectsReturned()
 
         return matches[0]
-    
+
     def order_by(self, *fields):
         """
         Mock order_by note: no actual ordering takes place.

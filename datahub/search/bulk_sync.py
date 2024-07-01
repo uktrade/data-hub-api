@@ -25,7 +25,9 @@ def sync_app(search_app, batch_size=None, post_batch_callback=None):
 
     # We know pk exists but some models don't have modified_on, so handle this.
     try:
-        it = search_app.queryset.order_by('-modified_on').values_list('pk', flat=True).iterator(chunk_size=batch_size)
+        it = search_app.queryset.order_by('-modified_on').values_list('pk', flat=True).iterator(
+            chunk_size=batch_size,
+        )
         has_modified_on = True
     except FieldError:
         it = search_app.queryset.values_list('pk', flat=True).iterator(chunk_size=batch_size)
