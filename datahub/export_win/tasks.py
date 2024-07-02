@@ -85,7 +85,7 @@ def auto_resend_client_email_from_unconfirmed_win():
                 )
 
 
-def create_token_for_contact(contact, customer_response):
+def create_token_for_contact(contact, customer_response, adviser=None):
     """
     Generate new token and set all existing unexpired token to expire
     """
@@ -98,21 +98,33 @@ def create_token_for_contact(contact, customer_response):
         expires_on=expires_on,
         company_contact=contact,
         customer_response=customer_response,
+        adviser=adviser,
     )
     return new_token
 
 
 def get_all_fields_for_client_email_receipt(token, customer_response):
     win = customer_response.win
-    win_token = token.company_contact
     details = {
-        'customer_email': win_token.email,
         'country_destination': win.country.name,
-        'client_firstname': win_token.first_name,
         'lead_officer_name': win.lead_officer.name,
         'goods_services': win.goods_vs_services.name,
         'url': f'{settings.EXPORT_WIN_CLIENT_REVIEW_WIN_URL}/{token.id}',
     }
+
+    if token.company_contact:
+        win_token = token.company_contact
+        details.update({
+            'customer_email': win_token.email,
+            'client_firstname': win_token.first_name,
+        })
+
+    if token.adviser:
+        win_token = token.adviser
+        details.update({
+            'customer_email': win_token.contact_email,
+            'client_firstname': win_token.first_name,
+        })
 
     return details
 

@@ -79,6 +79,7 @@ MAPPINGS = {
     'export_win.Breakdown': BreakdownFactory,
     'export_win.WinAdviser': WinAdviserFactory,
     'export_win.DeletedWin': WinFactory,
+    'export_win.AnonymousWin': WinFactory,
 }
 
 

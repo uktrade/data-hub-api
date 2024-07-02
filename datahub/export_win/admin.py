@@ -1,6 +1,8 @@
 import reversion
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter
+from django.db import transaction
 from django.db.models import Value
 from django.db.models.functions import Concat
 from django.forms import ModelForm
@@ -10,11 +12,19 @@ from reversion.admin import VersionAdmin
 from datahub.core.admin import BaseModelAdminMixin, EXPORT_WIN_GROUP_NAME
 
 from datahub.export_win.models import (
+    AnonymousWin,
     Breakdown,
     CustomerResponse,
     DeletedWin,
     Win,
     WinAdviser)
+
+from datahub.export_win.tasks import (
+    create_token_for_contact,
+    get_all_fields_for_client_email_receipt,
+    notify_export_win_email_by_rq_email,
+    update_customer_response_token_for_email_notification_id,
+)
 
 
 class BaseTabularInline(admin.TabularInline):
@@ -379,6 +389,104 @@ class DeletedWinAdmin(WinAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+class AnonymousWinAdminForm(ModelForm):
+    """Admin form for Anonymous Wins."""
+
+    class Meta:
+        model = AnonymousWin
+        fields = '__all__'
+        labels = {
+            'adviser': 'Creator',
+            'company': 'Company (leave blank for an anonymous win)',
+            'company_contacts': 'Contact names (leave blank for an anonymous win)',
+            'total_expected_odi_value': 'Total expected ODI value',
+            'customer_email_address': 'Company email',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        customer_details_fields = {
+            'cdms_reference': 'Data Hub (Companies House) or CDMS reference number',
+            'customer_email_address': 'Contact email',
+            'customer_job_title': 'Job title',
+        }
+
+        for field_name, label in customer_details_fields.items():
+            if field_name in self.fields:
+                self.fields[field_name].required = False
+                self.fields[field_name].label = f'{label} (legacy)'
+
+        if 'lead_officer' in self.fields:
+            self.fields['lead_officer'].required = True
+
+
+@admin.register(AnonymousWin)
+class AnonymousWinAdmin(WinAdmin):
+    """Admin for Anonymous Wins."""
+
+    form = AnonymousWinAdminForm
+    inlines = (BreakdownInline, CustomerResponseInline, AdvisorInline)
+
+    def save_model(self, request, obj, form, change):
+        with transaction.atomic(), reversion.create_revision():
+            if not change:
+                obj.is_personally_confirmed = True
+                obj.is_line_manager_confirmed = True
+                obj.is_anonymous_win = True
+                obj.adviser = request.user
+            super().save_model(request, obj, form, change)
+
+            # Customer response will be created upon wins being saved
+            if not change:
+                customer_response = CustomerResponse.objects.create(win=obj)
+                self.notify_anonymous_wins_adviser_as_contact(request.user, customer_response)
+
+            reversion.set_comment('Anonymous Win created')
+
+    def get_queryset(self, request):
+        """Return win queryset only for anonymous win."""
+        return self.model.anonymous_objects.anonymous_win()
+
+    def has_add_permission(self, request, obj=None):
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_view_permission(self, request, obj=None):
+        """Set the desired user group to access view anonymous win"""
+        if (
+            request.user.is_superuser
+            or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
+        ):
+            return True
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return True
+
+    def notify_anonymous_wins_adviser_as_contact(self, adviser, customer_response):
+        """Notify anonymous wins adviser as contact"""
+        token = create_token_for_contact(
+            None,
+            customer_response,
+            adviser,
+        )
+        context = get_all_fields_for_client_email_receipt(
+            token,
+            customer_response,
+        )
+        template_id = settings.EXPORT_WIN_CLIENT_RECEIPT_TEMPLATE_ID
+        notify_export_win_email_by_rq_email(
+            adviser.contact_email,
+            template_id,
+            context,
+            update_customer_response_token_for_email_notification_id,
+            token.id,
+        )
 
 
 @admin.register(WinAdviser)
