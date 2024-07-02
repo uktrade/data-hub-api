@@ -1,5 +1,4 @@
 from logging import getLogger
-from urllib.parse import urlparse
 
 from django.conf import settings
 from opensearchpy.exceptions import ConnectionError
