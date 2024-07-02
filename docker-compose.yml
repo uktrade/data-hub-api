@@ -26,6 +26,16 @@ services:
     depends_on:
       - api
     command: python short-running-worker.py
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python ./manage.py rq_health_check --queue=short-running"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+      start_period: 5s
 
   rq_long:
     build:
@@ -37,6 +47,16 @@ services:
     depends_on:
       - api
     command: python long-running-worker.py
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python ./manage.py rq_health_check --queue=long-running"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+      start_period: 5s
 
   rq_sched:
     build:
@@ -50,7 +70,7 @@ services:
     command: python cron-scheduler.py
 
   postgres:
-    image: postgres:12
+    image: postgres:16
     restart: always
     ports:
       - "5432:5432"
@@ -59,7 +79,7 @@ services:
       - POSTGRES_PASSWORD=datahub
 
   opensearch:
-    image: opensearchproject/opensearch:1.2.4
+    image: opensearchproject/opensearch:2.11.0
     environment:
       - plugins.security.disabled=true
       - cluster.name=cluster-001
@@ -70,7 +90,7 @@ services:
       - "9200:9200"
 
   redis:
-    image: redis:6.2.6
+    image: redis:7.2.4
     restart: always
     ports:
       - "6379:6379"
@@ -86,4 +106,3 @@ services:
       RQ_REDIS_HOST: "redis"
     depends_on:
       - redis
-

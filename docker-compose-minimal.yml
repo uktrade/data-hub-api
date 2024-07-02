@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   postgres:
-    image: postgres:12
+    image: postgres:16
     restart: always
     environment:
       - POSTGRES_DB=datahub

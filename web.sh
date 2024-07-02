@@ -13,5 +13,11 @@ if [ -z "$SKIP_OPENSEARCH_MAPPING_MIGRATIONS" ] && [ "${CF_INSTANCE_INDEX:-0}" =
   ./manage.py migrate_search
 fi
 
-python manage.py collectstatic  --noinput
-python app.py
+if [ -n "${COPILOT_ENVIRONMENT_NAME}" ]; then
+  echo "Running in DBT Platform"
+  python app.py
+else
+  echo "Running in Cloud Foundry"
+  python manage.py collectstatic  --noinput
+  python app.py
+fi
