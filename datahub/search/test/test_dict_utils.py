@@ -304,9 +304,9 @@ def test_contact_or_adviser_dict_include_dit_team(obj, expected_dict):
 
 
 @pytest.mark.django_db
-def test_adviser_list_of_dicts():
+def test_core_team_advisers_list_of_dicts():
     """
-    Test that adviser_list_of_dicts returns a list of advisers if
+    Test that core_team_advisers_list_of_dicts returns a list of advisers if
     they are not global account managers.
     """
     adviser_1 = AdviserFactory()
@@ -324,7 +324,7 @@ def test_adviser_list_of_dicts():
             'last_name': adviser_3.last_name, 'name': adviser_3.name},
     ]
 
-    assert dict_utils.adviser_list_of_dicts(data) == expected_response
+    assert dict_utils.core_team_advisers_list_of_dicts(data) == expected_response
 
 
 def test_contact_or_adviser_list_of_dicts():

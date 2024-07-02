@@ -77,7 +77,7 @@ class Company(BaseSearchModel):
         ),
         'adviser': dict_utils.computed_field_function(
             'get_one_list_group_core_team',
-            dict_utils.adviser_list_of_dicts,
+            dict_utils.core_team_advisers_list_of_dicts,
         ),
         'export_to_countries': lambda obj: [
             dict_utils.id_name_dict(o.country)

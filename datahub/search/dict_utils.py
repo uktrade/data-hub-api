@@ -119,7 +119,7 @@ def contact_or_adviser_dict(obj, include_dit_team=False):
     return data
 
 
-def adviser_list_of_dicts(list_of_obj):
+def core_team_advisers_list_of_dicts(list_of_obj):
     """
     Creates a list of dicts for company advisers if they are
     not global account managers.
