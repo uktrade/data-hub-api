@@ -1,5 +1,4 @@
 from logging import getLogger
-from urllib.parse import urlparse
 
 from django.conf import settings
 from opensearchpy.exceptions import ConnectionError
@@ -22,7 +21,7 @@ def execute_search_query(query):
         ).execute()
     except ConnectionError:
         raise APIBadGatewayException(
-            f'Upstream service unavailable: {urlparse(settings.OPENSEARCH_URL).netloc}',
+            'Upstream Open Search service unavailable',
         )
 
     if response.took >= settings.OPENSEARCH_SEARCH_REQUEST_WARNING_THRESHOLD * 1000:

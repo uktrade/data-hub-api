@@ -136,6 +136,7 @@ def configure_connection():
     connections_default = {
         'hosts': [settings.OPENSEARCH_URL],
         'verify_certs': settings.OPENSEARCH_VERIFY_CERTS,
+        'pool_maxsize': settings.OPENSEARCH_POOL_MAXSIZE,
     }
     connections.configure(default=connections_default)
 
