@@ -18,6 +18,7 @@ from datahub.company.test.factories import (
     AdviserFactory,
     CompanyExportCountryFactory,
     CompanyFactory,
+    OneListCoreTeamMemberFactory,
     OneListTierFactory,
 )
 from datahub.core import constants
@@ -270,6 +271,7 @@ class TestSearch(APITestMixin):
     def test_response_body(self, opensearch_with_collector):
         """Tests the response body of a search query."""
         one_list_account_owner = AdviserFactory()
+        adviser = AdviserFactory()
         company = CompanyFactory(
             company_number='123',
             trading_names=['Xyz trading', 'Abc trading'],
@@ -277,6 +279,7 @@ class TestSearch(APITestMixin):
             one_list_tier=OneListTierFactory(),
             one_list_account_owner=one_list_account_owner,
         )
+        OneListCoreTeamMemberFactory(adviser=adviser, company=company)
         opensearch_with_collector.flush_and_refresh()
 
         url = reverse('api-v4:search:company')
@@ -326,6 +329,14 @@ class TestSearch(APITestMixin):
                         'last_name': one_list_account_owner.last_name,
                         'name': one_list_account_owner.name,
                     },
+                    'adviser': [
+                        {
+                            'id': str(adviser.id),
+                            'first_name': adviser.first_name,
+                            'last_name': adviser.last_name,
+                            'name': adviser.name,
+                        },
+                    ],
                     'uk_based': (
                         company.address_country.id
                         == uuid.UUID(

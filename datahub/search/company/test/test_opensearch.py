@@ -23,6 +23,26 @@ def test_mapping(opensearch):
             '_document_type': {
                 'type': 'keyword',
             },
+            'adviser': {
+                'properties': {
+                    'first_name': {
+                        'index': False,
+                        'type': 'text',
+                    },
+                    'id': {
+                        'type': 'keyword',
+                    },
+                    'last_name': {
+                        'index': False,
+                        'type': 'text',
+                    },
+                    'name': {
+                        'index': False,
+                        'type': 'text',
+                    },
+                },
+                'type': 'object',
+            },
             'archived': {'type': 'boolean'},
             'archived_by': {
                 'properties': {
@@ -732,4 +752,5 @@ def test_indexed_doc(opensearch):
         'number_of_employees',
         'global_ultimate_duns_number',
         'is_global_ultimate',
+        'adviser',
     }
