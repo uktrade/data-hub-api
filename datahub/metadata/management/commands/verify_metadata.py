@@ -32,7 +32,7 @@ class Command(BaseCommand):
         headers = ['Model', 'Count']
 
         logger.info(
-            f'\n{tabulate(sorted_models_and_counts, headers, tablefmt="github")}'
+            f'\n{tabulate(sorted_models_and_counts, headers, tablefmt="github")}',
         )
 
         sorted_models_and_counts = ','.join(
@@ -42,7 +42,7 @@ class Command(BaseCommand):
         logger.info(sorted_models_and_counts)
 
         hash_sah256 = hashlib.sha256(
-            sorted_models_and_counts.encode('utf-8')
+            sorted_models_and_counts.encode('utf-8'),
         ).hexdigest()
 
-        logger.info(f"Hash value: {hash_sah256}")
+        logger.info(f'Hash value: {hash_sah256}')
