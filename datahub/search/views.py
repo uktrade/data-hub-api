@@ -212,7 +212,6 @@ class SearchAPIView(APIView):
     def get_base_query(self, request, validated_data):
         """Gets a filtered OpenSearch query for the provided search parameters."""
         filter_data = self._get_filter_data(validated_data)
-
         # Handle sector filtering...
         if 'sector_descends' in filter_data.keys():
             sector_ids = filter_data['sector_descends']
