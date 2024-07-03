@@ -46,6 +46,7 @@ def test_configure_connection(connections, settings):
     connections.configure.assert_called_with(default={
         'hosts': [settings.OPENSEARCH_URL],
         'verify_certs': settings.OPENSEARCH_VERIFY_CERTS,
+        'pool_maxsize': settings.OPENSEARCH_POOL_MAXSIZE,
     })
 
 
