@@ -58,6 +58,7 @@ class TestCompanySearchModel:
             'number_of_employees',
             'global_ultimate_duns_number',
             'is_global_ultimate',
+            'adviser',
         }
 
         assert set(result.keys()) == keys

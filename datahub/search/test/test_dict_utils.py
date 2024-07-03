@@ -303,12 +303,37 @@ def test_contact_or_adviser_dict_include_dit_team(obj, expected_dict):
     assert res == expected_dict
 
 
+@pytest.mark.django_db
+def test_core_team_advisers_list_of_dicts():
+    """
+    Test that core_team_advisers_list_of_dicts returns a list of advisers if
+    they are not global account managers.
+    """
+    adviser_1 = AdviserFactory()
+    adviser_2 = AdviserFactory()
+    adviser_3 = AdviserFactory()
+    data = [
+        {'adviser': adviser_1, 'is_global_account_manager': True},
+        {'adviser': adviser_2, 'is_global_account_manager': False},
+        {'adviser': adviser_3, 'is_global_account_manager': False},
+    ]
+    expected_response = [
+        {'id': str(adviser_2.id), 'first_name': adviser_2.first_name,
+            'last_name': adviser_2.last_name, 'name': adviser_2.name},
+        {'id': str(adviser_3.id), 'first_name': adviser_3.first_name,
+            'last_name': adviser_3.last_name, 'name': adviser_3.name},
+    ]
+
+    assert dict_utils.core_team_advisers_list_of_dicts(data) == expected_response
+
+
 def test_contact_or_adviser_list_of_dicts():
     """Test that contact_or_adviser_list_of_dicts returns a list of person dicts."""
     data = [
         {'id': '12', 'first_name': 'first A', 'last_name': 'last A', 'name': 'test A'},
         {'id': '99', 'first_name': 'first B', 'last_name': 'last B', 'name': 'testing B'},
     ]
+
     objects = [construct_mock(**data_item) for data_item in data]
 
     manager = mock.Mock(
