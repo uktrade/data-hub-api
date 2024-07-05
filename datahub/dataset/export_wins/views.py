@@ -5,16 +5,20 @@ from django.db.models import (
     Case,
     CharField,
     Count,
+    DateTimeField,
     ExpressionWrapper,
     F,
     Func,
     IntegerField,
     Max,
+    Min,
     OuterRef,
+    Q,
     Subquery,
     Value,
     When,
 )
+from django.db.models.fields.json import KT
 from django.db.models.functions import (
     Cast,
     Concat,
@@ -52,10 +56,12 @@ class ExportWinsAdvisersDatasetView(BaseDatasetView):
     A GET API view to return export win advisers.
     """
 
+    allow_legacy_data = False
+
     def get_dataset(self):
         if is_feature_flag_active(
             EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
-        ):
+        ) or self.allow_legacy_data:
             migrated_filter = {}
         else:
             migrated_filter = {
@@ -75,11 +81,25 @@ class ExportWinsAdvisersDatasetView(BaseDatasetView):
             )
             .annotate(
                 id=F('legacy_id'),
-                name=Concat(F('adviser__first_name'), Value(' '), F('adviser__last_name')),
+                name=Case(
+                    When(
+                        Q(win__migrated_on__isnull=False) & Q(adviser__isnull=True),
+                        then=F('name'),
+                    ),
+                    default=Concat(
+                        F('adviser__first_name'),
+                        Value(' '),
+                        F('adviser__last_name'),
+                    ),
+                    output_field=CharField(),
+                ),
                 hq_team=F('hq_team__export_win_id'),
                 team_type=F('team_type__export_win_id'),
             )
         )
+
+    def _get_request_params(self, request):
+        self.allow_legacy_data = request.GET.get('legacy_data', 'false').lower() == 'true'
 
 
 class ExportWinsBreakdownsDatasetView(BaseDatasetView):
@@ -162,10 +182,12 @@ class ExportWinsWinDatasetView(BaseDatasetView):
     A GET API view to return export win wins.
     """
 
+    allow_legacy_data = False
+
     def get_dataset(self):
         if is_feature_flag_active(
             EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
-        ):
+        ) or self.allow_legacy_data:
             migrated_filter = {}
         else:
             migrated_filter = {
@@ -176,6 +198,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 'adviser',
                 'business_potential',
                 'country',
+                'company',
                 'customer_location',
                 'customer_response',
                 'export_experience',
@@ -208,6 +231,14 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 ),
                 temp_cdms_reference=F('cdms_reference'),
                 temp_complete=F('complete'),
+                temp_company_name=Case(
+                    When(
+                        Q(migrated_on__isnull=False) & Q(company__isnull=True),
+                        then=F('company_name'),
+                    ),
+                    default=F('company__name'),
+                    output_field=CharField(),
+                ),
             )
             .prefetch_related('associated_programme', 'type_of_support')
             .values(
@@ -247,7 +278,15 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 sector_display=F('sector_name'),
                 team_type_display=F('team_type__name'),
                 num_notifications=Count('customer_response__tokens'),
-                customer_email_date=Max('customer_response__tokens__created_on'),
+                customer_email_date=Case(
+                    When(
+                        migrated_on__isnull=False,
+                        # legacy endpoint returns date of first notification
+                        then=Min('customer_response__tokens__created_on'),
+                    ),
+                    default=Max('customer_response__tokens__created_on'),
+                    output=DateTimeField(),
+                ),
             )
             .annotate(
                 complete=Case(
@@ -262,7 +301,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                     default=F('temp_complete'),
                     output_field=BooleanField(),
                 ),
-                company_name=F('company__name'),
+                company_name=F('temp_company_name'),
                 confirmation__access_to_contacts=Case(
                     When(customer_response__responded_on__isnull=True, then=None),
                     default=F('customer_response__our_support__export_win_id'),
@@ -331,7 +370,14 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                     default=F('customer_response__involved_state_enterprise'),
                     output_field=BooleanField(),
                 ),
-                confirmation__name=F('customer_details__name'),
+                confirmation__name=Case(
+                    When(
+                        Q(migrated_on__isnull=False) & Q(customer_details__isnull=True),
+                        then=F('customer_name'),
+                    ),
+                    default=KT('customer_details__name'),
+                    output_field=CharField(),
+                ),
                 confirmation__other_marketing_source=F(
                     'customer_response__other_marketing_source',
                 ),
@@ -361,11 +407,25 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                     Value(' '),
                     'adviser__last_name',
                 ),
-                lead_officer_email_address=F('lead_officer__contact_email'),
-                lead_officer_name=Concat(
-                    'lead_officer__first_name',
-                    Value(' '),
-                    'lead_officer__last_name',
+                lead_officer_email_address=Case(
+                    When(
+                        Q(migrated_on__isnull=False) & Q(lead_officer__isnull=True),
+                        then=F('lead_officer_email_address'),
+                    ),
+                    default=F('lead_officer__contact_email'),
+                    output_field=CharField(),
+                ),
+                lead_officer_name=Case(
+                    When(
+                        Q(migrated_on__isnull=False) & Q(lead_officer__isnull=True),
+                        then=F('lead_officer_name'),
+                    ),
+                    default=Concat(
+                        'lead_officer__first_name',
+                        Value(' '),
+                        'lead_officer__last_name',
+                    ),
+                    output_field=CharField(),
                 ),
                 associated_programmes=ArraySubquery(
                     AssociatedProgramme.objects.filter(
@@ -380,9 +440,30 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 export_wins_export_experience_display=F(
                     'export_experience__export_wins_export_experience__name',
                 ),
-                customer_email_address=F('customer_details__email'),
-                customer_job_title=F('customer_details__job_title'),
-                customer_name=F('customer_details__name'),
+                customer_email_address=Case(
+                    When(
+                        Q(migrated_on__isnull=False) & Q(customer_details__isnull=True),
+                        then=F('customer_email_address'),
+                    ),
+                    default=KT('customer_details__email'),
+                    output_field=CharField(),
+                ),
+                customer_job_title=Case(
+                    When(
+                        Q(migrated_on__isnull=False) & Q(customer_details__isnull=True),
+                        then=F('customer_job_title'),
+                    ),
+                    default=KT('customer_details__job_title'),
+                    output_field=CharField(),
+                ),
+                customer_name=Case(
+                    When(
+                        Q(migrated_on__isnull=False) & Q(customer_details__isnull=True),
+                        then=F('customer_name'),
+                    ),
+                    default=KT('customer_details__name'),
+                    output_field=CharField(),
+                ),
                 cdms_reference=Case(
                     When(
                         temp_cdms_reference='',
@@ -393,6 +474,9 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 ),
             )
         )
+
+    def _get_request_params(self, request):
+        self.allow_legacy_data = request.GET.get('legacy_data', 'false').lower() == 'true'
 
     def _enrich_data(self, dataset):
         for data in dataset:

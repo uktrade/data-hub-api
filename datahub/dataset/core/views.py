@@ -23,11 +23,20 @@ class BaseDatasetView(HawkResponseSigningMixin, APIView):
 
     def get(self, request):
         """Endpoint which serves all records for a specific Dataset"""
+        self._get_request_params(request)
         dataset = self.get_dataset()
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(dataset, request, view=self)
         self._enrich_data(page)
         return paginator.get_paginated_response(page)
+
+    def _get_request_params(self, request):
+        """
+        Hook for checking request parameters before querying dataset.
+        By default it does nothing, but subclasses can use it to modify the query set,
+        based on user parameters.
+        """
+        pass
 
     def _enrich_data(self, dataset):
         """
