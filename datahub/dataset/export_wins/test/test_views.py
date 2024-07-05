@@ -1,9 +1,10 @@
 from datetime import date, datetime, timedelta
 
 import pytest
-from dateutil.relativedelta import relativedelta
 
+from dateutil.relativedelta import relativedelta
 from django.urls import reverse
+from factory import Iterator
 
 from freezegun import freeze_time
 
@@ -58,7 +59,7 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
             'created_on': format_date_or_datetime(win_adviser.created_on),
             'id': win_adviser.legacy_id,
             'location': win_adviser.location,
-            'name': win_adviser.adviser.name,
+            'name': win_adviser.adviser.name if win_adviser.adviser else win_adviser.name,
             'win__id': str(win_adviser.win.id),
             'hq_team_display': win_adviser.hq_team.name,
             'team_type_display': win_adviser.team_type.name,
@@ -99,6 +100,37 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
         response = data_flow_api_client.get(self.view_url).json()
 
         assert len(response['results']) == (2 if list_legacy_data else 1)
+
+    @pytest.mark.parametrize(
+        'allow_legacy_data',
+        (
+            True,
+            False,
+        ),
+    )
+    def test_success_with_legacy_content_override(
+        self,
+        allow_legacy_data,
+        data_flow_api_client,
+    ):
+        win_advisers = [self.factory()]
+        params = {
+            'win': WinFactory(migrated_on=datetime.now()),
+            'adviser': None,
+            'name': 'John Doe',
+        }
+        win_advisers.append(self.factory(**params))
+
+        response = data_flow_api_client.get(
+            self.view_url,
+            {
+                'legacy_data': allow_legacy_data,
+            },
+        ).json()
+
+        assert len(response['results']) == (2 if allow_legacy_data else 1)
+        for i, result in enumerate(response['results']):
+            self._assert_win_adviser_matches_result(win_advisers[i], result)
 
     def test_with_multiple_win_adviser(self, data_flow_api_client):
 
@@ -289,7 +321,8 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
                 win.customer_response.interventions_were_prerequisite if has_responded else None,
             'confirmation__involved_state_enterprise':
                 win.customer_response.involved_state_enterprise if has_responded else None,
-            'confirmation__name': contact.name,
+            'confirmation__name': contact.name
+                if contact else win.customer_name if win.customer_name else None,
             'confirmation__other_marketing_source':
                 win.customer_response.other_marketing_source if has_responded else None,
             'confirmation__our_support':
@@ -300,9 +333,12 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
                 win.customer_response.support_improved_speed if has_responded else None,
             'country': win.country.iso_alpha2_code,
             'created': format_date_or_datetime(win.created_on),
-            'customer_email_address': contact.email,
-            'customer_job_title': contact.job_title,
-            'customer_name': contact.name,
+            'customer_email_address': contact.email
+                if contact else win.customer_email_address if win.customer_email_address else None,
+            'customer_job_title': contact.job_title
+                if contact else win.customer_job_title if win.customer_job_title else None,
+            'customer_name': contact.name
+                if contact else win.customer_name if win.customer_name else None,
             'date': format_date_or_datetime(win.date),
             'description': win.description,
             'has_hvo_specialist_involvement': win.has_hvo_specialist_involvement,
@@ -311,8 +347,12 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'is_line_manager_confirmed': win.is_line_manager_confirmed,
             'is_personally_confirmed': win.is_personally_confirmed,
             'is_prosperity_fund_related': win.is_prosperity_fund_related,
-            'lead_officer_email_address': win.lead_officer.contact_email,
-            'lead_officer_name': win.lead_officer.name,
+            'lead_officer_email_address':
+                win.lead_officer.contact_email
+                if win.lead_officer else win.lead_officer_email_address,
+            'lead_officer_name':
+                win.lead_officer.name
+                if win.lead_officer else win.lead_officer_name,
             'line_manager_name': win.line_manager_name,
             'name_of_customer': win.name_of_customer,
             'name_of_export': win.name_of_export,
@@ -320,8 +360,8 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'total_expected_export_value': win.total_expected_export_value,
             'total_expected_non_export_value': win.total_expected_non_export_value,
             'total_expected_odi_value': win.total_expected_odi_value,
-            'user__email': win.adviser.contact_email,
-            'user__name': win.adviser.name,
+            'user__email': win.adviser.contact_email if win.adviser else win.adviser_email_address,
+            'user__name': win.adviser.name if win.adviser else win.adviser_name,
             'business_potential_display': win.business_potential.name,
             'confirmation_last_export': win.customer_response.last_export.name,
             'confirmation_marketing_source': win.customer_response.marketing_source.name,
@@ -332,12 +372,13 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'export_experience_display': win.export_experience.name,
             'goods_vs_services_display': win.goods_vs_services.name,
             'hq_team_display': win.hq_team.name,
-            'hvo_programme_display': win.hvo_programme.name,
+            'hvo_programme_display': win.hvo_programme.name if win.hvo_programme else None,
             'sector_display': win.sector.name,
             'team_type_display': win.team_type.name,
             'num_notifications': len(tokens),
-            'customer_email_date':
-                format_date_or_datetime(max(tokens, key=lambda item: item.created_on).created_on),
+            'customer_email_date': format_date_or_datetime(
+                max(tokens, key=lambda item: item.created_on).created_on,
+            ) if len(tokens) > 0 else None,
         }
         for i, associated_programme in enumerate(associated_programmes):
             expected[f'associated_programme_{i+1}_display'] = associated_programme.name
@@ -395,8 +436,9 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
     ):
         if list_legacy_data:
             assert get_export_wins_legacy_data_feature_flag()
-
-        self.factory()
+        company = CompanyFactory(company_number='012345')
+        contact = ContactFactory(company=company)
+        self.factory(company=company, company_contacts=[contact])
         self.factory(complete=False, migrated_on=datetime.now())
         self.factory(complete=True, migrated_on=datetime.now())
 
@@ -410,6 +452,58 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
                 if Win.objects.get(id=result['id']).migrated_on
             ]
             assert {True, False} == set(completes)
+
+    @pytest.mark.parametrize(
+        'allow_legacy_data',
+        (
+            True,
+            False,
+        ),
+    )
+    def test_success_with_legacy_content_override(
+        self,
+        allow_legacy_data,
+        data_flow_api_client,
+    ):
+        wins = [self.factory()]
+
+        wins.append(
+            self.factory(
+                complete=False,
+                migrated_on=datetime.now(),
+                customer_email_address='test@customer',
+                customer_name='John Doe',
+                customer_job_title='Tester',
+            ),
+        )
+        wins.append(
+            self.factory(
+                complete=True,
+                migrated_on=datetime.now(),
+                customer_email_address='test@customer',
+                customer_name='John Doe',
+                customer_job_title='Tester',
+            ),
+        )
+
+        CustomerResponseFactory.create_batch(len(wins), win=Iterator(wins))
+
+        response = data_flow_api_client.get(
+            self.view_url,
+            {
+                'legacy_data': allow_legacy_data,
+            },
+        ).json()
+
+        assert len(response['results']) == (3 if allow_legacy_data else 1)
+        for i, result in enumerate(response['results']):
+            self._assert_win_matches_result(
+                wins[i],
+                [],
+                [],
+                [],
+                result,
+            )
 
     def test_customer_email_date_uses_most_recent(self, data_flow_api_client):
         win = self.factory()
