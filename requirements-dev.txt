@@ -34,7 +34,7 @@ botocore==1.34.136
     #   s3transfer
 build==1.0.3
     # via pip-tools
-certifi==2023.7.22
+certifi==2024.7.4
     # via
     #   elastic-apm
     #   opensearch-py
