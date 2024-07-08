@@ -27,6 +27,7 @@ from datahub.export_win.models import (
     BreakdownType,
     BusinessPotential,
     CustomerResponse,
+    CustomerResponseToken,
     ExpectedValueRelation,
     Experience,
     HQTeamRegionOrPost,
@@ -617,6 +618,41 @@ def migrate_edit_history(soft_deleted=False):
     for page in get_legacy_export_wins_dataset('/datasets/data-hub-edit-history'):
         for legacy_edit_history in page:
             migrate_legacy_edit_history(content_type_id, legacy_edit_history, soft_deleted)
+
+
+def migrate_legacy_notifications(legacy_notification):
+    try:
+        win = Win.objects.all_wins().select_related(
+            'customer_response',
+        ).get(pk=legacy_notification['win_id'])
+        customer_response = win.customer_response
+
+        if legacy_notification['type'] == 'c':
+            # customer notification
+            token, _ = CustomerResponseToken.objects.update_or_create(
+                customer_response_id=customer_response.id,
+                legacy_id=legacy_notification['id'],
+                defaults={
+                    'legacy_recipient': legacy_notification['recipient'],
+                    'expires_on': legacy_notification['created'],
+                },
+            )
+            token.created_on = legacy_notification['created']
+            token.save()
+        elif legacy_notification['type'] == 'o':
+            customer_response.lead_officer_email_sent_on = legacy_notification['created']
+            customer_response.save()
+    except Win.DoesNotExist:
+        logger.warning(f'Legacy Win {legacy_notification["win_id"]} does not exist.')
+        pass
+
+    return None
+
+
+def migrate_notifications(soft_deleted=False):
+    for page in get_legacy_export_wins_dataset('/datasets/data-hub-notifications'):
+        for legacy_notification in page:
+            migrate_legacy_notifications(legacy_notification)
 
 
 def _email_mapping(email):
