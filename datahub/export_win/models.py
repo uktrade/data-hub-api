@@ -741,6 +741,13 @@ class CustomerResponseToken(models.Model):
     times_used = models.PositiveIntegerField(default=0)
     created_on = models.DateTimeField(db_index=True, null=True, blank=True, auto_now_add=True)
 
+    legacy_id = models.IntegerField(blank=True, null=True, unique=True)
+    legacy_recipient = models.CharField(
+        blank=True,
+        max_length=256,
+        verbose_name='Legacy recipient',
+    )
+
     def __str__(self):
         return f'Token: {self.id} ({self.expires_on})'
 

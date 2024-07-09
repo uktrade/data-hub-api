@@ -21,6 +21,7 @@ from datahub.export_win.legacy_migration import (
     _email_mapping,
     migrate_all_legacy_wins,
     migrate_edit_history,
+    migrate_notifications,
 )
 from datahub.export_win.models import (
     Win,
@@ -53,6 +54,11 @@ mock_legacy_wins_page_urls = {
     'edit-history': [
         f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-edit-history',
         f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-edit-history'
+        '?cursor=1&source=L',
+    ],
+    'notifications': [
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-notifications',
+        f'{settings.EXPORT_WINS_SERVICE_BASE_URL}/datasets/data-hub-notifications'
         '?cursor=1&source=L',
     ],
 }
@@ -628,6 +634,52 @@ legacy_wins = {
             },
         ],
     },
+    mock_legacy_wins_page_urls['notifications'][0]: {
+        'next': mock_legacy_wins_page_urls['notifications'][1],
+        'results': [
+            {
+                'id': 204,
+                'win_id': '4c90a214-035f-4445-b6a1-ca7af3486f8c',
+                'created': '2020-02-29T12:47:50.062940Z',
+                'type': 'c',
+                'user__name': 'John Doe',
+                'user__email': 'john.doe@test',
+                'recipient': 'test@test',
+            },
+        ],
+    },
+    mock_legacy_wins_page_urls['notifications'][1]: {
+        'next': None,
+        'results': [
+            {
+                'id': 205,
+                'win_id': '4c90a214-035f-4445-b6a1-ca7af3486f8c',
+                'created': '2020-02-29T12:47:51.012230Z',
+                'type': 'c',
+                'user__name': 'John Doe',
+                'user__email': 'john.doe@test',
+                'recipient': 'test@test',
+            },
+            {
+                'id': 206,
+                'win_id': '4c90a214-035f-4445-b6a1-ca7af3486f8c',
+                'created': '2020-02-29T15:47:50.062940Z',
+                'type': 'o',
+                'user__name': 'John Doe',
+                'user__email': 'john.doe@test',
+                'recipient': 'john.doe@test',
+            },
+            {
+                'id': 207,
+                'win_id': '11111111-035f-4445-b6a1-ca7af3486f8c',
+                'created': '2020-02-29T12:47:50.062940Z',
+                'type': 'c',
+                'user__name': 'John Doe',
+                'user__email': 'john.doe@test',
+                'recipient': 'test@test',
+            },
+        ],
+    },
 }
 
 
@@ -889,6 +941,32 @@ def test_legacy_migration(mock_legacy_wins_pages):
         datetime(2020, 2, 29, 12, 47, 50, 62940, tzinfo=timezone.utc),
     }
     assert LogEntry.objects.count() == 0
+
+    migrate_notifications()
+
+    win_1_tokens = win_1.customer_response.tokens
+    win_1.customer_response.refresh_from_db()
+    assert win_1_tokens.count() == 2
+    tokens = win_1_tokens.filter(customer_response=win_1.customer_response)
+    token_ids = {token.legacy_id for token in tokens}
+    assert token_ids == {204, 205}
+    token_created = {token.created_on for token in tokens}
+    assert token_created == {
+        datetime(2020, 2, 29, 12, 47, 50, 62940, tzinfo=timezone.utc),
+        datetime(2020, 2, 29, 12, 47, 51, 12230, tzinfo=timezone.utc),
+    }
+    token_expires = {token.expires_on for token in tokens}
+    assert token_created == token_expires
+    assert win_1.customer_response.lead_officer_email_sent_on == datetime(
+        2020,
+        2,
+        29,
+        15,
+        47,
+        50,
+        62940,
+        tzinfo=timezone.utc,
+    )
 
 
 @pytest.mark.parametrize(
