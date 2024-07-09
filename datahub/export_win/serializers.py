@@ -6,6 +6,7 @@ from django.db import transaction
 
 from rest_framework.serializers import (
     BooleanField,
+    CharField,
     DateTimeField,
     ModelSerializer,
     SerializerMethodField,
@@ -70,11 +71,16 @@ class WinAdviserSerializer(ModelSerializer):
     team_type = NestedRelatedField(TeamType)
     hq_team = NestedRelatedField(HQTeamRegionOrPost)
 
+    # legacy field
+    name = CharField(read_only=True)
+
     class Meta:
         model = WinAdviser
         fields = (
             'id',
             'adviser',
+            # legacy field
+            'name',
             'team_type',
             'hq_team',
             'location',
@@ -163,6 +169,17 @@ class WinSerializer(ModelSerializer):
     complete = BooleanField(read_only=True)
     first_sent = DateTimeField(read_only=True)
     last_sent = DateTimeField(read_only=True)
+    migrated_on = DateTimeField(read_only=True)
+
+    # legacy fields
+    company_name = CharField(read_only=True)
+    customer_name = CharField(read_only=True)
+    customer_job_title = CharField(read_only=True)
+    customer_email_address = CharField(read_only=True)
+    lead_officer_name = CharField(read_only=True)
+    lead_officer_email_address = CharField(read_only=True)
+    adviser_name = CharField(read_only=True)
+    adviser_email_address = CharField(read_only=True)
 
     company_export = NestedRelatedField(
         CompanyExport,
@@ -175,10 +192,22 @@ class WinSerializer(ModelSerializer):
         fields = (
             'id',
             'adviser',
+            # legacy field
+            'adviser_name',
+            # legacy field
+            'adviser_email_address',
             'advisers',
             'breakdowns',
             'company',
+            # legacy field
+            'company_name',
             'company_contacts',
+            # legacy field
+            'customer_name',
+            # legacy field
+            'customer_job_title',
+            # legacy field
+            'customer_email_address',
             'complete',
             'customer_location',
             'business_type',
@@ -204,6 +233,10 @@ class WinSerializer(ModelSerializer):
             'is_personally_confirmed',
             'is_line_manager_confirmed',
             'lead_officer',
+            # legacy field
+            'lead_officer_name',
+            # legacy field
+            'lead_officer_email_address',
             'team_type',
             'hq_team',
             'business_potential',
@@ -221,6 +254,7 @@ class WinSerializer(ModelSerializer):
             'company_export',
             'first_sent',
             'last_sent',
+            'migrated_on',
         )
 
     def create(self, validated_data):
