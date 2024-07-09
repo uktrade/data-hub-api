@@ -196,10 +196,16 @@ class TestGetWinView(APITestMixin):
                 'last_name': win.adviser.last_name,
                 'name': win.adviser.name,
             },
+            # legacy field
+            'adviser_name': win.adviser_name,
+            # legacy field
+            'adviser_email_address': win.adviser_email_address,
             'company': {
                 'id': str(win.company.id),
                 'name': win.company.name,
             },
+            # legacy field
+            'company_name': win.company_name,
             'country': {
                 'id': str(win.country.id),
                 'name': win.country.name,
@@ -217,6 +223,12 @@ class TestGetWinView(APITestMixin):
                     'email': contact.email,
                 },
             ],
+            # legacy field
+            'customer_name': win.customer_name,
+            # legacy field
+            'customer_email_address': win.customer_email_address,
+            # legacy field
+            'customer_job_title': win.customer_job_title,
             'audit': win.audit,
             'business_potential': {
                 'id': str(win.business_potential.id),
@@ -259,8 +271,13 @@ class TestGetWinView(APITestMixin):
                 'last_name': win.lead_officer.last_name,
                 'name': win.lead_officer.name,
             },
+            # legacy field
+            'lead_officer_name': win.lead_officer_name,
+            # legacy field
+            'lead_officer_email_address': win.lead_officer_email_address,
             'location': win.location,
             'modified_on': format_date_or_datetime(win.modified_on),
+            'migrated_on': format_date_or_datetime(win.migrated_on),
             'name_of_customer': win.name_of_customer,
             'name_of_customer_confidential': win.name_of_customer_confidential,
             'name_of_export': win.name_of_export,
@@ -727,7 +744,13 @@ class TestCreateWinView(APITestMixin):
                 'last_name': win.adviser.last_name,
                 'name': win.adviser.name,
             },
+            # legacy field
+            'adviser_name': win.adviser_name,
+            # legacy field
+            'adviser_email_address': win.adviser_email_address,
             'company': {'id': str(win.company_id), 'name': win.company.name},
+            # legacy field
+            'company_name': win.company_name,
             'country': {'id': str(win.country_id), 'name': win.country.name},
             'associated_programme': [
                 {
@@ -742,6 +765,12 @@ class TestCreateWinView(APITestMixin):
                     'email': contact.email,
                 },
             ],
+            # legacy field
+            'customer_name': win.customer_name,
+            # legacy field
+            'customer_email_address': win.customer_email_address,
+            # legacy field
+            'customer_job_title': win.customer_job_title,
             'audit': win.audit,
             'business_potential': {
                 'id': str(win.business_potential_id),
@@ -808,8 +837,13 @@ class TestCreateWinView(APITestMixin):
                 'last_name': win.lead_officer.last_name,
                 'name': win.lead_officer.name,
             },
+            # legacy field
+            'lead_officer_name': win.lead_officer_name,
+            # legacy field
+            'lead_officer_email_address': win.lead_officer_email_address,
             'location': win.location,
             'modified_on': format_date_or_datetime(win.modified_on),
+            'migrated_on': format_date_or_datetime(win.migrated_on),
             'name_of_customer': win.name_of_customer,
             'name_of_customer_confidential': win.name_of_customer_confidential,
             'name_of_export': win.name_of_export,
@@ -983,10 +1017,16 @@ class TestCreateWinView(APITestMixin):
                 'last_name': win.adviser.last_name,
                 'name': win.adviser.name,
             },
+            # legacy field
+            'adviser_name': win.adviser_name,
+            # legacy field
+            'adviser_email_address': win.adviser_email_address,
             'company': {
                 'id': str(win.company_id),
                 'name': win.company.name,
             },
+            # legacy field
+            'company_name': win.company_name,
             'country': {
                 'id': str(win.country_id),
                 'name': win.country.name,
@@ -1004,6 +1044,12 @@ class TestCreateWinView(APITestMixin):
                     'email': contact.email,
                 },
             ],
+            # legacy field
+            'customer_name': win.customer_name,
+            # legacy field
+            'customer_email_address': win.customer_email_address,
+            # legacy field
+            'customer_job_title': win.customer_job_title,
             'audit': win.audit,
             'business_potential': {
                 'id': str(win.business_potential_id),
@@ -1070,8 +1116,13 @@ class TestCreateWinView(APITestMixin):
                 'last_name': win.lead_officer.last_name,
                 'name': win.lead_officer.name,
             },
+            # legacy field
+            'lead_officer_name': win.lead_officer_name,
+            # legacy field
+            'lead_officer_email_address': win.lead_officer_email_address,
             'location': win.location,
             'modified_on': format_date_or_datetime(win.modified_on),
+            'migrated_on': format_date_or_datetime(win.migrated_on),
             'name_of_customer': win.name_of_customer,
             'name_of_customer_confidential': win.name_of_customer_confidential,
             'name_of_export': win.name_of_export,
@@ -1104,6 +1155,8 @@ class TestCreateWinView(APITestMixin):
                         'last_name': win_adviser.adviser.last_name,
                         'name': win_adviser.adviser.name,
                     },
+                    # legacy field
+                    'name': win_adviser.name,
                     'location': win_adviser.location,
                     'team_type': {
                         'id': str(win_adviser.team_type.id),
@@ -1376,10 +1429,16 @@ class TestUpdateWinView(APITestMixin):
                 'last_name': adviser.last_name,
                 'name': adviser.name,
             },
+            # legacy field
+            'adviser_name': win.adviser_name,
+            # legacy field
+            'adviser_email_address': win.adviser_email_address,
             'company': {
                 'id': str(company.id),
                 'name': company.name,
             },
+            # legacy field
+            'company_name': win.company_name,
             'country': {
                 'id': str(CountryConstant.canada.value.id),
                 'name': CountryConstant.canada.value.name,
@@ -1397,6 +1456,12 @@ class TestUpdateWinView(APITestMixin):
                     'email': contact.email,
                 },
             ],
+            # legacy field
+            'customer_name': win.customer_name,
+            # legacy field
+            'customer_email_address': win.customer_email_address,
+            # legacy field
+            'customer_job_title': win.customer_job_title,
             'audit': win.audit,
             'business_potential': {
                 'id': str(win.business_potential_id),
@@ -1466,8 +1531,13 @@ class TestUpdateWinView(APITestMixin):
                 'last_name': lead_officer.last_name,
                 'name': lead_officer.name,
             },
+            # legacy field
+            'lead_officer_name': win.lead_officer_name,
+            # legacy field
+            'lead_officer_email_address': win.lead_officer_email_address,
             'location': 'Park',
             'modified_on': format_date_or_datetime(win.modified_on),
+            'migrated_on': format_date_or_datetime(win.migrated_on),
             'name_of_customer': win.name_of_customer,
             'name_of_customer_confidential': win.name_of_customer_confidential,
             'name_of_export': win.name_of_export,
@@ -1500,6 +1570,8 @@ class TestUpdateWinView(APITestMixin):
                         'last_name': win_adviser.adviser.last_name,
                         'name': win_adviser.adviser.name,
                     },
+                    # legacy field
+                    'name': win_adviser.name,
                     'location': win_adviser.location,
                     'team_type': {
                         'id': str(win_adviser.team_type.id),
@@ -1590,10 +1662,16 @@ class TestUpdateWinView(APITestMixin):
                 'last_name': win.adviser.last_name,
                 'name': win.adviser.name,
             },
+            # legacy field
+            'adviser_name': win.adviser_name,
+            # legacy field
+            'adviser_email_address': win.adviser_email_address,
             'company': {
                 'id': str(win.company.id),
                 'name': win.company.name,
             },
+            # legacy field
+            'company_name': win.company_name,
             'country': {
                 'id': str(win.country.id),
                 'name': win.country.name,
@@ -1611,6 +1689,12 @@ class TestUpdateWinView(APITestMixin):
                     'email': contact.email,
                 },
             ],
+            # legacy field
+            'customer_name': win.customer_name,
+            # legacy field
+            'customer_email_address': win.customer_email_address,
+            # legacy field
+            'customer_job_title': win.customer_job_title,
             'audit': win.audit,
             'business_potential': {
                 'id': str(win.business_potential.id),
@@ -1653,8 +1737,13 @@ class TestUpdateWinView(APITestMixin):
                 'last_name': win.lead_officer.last_name,
                 'name': win.lead_officer.name,
             },
+            # legacy field
+            'lead_officer_name': win.lead_officer_name,
+            # legacy field
+            'lead_officer_email_address': win.lead_officer_email_address,
             'location': win.location,
             'modified_on': format_date_or_datetime(win.modified_on),
+            'migrated_on': format_date_or_datetime(win.migrated_on),
             'name_of_customer': win.name_of_customer,
             'name_of_customer_confidential': win.name_of_customer_confidential,
             'name_of_export': win.name_of_export,
@@ -1689,6 +1778,8 @@ class TestUpdateWinView(APITestMixin):
                         'last_name': win_adviser.adviser.last_name,
                         'name': win_adviser.adviser.name,
                     },
+                    # legacy field
+                    'name': win_adviser.name,
                     'location': win_adviser.location,
                     'team_type': {
                         'id': str(win_adviser.team_type.id),
