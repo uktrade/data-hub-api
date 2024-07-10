@@ -403,24 +403,40 @@ class AnonymousWinAdminForm(ModelForm):
             'company_contacts': 'Contact names (leave blank for an anonymous win)',
             'total_expected_odi_value': 'Total expected ODI value',
             'customer_email_address': 'Company email',
+            'name_of_customer': 'Overseas customer (leave blank for an anonymous win)',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        customer_details_fields = {
+        self.fields['name_of_customer'].required = False
+
+        optional_legacy_fields = {
             'cdms_reference': 'Data Hub (Companies House) or CDMS reference number',
             'customer_email_address': 'Contact email',
             'customer_job_title': 'Job title',
+            'line_manager_name': 'Line manager',
+            'lead_officer_email_address': 'Lead officer email address',
+            'other_official_email_address': 'Secondary email address',
         }
 
-        for field_name, label in customer_details_fields.items():
+        for field_name, label in optional_legacy_fields.items():
             if field_name in self.fields:
                 self.fields[field_name].required = False
                 self.fields[field_name].label = f'{label} (legacy)'
 
-        if 'lead_officer' in self.fields:
-            self.fields['lead_officer'].required = True
+        mandatory_fields_for_anonymous_wins = {
+            'lead_officer': 'Lead officer',
+            'export_experience': 'Export experience',
+            'business_potential': 'Medium-sized and high potential companies',
+            'customer_location': 'HQ location',
+            'sector': 'Sector',
+        }
+
+        for field_name, label in mandatory_fields_for_anonymous_wins.items():
+            if field_name in self.fields:
+                self.fields[field_name].required = True
+                self.fields[field_name].label = f'{label}'
 
 
 @admin.register(AnonymousWin)
