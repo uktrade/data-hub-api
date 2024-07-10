@@ -50,4 +50,5 @@ sentry_sdk.init(
     ],
     in_app_include=['datahub'],
     enable_tracing=True,
+    sample_rate=0.01,
 )
