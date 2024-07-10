@@ -1,0 +1,8 @@
+- model: export_win.hqteamregionorpost
+  pk: 7dff9a0d-ac6c-40fc-86b5-050d255ac9bc
+  fields:
+    disabled_on: "2024-07-10T12:33:03Z"
+- model: export_win.hqteamregionorpost
+  pk: 37b7422d-02ad-4bcf-b5f3-1a0f5aaa2828
+  fields:
+    disabled_on: "2024-07-10T12:33:03Z"
