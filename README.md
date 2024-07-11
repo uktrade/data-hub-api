@@ -1,5 +1,5 @@
 # Data Hub API
-
+-
 [![CircleCI](https://circleci.com/gh/uktrade/data-hub-api.svg?style=svg)](https://circleci.com/gh/uktrade/data-hub-api)
 [![codecov](https://codecov.io/gh/uktrade/data-hub-api/branch/main/graph/badge.svg)](https://codecov.io/gh/uktrade/data-hub-api)
 
