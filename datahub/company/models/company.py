@@ -244,7 +244,7 @@ class Company(ArchivableModel, BaseModel):
     )
     address_country = models.ForeignKey(
         metadata_models.Country,
-        blank=True,
+        blank=False,
         null=True,
         on_delete=models.PROTECT,
         related_name='companies_with_country_address',
