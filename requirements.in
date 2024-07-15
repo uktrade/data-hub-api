@@ -6,7 +6,7 @@ django-csp==3.8
 django-environ==0.11.2
 django-extensions==3.2.3
 django-filter==24.2
-django-log-formatter-ecs==0.0.5
+django-log-formatter-asim==0.0.4
 django-mptt==0.16.0
 django-pglocks==1.0.4
 django-reversion==5.0.12
@@ -17,6 +17,10 @@ whitenoise==6.7.0
 chardet==5.2.0
 pyyaml==6.0.1
 python-dateutil==2.9.0.post0
+
+# DBT Platform
+dbt-copilot-python==0.1.4
+dj-database-url==2.1.0
 
 # Persistency layer
 psycopg2-binary==2.9.9
