@@ -12,7 +12,8 @@ from urllib.parse import urlencode
 
 import environ
 from django.core.exceptions import ImproperlyConfigured
-
+import dj_database_url
+from dbt_copilot_python.database import database_url_from_env
 from config.settings.types import HawkScope
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -181,7 +182,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        **env.db('DATABASE_URL'),
+        **dj_database_url.config(default=database_url_from_env("DATABASE_CREDENTIALS")),
         'ATOMIC_REQUESTS': True,
         'CONN_MAX_AGE': env.int('DATABASE_CONN_MAX_AGE', 0),
         'DISABLE_SERVER_SIDE_CURSORS': False,
@@ -341,6 +342,7 @@ else:
     OPENSEARCH_URL = env('OPENSEARCH_URL') or '<invalid-configuration>'
 
 OPENSEARCH_VERIFY_CERTS = env.bool('OPENSEARCH_VERIFY_CERTS', True)
+OPENSEARCH_POOL_MAXSIZE = env.int('OPENSEARCH_POOL_MAXSIZE', default=10)
 OPENSEARCH_INDEX_PREFIX = env('OPENSEARCH_INDEX_PREFIX')
 OPENSEARCH_INDEX_SETTINGS = {}
 OPENSEARCH_BULK_MAX_CHUNK_BYTES = 10 * 1024 * 1024  # 10MB
@@ -620,9 +622,9 @@ ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY = env(
 DOCUMENT_BUCKETS = {
     'default': {
         'bucket': env('DEFAULT_BUCKET'),
-        'aws_access_key_id': env('AWS_ACCESS_KEY_ID', default=''),
-        'aws_secret_access_key': env('AWS_SECRET_ACCESS_KEY', default=''),
-        'aws_region': env('AWS_DEFAULT_REGION', default=''),
+        'aws_access_key_id': env('DEFAULT_BUCKET_AWS_ACCESS_KEY_ID', default=''),
+        'aws_secret_access_key': env('DEFAULT_BUCKET_AWS_SECRET_ACCESS_KEY', default=''),
+        'aws_region': env('DEFAULT_BUCKET_AWS_DEFAULT_REGION', default=''),
     },
     'investment': {
         'bucket': env('INVESTMENT_DOCUMENT_BUCKET', default=''),

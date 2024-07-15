@@ -1,3 +1,5 @@
+import logging
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.mixins import ListModelMixin
 from rest_framework.viewsets import GenericViewSet
@@ -11,11 +13,12 @@ from datahub.core.hawk_receiver import (
 )
 from datahub.metadata.registry import registry
 
+logger = logging.getLogger(__name__)
+
 
 def _create_metadata_view(mapping):
     has_filters = mapping.filterset_fields or mapping.filterset_class
     model = mapping.queryset.model
-
     attrs = {
         'authentication_classes': (PaaSIPAuthentication, HawkAuthentication),
         'permission_classes': (HawkScopePermission,),
