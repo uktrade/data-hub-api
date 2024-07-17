@@ -169,6 +169,7 @@ class WinSerializer(ModelSerializer):
     complete = BooleanField(read_only=True)
     first_sent = DateTimeField(read_only=True)
     last_sent = DateTimeField(read_only=True)
+
     migrated_on = DateTimeField(read_only=True)
 
     # legacy fields
@@ -386,21 +387,21 @@ class PublicCustomerResponseSerializer(ModelSerializer):
         )
         return field.to_representation(token.company_contact)
 
-    @transaction.atomic
     def update(self, instance, validated_data):
         """
         Update the customer response and invalidate token.
         """
-        instance = super().update(instance, validated_data)
+        with transaction.atomic():
+            instance = super().update(instance, validated_data)
 
-        instance.responded_on = datetime.utcnow()
-        instance.save(update_fields=('responded_on',))
+            instance.responded_on = datetime.utcnow()
+            instance.save(update_fields=('responded_on',))
 
-        CustomerResponseToken.objects.filter(
-            id=self.context.get('token_pk'),
-        ).update(
-            expires_on=datetime.utcnow(),
-        )
+            CustomerResponseToken.objects.filter(
+                id=self.context.get('token_pk'),
+            ).update(
+                expires_on=datetime.utcnow(),
+            )
 
         if instance.agree_with_win:
             template_id = settings.EXPORT_WIN_LEAD_OFFICER_APPROVED_TEMPLATE_ID
