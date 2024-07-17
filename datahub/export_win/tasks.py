@@ -292,7 +292,9 @@ def update_customer_response_for_lead_officer_notification_id(
     customer_response = CustomerResponse.objects.get(id=object_id)
     customer_response.lead_officer_email_notification_id = email_notification_id
     customer_response.lead_officer_email_sent_on = datetime.utcnow()
-    customer_response.save()
+    customer_response.save(
+        update_fields=('lead_officer_email_notification_id', 'lead_officer_email_sent_on'),
+    )
 
     logger.info(
         'Task update_customer_response_for_lead_officer_notification_id completed '
