@@ -495,6 +495,12 @@ class Win(BaseModel):
             )
 
     def save(self, *args, **kwargs):
+        if not self.pk:
+            self.total_expected_export_value = 0
+            self.total_expected_non_export_value = 0
+            self.total_expected_odi_value = 0
+            super().save(*args, **kwargs)
+
         calc_total = calculate_totals_for_export_win(self)
         self.total_expected_export_value = calc_total['total_export_value']
         self.total_expected_non_export_value = calc_total['total_non_export_value']

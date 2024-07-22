@@ -514,7 +514,7 @@ class TestAutoResendClientEmailFromUnconfirmedWinTask:
         assert customer_response.tokens.count() == (2 if is_deleted else 3)
 
 
-def test_get_all_fields_for_client_email_receipt_success():
+def test_get_all_fields_for_client_email_receipt_as_company_contact_success():
     customer_response = CustomerResponseFactory()
     token = CustomerResponseTokenFactory(customer_response=customer_response)
     result = get_all_fields_for_client_email_receipt(
@@ -529,6 +529,28 @@ def test_get_all_fields_for_client_email_receipt_success():
     assert result['customer_email'] == token.company_contact.email
     assert result['country_destination'] == win.country.name
     assert result['client_firstname'] == token.company_contact.first_name
+    assert result['lead_officer_name'] == win.lead_officer.name
+    assert result['goods_services'] == win.goods_vs_services.name
+    # Compare the generated URL with the expected URL using the specific ID
+    assert result['url'] == f'{settings.EXPORT_WIN_CLIENT_REVIEW_WIN_URL}/{str(token.id)}'
+
+
+def test_get_all_fields_for_client_email_receipt_as_adviser_success():
+    customer_response = CustomerResponseFactory()
+    adviser = AdviserFactory()
+    token = CustomerResponseTokenFactory(adviser=adviser)
+    result = get_all_fields_for_client_email_receipt(
+        token,
+        customer_response,
+    )
+    """
+    Testing to get all fields for adviser as client email receipt
+    """
+    # Assertions for the expected values
+    win = customer_response.win
+    assert result['customer_email'] == token.adviser.contact_email
+    assert result['country_destination'] == win.country.name
+    assert result['client_firstname'] == token.adviser.first_name
     assert result['lead_officer_name'] == win.lead_officer.name
     assert result['goods_services'] == win.goods_vs_services.name
     # Compare the generated URL with the expected URL using the specific ID

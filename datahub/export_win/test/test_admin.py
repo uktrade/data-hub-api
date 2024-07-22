@@ -185,6 +185,26 @@ def test_has_view_permission(admin):
 
 
 @pytest.mark.django_db
+def test_has_view_permission_for_anonymous_wins(admin):
+    """Test for has view permission for anonymous wins"""
+    regular_user = AdviserFactory()
+    export_win_admin_group = Group.objects.create(name='ExportWinAdmin')
+    regular_user.groups.add(export_win_admin_group)
+
+    superuser = AdviserFactory(is_superuser=True)
+    request = RequestFactory().get('/anonymouswin/')
+
+    request.user = regular_user
+    assert admin.has_view_permission(request) is True
+
+    request.user = AdviserFactory()
+    assert admin.has_view_permission(request) is False
+
+    request.user = superuser
+    assert admin.has_view_permission(request) is True
+
+
+@pytest.mark.django_db
 def test_get_queryset():
     """
     Test to get winadviser
@@ -265,7 +285,7 @@ class TestWinAdminForm:
 class TestAnonymousWinAdminForm:
     """Test for AnonymousWinAdminForm"""
 
-    def test_anonymous_win_admin_form(self):
+    def test_anonymous_win_admin_form_with_mandatory_fields(self):
         form = AnonymousWinAdminForm()
         assert form is not None
 
@@ -302,7 +322,7 @@ class TestAnonymousWinAdminForm:
         Test for notify anonymous wins adviser as contact
 
         It should schedule a task to:
-            * notify a adviser
+            * notify an adviser
             * trigger a second task to store the notification_id
         """
         adviser_email_address = 'win.admin@example.com'
