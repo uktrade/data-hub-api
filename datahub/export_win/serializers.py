@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import reversion
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import transaction
 
@@ -15,6 +16,7 @@ from rest_framework.serializers import (
 from datahub.company.models import Company, CompanyExport, Contact, ExportExperience
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
+from datahub.core.utils import get_financial_year
 from datahub.export_win.models import (
     AssociatedProgramme,
     Breakdown,
@@ -59,6 +61,24 @@ class BreakdownSerializer(ModelSerializer):
         fields = (
             'id',
             'type',
+            'year',
+            'value',
+        )
+
+
+class LegacyBreakdownSerializer(ModelSerializer):
+    """Breakdown serializer for legacy win view."""
+
+    year = SerializerMethodField()
+
+    def get_year(self, breakdown):
+        return get_financial_year(
+            breakdown.win.date + relativedelta(years=breakdown.year - 1),
+        )
+
+    class Meta:
+        model = Breakdown
+        fields = (
             'year',
             'value',
         )
@@ -131,6 +151,21 @@ class CustomerResponseSerializer(ModelSerializer):
             'other_marketing_source',
             'responded_on',
         )
+
+
+class LegacyCustomerResponseSerializer(ModelSerializer):
+    """Serializer for CustomerResponse to expose confirmation status and date"""
+
+    confirmed = BooleanField(source='agree_with_win', read_only=True)
+    date = DateTimeField(source='responded_on', read_only=True)
+
+    class Meta:
+        model = CustomerResponse
+        fields = (
+            'confirmed',
+            'date',
+        )
+        read_only_fields = fields
 
 
 class WinSerializer(ModelSerializer):
@@ -448,3 +483,129 @@ class PublicCustomerResponseSerializer(ModelSerializer):
             'other_marketing_source',
             'company_contact',
         )
+
+
+class DataHubLegacyExportWinSerializer(ModelSerializer):
+    """
+    Legacy read-only serialiser for export win views.
+    """
+
+    response = SerializerMethodField(read_only=True)
+
+    title = CharField(source='name_of_export', read_only=True)
+    customer = CharField(source='company_name', read_only=True)
+    hvc = SerializerMethodField(read_only=True)
+    officer = SerializerMethodField(read_only=True)
+    country = SerializerMethodField(read_only=True)
+    sector = SerializerMethodField(read_only=True)
+    contact = SerializerMethodField(read_only=True)
+    created = SerializerMethodField(read_only=True)
+    value = SerializerMethodField(read_only=True)
+    business_potential = SerializerMethodField(read_only=True)
+
+    def get_created(self, win):
+        return win.created_on
+
+    def get_value(self, win):
+        """
+        Return breakdown vaules in a value nested dict.
+        Use only breakdown type EXPORT
+        """
+        breakdowns_exports = win.breakdowns.filter(type__name='Export')
+        breakdowns = LegacyBreakdownSerializer(breakdowns_exports, many=True)
+        return {
+            'export': {
+                'total': win.total_expected_export_value,
+                'breakdowns': breakdowns.data,
+            },
+        }
+
+    def get_officer(self, win):
+        """Return lead officer in a officer nested dict."""
+        if win.lead_officer:
+            officer = {
+                'name': win.lead_officer.name,
+                'email': win.lead_officer.contact_email,
+            }
+        else:
+            officer = {
+                'name': win.lead_officer_name,
+                'email': win.lead_officer_email_address,
+            }
+        officer.update({
+            'team': {
+                'type': win.team_type.name,
+                'sub_type': win.hq_team.name,
+            },
+        })
+        return officer
+
+    def get_hvc(self, win):
+        """Return hvc data in a hvc nested dict."""
+        if win.hvc:
+            return {
+                'code': win.hvc.campaign_id,
+                'name': win.hvc.name,
+            }
+        return None
+
+    def get_contact(self, win):
+        """Return contact information in a contact nested dict."""
+        contact = win.company_contacts.first()
+        if contact:
+            return {
+                'name': contact.name,
+                'email': contact.email,
+                'job_title': contact.job_title,
+            }
+        return {
+            'name': win.customer_name,
+            'email': win.customer_email_address,
+            'job_title': win.customer_job_title,
+        }
+
+    def get_country(self, win):
+        """Return country name for the code."""
+        if win.country:
+            return win.country.name
+        return None
+
+    def get_sector(self, win):
+        """Return sector name for the code."""
+        if win.sector:
+            return win.sector.name
+        return None
+
+    def get_business_potential(self, win):
+        """Return human readable name for business type."""
+        if win.business_potential:
+            return win.business_potential.export_win_id
+        return None
+
+    def get_response(self, win):
+        if win.customer_response.responded_on:
+            return LegacyCustomerResponseSerializer(
+                win.customer_response,
+            ).data
+        return None
+
+    class Meta:
+        model = Win
+        fields = (
+            'id',
+            'title',
+            'date',
+            'created',
+            'country',
+            'sector',
+            'business_potential',
+            'business_type',
+            'name_of_export',
+            'officer',
+            'contact',
+            'value',
+            'customer',
+            'response',
+            'hvc',
+        )
+        read_only_fields = fields

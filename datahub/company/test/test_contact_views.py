@@ -34,8 +34,8 @@ pytestmark = pytest.mark.django_db
 def generate_hawk_response(response):
     """Mocks HAWK server validation for content."""
     return HawkMockJSONResponse(
-        api_id=settings.COMPANY_MATCHING_HAWK_ID,
-        api_key=settings.COMPANY_MATCHING_HAWK_KEY,
+        api_id=settings.CONSENT_SERVICE_HAWK_ID,
+        api_key=settings.CONSENT_SERVICE_HAWK_KEY,
         response=response,
     )
 
@@ -993,8 +993,8 @@ class ViewContactBase(APITestMixin):
         """
         contact = ContactFactory()
         hawk_response = HawkMockJSONResponse(
-            api_id=settings.COMPANY_MATCHING_HAWK_ID,
-            api_key=settings.COMPANY_MATCHING_HAWK_KEY,
+            api_id=settings.CONSENT_SERVICE_HAWK_ID,
+            api_key=settings.CONSENT_SERVICE_HAWK_KEY,
             response={
                 'results': [{
                     'email': contact.email,

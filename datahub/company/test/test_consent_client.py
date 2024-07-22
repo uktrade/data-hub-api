@@ -13,8 +13,8 @@ from datahub.core.test_utils import HawkMockJSONResponse
 def generate_hawk_response(payload):
     """Mocks HAWK server validation for content."""
     return HawkMockJSONResponse(
-        api_id=settings.COMPANY_MATCHING_HAWK_ID,
-        api_key=settings.COMPANY_MATCHING_HAWK_KEY,
+        api_id=settings.CONSENT_SERVICE_HAWK_ID,
+        api_key=settings.CONSENT_SERVICE_HAWK_KEY,
         response=payload,
     )
 
