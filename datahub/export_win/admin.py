@@ -5,7 +5,7 @@ from django.contrib.admin import DateFieldListFilter
 from django.db import transaction
 from django.db.models import Value
 from django.db.models.functions import Concat
-from django.forms import ModelForm
+from django.forms import BaseInlineFormSet, ModelForm, ValidationError
 from django.urls import reverse
 from reversion.admin import VersionAdmin
 
@@ -35,6 +35,28 @@ class BaseTabularInline(admin.TabularInline):
     exclude = ('id',)
 
 
+class RequiredInLineFormSet(BaseInlineFormSet):
+    """Generates an inline formset that is required"""
+
+    def _construct_form(self, i, **kwargs):
+        """Overide the method to change the form attribute empty_permitted"""
+        form = super(RequiredInLineFormSet, self)._construct_form(i, **kwargs)
+        form.empty_permitted = False
+        return form
+
+    def clean(self):
+        """Clean and sanitise form array"""
+        super().clean()
+        if any(self.errors):
+            return
+        if not any(
+            form.cleaned_data
+            for form in self.forms
+            if form.cleaned_data and not form.cleaned_data.get('DELETE', False)
+        ):
+            raise ValidationError('You must specify at least one record.')
+
+
 class BreakdownInlineForm(ModelForm):
     """Breakdown inline form."""
 
@@ -51,6 +73,7 @@ class BreakdownInline(BaseTabularInline):
 
     model = Breakdown
     form = BreakdownInlineForm
+    formset = RequiredInLineFormSet
 
     fields = ('id', 'type', 'year', 'value')
     verbose_name_plural = 'Breakdowns'
