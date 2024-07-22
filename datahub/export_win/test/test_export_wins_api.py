@@ -14,13 +14,11 @@ from requests.exceptions import (
 
 from rest_framework import status
 
-from datahub.company.export_wins_api import (
+from datahub.core.test_utils import APITestMixin, HawkMockJSONResponse
+from datahub.export_win.export_wins_api import (
     ExportWinsAPIConnectionError,
     ExportWinsAPIHTTPError,
     ExportWinsAPITimeoutError,
-)
-from datahub.core.test_utils import APITestMixin, HawkMockJSONResponse
-from datahub.export_win.export_wins_api import (
     get_legacy_export_wins_dataset,
 )
 
