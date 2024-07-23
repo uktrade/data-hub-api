@@ -595,6 +595,12 @@ _add_hawk_credentials(
 )
 
 _add_hawk_credentials(
+    'DATA_HUB_ENQUIRY_MGMT_HAWK_ID',
+    'DATA_HUB_ENQUIRY_MGMT_HAWK_SECRET_KEY',
+    (HawkScope.metadata,),
+)
+
+_add_hawk_credentials(
     'OMIS_PUBLIC_ACCESS_KEY_ID',
     'OMIS_PUBLIC_SECRET_ACCESS_KEY',
     (HawkScope.public_omis,),
