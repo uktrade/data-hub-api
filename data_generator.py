@@ -6,6 +6,7 @@ from collections import defaultdict
 from datetime import timedelta
 
 import django
+from django.db import transaction
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
 django.setup()
@@ -22,13 +23,31 @@ from django.db.models.signals import (
     pre_save,
 )
 
+from datahub.company.models.adviser import Advisor
+from datahub.company.models.company import Company
 from datahub.company.test.factories import (
     AdviserFactory,
     ArchivedCompanyFactory,
+    # ArchivedCompanyFactory,
     CompanyFactory,
     CompanyWithAreaFactory,
+    # CompanyWithAreaFactory,
     ContactFactory,
+    ContactWithOwnAddressFactory,
+    ContactWithOwnAreaFactory,
+    DuplicateCompanyFactory,
     SubsidiaryFactory,
+)
+from datahub.metadata.models import Team
+from datahub.omis.order.test.factories import (
+    OrderCancelledFactory,
+    OrderCompleteFactory,
+    OrderPaidFactory,
+    OrderWithOpenQuoteFactory,
+)
+from datahub.omis.quote.test.factories import (
+    AcceptedQuoteFactory,
+    QuoteFactory,
 )
 
 
@@ -64,54 +83,158 @@ class DisableSignals:
         del self.stashed_signals[signal]
 
 
+def create_omis_orders(companies, range_bottom, range_top):
+    if range_bottom > range_top:
+        return
+
+    for company in companies:
+        with transaction.atomic():
+
+            # Create contact to prevent one being created with a new company
+            # for quotes requiring a contact.
+            contact = ContactFactory(company=company)
+
+            # Generate Complete Orders
+            OrderCompleteFactory.create_batch(
+                random.randint(range_bottom, range_top),
+                company=company,
+                quote=AcceptedQuoteFactory(
+                    accepted_by=contact,
+                    created_by=company.created_by,
+                ),
+                created_by=company.created_by,
+                completed_by=company.created_by,
+            )
+
+            # Generate Cancelled Orders
+            OrderCancelledFactory.create_batch(
+                random.randint(range_bottom, range_top),
+                company=company,
+                quote=AcceptedQuoteFactory(
+                    accepted_by=contact,
+                    created_by=company.created_by,
+                ),
+                created_by=company.created_by,
+                cancelled_by=company.created_by,
+            )
+
+            # Generate Paid Orders
+            OrderPaidFactory.create_batch(
+                random.randint(range_bottom, range_top),
+                company=company,
+                quote=AcceptedQuoteFactory(
+                    accepted_by=contact,
+                    created_by=company.created_by,
+                ),
+                created_by=company.created_by,
+            )
+
+            # Generate order with open quote
+            OrderWithOpenQuoteFactory.create_batch(
+                random.randint(range_bottom, range_top),
+                company=company,
+                quote=QuoteFactory(created_by=company.created_by),
+                created_by=company.created_by,
+            )
+
+
 # Disable open search indexing
 with DisableSignals():
     start_time = time.time()
 
+    # Pre fetch Metadata
+    teams = list(Team.objects.all())
+
+    advisers = Advisor.objects.all()
+
     # In February 2024 there were 18,000 advisers, 500,000 companies, and 950,000 contacts.
     # Alter number of adivsers below to create larger or smaller data set.
-    advisers = AdviserFactory.create_batch(200)
-    print(f'Generated {len(advisers)} advisers')  # noqa
+    # Generate Advisers
+    print('Generating advisers')  # noqa
+    for index in range(10):
+        AdviserFactory(dit_team=random.choice(teams))
+        if index % 10 == 0:
+            print('.', end='')  # noqa
+    advisers = Advisor.objects.all()
+
+    print(f'Generated {advisers.count} advisers')  # noqa
+
+    # # Generate base companies
+    print('\nGenerating Companies')  # noqa
     for index, adviser in enumerate(advisers):
-        companies = CompanyFactory.create_batch(
-            random.randint(1, 25),
+        CompanyFactory.create_batch(
+            random.randint(0, 25),
+            created_by=adviser,
+            modified_by=random.choice(advisers),
+        )
+        if index % 10 == 0:
+            print('.', end='')  # noqa
+
+    print('\nGenerating Company variations')  # noqa
+    companies = Company.objects.all()
+    # The ratios of the below types of companies do not reflect the live database.
+    # Generate different type of companies
+    for index, adviser in enumerate(advisers):
+        SubsidiaryFactory.create_batch(
+            random.randint(0, 25),
+            created_by=adviser,
+            modified_by=random.choice(advisers),
+            global_headquarters=random.choice(companies),
+        )
+        CompanyWithAreaFactory.create_batch(
+            random.randint(0, 1),
+            created_by=adviser,
+            modified_by=random.choice(advisers),
+        )
+        ArchivedCompanyFactory.create_batch(
+            random.randint(0, 1),
             created_by=adviser,
             modified_by=adviser,
         )
+        DuplicateCompanyFactory.create_batch(
+            random.randint(0, 1),
+            created_by=adviser,
+            modified_by=adviser,
+            transferred_by=random.choice(advisers),
+            transferred_to=random.choice(companies),
+        )
 
-        # The ratios of the below types of companies do not reflect the live database.
-        companies.extend(
-            SubsidiaryFactory.create_batch(
-                random.randint(1, 5),
-                created_by=adviser,
-                modified_by=adviser,
-            ),
-        )
-        companies.extend(
-            CompanyWithAreaFactory.create_batch(
-                random.randint(0, 1),
-                created_by=adviser,
-                modified_by=adviser,
-            ),
-        )
-        companies.extend(
-            ArchivedCompanyFactory.create_batch(
-                random.randint(0, 1),
-                created_by=adviser,
-                modified_by=adviser,
-            ),
-        )
+        def generate_contacts(advisers, min, max):
+            print('\nGenerating contacts on advisers')  # noqa
+            for _ in advisers:
+                ContactFactory.create_batch(
+                    random.randint(min, max),
+                    created_by=random.choice(advisers),
+                    modified_by=random.choice(advisers),
+                )
+
+            print('\nGenerating contacts on advisers with a different address from company')   # noqa
+            for _ in advisers:
+                ContactWithOwnAddressFactory.create_batch(
+                    random.randint(min, max),
+                    created_by=random.choice(advisers),
+                    modified_by=random.choice(advisers),
+                )
+
+            print('\nGenerating contacts on advisers with a different address from the contact company that includes an area')  # noqa
+            for _ in advisers:
+                ContactWithOwnAreaFactory.create_batch(
+                    random.randint(min, max),
+                    created_by=random.choice(advisers),
+                    modified_by=random.choice(advisers),
+                )
+
         # Show a sign of life every now and then
         if index % 10 == 0:
             print('.', end='')  # noqa
 
         # The below ratio of contacts to companies does not reflect the live database.
-        for company in companies:
-            ContactFactory.create_batch(
-                random.randint(1, 2),
-                company=company,
-                created_by=adviser,
-            )
+        # for company in companies:
+        #     ContactFactory.create_batch(
+        #         random.randint(1, 2),
+        #         company=company,
+        #         created_by=adviser,
+        # )
 
     elapsed = time.time() - start_time
     print(f'{timedelta(seconds=elapsed)}')  # noqa
