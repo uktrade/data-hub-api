@@ -1,0 +1,8 @@
+- model: export_win.hqteamregionorpost
+  pk: ea0e9035-74ee-41ad-848a-5dd88dceb064
+  fields:
+    disabled_on: null
+    name: 'Chemicals Critical Minerals and Mining'
+    export_win_id: 'other:14'
+    team_type_id: bbb7fad4-417c-411e-a40a-11184b0c635d
+    order:  4130
