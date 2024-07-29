@@ -402,7 +402,8 @@ class DeletedWinAdmin(WinAdmin):
             or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
         ):
             return True
-        return False
+        else:
+            return False
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -496,7 +497,8 @@ class AnonymousWinAdmin(WinAdmin):
             or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
         ):
             return True
-        return False
+        else:
+            return False
 
     def has_change_permission(self, request, obj=None):
         return True

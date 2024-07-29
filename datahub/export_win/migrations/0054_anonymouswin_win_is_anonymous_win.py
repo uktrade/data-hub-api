@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('export_win', '0049_add_teams'),
+        ('export_win', '0053_disable_teams'),
     ]
 
     operations = [

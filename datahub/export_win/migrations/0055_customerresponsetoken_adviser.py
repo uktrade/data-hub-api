@@ -9,13 +9,14 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('export_win', '0050_anonymouswin_win_is_anonymous_win'),
+        ('export_win', '0054_anonymouswin_win_is_anonymous_win'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='customerresponsetoken',
             name='adviser',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='admin_tokens', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT,
+                                    related_name='admin_tokens', to=settings.AUTH_USER_MODEL),
         ),
     ]
