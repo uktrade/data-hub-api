@@ -397,13 +397,10 @@ class DeletedWinAdmin(WinAdmin):
 
     def has_view_permission(self, request, obj=None):
         """Set the desired user group to access view deleted win"""
-        if (
+        return True if (
             request.user.is_superuser
             or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
-        ):
-            return True
-        else:
-            return False
+        ) else False
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -492,13 +489,10 @@ class AnonymousWinAdmin(WinAdmin):
 
     def has_view_permission(self, request, obj=None):
         """Set the desired user group to access view anonymous win"""
-        if (
+        return True if (
             request.user.is_superuser
             or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
-        ):
-            return True
-        else:
-            return False
+        ) else False
 
     def has_change_permission(self, request, obj=None):
         return True
