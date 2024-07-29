@@ -216,7 +216,7 @@ pandas==2.2.2
     # via -r requirements.in
 platformdirs==4.2.0
     # via virtualenv
-pre-commit==3.7.0
+pre-commit==3.8.0
     # via django-log-formatter-asim
 protobuf==4.25.3
     # via
