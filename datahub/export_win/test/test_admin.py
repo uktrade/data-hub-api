@@ -1,3 +1,4 @@
+import uuid
 from unittest.mock import Mock
 
 import pytest
@@ -10,6 +11,7 @@ from reversion.models import Version
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.export_win.admin import (
     AdvisorInlineForm,
+    AnonymousWinAdminForm,
     BreakdownInlineForm,
     CustomerResponseInlineForm,
     DeletedWinAdmin, WinAdmin,
@@ -17,8 +19,14 @@ from datahub.export_win.admin import (
     WinAdviserAdmin,
     WinSoftDeletedAdminForm)
 from datahub.export_win.models import DeletedWin, Win, WinAdviser
+from datahub.export_win.tasks import (
+    notify_export_win_email_by_rq_email,
+    send_export_win_email_notification_via_rq,
+    update_customer_response_token_for_email_notification_id,
+)
 from datahub.export_win.test.factories import (
     CustomerResponseFactory, WinAdviserFactory, WinFactory)
+from datahub.notification.constants import NotifyServiceName
 
 
 @pytest.fixture
@@ -177,6 +185,26 @@ def test_has_view_permission(admin):
 
 
 @pytest.mark.django_db
+def test_has_view_permission_for_anonymous_wins(admin):
+    """Test for has view permission for anonymous wins"""
+    regular_user = AdviserFactory()
+    export_win_admin_group = Group.objects.create(name='ExportWinAdmin')
+    regular_user.groups.add(export_win_admin_group)
+
+    superuser = AdviserFactory(is_superuser=True)
+    request = RequestFactory().get('/anonymouswin/')
+
+    request.user = regular_user
+    assert admin.has_view_permission(request) is True
+
+    request.user = AdviserFactory()
+    assert admin.has_view_permission(request) is False
+
+    request.user = superuser
+    assert admin.has_view_permission(request) is True
+
+
+@pytest.mark.django_db
 def test_get_queryset():
     """
     Test to get winadviser
@@ -210,6 +238,16 @@ def test_get_computed_adviser_name_legacy_adviser():
     assert admin_instance.get_computed_adviser_name(win_adviser) == 'John Smith'
 
 
+@pytest.fixture()
+def mock_job_scheduler(monkeypatch):
+    mock_job_scheduler = Mock()
+    monkeypatch.setattr(
+        'datahub.export_win.tasks.job_scheduler',
+        mock_job_scheduler,
+    )
+    return mock_job_scheduler
+
+
 @pytest.mark.django_db
 class TestWinSoftDeletedAdminForm:
     """Test for WinSoftDeletedAdminForm"""
@@ -241,6 +279,99 @@ class TestWinAdminForm:
         for field_name, label in legacy_fields.items():
             assert form.fields[field_name].required is False
             assert form.fields[field_name].label == f'{label} (legacy)'
+
+
+@pytest.mark.django_db
+class TestAnonymousWinAdminForm:
+    """Test for AnonymousWinAdminForm"""
+
+    def test_anonymous_win_admin_form_with_mandatory_fields(self):
+        form = AnonymousWinAdminForm()
+        assert form is not None
+
+        optional_legacy_fields = {
+            'cdms_reference': 'Data Hub (Companies House) or CDMS reference number',
+            'customer_email_address': 'Contact email',
+            'customer_job_title': 'Job title',
+            'line_manager_name': 'Line manager',
+            'lead_officer_email_address': 'Lead officer email address',
+            'other_official_email_address': 'Secondary email address',
+        }
+
+        for field_name, label in optional_legacy_fields.items():
+            assert form.fields[field_name].required is False
+            assert form.fields[field_name].label == f'{label} (legacy)'
+
+        mandatory_fields_for_anonymous_wins = {
+            'lead_officer': 'Lead officer',
+            'export_experience': 'Export experience',
+            'business_potential': 'Medium-sized and high potential companies',
+            'customer_location': 'HQ location',
+            'sector': 'Sector',
+        }
+
+        for field_name, label in mandatory_fields_for_anonymous_wins.items():
+            assert form.fields[field_name].required is True
+            assert form.fields[field_name].label == f'{label}'
+
+    def notify_anonymous_wins_adviser_as_contact(
+        self,
+        mock_job_scheduler,
+    ):
+        """
+        Test for notify anonymous wins adviser as contact
+
+        It should schedule a task to:
+            * notify an adviser
+            * trigger a second task to store the notification_id
+        """
+        adviser_email_address = 'win.admin@example.com'
+        template_id = str(uuid.uuid4())
+        context = {}
+        token_id = uuid.uuid4()
+
+        notify_export_win_email_by_rq_email(
+            adviser_email_address,
+            template_id,
+            context,
+            update_customer_response_token_for_email_notification_id,
+            token_id,
+        )
+        mock_job_scheduler.assert_called_once_with(
+            function=send_export_win_email_notification_via_rq,
+            function_args=(
+                adviser_email_address,
+                template_id,
+                context,
+                update_customer_response_token_for_email_notification_id,
+                token_id,
+                NotifyServiceName.export_win,
+            ),
+            retry_backoff=True,
+            max_retries=5,
+        )
+
+        mock_job_scheduler.reset_mock()
+        notify_export_win_email_by_rq_email(
+            adviser_email_address,
+            template_id,
+            context,
+            update_customer_response_token_for_email_notification_id,
+            token_id,
+        )
+        mock_job_scheduler.assert_called_once_with(
+            function=send_export_win_email_notification_via_rq,
+            function_args=(
+                adviser_email_address,
+                template_id,
+                context,
+                update_customer_response_token_for_email_notification_id,
+                token_id,
+                NotifyServiceName.export_win,
+            ),
+            retry_backoff=True,
+            max_retries=5,
+        )
 
 
 @pytest.mark.django_db
