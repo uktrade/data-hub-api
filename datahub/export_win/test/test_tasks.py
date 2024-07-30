@@ -29,8 +29,8 @@ from datahub.export_win.tasks import (
     update_notify_email_delivery_status_for_customer_response_token,
 )
 from datahub.export_win.test.factories import (
-    BreakdownFactory, CustomerResponseFactory, CustomerResponseTokenFactory,
-    WinFactory,
+    AdviserFactory, BreakdownFactory, CustomerResponseFactory,
+    CustomerResponseTokenFactory, WinFactory,
 )
 from datahub.notification.constants import NotifyServiceName
 from datahub.reminder.models import EmailDeliveryStatus
@@ -514,7 +514,7 @@ class TestAutoResendClientEmailFromUnconfirmedWinTask:
         assert customer_response.tokens.count() == (2 if is_deleted else 3)
 
 
-def test_get_all_fields_for_client_email_receipt_success():
+def test_get_all_fields_for_client_email_receipt_as_company_contact_success():
     customer_response = CustomerResponseFactory()
     token = CustomerResponseTokenFactory(customer_response=customer_response)
     result = get_all_fields_for_client_email_receipt(
@@ -535,11 +535,33 @@ def test_get_all_fields_for_client_email_receipt_success():
     assert result['url'] == f'{settings.EXPORT_WIN_CLIENT_REVIEW_WIN_URL}/{str(token.id)}'
 
 
+def test_get_all_fields_for_client_email_receipt_as_adviser_success():
+    customer_response = CustomerResponseFactory()
+    adviser = AdviserFactory()
+    token = CustomerResponseTokenFactory(adviser=adviser)
+    result = get_all_fields_for_client_email_receipt(
+        token,
+        customer_response,
+    )
+    """
+    Testing to get all fields for adviser as client email receipt
+    """
+    # Assertions for the expected values
+    win = customer_response.win
+    assert result['customer_email'] == token.adviser.contact_email
+    assert result['country_destination'] == win.country.name
+    assert result['client_firstname'] == token.adviser.first_name
+    assert result['lead_officer_name'] == win.lead_officer.name
+    assert result['goods_services'] == win.goods_vs_services.name
+    # Compare the generated URL with the expected URL using the specific ID
+    assert result['url'] == f'{settings.EXPORT_WIN_CLIENT_REVIEW_WIN_URL}/{str(token.id)}'
+
+
 @pytest.mark.django_db
 @freeze_time('2023-12-11')
 def test_create_token_for_contact_without_existing_unexpired_token():
     """
-    Testing the create token where no existing unexpired token
+    Testing the create token for contact where no existing unexpired token
     """
     mock_customer_response = CustomerResponseFactory()
     mock_contact = ContactFactory()
@@ -556,10 +578,30 @@ def test_create_token_for_contact_without_existing_unexpired_token():
 
 
 @pytest.mark.django_db
-@freeze_time('2023-12-11')
-def test_create_token_with_existing_unexpired_token():
+@freeze_time('2023-12-14')
+def test_create_token_for_contact_as_adviser_without_existing_unexpired_token():
     """
-    Testing the creation token where there is existing unexpired token
+    Testing the create token for contact as adviser where no existing unexpired token
+    """
+    mock_customer_response = CustomerResponseFactory()
+    mock_adviser = AdviserFactory()
+    new_token = create_token_for_contact(None, mock_customer_response, mock_adviser)
+    assert new_token.id is not None
+    token_exists = CustomerResponseToken.objects.filter(
+        id=new_token.id,
+        adviser=mock_adviser,
+        customer_response=mock_customer_response,
+    ).exists()
+    assert token_exists is True
+    expected_time = datetime.utcnow() + timedelta(days=7)
+    assert expected_time == new_token.expires_on
+
+
+@pytest.mark.django_db
+@freeze_time('2023-12-11')
+def test_create_token_for_contact_with_existing_unexpired_token():
+    """
+    Testing the creation token for contact where there is existing unexpired token
     """
     mock_customer_response = CustomerResponseFactory()
     mock_contact = ContactFactory()
@@ -580,11 +622,35 @@ def test_create_token_with_existing_unexpired_token():
 
 
 @pytest.mark.django_db
-@freeze_time('2023-12-11')
-def test_create_token_with_existing_expired_and_unexpired_tokens():
+@freeze_time('2023-12-14')
+def test_create_token_for_contact_as_adviser_with_existing_unexpired_token():
     """
-    Testing the creation of a token where there are existing multiple tokens,
-    both in expired and unexpired states
+    Testing the creation token for contact as adviser where there is existing unexpired token
+    """
+    mock_customer_response = CustomerResponseFactory()
+    mock_adviser = AdviserFactory()
+    with freeze_time('2023-12-10'):
+        existing_token = CustomerResponseTokenFactory(
+            adviser=mock_adviser,
+            customer_response=mock_customer_response,
+            expires_on=datetime.utcnow() + timedelta(days=1),
+        )
+    new_token = create_token_for_contact(None, mock_customer_response, mock_adviser)
+    assert new_token.id is not None
+    assert new_token.id != existing_token.id
+    expected_time = datetime.utcnow() + timedelta(days=7)
+    assert expected_time == new_token.expires_on
+    existing_token.refresh_from_db()
+    utc_now = datetime.utcnow().replace(tzinfo=pytz.UTC)
+    assert existing_token.expires_on <= utc_now
+
+
+@pytest.mark.django_db
+@freeze_time('2023-12-11')
+def test_create_token_for_contact_with_existing_expired_and_unexpired_tokens():
+    """
+    Testing the creation of a token for company contact where there are existing
+    multiple tokens, both in expired and unexpired states
     """
     mock_customer_response = CustomerResponseFactory()
     mock_contact = ContactFactory()
@@ -601,6 +667,39 @@ def test_create_token_with_existing_expired_and_unexpired_tokens():
             expires_on=datetime.utcnow() + timedelta(days=1),
         )
     new_token = create_token_for_contact(mock_contact, mock_customer_response)
+    assert new_token.id is not None
+    assert new_token.id != existing_token.id
+    expected_time = datetime.utcnow() + timedelta(days=7)
+    assert expected_time == new_token.expires_on
+    expired_token.refresh_from_db()
+    utc_now = datetime.utcnow().replace(tzinfo=pytz.UTC)
+    assert expired_token.expires_on <= utc_now
+    existing_token.refresh_from_db()
+    assert existing_token.expires_on <= utc_now
+
+
+@pytest.mark.django_db
+@freeze_time('2023-12-14')
+def test_create_token_for_contact_as_adviser_with_existing_expired_and_unexpired_tokens():
+    """
+    Testing the creation of a token for contact as adviser where there are existing
+    multiple tokens, both in expired and unexpired states
+    """
+    mock_customer_response = CustomerResponseFactory()
+    mock_adviser = AdviserFactory()
+    with freeze_time('2023-12-09'):
+        expired_token = CustomerResponseTokenFactory(
+            adviser=mock_adviser,
+            customer_response=mock_customer_response,
+            expires_on=datetime.utcnow() - timedelta(days=1),
+        )
+    with freeze_time('2023-12-10'):
+        existing_token = CustomerResponseTokenFactory(
+            adviser=mock_adviser,
+            customer_response=mock_customer_response,
+            expires_on=datetime.utcnow() + timedelta(days=1),
+        )
+    new_token = create_token_for_contact(None, mock_customer_response, mock_adviser)
     assert new_token.id is not None
     assert new_token.id != existing_token.id
     expected_time = datetime.utcnow() + timedelta(days=7)
