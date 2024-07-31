@@ -23,11 +23,11 @@ backoff==2.2.1
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
-bigtree==0.19.2
+bigtree==0.19.3
     # via -r requirements.in
-boto3==1.34.140
+boto3==1.34.149
     # via -r requirements.in
-botocore==1.34.140
+botocore==1.34.149
     # via
     #   boto3
     #   s3transfer
@@ -56,7 +56,7 @@ deprecated==1.2.14
     #   opentelemetry-exporter-otlp-proto-http
 distlib==0.3.8
     # via virtualenv
-dj-database-url==2.1.0
+dj-database-url==2.2.0
     # via -r requirements.in
 django==4.2.14
     # via
@@ -76,7 +76,7 @@ django-axes==6.5.1
     # via -r requirements.in
 django-csp==3.8
     # via -r requirements.in
-django-debug-toolbar==4.4.5
+django-debug-toolbar==4.4.6
     # via -r requirements.in
 django-environ==0.11.2
     # via -r requirements.in
@@ -86,7 +86,7 @@ django-filter==24.2
     # via -r requirements.in
 django-js-asset==2.0.0
     # via django-mptt
-django-log-formatter-asim==0.0.4
+django-log-formatter-asim==0.0.5
     # via -r requirements.in
 django-mptt==0.16.0
     # via -r requirements.in
@@ -152,7 +152,7 @@ multidict==6.0.4
     #   yarl
 nodeenv==1.8.0
     # via pre-commit
-notifications-python-client==9.1.0
+notifications-python-client==10.0.0
     # via -r requirements.in
 numpy==1.24.3
     # via pandas
@@ -216,7 +216,7 @@ pandas==2.2.2
     # via -r requirements.in
 platformdirs==4.2.0
     # via virtualenv
-pre-commit==3.7.0
+pre-commit==3.8.0
     # via django-log-formatter-asim
 protobuf==4.25.3
     # via
@@ -271,7 +271,7 @@ rq-scheduler==0.13.1
     # via -r requirements.in
 s3transfer==0.10.0
     # via boto3
-sentry-sdk==2.8.0
+sentry-sdk==2.11.0
     # via -r requirements.in
 simplejson==3.18.0
     # via mail-parser
