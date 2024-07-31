@@ -56,7 +56,7 @@ deprecated==1.2.14
     #   opentelemetry-exporter-otlp-proto-http
 distlib==0.3.8
     # via virtualenv
-dj-database-url==2.1.0
+dj-database-url==2.2.0
     # via -r requirements.in
 django==4.2.14
     # via

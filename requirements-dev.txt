@@ -72,7 +72,7 @@ dill==0.3.6
     # via pylint
 distlib==0.3.6
     # via virtualenv
-dj-database-url==2.1.0
+dj-database-url==2.2.0
     # via -r requirements.in
 django==4.2.14
     # via
