@@ -12,7 +12,7 @@ asgiref==3.6.0
     # via
     #   django
     #   django-axes
-astroid==3.2.2
+astroid==3.2.4
     # via pylint
 asttokens==2.2.1
     # via stack-data
@@ -29,11 +29,11 @@ backoff==2.2.1
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
-bigtree==0.19.2
+bigtree==0.19.3
     # via -r requirements.in
-boto3==1.34.140
+boto3==1.34.149
     # via -r requirements.in
-botocore==1.34.140
+botocore==1.34.149
     # via
     #   boto3
     #   s3transfer
@@ -72,7 +72,7 @@ dill==0.3.6
     # via pylint
 distlib==0.3.6
     # via virtualenv
-dj-database-url==2.1.0
+dj-database-url==2.2.0
     # via -r requirements.in
 django==4.2.14
     # via
@@ -92,7 +92,7 @@ django-axes==6.5.1
     # via -r requirements.in
 django-csp==3.8
     # via -r requirements.in
-django-debug-toolbar==4.4.5
+django-debug-toolbar==4.4.6
     # via -r requirements.in
 django-environ==0.11.2
     # via -r requirements.in
@@ -102,7 +102,7 @@ django-filter==24.2
     # via -r requirements.in
 django-js-asset==2.0.0
     # via django-mptt
-django-log-formatter-asim==0.0.4
+django-log-formatter-asim==0.0.5
     # via -r requirements.in
 django-mptt==0.16.0
     # via -r requirements.in
@@ -223,7 +223,7 @@ multidict==6.0.4
     #   yarl
 nodeenv==1.7.0
     # via pre-commit
-notifications-python-client==9.1.0
+notifications-python-client==10.0.0
     # via -r requirements.in
 numpy==1.24.3
     # via pandas
@@ -304,7 +304,7 @@ platformdirs==2.6.0
     #   virtualenv
 pluggy==1.5.0
     # via pytest
-pre-commit==3.7.1
+pre-commit==3.8.0
     # via
     #   -r requirements-dev.in
     #   django-log-formatter-asim
@@ -338,7 +338,7 @@ pygments==2.15.0
     # via ipython
 pyjwt==2.6.0
     # via notifications-python-client
-pylint==3.2.5
+pylint==3.2.6
     # via
     #   -r requirements-dev.in
     #   pylint-django
@@ -354,7 +354,7 @@ pyproject-hooks==1.0.0
     # via
     #   build
     #   pip-tools
-pytest==8.2.2
+pytest==8.3.2
     # via
     #   -r requirements-dev.in
     #   pylint-pytest
@@ -421,7 +421,7 @@ rq-scheduler==0.13.1
     # via -r requirements.in
 s3transfer==0.10.0
     # via boto3
-sentry-sdk==2.8.0
+sentry-sdk==2.11.0
     # via -r requirements.in
 simplejson==3.18.0
     # via mail-parser
