@@ -9,7 +9,7 @@ From the rq docs:
 ### Generic concepts to understand:
 
 - Workers
-  - These are services (when running on GovPaaS) or containers (when running locally on Docker). They loop through their assigned queues looking for jobs to process. They are started from the scripts `long-running-worker.py` and `short-running-worker.py`.
+  - These are services (when running on DBT Platform) or containers (when running locally on Docker). They loop through their assigned queues looking for jobs to process. They are started from the scripts `long-running-worker.py` and `short-running-worker.py`.
 - Queues
   - These are just like real life queues, identified by unique strings (e.g. ‘long-running’). Jobs can be ‘enqueued’ on them, to be run asynchronously in order.
 - Jobs
@@ -132,3 +132,11 @@ Sometimes you need to calculate intervals for setting specific values at irregul
 The cron expression is made of five fields. Each field can have the following values. [crontab.cronhub.io](https://crontab.cronhub.io/) is a great way to visualise the settings created.
 
 ![image-20221021064804187](./cronhub.png)
+
+### Rebooting Redis Cache on AWS Console for Production, Staging or UAT.
+
+If the production, staging or UAT queue has thousands of messages and the workers are struggling to process them, you can reboot the Redis Cache on the AWS console. To restart it, refer to the [documentation on Confluence](https://uktrade.atlassian.net/wiki/spaces/TechEx/pages/4116906098/Restarting+Redis+Cache+on+AWS+Console).
+
+> :warning: **Rebooting the Redis Cache will delete the whole queue**, so anything queued such as emails and OpenSearch changes will not be run.
+
+> :warning: **Services (workers, queues, etc) must be restarted** after rebooting the Redis Cache for the application and environment you rebooted. If these are not restarted then scheduled tasks will not be picked up by the scheduler.
