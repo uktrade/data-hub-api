@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: cc5e8e13-8cd2-4ec7-8d2b-322250efbc12
+  fields:
+    disabled_on:
+    order: 665.0
+    segment: MEaP Marketing
+    parent: 552f4ba8-b993-498f-a640-c1b9a888f83e
+    contexts: ["other_service_delivery", "interaction"]
+    lft: 4
+    rght: 2
+    tree_id: 3
+    level: 1
