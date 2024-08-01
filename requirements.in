@@ -59,7 +59,7 @@ gevent==24.2.1
 mohawk==1.1.0
 requests==2.32.3
 requests_toolbelt==1.0.0
-sentry_sdk==2.11.0
+sentry_sdk==2.12.0
 
 # RQ and associated helpers
 rq==1.16.2
