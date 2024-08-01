@@ -217,7 +217,7 @@ def update_estimated_land_date_reminder_email_status(email_notification_id, remi
     reminders = UpcomingEstimatedLandDateReminder.all_objects.filter(id__in=reminder_ids)
     for reminder in reminders:
         reminder.email_notification_id = email_notification_id
-        reminder.save()
+        reminder.save(update_fields=('email_notification_id',))
 
     logger.info(
         'Task update_estimated_land_date_reminder_email_status completed'
@@ -229,7 +229,7 @@ def update_no_recent_interaction_reminder_email_status(email_notification_id, re
     reminders = NoRecentInvestmentInteractionReminder.all_objects.filter(id__in=reminder_ids)
     for reminder in reminders:
         reminder.email_notification_id = email_notification_id
-        reminder.save()
+        reminder.save(update_fields=('email_notification_id',))
 
     logger.info(
         'Task update_no_recent_interaction_reminder_email_status completed'
@@ -241,7 +241,7 @@ def update_no_recent_export_interaction_reminder_email_status(email_notification
     reminders = NoRecentExportInteractionReminder.all_objects.filter(id__in=reminder_ids)
     for reminder in reminders:
         reminder.email_notification_id = email_notification_id
-        reminder.save()
+        reminder.save(update_fields=('email_notification_id',))
 
     logger.info(
         'Task update_no_recent_export_interaction_reminder_email_status completed'
@@ -268,7 +268,7 @@ def update_new_export_interaction_reminder_email_status(email_notification_id, r
     reminders = NewExportInteractionReminder.all_objects.filter(id__in=reminder_ids)
     for reminder in reminders:
         reminder.email_notification_id = email_notification_id
-        reminder.save()
+        reminder.save(update_fields=('email_notification_id',))
 
 
 def generate_estimated_land_date_reminders():
