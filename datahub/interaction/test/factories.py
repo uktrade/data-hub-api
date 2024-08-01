@@ -230,7 +230,10 @@ class EventServiceDeliveryFactory(InteractionFactoryBase):
 class InteractionDITParticipantFactory(factory.django.DjangoModelFactory):
     """Factory for a DIT participant in an interaction."""
 
-    interaction = factory.SubFactory(CompanyInteractionFactory)
+    interaction = factory.SubFactory(CompanyInteractionFactory,
+                                     dit_participants=[],
+                                     contacts=[],
+                                     )
     adviser = factory.SubFactory(AdviserFactory)
     team = factory.SelfAttribute('adviser.dit_team')
 
