@@ -89,6 +89,7 @@ class PolicyIssueType(BaseOrderedConstantModel):
     """
 
 
+@reversion.register_base_model()
 class InteractionDITParticipant(models.Model):
     """
     Many-to-many model between an interaction and an adviser (called a DIT participant).

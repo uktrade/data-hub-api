@@ -32,7 +32,9 @@ from datahub.export_win.test.factories import (
 )
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
+    InteractionDITParticipantFactory,
     InteractionExportCountryFactory,
+
 )
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
@@ -63,6 +65,7 @@ MAPPINGS = {
     'company_list.PipelineItem': PipelineItemFactory,
     'company_referral.CompanyReferral': CompanyReferralFactory,
     'event.Event': EventFactory,
+    'interaction.InteractionDITParticipant': InteractionDITParticipantFactory,
     'interaction.Interaction': CompanyInteractionFactory,
     'interaction.InteractionExportCountry': InteractionExportCountryFactory,
     'investment.InvestmentProject': InvestmentProjectFactory,
@@ -105,7 +108,6 @@ def test_with_one_model(model_label, model_factory):
     with reversion.create_revision():
         objs = model_factory.create_batch(2)
 
-    # check created versions/revisions
     assert Version.objects.get_for_model(model).count() == 2
     assert Revision.objects.count() == 1
 
@@ -134,7 +136,16 @@ def test_with_all_models(caplog):
     objs = []
     for model_factory in MAPPINGS.values():
         with reversion.create_revision():
-            obj = model_factory.create_batch(2)  # keep only one
+
+            # This prevents CompanyInteractionFactory from creating an
+            # InteractionDITParticipantFactory which has a revision.
+            # Deleting the CompanyInteraction also deletes the InteractionDITParticipant
+            # causing two revsions instead of the expected one for this test.
+            if model_factory == CompanyInteractionFactory:
+                obj = model_factory.create_batch(2, dit_participants=[])
+            else:
+                obj = model_factory.create_batch(2)  # keep only one
+
             objs.append(obj[0])
 
     total_versions = Version.objects.count()
