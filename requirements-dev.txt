@@ -8,7 +8,7 @@ aiohttp==3.9.4
     # via slackclient
 aiosignal==1.3.1
     # via aiohttp
-asgiref==3.6.0
+asgiref==3.8.1
     # via
     #   django
     #   django-axes
@@ -74,7 +74,7 @@ distlib==0.3.6
     # via virtualenv
 dj-database-url==2.2.0
     # via -r requirements.in
-django==4.2.14
+django==5.0.7
     # via
     #   -r requirements.in
     #   dj-database-url
@@ -467,6 +467,7 @@ traitlets==5.14.1
     #   matplotlib-inline
 typing-extensions==4.10.0
     # via
+    #   asgiref
     #   astroid
     #   dj-database-url
     #   ipython
