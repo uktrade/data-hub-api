@@ -8,6 +8,8 @@ aiohttp==3.9.4
     # via slackclient
 aiosignal==1.3.1
     # via aiohttp
+amqp==5.2.0
+    # via kombu
 asgiref==3.6.0
     # via
     #   django
@@ -31,6 +33,8 @@ backoff==2.2.1
     #   opentelemetry-exporter-otlp-proto-http
 bigtree==0.19.3
     # via -r requirements.in
+billiard==4.2.0
+    # via celery
 boto3==1.34.151
     # via -r requirements.in
 botocore==1.34.151
@@ -39,6 +43,8 @@ botocore==1.34.151
     #   s3transfer
 build==1.0.3
     # via pip-tools
+celery==5.4.0
+    # via dbt-copilot-python
 certifi==2024.7.4
     # via
     #   elastic-apm
@@ -53,13 +59,23 @@ charset-normalizer==2.1.1
     # via requests
 click==8.1.3
     # via
+    #   celery
+    #   click-didyoumean
+    #   click-plugins
+    #   click-repl
     #   pip-tools
     #   rq
+click-didyoumean==0.3.1
+    # via celery
+click-plugins==1.1.1
+    # via celery
+click-repl==0.3.0
+    # via celery
 coverage[toml]==7.0.1
     # via pytest-cov
 crontab==1.0.0
     # via rq-scheduler
-dbt-copilot-python==0.1.4
+dbt-copilot-python==0.2.1
     # via -r requirements.in
 decorator==5.1.1
     # via ipython
@@ -205,6 +221,8 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
+kombu==5.3.7
+    # via celery
 mail-parser==3.15.0
     # via -r requirements.in
 markupsafe==2.1.2
@@ -309,7 +327,9 @@ pre-commit==3.8.0
     #   -r requirements-dev.in
     #   django-log-formatter-asim
 prompt-toolkit==3.0.41
-    # via ipython
+    # via
+    #   click-repl
+    #   ipython
 protobuf==4.25.3
     # via
     #   googleapis-common-protos
@@ -374,6 +394,7 @@ python-dateutil==2.9.0.post0
     # via
     #   -r requirements.in
     #   botocore
+    #   celery
     #   faker
     #   freezegun
     #   icalendar
@@ -472,7 +493,9 @@ typing-extensions==4.10.0
     #   ipython
     #   opentelemetry-sdk
 tzdata==2023.3
-    # via pandas
+    # via
+    #   celery
+    #   pandas
 uritemplate==4.1.1
     # via -r requirements.in
 urllib3==1.26.19
@@ -482,6 +505,11 @@ urllib3==1.26.19
     #   opensearch-py
     #   requests
     #   sentry-sdk
+vine==5.1.0
+    # via
+    #   amqp
+    #   celery
+    #   kombu
 virtualenv==20.17.1
     # via pre-commit
 wcwidth==0.2.5

@@ -19,7 +19,7 @@ pyyaml==6.0.1
 python-dateutil==2.9.0.post0
 
 # DBT Platform
-dbt-copilot-python==0.1.4
+dbt-copilot-python==0.2.1
 dj-database-url==2.2.0
 
 # Persistency layer
