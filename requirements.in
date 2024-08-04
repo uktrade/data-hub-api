@@ -5,7 +5,7 @@ django-axes==6.5.1
 django-csp==3.8
 django-environ==0.11.2
 django-extensions==3.2.3
-django-filter==24.2
+django-filter==24.3
 django-log-formatter-asim==0.0.5
 django-mptt==0.16.0
 django-pglocks==1.0.4

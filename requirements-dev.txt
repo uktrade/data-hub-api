@@ -114,7 +114,7 @@ django-environ==0.11.2
     # via -r requirements.in
 django-extensions==3.2.3
     # via -r requirements.in
-django-filter==24.2
+django-filter==24.3
     # via -r requirements.in
 django-js-asset==2.0.0
     # via django-mptt
