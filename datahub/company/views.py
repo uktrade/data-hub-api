@@ -2,10 +2,7 @@
 from django.contrib.auth.models import Group, Permission
 from django.db import transaction
 from django.db.models import Exists, Prefetch, Q
-from django.http import (
-    Http404,
-    JsonResponse,
-)
+from django.http import Http404
 from django_filters.rest_framework import (
     CharFilter,
     DateFromToRangeFilter,
@@ -16,6 +13,8 @@ from django_filters.rest_framework import (
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.filters import OrderingFilter
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -23,19 +22,6 @@ from rest_framework.viewsets import GenericViewSet
 
 from config.settings.types import HawkScope
 from datahub.company.autocomplete import WithListAutocompleteFilter
-from datahub.company.company_matching_api import (
-    CompanyMatchingServiceConnectionError,
-    CompanyMatchingServiceHTTPError,
-    CompanyMatchingServiceTimeoutError,
-    extract_match_ids,
-    match_company,
-)
-from datahub.company.export_wins_api import (
-    ExportWinsAPIConnectionError,
-    ExportWinsAPIHTTPError,
-    ExportWinsAPITimeoutError,
-    get_export_wins,
-)
 from datahub.company.models import (
     Advisor,
     Company,
@@ -72,7 +58,6 @@ from datahub.company.validators import NotATransferredCompanyValidator
 from datahub.core.audit import AuditViewSet
 from datahub.core.auth import PaaSIPAuthentication
 from datahub.core.autocomplete import AutocompleteFilter
-from datahub.core.exceptions import APIUpstreamException
 from datahub.core.hawk_receiver import (
     HawkAuthentication,
     HawkResponseSigningMixin,
@@ -82,6 +67,8 @@ from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.permissions import HasPermissions
 from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet, SoftDeleteCoreViewSet
+from datahub.export_win.models import Win
+from datahub.export_win.serializers import DataHubLegacyExportWinSerializer
 from datahub.investment.project.queryset import get_slim_investment_project_queryset
 
 
@@ -541,21 +528,28 @@ class AdviserReadOnlyViewSetV1(
         return filtered_queryset
 
 
-class ExportWinsForCompanyView(APIView):
+class BigPagination(PageNumberPagination):
+    """Big pagination."""
+
+    page_size = 1000
+    page_size_query_param = 'page-size'
+
+
+class ExportWinsForCompanyView(ListAPIView):
     """
-    View proxying export wins for a company that are retrieved from
-    Export Wins system as is, based on the match id obtained from
-    Company Matching Service.
+    Export Wins for Company. The view is based on the legacy view that used
+    external system storing export wins. They are now migrated to Data Hub so there
+    is no need for that.
     """
 
-    queryset = Company.objects.prefetch_related(
-        'transferred_from',
-    )
     permission_classes = (
         HasPermissions(
             f'company.{CompanyPermission.view_export_win}',
         ),
     )
+    serializer_class = DataHubLegacyExportWinSerializer
+    pagination_class = BigPagination
+    http_method_names = ('get',)
 
     def _get_company(self, company_pk):
         """
@@ -567,53 +561,9 @@ class ExportWinsForCompanyView(APIView):
         except Company.DoesNotExist:
             raise Http404
 
-    def _get_match_ids(self, target_company, request=None):
-        """
-        Returns match ids matching the company and
-        all companies that were merged into it, if there are any.
-        """
-        companies = [target_company]
-        for company in target_company.transferred_from.all():
-            companies.append(company)
-
-        matching_response = match_company(companies, request)
-        return extract_match_ids(matching_response.json().get('matches', []))
-
-    def get(self, request, pk):
-        """
-        Proxy to Export Wins API for GET requests for given company's match id
-        is obtained from Company Matching Service.
-        """
-        company = self._get_company(pk)
-        try:
-            match_ids = self._get_match_ids(company, request)
-        except (
-            CompanyMatchingServiceConnectionError,
-            CompanyMatchingServiceTimeoutError,
-            CompanyMatchingServiceHTTPError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
-
-        if not match_ids:
-            return JsonResponse(
-                {
-                    'count': 0,
-                    'next': None,
-                    'previous': None,
-                    'results': [],
-                },
-            )
-
-        try:
-            export_wins_results = get_export_wins(match_ids, request)
-        except (
-            ExportWinsAPIConnectionError,
-            ExportWinsAPITimeoutError,
-            ExportWinsAPIHTTPError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
-
-        return JsonResponse(export_wins_results.json())
+    def get_queryset(self):
+        company = self._get_company(self.kwargs['pk'])
+        return Win.objects.filter(company=company).order_by('-created_on')
 
 
 class CompanyExportEstimatedWinDateFilterSet(FilterSet):
