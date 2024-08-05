@@ -251,6 +251,7 @@ class Company(ArchivableModel, BaseModel):
     )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
 
+    # registered_address is the official address (e.g. from companies house).
     registered_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
     registered_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     registered_address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
