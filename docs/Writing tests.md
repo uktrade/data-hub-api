@@ -22,7 +22,7 @@ The basic set to look at for TDD:
 
 An example of tests with different mocks can be found [here](../datahub/core/test/test_serializers.py) 
 
-An example of tests with mixin logic can be found [here](datahub/company/test/test_company_matching_api.py)
+An example of tests with mixin logic can be found [here](datahub/company/test/test_company_views.py)
 
 An example of an integration test with the database can be found [here](datahub/company/test/test_models.py)
 

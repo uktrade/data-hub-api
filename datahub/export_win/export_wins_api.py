@@ -6,16 +6,35 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from requests.exceptions import HTTPError, Timeout
 
-from datahub.company.export_wins_api import (
-    ExportWinsAPIConnectionError,
-    ExportWinsAPIHTTPError,
-    ExportWinsAPITimeoutError,
-)
 from datahub.core.api_client import APIClient, HawkAuth
 from datahub.core.exceptions import APIBadGatewayException
 
 
 logger = getLogger(__name__)
+
+
+class ExportWinsAPIError(Exception):
+    """
+    Base exception class for Export Wins API related errors.
+    """
+
+
+class ExportWinsAPIHTTPError(ExportWinsAPIError):
+    """
+    Exception for all HTTP errors.
+    """
+
+
+class ExportWinsAPITimeoutError(ExportWinsAPIError):
+    """
+    Exception for when a timeout was encountered when connecting to Export Wins API.
+    """
+
+
+class ExportWinsAPIConnectionError(ExportWinsAPIError):
+    """
+    Exception for when an error was encountered when connecting to Export Wins API.
+    """
 
 
 def _fetch_page(api_client, source_url, max_retries=5, retry_delay=2):
