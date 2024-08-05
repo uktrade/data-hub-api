@@ -181,6 +181,7 @@ def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=()
     area = (
         AdministrativeArea.objects.filter(
             area_code=dnb_company[f'{prefix}_area_abbrev_name'],
+            name=dnb_company[f'{prefix}_area_name'],
         ).first()
         if dnb_company.get(f'{prefix}_area_abbrev_name')
         else None
