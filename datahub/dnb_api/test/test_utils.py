@@ -30,6 +30,8 @@ from datahub.company.test.factories import (
     CompanyFactory,
     CompanyWithAreaFactory,
 )
+from datahub.core.constants import AdministrativeArea as AdministrativeAreaConstants
+from datahub.core.constants import Country as CountryConstants
 from datahub.core.exceptions import (
     APIBadRequestException,
     APINotFoundException,
@@ -274,7 +276,7 @@ class TestUpdateCompanyFromDNB:
     @freeze_time('2019-01-01 11:12:13')
     def test_update_company_from_dnb_all_fields(
         self,
-        formatted_dnb_company_area,
+        formatted_dnb_company_area_non_uk,
         base_company_dict,
         adviser_callable,
         update_descriptor,
@@ -282,49 +284,59 @@ class TestUpdateCompanyFromDNB:
         """
         Test that update_company_from_dnb will update all fields when the fields
         kwarg is not specified.
+
+        Test with non-uk companies as UK companies do not have an AdministrativeArea.
         """
         duns_number = '123456789'
         company = CompanyWithAreaFactory(
             duns_number=duns_number,
             pending_dnb_investigation=True,
             strategy='ABC',
+            address_area_id=AdministrativeAreaConstants.new_york.value.id,
+            address_country_id=CountryConstants.united_states.value.id,
         )
         original_company = Company.objects.get(id=company.id)
         adviser = adviser_callable()
         update_company_from_dnb(
             company,
-            formatted_dnb_company_area,
+            formatted_dnb_company_area_non_uk,
             user=adviser,
             update_descriptor=update_descriptor,
         )
         company.refresh_from_db()
-        uk_country = Country.objects.get(iso_alpha2_code='GB')
+
+        us_country = Country.objects.get(iso_alpha2_code='US')
+
         assert model_to_dict_company(company) == {
             **base_company_dict,
-            'address_1': 'Unit 10, Ockham Drive',
+            'address_1': '150 Madison Ave',
             'address_2': '',
-            'address_country': uk_country.id,
+            'address_country': us_country.id,
             'address_county': '',
-            'address_area': AdministrativeArea.objects.get(area_code='TX').id,
-            'address_postcode': 'UB6 0F2',
-            'address_town': 'GREENFORD',
+            'address_area': AdministrativeArea.objects.get(
+                country_id=us_country.id, name='New York',
+            ).id,
+            'address_postcode': '10033-1062',
+            'address_town': 'New York',
             'archived_documents_url_path': original_company.archived_documents_url_path,
             'business_type': original_company.business_type.id,
-            'company_number': '01261539',
+            'trading_names': [
+                'Acme',
+            ],
             'created_by': original_company.created_by.id,
             'duns_number': '123456789',
             'employee_range': original_company.employee_range.id,
             'export_experience_category': original_company.export_experience_category.id,
-            'global_ultimate_duns_number': '291332174',
+            'global_ultimate_duns_number': '157270606',
             'id': original_company.id,
-            'is_number_of_employees_estimated': True,
+            'is_number_of_employees_estimated': False,
             'modified_by': adviser.id if adviser else original_company.modified_by.id,
-            'name': 'FOO BICYCLE LIMITED',
-            'number_of_employees': 260,
+            'name': 'Acme Corporation',
+            'number_of_employees': 100,
             'sector': original_company.sector.id,
             'export_segment': original_company.export_segment,
             'export_sub_segment': original_company.export_sub_segment,
-            'turnover': 50651895,
+            'turnover': 1000000,
             'turnover_range': original_company.turnover_range.id,
             'uk_region': original_company.uk_region.id,
             'dnb_modified_on': now(),
@@ -574,23 +586,26 @@ class TestRollbackDNBCompanyUpdate:
     )
     def test_rollback(
         self,
-        formatted_dnb_company_area,
+        formatted_dnb_company_area_non_uk,
         fields,
         expected_fields,
     ):
         """
         Test that rollback_dnb_company_update will roll back all DNB fields.
+        Test with non-uk companies as UK companies do not have an AdministrativeArea.
         """
         with reversion.create_revision():
             company = CompanyWithAreaFactory(
-                duns_number=formatted_dnb_company_area['duns_number'],
+                duns_number=formatted_dnb_company_area_non_uk['duns_number'],
+                address_area_id=AdministrativeAreaConstants.new_york.value.id,
+                address_country_id=CountryConstants.united_states.value.id,
             )
 
         original_company = Company.objects.get(id=company.id)
 
         update_company_from_dnb(
             company,
-            formatted_dnb_company_area,
+            formatted_dnb_company_area_non_uk,
             update_descriptor='foo',
         )
 
