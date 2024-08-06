@@ -178,14 +178,15 @@ def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=()
         if dnb_company.get(f'{prefix}_country')
         else None
     )
-    area = (
-        AdministrativeArea.objects.filter(
-            area_code=dnb_company[f'{prefix}_area_abbrev_name'],
-            name=dnb_company[f'{prefix}_area_name'],
-        ).first()
-        if dnb_company.get(f'{prefix}_area_abbrev_name')
-        else None
-    )
+
+    area = None
+    if country and dnb_company.get(f'{prefix}_area_name'):
+        area = (
+            AdministrativeArea.objects.filter(
+                name=dnb_company[f'{prefix}_area_name'],
+                country_id=country.id,
+            ).first()
+        )
 
     extracted_address = {
         'line_1': dnb_company.get(f'{prefix}_line_1') or '',
