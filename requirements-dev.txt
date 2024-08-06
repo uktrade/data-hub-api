@@ -35,9 +35,9 @@ bigtree==0.19.3
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.34.151
+boto3==1.34.153
     # via -r requirements.in
-botocore==1.34.151
+botocore==1.34.153
     # via
     #   boto3
     #   s3transfer
@@ -114,7 +114,7 @@ django-environ==0.11.2
     # via -r requirements.in
 django-extensions==3.2.3
     # via -r requirements.in
-django-filter==24.2
+django-filter==24.3
     # via -r requirements.in
 django-js-asset==2.0.0
     # via django-mptt
@@ -152,7 +152,7 @@ faker==15.3.4
     # via factory-boy
 filelock==3.8.2
     # via virtualenv
-flake8==7.1.0
+flake8==7.1.1
     # via
     #   -r requirements-dev.in
     #   flake8-bugbear
@@ -480,7 +480,7 @@ tomli==2.0.1
     #   pytest
 tomlkit==0.11.6
     # via pylint
-tqdm==4.66.4
+tqdm==4.66.5
     # via -r requirements.in
 traitlets==5.14.1
     # via
