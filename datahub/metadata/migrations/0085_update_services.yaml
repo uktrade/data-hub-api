@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: b4978659-fb60-40f2-8633-503c32042dc7
+  fields:
+    disabled_on: ~
+    order: 5252
+    segment: DBT Middle East & Pakistan Comms & Marketing campaigns
+    parent:
+    contexts: ["export_service_delivery", "export_interaction"]
+    lft: 2
+    rght: 3
+    tree_id: 19
+    level: 1
