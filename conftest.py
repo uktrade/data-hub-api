@@ -469,6 +469,7 @@ def formatted_dnb_company_area(dnb_response_uk):
     dnb_response_area = dnb_response_uk['results'][0].copy()
     dnb_response_area.update(
         address_area_abbrev_name=AdministrativeArea.texas.value.area_code,
+        address_area_name=AdministrativeArea.texas.value.name,
     )
     return format_dnb_company(dnb_response_area)
 
