@@ -284,12 +284,16 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
             *super().get_urls(),
         ]
 
+    @admin.display(
+        description='transferred to',
+    )
     def transferred_to_display(self, obj):
         """Link to the company that data for this company has been transferred to."""
         return get_change_link(obj.transferred_to)
 
-    transferred_to_display.short_description = 'transferred to'
-
+    @admin.display(
+        description='Transferred from',
+    )
     def transferred_from_display(self, obj):
         """List of other companies that have had their data transferred to this company."""
         return format_html_join(
@@ -300,5 +304,3 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                 for company in obj.transferred_from.all()
             ),
         )
-
-    transferred_from_display.short_description = 'Transferred from'
