@@ -1,5 +1,4 @@
 from django.contrib.postgres.expressions import ArraySubquery
-from django.contrib.postgres.fields import JSONField
 from django.db.models import (
     BooleanField,
     Case,
@@ -10,6 +9,7 @@ from django.db.models import (
     F,
     Func,
     IntegerField,
+    JSONField,
     Max,
     Min,
     OuterRef,
