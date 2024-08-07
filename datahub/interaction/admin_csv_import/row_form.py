@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime, time, timezone
 from functools import reduce
 from typing import NamedTuple
 
@@ -6,7 +6,6 @@ from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.db.models import Q, Value
 from django.db.transaction import atomic
-from django.utils.timezone import utc
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
@@ -489,7 +488,7 @@ class InteractionCSVRowForm(forms.Form):
             'communication_channel': data.get('communication_channel'),
             'company': data['contact'].company,
             'companies': [data['contact'].company],
-            'date': datetime.combine(data['date'], time(), tzinfo=utc),
+            'date': datetime.combine(data['date'], time(), tzinfo=timezone.utc),
             'dit_participants': dit_participants,
             'event': data.get('event_id'),
             'kind': data['kind'],

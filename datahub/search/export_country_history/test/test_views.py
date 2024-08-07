@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from operator import attrgetter, itemgetter
 from uuid import uuid4
 
 import pytest
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -333,10 +332,10 @@ class TestSearchExportCountryHistory(APITestMixin):
         Note that a filter is mandatory in this view, hence the test filters by company.
         """
         datetimes = [
-            datetime(2001, 1, 22, tzinfo=utc),
-            datetime(2002, 2, 23, 1, 2, 3, tzinfo=utc),
-            datetime(2003, 3, 24, tzinfo=utc),
-            datetime(2004, 4, 25, 1, 2, 3, tzinfo=utc),
+            datetime(2001, 1, 22, tzinfo=timezone.utc),
+            datetime(2002, 2, 23, 1, 2, 3, tzinfo=timezone.utc),
+            datetime(2003, 3, 24, tzinfo=timezone.utc),
+            datetime(2004, 4, 25, 1, 2, 3, tzinfo=timezone.utc),
         ]
         company = CompanyFactory()
 

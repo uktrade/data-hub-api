@@ -3,7 +3,7 @@ import datetime
 from collections import Counter
 
 import icalendar
-from django.utils.timezone import make_aware, utc
+from django.utils.timezone import make_aware
 
 from datahub.company.contact_matching import (
     find_active_contact_by_email_address,
@@ -82,7 +82,7 @@ def _convert_calendar_time_to_utc_datetime(calendar_time):
         )
     # If calendar_time does not have a timezone, this will assume calendar_time
     # is the default timezone for this django project
-    return calendar_time.astimezone(utc)
+    return calendar_time.astimezone(datetime.timezone.utc)
 
 
 class BaseEmailParser:

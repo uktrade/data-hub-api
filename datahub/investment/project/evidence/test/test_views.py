@@ -1,10 +1,9 @@
-import datetime
+from datetime import datetime, timezone
 from operator import attrgetter, itemgetter
 from unittest.mock import Mock, patch
 from uuid import uuid4
 
 import pytest
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -718,7 +717,7 @@ class TestEvidenceDocumentViews(APITestMixin):
 
         api_client = self.create_api_client(user=user)
 
-        frozen_time = datetime.datetime(2018, 1, 2, 12, 30, 50, tzinfo=utc)
+        frozen_time = datetime(2018, 1, 2, 12, 30, 50, tzinfo=timezone.utc)
         with freeze_time(frozen_time):
             response = api_client.delete(url)
 

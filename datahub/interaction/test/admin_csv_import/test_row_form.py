@@ -1,10 +1,9 @@
 from collections import Counter
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timezone
 from unittest.mock import Mock
 
 import pytest
 from django.core.exceptions import NON_FIELD_ERRORS
-from django.utils.timezone import utc
 from rest_framework import serializers
 
 from datahub.company.contact_matching import ContactMatchingStatus
@@ -516,7 +515,7 @@ class TestInteractionCSVRowFormValidation:
             CompanyInteractionFactory(
                 contacts=[existing_object_data['contact']],
                 company=existing_object_data['contact'].company,
-                date=datetime.combine(existing_object_data['date'], time(), tzinfo=utc),
+                date=datetime.combine(existing_object_data['date'], time(), tzinfo=timezone.utc),
                 # Unfortunately, the factory sets service_id, so we have to as well (instead
                 # of service)
                 service_id=existing_object_data['service'].pk,
@@ -1208,7 +1207,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'communication_channel': communication_channel,
             'company': contact.company,
             'companies': [contact.company],
-            'date': datetime(2018, 1, 1, tzinfo=utc),
+            'date': datetime(2018, 1, 1, tzinfo=timezone.utc),
             'dit_participants': [
                 {
                     'adviser': adviser,
@@ -1254,7 +1253,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'communication_channel': None,
             'company': contact.company,
             'companies': [contact.company],
-            'date': datetime(2018, 1, 1, tzinfo=utc),
+            'date': datetime(2018, 1, 1, tzinfo=timezone.utc),
             'dit_participants': [
                 {
                     'adviser': adviser,
@@ -1304,7 +1303,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
             'communication_channel': communication_channel,
             'company': contact.company,
             'companies': [contact.company],
-            'date': datetime(2018, 1, 1, tzinfo=utc),
+            'date': datetime(2018, 1, 1, tzinfo=timezone.utc),
             'dit_participants': [
                 {
                     'adviser': adviser,
@@ -1356,7 +1355,7 @@ class TestInteractionCSVRowFormSaving:
 
         assert interaction.theme == data['theme']
         assert interaction.kind == data['kind']
-        assert interaction.date == datetime(2018, 3, 2, tzinfo=utc)
+        assert interaction.date == datetime(2018, 3, 2, tzinfo=timezone.utc)
         assert interaction.communication_channel == communication_channel
         assert interaction.service == service
         assert interaction.status == Interaction.Status.COMPLETE
@@ -1406,7 +1405,7 @@ class TestInteractionCSVRowFormSaving:
 
         assert interaction.theme == data['theme']
         assert interaction.kind == data['kind']
-        assert interaction.date == datetime(2018, 3, 2, tzinfo=utc)
+        assert interaction.date == datetime(2018, 3, 2, tzinfo=timezone.utc)
         assert interaction.event == event
         assert interaction.service == service
         assert interaction.status == Interaction.Status.COMPLETE

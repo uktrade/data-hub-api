@@ -1,15 +1,14 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.db.models import Q
-from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter
 
 
-FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
+FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=timezone.utc)
 
 
 @freeze_time(FROZEN_TIME)
@@ -21,11 +20,11 @@ class TestCleanupFilter:
         (
             (
                 relativedelta(years=10),
-                datetime(2008, 6, 1, 0, tzinfo=utc),
+                datetime(2008, 6, 1, 0, tzinfo=timezone.utc),
             ),
             (
-                datetime(2012, 8, 3, 5, tzinfo=utc),
-                datetime(2012, 8, 3, 5, tzinfo=utc),
+                datetime(2012, 8, 3, 5, tzinfo=timezone.utc),
+                datetime(2012, 8, 3, 5, tzinfo=timezone.utc),
             ),
         ),
     )
@@ -42,11 +41,11 @@ class TestCleanupFilter:
         (
             (
                 False,
-                Q(date__lt=datetime(2008, 6, 1, 0, tzinfo=utc)),
+                Q(date__lt=datetime(2008, 6, 1, 0, tzinfo=timezone.utc)),
             ),
             (
                 True,
-                Q(date__lt=datetime(2008, 6, 1, 0, tzinfo=utc)) | Q(date__isnull=True),
+                Q(date__lt=datetime(2008, 6, 1, 0, tzinfo=timezone.utc)) | Q(date__isnull=True),
             ),
         ),
     )

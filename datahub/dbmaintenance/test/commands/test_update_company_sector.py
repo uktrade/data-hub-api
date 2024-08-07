@@ -1,11 +1,10 @@
 """Tests for the update_company_sector management command."""
-from datetime import datetime
+from datetime import datetime, timezone
 from io import BytesIO
 
 import factory
 import pytest
 from django.core.management import call_command
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from reversion.models import Version
 
@@ -35,7 +34,7 @@ def test_run(s3_stubber, caplog, simulate, overwrite):
     """
     caplog.set_level('ERROR')
 
-    original_datetime = datetime(2017, 1, 1, tzinfo=utc)
+    original_datetime = datetime(2017, 1, 1, tzinfo=timezone.utc)
 
     sector_a, sector_b = Sector.objects.order_by('?')[:2]
 

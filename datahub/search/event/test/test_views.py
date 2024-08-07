@@ -1,7 +1,7 @@
 import datetime
 
 import pytest
-from django.utils.timezone import now, utc
+from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -236,7 +236,7 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:event')
 
         current_datetime = now()
-        old_datetime = datetime.datetime(2000, 9, 12, 1, 2, 3, tzinfo=utc)
+        old_datetime = datetime.datetime(2000, 9, 12, 1, 2, 3, tzinfo=datetime.timezone.utc)
         EventFactory.create_batch(2)
         EventFactory.create_batch(3, disabled_on=old_datetime)
         EventFactory.create_batch(5, disabled_on=current_datetime)

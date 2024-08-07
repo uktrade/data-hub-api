@@ -1,10 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import Mock
 from uuid import UUID
 
 import pytest
 from django.urls import reverse
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 
@@ -42,7 +41,7 @@ class TestUserEventsViewSet:
                 {'a': 'b'},
             ),
             (
-                {'a': datetime(2016, 10, 10, 1, 0, 2, tzinfo=utc)},
+                {'a': datetime(2016, 10, 10, 1, 0, 2, tzinfo=timezone.utc)},
                 {'a': '2016-10-10T01:00:02Z'},
             ),
             (
@@ -76,7 +75,7 @@ class TestUserEventsViewSet:
             event_after = record_user_event(request, UserEventType.SEARCH_EXPORT, data={'a': 'b'})
             event_after.refresh_from_db()
         # Define the `updated_since` date
-        updated_since_date = datetime(2021, 2, 1, tzinfo=utc).strftime('%Y-%m-%d')
+        updated_since_date = datetime(2021, 2, 1, tzinfo=timezone.utc).strftime('%Y-%m-%d')
 
         # Make the request with the `updated_since` parameter
         response = data_flow_api_client.get(self.view_url, {'updated_since': updated_since_date})
