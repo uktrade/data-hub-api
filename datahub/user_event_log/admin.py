@@ -22,14 +22,16 @@ class UserEventAdmin(ViewOnlyAdmin):
     search_fields = ('^api_url_path', '=adviser__id')
     readonly_fields = fields
 
+    @admin.display(
+        description='adviser',
+    )
     def adviser_link(self, obj):
         """Returns a link to the adviser."""
         return get_change_link(obj.adviser)
 
-    adviser_link.short_description = 'adviser'
-
+    @admin.display(
+        description='data',
+    )
     def pretty_data(self, obj):
         """Returns the data field formatted with indentation."""
         return format_json_as_html(obj.data)
-
-    pretty_data.short_description = 'data'
