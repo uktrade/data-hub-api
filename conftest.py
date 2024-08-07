@@ -397,6 +397,7 @@ def dnb_response_uk():
             {
                 'address_country': 'GB',
                 'address_county': '',
+                'address_area_name': None,
                 'address_line_1': 'Unit 10, Ockham Drive',
                 'address_line_2': '',
                 'address_postcode': 'UB6 0F2',
@@ -467,10 +468,21 @@ def formatted_dnb_company_area(dnb_response_uk):
     Get formatted DNB company data.
     """
     dnb_response_area = dnb_response_uk['results'][0].copy()
-    dnb_response_area.update(
-        address_area_abbrev_name=AdministrativeArea.texas.value.area_code,
-        address_area_name=AdministrativeArea.texas.value.name,
-    )
+    return format_dnb_company(dnb_response_area)
+
+
+@pytest.fixture
+def formatted_dnb_company_area_non_uk(dnb_response_non_uk):
+    """
+    Get formatted DNB company data.
+    """
+    dnb_response_area = dnb_response_non_uk['results'][0].copy()
+
+    administrative_areas = [area.value.name for area in AdministrativeArea]
+    if dnb_response_area['address_area_name'] in administrative_areas:
+        dnb_response_area.update(
+            address_area_name=dnb_response_area['address_area_name'],
+        )
     return format_dnb_company(dnb_response_area)
 
 
