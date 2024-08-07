@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from io import BytesIO
 
 import pytest
 from django.core.management import call_command
-from django.utils.timezone import utc
 from reversion.models import Version
 
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -50,7 +49,9 @@ def test_run(s3_stubber):
     for investment_project in investment_projects:
         investment_project.refresh_from_db()
 
-    assert investment_projects[0].created_on == datetime(2015, 9, 29, 11, 3, 20, tzinfo=utc)
+    assert investment_projects[0].created_on == datetime(
+        2015, 9, 29, 11, 3, 20, tzinfo=timezone.utc,
+    )
     assert investment_projects[1].created_on == created_on_dates[1]
     assert investment_projects[2].created_on == created_on_dates[2]
 
@@ -110,7 +111,7 @@ def test_audit_log(s3_stubber):
 
     investment_project.refresh_from_db()
 
-    assert investment_project.created_on == datetime(2015, 9, 29, 11, 3, 20, tzinfo=utc)
+    assert investment_project.created_on == datetime(2015, 9, 29, 11, 3, 20, tzinfo=timezone.utc)
 
     versions = Version.objects.get_for_object(investment_project)
     assert len(versions) == 1

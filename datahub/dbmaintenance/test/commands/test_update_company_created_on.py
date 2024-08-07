@@ -1,10 +1,9 @@
 """Tests for the update_company_uk_region management command."""
-from datetime import datetime
+from datetime import datetime, timezone
 from io import BytesIO
 
 import pytest
 from django.core.management import call_command
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from reversion.models import Version
 
@@ -32,7 +31,7 @@ def test_run(s3_stubber, caplog, simulate):
     """
     caplog.set_level('WARNING')
 
-    original_created_on = datetime(2017, 1, 1, tzinfo=utc)
+    original_created_on = datetime(2017, 1, 1, tzinfo=timezone.utc)
 
     with freeze_time(original_created_on):
         companies = CompanyFactory.create_batch(2)

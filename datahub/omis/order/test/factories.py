@@ -1,7 +1,7 @@
-import datetime
+from datetime import timedelta, timezone
 
 import factory
-from django.utils.timezone import now, utc
+from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector, UKRegion
@@ -36,7 +36,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     existing_agents = factory.Faker('text')
     permission_to_approach_contacts = factory.Faker('text')
     delivery_date = factory.LazyFunction(
-        lambda: (now() + datetime.timedelta(days=60)).date(),
+        lambda: (now() + timedelta(days=60)).date(),
     )
     contact_email = factory.Faker('email')
     contact_phone = '+44 (0)7123 123456'
@@ -111,7 +111,7 @@ class OrderCompleteFactory(OrderWithAcceptedQuoteFactory):
     """Factory for orders marked as paid."""
 
     status = OrderStatus.COMPLETE
-    completed_on = factory.Faker('date_time', tzinfo=utc)
+    completed_on = factory.Faker('date_time', tzinfo=timezone.utc)
     completed_by = factory.SubFactory(AdviserFactory)
 
 
@@ -119,7 +119,7 @@ class OrderCancelledFactory(OrderWithAcceptedQuoteFactory):
     """Factory for cancelled orders."""
 
     status = OrderStatus.CANCELLED
-    cancelled_on = factory.Faker('date_time', tzinfo=utc)
+    cancelled_on = factory.Faker('date_time', tzinfo=timezone.utc)
     cancelled_by = factory.SubFactory(AdviserFactory)
     cancellation_reason = factory.LazyFunction(CancellationReason.objects.first)
 
@@ -127,7 +127,7 @@ class OrderCancelledFactory(OrderWithAcceptedQuoteFactory):
 class OrderPaidFactory(OrderWithAcceptedQuoteFactory):
     """Factory for orders marked as paid."""
 
-    paid_on = factory.Faker('date_time', tzinfo=utc)
+    paid_on = factory.Faker('date_time', tzinfo=timezone.utc)
     status = OrderStatus.PAID
 
 

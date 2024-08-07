@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest import mock
 
 import pytest
@@ -6,7 +6,6 @@ from dateutil.relativedelta import relativedelta
 from django.apps import apps
 from django.core import management
 from django.db.models import QuerySet
-from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.cleanup.management.commands import delete_orphans
@@ -43,7 +42,7 @@ from datahub.omis.quote.test.factories import QuoteFactory
 from datahub.search.apps import get_search_app_by_model
 from datahub.user.company_list.test.factories import PipelineItemFactory
 
-FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
+FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=timezone.utc)
 
 """
 For each model in the CONFIG attribute for clean-up management commands:

@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 import reversion
 from django.utils.timezone import now
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -64,7 +63,7 @@ class TestCreateLargeCapitalOpportunityView(APITestMixin):
         url = reverse('api-v4:large-capital-opportunity:collection')
 
         request_data = {'name': 'test'}
-        with freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc)):
+        with freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc)):
             response = self.api_client.post(url, data=request_data)
 
         expected_incomplete_details_fields = [

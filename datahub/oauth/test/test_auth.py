@@ -1,9 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from django.conf import settings
 from django.core.cache import cache
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.response import Response
@@ -14,7 +13,7 @@ from datahub.oauth.auth import SSOIntrospectionAuthentication
 from datahub.user_event_log.constants import UserEventType
 from datahub.user_event_log.models import UserEvent
 
-FROZEN_DATETIME = datetime(2020, 1, 1, 0, tzinfo=utc)
+FROZEN_DATETIME = datetime(2020, 1, 1, 0, tzinfo=timezone.utc)
 STAFF_SSO_INTROSPECT_URL = f'{settings.STAFF_SSO_BASE_URL}o/introspect/'
 EXAMPLE_SSO_EMAIL_USER_ID = 'user_id@example.test'
 

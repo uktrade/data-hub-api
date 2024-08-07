@@ -3,7 +3,7 @@
 import re
 import uuid
 from collections import Counter
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from decimal import Decimal
 from operator import attrgetter
 from unittest import mock
@@ -11,7 +11,7 @@ from unittest import mock
 import factory
 import pytest
 import reversion
-from django.utils.timezone import now, utc
+from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -1412,7 +1412,7 @@ class TestPartialUpdateView(APITestMixin):
             ),
         ),
     )
-    @freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+    @freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc))
     def test_update_project_manager_request_status(self, request_status, requested_on):
         """
         Test updating the project manager request status, if the request type
@@ -1779,8 +1779,8 @@ class TestPartialUpdateView(APITestMixin):
     def test_change_stage_log(self):
         """Tests change of the project stage is being logged."""
         dates = (
-            datetime(2017, 4, 28, 17, 35, tzinfo=utc),
-            datetime(2017, 4, 28, 17, 37, tzinfo=utc),
+            datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc),
+            datetime(2017, 4, 28, 17, 37, tzinfo=timezone.utc),
         )
         date_iter = iter(dates)
 
@@ -1856,7 +1856,7 @@ class TestPartialUpdateView(APITestMixin):
             },
         }
 
-        with freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc)):
+        with freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc)):
             response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
 
@@ -1877,7 +1877,7 @@ class TestPartialUpdateView(APITestMixin):
         ] == [
             (
                 uuid.UUID(constants.InvestmentProjectStage.active.value.id),
-                datetime(2017, 4, 28, 17, 35, tzinfo=utc),
+                datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc),
             ),
         ]
 
@@ -2093,7 +2093,7 @@ class TestPartialUpdateView(APITestMixin):
         assert project.project_manager_first_assigned_on is None
         assert project.project_manager_first_assigned_by is None
 
-    @freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+    @freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc))
     def test_assigning_project_manager_first_time_sets_date_and_assigner(self):
         """
         Test that when project manager is first time assigned, a date
@@ -2116,7 +2116,7 @@ class TestPartialUpdateView(APITestMixin):
                 'id': str(adviser_1.id),
             },
         }
-        with freeze_time(datetime(2017, 4, 30, 11, 25, tzinfo=utc)):
+        with freeze_time(datetime(2017, 4, 30, 11, 25, tzinfo=timezone.utc)):
             response = self.api_client.patch(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
@@ -2133,7 +2133,7 @@ class TestPartialUpdateView(APITestMixin):
             'name': crm_team.name,
         }
         project.refresh_from_db()
-        assigned_on = datetime(2017, 4, 30, 11, 25, tzinfo=utc)
+        assigned_on = datetime(2017, 4, 30, 11, 25, tzinfo=timezone.utc)
         assert project.project_manager_first_assigned_on == assigned_on
         assert project.project_manager_first_assigned_by == self.user
 

@@ -1,7 +1,7 @@
 from cgi import parse_header
 from collections import Counter
 from csv import DictReader
-from datetime import datetime
+from datetime import datetime, timezone
 from io import StringIO
 from operator import attrgetter, itemgetter
 from random import choice
@@ -11,7 +11,6 @@ import factory
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -184,11 +183,11 @@ class TestInteractionEntitySearchView(APITestMixin):
         url = reverse('api-v3:search:interaction')
 
         dates = (
-            datetime(2017, 2, 4, 13, 15, 0, tzinfo=utc),
-            datetime(2017, 1, 4, 11, 23, 10, tzinfo=utc),
-            datetime(2017, 9, 29, 3, 25, 15, tzinfo=utc),
-            datetime(2017, 7, 5, 11, 44, 33, tzinfo=utc),
-            datetime(2017, 2, 1, 18, 15, 1, tzinfo=utc),
+            datetime(2017, 2, 4, 13, 15, 0, tzinfo=timezone.utc),
+            datetime(2017, 1, 4, 11, 23, 10, tzinfo=timezone.utc),
+            datetime(2017, 9, 29, 3, 25, 15, tzinfo=timezone.utc),
+            datetime(2017, 7, 5, 11, 44, 33, tzinfo=timezone.utc),
+            datetime(2017, 2, 1, 18, 15, 1, tzinfo=timezone.utc),
         )
         CompanyInteractionFactory.create_batch(
             len(dates),

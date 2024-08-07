@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import ANY
 from uuid import UUID, uuid4
 
 import pytest
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -23,7 +22,7 @@ from datahub.core.test_utils import (
     resolve_objects,
 )
 
-FROZEN_DATETIME = datetime(2020, 1, 24, 16, 26, 50, tzinfo=utc)
+FROZEN_DATETIME = datetime(2020, 1, 24, 16, 26, 50, tzinfo=timezone.utc)
 
 collection_url = reverse('api-v4:company-referral:collection')
 

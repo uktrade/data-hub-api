@@ -11,7 +11,7 @@ import factory
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
-from django.utils.timezone import now, utc
+from django.utils.timezone import now
 
 from freezegun import freeze_time
 from rest_framework import status
@@ -541,7 +541,7 @@ class TestSearch(APITestMixin):
         assert len(results) == num_results
 
         for result in results:
-            created_on = dateutil_parse(result['created_on']).replace(tzinfo=utc)
+            created_on = dateutil_parse(result['created_on']).replace(tzinfo=datetime.timezone.utc)
             for filter_key, date in query.items():
                 date = dateutil_parse(date)
                 if filter_key == 'created_on_before':
