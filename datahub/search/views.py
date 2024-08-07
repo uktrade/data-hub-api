@@ -380,6 +380,9 @@ class SearchExportAPIView(SearchAPIView):
 
         At the moment, all rows are fetched in one query (using a server-side cursor) as
         settings.SEARCH_EXPORT_MAX_RESULTS is set to a (relatively) low value.
+
+        With server-side cursors, the chunk_size parameter specifies the number of results
+        to cache at the database driver level.
         """
         db_ordering = self._translate_search_ordering_to_django_ordering(search_ordering)
 
@@ -393,7 +396,7 @@ class SearchExportAPIView(SearchAPIView):
             .values(
                 *self.field_titles.keys(),
             )
-            .iterator()
+            .iterator(chunk_size=settings.SEARCH_EXPORT_MAX_RESULTS)
         )
 
     def _translate_search_ordering_to_django_ordering(self, ordering):
