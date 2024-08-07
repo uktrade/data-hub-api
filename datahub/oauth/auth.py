@@ -44,7 +44,7 @@ class SSOIntrospectionAuthentication(BaseAuthentication):
         up in Staff SSO. An adviser is then looked up using the retrieved token data.
         """
         try:
-            authorization_header = request.META['HTTP_AUTHORIZATION']
+            authorization_header = request.headers['authorization']
         except KeyError as exc:
             raise AuthenticationFailed(NO_CREDENTIALS_MESSAGE) from exc
 
