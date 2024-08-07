@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg, StringAgg
-from django.contrib.postgres.fields import JSONField
-from django.db.models import Case, CharField, F, Func, OuterRef, Subquery, Value, When
+from django.db.models import Case, CharField, F, Func, JSONField, OuterRef, Subquery, Value, When
 from django.db.models.functions import Cast, Coalesce, Concat, NullIf
 
 
