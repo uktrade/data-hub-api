@@ -1,5 +1,5 @@
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 import pytest
@@ -7,7 +7,6 @@ from django.contrib import messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.urls import reverse
 from django.utils.html import escape
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from reversion.models import Version
@@ -114,7 +113,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         Test that the merge succeeds and the source contact is marked as a duplicate when the
         source contact interactions, investment projects, referrals, exports and orders.
         """
-        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=utc)
+        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=timezone.utc)
         with freeze_time(creation_time):
             source_contact = _contact_factory(
                 **{factory_relation_kwarg: num_related_objects},
@@ -129,7 +128,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
 
         confirm_merge_url = _make_confirm_merge_url(source_contact, target_contact)
 
-        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
         with freeze_time(merge_time):
             response = self.client.post(confirm_merge_url, follow=True)
 
@@ -219,7 +218,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
 
         confirm_merge_url = _make_confirm_merge_url(source_contact, target_contact)
 
-        frozen_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        frozen_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
         with freeze_time(frozen_time):
             response = self.client.post(confirm_merge_url, follow=True)
 
@@ -271,7 +270,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         """
         Test that the merge fails when the source contact cannot be merged into the target contact.
         """
-        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=utc)
+        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=timezone.utc)
         with freeze_time(creation_time):
             source_contact = _contact_factory(
                 **{factory_relation_kwarg: num_related_objects},

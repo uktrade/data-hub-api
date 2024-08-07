@@ -1,11 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import partial
 from random import sample
 from uuid import uuid4
 
 import factory
 import pytest
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -659,8 +658,8 @@ class TestCreateOrUpdateCompanyListItemAPIView(APITestMixin):
         Test that no error is returned if the specified company is already on the
         authenticated user's list.
         """
-        creation_date = datetime(2018, 1, 2, tzinfo=utc)
-        modified_date = datetime(2018, 1, 5, tzinfo=utc)
+        creation_date = datetime(2018, 1, 2, tzinfo=timezone.utc)
+        modified_date = datetime(2018, 1, 5, tzinfo=timezone.utc)
         company = CompanyFactory()
 
         company_list = CompanyListFactory(adviser=self.user)
@@ -894,9 +893,9 @@ class TestCompanyListItemViewSet(APITestMixin):
         # These dates are in the order we expect them to be returned
         # `None` represents a company without any interactions
         interaction_dates = [
-            datetime(2019, 10, 8, tzinfo=utc),
-            datetime(2016, 9, 7, tzinfo=utc),
-            datetime(2009, 5, 6, tzinfo=utc),
+            datetime(2019, 10, 8, tzinfo=timezone.utc),
+            datetime(2016, 9, 7, tzinfo=timezone.utc),
+            datetime(2009, 5, 6, tzinfo=timezone.utc),
             None,
         ]
         shuffled_dates = sample(interaction_dates, len(interaction_dates))

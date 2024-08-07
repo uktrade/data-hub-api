@@ -1,8 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 import pytest
-from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.company.merge import (
@@ -235,7 +234,7 @@ class TestDuplicateContactMerger:
 
         user = AdviserFactory()
 
-        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
 
         with freeze_time(merge_time):
             merge_contacts(source_contact, target_contact, user)
@@ -286,7 +285,7 @@ class TestDuplicateContactMerger:
 
         user = AdviserFactory()
 
-        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
 
         with freeze_time(merge_time):
             merge_contacts(source_contact, target_contact, user)
@@ -340,7 +339,7 @@ class TestDuplicateContactMerger:
 
         user = AdviserFactory()
 
-        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
 
         with freeze_time(merge_time):
             merge_contacts(source_contact, target_contact, user)
@@ -379,7 +378,7 @@ class TestDuplicateContactMerger:
 
         user = AdviserFactory()
 
-        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
 
         with freeze_time(merge_time):
             merge_contacts(source_contact, target_contact, user)
@@ -415,7 +414,7 @@ class TestDuplicateContactMerger:
 
         user = AdviserFactory()
 
-        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
 
         with freeze_time(merge_time):
             merge_contacts(source_contact, target_contact, user)
@@ -451,7 +450,7 @@ class TestDuplicateContactMerger:
 
         user = AdviserFactory()
 
-        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
 
         with freeze_time(merge_time):
             merge_contacts(source_contact, target_contact, user)
@@ -499,7 +498,7 @@ class TestDuplicateContactMerger:
         Tests that merge_contacts() moves models that are linked to the source contact to the
         target contact and marks the source contact as archived.
         """
-        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=utc)
+        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=timezone.utc)
         with freeze_time(creation_time):
             source_contact = _contact_factory(
                 **{factory_relation_kwarg: num_related_objects},
@@ -514,7 +513,7 @@ class TestDuplicateContactMerger:
         source_exports = list(source_contact.contact_exports.all())
         source_investments = list(source_contact.investment_projects.all())
 
-        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
 
         with freeze_time(merge_time):
             result = merge_contacts(source_contact, target_contact, user)

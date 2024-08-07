@@ -1,5 +1,6 @@
+from datetime import timezone
+
 import factory
-from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test.factories import to_many_field
@@ -54,5 +55,5 @@ class ArchivedPipelineItemFactory(PipelineItemFactory):
     """Factory for an archived pipeline item"""
 
     archived = True
-    archived_on = factory.Faker('past_datetime', tzinfo=utc)
+    archived_on = factory.Faker('past_datetime', tzinfo=timezone.utc)
     archived_reason = factory.Faker('sentence')

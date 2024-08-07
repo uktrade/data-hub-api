@@ -5,7 +5,6 @@ from uuid import UUID
 import factory
 import pytest
 
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -809,7 +808,7 @@ class TestSearchExportAPIView(APITestMixin):
 
         opensearch_with_collector.flush_and_refresh()
 
-        frozen_time = datetime.datetime(2018, 1, 2, 12, 30, 50, tzinfo=utc)
+        frozen_time = datetime.datetime(2018, 1, 2, 12, 30, 50, tzinfo=datetime.timezone.utc)
         with freeze_time(frozen_time):
             response = api_client.post(
                 url,

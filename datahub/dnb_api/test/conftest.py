@@ -1,7 +1,6 @@
 import datetime
 
 import pytest
-from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.company.test.factories import CompanyFactory
@@ -99,7 +98,9 @@ def dnb_company_search_datahub_companies():
     # Company with two interactions
     company = CompanyFactory(duns_number='7654321', id='6083b732-b07a-42d6-ada4-c99999999999')
 
-    interaction_date = datetime.datetime(year=2019, month=8, day=1, hour=16, minute=0, tzinfo=utc)
+    interaction_date = datetime.datetime(
+        year=2019, month=8, day=1, hour=16, minute=0, tzinfo=datetime.timezone.utc,
+    )
     with freeze_time(interaction_date):
         CompanyInteractionFactory(
             id='6083b732-b07a-42d6-ada4-222222222222',
@@ -108,7 +109,9 @@ def dnb_company_search_datahub_companies():
             company=company,
         )
 
-    older_interaction_date = datetime.datetime(year=2018, month=8, day=1, tzinfo=utc)
+    older_interaction_date = datetime.datetime(
+        year=2018, month=8, day=1, tzinfo=datetime.timezone.utc,
+    )
     with freeze_time(older_interaction_date):
         CompanyInteractionFactory(
             id='6083b732-b07a-42d6-ada4-111111111111',

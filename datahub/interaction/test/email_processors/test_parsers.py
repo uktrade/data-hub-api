@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import PurePath
 
 import mailparser
 import pytest
-from django.utils.timezone import utc
 
 from datahub.interaction.email_processors.exceptions import (
     BadCalendarInviteError,
@@ -36,9 +35,9 @@ class TestCalendarInteractionEmailParser:
                 'email_samples/valid/outlook_online/sample.eml',
                 {
                     'subject': 'test meet',
-                    'start': datetime(2019, 3, 29, 12, 00, tzinfo=utc),
-                    'end': datetime(2019, 3, 29, 12, 30, tzinfo=utc),
-                    'sent': datetime(2019, 3, 29, 11, 28, 24, tzinfo=utc),
+                    'start': datetime(2019, 3, 29, 12, 00, tzinfo=timezone.utc),
+                    'end': datetime(2019, 3, 29, 12, 30, tzinfo=timezone.utc),
+                    'sent': datetime(2019, 3, 29, 11, 28, 24, tzinfo=timezone.utc),
                     'status': 'CONFIRMED',
                     'uid': (
                         '040000008200E00074C5B7101A82E008000000001670528522E6D40100000'
@@ -50,9 +49,9 @@ class TestCalendarInteractionEmailParser:
                 'email_samples/valid/gmail/sample.eml',
                 {
                     'subject': 'initial',
-                    'start': datetime(2019, 3, 29, 16, 30, tzinfo=utc),
-                    'end': datetime(2019, 3, 29, 17, 30, tzinfo=utc),
-                    'sent': datetime(2019, 3, 29, 11, 36, 33, tzinfo=utc),
+                    'start': datetime(2019, 3, 29, 16, 30, tzinfo=timezone.utc),
+                    'end': datetime(2019, 3, 29, 17, 30, tzinfo=timezone.utc),
+                    'sent': datetime(2019, 3, 29, 11, 36, 33, tzinfo=timezone.utc),
                     'status': 'CONFIRMED',
                     'uid': '5iggr1e2luglss6c789b0scvgr@google.com',
                 },
@@ -61,9 +60,9 @@ class TestCalendarInteractionEmailParser:
                 'email_samples/valid/gmail/no_vcalendar.eml',
                 {
                     'subject': 'initial',
-                    'start': datetime(2019, 3, 29, 16, 30, tzinfo=utc),
-                    'end': datetime(2019, 3, 29, 17, 30, tzinfo=utc),
-                    'sent': datetime(2019, 3, 29, 11, 36, 33, tzinfo=utc),
+                    'start': datetime(2019, 3, 29, 16, 30, tzinfo=timezone.utc),
+                    'end': datetime(2019, 3, 29, 17, 30, tzinfo=timezone.utc),
+                    'sent': datetime(2019, 3, 29, 11, 36, 33, tzinfo=timezone.utc),
                     'status': 'CONFIRMED',
                     'uid': '5iggr1e2luglss6c789b0scvgr@google.com',
                 },
@@ -73,9 +72,9 @@ class TestCalendarInteractionEmailParser:
                 'email_samples/valid/outlook_iphone/sample.eml',
                 {
                     'subject': 'Test meeting iPhone 5',
-                    'start': datetime(2019, 5, 19, tzinfo=utc),
-                    'end': datetime(2019, 5, 20, tzinfo=utc),
-                    'sent': datetime(2019, 5, 13, 10, 34, 50, tzinfo=utc),
+                    'start': datetime(2019, 5, 19, tzinfo=timezone.utc),
+                    'end': datetime(2019, 5, 20, tzinfo=timezone.utc),
+                    'sent': datetime(2019, 5, 13, 10, 34, 50, tzinfo=timezone.utc),
                     'status': 'CONFIRMED',
                     'uid': (
                         '040000008200E00074C5B7101A82E00800000000CCE64C7E7709D50100000000000000001'
@@ -87,9 +86,9 @@ class TestCalendarInteractionEmailParser:
                 'email_samples/valid/outlook_desktop/sample.eml',
                 {
                     'subject': 'Meeting test outlook desktop',
-                    'start': datetime(2019, 5, 15, 11, 00, 00, tzinfo=utc),
-                    'end': datetime(2019, 5, 15, 11, 30, 00, tzinfo=utc),
-                    'sent': datetime(2019, 5, 13, 10, 52, 32, tzinfo=utc),
+                    'start': datetime(2019, 5, 15, 11, 00, 00, tzinfo=timezone.utc),
+                    'end': datetime(2019, 5, 15, 11, 30, 00, tzinfo=timezone.utc),
+                    'sent': datetime(2019, 5, 13, 10, 52, 32, tzinfo=timezone.utc),
                     'status': 'CONFIRMED',
                     'uid': (
                         '040000008200E00074C5B7101A82E00800000000399124F77909D501000000'
@@ -125,7 +124,7 @@ class TestCalendarInteractionEmailParser:
                     ],
                     'secondary_adviser_emails': [],
                     'top_company_name': 'Company 1',
-                    'date': datetime(2019, 3, 29, 12, 0, tzinfo=utc),
+                    'date': datetime(2019, 3, 29, 12, 0, tzinfo=timezone.utc),
                     'subject': 'test meet',
                 },
             ),
@@ -145,7 +144,7 @@ class TestCalendarInteractionEmailParser:
                     ],
                     'secondary_adviser_emails': ['adviser2@digital.trade.gov.uk'],
                     'top_company_name': 'Company 1',
-                    'date': datetime(2019, 3, 29, 16, 30, tzinfo=utc),
+                    'date': datetime(2019, 3, 29, 16, 30, tzinfo=timezone.utc),
                     'subject': 'initial',
                 },
             ),
@@ -296,7 +295,7 @@ class TestInteractionEmailParser:
                     ],
                     'secondary_adviser_emails': [],
                     'top_company_name': 'Company 1',
-                    'date': datetime(2019, 3, 29, 11, 28, 24, tzinfo=utc),
+                    'date': datetime(2019, 3, 29, 11, 28, 24, tzinfo=timezone.utc),
                     'subject': 'test meet',
                     'body': 'BEGIN:VCALENDAR',
                 },
@@ -319,7 +318,7 @@ class TestInteractionEmailParser:
                     ],
                     'secondary_adviser_emails': ['adviser2@digital.trade.gov.uk'],
                     'top_company_name': 'Company 1',
-                    'date': datetime(2019, 3, 29, 11, 36, 33, tzinfo=utc),
+                    'date': datetime(2019, 3, 29, 11, 36, 33, tzinfo=timezone.utc),
                     'subject':
                         'Invitation: initial @ Fri 29 Mar 2019 4:30pm - 5:30pm '
                         '(GMT) (bill.adama@example.net)',

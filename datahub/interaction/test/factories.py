@@ -1,5 +1,7 @@
+from datetime import timezone
+
 import factory
-from django.utils.timezone import now, utc
+from django.utils.timezone import now
 
 from datahub.company.models import CompanyExportCountry
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
@@ -56,7 +58,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
     modified_by = factory.SelfAttribute('created_by')
     company = factory.SubFactory(CompanyFactory)
     subject = factory.Faker('sentence', nb_words=8)
-    date = factory.Faker('past_datetime', start_date='-5y', tzinfo=utc)
+    date = factory.Faker('past_datetime', start_date='-5y', tzinfo=timezone.utc)
     notes = factory.Faker('paragraph', nb_sentences=10)
     service_id = constants.Service.inbound_referral.value.id
     archived_documents_url_path = factory.Faker('uri_path')
