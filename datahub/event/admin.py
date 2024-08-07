@@ -96,6 +96,9 @@ class EventAdmin(BaseModelAdminMixin, VersionAdmin):
 
     actions = ('disable_selected', 'enable_selected')
 
+    @admin.action(
+        description='Disable selected events',
+    )
     @confirm_action(
         title='Disable selected events',
         action_message='disable the selected events',
@@ -109,8 +112,9 @@ class EventAdmin(BaseModelAdminMixin, VersionAdmin):
             row.disabled_on = current_date
             row.save()
 
-    disable_selected.short_description = 'Disable selected events'
-
+    @admin.action(
+        description='Enable selected events',
+    )
     @confirm_action(
         title='Enable selected events',
         action_message='enable the selected events',
@@ -122,8 +126,6 @@ class EventAdmin(BaseModelAdminMixin, VersionAdmin):
         for row in queryset:
             row.disabled_on = None
             row.save()
-
-    enable_selected.short_description = 'Enable selected events'
 
 
 admin.site.register((EventType, LocationType, Programme, TradeAgreement), DisableableMetadataAdmin)

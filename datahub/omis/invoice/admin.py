@@ -49,11 +49,12 @@ class InvoiceAdmin(BaseModelAdminMixin, ViewOnlyAdmin):
         'total_cost',
     )
 
+    @admin.display(
+        description='order',
+    )
     def order_link(self, obj):
         """Returns a link to the order change page."""
         order = Order.objects.filter(reference=obj.order_reference).first()
         if order:
             return get_change_link(order)
         return obj.order_reference
-
-    order_link.short_description = 'order'

@@ -1,5 +1,6 @@
+from datetime import timezone
+
 import factory
-from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.documents.models import UploadStatus
@@ -12,7 +13,7 @@ class DocumentFactory(factory.django.DjangoModelFactory):
     modified_by = factory.SubFactory(AdviserFactory)
     bucket_id = 'default'
     path = factory.Sequence(lambda n: f'projects/doc{n}.txt')
-    uploaded_on = factory.Faker('past_datetime', tzinfo=utc)
+    uploaded_on = factory.Faker('past_datetime', tzinfo=timezone.utc)
     scan_initiated_on = None
     scanned_on = None
     av_clean = None

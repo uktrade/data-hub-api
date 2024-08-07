@@ -8,7 +8,6 @@ from unittest.mock import ANY, call, Mock
 import factory
 import pytest
 from dateutil.relativedelta import relativedelta
-from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.company.constants import OneListTierID
@@ -2815,7 +2814,7 @@ class TestUpdateEmailDeliveryStatusTask:
             == datetime.datetime.combine(
                 status_updated_on,
                 datetime.datetime.min.time(),
-                tzinfo=utc,
+                tzinfo=datetime.timezone.utc,
             )
             for reminder_to_update in reminders_to_update
         )
@@ -2876,7 +2875,7 @@ class TestUpdateEmailDeliveryStatusTask:
         assert reminder_to_update.modified_on == datetime.datetime.combine(
             status_updated_on,
             datetime.datetime.min.time(),
-            tzinfo=utc,
+            tzinfo=datetime.timezone.utc,
         )
         mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once_with(
             reminder_to_update.email_notification_id,
@@ -2986,7 +2985,7 @@ class TestUpdateEmailDeliveryStatusTask:
         assert reminder_to_update.modified_on == datetime.datetime.combine(
             status_updated_on,
             datetime.datetime.min.time(),
-            tzinfo=utc,
+            tzinfo=datetime.timezone.utc,
         )
         mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once_with(
             reminder_to_update.email_notification_id,
@@ -3097,7 +3096,7 @@ class TestUpdateEmailDeliveryStatusTask:
         assert reminder_to_update.modified_on == datetime.datetime.combine(
             status_updated_on,
             datetime.datetime.min.time(),
-            tzinfo=utc,
+            tzinfo=datetime.timezone.utc,
         )
         mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_called_once_with(
             reminder_to_update.email_notification_id,

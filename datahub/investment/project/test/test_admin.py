@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from unittest import mock
 from uuid import UUID, uuid4
@@ -6,7 +6,7 @@ from uuid import UUID, uuid4
 import pytest
 from django.contrib.admin.sites import site
 from django.urls import reverse
-from django.utils.timezone import now, utc
+from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
 
@@ -200,7 +200,7 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
         """
         investment_project = InvestmentProjectFactory(
             project_manager=AdviserFactory(),
-            project_manager_first_assigned_on=datetime(2010, 1, 2, 0, 0, tzinfo=utc),
+            project_manager_first_assigned_on=datetime(2010, 1, 2, 0, 0, tzinfo=timezone.utc),
             project_manager_first_assigned_by=AdviserFactory(),
         )
         url = reverse('admin:investment_investmentproject_change', args=(investment_project.pk,))

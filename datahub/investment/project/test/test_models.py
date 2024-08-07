@@ -1,12 +1,11 @@
 """Tests for investment models."""
 
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from uuid import UUID
 
 import pytest
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
@@ -153,8 +152,8 @@ def test_associated_advisers_no_none():
 def test_creates_stage_log_if_stage_was_modified():
     """Tests that change to investment project stage creates a stage log record."""
     dates = (
-        datetime(2017, 4, 28, 17, 35, tzinfo=utc),
-        datetime(2017, 4, 28, 17, 37, tzinfo=utc),
+        datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc),
+        datetime(2017, 4, 28, 17, 37, tzinfo=timezone.utc),
     )
     date_iter = iter(dates)
 
@@ -181,7 +180,7 @@ def test_doesnt_create_stage_log_if_stage_was_not_modified():
     assert project.stage_log.count() == 1
 
 
-@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc))
 def test_stage_log_added_when_investment_project_is_created():
     """Tests that stage is being logged when Investment Projects is created."""
     project = InvestmentProjectFactory()
@@ -190,12 +189,12 @@ def test_stage_log_added_when_investment_project_is_created():
     ] == [
         (
             UUID(constants.InvestmentProjectStage.prospect.value.id),
-            datetime(2017, 4, 28, 17, 35, tzinfo=utc),
+            datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc),
         ),
     ]
 
 
-@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc))
 def test_prospect_financial_year():
     """Prospects should use created date to determine financial year."""
     project = InvestmentProjectFactory(
@@ -206,7 +205,7 @@ def test_prospect_financial_year():
     assert project.financial_year == 2017
 
 
-@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc))
 def test_non_prospect_financial_year_estimated_land_date():
     """Use estimated land date when actual land date is not set."""
     project = InvestmentProjectFactory(
@@ -217,7 +216,7 @@ def test_non_prospect_financial_year_estimated_land_date():
     assert project.financial_year == 2018
 
 
-@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc))
 def test_non_prospect_financial_year_actual_land_date():
     """Use actual land date when it is set."""
     project = InvestmentProjectFactory(
@@ -228,7 +227,7 @@ def test_non_prospect_financial_year_actual_land_date():
     assert project.financial_year == 2019
 
 
-@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc))
 def test_prospect_financial_year_verbose():
     """Prospects should use created date to determine financial year."""
     project = InvestmentProjectFactory(
@@ -239,7 +238,7 @@ def test_prospect_financial_year_verbose():
     assert project.financial_year_verbose == '2017-18 (onwards)'
 
 
-@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc))
 def test_non_prospect_financial_year_verbose_estimated_land_date():
     """Use estimated land date when actual land date is not set."""
     project = InvestmentProjectFactory(
@@ -250,7 +249,7 @@ def test_non_prospect_financial_year_verbose_estimated_land_date():
     assert project.financial_year_verbose == '2018-19'
 
 
-@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc))
 def test_non_prospect_financial_year_verbose_actual_land_date():
     """Use actual land date when it is set."""
     project = InvestmentProjectFactory(

@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 import pytest
 import reversion
-from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.company.merge import (
@@ -297,7 +296,7 @@ class TestDuplicateCompanyMerger:
         Tests that perform_merge() moves contacts and interactions to the target company,
         and marks the source company as archived and transferred.
         """
-        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=utc)
+        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=timezone.utc)
         with freeze_time(creation_time):
             source_company = _company_factory(
                 **{factory_relation_kwarg: num_related_objects},
@@ -316,7 +315,7 @@ class TestDuplicateCompanyMerger:
         # source_num_interactions + source_num_contacts + source_num_orders
         assert len(source_contacts) == (num_related_objects if creates_contacts else 0)
 
-        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
 
         with freeze_time(merge_time):
             result = merge_companies(source_company, target_company, user)
@@ -386,7 +385,7 @@ class TestDuplicateCompanyMerger:
         Tests that perform_merge() moves investment projects to the target company and marks the
         source company as archived and transferred.
         """
-        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=utc)
+        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=timezone.utc)
         with freeze_time(creation_time):
             source_company = CompanyFactory()
             investment_project = InvestmentProjectFactory(
@@ -396,7 +395,7 @@ class TestDuplicateCompanyMerger:
         target_company = CompanyFactory()
         user = AdviserFactory()
 
-        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
 
         with freeze_time(merge_time):
             result = merge_companies(source_company, target_company, user)
@@ -561,7 +560,7 @@ class TestDuplicateCompanyMerger:
         target_company = CompanyFactory()
         user = AdviserFactory()
 
-        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
 
         with freeze_time(merge_time):
             merge_companies(source_company, target_company, user)

@@ -73,10 +73,12 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified_by',
     )
 
+    @admin.display(
+        description='Financial year',
+    )
     def financial_year_verbose(self, obj):
         """Financial year in YYYY-YY format, for example 2021-22."""
         return obj.financial_year_verbose
-    financial_year_verbose.short_description = 'Financial year'
 
     def save_model(self, request, obj, form, change):
         """

@@ -126,13 +126,14 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
     _editable_fields = ('sector', 'uk_region')
     fields = readonly_fields + _editable_fields
 
+    @admin.display(
+        description='Current invoice',
+    )
     def invoice_link(self, obj):
         """Returns a link to the invoice change page."""
         if obj.invoice:
             return get_change_link(obj.invoice)
         return ''
-
-    invoice_link.short_description = 'Current invoice'
 
     def completed(self, order):
         """:returns: completed on/by details."""

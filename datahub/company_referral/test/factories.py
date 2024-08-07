@@ -1,5 +1,6 @@
+from datetime import timezone
+
 import factory
-from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.company_referral.models import CompanyReferral
@@ -33,4 +34,4 @@ class CompleteCompanyReferralFactory(CompanyReferralFactory):
     status = CompanyReferral.Status.COMPLETE
     interaction = factory.SubFactory(CompanyInteractionFactory)
     completed_by = factory.SubFactory(AdviserFactory)
-    completed_on = factory.Faker('past_datetime', tzinfo=utc)
+    completed_on = factory.Faker('past_datetime', tzinfo=timezone.utc)

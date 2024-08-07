@@ -1,8 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 from django.urls import reverse
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 
@@ -118,7 +117,7 @@ class TestTasksDatasetViewSet(BaseDatasetViewTest):
                 interaction=InteractionFactoryBase(),
             )
 
-        updated_since_date = datetime(2024, 1, 2, tzinfo=utc).strftime('%Y-%m-%d')
+        updated_since_date = datetime(2024, 1, 2, tzinfo=timezone.utc).strftime('%Y-%m-%d')
         response = data_flow_api_client.get(self.view_url, {'updated_since': updated_since_date})
         assert response.status_code == status.HTTP_200_OK
 

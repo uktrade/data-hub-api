@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 from django.contrib.auth import login as django_login
 from django.urls import reverse
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 
@@ -15,7 +14,7 @@ from datahub.oauth.admin_sso.test.utils import get_request_with_session
 pytestmark = pytest.mark.django_db
 
 
-FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
+FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=timezone.utc)
 
 
 @freeze_time(FROZEN_TIME)

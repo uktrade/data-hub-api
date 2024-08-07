@@ -1,7 +1,7 @@
 import random
+from datetime import timezone
 
 import factory
-from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.omis.order.test.factories import OrderPaidFactory, OrderWithAcceptedQuoteFactory
@@ -43,7 +43,7 @@ class RequestedRefundFactory(factory.django.DjangoModelFactory):
     order = factory.SubFactory(OrderPaidFactory)
     reference = factory.Faker('pystr')
     status = RefundStatus.REQUESTED
-    requested_on = factory.Faker('date_time', tzinfo=utc)
+    requested_on = factory.Faker('date_time', tzinfo=timezone.utc)
     requested_by = factory.SubFactory(AdviserFactory)
     refund_reason = factory.Faker('text')
     requested_amount = factory.LazyAttribute(
@@ -59,11 +59,11 @@ class ApprovedRefundFactory(RequestedRefundFactory):
 
     status = RefundStatus.APPROVED
 
-    level1_approved_on = factory.Faker('date_time', tzinfo=utc)
+    level1_approved_on = factory.Faker('date_time', tzinfo=timezone.utc)
     level1_approved_by = factory.SelfAttribute('created_by')
     level1_approval_notes = factory.Faker('text')
 
-    level2_approved_on = factory.Faker('date_time', tzinfo=utc)
+    level2_approved_on = factory.Faker('date_time', tzinfo=timezone.utc)
     level2_approved_by = factory.SelfAttribute('created_by')
     level2_approval_notes = factory.Faker('text')
 

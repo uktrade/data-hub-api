@@ -1,10 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Mapping, NamedTuple, Sequence, Union
 
 from dateutil.relativedelta import relativedelta
 from dateutil.utils import today
 from django.db.models import Q
-from django.utils.timezone import utc
 
 
 class DatetimeLessThanCleanupFilter(NamedTuple):
@@ -23,7 +22,7 @@ class DatetimeLessThanCleanupFilter(NamedTuple):
         if isinstance(self.age_threshold, datetime):
             return self.age_threshold
 
-        return today(tzinfo=utc) - self.age_threshold
+        return today(tzinfo=timezone.utc) - self.age_threshold
 
     def as_q(self):
         """Returns a Q object for this filter."""

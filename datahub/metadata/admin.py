@@ -35,6 +35,7 @@ MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY = (
 )
 
 
+@admin.register(*MODELS_TO_REGISTER_DISABLEABLE)
 class DisableableMetadataAdmin(admin.ModelAdmin):
     """
     Generic admin for disableable metadata models.
@@ -49,6 +50,7 @@ class DisableableMetadataAdmin(admin.ModelAdmin):
     list_filter = (DisabledOnFilter,)
 
 
+@admin.register(*MODELS_TO_REGISTER_READ_ONLY)
 class ReadOnlyMetadataAdmin(ViewOnlyAdmin):
     """
     Generic admin for metadata models that shouldn't be edited.
@@ -61,6 +63,7 @@ class ReadOnlyMetadataAdmin(ViewOnlyAdmin):
     list_filter = (DisabledOnFilter,)
 
 
+@admin.register(*MODELS_TO_REGISTER_WITH_ORDER)
 class OrderedMetadataAdmin(admin.ModelAdmin):
     """
     Generic admin for ordered metadata models.
@@ -75,6 +78,7 @@ class OrderedMetadataAdmin(admin.ModelAdmin):
     list_filter = (DisabledOnFilter,)
 
 
+@admin.register(*MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY)
 class EditableOrderOnlyOrderedMetadataAdmin(OrderedMetadataAdmin, ViewAndChangeOnlyAdmin):
     """
     Generic admin for ordered metadata models with editable order.
@@ -83,15 +87,6 @@ class EditableOrderOnlyOrderedMetadataAdmin(OrderedMetadataAdmin, ViewAndChangeO
     """
 
     readonly_fields = ('id', 'name', 'disabled_on')
-
-
-admin.site.register(MODELS_TO_REGISTER_DISABLEABLE, DisableableMetadataAdmin)
-admin.site.register(MODELS_TO_REGISTER_READ_ONLY, ReadOnlyMetadataAdmin)
-admin.site.register(MODELS_TO_REGISTER_WITH_ORDER, OrderedMetadataAdmin)
-admin.site.register(
-    MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY,
-    EditableOrderOnlyOrderedMetadataAdmin,
-)
 
 
 @admin.register(models.AdministrativeArea)
