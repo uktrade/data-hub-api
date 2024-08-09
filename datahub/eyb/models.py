@@ -1,13 +1,15 @@
-from django.db import models
 from django.contrib.postgres.fields import ArrayField
+from django.db import models
+
 
 from datahub.core.models import ArchivableModel, BaseModel
 
 
 class EYBLead(ArchivableModel, BaseModel):
-    """EYB Triage and User data combined
-
-    This mirrors the data held in Expand Your Business"""
+    """
+    EYB Triage and User data combined
+    This mirrors the data held in Expand Your Business
+    """
 
     # EYB Triage data
     triage_id = models.IntegerField
