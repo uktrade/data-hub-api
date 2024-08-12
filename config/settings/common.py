@@ -260,7 +260,6 @@ ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIEW = env.bool('ENABLE_ADMIN_ADD_ACCESS_TOKEN_VIE
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
 LANGUAGE_CODE = 'en-gb'
-USE_L10N = True
 USE_THOUSAND_SEPARATOR = True
 PUBLIC_ROOT = str(CONFIG_DIR('public'))
 STATIC_ROOT = str(CONFIG_DIR('staticfiles'))

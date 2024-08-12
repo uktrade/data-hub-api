@@ -1,7 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
-from django.utils.timezone import utc
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -46,10 +45,10 @@ class TestAdviserDatasetViewSet(BaseDatasetViewTest):
 
     def test_with_multiple_advisers(self, data_flow_api_client):
         """Test that endpoint returns correct order of records"""
-        adviser_1 = AdviserFactory(date_joined=datetime(2019, 1, 2, tzinfo=utc))
-        adviser_2 = AdviserFactory(date_joined=datetime(2019, 1, 3, tzinfo=utc))
-        adviser_3 = AdviserFactory(date_joined=datetime(2019, 1, 1, tzinfo=utc))
-        adviser_4 = AdviserFactory(date_joined=datetime(2019, 1, 1, tzinfo=utc))
+        adviser_1 = AdviserFactory(date_joined=datetime(2019, 1, 2, tzinfo=timezone.utc))
+        adviser_2 = AdviserFactory(date_joined=datetime(2019, 1, 3, tzinfo=timezone.utc))
+        adviser_3 = AdviserFactory(date_joined=datetime(2019, 1, 1, tzinfo=timezone.utc))
+        adviser_4 = AdviserFactory(date_joined=datetime(2019, 1, 1, tzinfo=timezone.utc))
 
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK

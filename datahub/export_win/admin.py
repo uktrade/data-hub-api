@@ -286,29 +286,36 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         AdvisorInline,
     ]
 
+    @admin.display(
+        description='Creator',
+    )
     def get_adviser(self, obj):
         """Return adviser as user with email."""
         return f'{obj.adviser} <{obj.adviser.email}>' if obj.adviser else \
             f'{obj.adviser_name} <{obj.adviser_email_address}>'
 
-    get_adviser.short_description = 'Creator'
-
+    @admin.display(
+        description='Company name',
+    )
     def get_company(self, obj):
         """Return company name."""
         return obj.company
-    get_company.short_description = 'Company name'
 
+    @admin.display(
+        description='Date win confirmed',
+    )
     def get_date_confirmed(self, obj):
         """Return wins being confirmed."""
         return obj.customer_response.responded_on
-    get_date_confirmed.short_description = 'Date win confirmed'
 
+    @admin.display(
+        description='Contact names',
+    )
     def get_contact_names(self, obj):
         """Return a comma separated list of company contact names."""
         return ', '.join(
             contact.name for contact in obj.company_contacts.all().order_by('last_name')
         )
-    get_contact_names.short_description = 'Contact names'
 
     def get_actions(self, request):
         """Remove the delete selected action."""
@@ -549,6 +556,9 @@ class WinAdviserAdmin(BaseModelAdminMixin):
         queryset = super().get_queryset(request)
         return queryset.filter(win__is_deleted=False)
 
+    @admin.display(
+        description='Contributing Adviser',
+    )
     def get_computed_adviser_name(self, obj):
         """Return computed adviser name."""
         return obj.adviser.name if obj.adviser else obj.name
@@ -564,7 +574,5 @@ class WinAdviserAdmin(BaseModelAdminMixin):
 
     def has_change_permission(self, request, obj=None):
         return False
-
-    get_computed_adviser_name.short_description = 'Contributing Adviser'
 
     WinAdviser._meta.verbose_name_plural = 'Advisers'

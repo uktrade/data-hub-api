@@ -1,7 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from dateutil.relativedelta import relativedelta
-from django.utils.timezone import utc
 
 from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelCleanupConfig
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
@@ -12,14 +11,16 @@ from datahub.investment.project.models import InvestmentProject
 from datahub.omis.order.models import Order
 from datahub.omis.quote.models import Quote
 
-COMPANY_MODIFIED_ON_CUT_OFF = datetime(2013, 8, 19, tzinfo=utc)  # 2013-08-18 + 1 day
+COMPANY_MODIFIED_ON_CUT_OFF = datetime(2013, 8, 19, tzinfo=timezone.utc)  # 2013-08-18 + 1 day
 COMPANY_EXPIRY_PERIOD = relativedelta(years=10)
-CONTACT_MODIFIED_ON_CUT_OFF = datetime(2014, 7, 22, tzinfo=utc)  # 2014-07-21 + 1 day
+CONTACT_MODIFIED_ON_CUT_OFF = datetime(2014, 7, 22, tzinfo=timezone.utc)  # 2014-07-21 + 1 day
 CONTACT_EXPIRY_PERIOD = relativedelta(years=10)
 INTERACTION_EXPIRY_PERIOD = relativedelta(years=10)
-INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF = datetime(2013, 11, 23, tzinfo=utc)  # 2013-11-22 + 1 day
+INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF = datetime(
+    2013, 11, 23, tzinfo=timezone.utc,
+)  # 2013-11-22 + 1 day
 INVESTMENT_PROJECT_EXPIRY_PERIOD = relativedelta(years=10)
-ORDER_MODIFIED_ON_CUT_OFF = datetime(2014, 7, 12, tzinfo=utc)  # 2014-07-11 + 1 day
+ORDER_MODIFIED_ON_CUT_OFF = datetime(2014, 7, 12, tzinfo=timezone.utc)  # 2014-07-11 + 1 day
 ORDER_EXPIRY_PERIOD = relativedelta(years=7)
 INVESTOR_PROFILE_EXPIRY_PERIOD = relativedelta(years=10)
 COMPANY_EXPORT_EXPIRY_PERIOD = relativedelta(years=10)

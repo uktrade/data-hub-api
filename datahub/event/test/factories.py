@@ -1,5 +1,6 @@
+from datetime import timezone
+
 import factory
-from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import Country, Service, Team, UKRegion
@@ -49,4 +50,4 @@ class EventFactory(factory.django.DjangoModelFactory):
 class DisabledEventFactory(EventFactory):
     """Disabled event factory."""
 
-    disabled_on = factory.Faker('past_datetime', tzinfo=utc)
+    disabled_on = factory.Faker('past_datetime', tzinfo=timezone.utc)

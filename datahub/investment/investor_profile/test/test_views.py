@@ -1,8 +1,7 @@
 import uuid
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 import pytest
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -76,7 +75,7 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
         request_data = {
             'investor_company': {'id': investor_company.pk},
         }
-        with freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc)):
+        with freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc)):
             response = self.api_client.post(url, data=request_data)
 
         expected_incomplete_details_fields = [
