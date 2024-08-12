@@ -12,10 +12,10 @@ class EYBLead(ArchivableModel, BaseModel):
     """
 
     # EYB Triage data
-    triage_id = models.IntegerField
+    triage_id = models.IntegerField()
     triage_hashed_uuid = models.CharField(max_length=200)
-    triage_created = models.DateTimeField
-    triage_modified = models.DateTimeField
+    triage_created = models.DateTimeField()
+    triage_modified = models.DateTimeField()
     sector = models.CharField(max_length=255)
     sector_sub = models.CharField(max_length=255, default=None, null=True)
     intent = ArrayField(
@@ -35,10 +35,10 @@ class EYBLead(ArchivableModel, BaseModel):
     is_high_value = models.BooleanField(default=False)
 
     # EYB User data
-    user_id = models.IntegerField
+    user_id = models.IntegerField()
     user_hashed_uuid = models.CharField(max_length=200)
-    user_created = models.DateTimeField
-    user_modified = models.DateTimeField
+    user_created = models.DateTimeField()
+    user_modified = models.DateTimeField()
     company_name = models.CharField(max_length=255)
     company_location = models.CharField(max_length=255)
     full_name = models.CharField(max_length=255)
