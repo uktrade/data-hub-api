@@ -98,6 +98,9 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'source',
     )
 
+    @admin.display(
+        description='contacts',
+    )
     def get_contact_names(self, obj):
         """Returns contact names for the interaction as a formatted string."""
         contact_queryset = obj.contacts.order_by('pk')
@@ -112,21 +115,21 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
             f'and {contact_count - 1} more' if contact_count > 1 else '',
         )
 
-    get_contact_names.short_description = 'contacts'
-
+    @admin.display(
+        description='source',
+    )
     def pretty_source(self, obj):
         """
         Return the source field formatted with indentation.
         """
         return format_json_as_html(obj.source)
 
-    pretty_source.short_description = 'source'
-
+    @admin.display(
+        description='service answers',
+    )
     def pretty_service_answers(self, obj):
         """Return the service_answers field formatted with indentation."""
         return format_json_as_html(obj.service_answers)
-
-    pretty_service_answers.short_description = 'service answers'
 
     def get_urls(self):
         """Gets the URLs for this model's admin views."""

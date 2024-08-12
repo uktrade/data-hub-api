@@ -1,10 +1,9 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest import mock
 
 import pytest
 from django.conf import settings
-from django.utils.timezone import utc
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.feature_flag.test.factories import FeatureFlagFactory
@@ -45,7 +44,7 @@ def base_interaction_data_fixture():
         'sender_email': 'adviser1@trade.gov.uk',
         'contact_emails': ['bill.adama@example.net', 'saul.tigh@example.net'],
         'secondary_adviser_emails': [],
-        'date': datetime(2019, 5, 1, 13, 00, tzinfo=utc),
+        'date': datetime(2019, 5, 1, 13, 00, tzinfo=timezone.utc),
         'top_company_name': 'Company 1',
         'meeting_details': {'uid': '12345'},
         'subject': 'A meeting',

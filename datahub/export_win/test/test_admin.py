@@ -142,9 +142,9 @@ def test_get_adviser(admin):
 @pytest.mark.django_db
 def test_get_date_confirmed(admin):
     """Test for get date confirmed"""
-    customer_response = CustomerResponseFactory(responded_on='2024-04-01')
-    obj = WinFactory(customer_response=customer_response)
-    result = admin.get_date_confirmed(obj)
+    win = WinFactory()
+    CustomerResponseFactory(responded_on='2024-04-01', win=win)
+    result = admin.get_date_confirmed(win)
 
     expected_result = '2024-04-01'
     assert result == expected_result

@@ -1,13 +1,13 @@
 import secrets
 import uuid
-from datetime import datetime, time
+from datetime import datetime, time, timezone
 from functools import partial
 
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
 from django.utils.crypto import get_random_string
-from django.utils.timezone import now, utc
+from django.utils.timezone import now
 from mptt.fields import TreeForeignKey
 
 from datahub.company.models import Advisor, Company, Contact
@@ -511,7 +511,7 @@ class Order(BaseModel):
 
         self.status = OrderStatus.PAID
         max_received_on = max(item['received_on'] for item in payments_data)
-        self.paid_on = datetime.combine(date=max_received_on, time=time(tzinfo=utc))
+        self.paid_on = datetime.combine(date=max_received_on, time=time(tzinfo=timezone.utc))
         self.save()
 
         # send signal

@@ -1,8 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 
 import pytest
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -26,7 +25,7 @@ from datahub.event.test.factories import EventFactory
 from datahub.interaction.models import CommunicationChannel, Interaction
 from datahub.interaction.test.utils import random_service
 
-FROZEN_DATETIME = datetime(2020, 1, 24, 16, 26, 50, tzinfo=utc)
+FROZEN_DATETIME = datetime(2020, 1, 24, 16, 26, 50, tzinfo=timezone.utc)
 
 
 def _complete_url(pk):
@@ -419,7 +418,7 @@ class TestCompleteCompanyReferral(APITestMixin):
 
             # Fields specified in the request body
             'communication_channel_id': resolved_request_data.get('communication_channel'),
-            'date': datetime(2020, 2, 3, tzinfo=utc),
+            'date': datetime(2020, 2, 3, tzinfo=timezone.utc),
             'event_id': resolved_request_data.get('event'),
             'grant_amount_offered': None,
             'investment_project_id': None,

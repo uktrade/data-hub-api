@@ -1,5 +1,5 @@
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from itertools import chain, cycle, islice
 from unittest.mock import patch
 
@@ -8,7 +8,6 @@ from django.contrib import messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.urls import reverse
 from django.utils.html import escape
-from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from reversion.models import Version
@@ -129,7 +128,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         source company has various amounts of contacts, interactions, investment projects and
         orders.
         """
-        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=utc)
+        creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=timezone.utc)
         with freeze_time(creation_time):
             source_company = _company_factory(
                 **{factory_relation_kwarg: num_related_objects},
@@ -156,7 +155,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
 
         confirm_merge_url = _make_confirm_merge_url(source_company, target_company)
 
-        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        merge_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
         with freeze_time(merge_time):
             response = self.client.post(confirm_merge_url, follow=True)
 
@@ -263,7 +262,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
 
         confirm_merge_url = _make_confirm_merge_url(source_company, target_company)
 
-        frozen_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=utc)
+        frozen_time = datetime(2011, 2, 1, 14, 0, 10, tzinfo=timezone.utc)
         with freeze_time(frozen_time):
             response = self.client.post(confirm_merge_url, follow=True)
 

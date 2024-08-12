@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import Mock
 from uuid import UUID
 
 import pytest
-from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.user_event_log.constants import UserEventType
@@ -23,7 +22,7 @@ class TestRecordUserEvent:
                 {'a': 'b'},
             ),
             (
-                {'a': datetime(2016, 10, 10, 1, 0, 2, tzinfo=utc)},
+                {'a': datetime(2016, 10, 10, 1, 0, 2, tzinfo=timezone.utc)},
                 {'a': '2016-10-10T01:00:02Z'},
             ),
             (

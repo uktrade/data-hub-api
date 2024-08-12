@@ -36,7 +36,7 @@ class HawkAuthentication(BaseAuthentication):
         If we cannot authenticate, AuthenticationFailed is raised, as required
         in the DRF authentication flow
         """
-        if 'HTTP_AUTHORIZATION' not in request.META:
+        if 'authorization' not in request.headers:
             raise AuthenticationFailed(NO_CREDENTIALS_MESSAGE)
 
         try:
@@ -127,7 +127,7 @@ def _authorise(request):
     """Raises a HawkFail if the passed request cannot be authenticated"""
     return Receiver(
         _lookup_credentials,
-        request.META['HTTP_AUTHORIZATION'],
+        request.headers['authorization'],
         request.build_absolute_uri(),
         request.method,
         content=request.body,

@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from logging import getLogger
 
 import django
@@ -9,7 +9,6 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
 django.setup()
 
 from django.conf import settings
-from pytz import utc
 
 from datahub.company.tasks.adviser import schedule_automatic_adviser_deactivate
 from datahub.company.tasks.company import schedule_automatic_company_archive
@@ -177,7 +176,7 @@ def schedule_jobs():
             hour=23,
             minute=59,
             second=59,
-            tzinfo=utc,
+            tzinfo=timezone.utc,
         )
         job_scheduler(
             function=schedule_sync_outdated_companies_with_dnb,
