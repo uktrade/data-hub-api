@@ -1,5 +1,4 @@
 import factory
-import datetime
 
 
 class EYBLeadFactory(factory.django.DjangoModelFactory):
