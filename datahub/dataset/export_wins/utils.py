@@ -6,10 +6,17 @@ def use_nulls_on_empty_string_fields(data):
             data[column] = None
 
 
-def create_columns_with_index(data, key, new_key):
-    if data.get(key) is not None:
-        for i, value in enumerate(data[key]):
-            data[f'{new_key}_{i+1}_display'] = value
+def create_columns_with_index(data, key, new_key, max_items=5):
+    num_items = len(data.get(key, []))
+
+    for i in range(max(num_items, max_items)):
+        if i < num_items:
+            value = data[key][i]
+        else:
+            value = None
+        data[f'{new_key}_{i+1}_display'] = value
+
+    if key in data:
         del data[key]
 
 
