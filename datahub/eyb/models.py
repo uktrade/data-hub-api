@@ -7,7 +7,7 @@ from datahub.core.models import ArchivableModel, BaseModel
 
 class EYBLead(ArchivableModel, BaseModel):
     """
-    EYB Triage and User data combined
+    EYB Triage and User data combined.
     This mirrors the data held in Expand Your Business
     """
 

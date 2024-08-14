@@ -1,5 +1,4 @@
 import datetime
-import factory
 import pytest
 
 from datahub.eyb.models import EYBLead
@@ -12,8 +11,12 @@ def eyb_lead_data():
         # EYB Triage data
         'triage_id': 96,
         'triage_hashed_uuid': 'b85dabe2a4c46828424d61ec99f496d91952f9e53733898ff5f0fee89f08b635',
-        'triage_created': datetime.datetime(2023, 9, 21, 7, 53, 19, 534794, tzinfo=datetime.timezone.utc),
-        'triage_modified': datetime.datetime(2023, 9, 27, 11, 32, 28, 853014, tzinfo=datetime.timezone.utc),
+        'triage_created': datetime.datetime(
+            2023, 9, 21, 7, 53, 19, 534794, tzinfo=datetime.timezone.utc
+        ),
+        'triage_modified': datetime.datetime(
+            2023, 9, 27, 11, 32, 28, 853014, tzinfo=datetime.timezone.utc
+        ),
         'sector': 'FOOD_AND_DRINK',
         'sector_sub': 'PROCESSING_AND_PRESERVING_OF_MEAT',
         'intent': [
@@ -33,8 +36,12 @@ def eyb_lead_data():
         # EYB User data
         'user_id': 90,
         'user_hashed_uuid': 'b85dabe2a4c46828424d61ec99f496d91952f9e53733898ff5f0fee89f08b635',
-        'user_created': datetime.datetime(2023, 9, 21, 7, 53, 19, 472710, tzinfo=datetime.timezone.utc),
-        'user_modified': datetime.datetime(2023, 9, 22, 8, 53, 19, 472723, tzinfo=datetime.timezone.utc),
+        'user_created': datetime.datetime(
+            2023, 9, 21, 7, 53, 19, 472710, tzinfo=datetime.timezone.utc
+        ),
+        'user_modified': datetime.datetime(
+            2023, 9, 22, 8, 53, 19, 472723, tzinfo=datetime.timezone.utc
+        ),
         'company_name': 'Stu co',
         'company_location': 'FR',
         'full_name': 'John Doe',
@@ -89,7 +96,7 @@ class TestEYBLead:
     """Tests EYB Lead model"""
 
     def test_db_instance_matches_factory_instance(self, eyb_lead_data):
-        eyb_lead_factory = EYBLeadFactory(**eyb_lead_data)
+        EYBLeadFactory(**eyb_lead_data)
         assert EYBLead.objects.all().exists()
         eyb_lead_db = EYBLead.objects.all().first()
         verify_eyb_lead_data(eyb_lead_db, eyb_lead_data)
