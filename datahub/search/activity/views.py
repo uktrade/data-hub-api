@@ -15,7 +15,7 @@ from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.metadata.query_utils import get_service_name_subquery
 from datahub.search.activity import InteractionActivitySearchApp
 from datahub.search.activity.serializers import SearchInteractionQuerySerializer
-from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAPIView
+from datahub.search.views import register_v4_view, SearchAPIView, SearchExportAPIView
 
 
 class SearchInteractionAPIViewMixin:
@@ -84,12 +84,12 @@ class SearchInteractionAPIViewMixin:
     }
 
 
-@register_v3_view()
+@register_v4_view()
 class SearchInteractionAPIView(SearchInteractionAPIViewMixin, SearchAPIView):
     """Filtered interaction search view."""
 
 
-@register_v3_view(sub_path='export')
+@register_v4_view(sub_path='export')
 class SearchInteractionExportAPIView(SearchInteractionAPIViewMixin, SearchExportAPIView):
     """Filtered interaction search export view."""
 
@@ -149,7 +149,7 @@ class SearchInteractionExportAPIView(SearchInteractionAPIViewMixin, SearchExport
     }
 
 
-@register_v3_view(sub_path='policy-feedback')
+@register_v4_view(sub_path='policy-feedback')
 class SearchInteractionPolicyFeedbackExportAPIView(
     SearchInteractionAPIViewMixin,
     SearchExportAPIView,
