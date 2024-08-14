@@ -1,3 +1,3 @@
-from datahub.search.interaction.apps import InteractionSearchApp
+from datahub.search.activity.apps import InteractionActivitySearchApp
 
-__all__ = ('InteractionSearchApp',)
+__all__ = ('InteractionActivitySearchApp',)

@@ -46,7 +46,7 @@ from datahub.interaction.test.factories import (
 from datahub.investment.project.test.factories import ActiveInvestmentProjectFactory
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
-from datahub.search.activity import InteractionSearchApp
+from datahub.search.activity import InteractionActivitySearchApp
 from datahub.search.activity.views import (
     SearchInteractionExportAPIView,
     SearchInteractionPolicyFeedbackExportAPIView,
@@ -56,7 +56,7 @@ from datahub.search.activity.views import (
 pytestmark = [
     pytest.mark.django_db,
     # Index objects for this search app only
-    pytest.mark.opensearch_collector_apps.with_args(InteractionSearchApp),
+    pytest.mark.opensearch_collector_apps.with_args(InteractionActivitySearchApp),
 ]
 
 

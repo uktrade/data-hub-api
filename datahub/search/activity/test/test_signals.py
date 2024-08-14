@@ -6,7 +6,7 @@ from datahub.interaction.test.factories import (
     InteractionDITParticipantFactory,
     InvestmentProjectInteractionFactory,
 )
-from datahub.search.activity.apps import InteractionSearchApp
+from datahub.search.activity.apps import InteractionActivitySearchApp
 
 pytestmark = pytest.mark.django_db
 
@@ -17,7 +17,7 @@ def test_new_interaction_synced(opensearch_with_signals):
     opensearch_with_signals.indices.refresh()
 
     assert opensearch_with_signals.get(
-        index=InteractionSearchApp.search_model.get_write_index(),
+        index=InteractionActivitySearchApp.search_model.get_write_index(),
         id=interaction.pk,
     )
 
@@ -31,7 +31,7 @@ def test_updated_interaction_synced(opensearch_with_signals):
     opensearch_with_signals.indices.refresh()
 
     result = opensearch_with_signals.get(
-        index=InteractionSearchApp.search_model.get_write_index(),
+        index=InteractionActivitySearchApp.search_model.get_write_index(),
         id=interaction.pk,
     )
     assert result['_source']['subject'] == new_subject
@@ -46,7 +46,7 @@ def test_deleted_interaction_deleted_from_opensearch(opensearch_with_signals):
     opensearch_with_signals.indices.refresh()
 
     assert opensearch_with_signals.get(
-        index=InteractionSearchApp.search_model.get_write_index(),
+        index=InteractionActivitySearchApp.search_model.get_write_index(),
         id=interaction.pk,
     )
 
@@ -56,7 +56,7 @@ def test_deleted_interaction_deleted_from_opensearch(opensearch_with_signals):
 
     with pytest.raises(NotFoundError):
         assert opensearch_with_signals.get(
-            index=InteractionSearchApp.search_model.get_write_index(),
+            index=InteractionActivitySearchApp.search_model.get_write_index(),
             id=interaction_id,
         ) is None
 
@@ -67,7 +67,7 @@ def test_interaction_synced_when_dit_participant_added(opensearch_with_signals):
     opensearch_with_signals.indices.refresh()
 
     doc = opensearch_with_signals.get(
-        index=InteractionSearchApp.search_model.get_read_alias(),
+        index=InteractionActivitySearchApp.search_model.get_read_alias(),
         id=interaction.pk,
     )
     assert doc['_source']['dit_participants'] == []
@@ -76,7 +76,7 @@ def test_interaction_synced_when_dit_participant_added(opensearch_with_signals):
     opensearch_with_signals.indices.refresh()
 
     updated_doc = opensearch_with_signals.get(
-        index=InteractionSearchApp.search_model.get_read_alias(),
+        index=InteractionActivitySearchApp.search_model.get_read_alias(),
         id=interaction.pk,
     )
     actual_dit_participants = updated_doc['_source']['dit_participants']
@@ -96,7 +96,7 @@ def test_updating_company_name_updates_interaction(opensearch_with_signals):
     opensearch_with_signals.indices.refresh()
 
     result = opensearch_with_signals.get(
-        index=InteractionSearchApp.search_model.get_write_index(),
+        index=InteractionActivitySearchApp.search_model.get_write_index(),
         id=interaction.pk,
     )
     assert result['_source']['company']['name'] == new_company_name
@@ -117,7 +117,7 @@ def test_updating_contact_name_updates_interaction(opensearch_with_signals):
     opensearch_with_signals.indices.refresh()
 
     result = opensearch_with_signals.get(
-        index=InteractionSearchApp.search_model.get_write_index(),
+        index=InteractionActivitySearchApp.search_model.get_write_index(),
         id=interaction.pk,
     )
     assert result['_source']['contacts'][0] == {
@@ -140,7 +140,7 @@ def test_updating_project_name_updates_interaction(opensearch_with_signals):
     opensearch_with_signals.indices.refresh()
 
     result = opensearch_with_signals.get(
-        index=InteractionSearchApp.search_model.get_write_index(),
+        index=InteractionActivitySearchApp.search_model.get_write_index(),
         id=interaction.pk,
     )
     assert result['_source']['investment_project']['name'] == new_project_name

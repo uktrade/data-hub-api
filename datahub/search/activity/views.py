@@ -13,7 +13,7 @@ from datahub.interaction.models import Interaction as DBInteraction, Interaction
 from datahub.metadata.models import Sector
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.metadata.query_utils import get_service_name_subquery
-from datahub.search.activity import InteractionSearchApp
+from datahub.search.activity import InteractionActivitySearchApp
 from datahub.search.activity.serializers import SearchInteractionQuerySerializer
 from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAPIView
 
@@ -21,7 +21,7 @@ from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAP
 class SearchInteractionAPIViewMixin:
     """Defines common settings."""
 
-    search_app = InteractionSearchApp
+    search_app = InteractionActivitySearchApp
     serializer_class = SearchInteractionQuerySerializer
     es_sort_by_remappings = {
         'company.name': 'company.name.keyword',
