@@ -1,4 +1,5 @@
 import datetime
+
 import pytest
 
 from datahub.eyb.models import EYBLead
@@ -12,10 +13,10 @@ def eyb_lead_data():
         'triage_id': 96,
         'triage_hashed_uuid': 'b85dabe2a4c46828424d61ec99f496d91952f9e53733898ff5f0fee89f08b635',
         'triage_created': datetime.datetime(
-            2023, 9, 21, 7, 53, 19, 534794, tzinfo=datetime.timezone.utc
+            2023, 9, 21, 7, 53, 19, 534794, tzinfo=datetime.timezone.utc,
         ),
         'triage_modified': datetime.datetime(
-            2023, 9, 27, 11, 32, 28, 853014, tzinfo=datetime.timezone.utc
+            2023, 9, 27, 11, 32, 28, 853014, tzinfo=datetime.timezone.utc,
         ),
         'sector': 'FOOD_AND_DRINK',
         'sector_sub': 'PROCESSING_AND_PRESERVING_OF_MEAT',
@@ -37,10 +38,10 @@ def eyb_lead_data():
         'user_id': 90,
         'user_hashed_uuid': 'b85dabe2a4c46828424d61ec99f496d91952f9e53733898ff5f0fee89f08b635',
         'user_created': datetime.datetime(
-            2023, 9, 21, 7, 53, 19, 472710, tzinfo=datetime.timezone.utc
+            2023, 9, 21, 7, 53, 19, 472710, tzinfo=datetime.timezone.utc,
         ),
         'user_modified': datetime.datetime(
-            2023, 9, 22, 8, 53, 19, 472723, tzinfo=datetime.timezone.utc
+            2023, 9, 22, 8, 53, 19, 472723, tzinfo=datetime.timezone.utc,
         ),
         'company_name': 'Stu co',
         'company_location': 'FR',
