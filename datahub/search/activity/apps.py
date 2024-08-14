@@ -6,11 +6,11 @@ from datahub.interaction.models import (
     InteractionExportCountry,
     InteractionPermission,
 )
-from datahub.search.apps import SearchApp
 from datahub.search.activity.models import Interaction
+from datahub.search.apps import SearchApp
 
 
-class InteractionSearchApp(SearchApp):
+class InteractionActivitySearchApp(SearchApp):
     """SearchApp for interactions."""
 
     name = 'interaction'

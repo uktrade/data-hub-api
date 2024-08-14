@@ -7,9 +7,9 @@ from datahub.interaction.models import (
     InteractionDITParticipant as DBInteractionDITParticipant,
 )
 from datahub.investment.project.models import InvestmentProject as DBInvestmentProject
-from datahub.search.deletion import delete_document
-from datahub.search.activity import InteractionSearchApp
+from datahub.search.activity import InteractionActivitySearchApp
 from datahub.search.activity.models import Interaction as SearchInteraction
+from datahub.search.deletion import delete_document
 from datahub.search.signals import SignalReceiver
 from datahub.search.sync_object import sync_object_async, sync_related_objects_async
 
@@ -17,14 +17,14 @@ from datahub.search.sync_object import sync_object_async, sync_related_objects_a
 def sync_interaction_to_opensearch(instance):
     """Sync interaction to the OpenSearch."""
     transaction.on_commit(
-        lambda: sync_object_async(InteractionSearchApp, instance.pk),
+        lambda: sync_object_async(InteractionActivitySearchApp, instance.pk),
     )
 
 
 def sync_participant_to_opensearch(dit_participant):
     """Sync a DIT participant's interaction to OpenSearch."""
     transaction.on_commit(
-        lambda: sync_object_async(InteractionSearchApp, dit_participant.interaction_id),
+        lambda: sync_object_async(InteractionActivitySearchApp, dit_participant.interaction_id),
     )
 
 
