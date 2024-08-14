@@ -133,7 +133,6 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
             self._assert_win_adviser_matches_result(win_advisers[i], result)
 
     def test_with_multiple_win_adviser(self, data_flow_api_client):
-
         win_advisers = self.factory.create_batch(3)
 
         response = data_flow_api_client.get(self.view_url).json()
@@ -141,6 +140,18 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
         assert len(response['results']) == 3
         for i, result in enumerate(response['results']):
             self._assert_win_adviser_matches_result(win_advisers[i], result)
+
+    def test_with_win_id(self, data_flow_api_client):
+        win_advisers = self.factory.create_batch(3)
+
+        response = data_flow_api_client.get(
+            self.view_url,
+            {
+                'win_id': win_advisers[0].win_id,
+            }).json()
+
+        assert len(response['results']) == 1
+        self._assert_win_adviser_matches_result(win_advisers[0], response['results'][0])
 
 
 class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
@@ -161,7 +172,6 @@ class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
         }
 
     def test_success(self, data_flow_api_client):
-
         breakdown = self.factory()
 
         response = data_flow_api_client.get(self.view_url).json()
@@ -193,8 +203,34 @@ class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
         response = data_flow_api_client.get(self.view_url).json()
         assert len(response['results']) == (2 if list_legacy_data else 1)
 
-    def test_with_multiple_breakdowns(self, data_flow_api_client):
+    @pytest.mark.parametrize(
+        'allow_legacy_data',
+        (
+            True,
+            False,
+        ),
+    )
+    def test_success_with_legacy_content_override(
+        self,
+        allow_legacy_data,
+        data_flow_api_client,
+    ):
+        self.factory()
+        params = {
+            'win': WinFactory(migrated_on=datetime.now()),
+        }
+        self.factory(**params)
 
+        response = data_flow_api_client.get(
+            self.view_url,
+            {
+                'legacy_data': allow_legacy_data,
+            },
+        ).json()
+
+        assert len(response['results']) == (2 if allow_legacy_data else 1)
+
+    def test_with_multiple_breakdowns(self, data_flow_api_client):
         breakdowns = self.factory.create_batch(3)
 
         response = data_flow_api_client.get(self.view_url).json()
@@ -202,6 +238,21 @@ class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
         assert len(response['results']) == 3
         for i, result in enumerate(response['results']):
             self._assert_breakdown_matches_result(breakdowns[i], result)
+
+    def test_with_win_id(self, data_flow_api_client):
+        breakdowns = self.factory.create_batch(3)
+
+        response = data_flow_api_client.get(
+            self.view_url,
+            {
+                'win_id': breakdowns[0].win_id,
+            }).json()
+
+        assert len(response['results']) == 1
+        self._assert_breakdown_matches_result(
+            breakdowns[0],
+            response['results'][0],
+        )
 
 
 class TestExportWinsHVCDatasetView(BaseDatasetViewTest):
@@ -377,13 +428,22 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'team_type_display': win.team_type.name,
             'num_notifications': len(tokens),
             'customer_email_date': format_date_or_datetime(
-                max(tokens, key=lambda item: item.created_on).created_on,
+                min(tokens, key=lambda item: item.created_on).created_on,
             ) if len(tokens) > 0 else None,
         }
+        max_associated_programmes = len(associated_programmes)
         for i, associated_programme in enumerate(associated_programmes):
             expected[f'associated_programme_{i+1}_display'] = associated_programme.name
+        if max_associated_programmes < 5:
+            for i in range(5 - max_associated_programmes):
+                expected[f'associated_programme_{i+max_associated_programmes+1}_display'] = None
+
+        max_types_of_support = len(types_of_support)
         for i, type_of_support in enumerate(types_of_support):
             expected[f'type_of_support_{i+1}_display'] = type_of_support.name
+        if max_types_of_support < 3:
+            for i in range(3 - max_types_of_support):
+                expected[f'type_of_support_{i+max_types_of_support+1}_display'] = None
 
         assert result == expected
 
@@ -505,29 +565,26 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
                 result,
             )
 
-    def test_customer_email_date_uses_most_recent(self, data_flow_api_client):
+    def test_customer_email_date_uses_earliest(self, data_flow_api_client):
         win = self.factory()
         customer_response = CustomerResponseFactory(win=win)
         created_on = date.today()
         with freeze_time(created_on) as frozen_time:
-            customer_response_token_today = CustomerResponseTokenFactory(
+            CustomerResponseTokenFactory(
                 customer_response=customer_response,
-                created_on=created_on,
             )
 
             frozen_time.move_to(created_on - timedelta(days=1))
             CustomerResponseTokenFactory(
                 customer_response=customer_response,
-                created_on=created_on,
             )
 
             frozen_time.move_to(created_on - timedelta(days=7))
-            CustomerResponseTokenFactory(
+            customer_response_earliest = CustomerResponseTokenFactory(
                 customer_response=customer_response,
-                created_on=created_on,
             )
 
         response = data_flow_api_client.get(self.view_url).json()
         assert response['results'][0]['customer_email_date'] == format_date_or_datetime(
-            customer_response_token_today.created_on,
+            customer_response_earliest.created_on,
         )
