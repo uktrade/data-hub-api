@@ -13,7 +13,7 @@ from datahub.search.apps import SearchApp
 class InteractionActivitySearchApp(SearchApp):
     """SearchApp for interactions."""
 
-    name = 'interaction'
+    name = 'activity'
     search_model = Interaction
     view_permissions = (f'interaction.{InteractionPermission.view_all}',)
     export_permission = f'interaction.{InteractionPermission.export}'
