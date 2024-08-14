@@ -4,13 +4,11 @@ from django.db.models import (
     Case,
     CharField,
     Count,
-    DateTimeField,
     ExpressionWrapper,
     F,
     Func,
     IntegerField,
     JSONField,
-    Max,
     Min,
     OuterRef,
     Q,
@@ -57,6 +55,7 @@ class ExportWinsAdvisersDatasetView(BaseDatasetView):
     """
 
     allow_legacy_data = False
+    win_id = None
 
     def get_dataset(self):
         if is_feature_flag_active(
@@ -67,6 +66,11 @@ class ExportWinsAdvisersDatasetView(BaseDatasetView):
             migrated_filter = {
                 'win__migrated_on__isnull': True,
             }
+        if self.win_id:
+            migrated_filter.update({
+                'win__id': self.win_id,
+            })
+
         return (
             WinAdviser.objects.select_related('win', 'adviser', 'hq_team', 'team_type')
             .filter(
@@ -100,6 +104,7 @@ class ExportWinsAdvisersDatasetView(BaseDatasetView):
 
     def _get_request_params(self, request):
         self.allow_legacy_data = request.GET.get('legacy_data', 'false').lower() == 'true'
+        self.win_id = request.GET.get('win_id', None)
 
 
 class ExportWinsBreakdownsDatasetView(BaseDatasetView):
@@ -107,15 +112,23 @@ class ExportWinsBreakdownsDatasetView(BaseDatasetView):
     A GET API view to return export win breakdowns.
     """
 
+    allow_legacy_data = False
+    win_id = None
+
     def get_dataset(self):
         if is_feature_flag_active(
             EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
-        ):
+        ) or self.allow_legacy_data:
             migrated_filter = {}
         else:
             migrated_filter = {
                 'win__migrated_on__isnull': True,
             }
+
+        if self.win_id:
+            migrated_filter.update({
+                'win__id': self.win_id,
+            })
 
         return (
             Breakdown.objects.select_related('win', 'breakdown_type')
@@ -149,6 +162,10 @@ class ExportWinsBreakdownsDatasetView(BaseDatasetView):
                 year=F('financial_year'),
             )
         )
+
+    def _get_request_params(self, request):
+        self.allow_legacy_data = request.GET.get('legacy_data', 'false').lower() == 'true'
+        self.win_id = request.GET.get('win_id', None)
 
 
 class ExportWinsHVCDatasetView(BaseFilterDatasetView):
@@ -278,15 +295,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 sector_display=F('sector_name'),
                 team_type_display=F('team_type__name'),
                 num_notifications=Count('customer_response__tokens'),
-                customer_email_date=Case(
-                    When(
-                        migrated_on__isnull=False,
-                        # legacy endpoint returns date of first notification
-                        then=Min('customer_response__tokens__created_on'),
-                    ),
-                    default=Max('customer_response__tokens__created_on'),
-                    output=DateTimeField(),
-                ),
+                customer_email_date=Min('customer_response__tokens__created_on'),
             )
             .annotate(
                 complete=Case(
@@ -481,6 +490,6 @@ class ExportWinsWinDatasetView(BaseDatasetView):
     def _enrich_data(self, dataset):
         for data in dataset:
             create_columns_with_index(data, 'associated_programmes', 'associated_programme')
-            create_columns_with_index(data, 'types_of_support', 'type_of_support')
+            create_columns_with_index(data, 'types_of_support', 'type_of_support', 3)
             use_nulls_on_empty_string_fields(data)
             convert_datahub_export_experience_to_export_wins(data)
