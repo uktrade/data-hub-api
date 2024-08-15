@@ -98,6 +98,10 @@ def get_global_search_apps_as_mapping():
 
 def get_search_app(app_name):
     """Gets a single search app (by name)."""
+    search_app = _load_search_apps()[app_name]
+    if not search_app:
+        raise LookupError(f'Search app with name {app_name} not found.')
+
     return _load_search_apps()[app_name]
 
 

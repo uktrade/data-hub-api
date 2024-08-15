@@ -6,7 +6,7 @@ from datahub.interaction.models import (
     InteractionExportCountry,
     InteractionPermission,
 )
-from datahub.search.activity.models import Interaction
+from datahub.search.activity.models import Activity
 from datahub.search.apps import SearchApp
 
 
@@ -14,7 +14,7 @@ class InteractionActivitySearchApp(SearchApp):
     """SearchApp for interactions."""
 
     name = 'activity'
-    search_model = Interaction
+    search_model = Activity
     view_permissions = (f'interaction.{InteractionPermission.view_all}',)
     export_permission = f'interaction.{InteractionPermission.export}'
     queryset = DBInteraction.objects.select_related(

@@ -64,6 +64,7 @@ def sync_related_objects_task(
     related_obj_pk,
     related_obj_field_name,
     related_obj_filter=None,
+    search_app_name=None,
 ):
     """
     Syncs objects related to another object via a specified field.
@@ -80,6 +81,10 @@ def sync_related_objects_task(
     If an error occurs, the task will be automatically retried with an exponential back-off.
     The wait between attempts is approximately 2 ** attempt_num seconds (with some jitter
     added).
+
+    :param search_app_name: str - Syncs to the given search app if given, used when there are
+        multiple search apps for the same DB model as get_search_apps returns the first search app
+        associated with a DB model.
     """
     logger.info(
         f"Running sync_related_objects_task '{related_model_label}' "
@@ -91,7 +96,13 @@ def sync_related_objects_task(
     if related_obj_filter:
         manager = manager.filter(**related_obj_filter)
     queryset = manager.values_list('pk', flat=True)
-    search_app = get_search_app_by_model(manager.model)
+
+    # If there are multiple search apps for the same DB model, search_app_name allows
+    # you to specify the search app you want to update.
+    if search_app_name:
+        search_app = get_search_app(search_app_name)
+    else:
+        search_app = get_search_app_by_model(manager.model)
 
     for pk in queryset:
         job_scheduler(

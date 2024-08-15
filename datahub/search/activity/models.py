@@ -70,7 +70,7 @@ class _DITParticipant(InnerDoc):
     team = Object(IDNameTrigram)
 
 
-class Interaction(BaseSearchModel):
+class Activity(BaseSearchModel):
     """OpenSearch representation of Interaction model."""
 
     id = Keyword()

@@ -62,7 +62,12 @@ def sync_object_async(search_app, pk):
     )
 
 
-def sync_related_objects_async(related_obj, related_obj_field_name, related_obj_filter=None):
+def sync_related_objects_async(
+        related_obj,
+        related_obj_field_name,
+        related_obj_filter=None,
+        search_app_name=None,
+):
     """
     Syncs objects related to another object via a specified field.
 
@@ -73,8 +78,18 @@ def sync_related_objects_async(related_obj, related_obj_field_name, related_obj_
 
     This function is normally used by signal receivers to copy new or updated related objects to
     OpenSearch.
+
+    :param search_app_name: str - Syncs to the given search app if given, used when there are
+        multiple search apps for the same DB model as get_search_apps returns the first search app
+        associated with a DB model.
     """
     kwargs = {'related_obj_filter': related_obj_filter} if related_obj_filter else {}
+
+    # Specify the search app to update, used when there are multiple search apps for
+    # the same DB model.
+    if search_app_name:
+        kwargs['search_app_name'] = search_app_name
+
     job = job_scheduler(
         function=sync_related_objects_task,
         function_args=(
