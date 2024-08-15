@@ -2,6 +2,8 @@ from enum import Enum
 
 from datahub.core.constants import Constant
 
+ANONYMOUS = 'anonymous'
+
 EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD = 7
 EMAIL_MAX_WEEKS_AUTO_RESEND_THRESHOLD = 3
 EMAIL_MAX_TOKEN_ISSUED_WITHIN_RESPONSE_THRESHOLD = 4
