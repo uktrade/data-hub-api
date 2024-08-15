@@ -14,7 +14,7 @@ from datahub.search.tasks import (
 from datahub.search.test.search_support.models import RelatedModel, SimpleModel
 from datahub.search.test.search_support.relatedmodel import RelatedModelSearchApp
 from datahub.search.test.search_support.searchappwithsamemodel import (
-    RelatedModelWithSameSearchModelApp,
+    RelatedModelWithSameDBModelApp,
 )
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
 from datahub.search.test.utils import create_mock_search_app, doc_exists
@@ -107,9 +107,9 @@ def test_sync_related_objects_task_syncs_for_given_search_app(related_obj_filter
     opensearch.indices.refresh()
 
     # Updates only the search app specified by name 'related_search_with_same_model'
-    assert doc_exists(opensearch, RelatedModelWithSameSearchModelApp, relation_1.pk)
-    assert doc_exists(opensearch, RelatedModelWithSameSearchModelApp, relation_2.pk)
-    assert not doc_exists(opensearch, RelatedModelWithSameSearchModelApp, unrelated_obj.pk)
+    assert doc_exists(opensearch, RelatedModelWithSameDBModelApp, relation_1.pk)
+    assert doc_exists(opensearch, RelatedModelWithSameDBModelApp, relation_2.pk)
+    assert not doc_exists(opensearch, RelatedModelWithSameDBModelApp, unrelated_obj.pk)
 
     # Doesn't update the other search app not specified
     assert not doc_exists(opensearch, RelatedModelSearchApp, relation_1.pk)
