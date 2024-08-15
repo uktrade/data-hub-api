@@ -49,3 +49,7 @@ class EYBLead(ArchivableModel, BaseModel):
     agree_info_email = models.BooleanField(default=False)
     landing_timeframe = models.CharField(null=True, default=None, max_length=255)
     company_website = models.CharField(max_length=255, null=True)
+
+    def __str__(self):
+            """Admin displayed human readable name."""
+            return self.triage_hashed_uuid
