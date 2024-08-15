@@ -735,6 +735,25 @@ def test_get_all_fields_for_lead_officer_email_receipt_no_success():
     )
 
 
+def test_get_all_fields_for_lead_officer_email_receipt_no_success_anonymous():
+    win = WinFactory(company=None)
+    customer_response = CustomerResponseFactory(win=win)
+
+    result = get_all_fields_for_lead_officer_email_receipt_no(
+        customer_response,
+    )
+    """
+    Testing to get all fields for lead officer rejected email receipt
+    """
+    assert result['lead_officer_email'] == win.lead_officer.contact_email
+    assert result['country_destination'] == win.country.name
+    assert result['client_fullname'] == 'anonymous'
+    assert result['lead_officer_first_name'] == win.lead_officer.first_name
+    assert result['goods_services'] == win.goods_vs_services.name
+    assert result['client_company_name'] == 'anonymous'
+    assert result['url'] == settings.DATAHUB_FRONTEND_BASE_URL
+
+
 def test_get_all_fields_for_lead_officer_email_receipt_yes_success():
     win = WinFactory()
     contact = ContactFactory(company=win.company)
@@ -765,3 +784,30 @@ def test_get_all_fields_for_lead_officer_email_receipt_yes_success():
         company_id=win.company.id,
         uuid=win.id,
     )
+
+
+def test_get_all_fields_for_lead_officer_email_receipt_yes_success_anonymous():
+    win = WinFactory(company=None)
+    customer_response = CustomerResponseFactory(win=win)
+
+    num_breakdowns = 5
+    breakdown_value = 10000
+
+    BreakdownFactory.create_batch(num_breakdowns, win=win, value=breakdown_value)
+
+    result = get_all_fields_for_lead_officer_email_receipt_yes(
+        customer_response,
+    )
+    expected_total_export_win_value = num_breakdowns * breakdown_value
+
+    """
+    Testing to get all fields for lead officer approved email receipt (with total_export_win_value)
+    """
+    assert result['lead_officer_email'] == win.lead_officer.contact_email
+    assert result['country_destination'] == win.country.name
+    assert result['client_fullname'] == 'anonymous'
+    assert result['lead_officer_first_name'] == win.lead_officer.first_name
+    assert result['total_export_win_value'] == expected_total_export_win_value
+    assert result['goods_services'] == win.goods_vs_services.name
+    assert result['client_company_name'] == 'anonymous'
+    assert result['url'] == settings.DATAHUB_FRONTEND_BASE_URL
