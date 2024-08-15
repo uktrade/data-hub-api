@@ -10,7 +10,7 @@ from datahub.interaction.test.factories import (
     ServiceDeliveryFactory,
 )
 from datahub.search.activity import InteractionActivitySearchApp
-from datahub.search.activity.models import Interaction
+from datahub.search.activity.models import Activity
 
 pytestmark = pytest.mark.django_db
 
@@ -28,7 +28,7 @@ def test_interaction_to_dict(opensearch, factory_cls):
     """Test converting an interaction to a dict."""
     interaction = factory_cls()
 
-    result = Interaction.db_object_to_dict(interaction)
+    result = Activity.db_object_to_dict(interaction)
     result['contacts'].sort(key=itemgetter('id'))
     result['companies'].sort(key=itemgetter('id'))
     result['dit_participants'].sort(key=lambda dit_participant: dit_participant['adviser']['id'])
@@ -147,7 +147,7 @@ def test_service_delivery_to_dict(opensearch):
     """Test converting an interaction to a dict."""
     interaction = ServiceDeliveryFactory()
 
-    result = Interaction.db_object_to_dict(interaction)
+    result = Activity.db_object_to_dict(interaction)
     result['contacts'].sort(key=itemgetter('id'))
     result['companies'].sort(key=itemgetter('id'))
     result['dit_participants'].sort(key=lambda dit_participant: dit_participant['adviser']['id'])
@@ -235,6 +235,6 @@ def test_interactions_to_documents(opensearch):
     """Test converting 2 orders to OpenSearch documents."""
     interactions = CompanyInteractionFactory.create_batch(2)
 
-    result = Interaction.db_objects_to_documents(interactions)
+    result = Activity.db_objects_to_documents(interactions)
 
     assert {item['_id'] for item in result} == {item.pk for item in interactions}
