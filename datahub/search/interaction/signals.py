@@ -38,7 +38,7 @@ def remove_interaction_from_opensearch(instance):
 def sync_related_interactions_to_opensearch(instance):
     """Sync related interactions."""
     transaction.on_commit(
-        lambda: sync_related_objects_async(instance, 'interactions'),
+        lambda: sync_related_objects_async(instance, 'interactions', None, 'interaction'),
     )
 
 

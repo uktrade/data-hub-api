@@ -8,7 +8,7 @@ from datahub.interaction.models import (
 )
 from datahub.investment.project.models import InvestmentProject as DBInvestmentProject
 from datahub.search.activity import InteractionActivitySearchApp
-from datahub.search.activity.models import Interaction as SearchInteraction
+from datahub.search.activity.models import Activity as SearchActivity
 from datahub.search.deletion import delete_document
 from datahub.search.signals import SignalReceiver
 from datahub.search.sync_object import sync_object_async, sync_related_objects_async
@@ -31,14 +31,14 @@ def sync_participant_to_opensearch(dit_participant):
 def remove_interaction_from_opensearch(instance):
     """Remove interaction from es."""
     transaction.on_commit(
-        lambda pk=instance.pk: delete_document(SearchInteraction, pk),
+        lambda pk=instance.pk: delete_document(SearchActivity, pk),
     )
 
 
 def sync_related_interactions_to_opensearch(instance):
     """Sync related interactions."""
     transaction.on_commit(
-        lambda: sync_related_objects_async(instance, 'interactions'),
+        lambda: sync_related_objects_async(instance, 'interactions', None, 'activity'),
     )
 
 

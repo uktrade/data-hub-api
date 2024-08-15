@@ -20,6 +20,7 @@ INSTALLED_APPS += [
 SEARCH_APPS += [
     'datahub.search.test.search_support.simplemodel.SimpleModelSearchApp',
     'datahub.search.test.search_support.relatedmodel.RelatedModelSearchApp',
+    'datahub.search.test.search_support.searchappwithsamemodel.RelatedModelWithSameSearchModelApp',
 ]
 
 # Note that the prefix used for indexes created during tests is set dynamically in
