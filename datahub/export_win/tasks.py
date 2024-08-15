@@ -15,6 +15,7 @@ from django_pglocks import advisory_lock
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.export_win.constants import (
+    ANONYMOUS,
     EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD,
     EMAIL_MAX_TOKEN_ISSUED_WITHIN_RESPONSE_THRESHOLD,
     EMAIL_MAX_WEEKS_AUTO_RESEND_THRESHOLD)
@@ -129,44 +130,50 @@ def get_all_fields_for_client_email_receipt(token, customer_response):
     return details
 
 
-def get_all_fields_for_lead_officer_email_receipt_no(customer_response):
+def _get_customer_details_for_lead_officer_email(customer_response):
     win = customer_response.win
     contact = win.company_contacts.first()
+    contact_name = contact.name if contact else ANONYMOUS
+    if win.company:
+        client_company_name = win.company.name
+        url = settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(
+            company_id=win.company.id,
+            uuid=win.id,
+        )
+    else:
+        client_company_name = ANONYMOUS
+        url = settings.DATAHUB_FRONTEND_BASE_URL
+    return {
+        'client_fullname': contact_name,
+        'client_company_name': client_company_name,
+        'url': url,
+    }
+
+
+def get_all_fields_for_lead_officer_email_receipt_no(customer_response):
+    win = customer_response.win
     details = {
         'lead_officer_email': win.lead_officer.contact_email,
         'country_destination': win.country.name,
-        'client_fullname': contact.name,
         'lead_officer_first_name': win.lead_officer.first_name,
         'goods_services': win.goods_vs_services.name,
-        'client_company_name': win.company.name,
-        'url': settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(
-            company_id=win.company.id,
-            uuid=win.id,
-        ),
+        **_get_customer_details_for_lead_officer_email(customer_response),
     }
-
     return details
 
 
 def get_all_fields_for_lead_officer_email_receipt_yes(customer_response):
     win = customer_response.win
-    contact = win.company_contacts.first()
     total_export_win_value = Breakdown.objects.filter(win=win).aggregate(
         Sum('value'))['value__sum'] or 0
     details = {
         'lead_officer_email': win.lead_officer.contact_email,
         'country_destination': win.country.name,
-        'client_fullname': contact.name,
         'lead_officer_first_name': win.lead_officer.first_name,
         'total_export_win_value': total_export_win_value,
         'goods_services': win.goods_vs_services.name,
-        'client_company_name': win.company.name,
-        'url': settings.EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL.format(
-            company_id=win.company.id,
-            uuid=win.id,
-        ),
+        **_get_customer_details_for_lead_officer_email(customer_response),
     }
-
     return details
 
 
