@@ -55,10 +55,12 @@ def eyb_lead_data():
         'company_website': 'http://www.google.com',
     }
 
+
 @pytest.fixture
 def eyb_lead_db(eyb_lead_data):
     eyb_lead_factory = EYBLeadFactory(**eyb_lead_data)
-    return EYBLead.objects.get(pk = eyb_lead_factory.pk)
+    return EYBLead.objects.get(pk=eyb_lead_factory.pk)
+
 
 def verify_eyb_lead_data(instance: EYBLead, data: dict):
     """Method to verify the EYBLead data against the instance created."""
