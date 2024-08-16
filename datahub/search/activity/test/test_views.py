@@ -1,10 +1,11 @@
+import random
+
 from cgi import parse_header
 from collections import Counter
 from csv import DictReader
 from datetime import datetime, timezone
 from io import StringIO
 from operator import attrgetter, itemgetter
-from random import choice
 from uuid import UUID
 
 import factory
@@ -495,7 +496,9 @@ class TestInteractionEntitySearchView(APITestMixin):
         """
         Test that we can filter by one list tier group.
         """
-        one_list_tier = OneListTier.objects.all().order_by('?')[0]
+        one_list_tier = OneListTier.objects.all()[
+            random.randint(0, OneListTier.objects.count() - 1)
+        ]
         company_1 = CompanyFactory(
             name='Global HQ Ltd',
             one_list_tier=one_list_tier,
@@ -620,7 +623,7 @@ class TestInteractionEntitySearchView(APITestMixin):
 
         opensearch_with_collector.flush_and_refresh()
 
-        interaction = choice(interactions)
+        interaction = random.choice(interactions)
         dit_participant = interaction.dit_participants.order_by('?').first()
 
         url = reverse('api-v3:search:interaction')
@@ -1056,7 +1059,7 @@ class TestInteractionExportView(APITestMixin):
                 'Company': get_attr_or_none(interaction, 'company.name'),
                 'Company link':
                     f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
-                    f'/{interaction.company.pk}',
+                    f'/{interaction.company_id}',
                 'Company country': get_attr_or_none(
                     interaction,
                     'company.address_country.name',
