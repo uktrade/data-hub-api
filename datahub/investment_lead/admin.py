@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from datahub.eyb.models import EYBLead
+from datahub.investment_lead.models import EYBLead
 
 
 class EYBLeadAdmin(admin.ModelAdmin):

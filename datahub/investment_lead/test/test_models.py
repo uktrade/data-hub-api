@@ -2,8 +2,8 @@ import datetime
 
 import pytest
 
-from datahub.eyb.models import EYBLead
-from datahub.eyb.test.factories import EYBLeadFactory
+from datahub.investment_lead.models import EYBLead
+from datahub.investment_lead.test.factories import EYBLeadFactory
 
 
 @pytest.fixture

@@ -46,4 +46,4 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     company_website = factory.Sequence(lambda n: f'foo{n}.bar.com')
 
     class Meta:
-        model = 'eyb.EYBLead'
+        model = 'investment_lead.EYBLead'

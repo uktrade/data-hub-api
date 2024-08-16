@@ -93,7 +93,7 @@ LOCAL_APPS = [
     'datahub.email_ingestion',
     'datahub.dnb_api',
     'datahub.event',
-    'datahub.eyb',
+    'datahub.investment_lead',
     'datahub.feature_flag.apps.FeatureFlagConfig',
     'datahub.interaction',
     'datahub.investment.project',

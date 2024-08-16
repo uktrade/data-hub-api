@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class EybConfig(AppConfig):
-    name = 'datahub.eyb'
+    name = 'datahub.investment_lead'
