@@ -31,9 +31,9 @@ bigtree==0.19.4
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.34.158
+boto3==1.35.0
     # via -r requirements.in
-botocore==1.34.158
+botocore==1.35.0
     # via
     #   boto3
     #   s3transfer
