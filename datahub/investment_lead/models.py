@@ -5,7 +5,11 @@ from django.db import models
 from datahub.core.models import ArchivableModel, BaseModel
 
 
-class EYBLead(ArchivableModel, BaseModel):
+class InvestmentLead(ArchivableModel, BaseModel):
+    pass
+
+
+class EYBLead(InvestmentLead):
     """
     EYB Triage and User data combined.
     This mirrors the data held in Expand Your Business
