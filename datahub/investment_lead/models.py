@@ -1,0 +1,57 @@
+from django.contrib.postgres.fields import ArrayField
+from django.db import models
+
+
+from datahub.core.models import ArchivableModel, BaseModel
+
+
+class InvestmentLead(ArchivableModel, BaseModel):
+    pass
+
+
+class EYBLead(InvestmentLead):
+    """
+    EYB Triage and User data combined.
+    This mirrors the data held in Expand Your Business
+    """
+
+    # EYB Triage data
+    triage_id = models.IntegerField()
+    triage_hashed_uuid = models.CharField(max_length=200)
+    triage_created = models.DateTimeField()
+    triage_modified = models.DateTimeField()
+    sector = models.CharField(max_length=255)
+    sector_sub = models.CharField(max_length=255, default='', blank=True)
+    intent = ArrayField(
+        models.CharField(max_length=255),
+        size=6,
+        default=list,
+    )
+    intent_other = models.CharField(max_length=255)
+    location = models.CharField(max_length=255)
+    location_city = models.CharField(max_length=255, default='', blank=True)
+    location_none = models.BooleanField(default=None, null=True)
+    hiring = models.CharField(max_length=255)
+    spend = models.CharField(max_length=255)
+    spend_other = models.CharField(max_length=255, default='', blank=True)
+    is_high_value = models.BooleanField(default=False)
+
+    # EYB User data
+    user_id = models.IntegerField()
+    user_hashed_uuid = models.CharField(max_length=200)
+    user_created = models.DateTimeField()
+    user_modified = models.DateTimeField()
+    company_name = models.CharField(max_length=255)
+    company_location = models.CharField(max_length=255)
+    full_name = models.CharField(max_length=255)
+    role = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
+    telephone_number = models.CharField(max_length=255)
+    agree_terms = models.BooleanField(default=False)
+    agree_info_email = models.BooleanField(default=False)
+    landing_timeframe = models.CharField(default='', max_length=255, blank=True)
+    company_website = models.CharField(max_length=255, default='', blank=True)
+
+    def __str__(self):
+        """Admin displayed human readable name."""
+        return self.triage_hashed_uuid
