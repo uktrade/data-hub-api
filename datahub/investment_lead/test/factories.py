@@ -39,12 +39,12 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     company_location = 'FR'
     full_name = fake.name()
     role = factory.Faker('job')
-    email = factory.Sequence(lambda n: f'foo-{n}@bar.com')
+    email = 'foo@bar.com'
     telephone_number = factory.Faker('phone_number')
     agree_terms = True
     agree_info_email = False
     landing_timeframe = 'SIX_TO_TWELVE_MONTHS'
-    company_website = factory.Sequence(lambda n: f'foo{n}.bar.com')
+    company_website = f'{company_name}.com'
 
     class Meta:
         model = 'investment_lead.EYBLead'
