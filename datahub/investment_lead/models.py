@@ -21,7 +21,7 @@ class EYBLead(InvestmentLead):
     triage_created = models.DateTimeField()
     triage_modified = models.DateTimeField()
     sector = models.CharField(max_length=255)
-    sector_sub = models.CharField(max_length=255, default="", blank=True)
+    sector_sub = models.CharField(max_length=255, default='', blank=True)
     intent = ArrayField(
         models.CharField(max_length=255),
         size=6,
@@ -29,11 +29,11 @@ class EYBLead(InvestmentLead):
     )
     intent_other = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
-    location_city = models.CharField(max_length=255, default="", blank=True)
+    location_city = models.CharField(max_length=255, default='', blank=True)
     location_none = models.BooleanField(default=None, null=True)
     hiring = models.CharField(max_length=255)
     spend = models.CharField(max_length=255)
-    spend_other = models.CharField(max_length=255, default="", blank=True)
+    spend_other = models.CharField(max_length=255, default='', blank=True)
     is_high_value = models.BooleanField(default=False)
 
     # EYB User data
@@ -49,8 +49,8 @@ class EYBLead(InvestmentLead):
     telephone_number = models.CharField(max_length=255)
     agree_terms = models.BooleanField(default=False)
     agree_info_email = models.BooleanField(default=False)
-    landing_timeframe = models.CharField(default="", max_length=255, blank=True)
-    company_website = models.CharField(max_length=255, default="", blank=True)
+    landing_timeframe = models.CharField(default='', max_length=255, blank=True)
+    company_website = models.CharField(max_length=255, default='', blank=True)
 
     def __str__(self):
         """Admin displayed human readable name."""
