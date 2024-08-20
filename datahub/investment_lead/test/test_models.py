@@ -110,3 +110,6 @@ class TestEYBLead:
         """Test the human friendly string representation of the object"""
         hashed_id = f'{eyb_lead_db.triage_hashed_uuid}'
         assert str(eyb_lead_db) == hashed_id
+
+    def test_triage_uuid_and_user_uuid_match(self, eyb_lead_db):
+        assert eyb_lead_db.triage_hashed_uuid == eyb_lead_db.user_hashed_uuid
