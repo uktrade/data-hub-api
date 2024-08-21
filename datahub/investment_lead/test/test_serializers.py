@@ -6,7 +6,7 @@ from datahub.investment_lead.test.utils import verify_eyb_lead_data
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures('eyb_lead_data', 'eyb_lead_d')
+@pytest.mark.usefixtures('eyb_lead_data', 'eyb_lead_db')
 class TestEYBLeadSerializer:
     """Tests for EYBLeadSerializer."""
 

@@ -17,6 +17,7 @@ from datahub.event import urls as event_urls
 from datahub.export_win import urls as export_win_urls
 from datahub.feature_flag import urls as feature_flag_urls
 from datahub.interaction import urls as interaction_urls
+from datahub.investment_lead import urls as investment_lead_urls
 from datahub.investment.investor_profile import urls as investor_profile_urls
 from datahub.investment.opportunity import urls as opportunity_urls
 from datahub.investment.project import urls as investment_urls
@@ -100,4 +101,8 @@ v4_urls = [
     path('', include((export_win_urls.urls, 'export-win'), namespace='export-win')),
     path('', include((objective_urls.urls_v4, 'objective'), namespace='objective')),
     path('', include((task_urls.urls_v4, 'task'), namespace='task')),
+    path(
+        '',
+        include((investment_lead_urls, 'investment-lead'), namespace='investment-lead')
+    ),
 ]
