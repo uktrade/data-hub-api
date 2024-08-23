@@ -7,12 +7,12 @@ from datahub.investment_lead.models import EYBLead
 
 class TestEYBLeadCreateAPI(APITestMixin):
     """
-        EYB Lead Create view test case.
+    EYB Lead Create view test case.
     """
 
     def test_get_not_allowed(self, eyb_lead_data):
         """
-            Should return 405
+        Should return 405
         """
         post_url = reverse('api-v4:investment-lead:create')
         response = self.api_client.get(post_url)
@@ -21,9 +21,8 @@ class TestEYBLeadCreateAPI(APITestMixin):
 
     def test_post_with_no_payload(self):
         """
-            Test that we get an Exception when no payload is sent
+        Test that we get an Exception when no payload is sent
         """
-
         post_url = reverse('api-v4:investment-lead:create')
         response = self.api_client.post(post_url, data={})
 
@@ -31,9 +30,8 @@ class TestEYBLeadCreateAPI(APITestMixin):
 
     def test_post_with_incomplete_payload(self, eyb_lead_data):
         """
-            Test that we get an Exception when incomplete payload is sent
+        Test that we get an Exception when incomplete payload is sent
         """
-
         incomplete_data = eyb_lead_data.copy()
         incomplete_data['location'] = None
 
@@ -46,9 +44,8 @@ class TestEYBLeadCreateAPI(APITestMixin):
 
     def test_post_success(self, eyb_lead_data):
         """
-            Test successful POST to EYB
+        Test successful POST to EYB
         """
-
         assert EYBLead.objects.count() == 0
 
         post_url = reverse('api-v4:investment-lead:create')
