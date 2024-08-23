@@ -25,7 +25,7 @@ def eyb_lead_data():
             'SET_UP_A_NEW_DISTRIBUTION_CENTRE',
             'ONWARD_SALES_AND_EXPORTS_FROM_THE_UK',
         ],
-        'intent_other': '',
+        'intent_other': 'other intent',
         'location': 'NORTHERN_IRELAND',
         'location_city': 'ARMAGH_CITY',
         'location_none': False,
