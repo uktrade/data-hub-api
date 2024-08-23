@@ -1,17 +1,8 @@
-import pytest
-
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import (
-    APITestMixin,
-    create_test_user,
-)
+from datahub.core.test_utils import APITestMixin
 from datahub.investment_lead.models import EYBLead
-from datahub.metadata.test.factories import TeamFactory
 
 
 class TestEYBLeadCreateAPI(APITestMixin):
@@ -19,17 +10,14 @@ class TestEYBLeadCreateAPI(APITestMixin):
         EYB Lead Create view test case.
     """
 
-    def test_post_not_authorized(self):
+    def test_get_not_allowed(self, eyb_lead_data):
         """
-            Should return 403
+            Should return 405
         """
-
-        user = create_test_user(dit_team=TeamFactory())
-        api_client = self.create_api_client(user=user)
         post_url = reverse('api-v4:investment-lead:create')
-        response = api_client.post(post_url, data={})
+        response = self.api_client.get(post_url)
 
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
     def test_post_with_no_payload(self):
         """
@@ -46,9 +34,12 @@ class TestEYBLeadCreateAPI(APITestMixin):
             Test that we get an Exception when incomplete payload is sent
         """
 
+        incomplete_data = eyb_lead_data.copy()
+        incomplete_data['location'] = None
+
         post_url = reverse('api-v4:investment-lead:create')
         response = self.api_client.post(
-            post_url, data={**eyb_lead_data},
+            post_url, data=incomplete_data,
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -62,7 +53,7 @@ class TestEYBLeadCreateAPI(APITestMixin):
 
         post_url = reverse('api-v4:investment-lead:create')
         response = self.api_client.post(
-            post_url, data={**eyb_lead_data},
+            post_url, data=eyb_lead_data,
         )
 
         assert response.status_code == status.HTTP_201_CREATED

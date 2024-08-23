@@ -39,11 +39,11 @@ ALL_FIELDS = [
 class EYBLeadSerializer(serializers.ModelSerializer):
     """Serializer for an EYB lead object"""
 
-    triage_created = serializers.DateTimeField(read_only=True)
-    triage_modified = serializers.DateTimeField(read_only=True)
+    triage_created = serializers.DateTimeField()
+    triage_modified = serializers.DateTimeField()
 
-    user_created = serializers.DateTimeField(read_only=True)
-    user_modified = serializers.DateTimeField(read_only=True)
+    user_created = serializers.DateTimeField()
+    user_modified = serializers.DateTimeField()
 
     class Meta:
         model = EYBLead
