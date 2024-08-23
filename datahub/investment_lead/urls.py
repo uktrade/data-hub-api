@@ -1,13 +1,14 @@
 from django.urls import path
 
 from datahub.investment_lead.views import (
-    EYBLeadCreateView
+    EYBLeadViewset
 )
 
 urlpatterns = [
     path(
-        'eyb-lead-create',
-        EYBLeadCreateView.as_view(),
-        name='eyb-lead-create',
+        'investment-lead',
+        EYBLeadViewset.as_view({'post': 'create'}),
+        name='create'
     ),
+    
 ]
