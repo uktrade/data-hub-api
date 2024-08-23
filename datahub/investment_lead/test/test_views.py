@@ -41,12 +41,13 @@ class TestEYBLeadCreateAPI(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data['location'][0] == 'This field may not be null.'
 
     def test_post_success(self, eyb_lead_data):
         """
         Test successful POST to EYB
         """
-        assert EYBLead.objects.count() == 0
+        current_count = EYBLead.objects.count()
 
         post_url = reverse('api-v4:investment-lead:create')
         response = self.api_client.post(
@@ -54,4 +55,4 @@ class TestEYBLeadCreateAPI(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_201_CREATED
-        assert EYBLead.objects.count() == 1
+        assert EYBLead.objects.count() == current_count + 1
