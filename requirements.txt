@@ -179,7 +179,7 @@ numpy==1.24.3
     # via pandas
 opensearch-dsl==2.1.0
     # via -r requirements.in
-opensearch-py==2.6.0
+opensearch-py==2.7.1
     # via
     #   -r requirements.in
     #   opensearch-dsl
@@ -305,7 +305,6 @@ six==1.16.0
     #   mail-parser
     #   mohawk
     #   opensearch-dsl
-    #   opensearch-py
     #   python-dateutil
 slackclient==2.9.4
     # via -r requirements.in
