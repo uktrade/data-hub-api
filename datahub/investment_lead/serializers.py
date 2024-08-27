@@ -35,6 +35,8 @@ ALL_FIELDS = [
     'company_website',
 ]
 
+UUIDS_ERROR_MESSAGE = 'Invalid serializer data: UUIDs must match.'
+
 
 class EYBLeadSerializer(serializers.ModelSerializer):
     """Serializer for an EYB lead object"""
@@ -48,3 +50,8 @@ class EYBLeadSerializer(serializers.ModelSerializer):
     class Meta:
         model = EYBLead
         fields = ALL_FIELDS
+
+    def validate(self, data):
+        if data['triage_hashed_uuid'] != data['user_hashed_uuid']:
+            raise serializers.ValidationError(UUIDS_ERROR_MESSAGE)
+        return data
