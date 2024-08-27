@@ -5,6 +5,7 @@ from datetime import datetime
 import pytest
 
 from dateutil.relativedelta import relativedelta
+from freezegun import freeze_time
 
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -23,11 +24,32 @@ from datahub.core.test_utils import (
     format_date_or_datetime,
 )
 from datahub.core.utils import get_financial_year
+from datahub.export_win.models import Win
 from datahub.export_win.test.factories import (
     BreakdownFactory,
     CustomerResponseFactory,
     WinFactory,
 )
+
+
+@pytest.fixture()
+def export_wins():
+    confirmed = CustomerResponseFactory.create_batch(
+        2,
+        agree_with_win=True,
+        responded_on=datetime.utcnow(),
+    )
+    unconfirmed = CustomerResponseFactory.create_batch(
+        3,
+        agree_with_win=False,
+        responded_on=datetime.utcnow(),
+    )
+    awaiting = CustomerResponseFactory(agree_with_win=None)
+    yield [
+        confirmed,
+        unconfirmed,
+        awaiting,
+    ]
 
 
 class TestGetCompanyExportWins(APITestMixin):
@@ -190,3 +212,74 @@ class TestGetCompanyExportWins(APITestMixin):
         response = api_client.get(url)
         assert response.status_code == 200
         assert response.json() == export_wins_response
+
+    def test_list_default_sorting(self):
+        """Tests wins are sorted."""
+        responded_on1 = datetime(2022, 4, 1)
+        responded_on2 = datetime(2022, 5, 1)
+        created_on1 = datetime(2022, 6, 1)
+        created_on2 = datetime(2022, 7, 1)
+
+        company = CompanyFactory()
+        win1 = WinFactory(company=company)
+        CustomerResponseFactory(win=win1, responded_on=responded_on1)
+        win2 = WinFactory(company=company)
+        CustomerResponseFactory(win=win2, responded_on=responded_on2)
+        with freeze_time(created_on1):
+            win3 = WinFactory(company=company)
+            CustomerResponseFactory(win=win3)
+        with freeze_time(created_on2):
+            win4 = WinFactory(company=company)
+            CustomerResponseFactory(win=win4)
+
+        url = reverse('api-v4:company:export-win', kwargs={'pk': company.id})
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        result_ids = [result['id'] for result in response_data['results']]
+        assert result_ids == [str(win4.id), str(win3.id), str(win2.id), str(win1.id)]
+
+    @pytest.mark.parametrize(
+        'confirmed,results_length',
+        (
+            (
+                'true',
+                2,
+            ),
+            (
+                'false',
+                3,
+            ),
+            (
+                'null',
+                1,
+            ),
+        ),
+    )
+    def test_list_filtered_by_agree_with_win(self, export_wins, confirmed, results_length):
+        """Test the export wins view when filtered by confirmation."""
+        company = CompanyFactory()
+        Win.objects.update(company_id=company.id)
+        url = reverse('api-v4:company:export-win', kwargs={'pk': company.id})
+
+        response = self.api_client.get(url, data={
+            'confirmed': confirmed,
+        })
+        assert response.status_code == status.HTTP_200_OK
+        results = response.json()
+
+        assert len(results['results']) == results_length
+
+        expected = {
+            'true': True,
+            'false': False,
+            'null': None,
+        }
+        assert all(
+            getattr(
+                result['response'], 'get', lambda x: None,
+            )('confirmed') == expected[confirmed]
+            for result in results['results']
+        ) is True
