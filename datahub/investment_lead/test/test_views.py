@@ -57,3 +57,36 @@ class TestEYBLeadCreateAPI(APITestMixin):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert EYBLead.objects.count() == current_count + 1
+
+    def test_post_does_not_create_duplicates(self, eyb_lead_data, data_flow_api_client):
+        """
+        Test successful POST to EYB does not create duplicates
+        """
+        current_count = EYBLead.objects.count()
+        current_data = eyb_lead_data.copy()
+        post_url = reverse('api-v4:investment-lead:create')
+
+        # Create the first object
+        response = data_flow_api_client.post(
+            post_url, json_=current_data,
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert EYBLead.objects.count() == current_count + 1
+
+        current_obj = EYBLead.objects.first()
+        assert current_obj.location == current_data['location']
+
+        # Change the data, create the "second object"
+        current_data['location'] = 'different_location'
+        response = data_flow_api_client.post(
+            post_url, json_=current_data,
+        )
+
+        # Assert that no new object has been created but the data
+        # has succesfully been updated
+        assert response.status_code == status.HTTP_200_OK
+        assert EYBLead.objects.count() == current_count + 1
+
+        current_obj = EYBLead.objects.first()
+        assert current_obj.location == current_data['location']
