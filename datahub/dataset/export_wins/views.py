@@ -277,6 +277,8 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 'total_expected_export_value',
                 'total_expected_non_export_value',
                 'total_expected_odi_value',
+                'migrated_on',
+                data_hub_company_id=F('company_id'),
                 created=F('created_on'),
                 business_potential_display=F('business_potential__name'),
                 confirmation_last_export=F('customer_response__last_export__name'),
