@@ -69,6 +69,7 @@ from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet, SoftDeleteCoreViewSet
 from datahub.export_win.models import Win
 from datahub.export_win.serializers import DataHubLegacyExportWinSerializer
+from datahub.export_win.views import ConfirmedFilterSet
 from datahub.investment.project.queryset import get_slim_investment_project_queryset
 
 
@@ -550,6 +551,10 @@ class ExportWinsForCompanyView(ListAPIView):
     serializer_class = DataHubLegacyExportWinSerializer
     pagination_class = BigPagination
     http_method_names = ('get',)
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = ConfirmedFilterSet
+    ordering_fields = ('customer_response__responded_on', 'created_on')
+    ordering = ('-customer_response__responded_on', '-created_on')
 
     def _get_company(self, company_pk):
         """
