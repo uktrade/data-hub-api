@@ -14,7 +14,6 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import ListAPIView
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -529,13 +528,6 @@ class AdviserReadOnlyViewSetV1(
         return filtered_queryset
 
 
-class BigPagination(PageNumberPagination):
-    """Big pagination."""
-
-    page_size = 1000
-    page_size_query_param = 'page-size'
-
-
 class ExportWinsForCompanyView(ListAPIView):
     """
     Export Wins for Company. The view is based on the legacy view that used
@@ -549,7 +541,6 @@ class ExportWinsForCompanyView(ListAPIView):
         ),
     )
     serializer_class = DataHubLegacyExportWinSerializer
-    pagination_class = BigPagination
     http_method_names = ('get',)
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ConfirmedFilterSet
