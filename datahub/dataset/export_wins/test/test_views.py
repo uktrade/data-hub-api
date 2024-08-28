@@ -411,6 +411,8 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'total_expected_export_value': win.total_expected_export_value,
             'total_expected_non_export_value': win.total_expected_non_export_value,
             'total_expected_odi_value': win.total_expected_odi_value,
+            'migrated_on': format_date_or_datetime(win.migrated_on),
+            'data_hub_company_id': str(win.company_id),
             'user__email': win.adviser.contact_email if win.adviser else win.adviser_email_address,
             'user__name': win.adviser.name if win.adviser else win.adviser_name,
             'business_potential_display': win.business_potential.name,
