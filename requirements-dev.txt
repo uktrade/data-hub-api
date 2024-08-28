@@ -33,13 +33,13 @@ backoff==2.2.1
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
-bigtree==0.19.4
+bigtree==0.21.0
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.35.0
+boto3==1.35.5
     # via -r requirements.in
-botocore==1.35.0
+botocore==1.35.5
     # via
     #   boto3
     #   s3transfer
@@ -165,7 +165,7 @@ flake8==7.1.1
     #   flake8-quotes
     #   flake8-string-format
     #   pep8-naming
-flake8-bugbear==24.4.26
+flake8-bugbear==24.8.19
     # via -r requirements-dev.in
 flake8-commas==4.0.0
     # via -r requirements-dev.in
@@ -249,7 +249,7 @@ numpy==1.24.3
     # via pandas
 opensearch-dsl==2.1.0
     # via -r requirements.in
-opensearch-py==2.6.0
+opensearch-py==2.7.1
     # via
     #   -r requirements.in
     #   opensearch-dsl
@@ -455,7 +455,6 @@ six==1.16.0
     #   mail-parser
     #   mohawk
     #   opensearch-dsl
-    #   opensearch-py
     #   piprot
     #   python-dateutil
 slackclient==2.9.4
@@ -516,7 +515,7 @@ virtualenv==20.17.1
     # via pre-commit
 wcwidth==0.2.5
     # via prompt-toolkit
-werkzeug==3.0.3
+werkzeug==3.0.4
     # via -r requirements.in
 wheel==0.38.4
     # via pip-tools
