@@ -14,13 +14,10 @@ class TestCompanyActivityViewSetV4(APITestMixin):
 
     def test_endpoint__has_company_data(self):
         """Test activity endpoint returns company data for given company"""
-
         company = CompanyFactory()
 
-        requester = create_test_user()
-        api_client = self.create_api_client(user=requester)
         url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
-        response = api_client.post(url)
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -35,11 +32,8 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         interaction = CompanyInteractionFactory(company=company)
         CompanyInteractionFactory(company=company)
 
-        requester = create_test_user()
-        api_client = self.create_api_client(user=requester)
         url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
-
-        response = api_client.post(url)
+        response = self.api_client.post(url)
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
@@ -74,11 +68,8 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         interaction = CompanyInteractionFactory(company=company)
         CompanyInteractionFactory()
 
-        requester = create_test_user()
-        api_client = self.create_api_client(user=requester)
         url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
-        response = api_client.post(url)
-
+        response = self.api_client.post(url)
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
@@ -96,18 +87,28 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         )
         CompanyInteractionFactory(company=company)
 
-        requester = create_test_user()
-        api_client = self.create_api_client(user=requester)
         url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
 
-        response = api_client.post(url)
+        response = self.api_client.post(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert len(response_data['activities']) == 2
 
-        response = api_client.post(url, {'advisers': [str(adviser.id)]})
+        response = self.api_client.post(url, {'advisers': [str(adviser.id)]})
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert len(response_data['activities']) == 1
 
         assert response_data['activities'][0]['id'] == str(interaction.id)
+
+    def test_endpoint__returns_forbidden_for_unauthenticated_requests(self):
+        """Test activity endpoint returns Forbidden for unauthenticated requests"""
+
+        company = CompanyFactory()
+
+        requester = create_test_user()
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
+        response = api_client.post(url)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
