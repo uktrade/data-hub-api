@@ -1,5 +1,5 @@
-from rest_framework.reverse import reverse
 from rest_framework import status
+from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
@@ -42,24 +42,24 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         activtiy = [
             activity
             for activity in response_data['activities']
-            if activity["id"] == str(interaction.id)
+            if activity['id'] == str(interaction.id)
         ][0]
 
-        assert activtiy["id"] == str(interaction.id)
-        assert activtiy["subject"] == interaction.subject
-        assert activtiy["kind"] == interaction.kind
+        assert activtiy['id'] == str(interaction.id)
+        assert activtiy['subject'] == interaction.subject
+        assert activtiy['kind'] == interaction.kind
         assert (
-            activtiy["communication_channel"]["name"]
+            activtiy['communication_channel']['name']
             == interaction.communication_channel.name
         )
-        assert activtiy["communication_channel"]["id"] == str(
-            interaction.communication_channel.id
+        assert activtiy['communication_channel']['id'] == str(
+            interaction.communication_channel.id,
         )
-        assert activtiy["service"]["name"] == interaction.service.name
-        assert activtiy["service"]["id"] == str(interaction.service.id)
+        assert activtiy['service']['name'] == interaction.service.name
+        assert activtiy['service']['id'] == str(interaction.service.id)
 
-        assert activtiy["dit_participants"][0]["adviser"]["id"] == str(
-            interaction.dit_participants.all()[0].adviser.id
+        assert activtiy['dit_participants'][0]['adviser']['id'] == str(
+            interaction.dit_participants.all()[0].adviser.id,
         )
 
     def test_endpoint__has_interactions_for_given_company_only(self):
@@ -101,9 +101,22 @@ class TestCompanyActivityViewSetV4(APITestMixin):
 
         assert response_data['activities'][0]['id'] == str(interaction.id)
 
+    def test_endpoint__can_handle_incorrect_advisor_id_param(self):
+        """Test activity endpoint can handle an advisor id param that isn't a valid uuid"""
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        CompanyInteractionFactory(company=company)
+
+        url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
+        response = self.api_client.post(
+            url, {'advisers': [str(adviser.id), 'not-a-uuid']},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data['advisers']['1'] == ['Must be a valid UUID.']
+
     def test_endpoint__returns_forbidden_for_unauthenticated_requests(self):
         """Test activity endpoint returns Forbidden for unauthenticated requests"""
-
         company = CompanyFactory()
 
         requester = create_test_user()
