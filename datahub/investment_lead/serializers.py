@@ -3,7 +3,19 @@ from rest_framework import serializers
 from datahub.investment_lead.models import EYBLead
 
 
-ALL_FIELDS = [
+ARCHIVABLE_FIELDS = [
+    'archived',
+    'archived_on',
+    'archived_reason',
+    'archived_by',
+]
+
+BASE_FIELDS = [
+    'created_on',
+    'modified_on',
+]
+
+TRIAGE_FIELDS = [
     'triage_id',
     'triage_hashed_uuid',
     'triage_created',
@@ -19,6 +31,9 @@ ALL_FIELDS = [
     'spend',
     'spend_other',
     'is_high_value',
+]
+
+USER_FIELDS = [
     'user_id',
     'user_hashed_uuid',
     'user_created',
@@ -34,6 +49,8 @@ ALL_FIELDS = [
     'landing_timeframe',
     'company_website',
 ]
+
+ALL_FIELDS = ARCHIVABLE_FIELDS + BASE_FIELDS + TRIAGE_FIELDS + USER_FIELDS
 
 UUIDS_ERROR_MESSAGE = 'Invalid serializer data: UUIDs must match.'
 
