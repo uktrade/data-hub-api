@@ -27,7 +27,7 @@ class EYBLeadViewset(
     serializer_class = EYBLeadSerializer
     queryset = EYBLead.objects.all()
 
-    authentication_classes = (PaaSIPAuthentication, HawkAuthentication, )
+    authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
     permission_classes = (HawkScopePermission, )
     required_hawk_scope = HawkScope.data_flow_api
 
