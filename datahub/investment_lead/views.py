@@ -78,7 +78,7 @@ class EYBLeadViewset(
         else:
             # Some leads have been created, others failed
             status_code = status.HTTP_207_MULTI_STATUS
-
+        logger.info(f'Processed {len(request.data)} EYB leads: {response_data}')
         return Response(response_data, status_code)
 
     def perform_create(self, serializer):
