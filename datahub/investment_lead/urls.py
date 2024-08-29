@@ -4,8 +4,8 @@ from datahub.investment_lead.views import EYBLeadViewset
 
 urlpatterns = [
     path(
-        'investment-lead',
+        'eyb',
         EYBLeadViewset.as_view({'post': 'create'}),
-        name='create',
+        name='eyb-create',
     ),
 ]

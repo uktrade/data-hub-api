@@ -102,7 +102,7 @@ v4_urls = [
     path('', include((objective_urls.urls_v4, 'objective'), namespace='objective')),
     path('', include((task_urls.urls_v4, 'task'), namespace='task')),
     path(
-        '',
+        'investment-lead/',
         include((investment_lead_urls, 'investment-lead'), namespace='investment-lead'),
     ),
 ]
