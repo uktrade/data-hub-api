@@ -128,6 +128,7 @@ LOCAL_APPS = [
     'datahub.testfixtureapi',
     'datahub.task',
     'datahub.export_win',
+    'datahub.company_activity',
 ]
 
 # Can be used as a way to load a third-party app that has been removed from the
