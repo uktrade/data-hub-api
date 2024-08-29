@@ -24,6 +24,7 @@ class ActivityInteractionSerializer(InteractionSerializerV4):
 
 class CompanyActivitySerializer(serializers.ModelSerializer):
     """Serialiser for all activities in a company"""
+
     activities = serializers.SerializerMethodField()
 
     class Meta:
@@ -70,3 +71,7 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
             return []
 
         return advisers
+
+
+class CompanyActivityFilterSerializer(serializers.Serializer):
+    advisers = serializers.ListField(child=serializers.UUIDField())
