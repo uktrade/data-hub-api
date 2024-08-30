@@ -56,7 +56,20 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
         advisers = self.get_adviser_from_post_data()
 
         if advisers:
-            interactions = interactions.filter(dit_participants__adviser_id__in=advisers)
+            interactions = interactions.filter(
+                dit_participants__adviser_id__in=advisers)
+
+        date_before, date_after = self.get_dates_from_post_data()
+
+        if date_before:
+            interactions = interactions.filter(
+                date__lte=date_before
+            )
+
+        if date_after:
+            interactions = interactions.filter(
+                date__gte=date_after
+            )
 
         return ActivityInteractionSerializer(interactions, many=True).data
 
@@ -72,7 +85,20 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
 
         return advisers
 
+    def get_dates_from_post_data(self):
+        """Get the date after from post data."""
+        request = self.context.get('request')
+        if not request:
+            return None
+
+        date_before = request.data.get('date_before')
+        date_after = request.data.get('date_after')
+
+        return date_before, date_after
+
 
 class CompanyActivityFilterSerializer(serializers.Serializer):
     advisers = serializers.ListField(
         child=serializers.UUIDField(), required=False)
+    date_before = serializers.DateField(required=False)
+    date_after = serializers.DateField(required=False)
