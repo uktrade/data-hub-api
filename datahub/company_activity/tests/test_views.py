@@ -134,19 +134,19 @@ class TestCompanyActivityViewSetV4(APITestMixin):
             company=company,
             dit_participants=[
                 InteractionDITParticipantFactory(adviser=adviser)],
-            date='2023-01-01'
+            date='2023-01-01',
         )
         interaction_after = CompanyInteractionFactory(
             company=company,
             dit_participants=[
                 InteractionDITParticipantFactory(adviser=adviser)],
-            date='2024-02-01'
+            date='2024-02-01',
         )
         interaction_between = CompanyInteractionFactory(
             company=company,
             dit_participants=[
                 InteractionDITParticipantFactory(adviser=adviser)],
-            date='2023-08-08'
+            date='2023-08-08',
         )
 
         url = reverse('api-v4:company-activity:activity',
@@ -185,3 +185,31 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         assert len(response_data['activities']) == 1
         assert response_data['activities'][0]['id'] == str(
             interaction_between.id)
+
+    def test_endpoint__invalid_date_filter(self):
+        """Test activity endpoint returns response handles invalid dates"""
+        company = CompanyFactory()
+
+        url = reverse('api-v4:company-activity:activity',
+                      kwargs={'pk': company.pk})
+        payload = {
+            'date_after': 'abcd',
+        }
+
+        response = self.api_client.post(url, data=payload)
+        response_data = response.json()
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data['date_after'] == [
+            'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.']
+
+        payload = {
+            'date_before': 'abcd',
+        }
+
+        response = self.api_client.post(url, data=payload)
+        response_data = response.json()
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data['date_before'] == [
+            'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.']
