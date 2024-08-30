@@ -74,4 +74,5 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
 
 
 class CompanyActivityFilterSerializer(serializers.Serializer):
-    advisers = serializers.ListField(child=serializers.UUIDField())
+    advisers = serializers.ListField(
+        child=serializers.UUIDField(), required=False)

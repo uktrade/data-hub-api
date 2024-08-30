@@ -125,3 +125,24 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         response = api_client.post(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_endpoint__date_filter(self):
+        """Test activity endpoint returns response filtered by the date"""
+        company = CompanyFactory()
+        adviser = AdviserFactory()
+        interaction = CompanyInteractionFactory(
+            company=company,
+            dit_participants=[
+                InteractionDITParticipantFactory(adviser=adviser)],
+            date='2023-01-01'
+        )
+
+        url = reverse('api-v4:company-activity:activity',
+                      kwargs={'pk': company.pk})
+        payload = {
+            'date_after':  '2024-10-01',
+        }
+
+        response = self.api_client.post(url, data=payload)
+
+        assert response.status_code == status.HTTP_200_OK
