@@ -151,13 +151,14 @@ class TestCompanyActivityViewSetV4(APITestMixin):
 
         url = reverse('api-v4:company-activity:activity',
                       kwargs={'pk': company.pk})
-        payload = {
-            'date_after': '2024-01-01',
-        }
 
         response = self.api_client.post(url)
         response_data = response.json()
         assert len(response_data['activities']) == 3
+
+        payload = {
+            'date_after': '2024-01-01',
+        }
 
         response = self.api_client.post(url, data=payload)
         response_data = response.json()
