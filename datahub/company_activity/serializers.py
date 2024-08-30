@@ -73,12 +73,16 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
 
         return ActivityInteractionSerializer(interactions, many=True).data
 
-    def get_adviser_from_post_data(self):
-        """Get the adviser from post data."""
+    def get_request_data(self):
+        """Get the post request parameter data"""
         request = self.context.get('request')
         if not request:
-            return []
-        advisers = request.data.get('advisers')
+            return {}
+        return request.data
+
+    def get_adviser_from_post_data(self):
+        """Get the adviser from post data."""
+        advisers = self.get_request_data().get('advisers')
 
         if not advisers or type(advisers) is not list:
             return []
@@ -86,13 +90,10 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
         return advisers
 
     def get_dates_from_post_data(self):
-        """Get the date after from post data."""
-        request = self.context.get('request')
-        if not request:
-            return None
-
-        date_before = request.data.get('date_before')
-        date_after = request.data.get('date_after')
+        """Get the dates from post data."""
+        request_data = self.get_request_data()
+        date_before = request_data.get('date_before')
+        date_after = request_data.get('date_after')
 
         return date_before, date_after
 
