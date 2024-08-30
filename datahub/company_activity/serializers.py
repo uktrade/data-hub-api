@@ -63,12 +63,12 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
 
         if date_before:
             interactions = interactions.filter(
-                date__lte=date_before
+                date__lte=date_before,
             )
 
         if date_after:
             interactions = interactions.filter(
-                date__gte=date_after
+                date__gte=date_after,
             )
 
         return ActivityInteractionSerializer(interactions, many=True).data
