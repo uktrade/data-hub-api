@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.pagination import LimitOffsetPagination
 
 from datahub.company.models import Company
 from datahub.interaction.models import Interaction
@@ -36,6 +37,11 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
             'activities',
         )
 
+    def paginate_activities(self, activities):
+        page = LimitOffsetPagination().paginate_queryset(activities, self.context['request'])
+        return ActivityInteractionSerializer(interactions, many=True).data
+        return page
+
     def get_activities(self, company):
         """Gets all company activities (Interactions, Orders etc)"""
         interactions = self.get_interactions(company)
@@ -43,7 +49,7 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
         activities = []
         activities += interactions
 
-        return activities
+        return self.paginate_activities(activities)
 
     def get_interactions(self, company):
         """
