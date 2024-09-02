@@ -38,18 +38,27 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
         )
 
     def paginate_activities(self, activities):
-        page = LimitOffsetPagination().paginate_queryset(activities, self.context['request'])
-        return ActivityInteractionSerializer(interactions, many=True).data
-        return page
+        """Paginates the activities using limit and offset query params"""
+        paginator = LimitOffsetPagination()
+        page = paginator.paginate_queryset(
+            activities,
+            self.context['request'],
+        )
+        data = ActivityInteractionSerializer(page, many=True).data
+        return {
+            'links': {
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+            },
+            'count': paginator.count,
+            'results': data,
+        }
 
     def get_activities(self, company):
         """Gets all company activities (Interactions, Orders etc)"""
         interactions = self.get_interactions(company)
 
-        activities = []
-        activities += interactions
-
-        return self.paginate_activities(activities)
+        return self.paginate_activities(interactions)
 
     def get_interactions(self, company):
         """
@@ -57,13 +66,14 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
 
         Also applies any filters from the query_params to the related models.
         """
-        interactions = company.interactions
+        interactions = company.interactions.all()
 
         advisers = self.get_adviser_from_post_data()
 
         if advisers:
             interactions = interactions.filter(
-                dit_participants__adviser_id__in=advisers)
+                dit_participants__adviser_id__in=advisers,
+            )
 
         date_before, date_after = self.get_dates_from_post_data()
 
@@ -77,7 +87,7 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
                 date__gte=date_after,
             )
 
-        return ActivityInteractionSerializer(interactions, many=True).data
+        return interactions
 
     def get_request_data(self):
         """Get the post request parameter data"""
@@ -105,7 +115,6 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
 
 
 class CompanyActivityFilterSerializer(serializers.Serializer):
-    advisers = serializers.ListField(
-        child=serializers.UUIDField(), required=False)
+    advisers = serializers.ListField(child=serializers.UUIDField(), required=False)
     date_before = serializers.DateField(required=False)
     date_after = serializers.DateField(required=False)
