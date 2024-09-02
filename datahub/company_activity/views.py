@@ -16,12 +16,12 @@ class CompanyActivityViewSetV4(CoreViewSet):
     http_method_names = ['post']
     serializer_class = CompanyActivitySerializer
     queryset = Company.objects.prefetch_related(
-        'company_interactions',
-        'company_interactions__contacts',
-        'company_interactions__service',
-        'company_interactions__dit_participants__adviser',
-        'company_interactions__dit_participants__team',
-        'company_interactions__communication_channel',
+        'interactions',
+        'interactions__contacts',
+        'interactions__service',
+        'interactions__dit_participants__adviser',
+        'interactions__dit_participants__team',
+        'interactions__communication_channel',
     )
 
     def retrieve(self, request, *args, **kwargs):
