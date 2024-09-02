@@ -33,13 +33,13 @@ backoff==2.2.1
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
-bigtree==0.21.0
+bigtree==0.21.1
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.35.5
+boto3==1.35.10
     # via -r requirements.in
-botocore==1.35.5
+botocore==1.35.10
     # via
     #   boto3
     #   s3transfer
@@ -213,7 +213,7 @@ inflection==0.5.1
     # via -r requirements.in
 iniconfig==1.1.1
     # via pytest
-ipython==8.26.0
+ipython==8.27.0
     # via -r requirements-dev.in
 isort==5.11.4
     # via pylint
@@ -360,7 +360,7 @@ pygments==2.15.0
     # via ipython
 pyjwt==2.6.0
     # via notifications-python-client
-pylint==3.2.6
+pylint==3.2.7
     # via
     #   -r requirements-dev.in
     #   pylint-django
