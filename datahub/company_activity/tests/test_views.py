@@ -29,8 +29,8 @@ class TestCompanyActivityViewSetV4(APITestMixin):
     def test_endpoint__has_company_interactions(self):
         """Test activity endpoint returns interactions for given company"""
         company = CompanyFactory()
-        interaction = CompanyInteractionFactory(company=company)
-        CompanyInteractionFactory(company=company)
+        interaction = CompanyInteractionFactory(company=company, companies=[])
+        CompanyInteractionFactory(company=company, companies=[])
 
         url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
         response = self.api_client.post(url)
@@ -65,8 +65,8 @@ class TestCompanyActivityViewSetV4(APITestMixin):
     def test_endpoint__has_interactions_for_given_company_only(self):
         """Test activity endpoint returns interaction for given company only"""
         company = CompanyFactory()
-        interaction = CompanyInteractionFactory(company=company)
-        CompanyInteractionFactory()
+        interaction = CompanyInteractionFactory(company=company, companies=[])
+        CompanyInteractionFactory(companies=[])
 
         url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
         response = self.api_client.post(url)
@@ -84,8 +84,9 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         interaction = CompanyInteractionFactory(
             company=company,
             dit_participants=[InteractionDITParticipantFactory(adviser=adviser)],
+            companies=[],
         )
-        CompanyInteractionFactory(company=company)
+        CompanyInteractionFactory(company=company, companies=[])
 
         url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
 
@@ -105,7 +106,7 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         """Test activity endpoint can handle an advisor id param that isn't a valid uuid"""
         adviser = AdviserFactory()
         company = CompanyFactory()
-        CompanyInteractionFactory(company=company)
+        CompanyInteractionFactory(company=company, companies=[])
 
         url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
         response = self.api_client.post(
@@ -132,18 +133,21 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         adviser = AdviserFactory()
         interaction_before = CompanyInteractionFactory(
             company=company,
+            companies=[],
             dit_participants=[
                 InteractionDITParticipantFactory(adviser=adviser)],
             date='2023-01-01',
         )
         interaction_after = CompanyInteractionFactory(
             company=company,
+            companies=[],
             dit_participants=[
                 InteractionDITParticipantFactory(adviser=adviser)],
             date='2024-02-01',
         )
         interaction_between = CompanyInteractionFactory(
             company=company,
+            companies=[],
             dit_participants=[
                 InteractionDITParticipantFactory(adviser=adviser)],
             date='2023-08-08',
