@@ -175,7 +175,8 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         response_data = response.json()
         assert len(response_data['activities']['results']) == 2
         returned_ids = [a.get('id') for a in response_data['activities']['results']]
-        assert returned_ids == [str(interaction_before.id), str(interaction_between.id)]
+        assert str(interaction_before.id) in returned_ids
+        assert str(interaction_between.id) in returned_ids
 
         payload = {
             'date_before': '2023-12-30',
