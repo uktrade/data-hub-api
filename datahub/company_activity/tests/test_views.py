@@ -37,11 +37,11 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
-        assert len(response_data['activities']) == 2
+        assert len(response_data['activities']['results']) == 2
 
         activtiy = [
             activity
-            for activity in response_data['activities']
+            for activity in response_data['activities']['results']
             if activity['id'] == str(interaction.id)
         ][0]
 
@@ -73,9 +73,9 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
-        assert len(response_data['activities']) == 1
+        assert len(response_data['activities']['results']) == 1
 
-        assert response_data['activities'][0]['id'] == str(interaction.id)
+        assert response_data['activities']['results'][0]['id'] == str(interaction.id)
 
     def test_endpoint__can_filter_activities_by_adviser_only(self):
         """Test activity endpoint returns interactions for given adviser and company only"""
@@ -93,14 +93,14 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         response = self.api_client.post(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert len(response_data['activities']) == 2
+        assert len(response_data['activities']['results']) == 2
 
         response = self.api_client.post(url, {'advisers': [str(adviser.id)]})
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert len(response_data['activities']) == 1
+        assert len(response_data['activities']['results']) == 1
 
-        assert response_data['activities'][0]['id'] == str(interaction.id)
+        assert response_data['activities']['results'][0]['id'] == str(interaction.id)
 
     def test_endpoint__can_handle_incorrect_advisor_id_param(self):
         """Test activity endpoint can handle an advisor id param that isn't a valid uuid"""
@@ -110,7 +110,8 @@ class TestCompanyActivityViewSetV4(APITestMixin):
 
         url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
         response = self.api_client.post(
-            url, {'advisers': [str(adviser.id), 'not-a-uuid']},
+            url,
+            {'advisers': [str(adviser.id), 'not-a-uuid']},
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -134,31 +135,27 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         interaction_before = CompanyInteractionFactory(
             company=company,
             companies=[],
-            dit_participants=[
-                InteractionDITParticipantFactory(adviser=adviser)],
+            dit_participants=[InteractionDITParticipantFactory(adviser=adviser)],
             date='2023-01-01',
         )
         interaction_after = CompanyInteractionFactory(
             company=company,
             companies=[],
-            dit_participants=[
-                InteractionDITParticipantFactory(adviser=adviser)],
+            dit_participants=[InteractionDITParticipantFactory(adviser=adviser)],
             date='2024-02-01',
         )
         interaction_between = CompanyInteractionFactory(
             company=company,
             companies=[],
-            dit_participants=[
-                InteractionDITParticipantFactory(adviser=adviser)],
+            dit_participants=[InteractionDITParticipantFactory(adviser=adviser)],
             date='2023-08-08',
         )
 
-        url = reverse('api-v4:company-activity:activity',
-                      kwargs={'pk': company.pk})
+        url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
 
         response = self.api_client.post(url)
         response_data = response.json()
-        assert len(response_data['activities']) == 3
+        assert len(response_data['activities']['results']) == 3
 
         payload = {
             'date_after': '2024-01-01',
@@ -166,19 +163,19 @@ class TestCompanyActivityViewSetV4(APITestMixin):
 
         response = self.api_client.post(url, data=payload)
         response_data = response.json()
-        assert len(response_data['activities']) == 1
-        assert response_data['activities'][0]['id'] == str(
-            interaction_after.id)
+        assert len(response_data['activities']['results']) == 1
+        assert response_data['activities']['results'][0]['id'] == str(
+            interaction_after.id,
+        )
 
         payload = {
             'date_before': '2024-01-01',
         }
         response = self.api_client.post(url, data=payload)
         response_data = response.json()
-        assert len(response_data['activities']) == 2
-        returned_ids = [a.get('id') for a in response_data['activities']]
-        assert returned_ids == [str(
-            interaction_before.id), str(interaction_between.id)]
+        assert len(response_data['activities']['results']) == 2
+        returned_ids = [a.get('id') for a in response_data['activities']['results']]
+        assert returned_ids == [str(interaction_before.id), str(interaction_between.id)]
 
         payload = {
             'date_before': '2023-12-30',
@@ -187,16 +184,16 @@ class TestCompanyActivityViewSetV4(APITestMixin):
 
         response = self.api_client.post(url, data=payload)
         response_data = response.json()
-        assert len(response_data['activities']) == 1
-        assert response_data['activities'][0]['id'] == str(
-            interaction_between.id)
+        assert len(response_data['activities']['results']) == 1
+        assert response_data['activities']['results'][0]['id'] == str(
+            interaction_between.id,
+        )
 
     def test_endpoint__invalid_date_filter(self):
         """Test activity endpoint returns response handles invalid dates"""
         company = CompanyFactory()
 
-        url = reverse('api-v4:company-activity:activity',
-                      kwargs={'pk': company.pk})
+        url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
         payload = {
             'date_after': 'abcd',
         }
@@ -206,7 +203,8 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data['date_after'] == [
-            'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.']
+            'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.',
+        ]
 
         payload = {
             'date_before': 'abcd',
@@ -217,4 +215,37 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data['date_before'] == [
-            'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.']
+            'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.',
+        ]
+
+    def test_endpoint__pagination(self):
+        """Test activity endpoint returns response filtered by the date"""
+        company = CompanyFactory()
+        CompanyInteractionFactory(
+            company=company,
+            companies=[],
+        )
+        interaction_2 = CompanyInteractionFactory(
+            company=company,
+            companies=[],
+        )
+        interaction_3 = CompanyInteractionFactory(
+            company=company,
+            companies=[],
+        )
+
+        url = reverse(
+            'api-v4:company-activity:activity',
+            kwargs={'pk': company.pk},
+        )
+        url = f'{url}?limit=2&offset=1'
+
+        response = self.api_client.post(url)
+        response_data = response.json()
+
+        assert response_data['activities']['count'] == 3
+        assert len(response_data['activities']['results']) == 2
+
+        returned_ids = [a.get('id') for a in response_data['activities']['results']]
+        assert str(interaction_2.id) in returned_ids
+        assert str(interaction_3.id) in returned_ids
