@@ -218,3 +218,33 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         response_data = response.json()
         assert response_data['date_before'] == [
             'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.']
+
+    def test_endpoint__pagination(self):
+        """Test activity endpoint returns response filtered by the date"""
+        company = CompanyFactory()
+        CompanyInteractionFactory(
+            company=company,
+            companies=[],
+        )
+        interaction_2 = CompanyInteractionFactory(
+            company=company,
+            companies=[],
+        )
+        interaction_3 = CompanyInteractionFactory(
+            company=company,
+            companies=[],
+        )
+
+        url = reverse('api-v4:company-activity:activity',
+                      kwargs={'pk': company.pk})
+
+        payload = {
+            'limit': 2,
+            'offset': 1
+        }
+        response = self.api_client.post(url, data=payload)
+        response_data = response.json()
+        assert len(response_data['activities']) == 2
+        returned_ids = [a.get('id') for a in response_data['activities']]
+        assert returned_ids == [str(
+            interaction_2.id), str(interaction_3.id)]
