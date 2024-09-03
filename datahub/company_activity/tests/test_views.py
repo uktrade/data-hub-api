@@ -191,7 +191,7 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         )
 
     def test_endpoint__invalid_date_filter(self):
-        """Test activity endpoint returns response handles invalid dates"""
+        """Test activity endpoint handles invalid dates"""
         company = CompanyFactory()
 
         url = reverse('api-v4:company-activity:activity', kwargs={'pk': company.pk})
