@@ -579,7 +579,7 @@ class DataHubLegacyExportWinSerializer(ModelSerializer):
     def get_business_potential(self, win):
         """Return human readable name for business type."""
         if win.business_potential:
-            return win.business_potential.export_win_id
+            return win.business_potential.name
         return None
 
     def get_response(self, win):

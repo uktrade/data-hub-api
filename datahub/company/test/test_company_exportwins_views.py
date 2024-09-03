@@ -173,7 +173,7 @@ class TestGetCompanyExportWins(APITestMixin):
                     'created': format_date_or_datetime(win.created_on),
                     'country': win.country.iso_alpha2_code,
                     'sector': win.sector.name,
-                    'business_potential': win.business_potential.export_win_id,
+                    'business_potential': win.business_potential.name,
                     'business_type': win.business_type,
                     'name_of_export': win.name_of_export,
                     # this field is intentionally duplicated to match legacy system output
