@@ -21,6 +21,7 @@ from datahub.investment.investor_profile import urls as investor_profile_urls
 from datahub.investment.opportunity import urls as opportunity_urls
 from datahub.investment.project import urls as investment_urls
 from datahub.investment.project.proposition import urls as proposition_urls
+from datahub.investment_lead import urls as investment_lead_urls
 from datahub.metadata import urls as metadata_urls
 from datahub.omis import urls as omis_urls
 from datahub.reminder import urls as reminder_urls
@@ -100,4 +101,8 @@ v4_urls = [
     path('', include((export_win_urls.urls, 'export-win'), namespace='export-win')),
     path('', include((objective_urls.urls_v4, 'objective'), namespace='objective')),
     path('', include((task_urls.urls_v4, 'task'), namespace='task')),
+    path(
+        'investment-lead/',
+        include((investment_lead_urls, 'investment-lead'), namespace='investment-lead'),
+    ),
 ]
