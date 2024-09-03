@@ -225,14 +225,17 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         CompanyInteractionFactory(
             company=company,
             companies=[],
+            date='2023-08-10',
         )
         interaction_2 = CompanyInteractionFactory(
             company=company,
             companies=[],
+            date='2023-08-09',
         )
         interaction_3 = CompanyInteractionFactory(
             company=company,
             companies=[],
+            date='2023-08-08',
         )
 
         url = reverse(

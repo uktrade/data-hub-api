@@ -66,7 +66,7 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
 
         Also applies any filters from the query_params to the related models.
         """
-        interactions = company.interactions.all()
+        interactions = company.interactions.all().order_by('-date')
 
         advisers = self.get_adviser_from_post_data()
 
