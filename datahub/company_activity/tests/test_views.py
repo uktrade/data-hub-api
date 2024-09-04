@@ -253,3 +253,55 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         returned_ids = [a.get('id') for a in response_data['activities']['results']]
         assert str(interaction_2.id) in returned_ids
         assert str(interaction_3.id) in returned_ids
+
+    def test_endpoint__sorting(self):
+        """Test activity endpoint sorts correctly based on request param"""
+        company = CompanyFactory()
+        interaction_1 = CompanyInteractionFactory(
+            company=company,
+            companies=[],
+            date='2023-08-10',
+        )
+        interaction_2 = CompanyInteractionFactory(
+            company=company,
+            companies=[],
+            date='2023-08-09',
+        )
+        interaction_3 = CompanyInteractionFactory(
+            company=company,
+            companies=[],
+            date='2023-08-08',
+        )
+
+        url = reverse(
+            'api-v4:company-activity:activity',
+            kwargs={'pk': company.pk},
+        )
+
+        payload = {
+            'sortby': 'date:desc',
+        }
+
+        response = self.api_client.post(url, data=payload)
+        response_data = response.json()
+
+        returned_ids = [a.get('id') for a in response_data['activities']['results']]
+        assert returned_ids == [
+            str(interaction_1.id),
+            str(interaction_2.id),
+            str(interaction_3.id),
+        ]
+
+        payload = {
+            'sortby': 'date:asc',
+        }
+
+        response = self.api_client.post(url, data=payload)
+        response_data = response.json()
+
+        returned_ids = [a.get('id') for a in response_data['activities']['results']]
+        assert returned_ids == [
+            str(interaction_3.id),
+            str(interaction_2.id),
+            str(interaction_1.id),
+        ]
