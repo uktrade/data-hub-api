@@ -66,7 +66,8 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
 
         Also applies any filters from the query_params to the related models.
         """
-        interactions = company.interactions.all().order_by('-date')
+        sortby = self.get_sortby_from_post_data()
+        interactions = company.interactions.all().order_by(sortby)
 
         advisers = self.get_adviser_from_post_data()
 
@@ -112,6 +113,17 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
         date_after = request_data.get('date_after')
 
         return date_before, date_after
+
+    def get_sortby_from_post_data(self):
+        """Get the sortby string from post data."""
+        request_data = self.get_request_data()
+        match request_data.get('sortby'):
+            case 'date:desc':
+                return '-date'
+            case 'date:asc':
+                return 'date'
+            case _:
+                return '-date'
 
 
 class CompanyActivityFilterSerializer(serializers.Serializer):
