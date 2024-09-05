@@ -35,6 +35,7 @@ from datahub.interaction.test.factories import (
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.omis.order.test.factories import (
     OrderFactory,
 )
@@ -77,6 +78,7 @@ MAPPINGS = {
             (CompanyInteractionFactory, 'company'),
             (CompaniesInteractionFactory, 'companies'),
             (ContactFactory, 'company'),
+            (EYBLeadFactory, 'company'),
             (ShallowInvestmentProjectFactory, 'intermediate_company'),
             (ShallowInvestmentProjectFactory, 'investor_company'),
             (ShallowInvestmentProjectFactory, 'uk_company'),
