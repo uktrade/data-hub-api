@@ -8,16 +8,14 @@ from datahub.investment_lead.test.utils import verify_eyb_lead_data
 class TestEYBLead:
     """Tests EYB Lead model"""
 
-    def test_db_instance_matches_factory_instance(self, eyb_lead_data, eyb_lead_db):
+    def test_db_instance_matches_factory_instance(
+        self, eyb_lead_factory_data, eyb_lead_instance_from_db,
+    ):
         assert EYBLead.objects.all().exists()
-        verify_eyb_lead_data(eyb_lead_db, eyb_lead_data)
+        verify_eyb_lead_data(
+            eyb_lead_instance_from_db, eyb_lead_factory_data, is_factory_data=True,
+        )
 
-    def test_str(self, eyb_lead_db):
+    def test_str(self, eyb_lead_instance_from_db):
         """Test the human friendly string representation of the object"""
-        hashed_id = f'{eyb_lead_db.triage_hashed_uuid}'
-        assert str(eyb_lead_db) == hashed_id
-
-    def test_triage_uuid_and_user_uuid_match(self, eyb_lead_db):
-        # TODO: verify whether this will be needed in the long run
-        # we might squash the *_uuids into one
-        assert eyb_lead_db.triage_hashed_uuid == eyb_lead_db.user_hashed_uuid
+        assert str(eyb_lead_instance_from_db) == eyb_lead_instance_from_db.name
