@@ -13,7 +13,7 @@ from datahub.core.hawk_receiver import (
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import SoftDeleteCoreViewSet
 from datahub.investment_lead.models import EYBLead
-from datahub.investment_lead.serializers import EYBLeadSerializer
+from datahub.investment_lead.serializers import CreateEYBLeadSerializer
 
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ class EYBLeadViewset(
     SoftDeleteCoreViewSet,
     HawkResponseSigningMixin,
 ):
-    serializer_class = EYBLeadSerializer
+    serializer_class = CreateEYBLeadSerializer
     queryset = EYBLead.objects.all()
 
     authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
@@ -40,7 +40,7 @@ class EYBLeadViewset(
         To reduce complexity of the pipeline, it was decided to have the separation
         logic within the API endpoint.
         """
-        if not isinstance(request.data, list):
+        if not isinstance(request.data, list) or len(request.data) == 0:
             return Response(
                 {'error': 'Expected a list of leads.'},
                 status.HTTP_400_BAD_REQUEST,
@@ -53,11 +53,11 @@ class EYBLeadViewset(
         for index, lead_data in enumerate(request.data):
             serializer = self.get_serializer(data=lead_data)
             if serializer.is_valid():
-                _, created = self.perform_create(serializer)
+                instance, created = self.perform_create_or_update(serializer)
                 if created:
-                    created_leads.append(serializer.validated_data)
+                    created_leads.append(serializer.to_representation(instance))
                 else:
-                    updated_leads.append(serializer.validated_data)
+                    updated_leads.append(serializer.to_representation(instance))
             else:
                 errors.append({'index': index, 'errors': serializer.errors})
 
@@ -81,14 +81,12 @@ class EYBLeadViewset(
         logger.info(f'Processed {len(request.data)} EYB leads: {response_data}')
         return Response(response_data, status_code)
 
-    def perform_create(self, serializer):
+    def perform_create_or_update(self, serializer):
         """Processes a single lead.
 
         The `triage_hashed_uuid` and `user_hashed_uuid` field should be unique for each EYBLead
         instance. As a result, we use these to determine if a new instance is created, or an
         existing one updated.
-
-        This overwrites the inherited BaseViewSet method.
         """
         validated_lead_data = serializer.validated_data
         lead_instance, created = EYBLead.objects.update_or_create(
