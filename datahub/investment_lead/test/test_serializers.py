@@ -1,31 +1,92 @@
 import pytest
 
-from rest_framework import serializers
-
+from datahub.core import constants
+from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import (
-    EYBLeadSerializer,
+    CreateEYBLeadSerializer,
     UUIDS_ERROR_MESSAGE,
 )
 from datahub.investment_lead.test.utils import verify_eyb_lead_data
+from datahub.metadata.models import (
+    AdministrativeArea,
+    Country,
+    Sector,
+    UKRegion,
+)
+
+pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures('eyb_lead_data', 'eyb_lead_db')
-class TestEYBLeadSerializer:
-    """Tests for EYBLeadSerializer."""
+class TestBaseEYBLeadSerializer:
+    """Tests for BaseEYBLeadSerializer"""
 
-    def test_eyb_lead_serializer_raises_if_uuids_different(self, eyb_lead_data):
-        invalid_eyb_data = eyb_lead_data.copy()
-        invalid_eyb_data['triage_hashed_uuid'] = '123abc'
-        invalid_eyb_data['user_hashed_uuid'] = '456def'
-        eyb_serializer = EYBLeadSerializer(data=invalid_eyb_data)
+    def test_eyb_lead_serializer_raises_if_uuids_different(self, eyb_lead_post_data):
+        eyb_lead_post_data['triage_hashed_uuid'] = '123abc'
+        eyb_lead_post_data['user_hashed_uuid'] = '456def'
+        serializer = CreateEYBLeadSerializer(data=eyb_lead_post_data)
+        assert not serializer.is_valid()
+        assert 'non_field_errors' in serializer.errors
+        assert serializer.errors['non_field_errors'] == [UUIDS_ERROR_MESSAGE]
 
-        with pytest.raises(serializers.ValidationError):
-            eyb_serializer.is_valid(raise_exception=True)
 
-        assert UUIDS_ERROR_MESSAGE in eyb_serializer.errors['non_field_errors']
+class TestCreateEYBLeadSerializer:
+    """Tests for CreateEYBLeadSerializer"""
 
-    def test_eyb_lead_serializer_as_expected(self, eyb_lead_db):
-        db_instance = eyb_lead_db
-        serialized_instance = EYBLeadSerializer(eyb_lead_db)
-        verify_eyb_lead_data(db_instance, serialized_instance.data)
+    def test_create_valid_eyb_lead(self, eyb_lead_post_data):
+        serializer = CreateEYBLeadSerializer(data=eyb_lead_post_data)
+        assert serializer.is_valid(), serializer.errors
+        instance = serializer.save()
+        assert isinstance(instance, EYBLead)
+        assert EYBLead.objects.count() == 1
+        verify_eyb_lead_data(instance, serializer.validated_data, is_factory_data=False)
+
+    def test_create_invalid_eyb_lead(self, eyb_lead_post_data):
+        eyb_lead_post_data['spend'] = 'Invalid spend choice'
+        serializer = CreateEYBLeadSerializer(data=eyb_lead_post_data)
+        assert not serializer.is_valid()
+        assert 'spend' in serializer.errors
+
+    def test_related_field_validation(self, eyb_lead_post_data):
+        eyb_lead_post_data.update({
+            'sector': 'Invalid sector name',
+            'location': 'Invalid UK region name',
+            'company_location': 'Invalid country ISO code',
+            'address_area': 'Invalid area name',
+            'address_country': 'Invalid country ISO code',
+        })
+        serializer = CreateEYBLeadSerializer(data=eyb_lead_post_data)
+        assert not serializer.is_valid()
+        assert 'sector' in serializer.errors
+        assert 'location' in serializer.errors
+        assert 'company_location' in serializer.errors
+        assert 'address_area' in serializer.errors
+        assert 'address_country' in serializer.errors
+
+    def test_related_field_conversion(self, eyb_lead_post_data):
+        mining_sector = Sector.objects.get(
+            pk=constants.Sector.mining_mining_vehicles_transport_equipment.value.id,
+        )
+        wales_region = UKRegion.objects.get(
+            pk=constants.UKRegion.wales.value.id,
+        )
+        canada_country = Country.objects.get(
+            pk=constants.Country.canada.value.id,
+        )
+        alberta_area = AdministrativeArea.objects.get(
+            pk=constants.AdministrativeArea.alberta.value.id,
+        )
+        eyb_lead_post_data.update({
+            'sector': mining_sector.segment,
+            'location': wales_region.name,
+            'company_location': canada_country.iso_alpha2_code,
+            'address_area': alberta_area.name,
+            'address_country': canada_country.iso_alpha2_code,
+        })
+        serializer = CreateEYBLeadSerializer(data=eyb_lead_post_data)
+        assert serializer.is_valid(), serializer.errors
+        validated_data = serializer.validated_data
+        assert validated_data['sector'].pk == mining_sector.pk
+        assert validated_data['location'].pk == wales_region.pk
+        assert validated_data['company_location'].pk == canada_country.pk
+        assert validated_data['address_area'].pk == alberta_area.pk
+        assert validated_data['address_country'].pk == canada_country.pk
