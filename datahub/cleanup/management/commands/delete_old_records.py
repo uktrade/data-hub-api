@@ -78,6 +78,7 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('company_objectives'): (),
                 Company._meta.get_field('wins'): (),
                 Company._meta.get_field('legacy_wins'): (),
+                Company._meta.get_field('eyb_leads'): (),
             },
             # We want to delete the relations below along with any expired companies
             excluded_relations=(
