@@ -52,6 +52,7 @@ def set_gross_value_added_for_investment_project_pre_save(sender, instance, **kw
     triggering this signal. There is a separate signal receiver below to reliably
     pick up changes to them.
     """
+    print(f"pre_save InvestmentProject {instance.id}")
     set_gross_value_added_for_investment_project(instance)
 
 

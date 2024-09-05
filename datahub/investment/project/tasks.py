@@ -11,9 +11,53 @@ from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.investment.project.models import GVAMultiplier, InvestmentProject
+from datahub.investment.project.gva_utils import set_gross_value_added_for_investment_project
+from collections import defaultdict
+from django.db.models.signals import (
+    m2m_changed,
+    post_delete,
+    post_init,
+    post_migrate,
+    post_save,
+    pre_delete,
+    pre_init,
+    pre_migrate,
+    pre_save,
+)
+
 
 logger = logging.getLogger(__name__)
 
+class DisableSignals:
+    def __init__(self, disabled_signals=None):
+        self.stashed_signals = defaultdict(list)
+        self.disabled_signals = disabled_signals or [
+            pre_init,
+            post_init,
+            pre_save,
+            post_save,
+            pre_delete,
+            post_delete,
+            pre_migrate,
+            post_migrate,
+            m2m_changed,
+        ]
+
+    def __enter__(self):
+        for signal in self.disabled_signals:
+            self.disconnect(signal)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        for signal in list(self.stashed_signals):
+            self.reconnect(signal)
+
+    def disconnect(self, signal):
+        self.stashed_signals[signal] = signal.receivers
+        signal.receivers = []
+
+    def reconnect(self, signal):
+        signal.receivers = self.stashed_signals.get(signal, [])
+        del self.stashed_signals[signal]
 
 def schedule_update_investment_projects_for_gva_multiplier_task(gva_multiplier_id):
     job = job_scheduler(
@@ -77,12 +121,14 @@ def refresh_gross_value_added_value_for_fdi_investment_projects():
     could be calculated for and saving the project.
 
     Saving the project in turn calls the pre_save method
-    'update_gross_value_added_for_investment_project_pre_save'
+    'set_gross_value_added_for_investment_project_pre_save'
     which sets the Gross Value added data for a project.
     """
     investment_projects = get_investment_projects_to_refresh_gva_values()
     for project in investment_projects.iterator():
-        project.save(update_fields=['gross_value_added', 'gva_multiplier'])
+        print(f"refresh_gross_value_added_value_for_fdi_investment_project {project.id}")
+        set_gross_value_added_for_investment_project(project)
+        project.update(update_fields=['gross_value_added', 'gva_multiplier'])
 
     logger.info(
         'Task refresh_gross_value_added_value_for_fdi_investment_projects completed',

@@ -599,6 +599,7 @@ class InvestmentProject(
         return get_front_end_url(self)
 
     def save(self, *args, **kwargs):
+        print("InvestmentProject save")
         """Updates the stage log after saving."""
         adding = self._state.adding
         super().save(*args, **kwargs)

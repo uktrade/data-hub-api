@@ -16,7 +16,7 @@ class Command(BaseCommand):
         could be calculated for and saving the project.
 
         Saving the project in turn calls the pre_save method
-        'update_gross_value_added_for_investment_project_pre_save'
+        'set_gross_value_added_for_investment_project_pre_save'
         which sets the Gross Value added data for a project.
         """
         schedule_refresh_gross_value_added_value_for_fdi_investment_projects()
