@@ -18,12 +18,12 @@ CHAR_FIELD_MAX_LENGTH = 256
 class InvestmentLead(ArchivableModel):
     """Abstract model for different types of investment leads."""
 
-    class Meta:
-        abstract = True
-
     created_on = models.DateTimeField(db_index=True, null=True, blank=True, auto_now_add=True)
     modified_on = models.DateTimeField(null=True, blank=True, auto_now=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+    class Meta:
+        abstract = True
 
 
 class EYBLead(InvestmentLead):
@@ -176,6 +176,10 @@ class EYBLead(InvestmentLead):
         on_delete=models.CASCADE,
     )
 
+    def __str__(self):
+        """String representation of the model."""
+        return self.name
+
     @property
     def name(self):
         """The name of an EYB lead record."""
@@ -183,7 +187,3 @@ class EYBLead(InvestmentLead):
         if self.company:
             return f'EYB Lead ({shortened_pk}...) for {self.company.name}'
         return f'EYB Lead ({shortened_pk}...)'
-
-    def __str__(self):
-        """String representation of the model."""
-        return self.name
