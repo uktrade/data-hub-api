@@ -15,14 +15,7 @@ class CompanyActivityViewSetV4(CoreViewSet):
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     http_method_names = ['post']
     serializer_class = CompanyActivitySerializer
-    queryset = Company.objects.prefetch_related(
-        'interactions',
-        'interactions__contacts',
-        'interactions__service',
-        'interactions__dit_participants__adviser',
-        'interactions__dit_participants__team',
-        'interactions__communication_channel',
-    )
+    queryset = Company.objects.all()
 
     def retrieve(self, request, *args, **kwargs):
         if request.data:
