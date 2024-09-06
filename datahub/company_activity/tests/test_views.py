@@ -256,7 +256,7 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         referral = CompanyReferralInteractionFactory(
             company=company,
             companies=[],
-            company_referral__completed_on='2023-08-08',
+            date='2023-08-08',
         )
 
         url = reverse(
@@ -293,7 +293,7 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         referral = CompanyReferralInteractionFactory(
             company=company,
             companies=[],
-            company_referral__completed_on='2023-08-08',
+            date='2023-08-08',
         )
 
         url = reverse(
