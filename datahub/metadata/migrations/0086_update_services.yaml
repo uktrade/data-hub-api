@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: afb989d3-be68-4e0d-9827-844cb9556199
+  fields:
+    disabled_on: ~
+    order: 5253
+    segment: Expo 2025 Osaka
+    parent:
+    contexts: ["export_service_delivery", "export_interaction", "event", "investment_interaction", "investment_project_interaction", "trade_agreement_interaction", "other_interaction", "other_service_delivery"]
+    lft: 2
+    rght: 3
+    tree_id: 19
+    level: 1
