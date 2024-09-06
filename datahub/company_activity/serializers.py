@@ -66,8 +66,13 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
 
         Also applies any filters from the query_params to the related models.
         """
-        sortby = self.get_sortby_from_post_data()
-        interactions = company.interactions.all().order_by(sortby)
+        interactions = company.interactions.all().prefetch_related(
+            'contacts',
+            'service',
+            'dit_participants__adviser',
+            'dit_participants__team',
+            'communication_channel',
+        )
 
         advisers = self.get_adviser_from_post_data()
 
@@ -88,7 +93,8 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
                 date__gte=date_after,
             )
 
-        return interactions
+        sortby = self.get_sortby_from_post_data()
+        return interactions.order_by(sortby)
 
     def get_request_data(self):
         """Get the post request parameter data"""
