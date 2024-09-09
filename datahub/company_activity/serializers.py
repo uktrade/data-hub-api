@@ -2,12 +2,33 @@ from rest_framework import serializers
 from rest_framework.pagination import LimitOffsetPagination
 
 from datahub.company.models import Company
+from datahub.company_referral.models import CompanyReferral
+from datahub.company_referral.serializers import CompanyReferralSerializer
 from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import InteractionSerializerV4
 
 
+class ReferralInteractionSerializer(CompanyReferralSerializer):
+    """Serialiser for all referral interactions in a company"""
+
+    class Meta:
+        model = CompanyReferral
+        fields = (
+            'completed_on',
+            'created_on',
+            'recipient',
+            'created_by',
+            'status',
+            'subject',
+            'notes',
+        )
+
+
 class ActivityInteractionSerializer(InteractionSerializerV4):
     """Serializer for an interaction with only the data required for a company activity"""
+
+    activity_source = serializers.SerializerMethodField()
+    company_referral = ReferralInteractionSerializer()
 
     class Meta:
         model = Interaction
@@ -20,7 +41,21 @@ class ActivityInteractionSerializer(InteractionSerializerV4):
             'dit_participants',
             'kind',
             'communication_channel',
+            'activity_source',
+            'company_referral',
         )
+
+    def get_activity_source(self, interaction):
+        """
+        Returns the source of the activity.
+        Used for the frontend to determine how to transform the data.
+
+        For a referral interaction the source is 'referral'.
+        """
+        if hasattr(interaction, 'company_referral'):
+            return 'referral'
+
+        return 'interaction'
 
 
 class CompanyActivitySerializer(serializers.ModelSerializer):
@@ -35,6 +70,27 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
             'name',
             'id',
             'activities',
+        )
+        read_only_fields = (
+            'name',
+            'id',
+            'trading_names',
+        )
+
+    @staticmethod
+    def get_interactions(company):
+        """
+        Returns all the interactions for the company.
+        """
+        return company.interactions.all().prefetch_related(
+            'contacts',
+            'service',
+            'dit_participants__adviser',
+            'dit_participants__team',
+            'communication_channel',
+            'company_referral',
+            'company_referral__created_by',
+            'company_referral__recipient',
         )
 
     def paginate_activities(self, activities):
@@ -58,43 +114,64 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
         """Gets all company activities (Interactions, Orders etc)"""
         interactions = self.get_interactions(company)
 
-        return self.paginate_activities(interactions)
-
-    def get_interactions(self, company):
-        """
-        Returns all the interactions for the company.
-
-        Also applies any filters from the query_params to the related models.
-        """
-        interactions = company.interactions.all().prefetch_related(
-            'contacts',
-            'service',
-            'dit_participants__adviser',
-            'dit_participants__team',
-            'communication_channel',
+        # Referrals are part of interactions once marked as complete, so
+        # split referrals and interactions separately so they can be filtered
+        # on their own fields.
+        referrals = interactions.filter(company_referral__isnull=False)
+        referrals = self.filter_queryset(
+            referrals,
+            'dit_participants__adviser_id__in',
+            'company_referral__completed_on__lte',
+            'company_referral__completed_on__gte',
+        )
+        # Remove referrals from interactions
+        interactions = interactions.filter(company_referral__isnull=True)
+        interactions = self.filter_queryset(
+            interactions,
+            'dit_participants__adviser_id__in',
+            'date__lte',
+            'date__gte',
         )
 
+        activites = referrals | interactions
+        activites = self.sort_queryset(activites)
+
+        return self.paginate_activities(activites)
+
+    def filter_queryset(
+        self,
+        queryset,
+        adviser_field,
+        date_before_field,
+        date_after_field,
+    ):
+        """
+        Filters the queryset for the given post data. Allows each queryset
+        to specify their own filter fields.
+        """
         advisers = self.get_adviser_from_post_data()
 
         if advisers:
-            interactions = interactions.filter(
-                dit_participants__adviser_id__in=advisers,
+            queryset = queryset.filter(
+                **{adviser_field: advisers},
             )
 
         date_before, date_after = self.get_dates_from_post_data()
-
         if date_before:
-            interactions = interactions.filter(
-                date__lte=date_before,
+            queryset = queryset.filter(
+                **{date_before_field: date_before},
             )
-
         if date_after:
-            interactions = interactions.filter(
-                date__gte=date_after,
+            queryset = queryset.filter(
+                **{date_after_field: date_after},
             )
 
+        return queryset
+
+    def sort_queryset(self, queryset):
+        """Returns the sorted queryset from the sort post data"""
         sortby = self.get_sortby_from_post_data()
-        return interactions.order_by(sortby)
+        return queryset.order_by(sortby)
 
     def get_request_data(self):
         """Get the post request parameter data"""
