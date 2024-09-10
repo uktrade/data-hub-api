@@ -14,6 +14,7 @@ class ReferralInteractionSerializer(CompanyReferralSerializer):
     class Meta:
         model = CompanyReferral
         fields = (
+            'id',
             'completed_on',
             'created_on',
             'recipient',
