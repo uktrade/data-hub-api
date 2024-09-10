@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from datahub.core.serializers import NestedRelatedField
 from datahub.investment_lead.models import EYBLead
 from datahub.metadata.models import (
     AdministrativeArea,
@@ -194,3 +195,12 @@ class CreateEYBLeadSerializer(BaseEYBLeadSerializer):
             )
 
         return validated_data
+
+
+class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
+
+    sector = NestedRelatedField(Sector)
+    location = NestedRelatedField(UKRegion)
+    company_location = NestedRelatedField(Country)
+    address_area = NestedRelatedField(AdministrativeArea)
+    address_country = NestedRelatedField(Country)

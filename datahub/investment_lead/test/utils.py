@@ -1,4 +1,5 @@
 import datetime
+from typing import Literal
 
 from datahub.investment_lead.models import EYBLead
 
@@ -14,14 +15,18 @@ def assert_datetimes(first, second):
     assert _to_iso(first) == _to_iso(second)
 
 
-def verify_eyb_lead_data(instance: EYBLead, data: dict, is_factory_data: bool = False):
-    """Method to verify the EYBLead data against the instance created.
+def verify_eyb_lead_data(
+    instance: EYBLead, data: dict, data_type: Literal['post', 'factory', 'nested'],
+):
+    """Method to verify the EYBLead data against the passed instance.
 
     Use:
-    - `is_factory_data=True` if passing in factory data which contains actual model
-    instances for related fields
-    - `is_factory_data=False` if passing in POST data that contains strings for
-    these fields.
+    - `data_type='post'` if passing in POST data which contains string names
+    for related fields
+    - `data_type='factory'` if passing in factory (or validated serializer) data that
+    contains model instances for these fields
+    - `data_type='nested'` if passing in serialized data (from the RetrieveEYBLeadSerializer)
+    that contains nested objects for these fields, with the id and name attributes.
 
     Related fields are:
     - Sector
@@ -34,13 +39,9 @@ def verify_eyb_lead_data(instance: EYBLead, data: dict, is_factory_data: bool = 
     assert instance.triage_hashed_uuid == data['triage_hashed_uuid']
     assert_datetimes(instance.triage_created, data['triage_created'])
     assert_datetimes(instance.triage_modified, data['triage_modified'])
-    assert data['sector'] == instance.sector \
-        if is_factory_data else instance.sector.segment
     assert instance.sector_sub == data['sector_sub']
     assert instance.intent == data['intent']
     assert instance.intent_other == data['intent_other']
-    assert data['location'] == instance.location \
-        if is_factory_data else instance.location.name
     assert instance.location_city == data['location_city']
     assert instance.location_none == data['location_none']
     assert instance.hiring == data['hiring']
@@ -53,8 +54,6 @@ def verify_eyb_lead_data(instance: EYBLead, data: dict, is_factory_data: bool = 
     assert_datetimes(instance.user_created, data['user_created'])
     assert_datetimes(instance.user_modified, data['user_modified'])
     assert instance.company_name == data['company_name']
-    assert data['company_location'] == instance.company_location \
-        if is_factory_data else instance.company_location.iso_alpha2_code
     assert instance.full_name == data['full_name']
     assert instance.role == data['role']
     assert instance.email == data['email']
@@ -69,8 +68,26 @@ def verify_eyb_lead_data(instance: EYBLead, data: dict, is_factory_data: bool = 
     assert instance.address_2 == data['address_2']
     assert instance.address_town == data['address_town']
     assert instance.address_county == data['address_county']
-    assert data['address_area'] == instance.address_area \
-        if is_factory_data else instance.address_area.name
-    assert data['address_country'] == instance.address_country \
-        if is_factory_data else instance.address_country.iso_alpha2_code
     assert instance.address_postcode == data['address_postcode']
+
+    # Related fields
+    if data_type == 'post':
+        assert instance.sector.segment == data['sector']
+        assert instance.location.name == data['location']
+        assert instance.company_location.iso_alpha2_code == data['company_location']
+        assert instance.address_area.name == data['address_area']
+        assert instance.address_country.iso_alpha2_code == data['address_country']
+    elif data_type == 'factory':
+        assert instance.sector == data['sector']
+        assert instance.location == data['location']
+        assert instance.company_location == data['company_location']
+        assert instance.address_area == data['address_area']
+        assert instance.address_country == data['address_country']
+    elif data_type == 'nested':
+        assert str(instance.sector.id) == data['sector']['id']
+        assert str(instance.location.id) == data['location']['id']
+        assert str(instance.company_location.id) == data['company_location']['id']
+        assert str(instance.address_area.id) == data['address_area']['id']
+        assert str(instance.address_country.id) == data['address_country']['id']
+    else:
+        raise ValueError(f'Invalid value "{data_type}" for argument data_type')

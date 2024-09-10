@@ -4,6 +4,7 @@ from datahub.core import constants
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import (
     CreateEYBLeadSerializer,
+    RetrieveEYBLeadSerializer,
     UUIDS_ERROR_MESSAGE,
 )
 from datahub.investment_lead.test.utils import verify_eyb_lead_data
@@ -38,7 +39,7 @@ class TestCreateEYBLeadSerializer:
         instance = serializer.save()
         assert isinstance(instance, EYBLead)
         assert EYBLead.objects.count() == 1
-        verify_eyb_lead_data(instance, serializer.validated_data, is_factory_data=False)
+        verify_eyb_lead_data(instance, serializer.validated_data, data_type='factory')
 
     def test_create_invalid_eyb_lead(self, eyb_lead_post_data):
         eyb_lead_post_data['spend'] = 'Invalid spend choice'
@@ -90,3 +91,17 @@ class TestCreateEYBLeadSerializer:
         assert validated_data['company_location'].pk == canada_country.pk
         assert validated_data['address_area'].pk == alberta_area.pk
         assert validated_data['address_country'].pk == canada_country.pk
+
+
+class TestRetrieveEYBLeadSerializer:
+    """Tests for RetrieveEYBLeadSerializer"""
+
+    def test_retrieve_eyb_lead(self, eyb_lead_instance_from_db):
+        serializer = RetrieveEYBLeadSerializer(eyb_lead_instance_from_db)
+        verify_eyb_lead_data(eyb_lead_instance_from_db, serializer.data, data_type='nested')
+
+    def test_serialize_queryset(self, eyb_lead_instance_from_db):
+        queryset = EYBLead.objects.all()
+        serializer = RetrieveEYBLeadSerializer(queryset, many=True)
+        assert len(serializer.data) == 1
+        verify_eyb_lead_data(eyb_lead_instance_from_db, serializer.data[0], data_type='nested')
