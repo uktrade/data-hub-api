@@ -182,7 +182,7 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
 
     def get_adviser_from_post_data(self):
         """Get the adviser from post data."""
-        advisers = self.get_request_data().get('advisers')
+        advisers = self.get_request_data().get('dit_participants__adviser')
 
         if not advisers or type(advisers) is not list:
             return []

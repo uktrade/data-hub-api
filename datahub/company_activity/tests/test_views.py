@@ -103,7 +103,7 @@ class TestCompanyActivityViewSetV4(APITestMixin):
         response_data = response.json()
         assert len(response_data['activities']['results']) == 4
 
-        response = self.api_client.post(url, {'advisers': [str(adviser.id)]})
+        response = self.api_client.post(url, {'dit_participants__adviser': [str(adviser.id)]})
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert len(response_data['activities']['results']) == 2
