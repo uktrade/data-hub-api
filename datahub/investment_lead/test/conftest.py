@@ -1,7 +1,7 @@
 import pytest
 
 from datahub.core import constants
-
+from datahub.core.test_utils import create_test_user
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.metadata.models import (
@@ -12,6 +12,11 @@ from datahub.metadata.models import (
 )
 
 DATETIME_STRING = '2024-09-04T08:02:30.123456Z'
+
+
+@pytest.fixture
+def test_user_with_view_permissions():
+    return create_test_user(permission_codenames=['view_eyblead'])
 
 
 @pytest.fixture
