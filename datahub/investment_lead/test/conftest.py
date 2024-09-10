@@ -66,7 +66,7 @@ def eyb_lead_post_data():
         'address_1': '4288 Rebecca Common Apt. 204',
         'address_2': 'Suite 707',
         'address_town': 'Port Robertville',
-        'address_county': 'Iowa',
+        'address_county': 'Clearwater County',
         'address_area': 'Alberta',
         'address_country': 'CA',
         'address_postcode': '87107',

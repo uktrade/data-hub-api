@@ -12,7 +12,7 @@ from datahub.investment_lead.models import EYBLead
 from datahub.metadata.test.factories import SectorFactory
 
 
-factory.Faker.override_default_locale('en_GB')
+factory.Faker._DEFAULT_LOCALE = 'en_GB'
 
 
 def generate_hashed_uuid():
