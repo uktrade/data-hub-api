@@ -35,7 +35,6 @@ class SearchCompanyActivityAPIViewMixin:
     REMAP_FIELDS = {
         'company': 'company.id',
         'interaction': 'interaction.id',
-        'dit_participants__adviser': 'interaction.dit_participants.adviser.id',
     }
 
     COMPOSITE_FILTERS = {
@@ -44,6 +43,11 @@ class SearchCompanyActivityAPIViewMixin:
             'company.name.trigram',
             'company.trading_names',  # to find 2-letter words
             'company.trading_names.trigram',
+        ],
+        'dit_participants__adviser': [
+            'interaction.dit_participants.adviser.id',
+            'referral.recipient.id',
+            'referral.created_by.id',
         ],
     }
 
