@@ -60,7 +60,7 @@ class EYBLeadViewSet(HawkResponseSigningMixin, SoftDeleteCoreViewSet):
         errors = []
 
         for index, lead_data in enumerate(request.data):
-            serializer = CreateEYBLeadSerializer(data=lead_data)
+            serializer = self.get_serializer(data=lead_data)
             if serializer.is_valid():
                 instance, created = self.perform_create_or_update(serializer)
                 if created:
