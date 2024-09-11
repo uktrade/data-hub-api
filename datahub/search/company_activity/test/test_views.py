@@ -12,14 +12,14 @@ from datahub.company.test.factories import (
     AdviserFactory,
     CompanyFactory,
 )
-from datahub.core.test_utils import (
-    APITestMixin,
-    create_test_user,
-)
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_activity.tests.factories import (
     CompanyActivityInteractionFactory,
     CompanyActivityReferralFactory,
+)
+from datahub.core.test_utils import (
+    APITestMixin,
+    create_test_user,
 )
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
