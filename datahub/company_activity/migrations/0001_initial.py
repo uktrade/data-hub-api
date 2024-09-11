@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('company', '0142_alter_company_address_country'),
-        ('interaction', '0082_alter_interaction_company_alter_interaction_contacts_and_more'),
+        ('interaction', '0081_auto_20230130_1124.py'),
         ('company_referral', '0008_add_help_text'),
     ]
 
