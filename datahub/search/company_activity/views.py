@@ -12,8 +12,6 @@ class SearchCompanyActivityAPIViewMixin:
     """Defines common settings."""
 
     search_app = CompanyActivitySearchApp
-    authentication_classes = []
-    permission_classes = []
     serializer_class = SearchCompanyActivityQuerySerializer
     es_sort_by_remappings = {
         'name': 'name.keyword',

@@ -301,6 +301,15 @@
     - - view_company
       - company
       - company
+    - - add_companyactivity
+      - company_activity
+      - companyactivity
+    - - change_companyactivity
+      - company_activity
+      - companyactivity
+    - - view_companyactivity
+      - company_activity
+      - companyactivity
     - - view_company_timeline
       - company
       - company
