@@ -345,15 +345,18 @@ class Interaction(ArchivableModel, BaseModel):
     def save(self, *args, **kwargs):
         """
         Create a `CompanyActivity` linked to this interaction for
-        showing all activities related to a company.
+        showing all activities related to a company, if the relation
+        doesn't already exist.
         """
         with transaction.atomic():
             super().save(*args, **kwargs)
-            CompanyActivity.objects.create(
+            CompanyActivity.objects.update_or_create(
                 interaction_id=self.id,
-                date=self.date,
-                company_id=self.company_id,
                 activity_source=CompanyActivity.ActivitySource.interaction,
+                defaults={
+                    'date': self.date,
+                    'company_id': self.company_id,
+                },
             )
 
     class Meta:
