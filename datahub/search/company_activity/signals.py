@@ -3,8 +3,8 @@ from django.db.models.signals import post_save
 
 from datahub.company.models import Company as DBCompany
 from datahub.company_activity.models import CompanyActivity as DBCompanyActivity
-from datahub.interaction.models import Interaction as DBInteraction
 from datahub.company_referral.models import CompanyReferral as DBCompanyReferral
+from datahub.interaction.models import Interaction as DBInteraction
 from datahub.search.company_activity import CompanyActivitySearchApp
 from datahub.search.signals import SignalReceiver
 from datahub.search.sync_object import sync_object_async, sync_related_objects_async

@@ -1,11 +1,11 @@
 import logging
 
-from datahub.interaction.models import Interaction
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.models import CompanyReferral
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
+from datahub.interaction.models import Interaction
 
 
 logger = logging.getLogger(__name__)
@@ -35,11 +35,11 @@ def relate_company_activity_to_interactions():
     interactions already associated in the CompanyActivity model.
     """
     activity_interactions = CompanyActivity.objects.filter(
-        interaction__isnull=False
+        interaction__isnull=False,
     ).values_list('interaction_id', flat=True)
 
     interactions = Interaction.objects.exclude(
-        id__in=activity_interactions
+        id__in=activity_interactions,
     ).values('id', 'date', 'company_id')
 
     objs = [
@@ -79,11 +79,11 @@ def relate_company_activity_to_referrals():
     referrals already associated in the CompanyActivity model.
     """
     activity_referral = CompanyActivity.objects.filter(
-        referral__isnull=False
+        referral__isnull=False,
     ).values_list('referral_id', flat=True)
 
     referrals = CompanyReferral.objects.exclude(
-        id__in=activity_referral
+        id__in=activity_referral,
     ).values('id', 'created_on', 'company_id')
 
     objs = [

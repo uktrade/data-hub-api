@@ -4,9 +4,9 @@ from django.conf import settings
 from django.db import models, transaction
 from django.utils.timezone import now
 
+from datahub.company_activity.models import CompanyActivity
 from datahub.core import reversion
 from datahub.core.models import BaseModel
-from datahub.company_activity.models import CompanyActivity
 from datahub.core.utils import get_front_end_url
 
 
