@@ -1,3 +1,6 @@
+from datahub.search import dict_utils
+
+
 def _attrgetter_with_default(attr, default):
     """
     It returns a function that can be called with an object to get the value
@@ -272,3 +275,13 @@ def nested_company_global_account_manager(obj, company_prop_name):
     if field is None:
         return None
     return contact_or_adviser_dict(field.get_one_list_group_global_account_manager())
+
+
+def dit_participant_list(dit_participant_manager):
+    return [
+        {
+            'adviser': dict_utils.contact_or_adviser_dict(dit_participant.adviser),
+            'team': dict_utils.id_name_dict(dit_participant.team),
+        }
+        for dit_participant in dit_participant_manager.all()
+    ]
