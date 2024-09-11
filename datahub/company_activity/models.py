@@ -16,6 +16,9 @@ class CompanyActivity(models.Model):
 
     This is to be used with OpenSearch so we can view, filter and sort all activities
     related to a company.
+
+    The save methods of the related activities have been overwritten to write to this
+    model as well.
     """
 
     class ActivitySource(models.TextChoices):

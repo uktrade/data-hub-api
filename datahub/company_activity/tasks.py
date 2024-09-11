@@ -13,7 +13,10 @@ logger = logging.getLogger(__name__)
 
 def schedule_sync_interactions_to_company_activity():
     """
-    Schedules a task to relate all `Interaction`s to `CompanyActivity`s
+    Schedules a task to relate all `Interaction`s to `CompanyActivity`s.
+
+    Can be used to populate the CompanyActivity with missing interactions
+    or to initially populate the model.
     """
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
@@ -33,6 +36,9 @@ def relate_company_activity_to_interactions():
     Grabs all interactions so they can be related to in the
     `CompanyActivity` model with bulk_create. Excludes any
     interactions already associated in the CompanyActivity model.
+
+    Can be used to populate the CompanyActivity with missing interactions
+    or to initially populate the model.
     """
     activity_interactions = CompanyActivity.objects.filter(
         interaction__isnull=False,
@@ -58,6 +64,9 @@ def relate_company_activity_to_interactions():
 def schedule_sync_referrals_to_company_activity():
     """
     Schedules a task to relate all `CompanyReferral`s to `CompanyActivity`s
+
+    Can be used to populate the CompanyActivity with missing referrals
+    or to initially populate the model.
     """
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
@@ -77,6 +86,9 @@ def relate_company_activity_to_referrals():
     Grabs all referrals so they can be related to in the
     `CompanyActivity` model with a bulk_create. Excludes any
     referrals already associated in the CompanyActivity model.
+
+    Can be used to populate the CompanyActivity with missing referrals
+    or to initially populate the model.
     """
     activity_referral = CompanyActivity.objects.filter(
         referral__isnull=False,
