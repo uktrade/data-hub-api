@@ -1,7 +1,7 @@
 import pytest
 
-from datahub.company_activity.tasks import schedule_sync_interactions_to_company_activity
 from datahub.company_activity.models import CompanyActivity
+from datahub.company_activity.tasks import schedule_sync_interactions_to_company_activity
 from datahub.interaction.test.factories import CompanyInteractionFactory
 
 

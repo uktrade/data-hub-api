@@ -106,7 +106,8 @@ def test_company_activity_syncs_interaction_fields_when_changed(opensearch_with_
 
 def test_updating_company_name_updates_activity(opensearch_with_signals):
     """
-    Test that when a company name is updated, the company activity company name is synced to OpenSearch.
+    Test that when a company name is updated, the company activity company name is synced to
+    OpenSearch.
     """
     interaction = CompanyInteractionFactory(dit_participants=[], contacts=[])
     company_activity = DBCompanyActivity.objects.get(interaction_id=interaction.id)

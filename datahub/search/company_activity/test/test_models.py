@@ -2,11 +2,11 @@ from operator import attrgetter
 
 import pytest
 
+from datahub.company_activity.models import CompanyActivity as DBCompanyActivity
 from datahub.company_activity.tests.factories import (
     CompanyActivityReferralFactory,
     CompanyActivityInteractionFactory,
 )
-from datahub.company_activity.models import CompanyActivity as DBCompanyActivity
 from datahub.search.company_activity import CompanyActivitySearchApp
 from datahub.search.company_activity.models import CompanyActivity
 
@@ -89,7 +89,7 @@ def test_company_activity_interaction_to_dict():
                     },
                 }
                 for dit_participant in company_activity.interaction.dit_participants.order_by(
-                    'adviser__pk'
+                    'adviser__pk',
                 )
             ],
             'contacts': [
@@ -100,7 +100,7 @@ def test_company_activity_interaction_to_dict():
                     'last_name': contact.last_name,
                 }
                 for contact in sorted(
-                    company_activity.interaction.contacts.all(), key=attrgetter('id')
+                    company_activity.interaction.contacts.all(), key=attrgetter('id'),
                 )
             ],
             'communication_channel': {

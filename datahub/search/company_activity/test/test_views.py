@@ -9,13 +9,13 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import (
+    AdviserFactory,
     CompanyFactory,
 )
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
 )
-from datahub.company.test.factories import AdviserFactory
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_activity.tests.factories import (
     CompanyActivityInteractionFactory,
@@ -52,7 +52,7 @@ def company_activities(opensearch_with_collector):
                 CompanyActivityReferralFactory(company=company_1),
                 CompanyActivityReferralFactory(company=company_2),
                 CompanyActivityReferralFactory(company=company_2),
-            ]
+            ],
         )
 
     opensearch_with_collector.flush_and_refresh()
@@ -171,7 +171,7 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
             dit_participants=[
                 InteractionDITParticipantFactory(adviser=adviser_1),
                 InteractionDITParticipantFactory(adviser=adviser_2),
-            ]
+            ],
         )
 
         opensearch_with_collector.flush_and_refresh()
@@ -264,7 +264,7 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         match = CompanyActivity.objects.filter(
-            company__name=matched_company_name
+            company__name=matched_company_name,
         ).first()
         if match:
             assert response.data['count'] == 1
@@ -308,20 +308,24 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
     def test_filter_by_date(self, opensearch_with_collector, data, results):
         """Tests filtering activities by date."""
         CompanyInteractionFactory(
-            date=dateutil_parse('2017-10-30T00:00:00Z'), subject='Exports meeting'
+            date=dateutil_parse('2017-10-30T00:00:00Z'),
+            subject='Exports meeting',
         )
         CompanyInteractionFactory(
-            date=dateutil_parse('2017-04-05T00:00:00Z'), subject='a coffee'
+            date=dateutil_parse('2017-04-05T00:00:00Z'),
+            subject='a coffee',
         )
         CompanyInteractionFactory(
             date=dateutil_parse('2016-09-02T00:00:00Z'),
             subject='Email about exhibition',
         )
         CompanyInteractionFactory(
-            date=dateutil_parse('2018-02-01T00:00:00Z'), subject='talking about cats'
+            date=dateutil_parse('2018-02-01T00:00:00Z'),
+            subject='talking about cats',
         )
         CompanyInteractionFactory(
-            date=dateutil_parse('2018-01-01T00:00:00Z'), subject='Event at HQ'
+            date=dateutil_parse('2018-01-01T00:00:00Z'),
+            subject='Event at HQ',
         )
 
         opensearch_with_collector.flush_and_refresh()
