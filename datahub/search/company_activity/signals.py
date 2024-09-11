@@ -29,7 +29,7 @@ def sync_related_activities_to_opensearch(instance):
     """Sync related activities objects to DB such as interactions, referalls etc."""
     transaction.on_commit(
         lambda: sync_related_objects_async(
-            instance, 'activities', None, 'company-activity'
+            instance, 'activities', None, 'company-activity',
         ),
     )
 
@@ -38,7 +38,7 @@ def sync_related_activity_to_opensearch(instance):
     """Sync related activities objects to DB such as interactions, referalls etc."""
     transaction.on_commit(
         lambda: sync_related_objects_async(
-            instance, 'activity', None, 'company-activity'
+            instance, 'activity', None, 'company-activity',
         ),
     )
 
