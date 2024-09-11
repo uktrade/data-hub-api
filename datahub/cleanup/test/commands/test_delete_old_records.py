@@ -59,6 +59,7 @@ from datahub.investment.opportunity.test.factories import LargeCapitalOpportunit
 from datahub.investment.project.evidence.test.factories import EvidenceDocumentFactory
 from datahub.investment.project.proposition.test.factories import PropositionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.omis.payment.test.factories import (
     ApprovedRefundFactory,
@@ -189,6 +190,17 @@ MAPPING = {
             {
                 'factory': CompaniesInteractionFactory,
                 'field': 'companies',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+            {
+                'factory': EYBLeadFactory,
+                'field': 'company',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
                     {
