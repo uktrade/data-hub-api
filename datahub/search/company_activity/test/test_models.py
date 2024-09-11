@@ -4,8 +4,8 @@ import pytest
 
 from datahub.company_activity.models import CompanyActivity as DBCompanyActivity
 from datahub.company_activity.tests.factories import (
-    CompanyActivityReferralFactory,
     CompanyActivityInteractionFactory,
+    CompanyActivityReferralFactory,
 )
 from datahub.search.company_activity import CompanyActivitySearchApp
 from datahub.search.company_activity.models import CompanyActivity
