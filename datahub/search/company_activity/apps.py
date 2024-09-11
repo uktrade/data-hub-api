@@ -11,4 +11,5 @@ class CompanyActivitySearchApp(SearchApp):
     view_permissions = ('company_activity.view_companyactivity',)
     queryset = DBCompanyActivity.objects.select_related(
         'interaction',
+        'referral',
     )
