@@ -92,9 +92,11 @@ class CompanyReferral(BaseModel):
         """
         with transaction.atomic():
             super().save(*args, **kwargs)
-            CompanyActivity.objects.create(
+            CompanyActivity.objects.update_or_create(
                 referral_id=self.id,
-                date=self.created_on,
-                company_id=self.company_id,
                 activity_source=CompanyActivity.ActivitySource.referral,
+                defaults={
+                    'date': self.created_on,
+                    'company_id': self.company_id,
+                },
             )

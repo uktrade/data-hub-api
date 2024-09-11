@@ -2,6 +2,8 @@ import pytest
 from django.conf import settings
 from django.db.utils import IntegrityError
 
+from datahub.company.test.factories import CompanyFactory
+from datahub.company_activity.models import CompanyActivity
 from datahub.core.test_utils import random_obj_for_model
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
@@ -48,3 +50,32 @@ class TestInteractionExportCountry:
                 interaction=interaction,
                 country=country,
             )
+
+
+@pytest.mark.django_db
+class TestInteraction:
+    """Tests for the Interaction model."""
+
+    def test_save(self):
+        """
+        Test save also saves to the `CompanyActivity` model.
+        Test save does not save to the `CompanyActivity` model if it already exists.
+        """
+        assert CompanyActivity.objects.all().count() == 0
+        interaction = CompanyInteractionFactory()
+        assert CompanyActivity.objects.all().count() == 1
+
+        company_activity = CompanyActivity.objects.get(interaction_id=interaction.id)
+        assert company_activity.company_id == interaction.company_id
+        assert company_activity.date == interaction.date
+        assert company_activity.activity_source == CompanyActivity.ActivitySource.interaction
+
+        # Update and save the interaction and ensure if doesn't create another
+        # `CompanyActivity` and only updates it
+        new_company = CompanyFactory()
+        interaction.company_id = new_company.id
+        interaction.save()
+
+        assert CompanyActivity.objects.all().count() == 1
+        company_activity.refresh_from_db()
+        assert company_activity.company_id == new_company.id
