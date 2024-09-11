@@ -1917,15 +1917,20 @@ class TestUpdateWinView(APITestMixin):
     def test_only_users_involved_in_the_win_can_update(self, params, related_objects, status_code):
         """Test only users involved in the win can update."""
         resolved_params = params(self)
-        win = WinFactory(**resolved_params)
+        win = WinFactory(description='Not changed', **resolved_params)
         related_objects(self, win)
-
+        assert win.description == 'Not changed'
         url = reverse('api-v4:export-win:item', kwargs={'pk': win.pk})
         request_data = {
-            'description': 'Description',
+            'description': 'Changed',
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status_code
+        win.refresh_from_db()
+        if status_code == status.HTTP_200_OK:
+            assert win.description == 'Changed'
+        else:
+            assert win.description == 'Not changed'
 
     @pytest.mark.parametrize(
         'request_data',
