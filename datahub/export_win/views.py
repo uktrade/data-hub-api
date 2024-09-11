@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db.models import Max, Min, Q
 
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import (
     DjangoFilterBackend,
     Filter,
@@ -143,6 +144,7 @@ class WinViewSet(CoreViewSet):
             super()
             .get_queryset()
             .filter(
+                is_anonymous_win=False,
                 **migrated_filter,
             )
             .exclude(
@@ -173,6 +175,19 @@ class WinViewSet(CoreViewSet):
         """
         instance = serializer.save()
         serializer.instance = self.get_queryset().get(pk=instance.pk)
+
+    def retrieve(self, request, *args, **kwargs):
+        """Confirmed wins should be retrievable to all, otherwise revert to default rules."""
+        queryset = super().get_queryset().exclude(is_anonymous_win=True)
+        win = get_object_or_404(queryset, pk=kwargs['pk'])
+        if not hasattr(
+            win,
+            'customer_response',
+        ) or win.customer_response.agree_with_win is not True:
+            queryset = self.get_queryset()
+            win = get_object_or_404(queryset, pk=kwargs['pk'])
+        serializer = self.get_serializer(win)
+        return Response(serializer.data)
 
     @action(methods=['post'], detail=True, schema=StubSchema())
     def resend_export_win(self, request, *args, **kwargs):

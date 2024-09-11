@@ -424,11 +424,19 @@ class TestGetWinView(APITestMixin):
                     WinAdviserFactory(win=win),
                     CustomerResponseFactory(win=win, agree_with_win=True),
                 ],
-                status.HTTP_404_NOT_FOUND,
+                status.HTTP_200_OK,
             ),
             (
                 lambda self: {},
                 lambda self, win: None,
+                status.HTTP_404_NOT_FOUND,
+            ),
+            (
+                lambda self: {'is_anonymous_win': True},
+                lambda self, win: [
+                    WinAdviserFactory(win=win),
+                    CustomerResponseFactory(win=win, agree_with_win=True),
+                ],
                 status.HTTP_404_NOT_FOUND,
             ),
         ),
@@ -609,6 +617,14 @@ class TestListWinView(APITestMixin):
             (
                 lambda self: {},
                 lambda self, win: None,
+                0,
+            ),
+            (
+                lambda self: {'is_anonymous_win': True},
+                lambda self, win: [
+                    WinAdviserFactory(win=win, adviser=self.user),
+                    CustomerResponseFactory(win=win, agree_with_win=True),
+                ],
                 0,
             ),
         ),
@@ -1392,6 +1408,8 @@ class TestUpdateWinView(APITestMixin):
             'company_export': {
                 'id': str(export.id),
             },
+            # to confirm, the field should not be updated
+            'customer_response': None,
         }
         assert win.breakdowns.count() == 3
         assert win.advisers.count() == 2
@@ -1830,6 +1848,84 @@ class TestUpdateWinView(APITestMixin):
         version = Version.objects.get_for_object(win).first()
         assert version.revision.user == self.user
         assert version.revision.comment == 'Win updated'
+
+    @pytest.mark.parametrize(
+        'params,related_objects,status_code',
+        (
+            (
+                lambda self: {'adviser': self.user},
+                lambda self, win: None,
+                status.HTTP_200_OK,
+            ),
+            (
+                lambda self: {'lead_officer': self.user},
+                lambda self, win: None,
+                status.HTTP_200_OK,
+            ),
+            (
+                lambda self: {'team_members': [self.user]},
+                lambda self, win: None,
+                status.HTTP_200_OK,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win, adviser=self.user),
+                    CustomerResponseFactory(win=win, agree_with_win=True),
+                ],
+                status.HTTP_200_OK,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win, adviser=self.user),
+                    CustomerResponseFactory(win=win, agree_with_win=False),
+                ],
+                status.HTTP_404_NOT_FOUND,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win, adviser=self.user),
+                    CustomerResponseFactory(win=win, agree_with_win=None),
+                ],
+                status.HTTP_404_NOT_FOUND,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: [
+                    WinAdviserFactory(win=win),
+                    CustomerResponseFactory(win=win, agree_with_win=True),
+                ],
+                status.HTTP_404_NOT_FOUND,
+            ),
+            (
+                lambda self: {},
+                lambda self, win: None,
+                status.HTTP_404_NOT_FOUND,
+            ),
+            (
+                lambda self: {'is_anonymous_win': True},
+                lambda self, win: [
+                    WinAdviserFactory(win=win),
+                    CustomerResponseFactory(win=win, agree_with_win=True),
+                ],
+                status.HTTP_404_NOT_FOUND,
+            ),
+        ),
+    )
+    def test_only_users_involved_in_the_win_can_update(self, params, related_objects, status_code):
+        """Test only users involved in the win can update."""
+        resolved_params = params(self)
+        win = WinFactory(**resolved_params)
+        related_objects(self, win)
+
+        url = reverse('api-v4:export-win:item', kwargs={'pk': win.pk})
+        request_data = {
+            'description': 'Description',
+        }
+        response = self.api_client.patch(url, data=request_data)
+        assert response.status_code == status_code
 
     @pytest.mark.parametrize(
         'request_data',
