@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
+from datahub.core.serializers import RelaxedDateTimeField
 from datahub.search.serializers import (
     EntitySearchQuerySerializer,
     SingleOrListField,
     StringUUIDField,
 )
-from datahub.core.serializers import RelaxedDateTimeField
 
 
 class SearchCompanyActivityQuerySerializer(EntitySearchQuerySerializer):

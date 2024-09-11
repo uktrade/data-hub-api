@@ -3,8 +3,7 @@ import uuid
 from django.conf import settings
 from django.db import models
 
-from datahub.core import constants, reversion
-from datahub.core.utils import StrEnum
+from datahub.core import reversion
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -36,10 +35,15 @@ class CompanyActivity(models.Model):
     activity_source = models.CharField(
         max_length=MAX_LENGTH,
         choices=ActivitySource.choices,
-        help_text='The type of company activity, such as an interaction, event, referral etc.',
+        help_text=(
+            'The type of company activity, such as an interaction, event, referral etc.'
+        ),
     )
     date = models.DateTimeField(
-        help_text="A date field copied from the activity_source model, so it can be sorted in the API.",
+        help_text=(
+            'A date field copied from the activity_source model, '
+            'so it can be sorted in the API.'
+        ),
     )
 
     # A single company activity must have one of the following relationships, but not multiple.
@@ -49,7 +53,10 @@ class CompanyActivity(models.Model):
         blank=True,
         related_name='activity',
         on_delete=models.CASCADE,
-        help_text="If related to an interaction, must not have relations to any other activity (referral, event etc)",
+        help_text=(
+            'If related to an interaction, must not have relations to any other activity '
+            '(referral, event etc)'
+        ),
     )
     referral = models.ForeignKey(
         'company_referral.CompanyReferral',
@@ -57,7 +64,10 @@ class CompanyActivity(models.Model):
         blank=True,
         related_name='activity',
         on_delete=models.CASCADE,
-        help_text="If related to an referral, must not have relations to any other activity (interaction, event etc)",
+        help_text=(
+            'If related to an referral, must not have relations to any other activity '
+            '(interaction, event etc)'
+        ),
     )
 
     def __str__(self):

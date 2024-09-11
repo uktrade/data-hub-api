@@ -1,7 +1,3 @@
-from functools import reduce
-
-from datahub.company_activity.models import CompanyActivity as DBCompanyActivity
-
 from datahub.search.company_activity import CompanyActivitySearchApp
 from datahub.search.company_activity.serializers import (
     SearchCompanyActivityQuerySerializer,

@@ -1,8 +1,14 @@
-from opensearch_dsl import Boolean, Date, Integer, Keyword, Object, Text
+from opensearch_dsl import Date, Keyword, Text
 
 from datahub.search import dict_utils, fields
-from datahub.search.company_activity.dict_utils import activity_interaction_dict, activity_referral_dict
-from datahub.search.company_activity.fields import activity_interaction_field, activity_referral_field
+from datahub.search.company_activity.dict_utils import (
+    activity_interaction_dict,
+    activity_referral_dict,
+)
+from datahub.search.company_activity.fields import (
+    activity_interaction_field,
+    activity_referral_field,
+)
 from datahub.search.models import BaseSearchModel
 
 
