@@ -25,6 +25,7 @@ from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
 )
+from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.models import CompanyReferral
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.models import Interaction
@@ -122,6 +123,7 @@ class TestDuplicateCompanyMerger:
             (
                 CompanyFactory,
                 {
+                    CompanyActivity: {'company': 0},
                     CompanyListItem: {'company': 0},
                     CompanyReferral: {'company': 0},
                     Contact: {'company': 0},
@@ -137,6 +139,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_interactions_and_contacts_factory,
                 {
+                    CompanyActivity: {'company': 3},
                     CompanyListItem: {'company': 0},
                     CompanyReferral: {'company': 0},
                     Contact: {'company': 3},
@@ -152,6 +155,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_contacts_factory,
                 {
+                    CompanyActivity: {'company': 0},
                     CompanyListItem: {'company': 0},
                     CompanyReferral: {'company': 0},
                     Contact: {'company': 3},
@@ -167,6 +171,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_referrals_factory,
                 {
+                    CompanyActivity: {'company': 3},
                     CompanyListItem: {'company': 0},
                     CompanyReferral: {'company': 3},
                     Contact: {'company': 0},
@@ -182,6 +187,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_company_list_items_factory,
                 {
+                    CompanyActivity: {'company': 0},
                     CompanyListItem: {'company': 3},
                     CompanyReferral: {'company': 0},
                     Contact: {'company': 0},
@@ -197,6 +203,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_pipeline_items_factory,
                 {
+                    CompanyActivity: {'company': 0},
                     CompanyListItem: {'company': 0},
                     CompanyReferral: {'company': 0},
                     Contact: {'company': 0},
@@ -212,6 +219,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_investment_projects_factory,
                 {
+                    CompanyActivity: {'company': 0},
                     CompanyListItem: {'company': 0},
                     CompanyReferral: {'company': 0},
                     Contact: {'company': 0},
@@ -227,6 +235,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_orders_factory,
                 {
+                    CompanyActivity: {'company': 0},
                     CompanyListItem: {'company': 0},
                     CompanyReferral: {'company': 0},
                     Contact: {'company': 3},
@@ -242,6 +251,7 @@ class TestDuplicateCompanyMerger:
             (
                 ArchivedCompanyFactory,
                 {
+                    CompanyActivity: {'company': 0},
                     CompanyListItem: {'company': 0},
                     CompanyReferral: {'company': 0},
                     Contact: {'company': 0},
@@ -304,6 +314,7 @@ class TestDuplicateCompanyMerger:
         target_company = CompanyFactory()
         user = AdviserFactory()
 
+        source_company_activity_items = list(source_company.activities.all())
         source_interactions = list(source_company.interactions.all())
         source_contacts = list(source_company.contacts.all())
         source_orders = list(source_company.orders.all())
@@ -321,6 +332,7 @@ class TestDuplicateCompanyMerger:
             result = merge_companies(source_company, target_company, user)
 
         assert result == {
+            CompanyActivity: {'company': len(source_company_activity_items)},
             CompanyListItem: {'company': len(source_company_list_items)},
             CompanyReferral: {'company': len(source_referrals)},
             Contact: {'company': len(source_contacts)},
@@ -405,6 +417,7 @@ class TestDuplicateCompanyMerger:
         assert result == {
             # each interaction has a contact, that's why 4 contacts should be moved
             CompanyListItem: {'company': 0},
+            CompanyActivity: {'company': 0},
             CompanyReferral: {'company': 0},
             Contact: {'company': 0},
             Interaction: {'company': 0, 'companies': 0},

@@ -123,10 +123,15 @@ def merge_companies(source_company: Company, target_company: Company, user):
                 configuration.model: update_objects(configuration, source_company, target_company)
                 for configuration in MERGE_CONFIGURATION
             }
-
         except Exception as e:
             logger.exception(f'An error occurred while merging companies: {e}')
             raise
+
+        # As CompanyActivities are saved when an Interaction or Referral
+        # automatically saved add them to the updated count.
+        results[CompanyActivity] = {
+            'company': results[Interaction]['company'] + results[CompanyReferral]['company']
+        }
 
         source_company.mark_as_transferred(
             target_company,
