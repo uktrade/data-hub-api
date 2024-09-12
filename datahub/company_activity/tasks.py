@@ -26,7 +26,7 @@ def schedule_sync_interactions_to_company_activity():
         retry_backoff=True,
     )
     logger.info(
-        f'Task {job.id} schedule_sync_interactions_to_company_activity ' f'scheduled.',
+        f'Task {job.id} schedule_sync_interactions_to_company_activity scheduled.',
     )
     return job
 
@@ -76,7 +76,7 @@ def schedule_sync_referrals_to_company_activity():
         retry_backoff=True,
     )
     logger.info(
-        f'Task {job.id} schedule_sync_referrals_to_company_activity ' f'scheduled.',
+        f'Task {job.id} schedule_sync_referrals_to_company_activity scheduled.',
     )
     return job
 

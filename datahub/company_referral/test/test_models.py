@@ -22,7 +22,7 @@ class TestCompanyReferral:
         Test save also saves to the `CompanyActivity` model.
         Test save does not save to the `CompanyActivity` model if it already exists.
         """
-        assert CompanyActivity.objects.all().count() == 0
+        assert not CompanyActivity.objects.all().exists()
         referral = CompanyReferralFactory()
         assert CompanyActivity.objects.all().count() == 1
 
@@ -37,6 +37,6 @@ class TestCompanyReferral:
         referral.company_id = new_company.id
         referral.save()
 
-        assert CompanyActivity.objects.all().count() == 1
+        assert not CompanyActivity.objects.all().exists()
         company_activity.refresh_from_db()
         assert company_activity.company_id == new_company.id
