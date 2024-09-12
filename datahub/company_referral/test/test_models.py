@@ -37,6 +37,6 @@ class TestCompanyReferral:
         referral.company_id = new_company.id
         referral.save()
 
-        assert not CompanyActivity.objects.all().exists()
+        assert CompanyActivity.objects.all().count() == 1
         company_activity.refresh_from_db()
         assert company_activity.company_id == new_company.id
