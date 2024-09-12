@@ -13,11 +13,8 @@ class SearchCompanyActivityAPIViewMixin:
 
     search_app = CompanyActivitySearchApp
     serializer_class = SearchCompanyActivityQuerySerializer
-    es_sort_by_remappings = {
-        'name': 'name.keyword',
-    }
-    fields_to_exclude = (
-    )
+    es_sort_by_remappings = {}
+    fields_to_exclude = ()
 
     FILTER_FIELDS = (
         'id',

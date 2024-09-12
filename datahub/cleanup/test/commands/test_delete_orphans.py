@@ -20,6 +20,7 @@ from datahub.company.test.factories import (
     ObjectiveFactory,
     OneListCoreTeamMemberFactory,
 )
+from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.core.exceptions import DataHubError
 from datahub.core.model_helpers import get_related_fields
@@ -93,7 +94,10 @@ MAPPINGS = {
             (ObjectiveFactory, 'company'),
         ),
         'implicit_related_models': (),
-        'ignored_models': (),
+        'ignored_models': (
+            # Ignored as deleted with interactions and referrals
+            ('company_activity.CompanyActivity', 'company'),
+        ),
     },
     'event.Event': {
         'factory': EventFactory,
