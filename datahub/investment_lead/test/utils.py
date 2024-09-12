@@ -64,11 +64,20 @@ def verify_eyb_lead_data(
 
     # Company fields
     assert instance.duns_number == data['duns_number']
-    assert instance.address_1 == data['address_1']
-    assert instance.address_2 == data['address_2']
-    assert instance.address_town == data['address_town']
-    assert instance.address_county == data['address_county']
-    assert instance.address_postcode == data['address_postcode']
+
+    # Address fields
+    if data_type != 'nested':
+        assert instance.address_1 == data['address_1']
+        assert instance.address_2 == data['address_2']
+        assert instance.address_town == data['address_town']
+        assert instance.address_county == data['address_county']
+        assert instance.address_postcode == data['address_postcode']
+    else:
+        assert instance.address_1 == data['address']['line_1']
+        assert instance.address_2 == data['address']['line_2']
+        assert instance.address_town == data['address']['town']
+        assert instance.address_county == data['address']['county']
+        assert instance.address_postcode == data['address']['postcode']
 
     # Related fields
     if data_type == 'post':
@@ -87,7 +96,7 @@ def verify_eyb_lead_data(
         assert str(instance.sector.id) == data['sector']['id']
         assert str(instance.location.id) == data['location']['id']
         assert str(instance.company_location.id) == data['company_location']['id']
-        assert str(instance.address_area.id) == data['address_area']['id']
-        assert str(instance.address_country.id) == data['address_country']['id']
+        assert str(instance.address_area.id) == data['address']['area']['id']
+        assert str(instance.address_country.id) == data['address']['country']['id']
     else:
         raise ValueError(f'Invalid value "{data_type}" for argument data_type')

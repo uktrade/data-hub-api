@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
-from datahub.core.serializers import NestedRelatedField
+from datahub.core.serializers import (
+    AddressSerializer,
+    NestedRelatedField,
+)
 from datahub.investment_lead.models import EYBLead
 from datahub.metadata.models import (
     AdministrativeArea,
@@ -75,6 +78,16 @@ RELATED_FIELDS = [
     'address_area',
     'address_country',
     'company',
+]
+
+ADDRESS_FIELDS = [
+    'address_1',
+    'address_2',
+    'address_town',
+    'address_county',
+    'address_area',
+    'address_country',
+    'address_postcode',
 ]
 
 ALL_FIELDS = ARCHIVABLE_FIELDS + INVESTMENT_LEAD_BASE_FIELDS + \
@@ -199,8 +212,16 @@ class CreateEYBLeadSerializer(BaseEYBLeadSerializer):
 
 class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
 
+    class Meta(BaseEYBLeadSerializer.Meta):
+        fields = [
+            f for f in ALL_FIELDS
+            if f not in ADDRESS_FIELDS
+        ] + ['address']
+
     sector = NestedRelatedField(Sector)
     location = NestedRelatedField(UKRegion)
     company_location = NestedRelatedField(Country)
-    address_area = NestedRelatedField(AdministrativeArea)
-    address_country = NestedRelatedField(Country)
+    address = AddressSerializer(
+        source_model=EYBLead,
+        address_source_prefix='address',
+    )
