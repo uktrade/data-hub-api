@@ -20,11 +20,7 @@ from datahub.company.test.factories import (
     ExportFactory,
     ObjectiveFactory,
 )
-from datahub.company_activity.models import CompanyActivity
-from datahub.company_activity.tests.factories import (
-    CompanyActivityInteractionFactory,
-    CompanyActivityReferralFactory,
-)
+from datahub.company_activity.tests.factories import CompanyActivityInteractionFactory
 from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
 )
@@ -94,7 +90,7 @@ MAPPINGS = {
 # Factories which create a CompanyActivity via their model save method
 COMPANY_ACTIVITY_CREATED_BY_MODELS = [
     CompanyReferralFactory,
-    CompanyInteractionFactory
+    CompanyInteractionFactory,
 ]
 
 
