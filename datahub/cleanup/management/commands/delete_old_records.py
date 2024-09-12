@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelCleanupConfig
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
 from datahub.company.models import Company, CompanyExport, Contact
+from datahub.company_referral.models import CompanyReferral
 from datahub.export_win.models import CustomerResponse, Win
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
@@ -60,6 +61,7 @@ class Command(BaseCleanupCommand):
                 # Apart from for one_list_core_team_members, we wait for related records to expire
                 # before we delete the relevant companies
                 Company._meta.get_field('contacts'): (),
+                Company._meta.get_field('activities'): (),
                 Company._meta.get_field('interactions'): (),
                 Company._meta.get_field('company_interactions'): (),
                 Company._meta.get_field('intermediate_investment_projects'): (),
@@ -120,6 +122,9 @@ class Command(BaseCleanupCommand):
                 DatetimeLessThanCleanupFilter('created_on', COMPANY_EXPIRY_PERIOD),
                 DatetimeLessThanCleanupFilter('modified_on', COMPANY_EXPIRY_PERIOD),
             ),
+            excluded_relations=(
+                CompanyReferral._meta.get_field('activity'),
+            ),
         ),
         'interaction.Interaction': ModelCleanupConfig(
             (DatetimeLessThanCleanupFilter('date', INTERACTION_EXPIRY_PERIOD),),
@@ -132,6 +137,7 @@ class Command(BaseCleanupCommand):
             # We want to delete the relations below along with any expired interactions
             excluded_relations=(
                 Interaction._meta.get_field('dit_participants'),
+                Interaction._meta.get_field('activity'),
                 Interaction._meta.get_field('export_countries'),
                 Interaction._meta.get_field('new_export_interaction_reminders'),
                 Interaction._meta.get_field('no_recent_export_interaction_reminders'),

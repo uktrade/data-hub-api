@@ -491,6 +491,7 @@ def test_get_basic_search_query():
                                 'first_name.trigram',
                                 'full_telephone_number',
                                 'id',
+                                'interaction.name',
                                 'investor_company.name',
                                 'investor_company.name.trigram',
                                 'is_active',

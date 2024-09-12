@@ -16,6 +16,7 @@ from datahub.company.models import (
     CompanyExportCountryHistory,
     Contact,
 )
+from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.models import CompanyReferral
 from datahub.dnb_api.utils import _get_rollback_version
 from datahub.interaction.models import Interaction
@@ -33,6 +34,7 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     Company._meta.get_field('company_list_items').remote_field,
     Company._meta.get_field('pipeline_list_items').remote_field,
     Company._meta.get_field('wins').remote_field,
+    CompanyActivity.company.field,
     CompanyReferral.company.field,
     Contact.company.field,
     Interaction.company.field,
@@ -85,6 +87,7 @@ def _pipeline_item_updater(pipeline_item, field, target_company, source_company)
 MERGE_CONFIGURATION = [
     MergeConfiguration(Interaction, ('company', 'companies'), Company),
     MergeConfiguration(CompanyReferral, ('company',), Company),
+    MergeConfiguration(CompanyActivity, ('company',), Company),
     MergeConfiguration(Contact, ('company',), Company),
     MergeConfiguration(InvestmentProject, INVESTMENT_PROJECT_COMPANY_FIELDS, Company),
     MergeConfiguration(Order, ('company',), Company),
