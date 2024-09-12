@@ -18,11 +18,11 @@ def test_activity_interaction_dict():
     assert result['id'] == str(interaction.id)
     assert result['subject'] == interaction.subject
     assert result['dit_participants'][0]['adviser']['id'] == str(
-        interaction.dit_participants.all()[0].adviser_id
+        interaction.dit_participants.all()[0].adviser_id,
     )
     assert result['contacts'][0]['id'] == str(interaction.contacts.all()[0].id)
     assert result['communication_channel']['id'] == str(
-        interaction.communication_channel.id
+        interaction.communication_channel.id,
     )
     assert result['service']['id'] == str(interaction.service.id)
 
