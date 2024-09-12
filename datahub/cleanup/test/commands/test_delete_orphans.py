@@ -20,7 +20,6 @@ from datahub.company.test.factories import (
     ObjectiveFactory,
     OneListCoreTeamMemberFactory,
 )
-from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.core.exceptions import DataHubError
 from datahub.core.model_helpers import get_related_fields
