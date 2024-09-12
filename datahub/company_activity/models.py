@@ -50,8 +50,9 @@ class CompanyActivity(models.Model):
     )
 
     # A single company activity must have one of the following relationships, but not multiple.
-    interaction = models.OneToOneField(
+    interaction = models.ForeignKey(
         'interaction.Interaction',
+        unique=True,
         null=True,
         blank=True,
         related_name='activity',
@@ -61,8 +62,9 @@ class CompanyActivity(models.Model):
             '(referral, event etc)'
         ),
     )
-    referral = models.OneToOneField(
+    referral = models.ForeignKey(
         'company_referral.CompanyReferral',
+        unique=True,
         null=True,
         blank=True,
         related_name='activity',
