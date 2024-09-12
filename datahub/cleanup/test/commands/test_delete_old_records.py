@@ -34,6 +34,7 @@ from datahub.company.test.factories import (
     OneListCoreTeamMemberFactory,
     SubsidiaryFactory,
 )
+from datahub.company_activity.tests.factories import CompanyActivityInteractionFactory
 from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
     CompleteCompanyReferralFactory,
@@ -199,6 +200,12 @@ MAPPING = {
                 ],
             },
             {
+                'factory': CompanyActivityInteractionFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [],
+            },
+            {
                 'factory': EYBLeadFactory,
                 'field': 'company',
                 'expired_objects_kwargs': [],
@@ -329,7 +336,9 @@ MAPPING = {
     },
     'company_referral.CompanyReferral': {
         'factory': CompanyReferralFactory,
-        'implicitly_deletable_models': set(),
+        'implicitly_deletable_models': {
+            'company_activity.CompanyActivity',
+        },
         'has_no_search_app': True,
         'expired_objects_kwargs': [
             {
@@ -464,6 +473,7 @@ MAPPING = {
     'interaction.Interaction': {
         'factory': CompanyInteractionFactory,
         'implicitly_deletable_models': {
+            'company_activity.CompanyActivity',
             'interaction.Interaction_contacts',
             'interaction.Interaction_companies',
             'interaction.InteractionDITParticipant',

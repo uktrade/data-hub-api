@@ -20,6 +20,11 @@ from datahub.company.test.factories import (
     ExportFactory,
     ObjectiveFactory,
 )
+from datahub.company_activity.models import CompanyActivity
+from datahub.company_activity.tests.factories import (
+    CompanyActivityInteractionFactory,
+    CompanyActivityReferralFactory,
+)
 from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
 )
@@ -61,6 +66,7 @@ MAPPINGS = {
     'company.CompanyExportCountryHistory': CompanyExportCountryHistoryFactory,
     'company.Contact': ContactFactory,
     'company.Objective': ObjectiveFactory,
+    'company_activity.CompanyActivity': CompanyActivityInteractionFactory,
     'company_list.CompanyListItem': CompanyListItemFactory,
     'company_list.PipelineItem': PipelineItemFactory,
     'company_referral.CompanyReferral': CompanyReferralFactory,
@@ -84,6 +90,12 @@ MAPPINGS = {
     'export_win.DeletedWin': WinFactory,
     'export_win.AnonymousWin': WinFactory,
 }
+
+# Factories which create a CompanyActivity via their model save method
+COMPANY_ACTIVITY_CREATED_BY_MODELS = [
+    CompanyReferralFactory,
+    CompanyInteractionFactory
+]
 
 
 def test_mappings():
@@ -157,11 +169,16 @@ def test_with_all_models(caplog):
 
     management.call_command(delete_orphaned_versions.Command())
 
-    assert Version.objects.count() == total_versions - len(MAPPINGS)
+    # Interactions and referrals create a CompanyActivity when saved
+    # so account for these being deleted as well.
+    deleted_versions = len(MAPPINGS) + len(COMPANY_ACTIVITY_CREATED_BY_MODELS)
+    assert Version.objects.count() == (
+        total_versions - deleted_versions
+    )
     assert Revision.objects.count() == len(MAPPINGS)
 
-    assert f'{len(MAPPINGS)} records deleted' in caplog.text
-    assert f'reversion.Version: {len(MAPPINGS)}' in caplog.text
+    assert f'{deleted_versions} records deleted' in caplog.text
+    assert f'reversion.Version: {deleted_versions}' in caplog.text
 
 
 @pytest.mark.django_db

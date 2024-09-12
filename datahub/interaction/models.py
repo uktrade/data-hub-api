@@ -350,6 +350,9 @@ class Interaction(ArchivableModel, BaseModel):
         """
         with transaction.atomic():
             super().save(*args, **kwargs)
+            if not self.company:
+                return
+
             CompanyActivity.objects.update_or_create(
                 interaction_id=self.id,
                 activity_source=CompanyActivity.ActivitySource.interaction,
