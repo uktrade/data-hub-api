@@ -324,12 +324,11 @@ MPTT_ADMIN_LEVEL_INDENT = 30
 SEARCH_APPS = [
     'datahub.search.adviser.AdviserSearchApp',
     'datahub.search.company.CompanySearchApp',
-    'datahub.search.company_activity.CompanyActivitySearchApp',
     'datahub.search.contact.ContactSearchApp',
     'datahub.search.event.EventSearchApp',
     'datahub.search.export_country_history.ExportCountryHistoryApp',
     'datahub.search.interaction.InteractionSearchApp',
-    'datahub.search.activity.InteractionActivitySearchApp',
+    'datahub.search.company_activity.CompanyActivitySearchApp',
     'datahub.search.investment.InvestmentSearchApp',
     'datahub.search.omis.OrderSearchApp',
     'datahub.search.large_investor_profile.LargeInvestorProfileSearchApp',
