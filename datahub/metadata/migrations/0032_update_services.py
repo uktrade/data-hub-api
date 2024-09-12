@@ -24,6 +24,7 @@ def rebuild_tree(apps, _):
 
 class Migration(migrations.Migration):
     dependencies = [
+        ("event", "0027_update_event_programme"),
         ('metadata', '0031_update_services'),
     ]
 
