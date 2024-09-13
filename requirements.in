@@ -76,3 +76,6 @@ pandas
 
 # Progress bar
 tqdm
+
+#AWS related
+smart_open
