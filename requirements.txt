@@ -105,7 +105,7 @@ django-filter==24.3
     # via -r requirements.in
 django-js-asset==2.0.0
     # via django-mptt
-django-log-formatter-asim==0.0.5
+django-log-formatter-asim==0.0.6
     # via -r requirements.in
 django-mptt==0.16.0
     # via -r requirements.in
