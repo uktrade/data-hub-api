@@ -77,7 +77,7 @@ coverage[toml]==7.0.1
     # via pytest-cov
 crontab==1.0.0
     # via rq-scheduler
-dbt-copilot-python==0.2.1
+dbt-copilot-python==0.2.2
     # via -r requirements.in
 decorator==5.1.1
     # via ipython
