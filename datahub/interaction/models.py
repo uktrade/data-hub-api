@@ -3,10 +3,11 @@ import uuid
 from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models
+from django.db import models, transaction
 from mptt.fields import TreeForeignKey
 
 from datahub.company.models import CompanyExportCountry
+from datahub.company_activity.models import CompanyActivity
 from datahub.core import reversion
 from datahub.core.models import (
     ArchivableModel,
@@ -340,6 +341,26 @@ class Interaction(ArchivableModel, BaseModel):
     def __str__(self):
         """Human-readable representation."""
         return self.subject
+
+    def save(self, *args, **kwargs):
+        """
+        Create a `CompanyActivity` linked to this interaction for
+        showing all activities related to a company, if the relation
+        doesn't already exist.
+        """
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            if not self.company:
+                return
+
+            CompanyActivity.objects.update_or_create(
+                interaction_id=self.id,
+                activity_source=CompanyActivity.ActivitySource.interaction,
+                defaults={
+                    'date': self.date,
+                    'company_id': self.company_id,
+                },
+            )
 
     class Meta:
         indexes = [

@@ -23,16 +23,6 @@ def _contact_field():
     )
 
 
-def _dit_participant_list(dit_participant_manager):
-    return [
-        {
-            'adviser': dict_utils.contact_or_adviser_dict(dit_participant.adviser),
-            'team': dict_utils.id_name_dict(dit_participant.team),
-        }
-        for dit_participant in dit_participant_manager.all()
-    ]
-
-
 def _export_country_field():
     return Object(
         properties={
@@ -112,7 +102,7 @@ class Interaction(BaseSearchModel):
         'companies': _companies_list,
         'communication_channel': dict_utils.id_name_dict,
         'contacts': dict_utils.contact_or_adviser_list_of_dicts,
-        'dit_participants': _dit_participant_list,
+        'dit_participants': dict_utils.dit_participant_list,
         'export_countries': _export_countries_list,
         'event': dict_utils.id_name_dict,
         'investment_project': dict_utils.id_name_dict,
