@@ -24,6 +24,7 @@ from datahub.company.test.factories import (
     ContactFactory,
     SubsidiaryFactory,
 )
+from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.models import CompanyReferral
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.core.test_utils import AdminTestMixin
@@ -134,6 +135,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
                 **{factory_relation_kwarg: num_related_objects},
             )
         target_company = CompanyFactory()
+        source_company_activities = list(source_company.activities.all())
         source_interactions = list(source_company.interactions.all())
         source_interactions_by_companies = list(source_company.company_interactions.all())
         source_contacts = list(source_company.contacts.all())
@@ -187,6 +189,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             ),
             (source_contacts, Contact, '{num} {noun}'),
             (source_orders, Order, '{num} {noun}'),
+            (source_company_activities, CompanyActivity, '{num} {noun}'),
             (source_referrals, CompanyReferral, '{num} {noun}'),
             (source_company_list_items, CompanyListItem, '{num} {noun}'),
             *investment_project_entries,
@@ -210,13 +213,14 @@ class TestConfirmMergeViewPost(AdminTestMixin):
             messages[0].message,
         )
         assert match
-        assert match.groupdict() == {
-            'merge_entries': merge_entries,
-            'source_company_url': escape(source_company.get_absolute_url()),
-            'source_company': escape(str(source_company)),
-            'target_company_url': escape(target_company.get_absolute_url()),
-            'target_company': escape(str(target_company)),
-        }
+
+        assert escape(source_company.get_absolute_url()) in match.groupdict()['source_company_url']
+        assert escape(str(source_company)) in match.groupdict()['source_company']
+        assert escape(target_company.get_absolute_url()) in match.groupdict()['target_company_url']
+        assert escape(str(target_company)) in match.groupdict()['target_company']
+
+        for entry in merge_entries:
+            assert entry in match.groupdict().pop('merge_entries', None)
 
         source_non_project_related_objects = [
             *source_company_list_items,

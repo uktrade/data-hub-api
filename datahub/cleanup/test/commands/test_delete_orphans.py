@@ -93,7 +93,10 @@ MAPPINGS = {
             (ObjectiveFactory, 'company'),
         ),
         'implicit_related_models': (),
-        'ignored_models': (),
+        'ignored_models': (
+            # Ignored as deleted with interactions and referrals
+            ('company_activity.CompanyActivity', 'company'),
+        ),
     },
     'event.Event': {
         'factory': EventFactory,

@@ -1,9 +1,10 @@
 from uuid import uuid4
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils.timezone import now
 
+from datahub.company_activity.models import CompanyActivity
 from datahub.core import reversion
 from datahub.core.models import BaseModel
 from datahub.core.utils import get_front_end_url
@@ -83,3 +84,19 @@ class CompanyReferral(BaseModel):
         self.modified_by = user
         self.completed_by = user
         self.completed_on = now()
+
+    def save(self, *args, **kwargs):
+        """
+        Create a `CompanyActivity` linked to this referral for
+        showing all activities related to a company.
+        """
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            CompanyActivity.objects.update_or_create(
+                referral_id=self.id,
+                activity_source=CompanyActivity.ActivitySource.referral,
+                defaults={
+                    'date': self.created_on,
+                    'company_id': self.company_id,
+                },
+            )
