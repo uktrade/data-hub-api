@@ -10,26 +10,35 @@ from datahub.core.hawk_receiver import (
     HawkResponseSigningMixin,
     HawkScopePermission,
 )
-from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import SoftDeleteCoreViewSet
 from datahub.investment_lead.models import EYBLead
-from datahub.investment_lead.serializers import CreateEYBLeadSerializer
+from datahub.investment_lead.serializers import (
+    CreateEYBLeadSerializer,
+    RetrieveEYBLeadSerializer,
+)
 
 
 logger = logging.getLogger(__name__)
 
 
-class EYBLeadViewset(
-    ArchivableViewSetMixin,
-    SoftDeleteCoreViewSet,
-    HawkResponseSigningMixin,
-):
-    serializer_class = CreateEYBLeadSerializer
-    queryset = EYBLead.objects.all()
-
-    authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
-    permission_classes = (HawkScopePermission, )
+class EYBLeadViewSet(HawkResponseSigningMixin, SoftDeleteCoreViewSet):
+    queryset = EYBLead.objects.filter(archived=False)
     required_hawk_scope = HawkScope.data_flow_api
+
+    def get_authenticators(self):
+        if self.request.method == 'POST':
+            return [PaaSIPAuthentication(), HawkAuthentication()]
+        return super().get_authenticators()
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [HawkScopePermission()]
+        return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateEYBLeadSerializer
+        return RetrieveEYBLeadSerializer
 
     def create(self, request):
         """POST route definition.

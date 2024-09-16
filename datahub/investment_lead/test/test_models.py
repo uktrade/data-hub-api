@@ -13,7 +13,7 @@ class TestEYBLead:
     ):
         assert EYBLead.objects.all().exists()
         verify_eyb_lead_data(
-            eyb_lead_instance_from_db, eyb_lead_factory_data, is_factory_data=True,
+            eyb_lead_instance_from_db, eyb_lead_factory_data, data_type='factory',
         )
 
     def test_str(self, eyb_lead_instance_from_db):
