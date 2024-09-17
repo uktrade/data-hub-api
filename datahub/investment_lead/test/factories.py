@@ -9,7 +9,7 @@ from django.utils import timezone
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.investment_lead.models import EYBLead
-from datahub.metadata.test.factories import SectorFactory
+from datahub.metadata.models import Sector
 
 
 factory.Faker._DEFAULT_LOCALE = 'en_GB'
@@ -31,7 +31,7 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     triage_hashed_uuid = factory.LazyFunction(generate_hashed_uuid)
     triage_created = factory.LazyFunction(timezone.now)
     triage_modified = factory.LazyFunction(timezone.now)
-    sector = factory.SubFactory(SectorFactory)
+    sector = factory.LazyAttribute(lambda o: random.choice(list(Sector.objects.all())))
     sector_sub = factory.LazyAttribute(lambda o: f'{o.sector.segment}')
     intent = random.choices(EYBLead.IntentChoices.values, k=random.randint(1, 6))
     intent_other = ''
