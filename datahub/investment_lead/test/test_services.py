@@ -1,10 +1,12 @@
 import pytest
 
+from django.db import IntegrityError
+
 from datahub.company.models.company import Company
 from datahub.company.test.factories import CompanyFactory
-from datahub.investment_lead.services import match_by_duns_number, process_eyb_lead
+from datahub.investment_lead.services import match_by_duns_number, add_new_company_from_eyb_lead, process_eyb_lead
 from datahub.investment_lead.test.factories import EYBLeadFactory
-from datahub.investment_lead.test.utils import assert_company_matches_eyb_lead
+from datahub.investment_lead.test.utils import assert_eyb_lead_matches_company
 
 
 @pytest.mark.django_db
@@ -41,8 +43,23 @@ class TestEYBLeadServices:
     def test_add_new_company_from_eyb_lead(self):
         eyb_lead = EYBLeadFactory(duns_number=None)
 
-        process_eyb_lead(eyb_lead)
+        company = add_new_company_from_eyb_lead(eyb_lead)
 
-        company = Company.objects.all().order_by('modified_on').last()
+        company = Company.objects.get(pk=company.pk)
+        assert_eyb_lead_matches_company(company, eyb_lead)
 
-        assert_company_matches_eyb_lead(eyb_lead, company)
+        assert eyb_lead.company == company
+
+    def test_add_new_company_with_company_name_none_fails(self):
+        eyb_lead = EYBLeadFactory(duns_number=None)
+        eyb_lead.company_name = None
+
+        with pytest.raises(IntegrityError):
+            add_new_company_from_eyb_lead(eyb_lead)
+
+    def test_add_new_company_without_address_country_none_fails(self):
+        eyb_lead = EYBLeadFactory(duns_number=None)
+        eyb_lead.address_county = None
+
+        with pytest.raises(IntegrityError):
+            add_new_company_from_eyb_lead(eyb_lead)
