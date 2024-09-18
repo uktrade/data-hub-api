@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from datahub.company.models import Company
 from datahub.core.serializers import (
     AddressSerializer,
     NestedRelatedField,
@@ -225,3 +226,4 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
         source_model=EYBLead,
         address_source_prefix='address',
     )
+    company = NestedRelatedField(Company)
