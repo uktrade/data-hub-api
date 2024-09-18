@@ -119,6 +119,21 @@ def contact_or_adviser_dict(obj, include_dit_team=False):
     return data
 
 
+def contact_job_dict(obj):
+    """Creates dictionary with selected field from supplied object."""
+    if obj is None:
+        return None
+
+    data = {
+        'id': str(obj.id),
+        'first_name': obj.first_name,
+        'last_name': obj.last_name,
+        'name': obj.name,
+        'job_title': obj.job_title,
+    }
+    return data
+
+
 def core_team_advisers_list_of_dicts(list_of_obj):
     """
     Creates a list of dicts for company advisers if they are
@@ -135,6 +150,11 @@ def contact_or_adviser_list_of_dicts(manager):
     return _list_of_dicts(contact_or_adviser_dict, manager)
 
 
+def contact_job_list_of_dicts(manager):
+    """Creates a list of dicts from a manager for contacts or advisers."""
+    return _list_of_dicts(contact_job_dict, manager)
+
+
 def adviser_dict_with_team(obj):
     """Creates a dictionary with adviser names fields and the adviser's team."""
     return contact_or_adviser_dict(obj, include_dit_team=True)
@@ -146,7 +166,8 @@ def _computed_nested_dict(nested_field, dict_func):
     def get_dict(obj):
         fields = nested_field.split('.', maxsplit=1)
         if len(fields) != 2:
-            raise ValueError("nested_field must be in 'nested_object.nested_field' format.")
+            raise ValueError(
+                "nested_field must be in 'nested_object.nested_field' format.")
 
         related_object = getattr(obj, fields[0])
         if related_object is None:
@@ -167,7 +188,8 @@ def computed_field_function(function_name, dict_func):
     def get_dict(obj):
         field = getattr(obj, function_name, None)
         if field is None:
-            raise ValueError(f'The object function "{function_name}" does not exist.')
+            raise ValueError(
+                f'The object function "{function_name}" does not exist.')
         if not callable(field):
             raise ValueError(f'"{function_name}" is not callable.')
 

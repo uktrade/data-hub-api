@@ -5,6 +5,7 @@ import pytest
 from datahub.company_activity.models import CompanyActivity as DBCompanyActivity
 from datahub.company_activity.tests.factories import (
     CompanyActivityInteractionFactory,
+    CompanyActivityInvestmentProjectFactory,
     CompanyActivityReferralFactory,
 )
 from datahub.search.company_activity import CompanyActivitySearchApp
@@ -21,6 +22,7 @@ def test_company_activity_referral_to_dict():
 
     assert result == {
         'interaction': company_activity.interaction,
+        'investment': company_activity.investment,
         'referral': {
             'id': str(company_activity.referral_id),
             'completed_on': company_activity.referral.completed_on,
@@ -112,6 +114,7 @@ def test_company_activity_interaction_to_dict():
                 'name': company_activity.interaction.service.name,
             },
         },
+        'investment': company_activity.investment,
         'referral': company_activity.referral,
         'company': (
             {
@@ -129,10 +132,53 @@ def test_company_activity_interaction_to_dict():
     }
 
 
+def test_company_activity_investment_to_dict():
+    """Test converting a CompanyActivity with an investment to a dict."""
+    company_activity = CompanyActivityInvestmentProjectFactory.build()
+
+    result = CompanyActivity.db_object_to_dict(company_activity)
+
+    assert result == {
+        'interaction': company_activity.interaction,
+        'investment': {
+            'id': str(company_activity.id),
+            'name': company_activity.investment.name,
+            'investment_type': company_activity.investment.investment_type,
+            'estimated_land_date': company_activity.investment.estimated_land_date,
+            'total_investment': company_activity.investment.total_investment,
+            'foreign_equity_investment': company_activity.investment.foreign_equity_investment,
+            'gross_value_added': company_activity.investment.gross_value_added,
+            'number_new_jobs': company_activity.investment.number_new_jobs,
+            'created_by': {
+                'id': str(company_activity.investment.created_by.id),
+                'first_name': company_activity.investment.created_by.first_name,
+                'last_name': company_activity.investment.created_by.last_name,
+                'name': company_activity.investment.created_by.name,
+            },
+            'client_contacts': company_activity.investment.client_contacts,
+        },
+        'referral': company_activity.referral,
+        'company': (
+            {
+                'id': str(company_activity.company_id),
+                'name': company_activity.company.name,
+                'trading_names': company_activity.company.trading_names,
+            }
+            if company_activity.company
+            else None
+        ),
+        'activity_source': DBCompanyActivity.ActivitySource.investment,
+        'id': company_activity.pk,
+        '_document_type': CompanyActivitySearchApp.name,
+        'date': company_activity.date,
+    }
+
+
 def test_interactions_to_documents():
     """Test converting 2 CompanyActivity's to OpenSearch documents."""
     company_activities = CompanyActivityReferralFactory.build_batch(2)
 
     result = CompanyActivity.db_objects_to_documents(company_activities)
 
-    assert {item['_id'] for item in result} == {item.pk for item in company_activities}
+    assert {item['_id'] for item in result} == {
+        item.pk for item in company_activities}

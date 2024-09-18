@@ -74,6 +74,17 @@ class CompanyActivity(models.Model):
             '(interaction, event etc)'
         ),
     )
+    investment = models.ForeignKey(
+        'investment.InvestmentProject',
+        unique=True,
+        null=True,
+        blank=True,
+        related_name='activity',
+        on_delete=models.CASCADE,
+        help_text=(
+            'investment project for company'
+        ),
+    )
 
     def __str__(self):
         """Readable name for CompanyActivity"""

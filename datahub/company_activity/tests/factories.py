@@ -5,6 +5,7 @@ from datahub.company.test.factories import CompanyFactory
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 
 class CompanyActivityInteractionFactory(factory.django.DjangoModelFactory):
@@ -20,6 +21,7 @@ class CompanyActivityInteractionFactory(factory.django.DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     interaction = factory.SubFactory(CompanyInteractionFactory)
     referral = None
+    investment = None
 
     class Meta:
         model = 'company_activity.CompanyActivity'
@@ -45,6 +47,7 @@ class CompanyActivityReferralFactory(factory.django.DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     referral = factory.SubFactory(CompanyReferralFactory)
     interaction = None
+    investment = None
 
     class Meta:
         model = 'company_activity.CompanyActivity'
@@ -58,3 +61,29 @@ class CompanyActivityReferralFactory(factory.django.DjangoModelFactory):
         """
         obj = model_class(*args, **kwargs)
         return CompanyActivity.objects.get(referral_id=obj.referral_id)
+
+
+class CompanyActivityInvestmentProjectFactory(factory.django.DjangoModelFactory):
+    """
+    CompanyActivity factory with an investment project.
+    """
+
+    date = now()
+    activity_source = CompanyActivity.ActivitySource.investment
+    company = factory.SubFactory(CompanyFactory)
+    investment = factory.SubFactory(InvestmentProjectFactory)
+    interaction = None
+    referral = None
+
+    class Meta:
+        model = 'company_activity.CompanyActivity'
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """
+        Overwrite the _create to prevent the CompanyActivity from saving to the database.
+        This is due to the InvestmentProject already creating the CompanyActivity inside its
+        model save.
+        """
+        obj = model_class(*args, **kwargs)
+        return CompanyActivity.objects.get(investment_id=obj.investment_id)
