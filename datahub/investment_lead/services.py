@@ -17,8 +17,7 @@ def match_by_duns_number(duns_number):
     """
     companies = Company.objects.filter(duns_number=duns_number)
 
-    if len(companies) == 1:
-        # match found
+    if companies.count() == 1:
         return True, companies[0]
 
     # no match found
