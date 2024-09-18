@@ -1,0 +1,3 @@
+- model: event.programme
+  pk: 18d91ad6-5a80-4471-999a-27b3860bb2c4
+  fields: {disabled_on: null, name: International Trade Week}
