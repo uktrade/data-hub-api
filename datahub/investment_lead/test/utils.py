@@ -2,6 +2,7 @@ import datetime
 from typing import Literal
 
 from datahub.company.models.company import Company
+from datahub.company.models.contact import Contact
 from datahub.investment_lead.models import EYBLead
 
 
@@ -130,3 +131,14 @@ def assert_eyb_lead_matches_company(company: Company, eyb_lead: EYBLead):
     assert eyb_lead.company_website == company.website
 
     assert eyb_lead.company == company
+
+
+def assert_eyb_lead_matches_contact(contact: Contact, eyb_lead: EYBLead):
+    assert eyb_lead.company == contact.company
+    assert eyb_lead.email == contact.email
+    assert eyb_lead.telephone_number == contact.full_telephone_number
+    assert eyb_lead.role == contact.job_title
+    assert eyb_lead.full_name == contact.first_name
+    assert eyb_lead.full_name == contact.last_name
+    assert contact.address_same_as_company
+    assert contact.primary
