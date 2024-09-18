@@ -22,7 +22,7 @@ class TestCompanyActivityInteractionTasks:
 
         # Remove the created CompanyActivities added by the Interactions `save` method
         # to mimick already existing data in staging and prod database.
-        assert CompanyActivity.objects.all().delete()
+        CompanyActivity.objects.all().delete()
         assert CompanyActivity.objects.count() == 0
 
         # Check the "existing" interactions are addded to the company activity model
@@ -49,3 +49,17 @@ class TestCompanyActivityInteractionTasks:
         # Check count remains unchanged.
         schedule_sync_interactions_to_company_activity()
         assert CompanyActivity.objects.count() == 4
+
+    def test_interactions_without_a_company_activity_are_not_added(self):
+        """
+        Test that interactions which have no company are not added.
+        """
+        CompanyInteractionFactory(company=None)
+
+        # Delete any activity created through the interactions save method.
+        CompanyActivity.objects.all().delete()
+        assert CompanyActivity.objects.count() == 0
+
+        # Schedule the sync and ensure interaction with no company is not added.
+        schedule_sync_interactions_to_company_activity()
+        assert CompanyActivity.objects.count() == 0
