@@ -40,12 +40,9 @@ def verify_eyb_lead_data(
     assert_datetimes(instance.triage_created, data['triage_created'])
     assert_datetimes(instance.triage_modified, data['triage_modified'])
     assert instance.sector_sub == data['sector_sub']
-    assert instance.intent == data['intent']
     assert instance.intent_other == data['intent_other']
     assert instance.location_city == data['location_city']
     assert instance.location_none == data['location_none']
-    assert instance.hiring == data['hiring']
-    assert instance.spend == data['spend']
     assert instance.spend_other == data['spend_other']
     assert instance.is_high_value == data['is_high_value']
 
@@ -60,7 +57,6 @@ def verify_eyb_lead_data(
     assert instance.telephone_number == data['telephone_number']
     assert instance.agree_terms == data['agree_terms']
     assert instance.agree_info_email == data['agree_info_email']
-    assert instance.landing_timeframe == data['landing_timeframe']
 
     # Company fields
     assert instance.duns_number == data['duns_number']
@@ -78,6 +74,22 @@ def verify_eyb_lead_data(
         assert instance.address_town == data['address']['town']
         assert instance.address_county == data['address']['county']
         assert instance.address_postcode == data['address']['postcode']
+
+    # Choice fields
+    if data_type == 'nested':
+        assert [
+            EYBLead.IntentChoices(intent_choice).label
+            for intent_choice in instance.intent
+        ] == data['intent']
+        assert EYBLead.HiringChoices(instance.hiring).label == data['hiring']
+        assert EYBLead.SpendChoices(instance.spend).label == data['spend']
+        assert EYBLead.LandingTimeframeChoices(instance.landing_timeframe).label \
+            == data['landing_timeframe']
+    else:
+        assert instance.intent == data['intent']
+        assert instance.hiring == data['hiring']
+        assert instance.spend == data['spend']
+        assert instance.landing_timeframe == data['landing_timeframe']
 
     # Related fields
     if data_type == 'post':
@@ -98,5 +110,6 @@ def verify_eyb_lead_data(
         assert str(instance.company_location.id) == data['company_location']['id']
         assert str(instance.address_area.id) == data['address']['area']['id']
         assert str(instance.address_country.id) == data['address']['country']['id']
+        assert str(instance.company.id) == data['company']['id']
     else:
         raise ValueError(f'Invalid value "{data_type}" for argument data_type')
