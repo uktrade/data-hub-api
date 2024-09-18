@@ -29,6 +29,15 @@ class TestEYBLeadServices:
         assert found is False
         assert found_company is None
 
+    def test_attach_existing_company_from_eyb_lead(self):
+        company = CompanyFactory(duns_number='123456789')
+        eyb_lead = EYBLeadFactory(duns_number='123456789')
+
+        process_eyb_lead(eyb_lead)
+
+        assert eyb_lead.company is not None
+        assert eyb_lead.company == company
+
     def test_add_new_company_from_eyb_lead(self):
         eyb_lead = EYBLeadFactory(duns_number=None)
 
