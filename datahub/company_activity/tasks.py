@@ -46,6 +46,8 @@ def relate_company_activity_to_interactions():
 
     interactions = Interaction.objects.exclude(
         id__in=activity_interactions,
+    ).filter(
+        company_id__isnull=False,
     ).values('id', 'date', 'company_id')
 
     objs = [
