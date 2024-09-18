@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def match_by_duns_number(duns_number):
-    """ Uses an EYB lead provided DnB number
+    """Uses an EYB lead provided DnB number
     to search Data Hub for existing Companies
 
     Args:
@@ -31,7 +31,6 @@ def process_eyb_lead(eyb_lead):
     Args:
         eyb_lead (object): an EYB lead object
     """
-
     if eyb_lead.duns_number is not None:
         found, company = match_by_duns_number(eyb_lead.duns_number)
 
