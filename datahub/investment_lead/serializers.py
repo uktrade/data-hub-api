@@ -219,6 +219,27 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
             if f not in ADDRESS_FIELDS
         ] + ['address']
 
+    def to_representation(self, instance):
+        """Convert model instance to built-in Python (JSON friendly) data types.
+
+        Specifically, we want to convert `UPPER_CASE` values to `Sentence case` labels
+        for choice fields.
+        """
+        related_fields = {
+            'intent': [
+                EYBLead.IntentChoices(intent_choice).label
+                for intent_choice in instance.intent
+            ],
+            'hiring': EYBLead.HiringChoices(instance.hiring).label,
+            'spend': EYBLead.SpendChoices(instance.spend).label,
+            'landing_timeframe': EYBLead.LandingTimeframeChoices(
+                instance.landing_timeframe,
+            ).label,
+        }
+        rep = super().to_representation(instance)
+        rep.update(related_fields)
+        return rep
+
     sector = NestedRelatedField(Sector)
     location = NestedRelatedField(UKRegion)
     company_location = NestedRelatedField(Country)
