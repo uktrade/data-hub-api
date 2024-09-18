@@ -21,7 +21,7 @@ def match_by_duns_number(duns_number):
         # match found
         return True, companies[0]
 
-    # TODO: if len(companies) > 1 what to do? raise or treat as not found?
+    # no match found
     return False, None
 
 
