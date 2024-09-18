@@ -98,5 +98,6 @@ def verify_eyb_lead_data(
         assert str(instance.company_location.id) == data['company_location']['id']
         assert str(instance.address_area.id) == data['address']['area']['id']
         assert str(instance.address_country.id) == data['address']['country']['id']
+        assert str(instance.company.id) == data['company']['id']
     else:
         raise ValueError(f'Invalid value "{data_type}" for argument data_type')
