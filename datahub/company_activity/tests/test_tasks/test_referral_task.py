@@ -22,7 +22,7 @@ class TestCompanyActivityReferralTasks:
 
         # Remove the created CompanyActivities added by the CompanyReferral `save` method
         # to mimick already existing data in staging and prod database.
-        assert CompanyActivity.objects.all().delete()
+        CompanyActivity.objects.all().delete()
         assert CompanyActivity.objects.count() == 0
 
         # Check the "existing" referrals are addded to the company activity model
