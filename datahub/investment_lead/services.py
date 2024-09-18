@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 def raise_exception_for_eyb_lead_without_company(eyb_lead: EYBLead):
     if not eyb_lead.company:
-        raise AttributeError("The 'company' attribute is not set for the 'EYBLead' object.")
+        raise AttributeError('The ''company'' attribute is not set for the ''EYBLead'' object.')
 
 
 def match_by_duns_number(duns_number):

@@ -6,10 +6,10 @@ from datahub.company.models.company import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.company.models.contact import Contact
 from datahub.company.test.factories import ContactFactory
+from datahub.investment_lead import services
 from datahub.investment_lead.services import (
     add_new_company_from_eyb_lead,
     create_company_contact_for_eyb_lead,
-    create_or_skip_eyb_lead_as_company_contact,
     email_matches_contact_on_eyb_lead_company,
     match_by_duns_number,
     process_eyb_lead,
@@ -63,6 +63,22 @@ class TestEYBLeadServices:
 
         assert eyb_lead.company == company
 
+    @pytest.mark.parametrize(
+        'function_to_test',
+        [
+            'raise_exception_for_eyb_lead_without_company',
+            'email_matches_contact_on_eyb_lead_company',
+            'create_or_skip_eyb_lead_as_company_contact',
+            'create_company_contact_for_eyb_lead',
+        ],
+    )
+    def test_exeption_raised_when_company_is_none(self, function_to_test):
+        eyb_lead = EYBLeadFactory()
+        eyb_lead.company = None
+
+        with pytest.raises(AttributeError):
+            getattr(services, function_to_test)(eyb_lead)
+
     def test_add_new_company_without_company_name_fails(self):
         eyb_lead = EYBLeadFactory(duns_number=None)
         eyb_lead.company_name = None
@@ -102,7 +118,7 @@ class TestEYBLeadServices:
         contact = ContactFactory()
         eyb_lead_not_matching = EYBLeadFactory(
             company=contact.company,
-            email=f"notmatch.{contact.email}",
+            email=f'notmatch.{contact.email}',
             full_name=contact.name,
         )
         eyb_lead_not_matching.save()
@@ -136,10 +152,3 @@ class TestEYBLeadServices:
 
         assert contact.company == eyb_lead.company
         assert_eyb_lead_matches_contact(contact, eyb_lead)
-
-    def test_eyb_lead_has_no_company_set(self):
-        eyb_lead = EYBLeadFactory()
-        eyb_lead.company = None
-
-        with pytest.raises(AttributeError):
-            create_or_skip_eyb_lead_as_company_contact(eyb_lead)
