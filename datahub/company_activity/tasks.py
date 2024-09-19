@@ -1,4 +1,5 @@
 import logging
+from itertools import islice
 
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.models import CompanyReferral
@@ -31,7 +32,7 @@ def schedule_sync_interactions_to_company_activity():
     return job
 
 
-def relate_company_activity_to_interactions():
+def relate_company_activity_to_interactions(batch_size=500):
     """
     Grabs all interactions so they can be related to in the
     `CompanyActivity` model with bulk_create. Excludes any
@@ -50,7 +51,7 @@ def relate_company_activity_to_interactions():
         company_id__isnull=False,
     ).values('id', 'date', 'company_id')
 
-    objs = [
+    objs = (
         CompanyActivity(
             interaction_id=interaction['id'],
             date=interaction['date'],
@@ -58,9 +59,18 @@ def relate_company_activity_to_interactions():
             activity_source=CompanyActivity.ActivitySource.interaction,
         )
         for interaction in interactions
-    ]
-    logger.info('bulk_creating all interactions into CompanyActivity.')
-    CompanyActivity.objects.bulk_create(objs=objs, batch_size=500)
+    )
+
+    total = interactions.count()
+
+    while True:
+        batch = list(islice(objs, batch_size))
+        if not batch:
+            logger.info('Finished bulk creating CompanyActivities.')
+            break
+        logger.info(f'Bulk creating {batch_size} CompanyActivities, {total} remaining.')
+        CompanyActivity.objects.bulk_create(objs=batch, batch_size=batch_size)
+        total -= batch_size
 
 
 def schedule_sync_referrals_to_company_activity():
@@ -83,7 +93,7 @@ def schedule_sync_referrals_to_company_activity():
     return job
 
 
-def relate_company_activity_to_referrals():
+def relate_company_activity_to_referrals(batch_size=500):
     """
     Grabs all referrals so they can be related to in the
     `CompanyActivity` model with a bulk_create. Excludes any
@@ -100,7 +110,7 @@ def relate_company_activity_to_referrals():
         id__in=activity_referral,
     ).values('id', 'created_on', 'company_id')
 
-    objs = [
+    objs = (
         CompanyActivity(
             referral_id=referral['id'],
             date=referral['created_on'],
@@ -108,6 +118,14 @@ def relate_company_activity_to_referrals():
             activity_source=CompanyActivity.ActivitySource.referral,
         )
         for referral in referrals
-    ]
-    logger.info('bulk_creating all referrals into CompanyActivity.')
-    CompanyActivity.objects.bulk_create(objs=objs, batch_size=500)
+    )
+    total = referrals.count()
+
+    while True:
+        batch = list(islice(objs, batch_size))
+        if not batch:
+            logger.info('Finished bulk creating CompanyActivities.')
+            break
+        logger.info(f'Bulk creating {batch_size} CompanyActivities, {total} remaining.')
+        CompanyActivity.objects.bulk_create(objs=batch, batch_size=batch_size)
+        total -= batch_size
