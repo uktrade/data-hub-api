@@ -4,7 +4,11 @@ from django.db import IntegrityError
 
 from datahub.company.models.company import Company
 from datahub.company.test.factories import CompanyFactory
-from datahub.investment_lead.services import match_by_duns_number, add_new_company_from_eyb_lead, process_eyb_lead
+from datahub.investment_lead.services import (
+    add_new_company_from_eyb_lead,
+    match_by_duns_number,
+    process_eyb_lead,
+)
 from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.investment_lead.test.utils import assert_eyb_lead_matches_company
 
