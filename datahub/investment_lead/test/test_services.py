@@ -3,12 +3,11 @@ import pytest
 from django.db import IntegrityError
 
 from datahub.company.models.company import Company
-from datahub.company.models.contact import Contact
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.investment_lead import services
 from datahub.investment_lead.services import (
     add_new_company_from_eyb_lead,
-    create_company_contact_for_eyb_lead,
+    create_or_skip_eyb_lead_as_company_contact,
     email_matches_contact_on_eyb_lead_company,
     match_by_duns_number,
     process_eyb_lead,
@@ -143,11 +142,31 @@ class TestEYBLeadServices:
 
         assert not result
 
+    def test_skip_creation_when_contact_exists(self):
+        """
+        Match email address for contact associated with EYB Lead company
+        """
+        contact = ContactFactory()
+        eyb_lead_matching = EYBLeadFactory(
+            company=contact.company,
+            email=contact.email,
+            full_name=contact.name,
+        )
+        eyb_lead_matching.save()
+        contact.save()
+        count = eyb_lead_matching.company.contacts.count()
+
+        create_or_skip_eyb_lead_as_company_contact(eyb_lead_matching)
+
+        assert eyb_lead_matching.company.contacts.count() == count
+        assert eyb_lead_matching.company.contacts.first() == contact
+
     def test_create_contact_on_company(self):
         eyb_lead = EYBLeadFactory()
-        contact = create_company_contact_for_eyb_lead(eyb_lead)
+        count = eyb_lead.company.contacts.count()
 
-        contact = Contact.objects.get(pk=contact.pk)
+        create_or_skip_eyb_lead_as_company_contact(eyb_lead)
 
-        assert contact.company == eyb_lead.company
+        assert eyb_lead.company.contacts.count() == count + 1
+        contact = eyb_lead.company.contacts.first()
         assert_eyb_lead_matches_contact(contact, eyb_lead)
