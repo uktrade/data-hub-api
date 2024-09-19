@@ -40,6 +40,25 @@ class EYBLeadViewSet(HawkResponseSigningMixin, SoftDeleteCoreViewSet):
             return CreateEYBLeadSerializer
         return RetrieveEYBLeadSerializer
 
+    def get_queryset(self):
+        """Apply filters to queryset based on query parameters (in GET operations)."""
+        queryset = super().get_queryset()
+        company_name = self.request.query_params.get('company')
+        sector_id = self.request.query_params.get('sector')
+        value = self.request.query_params.get('value')
+
+        if company_name:
+            queryset = queryset.filter(company__name__icontains=company_name)
+        if sector_id:
+            queryset = queryset.filter(sector__pk=sector_id)
+        if value is not None:
+            if value.lower() in ['high', 'h']:
+                queryset = queryset.filter(is_high_value=True)
+            elif value.lower() in ['low', 'l']:
+                queryset = queryset.filter(is_high_value=False)
+
+        return queryset
+
     def create(self, request):
         """POST route definition.
 

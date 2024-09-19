@@ -5,11 +5,13 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.investment_lead.test.utils import verify_eyb_lead_data
+from datahub.metadata.models import Sector
 
 
 EYB_LEAD_COLLECTION_URL = reverse('api-v4:investment-lead:eyb-lead-collection')
@@ -153,3 +155,42 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.data['count'] == number_of_leads
         assert response.data['next'] is not None
         assert len(response.data['results']) == pagination_limit
+
+    def test_filter_by_company_name(self, test_user_with_view_permissions):
+        """Test filtering EYB leads by company name"""
+        company_name = 'Mars Exports Ltd'
+        company = CompanyFactory(name=company_name)
+        EYBLeadFactory(company=company)
+        EYBLeadFactory()
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'company': company_name})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['results'][0]['company']['name'] == company_name
+
+    def test_filter_by_sector(self, test_user_with_view_permissions):
+        """Test filtering EYB leads by sector id"""
+        sector = Sector.objects.get(pk=constants.Sector.renewable_energy_wind.value.id)
+        EYBLeadFactory(sector=sector)
+        EYBLeadFactory()
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'sector': sector.pk})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['results'][0]['sector']['id'] == str(sector.pk)
+
+    def test_filter_by_is_high_value(self, test_user_with_view_permissions):
+        """Test filtering EYB leads by is high value status"""
+        EYBLeadFactory(is_high_value=True)
+        EYBLeadFactory(is_high_value=False)
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'value': 'high'})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['results'][0]['is_high_value'] is True
+
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'value': 'low'})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['results'][0]['is_high_value'] is False
