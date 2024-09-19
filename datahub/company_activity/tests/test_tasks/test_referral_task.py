@@ -1,7 +1,12 @@
+from unittest import mock
+
 import pytest
 
 from datahub.company_activity.models import CompanyActivity
-from datahub.company_activity.tasks import schedule_sync_referrals_to_company_activity
+from datahub.company_activity.tasks import (
+    relate_company_activity_to_referrals,
+    schedule_sync_referrals_to_company_activity,
+)
 from datahub.company_referral.test.factories import CompanyReferralFactory
 
 
@@ -49,3 +54,34 @@ class TestCompanyActivityReferralTasks:
         # Check count remains unchanged.
         schedule_sync_referrals_to_company_activity()
         assert CompanyActivity.objects.count() == 4
+
+    @mock.patch('datahub.company_activity.models.CompanyActivity.objects.bulk_create')
+    def test_referrals_are_bulk_created_in_batches(self, mocked_bulk_create, caplog):
+        """
+        Test that referrals are bulk created in batches.
+        """
+        caplog.set_level('INFO')
+        batch_size = 5
+
+        CompanyReferralFactory.create_batch(10)
+
+        # Delete any activity created through the referrals save method.
+        CompanyActivity.objects.all().delete()
+        assert CompanyActivity.objects.count() == 0
+
+        # Ensure referrals are bulk_created
+        relate_company_activity_to_referrals(batch_size)
+        assert mocked_bulk_create.call_count == 2
+
+        assert (
+            f'Bulk creating {batch_size} CompanyActivities, 10 remaining.'
+            in caplog.text
+        )
+        assert (
+            f'Bulk creating {batch_size} CompanyActivities, 5 remaining.'
+            in caplog.text
+        )
+        assert (
+            'Finished bulk creating CompanyActivities.'
+            in caplog.text
+        )

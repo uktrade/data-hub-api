@@ -1,7 +1,12 @@
+from unittest import mock
+
 import pytest
 
 from datahub.company_activity.models import CompanyActivity
-from datahub.company_activity.tasks import schedule_sync_interactions_to_company_activity
+from datahub.company_activity.tasks import (
+    relate_company_activity_to_interactions,
+    schedule_sync_interactions_to_company_activity,
+)
 from datahub.interaction.test.factories import CompanyInteractionFactory
 
 
@@ -31,7 +36,10 @@ class TestCompanyActivityInteractionTasks:
 
         company_activity = CompanyActivity.objects.get(interaction_id=interaction.id)
         assert company_activity.date == interaction.date
-        assert company_activity.activity_source == CompanyActivity.ActivitySource.interaction
+        assert (
+            company_activity.activity_source
+            == CompanyActivity.ActivitySource.interaction
+        )
         assert company_activity.company_id == interaction.company_id
 
     def test_interactions_with_a_company_activity_are_not_added_again(self):
@@ -63,3 +71,34 @@ class TestCompanyActivityInteractionTasks:
         # Schedule the sync and ensure interaction with no company is not added.
         schedule_sync_interactions_to_company_activity()
         assert CompanyActivity.objects.count() == 0
+
+    @mock.patch('datahub.company_activity.models.CompanyActivity.objects.bulk_create')
+    def test_interactions_are_bulk_created_in_batches(self, mocked_bulk_create, caplog):
+        """
+        Test that interactions are bulk created in batches.
+        """
+        caplog.set_level('INFO')
+        batch_size = 5
+
+        CompanyInteractionFactory.create_batch(10)
+
+        # Delete any activity created through the interactions save method.
+        CompanyActivity.objects.all().delete()
+        assert CompanyActivity.objects.count() == 0
+
+        # Ensure interaction are bulk_created
+        relate_company_activity_to_interactions(batch_size)
+        assert mocked_bulk_create.call_count == 2
+
+        assert (
+            f'Bulk creating {batch_size} CompanyActivities, 10 remaining.'
+            in caplog.text
+        )
+        assert (
+            f'Bulk creating {batch_size} CompanyActivities, 5 remaining.'
+            in caplog.text
+        )
+        assert (
+            'Finished bulk creating CompanyActivities.'
+            in caplog.text
+        )
