@@ -3,8 +3,6 @@ import logging
 from datahub.company.models.company import Company
 from datahub.investment_lead.models import EYBLead
 
-from datahub.company.models.company import Company
-
 logger = logging.getLogger(__name__)
 
 
@@ -39,6 +37,9 @@ def process_eyb_lead(eyb_lead):
         if found:
             eyb_lead.company = company
             eyb_lead.save()
+            return
+
+    add_new_company_from_eyb_lead(eyb_lead)
 
 
 def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
