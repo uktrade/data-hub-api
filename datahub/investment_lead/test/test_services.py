@@ -39,15 +39,16 @@ class TestEYBLeadServices:
         company = CompanyFactory(duns_number='123456789')
         eyb_lead = EYBLeadFactory(duns_number='123456789')
 
-        process_eyb_lead(eyb_lead)
+        result = process_eyb_lead(eyb_lead)
 
         assert eyb_lead.company is not None
         assert eyb_lead.company == company
+        assert company == result
 
     def test_add_new_company_from_eyb_lead(self):
         eyb_lead = EYBLeadFactory(duns_number=None)
 
-        company = add_new_company_from_eyb_lead(eyb_lead)
+        company = process_eyb_lead(eyb_lead)
 
         company = Company.objects.get(pk=company.pk)
         assert_eyb_lead_matches_company(company, eyb_lead)

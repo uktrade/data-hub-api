@@ -37,9 +37,9 @@ def process_eyb_lead(eyb_lead):
         if found:
             eyb_lead.company = company
             eyb_lead.save()
-            return
+            return company
 
-    add_new_company_from_eyb_lead(eyb_lead)
+    company = add_new_company_from_eyb_lead(eyb_lead)
 
 
 def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
