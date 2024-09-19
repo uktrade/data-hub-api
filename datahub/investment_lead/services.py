@@ -55,7 +55,6 @@ def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
     """
     Add new company from EYB lead and link it.
     """
-
     # Create company record
     company = Company()
     company.duns_number = eyb_lead.duns_number

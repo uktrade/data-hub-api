@@ -3,9 +3,8 @@ import pytest
 from django.db import IntegrityError
 
 from datahub.company.models.company import Company
-from datahub.company.test.factories import CompanyFactory
 from datahub.company.models.contact import Contact
-from datahub.company.test.factories import ContactFactory
+from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.investment_lead import services
 from datahub.investment_lead.services import (
     add_new_company_from_eyb_lead,
