@@ -8,6 +8,9 @@ logger = logging.getLogger(__name__)
 
 
 def raise_exception_for_eyb_lead_without_company(eyb_lead: EYBLead):
+    """
+    Check for required attributes on EYB Lead to ensure there is a company
+    """
     if not eyb_lead.company:
         raise AttributeError('The ''company'' attribute is not set for the ''EYBLead'' object.')
 
@@ -49,6 +52,10 @@ def process_eyb_lead(eyb_lead):
 
 
 def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
+    """
+    Add new company from EYB lead and link it.
+    """
+
     # Create company record
     company = Company()
     company.duns_number = eyb_lead.duns_number
