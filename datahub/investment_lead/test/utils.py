@@ -116,86 +116,17 @@ def verify_eyb_lead_data(
         raise ValueError(f'Invalid value "{data_type}" for argument data_type')
 
 
-def assert_company_matches_eyb_lead(eyb_lead: EYBLead, company: Company):
-    """Method to verify the EYBLead data against the passed instance.
+def assert_eyb_lead_matches_company(company: Company, eyb_lead: EYBLead):
+    assert eyb_lead.duns_number == company.duns_number
+    assert eyb_lead.company_name == company.name
+    assert eyb_lead.sector == company.sector
+    assert eyb_lead.address_1 == company.address_1
+    assert eyb_lead.address_2 == company.address_2
+    assert eyb_lead.address_town == company.address_town
+    assert eyb_lead.address_county == company.address_county
+    assert eyb_lead.address_area == company.address_area
+    assert eyb_lead.address_country == company.address_country
+    assert eyb_lead.address_postcode == company.address_postcode
+    assert eyb_lead.company_website == company.website
 
-    Use:
-    - `data_type='post'` if passing in POST data which contains string names
-    for related fields
-    - `data_type='factory'` if passing in factory (or validated serializer) data that
-    contains model instances for these fields
-    - `data_type='nested'` if passing in serialized data (from the RetrieveEYBLeadSerializer)
-    that contains nested objects for these fields, with the id and name attributes.
-
-    Related fields are:
-    - Sector
-    - Location
-    - Company location
-    - Address area
-    - Address country
-    """
-    # # EYB triage fields
-    # assert eyb_lead.triage_hashed_uuid == data['triage_hashed_uuid']
-    # assert_datetimes(eyb_lead.triage_created, data['triage_created'])
-    # assert_datetimes(eyb_lead.triage_modified, data['triage_modified'])
-    # assert eyb_lead.sector_sub == data['sector_sub']
-    # assert eyb_lead.intent == data['intent']
-    # assert eyb_lead.intent_other == data['intent_other']
-    # assert eyb_lead.location_city == data['location_city']
-    # assert eyb_lead.location_none == data['location_none']
-    # assert eyb_lead.hiring == data['hiring']
-    # assert eyb_lead.spend == data['spend']
-    # assert eyb_lead.spend_other == data['spend_other']
-    # assert eyb_lead.is_high_value == data['is_high_value']
-
-    # # EYB user fields
-    # assert eyb_lead.user_hashed_uuid == data['user_hashed_uuid']
-    # assert_datetimes(eyb_lead.user_created, data['user_created'])
-    # assert_datetimes(eyb_lead.user_modified, data['user_modified'])
-    # assert eyb_lead.company_name == data['company_name']
-    # assert eyb_lead.full_name == data['full_name']
-    # assert eyb_lead.role == data['role']
-    # assert eyb_lead.email == data['email']
-    # assert eyb_lead.telephone_number == data['telephone_number']
-    # assert eyb_lead.agree_terms == data['agree_terms']
-    # assert eyb_lead.agree_info_email == data['agree_info_email']
-    # assert eyb_lead.landing_timeframe == data['landing_timeframe']
-
-    # # Company fields
-    # assert eyb_lead.duns_number == data['duns_number']
-
-    # # Address fields
-    # if data_type != 'nested':
-    #     assert eyb_lead.address_1 == data['address_1']
-    #     assert eyb_lead.address_2 == data['address_2']
-    #     assert eyb_lead.address_town == data['address_town']
-    #     assert eyb_lead.address_county == data['address_county']
-    #     assert eyb_lead.address_postcode == data['address_postcode']
-    # else:
-    #     assert eyb_lead.address_1 == data['address']['line_1']
-    #     assert eyb_lead.address_2 == data['address']['line_2']
-    #     assert eyb_lead.address_town == data['address']['town']
-    #     assert eyb_lead.address_county == data['address']['county']
-    #     assert eyb_lead.address_postcode == data['address']['postcode']
-
-    # # Related fields
-    # if data_type == 'post':
-    #     assert eyb_lead.sector.segment == data['sector']
-    #     assert eyb_lead.location.name == data['location']
-    #     assert eyb_lead.company_location.iso_alpha2_code == data['company_location']
-    #     assert eyb_lead.address_area.name == data['address_area']
-    #     assert eyb_lead.address_country.iso_alpha2_code == data['address_country']
-    # elif data_type == 'factory':
-    #     assert eyb_lead.sector == data['sector']
-    #     assert eyb_lead.location == data['location']
-    #     assert eyb_lead.company_location == data['company_location']
-    #     assert eyb_lead.address_area == data['address_area']
-    #     assert eyb_lead.address_country == data['address_country']
-    # elif data_type == 'nested':
-    #     assert str(eyb_lead.sector.id) == data['sector']['id']
-    #     assert str(eyb_lead.location.id) == data['location']['id']
-    #     assert str(eyb_lead.company_location.id) == data['company_location']['id']
-    #     assert str(eyb_lead.address_area.id) == data['address']['area']['id']
-    #     assert str(eyb_lead.address_country.id) == data['address']['country']['id']
-    # else:
-    #     raise ValueError(f'Invalid value "{data_type}" for argument data_type')
+    assert eyb_lead.company == company
