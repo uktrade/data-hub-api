@@ -1,6 +1,8 @@
 import datetime
 from typing import Literal
 
+from datahub.company.models.company import Company
+from datahub.company.models.contact import Contact
 from datahub.investment_lead.models import EYBLead
 
 
@@ -113,3 +115,30 @@ def verify_eyb_lead_data(
         assert str(instance.company.id) == data['company']['id']
     else:
         raise ValueError(f'Invalid value "{data_type}" for argument data_type')
+
+
+def assert_eyb_lead_matches_company(company: Company, eyb_lead: EYBLead):
+    assert eyb_lead.duns_number == company.duns_number
+    assert eyb_lead.company_name == company.name
+    assert eyb_lead.sector == company.sector
+    assert eyb_lead.address_1 == company.address_1
+    assert eyb_lead.address_2 == company.address_2
+    assert eyb_lead.address_town == company.address_town
+    assert eyb_lead.address_county == company.address_county
+    assert eyb_lead.address_area == company.address_area
+    assert eyb_lead.address_country == company.address_country
+    assert eyb_lead.address_postcode == company.address_postcode
+    assert eyb_lead.company_website == company.website
+
+    assert eyb_lead.company == company
+
+
+def assert_eyb_lead_matches_contact(contact: Contact, eyb_lead: EYBLead):
+    assert eyb_lead.company == contact.company
+    assert eyb_lead.email == contact.email
+    assert eyb_lead.telephone_number == contact.full_telephone_number
+    assert eyb_lead.role == contact.job_title
+    assert eyb_lead.full_name == contact.first_name
+    assert eyb_lead.full_name == contact.last_name
+    assert contact.address_same_as_company
+    assert contact.primary
