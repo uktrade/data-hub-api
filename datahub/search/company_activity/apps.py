@@ -13,6 +13,7 @@ class CompanyActivitySearchApp(SearchApp):
     search_model = CompanyActivity
     view_permissions = ('company_activity.view_companyactivity',)
     queryset = DBCompanyActivity.objects.select_related(
+        'company',
         'interaction',
         'interaction__communication_channel',
         'interaction__service',
