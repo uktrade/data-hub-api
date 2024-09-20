@@ -238,7 +238,9 @@ Dependencies:
     ./manage.py migrate
     ./manage.py migrate_search
 
-    ./manage.py loadinitialmetadata
+    # Force is required as `migrate` already loads some metadata
+    # but loading fixtures will fail without this
+    ./manage.py loadinitialmetadata --force
     ./manage.py createinitialrevisions
     ```
 
