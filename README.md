@@ -142,7 +142,7 @@ There is now a `make` command to bring up the three environments on a single doc
 Dependencies:
 
 - Python 3.10.x
-- PostgreSQL 12
+- PostgreSQL 16.x
 - redis 6.x
 - OpenSearch 1.x
 
@@ -171,7 +171,7 @@ Dependencies:
     brew install libpq
     ```
 
-4.  Install _postgres_, if not done already, as this is required by **psycopg2** in the requirements below
+4.  Install Postgres
 
     On Ubuntu:
 
@@ -183,42 +183,56 @@ Dependencies:
 
     ```shell
     brew install postgresql
+    brew services start postgresql
     ```
 
-5.  Create and activate the virtualenv:
+5. Setup the postgres user and database
+
+    ```shell
+    createdb
+    psql
+    CREATE DATABASE datahub;
+    CREATE USER datahubuser SUPERUSER WITH PASSWORD 'datahubpassword';
+    \q
+    ```
+
+    nb. SUPERUSER is needed to create 'citext' extension
+
+6.  Create and activate the virtualenv:
 
     ```shell
     python3.10 -m venv env
     source env/bin/activate
     pip install -U pip
-    or
-    formally to make sure you have the same version as what is used for cloudfoundry, use buildpack to install the same version e.g. https://github.com/cloudfoundry/python-buildpack/releases e.g. 22.1.2
-    python -m pip install pip==22.1.2
     ```
 
-6.  Install the dependencies:
+7.  Install the dependencies:
 
     ```shell
     pip install -r requirements-dev.txt
     ```
 
-7.  Create an `.env` settings file (it’s gitignored by default):
+8.  Create an `.env` file (it’s gitignored by default):
 
     ```shell
-    cp config/settings/sample.env config/settings/.env
+    cp local-dev-sample.env .env
     ```
 
-8.  Set `DOCKER_DEV=False` and `LOCAL_DEV=True` in `.env`
-
-9.  Make sure you have OpenSearch running locally. If you don't, you can run one in Docker:
+11.  Make sure you have OpenSearch running locally. 
 
     ```shell
-    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" -e "plugins.security.disabled=true" opensearchproject/opensearch:1.2.4
+    brew install opensearch
+    brew services start opensearch
+    ```
+    
+12. Install and run redis
+
+    ```shell
+    brew install redis
+    brew services start redis
     ```
 
-10. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
-
-11. Populate the databases and initialise OpenSearch:
+13. Populate the databases and initialise OpenSearch:
 
     ```shell
     ./manage.py migrate
@@ -228,7 +242,7 @@ Dependencies:
     ./manage.py createinitialrevisions
     ```
 
-12. Optionally, you can load some test data:
+14. Optionally, you can load some test data:
 
     ```shell
     ./manage.py loaddata fixtures/test_data.yaml
@@ -238,7 +252,7 @@ Dependencies:
     and hence the loaded records won‘t be returned by search endpoints until RQ is
     started and the queued tasks have run.
 
-13. Create a superuser:
+15. Create a superuser:
 
     ```shell
     ./manage.py createsuperuser
@@ -246,19 +260,23 @@ Dependencies:
 
     (You can enter any valid email address as the username and SSO email user ID.)
 
-14. Start the server:
+16. Start the server:
 
     ```shell
     ./manage.py runserver
     ```
 
-15. Start RQ (Redis Queue):
+17. Start RQ (Redis Queues):
 
+    Start short running queue working
     ```shell
-    python rq/rq-worker.py
+    ./rq-run.sh short-running-worker.py
     ```
 
-    Note that in production the cron-scheduler:1/1, short-running-working:4/4, long-running-worker:4/4 are run in separate instances .
+    Start long running queue working
+    ```shell
+    ./rq-run.sh long-running-worker.py
+    ```
 
 ## API documentation
 
