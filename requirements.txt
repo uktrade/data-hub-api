@@ -233,7 +233,7 @@ opentelemetry-util-http==0.43b0
     # via opentelemetry-instrumentation-wsgi
 packaging==22.0
     # via python-redis-rate-limit
-pandas==2.2.2
+pandas==2.2.3
     # via -r requirements.in
 platformdirs==4.2.0
     # via virtualenv
