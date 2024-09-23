@@ -9,7 +9,7 @@ from datahub.investment_lead.services import (
     add_new_company_from_eyb_lead,
     create_or_skip_eyb_lead_as_company_contact,
     email_matches_contact_on_eyb_lead_company,
-    match_by_duns_number,
+    find_match_by_duns_number,
     process_eyb_lead,
 )
 from datahub.investment_lead.test.factories import EYBLeadFactory
@@ -27,18 +27,16 @@ class TestEYBLeadServices:
         company = CompanyFactory(duns_number='123456789')
         eyb_lead = EYBLeadFactory(duns_number='123456789')
 
-        found, found_company = match_by_duns_number(eyb_lead.duns_number)
+        found_company = find_match_by_duns_number(eyb_lead.duns_number)
 
-        assert found is True
         assert found_company.id == company.id
 
     def test_duns_number_does_not_match_company(self):
         CompanyFactory(duns_number='123456789')
         eyb_lead = EYBLeadFactory(duns_number='123456788')
 
-        found, found_company = match_by_duns_number(eyb_lead.duns_number)
+        found_company = find_match_by_duns_number(eyb_lead.duns_number)
 
-        assert found is False
         assert found_company is None
 
     def test_attach_existing_company_from_eyb_lead(self):

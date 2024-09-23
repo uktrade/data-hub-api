@@ -15,7 +15,7 @@ def raise_exception_for_eyb_lead_without_company(eyb_lead: EYBLead):
         raise AttributeError('The ''company'' attribute is not set for the ''EYBLead'' object.')
 
 
-def match_by_duns_number(duns_number):
+def find_match_by_duns_number(duns_number):
     """Uses an EYB lead provided DnB number
     to search Data Hub for existing Companies
 
@@ -28,27 +28,10 @@ def match_by_duns_number(duns_number):
     companies = Company.objects.filter(duns_number=duns_number)
 
     if companies.count() == 1:
-        return True, companies[0]
+        return companies[0]
 
     # no match found
-    return False, None
-
-
-def process_eyb_lead(eyb_lead):
-    """Matches an EYB lead with an existing Company via DnB number
-
-    Args:
-        eyb_lead (object): an EYB lead object
-    """
-    if eyb_lead.duns_number is not None:
-        found, company = match_by_duns_number(eyb_lead.duns_number)
-
-        if found:
-            eyb_lead.company = company
-            eyb_lead.save()
-            return company
-
-    return add_new_company_from_eyb_lead(eyb_lead)
+    return None
 
 
 def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
@@ -71,9 +54,26 @@ def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
 
     company.save()
 
+    return company
+
+
+def process_eyb_lead(eyb_lead):
+    """Matches an EYB lead with an existing Company via DnB number
+
+    Args:
+        eyb_lead (object): an EYB lead object
+    Returns:
+        company (object): a company object
+    """
+    company = None
+    if eyb_lead.duns_number is not None:
+        company = find_match_by_duns_number(eyb_lead.duns_number)
+
+    if company is None:
+        company = add_new_company_from_eyb_lead(eyb_lead)
+
     eyb_lead.company = company
     eyb_lead.save()
-
     return company
 
 
