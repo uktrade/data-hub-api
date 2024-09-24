@@ -13,6 +13,7 @@ requests-mock==1.12.1
 pip-tools==7.4.1
 piprot==0.9.11
 pre-commit==3.8.0
+moto==5.0.15
 
 # Code static analysis
 flake8==7.1.1
