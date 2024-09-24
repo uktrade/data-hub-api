@@ -23,15 +23,27 @@ def bucket_name():
     return 'mock-bucket'
 
 
+@pytest.fixture
+def test_files():
+    files = [
+        '20240918T000000/full_ingestion.jsonl.gz',
+        '20240920T000000/full_ingestion.jsonl.gz',
+        '20240919T000000/full_ingestion.jsonl.gz',
+        '20230919T000000/full_ingestion.jsonl.gz',
+        '20240419T120000/full_ingestion.jsonl.gz',
+    ]
+    return list(map(lambda x: GREAT_PREFIX + x, files))
+
+
 @mock_aws
-def setup_s3_bucket(bucket_name):
+def setup_s3_bucket(bucket_name, test_files):
     mock_s3_client = boto3.client('s3', REGION)
     mock_s3_client.create_bucket(
         Bucket=bucket_name,
         CreateBucketConfiguration={'LocationConstraint': REGION},
     )
-    filename = GREAT_PREFIX + 'full_ingestion.jsonl.gz'
-    mock_s3_client.put_object(Bucket=bucket_name, Key=filename, Body='Test contents')
+    for file in test_files:
+        mock_s3_client.put_object(Bucket=bucket_name, Key=file, Body='Test contents')
 
 
 class TestCompanyActivityIngestionTasks:
@@ -59,12 +71,11 @@ class TestCompanyActivityIngestionTasks:
         sys.modules.pop('cron-scheduler')
 
     @mock_aws
-    def test_listing_great_data_files(self, bucket_name):
+    def test_get_most_recent_obj(self, bucket_name, test_files):
         """
         Test retrieval of the latest Great data file from S3
         """
-        setup_s3_bucket(bucket_name)
+        setup_s3_bucket(bucket_name, test_files)
         task = CompanyActivityIngestionTask()
-        objects = task.list_objects(bucket_name, GREAT_PREFIX)
-        expected_file = GREAT_PREFIX + 'full_ingestion.jsonl.gz'
-        assert objects == [expected_file]
+        most_recent = task.get_most_recent_obj(bucket_name, GREAT_PREFIX)
+        assert most_recent == GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
