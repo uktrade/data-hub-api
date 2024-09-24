@@ -116,6 +116,12 @@ def verify_eyb_lead_data(
     else:
         raise ValueError(f'Invalid value "{data_type}" for argument data_type')
 
+    # UTM fields
+    assert instance.utm_name == data['utm_name']
+    assert instance.utm_source == data['utm_source']
+    assert instance.utm_medium == data['utm_medium']
+    assert instance.utm_content == data['utm_content']
+
 
 def assert_eyb_lead_matches_company(company: Company, eyb_lead: EYBLead):
     assert eyb_lead.duns_number == company.duns_number

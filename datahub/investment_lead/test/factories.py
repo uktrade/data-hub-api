@@ -68,3 +68,9 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     address_country_id = constants.Country.canada.value.id
     address_postcode = factory.Faker('postcode')
     company = factory.SubFactory(CompanyFactory)
+
+    # UTM fields
+    utm_name = factory.Faker('pystr')
+    utm_source = factory.Faker('pystr')
+    utm_medium = factory.Faker('pystr')
+    utm_content = factory.Faker('pystr')
