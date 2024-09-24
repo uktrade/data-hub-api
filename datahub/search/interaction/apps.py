@@ -30,6 +30,7 @@ class InteractionSearchApp(SearchApp):
         'investment_project__sector__parent',
         'investment_project__sector__parent__parent',
         'service',
+        'service__parent',
         'service_delivery_status',
         'event',
     ).prefetch_related(
