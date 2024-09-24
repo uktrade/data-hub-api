@@ -97,7 +97,7 @@ class TestCreateEYBLeadSerializer:
             'utm_name': '',
             'utm_campaign': '',
             'utm_source': '',
-            'utm_medium': ''
+            'utm_medium': '',
         })
         serializer = CreateEYBLeadSerializer(data=eyb_lead_post_data)
         assert serializer.is_valid(), serializer.errors
