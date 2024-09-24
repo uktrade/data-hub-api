@@ -12,15 +12,11 @@ from moto import mock_aws
 from redis import Redis
 from rq_scheduler import Scheduler
 
+from datahub.company_activity.models import IngestedFile
 from datahub.company_activity.tasks.ingest_company_activity import (
-    CompanyActivityIngestionTask, GREAT_PREFIX, REGION,
+    BUCKET, CompanyActivityIngestionTask, GREAT_PREFIX, REGION,
 )
 from datahub.core.queues.constants import EVERY_TEN_MINUTES
-
-
-@pytest.fixture
-def bucket_name():
-    return 'mock-bucket'
 
 
 @pytest.fixture
@@ -71,11 +67,25 @@ class TestCompanyActivityIngestionTasks:
         sys.modules.pop('cron-scheduler')
 
     @mock_aws
-    def test_get_most_recent_obj(self, bucket_name, test_files):
+    def test_get_most_recent_obj(self, test_files):
         """
         Test retrieval of the latest Great data file from S3
         """
-        setup_s3_bucket(bucket_name, test_files)
+        setup_s3_bucket(BUCKET, test_files)
         task = CompanyActivityIngestionTask()
-        most_recent = task.get_most_recent_obj(bucket_name, GREAT_PREFIX)
+        most_recent = task.get_most_recent_obj(BUCKET, GREAT_PREFIX)
         assert most_recent == GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
+
+    @pytest.mark.django_db
+    def test_file_already_ingested(self):
+        """
+        Test checking whether the latest file has already been ingested
+        """
+        task = CompanyActivityIngestionTask()
+        ingested_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
+        not_ingested_file = GREAT_PREFIX + '20240921T000000/full_ingestion.jsonl.gz'
+        IngestedFile.objects.create(filepath=ingested_file)
+        result = task.has_file_been_ingested(ingested_file)
+        assert result
+        result = task.has_file_been_ingested(not_ingested_file)
+        assert not result
