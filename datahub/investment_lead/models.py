@@ -176,6 +176,12 @@ class EYBLead(InvestmentLead):
         on_delete=models.CASCADE,
     )
 
+    # UTM parameters
+    utm_name = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
+    utm_source = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
+    utm_medium = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
+    utm_content = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
+
     def __str__(self):
         """String representation of the model."""
         return self.name
