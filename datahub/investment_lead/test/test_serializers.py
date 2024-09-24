@@ -92,6 +92,20 @@ class TestCreateEYBLeadSerializer:
         assert validated_data['address_area'].pk == alberta_area.pk
         assert validated_data['address_country'].pk == canada_country.pk
 
+    def test_create_without_utm_parameters(self, eyb_lead_post_data):
+        eyb_lead_post_data.update({
+            'utm_name': '',
+            'utm_campaign': '',
+            'utm_source': '',
+            'utm_medium': ''
+        })
+        serializer = CreateEYBLeadSerializer(data=eyb_lead_post_data)
+        assert serializer.is_valid(), serializer.errors
+        instance = serializer.save()
+        assert isinstance(instance, EYBLead)
+        assert EYBLead.objects.count() == 1
+        verify_eyb_lead_data(instance, serializer.validated_data, data_type='factory')
+
 
 class TestRetrieveEYBLeadSerializer:
     """Tests for RetrieveEYBLeadSerializer"""
