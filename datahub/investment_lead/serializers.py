@@ -91,8 +91,15 @@ ADDRESS_FIELDS = [
     'address_postcode',
 ]
 
+UTM_FIELDS = [
+    'utm_name',
+    'utm_source',
+    'utm_medium',
+    'utm_content',
+]
+
 ALL_FIELDS = ARCHIVABLE_FIELDS + INVESTMENT_LEAD_BASE_FIELDS + \
-    TRIAGE_FIELDS + USER_FIELDS + COMPANY_FIELDS
+    TRIAGE_FIELDS + USER_FIELDS + COMPANY_FIELDS + UTM_FIELDS
 
 UUIDS_ERROR_MESSAGE = 'Invalid serializer data: UUIDs must match.'
 

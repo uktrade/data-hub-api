@@ -75,6 +75,12 @@ def eyb_lead_post_data():
         'address_area': 'Alberta',
         'address_country': 'CA',
         'address_postcode': '87107',
+
+        # UTM fields
+        'utm_name': 'utm-name',
+        'utm_source': 'source',
+        'utm_medium': 'medium',
+        'utm_content': 'content',
     }
 
 
