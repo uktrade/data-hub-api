@@ -88,6 +88,6 @@ class TestCompanyActivityIngestionTasks:
         task.ingest_activity_data()
         assert len(rq_queue.jobs) == initial_job_count + 1
         job = rq_queue.jobs[-1]
-        fn = 'datahub.company_activity.tasks.ingest_company_activity.ingest_great_data'
+        fn = 'datahub.company_activity.tasks.ingest_great_data.GreatIngestionTask.ingest'
         assert job.func_name == fn
         assert job.args[0] == new_file

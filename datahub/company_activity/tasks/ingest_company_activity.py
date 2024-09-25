@@ -7,6 +7,7 @@ from redis import Redis
 from rq import Queue
 
 from datahub.company_activity.models import IngestedFile
+from datahub.company_activity.tasks import GreatIngestionTask
 
 env = environ.Env()
 REGION = env('AWS_DEFAULT_REGION')
@@ -47,8 +48,4 @@ class CompanyActivityIngestionTask:
         rq_queue = Queue('long-running', connection=redis)
         latest_file = self._get_most_recent_obj(BUCKET, GREAT_PREFIX)
         if not self._has_file_been_ingested(latest_file):
-            rq_queue.enqueue(ingest_great_data, latest_file)
-
-
-def ingest_great_data(file):
-    pass
+            rq_queue.enqueue(GreatIngestionTask.ingest, latest_file)
