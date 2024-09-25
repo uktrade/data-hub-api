@@ -16,7 +16,7 @@ class CompanyActivitySearchApp(SearchApp):
         'company',
         'interaction',
         'interaction__communication_channel',
-        'interaction__service',
+        'interaction__service__parent',
         'referral',
         'referral__contact',
         'referral__created_by',
