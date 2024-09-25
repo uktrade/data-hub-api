@@ -190,6 +190,23 @@ class TestEYBLeadListAPI(APITestMixin):
         sector_ids_in_results = set([lead['sector']['id'] for lead in response.data['results']])
         assert {str(level_0_sector.pk), str(child_sector.pk)} == sector_ids_in_results
 
+    def test_filter_by_non_existing_sector(self, test_user_with_view_permissions):
+        """Test filtering EYB leads by non existent sector is handled without error."""
+        non_existent_sector_uuid = uuid.uuid4()
+        sector = Sector.objects.get(pk=constants.Sector.renewable_energy_wind.value.id)
+        EYBLeadFactory(sector=sector)
+
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(EYB_LEAD_COLLECTION_URL)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+
+        response = api_client.get(
+            EYB_LEAD_COLLECTION_URL, data={'sector': str(non_existent_sector_uuid)},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 0
+
     def test_filter_by_is_high_value(self, test_user_with_view_permissions):
         """Test filtering EYB leads by is high value status"""
         EYBLeadFactory(is_high_value=True)
