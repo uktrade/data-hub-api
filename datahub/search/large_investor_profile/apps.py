@@ -15,7 +15,10 @@ class LargeInvestorProfileSearchApp(SearchApp):
     export_permission = f'investor_profile.{InvestorProfilePermission.export}'
     exclude_from_global_search = True
     queryset = DBLargeCapitalInvestorProfile.objects.select_related(
+        'created_by',
+        'created_by__dit_team',
         'investor_company',
+        'investor_company__address_country',
         'investor_type',
         'required_checks_conducted',
         'minimum_return_rate',

@@ -17,20 +17,27 @@ class LargeCapitalOpportunitySearchApp(SearchApp):
     export_permission = f'opportunity.{LargeCapitalOpportunityPermission.export}'
     exclude_from_global_search = True
     queryset = DBLargeCapitalOpportunity.objects.select_related(
+        'created_by',
+        'created_by__dit_team',
         'lead_dit_relationship_manager',
+        'lead_dit_relationship_manager__dit_team',
+        'opportunity_value_type',
         'type',
         'status',
         'required_checks_conducted',
         'required_checks_conducted_by',
+        'required_checks_conducted_by__dit_team',
         'estimated_return_rate',
     ).prefetch_related(
         'promoters',
         'other_dit_contacts',
         'investment_projects',
+        'investment_projects__investmentprojectcode',
         'asset_classes',
         'investment_types',
         'sources_of_funding',
         'time_horizons',
         'construction_risks',
         'uk_region_locations',
+        'reasons_for_abandonment',
     )
