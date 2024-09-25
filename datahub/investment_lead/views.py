@@ -57,9 +57,9 @@ class EYBLeadViewSet(HawkResponseSigningMixin, SoftDeleteCoreViewSet):
             descendent_sectors = sector.get_descendants(include_self=True)
             queryset = queryset.filter(sector__in=descendent_sectors)
         if value is not None:
-            if value.lower() in ['high', 'h']:
+            if value.lower() == 'high':
                 queryset = queryset.filter(is_high_value=True)
-            elif value.lower() in ['low', 'l']:
+            if value.lower() == 'low':
                 queryset = queryset.filter(is_high_value=False)
 
         return queryset
