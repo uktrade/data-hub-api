@@ -194,12 +194,28 @@ class TestEYBLeadListAPI(APITestMixin):
         """Test filtering EYB leads by is high value status"""
         EYBLeadFactory(is_high_value=True)
         EYBLeadFactory(is_high_value=False)
+        EYBLeadFactory(is_high_value=False)
         api_client = self.create_api_client(user=test_user_with_view_permissions)
+
+        response = api_client.get(EYB_LEAD_COLLECTION_URL)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 3
 
         response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'value': 'high'})
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert response.data['results'][0]['is_high_value'] is True
+
+    def test_filter_by_is_low_value(self, test_user_with_view_permissions):
+        """Test filtering EYB leads by is low value status"""
+        EYBLeadFactory(is_high_value=True)
+        EYBLeadFactory(is_high_value=True)
+        EYBLeadFactory(is_high_value=False)
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+
+        response = api_client.get(EYB_LEAD_COLLECTION_URL)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 3
 
         response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'value': 'low'})
         assert response.status_code == status.HTTP_200_OK
