@@ -194,6 +194,7 @@ class Command(BaseCleanupCommand):
             # These relations do not have any datetime fields to check – we just want them to be
             # deleted along with expired records.
             excluded_relations=(
+                InvestmentProject._meta.get_field('activity'),
                 InvestmentProject._meta.get_field('team_members'),
                 InvestmentProject._meta.get_field('stage_log'),
                 InvestmentProject._meta.get_field('investmentprojectcode'),

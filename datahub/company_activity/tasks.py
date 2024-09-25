@@ -4,10 +4,10 @@ from itertools import islice
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.models import CompanyReferral
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
-from datahub.investment.project.models import InvestmentProject
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.interaction.models import Interaction
+from datahub.investment.project.models import InvestmentProject
 
 
 logger = logging.getLogger(__name__)
@@ -69,7 +69,7 @@ def relate_company_activity_to_interactions(batch_size=500):
             logger.info('Finished bulk creating CompanyActivities.')
             break
         logger.info(
-            f'Bulk creating {batch_size} CompanyActivities, {total} remaining.')
+            f'Creating in batches of: {batch_size} CompanyActivities. {total} remaining.')
         CompanyActivity.objects.bulk_create(objs=batch, batch_size=batch_size)
         total -= batch_size
 
@@ -128,7 +128,7 @@ def relate_company_activity_to_referrals(batch_size=500):
             logger.info('Finished bulk creating CompanyActivities.')
             break
         logger.info(
-            f'Bulk creating {batch_size} CompanyActivities, {total} remaining.')
+            f'Creating in batches of: {batch_size} CompanyActivities. {total} remaining.')
         CompanyActivity.objects.bulk_create(objs=batch, batch_size=batch_size)
         total -= batch_size
 
@@ -183,6 +183,6 @@ def relate_company_activity_to_investment_projects(batch_size=500):
             logger.info('Finished bulk creating CompanyActivities.')
             break
         logger.info(
-            f'Bulk creating {batch_size} CompanyActivities, {total} remaining.')
+            f'Creating in batches of: {batch_size} CompanyActivities. {total} remaining.')
         CompanyActivity.objects.bulk_create(objs=batch, batch_size=batch_size)
         total -= batch_size
