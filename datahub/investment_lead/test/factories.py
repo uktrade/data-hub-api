@@ -33,7 +33,9 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     triage_modified = factory.LazyFunction(timezone.now)
     sector = factory.LazyAttribute(lambda o: random.choice(list(Sector.objects.all())))
     sector_sub = factory.LazyAttribute(lambda o: f'{o.sector.segment}')
-    intent = random.choices(EYBLead.IntentChoices.values, k=random.randint(1, 6))
+    intent = factory.LazyAttribute(
+        lambda o: random.sample(EYBLead.IntentChoices.values, k=random.randint(1, 4)),
+    )
     intent_other = ''
     location_id = constants.UKRegion.wales.value.id
     location_city = 'Cardiff'
