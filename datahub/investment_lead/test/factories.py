@@ -40,8 +40,8 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     location_id = constants.UKRegion.wales.value.id
     location_city = 'Cardiff'
     location_none = False
-    hiring = random.choice(EYBLead.HiringChoices.values)
-    spend = random.choice(EYBLead.SpendChoices.values)
+    hiring = factory.LazyAttribute(lambda o: random.choice(EYBLead.HiringChoices.values))
+    spend = factory.LazyAttribute(lambda o: random.choice(EYBLead.SpendChoices.values))
     spend_other = ''
     is_high_value = factory.Faker('pybool')
 
@@ -57,7 +57,9 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     telephone_number = factory.Faker('phone_number')
     agree_terms = factory.Faker('pybool')
     agree_info_email = factory.Faker('pybool')
-    landing_timeframe = random.choice(EYBLead.LandingTimeframeChoices.values)
+    landing_timeframe = factory.LazyAttribute(
+        lambda o: random.choice(EYBLead.LandingTimeframeChoices.values),
+    )
     company_website = factory.Faker('url')
 
     # Company fields
