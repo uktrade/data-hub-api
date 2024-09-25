@@ -138,12 +138,25 @@ def test_company_activity_investment_to_dict():
 
     result = CompanyActivity.db_object_to_dict(company_activity)
 
+    client_contacts = [
+        {
+            'id': contact.id,
+            'name': contact.name,
+            'first_name': contact.first_name,
+            'last_name': contact.last_name,
+        }
+        for contact in company_activity.investment.client_contacts.all()
+    ]
+
     assert result == {
         'interaction': company_activity.interaction,
         'investment': {
-            'id': str(company_activity.id),
+            'id': str(company_activity.investment.id),
             'name': company_activity.investment.name,
-            'investment_type': company_activity.investment.investment_type,
+            'investment_type': {
+                'id': str(company_activity.investment.investment_type.id),
+                'name': company_activity.investment.investment_type.name,
+            },
             'estimated_land_date': company_activity.investment.estimated_land_date,
             'total_investment': company_activity.investment.total_investment,
             'foreign_equity_investment': company_activity.investment.foreign_equity_investment,
@@ -155,7 +168,8 @@ def test_company_activity_investment_to_dict():
                 'last_name': company_activity.investment.created_by.last_name,
                 'name': company_activity.investment.created_by.name,
             },
-            'client_contacts': company_activity.investment.client_contacts,
+
+            'client_contacts': client_contacts,
         },
         'referral': company_activity.referral,
         'company': (

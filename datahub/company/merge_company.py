@@ -130,7 +130,9 @@ def merge_companies(source_company: Company, target_company: Company, user):
         # As CompanyActivities are saved when an Interaction or Referral
         # automatically saved add them to the updated count.
         results[CompanyActivity] = {
-            'company': results[Interaction]['company'] + results[CompanyReferral]['company'],
+            'company': results[Interaction]['company']
+            + results[InvestmentProject]['investor_company']
+            + results[CompanyReferral]['company'],
         }
 
         source_company.mark_as_transferred(

@@ -8,12 +8,14 @@ from django.conf import settings
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from datahub.company_activity.models import CompanyActivity
 from django.db import models, transaction
+
 from django.utils.functional import cached_property
 from mptt.fields import TreeForeignKey
+
 from reversion.models import Revision
 
+from datahub.company_activity.models import CompanyActivity
 
 from datahub.core import reversion
 from datahub.core.constants import InvestmentProjectStage
@@ -608,15 +610,18 @@ class InvestmentProject(
         return get_front_end_url(self)
 
     def save(self, *args, **kwargs):
-        """Updates the stage log after saving."""
+        """Updates the stage log after saving.
+        Create a `CompanyActivity` linked to this investment project for
+        showing all activities related to a company. If no company exist then do nothing
+        """
         adding = self._state.adding
 
-        """
-        Create a `CompanyActivity` linked to this investment project for
-        showing all activities related to a company.
-        """
         with transaction.atomic():
             super().save(*args, **kwargs)
+            self._update_stage_log(adding)
+
+            if not self.investor_company_id:
+                return
             CompanyActivity.objects.update_or_create(
                 investment_id=self.id,
                 activity_source=CompanyActivity.ActivitySource.investment,
@@ -625,8 +630,6 @@ class InvestmentProject(
                     'company_id': self.investor_company_id,
                 },
             )
-
-        self._update_stage_log(adding)
 
     def _update_stage_log(self, adding):
         """Creates a log of changes to stage field.

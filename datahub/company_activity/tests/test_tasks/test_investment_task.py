@@ -26,11 +26,11 @@ class TestCompanyActivityInvestmentTasks:
         InvestmentProjectFactory()
 
         # Remove the created CompanyActivities added by the Investment project `save` method
-        # to mimick already existing data in staging and prod database.
+        # to mimic already existing data in staging and prod database.
         CompanyActivity.objects.all().delete()
         assert CompanyActivity.objects.count() == 0
 
-        # Check the "existing" investments are addded to the company activity model
+        # Check the "existing" investments are added to the company activity model
         schedule_sync_investments_to_company_activity()
         assert CompanyActivity.objects.count() == 4
 
