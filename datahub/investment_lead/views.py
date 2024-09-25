@@ -16,6 +16,7 @@ from datahub.investment_lead.serializers import (
     CreateEYBLeadSerializer,
     RetrieveEYBLeadSerializer,
 )
+from datahub.metadata.models import Sector
 
 
 logger = logging.getLogger(__name__)
@@ -39,6 +40,32 @@ class EYBLeadViewSet(HawkResponseSigningMixin, SoftDeleteCoreViewSet):
         if self.request.method == 'POST':
             return CreateEYBLeadSerializer
         return RetrieveEYBLeadSerializer
+
+    def get_queryset(self):
+        """Apply filters to queryset based on query parameters (in GET operations)."""
+        queryset = super().get_queryset()
+        company_name = self.request.query_params.get('company')
+        sector_id = self.request.query_params.get('sector')
+        value = self.request.query_params.get('value')
+
+        if company_name:
+            queryset = queryset.filter(company__name__icontains=company_name)
+        if sector_id:
+            try:
+                # This will be a level 0 sector id;
+                # We want to find and return all leads with sectors that have this ancestor
+                sector = Sector.objects.get(pk=sector_id)
+                descendent_sectors = sector.get_descendants(include_self=True)
+                queryset = queryset.filter(sector__in=descendent_sectors)
+            except Exception:
+                queryset = queryset.none()
+        if value is not None:
+            if value.lower().strip() == 'high':
+                queryset = queryset.filter(is_high_value=True)
+            if value.lower().strip() == 'low':
+                queryset = queryset.filter(is_high_value=False)
+
+        return queryset
 
     def create(self, request):
         """POST route definition.
