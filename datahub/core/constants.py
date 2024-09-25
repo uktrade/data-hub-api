@@ -119,6 +119,10 @@ class Sector(Enum):
         'Defence : Land',
         '7c432bdc-77e0-49ac-8d5f-1eece499ae2a',
     )
+    mining = Constant(
+        'Mining',
+        'a622c9d2-5f95-e211-a939-e4115bead28a',
+    )
     mining_mining_vehicles_transport_equipment = Constant(
         'Mining : Mining vehicles, transport and equipment',
         'e17c69f9-8c65-457e-9a65-fd7c52a45700',

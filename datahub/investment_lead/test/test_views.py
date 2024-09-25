@@ -170,14 +170,25 @@ class TestEYBLeadListAPI(APITestMixin):
 
     def test_filter_by_sector(self, test_user_with_view_permissions):
         """Test filtering EYB leads by sector id"""
-        sector = Sector.objects.get(pk=constants.Sector.renewable_energy_wind.value.id)
-        EYBLeadFactory(sector=sector)
-        EYBLeadFactory()
+        level_0_sector = Sector.objects.get(pk=constants.Sector.mining.value.id)
+        child_sector = Sector.objects.get(
+            pk=constants.Sector.mining_mining_vehicles_transport_equipment.value.id,
+        )
+        unrelated_sector = Sector.objects.get(pk=constants.Sector.renewable_energy_wind.value.id)
+        EYBLeadFactory(sector=level_0_sector)
+        EYBLeadFactory(sector=child_sector)
+        EYBLeadFactory(sector=unrelated_sector)
+
         api_client = self.create_api_client(user=test_user_with_view_permissions)
-        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'sector': sector.pk})
+        response = api_client.get(EYB_LEAD_COLLECTION_URL)
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert response.data['results'][0]['sector']['id'] == str(sector.pk)
+        assert response.data['count'] == 3
+
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'sector': level_0_sector.pk})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        sector_ids_in_results = set([lead['sector']['id'] for lead in response.data['results']])
+        assert {str(level_0_sector.pk), str(child_sector.pk)} == sector_ids_in_results
 
     def test_filter_by_is_high_value(self, test_user_with_view_permissions):
         """Test filtering EYB leads by is high value status"""
