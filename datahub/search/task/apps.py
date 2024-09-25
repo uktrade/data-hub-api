@@ -10,6 +10,9 @@ class TaskSearchApp(SearchApp):
     search_model = Task
     view_permissions = (f'task.{TaskPermission.view_task}',)
     queryset = DBTask.objects.all().select_related(
+        'created_by',
         'investment_project',
         'interaction',
+    ).prefetch_related(
+        'advisers',
     )

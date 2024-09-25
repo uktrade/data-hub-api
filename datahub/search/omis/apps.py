@@ -18,11 +18,16 @@ class OrderSearchApp(SearchApp):
     view_permissions = (f'order.{OrderPermission.view}',)
     export_permission = f'order.{OrderPermission.export}'
     queryset = DBOrder.objects.select_related(
+        'billing_address_country',
+        'cancellation_reason',
+        'cancelled_by',
         'company',
+        'completed_by',
         'contact',
-        'created_by',
+        'created_by__dit_team',
         'primary_market',
-        'sector',
+        'sector__parent__parent',
+        'uk_region',
     ).prefetch_related(
         'service_types',
         Prefetch('assignees', queryset=OrderAssignee.objects.select_related('adviser__dit_team')),
