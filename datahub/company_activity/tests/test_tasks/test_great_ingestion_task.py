@@ -3,44 +3,43 @@ import pytest
 
 from moto import mock_aws
 
-# from datahub.company_activity.models import IngestedFile
-from datahub.company_activity.tasks.ingest_company_activity import GREAT_PREFIX
+from datahub.company_activity.models import Great
+from datahub.company_activity.tasks.ingest_company_activity import BUCKET, GREAT_PREFIX
 from datahub.company_activity.tasks.ingest_great_data import (
-    BUCKET, GreatIngestionTask, REGION,
+    GreatIngestionTask, REGION,
 )
 
 
 @pytest.fixture
-def test_files():
-    files = [
-        '20240918T000000/full_ingestion.jsonl.gz',
-        '20240920T000000/full_ingestion.jsonl.gz',
-        '20240919T000000/full_ingestion.jsonl.gz',
-        '20230919T000000/full_ingestion.jsonl.gz',
-        '20240419T120000/full_ingestion.jsonl.gz',
-    ]
-    return list(map(lambda x: GREAT_PREFIX + x, files))
+def test_file():
+    filepath = 'datahub/company_activity/tests/test_tasks/fixtures/great/full_ingestion.jsonl.gz'
+    return open(filepath, 'rb')
+
+
+@pytest.fixture
+def test_file_path():
+    return GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
 
 
 @mock_aws
-def setup_s3_bucket(bucket_name, test_files):
+def setup_s3_bucket(bucket_name, test_file, test_file_path):
     mock_s3_client = boto3.client('s3', REGION)
     mock_s3_client.create_bucket(
         Bucket=bucket_name,
         CreateBucketConfiguration={'LocationConstraint': REGION},
     )
-    for file in test_files:
-        mock_s3_client.put_object(Bucket=bucket_name, Key=file, Body='Test contents')
+    mock_s3_client.put_object(Bucket=bucket_name, Key=test_file_path, Body=test_file)
 
 
 class TestGreatIngestionTasks:
     @pytest.mark.django_db
     @mock_aws
-    def test_great_data_file_ingestion(self, test_files):
+    def test_great_data_file_ingestion(self, test_file, test_file_path):
         """
         Test that a Great data file is ingested correctly
         """
-        new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
-        setup_s3_bucket(BUCKET, test_files)
+        initial_great_activity_count = Great.objects.count()
+        setup_s3_bucket(BUCKET, test_file, test_file_path)
         task = GreatIngestionTask()
-        task.ingest(new_file)
+        task.ingest(BUCKET, test_file_path)
+        assert Great.objects.count() == initial_great_activity_count + 28

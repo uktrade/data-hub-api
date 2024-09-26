@@ -48,4 +48,4 @@ class CompanyActivityIngestionTask:
         rq_queue = Queue('long-running', connection=redis)
         latest_file = self._get_most_recent_obj(BUCKET, GREAT_PREFIX)
         if not self._has_file_been_ingested(latest_file):
-            rq_queue.enqueue(GreatIngestionTask.ingest, latest_file)
+            rq_queue.enqueue(GreatIngestionTask.ingest, BUCKET, latest_file)
