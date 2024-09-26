@@ -41,9 +41,9 @@ def relate_company_activity_to_interactions(batch_size=500):
     Can be used to populate the CompanyActivity with missing interactions
     or to initially populate the model.
     """
-    activity_interactions = CompanyActivity.objects.filter(
+    activity_interactions = set(CompanyActivity.objects.filter(
         interaction__isnull=False,
-    ).values_list('interaction_id', flat=True)
+    ).values_list('interaction_id', flat=True))
 
     interactions = Interaction.objects.filter(
         company_id__isnull=False,
