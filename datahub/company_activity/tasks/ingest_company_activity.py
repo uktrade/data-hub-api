@@ -6,7 +6,7 @@ from datahub.company_activity.tasks import GreatIngestionTask
 from datahub.core.queues.job_scheduler import job_scheduler
 
 env = environ.Env()
-REGION = env('AWS_DEFAULT_REGION')
+REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
 BUCKET = 'data-flow-bucket' + env('ENVIRONMENT', default='')
 PREFIX = 'data-flow/exports/'
 GREAT_PREFIX = PREFIX + 'GreatGovUKFormsPipeline/'

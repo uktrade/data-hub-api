@@ -87,3 +87,49 @@ class CompanyActivityInvestmentProjectFactory(factory.django.DjangoModelFactory)
         """
         obj = model_class(*args, **kwargs)
         return CompanyActivity.objects.get(investment_id=obj.investment_id)
+
+
+class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):
+    """
+    CompanyActivity ingested file factory
+    """
+
+    filepath = 'data-flow/exports/GreatGovUKFormsPipeline/20240920T000000/full_ingestion.jsonl.gz'
+    created_on = now()
+
+    class Meta:
+        model = 'company_activity.IngestedFile'
+
+
+class CompanyActivityGreatFactory(factory.django.DjangoModelFactory):
+    """
+    CompanyActivity ingested Great data factory
+    """
+
+    form_id = 'dit:directoryFormsApi:Submission:9034'
+    published = now()
+
+    attributed_to_type = 'dit:directoryFormsApi:SubmissionAction:gov-notify-email'
+    attributed_to_id = 'dit:directoryFormsApi:SubmissionType:Unknown'
+
+    url = '"http://www.lewis.com/"'
+
+    meta_action_name = 'gov-notify-email'
+    meta_template_id = '07f729e9-8561-4180-a6ff-b14e6be1fef0'
+    meta_email_address = 'dcarter@example.com'
+
+    data_comment = 'some comment'
+    data_country = 'LU'
+    data_full_name = 'Keith Duncan'
+    data_website_url = 'http://www.smith-hall.com/'
+    data_company_name = 'Smith-Jenkins'
+    data_company_size = '1-10'
+    data_phone_number = '12345678'
+    data_terms_agreed = False
+    data_email_address = 'christian31@example.com'
+    data_opportunities = '[https://www.hoover-ramos.com/explore/wp-content/explorelogin.php]'
+    data_role_in_company = 'test'
+    data_opportunity_urls = 'http://moore.com/listpost.html'
+
+    class Meta:
+        model = 'company_activity.Great'

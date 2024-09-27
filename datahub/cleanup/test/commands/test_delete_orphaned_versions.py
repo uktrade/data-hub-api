@@ -20,7 +20,11 @@ from datahub.company.test.factories import (
     ExportFactory,
     ObjectiveFactory,
 )
-from datahub.company_activity.tests.factories import CompanyActivityInteractionFactory
+from datahub.company_activity.tests.factories import (
+    CompanyActivityGreatFactory,
+    CompanyActivityIngestedFileFactory,
+    CompanyActivityInteractionFactory,
+)
 from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
 )
@@ -63,6 +67,8 @@ MAPPINGS = {
     'company.Contact': ContactFactory,
     'company.Objective': ObjectiveFactory,
     'company_activity.CompanyActivity': CompanyActivityInteractionFactory,
+    'company_activity.Great': CompanyActivityGreatFactory,
+    'company_activity.IngestedFile': CompanyActivityIngestedFileFactory,
     'company_list.CompanyListItem': CompanyListItemFactory,
     'company_list.PipelineItem': PipelineItemFactory,
     'company_referral.CompanyReferral': CompanyReferralFactory,
