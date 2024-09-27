@@ -22,12 +22,22 @@ def test_file_path():
 
 
 @mock_aws
-def setup_s3_bucket(bucket_name, test_file, test_file_path):
-    mock_s3_client = boto3.client('s3', REGION)
+def setup_s3_client():
+    return boto3.client('s3', REGION)
+
+
+@mock_aws
+def setup_s3_bucket(bucket_name):
+    mock_s3_client = setup_s3_client()
     mock_s3_client.create_bucket(
         Bucket=bucket_name,
         CreateBucketConfiguration={'LocationConstraint': REGION},
     )
+
+
+@mock_aws
+def setup_s3_files(bucket_name, test_file, test_file_path):
+    mock_s3_client = setup_s3_client()
     mock_s3_client.put_object(Bucket=bucket_name, Key=test_file_path, Body=test_file)
 
 
@@ -39,7 +49,17 @@ class TestGreatIngestionTasks:
         Test that a Great data file is ingested correctly
         """
         initial_great_activity_count = Great.objects.count()
-        setup_s3_bucket(BUCKET, test_file, test_file_path)
+        setup_s3_bucket(BUCKET)
+        setup_s3_files(BUCKET, test_file, test_file_path)
         task = GreatIngestionTask()
         task.ingest(BUCKET, test_file_path)
         assert Great.objects.count() == initial_great_activity_count + 28
+
+    def test_invalid_file(self, test_file_path):
+        """
+        Test that an exception is raised when the file is not valid
+        """
+        setup_s3_bucket(BUCKET)
+        task = GreatIngestionTask()
+        with pytest.raises(Exception):
+            task.ingest(BUCKET, test_file_path)
