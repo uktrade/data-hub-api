@@ -18,6 +18,7 @@ from datahub.company_activity.tasks.ingest_company_activity import (
     BUCKET, CompanyActivityIngestionTask, GREAT_PREFIX, REGION,
 )
 from datahub.core.queues.constants import EVERY_TEN_MINUTES
+from datahub.core.queues.scheduler import DataHubScheduler
 
 
 @pytest.fixture
@@ -68,8 +69,13 @@ class TestCompanyActivityIngestionTasks:
         sys.modules.pop('cron-scheduler')
 
     @pytest.mark.django_db
+    # Patch so that we can test the job is queued, rather than having it be run instantly
+    @patch(
+        'datahub.core.queues.job_scheduler.DataHubScheduler',
+        return_value=DataHubScheduler(is_async=True),
+    )
     @mock_aws
-    def test_ingestion_job_is_queued_for_new_files(self, test_files):
+    def test_ingestion_job_is_queued_for_new_files(self, mock, test_files):
         """
         Test that when a new file is found a job is queued to ingest it
         and no jobs are created for files that have already been ingested
@@ -82,13 +88,13 @@ class TestCompanyActivityIngestionTasks:
 
         redis = Redis.from_url(settings.REDIS_BASE_URL)
         rq_queue = Queue('long-running', connection=redis)
-        initial_job_count = len(rq_queue.jobs)
+        initial_job_count = rq_queue.count
 
         task = CompanyActivityIngestionTask()
         task.ingest_activity_data()
-        assert len(rq_queue.jobs) == initial_job_count + 1
-        job = rq_queue.jobs[-1]
-        fn = 'datahub.company_activity.tasks.ingest_great_data.GreatIngestionTask.ingest'
-        assert job.func_name == fn
-        assert job.args[0] == BUCKET
-        assert job.args[1] == new_file
+        assert rq_queue.count == initial_job_count + 1
+        jobs = rq_queue.jobs
+        job = jobs[-1]
+        assert job.func_name == 'ingest'
+        assert job.kwargs['bucket'] == BUCKET
+        assert job.kwargs['file'] == new_file

@@ -1,17 +1,13 @@
 import boto3
 import environ
 
-from django.conf import settings
-
-from redis import Redis
-from rq import Queue
-
 from datahub.company_activity.models import IngestedFile
 from datahub.company_activity.tasks import GreatIngestionTask
+from datahub.core.queues.job_scheduler import job_scheduler
 
 env = environ.Env()
 REGION = env('AWS_DEFAULT_REGION')
-BUCKET = 'data-flow-bucket' + env('environment', default='')
+BUCKET = 'data-flow-bucket' + env('ENVIRONMENT', default='')
 PREFIX = 'data-flow/exports/'
 GREAT_PREFIX = PREFIX + 'GreatGovUKFormsPipeline/'
 
@@ -36,7 +32,7 @@ class CompanyActivityIngestionTask:
 
     def _has_file_been_ingested(self, file):
         previously_ingested = IngestedFile.objects.filter(filepath=file)
-        return previously_ingested.count() > 0
+        return previously_ingested.exists()
 
     def ingest_activity_data(self):
         """
@@ -44,8 +40,11 @@ class CompanyActivityIngestionTask:
         data source (prefix) and enqueues a job to process each file
         that hasn't already been ingested
         """
-        redis = Redis.from_url(settings.REDIS_BASE_URL)
-        rq_queue = Queue('long-running', connection=redis)
         latest_file = self._get_most_recent_obj(BUCKET, GREAT_PREFIX)
         if not self._has_file_been_ingested(latest_file):
-            rq_queue.enqueue(GreatIngestionTask.ingest, BUCKET, latest_file)
+            job_scheduler(
+                function=GreatIngestionTask().ingest,
+                function_kwargs={'bucket': BUCKET, 'file': latest_file},
+                queue_name='long-running',
+                description='Ingest Great data file',
+            )
