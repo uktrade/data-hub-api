@@ -7,7 +7,7 @@ from smart_open import open
 from datahub.company_activity.models import Great
 
 env = environ.Env()
-REGION = env('AWS_DEFAULT_REGION')
+REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
 
 
 class GreatIngestionTask:
@@ -37,6 +37,7 @@ class GreatIngestionTask:
                     data_company_size=data.get('company_size', ''),
                     data_phone_number=data.get('phone_number', ''),
                     data_email_address=data.get('email_address', ''),
+                    data_terms_agreed=data.get('terms_agreed', False),
                     data_opportunities=data.get('opportunities', ''),
                     data_role_in_company=data.get('role_in_company', ''),
                     data_opportunity_urls=data.get('opportunity_urls', ''),

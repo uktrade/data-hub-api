@@ -34,6 +34,7 @@ class Great(models.Model):
     data_company_size = models.CharField(max_length=MAX_LENGTH)
     data_phone_number = models.CharField(max_length=MAX_LENGTH)
     data_email_address = models.CharField(max_length=MAX_LENGTH)
+    data_terms_agreed = models.BooleanField()
     data_opportunities = models.CharField(max_length=MAX_LENGTH)
     data_role_in_company = models.CharField(max_length=MAX_LENGTH)
     data_opportunity_urls = models.CharField(max_length=MAX_LENGTH)
