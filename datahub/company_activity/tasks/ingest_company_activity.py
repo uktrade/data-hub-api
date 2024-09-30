@@ -36,7 +36,7 @@ class CompanyActivityIngestionTask:
 
     def ingest_activity_data(self):
         """
-        Gets the most recent file in the data-flow S3 bucekt for each
+        Gets the most recent file in the data-flow S3 bucket for each
         data source (prefix) and enqueues a job to process each file
         that hasn't already been ingested
         """
