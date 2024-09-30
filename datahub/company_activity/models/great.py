@@ -49,6 +49,6 @@ class Great(models.Model):
     actor_dit_email_address = models.CharField(max_length=MAX_LENGTH)
     actor_dit_is_blacklisted = models.BooleanField()
     actor_dit_is_whitelisted = models.BooleanField()
-    actor_dit_blacklisted_reason = models.CharField(max_length=MAX_LENGTH)
+    actor_dit_blacklisted_reason = models.CharField(max_length=MAX_LENGTH, null=True)
 
     created_on = models.DateTimeField(auto_now_add=True)
