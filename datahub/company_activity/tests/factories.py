@@ -6,6 +6,7 @@ from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.metadata.test.factories import CountryFactory
 
 
 class CompanyActivityInteractionFactory(factory.django.DjangoModelFactory):
@@ -108,18 +109,17 @@ class CompanyActivityGreatFactory(factory.django.DjangoModelFactory):
 
     form_id = 'dit:directoryFormsApi:Submission:9034'
     published = now()
+    url = '"http://www.lewis.com/"'
 
     attributed_to_type = 'dit:directoryFormsApi:SubmissionAction:gov-notify-email'
     attributed_to_id = 'dit:directoryFormsApi:SubmissionType:Unknown'
-
-    url = '"http://www.lewis.com/"'
 
     meta_action_name = 'gov-notify-email'
     meta_template_id = '07f729e9-8561-4180-a6ff-b14e6be1fef0'
     meta_email_address = 'dcarter@example.com'
 
     data_comment = 'some comment'
-    data_country = 'LU'
+    data_country = factory.SubFactory(CountryFactory)
     data_full_name = 'Keith Duncan'
     data_website_url = 'http://www.smith-hall.com/'
     data_company_name = 'Smith-Jenkins'
@@ -130,6 +130,13 @@ class CompanyActivityGreatFactory(factory.django.DjangoModelFactory):
     data_opportunities = '[https://www.hoover-ramos.com/explore/wp-content/explorelogin.php]'
     data_role_in_company = 'test'
     data_opportunity_urls = 'http://moore.com/listpost.html'
+
+    actor_type = 'dit:directoryFormsApi:Submission:Sender'
+    actor_id = 'dit:directoryFormsApi:Sender:1041'
+    actor_dit_email_address = 'crystalbrock@example.org'
+    actor_dit_is_blacklisted = False
+    actor_dit_is_whitelisted = False
+    actor_dit_blacklisted_reason = ''
 
     class Meta:
         model = 'company_activity.Great'
