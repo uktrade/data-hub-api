@@ -45,25 +45,29 @@ class EYBLeadViewSet(HawkResponseSigningMixin, SoftDeleteCoreViewSet):
         """Apply filters to queryset based on query parameters (in GET operations)."""
         queryset = super().get_queryset()
         company_name = self.request.query_params.get('company')
-        sector_id = self.request.query_params.get('sector')
-        value = self.request.query_params.get('value')
+        sector_ids = self.request.query_params.getlist('sector')
+        values = self.request.query_params.getlist('value')
 
         if company_name:
             queryset = queryset.filter(company__name__icontains=company_name)
-        if sector_id:
-            try:
-                # This will be a level 0 sector id;
-                # We want to find and return all leads with sectors that have this ancestor
-                sector = Sector.objects.get(pk=sector_id)
-                descendent_sectors = sector.get_descendants(include_self=True)
-                queryset = queryset.filter(sector__in=descendent_sectors)
-            except Exception:
-                queryset = queryset.none()
-        if value is not None:
-            if value.lower().strip() == 'high':
-                queryset = queryset.filter(is_high_value=True)
-            if value.lower().strip() == 'low':
-                queryset = queryset.filter(is_high_value=False)
+        if sector_ids:
+            # This will be a list of level 0 sector ids;
+            # We want to find and return all leads with sectors that have these ancestors
+            descendent_sectors = []
+            for sector in Sector.objects.filter(pk__in=sector_ids):
+                descendent_sectors.extend(sector.get_descendants(include_self=True))
+            queryset = queryset.filter(sector__in=descendent_sectors)
+        if values:
+            value_mappings = {
+                'high': True,
+                'low': False,
+            }
+            booleans_to_filter_by = []
+            for value in values:
+                value_string = value.lower().strip()
+                if value_string in value_mappings.keys():
+                    booleans_to_filter_by.append(value_mappings[value_string])
+            queryset = queryset.filter(is_high_value__in=booleans_to_filter_by)
 
         return queryset
 
