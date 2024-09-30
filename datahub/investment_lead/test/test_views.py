@@ -286,3 +286,18 @@ class TestEYBLeadListAPI(APITestMixin):
         response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'value': ['high', 'low']})
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 3
+
+    def test_filter_by_invalid_value(self, test_user_with_view_permissions):
+        """Test filtering EYB leads by an invalid value returns no leads"""
+        EYBLeadFactory(is_high_value=True)
+        EYBLeadFactory(is_high_value=True)
+        EYBLeadFactory(is_high_value=False)
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+
+        response = api_client.get(EYB_LEAD_COLLECTION_URL)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 3
+
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'value': 'invalid_value'})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 0
