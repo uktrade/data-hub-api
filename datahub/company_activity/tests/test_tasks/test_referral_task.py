@@ -74,11 +74,11 @@ class TestCompanyActivityReferralTasks:
         assert mocked_bulk_create.call_count == 2
 
         assert (
-            f'Bulk creating {batch_size} CompanyActivities, 10 remaining.'
+            f'Creating in batches of: {batch_size} CompanyActivities. 10 remaining.'
             in caplog.text
         )
         assert (
-            f'Bulk creating {batch_size} CompanyActivities, 5 remaining.'
+            f'Creating in batches of: {batch_size} CompanyActivities. 5 remaining.'
             in caplog.text
         )
         assert (

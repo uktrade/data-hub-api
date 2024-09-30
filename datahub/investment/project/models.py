@@ -5,12 +5,17 @@ from collections import namedtuple
 from itertools import chain
 
 from django.conf import settings
+
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import models
+
+from django.db import models, transaction
+
 from django.utils.functional import cached_property
 from mptt.fields import TreeForeignKey
+
 from reversion.models import Revision
 
+from datahub.company_activity.models import CompanyActivity
 
 from datahub.core import reversion
 from datahub.core.constants import InvestmentProjectStage
@@ -117,7 +122,8 @@ class IProjectAbstract(models.Model):
         related_name='investment_projects',
     )
 
-    cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    cdms_project_code = models.CharField(
+        max_length=MAX_LENGTH, blank=True, null=True)
     quotable_as_public_case_study = models.BooleanField(null=True)
     actual_land_date = models.DateField(
         blank=True,
@@ -250,7 +256,8 @@ class IProjectAbstract(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
-    referral_source_activity_event = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    referral_source_activity_event = models.CharField(
+        max_length=MAX_LENGTH, null=True, blank=True)
     fdi_type = models.ForeignKey(
         'metadata.FDIType',
         related_name='investment_projects',
@@ -432,8 +439,10 @@ class IProjectRequirementsAbstract(models.Model):
     site_decided = models.BooleanField(null=True)
     address_1 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
     address_2 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
-    address_town = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
-    address_postcode = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
+    address_town = models.CharField(
+        blank=True, null=True, max_length=MAX_LENGTH)
+    address_postcode = models.CharField(
+        blank=True, null=True, max_length=MAX_LENGTH)
     client_considering_other_countries = models.BooleanField(null=True)
 
     uk_company_decided = models.BooleanField(null=True)
@@ -444,7 +453,8 @@ class IProjectRequirementsAbstract(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
-    competitor_countries = models.ManyToManyField('metadata.Country', related_name='+', blank=True)
+    competitor_countries = models.ManyToManyField(
+        'metadata.Country', related_name='+', blank=True)
     allow_blank_possible_uk_regions = models.BooleanField(
         default=False,
         help_text='Controls whether possible UK regions is a required field (after the prospect '
@@ -498,7 +508,8 @@ class IProjectTeamAbstract(models.Model):
     )
     # field project_manager_first_assigned_on is being used for SPI reporting
     # it contains a datetime when first time a project manager has been assigned
-    project_manager_first_assigned_on = models.DateTimeField(null=True, blank=True)
+    project_manager_first_assigned_on = models.DateTimeField(
+        null=True, blank=True)
     # field project_manager_first_assigned_by is being used for SPI reporting
     # it contains a reference to an Adviser who first time assigned a project manager
     project_manager_first_assigned_by = models.ForeignKey(
@@ -599,11 +610,26 @@ class InvestmentProject(
         return get_front_end_url(self)
 
     def save(self, *args, **kwargs):
-        """Updates the stage log after saving."""
+        """Updates the stage log after saving.
+        Create a `CompanyActivity` linked to this investment project for
+        showing all activities related to a company. If no company exist then do nothing
+        """
         adding = self._state.adding
-        super().save(*args, **kwargs)
 
-        self._update_stage_log(adding)
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            self._update_stage_log(adding)
+
+            if not self.investor_company_id:
+                return
+            CompanyActivity.objects.update_or_create(
+                investment_id=self.id,
+                activity_source=CompanyActivity.ActivitySource.investment,
+                defaults={
+                    'date': self.created_on,
+                    'company_id': self.investor_company_id,
+                },
+            )
 
     def _update_stage_log(self, adding):
         """Creates a log of changes to stage field.
@@ -688,7 +714,8 @@ class InvestmentProject(
         return cls._ASSOCIATED_ADVISER_TO_ONE_FIELDS, cls._ASSOCIATED_ADVISER_TO_MANY_FIELDS
 
     def _get_associated_to_one_advisers(self):
-        advisers = (getattr(self, field) for field in self._ASSOCIATED_ADVISER_TO_ONE_FIELDS)
+        advisers = (getattr(self, field)
+                    for field in self._ASSOCIATED_ADVISER_TO_ONE_FIELDS)
         return filter(None, advisers)
 
     def _get_associated_to_many_advisers(self):
@@ -720,7 +747,8 @@ class InvestmentProjectTeamMember(models.Model):
         on_delete=models.CASCADE,
         related_name='team_members',
     )
-    adviser = models.ForeignKey('company.Advisor', on_delete=models.CASCADE, related_name='+')
+    adviser = models.ForeignKey(
+        'company.Advisor', on_delete=models.CASCADE, related_name='+')
     role = models.CharField(max_length=MAX_LENGTH)
 
     def __str__(self):
@@ -763,7 +791,8 @@ class InvestmentActivity(BaseModel):
     """An investment activity."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    revision = models.OneToOneField(Revision, on_delete=models.SET_NULL, null=True, blank=True)
+    revision = models.OneToOneField(
+        Revision, on_delete=models.SET_NULL, null=True, blank=True)
     text = models.TextField()
     activity_type = models.ForeignKey(
         'investment.InvestmentActivityType',

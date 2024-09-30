@@ -21,10 +21,14 @@ class CompanyActivitySearchApp(SearchApp):
         'referral__contact',
         'referral__created_by',
         'referral__recipient',
+        'investment',
+        'investment__investment_type',
+        'investment__created_by',
     ).prefetch_related(
         'interaction__contacts',
         Prefetch(
             'interaction__dit_participants',
-            queryset=InteractionDITParticipant.objects.select_related('adviser', 'team'),
+            queryset=InteractionDITParticipant.objects.select_related(
+                'adviser', 'team'),
         ),
     )

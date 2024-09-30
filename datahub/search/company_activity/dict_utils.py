@@ -34,3 +34,22 @@ def activity_referral_dict(obj):
         'created_by': dict_utils.contact_or_adviser_dict(obj.created_by),
         'contact': dict_utils.contact_or_adviser_dict(obj.contact),
     }
+
+
+def activity_investment_dict(obj):
+    """Creates dictionary from an investment project containing id, name and investor company"""
+    if obj is None:
+        return None
+
+    return {
+        'id': str(obj.id),
+        'name': obj.name,
+        'investment_type': dict_utils.id_name_dict(obj.investment_type),
+        'estimated_land_date': obj.estimated_land_date,
+        'total_investment': obj.total_investment,
+        'foreign_equity_investment': obj.foreign_equity_investment,
+        'gross_value_added': obj.gross_value_added,
+        'number_new_jobs': obj.number_new_jobs,
+        'created_by': dict_utils.contact_or_adviser_dict(obj.created_by),
+        'client_contacts': dict_utils.contact_job_list_of_dicts(obj.client_contacts),
+    }

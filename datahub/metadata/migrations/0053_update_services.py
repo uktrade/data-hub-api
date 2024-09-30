@@ -14,6 +14,7 @@ def load_services(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
+        ('interaction', '0081_auto_20230130_1124'),
         ('metadata', '0052_update_services'),
     ]
 
