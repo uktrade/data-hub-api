@@ -173,7 +173,7 @@ def relate_company_activity_to_investment_projects(batch_size=500):
         CompanyActivity(
             investment_id=investment['id'],
             date=investment['created_on'],
-            investor_company_id=investment['investor_company_id'],
+            company_id=investment['investor_company_id'],
             activity_source=CompanyActivity.ActivitySource.investment,
         )
         for investment in investments
