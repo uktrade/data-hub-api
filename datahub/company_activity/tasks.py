@@ -159,22 +159,25 @@ def relate_company_activity_to_investment_projects(batch_size=500):
     `CompanyActivity` model with a bulk_create. Excludes any
     investment projects already associated in the CompanyActivity model.
     """
-    activity_investment = CompanyActivity.objects.filter(
-        investment__isnull=False,
-    ).values_list('investment_id', flat=True)
+    activity_investments = set(
+        CompanyActivity.objects.filter(
+            investment__isnull=False,
+        ).values_list('investment_id', flat=True),
+    )
 
-    investments = InvestmentProject.objects.exclude(
-        id__in=activity_investment,
+    investments = InvestmentProject.objects.filter(
+        investor_company__isnull=False,
     ).values('id', 'created_on', 'investor_company_id')
 
     objs = (
         CompanyActivity(
             investment_id=investment['id'],
             date=investment['created_on'],
-            company_id=investment['investor_company_id'],
+            investor_company_id=investment['investor_company_id'],
             activity_source=CompanyActivity.ActivitySource.investment,
         )
         for investment in investments
+        if investment['id'] not in activity_investments
     )
     total = investments.count()
     while True:
