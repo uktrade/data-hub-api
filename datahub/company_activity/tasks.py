@@ -7,6 +7,7 @@ from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.interaction.models import Interaction
+from datahub.investment.project.models import InvestmentProject
 
 
 logger = logging.getLogger(__name__)
@@ -67,7 +68,8 @@ def relate_company_activity_to_interactions(batch_size=500):
         if not batch:
             logger.info('Finished bulk creating CompanyActivities.')
             break
-        logger.info(f'Bulk creating {batch_size} CompanyActivities, {total} remaining.')
+        logger.info(
+            f'Creating in batches of: {batch_size} CompanyActivities. {total} remaining.')
         CompanyActivity.objects.bulk_create(objs=batch, batch_size=batch_size)
         total -= batch_size
 
@@ -125,6 +127,65 @@ def relate_company_activity_to_referrals(batch_size=500):
         if not batch:
             logger.info('Finished bulk creating CompanyActivities.')
             break
-        logger.info(f'Bulk creating {batch_size} CompanyActivities, {total} remaining.')
+        logger.info(
+            f'Creating in batches of: {batch_size} CompanyActivities. {total} remaining.')
+        CompanyActivity.objects.bulk_create(objs=batch, batch_size=batch_size)
+        total -= batch_size
+
+
+def schedule_sync_investments_to_company_activity():
+    """
+    Schedules a task to relate all `Investment`s to `CompanyActivity`s
+
+    Can be used to populate the CompanyActivity with missing investments
+    or to initially populate the model.
+    """
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=relate_company_activity_to_investment_projects,
+        job_timeout=HALF_DAY_IN_SECONDS,
+        max_retries=5,
+        retry_backoff=True,
+    )
+    logger.info(
+        f'Task {job.id} schedule_sync_investments_to_company_activity scheduled.',
+    )
+    return job
+
+
+def relate_company_activity_to_investment_projects(batch_size=500):
+    """
+    Grabs all investment projects so they can be related to in the
+    `CompanyActivity` model with a bulk_create. Excludes any
+    investment projects already associated in the CompanyActivity model.
+    """
+    activity_investments = set(
+        CompanyActivity.objects.filter(
+            investment__isnull=False,
+        ).values_list('investment_id', flat=True),
+    )
+
+    investments = InvestmentProject.objects.filter(
+        investor_company__isnull=False,
+    ).values('id', 'created_on', 'investor_company_id')
+
+    objs = (
+        CompanyActivity(
+            investment_id=investment['id'],
+            date=investment['created_on'],
+            company_id=investment['investor_company_id'],
+            activity_source=CompanyActivity.ActivitySource.investment,
+        )
+        for investment in investments
+        if investment['id'] not in activity_investments
+    )
+    total = investments.count()
+    while True:
+        batch = list(islice(objs, batch_size))
+        if not batch:
+            logger.info('Finished bulk creating CompanyActivities.')
+            break
+        logger.info(
+            f'Creating in batches of: {batch_size} CompanyActivities. {total} remaining.')
         CompanyActivity.objects.bulk_create(objs=batch, batch_size=batch_size)
         total -= batch_size

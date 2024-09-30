@@ -1,3 +1,5 @@
+from datetime import date
+
 import pytest
 from opensearchpy.exceptions import NotFoundError
 
@@ -14,6 +16,7 @@ from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     InteractionDITParticipantFactory,
 )
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.search.company_activity.apps import CompanyActivitySearchApp
 
 pytestmark = pytest.mark.django_db
@@ -72,7 +75,8 @@ def test_deleted_company_activity_is_deleted_from_opensearch(opensearch_with_sig
 def test_company_activity_syncs_interaction_fields_when_changed(opensearch_with_signals):
     """Test that company_activities are synced to OpenSearch if their interactions updates."""
     interaction = CompanyInteractionFactory(dit_participants=[], contacts=[])
-    company_activity = DBCompanyActivity.objects.get(interaction_id=interaction.id)
+    company_activity = DBCompanyActivity.objects.get(
+        interaction_id=interaction.id)
     opensearch_with_signals.indices.refresh()
 
     doc = opensearch_with_signals.get(
@@ -95,8 +99,10 @@ def test_company_activity_syncs_interaction_fields_when_changed(opensearch_with_
     )
     actual_dit_participants = updated_doc['_source']['interaction']['dit_participants']
     assert len(actual_dit_participants) == 1
-    assert actual_dit_participants[0]['adviser']['id'] == str(dit_participant.adviser.pk)
-    assert actual_dit_participants[0]['team']['id'] == str(dit_participant.team.pk)
+    assert actual_dit_participants[0]['adviser']['id'] == str(
+        dit_participant.adviser.pk)
+    assert actual_dit_participants[0]['team']['id'] == str(
+        dit_participant.team.pk)
 
     actual_contacts = updated_doc['_source']['interaction']['contacts']
     assert len(actual_contacts) == 1
@@ -110,7 +116,8 @@ def test_updating_company_name_updates_activity(opensearch_with_signals):
     OpenSearch.
     """
     interaction = CompanyInteractionFactory(dit_participants=[], contacts=[])
-    company_activity = DBCompanyActivity.objects.get(interaction_id=interaction.id)
+    company_activity = DBCompanyActivity.objects.get(
+        interaction_id=interaction.id)
     new_company_name = 'exogenous'
     company_activity.company.name = new_company_name
     company_activity.company.save()
@@ -135,9 +142,12 @@ def test_company_activity_syncs_referral_fields_when_changed(opensearch_with_sig
         id=company_activity.pk,
     )
 
-    assert doc['_source']['referral']['recipient']['id'] == str(referral.recipient_id)
-    assert doc['_source']['referral']['contact']['id'] == str(referral.contact_id)
-    assert doc['_source']['referral']['created_by']['id'] == str(referral.created_by_id)
+    assert doc['_source']['referral']['recipient']['id'] == str(
+        referral.recipient_id)
+    assert doc['_source']['referral']['contact']['id'] == str(
+        referral.contact_id)
+    assert doc['_source']['referral']['created_by']['id'] == str(
+        referral.created_by_id)
     assert doc['_source']['referral']['subject'] == referral.subject
 
     new_recipient = AdviserFactory()
@@ -162,3 +172,40 @@ def test_company_activity_syncs_referral_fields_when_changed(opensearch_with_sig
     assert actual_referral['contact']['id'] == str(new_contact.id)
     assert actual_referral['created_by']['id'] == str(new_created_by.id)
     assert actual_referral['subject'] == new_subject
+
+
+def test_company_activity_syncs_investment_fields_when_changed(opensearch_with_signals):
+    """Test that company_activities are synced to OpenSearch if their investment updates."""
+    investment = InvestmentProjectFactory()
+    company_activity = DBCompanyActivity.objects.get(
+        investment_id=investment.id)
+    opensearch_with_signals.indices.refresh()
+
+    doc = opensearch_with_signals.get(
+        index=CompanyActivitySearchApp.search_model.get_read_alias(),
+        id=company_activity.pk,
+    )
+
+    assert doc['_source']['investment']['estimated_land_date'] == str(
+        investment.estimated_land_date)
+    assert doc['_source']['investment']['created_by']['id'] == str(
+        investment.created_by_id)
+
+    new_estimated_land_date = date(2023, 10, 12)
+    investment.estimated_land_date = new_estimated_land_date
+
+    new_created_by = AdviserFactory()
+    investment.created_by = new_created_by
+
+    investment.save()
+
+    opensearch_with_signals.indices.refresh()
+
+    updated_doc = opensearch_with_signals.get(
+        index=CompanyActivitySearchApp.search_model.get_read_alias(),
+        id=company_activity.pk,
+    )
+    actual_investment = updated_doc['_source']['investment']
+    assert actual_investment['estimated_land_date'] == str(
+        new_estimated_land_date)
+    assert actual_investment['created_by']['id'] == str(new_created_by.id)

@@ -34,7 +34,8 @@ class TestCompanyActivityInteractionTasks:
         schedule_sync_interactions_to_company_activity()
         assert CompanyActivity.objects.count() == 4
 
-        company_activity = CompanyActivity.objects.get(interaction_id=interaction.id)
+        company_activity = CompanyActivity.objects.get(
+            interaction_id=interaction.id)
         assert company_activity.date == interaction.date
         assert (
             company_activity.activity_source
@@ -91,11 +92,11 @@ class TestCompanyActivityInteractionTasks:
         assert mocked_bulk_create.call_count == 2
 
         assert (
-            f'Bulk creating {batch_size} CompanyActivities, 10 remaining.'
+            f'Creating in batches of: {batch_size} CompanyActivities. 10 remaining.'
             in caplog.text
         )
         assert (
-            f'Bulk creating {batch_size} CompanyActivities, 5 remaining.'
+            f'Creating in batches of: {batch_size} CompanyActivities. 5 remaining.'
             in caplog.text
         )
         assert (

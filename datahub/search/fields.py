@@ -49,6 +49,24 @@ def contact_or_adviser_field(include_dit_team=False):
     return Object(properties=props)
 
 
+def contact_job_field():
+    """Object field for contacts and job title."""
+    props = {
+        'id': Keyword(),
+        'first_name': NormalizedKeyword(),
+        'last_name': NormalizedKeyword(),
+        'name': Text(
+            fields={
+                'keyword': NormalizedKeyword(),
+                'trigram': TrigramText(),
+            },
+        ),
+        'job_title': NormalizedKeyword(),
+    }
+
+    return Object(properties=props)
+
+
 def id_name_field():
     """Object field with id and name sub-fields."""
     return Object(

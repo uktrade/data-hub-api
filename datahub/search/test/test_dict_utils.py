@@ -251,6 +251,27 @@ def test_contact_or_adviser_dict():
     }
 
 
+def test_contact_job_dict():
+    """Tests contact_job_dict."""
+    obj = construct_mock(
+        id=123,
+        first_name='First',
+        last_name='Last',
+        name='First Last',
+        job_title='Job Title',
+    )
+
+    res = dict_utils.contact_job_dict(obj)
+
+    assert res == {
+        'id': str(obj.id),
+        'first_name': obj.first_name,
+        'last_name': obj.last_name,
+        'name': obj.name,
+        'job_title': obj.job_title,
+    }
+
+
 @pytest.mark.parametrize(
     'obj,expected_dict',
     (

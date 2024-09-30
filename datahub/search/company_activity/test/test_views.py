@@ -15,6 +15,7 @@ from datahub.company.test.factories import (
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_activity.tests.factories import (
     CompanyActivityInteractionFactory,
+    CompanyActivityInvestmentProjectFactory,
     CompanyActivityReferralFactory,
 )
 from datahub.core.test_utils import (
@@ -52,6 +53,9 @@ def company_activities(opensearch_with_collector):
                 CompanyActivityReferralFactory(company=company_1),
                 CompanyActivityReferralFactory(company=company_2),
                 CompanyActivityReferralFactory(company=company_2),
+                CompanyActivityInvestmentProjectFactory(company=company_1),
+                CompanyActivityInvestmentProjectFactory(company=company_1),
+                CompanyActivityInvestmentProjectFactory(company=company_2),
             ],
         )
 
@@ -82,9 +86,11 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == len(company_activities)
-        expected_ids = Counter(str(activity.id) for activity in company_activities)
+        expected_ids = Counter(str(activity.id)
+                               for activity in company_activities)
         assert (
-            Counter([item['id'] for item in response_data['results']]) == expected_ids
+            Counter([item['id']
+                    for item in response_data['results']]) == expected_ids
         )
 
     def test_limit(self, company_activities):
@@ -111,7 +117,7 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert len(response_data['results']) == 6
+        assert len(response_data['results']) == 9
 
     def test_default_sort_by_date(self, opensearch_with_collector):
         """Tests default sorting of results by date (descending)."""
@@ -138,7 +144,8 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         sorted_dates = sorted(dates, reverse=True)
         expected_dates = [d.isoformat() for d in sorted_dates]
         assert response_data['count'] == len(dates)
-        assert [item['date'] for item in response_data['results']] == expected_dates
+        assert [item['date']
+                for item in response_data['results']] == expected_dates
 
     @pytest.mark.parametrize(
         'sortby,error',

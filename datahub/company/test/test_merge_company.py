@@ -219,7 +219,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_investment_projects_factory,
                 {
-                    CompanyActivity: {'company': 0},
+                    CompanyActivity: {'company': 1},
                     CompanyListItem: {'company': 0},
                     CompanyReferral: {'company': 0},
                     Contact: {'company': 0},
@@ -414,10 +414,15 @@ class TestDuplicateCompanyMerger:
 
         other_fields = set(INVESTMENT_PROJECT_COMPANY_FIELDS) - set(fields)
 
+        company = {'company': 0}
+        # CompanyActivity is created if an investment project investor_company is saved
+        if 'investor_company' in fields:
+            company = {'company': 1}
+
         assert result == {
             # each interaction has a contact, that's why 4 contacts should be moved
             CompanyListItem: {'company': 0},
-            CompanyActivity: {'company': 0},
+            CompanyActivity: company,
             CompanyReferral: {'company': 0},
             Contact: {'company': 0},
             Interaction: {'company': 0, 'companies': 0},

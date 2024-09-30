@@ -210,6 +210,7 @@ class CompanyActivitySerializer(serializers.ModelSerializer):
 
 
 class CompanyActivityFilterSerializer(serializers.Serializer):
-    advisers = serializers.ListField(child=serializers.UUIDField(), required=False)
+    advisers = serializers.ListField(
+        child=serializers.UUIDField(), required=False)
     date_before = serializers.DateField(required=False)
     date_after = serializers.DateField(required=False)

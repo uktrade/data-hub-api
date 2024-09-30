@@ -35,6 +35,7 @@ from datahub.company.test.factories import (
     SubsidiaryFactory,
 )
 from datahub.company_activity.tests.factories import CompanyActivityInteractionFactory
+from datahub.company_activity.tests.factories import CompanyActivityInvestmentProjectFactory
 from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
     CompleteCompanyReferralFactory,
@@ -201,6 +202,12 @@ MAPPING = {
             },
             {
                 'factory': CompanyActivityInteractionFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [],
+            },
+            {
+                'factory': CompanyActivityInvestmentProjectFactory,
                 'field': 'company',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [],
@@ -518,6 +525,7 @@ MAPPING = {
     'investment.InvestmentProject': {
         'factory': InvestmentProjectFactory,
         'implicitly_deletable_models': {
+            'company_activity.CompanyActivity',
             'evidence.EvidenceDocument',
             'investment.InvestmentProjectCode',
             'investment.InvestmentProjectStageLog',
