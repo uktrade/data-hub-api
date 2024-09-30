@@ -111,6 +111,10 @@ class Sector(Enum):
         'Consumer and retail',
         '355f977b-8ac3-e211-a646-e4115bead28a',
     )
+    defence = Constant(
+        'Defence',
+        '7dbb9fc6-5f95-e211-a939-e4115bead28a',
+    )
     defence_air = Constant(
         'Defence : Air',
         '03dbd3fb-24e4-421e-bcc1-1dfcd63b2eeb',
