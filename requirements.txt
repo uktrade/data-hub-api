@@ -31,9 +31,9 @@ bigtree==0.21.1
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.35.19
+boto3==1.35.29
     # via -r requirements.in
-botocore==1.35.19
+botocore==1.35.29
     # via
     #   boto3
     #   s3transfer
@@ -77,7 +77,7 @@ distlib==0.3.8
     # via virtualenv
 dj-database-url==2.2.0
     # via -r requirements.in
-django==4.2.15
+django==4.2.16
     # via
     #   -r requirements.in
     #   dj-database-url
@@ -91,7 +91,7 @@ django==4.2.15
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==6.5.1
+django-axes==6.5.2
     # via -r requirements.in
 django-csp==3.8
     # via -r requirements.in
@@ -143,7 +143,7 @@ greenlet==3.0.1
     # via gevent
 grpcio==1.62.1
     # via opentelemetry-exporter-otlp-proto-grpc
-icalendar==5.0.13
+icalendar==6.0.0
     # via -r requirements.in
 identify==2.5.35
     # via pre-commit
@@ -233,7 +233,7 @@ opentelemetry-util-http==0.43b0
     # via opentelemetry-instrumentation-wsgi
 packaging==22.0
     # via python-redis-rate-limit
-pandas==2.2.2
+pandas==2.2.3
     # via -r requirements.in
 platformdirs==4.2.0
     # via virtualenv
@@ -265,9 +265,7 @@ python-dateutil==2.9.0.post0
 python-redis-rate-limit==0.0.9
     # via -r requirements.in
 pytz==2022.7
-    # via
-    #   icalendar
-    #   pandas
+    # via pandas
 pyyaml==6.0.2
     # via
     #   -r requirements.in
@@ -325,6 +323,7 @@ typing-extensions==4.11.0
 tzdata==2023.3
     # via
     #   celery
+    #   icalendar
     #   pandas
 uritemplate==4.1.1
     # via -r requirements.in
