@@ -51,15 +51,12 @@ class EYBLeadViewSet(HawkResponseSigningMixin, SoftDeleteCoreViewSet):
         if company_name:
             queryset = queryset.filter(company__name__icontains=company_name)
         if sector_ids:
-            try:
-                # This will be a list of level 0 sector ids;
-                # We want to find and return all leads with sectors that have these ancestors
-                descendent_sectors = []
-                for sector in Sector.objects.filter(pk__in=sector_ids):
-                    descendent_sectors.extend(sector.get_descendants(include_self=True))
-                queryset = queryset.filter(sector__in=descendent_sectors)
-            except Exception:
-                queryset = queryset.none()
+            # This will be a list of level 0 sector ids;
+            # We want to find and return all leads with sectors that have these ancestors
+            descendent_sectors = []
+            for sector in Sector.objects.filter(pk__in=sector_ids):
+                descendent_sectors.extend(sector.get_descendants(include_self=True))
+            queryset = queryset.filter(sector__in=descendent_sectors)
         if values:
             value_mappings = {
                 'high': True,
