@@ -73,7 +73,7 @@ class TestGreatIngestionTasks:
         updated = Great.objects.get(form_id='dit:directoryFormsApi:Submission:9034')
         assert str(updated.data_country.id) == '876a9ab2-5d95-e211-a939-e4115bead28a'
         assert updated.actor_dit_is_blacklisted is False
-        assert updated.actor_dit_is_whitelisted is False
+        assert updated.actor_dit_is_whitelisted is True
         assert updated.data_full_name == 'Keith Duncan'
 
     def test_invalid_file(self, test_file_path):

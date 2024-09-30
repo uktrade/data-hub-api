@@ -49,6 +49,7 @@ class GreatIngestionTask:
                     'data_opportunities': data.get('opportunities', ''),
                     'data_role_in_company': data.get('role_in_company', ''),
                     'data_opportunity_urls': data.get('opportunity_urls', ''),
+        actor = jsn.get('actor', {})
 
                     'actor_type': actor.get('type', ''),
                     'actor_id': actor.get('id', ''),
