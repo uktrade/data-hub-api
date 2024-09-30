@@ -16,7 +16,7 @@ class Great(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    form_id = models.CharField(max_length=MAX_LENGTH)
+    form_id = models.CharField(max_length=MAX_LENGTH, unique=True)
     published = models.DateTimeField()
 
     attributed_to_type = models.CharField(max_length=MAX_LENGTH)

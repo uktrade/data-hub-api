@@ -120,7 +120,7 @@ class CompanyActivityGreatFactory(factory.django.DjangoModelFactory):
 
     data_comment = 'some comment'
     data_country = factory.SubFactory(CountryFactory)
-    data_full_name = 'Keith Duncan'
+    data_full_name = 'Charlie Smith'
     data_website_url = 'http://www.smith-hall.com/'
     data_company_name = 'Smith-Jenkins'
     data_company_size = '1-10'

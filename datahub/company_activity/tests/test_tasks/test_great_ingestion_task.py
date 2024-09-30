@@ -8,6 +8,8 @@ from datahub.company_activity.tasks.ingest_company_activity import BUCKET, GREAT
 from datahub.company_activity.tasks.ingest_great_data import (
     GreatIngestionTask, REGION,
 )
+from datahub.company_activity.tests.factories import CompanyActivityGreatFactory
+from datahub.metadata.models import Country
 
 
 @pytest.fixture
@@ -54,6 +56,25 @@ class TestGreatIngestionTasks:
         task = GreatIngestionTask()
         task.ingest(BUCKET, test_file_path)
         assert Great.objects.count() == initial_great_activity_count + 28
+
+    @pytest.mark.django_db
+    @mock_aws
+    def test_great_data_ingestion_updates_existing(self, test_file, test_file_path):
+        """
+        Test that a for records which have been previously ingested, updated fields
+        have their new values ingested
+        """
+        country = Country.objects.get(id='0350bdb8-5d95-e211-a939-e4115bead28a')
+        CompanyActivityGreatFactory(data_country=country)
+        setup_s3_bucket(BUCKET)
+        setup_s3_files(BUCKET, test_file, test_file_path)
+        task = GreatIngestionTask()
+        task.ingest(BUCKET, test_file_path)
+        updated = Great.objects.get(form_id='dit:directoryFormsApi:Submission:9034')
+        assert str(updated.data_country.id) == '876a9ab2-5d95-e211-a939-e4115bead28a'
+        assert updated.actor_dit_is_blacklisted is False
+        assert updated.actor_dit_is_whitelisted is False
+        assert updated.data_full_name == 'Keith Duncan'
 
     def test_invalid_file(self, test_file_path):
         """
