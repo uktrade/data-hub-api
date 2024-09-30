@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("metadata", "0087_update_services"),
-        ("company_activity", "0002_ingestedfile"),
+        ("company_activity", "0003_ingestedfile"),
     ]
 
     operations = [

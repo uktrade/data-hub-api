@@ -107,7 +107,7 @@ class CompanyActivityGreatFactory(factory.django.DjangoModelFactory):
     CompanyActivity ingested Great data factory
     """
 
-    form_id = 'dit:directoryFormsApi:Submission:9034'
+    form_id = factory.Sequence(lambda n: 'dit:directoryFormsApi:Submission:{0}'.format(n))
     published = now()
     url = '"http://www.lewis.com/"'
 

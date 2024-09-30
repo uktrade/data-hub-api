@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 
 from datahub.company_activity.models import CompanyActivity
-from datahub.company_activity.tasks import (
+from datahub.company_activity.tasks.sync import (
     relate_company_activity_to_investment_projects,
     schedule_sync_investments_to_company_activity,
 )
