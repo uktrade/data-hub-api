@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 
 from datahub.core import reversion
+from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -27,7 +28,11 @@ class Great(models.Model):
     meta_email_address = models.CharField(max_length=MAX_LENGTH)
 
     data_comment = models.CharField(max_length=MAX_LENGTH)
-    data_country = models.CharField(max_length=MAX_LENGTH)
+    data_country = models.ForeignKey(
+        metadata_models.Country,
+        on_delete=models.PROTECT,
+        null=True,
+    )
     data_full_name = models.CharField(max_length=MAX_LENGTH)
     data_website_url = models.CharField(max_length=MAX_LENGTH)
     data_company_name = models.CharField(max_length=MAX_LENGTH)
@@ -38,5 +43,12 @@ class Great(models.Model):
     data_opportunities = models.CharField(max_length=MAX_LENGTH)
     data_role_in_company = models.CharField(max_length=MAX_LENGTH)
     data_opportunity_urls = models.CharField(max_length=MAX_LENGTH)
+
+    actor_type = models.CharField(max_length=MAX_LENGTH)
+    actor_id = models.CharField(max_length=MAX_LENGTH)
+    actor_dit_email_address = models.CharField(max_length=MAX_LENGTH)
+    actor_dit_is_blacklisted = models.BooleanField()
+    actor_dit_is_whitelisted = models.BooleanField()
+    actor_dit_blacklisted_reason = models.CharField(max_length=MAX_LENGTH)
 
     created_on = models.DateTimeField(auto_now_add=True)
