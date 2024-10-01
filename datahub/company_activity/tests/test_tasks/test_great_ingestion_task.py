@@ -4,6 +4,7 @@ import boto3
 import pytest
 
 from moto import mock_aws
+from sentry_sdk import init
 
 from datahub.company_activity.models import Great
 from datahub.company_activity.tasks.ingest_company_activity import BUCKET, GREAT_PREFIX
@@ -92,6 +93,7 @@ class TestGreatIngestionTasks:
         """
         Test that when the country code provided in the data file cannot be found
         in the metadata countries table, we save the record with data_country: None
+        and trigger a Sentry alert
         """
         data = """
             {
@@ -133,7 +135,10 @@ class TestGreatIngestionTasks:
                 }
         }
         """
+        events = []
+        init(transport=events.append)
         task = GreatIngestionTask()
         task.json_to_model(json.loads(data))
         result = Great.objects.get(form_id='dit:directoryFormsApi:Submission:5249')
         assert result.data_country is None
+        assert events[0]['logentry']['message'] == 'Could not match country with iso code: ZZ'
