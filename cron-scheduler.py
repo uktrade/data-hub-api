@@ -125,7 +125,7 @@ def schedule_jobs():
     )
     job_scheduler(
         function=CompanyActivityIngestionTask.ingest_activity_data,
-        cron=EVERY_TEN_MINUTES,
+        cron=EVERY_HOUR,
         description='Check S3 for new Company Activity data files and schedule ingestion',
     )
 

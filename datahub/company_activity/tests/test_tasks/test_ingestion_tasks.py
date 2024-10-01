@@ -19,7 +19,7 @@ from datahub.company_activity.tasks import GreatIngestionTask
 from datahub.company_activity.tasks.ingest_company_activity import (
     BUCKET, CompanyActivityIngestionTask, GREAT_PREFIX, REGION,
 )
-from datahub.core.queues.constants import EVERY_TEN_MINUTES
+from datahub.core.queues.constants import EVERY_HOUR
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import DataHubScheduler
 
@@ -66,7 +66,7 @@ class TestCompanyActivityIngestionTasks:
         )
         scheduled_job = [job for job in scheduled_jobs if job.func_name == ingestion_task][0]
         assert scheduled_job.func_name == ingestion_task
-        assert scheduled_job.meta['cron_string'] == EVERY_TEN_MINUTES
+        assert scheduled_job.meta['cron_string'] == EVERY_HOUR
 
         # Prevents the scheduler loop from running after tests finish by unloading the module again
         sys.modules.pop('cron-scheduler')
