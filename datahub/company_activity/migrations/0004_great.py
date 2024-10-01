@@ -55,6 +55,7 @@ class Migration(migrations.Migration):
                     "data_country",
                     models.ForeignKey(
                         null=True,
+                        blank=True,
                         on_delete=django.db.models.deletion.PROTECT,
                         to="metadata.country",
                     ),

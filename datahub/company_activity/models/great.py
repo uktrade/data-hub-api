@@ -32,6 +32,7 @@ class Great(models.Model):
         metadata_models.Country,
         on_delete=models.PROTECT,
         null=True,
+        blank=True,
     )
     data_full_name = models.CharField(max_length=MAX_LENGTH)
     data_website_url = models.CharField(max_length=MAX_LENGTH)
