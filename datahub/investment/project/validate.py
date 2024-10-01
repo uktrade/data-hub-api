@@ -64,6 +64,7 @@ class InvestmentProjectStageValidationConfig:
             'uk_company': Stage.verify_win.value,
             'investor_type': Stage.verify_win.value,
             'level_of_involvement': Stage.verify_win.value,
+            'likelihood_to_land': Stage.assign_pm.value,
         }
 
     @classmethod
