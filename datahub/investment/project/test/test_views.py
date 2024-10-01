@@ -1468,7 +1468,7 @@ class TestPartialUpdateView(APITestMixin):
         project = AssignPMInvestmentProjectFactory(
             project_assurance_adviser=adviser,
             project_manager=adviser,
-            likelihood_to_land_id=None
+            likelihood_to_land_id=None,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
