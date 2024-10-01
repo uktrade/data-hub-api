@@ -7,7 +7,7 @@ from moto import mock_aws
 from sentry_sdk import init
 from sentry_sdk.transport import Transport
 
-from datahub.company_activity.models import Great
+from datahub.company_activity.models import Great, IngestedFile
 from datahub.company_activity.tasks.ingest_company_activity import BUCKET, GREAT_PREFIX
 from datahub.company_activity.tasks.ingest_great_data import (
     GreatIngestionTask, REGION,
@@ -63,14 +63,17 @@ class TestGreatIngestionTasks:
     @mock_aws
     def test_great_data_file_ingestion(self, test_file, test_file_path):
         """
-        Test that a Great data file is ingested correctly
+        Test that a Great data file is ingested correctly and the ingested file
+        is added to the IngestedFile table
         """
         initial_great_activity_count = Great.objects.count()
+        initial_ingested_count = IngestedFile.objects.count()
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
         task = GreatIngestionTask()
         task.ingest(BUCKET, test_file_path)
         assert Great.objects.count() == initial_great_activity_count + 28
+        assert IngestedFile.objects.count() == initial_ingested_count + 1
 
     @pytest.mark.django_db
     @mock_aws
