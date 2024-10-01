@@ -1,7 +1,7 @@
 import importlib
 import sys
 
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import boto3
 import pytest
@@ -10,7 +10,8 @@ from django.conf import settings
 from moto import mock_aws
 
 from redis import Redis
-from rq import Queue
+from rq import Queue, Worker
+from rq.job import Job
 from rq_scheduler import Scheduler
 
 from datahub.company_activity.models import IngestedFile
@@ -109,7 +110,7 @@ class TestCompanyActivityIngestionTasks:
         return_value=DataHubScheduler(is_async=True),
     )
     @mock_aws
-    def test_duplicate_ingestion_jobs_are_not_queued(self, mock, test_files):
+    def test_job_not_queued_when_already_on_queue(self, mock, test_files):
         """
         Test that when, the job has run and queued an ingestion job for a file
         but that child job hasn't completed yet, this job does not queue a duplicate
@@ -117,9 +118,6 @@ class TestCompanyActivityIngestionTasks:
         """
         new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
         setup_s3_bucket(BUCKET, test_files)
-        for file in test_files:
-            if not file == new_file:
-                IngestedFile.objects.create(filepath=file)
 
         redis = Redis.from_url(settings.REDIS_BASE_URL)
         rq_queue = Queue('long-running', connection=redis)
@@ -130,6 +128,34 @@ class TestCompanyActivityIngestionTasks:
             description='Ingest Great data file',
         )
         initial_job_count = rq_queue.count
+
+        task = CompanyActivityIngestionTask()
+        task.ingest_activity_data()
+        assert rq_queue.count == initial_job_count
+
+    @pytest.mark.django_db
+    # Patch so that we can test the job is queued, rather than having it be run instantly
+    @patch(
+        'datahub.core.queues.job_scheduler.DataHubScheduler',
+        return_value=DataHubScheduler(is_async=True),
+    )
+    @patch('datahub.company_activity.tasks.ingest_company_activity.Worker')
+    @mock_aws
+    def test_job_not_queued_when_already_running(self, mock_worker, mock_scheduler, test_files):
+        """
+        Test that we don't queue a job to ingest a file when a job is already running for it
+        """
+        new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
+        setup_s3_bucket(BUCKET, test_files)
+
+        redis = Redis.from_url(settings.REDIS_BASE_URL)
+        rq_queue = Queue('long-running', connection=redis)
+        rq_queue.empty()
+        initial_job_count = rq_queue.count
+        mock_job = Job.create('ingest', kwargs={'file': new_file}, connection=redis)
+        mock_worker_instance = Worker(['long-running'], connection=redis)
+        mock_worker_instance.get_current_job = MagicMock(return_value=mock_job)
+        mock_worker.all.return_value = [mock_worker_instance]
 
         task = CompanyActivityIngestionTask()
         task.ingest_activity_data()

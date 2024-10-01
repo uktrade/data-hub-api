@@ -4,7 +4,7 @@ import environ
 from django.conf import settings
 
 from redis import Redis
-from rq import Queue
+from rq import Queue, Worker
 
 from datahub.company_activity.models import IngestedFile
 from datahub.company_activity.tasks import GreatIngestionTask
@@ -40,12 +40,19 @@ class CompanyActivityIngestionTask:
         previously_ingested = IngestedFile.objects.filter(filepath=file)
         return previously_ingested.exists()
 
-    def _file_already_queued(self, file):
+    def _job_matches(self, job, file):
+        return job.kwargs.get('file') == file and job.func_name == 'ingest'
+
+    def _has_file_been_queued(self, file):
         """Check if there is already an RQ job queued or running to ingest the given file"""
         redis = Redis.from_url(settings.REDIS_BASE_URL)
         rq_queue = Queue('long-running', connection=redis)
         for job in rq_queue.jobs:
-            if job.kwargs.get('file') == file and job.func_name == 'ingest':
+            if self._job_matches(job, file):
+                return True
+        for worker in Worker.all(queue=rq_queue):
+            job = worker.get_current_job()
+            if self._job_matches(job, file):
                 return True
         return False
 
@@ -56,8 +63,8 @@ class CompanyActivityIngestionTask:
         that hasn't already been ingested
         """
         latest_file = self._get_most_recent_obj(BUCKET, GREAT_PREFIX)
-        if not self._has_file_been_ingested(latest_file):
-            if not self._file_already_queued(latest_file):
+        if not self._has_file_been_queued(latest_file):
+            if not self._has_file_been_ingested(latest_file):
                 job_scheduler(
                     function=GreatIngestionTask().ingest,
                     function_kwargs={'bucket': BUCKET, 'file': latest_file},
