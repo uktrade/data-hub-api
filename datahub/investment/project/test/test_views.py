@@ -1462,6 +1462,27 @@ class TestPartialUpdateView(APITestMixin):
             'project_manager': ['This field is required.'],
         }
 
+    def test_change_stage_active_missing_likelihood_to_land_failure(self):
+        """Tests moving a complete project to the Active stage."""
+        adviser = AdviserFactory()
+        project = AssignPMInvestmentProjectFactory(
+            project_assurance_adviser=adviser,
+            project_manager=adviser,
+            likelihood_to_land_id=None
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.active.value.id,
+            },
+        }
+        response = self.api_client.patch(url, data=request_data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'likelihood_to_land': ['This field is required.'],
+        }
+
     def test_change_stage_active_success(self):
         """Tests moving a complete project to the Active stage."""
         adviser = AdviserFactory()
