@@ -5,6 +5,7 @@ import pytest
 
 from moto import mock_aws
 from sentry_sdk import init
+from sentry_sdk.transport import Transport
 
 from datahub.company_activity.models import Great
 from datahub.company_activity.tasks.ingest_company_activity import BUCKET, GREAT_PREFIX
@@ -44,6 +45,17 @@ def setup_s3_bucket(bucket_name):
 def setup_s3_files(bucket_name, test_file, test_file_path):
     mock_s3_client = setup_s3_client()
     mock_s3_client.put_object(Bucket=bucket_name, Key=test_file_path, Body=test_file)
+
+
+class MockSentryTransport(Transport):
+    def __init__(self):
+        self.events = []
+
+    def capture_event(self, event):
+        pass
+
+    def capture_envelope(self, envelope):
+        self.events.append(envelope)
 
 
 class TestGreatIngestionTasks:
@@ -135,10 +147,11 @@ class TestGreatIngestionTasks:
                 }
         }
         """
-        events = []
-        init(transport=events.append)
+        mock_transport = MockSentryTransport()
+        init(transport=mock_transport)
         task = GreatIngestionTask()
         task.json_to_model(json.loads(data))
         result = Great.objects.get(form_id='dit:directoryFormsApi:Submission:5249')
         assert result.data_country is None
-        assert events[0]['logentry']['message'] == 'Could not match country with iso code: ZZ'
+        sentry_event = mock_transport.events[0].get_event()
+        assert sentry_event['logentry']['message'] == 'Could not match country with iso code: ZZ'
