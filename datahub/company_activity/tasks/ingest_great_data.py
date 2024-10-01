@@ -5,7 +5,7 @@ import environ
 
 from smart_open import open
 
-from datahub.company_activity.models import Great
+from datahub.company_activity.models import Great, IngestedFile
 from datahub.metadata.models import Country
 
 logger = logging.getLogger(__name__)
@@ -24,6 +24,7 @@ class GreatIngestionTask:
                 self.json_to_model(json.loads(line))
         except Exception as e:
             raise e
+        IngestedFile.objects.create(filepath=file)
 
     def _get_countries(self):
         self._countries = Country.objects.all()

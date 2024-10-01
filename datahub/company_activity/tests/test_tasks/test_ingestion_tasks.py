@@ -14,10 +14,12 @@ from rq import Queue
 from rq_scheduler import Scheduler
 
 from datahub.company_activity.models import IngestedFile
+from datahub.company_activity.tasks import GreatIngestionTask
 from datahub.company_activity.tasks.ingest_company_activity import (
     BUCKET, CompanyActivityIngestionTask, GREAT_PREFIX, REGION,
 )
 from datahub.core.queues.constants import EVERY_TEN_MINUTES
+from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import DataHubScheduler
 
 
@@ -88,6 +90,7 @@ class TestCompanyActivityIngestionTasks:
 
         redis = Redis.from_url(settings.REDIS_BASE_URL)
         rq_queue = Queue('long-running', connection=redis)
+        rq_queue.empty()
         initial_job_count = rq_queue.count
 
         task = CompanyActivityIngestionTask()
@@ -98,3 +101,36 @@ class TestCompanyActivityIngestionTasks:
         assert job.func_name == 'ingest'
         assert job.kwargs['bucket'] == BUCKET
         assert job.kwargs['file'] == new_file
+
+    @pytest.mark.django_db
+    # Patch so that we can simulate a job on the queue rather than having it run instantly
+    @patch(
+        'datahub.core.queues.job_scheduler.DataHubScheduler',
+        return_value=DataHubScheduler(is_async=True),
+    )
+    @mock_aws
+    def test_duplicate_ingestion_jobs_are_not_queued(self, mock, test_files):
+        """
+        Test that when, the job has run and queued an ingestion job for a file
+        but that child job hasn't completed yet, this job does not queue a duplicate
+        when running again
+        """
+        new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
+        setup_s3_bucket(BUCKET, test_files)
+        for file in test_files:
+            if not file == new_file:
+                IngestedFile.objects.create(filepath=file)
+
+        redis = Redis.from_url(settings.REDIS_BASE_URL)
+        rq_queue = Queue('long-running', connection=redis)
+        job_scheduler(
+            function=GreatIngestionTask().ingest,
+            function_kwargs={'bucket': BUCKET, 'file': new_file},
+            queue_name='long-running',
+            description='Ingest Great data file',
+        )
+        initial_job_count = rq_queue.count
+
+        task = CompanyActivityIngestionTask()
+        task.ingest_activity_data()
+        assert rq_queue.count == initial_job_count
