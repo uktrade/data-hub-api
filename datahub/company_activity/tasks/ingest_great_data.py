@@ -28,7 +28,7 @@ class GreatIngestionTask:
     def _get_countries(self):
         self._countries = Country.objects.all()
 
-    def country_from_iso_code(self, country_code):
+    def country_from_iso_code(self, country_code, form_id):
         if not country_code:
             return None
         if self._countries is None:
@@ -36,7 +36,9 @@ class GreatIngestionTask:
         countries = self._countries.filter(iso_alpha2_code=country_code)
         country = countries.first()
         if country is None:
-            logger.exception(f'Could not match country with iso code: {country_code}')
+            logger.exception(
+                f'Could not match country with iso code: {country_code}, for form: {form_id}',
+            )
         return country
 
     def json_to_model(self, jsn):
@@ -57,7 +59,7 @@ class GreatIngestionTask:
             'meta_email_address': meta.get('email_address', ''),
 
             'data_comment': data.get('comment', ''),
-            'data_country': self.country_from_iso_code(data.get('country', '')),
+            'data_country': self.country_from_iso_code(data.get('country', ''), obj['id']),
             'data_full_name': data.get('full_name', ''),
             'data_website_url': data.get('website_url', ''),
             'data_company_name': data.get('company_name', ''),

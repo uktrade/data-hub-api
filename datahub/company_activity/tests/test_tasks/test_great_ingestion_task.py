@@ -91,14 +91,22 @@ class TestGreatIngestionTasks:
         assert updated.actor_dit_is_whitelisted is True
         assert updated.data_full_name == 'Keith Duncan'
 
+    @mock_aws
     def test_invalid_file(self, test_file_path):
         """
         Test that an exception is raised when the file is not valid
         """
+        mock_transport = MockSentryTransport()
+        init(transport=mock_transport)
         setup_s3_bucket(BUCKET)
         task = GreatIngestionTask()
-        with pytest.raises(Exception):
+        with pytest.raises(Exception) as e:
             task.ingest(BUCKET, test_file_path)
+        exception = e.value.args[0]
+        assert 'The specified key does not exist' in exception
+        expected = " key: 'data-flow/exports/GreatGovUKFormsPipeline/" \
+            '20240920T000000/full_ingestion.jsonl.gz'
+        assert expected in exception
 
     @pytest.mark.django_db
     def test_invalid_country_code(self):
@@ -154,4 +162,6 @@ class TestGreatIngestionTasks:
         result = Great.objects.get(form_id='dit:directoryFormsApi:Submission:5249')
         assert result.data_country is None
         sentry_event = mock_transport.events[0].get_event()
-        assert sentry_event['logentry']['message'] == 'Could not match country with iso code: ZZ'
+        expected_message = 'Could not match country with iso code: ZZ, ' + \
+            'for form: dit:directoryFormsApi:Submission:5249'
+        assert sentry_event['logentry']['message'] == expected_message
