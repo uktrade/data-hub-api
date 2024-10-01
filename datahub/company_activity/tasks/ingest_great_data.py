@@ -1,4 +1,5 @@
 import json
+import logging
 
 import environ
 
@@ -7,6 +8,7 @@ from smart_open import open
 from datahub.company_activity.models import Great
 from datahub.metadata.models import Country
 
+logger = logging.getLogger(__name__)
 env = environ.Env()
 REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
 
@@ -32,7 +34,10 @@ class GreatIngestionTask:
         if self._countries is None:
             self._get_countries()
         countries = self._countries.filter(iso_alpha2_code=country_code)
-        return countries.first()
+        country = countries.first()
+        if country is None:
+            logger.exception(f'Could not match country with iso code: {country_code}')
+        return country
 
     def json_to_model(self, jsn):
         obj = jsn['object']
