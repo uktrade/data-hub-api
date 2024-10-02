@@ -12,9 +12,9 @@ from datahub.core.queues.job_scheduler import job_scheduler
 
 env = environ.Env()
 REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
-BUCKET = 'data-flow-bucket-' + env('ENVIRONMENT', default='')
+BUCKET = f"data-flow-bucket-{env('ENVIRONMENT', default='')}"
 PREFIX = 'data-flow/exports/'
-GREAT_PREFIX = PREFIX + 'GreatGovUKFormsPipeline/'
+GREAT_PREFIX = f'{PREFIX}GreatGovUKFormsPipeline/'
 
 
 class CompanyActivityIngestionTask:
@@ -63,11 +63,16 @@ class CompanyActivityIngestionTask:
         that hasn't already been ingested
         """
         latest_file = self._get_most_recent_obj(BUCKET, GREAT_PREFIX)
-        if not self._has_file_been_queued(latest_file):
-            if not self._has_file_been_ingested(latest_file):
-                job_scheduler(
-                    function=GreatIngestionTask().ingest,
-                    function_kwargs={'bucket': BUCKET, 'file': latest_file},
-                    queue_name='long-running',
-                    description='Ingest Great data file',
-                )
+
+        if self._has_file_been_queued(latest_file):
+            return
+
+        if self._has_file_been_ingested(latest_file):
+            return
+
+        job_scheduler(
+            function=GreatIngestionTask().ingest,
+            function_kwargs={'bucket': BUCKET, 'file': latest_file},
+            queue_name='long-running',
+            description='Ingest Great data file',
+        )
