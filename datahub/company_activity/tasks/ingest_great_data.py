@@ -33,15 +33,16 @@ class GreatIngestionTask:
     def country_from_iso_code(self, country_code, form_id):
         if not country_code:
             return None
+
         if self._countries is None:
             self._get_countries()
-        countries = self._countries.filter(iso_alpha2_code=country_code)
-        country = countries.first()
-        if country is None:
+
+        try:
+            return self._countries.get(iso_alpha2_code=country_code)
+        except Country.DoesNotExist:
             logger.exception(
                 f'Could not match country with iso code: {country_code}, for form: {form_id}',
             )
-        return country
 
     def json_to_model(self, jsn):
         obj = jsn['object']
