@@ -60,12 +60,8 @@ class TestCompanyActivityIngestionTasks:
 
         scheduler = Scheduler(queue, connection=Redis.from_url(settings.REDIS_BASE_URL))
         scheduled_jobs = scheduler.get_jobs()
-        ingestion_task = (
-            'datahub.company_activity.tasks.ingest_company_activity.'
-            'CompanyActivityIngestionTask.ingest_activity_data'
-        )
+        ingestion_task = 'ingest_activity_data'
         scheduled_job = [job for job in scheduled_jobs if job.func_name == ingestion_task][0]
-        assert scheduled_job.func_name == ingestion_task
         assert scheduled_job.meta['cron_string'] == EVERY_HOUR
 
         # Prevents the scheduler loop from running after tests finish by unloading the module again
