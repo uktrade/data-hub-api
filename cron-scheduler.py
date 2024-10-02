@@ -124,7 +124,7 @@ def schedule_jobs():
         description='Update companies from dnb service',
     )
     job_scheduler(
-        function=CompanyActivityIngestionTask.ingest_activity_data,
+        function=CompanyActivityIngestionTask().ingest_activity_data,
         cron=EVERY_HOUR,
         description='Check S3 for new Company Activity data files and schedule ingestion',
     )

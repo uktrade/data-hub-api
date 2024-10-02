@@ -18,12 +18,10 @@ GREAT_PREFIX = f'{PREFIX}GreatGovUKFormsPipeline/'
 
 
 class CompanyActivityIngestionTask:
-    def __init__(self):
-        self.s3_client = boto3.client('s3', REGION)
-
     def _list_objects(self, bucket_name, prefix):
         """Returns a list all objects with specified prefix."""
-        response = self.s3_client.list_objects(
+        s3_client = boto3.client('s3', REGION)
+        response = s3_client.list_objects(
             Bucket=bucket_name,
             Prefix=prefix,
         )
