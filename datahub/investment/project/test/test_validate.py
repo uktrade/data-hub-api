@@ -16,7 +16,7 @@ from datahub.investment.project.serializers import (
     VALUE_FIELDS,
 )
 from datahub.investment.project.test.factories import (
-    AssignPMInvestmentProjectFactory,
+    ActiveInvestmentProjectFactory,
     InvestmentProjectFactory,
 )
 from datahub.investment.project.validate import (
@@ -375,7 +375,7 @@ def test_validate_verify_win_instance_with_cond_fields():
 
 def test_likelihood_to_land_assign_pm_stage_missing_error():
     """Tests missing likelihood to land missing at assign pm stage."""
-    project = AssignPMInvestmentProjectFactory(
+    project = ActiveInvestmentProjectFactory(
         likelihood_to_land_id=None,
     )
     errors = validate(instance=project)
