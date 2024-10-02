@@ -7,7 +7,7 @@ from redis import Redis
 from rq import Queue, Worker
 
 from datahub.company_activity.models import IngestedFile
-from datahub.company_activity.tasks import GreatIngestionTask
+from datahub.company_activity.tasks import ingest_great_data
 from datahub.core.queues.job_scheduler import job_scheduler
 
 env = environ.Env()
@@ -15,6 +15,11 @@ REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
 BUCKET = f"data-flow-bucket-{env('ENVIRONMENT', default='')}"
 PREFIX = 'data-flow/exports/'
 GREAT_PREFIX = f'{PREFIX}GreatGovUKFormsPipeline/'
+
+
+def ingest_activity_data():
+    task = CompanyActivityIngestionTask()
+    task.ingest()
 
 
 class CompanyActivityIngestionTask:
@@ -39,7 +44,8 @@ class CompanyActivityIngestionTask:
         return previously_ingested.exists()
 
     def _job_matches(self, job, file):
-        return job.kwargs.get('file') == file and job.func_name == 'ingest'
+        func_name = 'datahub.company_activity.tasks.ingest_great_data.ingest_great_data'
+        return job.kwargs.get('file') == file and job.func_name == func_name
 
     def _has_file_been_queued(self, file):
         """Check if there is already an RQ job queued or running to ingest the given file"""
@@ -54,7 +60,7 @@ class CompanyActivityIngestionTask:
                 return True
         return False
 
-    def ingest_activity_data(self):
+    def ingest(self):
         """
         Gets the most recent file in the data-flow S3 bucket for each
         data source (prefix) and enqueues a job to process each file
@@ -69,7 +75,7 @@ class CompanyActivityIngestionTask:
             return
 
         job_scheduler(
-            function=GreatIngestionTask().ingest,
+            function=ingest_great_data,
             function_kwargs={'bucket': BUCKET, 'file': latest_file},
             queue_name='long-running',
             description='Ingest Great data file',
