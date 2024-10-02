@@ -76,3 +76,6 @@ pandas
 
 # Progress bar
 tqdm
+
+# S3 streaming
+smart_open

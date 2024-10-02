@@ -14,6 +14,7 @@ from datahub.company.tasks.adviser import schedule_automatic_adviser_deactivate
 from datahub.company.tasks.company import schedule_automatic_company_archive
 from datahub.company.tasks.contact import schedule_automatic_contact_archive
 from datahub.company.tasks.export_potential import update_company_export_potential_from_csv
+from datahub.company_activity.tasks.ingest_company_activity import CompanyActivityIngestionTask
 from datahub.core.queues.constants import (
     EVERY_EIGHT_AM,
     EVERY_EIGHT_THIRTY_AM_ON_FIRST_EACH_MONTH,
@@ -121,6 +122,11 @@ def schedule_jobs():
         function=schedule_get_company_updates,
         cron=EVERY_MIDNIGHT,
         description='Update companies from dnb service',
+    )
+    job_scheduler(
+        function=CompanyActivityIngestionTask.ingest_activity_data,
+        cron=EVERY_HOUR,
+        description='Check S3 for new Company Activity data files and schedule ingestion',
     )
 
     if settings.ENABLE_ESTIMATED_LAND_DATE_REMINDERS:
