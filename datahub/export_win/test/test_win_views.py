@@ -304,6 +304,7 @@ class TestGetWinView(APITestMixin):
             ],
             'team_members': [],
             'advisers': [],
+            'contributing_advisers': [],
             'customer_response': {
                 'id': str(customer_response.id),
                 'access_to_contacts': {
@@ -872,6 +873,7 @@ class TestCreateWinView(APITestMixin):
             'type_of_support': [{'id': str(type_of_support.id), 'name': type_of_support.name}],
             'team_members': [],
             'advisers': [],
+            'contributing_advisers': [],
             'first_sent': format_date_or_datetime(first_sent),
             'last_sent': format_date_or_datetime(first_sent),
             'company_export': None,
@@ -889,7 +891,11 @@ class TestCreateWinView(APITestMixin):
         ).exists()
         mock_export_win_serializer_notify.assert_called_once()
 
-    def test_create_win_all_fields(self, mock_export_win_serializer_notify):
+    @pytest.mark.parametrize(
+        'advisers_field',
+        ('advisers', 'contributing_advisers'),
+    )
+    def test_create_win_all_fields(self, mock_export_win_serializer_notify, advisers_field):
         """Tests successfully creating an export win with all fields only."""
         assert Version.objects.count() == 0
 
@@ -980,7 +986,7 @@ class TestCreateWinView(APITestMixin):
                     'id': str(team_member.id),
                 },
             ],
-            'advisers': [
+            advisers_field: [
                 {
                     'adviser': {
                         'id': str(additional_team_member.id),
@@ -1184,6 +1190,28 @@ class TestCreateWinView(APITestMixin):
                     },
                 },
             ],
+            'contributing_advisers': [
+                {
+                    'id': str(win_adviser.id),
+                    'adviser': {
+                        'id': str(win_adviser.adviser.id),
+                        'first_name': win_adviser.adviser.first_name,
+                        'last_name': win_adviser.adviser.last_name,
+                        'name': win_adviser.adviser.name,
+                    },
+                    # legacy field
+                    'name': win_adviser.name,
+                    'location': win_adviser.location,
+                    'team_type': {
+                        'id': str(win_adviser.team_type.id),
+                        'name': win_adviser.team_type.name,
+                    },
+                    'hq_team': {
+                        'id': str(win_adviser.hq_team.id),
+                        'name': win_adviser.hq_team.name,
+                    },
+                },
+            ],
             'company_export': {
                 'id': str(export.id),
                 'title': export.title,
@@ -1290,7 +1318,11 @@ class TestCreateWinView(APITestMixin):
 class TestUpdateWinView(APITestMixin):
     """Update export win view tests."""
 
-    def test_update_win_all_fields(self):
+    @pytest.mark.parametrize(
+        'advisers_field',
+        ('advisers', 'contributing_advisers'),
+    )
+    def test_update_win_all_fields(self, advisers_field):
         """Tests successfully updating an export win with all fields only."""
         win = WinFactory(adviser=self.user)
         customer_response = CustomerResponse(win=win)
@@ -1392,7 +1424,7 @@ class TestUpdateWinView(APITestMixin):
                     'id': str(team_member.id),
                 },
             ],
-            'advisers': [
+            advisers_field: [
                 {
                     'adviser': {
                         'id': str(additional_team_member.id),
@@ -1601,6 +1633,28 @@ class TestUpdateWinView(APITestMixin):
                     },
                 },
             ],
+            'contributing_advisers': [
+                {
+                    'id': str(win_adviser.id),
+                    'adviser': {
+                        'id': str(win_adviser.adviser.id),
+                        'first_name': win_adviser.adviser.first_name,
+                        'last_name': win_adviser.adviser.last_name,
+                        'name': win_adviser.adviser.name,
+                    },
+                    # legacy field
+                    'name': win_adviser.name,
+                    'location': win_adviser.location,
+                    'team_type': {
+                        'id': str(win_adviser.team_type.id),
+                        'name': win_adviser.team_type.name,
+                    },
+                    'hq_team': {
+                        'id': str(win_adviser.hq_team.id),
+                        'name': win_adviser.hq_team.name,
+                    },
+                },
+            ],
             'company_export': {
                 'id': str(export.id),
                 'title': export.title,
@@ -1788,6 +1842,28 @@ class TestUpdateWinView(APITestMixin):
             ],
             'team_members': [],
             'advisers': [
+                {
+                    'id': str(win_adviser.id),
+                    'adviser': {
+                        'id': str(win_adviser.adviser.id),
+                        'first_name': win_adviser.adviser.first_name,
+                        'last_name': win_adviser.adviser.last_name,
+                        'name': win_adviser.adviser.name,
+                    },
+                    # legacy field
+                    'name': win_adviser.name,
+                    'location': win_adviser.location,
+                    'team_type': {
+                        'id': str(win_adviser.team_type.id),
+                        'name': win_adviser.team_type.name,
+                    },
+                    'hq_team': {
+                        'id': str(win_adviser.hq_team.id),
+                        'name': win_adviser.hq_team.name,
+                    },
+                },
+            ],
+            'contributing_advisers': [
                 {
                     'id': str(win_adviser.id),
                     'adviser': {

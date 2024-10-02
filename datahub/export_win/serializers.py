@@ -197,7 +197,9 @@ class WinSerializer(ModelSerializer):
     export_experience = NestedRelatedField(ExportExperience)
     associated_programme = NestedRelatedField(AssociatedProgramme, many=True)
     customer_response = CustomerResponseSerializer(read_only=True)
+    # TODO: advisers should be removed once front end starts using contributing_advisers
     advisers = WinAdviserSerializer(many=True, required=False)
+    contributing_advisers = WinAdviserSerializer(many=True, required=False, source='advisers')
 
     breakdowns = BreakdownSerializer(many=True)
 
@@ -233,6 +235,7 @@ class WinSerializer(ModelSerializer):
             # legacy field
             'adviser_email_address',
             'advisers',
+            'contributing_advisers',
             'breakdowns',
             'company',
             # legacy field
@@ -297,6 +300,9 @@ class WinSerializer(ModelSerializer):
         """Create win, corresponding breakdowns and advisers."""
         breakdowns = validated_data.pop('breakdowns')
         advisers = validated_data.pop('advisers', [])
+        contributing_advisers = validated_data.pop('contributing_advisers', [])
+        if contributing_advisers:
+            advisers = contributing_advisers
         company_contacts = validated_data.pop('company_contacts')
         type_of_support = validated_data.pop('type_of_support')
         associated_programme = validated_data.pop('associated_programme')
@@ -341,7 +347,10 @@ class WinSerializer(ModelSerializer):
     def update(self, instance, validated_data):
         """Update win, corresponding breakdowns and advisers."""
         breakdowns = validated_data.pop('breakdowns', None)
-        advisers = validated_data.pop('advisers', None)
+        advisers = validated_data.pop('advisers', None) or validated_data.pop(
+            'contributing_advisers',
+            None,
+        )
         company_contacts = validated_data.pop('company_contacts', None)
         type_of_support = validated_data.pop('type_of_support', None)
         associated_programme = validated_data.pop('associated_programme', None)
@@ -495,13 +504,18 @@ class DataHubLegacyExportWinSerializer(ModelSerializer):
     title = CharField(source='name_of_export', read_only=True)
     customer = CharField(source='company_name', read_only=True)
     hvc = SerializerMethodField(read_only=True)
+    # TODO: officer field should be removed once FE is updated to use lead_officer field
     officer = SerializerMethodField(read_only=True)
+    lead_officer = SerializerMethodField(read_only=True)
     country = SerializerMethodField(read_only=True)
     sector = SerializerMethodField(read_only=True)
     contact = SerializerMethodField(read_only=True)
     created = SerializerMethodField(read_only=True)
     value = SerializerMethodField(read_only=True)
     business_potential = SerializerMethodField(read_only=True)
+    adviser = SerializerMethodField(read_only=True)
+    team_members = NestedAdviserField(many=True, required=False)
+    contributing_advisers = WinAdviserSerializer(many=True, required=False, source='advisers')
 
     def get_created(self, win):
         return win.created_on
@@ -521,9 +535,13 @@ class DataHubLegacyExportWinSerializer(ModelSerializer):
         }
 
     def get_officer(self, win):
+        return self.get_lead_officer(win)
+
+    def get_lead_officer(self, win):
         """Return lead officer in a officer nested dict."""
         if win.lead_officer:
             officer = {
+                'id': win.lead_officer.id,
                 'name': win.lead_officer.name,
                 'email': win.lead_officer.contact_email,
             }
@@ -540,6 +558,21 @@ class DataHubLegacyExportWinSerializer(ModelSerializer):
         })
         return officer
 
+    def get_adviser(self, win):
+        """Return adviser in a nested dict."""
+        if win.adviser:
+            adviser = {
+                'id': win.adviser.id,
+                'name': win.adviser.name,
+                'email': win.adviser.contact_email,
+            }
+        else:
+            adviser = {
+                'name': win.adviser_name,
+                'email': win.adviser_email_address,
+            }
+        return adviser
+
     def get_hvc(self, win):
         """Return hvc data in a hvc nested dict."""
         if win.hvc:
@@ -554,6 +587,7 @@ class DataHubLegacyExportWinSerializer(ModelSerializer):
         contact = win.company_contacts.first()
         if contact:
             return {
+                'id': contact.id,
                 'name': contact.name,
                 'email': contact.email,
                 'job_title': contact.job_title,
@@ -593,6 +627,7 @@ class DataHubLegacyExportWinSerializer(ModelSerializer):
         model = Win
         fields = (
             'id',
+            'adviser',
             'title',
             'date',
             'created',
@@ -602,10 +637,13 @@ class DataHubLegacyExportWinSerializer(ModelSerializer):
             'business_type',
             'name_of_export',
             'officer',
+            'lead_officer',
             'contact',
             'value',
             'customer',
             'response',
             'hvc',
+            'team_members',
+            'contributing_advisers',
         )
         read_only_fields = fields

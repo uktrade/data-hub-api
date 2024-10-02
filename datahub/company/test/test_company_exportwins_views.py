@@ -12,6 +12,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.models import CompanyPermission
 from datahub.company.test.factories import (
+    AdviserFactory,
     CompanyFactory,
     ContactFactory,
 )
@@ -28,6 +29,7 @@ from datahub.export_win.models import Win
 from datahub.export_win.test.factories import (
     BreakdownFactory,
     CustomerResponseFactory,
+    WinAdviserFactory,
     WinFactory,
 )
 
@@ -97,6 +99,7 @@ class TestGetCompanyExportWins(APITestMixin):
     @pytest.mark.parametrize(
         'not_matched',
         (
+            'adviser',
             'lead_officer',
             'contact',
         ),
@@ -105,6 +108,8 @@ class TestGetCompanyExportWins(APITestMixin):
         """Test get wins in a successful scenario."""
         company = CompanyFactory()
         kwargs = {}
+        if not_matched == 'adviser':
+            kwargs.update({'adviser': None})
         if not_matched == 'lead_officer':
             kwargs.update({'lead_officer': None})
         if not_matched != 'contact':
@@ -114,8 +119,10 @@ class TestGetCompanyExportWins(APITestMixin):
                     'company_contacts': [contact],
                 },
             )
+        team_member = AdviserFactory()
         win = WinFactory(
             company=company,
+            team_members=[team_member],
             **kwargs,
         )
         breakdown = BreakdownFactory(
@@ -130,6 +137,7 @@ class TestGetCompanyExportWins(APITestMixin):
         financial_year = get_financial_year(
             breakdown.win.date + relativedelta(years=breakdown.year - 1),
         )
+        win_adviser = WinAdviserFactory(win=win)
         if not_matched == 'lead_officer':
             officer = {
                 'name': win.lead_officer_name,
@@ -141,12 +149,24 @@ class TestGetCompanyExportWins(APITestMixin):
             }
         else:
             officer = {
+                'id': str(win.lead_officer.id),
                 'name': win.lead_officer.name,
                 'email': win.lead_officer.contact_email,
                 'team': {
                     'type': win.team_type.name,
                     'sub_type': win.hq_team.name,
                 },
+            }
+        if not_matched == 'adviser':
+            adviser = {
+                'name': win.adviser_name,
+                'email': win.adviser_email_address,
+            }
+        else:
+            adviser = {
+                'id': str(win.adviser.id),
+                'name': win.adviser.name,
+                'email': win.adviser.contact_email,
             }
         if not_matched == 'contact':
             contact = {
@@ -157,6 +177,7 @@ class TestGetCompanyExportWins(APITestMixin):
         else:
             company_contact = win.company_contacts.first()
             contact = {
+                'id': str(company_contact.id),
                 'name': company_contact.name,
                 'email': company_contact.email,
                 'job_title': company_contact.job_title,
@@ -171,6 +192,7 @@ class TestGetCompanyExportWins(APITestMixin):
                     'id': str(win.id),
                     'date': format_date_or_datetime(win.date),
                     'created': format_date_or_datetime(win.created_on),
+                    'adviser': adviser,
                     'country': win.country.iso_alpha2_code,
                     'sector': win.sector.name,
                     'business_potential': win.business_potential.export_win_id,
@@ -179,6 +201,7 @@ class TestGetCompanyExportWins(APITestMixin):
                     # this field is intentionally duplicated to match legacy system output
                     'title': win.name_of_export,
                     'officer': officer,
+                    'lead_officer': officer,
                     'contact': contact,
                     'value': {
                         'export': {
@@ -198,6 +221,36 @@ class TestGetCompanyExportWins(APITestMixin):
                         'code': win.hvc.campaign_id,
                         'name': win.hvc.name,
                     },
+                    'team_members': [
+                        {
+                            'first_name': team_member.first_name,
+                            'id': str(team_member.id),
+                            'last_name': team_member.last_name,
+                            'name': team_member.name,
+                        },
+                    ],
+                    'contributing_advisers': [
+                        {
+                            'id': str(win_adviser.id),
+                            'adviser': {
+                                'id': str(win_adviser.adviser.id),
+                                'first_name': win_adviser.adviser.first_name,
+                                'last_name': win_adviser.adviser.last_name,
+                                'name': win_adviser.adviser.name,
+                            },
+                            # legacy field
+                            'name': win_adviser.name,
+                            'location': win_adviser.location,
+                            'team_type': {
+                                'id': str(win_adviser.team_type.id),
+                                'name': win_adviser.team_type.name,
+                            },
+                            'hq_team': {
+                                'id': str(win_adviser.hq_team.id),
+                                'name': win_adviser.hq_team.name,
+                            },
+                        },
+                    ],
                 },
             ],
         }
