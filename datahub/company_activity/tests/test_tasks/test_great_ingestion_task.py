@@ -24,7 +24,7 @@ def test_file():
 
 @pytest.fixture
 def test_file_path():
-    return GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
+    return f'{GREAT_PREFIX}20240920T000000/full_ingestion.jsonl.gz'
 
 
 @mock_aws

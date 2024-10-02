@@ -20,8 +20,9 @@ class GreatIngestionTask:
     def ingest(self, bucket, file):
         path = f's3://{bucket}/{file}'
         try:
-            for line in open(path):
-                self.json_to_model(json.loads(line))
+            with open(path) as s3_file:
+                for line in s3_file:
+                    self.json_to_model(json.loads(line))
         except Exception as e:
             raise e
         IngestedFile.objects.create(filepath=file)
