@@ -190,7 +190,8 @@ class TestCompanyActivityIngestionTasks:
     @mock_aws
     def test_no_running_job(self, mock_worker, mock_scheduler, test_files):
         """
-        Test that when that already queued checks succeed when there are no running jobs
+        Test that the check for an already running ingestion job succeeds
+        when there are no jobs currently running
         """
         setup_s3_bucket(BUCKET, test_files)
         redis = Redis.from_url(settings.REDIS_BASE_URL)
