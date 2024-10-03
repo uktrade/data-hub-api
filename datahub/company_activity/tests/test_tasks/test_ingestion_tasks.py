@@ -181,6 +181,30 @@ class TestCompanyActivityIngestionTasks:
         assert rq_queue.count == initial_job_count
 
     @pytest.mark.django_db
+    # Patch so that we can test the job is queued, rather than having it be run instantly
+    @patch(
+        'datahub.core.queues.job_scheduler.DataHubScheduler',
+        return_value=DataHubScheduler(is_async=True),
+    )
+    @patch('datahub.company_activity.tasks.ingest_company_activity.Worker')
+    @mock_aws
+    def test_no_running_job(self, mock_worker, mock_scheduler, test_files):
+        """
+        Test that the check for an already running ingestion job succeeds
+        when there are no jobs currently running
+        """
+        setup_s3_bucket(BUCKET, test_files)
+        redis = Redis.from_url(settings.REDIS_BASE_URL)
+        rq_queue = Queue('long-running', connection=redis)
+        rq_queue.empty()
+        initial_job_count = rq_queue.count
+        mock_worker_instance = Worker(['long-running'], connection=redis)
+        mock_worker_instance.get_current_job = MagicMock(return_value=None)
+        mock_worker.all.return_value = [mock_worker_instance]
+        ingest_activity_data()
+        assert rq_queue.count == initial_job_count + 1
+
+    @pytest.mark.django_db
     @mock_aws
     def test_child_job(self, caplog, test_files):
         """
@@ -188,6 +212,9 @@ class TestCompanyActivityIngestionTasks:
         """
         new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
         setup_s3_bucket(BUCKET, test_files)
+        redis = Redis.from_url(settings.REDIS_BASE_URL)
+        rq_queue = Queue('long-running', connection=redis)
+        rq_queue.empty()
         for file in test_files:
             if not file == new_file:
                 IngestedFile.objects.create(filepath=file)
