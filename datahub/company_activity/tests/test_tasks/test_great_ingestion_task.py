@@ -1,4 +1,5 @@
 import json
+import logging
 
 import boto3
 import pytest
@@ -10,7 +11,7 @@ from sentry_sdk.transport import Transport
 from datahub.company_activity.models import Great, IngestedFile
 from datahub.company_activity.tasks.ingest_company_activity import BUCKET, GREAT_PREFIX
 from datahub.company_activity.tasks.ingest_great_data import (
-    GreatIngestionTask, REGION,
+    GreatIngestionTask, ingest_great_data, REGION,
 )
 from datahub.company_activity.tests.factories import CompanyActivityGreatFactory
 from datahub.metadata.models import Country
@@ -61,7 +62,7 @@ class MockSentryTransport(Transport):
 class TestGreatIngestionTasks:
     @pytest.mark.django_db
     @mock_aws
-    def test_great_data_file_ingestion(self, test_file, test_file_path):
+    def test_great_data_file_ingestion(self, caplog, test_file, test_file_path):
         """
         Test that a Great data file is ingested correctly and the ingested file
         is added to the IngestedFile table
@@ -70,8 +71,10 @@ class TestGreatIngestionTasks:
         initial_ingested_count = IngestedFile.objects.count()
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
-        task = GreatIngestionTask()
-        task.ingest(BUCKET, test_file_path)
+        with caplog.at_level(logging.INFO):
+            ingest_great_data(BUCKET, test_file_path)
+            assert f'Ingesting file: {test_file_path} started' in caplog.text
+            assert f'Ingesting file: {test_file_path} finished' in caplog.text
         assert Great.objects.count() == initial_great_activity_count + 28
         assert IngestedFile.objects.count() == initial_ingested_count + 1
 
@@ -86,8 +89,7 @@ class TestGreatIngestionTasks:
         CompanyActivityGreatFactory(data_country=country)
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
-        task = GreatIngestionTask()
-        task.ingest(BUCKET, test_file_path)
+        ingest_great_data(BUCKET, test_file_path)
         updated = Great.objects.get(form_id='dit:directoryFormsApi:Submission:9034')
         assert str(updated.data_country_id) == '876a9ab2-5d95-e211-a939-e4115bead28a'
         assert updated.actor_dit_is_blacklisted is False
@@ -102,9 +104,8 @@ class TestGreatIngestionTasks:
         mock_transport = MockSentryTransport()
         init(transport=mock_transport)
         setup_s3_bucket(BUCKET)
-        task = GreatIngestionTask()
         with pytest.raises(Exception) as e:
-            task.ingest(BUCKET, test_file_path)
+            ingest_great_data(BUCKET, test_file_path)
         exception = e.value.args[0]
         assert 'The specified key does not exist' in exception
         expected = " key: 'data-flow/exports/GreatGovUKFormsPipeline/" \
