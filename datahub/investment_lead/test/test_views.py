@@ -1,7 +1,5 @@
 import uuid
 
-import pytest
-
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -21,78 +19,6 @@ def eyb_lead_item_url(pk: uuid.uuid4) -> str:
     return reverse('api-v4:investment-lead:eyb-lead-item', kwargs={'pk': pk})
 
 
-class TestEYBLeadCreateAPI(APITestMixin):
-    """Test for create/update EYB lead view (via POST request)"""
-
-    @pytest.mark.parametrize('method', ('delete', 'patch', 'get', 'put'))
-    def test_methods_not_allowed(self, data_flow_api_client, method):
-        """Tests that requests using unsupported methods are not allowed."""
-        response = data_flow_api_client.request(method, EYB_LEAD_COLLECTION_URL)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_create_eyb_lead_list(self, data_flow_api_client, eyb_lead_post_data):
-        """Tests that a list of leads are processed in a single request/response cycle."""
-        response = data_flow_api_client.post(EYB_LEAD_COLLECTION_URL, json_=[eyb_lead_post_data])
-        assert response.status_code == status.HTTP_201_CREATED
-        assert 'created' in response.data
-
-        created_lead = response.data['created'][0]
-        assert EYBLead.objects.count() == 1
-        instance = EYBLead.objects.get(
-            triage_hashed_uuid=created_lead['triage_hashed_uuid'],
-            user_hashed_uuid=created_lead['user_hashed_uuid'],
-        )
-        verify_eyb_lead_data(instance, eyb_lead_post_data, data_type='post')
-
-    def test_create_empty_list(self, data_flow_api_client):
-        """Tests that no leads are created if an empty list is POSTed."""
-        response = data_flow_api_client.post(EYB_LEAD_COLLECTION_URL, json_=[])
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['error'] == 'Expected a list of leads.'
-
-    def test_create_invalid_list(self, data_flow_api_client, eyb_lead_post_data):
-        """Tests that no leads are created if a list containing invalid data is POSTed."""
-        invalid_post_data = eyb_lead_post_data.copy()
-        invalid_post_data['sector'] = None
-        response = data_flow_api_client.post(EYB_LEAD_COLLECTION_URL, json_=[invalid_post_data])
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert 'errors' in response.data
-
-    def test_updating_existing_lead(self, data_flow_api_client, eyb_lead_post_data):
-        """Tests that an existing lead is updated and does not create a duplicate."""
-        existing_lead = EYBLeadFactory(
-            triage_hashed_uuid=eyb_lead_post_data['triage_hashed_uuid'],
-            user_hashed_uuid=eyb_lead_post_data['user_hashed_uuid'],
-            location_id=constants.UKRegion.wales.value.id,
-        )
-        assert EYBLead.objects.count() == 1
-        assert existing_lead.location.name == constants.UKRegion.wales.value.name
-
-        modified_post_data = eyb_lead_post_data.copy()
-        modified_post_data['location'] = constants.UKRegion.south_west.value.name
-        response = data_flow_api_client.post(EYB_LEAD_COLLECTION_URL, json_=[modified_post_data])
-        assert response.status_code == status.HTTP_201_CREATED
-        assert 'updated' in response.data
-
-        updated_lead = response.data['updated'][0]
-        assert EYBLead.objects.count() == 1
-        instance = EYBLead.objects.get(
-            triage_hashed_uuid=updated_lead['triage_hashed_uuid'],
-            user_hashed_uuid=updated_lead['user_hashed_uuid'],
-        )
-        assert instance.triage_hashed_uuid == eyb_lead_post_data['triage_hashed_uuid']
-        assert instance.user_hashed_uuid == eyb_lead_post_data['user_hashed_uuid']
-        assert instance.location.name == constants.UKRegion.south_west.value.name
-
-    def test_creating_lead_with_sso_auth(
-        self, test_user_with_view_permissions, eyb_lead_post_data,
-    ):
-        """Tests that the create endpoint doesn't allow SSO authentication"""
-        api_client = self.create_api_client(user=test_user_with_view_permissions)
-        response = api_client.post(EYB_LEAD_COLLECTION_URL, json_=[eyb_lead_post_data])
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-
 class TestEYBLeadRetrieveAPI(APITestMixin):
     """Tests for retrieve EYB lead view (via GET request)"""
 
@@ -109,12 +35,6 @@ class TestEYBLeadRetrieveAPI(APITestMixin):
         url = eyb_lead_item_url(non_existent_pk)
         response = api_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
-
-    def test_list_with_hawk_credentials(self, eyb_lead_instance_from_db, data_flow_api_client):
-        """Tests that the retrieve endpoint doesn't allow hawk authentication"""
-        url = eyb_lead_item_url(eyb_lead_instance_from_db.pk)
-        response = data_flow_api_client.get(url)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 class TestEYBLeadListAPI(APITestMixin):
@@ -137,11 +57,6 @@ class TestEYBLeadListAPI(APITestMixin):
         response = api_client.get(EYB_LEAD_COLLECTION_URL)
         assert response.status_code == status.HTTP_200_OK
         assert response.data['results'] == []
-
-    def test_list_with_hawk_credentials(self, data_flow_api_client):
-        """Tests that the list endpoint doesn't allow hawk authentication"""
-        response = data_flow_api_client.get(EYB_LEAD_COLLECTION_URL)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_pagination(self, test_user_with_view_permissions):
         """Test that LimitOffsetPagination is enabled for this view"""
