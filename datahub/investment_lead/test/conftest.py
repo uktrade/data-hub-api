@@ -5,7 +5,6 @@ from datahub.core.test_utils import create_test_user
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.metadata.models import (
-    AdministrativeArea,
     Country,
     Sector,
     UKRegion,
@@ -27,7 +26,6 @@ def eyb_lead_post_data():
         'triage_created': DATETIME_STRING,
         'triage_modified': DATETIME_STRING,
         'sector': 'Mining vehicles, transport and equipment',
-        'sector_sub': 'Mining vehicles, transport and equipment',
         'intent': [
             EYBLead.IntentChoices.RESEARCH_DEVELOP_AND_COLLABORATE.value,
             EYBLead.IntentChoices.SET_UP_A_NEW_DISTRIBUTION_CENTRE.value,
@@ -46,7 +44,13 @@ def eyb_lead_post_data():
         'user_created': DATETIME_STRING,
         'user_modified': DATETIME_STRING,
         'company_name': 'Noble, Scott and Jackson',
-        'company_location': 'CA',
+        'duns_number': '004353373',
+        'address_1': '4288 Rebecca Common Apt. 204',
+        'address_2': 'Suite 707',
+        'address_town': 'Port Robertville',
+        'address_country': 'CA',
+        'address_postcode': '87107',
+        'company_website': 'http://www.stevens.org/',
         'full_name': 'James Swanson MD',
         'role': 'Manufacturing systems engineer',
         'email': 'whiteclifford@example.net',
@@ -54,19 +58,8 @@ def eyb_lead_post_data():
         'agree_terms': False,
         'agree_info_email': False,
         'landing_timeframe': EYBLead.LandingTimeframeChoices.UNDER_SIX_MONTHS.value,
-        'company_website': 'http://www.stevens.org/',
 
-        # Company fields
-        'duns_number': '004353373',
-        'address_1': '4288 Rebecca Common Apt. 204',
-        'address_2': 'Suite 707',
-        'address_town': 'Port Robertville',
-        'address_county': 'Clearwater County',
-        'address_area': 'Alberta',
-        'address_country': 'CA',
-        'address_postcode': '87107',
-
-        # UTM fields
+        # EYB marketing fields
         'utm_name': 'utm-name',
         'utm_source': 'source',
         'utm_medium': 'medium',
@@ -86,15 +79,9 @@ def eyb_lead_factory_data(eyb_lead_post_data):
     canada_country = Country.objects.get(
         pk=constants.Country.canada.value.id,
     )
-    alberta_area = AdministrativeArea.objects.get(
-        pk=constants.AdministrativeArea.alberta.value.id,
-    )
     data.update({
         'sector': mining_sector,
-        'sector_sub': mining_sector.segment,
         'location': wales_region,
-        'company_location': canada_country,
-        'address_area': alberta_area,
         'address_country': canada_country,
     })
     return data
