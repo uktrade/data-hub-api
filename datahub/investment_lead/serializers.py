@@ -7,7 +7,6 @@ from datahub.core.serializers import (
 )
 from datahub.investment_lead.models import EYBLead
 from datahub.metadata.models import (
-    AdministrativeArea,
     Country,
     Sector,
     UKRegion,
@@ -32,7 +31,6 @@ TRIAGE_FIELDS = [
     'triage_created',
     'triage_modified',
     'sector',
-    'sector_sub',
     'intent',
     'intent_other',
     'location',
@@ -49,7 +47,14 @@ USER_FIELDS = [
     'user_created',
     'user_modified',
     'company_name',
-    'company_location',
+    'duns_number',
+    'address_1',
+    'address_2',
+    'address_town',
+    'address_country',
+    'address_postcode',
+    'company_website',
+    'company',
     'full_name',
     'role',
     'email',
@@ -57,26 +62,11 @@ USER_FIELDS = [
     'agree_terms',
     'agree_info_email',
     'landing_timeframe',
-    'company_website',
-]
-
-COMPANY_FIELDS = [
-    'duns_number',
-    'address_1',
-    'address_2',
-    'address_town',
-    'address_county',
-    'address_area',
-    'address_country',
-    'address_postcode',
-    'company',
 ]
 
 RELATED_FIELDS = [
     'sector',
     'location',
-    'company_location',
-    'address_area',
     'address_country',
     'company',
     'investment_projects',
@@ -86,8 +76,6 @@ ADDRESS_FIELDS = [
     'address_1',
     'address_2',
     'address_town',
-    'address_county',
-    'address_area',
     'address_country',
     'address_postcode',
 ]
@@ -100,7 +88,7 @@ UTM_FIELDS = [
 ]
 
 ALL_FIELDS = ARCHIVABLE_FIELDS + INVESTMENT_LEAD_BASE_FIELDS + \
-    TRIAGE_FIELDS + USER_FIELDS + COMPANY_FIELDS + UTM_FIELDS
+    TRIAGE_FIELDS + USER_FIELDS + UTM_FIELDS
 
 UUIDS_ERROR_MESSAGE = 'Invalid serializer data: UUIDs must match.'
 
@@ -133,11 +121,9 @@ class CreateEYBLeadSerializer(BaseEYBLeadSerializer):
 
     sector = serializers.CharField()
     location = serializers.CharField()
-    company_location = serializers.CharField()
-    address_area = serializers.CharField()
     address_country = serializers.CharField()
 
-    # TODO: Refactor these field validation functions as they involve 5 db hits per lead
+    # TODO: Refactor these field validation functions as they involve 3 db hits per lead
     def validate_sector(self, value):
         if not Sector.objects.filter(segment=value.capitalize()).exists():
             raise serializers.ValidationError(f'Sector "{value}" does not exist.')
@@ -146,18 +132,6 @@ class CreateEYBLeadSerializer(BaseEYBLeadSerializer):
     def validate_location(self, value):
         if not UKRegion.objects.filter(name=value.title()).exists():
             raise serializers.ValidationError(f'Location "{value}" does not exist.')
-        return value
-
-    def validate_company_location(self, value):
-        if not Country.objects.filter(iso_alpha2_code=value.upper()).exists():
-            raise serializers.ValidationError(
-                f'Country location ISO code "{value}" does not exist.',
-            )
-        return value
-
-    def validate_address_area(self, value):
-        if not AdministrativeArea.objects.filter(name=value.capitalize()).exists():
-            raise serializers.ValidationError(f'Address area "{value}" does not exist.')
         return value
 
     def validate_address_country(self, value):
@@ -172,9 +146,6 @@ class CreateEYBLeadSerializer(BaseEYBLeadSerializer):
         related_fields = {
             'sector': instance.sector.segment if instance.sector else None,
             'location': instance.location.name if instance.location else None,
-            'company_location': instance.company_location.iso_alpha2_code
-            if instance.company_location else None,
-            'address_area': instance.address_area.name if instance.address_area else None,
             'address_country': instance.address_country.iso_alpha2_code
             if instance.address_country else None,
         }
@@ -187,14 +158,12 @@ class CreateEYBLeadSerializer(BaseEYBLeadSerializer):
         # Extract related field strings
         sector_segment = data.get('sector', None)
         location_name = data.get('location', None)
-        company_location_iso_code = data.get('company_location', None)
-        address_area_name = data.get('address_area', None)
         address_country_iso_code = data.get('address_country', None)
 
         validated_data = super().to_internal_value(data)
 
         # Convert strings to model instances for related fields
-        # TODO: Investigate refactoring this logic to involve less db hits (currently 5 per lead)
+        # TODO: Investigate refactoring this logic to involve less db hits (currently 3 per lead)
         if sector_segment:
             validated_data['sector'] = Sector.objects.get(
                 segment=sector_segment.capitalize(),
@@ -202,14 +171,6 @@ class CreateEYBLeadSerializer(BaseEYBLeadSerializer):
         if location_name:
             validated_data['location'] = UKRegion.objects.get(
                 name=location_name.title(),
-            )
-        if company_location_iso_code:
-            validated_data['company_location'] = Country.objects.get(
-                iso_alpha2_code=company_location_iso_code.upper(),
-            )
-        if address_area_name:
-            validated_data['address_area'] = AdministrativeArea.objects.get(
-                name=address_area_name.capitalize(),
             )
         if address_country_iso_code:
             validated_data['address_country'] = Country.objects.get(
@@ -250,7 +211,6 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
 
     sector = NestedRelatedField(Sector)
     location = NestedRelatedField(UKRegion)
-    company_location = NestedRelatedField(Country)
     address = AddressSerializer(
         source_model=EYBLead,
         address_source_prefix='address',
