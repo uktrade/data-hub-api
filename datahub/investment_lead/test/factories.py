@@ -33,7 +33,6 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     triage_created = factory.LazyFunction(timezone.now)
     triage_modified = factory.LazyFunction(timezone.now)
     sector = factory.LazyAttribute(lambda o: random.choice(list(Sector.objects.all())))
-    sector_sub = factory.LazyAttribute(lambda o: f'{o.sector.segment}')
     intent = factory.LazyAttribute(
         lambda o: random.sample(EYBLead.IntentChoices.values, k=random.randint(1, 4)),
     )
@@ -51,7 +50,14 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     user_created = factory.LazyFunction(timezone.now)
     user_modified = factory.LazyFunction(timezone.now)
     company_name = factory.Faker('company')
-    company_location_id = constants.Country.canada.value.id
+    duns_number = factory.Faker('numerify', text='00#######')
+    address_1 = factory.Faker('street_address')
+    address_2 = factory.Faker('secondary_address')
+    address_town = factory.Faker('city')
+    address_country_id = constants.Country.canada.value.id
+    address_postcode = factory.Faker('postcode')
+    company_website = factory.Faker('url')
+    company = factory.SubFactory(CompanyFactory)
     full_name = factory.Faker('name')
     role = factory.Faker('job')
     email = factory.Faker('email')
@@ -61,20 +67,8 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     landing_timeframe = factory.LazyAttribute(
         lambda o: random.choice(EYBLead.LandingTimeframeChoices.values),
     )
-    company_website = factory.Faker('url')
 
-    # Company fields
-    duns_number = factory.Faker('numerify', text='00#######')
-    address_1 = factory.Faker('street_address')
-    address_2 = factory.Faker('secondary_address')
-    address_town = factory.Faker('city')
-    address_county = factory.Faker('county')
-    address_area_id = constants.AdministrativeArea.alberta.value.id
-    address_country_id = constants.Country.canada.value.id
-    address_postcode = factory.Faker('postcode')
-    company = factory.SubFactory(CompanyFactory)
-
-    # UTM fields
+    # EYB marketing fields
     utm_name = factory.Faker('pystr')
     utm_source = factory.Faker('pystr')
     utm_medium = factory.Faker('pystr')
