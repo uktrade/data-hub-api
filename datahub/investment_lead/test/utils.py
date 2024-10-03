@@ -41,7 +41,6 @@ def verify_eyb_lead_data(
     assert instance.triage_hashed_uuid == data['triage_hashed_uuid']
     assert_datetimes(instance.triage_created, data['triage_created'])
     assert_datetimes(instance.triage_modified, data['triage_modified'])
-    assert instance.sector_sub == data['sector_sub']
     assert instance.intent_other == data['intent_other']
     assert instance.location_city == data['location_city']
     assert instance.location_none == data['location_none']
@@ -68,13 +67,11 @@ def verify_eyb_lead_data(
         assert instance.address_1 == data['address_1']
         assert instance.address_2 == data['address_2']
         assert instance.address_town == data['address_town']
-        assert instance.address_county == data['address_county']
         assert instance.address_postcode == data['address_postcode']
     else:
         assert instance.address_1 == data['address']['line_1']
         assert instance.address_2 == data['address']['line_2']
         assert instance.address_town == data['address']['town']
-        assert instance.address_county == data['address']['county']
         assert instance.address_postcode == data['address']['postcode']
 
     # Choice fields
@@ -97,20 +94,14 @@ def verify_eyb_lead_data(
     if data_type == 'post':
         assert instance.sector.segment == data['sector']
         assert instance.location.name == data['location']
-        assert instance.company_location.iso_alpha2_code == data['company_location']
-        assert instance.address_area.name == data['address_area']
         assert instance.address_country.iso_alpha2_code == data['address_country']
     elif data_type == 'factory':
         assert instance.sector == data['sector']
         assert instance.location == data['location']
-        assert instance.company_location == data['company_location']
-        assert instance.address_area == data['address_area']
         assert instance.address_country == data['address_country']
     elif data_type == 'nested':
         assert str(instance.sector.id) == data['sector']['id']
         assert str(instance.location.id) == data['location']['id']
-        assert str(instance.company_location.id) == data['company_location']['id']
-        assert str(instance.address_area.id) == data['address']['area']['id']
         assert str(instance.address_country.id) == data['address']['country']['id']
         assert str(instance.company.id) == data['company']['id']
     else:
@@ -130,8 +121,6 @@ def assert_eyb_lead_matches_company(company: Company, eyb_lead: EYBLead):
     assert eyb_lead.address_1 == company.address_1
     assert eyb_lead.address_2 == company.address_2
     assert eyb_lead.address_town == company.address_town
-    assert eyb_lead.address_county == company.address_county
-    assert eyb_lead.address_area == company.address_area
     assert eyb_lead.address_country == company.address_country
     assert eyb_lead.address_postcode == company.address_postcode
     assert eyb_lead.company_website == company.website

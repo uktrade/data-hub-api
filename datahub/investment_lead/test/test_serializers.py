@@ -9,7 +9,6 @@ from datahub.investment_lead.serializers import (
 )
 from datahub.investment_lead.test.utils import verify_eyb_lead_data
 from datahub.metadata.models import (
-    AdministrativeArea,
     Country,
     Sector,
     UKRegion,
@@ -51,16 +50,12 @@ class TestCreateEYBLeadSerializer:
         eyb_lead_post_data.update({
             'sector': 'Invalid sector name',
             'location': 'Invalid UK region name',
-            'company_location': 'Invalid country ISO code',
-            'address_area': 'Invalid area name',
             'address_country': 'Invalid country ISO code',
         })
         serializer = CreateEYBLeadSerializer(data=eyb_lead_post_data)
         assert not serializer.is_valid()
         assert 'sector' in serializer.errors
         assert 'location' in serializer.errors
-        assert 'company_location' in serializer.errors
-        assert 'address_area' in serializer.errors
         assert 'address_country' in serializer.errors
 
     def test_related_field_conversion(self, eyb_lead_post_data):
@@ -73,14 +68,9 @@ class TestCreateEYBLeadSerializer:
         canada_country = Country.objects.get(
             pk=constants.Country.canada.value.id,
         )
-        alberta_area = AdministrativeArea.objects.get(
-            pk=constants.AdministrativeArea.alberta.value.id,
-        )
         eyb_lead_post_data.update({
             'sector': mining_sector.segment,
             'location': wales_region.name,
-            'company_location': canada_country.iso_alpha2_code,
-            'address_area': alberta_area.name,
             'address_country': canada_country.iso_alpha2_code,
         })
         serializer = CreateEYBLeadSerializer(data=eyb_lead_post_data)
@@ -88,8 +78,6 @@ class TestCreateEYBLeadSerializer:
         validated_data = serializer.validated_data
         assert validated_data['sector'].pk == mining_sector.pk
         assert validated_data['location'].pk == wales_region.pk
-        assert validated_data['company_location'].pk == canada_country.pk
-        assert validated_data['address_area'].pk == alberta_area.pk
         assert validated_data['address_country'].pk == canada_country.pk
 
     def test_create_without_utm_parameters(self, eyb_lead_post_data):
