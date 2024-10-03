@@ -56,7 +56,7 @@ class CompanyActivityIngestionTask:
                 return True
         for worker in Worker.all(queue=rq_queue):
             job = worker.get_current_job()
-            if self._job_matches(job, file):
+            if job is not None and self._job_matches(job, file):
                 return True
         return False
 
