@@ -13,6 +13,13 @@ env = environ.Env()
 REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
 
 
+def ingest_great_data(bucket, file):
+    logger.info(f'Ingesting file: {file} started')
+    task = GreatIngestionTask()
+    task.ingest(bucket, file)
+    logger.info(f'Ingesting file: {file} finished')
+
+
 class GreatIngestionTask:
     def __init__(self):
         self._countries = None
