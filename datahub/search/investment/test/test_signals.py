@@ -343,7 +343,9 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
     """
     When project fields change, the incomplete fields should update accordingly.
     """
-    project = InvestmentProjectFactory(stage_id=InvestmentProjectStage.won.value.id)
+    project = InvestmentProjectFactory(
+        stage_id=InvestmentProjectStage.won.value.id,
+        likelihood_to_land_id=None)
     adviser = AdviserFactory()
 
     opensearch_with_signals.indices.refresh()
@@ -375,6 +377,7 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
         'uk_company',
         'investor_type',
         'level_of_involvement',
+        'likelihood_to_land',
         'total_investment',
         'uk_region_locations',
         'foreign_equity_investment',
@@ -413,6 +416,7 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
         'uk_company',
         'investor_type',
         'level_of_involvement',
+        'likelihood_to_land',
         'competitor_countries',
         'uk_region_locations',
         'average_salary',
