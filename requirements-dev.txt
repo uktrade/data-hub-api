@@ -478,7 +478,7 @@ six==1.16.0
     #   python-dateutil
 slackclient==2.9.4
     # via -r requirements.in
-smart-open==7.0.4
+smart-open==7.0.5
     # via -r requirements.in
 snowballstemmer==2.2.0
     # via pydocstyle
