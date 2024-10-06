@@ -220,7 +220,7 @@ inflection==0.5.1
     # via -r requirements.in
 iniconfig==1.1.1
     # via pytest
-ipython==8.27.0
+ipython==8.28.0
     # via -r requirements-dev.in
 isort==5.11.4
     # via pylint
