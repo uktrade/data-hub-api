@@ -113,7 +113,7 @@ django==4.2.16
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==6.5.2
+django-axes==7.0.0
     # via -r requirements.in
 django-csp==3.8
     # via -r requirements.in
