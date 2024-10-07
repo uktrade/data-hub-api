@@ -3,6 +3,7 @@
 from django.contrib.auth.models import Group, Permission
 from django.db import transaction
 from django.db.models import Exists, Prefetch, Q
+from django.db.models.functions import Lower
 from django.http import Http404
 from django_filters.rest_framework import (
     CharFilter,
@@ -532,7 +533,7 @@ class AdviserReadOnlyViewSetV1(
     )
     filterset_class = AdviserFilter
     ordering_fields = ('first_name', 'last_name', 'dit_team__name')
-    _default_ordering = ('first_name', 'last_name', 'dit_team__name')
+    _default_ordering = (Lower('first_name'), Lower('last_name'), Lower('dit_team__name'))
 
     def filter_queryset(self, queryset):
         """Applies the default ordering when the query set has not already been ordered.
