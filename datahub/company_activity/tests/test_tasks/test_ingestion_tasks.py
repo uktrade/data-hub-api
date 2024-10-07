@@ -75,7 +75,7 @@ class TestCompanyActivityIngestionTasks:
         return_value=DataHubScheduler(is_async=True),
     )
     @mock_aws
-    def test_ingestion_job_is_queued_for_new_files(self, mock, test_files):
+    def test_ingestion_job_is_queued_for_new_files(self, mock, test_files, caplog):
         """
         Test that when a new file is found a job is queued to ingest it
         and no jobs are created for files not the most recent
@@ -91,7 +91,11 @@ class TestCompanyActivityIngestionTasks:
         rq_queue.empty()
         initial_job_count = rq_queue.count
 
-        ingest_activity_data()
+        with caplog.at_level(logging.INFO):
+            ingest_activity_data()
+            assert 'Checking for new Company Activity data files' in caplog.text
+            assert f'Scheduled ingestion of {new_file}' in caplog.text
+
         assert rq_queue.count == initial_job_count + 1
         jobs = rq_queue.jobs
         job = jobs[-1]
@@ -107,10 +111,11 @@ class TestCompanyActivityIngestionTasks:
         return_value=DataHubScheduler(is_async=True),
     )
     @mock_aws
-    def test_ingestion_job_is_not_queued_for_already_ingested_file(self, mock, test_files):
+    def test_ingestion_job_is_not_queued_for_already_ingested_file(self, mock, test_files, caplog):
         """
         Test that when the latest file found has already been ingested no job is queued
         """
+        new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
         setup_s3_bucket(BUCKET, test_files)
         for file in test_files:
             IngestedFile.objects.create(filepath=file)
@@ -120,7 +125,9 @@ class TestCompanyActivityIngestionTasks:
         rq_queue.empty()
         initial_job_count = rq_queue.count
 
-        ingest_activity_data()
+        with caplog.at_level(logging.INFO):
+            ingest_activity_data()
+            assert f'{new_file} has already been ingested' in caplog.text
         assert rq_queue.count == initial_job_count
 
     @pytest.mark.django_db
@@ -130,7 +137,7 @@ class TestCompanyActivityIngestionTasks:
         return_value=DataHubScheduler(is_async=True),
     )
     @mock_aws
-    def test_job_not_queued_when_already_on_queue(self, mock, test_files):
+    def test_job_not_queued_when_already_on_queue(self, mock, test_files, caplog):
         """
         Test that when, the job has run and queued an ingestion job for a file
         but that child job hasn't completed yet, this job does not queue a duplicate
@@ -149,7 +156,9 @@ class TestCompanyActivityIngestionTasks:
         )
         initial_job_count = rq_queue.count
 
-        ingest_activity_data()
+        with caplog.at_level(logging.INFO):
+            ingest_activity_data()
+            assert f'{new_file} has already been queued for ingestion' in caplog.text
         assert rq_queue.count == initial_job_count
 
     @pytest.mark.django_db
@@ -222,3 +231,13 @@ class TestCompanyActivityIngestionTasks:
         with caplog.at_level(logging.INFO):
             ingest_activity_data()
             assert f'Ingesting file: {new_file} started' in caplog.text
+
+    @mock_aws
+    def test_empty_s3_bucket(self, caplog):
+        """
+        Test that the task can handle an empty S3 bucket
+        """
+        setup_s3_bucket(BUCKET, [])
+        with caplog.at_level(logging.INFO):
+            ingest_activity_data()
+            assert 'No files found' in caplog.text
