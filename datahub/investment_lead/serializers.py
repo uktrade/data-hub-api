@@ -94,7 +94,7 @@ ALL_FIELDS = ARCHIVABLE_FIELDS + INVESTMENT_LEAD_BASE_FIELDS + \
 class BaseEYBLeadSerializer(serializers.ModelSerializer):
     """Base serializer for an EYB lead object.
 
-    EYB serves data from 3 endpoints: triage, user, and marketing.
+    EYB serves data from 2 endpoints: triage and user.
     However, in Data Hub, we combine them into one EYB lead model instance.
     """
 
@@ -230,19 +230,6 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
                 iso_alpha2_code=address_country_iso_code.upper(),
             )
         return validated_data
-
-
-class CreateEYBLeadMarketingSerializer(BaseEYBLeadSerializer):
-    """Serializer for creating an EYB lead from marketing data."""
-
-    class Meta(BaseEYBLeadSerializer.Meta):
-        fields = MARKETING_FIELDS
-        extra_kwargs = {
-            'utm_name': {'required': True},
-            'utm_source': {'required': True},
-            'utm_medium': {'required': True},
-            'utm_content': {'required': True},
-        }
 
 
 class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
