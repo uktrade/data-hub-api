@@ -128,14 +128,6 @@ def verify_eyb_user_data(
         raise ValueError(f'Invalid value "{data_type}" for argument data_type')
 
 
-def verify_eyb_marketing_data(instance: EYBLead, data: dict):
-    """Method to verify the EYB marketing data against the created EYBLead instance."""
-    assert instance.utm_name == data['utm_name']
-    assert instance.utm_source == data['utm_source']
-    assert instance.utm_medium == data['utm_medium']
-    assert instance.utm_content == data['utm_content']
-
-
 def verify_eyb_lead_data(
     instance: EYBLead, data: dict, data_type: Literal['json', 'factory', 'nested'],
 ):
@@ -156,7 +148,6 @@ def verify_eyb_lead_data(
     """
     verify_eyb_triage_data(instance, data, data_type)
     verify_eyb_user_data(instance, data, data_type)
-    verify_eyb_marketing_data(instance, data)
 
 
 def assert_eyb_lead_matches_company(company: Company, eyb_lead: EYBLead):

@@ -3,14 +3,12 @@ import pytest
 from datahub.core import constants
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import (
-    CreateEYBLeadMarketingSerializer,
     CreateEYBLeadTriageSerializer,
     CreateEYBLeadUserSerializer,
     RetrieveEYBLeadSerializer,
 )
 from datahub.investment_lead.test.utils import (
     verify_eyb_lead_data,
-    verify_eyb_marketing_data,
     verify_eyb_triage_data,
     verify_eyb_user_data,
 )
@@ -120,45 +118,6 @@ class TestCreateEYBLeadUserSerializer:
         assert serializer.is_valid(), serializer.errors
         validated_data = serializer.validated_data
         assert validated_data['address_country'].pk == canada_country.pk
-
-
-class TestCreateEYBLeadMarketingSerializer:
-    """Tests for CreateEYBLeadMarketingSerializer"""
-
-    def test_create_lead_from_valid_marketing_data(self, eyb_lead_marketing_data):
-        serializer = CreateEYBLeadMarketingSerializer(data=eyb_lead_marketing_data)
-        assert serializer.is_valid(), serializer.errors
-        instance = serializer.save()
-        assert isinstance(instance, EYBLead)
-        assert EYBLead.objects.count() == 1
-        verify_eyb_marketing_data(instance, serializer.validated_data)
-
-    def test_create_lead_from_invalid_marketing_data(self, eyb_lead_marketing_data):
-        """Tests empty marketing data raises validation errors."""
-        eyb_lead_marketing_data.update({
-            'utm_name': None,
-            'utm_source': None,
-            'utm_medium': None,
-            'utm_content': None,
-        })
-        serializer = CreateEYBLeadMarketingSerializer(data=eyb_lead_marketing_data)
-        assert not serializer.is_valid()
-        assert 'utm_name' in serializer.errors
-        assert 'utm_source' in serializer.errors
-        assert 'utm_medium' in serializer.errors
-        assert 'utm_content' in serializer.errors
-
-    def test_create_lead_from_incomplete_marketing_data(self, eyb_lead_marketing_data):
-        eyb_lead_marketing_data.pop('utm_name')
-        eyb_lead_marketing_data.pop('utm_source')
-        eyb_lead_marketing_data.pop('utm_medium')
-        eyb_lead_marketing_data.pop('utm_content')
-        serializer = CreateEYBLeadMarketingSerializer(data=eyb_lead_marketing_data)
-        assert not serializer.is_valid()
-        assert 'utm_name' in serializer.errors
-        assert 'utm_source' in serializer.errors
-        assert 'utm_medium' in serializer.errors
-        assert 'utm_content' in serializer.errors
 
 
 class TestRetrieveEYBLeadSerializer:
