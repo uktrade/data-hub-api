@@ -29,10 +29,11 @@ class InvestmentLead(ArchivableModel):
 class EYBLead(InvestmentLead):
     """Model for an Expand Your Business (EYB) investment lead.
 
-    EYB leads come in two parts: triage and user data. This model represents a
-    combination of both. The two data models can be joined on `*_hashed_uuid`.
+    EYB leads come in three parts: triage, user, and marketing data.
+    This model represents a combination of these, but also contains additional Data Hub fields.
 
-    The fields in this model mirror those provided by the EYB endpoint.
+    The three data models can be joined on `*_hashed_uuid` which represent's the EYB
+    user's unique ID.
     """
 
     class IntentChoices(models.TextChoices):
