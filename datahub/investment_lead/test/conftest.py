@@ -1,16 +1,21 @@
+import random
+from datetime import timezone
+
 import pytest
+
 
 from datahub.core import constants
 from datahub.core.test_utils import create_test_user
 from datahub.investment_lead.models import EYBLead
-from datahub.investment_lead.test.factories import EYBLeadFactory
+from datahub.investment_lead.test.factories import (
+    EYBLeadFactory,
+    generate_hashed_uuid,
+)
 from datahub.metadata.models import (
     Country,
     Sector,
     UKRegion,
 )
-
-DATETIME_STRING = '2024-09-04T08:02:30.123456Z'
 
 
 @pytest.fixture
@@ -19,47 +24,57 @@ def test_user_with_view_permissions():
 
 
 @pytest.fixture
-def eyb_lead_post_data():
+def random_sector_instance():
+    sectors = Sector.objects.filter(disabled_on__isnull=True)
+    return random.choice(sectors)
+
+
+@pytest.fixture
+def eyb_lead_triage_data(faker, random_sector_instance):
     return {
-        # EYB triage fields
-        'triage_hashed_uuid': 'f9daca9c9ad9736cac5da34c6c65f343ed3bf7aee68cb5bdcef33684ed25d662',
-        'triage_created': DATETIME_STRING,
-        'triage_modified': DATETIME_STRING,
-        'sector': 'Mining vehicles, transport and equipment',
-        'intent': [
-            EYBLead.IntentChoices.RESEARCH_DEVELOP_AND_COLLABORATE.value,
-            EYBLead.IntentChoices.SET_UP_A_NEW_DISTRIBUTION_CENTRE.value,
-        ],
+        'triage_hashed_uuid': generate_hashed_uuid(),
+        'triage_created': faker.date_time_between(start_date='-1y', tzinfo=timezone.utc),
+        'triage_modified': faker.date_time_between(start_date='-1y', tzinfo=timezone.utc),
+        'sector': random_sector_instance.segment,
+        'intent': random.sample(EYBLead.IntentChoices.values, k=random.randint(1, 4)),
         'intent_other': '',
         'location': constants.UKRegion.wales.value.name,
         'location_city': 'Cardiff',
         'location_none': False,
-        'hiring': EYBLead.HiringChoices.ONE_TO_FIVE.value,
-        'spend': EYBLead.SpendChoices.FIVE_HUNDRED_THOUSAND_TO_ONE_MILLION.value,
+        'hiring': random.choice(EYBLead.HiringChoices.values),
+        'spend': random.choice(EYBLead.SpendChoices.values),
         'spend_other': '',
-        'is_high_value': False,
+        'is_high_value': faker.pybool(),
+    }
 
-        # EYB user fields
-        'user_hashed_uuid': 'f9daca9c9ad9736cac5da34c6c65f343ed3bf7aee68cb5bdcef33684ed25d662',
-        'user_created': DATETIME_STRING,
-        'user_modified': DATETIME_STRING,
-        'company_name': 'Noble, Scott and Jackson',
-        'duns_number': '004353373',
-        'address_1': '4288 Rebecca Common Apt. 204',
-        'address_2': 'Suite 707',
-        'address_town': 'Port Robertville',
-        'address_country': 'CA',
-        'address_postcode': '87107',
-        'company_website': 'http://www.stevens.org/',
-        'full_name': 'James Swanson MD',
-        'role': 'Manufacturing systems engineer',
-        'email': 'whiteclifford@example.net',
-        'telephone_number': '001-263-022-2444',
-        'agree_terms': False,
-        'agree_info_email': False,
-        'landing_timeframe': EYBLead.LandingTimeframeChoices.UNDER_SIX_MONTHS.value,
 
-        # EYB marketing fields
+@pytest.fixture
+def eyb_lead_user_data(faker):
+    return {
+        'user_hashed_uuid': generate_hashed_uuid(),
+        'user_created': faker.date_time_between(start_date='-1y', tzinfo=timezone.utc),
+        'user_modified': faker.date_time_between(start_date='-1y', tzinfo=timezone.utc),
+        'company_name': faker.company(),
+        'duns_number': faker.numerify(text='00#######'),
+        'address_1': faker.street_address(),
+        'address_2': faker.secondary_address(),
+        'address_town': faker.city(),
+        'address_country': faker.country_code(),
+        'address_postcode': faker.postcode(),
+        'company_website': faker.url(),
+        'full_name': faker.name(),
+        'role': faker.job(),
+        'email': faker.email(),
+        'telephone_number': faker.phone_number(),
+        'agree_terms': faker.pybool(),
+        'agree_info_email': faker.pybool(),
+        'landing_timeframe': random.choice(EYBLead.LandingTimeframeChoices.values),
+    }
+
+
+@pytest.fixture
+def eyb_lead_marketing_data():
+    return {
         'utm_name': 'utm-name',
         'utm_source': 'source',
         'utm_medium': 'medium',
@@ -68,8 +83,16 @@ def eyb_lead_post_data():
 
 
 @pytest.fixture
-def eyb_lead_factory_data(eyb_lead_post_data):
-    data = eyb_lead_post_data.copy()
+def eyb_lead_factory_data(
+    eyb_lead_triage_data,
+    eyb_lead_user_data,
+    eyb_lead_marketing_data,
+):
+    data = {
+        **eyb_lead_triage_data,
+        **eyb_lead_user_data,
+        **eyb_lead_marketing_data,
+    }
     mining_sector = Sector.objects.get(
         pk=constants.Sector.mining_mining_vehicles_transport_equipment.value.id,
     )
