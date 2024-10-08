@@ -1,5 +1,8 @@
+import gzip
 import json
 import logging
+
+from datetime import datetime, timedelta
 
 import boto3
 import pytest
@@ -13,7 +16,10 @@ from datahub.company_activity.tasks.ingest_company_activity import BUCKET, GREAT
 from datahub.company_activity.tasks.ingest_great_data import (
     GreatIngestionTask, ingest_great_data, REGION,
 )
-from datahub.company_activity.tests.factories import CompanyActivityGreatFactory
+from datahub.company_activity.tests.factories import (
+    CompanyActivityGreatFactory,
+    CompanyActivityIngestedFileFactory,
+)
 from datahub.metadata.models import Country
 
 
@@ -96,6 +102,32 @@ class TestGreatIngestionTasks:
         assert updated.actor_dit_is_whitelisted is True
         assert updated.data_full_name == 'Keith Duncan'
 
+    @pytest.mark.django_db
+    @mock_aws
+    def test_skip_unchanged_records(self, test_file_path):
+        """
+        Test that we skip updating records whose published date is older than the last
+        file ingestion date
+        """
+        yesterday = datetime.now() - timedelta(1)
+        CompanyActivityIngestedFileFactory(created_on=datetime.now())
+        record = json.dumps(dict(
+            object={
+                'id': 'dit:directoryFormsApi:Submission:5249',
+                'published': yesterday,
+                'attributedT': {
+                    'type': 'dit:directoryFormsApi:SubmissionAction:gov-notify-email',
+                    'id': 'dit:directoryFormsApi:SubmissionType:export-support-service',
+                },
+            },
+        ), default=str)
+        test_file = gzip.compress(record.encode('utf-8'))
+        setup_s3_bucket(BUCKET)
+        setup_s3_files(BUCKET, test_file, test_file_path)
+        ingest_great_data(BUCKET, test_file_path)
+        assert Great.objects.count() == 0
+
+    @pytest.mark.django_db
     @mock_aws
     def test_invalid_file(self, test_file_path):
         """

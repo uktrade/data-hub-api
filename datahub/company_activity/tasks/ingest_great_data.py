@@ -1,6 +1,8 @@
 import json
 import logging
 
+from datetime import datetime
+
 import environ
 
 from smart_open import open
@@ -11,6 +13,7 @@ from datahub.metadata.models import Country
 logger = logging.getLogger(__name__)
 env = environ.Env()
 REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
+DATE_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
 
 
 def ingest_great_data(bucket, file):
@@ -23,19 +26,36 @@ def ingest_great_data(bucket, file):
 class GreatIngestionTask:
     def __init__(self):
         self._countries = None
+        self._last_ingestion_datetime = self._get_last_ingestion_datetime()
 
     def ingest(self, bucket, file):
         path = f's3://{bucket}/{file}'
         try:
             with open(path) as s3_file:
                 for line in s3_file:
-                    self.json_to_model(json.loads(line))
+                    jsn = json.loads(line)
+                    if self._record_has_no_changes(jsn):
+                        continue
+                    self.json_to_model(jsn)
         except Exception as e:
             raise e
         IngestedFile.objects.create(filepath=file)
 
+    def _get_last_ingestion_datetime(self):
+        try:
+            return IngestedFile.objects.latest('created_on').created_on.timestamp()
+        except IngestedFile.DoesNotExist:
+            return None
+
     def _get_countries(self):
         self._countries = Country.objects.all()
+
+    def _record_has_no_changes(self, record):
+        if self._last_ingestion_datetime is None:
+            return False
+        else:
+            date = datetime.strptime(record['object']['published'], DATE_FORMAT).timestamp()
+            return date < self._last_ingestion_datetime
 
     def country_from_iso_code(self, country_code, form_id):
         if not country_code:
