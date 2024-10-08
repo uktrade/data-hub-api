@@ -107,12 +107,12 @@ class CompanyActivityGreatFactory(factory.django.DjangoModelFactory):
     CompanyActivity ingested Great data factory
     """
 
-    form_id = factory.Sequence('dit:directoryFormsApi:Submission:{0}'.format)
+    form_id = factory.Sequence(lambda n: n)
     published = now()
     url = '"http://www.lewis.com/"'
 
-    attributed_to_type = 'dit:directoryFormsApi:SubmissionAction:gov-notify-email'
-    attributed_to_id = 'dit:directoryFormsApi:SubmissionType:Unknown'
+    attributed_to_type = 'gov-notify-email'
+    attributed_to_id = 'Unknown'
 
     meta_action_name = 'gov-notify-email'
     meta_template_id = '07f729e9-8561-4180-a6ff-b14e6be1fef0'
@@ -127,12 +127,12 @@ class CompanyActivityGreatFactory(factory.django.DjangoModelFactory):
     data_phone_number = '12345678'
     data_terms_agreed = False
     data_email_address = 'christian31@example.com'
-    data_opportunities = '[https://www.hoover-ramos.com/explore/wp-content/explorelogin.php]'
+    data_opportunities = ['https://www.hoover-ramos.com/explore/wp-content/explorelogin.php']
     data_role_in_company = 'test'
     data_opportunity_urls = 'http://moore.com/listpost.html'
 
-    actor_type = 'dit:directoryFormsApi:Submission:Sender'
-    actor_id = 'dit:directoryFormsApi:Sender:1041'
+    actor_type = 'Sender'
+    actor_id = 1041
     actor_dit_email_address = 'crystalbrock@example.org'
     actor_dit_is_blacklisted = False
     actor_dit_is_whitelisted = False
