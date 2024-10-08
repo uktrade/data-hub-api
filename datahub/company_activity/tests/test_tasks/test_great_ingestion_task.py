@@ -86,11 +86,11 @@ class TestGreatIngestionTasks:
         have their new values ingested
         """
         country = Country.objects.get(id='0350bdb8-5d95-e211-a939-e4115bead28a')
-        CompanyActivityGreatFactory(data_country=country)
+        CompanyActivityGreatFactory(form_id='9034', data_country=country)
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
         ingest_great_data(BUCKET, test_file_path)
-        updated = Great.objects.get(form_id='dit:directoryFormsApi:Submission:9034')
+        updated = Great.objects.get(form_id='9034')
         assert str(updated.data_country_id) == '876a9ab2-5d95-e211-a939-e4115bead28a'
         assert updated.actor_dit_is_blacklisted is False
         assert updated.actor_dit_is_whitelisted is True
@@ -163,9 +163,9 @@ class TestGreatIngestionTasks:
         init(transport=mock_transport)
         task = GreatIngestionTask()
         task.json_to_model(json.loads(data))
-        result = Great.objects.get(form_id='dit:directoryFormsApi:Submission:5249')
+        result = Great.objects.get(form_id='5249')
         assert result.data_country is None
         sentry_event = mock_transport.events[0].get_event()
         expected_message = 'Could not match country with iso code: ZZ, ' + \
-            'for form: dit:directoryFormsApi:Submission:5249'
+            'for form: 5249'
         assert sentry_event['logentry']['message'] == expected_message
