@@ -8,8 +8,7 @@ from datahub.investment_lead.models import EYBLead
 
 def _to_iso(dateobject):
     if isinstance(dateobject, datetime.datetime):
-        return dateobject.astimezone().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-
+        return dateobject.astimezone().strftime('%Y-%m-%dT%H:%M:%SZ')
     return dateobject
 
 
@@ -17,13 +16,13 @@ def assert_datetimes(first, second):
     assert _to_iso(first) == _to_iso(second)
 
 
-def verify_eyb_lead_data(
-    instance: EYBLead, data: dict, data_type: Literal['post', 'factory', 'nested'],
+def verify_eyb_triage_data(
+    instance: EYBLead, data: dict, data_type: Literal['json', 'factory', 'nested'],
 ):
-    """Method to verify the EYBLead data against the passed instance.
+    """Method to verify the EYB triage data against the created EYBLead instance.
 
     Use:
-    - `data_type='post'` if passing in POST data which contains string names
+    - `data_type='json'` if passing in JSON data which contains string names
     for related fields
     - `data_type='factory'` if passing in factory (or validated serializer) data that
     contains model instances for these fields
@@ -33,11 +32,7 @@ def verify_eyb_lead_data(
     Related fields are:
     - Sector
     - Location
-    - Company location
-    - Address area
-    - Address country
     """
-    # EYB triage fields
     assert instance.triage_hashed_uuid == data['triage_hashed_uuid']
     assert_datetimes(instance.triage_created, data['triage_created'])
     assert_datetimes(instance.triage_modified, data['triage_modified'])
@@ -47,20 +42,60 @@ def verify_eyb_lead_data(
     assert instance.spend_other == data['spend_other']
     assert instance.is_high_value == data['is_high_value']
 
-    # EYB user fields
+    # Choice fields
+    if data_type == 'nested':
+        assert [
+            EYBLead.IntentChoices(intent_choice).label
+            for intent_choice in instance.intent
+        ] == data['intent']
+        assert EYBLead.HiringChoices(instance.hiring).label == data['hiring']
+        assert EYBLead.SpendChoices(instance.spend).label == data['spend']
+    else:
+        assert instance.intent == data['intent']
+        assert instance.hiring == data['hiring']
+        assert instance.spend == data['spend']
+
+    # Related fields
+    if data_type == 'json':
+        assert instance.sector.segment == data['sector']
+        assert instance.location.name == data['location']
+    elif data_type == 'factory':
+        assert instance.sector == data['sector']
+        assert instance.location == data['location']
+    elif data_type == 'nested':
+        assert str(instance.sector.id) == data['sector']['id']
+        assert str(instance.location.id) == data['location']['id']
+    else:
+        raise ValueError(f'Invalid value "{data_type}" for argument data_type')
+
+
+def verify_eyb_user_data(
+    instance: EYBLead, data: dict, data_type: Literal['json', 'factory', 'nested'],
+):
+    """Method to verify the EYB user data against the created EYBLead instance.
+
+    Use:
+    - `data_type='json'` if passing in JSON data which contains string names
+    for related fields
+    - `data_type='factory'` if passing in factory (or validated serializer) data that
+    contains model instances for these fields
+    - `data_type='nested'` if passing in serialized data (from the RetrieveEYBLeadSerializer)
+    that contains nested objects for these fields, with the id and name attributes.
+
+    Related fields are:
+    - Address country
+    """
     assert instance.user_hashed_uuid == data['user_hashed_uuid']
     assert_datetimes(instance.user_created, data['user_created'])
     assert_datetimes(instance.user_modified, data['user_modified'])
     assert instance.company_name == data['company_name']
+    assert instance.duns_number == data['duns_number']
     assert instance.full_name == data['full_name']
     assert instance.role == data['role']
     assert instance.email == data['email']
     assert instance.telephone_number == data['telephone_number']
     assert instance.agree_terms == data['agree_terms']
     assert instance.agree_info_email == data['agree_info_email']
-
-    # Company fields
-    assert instance.duns_number == data['duns_number']
 
     # Address fields
     if data_type != 'nested':
@@ -76,42 +111,52 @@ def verify_eyb_lead_data(
 
     # Choice fields
     if data_type == 'nested':
-        assert [
-            EYBLead.IntentChoices(intent_choice).label
-            for intent_choice in instance.intent
-        ] == data['intent']
-        assert EYBLead.HiringChoices(instance.hiring).label == data['hiring']
-        assert EYBLead.SpendChoices(instance.spend).label == data['spend']
         assert EYBLead.LandingTimeframeChoices(instance.landing_timeframe).label \
             == data['landing_timeframe']
     else:
-        assert instance.intent == data['intent']
-        assert instance.hiring == data['hiring']
-        assert instance.spend == data['spend']
         assert instance.landing_timeframe == data['landing_timeframe']
 
     # Related fields
-    if data_type == 'post':
-        assert instance.sector.segment == data['sector']
-        assert instance.location.name == data['location']
+    if data_type == 'json':
         assert instance.address_country.iso_alpha2_code == data['address_country']
     elif data_type == 'factory':
-        assert instance.sector == data['sector']
-        assert instance.location == data['location']
         assert instance.address_country == data['address_country']
     elif data_type == 'nested':
-        assert str(instance.sector.id) == data['sector']['id']
-        assert str(instance.location.id) == data['location']['id']
         assert str(instance.address_country.id) == data['address']['country']['id']
         assert str(instance.company.id) == data['company']['id']
     else:
         raise ValueError(f'Invalid value "{data_type}" for argument data_type')
 
-    # UTM fields
+
+def verify_eyb_marketing_data(instance: EYBLead, data: dict):
+    """Method to verify the EYB marketing data against the created EYBLead instance."""
     assert instance.utm_name == data['utm_name']
     assert instance.utm_source == data['utm_source']
     assert instance.utm_medium == data['utm_medium']
     assert instance.utm_content == data['utm_content']
+
+
+def verify_eyb_lead_data(
+    instance: EYBLead, data: dict, data_type: Literal['json', 'factory', 'nested'],
+):
+    """Method to verify an EYB lead instance against all data components that made it.
+
+    Use:
+    - `data_type='json'` if passing in JSON data which contains string names
+    for related fields
+    - `data_type='factory'` if passing in factory (or validated serializer) data that
+    contains model instances for these fields
+    - `data_type='nested'` if passing in serialized data (from the RetrieveEYBLeadSerializer)
+    that contains nested objects for these fields, with the id and name attributes.
+
+    Related fields are:
+    - Sector
+    - Location
+    - Address country
+    """
+    verify_eyb_triage_data(instance, data, data_type)
+    verify_eyb_user_data(instance, data, data_type)
+    verify_eyb_marketing_data(instance, data)
 
 
 def assert_eyb_lead_matches_company(company: Company, eyb_lead: EYBLead):
