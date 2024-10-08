@@ -186,11 +186,15 @@ Dependencies:
 
 5. Setup the postgres user and database
 
+    On macOS:
     ```shell
     createdb
+    ```
+
+    ```shell
     psql
     CREATE DATABASE datahub;
-    CREATE USER datahubuser SUPERUSER WITH PASSWORD 'datahubpassword';
+    CREATE USER datahubuser WITH SUPERUSER PASSWORD 'datahubpassword';
     \q
     ```
 
