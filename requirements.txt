@@ -31,9 +31,9 @@ bigtree==0.21.1
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.35.29
+boto3==1.35.34
     # via -r requirements.in
-botocore==1.35.29
+botocore==1.35.34
     # via
     #   boto3
     #   s3transfer
@@ -91,7 +91,7 @@ django==4.2.16
     #   django-redis
     #   django-reversion
     #   djangorestframework
-django-axes==6.5.2
+django-axes==7.0.0
     # via -r requirements.in
 django-csp==3.8
     # via -r requirements.in
@@ -293,7 +293,7 @@ rq-scheduler==0.13.1
     # via -r requirements.in
 s3transfer==0.10.0
     # via boto3
-sentry-sdk==2.14.0
+sentry-sdk==2.15.0
     # via -r requirements.in
 simplejson==3.18.0
     # via mail-parser
@@ -306,7 +306,7 @@ six==1.16.0
     #   python-dateutil
 slackclient==2.9.4
     # via -r requirements.in
-smart-open==7.0.4
+smart-open==7.0.5
     # via -r requirements.in
 sqlparse==0.5.0
     # via
