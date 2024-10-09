@@ -90,8 +90,10 @@ class DNBCompanySearchView(APIView):
         except (
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
+        ):
+            logger.error('Error communicating with DNB service during company search.')
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
         except DNBServiceError as exc:
             return HttpResponse(
                 exc.message,
@@ -199,12 +201,12 @@ class DNBCompanyCreateView(APIView):
             DNBServiceError,
             DNBServiceInvalidResponseError,
         ):
-            logging.error(
+            logger.error(
                 'An error occurred while retrieving data for DUNS number %s', duns_number)
             raise APIUpstreamException(
                 'An error occurred while processing your request. Please try again later.')
         except DNBServiceInvalidRequestError:
-            logging.warning(
+            logger.warning(
                 'Invalid request for DUNS number %s', duns_number)
             raise APIBadRequestException(
                 'The request could not be completed due to an issue with the provided data.')
