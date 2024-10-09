@@ -88,7 +88,7 @@ class GreatIngestionTask:
             actor_type = actor['type'].split(':')[-1]
         values = {
             'published': obj['published'],
-            'url': obj.get('url', ''),
+            'url': obj.get('url', None),
 
             'attributed_to_type': attributed_to_type,
             'attributed_to_id': attributed_to_id,

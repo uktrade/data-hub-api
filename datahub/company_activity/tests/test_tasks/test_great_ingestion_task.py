@@ -115,7 +115,7 @@ class TestGreatIngestionTasks:
             object={
                 'id': 'dit:directoryFormsApi:Submission:5249',
                 'published': yesterday,
-                'attributedT': {
+                'attributedTo': {
                     'type': 'dit:directoryFormsApi:SubmissionAction:gov-notify-email',
                     'id': 'dit:directoryFormsApi:SubmissionType:export-support-service',
                 },
@@ -156,38 +156,9 @@ class TestGreatIngestionTasks:
                 "object": {
                     "id": "dit:directoryFormsApi:Submission:5249",
                     "published": "2024-09-19T14:00:34.069Z",
-                    "attributedTo": {
-                      "type": "dit:directoryFormsApi:SubmissionAction:gov-notify-email",
-                      "id": "dit:directoryFormsApi:SubmissionType:export-support-service"
-                    },
-                    "url": "https://kane.net/",
-                    "dit:directoryFormsApi:Submission:Meta": {
-                      "action_name": "gov-notify-email",
-                      "template_id": "76f12003-74e8-4e6b-bbe9-8edc1b8619ae",
-                      "email_address": "brownalexandra@example.com"
-                    },
                     "dit:directoryFormsApi:Submission:Data": {
-                      "comment": "Issue why why morning save parent southern.",
-                      "country": "ZZ",
-                      "full_name": "Tina Gray",
-                      "website_url": "https://www.henderson-thomas.info/",
-                      "company_name": "Foster, Murphy and Diaz",
-                      "company_size": "1 - 10",
-                      "phone_number": "12345678",
-                      "terms_agreed": true,
-                      "email_address": "ericwilliams@example.com",
-                      "opportunities": ["https://white.net/app/tagscategory.php"],
-                      "role_in_company": "test",
-                      "opportunity_urls": "https://www.brown-andrade.com/wp-content/tagfaq.htm"
+                     "country": "ZZ"
                     }
-                },
-                "actor": {
-                    "type": "dit:directoryFormsApi:Submission:Sender",
-                    "id": "dit:directoryFormsApi:Sender:1041",
-                    "dit:emailAddress": "crystalbrock@example.org",
-                    "dit:isBlacklisted": true,
-                    "dit:isWhitelisted": false,
-                    "dit:blackListedReason": null
                 }
         }
         """
@@ -201,3 +172,23 @@ class TestGreatIngestionTasks:
         expected_message = 'Could not match country with iso code: ZZ, ' + \
             'for form: 5249'
         assert sentry_event['logentry']['message'] == expected_message
+
+    @pytest.mark.django_db
+    @mock_aws
+    def test_null_url(self, test_file_path):
+        """
+        Test that we can ingest records with URL field null
+        """
+        initial_count = Great.objects.count()
+        data = """
+            {
+                "object": {
+                    "id": "dit:directoryFormsApi:Submission:5249",
+                    "published": "2024-09-19T14:00:34.069Z",
+                    "url": null
+                }
+        }
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        assert Great.objects.count() == initial_count + 1

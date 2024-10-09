@@ -27,7 +27,7 @@ class Great(models.Model):
     attributed_to_type = models.CharField(max_length=MAX_LENGTH)
     attributed_to_id = models.CharField(max_length=MAX_LENGTH)
 
-    url = models.CharField(max_length=MAX_LENGTH)
+    url = models.CharField(max_length=MAX_LENGTH, null=True)
     meta_action_name = models.CharField(max_length=MAX_LENGTH)
     meta_template_id = models.CharField(max_length=MAX_LENGTH)
     meta_email_address = models.CharField(max_length=MAX_LENGTH)
