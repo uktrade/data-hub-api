@@ -331,9 +331,12 @@ class DNBCompanyChangeRequestView(APIView):
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
             DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
-
+        ):
+            logger.error(
+                'An error occurred while retrieving change request for DUNS number: %s',
+                duns_number)
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
         return Response(response)
 
 
