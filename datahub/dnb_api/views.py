@@ -524,8 +524,11 @@ class DNBRelatedCompaniesCountView(APIView):
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
             DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
+        ):
+            logger.error(
+                'Failed to retrieve company hierarchy count for DUNS number: %s', duns_number)
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
 
         json_response = {
             'related_companies_count': companies_count,
