@@ -306,8 +306,10 @@ class DNBCompanyChangeRequestView(APIView):
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
             DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
+        ):
+            logger.error('An error occurred while processing DNB companies POST request.')
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
 
         return Response(response)
 
@@ -333,7 +335,7 @@ class DNBCompanyChangeRequestView(APIView):
             DNBServiceError,
         ):
             logger.error(
-                'An error occurred while retrieving change request for DUNS number: %s',
+                'An error occurred while processing GET request for DUNS number: %s',
                 duns_number)
             raise APIUpstreamException(
                 'An error occurred while processing your request. Please try again later.')
@@ -406,7 +408,8 @@ class DNBCompanyHierarchyView(APIView):
             DNBServiceInvalidResponseError,
         ):
             logger.error(
-                'Failed to retrieve company hierarchy count for DUNS number: %s', duns_number)
+                'Failed to retrieve company hierarchy count for DUNS number: %s from dnb-service',
+                duns_number)
             raise APIUpstreamException(
                 'An error occurred while processing your request. Please try again later.')
 
