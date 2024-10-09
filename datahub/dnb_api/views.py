@@ -367,9 +367,10 @@ class DNBCompanyInvestigationView(APIView):
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
             DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
-
+        ):
+            logger.error('An error occurred while creating an investigation for the company.')
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
         company.dnb_investigation_id = response['id']
         company.pending_dnb_investigation = True
         company.save()
