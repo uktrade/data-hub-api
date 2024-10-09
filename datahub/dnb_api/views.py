@@ -400,8 +400,11 @@ class DNBCompanyHierarchyView(APIView):
             DNBServiceError,
             DNBServiceInvalidRequestError,
             DNBServiceInvalidResponseError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
+        ):
+            logger.error(
+                'Failed to retrieve company hierarchy count for DUNS number: %s', duns_number)
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
 
         manually_verified = self.get_manually_verified_subsidiaries(
             company_id,
