@@ -176,7 +176,7 @@ class EYBLead(InvestmentLead):
         on_delete=models.CASCADE,
     )
     investment_project = models.ManyToManyField(
-        'investment.InvestmentProject'
+        'investment.InvestmentProject',
     )
 
     # UTM parameters
