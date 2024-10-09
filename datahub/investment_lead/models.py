@@ -175,6 +175,9 @@ class EYBLead(InvestmentLead):
         blank=True,
         on_delete=models.CASCADE,
     )
+    investment_project = models.ManyToManyField(
+        'investment.InvestmentProject'
+    )
 
     # UTM parameters
     utm_name = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
