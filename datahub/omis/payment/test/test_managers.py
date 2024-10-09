@@ -1,3 +1,5 @@
+import uuid
+
 from unittest import mock
 
 import factory
@@ -64,7 +66,7 @@ class TestPaymentGatewaySessionManager:
         """
         monkeypatch.setattr(
             'uuid.uuid4',
-            mock.Mock(return_value='0123abcd-0000-0000-0000-000000000000'),
+            mock.Mock(return_value=uuid.UUID('0123abcd-0000-0000-0000-000000000000')),
         )
 
         # mock request
