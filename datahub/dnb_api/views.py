@@ -198,11 +198,16 @@ class DNBCompanyCreateView(APIView):
             DNBServiceConnectionError,
             DNBServiceError,
             DNBServiceInvalidResponseError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
-
-        except DNBServiceInvalidRequestError as exc:
-            raise APIBadRequestException(str(exc))
+        ):
+            logging.error(
+                'An error occurred while retrieving data for DUNS number %s', duns_number)
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
+        except DNBServiceInvalidRequestError:
+            logging.warning(
+                'Invalid request for DUNS number %s', duns_number)
+            raise APIBadRequestException(
+                'The request could not be completed due to an issue with the provided data.')
 
         company_serializer = DNBCompanySerializer(
             data=dnb_company,
@@ -265,14 +270,26 @@ class DNBCompanyLinkView(APIView):
             DNBServiceConnectionError,
             DNBServiceInvalidResponseError,
             DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
+        ):
+            logger.error(
+                'An error occurred while linking company ID %s with DUNS number %s',
+                company_id,
+                duns_number,
+            )
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
 
         except (
             DNBServiceInvalidRequestError,
             CompanyAlreadyDNBLinkedError,
-        ) as exc:
-            raise APIBadRequestException(str(exc))
+        ):
+            logger.warning(
+                'Invalid request or company ID %s is already linked to DUNS number %s',
+                company_id,
+                duns_number,
+            )
+            raise APIBadRequestException(
+                'The request could not be completed due to a problem with the provided data.')
 
         return Response(
             CompanySerializer().to_representation(company),
