@@ -8,7 +8,7 @@ from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.test.factories import EYBLeadFactory
-from datahub.investment_lead.test.utils import verify_eyb_lead_data
+from datahub.investment_lead.test.utils import assert_retrieved_eyb_lead_data
 from datahub.metadata.models import Sector
 
 
@@ -27,7 +27,7 @@ class TestEYBLeadRetrieveAPI(APITestMixin):
         url = eyb_lead_item_url(eyb_lead_instance_from_db.pk)
         response = api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        verify_eyb_lead_data(eyb_lead_instance_from_db, response.data, data_type='nested')
+        assert_retrieved_eyb_lead_data(eyb_lead_instance_from_db, response.data)
 
     def test_retrieve_non_existent_lead(self, test_user_with_view_permissions):
         non_existent_pk = uuid.uuid4()
@@ -45,9 +45,8 @@ class TestEYBLeadListAPI(APITestMixin):
         response = api_client.get(EYB_LEAD_COLLECTION_URL)
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data['results']) == 1
-        verify_eyb_lead_data(
-            eyb_lead_instance_from_db, response.data['results'][0], data_type='nested',
-        )
+        assert_retrieved_eyb_lead_data(
+            eyb_lead_instance_from_db, response.data['results'][0])
 
     def test_list_no_eyb_leads(self, test_user_with_view_permissions):
         """Tests that an empty list is returned if there are no EYB leads"""
