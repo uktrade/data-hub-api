@@ -84,6 +84,6 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     @to_many_field
     def investment_projects(self):
         """
-        Add support for setting `advisers`.
+        Add support for setting `investment_projects`.
         """
         return []
