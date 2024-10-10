@@ -85,6 +85,7 @@ class GreatIngestionTask:
         else:
             actor_id = actor['id'].split(':')[-1]
         actor_type = actor.get('type', '').split(':')[-1]
+        actor_blacklisted_reason = str(actor.get('dit:blackListedReason', '') or '')
         values = {
             'published': obj['published'],
             'url': obj.get('url', ''),
@@ -114,7 +115,7 @@ class GreatIngestionTask:
             'actor_dit_email_address': actor.get('dit:emailAddress', ''),
             'actor_dit_is_blacklisted': actor.get('dit:isBlacklisted', None),
             'actor_dit_is_whitelisted': actor.get('dit:isWhitelisted', None),
-            'actor_dit_blacklisted_reason': str(actor.get('dit:blackListedReason', '') or ''),
+            'actor_dit_blacklisted_reason': actor_blacklisted_reason,
         }
         Great.objects.update_or_create(
             form_id=form_id,
