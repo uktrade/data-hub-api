@@ -133,6 +133,7 @@ class EYBLead(InvestmentLead):
     address_1 = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
     address_2 = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
     address_town = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    address_county = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
     address_country = models.ForeignKey(
         'metadata.Country',
         blank=True,

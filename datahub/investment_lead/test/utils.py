@@ -82,6 +82,7 @@ def assert_ingested_eyb_user_data(instance: EYBLead, data: dict):
     assert instance.address_1 == data['addressLine1']
     assert instance.address_2 == data['addressLine2']
     assert instance.address_town == data['town']
+    assert instance.address_county == data['county']
     assert instance.address_country.iso_alpha2_code == data['companyLocation']
     assert instance.address_postcode == data['postcode']
     assert instance.company_website == data['companyWebsite']
@@ -129,6 +130,7 @@ def assert_retrieved_eyb_lead_data(instance: EYBLead, data: dict):
     assert instance.address_1 == data['address']['line_1']
     assert instance.address_2 == data['address']['line_2']
     assert instance.address_town == data['address']['town']
+    assert instance.address_county == data['address']['county']
     assert str(instance.address_country.id) == data['address']['country']['id']
     assert instance.address_postcode == data['address']['postcode']
     assert instance.company_website == data['company_website']
@@ -156,6 +158,7 @@ def assert_eyb_lead_matches_company(company: Company, eyb_lead: EYBLead):
     assert eyb_lead.address_1 == company.address_1
     assert eyb_lead.address_2 == company.address_2
     assert eyb_lead.address_town == company.address_town
+    assert eyb_lead.address_county == company.address_county
     assert eyb_lead.address_country == company.address_country
     assert eyb_lead.address_postcode == company.address_postcode
     assert eyb_lead.company_website == company.website
