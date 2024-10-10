@@ -4,7 +4,6 @@ from datahub.investment_lead.views import EYBLeadViewSet
 
 
 eyb_lead_collection = EYBLeadViewSet.as_view({
-    'post': 'create',
     'get': 'list',
 })
 
