@@ -202,12 +202,12 @@ class DNBCompanyCreateView(APIView):
             DNBServiceInvalidResponseError,
         ):
             logger.error(
-                'An error occurred while retrieving data for DUNS number %s', duns_number)
+                'An error occurred while retrieving data for DUNS number')
             raise APIUpstreamException(
                 'An error occurred while processing your request. Please try again later.')
         except DNBServiceInvalidRequestError:
             logger.warning(
-                'Invalid request for DUNS number %s', duns_number)
+                'Invalid request for DUNS number')
             raise APIBadRequestException(
                 'The request could not be completed due to an issue with the provided data.')
 
@@ -274,9 +274,7 @@ class DNBCompanyLinkView(APIView):
             DNBServiceError,
         ):
             logger.error(
-                'An error occurred while linking company ID %s with DUNS number %s',
-                company_id,
-                duns_number,
+                'An error occurred while linking company ID with DUNS number',
             )
             raise APIUpstreamException(
                 'An error occurred while processing your request. Please try again later.')
@@ -286,10 +284,7 @@ class DNBCompanyLinkView(APIView):
             CompanyAlreadyDNBLinkedError,
         ):
             logger.warning(
-                'Invalid request or company ID %s is already linked to DUNS number %s',
-                company_id,
-                duns_number,
-            )
+                'Invalid request or company ID is already linked to DUNS number')
             raise APIBadRequestException(
                 'The request could not be completed due to a problem with the provided data.')
 
@@ -354,8 +349,7 @@ class DNBCompanyChangeRequestView(APIView):
             DNBServiceError,
         ):
             logger.error(
-                'An error occurred while processing GET request for DUNS number: %s',
-                duns_number)
+                'An error occurred while processing GET request for DUNS number')
             raise APIUpstreamException(
                 'An error occurred while processing your request. Please try again later.')
         return Response(response)
@@ -427,8 +421,7 @@ class DNBCompanyHierarchyView(APIView):
             DNBServiceInvalidResponseError,
         ):
             logger.error(
-                'Failed to retrieve company hierarchy count for DUNS number: %s from dnb-service',
-                duns_number)
+                'Failed to retrieve company hierarchy count for DUNS number from dnb-service')
             raise APIUpstreamException(
                 'An error occurred while processing your request. Please try again later.')
 
@@ -555,7 +548,7 @@ class DNBRelatedCompaniesCountView(APIView):
             DNBServiceError,
         ):
             logger.error(
-                'Failed to retrieve company hierarchy count for DUNS number: %s', duns_number)
+                'Failed to retrieve company hierarchy count for DUNS number')
             raise APIUpstreamException(
                 'An error occurred while processing your request. Please try again later.')
 
