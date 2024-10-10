@@ -14,7 +14,7 @@ from sentry_sdk.transport import Transport
 from datahub.company_activity.models import Great, IngestedFile
 from datahub.company_activity.tasks.ingest_company_activity import BUCKET, GREAT_PREFIX
 from datahub.company_activity.tasks.ingest_great_data import (
-    GreatIngestionTask, ingest_great_data, REGION,
+    DATE_FORMAT, GreatIngestionTask, ingest_great_data, REGION,
 )
 from datahub.company_activity.tests.factories import (
     CompanyActivityGreatFactory,
@@ -109,7 +109,7 @@ class TestGreatIngestionTasks:
         Test that we skip updating records whose published date is older than the last
         file ingestion date
         """
-        yesterday = datetime.now() - timedelta(1)
+        yesterday = datetime.strftime(datetime.now() - timedelta(1), DATE_FORMAT)
         CompanyActivityIngestedFileFactory(created_on=datetime.now())
         record = json.dumps(dict(
             object={
@@ -192,3 +192,14 @@ class TestGreatIngestionTasks:
         task = GreatIngestionTask()
         task.json_to_model(json.loads(data))
         assert Great.objects.count() == initial_count + 1
+        data = """
+            {
+                "object": {
+                    "id": "dit:directoryFormsApi:Submission:5250",
+                    "published": "2024-09-19T15:00:34.069Z"
+                }
+        }
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        assert Great.objects.count() == initial_count + 2
