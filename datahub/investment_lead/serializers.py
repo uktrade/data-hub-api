@@ -130,8 +130,12 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
     created = serializers.DateTimeField(source='triage_created', required=True)
     modified = serializers.DateTimeField(source='triage_modified', required=True)
     sector = serializers.CharField(required=True)
-    sectorSub = serializers.CharField(required=False, allow_null=True)  # noqa: N815
-    sectorSubSub = serializers.CharField(required=False, allow_null=True)  # noqa: N815
+    sectorSub = serializers.CharField(  # noqa: N815
+        required=False, allow_null=True, read_only=True,
+    )
+    sectorSubSub = serializers.CharField(  # noqa: N815
+        required=False, allow_null=True, read_only=True,
+    )
     # Can't use MultipleChoiceField here as it returns a set rather than a list and raises db error
     intent = serializers.ListField(required=True)
     intentOther = serializers.CharField(  # noqa: N815
@@ -156,14 +160,15 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
             raise serializers.ValidationError(f'Location "{value}" does not exist.')
         return value
 
-    def _get_sector_instance_from_segments(
+    def _get_selected_and_parent_sector_segments(
         self,
         level_zero_segment,
         level_one_segment,
         level_two_segment,
-    ):
-        """Looks up and returns a sector instance given the individual level segments."""
-        # Determine selected sector and parent name
+    ) -> tuple[str, str | None]:
+        """Determines the selected and parent sector segments from the full sector name."""
+        selected_sector_segment = None
+        parent_sector_segment = None
         if level_two_segment:
             selected_sector_segment = level_two_segment
             parent_sector_segment = level_one_segment
@@ -173,20 +178,40 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
         elif level_zero_segment:
             selected_sector_segment = level_zero_segment
             parent_sector_segment = None
+        return selected_sector_segment, parent_sector_segment
 
-        # Filter based on found names
+    def _get_sector_from_selected_and_parent_segments(
+        self,
+        selected_sector_segment,
+        parent_sector_segment,
+    ) -> Sector | None:
+        """Looks up and returns a sector instance given the selected and parent sector segments."""
         queryset = Sector.objects.filter(segment=selected_sector_segment)
         if parent_sector_segment is not None:
             queryset.filter(parent__segment=parent_sector_segment)
+        return queryset.first()
 
-        # Raise validation error if no sectors matched
-        if not queryset.exists():
+    def validate(self, data):
+        """Validate sector data."""
+        # TODO: Fix sector validation so that it can pass the sub segments and raise the full name
+        segments = [
+            data.get('sector', None),
+            data.get('sectorSub', None),
+            data.get('sectorSubSub', None),
+        ]
+        selected_sector_segment, parent_sector_segment = \
+            self._get_selected_and_parent_sector_segments(*segments)
+        sector = self._get_sector_from_selected_and_parent_segments(
+            selected_sector_segment,
+            parent_sector_segment,
+        )
+        if sector is None:
             full_name = ' : '.join([
-                segment for segment in [level_zero_segment, level_one_segment, level_two_segment]
+                segment for segment in segments
                 if segment is not None
             ])
             raise serializers.ValidationError(f'Sector "{full_name}" does not exist.')
-        return queryset.first()
+        return data
 
     def to_representation(self, instance):
         """Convert model instance to built-in Python (JSON friendly) data types."""
@@ -205,23 +230,25 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
     def to_internal_value(self, data):
         """Convert unvalidated JSON data to validated data."""
         # Extract strings from incoming JSON for related fields
-        # Using .get() here as field is required by serializer/model
-        level_zero_segment = data.get('sector', None)
-        # Using .pop() here otherwise error is raised when calling serializer.save()
-        level_one_segment = data.pop('sectorSub', None)
-        level_two_segment = data.pop('sectorSubSub', None)
-
+        segments = [
+            data.get('sector', None),
+            data.get('sectorSub', None),
+            data.get('sectorSubSub', None),
+        ]
         location_name = data.get('location', None)
 
         # Convert and validate rest of the data
         validated_data = super().to_internal_value(data)
 
         # Convert strings to model instances for related fields and overwrite validated data
-        validated_data['sector'] = self._get_sector_instance_from_segments(
-            level_zero_segment,
-            level_one_segment,
-            level_two_segment,
+        selected_sector_segment, parent_sector_segment = \
+            self._get_selected_and_parent_sector_segments(*segments)
+        sector = self._get_sector_from_selected_and_parent_segments(
+            selected_sector_segment,
+            parent_sector_segment,
         )
+        if sector:
+            validated_data['sector'] = sector
         if location_name:
             validated_data['location'] = UKRegion.objects.get(
                 name=location_name.title(),
@@ -281,10 +308,10 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
         choices=EYBLead.LandingTimeframeChoices.choices,
     )
 
-    def validate_address_country(self, value):
+    def validate_companyLocation(self, value):  # noqa: N802
         if not Country.objects.filter(iso_alpha2_code=value.upper()).exists():
             raise serializers.ValidationError(
-                f'Address country ISO code "{value}" does not exist.',
+                f'Company location/country ISO2 code "{value}" does not exist.',
             )
         return value
 
