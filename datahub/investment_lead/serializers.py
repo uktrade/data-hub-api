@@ -6,7 +6,6 @@ from datahub.core.serializers import (
     NestedRelatedField,
 )
 from datahub.investment_lead.models import EYBLead
-from datahub.investment_lead.test.conftest import get_segments_from_sector_instance
 from datahub.metadata.models import (
     Country,
     Sector,
@@ -212,19 +211,20 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
             raise serializers.ValidationError(f'Sector "{full_name}" does not exist.')
         return data
 
-    def to_representation(self, instance):
-        """Convert model instance to built-in Python (JSON friendly) data types."""
-        level_zero_segment, level_one_segment, level_two_segment = \
-            get_segments_from_sector_instance(instance.sector)
-        related_fields = {
-            'sector': level_zero_segment,
-            'sectorSub': level_one_segment,
-            'sectorSubSub': level_two_segment,
-            'location': instance.location.name if instance.location else None,
-        }
-        rep = super().to_representation(instance)
-        rep.update(related_fields)
-        return rep
+    # TODO: investigate why this causes errors when ingesting
+    # def to_representation(self, instance):
+    #     """Convert model instance to built-in Python (JSON friendly) data types."""
+    #     level_zero_segment, level_one_segment, level_two_segment = \
+    #         get_segments_from_sector_instance(instance.sector)
+    #     related_fields = {
+    #         'sector': level_zero_segment,
+    #         'sectorSub': level_one_segment,
+    #         'sectorSubSub': level_two_segment,
+    #         'location': instance.location.name if instance.location else None,
+    #     }
+    #     rep = super().to_representation(instance)
+    #     rep.update(related_fields)
+    #     return rep
 
     def to_internal_value(self, data):
         """Convert unvalidated JSON data to validated data."""
