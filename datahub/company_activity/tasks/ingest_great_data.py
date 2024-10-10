@@ -13,7 +13,7 @@ from datahub.metadata.models import Country
 logger = logging.getLogger(__name__)
 env = environ.Env()
 REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
-DATE_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
+DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 
 def ingest_great_data(bucket, file):
@@ -82,13 +82,13 @@ class GreatIngestionTask:
         actor = jsn.get('actor', {})
         if not actor:
             actor_id = None
-            actor_type = None
         else:
             actor_id = actor['id'].split(':')[-1]
-            actor_type = actor['type'].split(':')[-1]
+        actor_type = actor.get('type', '').split(':')[-1]
+        actor_blacklisted_reason = str(actor.get('dit:blackListedReason', '') or '')
         values = {
             'published': obj['published'],
-            'url': obj.get('url', ''),
+            'url': str(obj.get('url', '') or ''),
 
             'attributed_to_type': attributed_to_type,
             'attributed_to_id': attributed_to_id,
@@ -112,10 +112,10 @@ class GreatIngestionTask:
 
             'actor_type': actor_type,
             'actor_id': actor_id,
-            'actor_dit_email_address': actor.get('dit:emailAddress', None),
+            'actor_dit_email_address': actor.get('dit:emailAddress', ''),
             'actor_dit_is_blacklisted': actor.get('dit:isBlacklisted', None),
             'actor_dit_is_whitelisted': actor.get('dit:isWhitelisted', None),
-            'actor_dit_blacklisted_reason': actor.get('dit:blackListedReason', None),
+            'actor_dit_blacklisted_reason': actor_blacklisted_reason,
         }
         Great.objects.update_or_create(
             form_id=form_id,
