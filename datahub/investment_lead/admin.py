@@ -58,6 +58,7 @@ class EYBLeadAdmin(admin.ModelAdmin):
                     'address_1',
                     'address_2',
                     'address_town',
+                    'address_county',
                     'address_country',
                     'address_postcode',
                     'company_website',

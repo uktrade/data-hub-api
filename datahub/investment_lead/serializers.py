@@ -242,6 +242,7 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
             'addressLine1',
             'addressLine2',
             'town',
+            'county',
             'companyLocation',
             'postcode',
             'companyWebsite',
@@ -262,6 +263,7 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
     addressLine1 = serializers.CharField(source='address_1', required=True)  # noqa: N815
     addressLine2 = serializers.CharField(source='address_2', required=False)  # noqa: N815
     town = serializers.CharField(source='address_town', required=True)
+    county = serializers.CharField(source='address_county', required=False)
     companyLocation = serializers.CharField(source='address_country', required=True)  # noqa: N815
     postcode = serializers.CharField(source='address_postcode', required=True)
     companyWebsite = serializers.CharField(source='company_website', required=True)  # noqa: N815
