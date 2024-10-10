@@ -79,6 +79,7 @@ RELATED_FIELDS = [
     'address_area',
     'address_country',
     'company',
+    'investment_projects',
 ]
 
 ADDRESS_FIELDS = [
