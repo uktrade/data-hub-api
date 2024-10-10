@@ -10,7 +10,6 @@ from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.test.factories import to_many_field
 from datahub.investment_lead.models import EYBLead
-from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.models import Sector
 
 
