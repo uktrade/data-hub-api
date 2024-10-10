@@ -31,7 +31,10 @@ def get_expected_data_from_task(task):
         'due_date': format_date_or_datetime(task.due_date),
         'reminder_days': task.reminder_days,
         'email_reminders_enabled': task.email_reminders_enabled,
-        'adviser_ids': [str(adviser.id) for adviser in task.advisers.all().order_by('first_name')],
+        'adviser_ids': [str(adviser.id) for adviser in task.advisers.all().order_by(
+            'first_name',
+            'id',
+        )],
         'reminder_date': task.reminder_date,
         'investment_project_id': str(task.investment_project.id)
         if task.investment_project else None,
