@@ -88,7 +88,7 @@ class GreatIngestionTask:
         actor_blacklisted_reason = str(actor.get('dit:blackListedReason', '') or '')
         values = {
             'published': obj['published'],
-            'url': obj.get('url', ''),
+            'url': str(obj.get('url', '') or ''),
 
             'attributed_to_type': attributed_to_type,
             'attributed_to_id': attributed_to_id,
