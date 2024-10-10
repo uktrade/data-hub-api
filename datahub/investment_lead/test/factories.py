@@ -8,7 +8,9 @@ from django.utils import timezone
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
+from datahub.core.test.factories import to_many_field
 from datahub.investment_lead.models import EYBLead
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.models import Sector
 
 
@@ -78,3 +80,10 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     utm_source = factory.Faker('pystr')
     utm_medium = factory.Faker('pystr')
     utm_content = factory.Faker('pystr')
+
+    @to_many_field
+    def investment_projects(self):
+        """
+        Add support for setting `advisers`.
+        """
+        return []

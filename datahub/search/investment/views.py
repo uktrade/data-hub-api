@@ -66,6 +66,7 @@ class SearchInvestmentProjectAPIViewMixin:
         'name',
         'project_code',
         'one_list_group_global_account_manager',
+        'eyb_leads',
     )
 
     REMAP_FIELDS = {
@@ -78,6 +79,7 @@ class SearchInvestmentProjectAPIViewMixin:
         'uk_region_location': 'uk_region_locations.id',
         'country_investment_originates_from': 'country_investment_originates_from.id',
         'one_list_group_global_account_manager': 'one_list_group_global_account_manager.id',
+        'eyb_leads': 'eyb_leads.id',
     }
 
     COMPOSITE_FILTERS = {
