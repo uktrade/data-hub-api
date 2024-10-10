@@ -36,17 +36,32 @@ class TestCreateEYBLeadTriageSerializer:
     def test_create_lead_from_invalid_triage_data(self, eyb_lead_triage_data):
         """Tests invalid choice-field and related-field data raises validation errors."""
         eyb_lead_triage_data.update({
-            # 'sector': 'Invalid sector name',
             'location': 'Invalid location name',
             'hiring': 'Invalid hiring choice',
             'spend': 'Invalid spend choice',
         })
         serializer = CreateEYBLeadTriageSerializer(data=eyb_lead_triage_data)
         assert not serializer.is_valid()
-        # assert 'sector' in serializer.errors
         assert 'location' in serializer.errors
         assert 'hiring' in serializer.errors
         assert 'spend' in serializer.errors
+
+    def test_create_lead_from_invalid_sector_data(self, eyb_lead_triage_data):
+        """Tests invalid sector data raises validation errors."""
+        eyb_lead_triage_data.update({
+            'sector': 'Invalid sector name',
+            'sectorSub': 'Invalid sectorSub name',
+            'sectorSubSub': None,
+        })
+        serializer = CreateEYBLeadTriageSerializer(data=eyb_lead_triage_data)
+        assert not serializer.is_valid()
+        # TODO: Fix sector validation so that it can pass the sub segments and raise the full name
+        # full_name = 'Invalid sector name : Invalid sectorSub name'
+        # assert any([
+        #     f'Sector "{full_name}" does not exist.' in e
+        #     for e in serializer.errors['non_field_errors']
+        # ])
+        assert any(['Sector' in e for e in serializer.errors['non_field_errors']])
 
     def test_create_lead_from_incomplete_triage_data(self, eyb_lead_triage_data):
         eyb_lead_triage_data.pop('sector')
@@ -103,7 +118,7 @@ class TestCreateEYBLeadUserSerializer:
         })
         serializer = CreateEYBLeadUserSerializer(data=eyb_lead_user_data)
         assert not serializer.is_valid()
-        # assert 'companyLocation' in serializer.errors
+        assert 'companyLocation' in serializer.errors
         assert 'landingTimeframe' in serializer.errors
 
     def test_create_lead_from_incomplete_user_data(self, eyb_lead_user_data):
