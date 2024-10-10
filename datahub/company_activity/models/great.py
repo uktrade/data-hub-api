@@ -27,7 +27,7 @@ class Great(models.Model):
     attributed_to_type = models.CharField(max_length=MAX_LENGTH)
     attributed_to_id = models.CharField(max_length=MAX_LENGTH)
 
-    url = models.CharField(max_length=MAX_LENGTH, default='')
+    url = models.CharField(max_length=MAX_LENGTH)
     meta_action_name = models.CharField(max_length=MAX_LENGTH)
     meta_template_id = models.CharField(max_length=MAX_LENGTH)
     meta_email_address = models.CharField(max_length=MAX_LENGTH)
@@ -53,11 +53,11 @@ class Great(models.Model):
     # This is a duplicate of opportunities but in the form of a '\n' delimited string
     data_opportunity_urls = models.CharField(max_length=MAX_LENGTH)
 
-    actor_type = models.CharField(max_length=MAX_LENGTH, default='')
+    actor_type = models.CharField(max_length=MAX_LENGTH, null=True)
     actor_id = models.IntegerField(null=True)
-    actor_dit_email_address = models.CharField(max_length=MAX_LENGTH, default='')
+    actor_dit_email_address = models.CharField(max_length=MAX_LENGTH, null=True)
     actor_dit_is_blacklisted = models.BooleanField(null=True)
     actor_dit_is_whitelisted = models.BooleanField(null=True)
-    actor_dit_blacklisted_reason = models.CharField(max_length=MAX_LENGTH, default='')
+    actor_dit_blacklisted_reason = models.CharField(max_length=MAX_LENGTH, null=True)
 
     created_on = models.DateTimeField(auto_now_add=True)
