@@ -98,7 +98,6 @@ class IProjectAbstract(models.Model):
         LOST = ('lost', 'Lost')
         ABANDONED = ('abandoned', 'Abandoned')
         WON = ('won', 'Won')
-        REFERRED = ('referred', 'Referred')
 
     class Involvement(models.TextChoices):
         UNSPECIFIED = ('unspecified', 'Unspecified')
