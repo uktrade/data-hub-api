@@ -145,6 +145,30 @@ class TestGreatIngestionTasks:
         assert expected in exception
 
     @pytest.mark.django_db
+    def test_country_code_is_country_name(self):
+        """
+        Test that when the country code is a country name string instead
+        of an iso code we are able to lookup country
+        """
+        data = """
+            {
+                "object": {
+                    "id": "dit:directoryFormsApi:Submission:5249",
+                    "published": "2024-09-19T14:00:34.069Z",
+                    "dit:directoryFormsApi:Submission:Data": {
+                     "country": "South Africa"
+                    }
+                }
+            }
+        """
+        initial_count = Great.objects.count()
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        assert Great.objects.count() == initial_count + 1
+        result = Great.objects.get(form_id='5249')
+        assert result.data_country.iso_alpha2_code == 'ZA'
+
+    @pytest.mark.django_db
     def test_invalid_country_code(self):
         """
         Test that when the country code provided in the data file cannot be found
