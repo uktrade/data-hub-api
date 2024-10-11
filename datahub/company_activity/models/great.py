@@ -27,12 +27,12 @@ class Great(models.Model):
     attributed_to_type = models.CharField(max_length=MAX_LENGTH)
     attributed_to_id = models.CharField(max_length=MAX_LENGTH)
 
-    url = models.CharField(max_length=MAX_LENGTH)
+    url = models.TextField()
     meta_action_name = models.CharField(max_length=MAX_LENGTH)
     meta_template_id = models.CharField(max_length=MAX_LENGTH)
     meta_email_address = models.CharField(max_length=MAX_LENGTH)
 
-    data_comment = models.CharField(max_length=MAX_LENGTH)
+    data_comment = models.TextField()
     data_country = models.ForeignKey(
         metadata_models.Country,
         on_delete=models.PROTECT,
@@ -51,7 +51,7 @@ class Great(models.Model):
     )
     data_role_in_company = models.CharField(max_length=MAX_LENGTH)
     # This is a duplicate of opportunities but in the form of a '\n' delimited string
-    data_opportunity_urls = models.CharField(max_length=MAX_LENGTH)
+    data_opportunity_urls = models.TextField()
 
     actor_type = models.CharField(max_length=MAX_LENGTH, null=True)
     actor_id = models.IntegerField(null=True)

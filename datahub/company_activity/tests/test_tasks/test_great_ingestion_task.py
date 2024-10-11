@@ -160,7 +160,7 @@ class TestGreatIngestionTasks:
                      "country": "ZZ"
                     }
                 }
-        }
+            }
         """
         mock_transport = MockSentryTransport()
         init(transport=mock_transport)
@@ -187,7 +187,7 @@ class TestGreatIngestionTasks:
                     "published": "2024-09-19T14:00:34.069Z",
                     "url": null
                 }
-        }
+            }
         """
         task = GreatIngestionTask()
         task.json_to_model(json.loads(data))
@@ -198,8 +198,46 @@ class TestGreatIngestionTasks:
                     "id": "dit:directoryFormsApi:Submission:5250",
                     "published": "2024-09-19T15:00:34.069Z"
                 }
-        }
+            }
         """
         task = GreatIngestionTask()
         task.json_to_model(json.loads(data))
         assert Great.objects.count() == initial_count + 2
+
+    @pytest.mark.django_db
+    @mock_aws
+    def test_long_field_values(self, test_file_path):
+        """
+        Test that we can ingest records with long field values
+        """
+        initial_count = Great.objects.count()
+        long_text = (
+            'Some text string that is longer than 255 characters.'
+            'Testing that because our default Char field storage is'
+            'limited to 255 chars so fields with values longer than'
+            'that either need to be stored as TextFields if we need'
+            'the full value or truncated if we do not. Long long long.'
+        )
+        data = f"""
+            {{
+                "object": {{
+                    "id": "dit:directoryFormsApi:Submission:5249",
+                    "published": "2024-09-19T14:00:34.069Z",
+                    "url": "{long_text}",
+                    "dit:directoryFormsApi:Submission:Data": {{
+                        "comment": "{long_text}",
+                        "opportunity_urls": "{long_text}",
+                        "full_name": "{long_text}",
+                        "website_url": "{long_text}",
+                        "company_name": "{long_text}",
+                        "company_size": "{long_text}",
+                        "phone_number": "{long_text}",
+                        "email_address": "{long_text}",
+                        "role_in_company": "{long_text}"
+                    }}
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        assert Great.objects.count() == initial_count + 1
