@@ -67,9 +67,12 @@ class GreatIngestionTask:
         try:
             return self._countries.get(iso_alpha2_code=country_code)
         except Country.DoesNotExist:
-            logger.exception(
-                f'Could not match country with iso code: {country_code}, for form: {form_id}',
-            )
+            try:
+                return self._countries.get(name=country_code)
+            except Country.DoesNotExist:
+                logger.exception(
+                    f'Could not match country with iso code: {country_code}, for form: {form_id}',
+                )
 
     def json_to_model(self, jsn):
         obj = jsn['object']
