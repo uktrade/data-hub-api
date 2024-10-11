@@ -183,7 +183,7 @@ class ContactFactory(factory.django.DjangoModelFactory):
     full_telephone_number = '+44 123456789'
     address_same_as_company = True
     created_on = now()
-    archived_documents_url_path = factory.Faker('uri_path')
+    archived_documents_url_path = factory.LazyFunction(lambda: f'/documents/{uuid.uuid4()}')
 
     class Meta:
         model = 'company.Contact'
