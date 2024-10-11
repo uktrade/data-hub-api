@@ -333,7 +333,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'audit': None,
             'business_type': win.business_type,
             'cdms_reference': win.company.company_number,
-            'company_name': win.company.name,
+            'company_name': win.company.name if win.migrated_on is None else win.company_name,
             'complete': len(tokens) > 0 if win.migrated_on is None else win.complete,
             'confirmation__access_to_contacts':
                 win.customer_response.our_support.export_win_id if has_responded else None,
@@ -385,11 +385,13 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'country': win.country.iso_alpha2_code,
             'created': format_date_or_datetime(win.created_on),
             'customer_email_address': contact.email
-                if contact else win.customer_email_address if win.customer_email_address else None,
+                if win.migrated_on is None else win.customer_email_address
+                if win.customer_email_address else None,
             'customer_job_title': contact.job_title
-                if contact else win.customer_job_title if win.customer_job_title else None,
+                if win.migrated_on is None else win.customer_job_title
+                if win.customer_job_title else None,
             'customer_name': contact.name
-                if contact else win.customer_name if win.customer_name else None,
+                if win.migrated_on is None else win.customer_name if win.customer_name else None,
             'date': format_date_or_datetime(win.date),
             'description': win.description,
             'has_hvo_specialist_involvement': win.has_hvo_specialist_involvement,
@@ -400,10 +402,10 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'is_prosperity_fund_related': win.is_prosperity_fund_related,
             'lead_officer_email_address':
                 win.lead_officer.contact_email
-                if win.lead_officer else win.lead_officer_email_address,
+                if win.migrated_on is None else win.lead_officer_email_address,
             'lead_officer_name':
                 win.lead_officer.name
-                if win.lead_officer else win.lead_officer_name,
+                if win.migrated_on is None else win.lead_officer_name,
             'line_manager_name': win.line_manager_name,
             'name_of_customer': win.name_of_customer,
             'name_of_export': win.name_of_export,
@@ -413,8 +415,9 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'total_expected_odi_value': win.total_expected_odi_value,
             'migrated_on': format_date_or_datetime(win.migrated_on),
             'data_hub_company_id': str(win.company_id),
-            'user__email': win.adviser.contact_email if win.adviser else win.adviser_email_address,
-            'user__name': win.adviser.name if win.adviser else win.adviser_name,
+            'user__email': win.adviser.contact_email
+                if win.migrated_on is None else win.adviser_email_address,
+            'user__name': win.adviser.name if win.migrated_on is None else win.adviser_name,
             'business_potential_display': win.business_potential.name,
             'confirmation_last_export': win.customer_response.last_export.name,
             'confirmation_marketing_source': win.customer_response.marketing_source.name,
@@ -527,7 +530,10 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
         allow_legacy_data,
         data_flow_api_client,
     ):
-        wins = [self.factory()]
+        win = self.factory()
+        contact = ContactFactory()
+        win.company_contacts.add(contact)
+        wins = [win]
 
         wins.append(
             self.factory(
@@ -536,6 +542,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
                 customer_email_address='test@customer',
                 customer_name='John Doe',
                 customer_job_title='Tester',
+                company_name='Company A',
             ),
         )
         wins.append(
@@ -545,6 +552,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
                 customer_email_address='test@customer',
                 customer_name='John Doe',
                 customer_job_title='Tester',
+                company_name='Company B',
             ),
         )
 
