@@ -664,6 +664,12 @@ MAPPING = {
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [{}],
             },
+            {
+                'factory': EYBLeadFactory,
+                'field': 'investment_projects',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
         ],
     },
     'order.Order': {
