@@ -11,7 +11,6 @@ from django.db.models import (
     JSONField,
     Min,
     OuterRef,
-    Q,
     Subquery,
     Value,
     When,
@@ -86,10 +85,7 @@ class ExportWinsAdvisersDatasetView(BaseDatasetView):
             .annotate(
                 id=F('legacy_id'),
                 name=Case(
-                    When(
-                        Q(win__migrated_on__isnull=False) & Q(adviser__isnull=True),
-                        then=F('name'),
-                    ),
+                    When(win__migrated_on__isnull=False, then=F('name')),
                     default=Concat(
                         F('adviser__first_name'),
                         Value(' '),
@@ -249,10 +245,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 temp_cdms_reference=F('cdms_reference'),
                 temp_complete=F('complete'),
                 temp_company_name=Case(
-                    When(
-                        Q(migrated_on__isnull=False) & Q(company__isnull=True),
-                        then=F('company_name'),
-                    ),
+                    When(migrated_on__isnull=False, then=F('company_name')),
                     default=F('company__name'),
                     output_field=CharField(),
                 ),
@@ -382,10 +375,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                     output_field=BooleanField(),
                 ),
                 confirmation__name=Case(
-                    When(
-                        Q(migrated_on__isnull=False) & Q(customer_details__isnull=True),
-                        then=F('customer_name'),
-                    ),
+                    When(migrated_on__isnull=False, then=F('customer_name')),
                     default=KT('customer_details__name'),
                     output_field=CharField(),
                 ),
@@ -412,15 +402,29 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                     Cast('hvc__campaign_id', CharField()),
                     Cast('hvc__financial_year', CharField()),
                 ),
-                user__email=F('adviser__contact_email'),
-                user__name=Concat(
-                    'adviser__first_name',
-                    Value(' '),
-                    'adviser__last_name',
+                user__email=Case(
+                    When(
+                        migrated_on__isnull=False,
+                        then=F('adviser_email_address'),
+                    ),
+                    default=F('adviser__contact_email'),
+                    output_field=CharField(),
+                ),
+                user__name=Case(
+                    When(
+                        migrated_on__isnull=False,
+                        then=F('adviser_name'),
+                    ),
+                    default=Concat(
+                        'adviser__first_name',
+                        Value(' '),
+                        'adviser__last_name',
+                    ),
+                    output_field=CharField(),
                 ),
                 lead_officer_email_address=Case(
                     When(
-                        Q(migrated_on__isnull=False) & Q(lead_officer__isnull=True),
+                        migrated_on__isnull=False,
                         then=F('lead_officer_email_address'),
                     ),
                     default=F('lead_officer__contact_email'),
@@ -428,7 +432,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 ),
                 lead_officer_name=Case(
                     When(
-                        Q(migrated_on__isnull=False) & Q(lead_officer__isnull=True),
+                        migrated_on__isnull=False,
                         then=F('lead_officer_name'),
                     ),
                     default=Concat(
@@ -453,7 +457,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 ),
                 customer_email_address=Case(
                     When(
-                        Q(migrated_on__isnull=False) & Q(customer_details__isnull=True),
+                        migrated_on__isnull=False,
                         then=F('customer_email_address'),
                     ),
                     default=KT('customer_details__email'),
@@ -461,7 +465,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 ),
                 customer_job_title=Case(
                     When(
-                        Q(migrated_on__isnull=False) & Q(customer_details__isnull=True),
+                        migrated_on__isnull=False,
                         then=F('customer_job_title'),
                     ),
                     default=KT('customer_details__job_title'),
@@ -469,7 +473,7 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 ),
                 customer_name=Case(
                     When(
-                        Q(migrated_on__isnull=False) & Q(customer_details__isnull=True),
+                        migrated_on__isnull=False,
                         then=F('customer_name'),
                     ),
                     default=KT('customer_details__name'),
