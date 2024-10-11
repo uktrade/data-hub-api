@@ -175,6 +175,13 @@ class EYBLead(InvestmentLead):
         blank=True,
         on_delete=models.CASCADE,
     )
+    investment_projects = models.ManyToManyField(
+        'investment.InvestmentProject',
+        related_name='eyb_leads',
+        help_text='Investment Projects associated with this EYB lead.',
+        null=True,
+        blank=True,
+    )
 
     # UTM parameters
     utm_name = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)

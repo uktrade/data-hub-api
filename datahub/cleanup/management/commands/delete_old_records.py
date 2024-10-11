@@ -190,6 +190,7 @@ class Command(BaseCleanupCommand):
                 ).remote_field: (),
                 InvestmentProject._meta.get_field('opportunities'): (),
                 InvestmentProject._meta.get_field('task_investment_project'): (),
+                InvestmentProject._meta.get_field('eyb_leads'): (),
             },
             # These relations do not have any datetime fields to check – we just want them to be
             # deleted along with expired records.
