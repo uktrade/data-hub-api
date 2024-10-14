@@ -28,25 +28,10 @@ def random_sector_instance():
     return random.choice(sectors)
 
 
-def get_segments_from_sector_instance(sector: Sector) -> tuple[
-    str, str | None, str | None,
-]:
-    """Splits a sector name into individual segments and returns a tuple of segments.
-
-    If a sector is a level zero or one, the level one and two segments will
-    be None where applicable.
-
-    This function is tailored to a max of three levels.
-    """
-    segments = sector.name.split(' : ')
-    return tuple(segments[i] if i < len(segments) else None for i in range(3))
-
-
 @pytest.fixture
 def eyb_lead_triage_data(faker, random_sector_instance):
-    level_zero_segment, level_one_segment, level_two_segment = get_segments_from_sector_instance(
-        random_sector_instance,
-    )
+    level_zero_segment, level_one_segment, level_two_segment = \
+        Sector.get_segments_from_sector_instance(random_sector_instance)
     return {
         'hashedUuid': generate_hashed_uuid(),
         'created': faker.date_time_between(
