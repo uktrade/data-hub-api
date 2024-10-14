@@ -6,7 +6,6 @@ from datahub.core.serializers import (
     NestedRelatedField,
 )
 from datahub.investment_lead.models import EYBLead
-from datahub.investment_lead.test.conftest import get_segments_from_sector_instance
 from datahub.metadata.models import (
     Country,
     Sector,
@@ -258,7 +257,7 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
     def get_related_fields_representation(self, instance):
         """Provides related fields in a representation-friendly format."""
         level_zero_segment, level_one_segment, level_two_segment = \
-            get_segments_from_sector_instance(instance.sector)
+            Sector.get_segments_from_sector_instance(instance.sector)
         return {
             'sector': level_zero_segment,
             'sectorSub': level_one_segment,

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from datahub.company.models.company import Company
 from datahub.company.models.contact import Contact
 from datahub.investment_lead.models import EYBLead
-from datahub.investment_lead.test.conftest import get_segments_from_sector_instance
+from datahub.metadata.models import Sector
 
 
 def assert_datetimes(
@@ -49,9 +49,8 @@ def assert_ingested_eyb_triage_data(instance: EYBLead, data: dict):
     assert_datetimes(instance.triage_created, data.get('created'))
     assert_datetimes(instance.triage_modified, data.get('modified'))
 
-    level_zero_segment, level_one_segment, level_two_segment = get_segments_from_sector_instance(
-        instance.sector,
-    )
+    level_zero_segment, level_one_segment, level_two_segment = \
+        Sector.get_segments_from_sector_instance(instance.sector)
     assert level_zero_segment == data.get('sector')
     assert level_one_segment == data.get('sectorSub', None)
     assert level_two_segment == data.get('sectorSubSub', None)

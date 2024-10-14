@@ -1,6 +1,7 @@
 import pytest
 from mptt.exceptions import InvalidMove
 
+from datahub.core.constants import Sector as SectorConstants
 from datahub.core.exceptions import DataHubError
 from datahub.metadata.models import Sector, Service
 from datahub.metadata.test.factories import SectorFactory
@@ -124,6 +125,21 @@ def test_get_name_from_segments(segments, expected_name):
 def test_get_selected_and_parent_segments(name, expected_segments):
     """Tests the correct segments are selected from a name."""
     assert Sector.get_selected_and_parent_segments(name) == expected_segments
+
+
+def test_get_segments_from_sector_instance():
+    """Tests the correct segments are returned from a sector instance."""
+    assert Sector.get_segments_from_sector_instance(
+        Sector.objects.get(pk=SectorConstants.mining.value.id),
+    ) == ('Mining', None, None)
+
+    assert Sector.get_segments_from_sector_instance(
+        Sector.objects.get(pk=SectorConstants.defence_land.value.id),
+    ) == ('Defence', 'Land', None)
+
+    assert Sector.get_segments_from_sector_instance(
+        Sector.objects.get(pk=SectorConstants.renewable_energy_wind.value.id),
+    ) == ('Energy', 'Renewable energy', 'Fixed-bottom offshore wind')
 
 
 def test_service_with_children_has_no_contexts():
