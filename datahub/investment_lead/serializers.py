@@ -137,6 +137,7 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
             'sector',
             'sectorSub',
             'sectorSubSub',
+            'sector_segments',  # snake_case as referring to model field directly
             'intent',
             'intentOther',
             'location',
@@ -199,16 +200,11 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
         or the original string if invalid (see get_related_fields_internal_value).
 
         Note, the sectorSub and sectorSubSub fields are not in the dictionary at
-        this stage. TODO: investigate why this is the case and attempt to
-        pass the full sector name to the ValidationError message.
+        this stage.
         """
         sector = data.get('sector')
         if not isinstance(sector, Sector):
-            segments = [
-                sector,
-                data.get('sectorSub', None),
-                data.get('sectorSubSub', None),
-            ]
+            segments = data.get('sector_segments')
             sector_name = Sector.get_name_from_segments(segments)
             raise serializers.ValidationError(f'Sector "{sector_name}" does not exist.')
         return data
@@ -231,6 +227,7 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
         sector = queryset.first()
         if isinstance(sector, Sector):
             internal_values['sector'] = sector
+        internal_values['sector_segments'] = segments
 
         # Intent
         intent = data.get('intent', None)
