@@ -238,8 +238,7 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
         location_name = data.get('location', None)
         if isinstance(location_name, str):
             location = UKRegion.objects.filter(name=location_name.title()).first()
-            if isinstance(location, UKRegion):
-                internal_values['location'] = location
+            internal_values['location'] = location
 
         # Rest of the character fields
         char_fields = {
