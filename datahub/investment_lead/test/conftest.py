@@ -85,6 +85,7 @@ def eyb_lead_user_data(faker):
         'addressLine1': faker.street_address(),
         'addressLine2': faker.secondary_address(),
         'town': faker.city(),
+        'county': faker.word(),
         'companyLocation': faker.country_code(),
         'postcode': faker.postcode(),
         'companyWebsite': faker.url(),

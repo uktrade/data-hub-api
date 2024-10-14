@@ -103,6 +103,28 @@ class BaseEYBLeadSerializer(serializers.ModelSerializer):
         model = EYBLead
         fields = []
 
+    def to_internal_value(self, data):
+        """Convert unvalidated JSON data to validated data."""
+        internal_value = super().to_internal_value(data)
+        related_fields = self.get_related_fields_internal_value(data)
+        internal_value.update(related_fields)
+        return internal_value
+
+    def get_related_fields_internal_value(self, data):
+        """Provides related fields in a format suitable for internal use; override as needed."""
+        return {}
+
+    def to_representation(self, instance):
+        """Convert model instance to built-in Python (JSON friendly) data types."""
+        representation = super().to_representation(instance)
+        related_fields = self.get_related_fields_representation(instance)
+        representation.update(related_fields)
+        return representation
+
+    def get_related_fields_representation(self, instance):
+        """Provides related fields in a representation-friendly format; override as needed."""
+        return {}
+
 
 class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
     """Serializer for creating an EYB lead from triage data."""
@@ -131,129 +153,122 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
     modified = serializers.DateTimeField(source='triage_modified', required=True)
     sector = serializers.CharField(required=True)
     sectorSub = serializers.CharField(  # noqa: N815
-        required=False, allow_null=True, read_only=True,
+        read_only=True, required=False, allow_null=True,
     )
     sectorSubSub = serializers.CharField(  # noqa: N815
-        required=False, allow_null=True, read_only=True,
+        read_only=True, required=False, allow_null=True,
     )
     # Can't use MultipleChoiceField here as it returns a set rather than a list and raises db error
-    intent = serializers.ListField(required=True)
+    intent = serializers.ListField(required=False, allow_null=True, allow_empty=True, default=list)
     intentOther = serializers.CharField(  # noqa: N815
-        source='intent_other', required=True, allow_blank=True,
+        source='intent_other', required=False, allow_null=True, allow_blank=True, default='',
     )
-    location = serializers.CharField(required=True)
-    locationCity = serializers.CharField(source='location_city', required=True)  # noqa: N815
-    locationNone = serializers.BooleanField(source='location_none', required=True)  # noqa: N815
+    location = serializers.CharField(required=False, allow_null=True)
+    locationCity = serializers.CharField(  # noqa: N815
+        source='location_city', required=False, allow_null=True, allow_blank=True, default='',
+    )
+    locationNone = serializers.BooleanField(  # noqa: N815
+        source='location_none', required=False, allow_null=True,
+    )
     hiring = serializers.ChoiceField(
-        required=True, choices=EYBLead.HiringChoices.choices,
+        choices=EYBLead.HiringChoices.choices,
+        required=False, allow_null=True, allow_blank=True, default='',
     )
     spend = serializers.ChoiceField(
-        required=True, choices=EYBLead.SpendChoices.choices,
+        choices=EYBLead.SpendChoices.choices,
+        required=False, allow_null=True, allow_blank=True, default='',
     )
     spendOther = serializers.CharField(  # noqa: N815
-        source='spend_other', required=True, allow_blank=True,
+        source='spend_other', required=False, allow_null=True, allow_blank=True, default='',
     )
-    isHighValue = serializers.BooleanField(source='is_high_value', required=True)  # noqa: N815
+    isHighValue = serializers.BooleanField(  # noqa: N815
+        source='is_high_value', required=False, allow_null=True,
+    )
 
     def validate_location(self, value):
-        if not UKRegion.objects.filter(name=value.title()).exists():
-            raise serializers.ValidationError(f'Location "{value}" does not exist.')
+        if isinstance(value, str):
+            if not UKRegion.objects.filter(name=value.title()).exists():
+                raise serializers.ValidationError(f'Location "{value}" does not exist.')
         return value
 
-    def _get_selected_and_parent_sector_segments(
-        self,
-        level_zero_segment,
-        level_one_segment,
-        level_two_segment,
-    ) -> tuple[str, str | None]:
-        """Determines the selected and parent sector segments from the full sector name."""
-        selected_sector_segment = None
-        parent_sector_segment = None
-        if level_two_segment:
-            selected_sector_segment = level_two_segment
-            parent_sector_segment = level_one_segment
-        elif level_one_segment:
-            selected_sector_segment = level_one_segment
-            parent_sector_segment = level_zero_segment
-        elif level_zero_segment:
-            selected_sector_segment = level_zero_segment
-            parent_sector_segment = None
-        return selected_sector_segment, parent_sector_segment
-
-    def _get_sector_from_selected_and_parent_segments(
-        self,
-        selected_sector_segment,
-        parent_sector_segment,
-    ) -> Sector | None:
-        """Looks up and returns a sector instance given the selected and parent sector segments."""
-        queryset = Sector.objects.filter(segment=selected_sector_segment)
-        if parent_sector_segment is not None:
-            queryset.filter(parent__segment=parent_sector_segment)
-        return queryset.first()
-
     def validate(self, data):
-        """Validate sector data."""
-        # TODO: Fix sector validation so that it can pass the sub segments and raise the full name
+        """Validate sector data.
+
+        At this stage, the data has passed through the to_internal_value()
+        method and the sector field will be a sector instance if valid,
+        or the original string if invalid (see get_related_fields_internal_value).
+
+        Note, the sectorSub and sectorSubSub fields are not in the dictionary at
+        this stage. TODO: investigate why this is the case and attempt to
+        pass the full sector name to the ValidationError message.
+        """
+        sector = data.get('sector')
+        if not isinstance(sector, Sector):
+            segments = [
+                sector,
+                data.get('sectorSub', None),
+                data.get('sectorSubSub', None),
+            ]
+            sector_name = Sector.get_name_from_segments(segments)
+            raise serializers.ValidationError(f'Sector "{sector_name}" does not exist.')
+        return data
+
+    def get_related_fields_internal_value(self, data):
+        """Provides related fields in a format suitable for internal use."""
+        internal_values = {}
+
+        # Sector
         segments = [
             data.get('sector', None),
             data.get('sectorSub', None),
             data.get('sectorSubSub', None),
         ]
-        selected_sector_segment, parent_sector_segment = \
-            self._get_selected_and_parent_sector_segments(*segments)
-        sector = self._get_sector_from_selected_and_parent_segments(
-            selected_sector_segment,
-            parent_sector_segment,
-        )
-        if sector is None:
-            full_name = ' : '.join([
-                segment for segment in segments
-                if segment is not None
-            ])
-            raise serializers.ValidationError(f'Sector "{full_name}" does not exist.')
-        return data
+        sector_name = Sector.get_name_from_segments(segments)
+        selected_segment, parent_segment = Sector.get_selected_and_parent_segments(sector_name)
+        queryset = Sector.objects.filter(segment=selected_segment)
+        if parent_segment is not None:
+            queryset.filter(parent__segment=parent_segment)
+        sector = queryset.first()
+        if isinstance(sector, Sector):
+            internal_values['sector'] = sector
 
-    def to_representation(self, instance):
-        """Convert model instance to built-in Python (JSON friendly) data types."""
+        # Intent
+        intent = data.get('intent', None)
+        if intent is None:
+            internal_values['intent'] = []
+
+        # Location
+        location_name = data.get('location', None)
+        if isinstance(location_name, str):
+            location = UKRegion.objects.filter(name=location_name.title()).first()
+            if isinstance(location, UKRegion):
+                internal_values['location'] = location
+
+        # Rest of the character fields
+        char_fields = {
+            'intentOther': 'intent_other',
+            'locationCity': 'location_city',
+            'hiring': 'hiring',
+            'spend': 'spend',
+            'spendOther': 'spend_other',
+        }
+        for incoming_field, internal_field in char_fields.items():
+            value = data.get(incoming_field, None)
+            if value is None:
+                internal_values[internal_field] = ''
+
+        return internal_values
+
+    def get_related_fields_representation(self, instance):
+        """Provides related fields in a representation-friendly format."""
         level_zero_segment, level_one_segment, level_two_segment = \
             get_segments_from_sector_instance(instance.sector)
-        related_fields = {
+        return {
             'sector': level_zero_segment,
             'sectorSub': level_one_segment,
             'sectorSubSub': level_two_segment,
             'location': instance.location.name if instance.location else None,
         }
-        rep = super().to_representation(instance)
-        rep.update(related_fields)
-        return rep
-
-    def to_internal_value(self, data):
-        """Convert unvalidated JSON data to validated data."""
-        # Extract strings from incoming JSON for related fields
-        segments = [
-            data.get('sector', None),
-            data.get('sectorSub', None),
-            data.get('sectorSubSub', None),
-        ]
-        location_name = data.get('location', None)
-
-        # Convert and validate rest of the data
-        validated_data = super().to_internal_value(data)
-
-        # Convert strings to model instances for related fields and overwrite validated data
-        selected_sector_segment, parent_sector_segment = \
-            self._get_selected_and_parent_sector_segments(*segments)
-        sector = self._get_sector_from_selected_and_parent_segments(
-            selected_sector_segment,
-            parent_sector_segment,
-        )
-        if sector:
-            validated_data['sector'] = sector
-        if location_name:
-            validated_data['location'] = UKRegion.objects.get(
-                name=location_name.title(),
-            )
-        return validated_data
 
 
 class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
@@ -286,26 +301,42 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
     created = serializers.DateTimeField(source='user_created', required=True)
     modified = serializers.DateTimeField(source='user_modified', required=True)
     companyName = serializers.CharField(source='company_name', required=True)  # noqa: N815
-    dunsNumber = serializers.CharField(source='duns_number', required=True)  # noqa: N815
+    dunsNumber = serializers.CharField(  # noqa: N815
+        source='duns_number', required=False, allow_null=True, default=None,
+    )
     addressLine1 = serializers.CharField(source='address_1', required=True)  # noqa: N815
-    addressLine2 = serializers.CharField(source='address_2', required=False)  # noqa: N815
+    addressLine2 = serializers.CharField(  # noqa: N815
+        source='address_2', required=False, allow_null=True, default='',
+    )
     town = serializers.CharField(source='address_town', required=True)
-    county = serializers.CharField(source='address_county', required=False)
+    county = serializers.CharField(
+        source='address_county', required=False, allow_null=True, default='',
+    )
     companyLocation = serializers.CharField(source='address_country', required=True)  # noqa: N815
-    postcode = serializers.CharField(source='address_postcode', required=True)
-    companyWebsite = serializers.CharField(source='company_website', required=True)  # noqa: N815
+    postcode = serializers.CharField(
+        source='address_postcode', required=False, allow_null=True, default='',
+    )
+    companyWebsite = serializers.CharField(  # noqa: N815
+        source='company_website', required=False, allow_null=True, default='',
+    )
     fullName = serializers.CharField(source='full_name', required=True)  # noqa: N815
-    role = serializers.CharField(required=True)
+    role = serializers.CharField(required=False, allow_null=True, default='')
     email = serializers.CharField(required=True)
-    telephoneNumber = serializers.CharField(source='telephone_number', required=True)  # noqa: N815
-    agreeTerms = serializers.BooleanField(source='agree_terms', required=True)  # noqa: N815
+    telephoneNumber = serializers.CharField(  # noqa: N815
+        source='telephone_number', required=False, allow_null=True, default='',
+    )
+    agreeTerms = serializers.BooleanField(  # noqa: N815
+        source='agree_terms', required=False, allow_null=True, default=None,
+    )
     agreeInfoEmail = serializers.BooleanField(  # noqa: N815
-        source='agree_info_email', required=True,
+        source='agree_info_email', required=False, allow_null=True, default=None,
     )
     landingTimeframe = serializers.ChoiceField(  # noqa: N815
         source='landing_timeframe',
-        required=True,
         choices=EYBLead.LandingTimeframeChoices.choices,
+        required=False,
+        allow_null=True,
+        default='',
     )
 
     def validate_companyLocation(self, value):  # noqa: N802
@@ -315,30 +346,50 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
             )
         return value
 
-    def to_representation(self, instance):
-        """Convert model instance to built-in Python (JSON friendly) data types."""
-        related_fields = {
+    def get_related_fields_internal_value(self, data):
+        """Provides related fields in a format suitable for internal use."""
+        internal_values = {}
+
+        # Company location / address country
+        address_country_iso_code = data.get('companyLocation', None)
+        internal_values['address_country'] = Country.objects.get(
+            iso_alpha2_code=address_country_iso_code.upper(),
+        )
+
+        # Fields that can be None
+        none_fields = {
+            'dunsNumber': 'duns_number',
+            'agreeTerms': 'agree_terms',
+            'agreeInfoEmail': 'agree_info_email',
+        }
+        for incoming_field, internal_field in none_fields.items():
+            value = data.get(incoming_field, None)
+            if value is None:
+                internal_values[internal_field] = None
+
+        # Rest of the character fields
+        char_fields = {
+            'dunsNumber': 'duns_number',
+            'addressLine2': 'address_2',
+            'county': 'address_county',
+            'postcode': 'address_postcode',
+            'role': 'role',
+            'telphoneNumber': 'telephone_number',
+            'landingTimeframe': 'landing_timeframe',
+        }
+        for incoming_field, internal_field in char_fields.items():
+            value = data.get(incoming_field, None)
+            if value is None:
+                internal_values[internal_field] = ''
+
+        return internal_values
+
+    def get_related_fields_representation(self, instance):
+        """Provides related fields in a representation-friendly format."""
+        return {
             'companyLocation': instance.address_country.iso_alpha2_code
             if instance.address_country else None,
         }
-        rep = super().to_representation(instance)
-        rep.update(related_fields)
-        return rep
-
-    def to_internal_value(self, data):
-        """Convert unvalidated JSON data to validated data."""
-        # Extract strings from incoming JSON for related fields
-        address_country_iso_code = data.get('companyLocation', None)
-
-        # Convert and validate rest of the data
-        validated_data = super().to_internal_value(data)
-
-        # Convert strings to model instances for related fields and overwrite validated data
-        if address_country_iso_code:
-            validated_data['address_country'] = Country.objects.get(
-                iso_alpha2_code=address_country_iso_code.upper(),
-            )
-        return validated_data
 
 
 class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
@@ -349,13 +400,21 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
             if f not in ADDRESS_FIELDS
         ] + ['address']
 
-    def to_representation(self, instance):
-        """Convert model instance to built-in Python (JSON friendly) data types.
+    sector = NestedRelatedField(Sector)
+    location = NestedRelatedField(UKRegion)
+    address = AddressSerializer(
+        source_model=EYBLead,
+        address_source_prefix='address',
+    )
+    company = NestedRelatedField(Company)
+
+    def get_related_fields_representation(self, instance):
+        """Provides related fields in a representation-friendly format.
 
         Specifically, we want to convert `UPPER_CASE` values to `Sentence case` labels
         for choice fields.
         """
-        related_fields = {
+        return {
             'intent': [
                 EYBLead.IntentChoices(intent_choice).label
                 for intent_choice in instance.intent
@@ -366,14 +425,3 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
                 instance.landing_timeframe,
             ).label,
         }
-        rep = super().to_representation(instance)
-        rep.update(related_fields)
-        return rep
-
-    sector = NestedRelatedField(Sector)
-    location = NestedRelatedField(UKRegion)
-    address = AddressSerializer(
-        source_model=EYBLead,
-        address_source_prefix='address',
-    )
-    company = NestedRelatedField(Company)
