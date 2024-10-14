@@ -2,7 +2,7 @@ import pytest
 from mptt.exceptions import InvalidMove
 
 from datahub.core.exceptions import DataHubError
-from datahub.metadata.models import Service
+from datahub.metadata.models import Sector, Service
 from datahub.metadata.test.factories import SectorFactory
 
 pytestmark = pytest.mark.django_db
@@ -72,6 +72,58 @@ def test_sector_name_level_recursive_unsaved():
     sector.parent = sector
     with pytest.raises(DataHubError):
         sector.name
+
+
+@pytest.mark.parametrize(
+    ['segments', 'expected_name'],
+    [
+        (
+            ['Level 0', 'Level 1', 'Level 2'],
+            'Level 0 : Level 1 : Level 2',
+        ),
+        (
+            ['Level 0', 'Level 1', None],
+            'Level 0 : Level 1',
+        ),
+        (
+            ['Level 0', None, None],
+            'Level 0',
+        ),
+        (
+            [None, None, None],
+            '',
+        ),
+    ],
+)
+def test_get_name_from_segments(segments, expected_name):
+    """Tests the correct name is returned from a list of segments."""
+    assert Sector.get_name_from_segments(segments) == expected_name
+
+
+@pytest.mark.parametrize(
+    ['name', 'expected_segments'],
+    [
+        (
+            'Level 0 : Level 1 : Level 2',
+            ('Level 2', 'Level 1'),
+        ),
+        (
+            'Level 0 : Level 1',
+            ('Level 1', 'Level 0'),
+        ),
+        (
+            'Level 0',
+            ('Level 0', None),
+        ),
+        (
+            None,
+            None,
+        ),
+    ],
+)
+def test_get_selected_and_parent_segments(name, expected_segments):
+    """Tests the correct segments are selected from a name."""
+    assert Sector.get_selected_and_parent_segments(name) == expected_segments
 
 
 def test_service_with_children_has_no_contexts():

@@ -84,6 +84,25 @@ class Sector(MPTTModel, _MPTTObjectName, DisableableModel):
             '(disabled)' if self.disabled_on else None,
         )
 
+    @staticmethod
+    def get_name_from_segments(segments: list[str | None]) -> str:
+        """Gets a sector's full name from a list of segments, some of which can be None."""
+        name = ' : '.join([
+            segment.strip() for segment in segments
+            if segment is not None
+        ])
+        return name
+
+    @staticmethod
+    def get_selected_and_parent_segments(name) -> tuple[str, str | None]:
+        """Determines the selected and parent sector segments from the sector name."""
+        if not isinstance(name, str):
+            return None
+        segments = name.split(':')
+        selected_segment = segments[-1].strip()
+        parent_segment = segments[-2].strip() if len(segments) > 1 else None
+        return selected_segment, parent_segment
+
     class MPTTMeta:
         order_insertion_by = ('segment',)
 

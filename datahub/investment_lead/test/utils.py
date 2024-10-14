@@ -45,26 +45,29 @@ def assert_ingested_eyb_triage_data(instance: EYBLead, data: dict):
     - camelCase field names
     - strings for related fields.
     """
-    assert instance.triage_hashed_uuid == data['hashedUuid']
-    assert_datetimes(instance.triage_created, data['created'])
-    assert_datetimes(instance.triage_modified, data['modified'])
+    assert instance.triage_hashed_uuid == data.get('hashedUuid')
+    assert_datetimes(instance.triage_created, data.get('created'))
+    assert_datetimes(instance.triage_modified, data.get('modified'))
 
     level_zero_segment, level_one_segment, level_two_segment = get_segments_from_sector_instance(
         instance.sector,
     )
-    assert level_zero_segment == data['sector']
-    assert level_one_segment == data['sectorSub']
-    assert level_two_segment == data['sectorSubSub']
+    assert level_zero_segment == data.get('sector')
+    assert level_one_segment == data.get('sectorSub', None)
+    assert level_two_segment == data.get('sectorSubSub', None)
 
-    assert instance.intent == data['intent']
-    assert instance.intent_other == data['intentOther']
-    assert instance.location.name == data['location']
-    assert instance.location_city == data['locationCity']
-    assert instance.location_none == data['locationNone']
-    assert instance.hiring == data['hiring']
-    assert instance.spend == data['spend']
-    assert instance.spend_other == data['spendOther']
-    assert instance.is_high_value == data['isHighValue']
+    assert instance.intent == data.get('intent', None)
+    assert instance.intent_other == data.get('intentOther', None)
+    if instance.location is not None:
+        assert instance.location.name == data.get('location')
+    else:
+        assert instance.location == data.get('location')
+    assert instance.location_city == data.get('locationCity', None)
+    assert instance.location_none == data.get('locationNone', None)
+    assert instance.hiring == data.get('hiring', None)
+    assert instance.spend == data.get('spend', None)
+    assert instance.spend_other == data.get('spendOther', None)
+    assert instance.is_high_value == data.get('isHighValue', None)
 
 
 def assert_ingested_eyb_user_data(instance: EYBLead, data: dict):
@@ -75,24 +78,24 @@ def assert_ingested_eyb_user_data(instance: EYBLead, data: dict):
     - strings for related fields.
     """
     assert instance.user_hashed_uuid == data['hashedUuid']
-    assert_datetimes(instance.user_created, data['created'])
-    assert_datetimes(instance.user_modified, data['modified'])
-    assert instance.company_name == data['companyName']
-    assert instance.duns_number == data['dunsNumber']
-    assert instance.address_1 == data['addressLine1']
-    assert instance.address_2 == data['addressLine2']
-    assert instance.address_town == data['town']
-    assert instance.address_county == data['county']
-    assert instance.address_country.iso_alpha2_code == data['companyLocation']
-    assert instance.address_postcode == data['postcode']
-    assert instance.company_website == data['companyWebsite']
-    assert instance.full_name == data['fullName']
-    assert instance.role == data['role']
-    assert instance.email == data['email']
-    assert instance.telephone_number == data['telephoneNumber']
-    assert instance.agree_terms == data['agreeTerms']
-    assert instance.agree_info_email == data['agreeInfoEmail']
-    assert instance.landing_timeframe == data['landingTimeframe']
+    assert_datetimes(instance.user_created, data.get('created'))
+    assert_datetimes(instance.user_modified, data.get('modified'))
+    assert instance.company_name == data.get('companyName')
+    assert instance.duns_number == data.get('dunsNumber', None)
+    assert instance.address_1 == data.get('addressLine1')
+    assert instance.address_2 == data.get('addressLine2', None)
+    assert instance.address_town == data.get('town')
+    assert instance.address_county == data.get('county', None)
+    assert instance.address_country.iso_alpha2_code == data.get('companyLocation')
+    assert instance.address_postcode == data.get('postcode', None)
+    assert instance.company_website == data.get('companyWebsite', None)
+    assert instance.full_name == data.get('fullName')
+    assert instance.role == data.get('role', None)
+    assert instance.email == data.get('email')
+    assert instance.telephone_number == data.get('telephoneNumber', None)
+    assert instance.agree_terms == data.get('agreeTerms', None)
+    assert instance.agree_info_email == data.get('agreeInfoEmail', None)
+    assert instance.landing_timeframe == data.get('landingTimeframe', None)
 
 
 def assert_retrieved_eyb_lead_data(instance: EYBLead, data: dict):
