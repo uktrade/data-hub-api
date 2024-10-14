@@ -148,7 +148,8 @@ class TestGreatIngestionTasks:
     def test_country_code_is_country_name(self):
         """
         Test that when the country code is a country name string instead
-        of an iso code we are able to lookup country
+        of an iso code we are able to lookup country case insensitively
+        and regardless of whitespacing
         """
         data = """
             {
@@ -156,7 +157,7 @@ class TestGreatIngestionTasks:
                     "id": "dit:directoryFormsApi:Submission:5249",
                     "published": "2024-09-19T14:00:34.069Z",
                     "dit:directoryFormsApi:Submission:Data": {
-                     "country": "South Africa"
+                     "country": "South  AfRica "
                     }
                 }
             }
