@@ -18,6 +18,7 @@ REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
 BUCKET = f"data-flow-bucket-{env('ENVIRONMENT', default='')}"
 PREFIX = 'data-flow/exports/'
 GREAT_PREFIX = f'{PREFIX}GreatGovUKFormsPipeline/'
+TWO_HOURS_IN_SECONDS = 7200
 
 
 def ingest_activity_data():
@@ -88,6 +89,7 @@ class CompanyActivityIngestionTask:
             function=ingest_great_data,
             function_kwargs={'bucket': BUCKET, 'file': latest_file},
             queue_name='long-running',
+            job_timeout=TWO_HOURS_IN_SECONDS,
             description='Ingest Great data file',
         )
         logger.info(f'Scheduled ingestion of {latest_file}')
