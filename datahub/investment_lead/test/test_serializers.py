@@ -9,7 +9,6 @@ from datahub.investment_lead.serializers import (
     CreateEYBLeadUserSerializer,
     RetrieveEYBLeadSerializer,
 )
-from datahub.investment_lead.test.conftest import get_segments_from_sector_instance
 from datahub.investment_lead.test.factories import generate_hashed_uuid
 from datahub.investment_lead.test.utils import (
     assert_ingested_eyb_triage_data,
@@ -74,7 +73,7 @@ class TestCreateEYBLeadTriageSerializer:
             pk=constants.UKRegion.wales.value.id,
         )
         level_zero_segment, level_one_segment, level_two_segment = \
-            get_segments_from_sector_instance(mining_sector)
+            Sector.get_segments_from_sector_instance(mining_sector)
         eyb_lead_triage_data.update({
             'sector': level_zero_segment,
             'sectorSub': level_one_segment,

@@ -103,6 +103,18 @@ class Sector(MPTTModel, _MPTTObjectName, DisableableModel):
         parent_segment = segments[-2].strip() if len(segments) > 1 else None
         return selected_segment, parent_segment
 
+    @staticmethod
+    def get_segments_from_sector_instance(sector) -> tuple[str, str | None, str | None]:
+        """Splits a sector name into individual segments and returns a tuple of segments.
+
+        If a sector is a level zero or one, the level one and two segments will
+        be None where applicable.
+
+        This function is tailored to a max of three levels.
+        """
+        segments = sector.name.split(' : ')
+        return tuple(segments[i] if i < len(segments) else None for i in range(3))
+
     class MPTTMeta:
         order_insertion_by = ('segment',)
 
