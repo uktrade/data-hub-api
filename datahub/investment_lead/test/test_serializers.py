@@ -112,16 +112,11 @@ class TestCreateEYBLeadTriageSerializer:
         })
         serializer = CreateEYBLeadTriageSerializer(data=eyb_lead_triage_data)
         assert not serializer.is_valid()
-        # TODO: pass segments to validate function so the name can be used in the exception
-        # sector_name = Sector.get_name_from_segments(
-        #     [level_one_segment, level_two_segment, level_three_segment],
-        # )
-        # assert any([
-        #     f'Sector "{sector_name}" does not exist.' in e
-        #     for e in serializer.errors['non_field_errors']
-        # ])
+        sector_name = Sector.get_name_from_segments(
+            [level_one_segment, level_two_segment, level_three_segment],
+        )
         assert any([
-            'Sector' in e
+            f'Sector "{sector_name}" does not exist.' in e
             for e in serializer.errors['non_field_errors']
         ])
 
