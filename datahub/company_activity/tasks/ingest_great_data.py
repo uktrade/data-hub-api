@@ -64,11 +64,13 @@ class GreatIngestionTask:
         if self._countries is None:
             self._get_countries()
 
+        country_code = ' '.join(country_code.split())
+
         try:
             return self._countries.get(iso_alpha2_code=country_code)
         except Country.DoesNotExist:
             try:
-                return self._countries.get(name=country_code)
+                return self._countries.get(name__iexact=country_code)
             except Country.DoesNotExist:
                 logger.exception(
                     f'Could not match country with iso code: {country_code}, for form: {form_id}',
