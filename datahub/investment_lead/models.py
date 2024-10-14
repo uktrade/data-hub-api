@@ -90,6 +90,11 @@ class EYBLead(InvestmentLead):
         null=True,
         on_delete=models.SET_NULL,
     )
+    sector_segments = ArrayField(
+        models.CharField(max_length=CHAR_FIELD_MAX_LENGTH),
+        size=3,
+        default=list,
+    )
     intent = ArrayField(
         models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, choices=IntentChoices.choices),
         size=6,
