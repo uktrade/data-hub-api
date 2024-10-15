@@ -97,7 +97,7 @@ def eyb_lead_factory_overrides():
     )
     overrides = {
         'sector': mining_sector,
-        'location': wales_region,
+        'proposed_investment_region': wales_region,
         'address_country': canada_country,
     }
     return overrides

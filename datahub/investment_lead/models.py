@@ -101,15 +101,20 @@ class EYBLead(InvestmentLead):
         default=list,
     )
     intent_other = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
-    location = models.ForeignKey(
+    # We receive location, locationCity, and locationNone from EYB;
+    # These fields represent the proposed location of investment (i.e. UK region etc);
+    # We have mapped and renamed the fields respectively, for clarity.
+    proposed_investment_region = models.ForeignKey(
         'metadata.UKRegion',
         related_name='+',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
     )
-    location_city = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
-    location_none = models.BooleanField(default=None, null=True, blank=True)
+    proposed_investment_city = models.CharField(
+        max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True,
+    )
+    proposed_investment_location_none = models.BooleanField(default=None, null=True, blank=True)
     hiring = models.CharField(
         max_length=CHAR_FIELD_MAX_LENGTH, choices=HiringChoices.choices, default='', blank=True,
     )

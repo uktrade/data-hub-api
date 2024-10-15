@@ -84,7 +84,7 @@ class TestCreateEYBLeadTriageSerializer:
         assert serializer.is_valid(), serializer.errors
         validated_data = serializer.validated_data
         assert validated_data['sector'].pk == mining_sector.pk
-        assert validated_data['location'].pk == wales_region.pk
+        assert validated_data['proposed_investment_region'].pk == wales_region.pk
 
     def test_create_lead_from_invalid_choice_and_related_data(self, eyb_lead_triage_data):
         """Tests invalid choice-field and related-field data raises validation errors."""

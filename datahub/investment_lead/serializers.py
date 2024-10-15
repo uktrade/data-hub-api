@@ -33,9 +33,9 @@ TRIAGE_FIELDS = [
     'sector',
     'intent',
     'intent_other',
-    'location',
-    'location_city',
-    'location_none',
+    'proposed_investment_region',
+    'proposed_investment_city',
+    'proposed_investment_location_none',
     'hiring',
     'spend',
     'spend_other',
@@ -66,7 +66,7 @@ USER_FIELDS = [
 
 RELATED_FIELDS = [
     'sector',
-    'location',
+    'proposed_investment_region',
     'address_country',
     'company',
     'investment_projects',
@@ -163,12 +163,15 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
     intentOther = serializers.CharField(  # noqa: N815
         source='intent_other', required=False, allow_null=True, allow_blank=True, default='',
     )
-    location = serializers.CharField(required=False, allow_null=True)
+    location = serializers.CharField(
+        source='proposed_investment_region', required=False, allow_null=True,
+    )
     locationCity = serializers.CharField(  # noqa: N815
-        source='location_city', required=False, allow_null=True, allow_blank=True, default='',
+        source='proposed_investment_city',
+        required=False, allow_null=True, allow_blank=True, default='',
     )
     locationNone = serializers.BooleanField(  # noqa: N815
-        source='location_none', required=False, allow_null=True,
+        source='proposed_investment_location_none', required=False, allow_null=True,
     )
     hiring = serializers.ChoiceField(
         choices=EYBLead.HiringChoices.choices,
@@ -188,7 +191,7 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
     def validate_location(self, value):
         if isinstance(value, str):
             if not UKRegion.objects.filter(name=value.title()).exists():
-                raise serializers.ValidationError(f'Location "{value}" does not exist.')
+                raise serializers.ValidationError(f'UK Region "{value}" does not exist.')
         return value
 
     def validate(self, data):
@@ -233,16 +236,16 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
         if intent is None:
             internal_values['intent'] = []
 
-        # Location
-        location_name = data.get('location', None)
-        if isinstance(location_name, str):
-            location = UKRegion.objects.filter(name=location_name.title()).first()
-            internal_values['location'] = location
+        # Proposed investment location
+        uk_region_name = data.get('location', None)
+        if isinstance(uk_region_name, str):
+            uk_region = UKRegion.objects.filter(name=uk_region_name.title()).first()
+            internal_values['proposed_investment_region'] = uk_region
 
         # Rest of the character fields
         char_fields = {
             'intentOther': 'intent_other',
-            'locationCity': 'location_city',
+            'locationCity': 'proposed_investment_city',
             'hiring': 'hiring',
             'spend': 'spend',
             'spendOther': 'spend_other',
@@ -262,7 +265,8 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
             'sector': level_zero_segment,
             'sectorSub': level_one_segment,
             'sectorSubSub': level_two_segment,
-            'location': instance.location.name if instance.location else None,
+            'location': instance.proposed_investment_region.name
+            if instance.proposed_investment_region else None,
         }
 
 
@@ -396,7 +400,7 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
         ] + ['address']
 
     sector = NestedRelatedField(Sector)
-    location = NestedRelatedField(UKRegion)
+    proposed_investment_region = NestedRelatedField(UKRegion)
     address = AddressSerializer(
         source_model=EYBLead,
         address_source_prefix='address',
