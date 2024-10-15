@@ -114,10 +114,10 @@ class TestCreateEYBLeadTriageSerializer:
         sector_name = Sector.get_name_from_segments(
             [level_one_segment, level_two_segment, level_three_segment],
         )
-        assert any([
+        assert any(
             f'Sector "{sector_name}" does not exist.' in e
             for e in serializer.errors['non_field_errors']
-        ])
+        )
 
     def test_required_fields_when_value_is_null(self):
         """Tests null values are handled correctly for required fields."""
