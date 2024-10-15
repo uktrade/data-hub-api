@@ -57,12 +57,12 @@ def assert_ingested_eyb_triage_data(instance: EYBLead, data: dict):
 
     assert instance.intent == data.get('intent', None)
     assert instance.intent_other == data.get('intentOther', None)
-    if instance.location is not None:
-        assert instance.location.name == data.get('location')
+    if instance.proposed_investment_region is not None:
+        assert instance.proposed_investment_region.name == data.get('location')
     else:
-        assert instance.location == data.get('location')
-    assert instance.location_city == data.get('locationCity', None)
-    assert instance.location_none == data.get('locationNone', None)
+        assert instance.proposed_investment_region == data.get('location')
+    assert instance.proposed_investment_city == data.get('locationCity', None)
+    assert instance.proposed_investment_location_none == data.get('locationNone', None)
     assert instance.hiring == data.get('hiring', None)
     assert instance.spend == data.get('spend', None)
     assert instance.spend_other == data.get('spendOther', None)
@@ -115,9 +115,9 @@ def assert_retrieved_eyb_lead_data(instance: EYBLead, data: dict):
         for intent_choice in instance.intent
     ] == data['intent']
     assert instance.intent_other == data['intent_other']
-    assert str(instance.location.id) == data['location']['id']
-    assert instance.location_city == data['location_city']
-    assert instance.location_none == data['location_none']
+    assert str(instance.proposed_investment_region.id) == data['proposed_investment_region']['id']
+    assert instance.proposed_investment_city == data['proposed_investment_city']
+    assert instance.proposed_investment_location_none == data['proposed_investment_location_none']
     assert EYBLead.HiringChoices(instance.hiring).label == data['hiring']
     assert EYBLead.SpendChoices(instance.spend).label == data['spend']
     assert instance.spend_other == data['spend_other']

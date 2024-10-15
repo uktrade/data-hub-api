@@ -37,9 +37,9 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
         lambda o: random.sample(EYBLead.IntentChoices.values, k=random.randint(1, 4)),
     )
     intent_other = ''
-    location_id = constants.UKRegion.wales.value.id
-    location_city = 'Cardiff'
-    location_none = False
+    proposed_investment_region_id = constants.UKRegion.wales.value.id
+    proposed_investment_city = 'Cardiff'
+    proposed_investment_location_none = False
     hiring = factory.LazyAttribute(lambda o: random.choice(EYBLead.HiringChoices.values))
     spend = factory.LazyAttribute(lambda o: random.choice(EYBLead.SpendChoices.values))
     spend_other = ''
