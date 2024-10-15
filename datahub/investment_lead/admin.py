@@ -88,8 +88,8 @@ class EYBLeadAdmin(admin.ModelAdmin):
             {
                 'fields': [
                     'investment_projects',
-                ]
-            }
+                ],
+            },
         ),
     ]
 
