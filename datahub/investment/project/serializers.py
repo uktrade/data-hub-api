@@ -34,6 +34,7 @@ from datahub.investment.project.models import (
     SpecificProgramme,
 )
 from datahub.investment.project.validate import REQUIRED_MESSAGE, validate
+from datahub.investment_lead.models import EYBLead
 
 CORE_FIELDS = (
     'id',
@@ -153,7 +154,13 @@ SPI_FIELDS = (
     'stage_log',
 )
 
-ALL_FIELDS = CORE_FIELDS + VALUE_FIELDS + REQUIREMENTS_FIELDS + TEAM_FIELDS + SPI_FIELDS
+EYB_FIELDS = (
+    'eyb_leads',
+)
+
+ALL_FIELDS = (
+    CORE_FIELDS + VALUE_FIELDS + REQUIREMENTS_FIELDS + TEAM_FIELDS + SPI_FIELDS + EYB_FIELDS
+)
 
 
 def _get_updated_status(instance, data):
@@ -419,6 +426,9 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
     project_arrived_in_triage_on = serializers.DateField(required=False, allow_null=True)
     proposal_deadline = serializers.DateField(required=False, allow_null=True)
     stage_log = NestedInvestmentProjectStageLogSerializer(many=True, read_only=True)
+
+    # EYB Lead fields
+    eyb_leads = NestedRelatedField(EYBLead, many=True)
 
     def save(self, **kwargs):
         """Saves when and who assigned a project manager for the first time."""
