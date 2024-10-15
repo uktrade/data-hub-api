@@ -14,6 +14,7 @@ class EYBLeadAdmin(admin.ModelAdmin):
         'id',
         'created_on',
         'modified_on',
+        'investment_projects',
     ]
     fieldsets = [
         (
@@ -81,6 +82,14 @@ class EYBLeadAdmin(admin.ModelAdmin):
                     'address_postcode',
                 ],
             },
+        ),
+        (
+            'Investment Projects',
+            {
+                'fields': [
+                    'investment_projects',
+                ]
+            }
         ),
     ]
 

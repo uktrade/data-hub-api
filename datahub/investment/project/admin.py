@@ -60,6 +60,7 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
         'created',
         'modified',
         'financial_year_verbose',
+        'get_eyb_leads',
     )
     list_display = (
         'name',
@@ -79,6 +80,15 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
     def financial_year_verbose(self, obj):
         """Financial year in YYYY-YY format, for example 2021-22."""
         return obj.financial_year_verbose
+
+    @admin.display(
+        description='EYB Leads'
+    )
+    def get_eyb_leads(self, obj):
+        """EYB Leads associated with this Investment Project"""
+        return "\n".join(
+            [str(eyb.id) for eyb in obj.eyb_leads.all()]
+        )
 
     def save_model(self, request, obj, form, change):
         """
