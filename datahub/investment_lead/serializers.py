@@ -126,7 +126,26 @@ class BaseEYBLeadSerializer(serializers.ModelSerializer):
 
 
 class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
-    """Serializer for creating an EYB lead from triage data."""
+    """Serializer for creating an EYB lead from triage data.
+
+    This serializer uses camelCase field names to mirror those in the incoming data.
+    Despite this being against Python convention (and Flake 8's checks), it was felt
+    this was more readable, and potentially easier to maintain, than defining an additional
+    step to translate them into snake_case names. The fields have `# noqa: N815` to tell
+    flake 8 to ignore the camelCase check for these lines.
+
+    As it currently stands, the lifecycle of incoming JSON data can roughly be defined as:
+
+    1.  The unmodified incoming data passed to the serializer can be accessed at
+        `.initial_data` and will have camelCase fields
+    2.  Incoming data is passed through the to_internal_value() method (see BaseEYBLeadSerializer)
+        where it's converted to Python objects. Any mappings/overrides specified in the
+        get_related_fields_internal_value() method are applied at this step.
+    3.  The resulting data is validated using any field or object level validators
+        that are defined. If successful, `.validated_data` is accessible and contains snake_case
+        field names (that match the model snake_case fields). Alternatively, any ValidationErrors
+        are captured in `.errors`.
+    """
 
     class Meta(BaseEYBLeadSerializer.Meta):
         fields = [
@@ -271,7 +290,26 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
 
 
 class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
-    """Serializer for creating an EYB lead from user data."""
+    """Translates, validates, and creates an EYB lead from incoming user data.
+
+    This serializer uses camelCase field names to mirror those in the incoming data.
+    Despite this being against Python convention (and Flake 8's checks), it was felt
+    this was more readable, and potentially easier to maintain, than defining an additional
+    step to translate them into snake_case names. The fields have `# noqa: N815` to tell
+    flake 8 to ignore the camelCase check for these lines.
+
+    As it currently stands, the lifecycle of incoming JSON data can roughly be defined as:
+
+    1.  The unmodified incoming data passed to the serializer can be accessed at
+        `.initial_data` and will have camelCase fields
+    2.  Incoming data is passed through the to_internal_value() method (see BaseEYBLeadSerializer)
+        where it's converted to Python objects. Any mappings/overrides specified in the
+        get_related_fields_internal_value() method are applied at this step.
+    3.  The resulting data is validated using any field or object level validators
+        that are defined. If successful, `.validated_data` is accessible and contains snake_case
+        field names (that match the model snake_case fields). Alternatively, any ValidationErrors
+        are captured in `.errors`.
+    """
 
     class Meta(BaseEYBLeadSerializer.Meta):
         fields = [
