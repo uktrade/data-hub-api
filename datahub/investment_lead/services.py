@@ -46,7 +46,11 @@ def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
     company.address_1 = eyb_lead.address_1
     company.address_2 = eyb_lead.address_2
     company.address_town = eyb_lead.address_town
-    company.address_country = eyb_lead.address_country
+    company.address_county = eyb_lead.address_county
+    if eyb_lead.address_country is None:
+        raise ValueError('Address country field is required to create a new company')
+    else:
+        company.address_country = eyb_lead.address_country
     company.address_postcode = eyb_lead.address_postcode
     company.website = eyb_lead.company_website
 
