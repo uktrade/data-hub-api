@@ -428,7 +428,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
     stage_log = NestedInvestmentProjectStageLogSerializer(many=True, read_only=True)
 
     # EYB Lead fields
-    eyb_leads = NestedRelatedField(EYBLead, many=True)
+    eyb_leads = NestedRelatedField(EYBLead, many=True, required=False, allow_null=True)
 
     def save(self, **kwargs):
         """Saves when and who assigned a project manager for the first time."""
