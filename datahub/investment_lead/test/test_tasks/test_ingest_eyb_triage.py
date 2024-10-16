@@ -13,12 +13,14 @@ from datahub.company_activity.models import IngestedFile
 from datahub.company_activity.tests.factories import CompanyActivityIngestedFileFactory
 from datahub.core import constants
 from datahub.investment_lead.models import EYBLead
+from datahub.investment_lead.serializers import CreateEYBLeadTriageSerializer
 from datahub.investment_lead.tasks.ingest_common import (
     BUCKET,
     DATE_FORMAT,
     REGION,
 )
 from datahub.investment_lead.tasks.ingest_eyb_triage import (
+    EYBTriageDataIngestionTask,
     ingest_eyb_triage_data,
     TRIAGE_PREFIX,
 )
@@ -76,6 +78,31 @@ class TestEYBTriageDataIngestionTasks:
             assert f'Ingesting file: {test_file_path} finished' in caplog.text
         assert EYBLead.objects.count() > initial_eyb_lead_count
         assert IngestedFile.objects.count() == initial_ingested_count + 1
+
+    def test_get_last_ingestion_datetime_of_triage_data(self):
+        triage_filepath_1 = 'data-flow/eyb-triage-pipeline/1.jsonl.gz'
+        triage_filepath_2 = 'data-flow/eyb-triage-pipeline/2.jsonl.gz'
+        user_filepath = 'data-flow/eyb-user-pipeline/1.jsonl.gz'
+
+        CompanyActivityIngestedFileFactory(
+            filepath = triage_filepath_1,
+            created_on = datetime.now() - timedelta(days=2)
+        )
+        most_recent_triage_file = CompanyActivityIngestedFileFactory(
+            filepath = triage_filepath_2,
+            created_on = datetime.now() - timedelta(days=1)
+        )
+        CompanyActivityIngestedFileFactory(
+            filepath = user_filepath,
+            created_on = datetime.now()
+        )
+
+        last_triage_ingestion_datetime = EYBTriageDataIngestionTask(
+            serializer_class=CreateEYBLeadTriageSerializer,
+            prefix='data-flow/eyb-triage-pipeline',
+        )._last_ingestion_datetime
+
+        assert last_triage_ingestion_datetime == most_recent_triage_file.created_on
 
     @mock_aws
     def test_eyb_triage_data_ingestion_updates_existing(self, test_file, test_file_path):

@@ -106,7 +106,7 @@ class BaseEYBDataIngestionTask:
         try:
             return IngestedFile.objects.filter(
                 filepath__icontains=prefix,
-            ).latest('created_on').created_on.timestamp()
+            ).latest('created_on').created_on
         except IngestedFile.DoesNotExist:
             return None
 
