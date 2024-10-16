@@ -29,10 +29,11 @@ class InvestmentLead(ArchivableModel):
 class EYBLead(InvestmentLead):
     """Model for an Expand Your Business (EYB) investment lead.
 
-    EYB leads come in two parts: triage and user data. This model represents a
-    combination of both. The two data models can be joined on `*_hashed_uuid`.
+    EYB leads come in three parts: triage, user, and marketing data.
+    This model represents a combination of these, but also contains additional Data Hub fields.
 
-    The fields in this model mirror those provided by the EYB endpoint.
+    The three data models can be joined on `*_hashed_uuid` which represent's the EYB
+    user's unique ID.
     """
 
     class IntentChoices(models.TextChoices):
@@ -78,65 +79,56 @@ class EYBLead(InvestmentLead):
         OVER_TWO_YEARS = 'OVER_TWO_YEARS', "In more than 2 years' time"
 
     # EYB triage fields
-    triage_hashed_uuid = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH)
-    triage_created = models.DateTimeField()
-    triage_modified = models.DateTimeField()
+    triage_hashed_uuid = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    triage_created = models.DateTimeField(null=True, blank=True)
+    triage_modified = models.DateTimeField(null=True, blank=True)
+    # We will receive the fields: sectorId, sector, sectorSub, sectorSubSub from EYB
+    # This can all be captured at creation as a single related field to a sector instance
     sector = TreeForeignKey(
         'metadata.Sector',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
     )
-    sector_sub = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    sector_segments = ArrayField(
+        models.CharField(max_length=CHAR_FIELD_MAX_LENGTH),
+        size=3,
+        default=list,
+    )
     intent = ArrayField(
         models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, choices=IntentChoices.choices),
         size=6,
         default=list,
     )
     intent_other = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
-    location = models.ForeignKey(
+    # We receive location, locationCity, and locationNone from EYB;
+    # These fields represent the proposed location of investment (i.e. UK region etc);
+    # We have mapped and renamed the fields respectively, for clarity.
+    proposed_investment_region = models.ForeignKey(
         'metadata.UKRegion',
         related_name='+',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
     )
-    location_city = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
-    location_none = models.BooleanField(default=None, null=True)
-    hiring = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, choices=HiringChoices.choices)
-    spend = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, choices=SpendChoices.choices)
-    spend_other = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
-    is_high_value = models.BooleanField(default=False)
-
-    # EYB user fields
-    user_hashed_uuid = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH)
-    user_created = models.DateTimeField()
-    user_modified = models.DateTimeField()
-    company_name = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH)
-    company_location = models.ForeignKey(
-        'metadata.Country',
-        related_name='+',
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-    )
-    full_name = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH)
-    role = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH)
-    email = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH)
-    telephone_number = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH)
-    agree_terms = models.BooleanField(default=False)
-    agree_info_email = models.BooleanField(default=False)
-    landing_timeframe = models.CharField(
-        default='',
-        max_length=CHAR_FIELD_MAX_LENGTH,
-        blank=True,
-        choices=LandingTimeframeChoices.choices,
-    )
-    company_website = models.CharField(
+    proposed_investment_city = models.CharField(
         max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True,
     )
+    proposed_investment_location_none = models.BooleanField(default=None, null=True, blank=True)
+    hiring = models.CharField(
+        max_length=CHAR_FIELD_MAX_LENGTH, choices=HiringChoices.choices, default='', blank=True,
+    )
+    spend = models.CharField(
+        max_length=CHAR_FIELD_MAX_LENGTH, choices=SpendChoices.choices, default='', blank=True,
+    )
+    spend_other = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    is_high_value = models.BooleanField(default=None, null=True)
 
-    # Company fields
+    # EYB user fields
+    user_hashed_uuid = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    user_created = models.DateTimeField(null=True, blank=True)
+    user_modified = models.DateTimeField(null=True, blank=True)
+    company_name = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
     duns_number = models.CharField(
         blank=True,
         null=True,
@@ -148,17 +140,10 @@ class EYBLead(InvestmentLead):
             integer_validator,
         ],
     )
-    address_1 = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
-    address_2 = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
-    address_town = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
-    address_county = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
-    address_area = models.ForeignKey(
-        'metadata.AdministrativeArea',
-        related_name='+',
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-    )
+    address_1 = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    address_2 = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    address_town = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    address_county = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
     address_country = models.ForeignKey(
         'metadata.Country',
         blank=True,
@@ -166,7 +151,24 @@ class EYBLead(InvestmentLead):
         on_delete=models.SET_NULL,
         related_name='+',
     )
-    address_postcode = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
+    address_postcode = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    company_website = models.CharField(
+        max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True,
+    )
+    full_name = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    role = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    email = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    telephone_number = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    agree_terms = models.BooleanField(default=None, null=True)
+    agree_info_email = models.BooleanField(default=None, null=True)
+    landing_timeframe = models.CharField(
+        default='',
+        max_length=CHAR_FIELD_MAX_LENGTH,
+        blank=True,
+        choices=LandingTimeframeChoices.choices,
+    )
+
+    # Related fields
     company = models.ForeignKey(
         'company.Company',
         related_name='eyb_leads',
@@ -183,11 +185,11 @@ class EYBLead(InvestmentLead):
         blank=True,
     )
 
-    # UTM parameters
-    utm_name = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
-    utm_source = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
-    utm_medium = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
-    utm_content = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, blank=True)
+    # EYB marketing fields
+    utm_name = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    utm_source = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    utm_medium = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
+    utm_content = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
 
     def __str__(self):
         """String representation of the model."""
