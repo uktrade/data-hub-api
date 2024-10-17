@@ -1011,8 +1011,11 @@ def get_datahub_ids_for_dnb_service_company_hierarchy(
         DNBServiceConnectionError,
         DNBServiceTimeoutError,
         DNBServiceError,
-    ) as exc:
-        raise APIUpstreamException(str(exc))
+    ):
+        logger.error(
+            'An error occurred while retrieving company hierarchy data.')
+        raise APIUpstreamException(
+            'An error occurred while retrieving company data. Please try again later.')
     family_tree_members = response.data
     if not family_tree_members:
         return json_response
