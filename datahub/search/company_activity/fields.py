@@ -2,6 +2,7 @@ from opensearch_dsl import Date, Keyword, Object, Text
 
 from datahub.search import fields
 from datahub.search.interaction.models import _DITParticipant
+from datahub.search.omis.models import _Assignee
 
 
 def activity_interaction_field():
@@ -48,5 +49,19 @@ def activity_investment_field():
             'number_new_jobs': Text(index=False),
             'created_by': fields.contact_or_adviser_field(),
             'client_contacts': fields.contact_job_field(),
+        },
+    )
+
+
+def activity_order_field():
+    return Object(
+        properties={
+            'id': Keyword(),
+            'created_on': Date(),
+            'reference': Text(index=False),
+            'primary_market': fields.country_field(),
+            'uk_region': fields.area_field(),
+            'assignees': Object(_Assignee),
+            'contact': fields.contact_or_adviser_field(),
         },
     )

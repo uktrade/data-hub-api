@@ -17,6 +17,7 @@ from datahub.company_activity.tests.factories import (
     CompanyActivityInteractionFactory,
     CompanyActivityInvestmentProjectFactory,
     CompanyActivityReferralFactory,
+    CompanyActivityOmisOrderFactory,
 )
 from datahub.core.test_utils import (
     APITestMixin,
@@ -56,6 +57,9 @@ def company_activities(opensearch_with_collector):
                 CompanyActivityInvestmentProjectFactory(company=company_1),
                 CompanyActivityInvestmentProjectFactory(company=company_1),
                 CompanyActivityInvestmentProjectFactory(company=company_2),
+                CompanyActivityOmisOrderFactory(company=company_1),
+                CompanyActivityOmisOrderFactory(company=company_1),
+                CompanyActivityOmisOrderFactory(company=company_2),
             ],
         )
 
