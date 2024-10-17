@@ -11,7 +11,7 @@ from datahub.investment_lead.tasks.ingest_eyb_user import ingest_eyb_user_file
 
 
 logger = logging.getLogger(__name__)
-TRIAGE_PREFIX = f'{PREFIX}DirectoryExpandYourBusinessTriageDataPipeline'
+TRIAGE_PREFIX = f'{PREFIX}DirectoryExpandYourBusinessTriageDataPipeline/'
 
 
 def ingest_eyb_triage_file():

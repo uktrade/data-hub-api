@@ -108,12 +108,12 @@ class TestEYBTriageFileIngestionTasks:
         return_value=DataHubScheduler(is_async=True),
     )
     @mock_aws
-    def test_ingestion_job_is_queued_for_new_files(self, test_file_paths, caplog):
+    def test_ingestion_job_is_queued_for_new_files(self, mock, test_file_paths, caplog):
         """
         Test that when a new file is found a job is queued to ingest it
         and no jobs are created for files not the most recent
         """
-        new_file_path = TRIAGE_PREFIX + '6.jsonl.gz'
+        new_file_path = TRIAGE_PREFIX + '5.jsonl.gz'
         setup_s3_bucket(BUCKET, test_file_paths)
         for file_path in test_file_paths:
             if not file_path == new_file_path:
@@ -144,7 +144,7 @@ class TestEYBTriageFileIngestionTasks:
         return_value=DataHubScheduler(is_async=True),
     )
     @mock_aws
-    def test_ingestion_job_is_not_queued_for_already_ingested_file(self, test_file_paths, caplog):
+    def test_ingestion_job_is_not_queued_for_already_ingested_file(self, mock, test_file_paths, caplog):
         """
         Test that when the latest file found has already been ingested no job is queued
         """
@@ -170,25 +170,27 @@ class TestEYBTriageFileIngestionTasks:
         return_value=DataHubScheduler(is_async=True),
     )
     @mock_aws
-    def test_job_not_queued_when_already_on_queue(self, test_file_paths, caplog):
+    def test_job_not_queued_when_already_on_queue(self, mock, test_file_paths, caplog):
         """
         Test that when, the job has run and queued an ingestion job for a file
         but that child job hasn't completed yet, this job does not queue a duplicate
         when running again
         """
-        new_file_path = TRIAGE_PREFIX + '6.jsonl.gz'
+        new_file_path = TRIAGE_PREFIX + '5.jsonl.gz'
         setup_s3_bucket(BUCKET, test_file_paths)
+        print(f'{test_file_paths=}')
 
         redis = Redis.from_url(settings.REDIS_BASE_URL)
         rq_queue = Queue('long-running', connection=redis)
+        # TODO: why is this not queuing a job?
         job_scheduler(
             function=ingest_eyb_triage_data,
             function_kwargs={'bucket': BUCKET, 'file': new_file_path},
             queue_name='long-running',
-            description='Ingest EYB data.',
+            description='Ingest EYB data',
         )
         initial_job_count = rq_queue.count
-
+        print(f'{initial_job_count=}')
         with caplog.at_level(logging.INFO):
             ingest_eyb_triage_file()
             assert f'{new_file_path} has already been queued for ingestion' in caplog.text
@@ -202,11 +204,11 @@ class TestEYBTriageFileIngestionTasks:
     )
     @patch('datahub.investment_lead.tasks.ingest_eyb_triage.Worker')
     @mock_aws
-    def test_job_not_queued_when_already_running(self, mock_worker, test_file_paths):
+    def test_job_not_queued_when_already_running(self, mock_worker, mock_scheduler,test_file_paths):
         """
         Test that we don't queue a job to ingest a file when a job is already running for it
         """
-        new_file_path = TRIAGE_PREFIX + '6.jsonl.gz'
+        new_file_path = TRIAGE_PREFIX + '5.jsonl.gz'
         setup_s3_bucket(BUCKET, test_file_paths)
 
         redis = Redis.from_url(settings.REDIS_BASE_URL)
