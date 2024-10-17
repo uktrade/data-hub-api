@@ -114,8 +114,8 @@ class BaseEYBDataIngestionTask:
         if self._last_ingestion_datetime is None:
             return False
         else:
-            date = datetime.strptime(record['object']['modified'], DATE_FORMAT).timestamp()
-            return date < self._last_ingestion_datetime
+            date = datetime.strptime(record['object']['modified'], DATE_FORMAT)
+            return date < self._last_ingestion_datetime.replace(tzinfo=None)
 
     def json_to_model(self, jsn):
         obj = jsn['object']
