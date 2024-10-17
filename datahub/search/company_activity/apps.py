@@ -4,7 +4,7 @@ from datahub.company_activity.models import CompanyActivity as DBCompanyActivity
 from datahub.interaction.models import InteractionDITParticipant
 from datahub.search.apps import SearchApp
 from datahub.search.company_activity.models import CompanyActivity
-
+from datahub.omis.order.models import OrderAssignee
 
 class CompanyActivitySearchApp(SearchApp):
     """SearchApp for company activity."""
@@ -24,11 +24,13 @@ class CompanyActivitySearchApp(SearchApp):
         'investment',
         'investment__investment_type',
         'investment__created_by',
+        'order',
+        'order__contact',
     ).prefetch_related(
         'interaction__contacts',
         Prefetch(
             'interaction__dit_participants',
-            queryset=InteractionDITParticipant.objects.select_related(
-                'adviser', 'team'),
+            queryset=InteractionDITParticipant.objects.select_related('adviser', 'team'),
         ),
+        Prefetch('assignees', queryset=OrderAssignee.objects.select_related('pk')),
     )
