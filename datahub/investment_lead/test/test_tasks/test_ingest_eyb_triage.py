@@ -31,8 +31,8 @@ from datahub.investment_lead.tasks.ingest_common import (
 )
 from datahub.investment_lead.tasks.ingest_eyb_triage import (
     EYBTriageDataIngestionTask,
-    ingest_eyb_triage_file,
     ingest_eyb_triage_data,
+    ingest_eyb_triage_file,
     TRIAGE_PREFIX,
 )
 from datahub.investment_lead.test.factories import (
@@ -69,7 +69,7 @@ def setup_s3_client():
 
 
 @mock_aws
-def setup_s3_bucket(bucket_name, test_file_paths, test_file_contents = None):
+def setup_s3_bucket(bucket_name, test_file_paths, test_file_contents=None):
     mock_s3_client = boto3.client('s3', REGION)
     mock_s3_client.create_bucket(
         Bucket=bucket_name,
@@ -83,7 +83,7 @@ def setup_s3_bucket(bucket_name, test_file_paths, test_file_contents = None):
 
 class TestEYBTriageFileIngestionTasks:
     @patch('os.system')
-    def test_eyb_triage_ingestion_task_schedule(self):
+    def test_eyb_triage_ingestion_task_schedule(self, mock_system):
         """
         Test that a task is scheduled to check for new EYB triage data
         """
@@ -144,11 +144,13 @@ class TestEYBTriageFileIngestionTasks:
         return_value=DataHubScheduler(is_async=True),
     )
     @mock_aws
-    def test_ingestion_job_is_not_queued_for_already_ingested_file(self, mock, test_file_paths, caplog):
+    def test_ingestion_job_is_not_queued_for_already_ingested_file(
+        self, mock, test_file_paths, caplog,
+    ):
         """
         Test that when the latest file found has already been ingested no job is queued
         """
-        ingested_file_path = TRIAGE_PREFIX + '5.jsonl.gz'  # this exists in the test_file_paths fixture
+        ingested_file_path = TRIAGE_PREFIX + '5.jsonl.gz'
         setup_s3_bucket(BUCKET, test_file_paths)
         for file_path in test_file_paths:
             IngestedFile.objects.create(filepath=file_path)
@@ -178,7 +180,6 @@ class TestEYBTriageFileIngestionTasks:
         """
         new_file_path = TRIAGE_PREFIX + '5.jsonl.gz'
         setup_s3_bucket(BUCKET, test_file_paths)
-        print(f'{test_file_paths=}')
 
         redis = Redis.from_url(settings.REDIS_BASE_URL)
         rq_queue = Queue('long-running', connection=redis)
@@ -190,7 +191,6 @@ class TestEYBTriageFileIngestionTasks:
             description='Ingest EYB data',
         )
         initial_job_count = rq_queue.count
-        print(f'{initial_job_count=}')
         with caplog.at_level(logging.INFO):
             ingest_eyb_triage_file()
             assert f'{new_file_path} has already been queued for ingestion' in caplog.text
@@ -204,7 +204,9 @@ class TestEYBTriageFileIngestionTasks:
     )
     @patch('datahub.investment_lead.tasks.ingest_eyb_triage.Worker')
     @mock_aws
-    def test_job_not_queued_when_already_running(self, mock_worker, mock_scheduler,test_file_paths):
+    def test_job_not_queued_when_already_running(
+        self, mock_worker, mock_scheduler, test_file_paths,
+    ):
         """
         Test that we don't queue a job to ingest a file when a job is already running for it
         """

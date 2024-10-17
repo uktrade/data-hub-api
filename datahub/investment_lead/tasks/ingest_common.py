@@ -32,16 +32,11 @@ class BaseEYBFileIngestionTask(CompanyActivityIngestionTask):
         """Check if there is already an RQ job queued or running to ingest the given file"""
         redis = Redis.from_url(settings.REDIS_BASE_URL)
         rq_queue = Queue('long-running', connection=redis)
-        print(f'{rq_queue.jobs=}')
         for job in rq_queue.jobs:
-            print(f'Job in rq: {job}')
             if matching_function(job, file):
                 return True
-        print(f'{Worker.all(queue=rq_queue)=}')
         for worker in Worker.all(queue=rq_queue):
-            print(f'{worker=}')
             job = worker.get_current_job()
-            print(f'{job=}')
             if job is not None and matching_function(job, file):
                 return True
         return False
@@ -52,7 +47,6 @@ class BaseEYBFileIngestionTask(CompanyActivityIngestionTask):
         data source (prefix) and enqueues a job to process each file
         that hasn't already been ingested
         """
-        print(f'{prefix=}')
         latest_file = self._get_most_recent_obj(BUCKET, prefix)
         if not latest_file:
             logger.info(f'No new files found in {prefix}')
