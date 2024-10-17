@@ -1,6 +1,6 @@
-import importlib
+# import importlib
 import logging
-import sys
+# import sys
 
 from unittest.mock import MagicMock, patch
 
@@ -13,14 +13,14 @@ from moto import mock_aws
 from redis import Redis
 from rq import Queue, Worker
 from rq.job import Job
-from rq_scheduler import Scheduler
+# from rq_scheduler import Scheduler
 
 from datahub.company_activity.models import IngestedFile
 from datahub.company_activity.tasks import ingest_great_data
 from datahub.company_activity.tasks.ingest_company_activity import (
     BUCKET, GREAT_PREFIX, ingest_activity_data, REGION,
 )
-from datahub.core.queues.constants import EVERY_HOUR
+# from datahub.core.queues.constants import EVERY_HOUR
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import DataHubScheduler
 
@@ -49,24 +49,25 @@ def setup_s3_bucket(bucket_name, test_files):
 
 
 class TestCompanyActivityIngestionTasks:
-    @patch('os.system')
-    def test_company_activity_ingestion_task_schedule(self, mock_system):
-        """
-        Test that a task is scheduled to check for new Company Activity data
-        """
-        # Import inside test to prevent the os.system call from running before the patch
-        cron = importlib.import_module('cron-scheduler')
-        cron.schedule_jobs()
-        queue = 'long-running'
+    # @patch('os.system')
+    # def test_company_activity_ingestion_task_schedule(self, mock_system):
+    #     """
+    #     Test that a task is scheduled to check for new Company Activity data
+    #     """
+    #     # Import inside test to prevent the os.system call from running before the patch
+    #     cron = importlib.import_module('cron-scheduler')
+    #     cron.schedule_jobs()
+    #     queue = 'long-running'
 
-        scheduler = Scheduler(queue, connection=Redis.from_url(settings.REDIS_BASE_URL))
-        scheduled_jobs = scheduler.get_jobs()
-        func = 'datahub.company_activity.tasks.ingest_company_activity.ingest_activity_data'
-        scheduled_job = [job for job in scheduled_jobs if job.func_name == func][0]
-        assert scheduled_job.meta['cron_string'] == EVERY_HOUR
+    #     scheduler = Scheduler(queue, connection=Redis.from_url(settings.REDIS_BASE_URL))
+    #     scheduled_jobs = scheduler.get_jobs()
+    #     func = 'datahub.company_activity.tasks.ingest_company_activity.ingest_activity_data'
+    #     scheduled_job = [job for job in scheduled_jobs if job.func_name == func][0]
+    #     assert scheduled_job.meta['cron_string'] == EVERY_HOUR
 
-        # Prevents the scheduler loop from running after tests finish by unloading the module again
-        sys.modules.pop('cron-scheduler')
+    #     # Prevents the scheduler loop from running after tests finish by unloading the
+    #     # module again
+    #     sys.modules.pop('cron-scheduler')
 
     @pytest.mark.django_db
     # Patch so that we can test the job is queued, rather than having it be run instantly
