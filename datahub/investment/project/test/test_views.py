@@ -51,6 +51,7 @@ from datahub.investment.project.test.factories import (
     VerifyWinInvestmentProjectFactory,
     WonInvestmentProjectFactory,
 )
+from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.metadata.models import UKRegion
 from datahub.metadata.test.factories import TeamFactory
 
@@ -184,6 +185,7 @@ class TestListView(APITestMixin):
             'proposal_deadline',
             'stage_log',
             'level_of_involvement_simplified',
+            'eyb_leads',
         }
 
     def test_list_is_sorted_by_created_on_desc(self):
@@ -442,6 +444,7 @@ class TestCreateView(APITestMixin):
         )
         intermediate_company = CompanyFactory()
         adviser = AdviserFactory()
+        eyb_lead = EYBLeadFactory()
         url = reverse('api-v3:investment:investment-collection')
         aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
         new_site_id = constants.FDIType.creation_of_new_site_or_activity.value.id
@@ -508,6 +511,7 @@ class TestCreateView(APITestMixin):
             },
             'foreign_equity_investment': 1000,
             'number_new_jobs': 200,
+            'eyb_leads': [eyb_lead.id],
         }
         response = self.api_client.post(url, data=request_data)
         assert response.status_code == status.HTTP_201_CREATED
@@ -553,6 +557,9 @@ class TestCreateView(APITestMixin):
         assert response_data['country_investment_originates_from']['id'] == str(
             investor_company.address_country.id,
         )
+        assert sorted(
+            eyb_lead_m2m['id'] for eyb_lead_m2m in response_data['eyb_leads']
+        ) == sorted([str(eyb_lead.id)])
 
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""
@@ -2345,6 +2352,7 @@ class TestInvestmentProjectActivities(APITestMixin):
                 'id': str(constants.Sector.aerospace_assembly_aircraft.value.id),
             },
             'note': {'text': 'An investment note'},
+            'eyb_leads': [],
         }
 
         response = self.api_client.post(
@@ -2492,6 +2500,7 @@ class TestInvestmentProjectVersioning(APITestMixin):
                 'sector': {
                     'id': str(constants.Sector.aerospace_assembly_aircraft.value.id),
                 },
+                'eyb_leads': [],
             },
         )
         assert response.status_code == status.HTTP_201_CREATED
