@@ -64,7 +64,7 @@ class BaseEYBFileIngestionTask(CompanyActivityIngestionTask):
             function=ingestion_function,
             function_kwargs={'bucket': BUCKET, 'file': latest_file},
             queue_name='long-running',
-            description='Ingest EYB triage data.',
+            description='Ingest EYB data.',
         )
         logger.info(f'Scheduled ingestion of {latest_file}')
 
