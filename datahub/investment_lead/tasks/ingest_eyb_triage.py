@@ -33,7 +33,7 @@ class EYBTriageFileIngestionTask(BaseEYBFileIngestionTask):
 
 def ingest_eyb_triage_data(bucket, file):
     """Ingests triage data from the file passed in.
-    
+
     Schedules the user data ingetion job after the triage ingestion job to prevent
     the risk of duplicate instances of the same lead being created.
     Triage data and user data are combined using a UUID to create/update a single EYB Lead.
