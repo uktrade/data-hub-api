@@ -39,6 +39,7 @@ class CompanyActivityIngestionTask:
     def _get_most_recent_obj(self, bucket_name, prefix):
         """Returns the most recent file object in the given bucket/prefix"""
         files = self._list_objects(bucket_name, prefix)
+        print(f'{files=}')
         if files:
             files.sort(reverse=True)
             return files[0]
