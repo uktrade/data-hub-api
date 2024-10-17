@@ -18,7 +18,7 @@ from rq.job import Job
 from datahub.company_activity.models import IngestedFile
 from datahub.company_activity.tasks import ingest_great_data
 from datahub.company_activity.tasks.ingest_company_activity import (
-    BUCKET, GREAT_PREFIX, ingest_activity_data, REGION,
+    BUCKET, GREAT_PREFIX, ingest_activity_data, REGION, TWO_HOURS_IN_SECONDS,
 )
 # from datahub.core.queues.constants import EVERY_HOUR
 from datahub.core.queues.job_scheduler import job_scheduler
@@ -104,6 +104,7 @@ class TestCompanyActivityIngestionTasks:
         assert job.func_name == ingestion_task
         assert job.kwargs['bucket'] == BUCKET
         assert job.kwargs['file'] == new_file
+        assert job.timeout == TWO_HOURS_IN_SECONDS
 
     @pytest.mark.django_db
     # Patch so that we can test the job is queued, rather than having it be run instantly
