@@ -28,6 +28,7 @@ class CompanyActivity(models.Model):
         referral = ('referral', 'referral')
         event = ('event', 'event')
         investment = ('investment', 'investment')
+        order = ('order', 'order')
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     company = models.ForeignKey(
@@ -83,6 +84,17 @@ class CompanyActivity(models.Model):
         on_delete=models.CASCADE,
         help_text=(
             'investment project for company'
+        ),
+    )
+    order = models.ForeignKey(
+        'order.Order',
+        unique=True,
+        null=True,
+        blank=True,
+        related_name='activity',
+        on_delete=models.CASCADE,
+        help_text=(
+            'If related to an omis order, must not have relations to any other activity ' '(referral, event etc)'
         ),
     )
 
