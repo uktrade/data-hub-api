@@ -1,11 +1,13 @@
 import logging
 
+from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.investment_lead.serializers import CreateEYBLeadTriageSerializer
 from datahub.investment_lead.tasks.ingest_common import (
     BaseEYBDataIngestionTask,
     BaseEYBFileIngestionTask,
     PREFIX,
 )
+from datahub.investment_lead.tasks.ingest_eyb_user import ingest_eyb_user_file
 
 
 logger = logging.getLogger(__name__)
@@ -30,6 +32,12 @@ class EYBTriageFileIngestionTask(BaseEYBFileIngestionTask):
 
 
 def ingest_eyb_triage_data(bucket, file):
+    """Ingests triage data from the file passed in.
+    
+    Schedules the user data ingetion job after the triage ingestion job to prevent
+    the risk of duplicate instances of the same lead being created.
+    Triage data and user data are combined using a UUID to create/update a single EYB Lead.
+    """
     logger.info(f'Ingesting file: {file} started')
     task = EYBTriageDataIngestionTask(
         serializer_class=CreateEYBLeadTriageSerializer,
@@ -37,6 +45,12 @@ def ingest_eyb_triage_data(bucket, file):
     )
     task.ingest(bucket, file)
     logger.info(f'Ingesting file: {file} finished')
+
+    job_scheduler(
+        function=ingest_eyb_user_file,
+        description='Check S3 for new EYB user data files and ingest',
+    )
+    logger.info(f'Scheduled ingestion of {file}')
 
 
 class EYBTriageDataIngestionTask(BaseEYBDataIngestionTask):
