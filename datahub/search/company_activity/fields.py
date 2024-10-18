@@ -61,7 +61,7 @@ def activity_order_field():
             'reference': Text(index=False),
             'primary_market': fields.country_field(),
             'uk_region': fields.area_field(),
-            'assignees': Object(_Assignee),
-            'contact': fields.contact_or_adviser_field(),
+            'contact': fields.contact_job_field(),
+            'created_by': fields.contact_or_adviser_field(),
         },
     )

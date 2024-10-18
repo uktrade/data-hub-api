@@ -31,6 +31,4 @@ class CompanyActivitySearchApp(SearchApp):
         Prefetch(
             'interaction__dit_participants',
             queryset=InteractionDITParticipant.objects.select_related('adviser', 'team'),
-        ),
-        Prefetch('assignees', queryset=OrderAssignee.objects.select_related('pk')),
-    )
+        ),)

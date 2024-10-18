@@ -163,7 +163,7 @@ def merge_companies(source_company: Company, target_company: Company, user):
         results[CompanyActivity] = {
             'company': results[Interaction]['company']
             + results[InvestmentProject]['investor_company']
-            + results[CompanyReferral]['company'],
+            + results[CompanyReferral]['company'] + results[Order]['company'],
         }
 
         source_company.mark_as_transferred(
