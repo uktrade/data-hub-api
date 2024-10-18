@@ -202,7 +202,7 @@ class TestEYBTriageFileIngestionTasks:
         'datahub.core.queues.job_scheduler.DataHubScheduler',
         return_value=DataHubScheduler(is_async=True),
     )
-    @patch('datahub.investment_lead.tasks.ingest_eyb_triage.Worker')
+    @patch('datahub.investment_lead.tasks.ingest_common.Worker')
     @mock_aws
     def test_job_not_queued_when_already_running(
         self, mock_worker, mock_scheduler, test_file_paths,
