@@ -10,6 +10,7 @@ from datahub.interaction.models import (
     Interaction as DBInteraction,
 )
 from datahub.investment.project.models import InvestmentProject as DBInvestmentProject
+from datahub.omis.order.models import Order as DBOrder
 from datahub.search.company_activity import CompanyActivitySearchApp
 from datahub.search.company_activity.models import (
     CompanyActivity as SearchCompanyActivity,
@@ -59,6 +60,7 @@ receivers = (
                    sync_related_activity_to_opensearch),
     SignalReceiver(post_save, DBCompanyReferral,
                    sync_related_activity_to_opensearch),
+    SignalReceiver(post_save, DBOrder, sync_related_activity_to_opensearch),
     SignalReceiver(post_save, DBInvestmentProject,
                    sync_related_activity_to_opensearch),
     SignalReceiver(post_delete, DBCompanyActivity,

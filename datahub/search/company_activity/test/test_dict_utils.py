@@ -3,6 +3,7 @@ import pytest
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.omis.order.test.factories import OrderFactory
 from datahub.search.company_activity import dict_utils
 
 pytestmark = pytest.mark.django_db
@@ -56,3 +57,17 @@ def test_activity_investment_dict():
     assert result['investment_type']['id'] == str(
         investment.investment_type_id)
     assert result['estimated_land_date'] == investment.estimated_land_date
+
+
+def test_activity_order_dict():
+    obj = None
+    result = dict_utils.activity_order_dict(obj)
+    assert result is None
+
+    order = OrderFactory()
+    result = dict_utils.activity_order_dict(order)
+
+    assert result['id'] == str(order.id)
+    assert result['created_by']['id'] == str(order.created_by_id)
+    assert result['contact']['id'] == str(order.contact_id)
+    assert result['primary_market']['id'] == order.primary_market_id
