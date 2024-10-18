@@ -33,15 +33,15 @@ backoff==2.2.1
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
-bigtree==0.21.1
+bigtree==0.21.2
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.35.34
+boto3==1.35.39
     # via
     #   -r requirements.in
     #   moto
-botocore==1.35.34
+botocore==1.35.39
     # via
     #   boto3
     #   moto
@@ -196,17 +196,17 @@ frozenlist==1.3.3
     # via
     #   aiohttp
     #   aiosignal
-gevent==24.2.1
+gevent==24.10.2
     # via -r requirements.in
 googleapis-common-protos==1.63.0
     # via
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
-greenlet==3.0.1
+greenlet==3.1.1
     # via gevent
 grpcio==1.62.1
     # via opentelemetry-exporter-otlp-proto-grpc
-icalendar==6.0.0
+icalendar==6.0.1
     # via -r requirements.in
 identify==2.5.11
     # via pre-commit
@@ -248,7 +248,7 @@ mccabe==0.7.0
     #   pylint
 mohawk==1.1.0
     # via -r requirements.in
-moto==5.0.16
+moto==5.0.17
     # via -r requirements-dev.in
 multidict==6.0.4
     # via
@@ -381,7 +381,7 @@ pylint==3.3.1
     #   pylint-django
     #   pylint-plugin-utils
     #   pylint-pytest
-pylint-django==2.5.5
+pylint-django==2.6.1
     # via -r requirements-dev.in
 pylint-plugin-utils==0.8.2
     # via pylint-django
@@ -463,7 +463,7 @@ rq-scheduler==0.13.1
     # via -r requirements.in
 s3transfer==0.10.0
     # via boto3
-sentry-sdk==2.15.0
+sentry-sdk==2.16.0
     # via -r requirements.in
 simplejson==3.18.0
     # via mail-parser
