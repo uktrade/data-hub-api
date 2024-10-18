@@ -235,7 +235,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_orders_factory,
                 {
-                    CompanyActivity: {'company': 0},
+                    CompanyActivity: {'company': 3},
                     CompanyListItem: {'company': 0},
                     CompanyReferral: {'company': 0},
                     Contact: {'company': 3},
