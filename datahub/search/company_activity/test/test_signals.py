@@ -17,6 +17,7 @@ from datahub.interaction.test.factories import (
     InteractionDITParticipantFactory,
 )
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.omis.order.test.factories import OrderFactory
 from datahub.search.company_activity.apps import CompanyActivitySearchApp
 
 pytestmark = pytest.mark.django_db
@@ -209,3 +210,34 @@ def test_company_activity_syncs_investment_fields_when_changed(opensearch_with_s
     assert actual_investment['estimated_land_date'] == str(
         new_estimated_land_date)
     assert actual_investment['created_by']['id'] == str(new_created_by.id)
+
+
+def test_company_activity_syncs_order_fields_when_changed(opensearch_with_signals):
+    """Test that company_activities are synced to OpenSearch if their omis order updates."""
+    order = OrderFactory()
+    company_activity = DBCompanyActivity.objects.get(order_id=order.id)
+    opensearch_with_signals.indices.refresh()
+
+    doc = opensearch_with_signals.get(
+        index=CompanyActivitySearchApp.search_model.get_read_alias(),
+        id=company_activity.pk,
+    )
+
+    assert doc['_source']['order']['contact']['id'] == str(order.contact_id)
+    assert doc['_source']['order']['created_by']['id'] == str(order.created_by_id)
+    new_contact = ContactFactory()
+    order.contact = new_contact
+
+    new_created_by = AdviserFactory()
+    order.created_by = new_created_by
+    order.save()
+
+    opensearch_with_signals.indices.refresh()
+
+    updated_doc = opensearch_with_signals.get(
+        index=CompanyActivitySearchApp.search_model.get_read_alias(),
+        id=company_activity.pk,
+    )
+    actual_order = updated_doc['_source']['order']
+    assert actual_order['contact']['id'] == str(new_contact.id)
+    assert actual_order['created_by']['id'] == str(new_created_by.id)
