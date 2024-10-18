@@ -245,6 +245,10 @@ class TestEYBTriageDataIngestionTasks:
         assert IngestedFile.objects.count() == initial_ingested_count + 1
 
     def test_get_last_ingestion_datetime_of_triage_data(self):
+        """
+        Test that the most recent triage file is ingested, even when there are
+        more recent files of a different data set present e.g. user data
+        """
         triage_filepath_1 = 'data-flow/eyb-triage-pipeline/1.jsonl.gz'
         triage_filepath_2 = 'data-flow/eyb-triage-pipeline/2.jsonl.gz'
         user_filepath = 'data-flow/eyb-user-pipeline/1.jsonl.gz'
