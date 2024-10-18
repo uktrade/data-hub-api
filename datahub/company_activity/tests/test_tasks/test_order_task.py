@@ -20,7 +20,6 @@ class TestCompanyActivityOrderTasks:
         """
         Test that investments are added to the CompanyActivity model.
         """
-        # for x in orderSize:
         orders = OrderFactory.create_batch(5)
 
         # Remove the created CompanyActivities added by the omis order `save` method

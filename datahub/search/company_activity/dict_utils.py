@@ -76,6 +76,6 @@ def activity_order_dict(obj):
         'reference': obj.reference,
         'primary_market': dict_utils.id_name_dict(obj.primary_market),
         'uk_region': dict_utils.id_name_dict(obj.uk_region),
-        'assignees': dict_utils.contact_or_adviser_dict(obj.assignees),
-        'contact': dict_utils.contact_or_adviser_list_of_dicts(obj.contacts),
+        'contact': dict_utils.contact_job_dict(obj.contact),
+        'created_by': dict_utils.contact_or_adviser_dict(obj.created_by),
     }

@@ -96,11 +96,11 @@ class CompanyActivityInvestmentProjectFactory(factory.django.DjangoModelFactory)
 
 class CompanyActivityOmisOrderFactory(factory.django.DjangoModelFactory):
     """
-    CompanyActivity factory with an investment project.
+    CompanyActivity factory with an omis order.
     """
 
     date = now()
-    activity_source = CompanyActivity.ActivitySource.investment
+    activity_source = CompanyActivity.ActivitySource.order
     company = factory.SubFactory(CompanyFactory)
     investment = None
     interaction = None
