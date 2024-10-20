@@ -26,7 +26,7 @@ dj-database-url==2.2.0
 psycopg2-binary==2.9.10
 psycogreen==1.0.2
 
-boto3==1.35.39
+boto3==1.35.44
 
 notifications-python-client==10.0.0
 
