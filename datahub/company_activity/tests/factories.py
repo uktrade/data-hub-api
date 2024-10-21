@@ -101,6 +101,26 @@ class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = 'company_activity.IngestedFile'
 
+    @classmethod
+    def _create(cls, target_class, *args, **kwargs):
+        """If specified, override the created_on field.
+
+        Because the `created_on` field has `auto_now_add=True`, Django overrides
+        any provided value with `now()`; and this happens "after" factory_boy's code
+        runs. To properly override it, we need to update the field after the model
+        instance has been created.
+
+        See https://github.com/FactoryBoy/factory_boy/issues/102 for more.
+        """
+        created_datetime = kwargs.pop('created_on', None)
+        obj = super(CompanyActivityIngestedFileFactory, cls)._create(
+            target_class, *args, **kwargs,
+        )
+        if created_datetime is not None:
+            obj.created_on = created_datetime
+            obj.save()
+        return obj
+
 
 class CompanyActivityGreatFactory(factory.django.DjangoModelFactory):
     """
