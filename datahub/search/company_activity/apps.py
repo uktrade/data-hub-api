@@ -4,7 +4,7 @@ from datahub.company_activity.models import CompanyActivity as DBCompanyActivity
 from datahub.interaction.models import InteractionDITParticipant
 from datahub.search.apps import SearchApp
 from datahub.search.company_activity.models import CompanyActivity
-from datahub.omis.order.models import OrderAssignee
+
 
 class CompanyActivitySearchApp(SearchApp):
     """SearchApp for company activity."""

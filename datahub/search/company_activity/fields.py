@@ -2,7 +2,6 @@ from opensearch_dsl import Date, Keyword, Object, Text
 
 from datahub.search import fields
 from datahub.search.interaction.models import _DITParticipant
-from datahub.search.omis.models import _Assignee
 
 
 def activity_interaction_field():
