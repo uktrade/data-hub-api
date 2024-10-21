@@ -54,8 +54,10 @@ class TestCompanyActivityOrderTasks:
         relate_company_activity_to_orders(batch_size)
         assert mocked_bulk_create.call_count == 2
 
-        assert f'Creating in batches of: {batch_size} CompanyActivities. 10 remaining.' in caplog.text
-        assert f'Creating in batches of: {batch_size} CompanyActivities. 5 remaining.' in caplog.text
+        assert f'Creating in batches of: {batch_size} CompanyActivities. '
+        '10 remaining.' in caplog.text
+        assert f'Creating in batches of: {batch_size} CompanyActivities. '
+        '5 remaining.' in caplog.text
         assert 'Finished bulk creating CompanyActivities.' in caplog.text
 
     def test_order_with_a_company_activity_are_not_added_again(self):
