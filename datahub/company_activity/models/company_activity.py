@@ -94,7 +94,8 @@ class CompanyActivity(models.Model):
         related_name='activity',
         on_delete=models.CASCADE,
         help_text=(
-            'If related to an omis order, must not have relations to any other activity ' '(referral, event etc)'
+            'If related to an omis order, must not have relations to any other activity '
+            '(referral, event etc)'
         ),
     )
 
