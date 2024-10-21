@@ -46,6 +46,7 @@ from datahub.export_win.tasks import (
 # from datahub.investment.project.tasks import (
 #     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
 # )
+from datahub.investment_lead.tasks.ingest_eyb_triage import ingest_eyb_triage_file
 from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
 from datahub.reminder.migration_tasks import run_ita_users_migration, run_post_users_migration
 from datahub.reminder.tasks import (
@@ -128,6 +129,11 @@ def schedule_jobs():
     #     cron=EVERY_HOUR,
     #     description='Check S3 for new Company Activity data files and schedule ingestion',
     # )
+    job_scheduler(
+        function=ingest_eyb_triage_file,
+        cron=EVERY_HOUR,
+        description='Check S3 for new EYB triage data files and schedule ingestion',
+    )
 
     if settings.ENABLE_ESTIMATED_LAND_DATE_REMINDERS:
         job_scheduler(
