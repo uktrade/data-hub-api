@@ -2,6 +2,10 @@ import importlib
 import logging
 import sys
 
+from datetime import (
+    datetime,
+    timedelta,
+)
 from unittest.mock import patch
 
 import pytest
@@ -14,11 +18,15 @@ from rq_scheduler import Scheduler
 
 
 from datahub.company_activity.models import IngestedFile
+from datahub.company_activity.tests.factories import CompanyActivityIngestedFileFactory
 from datahub.core import constants
 from datahub.core.queues.constants import EVERY_HOUR
 from datahub.core.queues.scheduler import DataHubScheduler
 from datahub.investment_lead.models import EYBLead
-from datahub.investment_lead.tasks.ingest_eyb_common import BUCKET
+from datahub.investment_lead.tasks.ingest_eyb_common import (
+    BUCKET,
+    DATE_FORMAT,
+)
 from datahub.investment_lead.tasks.ingest_eyb_triage import (
     ingest_eyb_triage_data,
     ingest_eyb_triage_file,
@@ -149,3 +157,30 @@ class TestEYBTriageDataIngestionTasks:
         updated = EYBLead.objects.get(triage_hashed_uuid=hashed_uuid)
         assert str(updated.proposed_investment_region.id) == \
             constants.UKRegion.northern_ireland.value.id
+
+    @mock_aws
+    def test_unmodified_records_are_skipped_during_ingestion(self):
+        """
+        Test that we skip updating records whose modified date is older than the last
+        file ingestion date
+        """
+        hashed_uuid = generate_hashed_uuid()
+        yesterday = datetime.strftime(datetime.now() - timedelta(1), DATE_FORMAT)
+        file_path = f'{TRIAGE_PREFIX}1.jsonl.gz'
+        new_file_path = f'{TRIAGE_PREFIX}2.jsonl.gz'
+        CompanyActivityIngestedFileFactory(
+            created_on=datetime.now(),
+            filepath=file_path,
+        )
+        records = [
+            {
+                'hashedUuid': hashed_uuid,
+                'created': yesterday,
+                'modified': yesterday,
+                'sector': 'Mining',
+            },
+        ]
+        file_contents = file_contents_faker(records)
+        setup_s3_bucket(BUCKET, [new_file_path], [file_contents])
+        ingest_eyb_triage_data(BUCKET, new_file_path)
+        assert EYBLead.objects.count() == 0

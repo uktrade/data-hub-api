@@ -15,14 +15,12 @@ from datahub.company_activity.models import IngestedFile
 from datahub.company_activity.tests.factories import CompanyActivityIngestedFileFactory
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import DataHubScheduler
-from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import (
     CreateEYBLeadTriageSerializer,
     CreateEYBLeadUserSerializer,
 )
 from datahub.investment_lead.tasks.ingest_eyb_common import (
     BUCKET,
-    DATE_FORMAT,
     REGION,
 )
 from datahub.investment_lead.tasks.ingest_eyb_triage import (
@@ -37,11 +35,7 @@ from datahub.investment_lead.tasks.ingest_eyb_user import (
     ingest_eyb_user_file,
     USER_PREFIX,
 )
-from datahub.investment_lead.test.factories import (
-    generate_hashed_uuid,
-)
 from datahub.investment_lead.test.test_tasks.utils import (
-    file_contents_faker,
     setup_s3_bucket,
     setup_s3_client,
 )
@@ -220,40 +214,6 @@ class TestEYBCommonDataIngestionTasks:
             most_recent_target_file_ingestion_datetime,
             most_recently_ingested_target_file.created_on,
         )
-
-    @pytest.mark.parametrize(
-        'ingest_data_task_function',
-        [
-            (ingest_eyb_triage_data),
-            (ingest_eyb_user_data),
-        ],
-    )
-    @mock_aws
-    def test_unmodified_records_are_skipped_during_ingestion(
-        self, faker, ingest_data_task_function,
-    ):
-        """
-        Test that we skip updating records whose modified date is older than the last
-        file ingestion date
-        """
-        hashed_uuid = generate_hashed_uuid()
-        yesterday = datetime.strftime(datetime.now() - timedelta(1), DATE_FORMAT)
-        file_path = 'test/file/path.jsonl.gz'
-        CompanyActivityIngestedFileFactory(
-            created_on=datetime.now(),
-            filepath=file_path,
-        )
-        records = [
-            {
-                'hashedUuid': hashed_uuid,
-                'created': yesterday,
-                'modified': yesterday,
-            },
-        ]
-        file = file_contents_faker(records)
-        setup_s3_bucket(BUCKET, [file_path], [file])
-        ingest_data_task_function(BUCKET, file_path)
-        assert EYBLead.objects.count() == 0
 
     @pytest.mark.parametrize(
         'ingest_data_task_function',

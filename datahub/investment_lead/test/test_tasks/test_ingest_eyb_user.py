@@ -1,5 +1,9 @@
 import logging
 
+from datetime import (
+    datetime,
+    timedelta,
+)
 from unittest.mock import patch
 
 import pytest
@@ -11,10 +15,14 @@ from rq import Queue
 
 
 from datahub.company_activity.models import IngestedFile
+from datahub.company_activity.tests.factories import CompanyActivityIngestedFileFactory
 from datahub.core import constants
 from datahub.core.queues.scheduler import DataHubScheduler
 from datahub.investment_lead.models import EYBLead
-from datahub.investment_lead.tasks.ingest_eyb_common import BUCKET
+from datahub.investment_lead.tasks.ingest_eyb_common import (
+    BUCKET,
+    DATE_FORMAT,
+)
 from datahub.investment_lead.tasks.ingest_eyb_triage import (
     ingest_eyb_triage_data,
     TRIAGE_PREFIX,
@@ -164,3 +172,35 @@ class TestEYBUserDataIngestionTasks:
         assert EYBLead.objects.count() == 1
         updated = EYBLead.objects.get(user_hashed_uuid=hashed_uuid)
         assert str(updated.address_country.id) == constants.Country.france.value.id
+
+    @mock_aws
+    def test_unmodified_records_are_skipped_during_ingestion(self, faker):
+        """
+        Test that we skip updating records whose modified date is older than the last
+        file ingestion date
+        """
+        hashed_uuid = generate_hashed_uuid()
+        yesterday = datetime.strftime(datetime.now() - timedelta(1), DATE_FORMAT)
+        file_path = f'{USER_PREFIX}1.jsonl.gz'
+        new_file_path = f'{USER_PREFIX}2.jsonl.gz'
+        CompanyActivityIngestedFileFactory(
+            created_on=datetime.now(),
+            filepath=file_path,
+        )
+        records = [
+            {
+                'hashedUuid': hashed_uuid,
+                'created': yesterday,
+                'modified': yesterday,
+                'companyName': faker.company(),
+                'addressLine1': faker.street_address(),
+                'town': faker.city(),
+                'companyLocation': faker.country_code(),
+                'fullName': faker.name(),
+                'email': faker.email(),
+            },
+        ]
+        file = file_contents_faker(records)
+        setup_s3_bucket(BUCKET, [new_file_path], [file])
+        ingest_eyb_user_data(BUCKET, new_file_path)
+        assert EYBLead.objects.count() == 0
