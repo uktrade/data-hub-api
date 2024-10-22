@@ -38,10 +38,10 @@ from datahub.investment_lead.tasks.ingest_eyb_user import (
     USER_PREFIX,
 )
 from datahub.investment_lead.test.factories import (
-    create_fake_file,
     generate_hashed_uuid,
 )
 from datahub.investment_lead.test.test_tasks.utils import (
+    file_contents_faker,
     setup_s3_bucket,
     setup_s3_client,
 )
@@ -250,7 +250,7 @@ class TestEYBCommonDataIngestionTasks:
                 'modified': yesterday,
             },
         ]
-        file = create_fake_file(records)
+        file = file_contents_faker(records)
         setup_s3_bucket(BUCKET, [file_path], [file])
         ingest_data_task_function(BUCKET, file_path)
         assert EYBLead.objects.count() == 0

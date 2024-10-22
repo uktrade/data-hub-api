@@ -25,12 +25,14 @@ from datahub.investment_lead.tasks.ingest_eyb_user import (
     USER_PREFIX,
 )
 from datahub.investment_lead.test.factories import (
-    create_fake_file,
     eyb_lead_user_record_faker,
     EYBLeadFactory,
     generate_hashed_uuid,
 )
-from datahub.investment_lead.test.test_tasks.utils import setup_s3_bucket
+from datahub.investment_lead.test.test_tasks.utils import (
+    file_contents_faker,
+    setup_s3_bucket,
+)
 
 
 pytestmark = pytest.mark.django_db
@@ -75,7 +77,8 @@ class TestEYBUserFileIngestionTasks:
         initial_job_count = rq_queue.count
 
         file_path = f'{TRIAGE_PREFIX}triage.jsonl.gz'
-        setup_s3_bucket(BUCKET, [file_path])
+        file_contents = file_contents_faker(default_faker='triage')
+        setup_s3_bucket(BUCKET, [file_path], [file_contents])
         with caplog.at_level(logging.INFO):
             ingest_eyb_triage_data(BUCKET, file_path)
             assert f'Ingesting file: {file_path} finished' in caplog.text
@@ -130,8 +133,8 @@ class TestEYBUserDataIngestionTasks:
         """
         initial_eyb_lead_count = EYBLead.objects.count()
         initial_ingested_count = IngestedFile.objects.count()
-        records = [eyb_lead_user_record_faker()]
-        setup_s3_bucket(BUCKET, [test_user_file_path], [create_fake_file(records)])
+        file_contents = file_contents_faker(default_faker='user')
+        setup_s3_bucket(BUCKET, [test_user_file_path], [file_contents])
         with caplog.at_level(logging.INFO):
             ingest_eyb_user_data(BUCKET, test_user_file_path)
             assert f'Ingesting file: {test_user_file_path} started' in caplog.text
@@ -155,8 +158,8 @@ class TestEYBUserDataIngestionTasks:
                 'companyLocation': 'FR',
             }),
         ]
-        file = create_fake_file(records)
-        setup_s3_bucket(BUCKET, [test_user_file_path], [file])
+        file_contents = file_contents_faker(records)
+        setup_s3_bucket(BUCKET, [test_user_file_path], [file_contents])
         ingest_eyb_user_data(BUCKET, test_user_file_path)
         assert EYBLead.objects.count() == 1
         updated = EYBLead.objects.get(user_hashed_uuid=hashed_uuid)
