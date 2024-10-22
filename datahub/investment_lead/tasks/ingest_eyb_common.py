@@ -125,10 +125,12 @@ class BaseEYBDataIngestionTask:
                 Q(user_hashed_uuid=obj['hashedUuid']) | Q(triage_hashed_uuid=obj['hashedUuid']),
             )
             instance, created = queryset.update_or_create(defaults=serializer.validated_data)
+            hashed_uuid = instance.triage_hashed_uuid \
+                if instance.triage_hashed_uuid else instance.user_hashed_uuid
             if created:
-                self.created_hashed_uuids.append(instance.triage_hashed_uuid)
+                self.created_hashed_uuids.append(hashed_uuid)
             else:
-                self.updated_hashed_uuids.append(instance.triage_hashed_uuid)
+                self.updated_hashed_uuids.append(hashed_uuid)
         else:
             self.errors.append({
                 'index': obj.get('hashedUuid', None),

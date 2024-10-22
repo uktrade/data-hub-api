@@ -174,7 +174,7 @@ class TestEYBUserDataIngestionTasks:
         assert str(updated.address_country.id) == constants.Country.france.value.id
 
     @mock_aws
-    def test_unmodified_records_are_skipped_during_ingestion(self, faker):
+    def test_unmodified_user_records_are_skipped_during_ingestion(self, faker):
         """
         Test that we skip updating records whose modified date is older than the last
         file ingestion date
@@ -204,3 +204,60 @@ class TestEYBUserDataIngestionTasks:
         setup_s3_bucket(BUCKET, [new_file_path], [file])
         ingest_eyb_user_data(BUCKET, new_file_path)
         assert EYBLead.objects.count() == 0
+
+    @mock_aws
+    def test_incoming_user_records_trigger_correct_logging(self, caplog):
+        """Test that incoming user correct logging messages.
+
+        If created -> hashed uuid is in the created list;
+        If updated existing record -> hashed uuid is in the updated list;
+        If failed validation -> errors captured in the error list.
+        """
+        today = datetime.now()
+        yesterday = datetime.now() - timedelta(days=1)
+
+        created_hashed_uuid = generate_hashed_uuid()
+        updated_hashed_uuid = generate_hashed_uuid()
+        failed_hashed_uuid = generate_hashed_uuid()
+
+        EYBLeadFactory(
+            triage_hashed_uuid=updated_hashed_uuid,
+            user_hashed_uuid=updated_hashed_uuid,
+        )
+        assert EYBLead.objects.count() == 1
+
+        records = [
+            # Created record
+            eyb_lead_user_record_faker({
+                'hashedUuid': created_hashed_uuid,
+                'created': today,
+                'modified': today,
+            }),
+            # Updated record
+            eyb_lead_user_record_faker({
+                'hashedUuid': updated_hashed_uuid,
+                'created': yesterday,
+                'modified': today,
+            }),
+            # Failed record
+            {
+                'hashedUuid': failed_hashed_uuid,
+                'created': today,
+                'modified': today,
+            },
+        ]
+
+        file_path = f'{USER_PREFIX}1.jsonl.gz'
+        CompanyActivityIngestedFileFactory(
+            created_on=yesterday,
+            filepath=file_path,
+        )
+        file_contents = file_contents_faker(records)
+        setup_s3_bucket(BUCKET, [file_path], [file_contents])
+        with caplog.at_level(logging.INFO):
+            ingest_eyb_user_data(BUCKET, file_path)
+            assert f"1 records created: ['{created_hashed_uuid}']" in caplog.text
+            assert f"1 records updated: ['{updated_hashed_uuid}']" in caplog.text
+            assert '1 records failed validation:' in caplog.text
+            assert f"'index': '{failed_hashed_uuid}'" in caplog.text
+        assert EYBLead.objects.count() == 2
