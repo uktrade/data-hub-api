@@ -155,8 +155,10 @@ class TestEYBTriageDataIngestionTasks:
         ingest_eyb_triage_data(BUCKET, test_triage_file_path)
         assert EYBLead.objects.count() == 1
         updated = EYBLead.objects.get(triage_hashed_uuid=hashed_uuid)
-        assert str(updated.proposed_investment_region.id) == \
-            constants.UKRegion.northern_ireland.value.id
+        assert (
+            str(updated.proposed_investment_region_id)
+            == constants.UKRegion.northern_ireland.value.id
+        )
 
     @mock_aws
     def test_unmodified_triage_records_are_skipped_during_ingestion(self):

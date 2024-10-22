@@ -171,7 +171,7 @@ class TestEYBUserDataIngestionTasks:
         ingest_eyb_user_data(BUCKET, test_user_file_path)
         assert EYBLead.objects.count() == 1
         updated = EYBLead.objects.get(user_hashed_uuid=hashed_uuid)
-        assert str(updated.address_country.id) == constants.Country.france.value.id
+        assert str(updated.address_country_id) == constants.Country.france.value.id
 
     @mock_aws
     def test_unmodified_user_records_are_skipped_during_ingestion(self, faker):

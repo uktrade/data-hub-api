@@ -113,7 +113,7 @@ class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):
         See https://github.com/FactoryBoy/factory_boy/issues/102 for more.
         """
         created_datetime = kwargs.pop('created_on', None)
-        obj = super(CompanyActivityIngestedFileFactory, cls)._create(
+        obj = super()._create(
             target_class, *args, **kwargs,
         )
         if created_datetime is not None:
