@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('order', '0014_alter_order_company_alter_order_contact_and_more'),
-        ('company_activity', '0005_alter_great_actor_dit_email_address_and_more'),
+        ('company_activity', '0006_alter_great_data_comment_and_more'),
     ]
 
     operations = [
