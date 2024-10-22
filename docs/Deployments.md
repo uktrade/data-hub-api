@@ -21,7 +21,7 @@ You can use the [GitHub comparison tool](https://github.com/uktrade/data-hub-api
 
 4. Check that the tag worked by using the [GitHub comparison tool](https://github.com/uktrade/data-hub-api/compare) again to compare main to the new tag. If done correctly, there should be no difference. 
 
-5. Create a GH pre-release by clicking `Draft a new release` on the [releases page](https://github.com/uktrade/data-hub-frontend/releases).
+5. Create a GH pre-release by clicking `Draft a new release` on the [releases page](https://github.com/uktrade/data-hub-api/releases).
 
 The release title should be `v<VERSION_NUMBER>` and release notes can be created by clicking the `Auto-generate release notes` button.
 
