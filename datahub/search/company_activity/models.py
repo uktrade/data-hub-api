@@ -4,14 +4,14 @@ from datahub.search import dict_utils, fields
 from datahub.search.company_activity.dict_utils import (
     activity_interaction_dict,
     activity_investment_dict,
-    activity_referral_dict,
     activity_order_dict,
+    activity_referral_dict,
 )
 from datahub.search.company_activity.fields import (
     activity_interaction_field,
     activity_investment_field,
-    activity_referral_field,
     activity_order_field,
+    activity_referral_field,
 )
 from datahub.search.models import BaseSearchModel
 
