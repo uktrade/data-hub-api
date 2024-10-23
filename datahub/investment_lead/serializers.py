@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import serializers
 
 from datahub.company.models import Company
@@ -183,7 +184,7 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
         source='intent_other', required=False, allow_null=True, allow_blank=True, default='',
     )
     location = serializers.CharField(
-        source='proposed_investment_region', required=False, allow_null=True,
+        source='proposed_investment_region', required=False, allow_null=True, allow_blank=True,
     )
     locationCity = serializers.CharField(  # noqa: N815
         source='proposed_investment_city',
@@ -209,7 +210,13 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
 
     def validate_location(self, value):
         if isinstance(value, str):
-            if not UKRegion.objects.filter(name=value.title()).exists():
+            transformed_value = value.replace('_', ' ').title()
+            if transformed_value == '':
+                return None
+            # Handle edge case where value is missing the word `The`
+            if transformed_value == 'Yorkshire And Humber':
+                transformed_value = 'Yorkshire and The Humber'
+            if not UKRegion.objects.filter(name__iexact=transformed_value).exists():
                 raise serializers.ValidationError(f'UK Region "{value}" does not exist.')
         return value
 
@@ -242,9 +249,12 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
         ]
         sector_name = Sector.get_name_from_segments(segments)
         selected_segment, parent_segment = Sector.get_selected_and_parent_segments(sector_name)
-        queryset = Sector.objects.filter(segment=selected_segment)
+        # Sector could currently be disabled for historical leads
+        queryset = Sector.objects.filter(
+            Q(disabled_on__isnull=True) | Q(disabled_on__isnull=False),
+        ).filter(segment__iexact=selected_segment)
         if parent_segment is not None:
-            queryset.filter(parent__segment=parent_segment)
+            queryset.filter(parent__segment__iexact=parent_segment)
         sector = queryset.first()
         if isinstance(sector, Sector):
             internal_values['sector'] = sector
@@ -339,28 +349,28 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
     modified = serializers.DateTimeField(source='user_modified', required=True)
     companyName = serializers.CharField(source='company_name', required=True)  # noqa: N815
     dunsNumber = serializers.CharField(  # noqa: N815
-        source='duns_number', required=False, allow_null=True, default=None,
+        source='duns_number', required=False, allow_null=True, allow_blank=True, default=None,
     )
     addressLine1 = serializers.CharField(source='address_1', required=True)  # noqa: N815
     addressLine2 = serializers.CharField(  # noqa: N815
-        source='address_2', required=False, allow_null=True, default='',
+        source='address_2', required=False, allow_null=True, allow_blank=True, default='',
     )
     town = serializers.CharField(source='address_town', required=True)
     county = serializers.CharField(
-        source='address_county', required=False, allow_null=True, default='',
+        source='address_county', required=False, allow_null=True, allow_blank=True, default='',
     )
     companyLocation = serializers.CharField(source='address_country', required=True)  # noqa: N815
     postcode = serializers.CharField(
-        source='address_postcode', required=False, allow_null=True, default='',
+        source='address_postcode', required=False, allow_null=True, allow_blank=True, default='',
     )
     companyWebsite = serializers.CharField(  # noqa: N815
-        source='company_website', required=False, allow_null=True, default='',
+        source='company_website', required=False, allow_null=True, allow_blank=True, default='',
     )
     fullName = serializers.CharField(source='full_name', required=True)  # noqa: N815
-    role = serializers.CharField(required=False, allow_null=True, default='')
+    role = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='')
     email = serializers.CharField(required=True)
     telephoneNumber = serializers.CharField(  # noqa: N815
-        source='telephone_number', required=False, allow_null=True, default='',
+        source='telephone_number', required=False, allow_null=True, allow_blank=True, default='',
     )
     agreeTerms = serializers.BooleanField(  # noqa: N815
         source='agree_terms', required=False, allow_null=True, default=None,
@@ -373,13 +383,14 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
         choices=EYBLead.LandingTimeframeChoices.choices,
         required=False,
         allow_null=True,
+        allow_blank=True,
         default='',
     )
 
     def validate_companyLocation(self, value):  # noqa: N802
         if not Country.objects.filter(iso_alpha2_code=value.upper()).exists():
             raise serializers.ValidationError(
-                f'Company location/country ISO2 code "{value}" does not exist.',
+                f'Company location/country ISO2 code "{value.upper()}" does not exist.',
             )
         return value
 
@@ -456,9 +467,11 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
                 EYBLead.IntentChoices(intent_choice).label
                 for intent_choice in instance.intent
             ],
-            'hiring': EYBLead.HiringChoices(instance.hiring).label,
-            'spend': EYBLead.SpendChoices(instance.spend).label,
+            'hiring': EYBLead.HiringChoices(instance.hiring).label
+            if instance.hiring else None,
+            'spend': EYBLead.SpendChoices(instance.spend).label
+            if instance.spend else None,
             'landing_timeframe': EYBLead.LandingTimeframeChoices(
                 instance.landing_timeframe,
-            ).label,
+            ).label if instance.landing_timeframe else None,
         }

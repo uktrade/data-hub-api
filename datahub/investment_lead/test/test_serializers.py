@@ -119,35 +119,43 @@ class TestCreateEYBLeadTriageSerializer:
             for e in serializer.errors['non_field_errors']
         )
 
-    def test_required_fields_when_value_is_null(self):
-        """Tests null values are handled correctly for required fields."""
-        null_data = {
-            'hashedUuid': None,
-            'created': None,
-            'modified': None,
-            'sector': None,
+    @pytest.mark.parametrize(
+        'value',
+        [None, ''],
+    )
+    def test_required_fields_when_value_is_null_or_empty(self, value):
+        """Tests null values and empty strings are handled correctly for required fields."""
+        test_data = {
+            'hashedUuid': value,
+            'created': value,
+            'modified': value,
+            'sector': value,
         }
-        serializer = CreateEYBLeadTriageSerializer(data=null_data)
+        serializer = CreateEYBLeadTriageSerializer(data=test_data)
         assert not serializer.is_valid()
         assert 'hashedUuid' in serializer.errors
         assert 'created' in serializer.errors
         assert 'modified' in serializer.errors
         assert 'sector' in serializer.errors
 
-    def test_non_required_fields_when_value_is_null(self, eyb_lead_triage_data):
-        """Tests null values are handled correctly for non-required fields."""
+    @pytest.mark.parametrize(
+        'value',
+        [None, ''],
+    )
+    def test_non_required_fields_when_value_is_null_or_empty(self, eyb_lead_triage_data, value):
+        """Tests null values and empty strings are handled correctly for non-required fields."""
         eyb_lead_triage_data.update({
-            'sectorSub': None,
-            'sectorSubSub': None,
-            'intent': None,
-            'intentOther': None,
-            'location': None,
-            'locationCity': None,
-            'locationNone': None,
-            'hiring': None,
-            'spend': None,
-            'spendOther': None,
-            'isHighValue': None,
+            'sectorSub': value,
+            'sectorSubSub': value,
+            'intent': [value] if value == '' else value,
+            'intentOther': value,
+            'location': value,
+            'locationCity': value,
+            'locationvalue': value,
+            'hiring': value,
+            'spend': value,
+            'spendOther': value,
+            'isHighValue': value,
         })
         serializer = CreateEYBLeadTriageSerializer(data=eyb_lead_triage_data)
         assert serializer.is_valid()
@@ -232,36 +240,44 @@ class TestCreateEYBLeadUserSerializer:
         assert 'companyLocation' in serializer.errors
         assert 'landingTimeframe' in serializer.errors
 
-    def test_required_fields_when_value_is_null(self):
-        """Tests null values are handled correctly for required fields."""
-        null_data = {
-            'hashedUuid': None,
-            'created': None,
-            'modified': None,
-            'companyName': None,
-            'addressLine1': None,
-            'town': None,
-            'companyLocation': None,
-            'fullName': None,
-            'email': None,
+    @pytest.mark.parametrize(
+        'value',
+        [None, ''],
+    )
+    def test_required_fields_when_value_is_null_or_empty(self, value):
+        """Tests null values and empty strings are handled correctly for required fields."""
+        test_data = {
+            'hashedUuid': value,
+            'created': value,
+            'modified': value,
+            'companyName': value,
+            'addressLine1': value,
+            'town': value,
+            'companyLocation': value,
+            'fullName': value,
+            'email': value,
         }
-        serializer = CreateEYBLeadUserSerializer(data=null_data)
+        serializer = CreateEYBLeadUserSerializer(data=test_data)
         assert not serializer.is_valid()
-        for field in null_data.keys():
+        for field in test_data.keys():
             assert field in serializer.errors
 
-    def test_non_required_fields_when_value_is_null(self, eyb_lead_user_data):
-        """Tests null values are handled correctly for non-required fields."""
+    @pytest.mark.parametrize(
+        'value',
+        [None, ''],
+    )
+    def test_non_required_fields_when_value_is_null_or_empty(self, eyb_lead_user_data, value):
+        """Tests null values and empty strings are handled correctly for non-required fields."""
         eyb_lead_user_data.update({
-            'dunsNumber': None,
-            'addressLine2': None,
-            'county': None,
-            'postcode': None,
-            'role': None,
-            'telephoneNumber': None,
-            'agreeTerms': None,
-            'agreeInfoEmail': None,
-            'landingTimeframe': None,
+            'dunsNumber': value,
+            'addressLine2': value,
+            'county': value,
+            'postcode': value,
+            'role': value,
+            'telephoneNumber': value,
+            'agreeTerms': value,
+            'agreeInfoEmail': value,
+            'landingTimeframe': value,
         })
         serializer = CreateEYBLeadUserSerializer(data=eyb_lead_user_data)
         assert serializer.is_valid()
