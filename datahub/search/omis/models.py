@@ -1,14 +1,8 @@
-from opensearch_dsl import Boolean, Date, Integer, Keyword, Text, InnerDoc, Object
+from opensearch_dsl import Boolean, Date, Integer, Keyword, Text
 
 from datahub.search import dict_utils
 from datahub.search import fields
-from datahub.search.inner_docs import IDNameTrigram, Person
 from datahub.search.models import BaseSearchModel
-
-
-class _Assignee(InnerDoc):
-    adviser = Object(Person)
-    team = Object(IDNameTrigram)
 
 
 class Order(BaseSearchModel):

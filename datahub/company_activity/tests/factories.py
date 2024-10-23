@@ -6,8 +6,8 @@ from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-from datahub.omis.order.test.factories import OrderFactory
 from datahub.metadata.test.factories import CountryFactory
+from datahub.omis.order.test.factories import OrderFactory
 
 
 class CompanyActivityInteractionFactory(factory.django.DjangoModelFactory):

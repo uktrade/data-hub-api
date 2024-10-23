@@ -290,12 +290,14 @@ MAPPING = {
                 'field': 'investor_company',
                 'expired_objects_kwargs': [
                     {
-                        'modified_on': INVESTOR_PROFILE_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': INVESTOR_PROFILE_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                     },
                 ],
                 'unexpired_objects_kwargs': [
                     {
-                        'modified_on': INVESTOR_PROFILE_DELETE_BEFORE_DATETIME + relativedelta(days=1),
+                        'modified_on': INVESTOR_PROFILE_DELETE_BEFORE_DATETIME
+                        + relativedelta(days=1),
                     },
                 ],
             },
@@ -552,7 +554,8 @@ MAPPING = {
             {
                 'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                 'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
-                'actual_land_date': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'actual_land_date': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                - relativedelta(days=1),
                 'date_abandoned': None,
                 'date_lost': None,
             },
@@ -560,7 +563,8 @@ MAPPING = {
                 'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                 'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF - relativedelta(days=1),
                 'actual_land_date': None,
-                'date_abandoned': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                'date_abandoned': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                - relativedelta(days=1),
                 'date_lost': None,
             },
             {
@@ -607,7 +611,8 @@ MAPPING = {
                 'field': 'investment_project',
                 'expired_objects_kwargs': [
                     {
-                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                     },
                 ],
                 'unexpired_objects_kwargs': [
@@ -621,7 +626,8 @@ MAPPING = {
                 'field': 'investment_project',
                 'expired_objects_kwargs': [
                     {
-                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                     },
                 ],
                 'unexpired_objects_kwargs': [
@@ -636,7 +642,8 @@ MAPPING = {
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
                     {
-                        'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'created_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                         'modified_on': INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF,
                     },
                 ],
@@ -647,7 +654,8 @@ MAPPING = {
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
                     {
-                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                        'modified_on': INVESTMENT_PROJECT_DELETE_BEFORE_DATETIME
+                        - relativedelta(days=1),
                     },
                 ],
             },
@@ -925,7 +933,9 @@ def test_mappings(model_label, config):
     if config.relation_filter_mapping:
         mapping = MAPPING[model_label]
         related_models_in_config = {field.field.model for field in config.relation_filter_mapping}
-        related_models_in_mapping = {relation['factory']._meta.get_model_class() for relation in mapping['relations']}
+        related_models_in_mapping = {
+            relation['factory']._meta.get_model_class() for relation in mapping['relations']
+        }
         assert (
             related_models_in_config <= related_models_in_mapping
         ), f'Missing test cases for relation filters for model {model_label} detected'
@@ -942,7 +952,9 @@ def test_configs(model_label, config):
     related_fields = get_related_fields(model)
 
     field_missing_from_config = (
-        set(related_fields) - (config.relation_filter_mapping or {}).keys() - set(config.excluded_relations)
+        set(related_fields)
+        - (config.relation_filter_mapping or {}).keys()
+        - set(config.excluded_relations)
     )
     fields_for_error_message = '\n'.join(
         (_format_field(field) for field in field_missing_from_config),
@@ -1043,7 +1055,9 @@ def test_run(
     assert model.objects.count() == total_model_records - num_expired_records
 
     if has_search_app:
-        assert opensearch_with_signals.count(index=read_alias)['count'] == (total_model_records - num_expired_records)
+        assert opensearch_with_signals.count(index=read_alias)['count'] == (
+            total_model_records - num_expired_records
+        )
 
     # Check which models were actually deleted
     return_values = delete_return_value_tracker.return_values
@@ -1055,7 +1069,9 @@ def test_run(
         assert model._meta.label in {model._meta.label}
 
     actual_deleted_models = {  # only include models actually deleted
-        deleted_model for deleted_model, deleted_count in deletions_by_model.items() if deleted_count
+        deleted_model
+        for deleted_model, deleted_count in deletions_by_model.items()
+        if deleted_count
     }
     assert actual_deleted_models - {model._meta.label} <= mapping['implicitly_deletable_models']
 
@@ -1106,7 +1122,9 @@ def test_simulate(
     assert len(return_values) == 1
     _, deletions_by_model = return_values[0]
     actual_deleted_models = {  # only include models actually deleted
-        deleted_model for deleted_model, deleted_count in deletions_by_model.items() if deleted_count
+        deleted_model
+        for deleted_model, deleted_count in deletions_by_model.items()
+        if deleted_count
     }
     assert model._meta.label in {model._meta.label}
     assert actual_deleted_models - {model._meta.label} <= mapping['implicitly_deletable_models']

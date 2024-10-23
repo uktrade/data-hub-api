@@ -31,3 +31,19 @@ def test_sync_related_objects_syncs_using_rq(opensearch):
     assert doc_exists(opensearch, RelatedModelSearchApp, relation_1.pk)
     assert doc_exists(opensearch, RelatedModelSearchApp, relation_2.pk)
     assert not doc_exists(opensearch, RelatedModelSearchApp, unrelated_obj.pk)
+
+
+@pytest.mark.django_db
+def test_sync_object_task_handles_obj_no_longer_in_db(opensearch):
+    """
+    Test that the sync does not crash trying to sync a deleted object, there are signals which
+    can trigger the sync for deleted objects.
+    """
+    obj = SimpleModel.objects.create()
+    obj_id = obj.id
+
+    obj.delete()
+    sync_object_async(SimpleModelSearchApp, obj_id)
+    opensearch.indices.refresh()
+
+    assert not doc_exists(opensearch, SimpleModelSearchApp, obj_id)

@@ -6,8 +6,8 @@ from datahub.company_activity.models import CompanyActivity as DBCompanyActivity
 from datahub.company_activity.tests.factories import (
     CompanyActivityInteractionFactory,
     CompanyActivityInvestmentProjectFactory,
-    CompanyActivityReferralFactory,
     CompanyActivityOmisOrderFactory,
+    CompanyActivityReferralFactory,
 )
 from datahub.search.company_activity import CompanyActivitySearchApp
 from datahub.search.company_activity.models import CompanyActivity

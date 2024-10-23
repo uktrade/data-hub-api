@@ -11,8 +11,8 @@ from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework.exceptions import ValidationError
 
-from datahub.company_activity.models import CompanyActivity
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company_activity.models import CompanyActivity
 from datahub.core import constants
 from datahub.core.exceptions import APIConflictException
 from datahub.metadata.test.factories import TeamFactory
@@ -773,10 +773,10 @@ class TestOrder:
 
     def test_save(self):
         """
-        Test save also saves to the `CompanyActivity` model.
-        Test save does not save to the `CompanyActivity` model if it already exists.
+        Test save also saves to the `CompanyActivity` model and does not save to the
+        `CompanyActivity` model if it already exists.
         """
-        assert CompanyActivity.objects.all().count() == 0
+        assert not CompanyActivity.objects.all().exists()
         order = OrderFactory()
         assert CompanyActivity.objects.all().count() == 1
 
@@ -796,4 +796,4 @@ class TestOrder:
         assert company_activity.company_id == new_company.id
 
         order.delete()
-        assert CompanyActivity.objects.all().count() == 0
+        assert not CompanyActivity.objects.all().exists()
