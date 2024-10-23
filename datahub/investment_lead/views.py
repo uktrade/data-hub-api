@@ -1,5 +1,7 @@
 import logging
 
+from django.db.models import Q
+
 from datahub.core.viewsets import SoftDeleteCoreViewSet
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import RetrieveEYBLeadSerializer
@@ -14,7 +16,9 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
 
     def get_queryset(self):
         """Apply filters to queryset based on query parameters (in GET operations)."""
-        queryset = EYBLead.objects.filter(archived=False)
+        queryset = EYBLead.objects.filter(archived=False).exclude(
+            Q(user_hashed_uuid='') | Q(triage_hashed_uuid=''),
+        )
         company_name = self.request.query_params.get('company')
         sector_ids = self.request.query_params.getlist('sector')
         values = self.request.query_params.getlist('value')

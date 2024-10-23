@@ -57,6 +57,21 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['results'] == []
 
+    def test_list_leads_with_missing_triage_or_user_component(
+        self, test_user_with_view_permissions,
+    ):
+        """Tests the list view only return leads with both triage and user hashed UUIDs."""
+        lead_with_both = EYBLeadFactory()
+        lead_without_triage = EYBLeadFactory(triage_hashed_uuid='')
+        lead_without_user = EYBLeadFactory(user_hashed_uuid='')
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(EYB_LEAD_COLLECTION_URL)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        result_ids = set([lead['id'] for lead in response.data['results']])
+        assert str(lead_with_both.pk) in result_ids
+        assert {str(lead_without_triage.pk), str(lead_without_user.pk)} not in result_ids
+
     def test_pagination(self, test_user_with_view_permissions):
         """Test that LimitOffsetPagination is enabled for this view"""
         number_of_leads = 3
