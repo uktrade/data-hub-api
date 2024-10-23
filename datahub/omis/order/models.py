@@ -10,8 +10,8 @@ from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 from mptt.fields import TreeForeignKey
 
-from datahub.company_activity.models import CompanyActivity
 from datahub.company.models import Advisor, Company, Contact
+from datahub.company_activity.models import CompanyActivity
 from datahub.core import reversion
 from datahub.core.models import (
     BaseConstantModel,
@@ -359,14 +359,14 @@ class Order(BaseModel):
 
         with transaction.atomic():
             super().save(*args, **kwargs)
-            if not self.company.id:
+            if not self.company_id:
                 return
             CompanyActivity.objects.update_or_create(
                 order_id=self.id,
                 activity_source=CompanyActivity.ActivitySource.order,
                 defaults={
                     'date': self.created_on,
-                    'company_id': self.company.id,
+                    'company_id': self.company_id,
                 },
             )
 
