@@ -146,28 +146,12 @@ def company_with_investment_projects_factory():
 class TestDuplicateCompanyMerger:
     """Tests DuplicateCompanyMerger."""
 
-    # Default expect values for company changes to 0, changed per test.
-    # Usually need to add a new company relation in here for the tests, manually updating
-    # the number of relations to be merged using the spread operator.
-    base_expected_result = {
-        CompanyActivity: {'company': 0},
-        CompanyExport: {'company': 0},
-        CompanyListItem: {'company': 0},
-        CompanyReferral: {'company': 0},
-        Contact: {'company': 0},
-        EYBLead: {'company': 0},
-        Interaction: {'company': 0, 'companies': 0},
-        InvestmentProject: {field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS},
-        LargeCapitalInvestorProfile: {'investor_company': 0},
-        LargeCapitalOpportunity: {'promoters': 0},
-        LegacyExportWinsToDataHubCompany: {'company': 0},
-        NewExportInteractionReminder: {'company': 0},
-        NoRecentExportInteractionReminder: {'company': 0},
-        Objective: {'company': 0},
-        OneListCoreTeamMember: {'company': 0},
-        Order: {'company': 0},
-        PipelineItem: {'company': 0},
-        Task: {'company': 0},
+    # The model and its fields related to a Company and a count for
+    # how many fields were merged during the company merge.
+    # i.e. {..., Contact: {'company': 0} }
+    base_expected_results = {
+        configuration.model: {field: 0 for field in configuration.fields}
+        for configuration in MERGE_CONFIGURATION
     }
 
     @pytest.mark.parametrize(
@@ -175,13 +159,13 @@ class TestDuplicateCompanyMerger:
         (
             (
                 CompanyFactory,
-                base_expected_result,
+                base_expected_results,
                 True,
             ),
             (
                 company_with_interactions_and_contacts_factory,
                 {
-                    **base_expected_result,
+                    **base_expected_results,
                     CompanyActivity: {'company': 3},
                     Contact: {'company': 3},
                     Interaction: {'company': 3, 'companies': 3},
@@ -191,7 +175,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_contacts_factory,
                 {
-                    **base_expected_result,
+                    **base_expected_results,
                     Contact: {'company': 3},
                 },
                 True,
@@ -199,7 +183,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_referrals_factory,
                 {
-                    **base_expected_result,
+                    **base_expected_results,
                     CompanyActivity: {'company': 3},
                     CompanyReferral: {'company': 3},
                 },
@@ -208,7 +192,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_company_list_items_factory,
                 {
-                    **base_expected_result,
+                    **base_expected_results,
                     CompanyListItem: {'company': 3},
                 },
                 True,
@@ -216,7 +200,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_pipeline_items_factory,
                 {
-                    **base_expected_result,
+                    **base_expected_results,
                     PipelineItem: {'company': 3},
                 },
                 True,
@@ -224,7 +208,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_investment_projects_factory,
                 {
-                    **base_expected_result,
+                    **base_expected_results,
                     CompanyActivity: {'company': 1},
                     InvestmentProject: {
                         field: 1 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
@@ -236,7 +220,7 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_orders_factory,
                 {
-                    **base_expected_result,
+                    **base_expected_results,
                     Contact: {'company': 3},
                     Order: {'company': 3},
 
@@ -246,7 +230,7 @@ class TestDuplicateCompanyMerger:
             (
                 ArchivedCompanyFactory,
                 {
-                    **base_expected_result,
+                    **base_expected_results,
                 },
                 False,
             ),
@@ -318,7 +302,7 @@ class TestDuplicateCompanyMerger:
             result = merge_companies(source_company, target_company, user)
 
         assert result == {
-            **self.base_expected_result,
+            **self.base_expected_results,
             CompanyActivity: {'company': len(source_company_activity_items)},
             CompanyListItem: {'company': len(source_company_list_items)},
             CompanyReferral: {'company': len(source_referrals)},
@@ -404,7 +388,7 @@ class TestDuplicateCompanyMerger:
             company = {'company': 1}
 
         assert result == {
-            **self.base_expected_result,
+            **self.base_expected_results,
             # each interaction has a contact, that's why 4 contacts should be moved
             CompanyActivity: company,
             InvestmentProject: {
