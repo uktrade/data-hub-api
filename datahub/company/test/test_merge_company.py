@@ -26,11 +26,11 @@ from datahub.company.models import (
 from datahub.company.test.factories import (
     AdviserFactory,
     ArchivedCompanyFactory,
-    ExportFactory,
     CompanyExportCountryFactory,
     CompanyExportCountryHistoryFactory,
     CompanyFactory,
     ContactFactory,
+    ExportFactory,
     ObjectiveFactory,
     OneListCoreTeamMemberFactory,
 )

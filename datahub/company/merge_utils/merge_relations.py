@@ -1,12 +1,12 @@
 # Any relations in the company merge which requires additional logic when merging.
+from datahub.company.merge import (
+    _default_object_updater,
+)
 from datahub.company.models import (
     OneListCoreTeamMember,
 )
 from datahub.investment.opportunity.models import LargeCapitalOpportunity
 from datahub.user.company_list.models import CompanyListItem, PipelineItem
-from datahub.company.merge import (
-    _default_object_updater,
-)
 
 
 def company_list_item_updater(list_item, field, target_company, source_company):

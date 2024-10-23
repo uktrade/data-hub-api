@@ -74,7 +74,7 @@ ALLOWED_RELATIONS_FOR_MERGING = {
 
     # Not added to MERGE_CONFIGURATION as filled in as part of the company merge process.
     Company.transferred_to.field,
-    Company.transferred_from.field
+    Company.transferred_from.field,
 }
 
 
@@ -106,14 +106,14 @@ MERGE_CONFIGURATION = [
     MergeConfiguration(InvestmentProject, INVESTMENT_PROJECT_COMPANY_FIELDS, Company),
     MergeConfiguration(LargeCapitalInvestorProfile, ('investor_company',), Company),
     MergeConfiguration(
-        LargeCapitalOpportunity, ('promoters',), Company, large_capital_opportunity_updater
+        LargeCapitalOpportunity, ('promoters',), Company, large_capital_opportunity_updater,
     ),
     MergeConfiguration(Order, ('company',), Company),
     MergeConfiguration(CompanyListItem, ('company',), Company, company_list_item_updater),
     MergeConfiguration(PipelineItem, ('company',), Company, pipeline_item_updater),
     MergeConfiguration(Objective, ('company',), Company),
     MergeConfiguration(
-        OneListCoreTeamMember, ('company',), Company, one_list_core_team_member_updater
+        OneListCoreTeamMember, ('company',), Company, one_list_core_team_member_updater,
     ),
 ]
 
