@@ -1,8 +1,9 @@
 import pytest
 from mptt.exceptions import InvalidMove
 
+from datahub.core.constants import Sector as SectorConstants
 from datahub.core.exceptions import DataHubError
-from datahub.metadata.models import Service
+from datahub.metadata.models import Sector, Service
 from datahub.metadata.test.factories import SectorFactory
 
 pytestmark = pytest.mark.django_db
@@ -72,6 +73,77 @@ def test_sector_name_level_recursive_unsaved():
     sector.parent = sector
     with pytest.raises(DataHubError):
         sector.name
+
+
+@pytest.mark.parametrize(
+    ['segments', 'expected_name'],
+    [
+        (
+            ['Level 0', 'Level 1', 'Level 2'],
+            'Level 0 : Level 1 : Level 2',
+        ),
+        (
+            ['Level 0', 'Level 1', None],
+            'Level 0 : Level 1',
+        ),
+        (
+            ['Level 0', None, None],
+            'Level 0',
+        ),
+        (
+            ['Level 0', '', ''],
+            'Level 0',
+        ),
+        (
+            [None, None, None],
+            '',
+        ),
+    ],
+)
+def test_get_name_from_segments(segments, expected_name):
+    """Tests the correct name is returned from a list of segments."""
+    assert Sector.get_name_from_segments(segments) == expected_name
+
+
+@pytest.mark.parametrize(
+    ['name', 'expected_segments'],
+    [
+        (
+            'Level 0 : Level 1 : Level 2',
+            ('Level 2', 'Level 1'),
+        ),
+        (
+            'Level 0 : Level 1',
+            ('Level 1', 'Level 0'),
+        ),
+        (
+            'Level 0',
+            ('Level 0', None),
+        ),
+        (
+            None,
+            None,
+        ),
+    ],
+)
+def test_get_selected_and_parent_segments(name, expected_segments):
+    """Tests the correct segments are selected from a name."""
+    assert Sector.get_selected_and_parent_segments(name) == expected_segments
+
+
+def test_get_segments_from_sector_instance():
+    """Tests the correct segments are returned from a sector instance."""
+    assert Sector.get_segments_from_sector_instance(
+        Sector.objects.get(pk=SectorConstants.mining.value.id),
+    ) == ('Mining', None, None)
+
+    assert Sector.get_segments_from_sector_instance(
+        Sector.objects.get(pk=SectorConstants.defence_land.value.id),
+    ) == ('Defence', 'Land', None)
+
+    assert Sector.get_segments_from_sector_instance(
+        Sector.objects.get(pk=SectorConstants.renewable_energy_wind.value.id),
+    ) == ('Energy', 'Renewable energy', 'Fixed-bottom offshore wind')
 
 
 def test_service_with_children_has_no_contexts():
