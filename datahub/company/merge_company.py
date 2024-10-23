@@ -27,12 +27,18 @@ from datahub.company.models import (
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.models import CompanyReferral
 from datahub.dnb_api.utils import _get_rollback_version
+from datahub.export_win.models import LegacyExportWinsToDataHubCompany
 from datahub.interaction.models import Interaction
 from datahub.investment.investor_profile.models import LargeCapitalInvestorProfile
 from datahub.investment.opportunity.models import LargeCapitalOpportunity
 from datahub.investment.project.models import InvestmentProject
 from datahub.investment_lead.models import EYBLead
 from datahub.omis.order.models import Order
+from datahub.reminder.models import (
+    NewExportInteractionReminder,
+    NoRecentExportInteractionReminder,
+)
+from datahub.task.models import Task
 from datahub.user.company_list.models import CompanyListItem, PipelineItem
 
 logger = logging.getLogger(__name__)
@@ -58,9 +64,13 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     InvestmentProject.uk_company.field,
     LargeCapitalInvestorProfile.investor_company.field,
     LargeCapitalOpportunity.promoters.field,
+    LegacyExportWinsToDataHubCompany.company.field,
+    NewExportInteractionReminder.company.field,
+    NoRecentExportInteractionReminder.company.field,
     Objective.company.field,
     OneListCoreTeamMember.company.field,
     Order.company.field,
+    Task.company.field,
 
     # Merging is allowed if the source company has export countries, but note that
     # they aren't moved to the target company (these can be manually moved in
@@ -108,7 +118,11 @@ MERGE_CONFIGURATION = [
     MergeConfiguration(
         LargeCapitalOpportunity, ('promoters',), Company, large_capital_opportunity_updater,
     ),
+    MergeConfiguration(LegacyExportWinsToDataHubCompany, ('company',), Company),
     MergeConfiguration(Order, ('company',), Company),
+    MergeConfiguration(NewExportInteractionReminder, ('company',), Company),
+    MergeConfiguration(NoRecentExportInteractionReminder, ('company',), Company),
+    MergeConfiguration(Task, ('company',), Company),
     MergeConfiguration(CompanyListItem, ('company',), Company, company_list_item_updater),
     MergeConfiguration(PipelineItem, ('company',), Company, pipeline_item_updater),
     MergeConfiguration(Objective, ('company',), Company),

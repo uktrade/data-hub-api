@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
+from datahub.core import reversion
 from datahub.task.models import Task
 
 
@@ -176,6 +177,7 @@ class BaseReminder(models.Model):
         return self.event
 
 
+@reversion.register_base_model()
 class NewExportInteractionReminder(BaseReminder):
     """
     New export interaction reminders.
@@ -198,6 +200,7 @@ class NewExportInteractionReminder(BaseReminder):
         return self.interaction.date if self.interaction else self.company.created_on
 
 
+@reversion.register_base_model()
 class NoRecentExportInteractionReminder(BaseReminder):
     """
     No recent export interaction reminders.

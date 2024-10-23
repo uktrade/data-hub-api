@@ -782,6 +782,7 @@ class CustomerResponseToken(models.Model):
         return f'Token: {self.id} ({self.expires_on})'
 
 
+@reversion.register_base_model()
 class LegacyExportWinsToDataHubCompany(models.Model):
     """Maps Legacy Export win to Data Hub company."""
 
