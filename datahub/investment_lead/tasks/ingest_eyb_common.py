@@ -22,7 +22,7 @@ env = environ.Env()
 REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
 BUCKET = f"data-flow-bucket-{env('ENVIRONMENT', default='')}"
 PREFIX = 'data-flow/exports/'
-DATE_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
+DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 
 class BaseEYBFileIngestionTask(CompanyActivityIngestionTask):
@@ -114,8 +114,12 @@ class BaseEYBDataIngestionTask:
         if self._last_ingestion_datetime is None:
             return False
         else:
-            date = datetime.fromisoformat(record['object']['modified'])
-            return date < self._last_ingestion_datetime.replace(tzinfo=None)
+            date_str = record['object']['modified']
+            try:
+                date = datetime.strptime(date_str, DATE_FORMAT)
+            except ValueError:
+                date = datetime.fromisoformat(date_str)
+            return date.timestamp() < self._last_ingestion_datetime.timestamp()
 
     def json_to_model(self, jsn):
         obj = jsn['object']
