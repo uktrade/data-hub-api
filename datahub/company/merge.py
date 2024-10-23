@@ -49,7 +49,16 @@ def _default_object_updater(obj, field, target, source):
 
 
 class MergeConfiguration(NamedTuple):
-    """Specifies how merging should be handled for a particular related model."""
+    """
+    Used to specify which `model` and its `field`/s to be merged into the `source_model`.
+
+    :param model: The model related to the `source_model` model. i.e. `Interaction`.
+    :param fields: The field/s in the given `model` which relates to the company.
+    :param source_model: The model to merge into.
+    :param object_updater: A function to update the related field/s. If the default function is
+        not suitable you can pass your own. For example if you need have unique constraints you
+        need to handle.
+    """
 
     model: Type[models.Model]
     fields: Sequence[str]
