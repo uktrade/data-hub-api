@@ -38,7 +38,14 @@ def _default_object_updater(obj, field, target, source):
         return
 
     setattr(obj, field, target)
-    obj.save(update_fields=(field, 'modified_on'))
+
+    update_fields = (field, )
+
+    # Not all models have modified_on field.
+    if hasattr(obj, 'modified_on'):
+        update_fields = (field, 'modified_on')
+
+    obj.save(update_fields=update_fields)
 
 
 class MergeConfiguration(NamedTuple):
