@@ -89,7 +89,7 @@ class Sector(MPTTModel, _MPTTObjectName, DisableableModel):
         """Gets a sector's full name from a list of segments, some of which can be None."""
         name = ' : '.join([
             segment.strip() for segment in segments
-            if segment is not None
+            if segment not in [None, '']
         ])
         return name
 

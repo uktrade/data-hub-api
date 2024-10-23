@@ -91,6 +91,10 @@ def test_sector_name_level_recursive_unsaved():
             'Level 0',
         ),
         (
+            ['Level 0', '', ''],
+            'Level 0',
+        ),
+        (
             [None, None, None],
             '',
         ),

@@ -57,6 +57,11 @@ class EYBLead(InvestmentLead):
         OTHER = 'OTHER', 'Other'
 
     class HiringChoices(models.TextChoices):
+        # Legacy choices
+        ONE_TO_TEN = '1-10', '1 to 10'
+        ELEVEN_TO_FIFTY = '11-50', '11 to 50'
+
+        # Current choices
         ONE_TO_FIVE = '1-5', '1 to 5'
         SIX_TO_FIFTY = '6-50', '6 to 50'
         FIFTY_ONE_TO_ONE_HUNDRED = '51-100', '51 to 100'
@@ -64,6 +69,15 @@ class EYBLead(InvestmentLead):
         NO_PLANS_TO_HIRE_YET = 'NO_PLANS_TO_HIRE_YET', 'No plans to hire'
 
     class SpendChoices(models.TextChoices):
+        # Legacy choice
+        FIVE_HUNDRED_THOUSAND_ONE_TO_ONE_MILLION = '500001-1000000', '£500,001 - £1,000,000'
+        ONE_MILLION_ONE_TO_TWO_MILLION = '1000001-2000000', '£1,000,001 - £2,000,000'
+        TWO_MILLION_ONE_TO_FIVE_MILLION = '2000001-5000000', '£2,000,001 - £5,000,000'
+        FIVE_MILLION_ONE_TO_TEN_MILLION = '5000001-10000000', '£5,000,001 - £10,000,000'
+        TEN_MILLION_ONE_PLUS = '10000001+', 'More than £10 million'
+        SPECIFIC_AMOUNT = 'SPECIFIC_AMOUNT', 'Specific amount'
+
+        # Current choices
         LESS_THAN_TEN_THOUSAND = '0-9999', 'Less than £10,000'
         TEN_THOUSAND_TO_FIVE_HUNDRED_THOUSAND = '10000-500000', '£10,000 to £500,000'
         FIVE_HUNDRED_THOUSAND_TO_ONE_MILLION = '500000-1000000', '£500,000 to £1 million'
