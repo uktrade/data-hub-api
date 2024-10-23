@@ -42,9 +42,6 @@ class TestDuplicateCompanyMerger:
             @reversion.register_base_model()
             class ModelRelatedToACompany(models.Model):
         ```
-
-        To get the full error message, you may be better to run this test with
-        the -s flag.
         """
         relations = get_related_fields(Company)
         for relation in relations:
