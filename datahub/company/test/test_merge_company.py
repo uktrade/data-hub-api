@@ -784,16 +784,18 @@ class TestDuplicateCompanyMerger:
         LargeCapitalOpportunityFactory(promoters=[source_company])
         LargeCapitalOpportunityFactory(promoters=[target_company])
 
-        # Target has only 1 export before merge
+        # Shared one, should not be merged.
+        LargeCapitalOpportunityFactory(promoters=[target_company, source_company])
+
         assert LargeCapitalOpportunity.objects.filter(
             promoters=target_company,
-        ).count() == 1
+        ).count() == 2
 
         merge_companies(source_company, target_company, adviser)
 
         assert LargeCapitalOpportunity.objects.filter(
             promoters=target_company,
-        ).count() == 2
+        ).count() == 3
 
     def test_company_new_export_interaction_reminder_merges_successfully(self):
         """
