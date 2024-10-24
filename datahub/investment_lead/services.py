@@ -8,11 +8,16 @@ from datahub.investment_lead.models import EYBLead
 
 logger = logging.getLogger(__name__)
 
+
 def link_leads_to_companies():
     queryset = EYBLead.objects.filter(archived=False).filter(
         Q(user_hashed_uuid=F('triage_hashed_uuid')),
         company__isnull=True,
     )
+
+    # match_or_create_company_for_eyb_lead
+    # then
+    # create_or_skip_eyb_lead_as_company_contact
 
 
 def raise_exception_for_eyb_lead_without_company(eyb_lead: EYBLead):
@@ -67,7 +72,7 @@ def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
     return company
 
 
-def process_eyb_lead(eyb_lead):
+def match_or_create_company_for_eyb_lead(eyb_lead):
     """Matches an EYB lead with an existing Company via DnB number
 
     Args:
@@ -100,17 +105,6 @@ def email_matches_contact_on_eyb_lead_company(eyb_lead: EYBLead):
     return count >= 1
 
 
-def create_or_skip_eyb_lead_as_company_contact(eyb_lead: EYBLead):
-    """
-    Given an EYB Lead with a linked company record:
-    Create new company contact if not exists
-    """
-    raise_exception_for_eyb_lead_without_company(eyb_lead)
-
-    if not email_matches_contact_on_eyb_lead_company(eyb_lead):
-        create_company_contact_for_eyb_lead(eyb_lead)
-
-
 def create_company_contact_for_eyb_lead(eyb_lead: EYBLead):
     """
     Given an EYB lead with a linked company record:
@@ -131,3 +125,14 @@ def create_company_contact_for_eyb_lead(eyb_lead: EYBLead):
     contact.save()
 
     return contact
+
+
+def create_or_skip_eyb_lead_as_company_contact(eyb_lead: EYBLead):
+    """
+    Given an EYB Lead with a linked company record:
+    Create new company contact if not exists
+    """
+    raise_exception_for_eyb_lead_without_company(eyb_lead)
+
+    if not email_matches_contact_on_eyb_lead_company(eyb_lead):
+        create_company_contact_for_eyb_lead(eyb_lead)
