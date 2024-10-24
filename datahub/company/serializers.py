@@ -172,6 +172,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
     archived_by = NestedAdviserField(read_only=True)
     primary = serializers.BooleanField()
     valid_email = serializers.BooleanField(required=False, allow_null=True)
+    consent_data = serializers.JSONField(required=False, allow_null=True)
 
     def validate_email(self, value):
         """
@@ -227,8 +228,12 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             'created_on',
             'modified_on',
             'address_area',
+            'consent_data',
         )
-        read_only_fields = ('archived_documents_url_path',)
+        read_only_fields = (
+            'archived_documents_url_path',
+            'consent_data',
+        )
         validators = [
             NotArchivedValidator(),
             RulesBasedValidator(

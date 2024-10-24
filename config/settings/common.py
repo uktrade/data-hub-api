@@ -308,9 +308,7 @@ STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
-    }
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
 APPEND_SLASH = False
@@ -506,9 +504,10 @@ EXPORT_WIN_LEAD_OFFICER_REJECTED_TEMPLATE_ID = env(
     'EXPORT_WIN_LEAD_OFFICER_REJECTED_TEMPLATE_ID',
     default='',
 )
-EXPORT_WIN_CLIENT_REVIEW_WIN_URL=f'{DATAHUB_FRONTEND_BASE_URL}/exportwins/review'
-EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL=\
+EXPORT_WIN_CLIENT_REVIEW_WIN_URL = f'{DATAHUB_FRONTEND_BASE_URL}/exportwins/review'
+EXPORT_WIN_LEAD_OFFICER_REVIEW_WIN_URL = (
     f'{DATAHUB_FRONTEND_BASE_URL}/companies/{{company_id}}/exportwins/{{uuid}}/edit?step=summary'
+)
 
 NOTIFICATION_SUMMARY_THRESHOLD = env.int(
     'NOTIFICATION_SUMMARY_THRESHOLD',
@@ -743,3 +742,5 @@ CSP_SCRIPT_SRC = (
 CSP_FONT_SRC = ("'self'", "'unsafe-inline'")
 CSP_INCLUDE_NONCE_IN = ("script-src",)
 CSP_REPORT_ONLY = False
+
+S3_LOCAL_ENDPOINT_URL = env("S3_LOCAL_ENDPOINT_URL", default='')
