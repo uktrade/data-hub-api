@@ -19,6 +19,7 @@ from datahub.company.test.factories import (
     ContactFactory,
     ExportFactory,
     ObjectiveFactory,
+    OneListCoreTeamMemberFactory,
 )
 from datahub.company_activity.tests.factories import (
     CompanyActivityGreatFactory,
@@ -29,6 +30,7 @@ from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
 )
 from datahub.event.test.factories import EventFactory
+from datahub.export_win.test.factories import LegacyExportWinsToDataHubCompanyFactory
 from datahub.export_win.test.factories import (
     BreakdownFactory,
     CustomerResponseFactory,
@@ -49,8 +51,13 @@ from datahub.investment.project.test.factories import (
     InvestmentProjectTeamMemberFactory,
     InvestmentSectorFactory,
 )
+from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.metadata.test.factories import SectorFactory
 from datahub.omis.order.test.factories import OrderFactory
+from datahub.reminder.test.factories import (
+    NewExportInteractionReminderFactory,
+    NoRecentExportInteractionReminderFactory,
+)
 from datahub.task.test.factories import TaskFactory
 from datahub.user.company_list.test.factories import (
     CompanyListItemFactory,
@@ -66,6 +73,7 @@ MAPPINGS = {
     'company.CompanyExportCountryHistory': CompanyExportCountryHistoryFactory,
     'company.Contact': ContactFactory,
     'company.Objective': ObjectiveFactory,
+    'company.OneListCoreTeamMember': OneListCoreTeamMemberFactory,
     'company_activity.CompanyActivity': CompanyActivityInteractionFactory,
     'company_activity.Great': CompanyActivityGreatFactory,
     'company_activity.IngestedFile': CompanyActivityIngestedFileFactory,
@@ -73,6 +81,7 @@ MAPPINGS = {
     'company_list.PipelineItem': PipelineItemFactory,
     'company_referral.CompanyReferral': CompanyReferralFactory,
     'event.Event': EventFactory,
+    'export_win.LegacyExportWinsToDataHubCompany': LegacyExportWinsToDataHubCompanyFactory,
     'interaction.InteractionDITParticipant': InteractionDITParticipantFactory,
     'interaction.Interaction': CompanyInteractionFactory,
     'interaction.InteractionExportCountry': InteractionExportCountryFactory,
@@ -80,10 +89,13 @@ MAPPINGS = {
     'investment.InvestmentProjectTeamMember': InvestmentProjectTeamMemberFactory,
     'investment.InvestmentActivity': InvestmentActivityFactory,
     'investment.InvestmentSector': InvestmentSectorFactory,
+    'investment_lead.EYBLead': EYBLeadFactory,
     'investor_profile.LargeCapitalInvestorProfile': LargeCapitalInvestorProfileFactory,
     'opportunity.LargeCapitalOpportunity': LargeCapitalOpportunityFactory,
     'metadata.Sector': SectorFactory,
     'order.Order': OrderFactory,
+    'reminder.NewExportInteractionReminder': NewExportInteractionReminderFactory,
+    'reminder.NoRecentExportInteractionReminder': NoRecentExportInteractionReminderFactory,
     'task.Task': TaskFactory,
     'export_win.Win': WinFactory,
     'export_win.CustomerResponse': CustomerResponseFactory,
