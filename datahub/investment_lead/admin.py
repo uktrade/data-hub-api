@@ -8,13 +8,16 @@ class EYBLeadAdmin(admin.ModelAdmin):
         'id',
         'created_on',
         'modified_on',
+        'company_name',
+    ]
+    raw_id_fields = [
         'company',
+        'investment_project',
     ]
     readonly_fields = [
         'id',
         'created_on',
         'modified_on',
-        'investment_projects',
     ]
     fieldsets = [
         (
