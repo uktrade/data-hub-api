@@ -1,9 +1,16 @@
+import json
 import logging
 
+import boto3
+import environ
 import requests
+
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
 from django_pglocks import advisory_lock
+
+from smart_open import open
 
 from datahub.company import consent
 from datahub.company.models import Contact
@@ -19,7 +26,8 @@ logger = logging.getLogger(__name__)
 
 def _automatic_contact_archive(limit=1000, simulate=False):
     contacts_to_be_archived = Contact.objects.filter(
-        archived=False, company__archived=True,
+        archived=False,
+        company__archived=True,
     ).prefetch_related('company')[:limit]
 
     for contact in contacts_to_be_archived:
@@ -28,8 +36,10 @@ def _automatic_contact_archive(limit=1000, simulate=False):
             logger.info(f'[SIMULATION] {message}')
             continue
         contact.archived = True
-        contact.archived_reason = f'Record was automatically archived due to the company ' \
-                                  f'"{contact.company.name}" being archived'
+        contact.archived_reason = (
+            f'Record was automatically archived due to the company '
+            f'"{contact.company.name}" being archived'
+        )
         contact.archived_on = timezone.now()
         contact.save(
             update_fields=[
@@ -129,3 +139,85 @@ def automatic_contact_archive(limit=1000, simulate=False):
         if simulate:
             realtime_message = f'[SIMULATE] {realtime_message}'
         send_realtime_message(realtime_message)
+
+
+def ingest_contact_consent_data():
+    with advisory_lock('consent_import', wait=False) as acquired:
+
+        if not acquired:
+            logger.info(
+                'Another instance of this ingest_contact_consent_data task is already running.',
+            )
+            return
+
+        task = ContactConsentIngestionTask()
+        task.ingest()
+
+
+env = environ.Env()
+REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
+BUCKET = f"data-flow-bucket-{env('ENVIRONMENT', default='')}"
+PREFIX = 'data-flow/exports/'
+CONSENT_PREFIX = f'{PREFIX}MergeConsentsPipeline/'
+
+
+class ContactConsentIngestionTask:
+
+    def get_s3_client(self):
+
+        if settings.S3_LOCAL_ENDPOINT_URL:
+            logger.debug('using local S3 endpoint %s', settings.S3_LOCAL_ENDPOINT_URL)
+            return boto3.client('s3', REGION, endpoint_url=settings.S3_LOCAL_ENDPOINT_URL)
+
+        return boto3.client('s3', REGION)
+
+    def _list_objects(self, bucket_name, prefix):
+        """Returns a list all objects with specified prefix."""
+        s3_client = self.get_s3_client()
+        response = s3_client.list_objects(
+            Bucket=bucket_name,
+            Prefix=prefix,
+        )
+        # Get the list of files, oldest first. Process in that order, so any changes in newer
+        # files take precedence
+        sorted_files = sorted(
+            [object for object in response.get('Contents', {})],
+            key=lambda x: x['LastModified'],
+            reverse=False,
+        )
+        return [file['Key'] for file in sorted_files]
+
+    def ingest(self):
+        logger.info('Checking for new Contact Consent data files')
+        file_keys = self._list_objects(BUCKET, CONSENT_PREFIX)
+        if len(file_keys) == 0:
+            logger.info('No files found in bucket %s matching prefix %s', BUCKET, CONSENT_PREFIX)
+            return
+        for file_key in file_keys:
+            self.sync_file_with_database(file_key)
+            self.delete_file(file_key)
+
+    def sync_file_with_database(self, file_key):
+        logger.info('Syncing file %s', file_key)
+        path = f's3://{BUCKET}/{file_key}'
+
+        with open(path) as s3_file:
+            for line in s3_file:
+                consent_row = json.loads(line)
+                if 'email' not in consent_row or 'consents' not in consent_row:
+                    continue
+                email = consent_row['email']
+                matching_contact = Contact.objects.filter(email=email).first()
+                if not matching_contact:
+                    logger.info('Email %s has no matching datahub contact', email)
+                    continue
+
+                matching_contact.consent_data = consent_row['consents']
+                matching_contact.save()
+
+                logger.info('Updated consents for email %s', email)
+
+    def delete_file(self, file_key):
+        logger.info('Deleting file %s', file_key)
+        s3_client = self.get_s3_client()
+        s3_client.delete_object(Bucket=BUCKET, Key=file_key)
