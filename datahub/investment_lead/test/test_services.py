@@ -177,7 +177,11 @@ class TestEYBLeadServices:
         EYBLeadFactory(company=company)
 
         # Returned in the results
-        expected_eyb_lead = EYBLeadFactory()
+        expected_eyb_lead = EYBLeadFactory(
+            company=None,
+            triage_hashed_uuid='123123123',
+            user_hashed_uuid='123123123'
+        )
 
         # only one result is expected
         result = get_leads_to_process()
@@ -188,15 +192,24 @@ class TestEYBLeadServices:
         assert tester.company is None
 
     def test_link_leads_to_companies(self):
-        eyb_lead = EYBLeadFactory(duns_number='123')
+        eyb_lead = EYBLeadFactory(
+            duns_number='123',
+            company=None,
+            triage_hashed_uuid='123123123',
+            user_hashed_uuid='123123123'
+        )
         company = CompanyFactory(duns_number='123')
 
         assert eyb_lead.company is None
 
+        # link company and create contact
         link_leads_to_companies()
 
+        # company linked assertions
         assert eyb_lead.company is not None
         assert eyb_lead.company == company
+
+        # contact linked assertions
         assert eyb_lead.company.contacts.count() == 1
         contact = eyb_lead.company.contacts.first()
         assert_eyb_lead_matches_contact(contact, eyb_lead)
