@@ -1,6 +1,7 @@
 import logging
 
 from datahub.investment_lead.serializers import CreateEYBLeadUserSerializer
+from datahub.investment_lead.services import link_leads_to_companies
 from datahub.investment_lead.tasks.ingest_eyb_common import (
     BaseEYBDataIngestionTask,
     BaseEYBFileIngestionTask,
@@ -38,6 +39,8 @@ def ingest_eyb_user_data(bucket, file):
     task.ingest(bucket, file)
     logger.info(f'Ingesting file: {file} finished')
 
+    link_leads_to_companies()
+    logger.info('Linked leads to companies')
 
 class EYBUserDataIngestionTask(BaseEYBDataIngestionTask):
     """Long running job to read the user file contents and ingest the records."""

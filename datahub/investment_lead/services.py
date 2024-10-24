@@ -1,10 +1,18 @@
 import logging
 
+from django.db.models import Q, F
+
 from datahub.company.models.company import Company
 from datahub.company.models.contact import Contact
 from datahub.investment_lead.models import EYBLead
 
 logger = logging.getLogger(__name__)
+
+def link_leads_to_companies():
+    queryset = EYBLead.objects.filter(archived=False).filter(
+        Q(user_hashed_uuid=F('triage_hashed_uuid')),
+        company__isnull=True,
+    )
 
 
 def raise_exception_for_eyb_lead_without_company(eyb_lead: EYBLead):
