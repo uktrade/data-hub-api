@@ -93,3 +93,6 @@ tags
 # IDE
 .vscode/
 .idea/
+
+# Localstack
+.localstack/mounted 
