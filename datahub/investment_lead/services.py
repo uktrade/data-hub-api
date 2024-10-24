@@ -24,6 +24,7 @@ def get_leads_to_process():
         company__isnull=True,
     )
 
+
 def raise_exception_for_eyb_lead_without_company(eyb_lead: EYBLead):
     """
     Check for required attributes on EYB Lead to ensure there is a company
