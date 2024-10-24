@@ -10,6 +10,7 @@ from datahub.investment_lead.services import (
     create_or_skip_eyb_lead_as_company_contact,
     email_matches_contact_on_eyb_lead_company,
     find_match_by_duns_number,
+    get_leads_to_process,
     match_or_create_company_for_eyb_lead,
 )
 from datahub.investment_lead.test.factories import EYBLeadFactory
@@ -168,3 +169,19 @@ class TestEYBLeadServices:
         assert eyb_lead.company.contacts.count() == count + 1
         contact = eyb_lead.company.contacts.first()
         assert_eyb_lead_matches_contact(contact, eyb_lead)
+
+    def test_get_leads_to_process(self):
+        # Not returned in the results
+        company = CompanyFactory()
+        EYBLeadFactory(company=company)
+
+        # Returned in the results
+        expected_eyb_lead = EYBLeadFactory()
+
+        # only one result is expected
+        result = get_leads_to_process()
+
+        assert result.count() == 1
+        tester = result[0]
+        assert tester == expected_eyb_lead
+        assert tester.company is None
