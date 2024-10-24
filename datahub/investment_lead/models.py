@@ -9,6 +9,7 @@ from django.core.validators import (
 from django.db import models
 from mptt.fields import TreeForeignKey
 
+from datahub.core import reversion
 from datahub.core.models import ArchivableModel
 
 
@@ -26,6 +27,7 @@ class InvestmentLead(ArchivableModel):
         abstract = True
 
 
+@reversion.register_base_model()
 class EYBLead(InvestmentLead):
     """Model for an Expand Your Business (EYB) investment lead.
 

@@ -38,11 +38,27 @@ def _default_object_updater(obj, field, target, source):
         return
 
     setattr(obj, field, target)
-    obj.save(update_fields=(field, 'modified_on'))
+
+    update_fields = (field, )
+
+    # Not all models have modified_on field.
+    if hasattr(obj, 'modified_on'):
+        update_fields = (field, 'modified_on')
+
+    obj.save(update_fields=update_fields)
 
 
 class MergeConfiguration(NamedTuple):
-    """Specifies how merging should be handled for a particular related model."""
+    """
+    Used to specify which `model` and its `field`/s to be merged into the `source_model`.
+
+    :param model: The model related to the `source_model` model. i.e. `Interaction`.
+    :param fields: The field/s in the given `model` which relates to the company.
+    :param source_model: The model to merge into.
+    :param object_updater: A function to update the related field/s. If the default function is
+        not suitable you can pass your own. For example if you need have unique constraints you
+        need to handle.
+    """
 
     model: Type[models.Model]
     fields: Sequence[str]

@@ -16,7 +16,13 @@ from datahub.company.merge_company import (
     MERGE_CONFIGURATION,
     rollback_merge_companies,
 )
-from datahub.company.models import Company, Contact
+from datahub.company.models import (
+    Company,
+    CompanyExport,
+    Contact,
+    Objective,
+    OneListCoreTeamMember,
+)
 from datahub.company.test.factories import (
     AdviserFactory,
     ArchivedCompanyFactory,
@@ -24,16 +30,39 @@ from datahub.company.test.factories import (
     CompanyExportCountryHistoryFactory,
     CompanyFactory,
     ContactFactory,
+    ExportFactory,
+    ObjectiveFactory,
+    OneListCoreTeamMemberFactory,
 )
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.models import CompanyReferral
 from datahub.company_referral.test.factories import CompanyReferralFactory
+from datahub.export_win.models import LegacyExportWinsToDataHubCompany
+from datahub.export_win.test.factories import LegacyExportWinsToDataHubCompanyFactory
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.factories import CompanyInteractionFactory
+from datahub.investment.investor_profile.models import LargeCapitalInvestorProfile
+from datahub.investment.investor_profile.test.factories import (
+    CompleteLargeCapitalInvestorProfileFactory,
+)
+from datahub.investment.opportunity.models import LargeCapitalOpportunity
+from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
 from datahub.investment.project.models import InvestmentProject
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.investment_lead.models import EYBLead
+from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import OrderFactory
+from datahub.reminder.models import (
+    NewExportInteractionReminder,
+    NoRecentExportInteractionReminder,
+)
+from datahub.reminder.test.factories import (
+    NewExportInteractionReminderFactory,
+    NoRecentExportInteractionReminderFactory,
+)
+from datahub.task.models import Task
+from datahub.task.test.factories import TaskFactory
 from datahub.user.company_list.models import CompanyListItem, PipelineItem
 from datahub.user.company_list.test.factories import (
     CompanyListFactory,
@@ -117,101 +146,61 @@ def company_with_investment_projects_factory():
 class TestDuplicateCompanyMerger:
     """Tests DuplicateCompanyMerger."""
 
+    # The model and its fields related to a Company and a count for
+    # how many fields were merged during the company merge.
+    # i.e. {..., Contact: {'company': 0} }
+    base_expected_results = {
+        configuration.model: {field: 0 for field in configuration.fields}
+        for configuration in MERGE_CONFIGURATION
+    }
+
     @pytest.mark.parametrize(
         'source_company_factory,expected_result,expected_should_archive',
         (
             (
                 CompanyFactory,
-                {
-                    CompanyActivity: {'company': 0},
-                    CompanyListItem: {'company': 0},
-                    CompanyReferral: {'company': 0},
-                    Contact: {'company': 0},
-                    Interaction: {'company': 0, 'companies': 0},
-                    InvestmentProject: {
-                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
-                    },
-                    Order: {'company': 0},
-                    PipelineItem: {'company': 0},
-                },
+                base_expected_results,
                 True,
             ),
             (
                 company_with_interactions_and_contacts_factory,
                 {
+                    **base_expected_results,
                     CompanyActivity: {'company': 3},
-                    CompanyListItem: {'company': 0},
-                    CompanyReferral: {'company': 0},
                     Contact: {'company': 3},
                     Interaction: {'company': 3, 'companies': 3},
-                    InvestmentProject: {
-                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
-                    },
-                    Order: {'company': 0},
-                    PipelineItem: {'company': 0},
                 },
                 True,
             ),
             (
                 company_with_contacts_factory,
                 {
-                    CompanyActivity: {'company': 0},
-                    CompanyListItem: {'company': 0},
-                    CompanyReferral: {'company': 0},
+                    **base_expected_results,
                     Contact: {'company': 3},
-                    Interaction: {'company': 0, 'companies': 0},
-                    InvestmentProject: {
-                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
-                    },
-                    Order: {'company': 0},
-                    PipelineItem: {'company': 0},
                 },
                 True,
             ),
             (
                 company_with_referrals_factory,
                 {
+                    **base_expected_results,
                     CompanyActivity: {'company': 3},
-                    CompanyListItem: {'company': 0},
                     CompanyReferral: {'company': 3},
-                    Contact: {'company': 0},
-                    Interaction: {'company': 0, 'companies': 0},
-                    InvestmentProject: {
-                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
-                    },
-                    Order: {'company': 0},
-                    PipelineItem: {'company': 0},
                 },
                 True,
             ),
             (
                 company_with_company_list_items_factory,
                 {
-                    CompanyActivity: {'company': 0},
+                    **base_expected_results,
                     CompanyListItem: {'company': 3},
-                    CompanyReferral: {'company': 0},
-                    Contact: {'company': 0},
-                    Interaction: {'company': 0, 'companies': 0},
-                    InvestmentProject: {
-                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
-                    },
-                    Order: {'company': 0},
-                    PipelineItem: {'company': 0},
                 },
                 True,
             ),
             (
                 company_with_pipeline_items_factory,
                 {
-                    CompanyActivity: {'company': 0},
-                    CompanyListItem: {'company': 0},
-                    CompanyReferral: {'company': 0},
-                    Contact: {'company': 0},
-                    Interaction: {'company': 0, 'companies': 0},
-                    InvestmentProject: {
-                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
-                    },
-                    Order: {'company': 0},
+                    **base_expected_results,
                     PipelineItem: {'company': 3},
                 },
                 True,
@@ -219,48 +208,29 @@ class TestDuplicateCompanyMerger:
             (
                 company_with_investment_projects_factory,
                 {
+                    **base_expected_results,
                     CompanyActivity: {'company': 1},
-                    CompanyListItem: {'company': 0},
-                    CompanyReferral: {'company': 0},
-                    Contact: {'company': 0},
-                    Interaction: {'company': 0, 'companies': 0},
                     InvestmentProject: {
                         field: 1 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
                     },
-                    Order: {'company': 0},
-                    PipelineItem: {'company': 0},
+
                 },
                 True,
             ),
             (
                 company_with_orders_factory,
                 {
-                    CompanyActivity: {'company': 0},
-                    CompanyListItem: {'company': 0},
-                    CompanyReferral: {'company': 0},
+                    **base_expected_results,
                     Contact: {'company': 3},
-                    Interaction: {'company': 0, 'companies': 0},
-                    InvestmentProject: {
-                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
-                    },
                     Order: {'company': 3},
-                    PipelineItem: {'company': 0},
+
                 },
                 True,
             ),
             (
                 ArchivedCompanyFactory,
                 {
-                    CompanyActivity: {'company': 0},
-                    CompanyListItem: {'company': 0},
-                    CompanyReferral: {'company': 0},
-                    Contact: {'company': 0},
-                    Interaction: {'company': 0, 'companies': 0},
-                    InvestmentProject: {
-                        field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
-                    },
-                    Order: {'company': 0},
-                    PipelineItem: {'company': 0},
+                    **base_expected_results,
                 },
                 False,
             ),
@@ -332,6 +302,7 @@ class TestDuplicateCompanyMerger:
             result = merge_companies(source_company, target_company, user)
 
         assert result == {
+            **self.base_expected_results,
             CompanyActivity: {'company': len(source_company_activity_items)},
             CompanyListItem: {'company': len(source_company_list_items)},
             CompanyReferral: {'company': len(source_referrals)},
@@ -339,9 +310,6 @@ class TestDuplicateCompanyMerger:
             Interaction: {
                 'company': len(source_interactions),
                 'companies': len(source_interactions),
-            },
-            InvestmentProject: {
-                field: 0 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
             },
             Order: {'company': len(source_orders)},
             PipelineItem: {'company': len(source_pipeline_list_items)},
@@ -420,12 +388,9 @@ class TestDuplicateCompanyMerger:
             company = {'company': 1}
 
         assert result == {
+            **self.base_expected_results,
             # each interaction has a contact, that's why 4 contacts should be moved
-            CompanyListItem: {'company': 0},
             CompanyActivity: company,
-            CompanyReferral: {'company': 0},
-            Contact: {'company': 0},
-            Interaction: {'company': 0, 'companies': 0},
             InvestmentProject: {
                 **{
                     field: 1
@@ -436,8 +401,6 @@ class TestDuplicateCompanyMerger:
                     for field in other_fields
                 },
             },
-            Order: {'company': 0},
-            PipelineItem: {'company': 0},
         }
 
         investment_project.refresh_from_db()
@@ -684,6 +647,243 @@ class TestDuplicateCompanyMerger:
         for relation in ALLOWED_RELATIONS_FOR_MERGING:
             assert reversion.is_registered(relation.model), \
                 f'{relation.model} is not registered with reversion'
+
+    def test_one_list_core_team_member_merges_successfully(self):
+        """
+        Test merge is successful.
+        If both the source and target company have the same adviser for the
+        one_list_core_team_member relationship that it is not copied as duplicates
+        are not allowed for the same company.
+        """
+        adviser = AdviserFactory()
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+
+        # Source company with same adviser as target company
+        OneListCoreTeamMemberFactory(adviser=adviser, company=source_company)
+        OneListCoreTeamMemberFactory(adviser=AdviserFactory(), company=source_company)
+
+        OneListCoreTeamMemberFactory(adviser=adviser, company=target_company)
+
+        # Target has only the 1 OneListCoreTeamMember
+        assert OneListCoreTeamMember.objects.filter(
+            company=target_company,
+        ).count() == 1
+
+        merge_companies(source_company, target_company, adviser)
+
+        # Merge successful and target has 2 advisers.
+        assert OneListCoreTeamMember.objects.filter(
+            company=target_company,
+        ).count() == 2
+        # Merge successful and target does not have duplicate advisers.
+        assert OneListCoreTeamMember.objects.filter(
+            company=target_company,
+            adviser=adviser,
+        ).count() == 1
+
+    def test_company_export_merges_successfully(self):
+        """
+        Test company merge successfully merges company `CompanyExport`s.
+        """
+        adviser = AdviserFactory()
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+
+        # Source company with export
+        ExportFactory(company=source_company)
+
+        # Target company with its own export
+        ExportFactory(company=target_company)
+
+        merge_companies(source_company, target_company, adviser)
+
+        # Merge successful and target now has 2 company exports
+        assert CompanyExport.objects.filter(
+            company=target_company,
+        ).count() == 2
+
+    def test_company_objective_merges_successfully(self):
+        """
+        Test company merge successfully merges company `Objective`s.
+        """
+        adviser = AdviserFactory()
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+
+        # Source company with objective
+        ObjectiveFactory(company=source_company)
+
+        # Target company with its own objective
+        ObjectiveFactory(company=target_company)
+
+        # Target has only 1 export before merge
+        assert Objective.objects.filter(
+            company=target_company,
+        ).count() == 1
+
+        merge_companies(source_company, target_company, adviser)
+
+        # Merge successful and target now has 2 objectives.
+        assert Objective.objects.filter(
+            company=target_company,
+        ).count() == 2
+
+    def test_company_eyb_lead_merges_successfully(self):
+        """
+        Test company merge successfully merges company `EYBLead`s.
+        """
+        adviser = AdviserFactory()
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+
+        EYBLeadFactory(company=source_company)
+        EYBLeadFactory(company=target_company)
+
+        # Target has only 1 export before merge
+        assert EYBLead.objects.filter(
+            company=target_company,
+        ).count() == 1
+
+        merge_companies(source_company, target_company, adviser)
+
+        assert EYBLead.objects.filter(
+            company=target_company,
+        ).count() == 2
+
+    def test_company_large_capital_investor_profile_merges_successfully(self):
+        """
+        Test company merge successfully merges company `LargeCapitalInvestorProfile`s.
+        """
+        adviser = AdviserFactory()
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+
+        CompleteLargeCapitalInvestorProfileFactory(investor_company=source_company)
+        CompleteLargeCapitalInvestorProfileFactory(investor_company=target_company)
+
+        # Target has only 1 export before merge
+        assert LargeCapitalInvestorProfile.objects.filter(
+            investor_company=target_company,
+        ).count() == 1
+
+        merge_companies(source_company, target_company, adviser)
+
+        assert LargeCapitalInvestorProfile.objects.filter(
+            investor_company=target_company,
+        ).count() == 2
+
+    def test_company_large_capital_opportunity_merges_successfully(self):
+        """
+        Test company merge successfully merges company `LargeCapitalOpportunity`s.
+        """
+        adviser = AdviserFactory()
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+
+        LargeCapitalOpportunityFactory(promoters=[source_company])
+        LargeCapitalOpportunityFactory(promoters=[target_company])
+
+        # Shared one, should not be merged.
+        LargeCapitalOpportunityFactory(promoters=[target_company, source_company])
+
+        assert LargeCapitalOpportunity.objects.filter(
+            promoters=target_company,
+        ).count() == 2
+
+        merge_companies(source_company, target_company, adviser)
+
+        assert LargeCapitalOpportunity.objects.filter(
+            promoters=target_company,
+        ).count() == 3
+
+    def test_company_new_export_interaction_reminder_merges_successfully(self):
+        """
+        Test company merge successfully merges company `NewExportInteractionReminder`s.
+        """
+        adviser = AdviserFactory()
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+
+        NewExportInteractionReminderFactory(company=source_company)
+        NewExportInteractionReminderFactory(company=target_company)
+
+        # Target has only 1 export before merge
+        assert NewExportInteractionReminder.objects.filter(
+            company=target_company,
+        ).count() == 1
+
+        merge_companies(source_company, target_company, adviser)
+
+        assert NewExportInteractionReminder.objects.filter(
+            company=target_company,
+        ).count() == 2
+
+    def test_company_no_recent_export_interaction_reminder_merges_successfully(self):
+        """
+        Test company merge successfully merges company `NoRecentExportInteractionReminder`s.
+        """
+        adviser = AdviserFactory()
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+
+        NoRecentExportInteractionReminderFactory(company=source_company)
+        NoRecentExportInteractionReminderFactory(company=target_company)
+
+        # Target has only 1 export before merge
+        assert NoRecentExportInteractionReminder.objects.filter(
+            company=target_company,
+        ).count() == 1
+
+        merge_companies(source_company, target_company, adviser)
+
+        assert NoRecentExportInteractionReminder.objects.filter(
+            company=target_company,
+        ).count() == 2
+
+    def test_company_task_merges_successfully(self):
+        """
+        Test company merge successfully merges company `Task`s.
+        """
+        adviser = AdviserFactory()
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+
+        TaskFactory(company=source_company)
+        TaskFactory(company=target_company)
+
+        # Target has only 1 export before merge
+        assert Task.objects.filter(
+            company=target_company,
+        ).count() == 1
+
+        merge_companies(source_company, target_company, adviser)
+
+        assert Task.objects.filter(
+            company=target_company,
+        ).count() == 2
+
+    def test_company_legacy_export_wins_merges_successfully(self):
+        """
+        Test company merge successfully merges company `LegacyExportWinsToDataHubCompany`s.
+        """
+        adviser = AdviserFactory()
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+
+        LegacyExportWinsToDataHubCompanyFactory(company=source_company)
+        LegacyExportWinsToDataHubCompanyFactory(company=target_company)
+
+        # Target has only 1 export before merge
+        assert LegacyExportWinsToDataHubCompany.objects.filter(
+            company=target_company,
+        ).count() == 1
+
+        merge_companies(source_company, target_company, adviser)
+
+        assert LegacyExportWinsToDataHubCompany.objects.filter(
+            company=target_company,
+        ).count() == 2
 
 
 def _company_factory(

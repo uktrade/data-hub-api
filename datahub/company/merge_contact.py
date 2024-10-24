@@ -57,7 +57,7 @@ def merge_contacts(source_contact: Contact, target_contact: Contact, user):
         logger.error(
             f"""MergeNotAllowedError {source_contact.id}
             for contact {target_contact.id}.
-            Invalid bojects: {invalid_obj}""",
+            Invalid objects: {invalid_obj}""",
         )
         raise MergeNotAllowedError()
 
