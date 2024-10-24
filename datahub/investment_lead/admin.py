@@ -4,17 +4,25 @@ from datahub.investment_lead.models import EYBLead
 
 
 class EYBLeadAdmin(admin.ModelAdmin):
+    search_fields = [
+        'triage_hashed_uuid',
+        'user_hashed_uuid',
+        'company_name',
+    ]
     list_display = [
         'id',
         'created_on',
         'modified_on',
+        'company_name',
+    ]
+    raw_id_fields = [
         'company',
+        'investment_projects',
     ]
     readonly_fields = [
         'id',
         'created_on',
         'modified_on',
-        'investment_projects',
     ]
     fieldsets = [
         (
