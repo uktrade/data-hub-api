@@ -23,10 +23,10 @@ dbt-copilot-python==0.2.2
 dj-database-url==2.2.0
 
 # Persistency layer
-psycopg2-binary==2.9.9
+psycopg2-binary==2.9.10
 psycogreen==1.0.2
 
-boto3==1.35.39
+boto3==1.35.44
 
 notifications-python-client==10.0.0
 
@@ -55,11 +55,11 @@ django-debug-toolbar==4.4.6
 werkzeug==3.0.4  # Required by runserver_plus - useful for local dev
 
 WSGIserver==1.3
-gevent==24.10.2
+gevent==24.10.3
 mohawk==1.1.0
 requests==2.32.3
 requests_toolbelt==1.0.0
-sentry_sdk==2.16.0
+sentry_sdk==2.17.0
 
 # RQ and associated helpers
 rq==1.16.2
