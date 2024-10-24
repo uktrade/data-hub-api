@@ -12,6 +12,7 @@ from datahub.investment_lead.tasks.ingest_eyb_common import (
 )
 from datahub.investment_lead.tasks.ingest_eyb_user import (
     ingest_eyb_user_data,
+    USER_PREFIX,
 )
 from datahub.investment_lead.test.test_tasks.utils import (
     file_contents_faker,
@@ -20,6 +21,11 @@ from datahub.investment_lead.test.test_tasks.utils import (
 
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture
+def test_user_file_path():
+    return f'{USER_PREFIX}user.jsonl.gz'
 
 
 class TestEYBCompanyContactLinking:
