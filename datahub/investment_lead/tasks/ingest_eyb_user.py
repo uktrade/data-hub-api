@@ -42,5 +42,6 @@ def ingest_eyb_user_data(bucket, file):
     link_leads_to_companies()
     logger.info('Linked leads to companies')
 
+
 class EYBUserDataIngestionTask(BaseEYBDataIngestionTask):
     """Long running job to read the user file contents and ingest the records."""

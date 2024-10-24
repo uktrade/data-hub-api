@@ -1,6 +1,6 @@
 import logging
 
-from django.db.models import Q, F
+from django.db.models import F, Q
 
 from datahub.company.models.company import Company
 from datahub.company.models.contact import Contact
@@ -10,15 +10,19 @@ logger = logging.getLogger(__name__)
 
 
 def link_leads_to_companies():
-    queryset = EYBLead.objects.filter(archived=False).filter(
+    # queryset = get_leads_to_process()
+    pass
+
+
+def get_leads_to_process():
+    """
+    Returns a list of EYB leads that are not archived
+    and that need company/contact linking
+    """
+    return EYBLead.objects.filter(archived=False).filter(
         Q(user_hashed_uuid=F('triage_hashed_uuid')),
         company__isnull=True,
     )
-
-    # match_or_create_company_for_eyb_lead
-    # then
-    # create_or_skip_eyb_lead_as_company_contact
-
 
 def raise_exception_for_eyb_lead_without_company(eyb_lead: EYBLead):
     """
