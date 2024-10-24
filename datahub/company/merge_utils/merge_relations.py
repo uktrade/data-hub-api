@@ -47,22 +47,6 @@ def large_capital_opportunity_updater(large_capital_opp, field, target_company, 
         _default_object_updater(large_capital_opp, field, target_company, source_company)
 
 
-def large_capital_investor_profile_updater(one_list_item, field, target_company, source_company):
-    """
-    The OneListCoreTeamMember model has a unique together contraint for company and adviser.
-
-    Before copying, if the target company already contains the adviser from the source company,
-    ignore it.
-    """
-    if OneListCoreTeamMember.objects.filter(
-        adviser_id=one_list_item.adviser_id,
-        company=target_company,
-    ).exists():
-        return
-    else:
-        _default_object_updater(one_list_item, field, target_company, source_company)
-
-
 def pipeline_item_updater(pipeline_item, field, target_company, source_company):
     # If there is already a pipeline item for the adviser for the target company
     # delete this item instead as the same company can't be added for the same adviser again
