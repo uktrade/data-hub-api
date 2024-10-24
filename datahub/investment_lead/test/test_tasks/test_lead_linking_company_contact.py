@@ -4,8 +4,8 @@ import pytest
 
 from moto import mock_aws
 
-from datahub.company_activity.models import IngestedFile
 from datahub.company.models import Company, Contact
+from datahub.company_activity.models import IngestedFile
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.tasks.ingest_eyb_common import (
     BUCKET,
