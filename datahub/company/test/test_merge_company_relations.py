@@ -4,7 +4,7 @@ from datahub.company.merge_company import (
     ALLOWED_RELATIONS_FOR_MERGING,
 )
 from datahub.company.models import Company
-from datahub.core.model_helpers import get_related_fields
+from datahub.core.model_helpers import get_related_fields, get_self_referential_relations
 
 
 @pytest.mark.django_db
@@ -44,7 +44,17 @@ class TestDuplicateCompanyMerger:
         ```
         """
         relations = get_related_fields(Company)
+
+        # All fields in the `Company` model which are related to another `Company`.
+        self_related_field_names = [
+            field.name for field in get_self_referential_relations(Company)
+        ]
+
         for relation in relations:
+            # Ignore fields related to the Company itself, the merge tool blocks these.
+            if relation.field.name in self_related_field_names:
+                continue
+
             assert relation.remote_field in ALLOWED_RELATIONS_FOR_MERGING, [(
                 'Required relationship missing from company merge. \n'
                 f'Field: {relation.field.name} \n'

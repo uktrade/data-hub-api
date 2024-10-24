@@ -30,10 +30,10 @@ from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
 )
 from datahub.event.test.factories import EventFactory
-from datahub.export_win.test.factories import LegacyExportWinsToDataHubCompanyFactory
 from datahub.export_win.test.factories import (
     BreakdownFactory,
     CustomerResponseFactory,
+    LegacyExportWinsToDataHubCompanyFactory,
     WinAdviserFactory,
     WinFactory,
 )

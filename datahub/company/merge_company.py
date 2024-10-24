@@ -77,14 +77,6 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     # the front end if required)
     CompanyExportCountry.company.field,
     CompanyExportCountryHistory.company.field,
-
-    # Not added to MERGE_CONFIGURATION as don't want to overwrite the existing companies global
-    # headquarters.
-    Company.global_headquarters.field,
-
-    # Not added to MERGE_CONFIGURATION as filled in as part of the company merge process.
-    Company.transferred_to.field,
-    Company.transferred_from.field,
 }
 
 
@@ -136,6 +128,9 @@ def merge_companies(source_company: Company, target_company: Company, user):
     """
     Merges the source company into the target company.
     MergeNotAllowedError will be raised if the merge is not allowed.
+
+    Companies with relations to another Company are not allowed to be merged. They would need to
+    be manually updated in the Admin before merging.
     """
     is_source_valid, invalid_obj = is_model_a_valid_merge_source(
         source_company,
