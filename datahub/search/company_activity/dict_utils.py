@@ -53,3 +53,19 @@ def activity_investment_dict(obj):
         'created_by': dict_utils.contact_or_adviser_dict(obj.created_by),
         'client_contacts': dict_utils.contact_job_list_of_dicts(obj.client_contacts),
     }
+
+
+def activity_order_dict(obj):
+    """Creates dictionary from an omis order"""
+    if obj is None:
+        return None
+
+    return {
+        'id': str(obj.id),
+        'created_on': obj.created_on,
+        'reference': obj.reference,
+        'primary_market': dict_utils.id_name_dict(obj.primary_market),
+        'uk_region': dict_utils.id_name_dict(obj.uk_region),
+        'contact': dict_utils.contact_job_dict(obj.contact),
+        'created_by': dict_utils.contact_or_adviser_dict(obj.created_by),
+    }

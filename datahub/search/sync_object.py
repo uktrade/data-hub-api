@@ -1,5 +1,7 @@
 from logging import getLogger
 
+from django.core.exceptions import ObjectDoesNotExist
+
 from datahub.core.models import BaseModel
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.search.bulk_sync import sync_objects
@@ -19,7 +21,10 @@ def sync_object(search_app, pk):
     search_model = search_app.search_model
     read_indices, write_index = search_model.get_read_and_write_indices()
 
-    obj = search_app.queryset.get(pk=pk)
+    try:
+        obj = search_app.queryset.get(pk=pk)
+    except ObjectDoesNotExist:
+        return
     sync_objects(
         search_model,
         [obj],
@@ -49,7 +54,11 @@ def sync_object_async(search_app, pk):
         retry_backoff=True,
     )
 
-    obj = search_app.queryset.get(pk=pk)
+    try:
+        obj = search_app.queryset.get(pk=pk)
+    except ObjectDoesNotExist:
+        # object may be deleted
+        return
 
     if obj is not None and issubclass(type(obj), BaseModel):
         logger.info(f'Object {obj.pk} created on: {obj.created_on} '

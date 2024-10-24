@@ -7,6 +7,7 @@ from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import CountryFactory
+from datahub.omis.order.test.factories import OrderFactory
 
 
 class CompanyActivityInteractionFactory(factory.django.DjangoModelFactory):
@@ -23,6 +24,7 @@ class CompanyActivityInteractionFactory(factory.django.DjangoModelFactory):
     interaction = factory.SubFactory(CompanyInteractionFactory)
     referral = None
     investment = None
+    order = None
 
     class Meta:
         model = 'company_activity.CompanyActivity'
@@ -49,6 +51,7 @@ class CompanyActivityReferralFactory(factory.django.DjangoModelFactory):
     referral = factory.SubFactory(CompanyReferralFactory)
     interaction = None
     investment = None
+    order = None
 
     class Meta:
         model = 'company_activity.CompanyActivity'
@@ -75,6 +78,7 @@ class CompanyActivityInvestmentProjectFactory(factory.django.DjangoModelFactory)
     investment = factory.SubFactory(InvestmentProjectFactory)
     interaction = None
     referral = None
+    order = None
 
     class Meta:
         model = 'company_activity.CompanyActivity'
@@ -88,6 +92,33 @@ class CompanyActivityInvestmentProjectFactory(factory.django.DjangoModelFactory)
         """
         obj = model_class(*args, **kwargs)
         return CompanyActivity.objects.get(investment_id=obj.investment_id)
+
+
+class CompanyActivityOmisOrderFactory(factory.django.DjangoModelFactory):
+    """
+    CompanyActivity factory with an omis order.
+    """
+
+    date = now()
+    activity_source = CompanyActivity.ActivitySource.order
+    company = factory.SubFactory(CompanyFactory)
+    investment = None
+    interaction = None
+    referral = None
+    order = factory.SubFactory(OrderFactory)
+
+    class Meta:
+        model = 'company_activity.CompanyActivity'
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """
+        Overwrite the _create to prevent the CompanyActivity from saving to the database.
+        This is due to the Omis Order already creating the CompanyActivity inside its
+        model save.
+        """
+        obj = model_class(*args, **kwargs)
+        return CompanyActivity.objects.get(order_id=obj.order_id)
 
 
 class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):

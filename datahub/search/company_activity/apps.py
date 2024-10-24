@@ -24,11 +24,15 @@ class CompanyActivitySearchApp(SearchApp):
         'investment',
         'investment__investment_type',
         'investment__created_by',
+        'order',
+        'order__contact',
+        'order__primary_market',
+        'order__uk_region',
+        'order__created_by',
     ).prefetch_related(
         'interaction__contacts',
         Prefetch(
             'interaction__dit_participants',
-            queryset=InteractionDITParticipant.objects.select_related(
-                'adviser', 'team'),
+            queryset=InteractionDITParticipant.objects.select_related('adviser', 'team'),
         ),
     )

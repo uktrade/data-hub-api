@@ -50,3 +50,17 @@ def activity_investment_field():
             'client_contacts': fields.contact_job_field(),
         },
     )
+
+
+def activity_order_field():
+    return Object(
+        properties={
+            'id': Keyword(),
+            'created_on': Date(),
+            'reference': Text(index=False),
+            'primary_market': fields.country_field(),
+            'uk_region': fields.area_field(),
+            'contact': fields.contact_job_field(),
+            'created_by': fields.contact_or_adviser_field(),
+        },
+    )

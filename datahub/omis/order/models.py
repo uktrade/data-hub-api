@@ -11,6 +11,7 @@ from django.utils.timezone import now
 from mptt.fields import TreeForeignKey
 
 from datahub.company.models import Advisor, Company, Contact
+from datahub.company_activity.models import CompanyActivity
 from datahub.core import reversion
 from datahub.core.models import (
     BaseConstantModel,
@@ -355,7 +356,19 @@ class Order(BaseModel):
             self.reference = self.generate_reference()
         if not self.public_token:
             self.public_token = self.generate_public_token()
-        return super().save(*args, **kwargs)
+
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            if not self.company_id:
+                return
+            CompanyActivity.objects.update_or_create(
+                order_id=self.id,
+                activity_source=CompanyActivity.ActivitySource.order,
+                defaults={
+                    'date': self.created_on,
+                    'company_id': self.company_id,
+                },
+            )
 
     def get_lead_assignee(self):
         """

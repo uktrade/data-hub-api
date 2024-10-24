@@ -34,8 +34,11 @@ from datahub.company.test.factories import (
     OneListCoreTeamMemberFactory,
     SubsidiaryFactory,
 )
-from datahub.company_activity.tests.factories import CompanyActivityInteractionFactory
-from datahub.company_activity.tests.factories import CompanyActivityInvestmentProjectFactory
+from datahub.company_activity.tests.factories import (
+    CompanyActivityInteractionFactory,
+    CompanyActivityInvestmentProjectFactory,
+    CompanyActivityOmisOrderFactory,
+)
 from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
     CompleteCompanyReferralFactory,
@@ -208,6 +211,12 @@ MAPPING = {
             },
             {
                 'factory': CompanyActivityInvestmentProjectFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [],
+            },
+            {
+                'factory': CompanyActivityOmisOrderFactory,
                 'field': 'company',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [],
@@ -681,6 +690,7 @@ MAPPING = {
             'omis_payment.Payment',
             'omis_payment.Refund',
             'omis_payment.PaymentGatewaySession',
+            'company_activity.CompanyActivity',
         },
         'expired_objects_kwargs': [
             {
