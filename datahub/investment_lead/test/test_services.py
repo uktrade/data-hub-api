@@ -180,7 +180,7 @@ class TestEYBLeadServices:
         expected_eyb_lead = EYBLeadFactory(
             company=None,
             triage_hashed_uuid='123123123',
-            user_hashed_uuid='123123123'
+            user_hashed_uuid='123123123',
         )
 
         # only one result is expected
@@ -196,7 +196,7 @@ class TestEYBLeadServices:
             duns_number='123',
             company=None,
             triage_hashed_uuid='123123123',
-            user_hashed_uuid='123123123'
+            user_hashed_uuid='123123123',
         )
         company = CompanyFactory(duns_number='123')
 

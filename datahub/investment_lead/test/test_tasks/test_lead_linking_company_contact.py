@@ -5,8 +5,8 @@ import pytest
 from moto import mock_aws
 
 from datahub.company_activity.models import IngestedFile
-from datahub.investment_lead.models import EYBLead
 from datahub.company.models import Company, Contact
+from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.tasks.ingest_eyb_common import (
     BUCKET,
 )
@@ -35,7 +35,6 @@ class TestEYBCompanyContactLinking:
         initial_ingested_count = IngestedFile.objects.count()
         file_contents = file_contents_faker(default_faker='user')
         setup_s3_bucket(BUCKET, [test_user_file_path], [file_contents])
-        
         with caplog.at_level(logging.INFO):
             ingest_eyb_user_data(BUCKET, test_user_file_path)
 
