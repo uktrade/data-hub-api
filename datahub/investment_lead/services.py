@@ -14,8 +14,10 @@ def link_leads_to_companies():
 
     for eyb_lead in queryset:
         company = match_or_create_company_for_eyb_lead(eyb_lead)
+        print(company)
         if company:
-            create_or_skip_eyb_lead_as_company_contact(eyb_lead)
+            contact = create_or_skip_eyb_lead_as_company_contact(eyb_lead)
+            print(contact)
 
 
 def get_leads_to_process():
