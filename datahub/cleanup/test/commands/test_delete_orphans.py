@@ -94,7 +94,7 @@ MAPPINGS = {
         ),
         'implicit_related_models': (),
         'ignored_models': (
-            # Ignored as deleted with interactions, investments and referrals
+            # Ignored as deleted with interactions, investments, orders and referrals
             ('company_activity.CompanyActivity', 'company'),
         ),
     },

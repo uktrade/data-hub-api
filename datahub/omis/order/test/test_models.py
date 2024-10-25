@@ -12,6 +12,7 @@ from freezegun import freeze_time
 from rest_framework.exceptions import ValidationError
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company_activity.models import CompanyActivity
 from datahub.core import constants
 from datahub.core.exceptions import APIConflictException
 from datahub.metadata.test.factories import TeamFactory
@@ -764,3 +765,35 @@ def test_order_get_absolute_url():
     assert order.get_absolute_url() == (
         f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["order"]}/{order.pk}'
     )
+
+
+@pytest.mark.django_db
+class TestOrder:
+    """Tests for the Omis Order model."""
+
+    def test_save(self):
+        """
+        Test save also saves to the `CompanyActivity` model and does not save to the
+        `CompanyActivity` model if it already exists.
+        """
+        assert not CompanyActivity.objects.all().exists()
+        order = OrderFactory()
+        assert CompanyActivity.objects.all().count() == 1
+
+        company_activity = CompanyActivity.objects.get(order_id=order.id)
+        assert company_activity.company_id == order.company_id
+        assert company_activity.date == order.created_on
+        assert company_activity.activity_source == CompanyActivity.ActivitySource.order
+
+        # Update and save the order and ensure if doesn't create another
+        # `CompanyActivity` and only updates it
+        new_company = CompanyFactory()
+        order.company_id = new_company.id
+        order.save()
+
+        assert CompanyActivity.objects.all().count() == 1
+        company_activity.refresh_from_db()
+        assert company_activity.company_id == new_company.id
+
+        order.delete()
+        assert not CompanyActivity.objects.all().exists()
