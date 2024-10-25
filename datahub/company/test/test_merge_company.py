@@ -887,6 +887,44 @@ class TestDuplicateCompanyMerger:
         ).count() == 2
 
 
+@pytest.mark.django_db
+class TestCompanyMerge:
+
+    def test_merge_logs_source_and_target_relations(self, caplog):
+        """
+        Tests before we merge companies that the counts of each models relations are logged.
+        """
+        adviser = AdviserFactory()
+        source_company = CompanyFactory()
+        target_company = CompanyFactory()
+
+        LegacyExportWinsToDataHubCompanyFactory(company=target_company)
+        TaskFactory(company=target_company)
+        CompanyInteractionFactory(company=target_company)
+        CompleteLargeCapitalInvestorProfileFactory(investor_company=target_company)
+
+        LegacyExportWinsToDataHubCompanyFactory(company=source_company)
+        TaskFactory(company=source_company)
+        CompanyInteractionFactory(company=source_company)
+        CompleteLargeCapitalInvestorProfileFactory(investor_company=source_company)
+
+        caplog.set_level('INFO')
+        target_planned_changes, _ = get_planned_changes(target_company, MERGE_CONFIGURATION)
+        source_planned_changes, _ = get_planned_changes(source_company, MERGE_CONFIGURATION)
+
+        merge_companies(source_company, target_company, adviser)
+
+        assert (
+            f'Target company with id: {target_company.id} relations before merge:' in caplog.text
+        )
+        assert f'{target_planned_changes}' in caplog.text
+
+        assert (
+            f'Source company with id: {source_company.id} relations before merge:' in caplog.text
+        )
+        assert f'{source_planned_changes}' in caplog.text
+
+
 def _company_factory(
         num_interactions=0,
         num_contacts=0,
