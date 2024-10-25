@@ -17,7 +17,7 @@ env = environ.Env()
 REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
 BUCKET = f"data-flow-bucket-{env('ENVIRONMENT', default='')}"
 PREFIX = 'data-flow/exports/'
-GREAT_PREFIX = f'{PREFIX}GreatGovUKFormsPipeline/'
+GREAT_PREFIX = f'{PREFIX}ExportGreatContactFormData/'
 TWO_HOURS_IN_SECONDS = 7200
 
 

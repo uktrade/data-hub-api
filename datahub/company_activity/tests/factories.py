@@ -6,7 +6,7 @@ from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-from datahub.metadata.test.factories import CountryFactory
+from datahub.metadata.test.factories import CountryFactory, SectorFactory
 from datahub.omis.order.test.factories import OrderFactory
 
 
@@ -126,7 +126,7 @@ class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):
     CompanyActivity ingested file factory
     """
 
-    filepath = 'data-flow/exports/GreatGovUKFormsPipeline/20240920T000000/full_ingestion.jsonl.gz'
+    filepath = 'data-flow/exports/GreatContactFormData/20240920T000000.jsonl.gz'
     created_on = now()
 
     class Meta:
@@ -153,41 +153,58 @@ class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):
         return obj
 
 
-class CompanyActivityGreatFactory(factory.django.DjangoModelFactory):
+class CompanyActivityGreatExportEnquiryFactory(factory.django.DjangoModelFactory):
     """
-    CompanyActivity ingested Great data factory
+    CompanyActivity ingested Great Export Enquiry data factory
     """
 
     form_id = factory.Sequence(lambda n: n)
-    published = now()
-    url = '"http://www.lewis.com/"'
+    url = 'http://www.lewis.com/'
+    form_created_at = now()
+    submission_type = 'magna'
+    submission_action = 'zendesk'
+    company = factory.SubFactory(CompanyFactory)
 
-    attributed_to_type = 'gov-notify-email'
-    attributed_to_id = 'Unknown'
+    meta_sender_ip_address = ''
+    meta_sender_country = factory.SubFactory(CountryFactory)
+    meta_sender_email_address = 'dcarter@example.com'
+    meta_subject = 'DPE Contact form - TEST PRODUCT'
+    meta_full_name = 'TEST TEST'
+    meta_subdomain = 'dit'
+    meta_action_name = 'zendesk'
+    meta_service_name = 'great'
+    meta_spam_control = {}
+    meta_email_address = 'lewis.coulson@digital.trade.gov.uk'
 
-    meta_action_name = 'gov-notify-email'
-    meta_template_id = '07f729e9-8561-4180-a6ff-b14e6be1fef0'
-    meta_email_address = 'dcarter@example.com'
-
-    data_comment = 'some comment'
-    data_country = factory.SubFactory(CountryFactory)
-    data_full_name = 'Charlie Smith'
-    data_website_url = 'http://www.smith-hall.com/'
-    data_company_name = 'Smith-Jenkins'
-    data_company_size = '1-10'
-    data_phone_number = '12345678'
-    data_terms_agreed = False
-    data_email_address = 'christian31@example.com'
-    data_opportunities = ['https://www.hoover-ramos.com/explore/wp-content/explorelogin.php']
-    data_role_in_company = 'test'
-    data_opportunity_urls = 'http://moore.com/listpost.html'
+    data_search = ''
+    data_enquiry = ''
+    data_find_out_about = 'twitter'
+    data_sector_primary = factory.SubFactory(SectorFactory)
+    data_sector_primary_other = ''
+    data_sector_secondary = factory.SubFactory(SectorFactory)
+    data_sector_tertiary = factory.SubFactory(SectorFactory)
+    data_triage_journey = ''
+    data_received_support = True
+    data_product_or_service_1 = 'TEST PRODUCT'
+    data_product_or_service_2 = ''
+    data_product_or_service_3 = ''
+    data_product_or_service_4 = ''
+    data_product_or_service_5 = ''
+    data_about_your_experience = 'neverexported'
+    data_contacted_gov_departments = True
+    data_help_us_further = False
+    data_help_us_improve = 'veryEasy'
 
     actor_type = 'Sender'
     actor_id = 1041
     actor_dit_email_address = 'crystalbrock@example.org'
     actor_dit_is_blacklisted = False
     actor_dit_is_whitelisted = False
-    actor_dit_blacklisted_reason = ''
+    actor_dit_blacklisted_reason = None
+
+    @factory.post_generation
+    def set_markets(self, create, extracted, **kwargs):
+        self.data_markets.set([CountryFactory()])
 
     class Meta:
-        model = 'company_activity.Great'
+        model = 'company_activity.GreatExportEnquiry'
