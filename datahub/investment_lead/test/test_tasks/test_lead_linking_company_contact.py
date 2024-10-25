@@ -5,26 +5,39 @@ import pytest
 from moto import mock_aws
 
 from datahub.company.models import Company, Contact
-from datahub.company.test.factories import CompanyFactory, ContactFactory
-from datahub.company_activity.models import IngestedFile
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.tasks.ingest_eyb_common import (
     BUCKET,
+)
+from datahub.investment_lead.tasks.ingest_eyb_triage import (
+    ingest_eyb_triage_data,
+    TRIAGE_PREFIX,
 )
 from datahub.investment_lead.tasks.ingest_eyb_user import (
     ingest_eyb_user_data,
     USER_PREFIX,
 )
 from datahub.investment_lead.test.factories import (
-    eyb_lead_user_record_faker
+    eyb_lead_user_record_faker,
+    eyb_lead_triage_record_faker,
+    generate_hashed_uuid,
 )
 from datahub.investment_lead.test.test_tasks.utils import (
     file_contents_faker,
     setup_s3_bucket,
 )
+from datahub.investment_lead.test.utils import (
+    assert_eyb_lead_matches_company,
+    assert_eyb_lead_matches_contact,
+)
 
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture
+def test_triage_file_path():
+    return f'{TRIAGE_PREFIX}/triage.jsonl.gz'
 
 
 @pytest.fixture
@@ -34,61 +47,51 @@ def test_user_file_path():
 
 class TestEYBCompanyContactLinking:
     @mock_aws
-    def test_create_company_and_contact_success(self, caplog, test_user_file_path):
+    def test_create_company_and_contact_success(
+        self, caplog, test_triage_file_path, test_user_file_path
+    ):
         """
-        Test that a EYB user data file is ingested correctly and the ingested
-        file is added to the IngestedFile table
         """
         initial_eyb_lead_count = EYBLead.objects.count()
         initial_company_count = Company.objects.count()
         initial_contact_count = Contact.objects.count()
-        initial_ingested_count = IngestedFile.objects.count()
+        hashed_uuid = generate_hashed_uuid()
 
-        records = [
-            # Created record
-            eyb_lead_user_record_faker(),
-            eyb_lead_user_record_faker(),
+        triage_records = [
+            eyb_lead_triage_record_faker({
+                'hashedUuid': hashed_uuid
+            }),
         ]
 
-        file_contents = file_contents_faker(records=records)
-        setup_s3_bucket(BUCKET, [test_user_file_path], [file_contents])
+        user_records = [
+            eyb_lead_user_record_faker({
+                'hashedUuid': hashed_uuid
+            }),
+        ]
+
+        triage_file_contents = file_contents_faker(records=triage_records)
+        user_file_contents = file_contents_faker(records=user_records)
+
+        setup_s3_bucket(
+            BUCKET,
+            [test_triage_file_path, test_user_file_path],
+            [triage_file_contents, user_file_contents]
+        )
+
         with caplog.at_level(logging.INFO):
-            ingest_eyb_user_data(BUCKET, test_user_file_path)
+            ingest_eyb_triage_data(BUCKET, test_triage_file_path)
 
-        assert EYBLead.objects.count() == initial_eyb_lead_count + 2
-        assert IngestedFile.objects.count() == initial_ingested_count + 1
-        assert Company.objects.count() > initial_company_count
-        assert Contact.objects.count() > initial_contact_count
-
-    @mock_aws
-    def test_linking_existing_success(self, caplog, test_user_file_path):
-        """
-        Test that a EYB user data file is ingested correctly and the ingested
-        file is added to the IngestedFile table
-        """
-
-        company = CompanyFactory(duns_number='123')
-
-        initial_eyb_lead_count = EYBLead.objects.count()
-        initial_company_count = Company.objects.count()
-        initial_contact_count = Contact.objects.count()
-        initial_ingested_count = IngestedFile.objects.count()
-
-        records = [
-            # Created record
-            eyb_lead_user_record_faker({'dunsNumber': '123'}),
-        ]
-
-        file_contents = file_contents_faker(records=records)
-        setup_s3_bucket(BUCKET, [test_user_file_path], [file_contents])
         with caplog.at_level(logging.INFO):
             ingest_eyb_user_data(BUCKET, test_user_file_path)
 
         assert EYBLead.objects.count() == initial_eyb_lead_count + 1
-        assert IngestedFile.objects.count() == initial_ingested_count + 1
-        assert Company.objects.count() == initial_company_count
-        assert Contact.objects.count() == initial_contact_count
+        assert Company.objects.count() == initial_company_count + 1
+        assert Contact.objects.count() == initial_contact_count + 1
 
         eyb_lead = EYBLead.objects.all()[0]
-        assert eyb_lead.duns_number == '123'
-        assert eyb_lead.company == company
+        company = Company.objects.all()[0]
+        assert_eyb_lead_matches_company(company, eyb_lead)
+        
+        assert eyb_lead.company.contacts.count() == 1
+        contact = eyb_lead.company.contacts.first()
+        assert_eyb_lead_matches_contact(contact, eyb_lead)
