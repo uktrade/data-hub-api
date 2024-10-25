@@ -221,6 +221,7 @@ class TestDuplicateCompanyMerger:
                 company_with_orders_factory,
                 {
                     **base_expected_results,
+                    CompanyActivity: {'company': 3},
                     Contact: {'company': 3},
                     Order: {'company': 3},
 
