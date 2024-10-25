@@ -204,6 +204,7 @@ class TestEYBLeadServices:
 
         # link company and create contact
         link_leads_to_companies()
+        eyb_lead.refresh_from_db()
 
         # company linked assertions
         assert eyb_lead.company is not None
