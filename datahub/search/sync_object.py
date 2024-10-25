@@ -23,7 +23,11 @@ def sync_object(search_app, pk):
 
     try:
         obj = search_app.queryset.get(pk=pk)
-    except ObjectDoesNotExist:
+    except ObjectDoesNotExist as e:
+        logger.exception(
+            f'An error occurred syncing a {search_app.name} object with id {pk}: {e} '
+            f'Object {search_app.name} may have been deleted before being synced',
+        )
         return
     sync_objects(
         search_model,
@@ -56,8 +60,11 @@ def sync_object_async(search_app, pk):
 
     try:
         obj = search_app.queryset.get(pk=pk)
-    except ObjectDoesNotExist:
-        # object may be deleted
+    except ObjectDoesNotExist as e:
+        logger.exception(
+            f'An error occurred syncing a {search_app.name} object with id {pk}: {e} '
+            f'Object {search_app.name} may have been deleted before being synced',
+        )        # object may be deleted
         return
 
     if obj is not None and issubclass(type(obj), BaseModel):
