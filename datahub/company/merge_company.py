@@ -24,7 +24,7 @@ from datahub.company.models import (
     Objective,
     OneListCoreTeamMember,
 )
-from datahub.company_activity.models import CompanyActivity
+from datahub.company_activity.models import CompanyActivity, GreatExportEnquiry
 from datahub.company_referral.models import CompanyReferral
 from datahub.dnb_api.utils import _get_rollback_version
 from datahub.export_win.models import LegacyExportWinsToDataHubCompany
@@ -57,6 +57,7 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     CompanyReferral.company.field,
     Contact.company.field,
     EYBLead.company.field,
+    GreatExportEnquiry.company.field,
     Interaction.company.field,
     Interaction.companies.field,
     InvestmentProject.investor_company.field,
@@ -105,6 +106,7 @@ MERGE_CONFIGURATION = [
     MergeConfiguration(CompanyExport, ('company',), Company),
     MergeConfiguration(Contact, ('company',), Company),
     MergeConfiguration(EYBLead, ('company',), Company),
+    MergeConfiguration(GreatExportEnquiry, ('company',), Company),
     MergeConfiguration(InvestmentProject, INVESTMENT_PROJECT_COMPANY_FIELDS, Company),
     MergeConfiguration(LargeCapitalInvestorProfile, ('investor_company',), Company),
     MergeConfiguration(
