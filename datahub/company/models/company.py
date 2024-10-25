@@ -680,6 +680,7 @@ class Company(ArchivableModel, BaseModel):
             export_country.delete()
 
 
+@reversion.register_base_model()
 class OneListCoreTeamMember(models.Model):
     """
     Adviser who is a member of the One List Core Team of a company.

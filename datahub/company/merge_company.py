@@ -3,25 +3,42 @@ import logging
 import reversion
 
 from datahub.company.merge import (
-    _default_object_updater,
     is_model_a_valid_merge_source,
     is_model_a_valid_merge_target,
     MergeConfiguration,
     MergeNotAllowedError,
     update_objects,
 )
+from datahub.company.merge_utils.merge_relations import (
+    company_list_item_updater,
+    large_capital_opportunity_updater,
+    one_list_core_team_member_updater,
+    pipeline_item_updater,
+)
 from datahub.company.models import (
     Company,
+    CompanyExport,
     CompanyExportCountry,
     CompanyExportCountryHistory,
     Contact,
+    Objective,
+    OneListCoreTeamMember,
 )
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.models import CompanyReferral
 from datahub.dnb_api.utils import _get_rollback_version
+from datahub.export_win.models import LegacyExportWinsToDataHubCompany
 from datahub.interaction.models import Interaction
+from datahub.investment.investor_profile.models import LargeCapitalInvestorProfile
+from datahub.investment.opportunity.models import LargeCapitalOpportunity
 from datahub.investment.project.models import InvestmentProject
+from datahub.investment_lead.models import EYBLead
 from datahub.omis.order.models import Order
+from datahub.reminder.models import (
+    NewExportInteractionReminder,
+    NoRecentExportInteractionReminder,
+)
+from datahub.task.models import Task
 from datahub.user.company_list.models import CompanyListItem, PipelineItem
 
 logger = logging.getLogger(__name__)
@@ -29,20 +46,31 @@ logger = logging.getLogger(__name__)
 # Merging is not allowed if the source company has any relations that aren't in
 # this list. This is to avoid references to the source company being inadvertently
 # left behind.
+# EXCLUDE RELATIONS: To Exclude relations, add them here, don't add them to MERGE_CONFIGURATION.
 ALLOWED_RELATIONS_FOR_MERGING = {
     # These relations are moved to the target company on merge
     Company._meta.get_field('company_list_items').remote_field,
     Company._meta.get_field('pipeline_list_items').remote_field,
     Company._meta.get_field('wins').remote_field,
     CompanyActivity.company.field,
+    CompanyExport.company.field,
     CompanyReferral.company.field,
     Contact.company.field,
+    EYBLead.company.field,
     Interaction.company.field,
     Interaction.companies.field,
     InvestmentProject.investor_company.field,
     InvestmentProject.intermediate_company.field,
     InvestmentProject.uk_company.field,
+    LargeCapitalInvestorProfile.investor_company.field,
+    LargeCapitalOpportunity.promoters.field,
+    LegacyExportWinsToDataHubCompany.company.field,
+    NewExportInteractionReminder.company.field,
+    NoRecentExportInteractionReminder.company.field,
+    Objective.company.field,
+    OneListCoreTeamMember.company.field,
     Order.company.field,
+    Task.company.field,
 
     # Merging is allowed if the source company has export countries, but note that
     # they aren't moved to the target company (these can be manually moved in
@@ -66,33 +94,33 @@ FIELD_TO_DESCRIPTION_MAPPING = {
 }
 
 
-def _company_list_item_updater(list_item, field, target_company, source_company):
-    # If there is already a list item for the target company, delete this list item instead
-    # as duplicates are not allowed
-    if CompanyListItem.objects.filter(list_id=list_item.list_id, company=target_company).exists():
-        list_item.delete()
-    else:
-        _default_object_updater(list_item, field, target_company, source_company)
-
-
-def _pipeline_item_updater(pipeline_item, field, target_company, source_company):
-    # If there is already a pipeline item for the adviser for the target company
-    # delete this item instead as the same company can't be added for the same adviser again
-    if PipelineItem.objects.filter(adviser=pipeline_item.adviser, company=target_company).exists():
-        pipeline_item.delete()
-    else:
-        _default_object_updater(pipeline_item, field, target_company, source_company)
-
-
+# Models related to a company for merging companies and how to merge them.
+# If its not a simple relation (like OneToMany) then you can specify a function for how each item
+# is merged.
+# Relations NOT added here but included in ALLOWED_RELATIONS_FOR_MERGING will NOT be merged.
 MERGE_CONFIGURATION = [
     MergeConfiguration(Interaction, ('company', 'companies'), Company),
     MergeConfiguration(CompanyReferral, ('company',), Company),
     MergeConfiguration(CompanyActivity, ('company',), Company),
+    MergeConfiguration(CompanyExport, ('company',), Company),
     MergeConfiguration(Contact, ('company',), Company),
+    MergeConfiguration(EYBLead, ('company',), Company),
     MergeConfiguration(InvestmentProject, INVESTMENT_PROJECT_COMPANY_FIELDS, Company),
+    MergeConfiguration(LargeCapitalInvestorProfile, ('investor_company',), Company),
+    MergeConfiguration(
+        LargeCapitalOpportunity, ('promoters',), Company, large_capital_opportunity_updater,
+    ),
+    MergeConfiguration(LegacyExportWinsToDataHubCompany, ('company',), Company),
     MergeConfiguration(Order, ('company',), Company),
-    MergeConfiguration(CompanyListItem, ('company',), Company, _company_list_item_updater),
-    MergeConfiguration(PipelineItem, ('company',), Company, _pipeline_item_updater),
+    MergeConfiguration(NewExportInteractionReminder, ('company',), Company),
+    MergeConfiguration(NoRecentExportInteractionReminder, ('company',), Company),
+    MergeConfiguration(Task, ('company',), Company),
+    MergeConfiguration(CompanyListItem, ('company',), Company, company_list_item_updater),
+    MergeConfiguration(PipelineItem, ('company',), Company, pipeline_item_updater),
+    MergeConfiguration(Objective, ('company',), Company),
+    MergeConfiguration(
+        OneListCoreTeamMember, ('company',), Company, one_list_core_team_member_updater,
+    ),
 ]
 
 
@@ -100,6 +128,9 @@ def merge_companies(source_company: Company, target_company: Company, user):
     """
     Merges the source company into the target company.
     MergeNotAllowedError will be raised if the merge is not allowed.
+
+    Companies with relations to another Company are not allowed to be merged. They would need to
+    be manually updated in the Admin before merging.
     """
     is_source_valid, invalid_obj = is_model_a_valid_merge_source(
         source_company,
@@ -112,7 +143,7 @@ def merge_companies(source_company: Company, target_company: Company, user):
         logger.error(
             f"""MergeNotAllowedError {source_company.id}
             for company {target_company.id}.
-            Invalid bojects: {invalid_obj}""",
+            Invalid objects: {invalid_obj}""",
         )
         raise MergeNotAllowedError()
 
