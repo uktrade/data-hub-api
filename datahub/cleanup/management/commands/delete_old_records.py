@@ -122,9 +122,7 @@ class Command(BaseCleanupCommand):
                 DatetimeLessThanCleanupFilter('created_on', COMPANY_EXPIRY_PERIOD),
                 DatetimeLessThanCleanupFilter('modified_on', COMPANY_EXPIRY_PERIOD),
             ),
-            excluded_relations=(
-                CompanyReferral._meta.get_field('activity'),
-            ),
+            excluded_relations=(CompanyReferral._meta.get_field('activity'),),
         ),
         'interaction.Interaction': ModelCleanupConfig(
             (DatetimeLessThanCleanupFilter('date', INTERACTION_EXPIRY_PERIOD),),
@@ -250,6 +248,7 @@ class Command(BaseCleanupCommand):
             excluded_relations=(
                 Order._meta.get_field('assignees'),
                 Order._meta.get_field('subscribers'),
+                Order._meta.get_field('activity'),
             ),
         ),
         'company.CompanyExport': ModelCleanupConfig(

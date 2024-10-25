@@ -61,7 +61,7 @@ class TestInteraction:
         Test save also saves to the `CompanyActivity` model.
         Test save does not save to the `CompanyActivity` model if it already exists.
         """
-        assert CompanyActivity.objects.all().count() == 0
+        assert not CompanyActivity.objects.all().exists()
         interaction = CompanyInteractionFactory()
         assert CompanyActivity.objects.all().count() == 1
 
