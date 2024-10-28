@@ -14,7 +14,7 @@ from datahub.investment_lead.services import (
     link_leads_to_companies,
     match_or_create_company_for_eyb_lead,
 )
-from datahub.investment_lead.test.factories import EYBLeadFactory
+from datahub.investment_lead.test.factories import EYBLeadFactory, generate_hashed_uuid
 from datahub.investment_lead.test.utils import (
     assert_eyb_lead_matches_company,
     assert_eyb_lead_matches_contact,
@@ -173,14 +173,19 @@ class TestEYBLeadServices:
 
     def test_get_leads_to_process(self):
         # Not returned in the results
-        company = CompanyFactory()
-        EYBLeadFactory(company=company)
+        EYBLeadFactory()
+        EYBLeadFactory(archived=True)
+        EYBLeadFactory(
+            triage_hashed_uuid='a hashed uuid',
+            user_hashed_uuid='another hashed uuid',
+        )
 
         # Returned in the results
+        matching_hashed_uuid = generate_hashed_uuid()
         expected_eyb_lead = EYBLeadFactory(
+            triage_hashed_uuid=matching_hashed_uuid,
+            user_hashed_uuid=matching_hashed_uuid,
             company=None,
-            triage_hashed_uuid='123123123',
-            user_hashed_uuid='123123123',
         )
 
         # only one result is expected

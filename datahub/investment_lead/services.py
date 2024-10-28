@@ -13,9 +13,12 @@ def link_leads_to_companies():
     queryset = get_leads_to_process()
 
     for eyb_lead in queryset:
-        company = match_or_create_company_for_eyb_lead(eyb_lead)
-        if company:
+        try:
+            match_or_create_company_for_eyb_lead(eyb_lead)
             create_or_skip_eyb_lead_as_company_contact(eyb_lead)
+        except Exception as e:
+            logger.error(f'Error linking EYB lead {eyb_lead.pk} to company/contact: {e}.')
+            continue
 
 
 def get_leads_to_process():
@@ -63,11 +66,11 @@ def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
     # Create company record
     company = Company()
     company.duns_number = eyb_lead.duns_number
-    company.name = eyb_lead.company_name
-    company.sector = eyb_lead.sector
-    company.address_1 = eyb_lead.address_1
+    company.name = eyb_lead.company_name  # mandatory
+    company.sector = eyb_lead.sector  # mandatory
+    company.address_1 = eyb_lead.address_1  # mandatory
     company.address_2 = eyb_lead.address_2
-    company.address_town = eyb_lead.address_town
+    company.address_town = eyb_lead.address_town  # mandatory
     company.address_county = eyb_lead.address_county
     if eyb_lead.address_country is None:
         raise ValueError('Address country field is required to create a new company')
