@@ -318,7 +318,6 @@ packaging==22.0
     # via
     #   build
     #   pytest
-    #   python-redis-rate-limit
 pandas==2.2.3
     # via -r requirements.in
 parso==0.8.3
@@ -420,7 +419,7 @@ python-dateutil==2.9.0.post0
     #   opensearch-py
     #   pandas
     #   rq-scheduler
-python-redis-rate-limit==0.0.9
+python-redis-rate-limit==0.0.10
     # via -r requirements.in
 pytz==2022.7
     # via pandas
