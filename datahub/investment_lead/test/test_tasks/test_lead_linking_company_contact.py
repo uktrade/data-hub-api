@@ -1,5 +1,3 @@
-import logging
-
 import pytest
 
 from moto import mock_aws
@@ -49,7 +47,7 @@ def test_user_file_path():
 class TestEYBCompanyContactLinking:
     @mock_aws
     def test_create_company_and_contact_success(
-        self, caplog, test_triage_file_path, test_user_file_path,
+        self, test_triage_file_path, test_user_file_path,
     ):
         """
         Test ingests triage and user data without any pre existing company and contacts
@@ -81,11 +79,8 @@ class TestEYBCompanyContactLinking:
             [triage_file_contents, user_file_contents],
         )
 
-        with caplog.at_level(logging.INFO):
-            ingest_eyb_triage_data(BUCKET, test_triage_file_path)
-
-        with caplog.at_level(logging.INFO):
-            ingest_eyb_user_data(BUCKET, test_user_file_path)
+        ingest_eyb_triage_data(BUCKET, test_triage_file_path)
+        ingest_eyb_user_data(BUCKET, test_user_file_path)
 
         assert EYBLead.objects.count() == initial_eyb_lead_count + 1
         assert Company.objects.count() == initial_company_count + 1
@@ -101,7 +96,7 @@ class TestEYBCompanyContactLinking:
 
     @mock_aws
     def test_linking_existing_company_contact_success(
-        self, caplog, test_triage_file_path, test_user_file_path,
+        self, test_triage_file_path, test_user_file_path,
     ):
         """
         Test ingests triage and user data with pre existing company and contacts
@@ -142,11 +137,8 @@ class TestEYBCompanyContactLinking:
             [triage_file_contents, user_file_contents],
         )
 
-        with caplog.at_level(logging.INFO):
-            ingest_eyb_triage_data(BUCKET, test_triage_file_path)
-
-        with caplog.at_level(logging.INFO):
-            ingest_eyb_user_data(BUCKET, test_user_file_path)
+        ingest_eyb_triage_data(BUCKET, test_triage_file_path)
+        ingest_eyb_user_data(BUCKET, test_user_file_path)
 
         assert EYBLead.objects.count() == initial_eyb_lead_count + 1
         assert Company.objects.count() == initial_company_count

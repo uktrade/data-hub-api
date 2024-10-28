@@ -1,8 +1,13 @@
+import logging
+
+from unittest.mock import patch
+
 import pytest
 
 from django.db import IntegrityError
 
 from datahub.company.models.company import Company
+from datahub.company.models.contact import Contact
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.investment_lead import services
 from datahub.investment_lead.services import (
@@ -195,6 +200,46 @@ class TestEYBLeadServices:
         tester = result[0]
         assert tester == expected_eyb_lead
         assert tester.company is None
+
+    def test_link_leads_to_companies_raises_exception_company(self, caplog):
+        hashed_uuid = generate_hashed_uuid()
+        eyb_lead = EYBLeadFactory(
+            company=None,
+            triage_hashed_uuid=hashed_uuid,
+            user_hashed_uuid=hashed_uuid,
+            address_country_id=None,  # this forces link_leads_to_companies into exception
+        )
+
+        assert eyb_lead.company is None
+
+        # link company and create contact failure
+        with caplog.at_level(logging.ERROR):
+            link_leads_to_companies()
+            assert f'Error linking EYB lead {eyb_lead.pk} to company/contact' in caplog.text
+
+        assert eyb_lead.company is None
+
+    @patch(
+        'datahub.investment_lead.services.match_or_create_company_for_eyb_lead',
+        return_value=None)
+    def test_link_leads_to_companies_raises_exception_contact(self, mock_method, caplog):
+        hashed_uuid = generate_hashed_uuid()
+        eyb_lead = EYBLeadFactory(
+            company=None,
+            triage_hashed_uuid=hashed_uuid,
+            user_hashed_uuid=hashed_uuid,
+        )
+
+        assert eyb_lead.company is None
+        assert Contact.objects.count() == 0
+
+        # link company and create contact failure
+        with caplog.at_level(logging.ERROR):
+            link_leads_to_companies()
+            assert f'Error linking EYB lead {eyb_lead.pk} to company/contact' in caplog.text
+
+        assert eyb_lead.company is None
+        assert Contact.objects.count() == 0
 
     def test_link_leads_to_companies(self):
         eyb_lead = EYBLeadFactory(
