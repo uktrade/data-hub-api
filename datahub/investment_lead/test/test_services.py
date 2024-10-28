@@ -1,8 +1,13 @@
+import logging
+
+from unittest.mock import patch
+
 import pytest
 
 from django.db import IntegrityError
 
 from datahub.company.models.company import Company
+from datahub.company.models.contact import Contact
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.investment_lead import services
 from datahub.investment_lead.services import (
@@ -10,9 +15,11 @@ from datahub.investment_lead.services import (
     create_or_skip_eyb_lead_as_company_contact,
     email_matches_contact_on_eyb_lead_company,
     find_match_by_duns_number,
-    process_eyb_lead,
+    get_leads_to_process,
+    link_leads_to_companies,
+    match_or_create_company_for_eyb_lead,
 )
-from datahub.investment_lead.test.factories import EYBLeadFactory
+from datahub.investment_lead.test.factories import EYBLeadFactory, generate_hashed_uuid
 from datahub.investment_lead.test.utils import (
     assert_eyb_lead_matches_company,
     assert_eyb_lead_matches_contact,
@@ -43,7 +50,7 @@ class TestEYBLeadServices:
         company = CompanyFactory(duns_number='123456789')
         eyb_lead = EYBLeadFactory(duns_number='123456789')
 
-        result = process_eyb_lead(eyb_lead)
+        result = match_or_create_company_for_eyb_lead(eyb_lead)
 
         assert eyb_lead.company is not None
         assert eyb_lead.company == company
@@ -52,7 +59,7 @@ class TestEYBLeadServices:
     def test_add_new_company_from_eyb_lead(self):
         eyb_lead = EYBLeadFactory(duns_number=None)
 
-        company = process_eyb_lead(eyb_lead)
+        company = match_or_create_company_for_eyb_lead(eyb_lead)
 
         company = Company.objects.get(pk=company.pk)
         assert_eyb_lead_matches_company(company, eyb_lead)
@@ -166,5 +173,94 @@ class TestEYBLeadServices:
         create_or_skip_eyb_lead_as_company_contact(eyb_lead)
 
         assert eyb_lead.company.contacts.count() == count + 1
+        contact = eyb_lead.company.contacts.first()
+        assert_eyb_lead_matches_contact(contact, eyb_lead)
+
+    def test_get_leads_to_process(self):
+        # Not returned in the results
+        EYBLeadFactory()
+        EYBLeadFactory(archived=True)
+        EYBLeadFactory(
+            triage_hashed_uuid='a hashed uuid',
+            user_hashed_uuid='another hashed uuid',
+        )
+
+        # Returned in the results
+        matching_hashed_uuid = generate_hashed_uuid()
+        expected_eyb_lead = EYBLeadFactory(
+            triage_hashed_uuid=matching_hashed_uuid,
+            user_hashed_uuid=matching_hashed_uuid,
+            company=None,
+        )
+
+        # only one result is expected
+        result = get_leads_to_process()
+
+        assert result.count() == 1
+        tester = result[0]
+        assert tester == expected_eyb_lead
+        assert tester.company is None
+
+    def test_link_leads_to_companies_raises_exception_company(self, caplog):
+        hashed_uuid = generate_hashed_uuid()
+        eyb_lead = EYBLeadFactory(
+            company=None,
+            triage_hashed_uuid=hashed_uuid,
+            user_hashed_uuid=hashed_uuid,
+            address_country_id=None,  # this forces link_leads_to_companies into exception
+        )
+
+        assert eyb_lead.company is None
+
+        # link company and create contact failure
+        with caplog.at_level(logging.ERROR):
+            link_leads_to_companies()
+            assert f'Error linking EYB lead {eyb_lead.pk} to company/contact' in caplog.text
+
+        assert eyb_lead.company is None
+
+    @patch(
+        'datahub.investment_lead.services.match_or_create_company_for_eyb_lead',
+        return_value=None)
+    def test_link_leads_to_companies_raises_exception_contact(self, mock_method, caplog):
+        hashed_uuid = generate_hashed_uuid()
+        eyb_lead = EYBLeadFactory(
+            company=None,
+            triage_hashed_uuid=hashed_uuid,
+            user_hashed_uuid=hashed_uuid,
+        )
+
+        assert eyb_lead.company is None
+        assert Contact.objects.count() == 0
+
+        # link company and create contact failure
+        with caplog.at_level(logging.ERROR):
+            link_leads_to_companies()
+            assert f'Error linking EYB lead {eyb_lead.pk} to company/contact' in caplog.text
+
+        assert eyb_lead.company is None
+        assert Contact.objects.count() == 0
+
+    def test_link_leads_to_companies(self):
+        eyb_lead = EYBLeadFactory(
+            duns_number='123',
+            company=None,
+            triage_hashed_uuid='123123123',
+            user_hashed_uuid='123123123',
+        )
+        company = CompanyFactory(duns_number='123')
+
+        assert eyb_lead.company is None
+
+        # link company and create contact
+        link_leads_to_companies()
+        eyb_lead.refresh_from_db()
+
+        # company linked assertions
+        assert eyb_lead.company is not None
+        assert eyb_lead.company == company
+
+        # contact linked assertions
+        assert eyb_lead.company.contacts.count() == 1
         contact = eyb_lead.company.contacts.first()
         assert_eyb_lead_matches_contact(contact, eyb_lead)
