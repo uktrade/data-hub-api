@@ -68,7 +68,7 @@ rq-scheduler==0.13.1
 # For logging tables
 tabulate
 
-python-redis-rate-limit==0.0.9
+python-redis-rate-limit==0.0.10
 
 #Tree related
 bigtree
