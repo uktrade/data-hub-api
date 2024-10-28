@@ -20,7 +20,7 @@ python-dateutil==2.9.0.post0
 
 # DBT Platform
 dbt-copilot-python==0.2.2
-dj-database-url==2.2.0
+dj-database-url==2.3.0
 
 # Persistency layer
 psycopg2-binary==2.9.10
