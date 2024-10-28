@@ -343,7 +343,7 @@ virtualenv==20.25.1
     # via pre-commit
 wcwidth==0.2.13
     # via prompt-toolkit
-werkzeug==3.0.4
+werkzeug==3.0.6
     # via -r requirements.in
 whitenoise==6.7.0
     # via -r requirements.in
