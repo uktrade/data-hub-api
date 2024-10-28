@@ -127,6 +127,10 @@ class Contact(ArchivableModel, BaseModel):
         blank=True,
         null=True,
     )
+    consent_data_last_modified = models.DateTimeField(
+        blank=True,
+        null=True,
+    )
 
     def get_absolute_url(self):
         """URL to the object in the Data Hub internal front end."""

@@ -484,14 +484,6 @@ class TestContactConsentIngestionTaskScheduler:
 @pytest.mark.django_db
 class TestContactConsentIngestionTask:
 
-    @override_settings(
-        S3_LOCAL_ENDPOINT_URL='http://localstack',
-    )
-    def test_get_s3_client_returns_local_instance(self):
-        with mock.patch('datahub.company.tasks.contact.boto3.client') as mock_s3_client:
-            ContactConsentIngestionTask().get_s3_client()
-            mock_s3_client.assert_called_with('s3', REGION, endpoint_url='http://localstack')
-
     @mock_aws
     def test_ingest_with_empty_s3_bucket_does_not_call_sync_or_delete(self):
         """
@@ -509,6 +501,7 @@ class TestContactConsentIngestionTask:
             task.delete_file.assert_not_called()
 
     @mock_aws
+    @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_ingest_calls_sync_with_correct_files_order(self, test_files):
         """
         Test that the ingest calls the sync with the files in correct order
@@ -522,10 +515,11 @@ class TestContactConsentIngestionTask:
         ):
             task.ingest()
             task.sync_file_with_database.assert_has_calls(
-                [mock.call(file) for file in test_files],
+                [mock.call(mock.ANY, file) for file in test_files],
             )
 
     @mock_aws
+    @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_ingest_calls_delete_for_all_files(
         self,
         test_files,
@@ -542,7 +536,7 @@ class TestContactConsentIngestionTask:
         ):
             task.ingest()
             task.delete_file.assert_has_calls(
-                [mock.call(file) for file in test_files],
+                [mock.call(mock.ANY, file) for file in test_files],
             )
 
     @mock_aws
@@ -554,7 +548,7 @@ class TestContactConsentIngestionTask:
         row = {}
         filename = f'{CONSENT_PREFIX}file_{uuid.uuid4()}.jsonl'
         upload_file_to_s3(BUCKET, filename, json.dumps(row))
-        ContactConsentIngestionTask().sync_file_with_database(filename)
+        ContactConsentIngestionTask().sync_file_with_database(boto3.client('s3', REGION), filename)
         assert Contact.objects.filter(id=contact.id).first().consent_data is None
 
     @mock_aws
@@ -566,11 +560,12 @@ class TestContactConsentIngestionTask:
         row = {'email': contact.email}
         filename = f'{CONSENT_PREFIX}file_{uuid.uuid4()}.jsonl'
         upload_file_to_s3(BUCKET, filename, json.dumps(row))
-        ContactConsentIngestionTask().sync_file_with_database(filename)
+        ContactConsentIngestionTask().sync_file_with_database(boto3.client('s3', REGION), filename)
         assert Contact.objects.filter(id=contact.id).first().consent_data is None
 
     @mock_aws
-    def test_sync_file_without_matching_email_does_not_update_contact_record(self):
+    @override_settings(ENABLE_CONTACT_CONSENT_INGEST=True)
+    def test_sync_file_without_matching_email_does_not_update_contact(self):
         """
         Test when a row has an email that does not match a contact no changes are made
         """
@@ -581,31 +576,123 @@ class TestContactConsentIngestionTask:
         filename = f'{CONSENT_PREFIX}file_{uuid.uuid4()}.jsonl'
         upload_file_to_s3(BUCKET, filename, json.dumps(row))
         contact = ContactFactory(consent_data='A')
-        ContactConsentIngestionTask().sync_file_with_database(filename)
+        ContactConsentIngestionTask().sync_file_with_database(boto3.client('s3', REGION), filename)
         assert Contact.objects.filter(id=contact.id).first().consent_data == 'A'
         assert Contact.objects.filter(email='not_matching@bar.com').first() is None
 
     @mock_aws
-    def test_sync_file_with_matching_email_updates_contact_record(self):
+    @override_settings(ENABLE_CONTACT_CONSENT_INGEST=True)
+    @pytest.mark.parametrize(
+        'consent_data_last_modified,file_last_modified',
+        (
+            (
+                '2024-08-02T12:00:00',
+                '2023-07-20T12:00:00',
+            ),
+        ),
+    )
+    def test_sync_file_with_matching_email_but_last_modified_check_false_does_not_update_contact(
+        self,
+        consent_data_last_modified,
+        file_last_modified,
+    ):
         """
         Test when a row has an email that matches a contact the consent_data is updated
         """
-        contact = ContactFactory()
+        contact = ContactFactory(
+            consent_data='A',
+            consent_data_last_modified=consent_data_last_modified,
+        )
         row = {
             'email': contact.email,
+            'last_modified': file_last_modified,
             'consents': {'consent': True},
         }
         filename = f'{CONSENT_PREFIX}file_{uuid.uuid4()}.jsonl'
         upload_file_to_s3(BUCKET, filename, json.dumps(row))
-        ContactConsentIngestionTask().sync_file_with_database(filename)
+
+        ContactConsentIngestionTask().sync_file_with_database(boto3.client('s3', REGION), filename)
+        assert Contact.objects.filter(id=contact.id).first().consent_data == 'A'
+
+    @mock_aws
+    @override_settings(ENABLE_CONTACT_CONSENT_INGEST=True)
+    @pytest.mark.parametrize(
+        'consent_data_last_modified,file_last_modified',
+        (
+            (
+                '2023-07-20T12:00:00',
+                '2024-08-02T12:00:00',
+            ),
+            (
+                None,
+                '2024-08-20T12:00:00',
+            ),
+            (
+                '2024-08-20T12:00:00',
+                None,
+            ),
+            (
+                None,
+                None,
+            ),
+        ),
+    )
+    def test_sync_file_with_matching_email_but_last_modified_check_true_does_update_contact(
+        self,
+        consent_data_last_modified,
+        file_last_modified,
+    ):
+        """
+        Test when a row has an email that matches a contact the consent_data is updated
+        """
+        contact = ContactFactory(
+            consent_data='A',
+            consent_data_last_modified=consent_data_last_modified,
+        )
+        row = {
+            'email': contact.email,
+            'last_modified': file_last_modified,
+            'consents': {'consent': True},
+        }
+        filename = f'{CONSENT_PREFIX}file_{uuid.uuid4()}.jsonl'
+        upload_file_to_s3(BUCKET, filename, json.dumps(row))
+
+        ContactConsentIngestionTask().sync_file_with_database(boto3.client('s3', REGION), filename)
         assert Contact.objects.filter(id=contact.id).first().consent_data == {'consent': True}
 
+    @mock_aws
+    @override_settings(ENABLE_CONTACT_CONSENT_INGEST=False)
+    def test_sync_file_with_matching_email_but_ingest_setting_false_does_not_update_contact(self):
+        """
+        Test when a row has an email that matches a contact the consent_data is updated
+        """
+        contact = ContactFactory(
+            consent_data='A',
+            consent_data_last_modified='2023-07-20T12:00:00',
+        )
+        row = {
+            'email': contact.email,
+            'last_modified': '2024-08-02T12:00:00',
+            'consents': {'consent': True},
+        }
+        filename = f'{CONSENT_PREFIX}file_{uuid.uuid4()}.jsonl'
+        upload_file_to_s3(BUCKET, filename, json.dumps(row))
+
+        ContactConsentIngestionTask().sync_file_with_database(boto3.client('s3', REGION), filename)
+        assert Contact.objects.filter(id=contact.id).first().consent_data == 'A'
+
+    @mock_aws
     def test_delete_file_removes_file_using_boto3(self):
         """
         Test that the file is deleted from the bucket
         """
-        with mock.patch('datahub.company.tasks.contact.boto3.client') as mock_s3_client:
-            client = mock.MagicMock()
-            mock_s3_client.return_value = client
-            ContactConsentIngestionTask().delete_file('abc.jsonl')
-            client.delete_object.assert_called_with(Bucket=mock.ANY, Key='abc.jsonl')
+        filename = f'{CONSENT_PREFIX}file_{uuid.uuid4()}.jsonl'
+        upload_file_to_s3(BUCKET, filename, 'test')
+        client = boto3.client('s3', REGION)
+
+        ContactConsentIngestionTask().delete_file(client, filename)
+        with pytest.raises(client.exceptions.NoSuchKey):
+            client.get_object(
+                Bucket=BUCKET,
+                Key=filename,
+            )

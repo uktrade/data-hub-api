@@ -254,6 +254,7 @@ def schedule_jobs():
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,
         description='Import contact consent data',
+        job_timeout=HALF_DAY_IN_SECONDS,
     )
 
 
