@@ -51,10 +51,12 @@ def test_run(s3_stubber, caplog):
         win = Win.objects.get(id=uuid)
         assert win.company_id == company.id
 
-        versions = Version.objects.get_for_object(win)
-        assert versions.count() == 1
+        versions = Version.objects.get_for_object(win).order_by('revision__date_created')
+        assert versions.count() == 2
         comment = versions[0].revision.get_comment()
-        assert comment == 'Legacy export wins company migration.'
+        assert comment == 'Legacy export wins company migration - before.'
+        comment = versions[1].revision.get_comment()
+        assert comment == 'Legacy export wins company migration - after.'
 
     assert f'Company with ID {bad_company_id} does not exist' in caplog.text
 
