@@ -3,6 +3,7 @@ import logging
 import reversion
 
 from datahub.company.merge import (
+    get_planned_changes,
     is_model_a_valid_merge_source,
     is_model_a_valid_merge_target,
     MergeConfiguration,
@@ -150,6 +151,16 @@ def merge_companies(source_company: Company, target_company: Company, user):
     with reversion.create_revision():
         reversion.set_comment('Company merged')
         try:
+            target_changes, _ = get_planned_changes(target_company, MERGE_CONFIGURATION)
+            source_changes, _ = get_planned_changes(source_company, MERGE_CONFIGURATION)
+            logger.info(
+                f'Target company with id: {target_company.id} relations before merge: \n'
+                f'{target_changes}',
+            )
+            logger.info(
+                f'Source company with id: {source_company.id} relations before merge: \n'
+                f'{source_changes}',
+            )
             results = {
                 configuration.model: update_objects(configuration, source_company, target_company)
                 for configuration in MERGE_CONFIGURATION
