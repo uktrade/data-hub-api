@@ -231,8 +231,6 @@ opentelemetry-semantic-conventions==0.43b0
     #   opentelemetry-sdk
 opentelemetry-util-http==0.43b0
     # via opentelemetry-instrumentation-wsgi
-packaging==22.0
-    # via python-redis-rate-limit
 pandas==2.2.3
     # via -r requirements.in
 platformdirs==4.2.0
@@ -262,7 +260,7 @@ python-dateutil==2.9.0.post0
     #   opensearch-py
     #   pandas
     #   rq-scheduler
-python-redis-rate-limit==0.0.9
+python-redis-rate-limit==0.0.10
     # via -r requirements.in
 pytz==2022.7
     # via pandas
