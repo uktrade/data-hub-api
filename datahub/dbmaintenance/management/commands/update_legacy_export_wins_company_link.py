@@ -27,6 +27,12 @@ class Command(CSVBaseCommand):
             if export_win.company_id == company_id:
                 return
 
+            if not simulate:
+                # The win likely will not have its original revision in the History
+                with reversion.create_revision():
+                    reversion.add_to_revision(export_win)
+                    reversion.set_comment('Legacy export wins company migration - before.')
+
             export_win.company_id = company_id
 
             if not simulate:
@@ -36,4 +42,4 @@ class Command(CSVBaseCommand):
                             'company_id',
                         ),
                     )
-                    reversion.set_comment('Legacy export wins company migration.')
+                    reversion.set_comment('Legacy export wins company migration - after.')

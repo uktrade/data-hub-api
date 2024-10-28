@@ -112,10 +112,12 @@ def test_run(s3_stubber, caplog):
         assert win.customer_job_title == customer_job_title
         assert win.customer_email_address == customer_email_address
 
-        versions = Version.objects.get_for_object(win)
-        assert versions.count() == 1
+        versions = Version.objects.get_for_object(win).order_by('revision__date_created')
+        assert versions.count() == 2
         comment = versions[0].revision.get_comment()
-        assert comment == 'Legacy export wins data migration.'
+        assert comment == 'Legacy export wins data migration - before.'
+        comment = versions[1].revision.get_comment()
+        assert comment == 'Legacy export wins data migration - after.'
 
 
 def test_simulate(s3_stubber, caplog):
