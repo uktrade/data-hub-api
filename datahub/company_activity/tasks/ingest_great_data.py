@@ -50,7 +50,7 @@ class GreatIngestionTask:
         except IngestedFile.DoesNotExist:
             return None
 
-    def _create_company(self, data):
+    def _create_company(self, data, form_id):
         company = Company.objects.create(
             name=data.get('business_name', ''),
             company_number=data.get('company_registration_number', ''),
@@ -68,9 +68,11 @@ class GreatIngestionTask:
             primary=True,
             company=company,
         )
+        logger.info(f'Could not match company for Great Export Enquiry: {form_id}.'
+                    'Created new company with id: {company.id}.')
         return company
 
-    def _get_company(self, data):
+    def _get_company(self, data, form_id):
         company = self._get_company_by_companies_house_num(
             data.get('company_registration_number'),
         )
@@ -82,7 +84,7 @@ class GreatIngestionTask:
         contact = self._get_company_contact(data)
         if contact and contact.company:
             return contact.company
-        return self._create_company(data)
+        return self._create_company(data, form_id)
 
     def _get_company_by_companies_house_num(self, companies_house_num):
         if not companies_house_num:
@@ -141,6 +143,8 @@ class GreatIngestionTask:
             return None
 
     def _get_sector(self, sector, form_id):
+        if not sector:
+            return None
         try:
             # The form only allows top level sectors to be selected
             sector = Sector.objects.get(segment=sector, level=0)
@@ -212,7 +216,7 @@ class GreatIngestionTask:
             'form_created_at': jsn.get('created_at'),
             'submission_type': jsn.get('submission_action', ''),
             'submission_action': jsn.get('submission_type', ''),
-            'company': self._get_company(data),
+            'company': self._get_company(data, form_id),
 
             'meta_sender_ip_address': meta.get('sender_ip_address', ''),
             'meta_sender_country': self._country_from_iso_code(
