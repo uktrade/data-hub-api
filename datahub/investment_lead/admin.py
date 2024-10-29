@@ -8,6 +8,7 @@ class EYBLeadAdmin(admin.ModelAdmin):
         'triage_hashed_uuid',
         'user_hashed_uuid',
         'company_name',
+        'id',
     ]
     list_display = [
         'id',
