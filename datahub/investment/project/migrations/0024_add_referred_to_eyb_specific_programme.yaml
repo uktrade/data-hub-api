@@ -1,0 +1,3 @@
+- model: investment.specificprogramme
+  pk: 3902b516-e553-4f54-b389-0a5db87ea507
+  fields: { disabled_on: null, name: Referred to EYB }
