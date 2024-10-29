@@ -25,7 +25,7 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
         values = self.request.query_params.getlist('value')
 
         if country_ids:
-            queryset = queryset.filter(company_location__id__in=country_ids)
+            queryset = queryset.filter(address_country__id__in=country_ids)
         if company_name:
             queryset = queryset.filter(company__name__icontains=company_name)
         if sector_ids:
