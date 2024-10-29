@@ -222,7 +222,7 @@ class TestGreatIngestionTasks:
         assert result.company == company
 
     @pytest.mark.django_db
-    def test_unmapped_company(self):
+    def test_unmapped_company(self, caplog):
         """
         Test that when a company can't be mapped based on Companies
         House number, name, or contact, then a new company record
@@ -251,7 +251,10 @@ class TestGreatIngestionTasks:
             }}
         """
         task = GreatIngestionTask()
-        task.json_to_model(json.loads(data))
+        with caplog.at_level(logging.INFO):
+            task.json_to_model(json.loads(data))
+            assert 'Could not match company for Great Export Enquiry: 5249.' \
+                'Created new company with id: ' in caplog.text
         result = GreatExportEnquiry.objects.get(form_id='5249').company
         assert result.name == name
         expected_size = EmployeeRange.objects.get(name='50 to 249')
