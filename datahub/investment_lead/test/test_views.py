@@ -247,7 +247,7 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         country_ids_in_results = set(
-            [lead['address']['country']['id'] for lead in response.data['results']]
+            [lead['address']['country']['id'] for lead in response.data['results']],
         )
         assert {str(default_country.pk)} == country_ids_in_results
 
