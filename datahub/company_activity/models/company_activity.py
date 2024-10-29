@@ -51,7 +51,7 @@ class CompanyActivity(models.Model):
     )
 
     # A single company activity must have one of the following relationships, but not multiple.
-    interaction = models.ForeignKey(
+    interaction = models.OneToOneField(
         'interaction.Interaction',
         unique=True,
         null=True,
@@ -59,11 +59,11 @@ class CompanyActivity(models.Model):
         related_name='activity',
         on_delete=models.CASCADE,
         help_text=(
-            'If related to an interaction, must not have relations to any other activity '
+            'If related to an Interaction, must not have relations to any other activity '
             '(referral, event etc)'
         ),
     )
-    referral = models.ForeignKey(
+    referral = models.OneToOneField(
         'company_referral.CompanyReferral',
         unique=True,
         null=True,
@@ -71,11 +71,11 @@ class CompanyActivity(models.Model):
         related_name='activity',
         on_delete=models.CASCADE,
         help_text=(
-            'If related to an referral, must not have relations to any other activity '
+            'If related to a CompanyReferral, must not have relations to any other activity '
             '(interaction, event etc)'
         ),
     )
-    investment = models.ForeignKey(
+    investment = models.OneToOneField(
         'investment.InvestmentProject',
         unique=True,
         null=True,
@@ -83,10 +83,11 @@ class CompanyActivity(models.Model):
         related_name='activity',
         on_delete=models.CASCADE,
         help_text=(
-            'investment project for company'
+            'InvestmentProject for a company, must not have relations to any other activity '
+            '(interaction, event etc)'
         ),
     )
-    order = models.ForeignKey(
+    order = models.OneToOneField(
         'order.Order',
         unique=True,
         null=True,
@@ -94,7 +95,7 @@ class CompanyActivity(models.Model):
         related_name='activity',
         on_delete=models.CASCADE,
         help_text=(
-            'If related to an omis order, must not have relations to any other activity '
+            'If related to an omis Order, must not have relations to any other activity '
             '(referral, event etc)'
         ),
     )
