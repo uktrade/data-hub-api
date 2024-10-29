@@ -37,11 +37,11 @@ bigtree==0.21.3
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.35.44
+boto3==1.35.49
     # via
     #   -r requirements.in
     #   moto
-botocore==1.35.44
+botocore==1.35.49
     # via
     #   boto3
     #   moto
@@ -97,7 +97,7 @@ dill==0.3.6
     # via pylint
 distlib==0.3.6
     # via virtualenv
-dj-database-url==2.2.0
+dj-database-url==2.3.0
     # via -r requirements.in
 django==4.2.16
     # via
@@ -220,7 +220,7 @@ inflection==0.5.1
     # via -r requirements.in
 iniconfig==1.1.1
     # via pytest
-ipython==8.28.0
+ipython==8.29.0
     # via -r requirements-dev.in
 isort==5.11.4
     # via pylint
@@ -318,7 +318,6 @@ packaging==22.0
     # via
     #   build
     #   pytest
-    #   python-redis-rate-limit
 pandas==2.2.3
     # via -r requirements.in
 parso==0.8.3
@@ -420,7 +419,7 @@ python-dateutil==2.9.0.post0
     #   opensearch-py
     #   pandas
     #   rq-scheduler
-python-redis-rate-limit==0.0.9
+python-redis-rate-limit==0.0.10
     # via -r requirements.in
 pytz==2022.7
     # via pandas
@@ -538,7 +537,7 @@ virtualenv==20.17.1
     # via pre-commit
 wcwidth==0.2.5
     # via prompt-toolkit
-werkzeug==3.0.4
+werkzeug==3.0.6
     # via
     #   -r requirements.in
     #   moto
