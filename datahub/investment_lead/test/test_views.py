@@ -9,7 +9,7 @@ from datahub.core.test_utils import APITestMixin
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.investment_lead.test.utils import assert_retrieved_eyb_lead_data
-from datahub.metadata.models import Sector, Country
+from datahub.metadata.models import Country, Sector
 
 
 EYB_LEAD_COLLECTION_URL = reverse('api-v4:investment-lead:eyb-lead-collection')
@@ -246,7 +246,9 @@ class TestEYBLeadListAPI(APITestMixin):
         response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'country': default_country.pk})
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
-        country_ids_in_results = set([lead['address']['country']['id'] for lead in response.data['results']])
+        country_ids_in_results = set(
+            [lead['address']['country']['id'] for lead in response.data['results']]
+        )
         assert {str(default_country.pk)} == country_ids_in_results
 
     # TODO: complete test with multiple countries (see sector tests above for example):
@@ -256,4 +258,3 @@ class TestEYBLeadListAPI(APITestMixin):
     # TODO: complete test with a non existent country (see sector tests above for example):
     # def test_filter_by_non_existing_country(self, test_user_with_view_permissions):
     #     """Test filtering EYB leads by non existent country is handled without error."""
-
