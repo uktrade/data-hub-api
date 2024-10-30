@@ -35,6 +35,7 @@ from datahub.company.test.factories import (
     SubsidiaryFactory,
 )
 from datahub.company_activity.tests.factories import (
+    CompanyActivityGreatExportEnquiryFactory,
     CompanyActivityInteractionFactory,
     CompanyActivityInvestmentProjectFactory,
     CompanyActivityOmisOrderFactory,
@@ -231,6 +232,12 @@ MAPPING = {
                         'modified_on': COMPANY_DELETE_BEFORE_DATETIME - relativedelta(days=1),
                     },
                 ],
+            },
+            {
+                'factory': CompanyActivityGreatExportEnquiryFactory,
+                'field': 'great_export_enquries',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [],
             },
             {
                 'factory': InvestmentProjectFactory,
