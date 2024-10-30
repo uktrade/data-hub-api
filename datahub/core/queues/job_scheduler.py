@@ -82,6 +82,7 @@ def job_scheduler(
                 args=function_args,
                 kwargs=function_kwargs,
                 description=description,
+                timeout=job_timeout,
             )
         else:
             retry = None
