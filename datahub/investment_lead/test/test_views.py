@@ -251,10 +251,51 @@ class TestEYBLeadListAPI(APITestMixin):
         )
         assert {str(default_country.pk)} == country_ids_in_results
 
-    # TODO: complete test with multiple countries (see sector tests above for example):
-    # def test_filter_by_multiple_countries(self, test_user_with_view_permissions):
-    #     """Test filtering EYB leads by multiple countries."""
+    def test_filter_by_multiple_countries(self, test_user_with_view_permissions):
+        """Test filtering EYB leads by multiple countries."""
+        france_country = Country.objects.get(pk=constants.Country.france.value.id)
+        greece_country = Country.objects.get(pk=constants.Country.greece.value.id)
+        canada_country = Country.objects.get(pk=constants.Country.canada.value.id)
+        italy_country = Country.objects.get(pk=constants.Country.italy.value.id)
+        japan_country = Country.objects.get(pk=constants.Country.japan.value.id)
 
-    # TODO: complete test with a non existent country (see sector tests above for example):
-    # def test_filter_by_non_existing_country(self, test_user_with_view_permissions):
-    #     """Test filtering EYB leads by non existent country is handled without error."""
+        EYBLeadFactory(address_country_id=france_country.id)
+        EYBLeadFactory(address_country_id=greece_country.id)
+        EYBLeadFactory(address_country_id=canada_country.id)
+        EYBLeadFactory(address_country_id=italy_country.id)
+        EYBLeadFactory(address_country_id=japan_country.id)
+
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(EYB_LEAD_COLLECTION_URL)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 5
+
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={
+            'country': [france_country.pk, greece_country.pk],
+        })
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        country_ids_in_results = set(
+            [lead['address']['country']['id'] for lead in response.data['results']]
+        )
+        assert {
+            str(france_country.pk),
+            str(greece_country.pk),
+        } == country_ids_in_results
+
+    def test_filter_by_non_existing_country(self, test_user_with_view_permissions):
+        """Test filtering EYB leads by non existent country is handled without error."""
+        non_existing_country_uuid = uuid.uuid4()
+        country = Country.objects.get(pk=constants.Country.france.value.id)
+        EYBLeadFactory(address_country_id=country.id)
+
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(EYB_LEAD_COLLECTION_URL)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+
+        response = api_client.get(
+            EYB_LEAD_COLLECTION_URL, data={'country': str(non_existing_country_uuid)},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 0
