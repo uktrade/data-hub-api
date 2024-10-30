@@ -11,27 +11,29 @@ from moto import mock_aws
 from sentry_sdk import init
 from sentry_sdk.transport import Transport
 
-from datahub.company_activity.models import Great, IngestedFile
+from datahub.company.models.company import Company
+from datahub.company.models.contact import Contact
+from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.company_activity.models import GreatExportEnquiry, IngestedFile
 from datahub.company_activity.tasks.ingest_company_activity import BUCKET, GREAT_PREFIX
 from datahub.company_activity.tasks.ingest_great_data import (
     DATE_FORMAT, GreatIngestionTask, ingest_great_data, REGION,
 )
 from datahub.company_activity.tests.factories import (
-    CompanyActivityGreatFactory,
     CompanyActivityIngestedFileFactory,
 )
-from datahub.metadata.models import Country
+from datahub.metadata.models import BusinessType, Country, EmployeeRange, Sector
 
 
 @pytest.fixture
 def test_file():
-    filepath = 'datahub/company_activity/tests/test_tasks/fixtures/great/full_ingestion.jsonl.gz'
+    filepath = 'datahub/company_activity/tests/test_tasks/fixtures/great/20241023T000346.jsonl.gz'
     return open(filepath, 'rb')
 
 
 @pytest.fixture
 def test_file_path():
-    return f'{GREAT_PREFIX}20240920T000000/full_ingestion.jsonl.gz'
+    return f'{GREAT_PREFIX}20240920T000000.jsonl.gz'
 
 
 @mock_aws
@@ -73,7 +75,7 @@ class TestGreatIngestionTasks:
         Test that a Great data file is ingested correctly and the ingested file
         is added to the IngestedFile table
         """
-        initial_great_activity_count = Great.objects.count()
+        initial_great_activity_count = GreatExportEnquiry.objects.count()
         initial_ingested_count = IngestedFile.objects.count()
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
@@ -81,51 +83,27 @@ class TestGreatIngestionTasks:
             ingest_great_data(BUCKET, test_file_path)
             assert f'Ingesting file: {test_file_path} started' in caplog.text
             assert f'Ingesting file: {test_file_path} finished' in caplog.text
-        assert Great.objects.count() == initial_great_activity_count + 28
+        assert GreatExportEnquiry.objects.count() == initial_great_activity_count + 7
         assert IngestedFile.objects.count() == initial_ingested_count + 1
 
     @pytest.mark.django_db
     @mock_aws
-    def test_great_data_ingestion_updates_existing(self, test_file, test_file_path):
+    def test_skip_previously_ingested_records(self, test_file_path):
         """
-        Test that for records which have been previously ingested, updated fields
-        have their new values ingested
-        """
-        country = Country.objects.get(id='0350bdb8-5d95-e211-a939-e4115bead28a')
-        CompanyActivityGreatFactory(form_id='9034', data_country=country)
-        setup_s3_bucket(BUCKET)
-        setup_s3_files(BUCKET, test_file, test_file_path)
-        ingest_great_data(BUCKET, test_file_path)
-        updated = Great.objects.get(form_id='9034')
-        assert str(updated.data_country_id) == '876a9ab2-5d95-e211-a939-e4115bead28a'
-        assert updated.actor_dit_is_blacklisted is False
-        assert updated.actor_dit_is_whitelisted is True
-        assert updated.data_full_name == 'Keith Duncan'
-
-    @pytest.mark.django_db
-    @mock_aws
-    def test_skip_unchanged_records(self, test_file_path):
-        """
-        Test that we skip updating records whose published date is older than the last
+        Test that we skip updating records whose created_at date is older than the last
         file ingestion date
         """
         yesterday = datetime.strftime(datetime.now() - timedelta(1), DATE_FORMAT)
         CompanyActivityIngestedFileFactory(created_on=datetime.now())
-        record = json.dumps(dict(
-            object={
-                'id': 'dit:directoryFormsApi:Submission:5249',
-                'published': yesterday,
-                'attributedTo': {
-                    'type': 'dit:directoryFormsApi:SubmissionAction:gov-notify-email',
-                    'id': 'dit:directoryFormsApi:SubmissionType:export-support-service',
-                },
-            },
-        ), default=str)
+        record = json.dumps(dict({
+            'id': '5249',
+            'created_at': yesterday,
+        }), default=str)
         test_file = gzip.compress(record.encode('utf-8'))
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
         ingest_great_data(BUCKET, test_file_path)
-        assert Great.objects.count() == 0
+        assert not GreatExportEnquiry.objects.exists()
 
     @pytest.mark.django_db
     @mock_aws
@@ -140,34 +118,296 @@ class TestGreatIngestionTasks:
             ingest_great_data(BUCKET, test_file_path)
         exception = e.value.args[0]
         assert 'The specified key does not exist' in exception
-        expected = " key: 'data-flow/exports/GreatGovUKFormsPipeline/" \
-            '20240920T000000/full_ingestion.jsonl.gz'
+        expected = " key: 'data-flow/exports/ExportGreatContactFormData/" \
+            '20240920T000000.jsonl.gz'
         assert expected in exception
 
     @pytest.mark.django_db
-    def test_country_code_is_country_name(self):
+    def test_company_house_number_mapping(self):
         """
-        Test that when the country code is a country name string instead
-        of an iso code, we are able to lookup `country` case-insensitively
-        and regardless of whitespacing
+        Test that Company is mapped correctly based on Company House number if
+        supplied
+        """
+        company = CompanyFactory(company_number='123')
+        data = f"""
+            {{
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "data": {{
+                    "company_registration_number": "{company.company_number}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        result = GreatExportEnquiry.objects.get(form_id='5249')
+        assert result.company.name == company.name
+
+    @pytest.mark.django_db
+    def test_company_name_mapping(self):
+        """
+        Test that Company is mapped correctly based on Company name if no
+        number is supplied or matched
+        """
+        company = CompanyFactory(company_number='123')
+        data = f"""
+            {{
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "data": {{
+                    "business_name": "{company.name}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        result = GreatExportEnquiry.objects.get(form_id='5249')
+        assert result.company == company
+        data = f"""
+            {{
+                "id": "5250",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "data": {{
+                    "company_registration_number": 994349,
+                    "business_name": "{company.name}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        result = GreatExportEnquiry.objects.get(form_id='5250')
+        assert result.company == company
+        data = f"""
+            {{
+                "id": "5251",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "data": {{
+                    "company_registration_number": "",
+                    "business_name": "{company.name}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        result = GreatExportEnquiry.objects.get(form_id='5251')
+        assert result.company == company
+
+    @pytest.mark.django_db
+    def test_company_name_mapping_when_duplicates_exist(self):
+        """
+        Test that when matching company name returns multiple results
+        because we already have duplicates in the database any of them
+        are assigned, and we assume the duplicate records will be merged
+        manually later.
+        """
+        name = 'duplicate'
+        CompanyFactory(name=name, company_number='123')
+        CompanyFactory(name=name, company_number='124')
+        data = f"""
+            {{
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "data": {{
+                    "business_name": "{name}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        result = GreatExportEnquiry.objects.get(form_id='5249')
+        assert result.company.name == name
+
+    @pytest.mark.django_db
+    def test_company_contact_mapping(self):
+        """
+        Test that Company is mapped correctly based on contact details if
+        no Companies House number is matched and the business name is not
+        matched
+        """
+        company = CompanyFactory(company_number='123')
+        contact = ContactFactory(company=company)
+        name = 'Some non-existent business'
+        data = f"""
+            {{
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "data": {{
+                    "company_registration_number": "",
+                    "business_name": "{name}",
+                    "first_name": "{contact.first_name}",
+                    "last_name": "{contact.last_name}",
+                    "uk_telephone_number": "{contact.full_telephone_number}",
+                    "email": "{contact.email}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        result = GreatExportEnquiry.objects.get(form_id='5249')
+        assert result.company == company
+
+    @pytest.mark.django_db
+    def test_unmapped_company(self, caplog):
+        """
+        Test that when a company can't be mapped based on Companies
+        House number, name, or contact, then a new company record
+        and a new contact record are created
+        """
+        name = 'Some non-existent business'
+        first_name = 'Ada'
+        last_name = 'Babbage'
+        email = 'test@example.com'
+        phone_number = '07900000000'
+        assert not Company.objects.filter(name=name).exists()
+        data = f"""
+            {{
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "data": {{
+                    "company_registration_number": "",
+                    "business_name": "{name}",
+                    "type": "privatelimitedcompany",
+                    "number_of_employees": "50-249",
+                    "first_name": "{first_name}",
+                    "last_name": "{last_name}",
+                    "uk_telephone_number": "{phone_number}",
+                    "email": "{email}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        with caplog.at_level(logging.INFO):
+            task.json_to_model(json.loads(data))
+            assert 'Could not match company for Great Export Enquiry: 5249.' \
+                'Created new company with id: ' in caplog.text
+        result = GreatExportEnquiry.objects.get(form_id='5249').company
+        assert result.name == name
+        expected_size = EmployeeRange.objects.get(name='50 to 249')
+        assert result.employee_range == expected_size
+        expected_type = BusinessType.objects.get(name='Private limited company')
+        assert result.business_type == expected_type
+        contact_result = Contact.objects.get(company=result)
+        assert contact_result.first_name == first_name
+        assert contact_result.last_name == last_name
+        assert contact_result.email == email
+        assert contact_result.full_telephone_number == phone_number
+        assert contact_result.primary is True
+
+    @pytest.mark.django_db
+    def test_upper_business_size(self):
+        """
+        Test that the upper business size range is mapped correctly
+        """
+        name = 'Some non-existent business'
+        first_name = 'Ada'
+        last_name = 'Babbage'
+        email = 'test@example.com'
+        phone_number = '07900000000'
+        assert not Company.objects.filter(name=name).exists()
+        data = f"""
+            {{
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "data": {{
+                    "company_registration_number": "",
+                    "business_name": "{name}",
+                    "type": "privatelimitedcompany",
+                    "number_of_employees": "500plus",
+                    "first_name": "{first_name}",
+                    "last_name": "{last_name}",
+                    "uk_telephone_number": "{phone_number}",
+                    "email": "{email}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        result = GreatExportEnquiry.objects.get(form_id='5249').company
+        expected_size = EmployeeRange.objects.get(name='500+')
+        assert result.employee_range == expected_size
+
+    @pytest.mark.django_db
+    def test_invalid_business_size(self):
+        """
+        Test that business size that doesn't match our range returns None
+        and does not throw an error
+        """
+        name = 'Some non-existent business'
+        first_name = 'Ada'
+        last_name = 'Babbage'
+        email = 'test@example.com'
+        phone_number = '07900000000'
+        assert not Company.objects.filter(name=name).exists()
+        data = f"""
+            {{
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "data": {{
+                    "company_registration_number": "",
+                    "business_name": "{name}",
+                    "type": "privatelimitedcompany",
+                    "number_of_employees": "50-259",
+                    "first_name": "{first_name}",
+                    "last_name": "{last_name}",
+                    "uk_telephone_number": "{phone_number}",
+                    "email": "{email}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        result = GreatExportEnquiry.objects.get(form_id='5249').company
+        assert result.employee_range is None
+
+    @pytest.mark.django_db
+    def test_sector_mapping(self):
+        """
+        Test that sectors are mapped correctly
+        """
+        primary = Sector.objects.get(segment='Aerospace', level=0)
+        secondary = Sector.objects.get(segment='Defence and Security', level=0)
+        tertiary = Sector.objects.get(segment='Energy', level=0)
+        data = f"""
+            {{
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "data": {{
+                    "sector_primary": "{primary.segment}",
+                    "sector_secondary": "{secondary.segment}",
+                    "sector_tertiary": "{tertiary.segment}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        result = GreatExportEnquiry.objects.get(form_id='5249')
+        assert result.data_sector_primary == primary
+        assert result.data_sector_secondary == secondary
+        assert result.data_sector_tertiary == tertiary
+
+    @pytest.mark.django_db
+    def test_invalid_sector(self):
+        """
+        Test that invalid sectors raise a Sentry alert
         """
         data = """
             {
-                "object": {
-                    "id": "dit:directoryFormsApi:Submission:5249",
-                    "published": "2024-09-19T14:00:34.069Z",
-                    "dit:directoryFormsApi:Submission:Data": {
-                     "country": "South  AfRica "
-                    }
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "data": {
+                    "sector_primary": "Some non-existent sector",
+                    "sector_secondary": ""
                 }
             }
         """
-        initial_count = Great.objects.count()
+        mock_transport = MockSentryTransport()
+        init(transport=mock_transport)
         task = GreatIngestionTask()
         task.json_to_model(json.loads(data))
-        assert Great.objects.count() == initial_count + 1
-        result = Great.objects.get(form_id='5249')
-        assert result.data_country.iso_alpha2_code == 'ZA'
+        sentry_event = mock_transport.events[0].get_event()
+        expected_message = 'Could not match sector: Some non-existent sector, ' + \
+            'for form: 5249'
+        assert sentry_event['logentry']['message'] == expected_message
 
     @pytest.mark.django_db
     def test_invalid_country_code(self):
@@ -178,12 +418,15 @@ class TestGreatIngestionTasks:
         """
         data = """
             {
-                "object": {
-                    "id": "dit:directoryFormsApi:Submission:5249",
-                    "published": "2024-09-19T14:00:34.069Z",
-                    "dit:directoryFormsApi:Submission:Data": {
-                     "country": "ZZ"
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "meta": {
+                    "sender": {
+                        "country_code": "ZZ"
                     }
+                },
+                "data": {
+                    "markets": ["AR", "ZP", "GB"]
                 }
             }
         """
@@ -191,43 +434,57 @@ class TestGreatIngestionTasks:
         init(transport=mock_transport)
         task = GreatIngestionTask()
         task.json_to_model(json.loads(data))
-        result = Great.objects.get(form_id='5249')
-        assert result.data_country is None
-        sentry_event = mock_transport.events[0].get_event()
+        result = GreatExportEnquiry.objects.get(form_id='5249')
+        argentina = Country.objects.get(name='Argentina')
+        uk = Country.objects.get(name='United Kingdom')
+        assert result.meta_sender_country is None
+        assert list(result.data_markets.all()) == [argentina, uk]
+        sentry_event = mock_transport.events[1].get_event()
         expected_message = 'Could not match country with iso code: ZZ, ' + \
+            'for form: 5249'
+        assert sentry_event['logentry']['message'] == expected_message
+        sentry_event = mock_transport.events[0].get_event()
+        expected_message = 'Could not match country with iso code: ZP, ' + \
             'for form: 5249'
         assert sentry_event['logentry']['message'] == expected_message
 
     @pytest.mark.django_db
-    @mock_aws
-    def test_null_url(self, test_file_path):
+    def test_boolean_field_mapping(self):
         """
-        Test that we can ingest records with URL field null
+        Test that boolean fields are mapped correctly
         """
-        initial_count = Great.objects.count()
         data = """
             {
-                "object": {
-                    "id": "dit:directoryFormsApi:Submission:5249",
-                    "published": "2024-09-19T14:00:34.069Z",
-                    "url": null
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "data": {
+                    "contacted_gov_departments": "no",
+                    "received_support": "yes",
+                    "help_us_further": null
                 }
             }
         """
         task = GreatIngestionTask()
         task.json_to_model(json.loads(data))
-        assert Great.objects.count() == initial_count + 1
+        result = GreatExportEnquiry.objects.get(form_id='5249')
+        assert result.data_contacted_gov_departments is False
+        assert result.data_received_support is True
+        assert result.data_help_us_further is None
         data = """
             {
-                "object": {
-                    "id": "dit:directoryFormsApi:Submission:5250",
-                    "published": "2024-09-19T15:00:34.069Z"
+                "id": "5250",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "data": {
+                    "contacted_gov_departments": "yes",
+                    "help_us_further": ""
                 }
             }
         """
-        task = GreatIngestionTask()
         task.json_to_model(json.loads(data))
-        assert Great.objects.count() == initial_count + 2
+        result = GreatExportEnquiry.objects.get(form_id='5250')
+        assert result.data_contacted_gov_departments is True
+        assert result.data_received_support is None
+        assert result.data_help_us_further is None
 
     @pytest.mark.django_db
     @mock_aws
@@ -235,7 +492,7 @@ class TestGreatIngestionTasks:
         """
         Test that we can ingest records with long field values
         """
-        initial_count = Great.objects.count()
+        initial_count = GreatExportEnquiry.objects.count()
         long_text = (
             'Some text string that is longer than 255 characters.'
             'Testing that because our default Char field storage is'
@@ -245,24 +502,14 @@ class TestGreatIngestionTasks:
         )
         data = f"""
             {{
-                "object": {{
-                    "id": "dit:directoryFormsApi:Submission:5249",
-                    "published": "2024-09-19T14:00:34.069Z",
-                    "url": "{long_text}",
-                    "dit:directoryFormsApi:Submission:Data": {{
-                        "comment": "{long_text}",
-                        "opportunity_urls": "{long_text}",
-                        "full_name": "{long_text}",
-                        "website_url": "{long_text}",
-                        "company_name": "{long_text}",
-                        "company_size": "{long_text}",
-                        "phone_number": "{long_text}",
-                        "email_address": "{long_text}",
-                        "role_in_company": "{long_text}"
-                    }}
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069Z",
+                "url": "{long_text}",
+                "data": {{
+                    "triage_journey": "{long_text}"
                 }}
             }}
         """
         task = GreatIngestionTask()
         task.json_to_model(json.loads(data))
-        assert Great.objects.count() == initial_count + 1
+        assert GreatExportEnquiry.objects.count() == initial_count + 1
