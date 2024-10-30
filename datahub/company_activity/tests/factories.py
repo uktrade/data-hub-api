@@ -174,7 +174,7 @@ class CompanyActivityGreatExportEnquiryFactory(factory.django.DjangoModelFactory
     meta_action_name = 'zendesk'
     meta_service_name = 'great'
     meta_spam_control = {}
-    meta_email_address = 'lewis.coulson@digital.trade.gov.uk'
+    meta_email_address = 'meta@example.com'
 
     data_search = ''
     data_enquiry = ''
