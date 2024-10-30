@@ -41,7 +41,7 @@ def _automatic_contact_archive(limit=1000, simulate=False):
             continue
         contact.archived = True
         contact.archived_reason = (
-            f'Record was automatically archived due to the company '
+            'Record was automatically archived due to the company '
             f'"{contact.company.name}" being archived'
         )
         contact.archived_on = timezone.now()
