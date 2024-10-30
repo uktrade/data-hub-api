@@ -4,7 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from datahub.core.queues.constants import EVERY_MINUTE
+from datahub.core.queues.constants import EVERY_MINUTE, THREE_MINUTES_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler, retry_backoff_intervals
 from datahub.core.queues.scheduler import DataHubScheduler
 from datahub.core.test.queues.test_scheduler import PickleableMock
@@ -144,7 +144,7 @@ def test_retry_backoff_returns_zero_when_turned_off():
     assert actual == 0
 
 
-def test_job_scheduler_creates_cron_jobs(queue: DataHubScheduler):
+def test_job_scheduler_creates_cron_jobs_with_default_timeout(queue: DataHubScheduler):
     existing_job_count = len(list(queue.scheduled_jobs()))
     actual_job = job_scheduler(
         function=PickleableMock.queue_handler,
@@ -159,6 +159,25 @@ def test_job_scheduler_creates_cron_jobs(queue: DataHubScheduler):
     assert len(list(queue.scheduled_jobs())) == existing_job_count + 1
     assert actual_job.meta['cron_string'] == EVERY_MINUTE
     assert actual_job.description == 'Test cron'
+    assert actual_job.timeout == THREE_MINUTES_IN_SECONDS
+
+
+def test_job_scheduler_creates_cron_jobs_with_overriden_timeout(queue: DataHubScheduler):
+    existing_job_count = len(list(queue.scheduled_jobs()))
+    actual_job = job_scheduler(
+        function=PickleableMock.queue_handler,
+        function_args=('arg1', 'arg2'),
+        function_kwargs={'test': True},
+        cron=EVERY_MINUTE,
+        description='Test job_timeout cron',
+        job_timeout=500,
+    )
+
+    assert actual_job in queue.scheduled_jobs()
+    assert len(list(queue.scheduled_jobs())) == existing_job_count + 1
+    assert actual_job.meta['cron_string'] == EVERY_MINUTE
+    assert actual_job.description == 'Test job_timeout cron'
+    assert actual_job.timeout == 500
 
 
 def test_job_scheduler_creates_time_delta_jobs(monkeypatch, queue: DataHubScheduler):
