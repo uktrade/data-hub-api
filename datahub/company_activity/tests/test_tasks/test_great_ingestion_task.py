@@ -132,7 +132,7 @@ class TestGreatIngestionTasks:
         data = f"""
             {{
                 "id": "5249",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "data": {{
                     "company_registration_number": "{company.company_number}"
                 }}
@@ -153,7 +153,7 @@ class TestGreatIngestionTasks:
         data = f"""
             {{
                 "id": "5249",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "data": {{
                     "business_name": "{company.name}"
                 }}
@@ -166,7 +166,7 @@ class TestGreatIngestionTasks:
         data = f"""
             {{
                 "id": "5250",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "data": {{
                     "company_registration_number": 994349,
                     "business_name": "{company.name}"
@@ -180,7 +180,7 @@ class TestGreatIngestionTasks:
         data = f"""
             {{
                 "id": "5251",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "data": {{
                     "company_registration_number": "",
                     "business_name": "{company.name}"
@@ -206,7 +206,7 @@ class TestGreatIngestionTasks:
         data = f"""
             {{
                 "id": "5249",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "data": {{
                     "business_name": "{name}"
                 }}
@@ -230,7 +230,7 @@ class TestGreatIngestionTasks:
         data = f"""
             {{
                 "id": "5249",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "data": {{
                     "company_registration_number": "",
                     "business_name": "{name}",
@@ -262,7 +262,7 @@ class TestGreatIngestionTasks:
         data = f"""
             {{
                 "id": "5249",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "data": {{
                     "company_registration_number": "",
                     "business_name": "{name}",
@@ -307,7 +307,7 @@ class TestGreatIngestionTasks:
         data = f"""
             {{
                 "id": "5249",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "data": {{
                     "company_registration_number": "",
                     "business_name": "{name}",
@@ -341,7 +341,7 @@ class TestGreatIngestionTasks:
         data = f"""
             {{
                 "id": "5249",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "data": {{
                     "company_registration_number": "",
                     "business_name": "{name}",
@@ -370,7 +370,7 @@ class TestGreatIngestionTasks:
         data = f"""
             {{
                 "id": "5249",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "data": {{
                     "sector_primary": "{primary.segment}",
                     "sector_secondary": "{secondary.segment}",
@@ -393,7 +393,7 @@ class TestGreatIngestionTasks:
         data = """
             {
                 "id": "5249",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "data": {
                     "sector_primary": "Some non-existent sector",
                     "sector_secondary": ""
@@ -419,7 +419,7 @@ class TestGreatIngestionTasks:
         data = """
             {
                 "id": "5249",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "meta": {
                     "sender": {
                         "country_code": "ZZ"
@@ -456,7 +456,7 @@ class TestGreatIngestionTasks:
         data = """
             {
                 "id": "5249",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "data": {
                     "contacted_gov_departments": "no",
                     "received_support": "yes",
@@ -473,7 +473,7 @@ class TestGreatIngestionTasks:
         data = """
             {
                 "id": "5250",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "data": {
                     "contacted_gov_departments": "yes",
                     "help_us_further": ""
@@ -503,7 +503,7 @@ class TestGreatIngestionTasks:
         data = f"""
             {{
                 "id": "5249",
-                "created_at": "2024-09-19T14:00:34.069Z",
+                "created_at": "2024-09-19T14:00:34.069",
                 "url": "{long_text}",
                 "data": {{
                     "triage_journey": "{long_text}"

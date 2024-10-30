@@ -15,7 +15,7 @@ from datahub.metadata.models import BusinessType, Country, EmployeeRange, Sector
 logger = logging.getLogger(__name__)
 env = environ.Env()
 REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
-DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
+DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 
 def ingest_great_data(bucket, file):
