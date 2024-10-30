@@ -98,11 +98,7 @@ class GreatIngestionTask:
     def _get_company_by_name(self, name):
         if not name:
             return None
-        try:
-            company = Company.objects.filter(name=name).first()
-            return company
-        except company.DoesNotExist:
-            return None
+        return Company.objects.filter(name=name).first()
 
     def _get_company_contact(self, data):
         first_name = data.get('first_name')
