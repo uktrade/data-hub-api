@@ -6,6 +6,7 @@ from datahub.core.serializers import (
     AddressSerializer,
     NestedRelatedField,
 )
+from datahub.investment.project.models import InvestmentProject
 from datahub.investment_lead.models import EYBLead
 from datahub.metadata.models import (
     Country,
@@ -446,7 +447,7 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
         fields = [
             f for f in ALL_FIELDS
             if f not in ADDRESS_FIELDS
-        ] + ['address']
+        ] + ['address', 'investment_projects']
 
     sector = NestedRelatedField(Sector)
     proposed_investment_region = NestedRelatedField(UKRegion)
@@ -455,6 +456,7 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
         address_source_prefix='address',
     )
     company = NestedRelatedField(Company)
+    investment_projects = NestedRelatedField(InvestmentProject, many=True)
 
     def get_related_fields_representation(self, instance):
         """Provides related fields in a representation-friendly format.
