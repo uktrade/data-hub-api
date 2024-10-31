@@ -278,8 +278,9 @@ class TestGreatIngestionTasks:
         task = GreatIngestionTask()
         with caplog.at_level(logging.INFO):
             task.json_to_model(json.loads(data))
+            id = Company.objects.latest('created_on').id
             assert 'Could not match company for Great Export Enquiry: 5249.' \
-                'Created new company with id: ' in caplog.text
+                f'Created new company with id: {id}' in caplog.text
         result = GreatExportEnquiry.objects.get(form_id='5249').company
         assert result.name == name
         expected_size = EmployeeRange.objects.get(name='50 to 249')
