@@ -299,3 +299,19 @@ class TestEYBLeadListAPI(APITestMixin):
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 0
+
+    def test_list_eyb_leads_default_order(self, test_user_with_view_permissions):
+        """Test the default ordering of EYB leads reflects descending created_on."""
+        to_create = 2
+        for _ in range(to_create):
+            EYBLeadFactory()
+
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(EYB_LEAD_COLLECTION_URL)
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data['results']) == to_create
+
+        newest_timestamp = response.data['results'][0]['created_on']
+        oldest_timestamp = response.data['results'][1]['created_on']
+
+        assert newest_timestamp > oldest_timestamp
