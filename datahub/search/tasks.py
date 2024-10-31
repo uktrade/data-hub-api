@@ -1,6 +1,8 @@
 from logging import getLogger
 
 from django.apps import apps
+from django.core.exceptions import ObjectDoesNotExist
+
 from django_pglocks import advisory_lock
 
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
@@ -92,10 +94,21 @@ def sync_related_objects_task(
     )
     related_model = apps.get_model(related_model_label)
     related_obj = related_model.objects.get(pk=related_obj_pk)
-    manager = getattr(related_obj, related_obj_field_name)
-    if related_obj_filter:
-        manager = manager.filter(**related_obj_filter)
-    queryset = manager.values_list('pk', flat=True)
+
+    try:
+        manager = getattr(related_obj, related_obj_field_name)
+    # For OneToOne fields where an error is thrown if the related object does not exist.
+    except ObjectDoesNotExist:
+        return
+
+    # OneToOne related fields return the object itself which does not have values_list.
+    if not hasattr(manager, 'values_list'):
+        queryset = [manager.id]
+    else:
+        queryset = manager.values_list('pk', flat=True)
+
+        if related_obj_filter:
+            manager = manager.filter(**related_obj_filter)
 
     # If there are multiple search apps for the same DB model, search_app_name allows
     # you to specify the search app you want to update.
