@@ -25,6 +25,7 @@ class Command(BaseCleanupCommand):
             (DatetimeLessThanCleanupFilter('modified_on', ORPHAN_AGE_THRESHOLD),),
             excluded_relations=(
                 Contact._meta.get_field('wins'),
+                Contact._meta.get_field('great_export_enquiries'),
             ),
         ),
         'company.Company': ModelCleanupConfig(
