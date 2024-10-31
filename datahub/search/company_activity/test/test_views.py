@@ -1,5 +1,6 @@
 from collections import Counter
 from datetime import datetime, timezone
+from unittest import mock
 
 import factory
 import pytest
@@ -11,6 +12,7 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import (
     AdviserFactory,
     CompanyFactory,
+    SubsidiaryFactory,
 )
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_activity.tests.factories import (
@@ -351,3 +353,105 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
             result['interaction']['subject'] for result in response_data['results']
         }
         assert names == results
+
+    @mock.patch(
+        'datahub.search.company_activity.views.get_datahub_ids_for_dnb_service_company_hierarchy',
+    )
+    def test_view__include_parent_companies__includes_parent_companies_in_response(
+        self,
+        get_datahub_ids_dnb_service_company_hierarchy_mock,
+        opensearch_with_collector,
+    ):
+        """
+        Tests that when the following parameters are given, a company and its parent
+        company activities are shown.
+        ```
+            company
+            include_parent_companies
+        ```
+        """
+        # Dummy companies with parent companies.
+        SubsidiaryFactory.create_batch(4)
+
+        # Test data setup
+        parent_company = CompanyFactory()
+        parent_company_activity_1 = CompanyInteractionFactory(
+            company=parent_company,
+        )
+        CompanyInteractionFactory(company=parent_company)
+        company = SubsidiaryFactory(global_headquarters=parent_company)
+        CompanyInteractionFactory(company=company)
+
+        opensearch_with_collector.flush_and_refresh()
+
+        # Mocked as uses another service: dnb-service
+        get_datahub_ids_dnb_service_company_hierarchy_mock.return_value = {
+            'related_companies': [
+                parent_company_activity_1.company_id,
+            ],
+            'reduced_tree': False,
+        }
+
+        url = reverse('api-v4:search:company-activity')
+        request_data = {
+            'company': company.id,
+            'include_parent_companies': True,
+        }
+        response = self.api_client.post(url, request_data)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['count'] == (
+            parent_company.activities.count() + company.activities.count()
+        )
+
+    @mock.patch(
+        'datahub.search.company_activity.views.get_datahub_ids_for_dnb_service_company_hierarchy',
+    )
+    def test_view__include_subsidiary_companies__includes_subsidiary_companies_in_response(
+        self,
+        get_datahub_ids_dnb_service_company_hierarchy_mock,
+        opensearch_with_collector,
+    ):
+        """
+        Tests that when the following parameters are given, a company and its subsidiary
+        company activities are shown.
+        ```
+            company
+            include_subsidiary_companies
+        ```
+        """
+        # Dummy companies with parent companies.
+        SubsidiaryFactory.create_batch(4)
+
+        # Test data setup
+        parent_company = CompanyFactory()
+        parent_company_activity_1 = CompanyInteractionFactory(
+            company=parent_company,
+        )
+        CompanyInteractionFactory(company=parent_company)
+        company = SubsidiaryFactory(global_headquarters=parent_company)
+        CompanyInteractionFactory(company=company)
+
+        opensearch_with_collector.flush_and_refresh()
+
+        # Mocked as uses another service: dnb-service
+        get_datahub_ids_dnb_service_company_hierarchy_mock.return_value = {
+            'related_companies': [
+                parent_company_activity_1.company_id,
+            ],
+            'reduced_tree': False,
+        }
+
+        url = reverse('api-v4:search:company-activity')
+        request_data = {
+            'company': company.id,
+            'include_subsidiary_companies': True,
+        }
+        response = self.api_client.post(url, request_data)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['count'] == (
+            parent_company.activities.count() + company.activities.count()
+        )
