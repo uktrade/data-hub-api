@@ -1,3 +1,6 @@
+from datahub.dnb_api.utils import (
+    get_datahub_ids_for_dnb_service_company_hierarchy,
+)
 from datahub.search.company_activity import CompanyActivitySearchApp
 from datahub.search.company_activity.serializers import (
     SearchCompanyActivityQuerySerializer,
@@ -49,4 +52,28 @@ class SearchCompanyActivityAPIViewMixin:
 
 @register_v4_view()
 class SearchCompanyActivityAPIView(SearchCompanyActivityAPIViewMixin, SearchAPIView):
-    """Filtered company search view."""
+    """Filtered company activity search view."""
+
+    def get_base_query(self, request, validated_data):
+        """Overwritten to add additional data to the Opensearch query"""
+        company_ids = validated_data.get('company')
+        if company_ids:
+            validated_data = self._include_parent_and_subsidiary_companies(
+                validated_data,
+                company_ids[0],
+            )
+        return super().get_base_query(request, validated_data)
+
+    @staticmethod
+    def _include_parent_and_subsidiary_companies(validated_data, company_id):
+        """Uses dnb-service to get parent and/or subsidiary companies for the given company id."""
+        related_company_ids = get_datahub_ids_for_dnb_service_company_hierarchy(
+            validated_data.get('include_parent_companies'),
+            validated_data.get('include_subsidiary_companies'),
+            company_id,
+        )
+
+        if related_company_ids['related_companies']:
+            validated_data.get('company').extend(related_company_ids['related_companies'])
+
+        return validated_data
