@@ -182,6 +182,15 @@ class ContactConsentIngestionTask:
         )
         return [file['Key'] for file in sorted_files]
 
+    def _log_at_interval(self, index: int, message: str):
+        """
+        Log in a way that is suitable for both small and large datasets. Initially
+        a log info entry will be written every 100 rows, then increasing in frequency
+        to every 1000, 10000, 100000 up to every million
+        """
+        if (index) % (10 ** min((max((math.floor(math.log10(index))), 2)), 6)) == 0:
+            logger.info(message)
+
     def ingest(self):
         logger.info('Checking for new Contact Consent data files')
         s3_client = get_s3_client(REGION)
@@ -207,53 +216,59 @@ class ContactConsentIngestionTask:
             i = 0
             for line in s3_file:
                 i = i + 1
-                if (i) % (10 ** min((max((math.floor(math.log10(i))), 2)), 6)) == 0:
-                    logger.info('Processed %s rows from %s', i, path)
+
+                self._log_at_interval(i, f'Processed {i} rows from {path}')
+
                 consent_row = json.loads(line)
                 if 'email' not in consent_row or 'consents' not in consent_row:
                     continue
 
                 email = consent_row['email']
-                matching_contact = Contact.objects.filter(email=email).first()
+                matching_contacts = Contact.objects.filter(email=email)
 
-                if not matching_contact:
+                if not matching_contacts.exists():
                     logger.debug('Email %s has no matching datahub contact', email)
                     continue
 
-                last_modified = (
-                    consent_row['last_modified'] if 'last_modified' in consent_row else None
-                )
+                for matching_contact in matching_contacts:
 
-                update_row = False
-                if matching_contact.consent_data_last_modified is None or last_modified is None:
-                    update_row = True
-                # to avoid issues with different source system time formats, just compare on the
-                # date portion
-                elif (
-                    parser.parse(last_modified).date()
-                    > matching_contact.consent_data_last_modified.date()
-                ):
-                    update_row = True
+                    last_modified = (
+                        consent_row['last_modified'] if 'last_modified' in consent_row else None
+                    )
 
-                if not update_row:
-                    logger.debug(
-                        'Email %s consent data has not been updated in the latest file',
-                        email,
-                    )
-                    continue
-                if settings.ENABLE_CONTACT_CONSENT_INGEST:
-                    matching_contact.consent_data = consent_row['consents']
-                    matching_contact.consent_data_last_modified = (
-                        last_modified if last_modified else datetime.datetime.now()
-                    )
-                    matching_contact.save()
+                    update_row = False
+                    if (
+                        matching_contact.consent_data_last_modified is None
+                        or last_modified is None
+                    ):
+                        update_row = True
+                    # to avoid issues with different source system time formats, just compare on
+                    # the date portion
+                    elif (
+                        parser.parse(last_modified).date()
+                        > matching_contact.consent_data_last_modified.date()
+                    ):
+                        update_row = True
 
-                    logger.debug('Updated consents for email %s', email)
-                else:
-                    logger.info(
-                        'Email %s would have consent data updated, but setting is disabled',
-                        email,
-                    )
+                    if not update_row:
+                        logger.debug(
+                            'Email %s consent data has not been updated in the latest file',
+                            email,
+                        )
+                        continue
+                    if settings.ENABLE_CONTACT_CONSENT_INGEST:
+                        matching_contact.consent_data = consent_row['consents']
+                        matching_contact.consent_data_last_modified = (
+                            last_modified if last_modified else datetime.datetime.now()
+                        )
+                        matching_contact.save()
+
+                        logger.debug('Updated consents for email %s', email)
+                    else:
+                        logger.info(
+                            'Email %s would have consent data updated, but setting is disabled',
+                            email,
+                        )
 
             logger.info('Finished processing total %s rows from %s', i, path)
 

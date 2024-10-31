@@ -661,6 +661,31 @@ class TestContactConsentIngestionTask:
         assert Contact.objects.filter(id=contact.id).first().consent_data == {'consent': True}
 
     @mock_aws
+    @override_settings(ENABLE_CONTACT_CONSENT_INGEST=True)
+    def test_sync_file_with_multiple_contacts_matching_email_does_update_contact(self):
+        """
+        Test when a row has an email that matches multiple contacts all contacts are updated
+        """
+        test_email = 'duplicate@test.com'
+        ContactFactory.create_batch(
+            3,
+            email=test_email,
+            consent_data='A',
+            consent_data_last_modified='2023-07-20T12:00:00',
+        )
+        row = {
+            'email': test_email,
+            'last_modified': '2024-08-02T12:00:00',
+            'consents': {'consent': True},
+        }
+        filename = f'{CONSENT_PREFIX}file_{uuid.uuid4()}.jsonl'
+        upload_file_to_s3(BUCKET, filename, json.dumps(row))
+
+        ContactConsentIngestionTask().sync_file_with_database(boto3.client('s3', REGION), filename)
+        for contact in Contact.objects.filter(email=test_email):
+            assert contact.consent_data == {'consent': True}
+
+    @mock_aws
     @override_settings(ENABLE_CONTACT_CONSENT_INGEST=False)
     def test_sync_file_with_matching_email_but_ingest_setting_false_does_not_update_contact(self):
         """
