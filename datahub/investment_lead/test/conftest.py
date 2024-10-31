@@ -2,6 +2,7 @@ import pytest
 
 from datahub.core import constants
 from datahub.core.test_utils import create_test_user
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.test.factories import (
     eyb_lead_triage_record_faker,
@@ -41,10 +42,12 @@ def eyb_lead_factory_overrides():
     canada_country = Country.objects.get(
         pk=constants.Country.canada.value.id,
     )
+    investment_project = InvestmentProjectFactory()
     overrides = {
         'sector': mining_sector,
         'proposed_investment_region': wales_region,
         'address_country': canada_country,
+        'investment_projects': [investment_project.id],
     }
     return overrides
 
