@@ -69,7 +69,7 @@ class GreatIngestionTask:
             company=company,
         )
         logger.info(f'Could not match company for Great Export Enquiry: {form_id}.'
-                    'Created new company with id: {company.id}.')
+                    f'Created new company with id: {company.id}.')
         return company
 
     def _get_company(self, data, form_id):
