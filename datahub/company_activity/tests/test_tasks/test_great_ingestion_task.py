@@ -295,6 +295,41 @@ class TestGreatIngestionTasks:
         assert contact_result.primary is True
 
     @pytest.mark.django_db
+    def test_company_contact_creation(self):
+        """
+        Test that when the company exists already but the contact doesn't
+        the contact is created
+        """
+        company = CompanyFactory(company_number='123')
+        first_name = 'Ada'
+        last_name = 'Babbage'
+        email = 'test@example.com'
+        phone_number = '07900000000'
+        assert not Contact.objects.filter(first_name=first_name, last_name=last_name).exists()
+        name = 'Some non-existent business'
+        data = f"""
+            {{
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069",
+                "data": {{
+                    "company_registration_number": "{company.company_number}",
+                    "business_name": "{name}",
+                    "first_name": "{first_name}",
+                    "last_name": "{last_name}",
+                    "uk_telephone_number": "{phone_number}",
+                    "email": "{email}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        result = GreatExportEnquiry.objects.get(form_id='5249')
+        assert result.contact.first_name == first_name
+        assert result.contact.last_name == last_name
+        assert result.contact.email == email
+        assert result.contact.full_telephone_number == phone_number
+
+    @pytest.mark.django_db
     def test_upper_business_size(self):
         """
         Test that the upper business size range is mapped correctly

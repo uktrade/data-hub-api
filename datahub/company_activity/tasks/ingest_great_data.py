@@ -59,7 +59,13 @@ class GreatIngestionTask:
             employee_range=self._get_business_size(data.get('number_of_employees')),
             address_postcode=data.get('business_postcode', ''),
         )
-        Contact.objects.create(
+        logger.info(f'Could not match company for Great Export Enquiry: {form_id}.'
+                    f'Created new company with id: {company.id}.')
+        self._create_contact(data, company, form_id)
+        return company
+
+    def _create_contact(self, data, company, form_id):
+        contact = Contact.objects.create(
             first_name=data.get('first_name', ''),
             last_name=data.get('last_name', ''),
             job_title=data.get('job_title', ''),
@@ -68,9 +74,9 @@ class GreatIngestionTask:
             primary=True,
             company=company,
         )
-        logger.info(f'Could not match company for Great Export Enquiry: {form_id}.'
-                    f'Created new company with id: {company.id}.')
-        return company
+        logger.info(f'Could not match contact for Great Export Enquiry: {form_id}.'
+                    f'Created new contact with id: {contact.id}.')
+        return contact
 
     def _get_company(self, data, form_id):
         company = self._get_company_by_companies_house_num(
@@ -205,6 +211,10 @@ class GreatIngestionTask:
             country = self._country_from_iso_code(country_code, form_id)
             if country:
                 markets.append(country)
+        company = self._get_company(data, form_id)
+        contact = self._get_company_contact(data)
+        if not contact:
+            contact = self._create_contact(data, company, form_id)
 
         values = {
             'form_id': form_id,
@@ -212,7 +222,8 @@ class GreatIngestionTask:
             'form_created_at': jsn.get('created_at'),
             'submission_type': jsn.get('submission_action', ''),
             'submission_action': jsn.get('submission_type', ''),
-            'company': self._get_company(data, form_id),
+            'company': company,
+            'contact': contact,
 
             'meta_sender_ip_address': meta.get('sender_ip_address', ''),
             'meta_sender_country': self._country_from_iso_code(
