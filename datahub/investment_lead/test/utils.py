@@ -145,6 +145,11 @@ def assert_retrieved_eyb_lead_data(instance: EYBLead, data: dict):
     assert instance.agree_info_email == data['agree_info_email']
     assert EYBLead.LandingTimeframeChoices(instance.landing_timeframe).label \
         == data['landing_timeframe']
+    assert [
+        str(ip.id) for ip in instance.investment_projects.all()
+    ] == [
+        data_ip['id'] for data_ip in data['investment_projects']
+    ]
 
     # EYB marketing fields
     assert instance.utm_name == data['utm_name']
