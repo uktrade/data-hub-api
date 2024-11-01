@@ -126,7 +126,7 @@ class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):
     CompanyActivity ingested file factory
     """
 
-    filepath = 'data-flow/exports/GreatContactFormData/20240920T000000.jsonl.gz'
+    filepath = 'data-flow/exports/ExportGreatContactFormData/20240920T000000.jsonl.gz'
     created_on = now()
 
     class Meta:
