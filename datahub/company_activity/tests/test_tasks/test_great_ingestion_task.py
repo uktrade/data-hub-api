@@ -15,9 +15,9 @@ from datahub.company.models.company import Company
 from datahub.company.models.contact import Contact
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.company_activity.models import GreatExportEnquiry, IngestedFile
-from datahub.company_activity.tasks.ingest_company_activity import BUCKET, GREAT_PREFIX
+from datahub.company_activity.tasks.constants import BUCKET, GREAT_PREFIX, REGION
 from datahub.company_activity.tasks.ingest_great_data import (
-    DATE_FORMAT, GreatIngestionTask, ingest_great_data, REGION,
+    DATE_FORMAT, GreatIngestionTask, ingest_great_data,
 )
 from datahub.company_activity.tests.factories import (
     CompanyActivityIngestedFileFactory,
@@ -104,6 +104,28 @@ class TestGreatIngestionTasks:
         setup_s3_files(BUCKET, test_file, test_file_path)
         ingest_great_data(BUCKET, test_file_path)
         assert not GreatExportEnquiry.objects.exists()
+
+    @pytest.mark.django_db
+    @mock_aws
+    def test_skipping_previous_by_prefix(self, test_file_path):
+        """
+        Test that we only consider previously ingested files with the
+        same prefix when deciding to skip ingestion
+        """
+        yesterday = datetime.strftime(datetime.now() - timedelta(1), DATE_FORMAT)
+        CompanyActivityIngestedFileFactory(
+            filepath='some_other_prefix/20240920T000000.jsonl.gz',
+            created_on=datetime.now(),
+        )
+        record = json.dumps(dict({
+            'id': '5249',
+            'created_at': yesterday,
+        }), default=str)
+        test_file = gzip.compress(record.encode('utf-8'))
+        setup_s3_bucket(BUCKET)
+        setup_s3_files(BUCKET, test_file, test_file_path)
+        ingest_great_data(BUCKET, test_file_path)
+        assert GreatExportEnquiry.objects.first().form_id == 5249
 
     @pytest.mark.django_db
     @mock_aws

@@ -1,7 +1,6 @@
 import logging
 
 import boto3
-import environ
 
 from django.conf import settings
 
@@ -10,14 +9,10 @@ from rq import Queue, Worker
 
 from datahub.company_activity.models import IngestedFile
 from datahub.company_activity.tasks import ingest_great_data
+from datahub.company_activity.tasks.constants import BUCKET, GREAT_PREFIX, REGION
 from datahub.core.queues.job_scheduler import job_scheduler
 
 logger = logging.getLogger(__name__)
-env = environ.Env()
-REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
-BUCKET = f"data-flow-bucket-{env('ENVIRONMENT', default='')}"
-PREFIX = 'data-flow/exports/'
-GREAT_PREFIX = f'{PREFIX}ExportGreatContactFormData/'
 TWO_HOURS_IN_SECONDS = 7200
 
 

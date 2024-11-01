@@ -3,18 +3,15 @@ import logging
 
 from datetime import datetime
 
-import environ
-
 from smart_open import open
 
 from datahub.company.models.company import Company
 from datahub.company.models.contact import Contact
 from datahub.company_activity.models import GreatExportEnquiry, IngestedFile
+from datahub.company_activity.tasks.constants import GREAT_PREFIX
 from datahub.metadata.models import BusinessType, Country, EmployeeRange, Sector
 
 logger = logging.getLogger(__name__)
-env = environ.Env()
-REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 
@@ -46,7 +43,9 @@ class GreatIngestionTask:
 
     def _get_last_ingestion_datetime(self):
         try:
-            return IngestedFile.objects.latest('created_on').created_on.timestamp()
+            return IngestedFile.objects.filter(
+                filepath__icontains=GREAT_PREFIX,
+            ).latest('created_on').created_on.timestamp()
         except IngestedFile.DoesNotExist:
             return None
 
