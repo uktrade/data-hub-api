@@ -108,6 +108,7 @@ class Command(BaseCleanupCommand):
                 # before we delete the related contacts.
                 Contact._meta.get_field('interactions'): (),
                 Contact._meta.get_field('investment_projects'): (),
+                Contact._meta.get_field('great_export_enquiries'): (),
                 Contact._meta.get_field('orders'): (),
                 Contact._meta.get_field('referrals'): (),
                 Contact._meta.get_field('pipeline_items_m2m'): (),

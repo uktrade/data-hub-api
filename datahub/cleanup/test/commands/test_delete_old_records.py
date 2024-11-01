@@ -435,6 +435,16 @@ MAPPING = {
                 ],
             },
             {
+                'factory': CompanyActivityGreatExportEnquiryFactory,
+                'field': 'contact',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+            {
                 'factory': OrderFactory,
                 'field': 'contact',
                 'expired_objects_kwargs': [],
