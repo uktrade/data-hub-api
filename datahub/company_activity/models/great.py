@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 
 from datahub.company.models.company import Company
+from datahub.company.models.contact import Contact
 from datahub.core import reversion
 from datahub.metadata import models as metadata_models
 
@@ -26,6 +27,13 @@ class GreatExportEnquiry(models.Model):
     url = models.TextField()
     company = models.ForeignKey(
         Company,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='great_export_enquiries',
+    )
+    contact = models.ForeignKey(
+        Contact,
         on_delete=models.PROTECT,
         null=True,
         blank=True,
