@@ -17,8 +17,9 @@ from rq_scheduler import Scheduler
 
 from datahub.company_activity.models import IngestedFile
 from datahub.company_activity.tasks import ingest_great_data
+from datahub.company_activity.tasks.constants import BUCKET, GREAT_PREFIX, REGION
 from datahub.company_activity.tasks.ingest_company_activity import (
-    BUCKET, GREAT_PREFIX, ingest_activity_data, REGION, TWO_HOURS_IN_SECONDS,
+    ingest_activity_data, TWO_HOURS_IN_SECONDS,
 )
 from datahub.core.queues.constants import EVERY_HOUR
 from datahub.core.queues.job_scheduler import job_scheduler
