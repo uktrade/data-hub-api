@@ -2,6 +2,8 @@ import logging
 
 from django.db.models import Q
 
+from rest_framework import filters
+
 from datahub.core.viewsets import SoftDeleteCoreViewSet
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import RetrieveEYBLeadSerializer
@@ -13,6 +15,8 @@ logger = logging.getLogger(__name__)
 
 class EYBLeadViewSet(SoftDeleteCoreViewSet):
     serializer_class = RetrieveEYBLeadSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering = ['-created_on']
 
     def get_queryset(self):
         """Apply filters to queryset based on query parameters (in GET operations)."""
