@@ -2,8 +2,6 @@ import gzip
 import json
 import logging
 
-from datetime import datetime, timedelta
-
 import boto3
 import pytest
 
@@ -17,10 +15,10 @@ from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.company_activity.models import GreatExportEnquiry, IngestedFile
 from datahub.company_activity.tasks.constants import BUCKET, GREAT_PREFIX, REGION
 from datahub.company_activity.tasks.ingest_great_data import (
-    DATE_FORMAT, GreatIngestionTask, ingest_great_data,
+    GreatIngestionTask, ingest_great_data,
 )
 from datahub.company_activity.tests.factories import (
-    CompanyActivityIngestedFileFactory,
+    CompanyActivityGreatExportEnquiryFactory,
 )
 from datahub.metadata.models import BusinessType, Country, EmployeeRange, Sector
 
@@ -90,42 +88,18 @@ class TestGreatIngestionTasks:
     @mock_aws
     def test_skip_previously_ingested_records(self, test_file_path):
         """
-        Test that we skip updating records whose created_at date is older than the last
-        file ingestion date
+        Test that we skip updating records that have already been ingested
         """
-        yesterday = datetime.strftime(datetime.now() - timedelta(1), DATE_FORMAT)
-        CompanyActivityIngestedFileFactory(created_on=datetime.now())
+        CompanyActivityGreatExportEnquiryFactory(form_id=5249)
         record = json.dumps(dict({
             'id': '5249',
-            'created_at': yesterday,
+            'created_at': '2024-09-19T14:00:34.069',
         }), default=str)
         test_file = gzip.compress(record.encode('utf-8'))
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
         ingest_great_data(BUCKET, test_file_path)
-        assert not GreatExportEnquiry.objects.exists()
-
-    @pytest.mark.django_db
-    @mock_aws
-    def test_skipping_previous_by_prefix(self, test_file_path):
-        """
-        Test that we only consider previously ingested files with the
-        same prefix when deciding to skip ingestion
-        """
-        yesterday = datetime.strftime(datetime.now() - timedelta(1), DATE_FORMAT)
-        CompanyActivityIngestedFileFactory(
-            filepath='some_other_prefix/20240920T000000.jsonl.gz',
-            created_on=datetime.now(),
-        )
-        record = json.dumps(dict({
-            'id': '5249',
-            'created_at': yesterday,
-        }), default=str)
-        test_file = gzip.compress(record.encode('utf-8'))
-        setup_s3_bucket(BUCKET)
-        setup_s3_files(BUCKET, test_file, test_file_path)
-        ingest_great_data(BUCKET, test_file_path)
-        assert GreatExportEnquiry.objects.first().form_id == 5249
+        assert GreatExportEnquiry.objects.filter(form_id=5249).count() == 1
 
     @pytest.mark.django_db
     @mock_aws
