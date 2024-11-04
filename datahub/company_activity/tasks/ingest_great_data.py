@@ -1,14 +1,11 @@
 import json
 import logging
 
-from datetime import datetime
-
 from smart_open import open
 
 from datahub.company.models.company import Company
 from datahub.company.models.contact import Contact
 from datahub.company_activity.models import GreatExportEnquiry, IngestedFile
-from datahub.company_activity.tasks.constants import GREAT_PREFIX
 from datahub.metadata.models import BusinessType, Country, EmployeeRange, Sector
 
 logger = logging.getLogger(__name__)
@@ -26,7 +23,7 @@ class GreatIngestionTask:
     def __init__(self):
         self._countries = None
         self._business_types = None
-        self._last_ingestion_datetime = self._get_last_ingestion_datetime()
+        self._existing_ids = []
 
     def ingest(self, bucket, file):
         path = f's3://{bucket}/{file}'
@@ -34,20 +31,16 @@ class GreatIngestionTask:
             with open(path) as s3_file:
                 for line in s3_file:
                     jsn = json.loads(line)
-                    if self._record_has_no_changes(jsn):
-                        continue
-                    self.json_to_model(jsn)
+                    if not self._already_ingested(jsn.get('id')):
+                        self.json_to_model(jsn)
         except Exception as e:
             raise e
         IngestedFile.objects.create(filepath=file)
 
-    def _get_last_ingestion_datetime(self):
-        try:
-            return IngestedFile.objects.filter(
-                filepath__icontains=GREAT_PREFIX,
-            ).latest('created_on').created_on.timestamp()
-        except IngestedFile.DoesNotExist:
-            return None
+    def _already_ingested(self, id):
+        if not self._existing_ids:
+            self._existing_ids = list(GreatExportEnquiry.objects.values_list('form_id', flat=True))
+        return int(id) in self._existing_ids
 
     def _create_company(self, data, form_id):
         company = Company.objects.create(
@@ -157,13 +150,6 @@ class GreatIngestionTask:
 
     def _get_countries(self):
         self._countries = Country.objects.all()
-
-    def _record_has_no_changes(self, record):
-        if self._last_ingestion_datetime is None:
-            return False
-        else:
-            date = datetime.strptime(record['created_at'], DATE_FORMAT).timestamp()
-            return date < self._last_ingestion_datetime
 
     def _country_from_iso_code(self, country_code, form_id):
         if not country_code:
