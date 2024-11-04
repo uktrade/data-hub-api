@@ -1,0 +1,12 @@
+- model: company.exportexperience
+  pk: d23012c5-c1a6-459d-9e05-b3d1b8539025
+  fields:
+    disabled_on: 2018-06-20T10:19:43Z
+    name: Is an exporter but exports currently account for less than 10% of its overall turnover
+    order: 1040
+- model: company.exportexperience
+  pk: 9390cc45-6ebb-4005-866c-c87fd6d6dec0
+  fields:
+    disabled_on: 2018-06-20T10:19:43Z
+    name: Is an exporter but has only won export orders in three countries or fewer
+    order: 1080
