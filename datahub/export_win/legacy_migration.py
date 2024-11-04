@@ -246,6 +246,9 @@ def create_export_win_from_legacy(item):
 
     win = {
         'id': item.get('id'),
+        'total_expected_export_value': item.get('total_expected_export_value'),
+        'total_expected_non_export_value': item.get('total_expected_non_export_value'),
+        'total_expected_odi_value': item.get('total_expected_odi_value'),
     }
     for field, resolver in must_resolvers.items():
         resolved = resolver(item, win)

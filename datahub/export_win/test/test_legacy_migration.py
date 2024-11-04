@@ -136,6 +136,9 @@ legacy_wins = {
             'confirmation_marketing_source': 'Don’t know',
             'confirmation_portion_without_help': 'No value without our help',
             'country_name': 'Austria',
+            'total_expected_export_value': 0,
+            'total_expected_non_export_value': 0,
+            'total_expected_odi_value': 0,
         }],
     },
     mock_legacy_wins_page_urls['wins'][1]: {
@@ -210,6 +213,9 @@ legacy_wins = {
             'confirmation_marketing_source': 'Don’t know',
             'confirmation_portion_without_help': 'No value without our help',
             'country_name': 'Austria',
+            'total_expected_export_value': 0,
+            'total_expected_non_export_value': 0,
+            'total_expected_odi_value': 0,
         }, {
             'associated_programme_1': None,
             'associated_programme_2': None,
@@ -255,6 +261,9 @@ legacy_wins = {
             'type_of_support_3': None,
             'user__email': 'abc@test',
             'user__name': 'Abc Def',
+            'total_expected_export_value': 0,
+            'total_expected_non_export_value': 0,
+            'total_expected_odi_value': 0,
         }, {
             'associated_programme_1': None,
             'associated_programme_2': None,
@@ -304,6 +313,9 @@ legacy_wins = {
             'confirmation__comments': None,
             'confirmation__name': None,
             'confirmation__other_marketing_source': None,
+            'total_expected_export_value': 0,
+            'total_expected_non_export_value': 0,
+            'total_expected_odi_value': 0,
         }, {
             'associated_programme_1': None,
             'associated_programme_2': None,
@@ -353,6 +365,9 @@ legacy_wins = {
             'confirmation__comments': None,
             'confirmation__name': None,
             'confirmation__other_marketing_source': None,
+            'total_expected_export_value': 0,
+            'total_expected_non_export_value': 0,
+            'total_expected_odi_value': 0,
         }, {
             'associated_programme_1': None,
             'associated_programme_2': None,
@@ -403,6 +418,9 @@ legacy_wins = {
             'confirmation__name': None,
             'confirmation__other_marketing_source': None,
             'is_active': False,
+            'total_expected_export_value': 0,
+            'total_expected_non_export_value': 0,
+            'total_expected_odi_value': 0,
         }, {  # Tests if deleted win will be updated
             'associated_programme_1': None,
             'associated_programme_2': None,
@@ -453,6 +471,9 @@ legacy_wins = {
             'confirmation__name': None,
             'confirmation__other_marketing_source': None,
             'is_active': False,
+            'total_expected_export_value': 0,
+            'total_expected_non_export_value': 0,
+            'total_expected_odi_value': 0,
         }],
     },
     mock_legacy_wins_page_urls['breakdowns'][0]: {
