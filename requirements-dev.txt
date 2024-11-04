@@ -33,7 +33,7 @@ backoff==2.2.1
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
-bigtree==0.21.3
+bigtree==0.22.1
     # via -r requirements.in
 billiard==4.2.0
     # via celery
