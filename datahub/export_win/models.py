@@ -501,10 +501,12 @@ class Win(BaseModel):
             self.total_expected_odi_value = 0
             super().save(*args, **kwargs)
 
-        calc_total = calculate_totals_for_export_win(self)
-        self.total_expected_export_value = calc_total['total_export_value']
-        self.total_expected_non_export_value = calc_total['total_non_export_value']
-        self.total_expected_odi_value = calc_total['total_odi_value']
+        # Don't recalculate totals for migrated legacy Export wins
+        if not self.migrated_on:
+            calc_total = calculate_totals_for_export_win(self)
+            self.total_expected_export_value = calc_total['total_export_value']
+            self.total_expected_non_export_value = calc_total['total_non_export_value']
+            self.total_expected_odi_value = calc_total['total_odi_value']
         super().save(*args, **kwargs)
 
 
