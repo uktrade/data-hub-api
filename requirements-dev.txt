@@ -78,7 +78,7 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
-coverage[toml]==7.0.1
+coverage[toml]==7.6.4
     # via pytest-cov
 crontab==1.0.0
     # via rq-scheduler
@@ -398,7 +398,7 @@ pytest==8.3.3
     #   pytest-django
     #   pytest-mock
     #   pytest-xdist
-pytest-cov==5.0.0
+pytest-cov==6.0.0
     # via -r requirements-dev.in
 pytest-django==4.9.0
     # via -r requirements-dev.in
