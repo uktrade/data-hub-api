@@ -543,7 +543,7 @@ werkzeug==3.0.6
     #   moto
 wheel==0.38.4
     # via pip-tools
-whitenoise==6.7.0
+whitenoise==6.8.2
     # via -r requirements.in
 wrapt==1.14.1
     # via
