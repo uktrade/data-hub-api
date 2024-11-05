@@ -44,8 +44,7 @@ def generate_hawk_response(response):
 def get_consent_fixture(requests_mock):
     """Mock get call to consent service."""
     yield lambda response: requests_mock.get(
-        f'{settings.CONSENT_SERVICE_BASE_URL}'
-        f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
+        f'{settings.CONSENT_SERVICE_BASE_URL}' f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
         status_code=200,
         text=generate_hawk_response(response),
     )
@@ -60,16 +59,18 @@ class AddContactBase(APITestMixin):
     def test_with_manual_address(self, get_consent_fixture):
         """Test add with manual address."""
         company = CompanyFactory()
-        get_consent_fixture({
-            'results': [
-                {
-                    'consents': [
-                        'email_marketing',
-                    ],
-                    'email': 'foo@bar.com',
-                },
-            ],
-        })
+        get_consent_fixture(
+            {
+                'results': [
+                    {
+                        'consents': [
+                            'email_marketing',
+                        ],
+                        'email': 'foo@bar.com',
+                    },
+                ],
+            },
+        )
         url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.post(
             url,
@@ -145,6 +146,7 @@ class AddContactBase(APITestMixin):
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
             'valid_email': None,
+            'consent_data': None,
         }
 
     def test_with_address_same_as_company(self):
@@ -363,16 +365,18 @@ class TestAddContactV4(AddContactBase):
     def test_with_us_manual_address(self, get_consent_fixture):
         """Test add with manual address."""
         company = CompanyFactory()
-        get_consent_fixture({
-            'results': [
-                {
-                    'consents': [
-                        'email_marketing',
-                    ],
-                    'email': 'foo@bar.com',
-                },
-            ],
-        })
+        get_consent_fixture(
+            {
+                'results': [
+                    {
+                        'consents': [
+                            'email_marketing',
+                        ],
+                        'email': 'foo@bar.com',
+                    },
+                ],
+            },
+        )
         url = reverse('api-v4:contact:list')
         response = self.api_client.post(
             url,
@@ -457,6 +461,7 @@ class TestAddContactV4(AddContactBase):
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
             'valid_email': True,
+            'consent_data': None,
         }
 
     def test_fails_with_us_but_no_area(self):
@@ -577,6 +582,7 @@ class EditContactBase(APITestMixin):
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-19T13:25:30.986208Z',
             'valid_email': True,
+            'consent_data': None,
         }
 
     def test_cannot_update_if_archived(self):
@@ -774,6 +780,7 @@ class TestEditContactV4(EditContactBase):
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-19T13:25:30.986208Z',
             'valid_email': True,
+            'consent_data': None,
         }
 
     def test_try_to_remove_area(self):
@@ -910,6 +917,7 @@ class ViewContactBase(APITestMixin):
             address_postcode='YO22 4JU',
             notes='lorem ipsum',
             valid_email=True,
+            consent_data={'consent': True},
         )
         url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
@@ -962,6 +970,7 @@ class ViewContactBase(APITestMixin):
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
             'valid_email': True,
+            'consent_data': {'consent': True},
         }
 
     def test_get_contact_without_view_document_permission(self):
@@ -970,9 +979,7 @@ class ViewContactBase(APITestMixin):
             archived_documents_url_path='http://some-documents',
         )
         user = create_test_user(
-            permission_codenames=(
-                'view_contact',
-            ),
+            permission_codenames=('view_contact',),
         )
         api_client = self.create_api_client(user=user)
 
@@ -996,17 +1003,22 @@ class ViewContactBase(APITestMixin):
             api_id=settings.CONSENT_SERVICE_HAWK_ID,
             api_key=settings.CONSENT_SERVICE_HAWK_KEY,
             response={
-                'results': [{
-                    'email': contact.email,
-                    'consents': [
-                        CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
-                    ] if accepts_marketing else [],
-                }],
+                'results': [
+                    {
+                        'email': contact.email,
+                        'consents': (
+                            [
+                                CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
+                            ]
+                            if accepts_marketing
+                            else []
+                        ),
+                    },
+                ],
             },
         )
         requests_mock.get(
-            f'{settings.CONSENT_SERVICE_BASE_URL}'
-            f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
+            f'{settings.CONSENT_SERVICE_BASE_URL}' f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             status_code=200,
             text=hawk_response,
         )
@@ -1038,8 +1050,7 @@ class ViewContactBase(APITestMixin):
         """Tests accepts_dit_email_marketing field return false if there is an error."""
         contact = ContactFactory()
         requests_mock.get(
-            f'{settings.CONSENT_SERVICE_BASE_URL}'
-            f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
+            f'{settings.CONSENT_SERVICE_BASE_URL}' f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             status_code=response_status,
         )
         api_client = self.create_api_client()
@@ -1066,8 +1077,7 @@ class ViewContactBase(APITestMixin):
         """Tests accepts_dit_email_marketing field return false if there is an error."""
         contact = ContactFactory()
         requests_mock.get(
-            f'{settings.CONSENT_SERVICE_BASE_URL}'
-            f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
+            f'{settings.CONSENT_SERVICE_BASE_URL}' f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
             exc=exceptions,
         )
         api_client = self.create_api_client()
@@ -1137,6 +1147,7 @@ class ContactListBase(APITestMixin):
             address_postcode='SW1A1AA',
             notes='lorem ipsum',
             valid_email=True,
+            consent_data={'consent': False},
         )
 
         url = reverse(f'{self.endpoint_namespace}:contact:list')
@@ -1191,6 +1202,7 @@ class ContactListBase(APITestMixin):
                         'name': constants.Title.admiral_of_the_fleet.value.name,
                     },
                     'valid_email': True,
+                    'consent_data': {'consent': False},
                 },
             ],
         }
@@ -1200,9 +1212,7 @@ class ContactListBase(APITestMixin):
         ContactFactory.create_batch(5, archived_documents_url_path='https://some-docs')
 
         user = create_test_user(
-            permission_codenames=(
-                'view_contact',
-            ),
+            permission_codenames=('view_contact',),
         )
         api_client = self.create_api_client(user=user)
 
@@ -1212,8 +1222,7 @@ class ContactListBase(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 5
         assert all(
-            'archived_documents_url_path' not in contact
-            for contact in response.data['results']
+            'archived_documents_url_path' not in contact for contact in response.data['results']
         )
 
     def test_all_with_view_document_permission(self):
@@ -1480,7 +1489,9 @@ class TestContactV3Versioning(ContactVersioningBase):
     def test_unarchive_creates_a_new_version(self):
         """Test that unarchiving a contact creates a new version."""
         contact = ContactFactory(
-            archived=True, archived_on=now(), archived_reason='foo',
+            archived=True,
+            archived_on=now(),
+            archived_reason='foo',
         )
         assert Version.objects.get_for_object(contact).count() == 0
 

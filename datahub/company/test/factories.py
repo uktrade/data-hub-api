@@ -184,6 +184,8 @@ class ContactFactory(factory.django.DjangoModelFactory):
     address_same_as_company = True
     created_on = now()
     archived_documents_url_path = factory.LazyFunction(lambda: f'/documents/{uuid.uuid4()}')
+    consent_data = None
+    consent_data_last_modified = None
 
     class Meta:
         model = 'company.Contact'

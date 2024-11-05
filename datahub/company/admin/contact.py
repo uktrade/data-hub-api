@@ -35,14 +35,14 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
         'transfer_reason',
         'transferred_on',
         'transferred_by',
+        'consent_data',
+        'consent_data_last_modified',
     )
     list_display = (
         'name',
         'company',
     )
-    list_select_related = (
-        'company',
-    )
+    list_select_related = ('company',)
     exclude = (
         'created_on',
         'created_by',
