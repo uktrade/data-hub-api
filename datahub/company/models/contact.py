@@ -11,6 +11,7 @@ from datahub.core.validators import (
     InternationalTelephoneValidator,
 )
 from datahub.metadata import models as metadata_models
+
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
@@ -43,17 +44,26 @@ class Contact(ArchivableModel, BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     title = models.ForeignKey(
-        metadata_models.Title, blank=True, null=True, on_delete=models.SET_NULL,
+        metadata_models.Title,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
     job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     company = models.ForeignKey(
-        'Company', related_name='contacts', null=True, blank=True,
+        'Company',
+        related_name='contacts',
+        null=True,
+        blank=True,
         on_delete=models.CASCADE,
     )
     adviser = models.ForeignKey(
-        'Advisor', related_name='contacts', null=True, blank=True,
+        'Advisor',
+        related_name='contacts',
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
     )
     primary = models.BooleanField()
@@ -70,7 +80,9 @@ class Contact(ArchivableModel, BaseModel):
     address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_country = models.ForeignKey(
-        metadata_models.Country, null=True, blank=True,
+        metadata_models.Country,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
     )
     address_area = models.ForeignKey(
@@ -83,7 +95,8 @@ class Contact(ArchivableModel, BaseModel):
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     notes = models.TextField(null=True, blank=True)
     archived_documents_url_path = models.CharField(
-        max_length=MAX_LENGTH, blank=True,
+        max_length=MAX_LENGTH,
+        blank=True,
         help_text='Legacy field. File browser path to the archived documents for this contact.',
     )
     valid_email = models.BooleanField(null=True, blank=True)
@@ -109,6 +122,14 @@ class Contact(ArchivableModel, BaseModel):
         null=True,
         on_delete=models.SET_NULL,
         related_name='+',
+    )
+    consent_data = models.JSONField(
+        blank=True,
+        null=True,
+    )
+    consent_data_last_modified = models.DateTimeField(
+        blank=True,
+        null=True,
     )
 
     def get_absolute_url(self):

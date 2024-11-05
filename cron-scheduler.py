@@ -12,7 +12,10 @@ from django.conf import settings
 
 from datahub.company.tasks.adviser import schedule_automatic_adviser_deactivate
 from datahub.company.tasks.company import schedule_automatic_company_archive
-from datahub.company.tasks.contact import schedule_automatic_contact_archive
+from datahub.company.tasks.contact import (
+    ingest_contact_consent_data,
+    schedule_automatic_contact_archive,
+)
 from datahub.company.tasks.export_potential import update_company_export_potential_from_csv
 from datahub.company_activity.tasks.ingest_company_activity import ingest_activity_data
 from datahub.core.queues.constants import (
@@ -43,6 +46,7 @@ from datahub.export_win.tasks import (
     update_notify_email_delivery_status_for_customer_response,
     update_notify_email_delivery_status_for_customer_response_token,
 )
+
 # from datahub.investment.project.tasks import (
 #     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
 # )
@@ -243,6 +247,15 @@ def schedule_jobs():
     schedule_export_win_auto_resend_client_email()
     schedule_user_reminder_migration()
     schedule_update_company_export_potential_from_csv()
+    job_scheduler(
+        max_retries=3,
+        function=ingest_contact_consent_data,
+        cron=EVERY_HOUR,
+        queue_name=LONG_RUNNING_QUEUE,
+        retry_backoff=True,
+        description='Import contact consent data',
+        job_timeout=HALF_DAY_IN_SECONDS,
+    )
 
 
 def schedule_email_ingestion_tasks():

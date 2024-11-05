@@ -1,12 +1,22 @@
+import datetime
+import json
 import logging
+import math
 
+import environ
 import requests
+
+from dateutil import parser
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
 from django_pglocks import advisory_lock
 
+from smart_open import open
+
 from datahub.company import consent
 from datahub.company.models import Contact
+from datahub.core.boto3_client import get_s3_client
 from datahub.core.exceptions import APIBadGatewayException
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.errors import RetryError
@@ -14,12 +24,14 @@ from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.core.realtime_messaging import send_realtime_message
 
+
 logger = logging.getLogger(__name__)
 
 
 def _automatic_contact_archive(limit=1000, simulate=False):
     contacts_to_be_archived = Contact.objects.filter(
-        archived=False, company__archived=True,
+        archived=False,
+        company__archived=True,
     ).prefetch_related('company')[:limit]
 
     for contact in contacts_to_be_archived:
@@ -28,8 +40,10 @@ def _automatic_contact_archive(limit=1000, simulate=False):
             logger.info(f'[SIMULATION] {message}')
             continue
         contact.archived = True
-        contact.archived_reason = f'Record was automatically archived due to the company ' \
-                                  f'"{contact.company.name}" being archived'
+        contact.archived_reason = (
+            'Record was automatically archived due to the company '
+            f'"{contact.company.name}" being archived'
+        )
         contact.archived_on = timezone.now()
         contact.save(
             update_fields=[
@@ -129,3 +143,135 @@ def automatic_contact_archive(limit=1000, simulate=False):
         if simulate:
             realtime_message = f'[SIMULATE] {realtime_message}'
         send_realtime_message(realtime_message)
+
+
+def ingest_contact_consent_data():
+    with advisory_lock('ingest_contact_consent_data', wait=False) as acquired:
+
+        if not acquired:
+            logger.info(
+                'Another instance of this ingest_contact_consent_data task is already running.',
+            )
+            return
+
+        task = ContactConsentIngestionTask()
+        task.ingest()
+
+
+env = environ.Env()
+REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
+BUCKET = f"data-flow-bucket-{env('ENVIRONMENT', default='')}"
+PREFIX = 'data-flow/exports/'
+CONSENT_PREFIX = f'{PREFIX}MergeConsentsPipeline/'
+
+
+class ContactConsentIngestionTask:
+
+    def _list_objects(self, client, bucket_name, prefix):
+        """Returns a list all objects with specified prefix."""
+        response = client.list_objects(
+            Bucket=bucket_name,
+            Prefix=prefix,
+        )
+        # Get the list of files, oldest first. Process in that order, so any changes in newer
+        # files take precedence
+        sorted_files = sorted(
+            [object for object in response.get('Contents', {})],
+            key=lambda x: x['LastModified'],
+            reverse=False,
+        )
+        return [file['Key'] for file in sorted_files]
+
+    def _log_at_interval(self, index: int, message: str):
+        """
+        Log in a way that is suitable for both small and large datasets. Initially
+        a log info entry will be written every 100 rows, then increasing in frequency
+        to every 1000, 10000, 100000 up to every million
+        """
+        if (index) % (10 ** min((max((math.floor(math.log10(index))), 2)), 6)) == 0:
+            logger.info(message)
+
+    def ingest(self):
+        logger.info('Checking for new Contact Consent data files')
+        s3_client = get_s3_client(REGION)
+        file_keys = self._list_objects(s3_client, BUCKET, CONSENT_PREFIX)
+        if len(file_keys) == 0:
+            logger.info('No files found in bucket %s matching prefix %s', BUCKET, CONSENT_PREFIX)
+            return
+        for file_key in file_keys:
+            self.sync_file_with_database(s3_client, file_key)
+            self.delete_file(s3_client, file_key)
+
+    def sync_file_with_database(self, client, file_key):
+        logger.info('Syncing file %s', file_key)
+        path = f's3://{BUCKET}/{file_key}'
+
+        with open(
+            path,
+            'r',
+            transport_params={
+                'client': client,
+            },
+        ) as s3_file:
+            i = 0
+            for line in s3_file:
+                i = i + 1
+
+                self._log_at_interval(i, f'Processed {i} rows from {path}')
+
+                consent_row = json.loads(line)
+                if 'email' not in consent_row or 'consents' not in consent_row:
+                    continue
+
+                email = consent_row['email']
+                matching_contacts = Contact.objects.filter(email=email)
+
+                if not matching_contacts.exists():
+                    logger.debug('Email %s has no matching datahub contact', email)
+                    continue
+
+                for matching_contact in matching_contacts:
+
+                    last_modified = (
+                        consent_row['last_modified'] if 'last_modified' in consent_row else None
+                    )
+
+                    update_row = False
+                    if (
+                        matching_contact.consent_data_last_modified is None
+                        or last_modified is None
+                    ):
+                        update_row = True
+                    # to avoid issues with different source system time formats, just compare on
+                    # the date portion
+                    elif (
+                        parser.parse(last_modified).date()
+                        > matching_contact.consent_data_last_modified.date()
+                    ):
+                        update_row = True
+
+                    if not update_row:
+                        logger.debug(
+                            'Email %s consent data has not been updated in the latest file',
+                            email,
+                        )
+                        continue
+                    if settings.ENABLE_CONTACT_CONSENT_INGEST:
+                        matching_contact.consent_data = consent_row['consents']
+                        matching_contact.consent_data_last_modified = (
+                            last_modified if last_modified else datetime.datetime.now()
+                        )
+                        matching_contact.save()
+
+                        logger.debug('Updated consents for email %s', email)
+                    else:
+                        logger.info(
+                            'Email %s would have consent data updated, but setting is disabled',
+                            email,
+                        )
+
+            logger.info('Finished processing total %s rows from %s', i, path)
+
+    def delete_file(self, client, file_key):
+        logger.info('Deleting file %s', file_key)
+        client.delete_object(Bucket=BUCKET, Key=file_key)

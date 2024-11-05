@@ -101,3 +101,19 @@ services:
       RQ_REDIS_HOST: "redis"
     depends_on:
       - redis
+
+  localstack:
+    build:
+      context: .localstack
+      dockerfile: Dockerfile
+    ports:
+      - '4563-4599:4563-4599'
+    environment:
+      - DISABLE_CORS_CHECKS=1
+      - DISABLE_CUSTOM_CORS_S3=1
+      - AWS_DEFAULT_REGION=eu-west-2
+      - EDGE_PORT=4566
+      - SERVICES=s3,sts,iam 
+    volumes:
+      - "./.localstack/mounted:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
