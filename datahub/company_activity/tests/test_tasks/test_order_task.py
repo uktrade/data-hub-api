@@ -5,7 +5,7 @@ import pytest
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_activity.tasks.sync import (
     relate_company_activity_to_orders,
-    schedule_sync_order_to_company_activity,
+    schedule_sync_data_to_company_activity,
 )
 from datahub.omis.order.test.factories import OrderFactory
 
@@ -28,7 +28,7 @@ class TestCompanyActivityOrderTasks:
         assert CompanyActivity.objects.count() == 0
 
         # Check the "existing" orders are added to the company activity model
-        schedule_sync_order_to_company_activity()
+        schedule_sync_data_to_company_activity(relate_company_activity_to_orders)
         assert CompanyActivity.objects.count() == len(orders)
 
         company_activity = CompanyActivity.objects.get(order_id=orders[0].id)
@@ -72,5 +72,5 @@ class TestCompanyActivityOrderTasks:
         assert CompanyActivity.objects.count() == 4
 
         # Check count remains unchanged.
-        schedule_sync_order_to_company_activity()
+        schedule_sync_data_to_company_activity(relate_company_activity_to_orders)
         assert CompanyActivity.objects.count() == 4
