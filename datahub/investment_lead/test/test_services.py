@@ -67,6 +67,31 @@ class TestEYBLeadServices:
         assert eyb_lead.company == company
 
     @pytest.mark.parametrize(
+        'duns_number_param',
+        [
+            '',
+            None
+        ],
+    )
+    def test_duns_does_not_match_when_empty_or_none(self, duns_number_param):
+        """An empty or None duns_number shouldn't match with any company."""
+        eyb_lead = EYBLeadFactory(
+            company=None,
+            duns_number=duns_number_param
+        )
+        empty_company = CompanyFactory(
+            duns_number=duns_number_param
+        )
+
+        initial_companies_count = Company.objects.count()
+        assert eyb_lead.company is None
+
+        match_or_create_company_for_eyb_lead(eyb_lead)
+
+        assert Company.objects.count() == initial_companies_count + 1
+        assert eyb_lead.company is not empty_company
+
+    @pytest.mark.parametrize(
         'function_to_test',
         [
             'raise_exception_for_eyb_lead_without_company',

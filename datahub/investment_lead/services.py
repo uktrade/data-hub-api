@@ -65,7 +65,8 @@ def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
     """
     # Create company record
     company = Company()
-    company.duns_number = eyb_lead.duns_number
+
+    company.duns_number = eyb_lead.duns_number if eyb_lead.duns_number else None
     company.name = eyb_lead.company_name
     company.sector = eyb_lead.sector
     company.address_1 = eyb_lead.address_1
@@ -93,7 +94,7 @@ def match_or_create_company_for_eyb_lead(eyb_lead):
         company (object): a company object
     """
     company = None
-    if eyb_lead.duns_number is not None:
+    if eyb_lead.duns_number:
         company = find_match_by_duns_number(eyb_lead.duns_number)
 
     if company is None:
