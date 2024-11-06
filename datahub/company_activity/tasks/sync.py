@@ -1,7 +1,6 @@
 import logging
-from itertools import islice
 
-from datahub.company_activity.models import CompanyActivity
+from datahub.company_activity.models import CompanyActivity, GreatExportEnquiry
 from datahub.company_referral.models import CompanyReferral
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
@@ -12,26 +11,6 @@ from datahub.omis.order.models import Order
 
 
 logger = logging.getLogger(__name__)
-
-
-def schedule_sync_interactions_to_company_activity():
-    """
-    Schedules a task to relate all `Interaction`s to `CompanyActivity`s.
-
-    Can be used to populate the CompanyActivity with missing interactions
-    or to initially populate the model.
-    """
-    job = job_scheduler(
-        queue_name=LONG_RUNNING_QUEUE,
-        function=relate_company_activity_to_interactions,
-        job_timeout=HALF_DAY_IN_SECONDS,
-        max_retries=5,
-        retry_backoff=True,
-    )
-    logger.info(
-        f'Task {job.id} schedule_sync_interactions_to_company_activity scheduled.',
-    )
-    return job
 
 
 def relate_company_activity_to_interactions(batch_size=500):
@@ -62,37 +41,7 @@ def relate_company_activity_to_interactions(batch_size=500):
         if interaction['id'] not in activity_interactions
     )
 
-    total = interactions.count()
-
-    while True:
-        batch = list(islice(objs, batch_size))
-        if not batch:
-            logger.info('Finished bulk creating CompanyActivities.')
-            break
-        logger.info(
-            f'Creating in batches of: {batch_size} CompanyActivities. {total} remaining.')
-        CompanyActivity.objects.bulk_create(objs=batch, batch_size=batch_size)
-        total -= batch_size
-
-
-def schedule_sync_referrals_to_company_activity():
-    """
-    Schedules a task to relate all `CompanyReferral`s to `CompanyActivity`s
-
-    Can be used to populate the CompanyActivity with missing referrals
-    or to initially populate the model.
-    """
-    job = job_scheduler(
-        queue_name=LONG_RUNNING_QUEUE,
-        function=relate_company_activity_to_referrals,
-        job_timeout=HALF_DAY_IN_SECONDS,
-        max_retries=5,
-        retry_backoff=True,
-    )
-    logger.info(
-        f'Task {job.id} schedule_sync_referrals_to_company_activity scheduled.',
-    )
-    return job
+    bulk_create_activity(objs, batch_size)
 
 
 def relate_company_activity_to_referrals(batch_size=500):
@@ -121,37 +70,8 @@ def relate_company_activity_to_referrals(batch_size=500):
         )
         for referral in referrals
     )
-    total = referrals.count()
 
-    while True:
-        batch = list(islice(objs, batch_size))
-        if not batch:
-            logger.info('Finished bulk creating CompanyActivities.')
-            break
-        logger.info(
-            f'Creating in batches of: {batch_size} CompanyActivities. {total} remaining.')
-        CompanyActivity.objects.bulk_create(objs=batch, batch_size=batch_size)
-        total -= batch_size
-
-
-def schedule_sync_investments_to_company_activity():
-    """
-    Schedules a task to relate all `Investment`s to `CompanyActivity`s
-
-    Can be used to populate the CompanyActivity with missing investments
-    or to initially populate the model.
-    """
-    job = job_scheduler(
-        queue_name=LONG_RUNNING_QUEUE,
-        function=relate_company_activity_to_investment_projects,
-        job_timeout=HALF_DAY_IN_SECONDS,
-        max_retries=5,
-        retry_backoff=True,
-    )
-    logger.info(
-        f'Task {job.id} schedule_sync_investments_to_company_activity scheduled.',
-    )
-    return job
+    bulk_create_activity(objs, batch_size)
 
 
 def relate_company_activity_to_investment_projects(batch_size=500):
@@ -180,36 +100,8 @@ def relate_company_activity_to_investment_projects(batch_size=500):
         for investment in investments
         if investment['id'] not in activity_investments
     )
-    total = investments.count()
-    while True:
-        batch = list(islice(objs, batch_size))
-        if not batch:
-            logger.info('Finished bulk creating CompanyActivities.')
-            break
-        logger.info(
-            f'Creating in batches of: {batch_size} CompanyActivities. {total} remaining.')
-        CompanyActivity.objects.bulk_create(objs=batch, batch_size=batch_size)
-        total -= batch_size
 
-
-def schedule_sync_order_to_company_activity():
-    """
-    Schedules a task to relate all `Omis Order`s to `CompanyActivity`s
-
-    Can be used to populate the CompanyActivity with missing orders
-    or to initially populate the model.
-    """
-    job = job_scheduler(
-        queue_name=LONG_RUNNING_QUEUE,
-        function=relate_company_activity_to_orders,
-        job_timeout=HALF_DAY_IN_SECONDS,
-        max_retries=5,
-        retry_backoff=True,
-    )
-    logger.info(
-        f'Task {job.id} schedule_sync_order_to_company_activity scheduled.',
-    )
-    return job
+    bulk_create_activity(objs, batch_size)
 
 
 def relate_company_activity_to_orders(batch_size=500):
@@ -227,7 +119,8 @@ def relate_company_activity_to_orders(batch_size=500):
     orders = Order.objects.filter(
         company_id__isnull=False,
     ).values('id', 'created_on', 'company_id')
-    objs = (
+
+    objs = [
         CompanyActivity(
             order_id=order['id'],
             date=order['created_on'],
@@ -236,13 +129,68 @@ def relate_company_activity_to_orders(batch_size=500):
         )
         for order in orders
         if order['id'] not in activity_orders
+    ]
+
+    bulk_create_activity(objs, batch_size)
+
+
+def relate_company_activity_to_great(batch_size=500):
+    """
+    Grabs all great export enquiry so they can be related to in the
+    `CompanyActivity` model with a bulk_create. Excludes any
+    great export enquiry already associated in the CompanyActivity model.
+    """
+    activity = set(
+        CompanyActivity.objects.filter(
+            great__isnull=False,
+        ).values_list('great_id', flat=True),
     )
-    total = orders.count()
+
+    great_export_enuiries = GreatExportEnquiry.objects.filter(
+        great_company__isnull=False,
+    ).values('id', 'created_on', 'company_id')
+
+    objs = (
+        CompanyActivity(
+            investment_id=great_export_enquiry['id'],
+            date=great_export_enquiry['created_on'],
+            company_id=great_export_enquiry['investor_company_id'],
+            activity_source=CompanyActivity.ActivitySource.great,
+        )
+        for great_export_enquiry in great_export_enuiries
+        if great_export_enquiry['id'] not in activity
+    )
+
+    bulk_create_activity(objs, batch_size)
+
+
+def schedule_sync_data_to_company_activity(relate_function):
+    """
+    Schedules a task for the given function.
+    """
+    job = job_scheduler(
+        queue_name=LONG_RUNNING_QUEUE,
+        function=relate_function,
+        job_timeout=HALF_DAY_IN_SECONDS,
+        max_retries=5,
+        retry_backoff=True,
+    )
+    logger.info(
+        f'Task {job.id} {relate_function.__name__} scheduled.',
+    )
+    return job
+
+
+def bulk_create_activity(objs, batch_size):
+    total = len(objs)
+    initial = 0
+
     while True:
-        batch = list(islice(objs, batch_size))
+        batch = objs[initial: initial + batch_size]
         if not batch:
             logger.info('Finished bulk creating CompanyActivities.')
             break
         logger.info(f'Creating in batches of: {batch_size} CompanyActivities. {total} remaining.')
         CompanyActivity.objects.bulk_create(objs=batch, batch_size=batch_size)
         total -= batch_size
+        initial += batch_size

@@ -101,7 +101,7 @@ class CompanyActivity(models.Model):
         ),
     )
 
-    great = models.OneToOneField(
+    great = models.ForeignKey(
         'company_activity.GreatExportEnquiry',
         unique=True,
         null=True,

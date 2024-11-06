@@ -1,7 +1,7 @@
 import factory.fuzzy
 from django.utils.timezone import now
 
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -158,7 +158,7 @@ class CompanyActivityGreatExportEnquiryFactory(factory.django.DjangoModelFactory
     CompanyActivity ingested Great Export Enquiry data factory
     """
 
-    form_id = factory.Sequence(lambda n: n)
+    form_id = factory.Faker('pyint', min_value=0, max_value=999999)
     url = 'http://www.lewis.com/'
     form_created_at = now()
     submission_type = 'magna'
@@ -201,6 +201,7 @@ class CompanyActivityGreatExportEnquiryFactory(factory.django.DjangoModelFactory
     actor_dit_is_blacklisted = False
     actor_dit_is_whitelisted = False
     actor_dit_blacklisted_reason = None
+    contact = factory.SubFactory(ContactFactory)
 
     @factory.post_generation
     def set_markets(self, create, extracted, **kwargs):

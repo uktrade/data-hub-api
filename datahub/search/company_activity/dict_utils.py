@@ -69,3 +69,17 @@ def activity_order_dict(obj):
         'contact': dict_utils.contact_job_dict(obj.contact),
         'created_by': dict_utils.contact_or_adviser_dict(obj.created_by),
     }
+
+
+def activity_great_dict(obj):
+    """Creates dictionary from an omis order"""
+    if obj is None:
+        return None
+
+    return {
+        'id': str(obj.id),
+        'created_on': obj.created_on,
+        'meta_full_name': obj.meta_full_name,
+        'meta_email_address': obj.meta_email_address,
+        'contact': obj.contact,
+    }

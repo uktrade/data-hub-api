@@ -73,5 +73,6 @@ def activity_great_field():
             'created_on': Date(),
             'meta_full_name': Text(index=False),
             'meta_email_address': Text(index=False),
+            'contact': fields.contact_job_field(),
         },
     )

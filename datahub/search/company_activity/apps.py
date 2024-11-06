@@ -30,6 +30,7 @@ class CompanyActivitySearchApp(SearchApp):
         'order__uk_region',
         'order__created_by',
         'great',
+        'great__contact',
     ).prefetch_related(
         'interaction__contacts',
         Prefetch(
