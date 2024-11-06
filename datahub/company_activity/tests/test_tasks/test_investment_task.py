@@ -5,7 +5,7 @@ import pytest
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_activity.tasks.sync import (
     relate_company_activity_to_investment_projects,
-    schedule_sync_investments_to_company_activity,
+    schedule_sync_data_to_company_activity,
 )
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 
@@ -31,7 +31,7 @@ class TestCompanyActivityInvestmentTasks:
         assert CompanyActivity.objects.count() == 0
 
         # Check the "existing" investments are added to the company activity model
-        schedule_sync_investments_to_company_activity()
+        schedule_sync_data_to_company_activity(relate_company_activity_to_investment_projects)
         assert CompanyActivity.objects.count() == 4
 
         company_activity = CompanyActivity.objects.get(
@@ -84,5 +84,5 @@ class TestCompanyActivityInvestmentTasks:
         assert CompanyActivity.objects.count() == 4
 
         # Check count remains unchanged.
-        schedule_sync_investments_to_company_activity()
+        schedule_sync_data_to_company_activity(relate_company_activity_to_investment_projects)
         assert CompanyActivity.objects.count() == 4

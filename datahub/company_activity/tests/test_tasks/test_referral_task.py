@@ -5,7 +5,7 @@ import pytest
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_activity.tasks.sync import (
     relate_company_activity_to_referrals,
-    schedule_sync_referrals_to_company_activity,
+    schedule_sync_data_to_company_activity,
 )
 from datahub.company_referral.test.factories import CompanyReferralFactory
 
@@ -31,7 +31,7 @@ class TestCompanyActivityReferralTasks:
         assert CompanyActivity.objects.count() == 0
 
         # Check the "existing" referrals are addded to the company activity model
-        schedule_sync_referrals_to_company_activity()
+        schedule_sync_data_to_company_activity(relate_company_activity_to_referrals)
         assert CompanyActivity.objects.count() == 4
 
         company_activity = CompanyActivity.objects.get(referral_id=referral.id)
@@ -52,7 +52,7 @@ class TestCompanyActivityReferralTasks:
         assert CompanyActivity.objects.count() == 4
 
         # Check count remains unchanged.
-        schedule_sync_referrals_to_company_activity()
+        schedule_sync_data_to_company_activity(relate_company_activity_to_referrals)
         assert CompanyActivity.objects.count() == 4
 
     @mock.patch('datahub.company_activity.models.CompanyActivity.objects.bulk_create')
