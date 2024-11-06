@@ -418,7 +418,6 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
 
         # Rest of the character fields
         char_fields = {
-            'dunsNumber': 'duns_number',
             'addressLine2': 'address_2',
             'county': 'address_county',
             'postcode': 'address_postcode',

@@ -70,17 +70,17 @@ class TestEYBLeadServices:
         'duns_number_param',
         [
             '',
-            None
+            None,
         ],
     )
     def test_duns_does_not_match_when_empty_or_none(self, duns_number_param):
         """An empty or None duns_number shouldn't match with any company."""
         eyb_lead = EYBLeadFactory(
             company=None,
-            duns_number=duns_number_param
+            duns_number=duns_number_param,
         )
         empty_company = CompanyFactory(
-            duns_number=duns_number_param
+            duns_number=duns_number_param,
         )
 
         initial_companies_count = Company.objects.count()
