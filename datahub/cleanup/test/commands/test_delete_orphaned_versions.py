@@ -22,9 +22,9 @@ from datahub.company.test.factories import (
     OneListCoreTeamMemberFactory,
 )
 from datahub.company_activity.tests.factories import (
-    CompanyActivityGreatExportEnquiryFactory,
     CompanyActivityIngestedFileFactory,
     CompanyActivityInteractionFactory,
+    GreatExportEnquiryFactory,
 )
 from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
@@ -75,7 +75,7 @@ MAPPINGS = {
     'company.Objective': ObjectiveFactory,
     'company.OneListCoreTeamMember': OneListCoreTeamMemberFactory,
     'company_activity.CompanyActivity': CompanyActivityInteractionFactory,
-    'company_activity.GreatExportEnquiry': CompanyActivityGreatExportEnquiryFactory,
+    'company_activity.GreatExportEnquiry': GreatExportEnquiryFactory,
     'company_activity.IngestedFile': CompanyActivityIngestedFileFactory,
     'company_list.CompanyListItem': CompanyListItemFactory,
     'company_list.PipelineItem': PipelineItemFactory,

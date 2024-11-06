@@ -18,7 +18,7 @@ from datahub.company_activity.tasks.ingest_great_data import (
     GreatIngestionTask, ingest_great_data,
 )
 from datahub.company_activity.tests.factories import (
-    CompanyActivityGreatExportEnquiryFactory,
+    GreatExportEnquiryFactory,
 )
 from datahub.metadata.models import BusinessType, Country, EmployeeRange, Sector
 
@@ -90,7 +90,7 @@ class TestGreatIngestionTasks:
         """
         Test that we skip updating records that have already been ingested
         """
-        CompanyActivityGreatExportEnquiryFactory(form_id=5249)
+        GreatExportEnquiryFactory(form_id=5249)
         record = json.dumps(dict({
             'id': '5249',
             'created_at': '2024-09-19T14:00:34.069',

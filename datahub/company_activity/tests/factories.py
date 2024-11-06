@@ -153,12 +153,12 @@ class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):
         return obj
 
 
-class CompanyActivityGreatExportEnquiryFactory(factory.django.DjangoModelFactory):
+class GreatExportEnquiryFactory(factory.django.DjangoModelFactory):
     """
-    CompanyActivity ingested Great Export Enquiry data factory
+    Ingested Great Export Enquiry data factory
     """
 
-    form_id = factory.Sequence(lambda n: n)
+    form_id = factory.Faker('pyint', min_value=0, max_value=999999)
     url = 'http://www.lewis.com/'
     form_created_at = now()
     submission_type = 'magna'
