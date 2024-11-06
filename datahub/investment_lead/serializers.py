@@ -413,7 +413,7 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
         }
         for incoming_field, internal_field in none_fields.items():
             value = data.get(incoming_field, None)
-            if value is None:
+            if value == '':
                 internal_values[internal_field] = None
 
         # Rest of the character fields
