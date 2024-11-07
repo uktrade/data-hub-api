@@ -301,7 +301,7 @@ legacy_wins = {
             'lead_officer_name': 'Lead officer name',
             'line_manager_name': 'line manager',
             'name_of_customer': '',
-            'name_of_export': '',
+            'name_of_export': '',  # noqa: B041
             'other_official_email_address': '',
             'sector_display': None,
             'team_type': 'team',
@@ -310,7 +310,7 @@ legacy_wins = {
             'type_of_support_3': None,
             'user__email': 'abc@test',
             'user__name': 'Abc Def',
-            'confirmation__comments': None,
+            'confirmation__comments': None,  # noqa: B041
             'confirmation__name': None,
             'confirmation__other_marketing_source': None,
             'total_expected_export_value': 0,
@@ -350,7 +350,7 @@ legacy_wins = {
             'is_personally_confirmed': True,
             'is_prosperity_fund_related': True,
             'lead_officer_email_address': '',
-            'lead_officer_name': 'Lead officer name',
+            'lead_officer_name': 'Lead officer name',  # noqa: B041
             'line_manager_name': 'line manager',
             'name_of_customer': '',
             'name_of_export': '',
@@ -362,7 +362,7 @@ legacy_wins = {
             'type_of_support_3': None,
             'user__email': 'abc@test',
             'user__name': 'Abc Def',
-            'confirmation__comments': None,
+            'confirmation__comments': None,  # noqa: B041
             'confirmation__name': None,
             'confirmation__other_marketing_source': None,
             'total_expected_export_value': 0,
@@ -399,7 +399,7 @@ legacy_wins = {
             'id': '5778b485-1060-46e2-b411-772cd0f76d79',
             'is_e_exported': True,
             'is_line_manager_confirmed': True,
-            'is_personally_confirmed': True,
+            'is_personally_confirmed': True,  # noqa: B041
             'is_prosperity_fund_related': True,
             'lead_officer_email_address': 'user.email2@trade.gov.uk',
             'lead_officer_name': 'Lead officer name',
@@ -414,7 +414,7 @@ legacy_wins = {
             'type_of_support_3': None,
             'user__email': 'abc@test',
             'user__name': 'Abc Def',
-            'confirmation__comments': None,
+            'confirmation__comments': None,  # noqa: B041
             'confirmation__name': None,
             'confirmation__other_marketing_source': None,
             'is_active': False,
@@ -449,7 +449,7 @@ legacy_wins = {
             'hq_team': 'team:1',
             'hvc': None,
             'hvo_programme': 'AER-01',
-            'id': '5778b485-1060-46e2-b411-772cd0f76d79',
+            'id': '5778b485-1060-46e2-b411-772cd0f76d79',  # noqa: B041
             'is_e_exported': True,
             'is_line_manager_confirmed': True,
             'is_personally_confirmed': True,
@@ -467,7 +467,7 @@ legacy_wins = {
             'type_of_support_3': None,
             'user__email': 'abc@test',
             'user__name': 'Abc Def',
-            'confirmation__comments': None,
+            'confirmation__comments': None,  # noqa: B041
             'confirmation__name': None,
             'confirmation__other_marketing_source': None,
             'is_active': False,
@@ -906,7 +906,8 @@ def test_legacy_migration(mock_legacy_wins_pages):
     with freeze_time(current_date):
         migrate_all_legacy_wins()
 
-    # After running migration again, the number of breakdowns and advisers shouldn't change
+    # After running migration again,
+    # the number of breakdowns & advisers shouldn't change
     assert win_1.breakdowns.count() == 5
     assert {breakdown.legacy_id for breakdown in win_1.breakdowns.all()} == {
         5, 6, 7, 8, 9,
@@ -993,7 +994,8 @@ def test_legacy_migration(mock_legacy_wins_pages):
 @pytest.mark.parametrize(
     'email,expected',
     (
-        ('test@trade.gov.uk', {'test@businessandtrade.gov.uk', 'test@trade.gov.uk'}),
+        ('test@trade.gov.uk', {'test@businessandtrade.gov.uk',
+         'test@trade.gov.uk'}),
         ('test@mobile.trade.gov.uk', {
             'test@mobile.trade.gov.uk',
             'test@mobile.ukti.gov.uk',
