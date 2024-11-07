@@ -10,6 +10,7 @@ from datahub.company.test.factories import (
 from datahub.company_activity.models import CompanyActivity as DBCompanyActivity
 from datahub.company_activity.tests.factories import (
     CompanyActivityInteractionFactory,
+    GreatExportEnquiryFactory,
 )
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import (
@@ -241,3 +242,45 @@ def test_company_activity_syncs_order_fields_when_changed(opensearch_with_signal
     actual_order = updated_doc['_source']['order']
     assert actual_order['contact']['id'] == str(new_contact.id)
     assert actual_order['created_by']['id'] == str(new_created_by.id)
+
+
+def test_company_activity_syncs_great_fields_when_changed(opensearch_with_signals):
+    """
+    Test that company_activities are synced to OpenSearch
+    if their great export enquiry order updates.
+    """
+    great = GreatExportEnquiryFactory()
+    company_activity = DBCompanyActivity.objects.get(great_id=great.id)
+    opensearch_with_signals.indices.refresh()
+
+    doc = opensearch_with_signals.get(
+        index=CompanyActivitySearchApp.search_model.get_read_alias(),
+        id=company_activity.pk,
+    )
+
+    assert doc['_source']['great']['contact']['id'] == str(great.contact_id)
+    assert doc['_source']['great']['meta_email_address'] == great.meta_email_address
+    assert doc['_source']['great']['meta_subject'] == great.meta_subject
+
+    new_contact = ContactFactory()
+    great.contact = new_contact
+
+    new_email_address = 'fake@fake.com'
+    great.meta_email_address = new_email_address
+
+    new_subject = 'great subject'
+
+    great.meta_subject = new_subject
+
+    great.save()
+
+    opensearch_with_signals.indices.refresh()
+
+    updated_doc = opensearch_with_signals.get(
+        index=CompanyActivitySearchApp.search_model.get_read_alias(),
+        id=company_activity.pk,
+    )
+    actual_great_export_enquiry = updated_doc['_source']['great']
+    assert actual_great_export_enquiry['contact']['id'] == str(new_contact.id)
+    assert actual_great_export_enquiry['meta_email_address'] == new_email_address
+    assert actual_great_export_enquiry['meta_subject'] == new_subject

@@ -194,6 +194,11 @@ class GreatExportEnquiryFactory(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def set_markets(self, create, extracted, **kwargs):
+        # Do not create markets if we are only building the factory without
+        # creating an instance in the DB.
+        if not create:
+            return
+
         self.data_markets.set([CountryFactory()])
 
     class Meta:

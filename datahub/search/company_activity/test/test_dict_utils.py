@@ -1,5 +1,6 @@
 import pytest
 
+from datahub.company_activity.tests.factories import GreatExportEnquiryFactory
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -71,3 +72,19 @@ def test_activity_order_dict():
     assert result['created_by']['id'] == str(order.created_by_id)
     assert result['contact']['id'] == str(order.contact_id)
     assert result['primary_market']['id'] == order.primary_market_id
+
+
+def test_activity_great_dict():
+    obj = None
+    result = dict_utils.activity_great_dict(obj)
+    assert result is None
+
+    great = GreatExportEnquiryFactory()
+    result = dict_utils.activity_great_dict(great)
+
+    assert result['id'] == str(great.id)
+    assert result['created_on'] == great.created_on
+    assert result['meta_full_name'] == great.meta_full_name
+    assert result['meta_email_address'] == great.meta_email_address
+    assert result['contact']['id'] == str(great.contact.id)
+    assert result['meta_subject'] == great.meta_subject
