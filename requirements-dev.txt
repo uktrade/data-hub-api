@@ -33,15 +33,15 @@ backoff==2.2.1
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
-bigtree==0.21.3
+bigtree==0.22.1
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.35.49
+boto3==1.35.54
     # via
     #   -r requirements.in
     #   moto
-botocore==1.35.49
+botocore==1.35.54
     # via
     #   boto3
     #   moto
@@ -78,7 +78,7 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
-coverage[toml]==7.0.1
+coverage[toml]==7.6.4
     # via pytest-cov
 crontab==1.0.0
     # via rq-scheduler
@@ -172,7 +172,7 @@ flake8==7.1.1
     #   flake8-quotes
     #   flake8-string-format
     #   pep8-naming
-flake8-bugbear==24.8.19
+flake8-bugbear==24.10.31
     # via -r requirements-dev.in
 flake8-commas==4.0.0
     # via -r requirements-dev.in
@@ -248,7 +248,7 @@ mccabe==0.7.0
     #   pylint
 mohawk==1.1.0
     # via -r requirements.in
-moto==5.0.18
+moto==5.0.19
     # via -r requirements-dev.in
 multidict==6.0.4
     # via
@@ -398,7 +398,7 @@ pytest==8.3.3
     #   pytest-django
     #   pytest-mock
     #   pytest-xdist
-pytest-cov==5.0.0
+pytest-cov==6.0.0
     # via -r requirements-dev.in
 pytest-django==4.9.0
     # via -r requirements-dev.in
@@ -454,7 +454,7 @@ requests-toolbelt==1.0.0
     # via -r requirements.in
 responses==0.25.3
     # via moto
-rq==1.16.2
+rq==2.0.0
     # via
     #   -r requirements.in
     #   rq-scheduler
@@ -501,7 +501,7 @@ tomli==2.0.1
     #   pytest
 tomlkit==0.11.6
     # via pylint
-tqdm==4.66.5
+tqdm==4.66.6
     # via -r requirements.in
 traitlets==5.14.1
     # via
@@ -537,13 +537,13 @@ virtualenv==20.17.1
     # via pre-commit
 wcwidth==0.2.5
     # via prompt-toolkit
-werkzeug==3.0.6
+werkzeug==3.1.1
     # via
     #   -r requirements.in
     #   moto
 wheel==0.38.4
     # via pip-tools
-whitenoise==6.7.0
+whitenoise==6.8.2
     # via -r requirements.in
 wrapt==1.14.1
     # via

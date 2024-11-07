@@ -12,7 +12,7 @@ django-pglocks==1.0.4
 django-reversion==5.1.0
 inflection==0.5.1  # required for DRF shcema features
 uritemplate==4.1.1  # required for DRF schema features
-whitenoise==6.7.0
+whitenoise==6.8.2
 
 chardet==5.2.0
 pyyaml==6.0.2
@@ -26,7 +26,7 @@ dj-database-url==2.3.0
 psycopg2-binary==2.9.10
 psycogreen==1.0.2
 
-boto3==1.35.49
+boto3==1.35.54
 
 notifications-python-client==10.0.0
 
@@ -52,7 +52,7 @@ elastic-apm==6.23.0
 
 # Testing and dev
 django-debug-toolbar==4.4.6
-werkzeug==3.0.6  # Required by runserver_plus - useful for local dev
+werkzeug==3.1.1  # Required by runserver_plus - useful for local dev
 
 WSGIserver==1.3
 gevent==24.10.3
@@ -62,7 +62,7 @@ requests_toolbelt==1.0.0
 sentry_sdk==2.17.0
 
 # RQ and associated helpers
-rq==1.16.2
+rq==2.0.0
 rq-scheduler==0.13.1
 
 # For logging tables
