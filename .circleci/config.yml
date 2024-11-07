@@ -84,14 +84,6 @@ job_defaults: &job_defaults
         name: Install dependencies
         command: python -m pip install --cache-dir ~/cache/pip --progress-bar off -r requirements-dev.txt
 
-    # patch rq-scheduler for compatibility with rq 2.0.0 
-    # this can be removed if there is an update to rq-scheduler that resolves this issue
-    - run:
-        name: Patch rq-scheduler for compatibility with rq 2.0.0
-        command: |
-          sed -i "/from rq.connections import resolve_connection/d" /usr/local/lib/python3.10/site-packages/rq_scheduler/scheduler.py
-          sed -i "s/self.connection = resolve_connection(connection)/self.connection = connection/" /usr/local/lib/python3.10/site-packages/rq_scheduler/scheduler.py
-
     - save_cache:
         name: Save pip cache
         key: v2-<< parameters.python_image >>-{{ checksum "requirements-dev.txt" }}
