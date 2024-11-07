@@ -29,6 +29,7 @@ class CompanyActivity(models.Model):
         event = ('event', 'event')
         investment = ('investment', 'investment')
         order = ('order', 'order')
+        great = ('great', 'great')
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     company = models.ForeignKey(
@@ -96,6 +97,19 @@ class CompanyActivity(models.Model):
         on_delete=models.CASCADE,
         help_text=(
             'If related to an omis Order, must not have relations to any other activity '
+            '(referral, event etc)'
+        ),
+    )
+
+    great = models.ForeignKey(
+        'company_activity.GreatExportEnquiry',
+        unique=True,
+        null=True,
+        blank=True,
+        related_name='activity',
+        on_delete=models.CASCADE,
+        help_text=(
+            'If related to an great export enquiry, must not have relations to any other activity '
             '(referral, event etc)'
         ),
     )

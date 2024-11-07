@@ -1,7 +1,7 @@
 import factory.fuzzy
 from django.utils.timezone import now
 
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -27,9 +27,9 @@ class CompanyActivityBaseFactory(factory.django.DjangoModelFactory):
 
 class CompanyActivityInteractionFactory(CompanyActivityBaseFactory):
     """
-    CompanyActivity factory with an interaction.
-    Be careful for tests as creating an Interaction already creates a CompanyActivity
-    for the interaction, so calling this creates two CompanyActivities.
+    Overwrite the _create to prevent the CompanyActivity from saving to the database.
+    This is due to the Interaction already creating the CompanyActivity inside its
+    model save.
     """
 
     activity_source = CompanyActivity.ActivitySource.interaction
@@ -190,6 +190,7 @@ class GreatExportEnquiryFactory(factory.django.DjangoModelFactory):
     actor_dit_is_blacklisted = False
     actor_dit_is_whitelisted = False
     actor_dit_blacklisted_reason = None
+    contact = factory.SubFactory(ContactFactory)
 
     @factory.post_generation
     def set_markets(self, create, extracted, **kwargs):
@@ -197,3 +198,25 @@ class GreatExportEnquiryFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company_activity.GreatExportEnquiry'
+
+
+class CompanyActivityGreatExportEnquiryFactory(CompanyActivityBaseFactory):
+    """
+    CompanyActivity factory with an great export enquiry.
+    """
+
+    activity_source = CompanyActivity.ActivitySource.great
+    great = factory.SubFactory(GreatExportEnquiryFactory)
+
+    class Meta:
+        model = 'company_activity.CompanyActivity'
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """
+        Overwrite the _create to prevent the CompanyActivity from saving to the database.
+        This is due to the great export enquiry already creating the CompanyActivity inside its
+        model save.
+        """
+        obj = model_class(*args, **kwargs)
+        return CompanyActivity.objects.get(great_id=obj.great_id)

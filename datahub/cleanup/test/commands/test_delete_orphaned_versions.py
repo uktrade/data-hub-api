@@ -109,6 +109,7 @@ MAPPINGS = {
 COMPANY_ACTIVITY_CREATED_BY_MODELS = [
     CompanyReferralFactory,
     CompanyInteractionFactory,
+    GreatExportEnquiryFactory,
     InvestmentProjectFactory,
     OrderFactory,
 ]
