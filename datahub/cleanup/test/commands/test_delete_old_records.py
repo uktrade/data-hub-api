@@ -35,6 +35,7 @@ from datahub.company.test.factories import (
     SubsidiaryFactory,
 )
 from datahub.company_activity.tests.factories import (
+    CompanyActivityGreatExportEnquiryFactory,
     CompanyActivityInteractionFactory,
     CompanyActivityInvestmentProjectFactory,
     CompanyActivityOmisOrderFactory,
@@ -218,6 +219,12 @@ MAPPING = {
             },
             {
                 'factory': CompanyActivityOmisOrderFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [],
+            },
+            {
+                'factory': CompanyActivityGreatExportEnquiryFactory,
                 'field': 'company',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [],
