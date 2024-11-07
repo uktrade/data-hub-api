@@ -1,0 +1,9 @@
+- model: export_win.experiencecategories
+  pk: b6a47b4c-4cfc-495c-aaec-d6480c4cac3b
+  fields:
+    export_experience: d23012c5-c1a6-459d-9e05-b3d1b8539025
+
+- model: export_win.experiencecategories
+  pk: fd3fbbd0-6c04-4110-aa6a-ba84a91c3272
+  fields:
+    export_experience: 9390cc45-6ebb-4005-866c-c87fd6d6dec0
