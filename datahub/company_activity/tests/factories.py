@@ -10,24 +10,30 @@ from datahub.metadata.test.factories import CountryFactory, SectorFactory
 from datahub.omis.order.test.factories import OrderFactory
 
 
-class CompanyActivityInteractionFactory(factory.django.DjangoModelFactory):
+class CompanyActivityBaseFactory(factory.django.DjangoModelFactory):
+    """
+    The activity_source fields and the foriegn keys in the `CompanyActivity` model are
+    automatically created as part of the save method inside the foreign key fields
+    (oder, interaction, referral etc).
+    """
+
+    date = now()
+    company = factory.SubFactory(CompanyFactory)
+    activity_source = None
+
+    class Meta:
+        model = 'company_activity.CompanyActivity'
+
+
+class CompanyActivityInteractionFactory(CompanyActivityBaseFactory):
     """
     CompanyActivity factory with an interaction.
-
     Be careful for tests as creating an Interaction already creates a CompanyActivity
     for the interaction, so calling this creates two CompanyActivities.
     """
 
-    date = now()
     activity_source = CompanyActivity.ActivitySource.interaction
-    company = factory.SubFactory(CompanyFactory)
     interaction = factory.SubFactory(CompanyInteractionFactory)
-    referral = None
-    investment = None
-    order = None
-
-    class Meta:
-        model = 'company_activity.CompanyActivity'
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
@@ -40,18 +46,11 @@ class CompanyActivityInteractionFactory(factory.django.DjangoModelFactory):
         return CompanyActivity.objects.get(interaction_id=obj.interaction_id)
 
 
-class CompanyActivityReferralFactory(factory.django.DjangoModelFactory):
-    """
-    CompanyActivity factory with a referral.
-    """
+class CompanyActivityReferralFactory(CompanyActivityBaseFactory):
+    """CompanyActivity factory with a referral."""
 
-    date = now()
     activity_source = CompanyActivity.ActivitySource.referral
-    company = factory.SubFactory(CompanyFactory)
     referral = factory.SubFactory(CompanyReferralFactory)
-    interaction = None
-    investment = None
-    order = None
 
     class Meta:
         model = 'company_activity.CompanyActivity'
@@ -67,18 +66,13 @@ class CompanyActivityReferralFactory(factory.django.DjangoModelFactory):
         return CompanyActivity.objects.get(referral_id=obj.referral_id)
 
 
-class CompanyActivityInvestmentProjectFactory(factory.django.DjangoModelFactory):
+class CompanyActivityInvestmentProjectFactory(CompanyActivityBaseFactory):
     """
     CompanyActivity factory with an investment project.
     """
 
-    date = now()
     activity_source = CompanyActivity.ActivitySource.investment
-    company = factory.SubFactory(CompanyFactory)
     investment = factory.SubFactory(InvestmentProjectFactory)
-    interaction = None
-    referral = None
-    order = None
 
     class Meta:
         model = 'company_activity.CompanyActivity'
@@ -94,17 +88,12 @@ class CompanyActivityInvestmentProjectFactory(factory.django.DjangoModelFactory)
         return CompanyActivity.objects.get(investment_id=obj.investment_id)
 
 
-class CompanyActivityOmisOrderFactory(factory.django.DjangoModelFactory):
+class CompanyActivityOmisOrderFactory(CompanyActivityBaseFactory):
     """
     CompanyActivity factory with an omis order.
     """
 
-    date = now()
     activity_source = CompanyActivity.ActivitySource.order
-    company = factory.SubFactory(CompanyFactory)
-    investment = None
-    interaction = None
-    referral = None
     order = factory.SubFactory(OrderFactory)
 
     class Meta:
