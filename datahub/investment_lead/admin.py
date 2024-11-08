@@ -87,6 +87,7 @@ class EYBLeadAdmin(admin.ModelAdmin):
             'Marketing Information',
             {
                 'fields': [
+                    'marketing_hashed_uuid',
                     'utm_name',
                     'utm_source',
                     'utm_medium',
