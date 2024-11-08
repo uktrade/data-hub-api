@@ -1,6 +1,6 @@
 import logging
 
-from datahub.company_activity.models import CompanyActivity
+from datahub.company_activity.models import CompanyActivity, GreatExportEnquiry
 from datahub.company_referral.models import CompanyReferral
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
@@ -129,6 +129,36 @@ def relate_company_activity_to_orders(batch_size=500):
         )
         for order in orders
         if order['id'] not in activity_orders
+    ]
+
+    bulk_create_activity(objs, batch_size)
+
+
+def relate_company_activity_to_great(batch_size=500):
+    """
+    Grabs all great export enquiry so they can be related to in the
+    `CompanyActivity` model with a bulk_create. Excludes any
+    great export enquiry already associated in the CompanyActivity model.
+    """
+    activity = set(
+        CompanyActivity.objects.filter(
+            great_id__isnull=False,
+        ).values_list('great_id', flat=True),
+    )
+
+    great_export_enquiries = GreatExportEnquiry.objects.filter(
+        company_id__isnull=False,
+    ).values('id', 'created_on', 'company_id')
+
+    objs = [
+        CompanyActivity(
+            great_id=great_export_enquiry['id'],
+            date=great_export_enquiry['created_on'],
+            company_id=great_export_enquiry['company_id'],
+            activity_source=CompanyActivity.ActivitySource.great,
+        )
+        for great_export_enquiry in great_export_enquiries
+        if great_export_enquiry['id'] not in activity
     ]
 
     bulk_create_activity(objs, batch_size)

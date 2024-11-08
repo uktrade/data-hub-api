@@ -1,10 +1,12 @@
 import uuid
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
+
 
 from datahub.company.models.company import Company
 from datahub.company.models.contact import Contact
+from datahub.company_activity.models import CompanyActivity
 from datahub.core import reversion
 from datahub.metadata import models as metadata_models
 
@@ -112,3 +114,17 @@ class GreatExportEnquiry(models.Model):
     submission_type = models.CharField(max_length=MAX_LENGTH)
     submission_action = models.CharField(max_length=MAX_LENGTH)
     created_on = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            if not self.company_id:
+                return
+            CompanyActivity.objects.update_or_create(
+                great_id=self.id,
+                activity_source=CompanyActivity.ActivitySource.great,
+                defaults={
+                    'date': self.created_on,
+                    'company_id': self.company_id,
+                },
+            )
