@@ -203,7 +203,7 @@ class EYBLead(InvestmentLead):
 
     # EYB marketing fields
     marketing_hashed_uuid = models.CharField(
-        max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True
+        max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True,
     )
     utm_name = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
     utm_source = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
