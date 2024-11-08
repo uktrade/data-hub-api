@@ -11,6 +11,7 @@ from django.db.models import (
     JSONField,
     Min,
     OuterRef,
+    Q,
     Subquery,
     Value,
     When,
@@ -85,7 +86,10 @@ class ExportWinsAdvisersDatasetView(BaseDatasetView):
             .annotate(
                 id=F('legacy_id'),
                 name=Case(
-                    When(win__migrated_on__isnull=False, then=F('name')),
+                    When(
+                        Q(win__migrated_on__isnull=False) & Q(adviser__isnull=True),
+                        then=F('name'),
+                    ),
                     default=Concat(
                         F('adviser__first_name'),
                         Value(' '),
