@@ -75,5 +75,6 @@ def activity_great_field():
             'meta_email_address': Text(index=False),
             'contact': fields.contact_job_field(),
             'meta_subject': Text(index=False),
+            'data_enquiry': Text(index=False),
         },
     )

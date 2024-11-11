@@ -283,6 +283,7 @@ def test_company_activity_great_to_dict():
                 'job_title': great.contact.job_title,
             },
             'meta_subject': great.meta_subject,
+            'data_enquiry': great.data_enquiry,
         },
         'activity_source': DBCompanyActivity.ActivitySource.great,
         'id': company_activity.pk,
