@@ -77,7 +77,9 @@ class TestPayClientCreatePayment:
                 description='payment description',
                 return_url='http://return.example.com',
             )
-        assert exc.value.detail == f'{error_msg}: {error_msg} for url: {url}'
+        # Check that the exception contains the generic message
+        assert exc.value.detail == (
+            'An error occurred while processing your request. Please try again later.')
 
 
 class TestPayClientGetPaymentById:
@@ -126,7 +128,9 @@ class TestPayClientGetPaymentById:
         with pytest.raises(GOVUKPayAPIException) as exc:
             pay = PayClient()
             pay.get_payment_by_id(payment_id)
-        assert exc.value.detail == f'{error_msg}: {error_msg} for url: {url}'
+        # Check that the exception contains the generic message
+        assert exc.value.detail == (
+            'An error occurred while processing your request. Please try again later.')
 
 
 class TestPayClientCancelPayment:
@@ -158,7 +162,7 @@ class TestPayClientCancelPayment:
         ),
     )
     def test_http_error(self, status_code, error_msg, requests_mock):
-        """Test that if GOV.UK Pay returns an HTTP error, an exception is raised."""
+        """Test that if GOV.UK Pay returns an HTTP error, a generic exception is raised."""
         payment_id = '123abc123abc123abc123abc12'
         url = govuk_url(f'payments/{payment_id}/cancel')
         requests_mock.post(url, status_code=status_code, reason=error_msg)
@@ -166,4 +170,6 @@ class TestPayClientCancelPayment:
         with pytest.raises(GOVUKPayAPIException) as exc:
             pay = PayClient()
             pay.cancel_payment(payment_id)
-        assert exc.value.detail == f'{error_msg}: {error_msg} for url: {url}'
+        # Check that the exception contains the generic message
+        assert exc.value.detail == (
+            'An error occurred while processing your request. Please try again later.')

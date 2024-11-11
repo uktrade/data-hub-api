@@ -90,8 +90,10 @@ class DNBCompanySearchView(APIView):
         except (
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
+        ):
+            logger.error('Error communicating with DNB service during company search.')
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
         except DNBServiceError as exc:
             return HttpResponse(
                 exc.message,
@@ -198,11 +200,16 @@ class DNBCompanyCreateView(APIView):
             DNBServiceConnectionError,
             DNBServiceError,
             DNBServiceInvalidResponseError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
-
-        except DNBServiceInvalidRequestError as exc:
-            raise APIBadRequestException(str(exc))
+        ):
+            logger.error(
+                'An error occurred while retrieving data for DUNS number')
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
+        except DNBServiceInvalidRequestError:
+            logger.warning(
+                'Invalid request for DUNS number')
+            raise APIBadRequestException(
+                'The request could not be completed due to an issue with the provided data.')
 
         company_serializer = DNBCompanySerializer(
             data=dnb_company,
@@ -265,14 +272,21 @@ class DNBCompanyLinkView(APIView):
             DNBServiceConnectionError,
             DNBServiceInvalidResponseError,
             DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
+        ):
+            logger.error(
+                'An error occurred while linking company ID with DUNS number',
+            )
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
 
         except (
             DNBServiceInvalidRequestError,
             CompanyAlreadyDNBLinkedError,
-        ) as exc:
-            raise APIBadRequestException(str(exc))
+        ):
+            logger.warning(
+                'Invalid request or company ID is already linked to DUNS number')
+            raise APIBadRequestException(
+                'The request could not be completed due to a problem with the provided data.')
 
         return Response(
             CompanySerializer().to_representation(company),
@@ -306,8 +320,10 @@ class DNBCompanyChangeRequestView(APIView):
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
             DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
+        ):
+            logger.error('An error occurred while processing DNB companies POST request.')
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
 
         return Response(response)
 
@@ -331,9 +347,11 @@ class DNBCompanyChangeRequestView(APIView):
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
             DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
-
+        ):
+            logger.error(
+                'An error occurred while processing GET request for DUNS number')
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
         return Response(response)
 
 
@@ -367,9 +385,10 @@ class DNBCompanyInvestigationView(APIView):
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
             DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
-
+        ):
+            logger.error('An error occurred while creating an investigation for the company.')
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
         company.dnb_investigation_id = response['id']
         company.pending_dnb_investigation = True
         company.save()
@@ -400,8 +419,11 @@ class DNBCompanyHierarchyView(APIView):
             DNBServiceError,
             DNBServiceInvalidRequestError,
             DNBServiceInvalidResponseError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
+        ):
+            logger.error(
+                'Failed to retrieve company hierarchy count for DUNS number from dnb-service')
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
 
         manually_verified = self.get_manually_verified_subsidiaries(
             company_id,
@@ -524,8 +546,11 @@ class DNBRelatedCompaniesCountView(APIView):
             DNBServiceConnectionError,
             DNBServiceTimeoutError,
             DNBServiceError,
-        ) as exc:
-            raise APIUpstreamException(str(exc))
+        ):
+            logger.error(
+                'Failed to retrieve company hierarchy count for DUNS number')
+            raise APIUpstreamException(
+                'An error occurred while processing your request. Please try again later.')
 
         json_response = {
             'related_companies_count': companies_count,

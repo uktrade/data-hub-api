@@ -604,18 +604,18 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             (
                 [],
                 400,
-                'Cannot find a company with duns_number: 123456789',
+                'The request could not be completed due to an issue with the provided data.',
             ),
             (
                 ['foo', 'bar'],
                 502,
-                'Multiple companies found with duns_number: 123456789',
+                'An error occurred while processing your request. Please try again later.',
             ),
             (
                 [{'duns_number': '012345678'}],
                 502,
-                'DUNS number of the company: 012345678 '
-                'did not match searched DUNS number: 123456789',
+                'An error occurred while processing your request. '
+                'Please try again later.',
             ),
         ),
     )
@@ -1042,7 +1042,8 @@ class TestCompanyLinkView(APITestMixin):
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'detail': f'Company {str(company.id)} is already linked ' 'with duns number 123456789',
+            'detail':
+            'The request could not be completed due to a problem with the provided data.',
         }
 
     def test_duplicate_duns_number(self):
@@ -1087,7 +1088,8 @@ class TestCompanyLinkView(APITestMixin):
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'detail': 'Cannot find a company with duns_number: 123456789',
+            'detail':
+            'The request could not be completed due to a problem with the provided data.',
         }
 
     def test_valid(
