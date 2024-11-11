@@ -83,4 +83,5 @@ def activity_great_dict(obj):
         'meta_email_address': obj.meta_email_address,
         'contact': dict_utils.contact_job_dict(obj.contact),
         'meta_subject': obj.meta_subject,
+        'data_enquiry': obj.data_enquiry,
     }

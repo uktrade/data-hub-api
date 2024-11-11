@@ -88,3 +88,4 @@ def test_activity_great_dict():
     assert result['meta_email_address'] == great.meta_email_address
     assert result['contact']['id'] == str(great.contact.id)
     assert result['meta_subject'] == great.meta_subject
+    assert result['data_enquiry'] == great.data_enquiry

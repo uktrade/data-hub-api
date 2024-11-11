@@ -166,7 +166,7 @@ class GreatExportEnquiryFactory(factory.django.DjangoModelFactory):
     meta_email_address = 'meta@example.com'
 
     data_search = ''
-    data_enquiry = ''
+    data_enquiry = factory.Faker('text')
     data_find_out_about = 'twitter'
     data_sector_primary = factory.SubFactory(SectorFactory)
     data_sector_primary_other = ''
