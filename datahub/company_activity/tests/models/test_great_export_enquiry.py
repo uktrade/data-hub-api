@@ -18,10 +18,12 @@ class TestGreatExportEnquiry:
         great = GreatExportEnquiryFactory()
         assert CompanyActivity.objects.all().count() == 1
 
-        company_activity = CompanyActivity.objects.get(great_id=great.id)
+        company_activity = CompanyActivity.objects.get(great_export_enquiry_id=great.id)
         assert company_activity.company_id == great.company_id
         assert company_activity.date == great.created_on
-        assert company_activity.activity_source == CompanyActivity.ActivitySource.great
+        assert (
+            company_activity.activity_source == CompanyActivity.ActivitySource.great_export_enquiry
+        )
 
         # Update and save the great export enquiry and ensure if doesn't create another
         # `CompanyActivity` and only updates it
