@@ -87,6 +87,7 @@ MARKETING_FIELDS = [
     'utm_source',
     'utm_medium',
     'utm_content',
+    'marketing_hashed_uuid',
 ]
 
 ALL_FIELDS = ARCHIVABLE_FIELDS + INVESTMENT_LEAD_BASE_FIELDS + \
@@ -476,3 +477,54 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
                 instance.landing_timeframe,
             ).label if instance.landing_timeframe else None,
         }
+
+class CreateEYBLeadMarketingSerializer(BaseEYBLeadSerializer):
+    class Meta(BaseEYBLeadSerializer.Meta):
+        # TODO: confirm whether content data will be received
+        fields = [
+            'name',
+            'medium',
+            'source',
+            'hashed_uuid',
+        ]
+
+    name = serializers.CharField(source='utm_name', required=False)
+    medium = serializers.CharField(source='utm_medium', required=False)
+    source = serializers.CharField(source='utm_source', required=False)
+    # TODO: confirm whether content data will be received
+    # content = serializers.CharField(source='utm_content', required=False)
+    hashed_uuid = serializers.CharField(source='marketing_hashed_uuid', required=True)
+    
+
+    # TODO: Update the following:
+
+    # def get_related_fields_internal_value(self, data):
+    #     """Provides related fields in a format suitable for internal use."""
+    #     internal_values = {}
+
+    #     # Fields that can be None
+    #     none_fields = {
+    #         'dunsNumber': 'duns_number',
+    #         'agreeTerms': 'agree_terms',
+    #         'agreeInfoEmail': 'agree_info_email',
+    #     }
+    #     for incoming_field, internal_field in none_fields.items():
+    #         value = data.get(incoming_field, None)
+    #         if value == '':
+    #             internal_values[internal_field] = None
+
+    #     # Rest of the character fields
+    #     char_fields = {
+    #         'addressLine2': 'address_2',
+    #         'county': 'address_county',
+    #         'postcode': 'address_postcode',
+    #         'role': 'role',
+    #         'telphoneNumber': 'telephone_number',
+    #         'landingTimeframe': 'landing_timeframe',
+    #     }
+    #     for incoming_field, internal_field in char_fields.items():
+    #         value = data.get(incoming_field, None)
+    #         if value is None:
+    #             internal_values[internal_field] = ''
+
+    #     return internal_values
