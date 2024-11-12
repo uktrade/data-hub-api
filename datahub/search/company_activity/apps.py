@@ -29,8 +29,8 @@ class CompanyActivitySearchApp(SearchApp):
         'order__primary_market',
         'order__uk_region',
         'order__created_by',
-        'great',
-        'great__contact',
+        'great_export_enquiry',
+        'great_export_enquiry__contact',
     ).prefetch_related(
         'interaction__contacts',
         Prefetch(

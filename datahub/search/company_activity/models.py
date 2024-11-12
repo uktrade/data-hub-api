@@ -31,7 +31,7 @@ class CompanyActivity(BaseSearchModel):
     referral = activity_referral_field()
     investment = activity_investment_field()
     order = activity_order_field()
-    great = activity_great_field()
+    great_export_enquiry = activity_great_field()
 
     COMPUTED_MAPPINGS = {}
 
@@ -41,7 +41,7 @@ class CompanyActivity(BaseSearchModel):
         'company': dict_utils.company_dict,
         'investment': activity_investment_dict,
         'order': activity_order_dict,
-        'great': activity_great_dict,
+        'great_export_enquiry': activity_great_dict,
     }
 
     SEARCH_FIELDS = (
