@@ -211,7 +211,7 @@ class CompanyActivityGreatExportEnquiryFactory(CompanyActivityBaseFactory):
     """
 
     activity_source = CompanyActivity.ActivitySource.great_export_enquiry
-    great = factory.SubFactory(GreatExportEnquiryFactory)
+    great_export_enquiry = factory.SubFactory(GreatExportEnquiryFactory)
 
     class Meta:
         model = 'company_activity.CompanyActivity'
