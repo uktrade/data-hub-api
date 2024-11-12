@@ -29,7 +29,7 @@ class CompanyActivity(models.Model):
         event = ('event', 'event')
         investment = ('investment', 'investment')
         order = ('order', 'order')
-        great_export_enquiry = ('greatExportEnquiry', 'greatExportEnquiry')
+        great_export_enquiry = ('great_export_enquiry', 'great_export_enquiry')
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     company = models.ForeignKey(
