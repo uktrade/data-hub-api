@@ -210,7 +210,7 @@ class CompanyActivityGreatExportEnquiryFactory(CompanyActivityBaseFactory):
     CompanyActivity factory with an great export enquiry.
     """
 
-    activity_source = CompanyActivity.ActivitySource.great
+    activity_source = CompanyActivity.ActivitySource.great_export_enquiry
     great = factory.SubFactory(GreatExportEnquiryFactory)
 
     class Meta:
@@ -224,4 +224,4 @@ class CompanyActivityGreatExportEnquiryFactory(CompanyActivityBaseFactory):
         model save.
         """
         obj = model_class(*args, **kwargs)
-        return CompanyActivity.objects.get(great_id=obj.great_id)
+        return CompanyActivity.objects.get(great_export_enquiry_id=obj.great_export_enquiry_id)

@@ -60,7 +60,7 @@ class GreatExportEnquiry(models.Model):
     meta_email_address = models.CharField(max_length=MAX_LENGTH)
 
     data_search = models.CharField(max_length=MAX_LENGTH)
-    data_enquiry = models.CharField(max_length=MAX_LENGTH)
+    data_enquiry = models.TextField()
     data_markets = models.ManyToManyField(
         metadata_models.Country,
         related_name='great_export_market_enquiries',
@@ -121,8 +121,8 @@ class GreatExportEnquiry(models.Model):
             if not self.company_id:
                 return
             CompanyActivity.objects.update_or_create(
-                great_id=self.id,
-                activity_source=CompanyActivity.ActivitySource.great,
+                great_export_enquiry_id=self.id,
+                activity_source=CompanyActivity.ActivitySource.great_export_enquiry,
                 defaults={
                     'date': self.created_on,
                     'company_id': self.company_id,

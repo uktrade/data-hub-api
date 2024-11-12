@@ -250,7 +250,7 @@ def test_company_activity_syncs_great_fields_when_changed(opensearch_with_signal
     if their great export enquiry order updates.
     """
     great = GreatExportEnquiryFactory()
-    company_activity = DBCompanyActivity.objects.get(great_id=great.id)
+    company_activity = DBCompanyActivity.objects.get(great_export_enquiry_id=great.id)
     opensearch_with_signals.indices.refresh()
 
     doc = opensearch_with_signals.get(

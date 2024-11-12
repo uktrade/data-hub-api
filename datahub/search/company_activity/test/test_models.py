@@ -26,7 +26,7 @@ def test_company_activity_referral_to_dict():
         'interaction': company_activity.interaction,
         'investment': company_activity.investment,
         'order': company_activity.order,
-        'great': company_activity.great,
+        'great_export_enquiry': company_activity.great_export_enquiry,
         'referral': {
             'id': str(company_activity.referral_id),
             'completed_on': company_activity.referral.completed_on,
@@ -122,7 +122,7 @@ def test_company_activity_interaction_to_dict():
         'investment': company_activity.investment,
         'referral': company_activity.referral,
         'order': company_activity.order,
-        'great': company_activity.great,
+        'great_export_enquiry': company_activity.great_export_enquiry,
         'company': (
             {
                 'id': str(company_activity.company_id),
@@ -158,7 +158,7 @@ def test_company_activity_investment_to_dict():
     assert result == {
         'interaction': company_activity.interaction,
         'order': company_activity.order,
-        'great': company_activity.great,
+        'great_export_enquiry': company_activity.great_export_enquiry,
         'investment': {
             'id': str(company_activity.investment.id),
             'name': company_activity.investment.name,
@@ -206,7 +206,7 @@ def test_company_activity_order_to_dict():
         'interaction': company_activity.interaction,
         'investment': company_activity.investment,
         'referral': company_activity.referral,
-        'great': company_activity.great,
+        'great_export_enquiry': company_activity.great_export_enquiry,
         'company': (
             {
                 'id': str(company_activity.company_id),
@@ -254,7 +254,7 @@ def test_company_activity_great_to_dict():
     company_activity = CompanyActivityGreatExportEnquiryFactory.build()
 
     result = CompanyActivity.db_object_to_dict(company_activity)
-    great = company_activity.great
+    great = company_activity.great_export_enquiry
 
     assert result == {
         'interaction': company_activity.interaction,
@@ -270,7 +270,7 @@ def test_company_activity_great_to_dict():
             else None
         ),
         'order': company_activity.order,
-        'great': {
+        'great_export_enquiry': {
             'id': str(great.id),
             'created_on': great.created_on,
             'meta_full_name': great.meta_full_name,
@@ -285,7 +285,7 @@ def test_company_activity_great_to_dict():
             'meta_subject': great.meta_subject,
             'data_enquiry': great.data_enquiry,
         },
-        'activity_source': DBCompanyActivity.ActivitySource.great,
+        'activity_source': DBCompanyActivity.ActivitySource.great_export_enquiry,
         'id': company_activity.pk,
         '_document_type': CompanyActivitySearchApp.name,
         'date': company_activity.date,
