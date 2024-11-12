@@ -5,7 +5,7 @@ job_defaults: &job_defaults
     python_image:
       type: string
 
-    es_image:
+    os_image:
       type: string
 
     postgres_image:
@@ -57,7 +57,7 @@ job_defaults: &job_defaults
   docker:
     - image: <<parameters.python_image>>
 
-    - image: <<parameters.es_image>>
+    - image: <<parameters.os_image>>
       environment:
         discovery.type: single-node
         plugins.security.disabled: "true"
@@ -126,5 +126,5 @@ workflows:
       - build:
           publish_coverage: true
           python_image: python:3.10.5
-          postgres_image: postgres:12
-          es_image: opensearchproject/opensearch:1.2.4
+          postgres_image: postgres:16
+          os_image: opensearchproject/opensearch:2.11.0
