@@ -192,18 +192,32 @@ class ContactConsentIngestionTask:
             logger.info(message)
 
     def ingest(self):
-        logger.info('Checking for new Contact Consent data files')
+        logger.info('Checking for new contact consent data files')
         s3_client = get_s3_client(REGION)
         file_keys = self._list_objects(s3_client, BUCKET, CONSENT_PREFIX)
         if len(file_keys) == 0:
-            logger.info('No files found in bucket %s matching prefix %s', BUCKET, CONSENT_PREFIX)
+            logger.info(
+                'No contact consent files found in bucket %s matching prefix %s',
+                BUCKET,
+                CONSENT_PREFIX,
+            )
             return
         for file_key in file_keys:
-            self.sync_file_with_database(s3_client, file_key)
-            self.delete_file(s3_client, file_key)
+            try:
+                self.sync_file_with_database(s3_client, file_key)
+                self.delete_file(s3_client, file_key)
+            except Exception as exc:
+                logger.exception(
+                    f'Error ingesting contact consent file {file_key}',
+                    stack_info=True,
+                )
+                raise exc
 
     def sync_file_with_database(self, client, file_key):
-        logger.info('Syncing file %s', file_key)
+        logger.info(
+            'Syncing contact consent file %s with datahub contacts',
+            file_key,
+        )
         path = f's3://{BUCKET}/{file_key}'
 
         with open(
@@ -221,13 +235,20 @@ class ContactConsentIngestionTask:
 
                 consent_row = json.loads(line)
                 if 'email' not in consent_row or 'consents' not in consent_row:
+                    logger.info(
+                        'Row %s does not contain required consent data to process, skipping',
+                        i,
+                    )
                     continue
 
                 email = consent_row['email']
                 matching_contacts = Contact.objects.filter(email=email)
 
                 if not matching_contacts.exists():
-                    logger.debug('Email %s has no matching datahub contact', email)
+                    logger.info(
+                        'Email %s in contact consent file has no matching datahub contact',
+                        email,
+                    )
                     continue
 
                 for matching_contact in matching_contacts:
@@ -242,7 +263,7 @@ class ContactConsentIngestionTask:
                         or last_modified is None
                     ):
                         update_row = True
-                    # to avoid issues with different source system time formats, just compare on
+                    # To avoid issues with different source system time formats, just compare on
                     # the date portion
                     elif (
                         parser.parse(last_modified).date()
@@ -263,15 +284,20 @@ class ContactConsentIngestionTask:
                         )
                         matching_contact.save()
 
-                        logger.debug('Updated consents for email %s', email)
+                        logger.info('Updated contact consent data for email %s', email)
                     else:
                         logger.info(
                             'Email %s would have consent data updated, but setting is disabled',
                             email,
                         )
 
-            logger.info('Finished processing total %s rows from %s', i, path)
+            logger.info(
+                'Finished processing total %s rows for contact consent from file %s',
+                i,
+                path,
+            )
 
     def delete_file(self, client, file_key):
-        logger.info('Deleting file %s', file_key)
+        logger.info('Deleting contact consent file %s', file_key)
         client.delete_object(Bucket=BUCKET, Key=file_key)
+        logger.info('Successfully deleted contact consent file %s', file_key)

@@ -485,6 +485,22 @@ class TestContactConsentIngestionTaskScheduler:
 class TestContactConsentIngestionTask:
 
     @mock_aws
+    @override_settings(S3_LOCAL_ENDPOINT_URL=None)
+    def test_ingest_with_exception_logs_error_and_reraises_original_exception(self, test_files):
+        """
+        Test that the task can catch and log any unhandled exceptions
+        """
+        setup_s3_bucket(BUCKET, test_files)
+
+        with mock.patch.object(
+            ContactConsentIngestionTask,
+            'sync_file_with_database',
+            side_effect=AttributeError('Original error message'),
+        ), pytest.raises(AttributeError, match='Original error message'):
+            task = ContactConsentIngestionTask()
+            task.ingest()
+
+    @mock_aws
     def test_ingest_with_empty_s3_bucket_does_not_call_sync_or_delete(self):
         """
         Test that the task can handle an empty S3 bucket
