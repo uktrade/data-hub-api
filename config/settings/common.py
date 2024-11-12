@@ -77,6 +77,8 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     *_ES_APM_APP,
+    'datahub.drf_browsable_api',  # not third party but must be before drf_redesign
+    'drf_redesign',  # must be before rest_framework
     'rest_framework',
     'django_extensions',
     'reversion',
@@ -739,7 +741,10 @@ CSP_SCRIPT_SRC = (
     "'unsafe-eval'",
     "'unsafe-inline'",
 )
-CSP_FONT_SRC = ("'self'", "'unsafe-inline'")
+CSP_FONT_SRC = (
+    "'self'",
+    "'unsafe-eval'",
+)
 CSP_INCLUDE_NONCE_IN = ("script-src",)
 CSP_REPORT_ONLY = False
 
