@@ -1,0 +1,16 @@
+- model: metadata.country
+  pk: f9a1148c-073a-4832-bfc6-2d96c7212a50
+  fields:
+    disabled_on: 2023-02-01T00:00:01Z
+    name: French Southern Territories
+    overseas_region: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+    is_export_win: True
+    iso_alpha2_code: TF
+- model: metadata.country
+  pk: 453b18b0-8d9b-4d37-a673-2ee4e2650fd2
+  fields:
+    disabled_on: 2018-01-01T00:00:01Z
+    name: Saint-Martin (French part)
+    overseas_region: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+    is_export_win: True
+    iso_alpha2_code: MF
