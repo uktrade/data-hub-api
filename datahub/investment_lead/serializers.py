@@ -97,7 +97,7 @@ ALL_FIELDS = ARCHIVABLE_FIELDS + INVESTMENT_LEAD_BASE_FIELDS + \
 class BaseEYBLeadSerializer(serializers.ModelSerializer):
     """Base serializer for an EYB lead object.
 
-    EYB serves data from 2 endpoints: triage and user.
+    EYB serves data from 3 endpoints: triage, user and marketing.
     However, in Data Hub, we combine them into one EYB lead model instance.
     """
 
@@ -456,9 +456,6 @@ class CreateEYBLeadMarketingSerializer(BaseEYBLeadSerializer):
     source = serializers.CharField(source='utm_source', required=False)
     content = serializers.CharField(source='utm_content', required=False)
     hashed_uuid = serializers.CharField(source='marketing_hashed_uuid', required=True)
-    
-
-    # TODO: Update the following:
 
     def get_related_fields_internal_value(self, data):
         """Provides related fields in a format suitable for internal use."""
