@@ -76,7 +76,7 @@ def assert_ingested_eyb_user_data(instance: EYBLead, data: dict):
     - camelCase field names
     - strings for related fields.
     """
-    assert instance.user_hashed_uuid == data['hashedUuid']
+    assert instance.user_hashed_uuid == data.get('hashedUuid')
     assert_datetimes(instance.user_created, data.get('created'))
     assert_datetimes(instance.user_modified, data.get('modified'))
     assert instance.company_name == data.get('companyName')
@@ -95,6 +95,15 @@ def assert_ingested_eyb_user_data(instance: EYBLead, data: dict):
     assert instance.agree_terms == data.get('agreeTerms', None)
     assert instance.agree_info_email == data.get('agreeInfoEmail', None)
     assert instance.landing_timeframe == data.get('landingTimeframe', None)
+
+
+def assert_ingested_eyb_marketing_data(instance: EYBLead, data: dict):
+    """Method to verify the ingested EYB marketing data against the created EYBLead instance."""
+    assert instance.utm_name == data.get('name')
+    assert instance.utm_medium == data.get('medium')
+    assert instance.utm_source == data.get('source')
+    assert instance.utm_content == data.get('content')
+    assert instance.marketing_hashed_uuid == data.get('hashed_uuid')
 
 
 def assert_retrieved_eyb_lead_data(instance: EYBLead, data: dict):
@@ -152,10 +161,11 @@ def assert_retrieved_eyb_lead_data(instance: EYBLead, data: dict):
     ]
 
     # EYB marketing fields
-    assert instance.utm_name == data['utm_name']
-    assert instance.utm_source == data['utm_source']
-    assert instance.utm_medium == data['utm_medium']
-    assert instance.utm_content == data['utm_content']
+    assert instance.utm_name == data.get('utm_name')
+    assert instance.utm_source == data.get('utm_source')
+    assert instance.utm_medium == data.get('utm_medium')
+    assert instance.utm_content == data.get('utm_content')
+    assert instance.marketing_hashed_uuid == data.get('marketing_hashed_uuid')
 
 
 def assert_eyb_lead_matches_company(company: Company, eyb_lead: EYBLead):

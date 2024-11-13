@@ -5,12 +5,14 @@ import pytest
 from datahub.core import constants
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import (
+    CreateEYBLeadMarketingSerializer,
     CreateEYBLeadTriageSerializer,
     CreateEYBLeadUserSerializer,
     RetrieveEYBLeadSerializer,
 )
 from datahub.investment_lead.test.factories import generate_hashed_uuid
 from datahub.investment_lead.test.utils import (
+    assert_ingested_eyb_marketing_data,
     assert_ingested_eyb_triage_data,
     assert_ingested_eyb_user_data,
     assert_retrieved_eyb_lead_data,
@@ -285,6 +287,78 @@ class TestCreateEYBLeadUserSerializer:
         assert isinstance(instance, EYBLead)
         assert EYBLead.objects.count() == 1
         assert_ingested_eyb_user_data(instance, serializer.data)
+
+
+class TestCreateEYBLeadMarketingSerializer:
+    """Tests for CreateEYBLeadMarketingSerializer"""
+
+    def test_lead_is_created_when_all_fields_contain_valid_data(self, eyb_lead_marketing_data):
+        serializer = CreateEYBLeadMarketingSerializer(data=eyb_lead_marketing_data)
+        assert serializer.is_valid(), serializer.errors
+        instance = serializer.save()
+        assert isinstance(instance, EYBLead)
+        assert EYBLead.objects.count() == 1
+        assert_ingested_eyb_marketing_data(instance, serializer.data)
+
+    def test_lead_is_created_when_only_required_fields_are_present(self, faker):
+        """Tests a lead is created with the minimum required fields."""
+        partially_valid_data = {
+            'hashed_uuid': generate_hashed_uuid(),
+        }
+        serializer = CreateEYBLeadMarketingSerializer(data=partially_valid_data)
+        assert serializer.is_valid(), serializer.errors
+        instance = serializer.save()
+        assert isinstance(instance, EYBLead)
+        assert EYBLead.objects.count() == 1
+        assert_ingested_eyb_marketing_data(instance, serializer.data)
+
+    def test_missing_required_marketing_fields_raises_validation_error(
+            self, eyb_lead_marketing_data):
+        """Tests missing required fields raises validation error."""
+        required_fields = [
+            'hashed_uuid',
+        ]
+        for key in required_fields:
+            eyb_lead_marketing_data.pop(key)
+        serializer = CreateEYBLeadMarketingSerializer(data=eyb_lead_marketing_data)
+        assert not serializer.is_valid()
+        for key in required_fields:
+            assert key in serializer.errors
+
+    @pytest.mark.parametrize(
+        'value',
+        [None, ''],
+    )
+    def test_required_fields_with_null_or_empty_values_are_handled_correctly(self, value):
+        """Tests null values and empty strings are handled correctly for required fields."""
+        test_data = {
+            'hashed_uuid': value,
+        }
+        serializer = CreateEYBLeadMarketingSerializer(data=test_data)
+        assert not serializer.is_valid()
+        for field in test_data.keys():
+            assert field in serializer.errors
+
+    @pytest.mark.parametrize(
+        'value',
+        [None, ''],
+    )
+    def test_non_required_fields_with_null_or_empty_values_are_handled_correctly(
+        self, eyb_lead_marketing_data, value,
+    ):
+        """Tests null values and empty strings are handled correctly for non-required fields."""
+        eyb_lead_marketing_data.update({
+            'name': value,
+            'medium': value,
+            'source': value,
+            'content': value,
+        })
+        serializer = CreateEYBLeadMarketingSerializer(data=eyb_lead_marketing_data)
+        assert serializer.is_valid()
+        instance = serializer.save()
+        assert isinstance(instance, EYBLead)
+        assert EYBLead.objects.count() == 1
+        assert_ingested_eyb_marketing_data(instance, serializer.data)
 
 
 class TestRetrieveEYBLeadSerializer:

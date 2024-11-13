@@ -451,10 +451,18 @@ class CreateEYBLeadMarketingSerializer(BaseEYBLeadSerializer):
             'hashed_uuid',
         ]
 
-    name = serializers.CharField(source='utm_name', required=False)
-    medium = serializers.CharField(source='utm_medium', required=False)
-    source = serializers.CharField(source='utm_source', required=False)
-    content = serializers.CharField(source='utm_content', required=False)
+    name = serializers.CharField(
+        source='utm_name', required=False, allow_null=True, allow_blank=True, default='',
+    )
+    medium = serializers.CharField(
+        source='utm_medium', required=False, allow_null=True, allow_blank=True, default='',
+    )
+    source = serializers.CharField(
+        source='utm_source', required=False, allow_null=True, allow_blank=True, default='',
+    )
+    content = serializers.CharField(
+        source='utm_content', required=False, allow_null=True, allow_blank=True, default='',
+    )
     hashed_uuid = serializers.CharField(source='marketing_hashed_uuid', required=True)
 
     def get_related_fields_internal_value(self, data):
@@ -467,7 +475,6 @@ class CreateEYBLeadMarketingSerializer(BaseEYBLeadSerializer):
             'medium': 'utm_medium',
             'source': 'utm_source',
             'content': 'utm_content',
-            'hashed_uuid': 'marketing_hashed_uuid',
         }
         for incoming_field, internal_field in char_fields.items():
             value = data.get(incoming_field, None)

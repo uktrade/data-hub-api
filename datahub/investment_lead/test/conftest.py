@@ -5,6 +5,7 @@ from datahub.core.test_utils import create_test_user
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.test.factories import (
+    eyb_lead_marketing_record_faker,
     eyb_lead_triage_record_faker,
     eyb_lead_user_record_faker,
     EYBLeadFactory,
@@ -29,6 +30,11 @@ def eyb_lead_triage_data():
 @pytest.fixture
 def eyb_lead_user_data():
     return eyb_lead_user_record_faker()
+
+
+@pytest.fixture
+def eyb_lead_marketing_data():
+    return eyb_lead_marketing_record_faker()
 
 
 @pytest.fixture
