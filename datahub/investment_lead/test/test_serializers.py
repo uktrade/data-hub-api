@@ -10,7 +10,7 @@ from datahub.investment_lead.serializers import (
     CreateEYBLeadUserSerializer,
     RetrieveEYBLeadSerializer,
 )
-from datahub.investment_lead.test.factories import generate_hashed_uuid
+from datahub.investment_lead.test.factories import eyb_lead_marketing_record_faker, generate_hashed_uuid
 from datahub.investment_lead.test.utils import (
     assert_ingested_eyb_marketing_data,
     assert_ingested_eyb_triage_data,
@@ -344,16 +344,16 @@ class TestCreateEYBLeadMarketingSerializer:
         [None, ''],
     )
     def test_non_required_fields_with_null_or_empty_values_are_handled_correctly(
-        self, eyb_lead_marketing_data, value,
+        self, value,
     ):
         """Tests null values and empty strings are handled correctly for non-required fields."""
-        eyb_lead_marketing_data.update({
+        marketing_data=eyb_lead_marketing_record_faker({
             'name': value,
             'medium': value,
             'source': value,
             'content': value,
         })
-        serializer = CreateEYBLeadMarketingSerializer(data=eyb_lead_marketing_data)
+        serializer = CreateEYBLeadMarketingSerializer(data=marketing_data)
         assert serializer.is_valid()
         instance = serializer.save()
         assert isinstance(instance, EYBLead)
