@@ -5,6 +5,7 @@ from datahub.company.models import (
     Company as DBCompany,
 )
 from datahub.company_activity.models import CompanyActivity as DBCompanyActivity
+from datahub.company_activity.models import GreatExportEnquiry as DBGreatExportEnquiry
 from datahub.company_referral.models import CompanyReferral as DBCompanyReferral
 from datahub.interaction.models import (
     Interaction as DBInteraction,
@@ -54,15 +55,11 @@ def remove_interaction_from_opensearch(instance):
 
 receivers = (
     SignalReceiver(post_save, DBCompanyActivity, sync_activity_to_opensearch),
-    SignalReceiver(post_save, DBCompany,
-                   sync_related_activities_to_opensearch),
-    SignalReceiver(post_save, DBInteraction,
-                   sync_related_activity_to_opensearch),
-    SignalReceiver(post_save, DBCompanyReferral,
-                   sync_related_activity_to_opensearch),
+    SignalReceiver(post_save, DBCompany, sync_related_activities_to_opensearch),
+    SignalReceiver(post_save, DBInteraction, sync_related_activity_to_opensearch),
+    SignalReceiver(post_save, DBCompanyReferral, sync_related_activity_to_opensearch),
     SignalReceiver(post_save, DBOrder, sync_related_activity_to_opensearch),
-    SignalReceiver(post_save, DBInvestmentProject,
-                   sync_related_activity_to_opensearch),
-    SignalReceiver(post_delete, DBCompanyActivity,
-                   remove_interaction_from_opensearch),
+    SignalReceiver(post_save, DBGreatExportEnquiry, sync_related_activity_to_opensearch),
+    SignalReceiver(post_save, DBInvestmentProject, sync_related_activity_to_opensearch),
+    SignalReceiver(post_delete, DBCompanyActivity, remove_interaction_from_opensearch),
 )
