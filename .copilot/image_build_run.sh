@@ -42,4 +42,4 @@ export ES_APM_SERVER_URL="http://localhost:8200"
 export ES_APM_ENVIRONMENT="circleci"
 export REDIS_BASE_URL="redis://localhost:6379"
 
-python manage.py collectstatic  --noinput
+python manage.py collectstatic  --noinput --ignore rest_framework/*
