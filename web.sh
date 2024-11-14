@@ -18,6 +18,6 @@ if [ -n "${COPILOT_ENVIRONMENT_NAME}" ]; then
   python app.py
 else
   echo "Running in Cloud Foundry"
-  python manage.py collectstatic  --noinput
+  python manage.py collectstatic --noinput --ignore rest_framework/*
   python app.py
 fi
