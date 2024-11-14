@@ -150,3 +150,17 @@ def eyb_lead_triage_record_faker(overrides: dict | None = None) -> dict:
     if overrides:
         data.update(overrides)
     return data
+
+
+def eyb_lead_marketing_record_faker(overrides: dict | None = None) -> dict:
+    """Creates a fake marketing record."""
+    data = {
+        'name': fake.word(),
+        'medium': fake.word(),
+        'source': fake.word(),
+        'content': fake.word(),
+        'hashed_uuid': generate_hashed_uuid(),
+    }
+    if overrides:
+        data.update(overrides)
+    return data
