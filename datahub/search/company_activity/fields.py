@@ -64,3 +64,17 @@ def activity_order_field():
             'created_by': fields.contact_or_adviser_field(),
         },
     )
+
+
+def activity_great_field():
+    return Object(
+        properties={
+            'id': Keyword(),
+            'created_on': Date(),
+            'meta_full_name': Text(index=False),
+            'meta_email_address': Text(index=False),
+            'contact': fields.contact_job_field(),
+            'meta_subject': Text(index=False),
+            'data_enquiry': Text(index=False),
+        },
+    )

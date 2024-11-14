@@ -166,7 +166,7 @@ class GreatExportEnquiryFactory(factory.django.DjangoModelFactory):
     meta_email_address = 'meta@example.com'
 
     data_search = ''
-    data_enquiry = ''
+    data_enquiry = factory.Faker('text')
     data_find_out_about = 'twitter'
     data_sector_primary = factory.SubFactory(SectorFactory)
     data_sector_primary_other = ''
@@ -194,6 +194,11 @@ class GreatExportEnquiryFactory(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def set_markets(self, create, extracted, **kwargs):
+        # Do not create markets if we are only building the factory without
+        # creating an instance in the DB.
+        if not create:
+            return
+
         self.data_markets.set([CountryFactory()])
 
     class Meta:
@@ -205,8 +210,8 @@ class CompanyActivityGreatExportEnquiryFactory(CompanyActivityBaseFactory):
     CompanyActivity factory with an great export enquiry.
     """
 
-    activity_source = CompanyActivity.ActivitySource.great
-    great = factory.SubFactory(GreatExportEnquiryFactory)
+    activity_source = CompanyActivity.ActivitySource.great_export_enquiry
+    great_export_enquiry = factory.SubFactory(GreatExportEnquiryFactory)
 
     class Meta:
         model = 'company_activity.CompanyActivity'
@@ -219,4 +224,4 @@ class CompanyActivityGreatExportEnquiryFactory(CompanyActivityBaseFactory):
         model save.
         """
         obj = model_class(*args, **kwargs)
-        return CompanyActivity.objects.get(great_id=obj.great_id)
+        return CompanyActivity.objects.get(great_export_enquiry_id=obj.great_export_enquiry_id)

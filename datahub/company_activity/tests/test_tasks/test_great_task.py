@@ -20,7 +20,7 @@ class TestCompanyActivityGreatTasks:
         """
         Test that great export enquiry are added to the CompanyActivity model.
         """
-        great = GreatExportEnquiryFactory()
+        great_export_enquiry = GreatExportEnquiryFactory()
         GreatExportEnquiryFactory.create_batch(3)
 
         # Remove the created CompanyActivities added by the Great model `save` method
@@ -32,10 +32,14 @@ class TestCompanyActivityGreatTasks:
         schedule_sync_data_to_company_activity(relate_company_activity_to_great)
         assert CompanyActivity.objects.count() == 4
 
-        company_activity = CompanyActivity.objects.get(great_id=great.id)
-        assert company_activity.date == great.created_on
-        assert company_activity.activity_source == CompanyActivity.ActivitySource.great
-        assert company_activity.company_id == great.company.id
+        company_activity = CompanyActivity.objects.get(
+            great_export_enquiry_id=great_export_enquiry.id,
+        )
+        assert company_activity.date == great_export_enquiry.created_on
+        assert (
+            company_activity.activity_source == CompanyActivity.ActivitySource.great_export_enquiry
+        )
+        assert company_activity.company_id == great_export_enquiry.company.id
 
     @mock.patch('datahub.company_activity.models.CompanyActivity.objects.bulk_create')
     def test_great_export_enquiry_are_bulk_created_in_batches(self, mocked_bulk_create, caplog):

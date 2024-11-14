@@ -142,8 +142,8 @@ def relate_company_activity_to_great(batch_size=500):
     """
     activity = set(
         CompanyActivity.objects.filter(
-            great_id__isnull=False,
-        ).values_list('great_id', flat=True),
+            great_export_enquiry_id__isnull=False,
+        ).values_list('great_export_enquiry_id', flat=True),
     )
 
     great_export_enquiries = GreatExportEnquiry.objects.filter(
@@ -152,10 +152,10 @@ def relate_company_activity_to_great(batch_size=500):
 
     objs = [
         CompanyActivity(
-            great_id=great_export_enquiry['id'],
+            great_export_enquiry_id=great_export_enquiry['id'],
             date=great_export_enquiry['created_on'],
             company_id=great_export_enquiry['company_id'],
-            activity_source=CompanyActivity.ActivitySource.great,
+            activity_source=CompanyActivity.ActivitySource.great_export_enquiry,
         )
         for great_export_enquiry in great_export_enquiries
         if great_export_enquiry['id'] not in activity
