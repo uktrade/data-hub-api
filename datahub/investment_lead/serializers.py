@@ -87,6 +87,7 @@ MARKETING_FIELDS = [
     'utm_source',
     'utm_medium',
     'utm_content',
+    'marketing_hashed_uuid',
 ]
 
 ALL_FIELDS = ARCHIVABLE_FIELDS + INVESTMENT_LEAD_BASE_FIELDS + \
@@ -96,7 +97,7 @@ ALL_FIELDS = ARCHIVABLE_FIELDS + INVESTMENT_LEAD_BASE_FIELDS + \
 class BaseEYBLeadSerializer(serializers.ModelSerializer):
     """Base serializer for an EYB lead object.
 
-    EYB serves data from 2 endpoints: triage and user.
+    EYB serves data from 3 endpoints: triage, user and marketing.
     However, in Data Hub, we combine them into one EYB lead model instance.
     """
 
@@ -438,6 +439,49 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
             'companyLocation': instance.address_country.iso_alpha2_code
             if instance.address_country else None,
         }
+
+
+class CreateEYBLeadMarketingSerializer(BaseEYBLeadSerializer):
+    class Meta(BaseEYBLeadSerializer.Meta):
+        fields = [
+            'name',
+            'medium',
+            'source',
+            'content',
+            'hashed_uuid',
+        ]
+
+    name = serializers.CharField(
+        source='utm_name', required=False, allow_null=True, allow_blank=True, default='',
+    )
+    medium = serializers.CharField(
+        source='utm_medium', required=False, allow_null=True, allow_blank=True, default='',
+    )
+    source = serializers.CharField(
+        source='utm_source', required=False, allow_null=True, allow_blank=True, default='',
+    )
+    content = serializers.CharField(
+        source='utm_content', required=False, allow_null=True, allow_blank=True, default='',
+    )
+    hashed_uuid = serializers.CharField(source='marketing_hashed_uuid', required=True)
+
+    def get_related_fields_internal_value(self, data):
+        """Provides related fields in a format suitable for internal use."""
+        internal_values = {}
+
+        # Character fields
+        char_fields = {
+            'name': 'utm_name',
+            'medium': 'utm_medium',
+            'source': 'utm_source',
+            'content': 'utm_content',
+        }
+        for incoming_field, internal_field in char_fields.items():
+            value = data.get(incoming_field, None)
+            if value is None:
+                internal_values[internal_field] = ''
+
+        return internal_values
 
 
 class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):

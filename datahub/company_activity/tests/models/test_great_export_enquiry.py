@@ -15,25 +15,29 @@ class TestGreatExportEnquiry:
         `CompanyActivity` model if it already exists.
         """
         assert not CompanyActivity.objects.all().exists()
-        great = GreatExportEnquiryFactory()
+        great_export_enquiry = GreatExportEnquiryFactory()
         assert CompanyActivity.objects.all().count() == 1
 
-        company_activity = CompanyActivity.objects.get(great_id=great.id)
-        assert company_activity.company_id == great.company_id
-        assert company_activity.date == great.created_on
-        assert company_activity.activity_source == CompanyActivity.ActivitySource.great
+        company_activity = CompanyActivity.objects.get(
+            great_export_enquiry_id=great_export_enquiry.id,
+        )
+        assert company_activity.company_id == great_export_enquiry.company_id
+        assert company_activity.date == great_export_enquiry.created_on
+        assert (
+            company_activity.activity_source == CompanyActivity.ActivitySource.great_export_enquiry
+        )
 
         # Update and save the great export enquiry and ensure if doesn't create another
         # `CompanyActivity` and only updates it
         new_company = CompanyFactory()
-        great.company_id = new_company.id
-        great.save()
+        great_export_enquiry.company_id = new_company.id
+        great_export_enquiry.save()
 
         assert CompanyActivity.objects.all().count() == 1
         company_activity.refresh_from_db()
         assert company_activity.company_id == new_company.id
 
-        great.delete()
+        great_export_enquiry.delete()
         assert not CompanyActivity.objects.all().exists()
 
     def test_save_with_no_company(self):

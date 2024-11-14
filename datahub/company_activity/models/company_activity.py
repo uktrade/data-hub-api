@@ -29,7 +29,7 @@ class CompanyActivity(models.Model):
         event = ('event', 'event')
         investment = ('investment', 'investment')
         order = ('order', 'order')
-        great = ('great', 'great')
+        great_export_enquiry = ('great_export_enquiry', 'great_export_enquiry')
         eyb_lead = ('eyb_lead', 'eyb_lead')
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -102,7 +102,7 @@ class CompanyActivity(models.Model):
         ),
     )
 
-    great = models.ForeignKey(
+    great_export_enquiry = models.ForeignKey(
         'company_activity.GreatExportEnquiry',
         unique=True,
         null=True,
