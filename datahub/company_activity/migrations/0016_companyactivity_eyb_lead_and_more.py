@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='companyactivity',
             name='eyb_lead',
-            field=models.ForeignKey(blank=True, help_text='If related to an EYB leady, must not have relations to any other activity (referral, event etc)', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='activity', to='investment_lead.eyblead', unique=True),
+            field=models.ForeignKey(blank=True, help_text='If related to an EYB lead, must not have relations to any other activity (referral, event etc)', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='activity', to='investment_lead.eyblead', unique=True),
         ),
         migrations.AlterField(
             model_name='companyactivity',

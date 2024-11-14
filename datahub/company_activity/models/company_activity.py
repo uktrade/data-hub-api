@@ -123,7 +123,7 @@ class CompanyActivity(models.Model):
         related_name='activity',
         on_delete=models.CASCADE,
         help_text=(
-            'If related to an EYB leady, must not have relations to any other activity '
+            'If related to an EYB lead, must not have relations to any other activity '
             '(referral, event etc)'
         ),
     )
