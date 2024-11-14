@@ -233,19 +233,12 @@ class ContactConsentIngestionTask:
 
     def should_update_contact(self, contact, consent_row):
         if not all(key in contact for key in ['id', 'email', 'consent_data_last_modified']):
-            print('Contact is missing mandatory fields')
             logger.info('Contact is missing mandatory fields')
             return False
 
         last_modified = consent_row['last_modified'] if 'last_modified' in consent_row else None
-        print('last_modified: ', last_modified)
-        print(
-            'consent_data_last_modified: ',
-            contact['consent_data_last_modified'],
-        )
 
         if contact['consent_data_last_modified'] is None or last_modified is None:
-            print("One of the values is missing")
             return True
 
         # To avoid issues with different source system time formats, just compare on
@@ -254,9 +247,7 @@ class ContactConsentIngestionTask:
             parser.parse(last_modified).date()
             > parser.parse(contact['consent_data_last_modified']).date()
         ):
-            print("Date in row is newer than contact date")
             return True
-        print("Date in row is older than contact date")
         return False
 
     def sync_file_with_database(self, client, file_key):
@@ -281,7 +272,6 @@ class ContactConsentIngestionTask:
 
                 consent_row = json.loads(line)
                 if 'email' not in consent_row or 'consents' not in consent_row:
-                    print('Row does not contain required consent data to process, skipping')
                     logger.info(
                         'Row %s does not contain required consent data to process, skipping',
                         i,
@@ -290,12 +280,8 @@ class ContactConsentIngestionTask:
 
                 email = consent_row['email']
                 matching_search_contacts = self.search_contacts(email)
-                print('matching_contacts: ', matching_search_contacts)
-                # matching_contacts = Contact.objects.filter(email=email)
-                # print('QUERY: ', matching_contacts.query)
 
                 if not matching_search_contacts:
-                    print('Email in contact consent file has no matching datahub contact')
                     logger.info(
                         'Email %s in contact consent file has no matching datahub contact',
                         email,
@@ -308,7 +294,6 @@ class ContactConsentIngestionTask:
                         matching_search_contact,
                         consent_row,
                     ):
-                        print('Email does not need to be updated')
                         logger.debug(
                             'Email %s does not need to be updated',
                             email,
@@ -320,14 +305,11 @@ class ContactConsentIngestionTask:
                             'Email %s would have consent data updated, but setting is disabled',
                             email,
                         )
-                        print('would have consent data updated, but setting is disabled')
                         continue
 
-                    print('matching_contact id: ', matching_search_contact['id'])
                     contact = Contact.objects.filter(id=matching_search_contact['id']).first()
 
                     if contact is None:
-                        print('Email in search contact response has no matching datahub contact')
                         logger.info(
                             'Email %s in search contact response has no matching datahub contact',
                             email,
@@ -341,7 +323,6 @@ class ContactConsentIngestionTask:
                         else datetime.datetime.now()
                     )
                     contact.save()
-                    print('Updated contact consent data for email ', email)
                     logger.info('Updated contact consent data for email %s', email)
 
             logger.info(
