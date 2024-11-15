@@ -607,7 +607,7 @@ class InvestmentProject(
 
     def get_absolute_url(self):
         """URL to the object in the Data Hub internal front end."""
-        return get_front_end_url(self)
+        return f'{get_front_end_url(self)}/details'
 
     def save(self, *args, **kwargs):
         """Updates the stage log after saving.
