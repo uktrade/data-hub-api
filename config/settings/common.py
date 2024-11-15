@@ -741,10 +741,7 @@ CSP_SCRIPT_SRC = (
     "'unsafe-eval'",
     "'unsafe-inline'",
 )
-CSP_FONT_SRC = (
-    "'self'",
-    "'unsafe-eval'",
-)
+CSP_FONT_SRC = ("'self'", "'unsafe-inline'")
 CSP_INCLUDE_NONCE_IN = ("script-src",)
 CSP_REPORT_ONLY = False
 
