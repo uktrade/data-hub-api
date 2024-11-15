@@ -63,6 +63,7 @@ class Contact(BaseSearchModel):
     full_telephone_number = Keyword()
     title = fields.id_name_field()
     valid_email = Boolean()
+    consent_data_last_modified = Date()
 
     MAPPINGS = {
         'adviser': dict_utils.contact_or_adviser_dict,

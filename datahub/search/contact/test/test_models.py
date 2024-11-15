@@ -19,6 +19,7 @@ def test_contact_dbmodel_to_dict(opensearch):
         'title',
         'company',
         'created_on',
+        'consent_data_last_modified',
         'created_by',
         'modified_on',
         'archived',
