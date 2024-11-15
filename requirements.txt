@@ -91,6 +91,7 @@ django==4.2.16
     #   django-redis
     #   django-reversion
     #   djangorestframework
+    #   drf-redesign
 django-axes==7.0.0
     # via -r requirements.in
 django-csp==3.8
@@ -116,9 +117,13 @@ django-redis==5.4.0
 django-reversion==5.1.0
     # via -r requirements.in
 djangorestframework==3.15.2
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   drf-redesign
 docopt==0.6.2
     # via notifications-python-client
+drf-redesign==0.4.0
+    # via -r requirements.in
 ecs-logging==2.0.2
     # via elastic-apm
 elastic-apm==6.23.0

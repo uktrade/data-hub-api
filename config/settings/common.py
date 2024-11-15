@@ -77,6 +77,8 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     *_ES_APM_APP,
+    'datahub.drf_browsable_api',  # not third party but must be before drf_redesign
+    'drf_redesign',  # must be before rest_framework
     'rest_framework',
     'django_extensions',
     'reversion',
