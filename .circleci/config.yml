@@ -96,7 +96,7 @@ job_defaults: &job_defaults
 
     - run:
         name: Run collectstatic
-        command: python manage.py collectstatic --noinput --ignore rest_framework/*
+        command: python manage.py collectstatic --noinput --ignore rest_framework/css/* --ignore rest_framework/js/bootstrap.min.js --ignore rest_framework/js/prettify-min.js --ignore rest_framework/js/default.js
 
     - run:
         name: Run tests
