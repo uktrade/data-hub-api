@@ -11,7 +11,7 @@ python /app/manage.py add_quote_to_order
 python /app/manage.py add_invoice_to_order
 python /app/manage.py set_order_as_paid
 python /app/manage.py createinitialrevisions
-python /app/manage.py collectstatic --noinput
+python /app/manage.py collectstatic --noinput --ignore rest_framework/css/* --ignore rest_framework/js/bootstrap.min.js --ignore rest_framework/js/prettify-min.js --ignore rest_framework/js/default.js
 # Create superuser - ignore errors as we may have already loaded it in to
 # this DB.
 if [[ -n "${DJANGO_SUPERUSER_EMAIL}" && -n "${DJANGO_SUPERUSER_PASSWORD}" && -n "${DJANGO_SUPERUSER_SSO_EMAIL_USER_ID}" ]]; then
