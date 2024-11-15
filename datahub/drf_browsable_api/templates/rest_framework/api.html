@@ -551,7 +551,27 @@ File copied: https://github.com/youzarsiph/drf-redesign/blob/main/drf_redesign/t
 {% endif %}
 
 {% block script %}
-{{ block.super }}
+{% comment %}
+--------------------------------------------------------------------------------------------------
+rest_framework JS exlcuding bootstrap3 and files using bootstrap3.
+--------------------------------------------------------------------------------------------------
+{% endcomment %}
+<script type="application/json" id="drf_csrf">
+  {
+    "csrfHeaderName": "{{ csrf_header_name|default:'X-CSRFToken' }}",
+    "csrfToken": "{% if request %}{{ csrf_token }}{% endif %}"
+  }
+</script>
+<script src="{% static "rest_framework/js/jquery-3.7.1.min.js" %}"></script>
+<script src="{% static "rest_framework/js/ajax-form.js" %}"></script>
+<script src="{% static "rest_framework/js/csrf.js" %}"></script>
+<script src="{% static "rest_framework/js/load-ajax-form.js" %}"></script>
+
+{% comment %}
+--------------------------------------------------------------------------------------------------
+drf_redesign JS exlcuding CDNs.
+--------------------------------------------------------------------------------------------------
+{% endcomment %}
 <script src="{% static "drf_browsable_api/js/bootstrap.bundle.min.js" %}"></script>
 <script src="{% static "drf_browsable_api/js/highlight.min.js" %}"></script>
 <script src="{% static "drf_browsable_api/js/http.min.js" %}"></script>
