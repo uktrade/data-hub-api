@@ -918,6 +918,24 @@ class TestContactConsentIngestionTask:
         )
 
     @mock_aws
+    def test_search_contacts_returns_expected_matches(
+        self,
+        opensearch_with_collector,
+    ):
+        """
+        Test the index returns expected contact matches
+        """
+        contact_1 = ContactFactory(email='index_search@bar.com')
+        ContactFactory(email='not_found@bar.com')
+
+        opensearch_with_collector.flush_and_refresh()
+        search_results = ContactConsentIngestionTask().search_contacts(contact_1.email)
+
+        assert len(search_results) == 1
+        assert search_results[0]['id'] == str(contact_1.id)
+        assert search_results[0]['email'] == contact_1.email
+
+    @mock_aws
     def test_delete_file_removes_file_using_boto3(self):
         """
         Test that the file is deleted from the bucket
