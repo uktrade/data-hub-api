@@ -625,6 +625,7 @@
     modified_on: "2018-06-05T00:00:00Z"
     archived_documents_url_path: "/documents/123"
     consent_data: [{"source_system": "System A", "consent_domain": "Domestic", "email_contact_consent": true, "telephone_contact_consent": false}]
+    consent_data_last_modified: "2024-09-09T14:10:00"
 
 - model: company.contact
   pk: 1430e18a-52ac-4185-b71d-b2be5a771fd0
@@ -642,6 +643,8 @@
     notes: This is a dummy contact for testing
     created_on: "2018-02-28T15:00:00Z"
     modified_on: "2018-06-05T00:00:00Z"
+    consent_data: [{"source_system": "System B", "consent_domain": "International", "email_contact_consent": false, "telephone_contact_consent": false}]
+    consent_data_last_modified: "2023-09-09T14:10:00"
 
 - model: company_referral.companyreferral
   pk: 02e4cce0-caf5-4eb8-8d6d-ebdd69a6545b
