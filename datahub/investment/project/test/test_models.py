@@ -48,7 +48,7 @@ def test_interaction_get_absolute_url():
     """Test that InvestmentProject.get_absolute_url() returns the correct URL."""
     project = InvestmentProjectFactory.build()
     assert project.get_absolute_url() == (
-        f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["investmentproject"]}/{project.pk}'
+        f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["investmentproject"]}/{project.pk}/details'
     )
 
 
