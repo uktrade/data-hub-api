@@ -537,8 +537,16 @@ class TestGreatIngestionTasks:
                 "id": "5249",
                 "created_at": "2024-09-19T14:00:34.069",
                 "url": "{long_text}",
+                "meta": {{
+                    "subject": "{long_text}"
+                }},
                 "data": {{
-                    "triage_journey": "{long_text}"
+                    "triage_journey": "{long_text}",
+                    "product_or_service_1": "{long_text}",
+                    "product_or_service_2": "{long_text}",
+                    "product_or_service_3": "{long_text}",
+                    "product_or_service_4": "{long_text}",
+                    "product_or_service_5": "{long_text}"
                 }}
             }}
         """
