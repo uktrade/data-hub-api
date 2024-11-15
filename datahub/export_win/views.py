@@ -23,7 +23,6 @@ from rest_framework.views import exception_handler, Response
 from datahub.core.schemas import StubSchema
 
 from datahub.core.viewsets import CoreViewSet
-from datahub.export_win import EXPORT_WINS_LEGACY_DATA_FEATURE_FLAG_NAME
 from datahub.export_win.decorators import validate_script_and_html_tags
 from datahub.export_win.models import (
     CustomerResponse,
@@ -40,9 +39,7 @@ from datahub.export_win.tasks import (
     notify_export_win_email_by_rq_email,
     update_customer_response_token_for_email_notification_id,
 )
-from datahub.feature_flag.utils import (
-    is_user_feature_flag_active,
-)
+
 
 logger = logging.getLogger(__name__)
 
@@ -131,21 +128,11 @@ class WinViewSet(CoreViewSet):
 
     def get_queryset(self):
         """Filter the queryset to the authenticated user."""
-        if is_user_feature_flag_active(
-            EXPORT_WINS_LEGACY_DATA_FEATURE_FLAG_NAME,
-            self.request.user,
-        ):
-            migrated_filter = {}
-        else:
-            migrated_filter = {
-                'migrated_on__isnull': True,
-            }
         return (
             super()
             .get_queryset()
             .filter(
                 is_anonymous_win=False,
-                **migrated_filter,
             )
             .exclude(
                 ~Q(adviser=self.request.user),

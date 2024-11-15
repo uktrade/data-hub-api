@@ -36,9 +36,6 @@ from datahub.core.test_utils import (
     create_test_user,
     format_date_or_datetime,
 )
-from datahub.export_win import (
-    EXPORT_WINS_LEGACY_DATA_FEATURE_FLAG_NAME,
-)
 from datahub.export_win.models import (
     CustomerResponse,
     CustomerResponseToken,
@@ -54,21 +51,9 @@ from datahub.export_win.test.factories import (
     WinAdviserFactory,
     WinFactory,
 )
-from datahub.feature_flag.test.factories import UserFeatureFlagFactory
 from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
-
-
-@pytest.fixture()
-def export_wins_legacy_data_feature_flag():
-    """
-    Creates the Export wins legacy data user feature flag.
-    """
-    yield UserFeatureFlagFactory(
-        code=EXPORT_WINS_LEGACY_DATA_FEATURE_FLAG_NAME,
-        is_active=True,
-    )
 
 
 @pytest.fixture()
@@ -476,17 +461,8 @@ class TestListWinView(APITestMixin):
 
         assert response_data['count'] == 2
 
-    @pytest.mark.parametrize(
-        'list_legacy_data',
-        (
-            True,
-            False,
-        ),
-    )
-    def test_list_with_legacy_wins(self, list_legacy_data, export_wins_legacy_data_feature_flag):
+    def test_list_with_legacy_wins(self):
         """Tests listing wins."""
-        if list_legacy_data:
-            self.user.features.set([export_wins_legacy_data_feature_flag])
         WinFactory.create_batch(2, adviser=self.user)
         WinFactory.create_batch(2, adviser=self.user, migrated_on=now())
         url = reverse('api-v4:export-win:collection')
@@ -495,7 +471,7 @@ class TestListWinView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
 
-        assert response_data['count'] == (4 if list_legacy_data else 2)
+        assert response_data['count'] == 4
 
     def test_list_default_sorting(self):
         """Tests wins are sorted."""
