@@ -148,7 +148,7 @@ class GreatIngestionTask:
         self._countries = Country.objects.all()
 
     def _country_from_iso_code(self, country_code, form_id):
-        if not country_code:
+        if not country_code or country_code == 'notspecificcountry':
             return None
 
         if self._countries is None:
