@@ -189,9 +189,9 @@ class TestGreatIngestionTasks:
         assert result.company == company
 
     @pytest.mark.django_db
-    def test_company_name_mapping_when_duplicates_exist(self):
+    def test_company_mapping_when_duplicates_exist(self):
         """
-        Test that when matching company name returns multiple results
+        Test that when matching company returns multiple results
         because we already have duplicates in the database any of them
         are assigned, and we assume the duplicate records will be merged
         manually later.
@@ -212,6 +212,23 @@ class TestGreatIngestionTasks:
         task.json_to_model(json.loads(data))
         result = GreatExportEnquiry.objects.get(form_id='5249')
         assert result.company.name == name
+
+        companies_house_num = 125
+        CompanyFactory(company_number=companies_house_num)
+        CompanyFactory(company_number=companies_house_num)
+        data = f"""
+            {{
+                "id": "5250",
+                "created_at": "2024-09-19T14:00:34.069",
+                "data": {{
+                    "company_registration_number": "{companies_house_num}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        result = GreatExportEnquiry.objects.get(form_id='5250')
+        assert result.company.company_number == str(companies_house_num)
 
     @pytest.mark.django_db
     def test_company_contact_mapping(self):
