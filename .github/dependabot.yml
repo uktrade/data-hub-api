@@ -14,4 +14,7 @@ updates:
     dependency-name: pylint-pytest
     versions:
     - "> 1.1.2"
+    dependency-name: mail-parser
+    versions:
+    - "> 4.1.2"
   rebase-strategy: disabled
