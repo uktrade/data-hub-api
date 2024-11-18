@@ -87,11 +87,7 @@ class GreatIngestionTask:
     def _get_company_by_companies_house_num(self, companies_house_num):
         if not companies_house_num:
             return None
-        try:
-            company = Company.objects.get(company_number=companies_house_num)
-            return company
-        except Company.DoesNotExist:
-            return None
+        return Company.objects.filter(company_number=companies_house_num).first()
 
     def _get_company_by_name(self, name):
         if not name:
