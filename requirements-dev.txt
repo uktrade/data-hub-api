@@ -253,7 +253,7 @@ mccabe==0.7.0
     #   pylint
 mohawk==1.1.0
     # via -r requirements.in
-moto==5.0.20
+moto==5.0.21
     # via -r requirements-dev.in
 multidict==6.0.4
     # via
