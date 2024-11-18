@@ -459,6 +459,32 @@ class TestGreatIngestionTasks:
         assert sentry_event['logentry']['message'] == expected_message
 
     @pytest.mark.django_db
+    def test_unspecified_country(self):
+        """
+        Test that when the country is unspecified null is assigned. Note that
+        `notspecificcountry` is the value we get from Great/Dataflow.
+        """
+        data = """
+            {
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069",
+                "meta": {
+                    "sender": {
+                        "country_code": "notspecificcountry"
+                    }
+                },
+                "data": {
+                    "markets": ["notspecificcountry"]
+                }
+            }
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        result = GreatExportEnquiry.objects.get(form_id='5249')
+        assert result.meta_sender_country is None
+        assert list(result.data_markets.all()) == []
+
+    @pytest.mark.django_db
     def test_invalid_country_code(self):
         """
         Test that when the country code provided in the data file cannot be found
