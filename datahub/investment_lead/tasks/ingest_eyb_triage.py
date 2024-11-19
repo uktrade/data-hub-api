@@ -34,7 +34,7 @@ class EYBTriageFileIngestionTask(BaseEYBFileIngestionTask):
 def ingest_eyb_triage_data(bucket, file):
     """Ingests triage data from the file passed in.
 
-    Schedules the user data ingetion job after the triage ingestion job to prevent
+    Schedules the user data ingestion job after the triage ingestion job to prevent
     the risk of duplicate instances of the same lead being created.
     Triage data and user data are combined using a UUID to create/update a single EYB Lead.
     """
@@ -46,6 +46,7 @@ def ingest_eyb_triage_data(bucket, file):
     task.ingest(bucket, file)
     logger.info(f'Ingesting file: {file} finished')
 
+    # Chain next job (EYB user file) to avoid creating duplicate EYB Leads.
     job_scheduler(
         function=ingest_eyb_user_file,
         description='Check S3 for new EYB user data files and ingest',
@@ -55,3 +56,6 @@ def ingest_eyb_triage_data(bucket, file):
 
 class EYBTriageDataIngestionTask(BaseEYBDataIngestionTask):
     """Long running job to read the triage file contents and ingest the records."""
+
+    def _get_hashed_uuid(self, obj):
+        return obj.get('hashedUuid', None)
