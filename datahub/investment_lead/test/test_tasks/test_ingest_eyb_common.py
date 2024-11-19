@@ -16,12 +16,19 @@ from datahub.company_activity.tests.factories import CompanyActivityIngestedFile
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import DataHubScheduler
 from datahub.investment_lead.serializers import (
+    CreateEYBLeadMarketingSerializer,
     CreateEYBLeadTriageSerializer,
     CreateEYBLeadUserSerializer,
 )
 from datahub.investment_lead.tasks.ingest_eyb_common import (
     BUCKET,
     REGION,
+)
+from datahub.investment_lead.tasks.ingest_eyb_marketing import (
+    EYBMarketingDataIngestionTask,
+    ingest_eyb_marketing_data,
+    ingest_eyb_marketing_file,
+    MARKETING_PREFIX,
 )
 from datahub.investment_lead.tasks.ingest_eyb_triage import (
     EYBTriageDataIngestionTask,
@@ -60,6 +67,7 @@ class TestEYBCommonFileIngestionTasks:
         [
             (TRIAGE_PREFIX, ingest_eyb_triage_file),
             (USER_PREFIX, ingest_eyb_user_file),
+            (MARKETING_PREFIX, ingest_eyb_marketing_file),
         ],
     )
     # Patch so that we can test the job is queued, rather than having it be run instantly
@@ -92,6 +100,7 @@ class TestEYBCommonFileIngestionTasks:
         [
             (TRIAGE_PREFIX, ingest_eyb_triage_data, ingest_eyb_triage_file),
             (USER_PREFIX, ingest_eyb_user_data, ingest_eyb_user_file),
+            (MARKETING_PREFIX, ingest_eyb_marketing_data, ingest_eyb_marketing_file),
         ],
     )
     @pytest.mark.django_db
@@ -140,6 +149,11 @@ class TestEYBCommonFileIngestionTasks:
                 ingest_eyb_user_file,
                 'datahub.investment_lead.tasks.ingest_eyb_user.ingest_eyb_user_data',
             ),
+            (
+                MARKETING_PREFIX,
+                ingest_eyb_marketing_file,
+                'datahub.investment_lead.tasks.ingest_eyb_marketing.ingest_eyb_marketing_data',
+            ),
         ],
     )
     @pytest.mark.django_db
@@ -177,6 +191,7 @@ class TestEYBCommonDataIngestionTasks:
         [
             (EYBTriageDataIngestionTask, CreateEYBLeadTriageSerializer),
             (EYBUserDataIngestionTask, CreateEYBLeadUserSerializer),
+            (EYBMarketingDataIngestionTask, CreateEYBLeadMarketingSerializer),
         ],
     )
     def test_get_last_ingestion_datetime_of_data(self, ingest_data_task_class, serializer_class):
@@ -220,6 +235,7 @@ class TestEYBCommonDataIngestionTasks:
         [
             (ingest_eyb_triage_data),
             (ingest_eyb_user_data),
+            (ingest_eyb_marketing_data),
         ],
     )
     @mock_aws

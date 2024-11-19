@@ -121,22 +121,29 @@ class BaseEYBDataIngestionTask:
                 date = datetime.fromisoformat(date_str)
             return date.timestamp() < self._last_ingestion_datetime.timestamp()
 
+    def _get_hashed_uuid(self, obj):
+        """
+        Method to get the hashed uuid from the incoming json object.
+        """
+        raise NotImplementedError
+
     def json_to_model(self, jsn):
         obj = jsn['object']
         serializer = self.serializer_class(data=obj)
+        hashed_uuid = self._get_hashed_uuid(obj)
         if serializer.is_valid():
             queryset = EYBLead.objects.filter(
-                Q(user_hashed_uuid=obj['hashedUuid']) | Q(triage_hashed_uuid=obj['hashedUuid']),
+                Q(user_hashed_uuid=hashed_uuid)
+                | Q(triage_hashed_uuid=hashed_uuid)
+                | Q(marketing_hashed_uuid=hashed_uuid),
             )
             instance, created = queryset.update_or_create(defaults=serializer.validated_data)
-            hashed_uuid = instance.triage_hashed_uuid \
-                if instance.triage_hashed_uuid else instance.user_hashed_uuid
             if created:
                 self.created_hashed_uuids.append(hashed_uuid)
             else:
                 self.updated_hashed_uuids.append(hashed_uuid)
         else:
             self.errors.append({
-                'index': obj.get('hashedUuid', None),
+                'index': hashed_uuid,
                 'errors': serializer.errors,
             })
