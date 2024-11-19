@@ -3,9 +3,11 @@ import logging
 from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
 
+import botocore.exceptions
 import pytest
 
 from django.conf import settings
+from freezegun import freeze_time
 from moto import mock_aws
 from redis import Redis
 from rq import Queue, Worker
@@ -21,6 +23,7 @@ from datahub.investment_lead.serializers import (
     CreateEYBLeadUserSerializer,
 )
 from datahub.investment_lead.tasks.ingest_eyb_common import (
+    BaseEYBDataIngestionTask,
     BUCKET,
     REGION,
 )
@@ -43,6 +46,7 @@ from datahub.investment_lead.tasks.ingest_eyb_user import (
     USER_PREFIX,
 )
 from datahub.investment_lead.test.test_tasks.utils import (
+    file_contents_faker,
     setup_s3_bucket,
     setup_s3_client,
 )
@@ -210,15 +214,15 @@ class TestEYBCommonDataIngestionTasks:
 
         CompanyActivityIngestedFileFactory(
             filepath=target_filepath_prefix + '1.jsonl.gz',
-            created_on=day_before_yesterday,
+            file_created=day_before_yesterday,
         )
         most_recently_ingested_target_file = CompanyActivityIngestedFileFactory(
             filepath=target_filepath_prefix + '2.jsonl.gz',
-            created_on=yesterday,
+            file_created=yesterday,
         )
         CompanyActivityIngestedFileFactory(
             filepath=other_filepath_prefix + '1.jsonl.gz',
-            created_on=now,
+            file_created=now,
         )
         most_recent_target_file_ingestion_datetime = ingest_data_task_class(
             serializer_class=serializer_class,
@@ -227,8 +231,48 @@ class TestEYBCommonDataIngestionTasks:
 
         assert_datetimes(
             most_recent_target_file_ingestion_datetime,
-            most_recently_ingested_target_file.created_on,
+            most_recently_ingested_target_file.file_created,
         )
+
+    @pytest.mark.parametrize(
+        'prefix, faker_type, ingest_data_task_class, serializer_class',
+        [
+            (TRIAGE_PREFIX, 'triage', EYBTriageDataIngestionTask, CreateEYBLeadTriageSerializer),
+            (USER_PREFIX, 'user', EYBUserDataIngestionTask, CreateEYBLeadUserSerializer),
+        ],
+    )
+    @mock_aws
+    def test_ingested_file_record_captures_file_last_modified_date(
+        self, prefix, faker_type, ingest_data_task_class, serializer_class,
+    ):
+        """Tests the created IngestedFile instance records file last modified datetime.
+
+        This is instead of recording the datetime of ingestion, which can cause new records
+        to be considered already ingested if the job is stuck on the queue for an extended
+        period of time.
+        """
+        file_path = f'{prefix}myfile.jsonl.gz'
+        file_last_modified = datetime(2024, 11, 12, 15, 30, 00, tzinfo=timezone.utc)
+        with freeze_time(file_last_modified):
+            setup_s3_bucket(BUCKET, [file_path], [file_contents_faker(default_faker=faker_type)])
+        now = datetime.now(tz=timezone.utc)
+        with freeze_time(now):
+            task = ingest_data_task_class(serializer_class, prefix)
+            task.ingest(BUCKET, file_path)
+            ingested_file = IngestedFile.objects.get(filepath=file_path)
+        assert ingested_file.file_created == file_last_modified
+        assert ingested_file.file_created != now
+
+    @mock_aws
+    def test_get_file_last_modified_date_logs_and_raises_error(self, caplog):
+        prefix = 'test_prefix/'
+        existing_file_path = f'{prefix}existing_file.jsonl.gz'
+        missing_file_path = f'{prefix}missing_file.jsonl.gz'
+        setup_s3_bucket(BUCKET, [existing_file_path])
+        task = BaseEYBDataIngestionTask(None, prefix)
+        with pytest.raises(botocore.exceptions.ClientError):
+            task._get_file_last_modified_datetime(BUCKET, missing_file_path)
+        assert 'NoSuchKey' in caplog.text
 
     @pytest.mark.parametrize(
         'ingest_data_task_function',
