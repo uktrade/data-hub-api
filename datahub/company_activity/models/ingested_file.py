@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 from datahub.core import reversion
 
@@ -15,10 +16,17 @@ class IngestedFile(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    created_on = models.DateTimeField(
+        auto_now_add=True,
+        help_text='DateTime the instance was created',
+    )
     filepath = models.CharField(
         max_length=MAX_LENGTH,
         help_text=(
             'The S3 object path including prefix of the ingested file'
         ),
     )
-    created_on = models.DateTimeField(auto_now_add=True)
+    file_created = models.DateTimeField(
+        default=timezone.now,
+        help_text='DateTime the ingested file was last modified in S3',
+    )
