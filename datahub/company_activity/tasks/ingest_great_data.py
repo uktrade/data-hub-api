@@ -19,6 +19,13 @@ def ingest_great_data(bucket, file):
     logger.info(f'Ingesting file: {file} finished')
 
 
+def validate_company_registration_number(company_registration_number):
+    if company_registration_number:
+        if len(company_registration_number) > 10:
+            return None
+    return company_registration_number
+
+
 class GreatIngestionTask:
     def __init__(self):
         self._countries = None
@@ -45,7 +52,9 @@ class GreatIngestionTask:
     def _create_company(self, data, form_id):
         company = Company.objects.create(
             name=data.get('business_name', ''),
-            company_number=data.get('company_registration_number', ''),
+            company_number=validate_company_registration_number(
+                data.get('company_registration_number', ''),
+            ),
             turnover_range=self._get_turnover_range(data.get('annual_turnover')),
             business_type=self._get_business_type(data.get('type')),
             employee_range=self._get_business_size(data.get('number_of_employees')),
@@ -72,7 +81,7 @@ class GreatIngestionTask:
 
     def _get_company(self, data, form_id):
         company = self._get_company_by_companies_house_num(
-            data.get('company_registration_number'),
+            validate_company_registration_number(data.get('company_registration_number')),
         )
         if company:
             return company
