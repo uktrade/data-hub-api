@@ -7,6 +7,7 @@ from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
+from datahub.investment_lead.models import EYBLead
 from datahub.omis.order.models import Order
 
 
@@ -159,6 +160,36 @@ def relate_company_activity_to_great(batch_size=500):
         )
         for great_export_enquiry in great_export_enquiries
         if great_export_enquiry['id'] not in activity
+    ]
+
+    bulk_create_activity(objs, batch_size)
+
+
+def relate_company_activity_to_eyb_lead(batch_size=500):
+    """
+    Grabs all EYB leads so they can be related to in the
+    `CompanyActivity` model with a bulk_create. Excludes any
+    EYB leads already associated in the CompanyActivity model.
+    """
+    activity = set(
+        CompanyActivity.objects.filter(
+            eyb_lead_id__isnull=False,
+        ).values_list('eyb_lead', flat=True),
+    )
+
+    eyb_leads = EYBLead.objects.filter(
+        company_id__isnull=False,
+    ).values('id', 'created_on', 'company_id')
+
+    objs = [
+        CompanyActivity(
+            eyb_lead=eyb_lead['id'],
+            date=eyb_lead['created_on'],
+            company_id=eyb_lead['company_id'],
+            activity_source=CompanyActivity.ActivitySource.eyb_lead,
+        )
+        for eyb_lead in eyb_leads
+        if eyb_lead['id'] not in activity
     ]
 
     bulk_create_activity(objs, batch_size)
