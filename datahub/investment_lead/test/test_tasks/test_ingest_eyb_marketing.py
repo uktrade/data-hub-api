@@ -151,18 +151,17 @@ class TestEYBMarketingDataIngestionTasks:
         assert IngestedFile.objects.count() == initial_ingested_count + 1
 
     @mock_aws
-    def test_marketing_data_ingestion_updates_existing_fields(self, test_marketing_file_path):
-        """
-        Test that for records which have been previously ingested, updated fields
-        have their new values ingested
-        """
+    def test_marketing_data_ingestion_does_not_update_existing(self, test_marketing_file_path):
+        """Test previously ingested records do not trigger an update to the existing instance."""
         hashed_uuid = generate_hashed_uuid()
-        EYBLeadFactory(marketing_hashed_uuid=hashed_uuid, utm_content='not hello')
+        initial_value = 'initial value'
+        updated_value = 'updated value'
+        EYBLeadFactory(marketing_hashed_uuid=hashed_uuid, utm_content=initial_value)
         assert EYBLead.objects.count() == 1
         records = [
             eyb_lead_marketing_record_faker({
                 'hashed_uuid': hashed_uuid,
-                'content': 'hello',
+                'content': updated_value,
             }),
         ]
         file_contents = file_contents_faker(records)
@@ -170,7 +169,7 @@ class TestEYBMarketingDataIngestionTasks:
         ingest_eyb_marketing_data(BUCKET, test_marketing_file_path)
         assert EYBLead.objects.count() == 1
         updated = EYBLead.objects.get(marketing_hashed_uuid=hashed_uuid)
-        assert str(updated.utm_content) == 'hello'
+        assert updated.utm_content == initial_value
 
     @mock_aws
     def test_incoming_marketing_records_trigger_correct_logging(self, caplog):
@@ -183,8 +182,12 @@ class TestEYBMarketingDataIngestionTasks:
         created_hashed_uuid = generate_hashed_uuid()
         updated_hashed_uuid = generate_hashed_uuid()
 
+        # Existing leads with matching hashed uuids for triage or user component will be updated.
+        # Existing leads with matching marketing hashed uuid will not be updated; this is because
+        # marketing data is not updatable and so it would be an unnecessary overwrite.
         EYBLeadFactory(
-            marketing_hashed_uuid=updated_hashed_uuid,
+            triage_hashed_uuid=updated_hashed_uuid,
+            user_hashed_uuid=updated_hashed_uuid,
         )
         assert EYBLead.objects.count() == 1
 
