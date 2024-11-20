@@ -1,5 +1,6 @@
 import logging
 
+from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import CreateEYBLeadMarketingSerializer
 from datahub.investment_lead.tasks.ingest_eyb_common import (
     BaseEYBDataIngestionTask,
@@ -33,7 +34,7 @@ def ingest_eyb_marketing_data(bucket, file):
     """Ingests marketing data from the file passed in.
 
     A chain of tasks is created schedules triage ingestion which in turn schedules the user data
-    ingetion which in turn schedules marketing data ingestion.
+    ingestion which in turn schedules marketing data ingestion.
     This to prevent the risk of duplicate instances of the same lead being created.
     Marketing data and user data are combined using a UUID to create/update a single EYB Lead.
     """
@@ -53,4 +54,7 @@ class EYBMarketingDataIngestionTask(BaseEYBDataIngestionTask):
         return obj.get('hashed_uuid', None)
 
     def _record_has_no_changes(self, record):
+        hashed_uuid = self._get_hashed_uuid(record['object'])
+        if hashed_uuid and EYBLead.objects.filter(marketing_hashed_uuid=hashed_uuid).exists():
+            return True
         return False
