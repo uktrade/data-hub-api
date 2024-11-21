@@ -225,6 +225,7 @@ class EYBLead(InvestmentLead):
 
     def save(self, *args, **kwargs):
         """
+        Creates a CompanyActivity when a EYB Lead is saved
         """
         with transaction.atomic():
             super().save(*args, **kwargs)
