@@ -34,7 +34,7 @@ class TestCompanyActivityEYBLeadTasks:
         company_activity = CompanyActivity.objects.get(eyb_lead=eyb_leads[0])
         assert company_activity.date == eyb_leads[0].created_on
         assert company_activity.activity_source == CompanyActivity.ActivitySource.eyb_lead
-        assert company_activity.eyb_lead.id == eyb_leads[0].id
+        assert company_activity.eyb_lead_id == eyb_leads[0].id
 
     @mock.patch('datahub.company_activity.models.CompanyActivity.objects.bulk_create')
     def test_eyb_leads_are_bulk_created_in_batches(self, mocked_bulk_create, caplog):

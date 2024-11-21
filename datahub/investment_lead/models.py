@@ -234,8 +234,5 @@ class EYBLead(InvestmentLead):
             CompanyActivity.objects.update_or_create(
                 eyb_lead_id=self.id,
                 activity_source=CompanyActivity.ActivitySource.eyb_lead,
-                defaults={
-                    'date': self.created_on,
-                    'company_id': self.company.id,
-                },
+                defaults={'date': self.created_on, 'company_id': self.company_id},
             )
