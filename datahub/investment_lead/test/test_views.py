@@ -86,7 +86,18 @@ class TestEYBLeadListAPI(APITestMixin):
         assert len(response.data['results']) == pagination_limit
 
     def test_filter_by_company_name(self, test_user_with_view_permissions):
-        """Test filtering EYB leads by company name"""
+        """Test filtering EYB leads by the EYBLead.company_name field."""
+        company_name = 'Mars Exports Ltd'
+        EYBLeadFactory(company_name=company_name)
+        EYBLeadFactory()
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'company': company_name})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['results'][0]['company_name'] == company_name
+
+    def test_filter_by_related_company_name(self, test_user_with_view_permissions):
+        """Test filtering EYB leads by the EYBLead.company.name field."""
         company_name = 'Mars Exports Ltd'
         company = CompanyFactory(name=company_name)
         EYBLeadFactory(company=company)
@@ -96,6 +107,19 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert response.data['results'][0]['company']['name'] == company_name
+
+    def test_filter_by_both_company_name_fields(self, test_user_with_view_permissions):
+        """Test filtering EYB leads by the EYBLead.company_name and EYBLead.company.name field."""
+        company_name = 'Mars Exports Ltd'
+        company = CompanyFactory(name=company_name)
+        EYBLeadFactory(company=company)
+        EYBLeadFactory(company_name=company_name)
+        EYBLeadFactory()
+        assert EYBLead.objects.count() == 3
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'company': company_name})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
 
     def test_filter_by_ancestor_sector(self, test_user_with_view_permissions):
         """Test filtering by sector returns leads with sectors that have the ancestor sector."""
