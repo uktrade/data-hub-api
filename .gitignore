@@ -96,3 +96,6 @@ tags
 
 # Localstack
 .localstack/mounted 
+
+# S3 data files
+*.jsonl.gz
