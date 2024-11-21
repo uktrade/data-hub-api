@@ -112,6 +112,7 @@ COMPANY_ACTIVITY_CREATED_BY_MODELS = [
     GreatExportEnquiryFactory,
     InvestmentProjectFactory,
     OrderFactory,
+    EYBLeadFactory,
 ]
 
 
