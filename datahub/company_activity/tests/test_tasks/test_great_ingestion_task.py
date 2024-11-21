@@ -594,14 +594,7 @@ class TestGreatIngestionTasks:
                     "product_or_service_3": "{long_text}",
                     "product_or_service_4": "{long_text}",
                     "product_or_service_5": "{long_text}",
-                    "business_name": "test name",
-                    "company_registration_number": "{long_text}",
-                    "type": "privatelimitedcompany",
-                    "number_of_employees": "50-249",
-                    "first_name": "Ada",
-                    "last_name": "Babbage",
-                    "uk_telephone_number": "07900000000",
-                    "email": "test@example.com"
+                    "company_registration_number": "{long_text}"
 
                 }}
             }}

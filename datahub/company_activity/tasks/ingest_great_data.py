@@ -20,13 +20,7 @@ def ingest_great_data(bucket, file):
 
 
 def validate_company_registration_number(company_registration_number):
-    try:
-        company_registration_number_str = str(company_registration_number)
-    except Exception as e:
-        logger.exception(
-            f'Incoming company registration number could not be converted to a string: {str(e)}',
-        )
-        return None
+    company_registration_number_str = str(company_registration_number)
     if len(company_registration_number_str) > 10:
         return None
     return company_registration_number_str
