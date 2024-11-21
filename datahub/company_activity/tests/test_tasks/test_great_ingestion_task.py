@@ -15,7 +15,8 @@ from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.company_activity.models import GreatExportEnquiry, IngestedFile
 from datahub.company_activity.tasks.constants import BUCKET, GREAT_PREFIX, REGION
 from datahub.company_activity.tasks.ingest_great_data import (
-    GreatIngestionTask, ingest_great_data,
+    GreatIngestionTask,
+    ingest_great_data,
 )
 from datahub.company_activity.tests.factories import (
     GreatExportEnquiryFactory,
@@ -25,7 +26,9 @@ from datahub.metadata.models import BusinessType, Country, EmployeeRange, Sector
 
 @pytest.fixture
 def test_file():
-    filepath = 'datahub/company_activity/tests/test_tasks/fixtures/great/20241023T000346.jsonl.gz'
+    filepath = (
+        'datahub/company_activity/tests/test_tasks/fixtures/great/20241023T000346.jsonl.gz'
+    )
     return open(filepath, 'rb')
 
 
@@ -164,7 +167,7 @@ class TestGreatIngestionTasks:
                 "id": "5250",
                 "created_at": "2024-09-19T14:00:34.069",
                 "data": {{
-                    "company_registration_number": 994349,
+                    "company_registration_number": "994349",
                     "business_name": "{company.name}"
                 }}
             }}
@@ -563,7 +566,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     @mock_aws
-    def test_long_field_values(self, test_file_path):
+    def test_long_field_values(self):
         """
         Test that we can ingest records with long field values
         """
@@ -575,6 +578,7 @@ class TestGreatIngestionTasks:
             'that either need to be stored as TextFields if we need'
             'the full value or truncated if we do not. Long long long.'
         )
+
         data = f"""
             {{
                 "id": "5249",
@@ -589,10 +593,18 @@ class TestGreatIngestionTasks:
                     "product_or_service_2": "{long_text}",
                     "product_or_service_3": "{long_text}",
                     "product_or_service_4": "{long_text}",
-                    "product_or_service_5": "{long_text}"
+                    "product_or_service_5": "{long_text}",
+                    "company_registration_number": "{long_text}"
+
                 }}
             }}
         """
         task = GreatIngestionTask()
         task.json_to_model(json.loads(data))
         assert GreatExportEnquiry.objects.count() == initial_count + 1
+
+        result = GreatExportEnquiry.objects.get(form_id='5249').company_id
+
+        company_result = Company.objects.get(id=result)
+
+        assert company_result.company_number is None
