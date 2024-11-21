@@ -566,7 +566,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     @mock_aws
-    def test_long_field_values(self, test_file_path):
+    def test_long_field_values(self):
         """
         Test that we can ingest records with long field values
         """
