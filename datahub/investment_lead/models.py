@@ -231,8 +231,8 @@ class EYBLead(InvestmentLead):
             if not self.company:
                 return
             CompanyActivity.objects.update_or_create(
-                order_id=self.id,
-                activity_source=CompanyActivity.ActivitySource.order,
+                eyb_lead_id=self.id,
+                activity_source=CompanyActivity.ActivitySource.eyb_lead,
                 defaults={
                     'date': self.created_on,
                     'company_id': self.company.id,
