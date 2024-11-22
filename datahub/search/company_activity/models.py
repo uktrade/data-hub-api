@@ -7,6 +7,7 @@ from datahub.search.company_activity.dict_utils import (
     activity_investment_dict,
     activity_order_dict,
     activity_referral_dict,
+    activity_eyb_lead_dict,
 )
 from datahub.search.company_activity.fields import (
     activity_great_field,
@@ -14,6 +15,7 @@ from datahub.search.company_activity.fields import (
     activity_investment_field,
     activity_order_field,
     activity_referral_field,
+    activity_eyb_lead_field,
 )
 from datahub.search.models import BaseSearchModel
 
@@ -32,6 +34,7 @@ class CompanyActivity(BaseSearchModel):
     investment = activity_investment_field()
     order = activity_order_field()
     great_export_enquiry = activity_great_field()
+    eyb_lead = activity_eyb_lead_field()
 
     COMPUTED_MAPPINGS = {}
 
@@ -42,6 +45,7 @@ class CompanyActivity(BaseSearchModel):
         'investment': activity_investment_dict,
         'order': activity_order_dict,
         'great_export_enquiry': activity_great_dict,
+        'eyb_lead': activity_eyb_lead_dict,
     }
 
     SEARCH_FIELDS = (
