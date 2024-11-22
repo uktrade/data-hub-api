@@ -78,3 +78,14 @@ def activity_great_field():
             'data_enquiry': Text(index=False),
         },
     )
+
+
+def activity_eyb_lead_field():
+    return Object(
+        properties={
+            'id': Keyword(),
+            'created_on': Date(),
+            'company_name': Text(index=False),
+            'dnb_number': Text(index=False),
+        },
+    )
