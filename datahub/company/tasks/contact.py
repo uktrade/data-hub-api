@@ -276,7 +276,7 @@ class ContactConsentIngestionTask:
 
                 matching_contacts = contact_dict.get(email)
 
-                if not matching_contacts or len(matching_contacts) == 0:
+                if not matching_contacts:
                     logger.debug(
                         'Email %s in contact consent file has no matching datahub contacts',
                         email,

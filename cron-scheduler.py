@@ -34,6 +34,7 @@ from datahub.core.queues.constants import (
     # EVERY_THREE_AM_ON_TWENTY_EIGHTH_EACH_MONTH,
     EVERY_TWO_AM,
     HALF_DAY_IN_SECONDS,
+    ONE_HOUR_IN_SECONDS,
 )
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
@@ -254,7 +255,7 @@ def schedule_jobs():
         queue_name=LONG_RUNNING_QUEUE,
         retry_backoff=True,
         description='Import contact consent data',
-        job_timeout=HALF_DAY_IN_SECONDS,
+        job_timeout=ONE_HOUR_IN_SECONDS * 2,
     )
 
 
