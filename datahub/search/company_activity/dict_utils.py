@@ -96,5 +96,5 @@ def activity_eyb_lead_dict(obj):
         'id': str(obj.id),
         'created_on': obj.created_on,
         'company_name': obj.company_name,
-        'dnb_number': obj.dnb_number
+        'duns_number': obj.duns_number,
     }
