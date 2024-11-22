@@ -2,20 +2,20 @@ from opensearch_dsl import Date, Keyword, Text
 
 from datahub.search import dict_utils, fields
 from datahub.search.company_activity.dict_utils import (
+    activity_eyb_lead_dict,
     activity_great_dict,
     activity_interaction_dict,
     activity_investment_dict,
     activity_order_dict,
     activity_referral_dict,
-    activity_eyb_lead_dict,
 )
 from datahub.search.company_activity.fields import (
+    activity_eyb_lead_field,
     activity_great_field,
     activity_interaction_field,
     activity_investment_field,
     activity_order_field,
     activity_referral_field,
-    activity_eyb_lead_field,
 )
 from datahub.search.models import BaseSearchModel
 

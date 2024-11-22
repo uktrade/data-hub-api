@@ -86,6 +86,6 @@ def activity_eyb_lead_field():
             'id': Keyword(),
             'created_on': Date(),
             'company_name': Text(index=False),
-            'dnb_number': Text(index=False),
+            'duns_number': Text(index=False),
         },
     )
