@@ -4,6 +4,7 @@ from datahub.company_activity.tests.factories import GreatExportEnquiryFactory
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.search.company_activity import dict_utils
 
@@ -89,3 +90,17 @@ def test_activity_great_dict():
     assert result['contact']['id'] == str(great.contact.id)
     assert result['meta_subject'] == great.meta_subject
     assert result['data_enquiry'] == great.data_enquiry
+
+
+def test_activity_eyb_lead_dict():
+    obj = None
+    result = dict_utils.activity_eyb_lead_dict(obj)
+    assert result is None
+
+    eyb_lead = EYBLeadFactory()
+    result = dict_utils.activity_eyb_lead_dict(eyb_lead)
+
+    assert result['id'] == str(eyb_lead.id)
+    assert result['created_on'] == eyb_lead.created_on
+    assert result['duns_number'] == eyb_lead.duns_number
+    assert result['company_name'] == eyb_lead.company_name

@@ -18,6 +18,7 @@ from datahub.interaction.test.factories import (
     InteractionDITParticipantFactory,
 )
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.search.company_activity.apps import CompanyActivitySearchApp
 
@@ -287,3 +288,32 @@ def test_company_activity_syncs_great_fields_when_changed(opensearch_with_signal
     assert actual_great_export_enquiry['contact']['id'] == str(new_contact.id)
     assert actual_great_export_enquiry['meta_email_address'] == new_email_address
     assert actual_great_export_enquiry['meta_subject'] == new_subject
+
+
+def test_company_activity_syncs_eyb_lead_fields_when_changed(opensearch_with_signals):
+    """Test that company_activities are synced to OpenSearch if their eyb lead updates."""
+    eyb_lead = EYBLeadFactory()
+    company_activity = DBCompanyActivity.objects.get(eyb_lead=eyb_lead)
+    opensearch_with_signals.indices.refresh()
+
+    doc = opensearch_with_signals.get(
+        index=CompanyActivitySearchApp.search_model.get_read_alias(),
+        id=company_activity.pk,
+    )
+
+    assert doc['_source']['eyb_lead']['duns_number'] == str(eyb_lead.duns_number)
+    assert doc['_source']['eyb_lead']['company_name'] == str(eyb_lead.company_name)
+    new_company_name = str(eyb_lead.company_name) + ' new'
+    eyb_lead.company_name = new_company_name
+
+    eyb_lead.save()
+
+    opensearch_with_signals.indices.refresh()
+
+    updated_doc = opensearch_with_signals.get(
+        index=CompanyActivitySearchApp.search_model.get_read_alias(),
+        id=company_activity.pk,
+    )
+    actual_eyb_lead = updated_doc['_source']['eyb_lead']
+    assert actual_eyb_lead['duns_number'] == str(eyb_lead.duns_number)
+    assert actual_eyb_lead['company_name'] == str(new_company_name)
