@@ -160,6 +160,9 @@ def test_mapping(opensearch):
                 },
                 'type': 'object',
             },
+            'consent_data_last_modified': {
+                'type': 'date',
+            },
             'created_by': {
                 'properties': {
                     'dit_team': {

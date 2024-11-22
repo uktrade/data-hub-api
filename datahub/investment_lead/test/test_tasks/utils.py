@@ -7,6 +7,7 @@ from moto import mock_aws
 
 from datahub.investment_lead.tasks.ingest_eyb_common import REGION
 from datahub.investment_lead.test.factories import (
+    eyb_lead_marketing_record_faker,
     eyb_lead_triage_record_faker,
     eyb_lead_user_record_faker,
 )
@@ -30,6 +31,8 @@ def file_contents_faker(records: list[dict] = None, default_faker: str = 'triage
             records = [eyb_lead_triage_record_faker()]
         elif default_faker == 'user':
             records = [eyb_lead_user_record_faker()]
+        elif default_faker == 'marketing':
+            records = [eyb_lead_marketing_record_faker()]
     json_lines = [
         json.dumps({'object': record}, default=str)
         for record in records

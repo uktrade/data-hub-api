@@ -12,6 +12,7 @@ class SpecificProgramme(Enum):
         'Advanced Engineering Supply Chain',
         '6513f918-4263-4516-8abb-8e4a6a4de857',
     )
+    referred_to_eyb = Constant('Referred to EYB', '3902b516-e553-4f54-b389-0a5db87ea507')
 
 
 class InvestorType(Enum):

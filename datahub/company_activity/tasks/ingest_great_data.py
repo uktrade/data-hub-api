@@ -19,6 +19,13 @@ def ingest_great_data(bucket, file):
     logger.info(f'Ingesting file: {file} finished')
 
 
+def validate_company_registration_number(company_registration_number):
+    company_registration_number_str = str(company_registration_number)
+    if len(company_registration_number_str) > 10:
+        return None
+    return company_registration_number_str
+
+
 class GreatIngestionTask:
     def __init__(self):
         self._countries = None
@@ -45,7 +52,9 @@ class GreatIngestionTask:
     def _create_company(self, data, form_id):
         company = Company.objects.create(
             name=data.get('business_name', ''),
-            company_number=data.get('company_registration_number', ''),
+            company_number=validate_company_registration_number(
+                data.get('company_registration_number', ''),
+            ),
             turnover_range=self._get_turnover_range(data.get('annual_turnover')),
             business_type=self._get_business_type(data.get('type')),
             employee_range=self._get_business_size(data.get('number_of_employees')),
@@ -72,7 +81,7 @@ class GreatIngestionTask:
 
     def _get_company(self, data, form_id):
         company = self._get_company_by_companies_house_num(
-            data.get('company_registration_number'),
+            validate_company_registration_number(data.get('company_registration_number')),
         )
         if company:
             return company
@@ -87,11 +96,7 @@ class GreatIngestionTask:
     def _get_company_by_companies_house_num(self, companies_house_num):
         if not companies_house_num:
             return None
-        try:
-            company = Company.objects.get(company_number=companies_house_num)
-            return company
-        except Company.DoesNotExist:
-            return None
+        return Company.objects.filter(company_number=companies_house_num).first()
 
     def _get_company_by_name(self, name):
         if not name:
@@ -152,7 +157,7 @@ class GreatIngestionTask:
         self._countries = Country.objects.all()
 
     def _country_from_iso_code(self, country_code, form_id):
-        if not country_code:
+        if not country_code or country_code == 'notspecificcountry':
             return None
 
         if self._countries is None:

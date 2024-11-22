@@ -3,6 +3,8 @@ import logging
 
 from datetime import datetime
 
+import boto3
+import botocore.exceptions
 import environ
 
 from django.conf import settings
@@ -90,7 +92,8 @@ class BaseEYBDataIngestionTask:
                     self.json_to_model(jsn)
         except Exception as e:
             raise e
-        IngestedFile.objects.create(filepath=file)
+        file_last_modified = self._get_file_last_modified_datetime(bucket, file)
+        IngestedFile.objects.create(filepath=file, file_created=file_last_modified)
         if self.created_hashed_uuids:
             logger.info(
                 f'{len(self.created_hashed_uuids)} records created: {self.created_hashed_uuids}',
@@ -102,11 +105,23 @@ class BaseEYBDataIngestionTask:
         if self.errors:
             logger.warning(f'{len(self.errors)} records failed validation: {self.errors}')
 
+    def _get_file_last_modified_datetime(self, bucket: str, file: str) -> datetime:
+        """Get the last modified date of a file in an S3 bucket."""
+        try:
+            s3_client = boto3.client('s3', REGION)
+            response = s3_client.get_object(Bucket=bucket, Key=file)
+            return response.get('LastModified')
+        except botocore.exceptions.ClientError as e:
+            logger.error(
+                f'Error getting last modified date for file {file} in bucket {bucket}: {str(e)}',
+            )
+            raise e
+
     def _get_last_ingestion_datetime(self, prefix):
         try:
             return IngestedFile.objects.filter(
                 filepath__icontains=prefix,
-            ).latest('created_on').created_on
+            ).latest('file_created').file_created
         except IngestedFile.DoesNotExist:
             return None
 
@@ -121,22 +136,29 @@ class BaseEYBDataIngestionTask:
                 date = datetime.fromisoformat(date_str)
             return date.timestamp() < self._last_ingestion_datetime.timestamp()
 
+    def _get_hashed_uuid(self, obj):
+        """
+        Method to get the hashed uuid from the incoming json object.
+        """
+        raise NotImplementedError
+
     def json_to_model(self, jsn):
         obj = jsn['object']
         serializer = self.serializer_class(data=obj)
+        hashed_uuid = self._get_hashed_uuid(obj)
         if serializer.is_valid():
             queryset = EYBLead.objects.filter(
-                Q(user_hashed_uuid=obj['hashedUuid']) | Q(triage_hashed_uuid=obj['hashedUuid']),
+                Q(user_hashed_uuid=hashed_uuid)
+                | Q(triage_hashed_uuid=hashed_uuid)
+                | Q(marketing_hashed_uuid=hashed_uuid),
             )
             instance, created = queryset.update_or_create(defaults=serializer.validated_data)
-            hashed_uuid = instance.triage_hashed_uuid \
-                if instance.triage_hashed_uuid else instance.user_hashed_uuid
             if created:
                 self.created_hashed_uuids.append(hashed_uuid)
             else:
                 self.updated_hashed_uuids.append(hashed_uuid)
         else:
             self.errors.append({
-                'index': obj.get('hashedUuid', None),
+                'index': hashed_uuid,
                 'errors': serializer.errors,
             })

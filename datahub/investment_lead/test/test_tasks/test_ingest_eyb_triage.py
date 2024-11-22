@@ -171,7 +171,7 @@ class TestEYBTriageDataIngestionTasks:
         file_path = f'{TRIAGE_PREFIX}1.jsonl.gz'
         new_file_path = f'{TRIAGE_PREFIX}2.jsonl.gz'
         CompanyActivityIngestedFileFactory(
-            created_on=datetime.now(),
+            file_created=datetime.now(),
             filepath=file_path,
         )
         records = [
@@ -232,7 +232,7 @@ class TestEYBTriageDataIngestionTasks:
 
         file_path = f'{TRIAGE_PREFIX}1.jsonl.gz'
         CompanyActivityIngestedFileFactory(
-            created_on=yesterday,
+            file_created=yesterday,
             filepath=file_path,
         )
         file_contents = file_contents_faker(records)
