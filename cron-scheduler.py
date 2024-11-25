@@ -13,6 +13,7 @@ from django.conf import settings
 from datahub.company.tasks.adviser import schedule_automatic_adviser_deactivate
 from datahub.company.tasks.company import schedule_automatic_company_archive
 from datahub.company.tasks.contact import (
+    ingest_contact_consent_data,
     schedule_automatic_contact_archive,
 )
 from datahub.company.tasks.export_potential import update_company_export_potential_from_csv
@@ -33,6 +34,7 @@ from datahub.core.queues.constants import (
     # EVERY_THREE_AM_ON_TWENTY_EIGHTH_EACH_MONTH,
     EVERY_TWO_AM,
     HALF_DAY_IN_SECONDS,
+    ONE_HOUR_IN_SECONDS,
 )
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
@@ -246,6 +248,15 @@ def schedule_jobs():
     schedule_export_win_auto_resend_client_email()
     schedule_user_reminder_migration()
     schedule_update_company_export_potential_from_csv()
+    job_scheduler(
+        max_retries=3,
+        function=ingest_contact_consent_data,
+        cron=EVERY_HOUR,
+        queue_name=LONG_RUNNING_QUEUE,
+        retry_backoff=True,
+        description='Import contact consent data',
+        job_timeout=ONE_HOUR_IN_SECONDS * 2,
+    )
 
 
 def schedule_email_ingestion_tasks():

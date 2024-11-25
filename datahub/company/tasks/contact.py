@@ -2,10 +2,10 @@ import datetime
 import json
 import logging
 import math
+from typing import List
 
 import environ
 import requests
-
 from dateutil import parser
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -202,6 +202,7 @@ class ContactConsentIngestionTask:
                 CONSENT_PREFIX,
             )
             return
+
         for file_key in file_keys:
             try:
                 self.sync_file_with_database(s3_client, file_key)
@@ -213,12 +214,38 @@ class ContactConsentIngestionTask:
                 )
                 raise exc
 
+    def get_grouped_contacts(self) -> dict[str, List[Contact]]:
+        contacts_qs = Contact.objects.all()
+        contact_dict = {}
+        for d in contacts_qs:
+            contact_dict.setdefault(d.email, []).append(d)
+        return contact_dict
+
+    def should_update_contact(self, contact: Contact, consent_row):
+
+        last_modified = consent_row['last_modified'] if 'last_modified' in consent_row else None
+
+        if contact.consent_data_last_modified is None or last_modified is None:
+            return True
+
+        # To avoid issues with different source system time formats, just compare on
+        # the date portion
+        if parser.parse(last_modified).date() > contact.consent_data_last_modified.date():
+            return True
+        return False
+
     def sync_file_with_database(self, client, file_key):
         logger.info(
             'Syncing contact consent file %s with datahub contacts',
             file_key,
         )
         path = f's3://{BUCKET}/{file_key}'
+
+        contact_dict = self.get_grouped_contacts()
+
+        if not contact_dict:
+            logger.info('No contacts were found')
+            return
 
         with open(
             path,
@@ -242,54 +269,50 @@ class ContactConsentIngestionTask:
                     continue
 
                 email = consent_row['email']
-                matching_contacts = Contact.objects.filter(email=email)
 
-                if not matching_contacts.exists():
-                    logger.info(
-                        'Email %s in contact consent file has no matching datahub contact',
+                if not email:
+                    logger.debug('Row %s has no email', i)
+                    continue
+
+                matching_contacts = contact_dict.get(email)
+
+                if not matching_contacts:
+                    logger.debug(
+                        'Email %s in contact consent file has no matching datahub contacts',
                         email,
                     )
                     continue
 
-                for matching_contact in matching_contacts:
+                for contact in matching_contacts:
 
-                    last_modified = (
-                        consent_row['last_modified'] if 'last_modified' in consent_row else None
-                    )
-
-                    update_row = False
-                    if (
-                        matching_contact.consent_data_last_modified is None
-                        or last_modified is None
-                    ):
-                        update_row = True
-                    # To avoid issues with different source system time formats, just compare on
-                    # the date portion
-                    elif (
-                        parser.parse(last_modified).date()
-                        > matching_contact.consent_data_last_modified.date()
-                    ):
-                        update_row = True
-
-                    if not update_row:
-                        logger.debug(
-                            'Email %s consent data has not been updated in the latest file',
+                    if not self.should_update_contact(contact, consent_row):
+                        logger.info(
+                            'Email %s does not need to be updated',
                             email,
                         )
                         continue
-                    if settings.ENABLE_CONTACT_CONSENT_INGEST:
-                        matching_contact.consent_data = consent_row['consents']
-                        matching_contact.consent_data_last_modified = (
-                            last_modified if last_modified else datetime.datetime.now()
-                        )
-                        matching_contact.save()
 
-                        logger.info('Updated contact consent data for email %s', email)
-                    else:
+                    if not settings.ENABLE_CONTACT_CONSENT_INGEST:
                         logger.info(
                             'Email %s would have consent data updated, but setting is disabled',
                             email,
                         )
+                        continue
+
+                    contact.consent_data = consent_row['consents']
+                    contact.consent_data_last_modified = (
+                        consent_row['last_modified']
+                        if 'last_modified' in consent_row and consent_row['last_modified']
+                        else datetime.datetime.now()
+                    )
+
+                    # We don't need to trigger sync related data signals, use an update
+                    # instead of a save
+                    Contact.objects.filter(id=contact.id).update(
+                        consent_data=contact.consent_data,
+                        consent_data_last_modified=contact.consent_data_last_modified,
+                    )
+                    logger.info('Updated contact consent data for email %s in row %s', email, i)
 
             logger.info(
                 'Finished processing total %s rows for contact consent from file %s',
