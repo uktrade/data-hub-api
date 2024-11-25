@@ -31,7 +31,9 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
         if country_ids:
             queryset = queryset.filter(address_country__id__in=country_ids)
         if company_name:
-            queryset = queryset.filter(company__name__icontains=company_name)
+            queryset = queryset.filter(
+                Q(company__name__icontains=company_name) | Q(company_name__icontains=company_name),
+            )
         if sector_ids:
             # This will be a list of level 0 sector ids;
             # We want to find and return all leads with sectors that have these ancestors
