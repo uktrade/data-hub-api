@@ -508,7 +508,7 @@ tomli==2.0.1
     #   pytest
 tomlkit==0.11.6
     # via pylint
-tqdm==4.67.0
+tqdm==4.67.1
     # via -r requirements.in
 traitlets==5.14.1
     # via
