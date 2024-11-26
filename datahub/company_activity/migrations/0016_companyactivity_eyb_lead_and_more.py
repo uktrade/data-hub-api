@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('investment_lead', '0009_alter_eyblead_marketing_hashed_uuid'),
-        ('company_activity', '0013_alter_greatexportenquiry_data_enquiry_squashed_0015_alter_companyactivity_activity_source'),
+        ('company_activity', '0016_alter_greatexportenquiry_data_product_or_service_1_and_more'),
     ]
 
     operations = [

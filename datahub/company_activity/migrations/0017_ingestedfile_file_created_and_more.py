@@ -7,7 +7,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('company_activity', '0016_alter_greatexportenquiry_data_product_or_service_1_and_more'),
+        ('company_activity', '0016_companyactivity_eyb_lead_and_more'),
     ]
 
     operations = [
