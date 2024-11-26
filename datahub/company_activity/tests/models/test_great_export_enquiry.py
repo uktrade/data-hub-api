@@ -22,7 +22,7 @@ class TestGreatExportEnquiry:
             great_export_enquiry_id=great_export_enquiry.id,
         )
         assert company_activity.company_id == great_export_enquiry.company_id
-        assert company_activity.date == great_export_enquiry.created_on
+        assert company_activity.date == great_export_enquiry.form_created_at
         assert (
             company_activity.activity_source == CompanyActivity.ActivitySource.great_export_enquiry
         )

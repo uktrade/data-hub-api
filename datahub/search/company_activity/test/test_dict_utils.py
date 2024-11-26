@@ -84,7 +84,7 @@ def test_activity_great_dict():
     result = dict_utils.activity_great_dict(great)
 
     assert result['id'] == str(great.id)
-    assert result['created_on'] == great.created_on
+    assert result['form_created_at'] == great.form_created_at
     assert result['meta_full_name'] == great.meta_full_name
     assert result['meta_email_address'] == great.meta_email_address
     assert result['contact']['id'] == str(great.contact.id)

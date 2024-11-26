@@ -149,12 +149,12 @@ def relate_company_activity_to_great(batch_size=500):
 
     great_export_enquiries = GreatExportEnquiry.objects.filter(
         company_id__isnull=False,
-    ).values('id', 'created_on', 'company_id')
+    ).values('id', 'form_created_at', 'company_id')
 
     objs = [
         CompanyActivity(
             great_export_enquiry_id=great_export_enquiry['id'],
-            date=great_export_enquiry['created_on'],
+            date=great_export_enquiry['form_created_at'],
             company_id=great_export_enquiry['company_id'],
             activity_source=CompanyActivity.ActivitySource.great_export_enquiry,
         )

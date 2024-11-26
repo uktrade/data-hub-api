@@ -747,3 +747,7 @@ CSP_REPORT_ONLY = False
 
 S3_LOCAL_ENDPOINT_URL = env("S3_LOCAL_ENDPOINT_URL", default='')
 ENABLE_CONTACT_CONSENT_INGEST = env("ENABLE_CONTACT_CONSENT_INGEST", default=False)
+
+# Initially set to 1 hour, to increase once confirmed it's successful.
+SECURE_HSTS_SECONDS = 3600
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True

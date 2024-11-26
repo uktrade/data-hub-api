@@ -277,7 +277,7 @@ def test_company_activity_great_to_dict():
         'order': company_activity.order,
         'great_export_enquiry': {
             'id': str(great.id),
-            'created_on': great.created_on,
+            'form_created_at': great.form_created_at,
             'meta_full_name': great.meta_full_name,
             'meta_email_address': great.meta_email_address,
             'contact': {
