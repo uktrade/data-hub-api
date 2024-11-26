@@ -31,6 +31,7 @@ class CompanyActivitySearchApp(SearchApp):
         'order__created_by',
         'great_export_enquiry',
         'great_export_enquiry__contact',
+        'eyb_lead',
     ).prefetch_related(
         'interaction__contacts',
         Prefetch(
