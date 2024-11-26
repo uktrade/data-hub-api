@@ -78,7 +78,7 @@ def activity_great_dict(obj):
 
     return {
         'id': str(obj.id),
-        'created_on': obj.created_on,
+        'form_created_at': obj.form_created_at,
         'meta_full_name': obj.meta_full_name,
         'meta_email_address': obj.meta_email_address,
         'contact': dict_utils.contact_job_dict(obj.contact),

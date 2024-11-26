@@ -70,7 +70,7 @@ def activity_great_field():
     return Object(
         properties={
             'id': Keyword(),
-            'created_on': Date(),
+            'form_created_at': Date(),
             'meta_full_name': Text(index=False),
             'meta_email_address': Text(index=False),
             'contact': fields.contact_job_field(),

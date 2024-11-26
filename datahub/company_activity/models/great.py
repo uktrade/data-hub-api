@@ -124,7 +124,7 @@ class GreatExportEnquiry(models.Model):
                 great_export_enquiry_id=self.id,
                 activity_source=CompanyActivity.ActivitySource.great_export_enquiry,
                 defaults={
-                    'date': self.created_on,
+                    'date': self.form_created_at,
                     'company_id': self.company_id,
                 },
             )
