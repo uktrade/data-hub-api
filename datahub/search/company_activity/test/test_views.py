@@ -16,6 +16,7 @@ from datahub.company.test.factories import (
 )
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_activity.tests.factories import (
+    CompanyActivityEYBLeadFactory,
     CompanyActivityInteractionFactory,
     CompanyActivityInvestmentProjectFactory,
     CompanyActivityOmisOrderFactory,
@@ -62,6 +63,9 @@ def company_activities(opensearch_with_collector):
                 CompanyActivityOmisOrderFactory(company=company_1),
                 CompanyActivityOmisOrderFactory(company=company_1),
                 CompanyActivityOmisOrderFactory(company=company_2),
+                CompanyActivityEYBLeadFactory(company=company_1),
+                CompanyActivityEYBLeadFactory(company=company_1),
+                CompanyActivityEYBLeadFactory(company=company_2),
             ],
         )
 
@@ -123,7 +127,7 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert len(response_data['results']) == 12
+        assert len(response_data['results']) == 15
 
     def test_default_sort_by_date(self, opensearch_with_collector):
         """Tests default sorting of results by date (descending)."""
