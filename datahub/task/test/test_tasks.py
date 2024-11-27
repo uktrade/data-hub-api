@@ -94,16 +94,16 @@ def mock_notify_adviser_by_rq_email(monkeypatch):
 
 
 @pytest.fixture
-def mock_statsd(monkeypatch):
+def mock_logger(monkeypatch):
     """
-    Returns a mock statsd client instance.
+    Returns a mock logger client instance.
     """
-    mock_statsd = mock.Mock()
+    mock_logger = mock.Mock()
     monkeypatch.setattr(
-        'datahub.reminder.tasks.statsd',
-        mock_statsd,
+        'datahub.reminder.tasks.logger',
+        mock_logger,
     )
-    return mock_statsd
+    return mock_logger
 
 
 def task_factory_due_on_date(days=1, advisers=None, due_date=None):
@@ -282,7 +282,7 @@ class TestTaskReminders:
     def test_generate_reminders_for_upcoming_tasks(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
     ):
         # create a few tasks with and without due reminders
         tasks = TaskFactory.create_batch(4)
@@ -345,7 +345,7 @@ class TestTaskReminders:
     def test_emails_only_send_when_email_subscription_enabled_by_adviser(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
     ):
         # Create two advisers one with and one without an task reminder email subscription
         matching_advisers = AdviserFactory.create_batch(2)
@@ -378,7 +378,7 @@ class TestTaskReminders:
     def test_notification_received_but_no_email_sent_to_adviser_when_email_subscription_disabled(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
         caplog,
     ):
         caplog.set_level(logging.INFO)
@@ -403,7 +403,7 @@ class TestTaskReminders:
     def test_if_reminder_already_sent_the_same_day_do_nothing(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
     ):
         adviser = AdviserFactory()
 
@@ -1265,7 +1265,7 @@ class TestTasksOverdue:
     def test_generate_reminders_for_tasks_overdue(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
     ):
         # create a few tasks with and without due reminders with some that are archived
         TaskFactory.create_batch(4)
@@ -1337,7 +1337,7 @@ class TestTasksOverdue:
     def test_notifications_not_sent_to_archived_or_completed_tasks_when_due_date_yesterday(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
     ):
         # create a few tasks with and without due reminders with some that are archived
         TaskFactory.create_batch(4)
@@ -1375,7 +1375,7 @@ class TestTasksOverdue:
     def test_emails_only_send_when_email_subscription_enabled_by_adviser(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
     ):
         # Create two advisers one with and one without an task reminder email subscription
         matching_advisers = AdviserFactory.create_batch(2)
@@ -1408,7 +1408,7 @@ class TestTasksOverdue:
     def test_notification_received_but_no_email_sent_to_adviser_when_email_subscription_disabled(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
         caplog,
     ):
         caplog.set_level(logging.INFO)
@@ -1433,7 +1433,7 @@ class TestTasksOverdue:
     def test_if_reminder_already_sent_the_same_day_do_nothing(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
     ):
         adviser = AdviserFactory()
 
