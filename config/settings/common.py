@@ -537,6 +537,26 @@ TASK_REMINDER_EMAIL_TEMPLATE_ID = env(
     default='',
 )
 
+MAILBOX_INGESTION_CLIENT_ID = env(
+    'MAILBOX_INGESTION_CLIENT_ID',
+    default='',
+)
+MAILBOX_INGESTION_CLIENT_SECRET = env(
+    'MAILBOX_INGESTION_CLIENT_SECRET',
+    default='',
+)
+MAILBOX_INGESTION_TENANT_ID = env(
+    'MAILBOX_INGESTION_TENANT_ID',
+    default='',
+)
+MAILBOX_INGESTION_GRAPH_URL = env(
+    'MAILBOX_INGESTION_GRAPH_URL',
+    default='https://graph.microsoft.com/v1.0/',
+)
+MAILBOX_INGESTION_EMAIL = env(
+    'MAILBOX_INGESTION_GRAPH_URL',
+    default='',
+)
 
 # GOV.UK PAY
 GOVUK_PAY_URL = env('GOVUK_PAY_URL', default='')
@@ -640,12 +660,6 @@ DOCUMENT_BUCKETS = {
         'aws_access_key_id': env('REPORT_AWS_ACCESS_KEY_ID', default=''),
         'aws_secret_access_key': env('REPORT_AWS_SECRET_ACCESS_KEY', default=''),
         'aws_region': env('REPORT_AWS_REGION', default=''),
-    },
-    'mailbox': {
-        'bucket': env('MAILBOX_BUCKET', default=''),
-        'aws_access_key_id': env('MAILBOX_AWS_ACCESS_KEY_ID', default=''),
-        'aws_secret_access_key': env('MAILBOX_AWS_SECRET_ACCESS_KEY', default=''),
-        'aws_region': env('MAILBOX_AWS_REGION', default=''),
     },
 }
 
