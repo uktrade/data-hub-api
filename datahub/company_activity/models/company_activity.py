@@ -30,6 +30,7 @@ class CompanyActivity(models.Model):
         investment = ('investment', 'investment')
         order = ('order', 'order')
         great_export_enquiry = ('great_export_enquiry', 'great_export_enquiry')
+        eyb_lead = ('eyb_lead', 'eyb_lead')
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     company = models.ForeignKey(
@@ -110,6 +111,19 @@ class CompanyActivity(models.Model):
         on_delete=models.CASCADE,
         help_text=(
             'If related to an great export enquiry, must not have relations to any other activity '
+            '(referral, event etc)'
+        ),
+    )
+
+    eyb_lead = models.ForeignKey(
+        'investment_lead.EYBLead',
+        unique=True,
+        null=True,
+        blank=True,
+        related_name='activity',
+        on_delete=models.CASCADE,
+        help_text=(
+            'If related to an EYB lead, must not have relations to any other activity '
             '(referral, event etc)'
         ),
     )
