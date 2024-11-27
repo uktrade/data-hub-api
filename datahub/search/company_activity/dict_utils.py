@@ -85,3 +85,16 @@ def activity_great_dict(obj):
         'meta_subject': obj.meta_subject,
         'data_enquiry': obj.data_enquiry,
     }
+
+
+def activity_eyb_lead_dict(obj):
+    """Creates a dictionary for an eyb lead."""
+    if obj is None:
+        return None
+
+    return {
+        'id': str(obj.id),
+        'created_on': obj.created_on,
+        'company_name': obj.company_name,
+        'duns_number': obj.duns_number,
+    }
