@@ -6,9 +6,10 @@ from django.core.validators import (
     MaxLengthValidator,
     MinLengthValidator,
 )
-from django.db import models
+from django.db import models, transaction
 from mptt.fields import TreeForeignKey
 
+from datahub.company_activity.models import CompanyActivity
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel
 
@@ -221,3 +222,17 @@ class EYBLead(InvestmentLead):
         if self.company:
             return f'EYB Lead ({shortened_pk}...) for {self.company.name}'
         return f'EYB Lead ({shortened_pk}...)'
+
+    def save(self, *args, **kwargs):
+        """
+        Creates a CompanyActivity when a EYB Lead is saved
+        """
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            if not self.company:
+                return
+            CompanyActivity.objects.update_or_create(
+                eyb_lead_id=self.id,
+                activity_source=CompanyActivity.ActivitySource.eyb_lead,
+                defaults={'date': self.created_on, 'company_id': self.company_id},
+            )

@@ -6,6 +6,7 @@ from datahub.company_activity.models import CompanyActivity
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
+from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.metadata.test.factories import CountryFactory, SectorFactory
 from datahub.omis.order.test.factories import OrderFactory
 
@@ -205,3 +206,25 @@ class CompanyActivityGreatExportEnquiryFactory(CompanyActivityBaseFactory):
         """
         obj = model_class(*args, **kwargs)
         return CompanyActivity.objects.get(great_export_enquiry_id=obj.great_export_enquiry_id)
+
+
+class CompanyActivityEYBLeadFactory(CompanyActivityBaseFactory):
+    """
+    CompanyActivity factory with an EYB lead.
+    """
+
+    activity_source = CompanyActivity.ActivitySource.eyb_lead
+    eyb_lead = factory.SubFactory(EYBLeadFactory)
+
+    class Meta:
+        model = 'company_activity.CompanyActivity'
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """
+        Overwrite the _create to prevent the CompanyActivity from saving to the database.
+        This is due to the EYB lead already creating the CompanyActivity inside its
+        model save.
+        """
+        obj = model_class(*args, **kwargs)
+        return CompanyActivity.objects.get(eyb_lead_id=obj.eyb_lead_id)

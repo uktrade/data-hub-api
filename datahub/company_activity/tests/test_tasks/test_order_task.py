@@ -13,12 +13,12 @@ from datahub.omis.order.test.factories import OrderFactory
 @pytest.mark.django_db
 class TestCompanyActivityOrderTasks:
     """
-    Tests for the schedule_sync_investments_to_company_activity task.
+    Tests for the schedule_sync_data_to_company_activity task.
     """
 
     def test_orders_are_copied_to_company_activity(self):
         """
-        Test that investments are added to the CompanyActivity model.
+        Test that omis orders are added to the CompanyActivity model.
         """
         orders = OrderFactory.create_batch(5)
 

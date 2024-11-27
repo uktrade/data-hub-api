@@ -4,6 +4,7 @@ import pytest
 
 from datahub.company_activity.models import CompanyActivity as DBCompanyActivity
 from datahub.company_activity.tests.factories import (
+    CompanyActivityEYBLeadFactory,
     CompanyActivityGreatExportEnquiryFactory,
     CompanyActivityInteractionFactory,
     CompanyActivityInvestmentProjectFactory,
@@ -27,6 +28,7 @@ def test_company_activity_referral_to_dict():
         'investment': company_activity.investment,
         'order': company_activity.order,
         'great_export_enquiry': company_activity.great_export_enquiry,
+        'eyb_lead': company_activity.eyb_lead,
         'referral': {
             'id': str(company_activity.referral_id),
             'completed_on': company_activity.referral.completed_on,
@@ -123,6 +125,7 @@ def test_company_activity_interaction_to_dict():
         'referral': company_activity.referral,
         'order': company_activity.order,
         'great_export_enquiry': company_activity.great_export_enquiry,
+        'eyb_lead': company_activity.eyb_lead,
         'company': (
             {
                 'id': str(company_activity.company_id),
@@ -179,6 +182,7 @@ def test_company_activity_investment_to_dict():
             },
             'client_contacts': client_contacts,
         },
+        'eyb_lead': company_activity.eyb_lead,
         'referral': company_activity.referral,
         'company': (
             {
@@ -207,6 +211,7 @@ def test_company_activity_order_to_dict():
         'investment': company_activity.investment,
         'referral': company_activity.referral,
         'great_export_enquiry': company_activity.great_export_enquiry,
+        'eyb_lead': company_activity.eyb_lead,
         'company': (
             {
                 'id': str(company_activity.company_id),
@@ -285,7 +290,43 @@ def test_company_activity_great_to_dict():
             'meta_subject': great.meta_subject,
             'data_enquiry': great.data_enquiry,
         },
+        'eyb_lead': company_activity.eyb_lead,
         'activity_source': DBCompanyActivity.ActivitySource.great_export_enquiry,
+        'id': company_activity.pk,
+        '_document_type': CompanyActivitySearchApp.name,
+        'date': company_activity.date,
+    }
+
+
+def test_company_activity_eyb_lead_to_dict():
+    """Test converting a CompanyActivity with an eyb lead to a dict."""
+    company_activity = CompanyActivityEYBLeadFactory.build()
+
+    result = CompanyActivity.db_object_to_dict(company_activity)
+    eyb_lead = company_activity.eyb_lead
+
+    assert result == {
+        'interaction': company_activity.interaction,
+        'investment': company_activity.investment,
+        'referral': company_activity.referral,
+        'company': (
+            {
+                'id': str(company_activity.company_id),
+                'name': company_activity.company.name,
+                'trading_names': company_activity.company.trading_names,
+            }
+            if company_activity.company
+            else None
+        ),
+        'order': company_activity.order,
+        'great_export_enquiry': company_activity.great_export_enquiry,
+        'eyb_lead': {
+            'id': str(eyb_lead.id),
+            'created_on': eyb_lead.created_on,
+            'duns_number': eyb_lead.duns_number,
+            'company_name': eyb_lead.company_name,
+        },
+        'activity_source': DBCompanyActivity.ActivitySource.eyb_lead,
         'id': company_activity.pk,
         '_document_type': CompanyActivitySearchApp.name,
         'date': company_activity.date,
