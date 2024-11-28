@@ -50,12 +50,11 @@ def ingest_eyb_marketing_data(bucket, file):
 class EYBMarketingDataIngestionTask(BaseEYBDataIngestionTask):
     """Long running job to read the marketing file contents and ingest the records."""
 
-    def _get_hashed_uuid(self, record):
-        obj = record.get('object')
+    def _get_hashed_uuid(self, obj):
         return None if obj is None else obj.get('hashed_uuid', None)
 
     def _record_has_no_changes(self, record):
-        hashed_uuid = self._get_hashed_uuid(record)
+        hashed_uuid = self._get_hashed_uuid(record.get('object'))
         if hashed_uuid and EYBLead.objects.filter(marketing_hashed_uuid=hashed_uuid).exists():
             return True
         return False
