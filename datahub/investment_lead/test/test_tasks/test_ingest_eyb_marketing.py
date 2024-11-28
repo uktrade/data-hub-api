@@ -172,7 +172,10 @@ class TestEYBMarketingDataIngestionTasks:
         assert updated.utm_content == initial_value
 
     @mock_aws
-    def test_marketing_data_ingestion_does_not_fail_with_empty_records(self, test_marketing_file_path):
+    def test_marketing_data_ingestion_does_not_fail_with_empty_records(
+        self,
+        test_marketing_file_path,
+    ):
         """Test previously ingested records do not trigger an update to the existing instance."""
         hashed_uuid = generate_hashed_uuid()
         initial_value = 'initial value'
