@@ -3,8 +3,6 @@ import logging
 
 from smart_open import open
 
-from datahub.company.models.company import Company
-from datahub.company.models.contact import Contact
 from datahub.company_activity.models import StovaEvents, IngestedFile
 
 logger = logging.getLogger(__name__)
@@ -13,7 +11,7 @@ DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 def ingest_stova_data(bucket, file):
     logger.info(f'Ingesting file: {file} started')
-    task = StovaEvents()
+    task = StovaEventIngestionTask()
     task.ingest(bucket, file)
     logger.info(f'Ingesting file: {file} finished')
 
@@ -40,14 +38,13 @@ class StovaEventIngestionTask:
         return int(id) in self._existing_ids
 
     def json_to_model(self, jsn):
-
         values = {
             'event_id': jsn.get('id'),
-            'url': str(jsn.get('url', '') or ''),
+            'url': jsn.get('url'),
             'city': jsn.get('city'),
-            'code': jsn.get('code', ''),
-            'name': jsn.get('name', ''),
-            'state': jsn.get('state', ''),
+            'code': jsn.get('code'),
+            'name': jsn.get('name'),
+            'state': jsn.get('state'),
             'country': jsn.get('submission_type', ''),
             'max_reg': jsn.get('max_reg'),
             'end_date': jsn.get('end_date'),
@@ -76,4 +73,6 @@ class StovaEventIngestionTask:
             'location_postcode': jsn.get('location_postcode'),
             'standard_currency': jsn.get('standard_currency'),
         }
+        print(values)
+
         StovaEvents.objects.create(**values)

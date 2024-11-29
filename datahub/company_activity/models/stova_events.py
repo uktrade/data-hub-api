@@ -8,7 +8,7 @@ from datahub.core import reversion
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-@reversion.register_base_model
+# @reversion.register_base_model
 class StovaEvents(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
@@ -23,18 +23,17 @@ class StovaEvents(models.Model):
     state = models.TextField()
     country = models.CharField(max_length=MAX_LENGTH)
 
-    # should max_reg": null default to False?
-    max_reg = models.IntegerField()
+    max_reg = models.IntegerField(null=True)
 
-    end_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True)
 
     timezone = models.CharField(max_length=MAX_LENGTH)
-    folder_id = models.IntegerField()
-    live_date = models.DateTimeField()
-    close_date = models.DateTimeField()
+    folder_id = models.IntegerField(null=True)
+    live_date = models.DateTimeField(null=True)
+    close_date = models.DateTimeField(null=True)
     created_by = models.CharField(max_length=MAX_LENGTH)
     price_type = models.CharField(max_length=MAX_LENGTH)
-    start_date = models.DateTimeField()
+    start_date = models.DateTimeField(null=True)
     description = models.TextField()
     modified_by = models.CharField(max_length=MAX_LENGTH)
     contact_info = models.CharField(max_length=MAX_LENGTH)
