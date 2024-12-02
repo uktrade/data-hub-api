@@ -461,7 +461,7 @@ requests-toolbelt==1.0.0
     # via -r requirements.in
 responses==0.25.3
     # via moto
-rq==1.16.2
+rq==2.0.0
     # via
     #   -r requirements.in
     #   rq-scheduler
