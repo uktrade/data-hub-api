@@ -102,7 +102,7 @@ class TestStovaIngestionTasks:
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
         ingest_stova_data(BUCKET, test_file_path)
-        assert StovaEvents.objects.filter(form_id=123456789).count() == 1
+        assert StovaEvents.objects.filter(event_id=123456789).count() == 1
 
     @pytest.mark.django_db
     @mock_aws
