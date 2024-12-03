@@ -27,7 +27,7 @@ dj-database-url==2.3.0
 psycopg2-binary==2.9.10
 psycogreen==1.0.2
 
-boto3==1.35.68
+boto3==1.35.71
 
 notifications-python-client==10.0.0
 
@@ -45,7 +45,7 @@ slackclient==2.9.4
 django-redis==5.4.0
 
 # OpenSearch
-opensearch-py==2.7.1
+opensearch-py==2.8.0
 opensearch-dsl==2.1.0
 
 # ES APM
