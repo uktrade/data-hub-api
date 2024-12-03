@@ -230,7 +230,7 @@ class CompanyActivityEYBLeadFactory(CompanyActivityBaseFactory):
         return CompanyActivity.objects.get(eyb_lead_id=obj.eyb_lead_id)
 
 
-class StovaEventsFactory(factory.django.DjangoModelFactory):
+class StovaEventFactory(factory.django.DjangoModelFactory):
     """
     Ingested Stova Events data factory
     """
@@ -270,4 +270,4 @@ class StovaEventsFactory(factory.django.DjangoModelFactory):
     standard_currency = "Sterling"
 
     class Meta:
-        model = 'company_activity.StovaEvents'
+        model = 'company_activity.StovaEvent'

@@ -3,7 +3,7 @@ import logging
 
 from smart_open import open
 
-from datahub.company_activity.models import StovaEvents, IngestedFile
+from datahub.company_activity.models import StovaEvent, IngestedFile
 
 logger = logging.getLogger(__name__)
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
@@ -34,7 +34,7 @@ class StovaEventIngestionTask:
 
     def _already_ingested(self, id):
         if not self._existing_ids:
-            self._existing_ids = list(StovaEvents.objects.values_list('event_id', flat=True))
+            self._existing_ids = list(StovaEvent.objects.values_list('event_id', flat=True))
         return int(id) in self._existing_ids
 
     def json_to_model(self, jsn):
@@ -75,4 +75,4 @@ class StovaEventIngestionTask:
         }
         print(values)
 
-        StovaEvents.objects.create(**values)
+        StovaEvent.objects.create(**values)

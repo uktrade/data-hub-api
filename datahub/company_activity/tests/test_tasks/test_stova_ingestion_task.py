@@ -9,13 +9,13 @@ from moto import mock_aws
 from sentry_sdk import init
 from sentry_sdk.transport import Transport
 
-from datahub.company_activity.models import StovaEvents, IngestedFile
+from datahub.company_activity.models import StovaEvent, IngestedFile
 from datahub.company_activity.tasks.constants import BUCKET, GREAT_PREFIX, REGION
 from datahub.company_activity.tasks.ingest_stova_events import (
     ingest_stova_data,
 )
 from datahub.company_activity.tests.factories import (
-    StovaEventsFactory,
+    StovaEventFactory,
 )
 
 
@@ -71,7 +71,7 @@ class TestStovaIngestionTasks:
         Test that a Aventri/Stova data file is ingested correctly and the ingested file
         is added to the IngestedFile table
         """
-        initial_stova_activity_count = StovaEvents.objects.count()
+        initial_stova_activity_count = StovaEvent.objects.count()
         initial_ingested_count = IngestedFile.objects.count()
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
@@ -79,7 +79,7 @@ class TestStovaIngestionTasks:
             ingest_stova_data(BUCKET, test_file_path)
             assert f'Ingesting file: {test_file_path} started' in caplog.text
             assert f'Ingesting file: {test_file_path} finished' in caplog.text
-        assert StovaEvents.objects.count() == initial_stova_activity_count + 4
+        assert StovaEvent.objects.count() == initial_stova_activity_count + 4
         assert IngestedFile.objects.count() == initial_ingested_count + 1
 
     @pytest.mark.django_db
@@ -88,7 +88,7 @@ class TestStovaIngestionTasks:
         """
         Test that we skip updating records that have already been ingested
         """
-        StovaEventsFactory(event_id=123456789)
+        StovaEventFactory(event_id=123456789)
         record = json.dumps(
             dict(
                 {
@@ -102,7 +102,7 @@ class TestStovaIngestionTasks:
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
         ingest_stova_data(BUCKET, test_file_path)
-        assert StovaEvents.objects.filter(event_id=123456789).count() == 1
+        assert StovaEvent.objects.filter(event_id=123456789).count() == 1
 
     @pytest.mark.django_db
     @mock_aws

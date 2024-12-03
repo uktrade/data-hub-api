@@ -9,7 +9,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 # @reversion.register_base_model
-class StovaEvents(models.Model):
+class StovaEvent(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     event_id = models.IntegerField(unique=True)
