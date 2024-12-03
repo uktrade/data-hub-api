@@ -64,7 +64,7 @@ sentry_sdk==2.19.0
 
 # RQ and associated helpers
 rq==2.0.0
-rq-scheduler==0.13.1
+rq-scheduler==0.14.0
 
 # For logging tables
 tabulate
