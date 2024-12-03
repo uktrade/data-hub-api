@@ -10,6 +10,11 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 # @reversion.register_base_model
 class StovaEvent(models.Model):
+    """
+    Stova can also be known as Aventri.
+
+    This model is filled and based off data from the S3 bucket: AventriEvents
+    """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     event_id = models.IntegerField(unique=True)
