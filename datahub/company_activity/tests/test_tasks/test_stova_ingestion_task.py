@@ -9,8 +9,8 @@ from moto import mock_aws
 from sentry_sdk import init
 from sentry_sdk.transport import Transport
 
-from datahub.company_activity.models import StovaEvent, IngestedFile
-from datahub.company_activity.tasks.constants import BUCKET, STOVA_EVENT_PREFIX, REGION
+from datahub.company_activity.models import IngestedFile, StovaEvent
+from datahub.company_activity.tasks.constants import BUCKET, REGION, STOVA_EVENT_PREFIX
 from datahub.company_activity.tasks.ingest_stova_events import (
     ingest_stova_data,
 )
@@ -94,7 +94,7 @@ class TestStovaIngestionTasks:
                 {
                     'id': '123456789',
                     'created_at': '2024-09-19T14:00:34.069',
-                }
+                },
             ),
             default=str,
         )

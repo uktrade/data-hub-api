@@ -3,7 +3,7 @@ import logging
 
 from smart_open import open
 
-from datahub.company_activity.models import StovaEvent, IngestedFile
+from datahub.company_activity.models import IngestedFile, StovaEvent
 
 logger = logging.getLogger(__name__)
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
@@ -73,6 +73,5 @@ class StovaEventIngestionTask:
             'location_postcode': jsn.get('location_postcode'),
             'standard_currency': jsn.get('standard_currency'),
         }
-        print(values)
 
         StovaEvent.objects.create(**values)
