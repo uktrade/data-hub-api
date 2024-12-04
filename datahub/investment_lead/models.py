@@ -234,5 +234,9 @@ class EYBLead(InvestmentLead):
             CompanyActivity.objects.update_or_create(
                 eyb_lead_id=self.id,
                 activity_source=CompanyActivity.ActivitySource.eyb_lead,
-                defaults={'date': self.triage_created, 'company_id': self.company_id},
+                defaults={
+                    'date': self.triage_created if self.triage_created is not None
+                    else self.created_on,
+                    'company_id': self.company_id,
+                },
             )

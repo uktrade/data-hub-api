@@ -184,7 +184,8 @@ def relate_company_activity_to_eyb_lead(batch_size=500):
     objs = [
         CompanyActivity(
             eyb_lead_id=eyb_lead['id'],
-            date=eyb_lead['triage_created'],
+            date=eyb_lead['triage_created'] if eyb_lead['triage_created'] is not None
+            else eyb_lead['created_on'],
             company_id=eyb_lead['company_id'],
             activity_source=CompanyActivity.ActivitySource.eyb_lead,
         )
