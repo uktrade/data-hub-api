@@ -1,4 +1,5 @@
 import pytest
+import pytz
 
 from datahub.company_activity.tests.factories import GreatExportEnquiryFactory
 from datahub.company_referral.test.factories import CompanyReferralFactory
@@ -59,6 +60,42 @@ def test_activity_investment_dict():
     assert result['investment_type']['id'] == str(
         investment.investment_type_id)
     assert result['estimated_land_date'] == investment.estimated_land_date
+    assert result['eyb_leads'] == []
+
+
+def assert_eyb_lead_in_result_list(eyb_lead, result_list):
+    assert {
+        'id': str(eyb_lead.id),
+        'company_name': eyb_lead.company_name,
+        'created_on': eyb_lead.created_on,
+        'triage_created': eyb_lead.triage_created.replace(tzinfo=pytz.UTC),
+        'is_high_value': eyb_lead.is_high_value,
+    } in result_list
+
+
+def test_activity_investment_with_eyb_leads_dict():
+    obj = None
+    result = dict_utils.activity_investment_dict(obj)
+    assert result is None
+
+    investment = InvestmentProjectFactory()
+    eyb_leads_is_high_value = EYBLeadFactory(
+        investment_projects=[investment.id],
+        is_high_value=True,
+    )
+    eyb_leads_is_not_high_value = EYBLeadFactory(
+        investment_projects=[investment.id],
+        is_high_value=False,
+    )
+    result = dict_utils.activity_investment_dict(investment)
+
+    assert result['id'] == str(investment.id)
+    assert result['created_by']['id'] == str(investment.created_by_id)
+    assert result['investment_type']['id'] == str(
+        investment.investment_type_id)
+    assert result['estimated_land_date'] == investment.estimated_land_date
+    assert_eyb_lead_in_result_list(eyb_leads_is_high_value, result['eyb_leads'])
+    assert_eyb_lead_in_result_list(eyb_leads_is_not_high_value, result['eyb_leads'])
 
 
 def test_activity_order_dict():
