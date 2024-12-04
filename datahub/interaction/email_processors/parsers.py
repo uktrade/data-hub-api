@@ -3,7 +3,7 @@ import datetime
 from collections import Counter
 
 import icalendar
-from django.utils.timezone import make_aware
+from django.utils.timezone import is_naive, make_aware
 
 from datahub.company.contact_matching import (
     find_active_contact_by_email_address,
@@ -236,14 +236,14 @@ class InteractionEmailParser(BaseEmailParser):
         secondary_advisers = self._extract_secondary_advisers(all_recipients, sender)
         contacts = self._extract_and_validate_contacts(all_recipients)
         top_company = _get_top_company_from_contacts(contacts)
-
+        date = self.message.date
         return {
             'id': self.message.message_id,
             'sender': sender,
             'contacts': contacts,
             'secondary_advisers': secondary_advisers,
             'top_company': top_company,
-            'date': make_aware(self.message.date),
+            'date': make_aware(date) if is_naive(date) else date,
             'body': self.message.body,
             'subject': self.message.subject,
         }

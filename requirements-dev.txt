@@ -225,6 +225,8 @@ inflection==0.5.1
     # via -r requirements.in
 iniconfig==1.1.1
     # via pytest
+ipaddress==1.0.23
+    # via mail-parser
 ipython==8.30.0
     # via -r requirements-dev.in
 isort==5.11.4
@@ -239,7 +241,7 @@ jmespath==1.0.1
     #   botocore
 kombu==5.3.7
     # via celery
-mail-parser==3.15.0
+mail-parser==4.1.2
     # via -r requirements.in
 markupsafe==2.1.2
     # via
@@ -471,8 +473,8 @@ s3transfer==0.10.0
     # via boto3
 sentry-sdk==2.19.0
     # via -r requirements.in
-simplejson==3.18.0
-    # via mail-parser
+simplejson==3.19.3
+    # via -r requirements.in
 six==1.16.0
     # via
     #   asttokens
