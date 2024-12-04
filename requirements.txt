@@ -302,6 +302,8 @@ s3transfer==0.10.0
     # via boto3
 sentry-sdk==2.19.0
     # via -r requirements.in
+simplejson==3.19.3
+    # via -r requirements.in
 six==1.16.0
     # via
     #   django-pglocks
