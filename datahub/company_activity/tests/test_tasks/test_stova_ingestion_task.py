@@ -10,7 +10,7 @@ from sentry_sdk import init
 from sentry_sdk.transport import Transport
 
 from datahub.company_activity.models import StovaEvent, IngestedFile
-from datahub.company_activity.tasks.constants import BUCKET, GREAT_PREFIX, REGION
+from datahub.company_activity.tasks.constants import BUCKET, STOVA_EVENT_PREFIX, REGION
 from datahub.company_activity.tasks.ingest_stova_events import (
     ingest_stova_data,
 )
@@ -22,14 +22,14 @@ from datahub.company_activity.tests.factories import (
 @pytest.fixture
 def test_file():
     filepath = (
-        'datahub/company_activity/tests/test_tasks/fixtures/great/stova/stovaEventFake.jsonl.gz'
+        'datahub/company_activity/tests/test_tasks/fixtures/stova/stovaEventFake.jsonl.gz'
     )
     return open(filepath, 'rb')
 
 
 @pytest.fixture
 def test_file_path():
-    return f'{GREAT_PREFIX}20240920T000000.jsonl.gz'
+    return f'{STOVA_EVENT_PREFIX}20240920T000000.jsonl.gz'
 
 
 @mock_aws
@@ -117,5 +117,5 @@ class TestStovaIngestionTasks:
             ingest_stova_data(BUCKET, test_file_path)
         exception = e.value.args[0]
         assert 'The specified key does not exist' in exception
-        expected = " key: 'data-flow/exports/ExportAventriEvents//" '20240920T000000.jsonl.gz'
+        expected = "key: 'data-flow/exports/ExportAventriEvents/" '20240920T000000.jsonl.gz'
         assert expected in exception
