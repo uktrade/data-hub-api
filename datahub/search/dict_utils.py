@@ -304,3 +304,16 @@ def dit_participant_list(dit_participant_manager):
         }
         for dit_participant in dit_participant_manager.all()
     ]
+
+
+def eyb_lead_list(eyb_lead_list):
+    return [
+        {
+            'id': str(eyb_lead.id),
+            'company_name': eyb_lead.company_name,
+            'created_on': eyb_lead.created_on,
+            'triage_created': eyb_lead.triage_created,
+            'is_high_value': eyb_lead.is_high_value,
+        }
+        for eyb_lead in eyb_lead_list.all()
+    ]
