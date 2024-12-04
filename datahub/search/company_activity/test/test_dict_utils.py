@@ -87,6 +87,10 @@ def test_activity_investment_with_eyb_leads_dict():
         investment_projects=[investment.id],
         is_high_value=False,
     )
+    eyb_leads_is_not_high_value = EYBLeadFactory(
+        investment_projects=[investment.id],
+        is_high_value=None,
+    )
     result = dict_utils.activity_investment_dict(investment)
 
     assert result['id'] == str(investment.id)
