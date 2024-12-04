@@ -170,6 +170,7 @@ def test_company_activity_investment_to_dict():
                 'name': company_activity.investment.investment_type.name,
             },
             'estimated_land_date': company_activity.investment.estimated_land_date,
+            'eyb_leads': [],
             'total_investment': company_activity.investment.total_investment,
             'foreign_equity_investment': company_activity.investment.foreign_equity_investment,
             'gross_value_added': company_activity.investment.gross_value_added,
