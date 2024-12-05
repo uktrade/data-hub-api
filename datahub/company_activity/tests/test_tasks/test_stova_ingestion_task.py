@@ -29,7 +29,7 @@ def test_file():
 
 @pytest.fixture
 def test_file_path():
-    return f'{STOVA_EVENT_PREFIX}20240920T000000.jsonl.gz'
+    return f'{STOVA_EVENT_PREFIX}stovaEventFake.jsonl.gz'
 
 
 @mock_aws
@@ -117,5 +117,5 @@ class TestStovaIngestionTasks:
             ingest_stova_data(BUCKET, test_file_path)
         exception = e.value.args[0]
         assert 'The specified key does not exist' in exception
-        expected = "key: 'data-flow/exports/ExportAventriEvents/" '20240920T000000.jsonl.gz'
+        expected = "key: 'data-flow/exports/ExportAventriEvents/" 'stovaEventFake.jsonl.gz'
         assert expected in exception
