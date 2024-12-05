@@ -59,6 +59,8 @@ class GreatIngestionTask:
             business_type=self._get_business_type(data.get('type')),
             employee_range=self._get_business_size(data.get('number_of_employees')),
             address_postcode=data.get('business_postcode', ''),
+            # Assume the export enquirer is UK based
+            address_country=Country.objects.get(iso_alpha2_code='GB'),
         )
         logger.info(f'Could not match company for Great Export Enquiry: {form_id}.'
                     f'Created new company with id: {company.id}.')
