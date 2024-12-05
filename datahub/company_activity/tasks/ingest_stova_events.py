@@ -45,7 +45,7 @@ class StovaEventIngestionTask:
             'code': jsn.get('code'),
             'name': jsn.get('name'),
             'state': jsn.get('state'),
-            'country': jsn.get('submission_type', ''),
+            'country': jsn.get('country'),
             'max_reg': jsn.get('max_reg'),
             'end_date': jsn.get('end_date'),
             'timezone': jsn.get('timezone'),
