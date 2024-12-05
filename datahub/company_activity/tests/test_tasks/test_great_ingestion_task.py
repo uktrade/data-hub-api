@@ -299,6 +299,7 @@ class TestGreatIngestionTasks:
                 f'Created new company with id: {id}' in caplog.text
         result = GreatExportEnquiry.objects.get(form_id='5249').company
         assert result.name == name
+        assert result.address_country.iso_alpha2_code == 'GB'
         expected_size = EmployeeRange.objects.get(name='50 to 249')
         assert result.employee_range == expected_size
         expected_type = BusinessType.objects.get(name='Private limited company')
