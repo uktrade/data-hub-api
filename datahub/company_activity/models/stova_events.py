@@ -31,14 +31,14 @@ class StovaEvent(models.Model):
     state = models.TextField()
     timezone = models.CharField(max_length=MAX_LENGTH)
     url = models.TextField()
-    max_reg = models.IntegerField(null=True)
+    max_reg = models.IntegerField(null=True, blank=True)
 
     created_date = models.DateTimeField()
     modified_date = models.DateTimeField()
-    start_date = models.DateTimeField(null=True)
-    live_date = models.DateTimeField(null=True)
-    close_date = models.DateTimeField(null=True)
-    end_date = models.DateTimeField(null=True)
+    start_date = models.DateTimeField(null=True, blank=True)
+    live_date = models.DateTimeField(null=True, blank=True)
+    close_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
 
     location_state = models.CharField(max_length=MAX_LENGTH)
     location_country = models.CharField(max_length=MAX_LENGTH)
@@ -51,6 +51,6 @@ class StovaEvent(models.Model):
 
     approval_required = models.BooleanField()
     price_type = models.CharField(max_length=MAX_LENGTH)
-    folder_id = models.IntegerField(null=True)
+    folder_id = models.IntegerField(null=True, blank=True)
     default_language = models.CharField(max_length=MAX_LENGTH)
     standard_currency = models.CharField(max_length=MAX_LENGTH)
