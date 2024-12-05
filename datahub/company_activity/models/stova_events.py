@@ -10,7 +10,7 @@ class StovaEvent(models.Model):
     """
     Stova can also be known as Aventri.
 
-    This model is filled and based off data from the S3 bucket: AventriEvents
+    This model is filled and based off data from the S3 bucket: ExportAventriEvents
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -18,7 +18,7 @@ class StovaEvent(models.Model):
     event_id = models.IntegerField(unique=True)
     name = models.TextField()
     description = models.TextField()
-    code = models.CharField()
+    code = models.CharField(max_length=MAX_LENGTH)
 
     created_by = models.CharField(max_length=MAX_LENGTH)
     modified_by = models.CharField(max_length=MAX_LENGTH)
@@ -27,8 +27,8 @@ class StovaEvent(models.Model):
     contact_info = models.CharField(max_length=MAX_LENGTH)
 
     country = models.CharField(max_length=MAX_LENGTH)
-    city = models.TextField()
-    state = models.TextField()
+    city = models.CharField(max_length=MAX_LENGTH)
+    state = models.CharField(max_length=MAX_LENGTH)
     timezone = models.CharField(max_length=MAX_LENGTH)
     url = models.TextField()
     max_reg = models.IntegerField(null=True, blank=True)
