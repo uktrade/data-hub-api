@@ -20,7 +20,7 @@ class StovaEventIngestionTask:
     def __init__(self):
         self._existing_ids = []
 
-    def ingest(self, bucket, file):
+    def ingest(self, bucket: str, file: str) -> None:
         path = f's3://{bucket}/{file}'
         try:
             with open(path) as s3_file:
@@ -32,14 +32,15 @@ class StovaEventIngestionTask:
             raise e
         IngestedFile.objects.create(filepath=file)
 
-    def _already_ingested(self, id):
+    def _already_ingested(self, id: int) -> bool:
         if not self._existing_ids:
-            self._existing_ids = list(StovaEvent.objects.values_list('event_id', flat=True))
-        return int(id) in self._existing_ids
+            self._existing_ids = list(StovaEvent.objects.values_list('stova_event_id', flat=True))
+        return id in self._existing_ids
 
-    def json_to_model(self, jsn):
+    @staticmethod
+    def json_to_model(jsn: dict) -> None:
         values = {
-            'event_id': jsn.get('id'),
+            'stova_event_id': jsn.get('id'),
             'url': jsn.get('url', ''),
             'city': jsn.get('city', ''),
             'code': jsn.get('code', ''),
