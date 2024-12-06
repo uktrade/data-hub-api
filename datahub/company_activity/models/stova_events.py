@@ -15,7 +15,7 @@ class StovaEvent(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
-    event_id = models.IntegerField(unique=True)
+    stova_event_id = models.IntegerField(unique=True)
     name = models.TextField()
     description = models.TextField()
     code = models.CharField(max_length=MAX_LENGTH)
