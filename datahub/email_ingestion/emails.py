@@ -1,90 +1,124 @@
-import tempfile
 from logging import getLogger
 
 import mailparser
+import requests
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.utils.timezone import now
+from rest_framework import status
 
-from datahub.documents import utils as documents
 from datahub.email_ingestion.models import MailboxLogging, MailboxProcessingStatus
-from datahub.interaction.email_processors.processors import CalendarInteractionEmailProcessor
+from datahub.interaction.email_processors.processors import InteractionPlainEmailProcessor
+
 
 logger = getLogger(__name__)
 
 BUCKET_ID = 'mailbox'
 
 
-def get_mail_docs_in_bucket():
-    """
-    Gets all mail documents in the bucket.
-    """
-    if BUCKET_ID not in settings.DOCUMENT_BUCKETS:
-        raise ImproperlyConfigured(f'Bucket "{BUCKET_ID}" is missing in settings')
+def _get_headers(token):
+    return {
+        'Authorization': f'Bearer {token}',
+    }
 
-    config = settings.DOCUMENT_BUCKETS[BUCKET_ID]
-    if 'bucket' not in config:
-        raise ImproperlyConfigured(f'Bucket "{BUCKET_ID}" not configured properly in settings')
 
-    name = config['bucket']
-    if not name:
-        raise ImproperlyConfigured(
-            f'Bucket "{BUCKET_ID}" bucket value not configured properly in settings',
-        )
+def _get_base_url():
+    user_email = settings.MAILBOX_INGESTION_EMAIL
+    return f'{settings.MAILBOX_INGESTION_GRAPH_URL}users/{user_email}'
 
-    client = documents.get_s3_client_for_bucket(bucket_id=BUCKET_ID)
 
-    paginator = client.get_paginator('list_objects')
-    for page in paginator.paginate(Bucket=name):
-        for doc in page.get('Contents') or []:
-            key = doc['Key']
-            with tempfile.TemporaryFile(mode='w+b') as f:
-                client.download_fileobj(Bucket=name, Key=key, Fileobj=f)
-                f.seek(0)
-                content = f.read()
-            yield {'source': key, 'content': content}
+def get_access_token(tenant_id, client_id, client_secret):
+    token_url = f'https://login.microsoftonline.com/{tenant_id}/oauth/v2.0/token'
+    token_data = {
+        'grant_type': 'client_credentials',
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'scope': 'https://graph.microsoft.com/.default',
+    }
+    token_request = requests.post(token_url, data=token_data)
+    return token_request.json().get('access_token')
+
+
+def read_messages(token):
+    base_url = _get_base_url()
+    messages_url = f'{base_url}/mailFolders/Inbox/messages'
+
+    messages_request = requests.get(
+        messages_url,
+        headers=_get_headers(token),
+    )
+    messages = messages_request.json().get('value', [])
+    return messages
+
+
+def fetch_message(token, message_id):
+    base_url = _get_base_url()
+    content_url = f'{base_url}/messages/{message_id}/$value'
+
+    content_request = requests.get(content_url, headers=_get_headers(token))
+    if content_request.status_code == status.HTTP_200_OK:
+        content = content_request.text
+        return content
+
+    return None
+
+
+def delete_message(token, message_id):
+    base_url = _get_base_url()
+    delete_path = '/mailFolders/Inbox/messages/'
+    delete_url = f'{base_url}{delete_path}{message_id}'
+
+    delete_request = requests.delete(delete_url, headers=_get_headers(token))
+    return delete_request.status_code == status.HTTP_204_NO_CONTENT
 
 
 def process_ingestion_emails():
     """
     Gets all new mail documents in the bucket and process each message.
     """
-    processor = CalendarInteractionEmailProcessor()
+    processor = InteractionPlainEmailProcessor()
 
-    for message in get_mail_docs_in_bucket():
-        source = message['source']
-        try:
-            documents.delete_document(bucket_id=BUCKET_ID, document_key=message['source'])
-        except Exception as e:
-            logger.exception('Error deleting message: "%s", error: "%s"', source, e)
+    token = get_access_token(
+        settings.MAILBOX_INGESTION_TENANT_ID,
+        settings.MAILBOX_INGESTION_CLIENT_ID,
+        settings.MAILBOX_INGESTION_CLIENT_SECRET,
+    )
+
+    for message in read_messages(token):
+        message_id = message['id']
+
+        content = fetch_message(token, message_id)
+        if not content:
+            logger.error('Error fetching message: "%s"', message_id)
+            continue
+        if not delete_message(token, message_id):
+            logger.error('Error deleting message: "%s"', message_id)
             continue
 
         try:
-            log = _create_log_entry(source, message)
+            log = _create_log_entry(message_id, message, content)
 
-            email = mailparser.parse_from_bytes(message['content'])
+            email = mailparser.parse_from_string(content)
             processed, reason, interaction_id = processor.process_email(message=email)
             if not processed:
                 _update_log_status(log, MailboxProcessingStatus.FAILURE, reason, None)
-                logger.error('Error parsing message: "%s", error: "%s"', source, reason)
+                logger.error('Error parsing message: "%s", error: "%s"', message_id, reason)
             else:
                 _update_log_status(log, MailboxProcessingStatus.PROCESSED, reason, interaction_id)
                 logger.info(reason)
         except Exception as e:
             _update_log_status(log, MailboxProcessingStatus.FAILURE, repr(e), None)
-            logger.exception('Error processing message: "%s", error: "%s"', source, e)
+            logger.exception('Error processing message: "%s", error: "%s"', message_id, e)
 
         logger.info(
-            'Successfully processed message "%s" and deleted document from bucket "%s"',
-            source,
-            BUCKET_ID,
+            'Successfully processed message "%s" and deleted it from mailbox.',
+            message_id,
         )
 
 
-def _create_log_entry(source, message):
+def _create_log_entry(source, message, content):
     log = MailboxLogging(
         retrieved_on=now(),
-        content=message['content'].decode('utf-8'),
+        content=content,
         source=source,
         status=MailboxProcessingStatus.RETRIEVED,
     )
