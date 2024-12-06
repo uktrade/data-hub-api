@@ -325,6 +325,8 @@ def test_company_activity_eyb_lead_to_dict():
             'created_on': eyb_lead.created_on,
             'duns_number': eyb_lead.duns_number,
             'company_name': eyb_lead.company_name,
+            'is_high_value': eyb_lead.is_high_value,
+            'triage_created': eyb_lead.triage_created,
         },
         'activity_source': DBCompanyActivity.ActivitySource.eyb_lead,
         'id': company_activity.pk,

@@ -95,6 +95,8 @@ def activity_eyb_lead_dict(obj):
     return {
         'id': str(obj.id),
         'created_on': obj.created_on,
+        'triage_created': obj.triage_created,
         'company_name': obj.company_name,
         'duns_number': obj.duns_number,
+        'is_high_value': obj.is_high_value,
     }

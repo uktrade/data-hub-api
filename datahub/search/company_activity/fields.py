@@ -1,4 +1,4 @@
-from opensearch_dsl import Date, Keyword, Object, Text
+from opensearch_dsl import Boolean, Date, Keyword, Object, Text
 
 from datahub.search import fields
 from datahub.search.interaction.models import _DITParticipant
@@ -87,5 +87,7 @@ def activity_eyb_lead_field():
             'created_on': Date(),
             'company_name': Text(index=False),
             'duns_number': Text(index=False),
+            'triage_created': Date(),
+            'is_high_value': Boolean(),
         },
     )
