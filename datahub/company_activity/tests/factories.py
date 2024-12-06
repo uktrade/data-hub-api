@@ -228,3 +228,46 @@ class CompanyActivityEYBLeadFactory(CompanyActivityBaseFactory):
         """
         obj = model_class(*args, **kwargs)
         return CompanyActivity.objects.get(eyb_lead_id=obj.eyb_lead_id)
+
+
+class StovaEventFactory(factory.django.DjangoModelFactory):
+    """
+    Ingested Stova Events data factory
+    """
+
+    event_id = factory.Faker('pyint', min_value=0, max_value=999999999)
+    url = factory.Faker('uri_path')
+    city = 'London, England'
+    code = 'CodeTest'
+    name = factory.Faker('first_name')
+    state = 'London'
+    country = 'England'
+    max_reg = 3
+    end_date = '2024-10-15T17:00:00+00:00'
+    timezone = 'Europe/London'
+    folder_id = 987654321
+    live_date = '2024-06-08T00:00:00+00:00'
+    close_date = None
+    created_by = 123458681
+    price_type = 'net'
+    start_date = '2024-06-08T00:00:00+00:00'
+    description = factory.Faker('paragraph', nb_sentences=10)
+    modified_by = 'fake@fake.co.uk'
+    contact_info = 'fake@fake.co.uk'
+    created_date = '2024-05-10T08:06:53+00:00'
+    location_city = 'London, England'
+    location_name = 'Exhibition'
+    modified_date = '2024-10-08T08:08:52+00:00'
+    client_contact = 'Billy Bob'
+    location_state = 'Abu Dhabi'
+    default_language = 'eng'
+    location_country = 'United Arab Emirates'
+    approval_required = False
+    location_address1 = factory.Sequence(lambda x: f'{x} Fake Lane')
+    location_address2 = factory.Sequence(lambda x: f'{x} Unreal Lane')
+    location_address3 = factory.Sequence(lambda x: f'{x} Bing Lane')
+    location_postcode = factory.Faker('postcode')
+    standard_currency = 'Sterling'
+
+    class Meta:
+        model = 'company_activity.StovaEvent'
