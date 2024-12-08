@@ -1,12 +1,15 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
+import boto3
 import factory
 import pytest
+
 from botocore.stub import Stubber
 from django.conf import settings
 from django.core.cache import cache
 from django.core.management import call_command
 from django.db.models.signals import post_save
+from moto import mock_aws
 from opensearchpy.helpers.test import get_test_client
 from pytest_django.lazy_django import skip_if_no_django
 
@@ -15,6 +18,7 @@ from datahub.core.queues.scheduler import DataHubScheduler
 from datahub.core.test_utils import create_test_user, HawkAPITestClient
 from datahub.dnb_api.utils import format_dnb_company
 from datahub.documents.utils import get_s3_client_for_bucket
+from datahub.ingest.constants import TEST_AWS_REGION, TEST_S3_BUCKET_NAME
 from datahub.metadata.test.factories import SectorFactory
 from datahub.search.apps import get_search_app_by_model, get_search_apps
 from datahub.search.bulk_sync import sync_objects
@@ -102,6 +106,36 @@ def track_return_values(monkeypatch):
         return tracker
 
     yield _patch
+
+# AWS
+
+
+@pytest.fixture
+def aws_credentials():
+    """Mocked AWS credentials for moto."""
+    with patch.dict('os.environ', {
+        'AWS_ACCESS_KEY_ID': 'test-key-id',
+        'AWS_SECRET_ACCESS_KEY': 'test-secret',
+        'AWS_SECURITY_TOKEN': 'test-token',
+        'AWS_SESSION_TOKEN': 'test-token',
+        'AWS_DEFAULT_REGION': TEST_AWS_REGION,
+    }):
+        yield
+
+
+@pytest.fixture
+def s3_client(aws_credentials):
+    """Fixture for a mocked S3 client.
+
+    Also creates a bucket named `test-bucket` in the same region.
+    """
+    with mock_aws():
+        s3_client = boto3.client('s3', region_name=TEST_AWS_REGION)
+        s3_client.create_bucket(
+            Bucket=TEST_S3_BUCKET_NAME,
+            CreateBucketConfiguration={'LocationConstraint': TEST_AWS_REGION},
+        )
+        yield s3_client
 
 
 @pytest.fixture()
