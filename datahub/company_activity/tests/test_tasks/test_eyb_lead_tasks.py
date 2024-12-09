@@ -1,6 +1,7 @@
 import datetime
 
 from unittest import mock
+
 import pytest
 
 from datahub.company_activity.models import CompanyActivity
