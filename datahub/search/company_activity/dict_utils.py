@@ -52,6 +52,7 @@ def activity_investment_dict(obj):
         'number_new_jobs': obj.number_new_jobs,
         'created_by': dict_utils.contact_or_adviser_dict(obj.created_by),
         'client_contacts': dict_utils.contact_job_list_of_dicts(obj.client_contacts),
+        'eyb_leads': dict_utils.eyb_lead_list(obj.eyb_leads) if obj.eyb_leads else None,
     }
 
 

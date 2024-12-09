@@ -128,6 +128,9 @@ def eyb_lead_triage_record_faker(overrides: dict | None = None) -> dict:
         Sector.get_segments_from_sector_instance(sector)
     data = {
         'hashedUuid': generate_hashed_uuid(),
+        'triage_created': fake.date_time_between(
+            start_date='-1y', tzinfo=timezone.utc,
+        ),
         'created': fake.date_time_between(
             start_date='-1y', tzinfo=timezone.utc,
         ),
