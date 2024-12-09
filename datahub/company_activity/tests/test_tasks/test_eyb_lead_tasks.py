@@ -1,7 +1,7 @@
-from unittest import mock
+import datetime
 
+from unittest import mock
 import pytest
-import pytz
 
 from datahub.company_activity.models import CompanyActivity
 from datahub.company_activity.tasks.sync import (
@@ -33,7 +33,9 @@ class TestCompanyActivityEYBLeadTasks:
         assert CompanyActivity.objects.count() == len(eyb_leads)
 
         company_activity = CompanyActivity.objects.get(eyb_lead=eyb_leads[0])
-        assert company_activity.date == eyb_leads[0].triage_created.replace(tzinfo=pytz.UTC)
+        assert company_activity.date == eyb_leads[0].triage_created.replace(
+            tzinfo=datetime.timezone.utc,
+        )
         assert company_activity.activity_source == CompanyActivity.ActivitySource.eyb_lead
         assert company_activity.eyb_lead_id == eyb_leads[0].id
 
