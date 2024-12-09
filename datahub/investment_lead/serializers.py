@@ -195,8 +195,7 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
     locationNone = serializers.BooleanField(  # noqa: N815
         source='proposed_investment_location_none', required=False, allow_null=True,
     )
-    hiring = serializers.ChoiceField(
-        choices=EYBLead.HiringChoices.choices,
+    hiring = serializers.CharField(
         required=False, allow_null=True, allow_blank=True, default='',
     )
     spend = serializers.ChoiceField(
@@ -512,8 +511,6 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
                 EYBLead.IntentChoices(intent_choice).label
                 for intent_choice in instance.intent
             ],
-            'hiring': EYBLead.HiringChoices(instance.hiring).label
-            if instance.hiring else None,
             'spend': EYBLead.SpendChoices(instance.spend).label
             if instance.spend else None,
             'landing_timeframe': EYBLead.LandingTimeframeChoices(
