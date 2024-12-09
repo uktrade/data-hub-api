@@ -55,13 +55,6 @@ def _companies_list(companies):
     ]
 
 
-def _eyb_leads_list(eyb_leads):
-    return [
-        dict_utils.id_name_dict(eyb_lead)
-        for eyb_lead in eyb_leads.all()
-    ]
-
-
 class _DITParticipant(InnerDoc):
     adviser = Object(Person)
     team = Object(IDNameTrigram)

@@ -71,6 +71,7 @@ class InvestmentSearchApp(SearchApp):
         'uk_region_locations',
         'interactions',
         'specific_programmes',
+        'eyb_leads',
         Prefetch(
             'team_members',
             queryset=InvestmentProjectTeamMember.objects.select_related('adviser__dit_team'),
