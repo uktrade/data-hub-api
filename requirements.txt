@@ -300,7 +300,7 @@ rq-scheduler==0.14.0
     # via -r requirements.in
 s3transfer==0.10.0
     # via boto3
-sentry-sdk==2.19.0
+sentry-sdk==2.19.2
     # via -r requirements.in
 simplejson==3.19.3
     # via -r requirements.in
