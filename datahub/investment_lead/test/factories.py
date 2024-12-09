@@ -14,6 +14,9 @@ from datahub.investment_lead.models import EYBLead
 from datahub.metadata.models import Sector
 
 
+HIRING_CHOICES = ['1-10', '11-50', '51-100', '101+', 'NO_PLANS_TO_HIRE_YET']
+
+
 fake = Faker(locale='en_GB')
 factory.Faker._DEFAULT_LOCALE = 'en_GB'
 
@@ -42,7 +45,7 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     proposed_investment_region_id = constants.UKRegion.wales.value.id
     proposed_investment_city = 'Cardiff'
     proposed_investment_location_none = False
-    hiring = factory.LazyAttribute(lambda o: random.choice(EYBLead.HiringChoices.values))
+    hiring = factory.LazyAttribute(lambda o: random.choice(HIRING_CHOICES))
     spend = factory.LazyAttribute(lambda o: random.choice(EYBLead.SpendChoices.values))
     spend_other = ''
     is_high_value = factory.Faker('pybool')
@@ -142,7 +145,7 @@ def eyb_lead_triage_record_faker(overrides: dict | None = None) -> dict:
         'location': constants.UKRegion.wales.value.name,
         'locationCity': 'Cardiff',
         'locationNone': False,
-        'hiring': random.choice(EYBLead.HiringChoices.values),
+        'hiring': random.choice(HIRING_CHOICES),
         'spend': random.choice(EYBLead.SpendChoices.values),
         'spendOther': '',
         'isHighValue': fake.pybool(),

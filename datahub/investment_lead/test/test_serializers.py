@@ -95,13 +95,11 @@ class TestCreateEYBLeadTriageSerializer:
         """Tests invalid choice-field and related-field data raises validation errors."""
         eyb_lead_triage_data.update({
             'location': 'Invalid location name',
-            'hiring': 'Invalid hiring choice',
             'spend': 'Invalid spend choice',
         })
         serializer = CreateEYBLeadTriageSerializer(data=eyb_lead_triage_data)
         assert not serializer.is_valid()
         assert 'location' in serializer.errors
-        assert 'hiring' in serializer.errors
         assert 'spend' in serializer.errors
 
     def test_create_lead_from_invalid_sector_data(self, eyb_lead_triage_data):
