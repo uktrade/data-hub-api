@@ -34,6 +34,7 @@ class CompanyActivitySearchApp(SearchApp):
         'eyb_lead',
     ).prefetch_related(
         'interaction__contacts',
+        'investment__eyb_leads',
         Prefetch(
             'interaction__dit_participants',
             queryset=InteractionDITParticipant.objects.select_related('adviser', 'team'),
