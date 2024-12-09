@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 
 from datahub.company_activity.models import CompanyActivity
@@ -17,6 +19,22 @@ class TestEYBLead:
         assert not CompanyActivity.objects.all().exists()
 
         eyb_lead = EYBLeadFactory()
+
+        assert CompanyActivity.objects.all().count() == 1
+
+        company_activity = CompanyActivity.objects.get(eyb_lead=eyb_lead.id)
+        assert company_activity.company_id == eyb_lead.company.id
+        assert company_activity.date == eyb_lead.triage_created.replace(
+            tzinfo=datetime.timezone.utc,
+        )
+        assert company_activity.activity_source == CompanyActivity.ActivitySource.eyb_lead
+
+    def test_save_with_company_creates_company_activity_when_triage_created_is_none(self):
+        assert not CompanyActivity.objects.all().exists()
+
+        eyb_lead = EYBLeadFactory()
+        eyb_lead.triage_created = None
+        eyb_lead.save()
 
         assert CompanyActivity.objects.all().count() == 1
 

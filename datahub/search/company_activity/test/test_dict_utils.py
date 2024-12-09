@@ -104,3 +104,5 @@ def test_activity_eyb_lead_dict():
     assert result['created_on'] == eyb_lead.created_on
     assert result['duns_number'] == eyb_lead.duns_number
     assert result['company_name'] == eyb_lead.company_name
+    assert result['triage_created'] == eyb_lead.triage_created
+    assert result['is_high_value'] == eyb_lead.is_high_value
