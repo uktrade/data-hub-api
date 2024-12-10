@@ -37,11 +37,11 @@ bigtree==0.22.3
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.35.71
+boto3==1.35.76
     # via
     #   -r requirements.in
     #   moto
-botocore==1.35.71
+botocore==1.35.76
     # via
     #   boto3
     #   moto
@@ -99,7 +99,7 @@ distlib==0.3.6
     # via virtualenv
 dj-database-url==2.3.0
     # via -r requirements.in
-django==4.2.16
+django==4.2.17
     # via
     #   -r requirements.in
     #   dj-database-url
@@ -114,7 +114,7 @@ django==4.2.16
     #   django-reversion
     #   djangorestframework
     #   drf-redesign
-django-axes==7.0.0
+django-axes==7.0.1
     # via -r requirements.in
 django-csp==3.8
     # via -r requirements.in
@@ -471,7 +471,7 @@ rq-scheduler==0.14.0
     # via -r requirements.in
 s3transfer==0.10.0
     # via boto3
-sentry-sdk==2.19.0
+sentry-sdk==2.19.2
     # via -r requirements.in
 simplejson==3.19.3
     # via -r requirements.in
