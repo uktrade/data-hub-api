@@ -65,7 +65,7 @@ class StovaEvent(models.Model):
             self.create_or_update_datahub_event()
 
     def create_or_update_datahub_event(self) -> Event:
-        return Event.objects.update_or_create(
+        event, _ = Event.objects.update_or_create(
             stova_event_id=self.id,
             defaults={
                 'name': self.name,
@@ -81,6 +81,7 @@ class StovaEvent(models.Model):
                 'notes': self.description,
             }
         )
+        return event
 
     @staticmethod
     def get_or_create_stova_event_type() -> EventType:
