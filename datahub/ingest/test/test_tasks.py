@@ -5,6 +5,7 @@ from datetime import (
     timezone,
 )
 from unittest import mock
+from uuid import uuid4
 
 import pytest
 
@@ -15,6 +16,7 @@ from datahub.ingest.constants import (
     TEST_OBJECT_KEY,
     TEST_PREFIX,
 )
+from datahub.ingest.models import IngestedObject
 from datahub.ingest.tasks import (
     base_ingestion_task,
     BaseObjectIdentificationTask,
@@ -104,7 +106,7 @@ class TestQueueChecker:
             object_key=TEST_OBJECT_KEY,
         )
 
-    def test_is_job_queued_returns_true_if_job_is_running(
+    def test_is_job_running_returns_true_if_job_is_running(
         self, mock_redis, mock_queue, mock_worker,
     ):
         queue_checker = QueueChecker('test-queue')
@@ -115,7 +117,18 @@ class TestQueueChecker:
         )
         mock_queue.return_value.jobs = []
         mock_worker.all.return_value = [mock.Mock(get_current_job=lambda: job)]
-        assert queue_checker.is_job_queued(
+        assert queue_checker.is_job_running(
+            ingestion_task_function=base_ingestion_task,
+            object_key=TEST_OBJECT_KEY,
+        )
+
+    def test_is_job_running_returns_false_if_job_is_not_running(
+        self, mock_queue, mock_worker,
+    ):
+        queue_checker = QueueChecker('test-queue')
+        mock_queue.return_value.jobs = []
+        mock_worker.all.return_value = [mock.Mock(get_current_job=lambda: None)]
+        assert not queue_checker.is_job_running(
             ingestion_task_function=base_ingestion_task,
             object_key=TEST_OBJECT_KEY,
         )
@@ -203,12 +216,13 @@ class TestBaseObjectIngestionTask:
             s3_processor=s3_object_processor,
         )
 
-    def test_ingest_object_raises_error(self, caplog, ingestion_task):
+    def test_ingest_task_raises_error(self, caplog, s3_object_processor):
         with (
             pytest.raises(Exception),
-            caplog.at_level(logging.ERROR),
+            caplog.at_level(logging.INFO),
         ):
-            ingestion_task.ingest_object()
+            base_ingestion_task(TEST_OBJECT_KEY, s3_object_processor)
+            assert 'Base ingestion task started...' in caplog.text
             assert f'An error occurred trying to process {TEST_OBJECT_KEY}' in caplog.text
 
     def test_ingest_object_raises_not_implemented_error(
@@ -274,3 +288,30 @@ class TestBaseObjectIngestionTask:
             ingestion_task._process_record({'data': 'content'})
             assert 'Please override the _process_record method and tailor to your use case.' \
                 in caplog.text
+
+    def test_create_ingested_object_instance(self, caplog, ingestion_task):
+        last_modified = datetime(2024, 12, 4, 10, 0, 0, tzinfo=timezone.utc)
+        assert IngestedObject.objects.count() == 0
+        with (
+            mock.patch.object(
+                S3ObjectProcessor, 'get_object_last_modified_datetime', return_value=last_modified,
+            ),
+            caplog.at_level(logging.INFO),
+        ):
+            ingestion_task._create_ingested_object_instance()
+            assert f'IngestObject instance created for {TEST_OBJECT_KEY}' in caplog.text
+        assert IngestedObject.objects.filter(object_key=TEST_OBJECT_KEY).exists()
+        assert IngestedObject.objects.count() == 1
+
+    def test_log_ingestion_metrics(self, ingestion_task, caplog):
+        ingestion_task.created_ids = [str(uuid4())]
+        ingestion_task.updated_ids = [str(uuid4()), str(uuid4())]
+        ingestion_task.errors = [{str(uuid4()): 'An error occurred'}]
+        ingestion_task.skipped_counter = 3
+        with caplog.at_level(logging.INFO):
+            ingestion_task._log_ingestion_metrics()
+            assert f'{ingestion_task.object_key} ingested.' in caplog.text
+            assert f'1 records created: {ingestion_task.created_ids}' in caplog.text
+            assert f'2 records updated: {ingestion_task.updated_ids}' in caplog.text
+            assert f'1 records failed validation: {ingestion_task.errors}' in caplog.text
+            assert '3 records skipped' in caplog.text

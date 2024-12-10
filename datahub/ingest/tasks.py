@@ -30,13 +30,15 @@ class QueueChecker:
         return job.func_name == function_name and job.kwargs.get('object_key') == object_key
 
     def is_job_queued(self, ingestion_task_function: callable, object_key: str) -> bool:
-        """Check if a job is queued or running."""
-        # Check queued jobs
+        """Check if a job is queued."""
         if any(
             self.match_job(job, ingestion_task_function, object_key) for job in self.queue.jobs
         ):
             return True
-        # Check running jobs
+        return False
+
+    def is_job_running(self, ingestion_task_function: callable, object_key: str) -> bool:
+        """Check if a job is running."""
         for worker in Worker.all(queue=self.queue):
             job = worker.get_current_job()
             if job and self.match_job(job, ingestion_task_function, object_key):
@@ -74,6 +76,12 @@ class BaseObjectIdentificationTask:
             ingestion_task_function, latest_object_key,
         ):
             logger.info(f'{latest_object_key} has already been queued for ingestion')
+            return
+
+        if self.long_queue_checker.is_job_running(
+            ingestion_task_function, latest_object_key,
+        ):
+            logger.info(f'{latest_object_key} is currently being ingested')
             return
 
         if self.s3_processor.has_object_been_ingested(latest_object_key):
@@ -144,27 +152,8 @@ class BaseObjectIngestionTask:
         except Exception as e:
             logger.error(f'An error occurred trying to process {self.object_key}: {str(e)}')
             raise e
-
-        # Record ingestion
-        last_modified = self.s3_processor.get_object_last_modified_datetime(self.object_key)
-        IngestedObject.objects.create(object_key=self.object_key, object_created=last_modified)
-        logger.info(f'{self.object_key} ingested.')
-
-        # Log metrics
-        if self.created_ids:
-            logger.info(
-                f'{len(self.created_ids)} records created: {self.created_ids}',
-            )
-        if self.updated_ids:
-            logger.info(
-                f'{len(self.updated_ids)} records updated: {self.updated_ids}',
-            )
-        if self.errors:
-            logger.warning(f'{len(self.errors)} records failed validation: {self.errors}')
-        if self.skipped_counter:
-            logger.info(
-                f'{self.skipped_counter} records skipped.',
-            )
+        self._create_ingested_object_instance()
+        self._log_ingestion_metrics()
 
     def _get_record_from_line(self, deserialized_line: dict) -> dict:
         """Extracts the record from the deserialized line.
@@ -234,4 +223,34 @@ class BaseObjectIngestionTask:
         """
         raise NotImplementedError(
             'Please override the _process_record method and tailor to your use case.',
+        )
+
+    def _create_ingested_object_instance(self):
+        """Record a successful ingestion by creating an IngestedObject instance."""
+        last_modified = self.s3_processor.get_object_last_modified_datetime(self.object_key)
+        IngestedObject.objects.create(object_key=self.object_key, object_created=last_modified)
+        logger.info(f'IngestObject instance created for {self.object_key}.')
+
+    def _log_ingestion_metrics(self):
+        """Log various metrics after a successful ingestion.
+
+        Metrics include:
+        - Number of and list of instance id's that have been created
+        - Number of and list of instance id's that have been updated
+        - List of errors that have been raised from individual records
+        - Number of records skipped due to the _should_process_record method returning False
+        """
+        logger.info(f'{self.object_key} ingested.')
+        if self.created_ids:
+            logger.info(
+                f'{len(self.created_ids)} records created: {self.created_ids}',
+            )
+        if self.updated_ids:
+            logger.info(
+                f'{len(self.updated_ids)} records updated: {self.updated_ids}',
+            )
+        if self.errors:
+            logger.warning(f'{len(self.errors)} records failed validation: {self.errors}')
+        logger.info(
+            f'{self.skipped_counter} records skipped.',
         )
