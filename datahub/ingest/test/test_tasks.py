@@ -254,9 +254,14 @@ class TestBaseObjectIngestionTask:
         assert ingestion_task._should_process_record({'modified': '2024-12-04T10:00:00Z'})
 
     def test_should_process_record_returns_true_when_error_determining_datetime(
-        self, ingestion_task,
+        self, caplog, ingestion_task,
     ):
-        assert ingestion_task._should_process_record({'modified': 'invalid-datetime'})
+        ingestion_task.last_ingestion_datetime = datetime(
+            2024, 12, 4, 10, 0, 0, tzinfo=timezone.utc,
+        )
+        with caplog.at_level(logging.ERROR):
+            assert ingestion_task._should_process_record({'modified': 'invalid-datetime'})
+            assert 'An error occurred determining the last modified datetime' in caplog.text
 
     def test_should_process_record_returns_true_when_modified_gte_last_ingestion(
         self, ingestion_task,
