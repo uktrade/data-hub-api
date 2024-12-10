@@ -76,7 +76,7 @@ class Event(BaseModel, DisableableModel):
         related_name='datahub_event',
         blank=True,
         null=True,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
     )
 
     class Meta:
