@@ -169,6 +169,23 @@ class TestBaseObjectIdentificationTask:
             assert f'{TEST_OBJECT_KEY} has already been queued for ingestion' in caplog.text
         mock_scheduler.assert_not_called()
 
+    def test_identify_new_objects_when_job_is_running(
+        self,
+        identification_task,
+        mock_scheduler,
+        caplog,
+    ):
+        with (
+            mock.patch.object(
+                S3ObjectProcessor, 'get_most_recent_object', return_value=TEST_OBJECT_KEY,
+            ),
+            mock.patch.object(QueueChecker, 'is_job_running', return_value=True),
+            caplog.at_level(logging.INFO),
+        ):
+            identification_task.identify_new_objects(base_ingestion_task)
+            assert f'{TEST_OBJECT_KEY} is currently being ingested' in caplog.text
+        mock_scheduler.assert_not_called()
+
     def test_identify_new_objects_when_object_already_ingested(
         self, identification_task, mock_scheduler, caplog,
     ):
@@ -241,6 +258,43 @@ class TestBaseObjectIngestionTask:
             assert f'An error occurred trying to process {TEST_OBJECT_KEY}' in caplog.text
             assert 'Please override the process_record method and tailor to your use case.' \
                 in caplog.text
+
+    def test_ingest_object_increments_skipped_counter(
+        self, s3_object_processor, caplog, ingestion_task,
+    ):
+        object_definition = (TEST_OBJECT_KEY, compressed_json_faker([
+            {'modified': '2024-12-05T10:00:00Z', 'data': 'content'},
+        ]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
+        assert ingestion_task.skipped_counter == 0
+        with (
+            mock.patch.object(ingestion_task, '_should_process_record', return_value=False),
+            caplog.at_level(logging.INFO),
+        ):
+            ingestion_task.ingest_object()
+        assert ingestion_task.skipped_counter == 1
+
+    def test_ingest_object_calls_additional_methods(
+        self, s3_object_processor, caplog, ingestion_task,
+    ):
+        """Test that _create_ingested_object_instance and _log_ingestion_metrics are called."""
+        object_definition = (TEST_OBJECT_KEY, compressed_json_faker([
+            {'modified': '2024-12-05T10:00:00Z', 'data': 'content'},
+        ]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
+        with (
+            mock.patch.object(ingestion_task, '_process_record', return_value=None),
+            # TODO: explore mocking the methods to assert they've been called
+            # mock.patch.object(ingestion_task, '_create_ingested_object_instance') \
+                # as mock_create_ingested_object,
+            # mock.patch.object(ingestion_task, '_log_ingestion_metrics') as mock_log_ingestion,
+            caplog.at_level(logging.INFO),
+        ):
+            ingestion_task.ingest_object()
+            # assert mock_create_ingested_object.assert_called_once()
+            # assert mock_log_ingestion.assert_called()
+            assert f'IngestObject instance created for {TEST_OBJECT_KEY}' in caplog.text
+            assert f'{ingestion_task.object_key} ingested.' in caplog.text
 
     def test_get_record_from_line(self, ingestion_task):
         deserialized_line = {'data': 'content'}
