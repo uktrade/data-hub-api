@@ -253,13 +253,13 @@ class StovaEventFactory(factory.django.DjangoModelFactory):
     price_type = 'net'
     start_date = now()
     description = factory.Faker('paragraph', nb_sentences=10)
-    modified_by = 'fake@fake.co.uk'
+    modified_by = 123458231
     contact_info = 'fake@fake.co.uk'
     created_date = '2024-05-10T08:06:53+00:00'
     location_city = 'London, England'
     location_name = 'Exhibition'
     modified_date = '2024-10-08T08:08:52+00:00'
-    client_contact = 'Billy Bob'
+    client_contact = 1239871
     location_state = 'Abu Dhabi'
     default_language = 'eng'
     location_country = 'United Arab Emirates'

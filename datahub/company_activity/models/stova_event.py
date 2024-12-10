@@ -23,10 +23,10 @@ class StovaEvent(models.Model):
     description = models.TextField()
     code = models.CharField(max_length=MAX_LENGTH)
 
-    created_by = models.CharField(max_length=MAX_LENGTH)
-    modified_by = models.CharField(max_length=MAX_LENGTH)
+    created_by = models.IntegerField(null=True, blank=True)
+    modified_by = models.IntegerField(null=True, blank=True)
 
-    client_contact = models.CharField(max_length=MAX_LENGTH)
+    client_contact = models.IntegerField(null=True, blank=True)
     contact_info = models.CharField(max_length=MAX_LENGTH)
 
     country = models.CharField(max_length=MAX_LENGTH)
@@ -65,6 +65,10 @@ class StovaEvent(models.Model):
             self.create_or_update_datahub_event()
 
     def create_or_update_datahub_event(self) -> Event:
+        # Dates are converted from string to datetime after saving, so refresh self otherwise
+        # dates will still be string.
+        # https://docs.djangoproject.com/en/4.2/ref/models/instances/#what-happens-when-you-save
+        self.refresh_from_db()
         event, _ = Event.objects.update_or_create(
             stova_event_id=self.id,
             defaults={
@@ -79,7 +83,7 @@ class StovaEvent(models.Model):
                 'address_postcode': self.location_postcode,
                 'address_country': get_country_by_country_name(self.name, 'GB'),
                 'notes': self.description,
-            }
+            },
         )
         return event
 
@@ -91,7 +95,6 @@ class StovaEvent(models.Model):
         DataHub events require an event type which is not provided by Stova. Therefore, all events
         ingested from Stova will be given the below event type by default.
         """
-
         event_type, _ = EventType.objects.get_or_create(
             name='Stova - unknown event type',
         )
