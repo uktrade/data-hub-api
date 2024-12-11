@@ -18,7 +18,9 @@ def setup_s3_client():
     return boto3.client('s3', REGION)
 
 
-def file_contents_faker(records: list[dict] = None, default_faker: str = 'triage') -> bytes:
+def file_contents_faker(
+    records: list[dict] = None, default_faker: str = 'triage', nested: bool = True,
+) -> bytes:
     """Create fake file contents with the specified list of records.
 
     Returns compressed lines of JSON encoded with UTF-8.
@@ -35,6 +37,7 @@ def file_contents_faker(records: list[dict] = None, default_faker: str = 'triage
             records = [eyb_lead_marketing_record_faker()]
     json_lines = [
         json.dumps({'object': record}, default=str)
+        if nested else json.dumps(record, default=str)
         for record in records
     ]
     compressed_content = gzip.compress('\n'.join(json_lines).encode('utf-8'))

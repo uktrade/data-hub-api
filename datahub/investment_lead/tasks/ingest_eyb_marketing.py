@@ -1,5 +1,7 @@
 import logging
 
+from django.db.models import Q
+
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import CreateEYBLeadMarketingSerializer
 from datahub.investment_lead.tasks.ingest_eyb_common import (
@@ -54,7 +56,27 @@ class EYBMarketingDataIngestionTask(BaseEYBDataIngestionTask):
         return None if obj is None else obj.get('hashed_uuid', None)
 
     def _record_has_no_changes(self, record):
-        hashed_uuid = self._get_hashed_uuid(record.get('object'))
+        hashed_uuid = self._get_hashed_uuid(record)
         if hashed_uuid and EYBLead.objects.filter(marketing_hashed_uuid=hashed_uuid).exists():
             return True
         return False
+
+    def json_to_model(self, jsn):
+        serializer = self.serializer_class(data=jsn)
+        hashed_uuid = self._get_hashed_uuid(jsn)
+        if serializer.is_valid():
+            queryset = EYBLead.objects.filter(
+                Q(user_hashed_uuid=hashed_uuid)
+                | Q(triage_hashed_uuid=hashed_uuid)
+                | Q(marketing_hashed_uuid=hashed_uuid),
+            )
+            instance, created = queryset.update_or_create(defaults=serializer.validated_data)
+            if created:
+                self.created_hashed_uuids.append(hashed_uuid)
+            else:
+                self.updated_hashed_uuids.append(hashed_uuid)
+        else:
+            self.errors.append({
+                'index': hashed_uuid,
+                'errors': serializer.errors,
+            })
