@@ -37,7 +37,7 @@ def get_country_by_country_name(name: str, default_iso='') -> Country:
     Attempts to match a Country from the given name or by the given default_iso is match by name
     is not found.
 
-    :param name: a country name from Stova
+    :param name: a country name
     :param default_iso: an ISO code to default to if there are no matches by name
     :returns: DataHub `Country`
     :raises Country.DoesNotExist: if Country is not found with given `name` and `default_iso` not
