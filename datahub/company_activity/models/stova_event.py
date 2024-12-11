@@ -81,7 +81,7 @@ class StovaEvent(models.Model):
                 'address_town': self.location_city,
                 'address_county': self.location_state,
                 'address_postcode': self.location_postcode,
-                'address_country': get_country_by_country_name(self.name, 'GB'),
+                'address_country': get_country_by_country_name(self.country, 'GB'),
                 'notes': self.description,
             },
         )

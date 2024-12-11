@@ -12,7 +12,7 @@ class TestStovaEvent:
     def test_save(self):
         """Test model save, also creates a DataHub Event."""
         assert not Event.objects.all().exists()
-        stova_event = StovaEventFactory()
+        stova_event = StovaEventFactory(country='United States')
         assert Event.objects.all().count() == 1
 
         datahub_event = Event.objects.get(stova_event_id=stova_event.id)
@@ -26,6 +26,8 @@ class TestStovaEvent:
         assert datahub_event.address_postcode == stova_event.location_postcode
         assert datahub_event.notes == stova_event.description
         assert datahub_event.event_type.name == 'Stova - unknown event type'
+
+        assert datahub_event.address_country.name == 'United States'
 
         stova_event.delete()
         assert not Event.objects.all().exists()
