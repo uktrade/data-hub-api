@@ -10,11 +10,40 @@ from faker import Faker
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.test.factories import to_many_field
-from datahub.investment_lead.models import EYBLead
 from datahub.metadata.models import Sector
 
 
-HIRING_CHOICES = ['1-10', '11-50', '51-100', '101+', 'NO_PLANS_TO_HIRE_YET']
+INTENT_CHOICES = [
+    'SET_UP_NEW_PREMISES',
+    'SET_UP_A_NEW_DISTRIBUTION_CENTRE',
+    'ONWARD_SALES_AND_EXPORTS_FROM_THE_UK',
+    'RESEARCH_DEVELOP_AND_COLLABORATE',
+    'FIND_PEOPLE_WITH_SPECIALIST_SKILLS',
+    'OTHER',
+]
+
+SPEND_CHOICES = [
+    '0-499999',
+    '500000-1000000',
+    '1000000-2500000',
+    '2500000-5000000',
+    '5000000+',
+]
+
+LANDING_TIME_FRAME_CHOICES = [
+    'UNDER_SIX_MONTHS',
+    'SIX_TO_TWELVE_MONTHS',
+    'ONE_TO_TWO_YEARS',
+    'OVER_TWO_YEARS',
+]
+
+HIRING_CHOICES = [
+    '1-5',
+    '6-10',
+    '11-20',
+    '21+',
+    'NO_PLANS_TO_HIRE_YET',
+]
 
 
 fake = Faker(locale='en_GB')
@@ -39,14 +68,14 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     triage_modified = factory.LazyFunction(datetime.now)
     sector = factory.LazyAttribute(lambda o: random.choice(list(Sector.objects.all())))
     intent = factory.LazyAttribute(
-        lambda o: random.sample(EYBLead.IntentChoices.values, k=random.randint(1, 4)),
+        lambda o: random.sample(INTENT_CHOICES, k=random.randint(1, 4)),
     )
     intent_other = ''
     proposed_investment_region_id = constants.UKRegion.wales.value.id
     proposed_investment_city = 'Cardiff'
     proposed_investment_location_none = False
     hiring = factory.LazyAttribute(lambda o: random.choice(HIRING_CHOICES))
-    spend = factory.LazyAttribute(lambda o: random.choice(EYBLead.SpendChoices.values))
+    spend = factory.LazyAttribute(lambda o: random.choice(SPEND_CHOICES))
     spend_other = ''
     is_high_value = factory.Faker('pybool')
 
@@ -70,7 +99,7 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     agree_terms = factory.Faker('pybool')
     agree_info_email = factory.Faker('pybool')
     landing_timeframe = factory.LazyAttribute(
-        lambda o: random.choice(EYBLead.LandingTimeframeChoices.values),
+        lambda o: random.choice(LANDING_TIME_FRAME_CHOICES),
     )
 
     # EYB marketing fields
@@ -117,7 +146,7 @@ def eyb_lead_user_record_faker(overrides: dict | None = None) -> dict:
         'telephoneNumber': fake.phone_number(),
         'agreeTerms': fake.pybool(),
         'agreeInfoEmail': fake.pybool(),
-        'landingTimeframe': random.choice(EYBLead.LandingTimeframeChoices.values),
+        'landingTimeframe': random.choice(LANDING_TIME_FRAME_CHOICES),
     }
     if overrides:
         data.update(overrides)
@@ -143,13 +172,13 @@ def eyb_lead_triage_record_faker(overrides: dict | None = None) -> dict:
         'sector': level_zero_segment,
         'sectorSub': level_one_segment,
         'sectorSubSub': level_two_segment,
-        'intent': random.sample(EYBLead.IntentChoices.values, k=random.randint(1, 4)),
+        'intent': random.sample(INTENT_CHOICES, k=random.randint(1, 4)),
         'intentOther': '',
         'location': constants.UKRegion.wales.value.name,
         'locationCity': 'Cardiff',
         'locationNone': False,
         'hiring': random.choice(HIRING_CHOICES),
-        'spend': random.choice(EYBLead.SpendChoices.values),
+        'spend': random.choice(SPEND_CHOICES),
         'spendOther': '',
         'isHighValue': fake.pybool(),
     }

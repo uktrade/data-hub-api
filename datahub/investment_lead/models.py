@@ -39,50 +39,6 @@ class EYBLead(InvestmentLead):
     user's unique ID.
     """
 
-    class IntentChoices(models.TextChoices):
-        SET_UP_NEW_PREMISES = 'SET_UP_NEW_PREMISES', 'Set up new premises'
-        SET_UP_A_NEW_DISTRIBUTION_CENTRE = (
-            'SET_UP_A_NEW_DISTRIBUTION_CENTRE',
-            'Set up a new distribution centre',
-        )
-        ONWARD_SALES_AND_EXPORTS_FROM_THE_UK = (
-            'ONWARD_SALES_AND_EXPORTS_FROM_THE_UK',
-            'Onward sales and exports from the UK',
-        )
-        RESEARCH_DEVELOP_AND_COLLABORATE = (
-            'RESEARCH_DEVELOP_AND_COLLABORATE',
-            'Research, develop and collaborate',
-        )
-        FIND_PEOPLE_WITH_SPECIALIST_SKILLS = (
-            'FIND_PEOPLE_WITH_SPECIALIST_SKILLS',
-            'Find people with specialist skills',
-        )
-        OTHER = 'OTHER', 'Other'
-
-    class SpendChoices(models.TextChoices):
-        # Legacy choice
-        FIVE_HUNDRED_THOUSAND_ONE_TO_ONE_MILLION = '500001-1000000', '£500,001 - £1,000,000'
-        ONE_MILLION_ONE_TO_TWO_MILLION = '1000001-2000000', '£1,000,001 - £2,000,000'
-        TWO_MILLION_ONE_TO_FIVE_MILLION = '2000001-5000000', '£2,000,001 - £5,000,000'
-        FIVE_MILLION_ONE_TO_TEN_MILLION = '5000001-10000000', '£5,000,001 - £10,000,000'
-        TEN_MILLION_ONE_PLUS = '10000001+', 'More than £10 million'
-        SPECIFIC_AMOUNT = 'SPECIFIC_AMOUNT', 'Specific amount'
-
-        # Current choices
-        LESS_THAN_TEN_THOUSAND = '0-9999', 'Less than £10,000'
-        TEN_THOUSAND_TO_FIVE_HUNDRED_THOUSAND = '10000-500000', '£10,000 to £500,000'
-        FIVE_HUNDRED_THOUSAND_TO_ONE_MILLION = '500000-1000000', '£500,000 to £1 million'
-        ONE_MILLION_TO_TWO_MILLION = '1000000-2000000', '£1 million to £2 million'
-        TWO_MILLION_TO_FIVE_MILLION = '2000000-5000000', '£2 million to £5 million'
-        FIVE_MILLION_TO_TEN_MILLION = '5000000-10000000', '£5 million to £10 million'
-        MORE_THAN_TEN_MILLION = '10000000+', 'More than £10 million'
-
-    class LandingTimeframeChoices(models.TextChoices):
-        UNDER_SIX_MONTHS = 'UNDER_SIX_MONTHS', 'In the next 6 months'
-        SIX_TO_TWELVE_MONTHS = 'SIX_TO_TWELVE_MONTHS', '6 to 12 months'
-        ONE_TO_TWO_YEARS = 'ONE_TO_TWO_YEARS', '1 to 2 years'
-        OVER_TWO_YEARS = 'OVER_TWO_YEARS', "In more than 2 years' time"
-
     # EYB triage fields
     triage_hashed_uuid = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
     triage_created = models.DateTimeField(null=True, blank=True)
@@ -101,7 +57,7 @@ class EYBLead(InvestmentLead):
         default=list,
     )
     intent = ArrayField(
-        models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, choices=IntentChoices.choices),
+        models.CharField(max_length=CHAR_FIELD_MAX_LENGTH),
         size=6,
         default=list,
     )
@@ -124,7 +80,7 @@ class EYBLead(InvestmentLead):
         max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True,
     )
     spend = models.CharField(
-        max_length=CHAR_FIELD_MAX_LENGTH, choices=SpendChoices.choices, default='', blank=True,
+        max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True,
     )
     spend_other = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
     is_high_value = models.BooleanField(default=None, null=True)
@@ -170,7 +126,6 @@ class EYBLead(InvestmentLead):
         default='',
         max_length=CHAR_FIELD_MAX_LENGTH,
         blank=True,
-        choices=LandingTimeframeChoices.choices,
     )
 
     # Related fields

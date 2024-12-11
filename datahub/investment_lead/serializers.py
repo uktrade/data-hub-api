@@ -180,7 +180,6 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
     sectorSubSub = serializers.CharField(  # noqa: N815
         read_only=True, required=False, allow_null=True,
     )
-    # Can't use MultipleChoiceField here as it returns a set rather than a list and raises db error
     intent = serializers.ListField(required=False, allow_null=True, allow_empty=True, default=list)
     intentOther = serializers.CharField(  # noqa: N815
         source='intent_other', required=False, allow_null=True, allow_blank=True, default='',
@@ -198,8 +197,7 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
     hiring = serializers.CharField(
         required=False, allow_null=True, allow_blank=True, default='',
     )
-    spend = serializers.ChoiceField(
-        choices=EYBLead.SpendChoices.choices,
+    spend = serializers.CharField(
         required=False, allow_null=True, allow_blank=True, default='',
     )
     spendOther = serializers.CharField(  # noqa: N815
@@ -379,9 +377,8 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
     agreeInfoEmail = serializers.BooleanField(  # noqa: N815
         source='agree_info_email', required=False, allow_null=True, default=None,
     )
-    landingTimeframe = serializers.ChoiceField(  # noqa: N815
+    landingTimeframe = serializers.CharField(  # noqa: N815
         source='landing_timeframe',
-        choices=EYBLead.LandingTimeframeChoices.choices,
         required=False,
         allow_null=True,
         allow_blank=True,
@@ -499,21 +496,3 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
     )
     company = NestedRelatedField(Company)
     investment_projects = NestedRelatedField(InvestmentProject, many=True)
-
-    def get_related_fields_representation(self, instance):
-        """Provides related fields in a representation-friendly format.
-
-        Specifically, we want to convert `UPPER_CASE` values to `Sentence case` labels
-        for choice fields.
-        """
-        return {
-            'intent': [
-                EYBLead.IntentChoices(intent_choice).label
-                for intent_choice in instance.intent
-            ],
-            'spend': EYBLead.SpendChoices(instance.spend).label
-            if instance.spend else None,
-            'landing_timeframe': EYBLead.LandingTimeframeChoices(
-                instance.landing_timeframe,
-            ).label if instance.landing_timeframe else None,
-        }
