@@ -119,16 +119,13 @@ def assert_retrieved_eyb_lead_data(instance: EYBLead, data: dict):
     assert_datetimes(instance.triage_created, data['triage_created'])
     assert_datetimes(instance.triage_modified, data['triage_modified'])
     assert str(instance.sector.id) == data['sector']['id']
-    assert [
-        EYBLead.IntentChoices(intent_choice).label
-        for intent_choice in instance.intent
-    ] == data['intent']
+    assert instance.intent == data['intent']
     assert instance.intent_other == data['intent_other']
     assert str(instance.proposed_investment_region.id) == data['proposed_investment_region']['id']
     assert instance.proposed_investment_city == data['proposed_investment_city']
     assert instance.proposed_investment_location_none == data['proposed_investment_location_none']
     assert instance.hiring == data['hiring']
-    assert EYBLead.SpendChoices(instance.spend).label == data['spend']
+    assert instance.spend == data['spend']
     assert instance.spend_other == data['spend_other']
     assert instance.is_high_value == data['is_high_value']
 
@@ -152,8 +149,7 @@ def assert_retrieved_eyb_lead_data(instance: EYBLead, data: dict):
     assert instance.telephone_number == data['telephone_number']
     assert instance.agree_terms == data['agree_terms']
     assert instance.agree_info_email == data['agree_info_email']
-    assert EYBLead.LandingTimeframeChoices(instance.landing_timeframe).label \
-        == data['landing_timeframe']
+    assert instance.landing_timeframe == data['landing_timeframe']
     assert [
         str(ip.id) for ip in instance.investment_projects.all()
     ] == [
