@@ -30,10 +30,12 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
 
         if country_ids:
             queryset = queryset.filter(address_country__id__in=country_ids)
+
         if company_name:
             queryset = queryset.filter(
                 Q(company__name__icontains=company_name) | Q(company_name__icontains=company_name),
             )
+
         if sector_ids:
             # This will be a list of level 0 sector ids;
             # We want to find and return all leads with sectors that have these ancestors
@@ -41,16 +43,26 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
             for sector in Sector.objects.filter(pk__in=sector_ids):
                 descendent_sectors.extend(sector.get_descendants(include_self=True))
             queryset = queryset.filter(sector__in=descendent_sectors)
+
         if values:
             value_mappings = {
                 'high': True,
                 'low': False,
+                'unknown': None,
             }
-            booleans_to_filter_by = []
+            values_to_filter_by = []
+            has_unknown = False
             for value in values:
                 value_string = value.lower().strip()
                 if value_string in value_mappings.keys():
-                    booleans_to_filter_by.append(value_mappings[value_string])
-            queryset = queryset.filter(is_high_value__in=booleans_to_filter_by)
+                    mapped_value = value_mappings[value_string]
+                    if mapped_value is None:
+                        has_unknown = True
+                    else:
+                        values_to_filter_by.append(mapped_value)
+            filter_query = Q(is_high_value__in=values_to_filter_by)
+            if has_unknown:
+                filter_query |= Q(is_high_value__isnull=True)
+            queryset = queryset.filter(filter_query)
 
         return queryset
