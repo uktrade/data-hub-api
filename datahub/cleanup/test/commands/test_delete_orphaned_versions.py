@@ -37,11 +37,11 @@ from datahub.export_win.test.factories import (
     WinAdviserFactory,
     WinFactory,
 )
+from datahub.ingest.test.factories import IngestedObjectFactory
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     InteractionDITParticipantFactory,
     InteractionExportCountryFactory,
-
 )
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
@@ -82,6 +82,7 @@ MAPPINGS = {
     'company_referral.CompanyReferral': CompanyReferralFactory,
     'event.Event': EventFactory,
     'export_win.LegacyExportWinsToDataHubCompany': LegacyExportWinsToDataHubCompanyFactory,
+    'ingest.IngestedObject': IngestedObjectFactory,
     'interaction.InteractionDITParticipant': InteractionDITParticipantFactory,
     'interaction.Interaction': CompanyInteractionFactory,
     'interaction.InteractionExportCountry': InteractionExportCountryFactory,
