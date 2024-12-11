@@ -421,6 +421,7 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
             'addressLine2': 'address_2',
             'county': 'address_county',
             'postcode': 'address_postcode',
+            'companyWebsite': 'company_website',
             'role': 'role',
             'telphoneNumber': 'telephone_number',
             'landingTimeframe': 'landing_timeframe',
