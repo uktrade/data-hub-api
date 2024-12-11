@@ -197,7 +197,7 @@ class TestEYBLeadListAPI(APITestMixin):
         """Test filtering EYB leads by is high value status"""
         EYBLeadFactory(is_high_value=True)
         EYBLeadFactory(is_high_value=False)
-        EYBLeadFactory(is_high_value=False)
+        EYBLeadFactory(is_high_value=None)
         api_client = self.create_api_client(user=test_user_with_view_permissions)
 
         response = api_client.get(EYB_LEAD_COLLECTION_URL)
@@ -212,8 +212,8 @@ class TestEYBLeadListAPI(APITestMixin):
     def test_filter_by_is_low_value(self, test_user_with_view_permissions):
         """Test filtering EYB leads by is low value status"""
         EYBLeadFactory(is_high_value=True)
-        EYBLeadFactory(is_high_value=True)
         EYBLeadFactory(is_high_value=False)
+        EYBLeadFactory(is_high_value=None)
         api_client = self.create_api_client(user=test_user_with_view_permissions)
 
         response = api_client.get(EYB_LEAD_COLLECTION_URL)
@@ -225,26 +225,44 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.data['count'] == 1
         assert response.data['results'][0]['is_high_value'] is False
 
-    def test_filter_by_is_high_and_low_value(self, test_user_with_view_permissions):
-        """Test filtering EYB leads by multiple values"""
-        EYBLeadFactory(is_high_value=True)
+    def test_filter_by_unknown_value(self, test_user_with_view_permissions):
+        """Test filtering EYB leads by unknown value."""
         EYBLeadFactory(is_high_value=True)
         EYBLeadFactory(is_high_value=False)
+        EYBLeadFactory(is_high_value=None)
         api_client = self.create_api_client(user=test_user_with_view_permissions)
 
         response = api_client.get(EYB_LEAD_COLLECTION_URL)
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 3
 
-        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'value': ['high', 'low']})
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'value': 'unknown'})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['results'][0]['is_high_value'] is None
+
+    def test_filter_by_is_all_values(self, test_user_with_view_permissions):
+        """Test filtering EYB leads by multiple values"""
+        EYBLeadFactory(is_high_value=True)
+        EYBLeadFactory(is_high_value=False)
+        EYBLeadFactory(is_high_value=None)
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+
+        response = api_client.get(EYB_LEAD_COLLECTION_URL)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 3
+
+        response = api_client.get(
+            EYB_LEAD_COLLECTION_URL, data={'value': ['high', 'low', 'unknown']},
+        )
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 3
 
     def test_filter_by_invalid_value(self, test_user_with_view_permissions):
         """Test filtering EYB leads by an invalid value returns no leads"""
         EYBLeadFactory(is_high_value=True)
-        EYBLeadFactory(is_high_value=True)
         EYBLeadFactory(is_high_value=False)
+        EYBLeadFactory(is_high_value=None)
         api_client = self.create_api_client(user=test_user_with_view_permissions)
 
         response = api_client.get(EYB_LEAD_COLLECTION_URL)
