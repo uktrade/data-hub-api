@@ -15,7 +15,6 @@ from datahub.company.models import (
     Company,
     OneListCoreTeamMember,
 )
-from datahub.core import statsd
 from datahub.core.constants import (
     InvestmentProjectStage,
 )
@@ -82,7 +81,7 @@ def send_estimated_land_date_reminder(project, adviser, days_left, reminders):
     """
     Sends approaching estimated land date reminder by email.
     """
-    statsd.incr(f'send_investment_notification.{days_left}')
+    logger.info(f'send_investment_notification.{days_left}')
 
     notify_adviser_by_rq_email(
         adviser,
@@ -97,7 +96,7 @@ def send_estimated_land_date_summary(projects, adviser, current_date, reminders)
     """
     Sends approaching estimated land date summary reminder by email.
     """
-    statsd.incr('send_estimated_land_date_summary')
+    logger.info('send_estimated_land_date_summary')
 
     notifications = get_projects_summary_list(projects)
 
@@ -126,7 +125,7 @@ def send_no_recent_export_interaction_reminder(
     """
     Sends no recent export interaction reminder by email.
     """
-    statsd.incr(f'send_no_recent_export_interaction_notification.{reminder_days}')
+    logger.info(f'send_no_recent_export_interaction_notification.{reminder_days}')
 
     item = get_company_item(company)
     last_interaction_date = current_date - relativedelta(days=reminder_days)
@@ -162,7 +161,7 @@ def send_new_export_interaction_reminder(
     reminders,
 ):
     """Sends new export interaction reminder by email."""
-    statsd.incr(f'send_new_export_interaction_notification.{reminder_days}')
+    logger.info(f'send_new_export_interaction_notification.{reminder_days}')
 
     item = get_company_item(company)
     last_interaction_date = current_date - relativedelta(days=reminder_days)
@@ -195,7 +194,7 @@ def send_no_recent_interaction_reminder(
     """
     Sends no recent interaction reminder by email.
     """
-    statsd.incr(f'send_no_recent_interaction_notification.{reminder_days}')
+    logger.info(f'send_no_recent_interaction_notification.{reminder_days}')
 
     item = get_project_item(project)
     last_interaction_date = current_date - relativedelta(days=reminder_days)
