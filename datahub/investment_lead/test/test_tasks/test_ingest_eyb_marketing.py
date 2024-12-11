@@ -141,7 +141,7 @@ class TestEYBMarketingDataIngestionTasks:
         """
         initial_eyb_lead_count = EYBLead.objects.count()
         initial_ingested_count = IngestedFile.objects.count()
-        file_contents = file_contents_faker(default_faker='marketing')
+        file_contents = file_contents_faker(default_faker='marketing', nested=False)
         setup_s3_bucket(BUCKET, [test_marketing_file_path], [file_contents])
         with caplog.at_level(logging.INFO):
             ingest_eyb_marketing_data(BUCKET, test_marketing_file_path)
@@ -164,7 +164,7 @@ class TestEYBMarketingDataIngestionTasks:
                 'content': updated_value,
             }),
         ]
-        file_contents = file_contents_faker(records)
+        file_contents = file_contents_faker(records, nested=False)
         setup_s3_bucket(BUCKET, [test_marketing_file_path], [file_contents])
         ingest_eyb_marketing_data(BUCKET, test_marketing_file_path)
         assert EYBLead.objects.count() == 1
@@ -182,7 +182,7 @@ class TestEYBMarketingDataIngestionTasks:
         EYBLeadFactory(marketing_hashed_uuid=hashed_uuid, utm_content=initial_value)
         assert EYBLead.objects.count() == 1
         records = []
-        file_contents = file_contents_faker(records)
+        file_contents = file_contents_faker(records, nested=False)
         setup_s3_bucket(BUCKET, [test_marketing_file_path], [file_contents])
         ingest_eyb_marketing_data(BUCKET, test_marketing_file_path)
         assert EYBLead.objects.count() == 1
@@ -223,7 +223,7 @@ class TestEYBMarketingDataIngestionTasks:
         ]
 
         file_path = f'{MARKETING_PREFIX}1.jsonl.gz'
-        file_contents = file_contents_faker(records)
+        file_contents = file_contents_faker(records, nested=False)
         setup_s3_bucket(BUCKET, [file_path], [file_contents])
         with caplog.at_level(logging.INFO):
             ingest_eyb_marketing_data(BUCKET, file_path)
