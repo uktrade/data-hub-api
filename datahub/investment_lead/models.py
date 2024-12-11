@@ -59,18 +59,6 @@ class EYBLead(InvestmentLead):
         )
         OTHER = 'OTHER', 'Other'
 
-    class HiringChoices(models.TextChoices):
-        # Legacy choices
-        ONE_TO_TEN = '1-10', '1 to 10'
-        ELEVEN_TO_FIFTY = '11-50', '11 to 50'
-
-        # Current choices
-        ONE_TO_FIVE = '1-5', '1 to 5'
-        SIX_TO_FIFTY = '6-50', '6 to 50'
-        FIFTY_ONE_TO_ONE_HUNDRED = '51-100', '51 to 100'
-        ONE_HUNDRED_ONE_PLUS = '101+', 'More than 100'
-        NO_PLANS_TO_HIRE_YET = 'NO_PLANS_TO_HIRE_YET', 'No plans to hire'
-
     class SpendChoices(models.TextChoices):
         # Legacy choice
         FIVE_HUNDRED_THOUSAND_ONE_TO_ONE_MILLION = '500001-1000000', '£500,001 - £1,000,000'
@@ -133,7 +121,7 @@ class EYBLead(InvestmentLead):
     )
     proposed_investment_location_none = models.BooleanField(default=None, null=True, blank=True)
     hiring = models.CharField(
-        max_length=CHAR_FIELD_MAX_LENGTH, choices=HiringChoices.choices, default='', blank=True,
+        max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True,
     )
     spend = models.CharField(
         max_length=CHAR_FIELD_MAX_LENGTH, choices=SpendChoices.choices, default='', blank=True,

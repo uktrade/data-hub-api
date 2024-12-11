@@ -127,7 +127,7 @@ def assert_retrieved_eyb_lead_data(instance: EYBLead, data: dict):
     assert str(instance.proposed_investment_region.id) == data['proposed_investment_region']['id']
     assert instance.proposed_investment_city == data['proposed_investment_city']
     assert instance.proposed_investment_location_none == data['proposed_investment_location_none']
-    assert EYBLead.HiringChoices(instance.hiring).label == data['hiring']
+    assert instance.hiring == data['hiring']
     assert EYBLead.SpendChoices(instance.spend).label == data['spend']
     assert instance.spend_other == data['spend_other']
     assert instance.is_high_value == data['is_high_value']
