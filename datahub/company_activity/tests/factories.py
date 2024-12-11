@@ -232,10 +232,11 @@ class CompanyActivityEYBLeadFactory(CompanyActivityBaseFactory):
 
 class StovaEventFactory(factory.django.DjangoModelFactory):
     """
-    Ingested Stova Events data factory
+    Ingested Stova Events data factory.
+    The StoveEvent model save also creates a DataHub `Event`.
     """
 
-    event_id = factory.Faker('pyint', min_value=0, max_value=999999999)
+    stova_event_id = factory.Faker('pyint', min_value=0, max_value=999999999)
     url = factory.Faker('uri_path')
     city = 'London, England'
     code = 'CodeTest'
@@ -243,22 +244,22 @@ class StovaEventFactory(factory.django.DjangoModelFactory):
     state = 'London'
     country = 'England'
     max_reg = 3
-    end_date = '2024-10-15T17:00:00+00:00'
+    end_date = now()
     timezone = 'Europe/London'
     folder_id = 987654321
     live_date = '2024-06-08T00:00:00+00:00'
     close_date = None
     created_by = 123458681
     price_type = 'net'
-    start_date = '2024-06-08T00:00:00+00:00'
+    start_date = now()
     description = factory.Faker('paragraph', nb_sentences=10)
-    modified_by = 'fake@fake.co.uk'
+    modified_by = 123458231
     contact_info = 'fake@fake.co.uk'
     created_date = '2024-05-10T08:06:53+00:00'
     location_city = 'London, England'
     location_name = 'Exhibition'
     modified_date = '2024-10-08T08:08:52+00:00'
-    client_contact = 'Billy Bob'
+    client_contact = 1239871
     location_state = 'Abu Dhabi'
     default_language = 'eng'
     location_country = 'United Arab Emirates'
