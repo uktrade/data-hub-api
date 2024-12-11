@@ -42,9 +42,9 @@ class TestStovaEvent:
         datahub_event = Event.objects.all()[0]
         assert stova_event.name == datahub_event.name
 
-        # Assert existing event is updated and a new event is not created
+        # Assert existing event is updated and a new event is not created, save calls the function
         stova_event.name = 'new name'
-        stova_event.create_or_update_datahub_event()
+        stova_event.save()
         datahub_event.refresh_from_db()
         assert datahub_event.name == 'new name'
         assert Event.objects.all().count() == 1
