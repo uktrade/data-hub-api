@@ -496,8 +496,6 @@ sqlparse==0.5.0
     #   django-debug-toolbar
 stack-data==0.6.2
     # via ipython
-statsd==4.0.1
-    # via -r requirements.in
 tabulate==0.9.0
     # via -r requirements.in
 tomli==2.0.1

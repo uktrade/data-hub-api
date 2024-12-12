@@ -73,16 +73,16 @@ def mock_notify_adviser_by_rq_email(monkeypatch):
 
 
 @pytest.fixture
-def mock_statsd(monkeypatch):
+def mock_logger(monkeypatch):
     """
-    Returns a mock statsd client instance.
+    Returns a mock logger client instance.
     """
-    mock_statsd = mock.Mock()
+    mock_logger = mock.Mock()
     monkeypatch.setattr(
-        'datahub.reminder.tasks.statsd',
-        mock_statsd,
+        'datahub.reminder.tasks.logger',
+        mock_logger,
     )
-    return mock_statsd
+    return mock_logger
 
 
 class TestEmailFunctions:
@@ -91,7 +91,7 @@ class TestEmailFunctions:
     def test_sends_estimated_land_date_notification(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
     ):
         """Test it sends an estimated land date notification."""
         adviser = AdviserFactory()
@@ -124,12 +124,12 @@ class TestEmailFunctions:
                 update_estimated_land_date_reminder_email_status,
                 None,
             )
-            mock_statsd.incr.assert_called_once_with('send_investment_notification.30')
+            mock_logger.info.assert_called_once_with('send_investment_notification.30')
 
     def test_sends_estimated_land_date_summary_notification(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
     ):
         """Test it sends an estimated land date summary notification."""
         adviser = AdviserFactory()
@@ -162,12 +162,12 @@ class TestEmailFunctions:
                 update_estimated_land_date_reminder_email_status,
                 None,
             )
-            mock_statsd.incr.assert_called_once_with('send_estimated_land_date_summary')
+            mock_logger.info.assert_called_once_with('send_estimated_land_date_summary')
 
     def test_sends_no_recent_interaction_notification(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
     ):
         """Test it sends a no recent interaction notification."""
         adviser = AdviserFactory()
@@ -209,12 +209,12 @@ class TestEmailFunctions:
                 update_no_recent_interaction_reminder_email_status,
                 None,
             )
-            mock_statsd.incr.assert_called_once_with('send_no_recent_interaction_notification.5')
+            mock_logger.info.assert_called_once_with('send_no_recent_interaction_notification.5')
 
     def test_sends_no_recent_export_interaction_notification(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
     ):
         """Test it sends a no recent export interaction notification."""
         days = 5
@@ -256,14 +256,14 @@ class TestEmailFunctions:
                 update_no_recent_export_interaction_reminder_email_status,
                 None,
             )
-            mock_statsd.incr.assert_called_once_with(
+            mock_logger.info.assert_called_once_with(
                 'send_no_recent_export_interaction_notification.5',
             )
 
     def test_sends_no_export_interaction_notification(
         self,
         mock_notify_adviser_by_rq_email,
-        mock_statsd,
+        mock_logger,
     ):
         """
         Test it sends a no recent export interaction notification
@@ -302,7 +302,7 @@ class TestEmailFunctions:
                 update_no_recent_export_interaction_reminder_email_status,
                 None,
             )
-            mock_statsd.incr.assert_called_once_with(
+            mock_logger.info.assert_called_once_with(
                 'send_no_recent_export_interaction_notification.5',
             )
 

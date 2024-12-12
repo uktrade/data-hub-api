@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import call, Mock
 
 import pytest
 
@@ -11,16 +11,16 @@ from datahub.interaction.email_processors.notify import (
 
 
 @pytest.fixture
-def mock_statsd(monkeypatch):
+def mock_logger(monkeypatch):
     """
-    Returns a mock statsd client instance.
+    Returns a mock logger client instance.
     """
-    mock_statsd = Mock()
+    mock_logger = Mock()
     monkeypatch.setattr(
-        'datahub.interaction.email_processors.notify.statsd',
-        mock_statsd,
+        'datahub.interaction.email_processors.notify.logger',
+        mock_logger,
     )
-    return mock_statsd
+    return mock_logger
 
 
 @pytest.mark.parametrize(
@@ -39,26 +39,28 @@ def test_get_domain_label(domain, label):
 
 
 @pytest.mark.django_db
-def test_notify_email_ingest_failure(mock_statsd):
+def test_notify_email_ingest_failure(mock_logger):
     """
-    Test that the `notify_email_ingest_failure` fucntion increments the
-    right counters in StatsD.
+    Test that the `notify_email_ingest_failure` logs failures
     """
     adviser = AdviserFactory(contact_email='adviser@dit.gov.uk')
     notify_meeting_ingest_failure(adviser, (), ())
-    mock_statsd.incr.assert_called_once_with(
-        'rq.calendar-invite-ingest.failure.dit_gov_uk',
-    )
+    calls = [
+        call('rq.calendar-invite-ingest.failure.dit_gov_uk'),
+        call('Feature flag "mailbox-notification" is not active, exiting.'),
+    ]
+    mock_logger.info.assert_has_calls(calls)
 
 
 @pytest.mark.django_db
-def test_notify_email_ingest_success(mock_statsd):
+def test_notify_email_ingest_success(mock_logger):
     """
-    Test that the `notify_email_ingest_failure` fucntion increments the
-    right counters in StatsD.
+    Test that the `notify_email_ingest_success` logs success
     """
     adviser = AdviserFactory(contact_email='adviser@dit.gov.uk')
     notify_meeting_ingest_success(adviser, Mock(), ())
-    mock_statsd.incr.assert_called_once_with(
-        'rq.calendar-invite-ingest.success.dit_gov_uk',
-    )
+    calls = [
+        call('rq.calendar-invite-ingest.success.dit_gov_uk'),
+        call('Feature flag "mailbox-notification" is not active, exiting.'),
+    ]
+    mock_logger.info.assert_has_calls(calls)
