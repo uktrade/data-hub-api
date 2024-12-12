@@ -47,8 +47,12 @@ class PayClient:
         """
         try:
             response.raise_for_status()
-        except requests.HTTPError as exc:
-            raise GOVUKPayAPIException(exc) from exc
+        except requests.HTTPError:
+
+            logger.error(f'HTTPError occurred with status code: {response.status_code}')
+            # Raise a generic exception for the user with less information
+            raise GOVUKPayAPIException(
+                'An error occurred while processing your request. Please try again later.')
 
     def _request(self, method, path, **kwargs):
         """
