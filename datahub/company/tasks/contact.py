@@ -17,7 +17,6 @@ from smart_open import open
 
 from datahub.company import consent
 from datahub.company.models import Contact
-from datahub.company_activity.models.ingested_file import IngestedFile
 from datahub.core.boto3_client import get_s3_client
 from datahub.core.exceptions import APIBadGatewayException
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
@@ -25,6 +24,7 @@ from datahub.core.queues.errors import RetryError
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.core.realtime_messaging import send_realtime_message
+from datahub.ingest.models import IngestedObject
 
 
 logger = logging.getLogger(__name__)
@@ -208,7 +208,7 @@ class ContactConsentIngestionTask:
             )
             return
 
-        if IngestedFile.objects.filter(filepath=file_key).exists():
+        if IngestedObject.objects.filter(object_key=file_key).exists():
             logger.info(
                 'File %s has already been processed',
                 file_key,
@@ -217,7 +217,7 @@ class ContactConsentIngestionTask:
 
         try:
             self.sync_file_with_database(s3_client, file_key)
-            IngestedFile.objects.create(filepath=file_key)
+            IngestedObject.objects.create(object_key=file_key)
         except Exception as exc:
             logger.exception(
                 f'Error ingesting contact consent file {file_key}',

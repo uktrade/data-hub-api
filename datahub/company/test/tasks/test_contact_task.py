@@ -33,10 +33,10 @@ from datahub.company.tasks.contact import (
     schedule_update_contact_consent,
 )
 from datahub.company.test.factories import CompanyFactory, ContactFactory
-from datahub.company_activity.models.ingested_file import IngestedFile
-from datahub.company_activity.tests.factories import CompanyActivityIngestedFileFactory
 from datahub.core.queues.errors import RetryError
 from datahub.core.test_utils import HawkMockJSONResponse
+from datahub.ingest.models import IngestedObject
+from datahub.ingest.test.factories import IngestedObjectFactory
 
 
 def generate_hawk_response(payload):
@@ -537,7 +537,7 @@ class TestContactConsentIngestionTask:
         Test that the task returns when the latest file is equal to an existing ingested file
         """
         setup_s3_bucket(BUCKET, test_files)
-        CompanyActivityIngestedFileFactory(filepath=test_files[-1])
+        IngestedObjectFactory(object_key=test_files[-1])
         task = ContactConsentIngestionTask()
         with mock.patch.multiple(
             task,
@@ -557,7 +557,7 @@ class TestContactConsentIngestionTask:
         not exist in the list of previously ingested files
         """
         setup_s3_bucket(BUCKET, test_files)
-        CompanyActivityIngestedFileFactory()
+        IngestedObjectFactory()
         task = ContactConsentIngestionTask()
         with mock.patch.multiple(
             task,
@@ -568,7 +568,7 @@ class TestContactConsentIngestionTask:
                 mock.ANY,
                 test_files[-1],
             )
-            assert IngestedFile.objects.filter(filepath=test_files[-1]).exists()
+            assert IngestedObject.objects.filter(object_key=test_files[-1]).exists()
 
     @mock_aws
     def test_sync_file_without_contacts_stops_job_processing(self):
