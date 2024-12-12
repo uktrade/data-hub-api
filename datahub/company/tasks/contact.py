@@ -173,14 +173,17 @@ class ContactConsentIngestionTask:
             Bucket=bucket_name,
             Prefix=prefix,
         )
-        # Get the list of files, oldest first. Process in that order, so any changes in newer
-        # files take precedence
+        # Get the list of files, ordered by LastModified descending.
         sorted_files = sorted(
             [object for object in response.get('Contents', {})],
             key=lambda x: x['LastModified'],
-            reverse=False,
+            reverse=True,
         )
         return [file['Key'] for file in sorted_files]
+
+    def _get_most_recent_object(self, client, bucket_name, prefix):
+        files_in_bucket = self._list_objects(client, bucket_name, prefix)
+        return files_in_bucket[0] if len(files_in_bucket) > 0 else None
 
     def _log_at_interval(self, index: int, message: str):
         """
@@ -194,8 +197,8 @@ class ContactConsentIngestionTask:
     def ingest(self):
         logger.info('Checking for new contact consent data files')
         s3_client = get_s3_client(REGION)
-        file_keys = self._list_objects(s3_client, BUCKET, CONSENT_PREFIX)
-        if len(file_keys) == 0:
+        file_key = self._get_most_recent_object(s3_client, BUCKET, CONSENT_PREFIX)
+        if not file_key:
             logger.info(
                 'No contact consent files found in bucket %s matching prefix %s',
                 BUCKET,
@@ -203,16 +206,14 @@ class ContactConsentIngestionTask:
             )
             return
 
-        for file_key in file_keys:
-            try:
-                self.sync_file_with_database(s3_client, file_key)
-                self.delete_file(s3_client, file_key)
-            except Exception as exc:
-                logger.exception(
-                    f'Error ingesting contact consent file {file_key}',
-                    stack_info=True,
-                )
-                raise exc
+        try:
+            self.sync_file_with_database(s3_client, file_key)
+        except Exception as exc:
+            logger.exception(
+                f'Error ingesting contact consent file {file_key}',
+                stack_info=True,
+            )
+            raise exc
 
     def get_grouped_contacts(self) -> dict[str, List[Contact]]:
         contacts_qs = Contact.objects.all()
@@ -319,8 +320,3 @@ class ContactConsentIngestionTask:
                 i,
                 path,
             )
-
-    def delete_file(self, client, file_key):
-        logger.info('Deleting contact consent file %s', file_key)
-        client.delete_object(Bucket=BUCKET, Key=file_key)
-        logger.info('Successfully deleted contact consent file %s', file_key)
