@@ -703,10 +703,6 @@ CONSENT_SERVICE_HAWK_KEY = env('CONSENT_SERVICE_HAWK_KEY', default=None)
 
 DATAHUB_SUPPORT_EMAIL_ADDRESS = env('DATAHUB_SUPPORT_EMAIL_ADDRESS', default=None)
 
-STATSD_HOST = env('STATSD_HOST', default='localhost')
-STATSD_PORT = env('STATSD_PORT', default='9125')
-STATSD_PREFIX = env('STATSD_PREFIX', default='datahub-api')
-
 # Settings for CSRF cookie.
 CSRF_COOKIE_SECURE = env('CSRF_COOKIE_SECURE', default=False)
 CSRF_COOKIE_HTTPONLY = env('CSRF_COOKIE_HTTPONLY', default=False)
