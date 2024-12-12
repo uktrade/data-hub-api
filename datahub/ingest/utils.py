@@ -20,7 +20,7 @@ def upload_objects_to_s3(
     """Uploads objects (and their contents) to the specified S3 bucket.
 
     An object definition takes the form (key, content) and an example is:
-    ('object/key.json', compressed_json_faker[{'test': 'content'}])
+    ('object/key.json.gz', compressed_json_faker[{'test': 'content'}])
     """
     for definition in object_definitions:
         key, content = definition

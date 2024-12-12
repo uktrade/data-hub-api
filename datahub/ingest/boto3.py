@@ -71,9 +71,7 @@ class S3ObjectProcessor:
 
     def has_object_been_ingested(self, object_key: str) -> bool:
         """Determines if the specified object has already been ingested."""
-        if IngestedObject.objects.filter(object_key=object_key).exists():
-            return True
-        return False
+        return IngestedObject.objects.filter(object_key=object_key).exists()
 
     def get_last_ingestion_datetime(self) -> datetime | None:
         """Get last ingestion datetime of an object with the same prefix (directory)."""

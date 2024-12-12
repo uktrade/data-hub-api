@@ -31,11 +31,9 @@ class QueueChecker:
 
     def is_job_queued(self, ingestion_task_function: callable, object_key: str) -> bool:
         """Check if a job is queued."""
-        if any(
+        return any(
             self.match_job(job, ingestion_task_function, object_key) for job in self.queue.jobs
-        ):
-            return True
-        return False
+        )
 
     def is_job_running(self, ingestion_task_function: callable, object_key: str) -> bool:
         """Check if a job is running."""
@@ -150,7 +148,7 @@ class BaseObjectIngestionTask:
                     else:
                         self.skipped_counter += 1
         except Exception as e:
-            logger.error(f'An error occurred trying to process {self.object_key}: {str(e)}')
+            logger.error(f'An error occurred trying to process {self.object_key}: {e}')
             raise e
         self._create_ingested_object_instance()
         self._log_ingestion_metrics()
@@ -180,7 +178,7 @@ class BaseObjectIngestionTask:
             modified_datetime = parser.parse(modified_datetime_str)
         except ValueError as e:
             logger.error(
-                f'An error occurred determining the last modified datetime: {str(e)}',
+                f'An error occurred determining the last modified datetime: {e}',
             )
             # If unable to parse datetime string, assume record should be processed.
             return True
@@ -197,7 +195,7 @@ class BaseObjectIngestionTask:
         and return None.
 
         Depending on preference, you can use a DRF serializer or dictionary of mappings.
-        Similarly, you can append information to the created, updated, and errors list for logging.
+        Similarly, you can append information to the created, updated, and error lists for logging.
 
         See below for an example using a DRF serializer and logging metrics:
         ```
@@ -235,8 +233,8 @@ class BaseObjectIngestionTask:
         """Log various metrics after a successful ingestion.
 
         Metrics include:
-        - Number of and list of instance id's that have been created
-        - Number of and list of instance id's that have been updated
+        - Number of and list of instance ids that have been created
+        - Number of and list of instance ids that have been updated
         - List of errors that have been raised from individual records
         - Number of records skipped due to the _should_process_record method returning False
         """
