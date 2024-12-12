@@ -330,7 +330,12 @@ class ContactConsentIngestionTask:
                         consent_data=contact.consent_data,
                         consent_data_last_modified=contact.consent_data_last_modified,
                     )
-                    logger.info('Updated contact consent data for email %s in row %s', email, i)
+                    logger.info(
+                        'Updated consent data for contact id %s with email %s in file row %s',
+                        contact.id,
+                        email,
+                        i,
+                    )
 
             logger.info(
                 'Finished processing total %s rows for contact consent from file %s',
