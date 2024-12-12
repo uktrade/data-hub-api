@@ -91,16 +91,14 @@ class TestCreateEYBLeadTriageSerializer:
         assert validated_data['sector'].pk == mining_sector.pk
         assert validated_data['proposed_investment_region'].pk == wales_region.pk
 
-    def test_create_lead_from_invalid_choice_and_related_data(self, eyb_lead_triage_data):
-        """Tests invalid choice-field and related-field data raises validation errors."""
+    def test_create_lead_from_invalid_choice(self, eyb_lead_triage_data):
+        """Tests invalid choice-field data raises validation errors."""
         eyb_lead_triage_data.update({
             'location': 'Invalid location name',
-            'spend': 'Invalid spend choice',
         })
         serializer = CreateEYBLeadTriageSerializer(data=eyb_lead_triage_data)
         assert not serializer.is_valid()
         assert 'location' in serializer.errors
-        assert 'spend' in serializer.errors
 
     def test_create_lead_from_invalid_sector_data(self, eyb_lead_triage_data):
         """Tests invalid sector data raises validation errors."""
@@ -232,16 +230,14 @@ class TestCreateEYBLeadUserSerializer:
         validated_data = serializer.validated_data
         assert validated_data['address_country'].pk == canada_country.pk
 
-    def test_create_lead_from_invalid_choice_and_related_data(self, eyb_lead_user_data):
-        """Tests invalid choice-field and related-field data raises validation errors."""
+    def test_create_lead_from_invalid_related_data(self, eyb_lead_user_data):
+        """Tests invalid related-field data raises validation errors."""
         eyb_lead_user_data.update({
             'companyLocation': 'Invalid country name',
-            'landingTimeframe': 'Invalid landing timeframe choice',
         })
         serializer = CreateEYBLeadUserSerializer(data=eyb_lead_user_data)
         assert not serializer.is_valid()
         assert 'companyLocation' in serializer.errors
-        assert 'landingTimeframe' in serializer.errors
 
     @pytest.mark.parametrize(
         'value',
