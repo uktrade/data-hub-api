@@ -11,6 +11,7 @@ import pytest
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.core.cache import cache
 from django.test import override_settings
 from django.utils import timezone
 from freezegun import freeze_time
@@ -527,11 +528,59 @@ class TestContactConsentIngestionTask:
 
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
-    def test_ingest_calls_sync_with_newest_file_order(self, test_files):
+    @pytest.mark.usefixtures('local_memory_cache')
+    def test_ingest_with_newest_file_key_equal_to_cached_file_key_does_not_call_sync(
+        self,
+        test_files,
+    ):
         """
-        Test that the ingest calls the sync with the files in correct order
+        Test that the task returns when the latest file and the cached file are equal
         """
         setup_s3_bucket(BUCKET, test_files)
+        cache.set('contact_consent_ingestion_task_key', test_files[-1])
+        task = ContactConsentIngestionTask()
+        with mock.patch.multiple(
+            task,
+            sync_file_with_database=mock.DEFAULT,
+        ):
+            task.ingest()
+            task.sync_file_with_database.assert_not_called()
+
+    @mock_aws
+    @override_settings(S3_LOCAL_ENDPOINT_URL=None)
+    def test_ingest_calls_sync_with_newest_file_order_when_cache_empty(
+        self,
+        test_files,
+    ):
+        """
+        Test that the ingest calls the sync with the files in correct order when there is no
+        existing cache entry
+        """
+        setup_s3_bucket(BUCKET, test_files)
+        task = ContactConsentIngestionTask()
+        with mock.patch.multiple(
+            task,
+            sync_file_with_database=mock.DEFAULT,
+        ):
+            task.ingest()
+            task.sync_file_with_database.assert_called_once_with(
+                mock.ANY,
+                test_files[-1],
+            )
+
+    @mock_aws
+    @override_settings(S3_LOCAL_ENDPOINT_URL=None)
+    @pytest.mark.usefixtures('local_memory_cache')
+    def test_ingest_calls_sync_with_newest_file_order_when_cache_file_key_different(
+        self,
+        test_files,
+    ):
+        """
+        Test that the ingest calls the sync with the files in correct order when the file key in
+        the cache is different to the newest file key
+        """
+        setup_s3_bucket(BUCKET, test_files)
+        cache.set('contact_consent_ingestion_task_key', test_files[0])
         task = ContactConsentIngestionTask()
         with mock.patch.multiple(
             task,

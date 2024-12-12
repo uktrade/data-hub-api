@@ -6,8 +6,10 @@ from typing import List
 
 import environ
 import requests
+
 from dateutil import parser
 from django.conf import settings
+from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
 from django_pglocks import advisory_lock
@@ -163,6 +165,7 @@ REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
 BUCKET = f"data-flow-bucket-{env('ENVIRONMENT', default='')}"
 PREFIX = 'data-flow/exports/'
 CONSENT_PREFIX = f'{PREFIX}MergeConsentsPipeline/'
+FILE_CACHE_TIMEOUT = int(datetime.timedelta(days=1).total_seconds())
 
 
 class ContactConsentIngestionTask:
@@ -206,8 +209,22 @@ class ContactConsentIngestionTask:
             )
             return
 
+        # Temp solution while a generic app with DB table for tracking files is worked on
+        cache_key = 'contact_consent_ingestion_task_key'
+
+        if cache.get(cache_key) == file_key:
+            logger.info(
+                'File %s was the last processed file, can be skipped',
+                file_key,
+            )
+            # Reset the cache even when no sync is required, to avoid the cache value getting
+            # removed every 24 hours
+            cache.set(cache_key, file_key, FILE_CACHE_TIMEOUT)
+            return
+
         try:
             self.sync_file_with_database(s3_client, file_key)
+            cache.set(cache_key, file_key, FILE_CACHE_TIMEOUT)
         except Exception as exc:
             logger.exception(
                 f'Error ingesting contact consent file {file_key}',
