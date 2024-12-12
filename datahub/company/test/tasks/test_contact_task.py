@@ -428,8 +428,17 @@ def test_files():
 @mock_aws
 def setup_s3_bucket(bucket_name, test_files):
     mock_s3_client = _create_bucket(bucket_name)
+
+    last_modfied = datetime.datetime.now()
     for file in test_files:
-        mock_s3_client.put_object(Bucket=bucket_name, Key=file, Body=json.dumps('Test contents'))
+        # use freeze_time to allow uploaded files to have a different LastModified date
+        with freeze_time(last_modfied):
+            mock_s3_client.put_object(
+                Bucket=bucket_name,
+                Key=file,
+                Body=json.dumps('Test contents'),
+            )
+            last_modfied = last_modfied + datetime.timedelta(seconds=3)
 
 
 def _create_bucket(bucket_name):
@@ -503,7 +512,7 @@ class TestContactConsentIngestionTask:
             task.ingest()
 
     @mock_aws
-    def test_ingest_with_empty_s3_bucket_does_not_call_sync_or_delete(self):
+    def test_ingest_with_empty_s3_bucket_does_not_call_sync(self):
         """
         Test that the task can handle an empty S3 bucket
         """
@@ -512,15 +521,13 @@ class TestContactConsentIngestionTask:
         with mock.patch.multiple(
             task,
             sync_file_with_database=mock.DEFAULT,
-            delete_file=mock.DEFAULT,
         ):
             task.ingest()
             task.sync_file_with_database.assert_not_called()
-            task.delete_file.assert_not_called()
 
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
-    def test_ingest_calls_sync_with_correct_files_order(self, test_files):
+    def test_ingest_calls_sync_with_newest_file_order(self, test_files):
         """
         Test that the ingest calls the sync with the files in correct order
         """
@@ -529,32 +536,11 @@ class TestContactConsentIngestionTask:
         with mock.patch.multiple(
             task,
             sync_file_with_database=mock.DEFAULT,
-            delete_file=mock.DEFAULT,
         ):
             task.ingest()
-            task.sync_file_with_database.assert_has_calls(
-                [mock.call(mock.ANY, file) for file in test_files],
-            )
-
-    @mock_aws
-    @override_settings(S3_LOCAL_ENDPOINT_URL=None)
-    def test_ingest_calls_delete_for_all_files(
-        self,
-        test_files,
-    ):
-        """
-        Test that the ingest calls delete with the files in correct order
-        """
-        setup_s3_bucket(BUCKET, test_files)
-        task = ContactConsentIngestionTask()
-        with mock.patch.multiple(
-            task,
-            sync_file_with_database=mock.DEFAULT,
-            delete_file=mock.DEFAULT,
-        ):
-            task.ingest()
-            task.delete_file.assert_has_calls(
-                [mock.call(mock.ANY, file) for file in test_files],
+            task.sync_file_with_database.assert_called_once_with(
+                mock.ANY,
+                test_files[-1],
             )
 
     @mock_aws
@@ -884,19 +870,3 @@ class TestContactConsentIngestionTask:
             contact,
             row,
         )
-
-    @mock_aws
-    def test_delete_file_removes_file_using_boto3(self):
-        """
-        Test that the file is deleted from the bucket
-        """
-        filename = f'{CONSENT_PREFIX}file_{uuid.uuid4()}.jsonl'
-        upload_file_to_s3(BUCKET, filename, 'test')
-        client = boto3.client('s3', REGION)
-
-        ContactConsentIngestionTask().delete_file(client, filename)
-        with pytest.raises(client.exceptions.NoSuchKey):
-            client.get_object(
-                Bucket=BUCKET,
-                Key=filename,
-            )
