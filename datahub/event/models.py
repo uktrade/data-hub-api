@@ -71,6 +71,13 @@ class Event(BaseModel, DisableableModel):
         max_length=MAX_LENGTH, blank=True,
         help_text='Legacy field. File browser path to the archived documents for this event.',
     )
+    stova_event = models.ForeignKey(
+        'company_activity.StovaEvent',
+        related_name='datahub_event',
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
         indexes = [
