@@ -11,7 +11,6 @@ import pytest
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.core.cache import cache
 from django.test import override_settings
 from django.utils import timezone
 from freezegun import freeze_time
@@ -34,6 +33,8 @@ from datahub.company.tasks.contact import (
     schedule_update_contact_consent,
 )
 from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.company_activity.models.ingested_file import IngestedFile
+from datahub.company_activity.tests.factories import CompanyActivityIngestedFileFactory
 from datahub.core.queues.errors import RetryError
 from datahub.core.test_utils import HawkMockJSONResponse
 
@@ -528,16 +529,15 @@ class TestContactConsentIngestionTask:
 
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
-    @pytest.mark.usefixtures('local_memory_cache')
-    def test_ingest_with_newest_file_key_equal_to_cached_file_key_does_not_call_sync(
+    def test_ingest_with_newest_file_key_equal_to_existing_file_key_does_not_call_sync(
         self,
         test_files,
     ):
         """
-        Test that the task returns when the latest file and the cached file are equal
+        Test that the task returns when the latest file is equal to an existing ingested file
         """
         setup_s3_bucket(BUCKET, test_files)
-        cache.set('contact_consent_ingestion_task_key', test_files[-1])
+        CompanyActivityIngestedFileFactory(filepath=test_files[-1])
         task = ContactConsentIngestionTask()
         with mock.patch.multiple(
             task,
@@ -548,15 +548,16 @@ class TestContactConsentIngestionTask:
 
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
-    def test_ingest_calls_sync_with_newest_file_order_when_cache_empty(
+    def test_ingest_calls_sync_with_newest_file_when_file_is_new(
         self,
         test_files,
     ):
         """
-        Test that the ingest calls the sync with the files in correct order when there is no
-        existing cache entry
+        Test that the ingest calls the sync with the latest file when the file key does
+        not exist in the list of previously ingested files
         """
         setup_s3_bucket(BUCKET, test_files)
+        CompanyActivityIngestedFileFactory()
         task = ContactConsentIngestionTask()
         with mock.patch.multiple(
             task,
@@ -567,30 +568,7 @@ class TestContactConsentIngestionTask:
                 mock.ANY,
                 test_files[-1],
             )
-
-    @mock_aws
-    @override_settings(S3_LOCAL_ENDPOINT_URL=None)
-    @pytest.mark.usefixtures('local_memory_cache')
-    def test_ingest_calls_sync_with_newest_file_order_when_cache_file_key_different(
-        self,
-        test_files,
-    ):
-        """
-        Test that the ingest calls the sync with the files in correct order when the file key in
-        the cache is different to the newest file key
-        """
-        setup_s3_bucket(BUCKET, test_files)
-        cache.set('contact_consent_ingestion_task_key', test_files[0])
-        task = ContactConsentIngestionTask()
-        with mock.patch.multiple(
-            task,
-            sync_file_with_database=mock.DEFAULT,
-        ):
-            task.ingest()
-            task.sync_file_with_database.assert_called_once_with(
-                mock.ANY,
-                test_files[-1],
-            )
+            assert IngestedFile.objects.filter(filepath=test_files[-1]).exists()
 
     @mock_aws
     def test_sync_file_without_contacts_stops_job_processing(self):
