@@ -64,7 +64,7 @@ class BaseObjectIdentificationTask:
 
     def identify_new_objects(self, ingestion_task_function: callable) -> None:
         """Entry point method to identify new objects and, if valid, schedule their ingestion."""
-        latest_object_key = self.s3_processor.get_most_recent_object()
+        latest_object_key = self.s3_processor.get_most_recent_object_key()
 
         if not latest_object_key:
             logger.info('No objects found')

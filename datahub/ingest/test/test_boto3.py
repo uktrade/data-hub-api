@@ -55,17 +55,31 @@ class TestS3ObjectProcessor:
         upload_objects_to_s3(s3_object_processor, test_object_tuples)
         objects = s3_object_processor.list_objects()
         assert len(objects) == 3
-        assert all(key.startswith(TEST_PREFIX) for key in objects)
-        assert all(key.endswith('.jsonl.gz') for key in objects)
+        assert all(obj['Key'].startswith(TEST_PREFIX) for obj in objects)
+        assert all(obj['Key'].endswith('.jsonl.gz') for obj in objects)
 
-    def test_get_most_recent_object(self, s3_object_processor, test_object_tuples):
-        upload_objects_to_s3(s3_object_processor, test_object_tuples)
-        most_recent_object = s3_object_processor.get_most_recent_object()
-        assert most_recent_object == f'{TEST_PREFIX}file_c.jsonl.gz'
+    def test_get_most_recent_object_key(self, s3_object_processor, test_object_tuples):
+        object_content = compressed_json_faker([{'test': 'content'}])
+        object_definitions = {
+            'oldest': (f'{TEST_PREFIX}/oldest-object.json.gz', object_content),
+            'middle': (f'{TEST_PREFIX}/middle-object.json.gz', object_content),
+            'newest': (f'{TEST_PREFIX}/newest-object.json.gz', object_content),
+        }
+        monday = datetime(2024, 12, 9, 10, 0, 0, tzinfo=timezone.utc)
+        tuesday = datetime(2024, 12, 10, 10, 0, 0, tzinfo=timezone.utc)
+        wednesday = datetime(2024, 12, 11, 10, 0, 0, tzinfo=timezone.utc)
+        with freeze_time(monday) as frozen_datetime:
+            upload_objects_to_s3(s3_object_processor, [object_definitions['oldest']])
+            frozen_datetime.move_to(tuesday)
+            upload_objects_to_s3(s3_object_processor, [object_definitions['middle']])
+            frozen_datetime.move_to(wednesday)
+            upload_objects_to_s3(s3_object_processor, [object_definitions['newest']])
+        most_recent_object_key = s3_object_processor.get_most_recent_object_key()
+        assert most_recent_object_key == f'{TEST_PREFIX}/newest-object.json.gz'
 
-    def test_get_most_recent_object_when_empty(self, s3_object_processor):
-        most_recent_object = s3_object_processor.get_most_recent_object()
-        assert most_recent_object is None
+    def test_get_most_recent_object_key_when_empty(self, s3_object_processor):
+        most_recent_object_key = s3_object_processor.get_most_recent_object_key()
+        assert most_recent_object_key is None
 
     def test_get_object_last_modified_datetime(self, s3_object_processor):
         object_definition = (

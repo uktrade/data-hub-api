@@ -145,7 +145,7 @@ class TestBaseObjectIdentificationTask:
         self, identification_task, mock_scheduler, caplog,
     ):
         with (
-            mock.patch.object(S3ObjectProcessor, 'get_most_recent_object', return_value=None),
+            mock.patch.object(S3ObjectProcessor, 'get_most_recent_object_key', return_value=None),
             caplog.at_level(logging.INFO),
         ):
             identification_task.identify_new_objects(base_ingestion_task)
@@ -160,7 +160,7 @@ class TestBaseObjectIdentificationTask:
     ):
         with (
             mock.patch.object(
-                S3ObjectProcessor, 'get_most_recent_object', return_value=TEST_OBJECT_KEY,
+                S3ObjectProcessor, 'get_most_recent_object_key', return_value=TEST_OBJECT_KEY,
             ),
             mock.patch.object(QueueChecker, 'is_job_queued', return_value=True),
             caplog.at_level(logging.INFO),
@@ -177,7 +177,7 @@ class TestBaseObjectIdentificationTask:
     ):
         with (
             mock.patch.object(
-                S3ObjectProcessor, 'get_most_recent_object', return_value=TEST_OBJECT_KEY,
+                S3ObjectProcessor, 'get_most_recent_object_key', return_value=TEST_OBJECT_KEY,
             ),
             mock.patch.object(QueueChecker, 'is_job_running', return_value=True),
             caplog.at_level(logging.INFO),
@@ -191,7 +191,7 @@ class TestBaseObjectIdentificationTask:
     ):
         with (
             mock.patch.object(
-                S3ObjectProcessor, 'get_most_recent_object', return_value=TEST_OBJECT_KEY,
+                S3ObjectProcessor, 'get_most_recent_object_key', return_value=TEST_OBJECT_KEY,
             ),
             mock.patch.object(S3ObjectProcessor, 'has_object_been_ingested', return_value=True),
             caplog.at_level(logging.INFO),
@@ -205,7 +205,7 @@ class TestBaseObjectIdentificationTask:
     ):
         with (
             mock.patch.object(
-                S3ObjectProcessor, 'get_most_recent_object', return_value=TEST_OBJECT_KEY,
+                S3ObjectProcessor, 'get_most_recent_object_key', return_value=TEST_OBJECT_KEY,
             ),
             mock.patch.object(S3ObjectProcessor, 'has_object_been_ingested', return_value=False),
             caplog.at_level(logging.INFO),
