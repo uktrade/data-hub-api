@@ -6,11 +6,9 @@ from uuid import UUID
 
 from django.conf import settings
 from django.db import models, transaction
-from django.utils.timezone import now
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
-from datahub.company import consent
 from datahub.company.constants import (
     BusinessTypeConstant,
     OneListTierID,
@@ -30,13 +28,12 @@ from datahub.company.models import (
     OneListCoreTeamMember,
     OneListTier,
 )
-from datahub.company.tasks.contact import schedule_update_contact_consent
+
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
     has_uk_establishment_number_prefix,
     validate_team_member_max_count,
 )
-from datahub.core.api_client import get_zipkin_headers
 from datahub.core.constants import Country
 from datahub.core.constants import HeadquarterType
 from datahub.core.serializers import (
@@ -288,96 +285,6 @@ class ContactV4Serializer(ContactSerializer):
                 ),
             ),
         ]
-
-
-class ConsentMarketingField(serializers.BooleanField):
-    """
-    ConsentMarketingField will lookup consent data.
-    The model that this fields is used must have an email field
-    BooleanField is subclassed here for validation.
-    """
-
-    def to_internal_value(self, data):
-        """Validate boolean on incoming data."""
-        return {
-            'accepts_dit_email_marketing': super().to_internal_value(data),
-        }
-
-    def to_representation(self, value):
-        """Lookup from consent service api/"""
-        try:
-            representation = consent.get_one(value.email)
-        except consent.ConsentAPIError:
-            representation = False
-        return representation
-
-
-class ContactDetailSerializer(ContactSerializer):
-    """
-    This is the same as the ContactSerializer except it includes
-    accepts_dit_email_marketing in the fields. Only 3 endpoints will use this serialiser
-    """
-
-    accepts_dit_email_marketing = ConsentMarketingField(source='*', required=False)
-
-    class Meta(ContactSerializer.Meta):
-        fields = ContactSerializer.Meta.fields + ('accepts_dit_email_marketing',)
-
-    def _notify_consent_service(self, validated_data):
-        """
-        Trigger the update_contact_consent task with the current version
-        of `validated_data`. The actual enqueuing of the task happens in the
-        on_commit hook so it won't actually notify the consent service unless
-        the database transaction was successful.
-        """
-        if 'accepts_dit_email_marketing' not in validated_data:
-            # If no consent value in request body
-            return
-        # Remove the accepts_dit_email_marketing from validated_data
-        accepts_dit_email_marketing = validated_data.pop('accepts_dit_email_marketing')
-        # If consent value in POST, notify
-        combiner = DataCombiner(self.instance, validated_data)
-        request = self.context.get('request', None)
-        transaction.on_commit(
-            lambda: schedule_update_contact_consent(
-                combiner.get_value('email'),
-                accepts_dit_email_marketing,
-                kwargs={
-                    'modified_at': now().isoformat(),
-                    'zipkin_headers': get_zipkin_headers(request),
-                },
-            ),
-        )
-
-    @transaction.atomic
-    def create(self, validated_data):
-        """
-        Create a new instance using this serializer
-
-        :return: created instance
-        """
-        self._notify_consent_service(validated_data)
-        return super().create(validated_data)
-
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        """
-        Update the given instance with validated_data
-
-        :return: updated instance
-        """
-        self._notify_consent_service(validated_data)
-        return super().update(instance, validated_data)
-
-
-class ContactDetailV4Serializer(ContactV4Serializer, ContactDetailSerializer):
-    """
-    This is the same as the ContactSerializer except it includes
-    accepts_dit_email_marketing in the fields.
-    """
-
-    class Meta(ContactV4Serializer.Meta):
-        fields = ContactV4Serializer.Meta.fields + ('accepts_dit_email_marketing',)
 
 
 class CompanyExportCountrySerializer(serializers.ModelSerializer):
