@@ -6,15 +6,10 @@ import reversion
 from django.conf import settings
 from django.utils.timezone import now
 from freezegun import freeze_time
-from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
 from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
 
-from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
-from datahub.company.constants import (
-    CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
-)
 from datahub.company.models import Contact
 from datahub.company.test.factories import ArchivedContactFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
@@ -40,37 +35,16 @@ def generate_hawk_response(response):
     )
 
 
-@pytest.fixture
-def get_consent_fixture(requests_mock):
-    """Mock get call to consent service."""
-    yield lambda response: requests_mock.get(
-        f'{settings.CONSENT_SERVICE_BASE_URL}' f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
-        status_code=200,
-        text=generate_hawk_response(response),
-    )
-
-
 class AddContactBase(APITestMixin):
     """Add contact test case."""
 
     endpoint_namespace = None
 
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_with_manual_address(self, get_consent_fixture):
+    def test_with_manual_address(self):
         """Test add with manual address."""
         company = CompanyFactory()
-        get_consent_fixture(
-            {
-                'results': [
-                    {
-                        'consents': [
-                            'email_marketing',
-                        ],
-                        'email': 'foo@bar.com',
-                    },
-                ],
-            },
-        )
+
         url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.post(
             url,
@@ -97,7 +71,6 @@ class AddContactBase(APITestMixin):
                 },
                 'address_postcode': 'SW1A1AA',
                 'notes': 'lorem ipsum',
-                'accepts_dit_email_marketing': True,
             },
         )
 
@@ -360,21 +333,10 @@ class TestAddContactV4(AddContactBase):
     endpoint_namespace = 'api-v4'
 
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_with_us_manual_address(self, get_consent_fixture):
+    def test_with_us_manual_address(self):
         """Test add with manual address."""
         company = CompanyFactory()
-        get_consent_fixture(
-            {
-                'results': [
-                    {
-                        'consents': [
-                            'email_marketing',
-                        ],
-                        'email': 'foo@bar.com',
-                    },
-                ],
-            },
-        )
+
         url = reverse('api-v4:contact:list')
         response = self.api_client.post(
             url,

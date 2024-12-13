@@ -16,7 +16,7 @@ request = Mock(
     headers={
         'x-b3-traceid': '123',
         'x-b3-spanid': '456',
-    }
+    },
 )
 
 
