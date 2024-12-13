@@ -1250,6 +1250,13 @@ class CompanyExportSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+NestedCompanyExportField = partial(
+    NestedRelatedField,
+    CompanyExport,
+    extra_fields=('title',),
+)
+
+
 class ObjectiveV4Serializer(PermittedFieldsModelSerializer):
     modified_by = NestedAdviserField(read_only=True)
     archived_by = NestedAdviserField(read_only=True)

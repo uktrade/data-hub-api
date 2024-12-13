@@ -10,7 +10,12 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyFactory,
+    ContactFactory,
+    ExportFactory,
+)
 from datahub.core.constants import Service
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
@@ -22,6 +27,7 @@ from datahub.core.test_utils import (
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.models import CommunicationChannel, Interaction, InteractionPermission
 from datahub.interaction.test.factories import (
+    CompanyExportInteractionFactory,
     CompanyInteractionFactory,
     EventServiceDeliveryFactory,
     InteractionDITParticipantFactory,
@@ -749,6 +755,33 @@ class TestListInteractions(APITestMixin):
 
         actual_ids = {result['id'] for result in response_data['results']}
         expected_ids = {str(service_delivery.id) for service_delivery in service_deliveries}
+        assert actual_ids == expected_ids
+
+    def test_filtered_by_company_export(self):
+        """List of interactions filtered by company export"""
+        contact = ContactFactory()
+        export = ExportFactory()
+        company = CompanyFactory()
+
+        CompanyInteractionFactory.create_batch(3, contacts=[contact])
+        CompanyInteractionFactory.create_batch(3, company=company)
+        export_interactions = CompanyExportInteractionFactory.create_batch(
+            2, company_export=export,
+        )
+
+        url = reverse('api-v3:interaction:collection')
+        response = self.api_client.get(
+            url,
+            data={
+                'company_export_id': export.id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 2
+        actual_ids = {i['id'] for i in response_data['results']}
+        expected_ids = {str(i.id) for i in export_interactions}
         assert actual_ids == expected_ids
 
     @pytest.mark.parametrize(

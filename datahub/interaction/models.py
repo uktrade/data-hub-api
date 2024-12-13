@@ -279,6 +279,14 @@ class Interaction(ArchivableModel, BaseModel):
         on_delete=models.CASCADE,
         help_text='For interactions only.',
     )
+    company_export = models.ForeignKey(
+        'company.CompanyExport',
+        related_name='%(class)ss',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        help_text='For Export theme only.',
+    )
 
     # Large capital opportunity
     large_capital_opportunity = models.ForeignKey(

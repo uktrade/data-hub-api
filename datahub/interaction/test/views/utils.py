@@ -19,12 +19,14 @@ def resolve_data(data):
 def _resolve_model_object(obj):
     resolved_value = {
         'id': str(obj.id),
-        'name': obj.name,
     }
 
     # this is here because of inconsistent endpoint :(
-    if hasattr(obj, 'project_code'):
-        resolved_value['project_code'] = obj.project_code
+    fields = ('name', 'project_code', 'title')
+    for field in fields:
+        value = getattr(obj, field, None)
+        if isinstance(value, str):
+            resolved_value[field] = value
 
     return resolved_value
 

@@ -12,6 +12,7 @@ from datahub.company.models import Company, Contact
 from datahub.company.serializers import (
     NestedAdviserField,
     NestedAdviserWithEmailAndTeamField,
+    NestedCompanyExportField,
     UniqueAdvisersBaseSerializer,
 )
 from datahub.core.constants import ExportBarrierType as ExportBarrierTypeConstant
@@ -151,6 +152,9 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
         'invalid_when_no_other_selected': gettext_lazy(
             'This field is only valid when the export barrier type is "Other"',
         ),
+        'invalid_for_non_export_theme': gettext_lazy(
+            'Company Export is only valid for Export theme.',
+        ),
     }
 
     INVALID_FOR_UPDATE = gettext_lazy(
@@ -191,6 +195,7 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
     is_event = serializers.BooleanField(required=False, allow_null=True)
     event = NestedRelatedField(Event, required=False, allow_null=True)
     investment_project = NestedInvestmentProjectField(required=False, allow_null=True)
+    company_export = NestedCompanyExportField(required=False, allow_null=True)
     large_capital_opportunity = NestedRelatedField(
         LargeCapitalOpportunity,
         required=False,
@@ -436,6 +441,7 @@ class InteractionSerializer(BaseInteractionSerializer):
             'communication_channel',
             'grant_amount_offered',
             'investment_project',
+            'company_export',
             'large_capital_opportunity',
             'net_company_receipt',
             'service',
@@ -506,6 +512,13 @@ class InteractionSerializer(BaseInteractionSerializer):
                     OperatorRule('event', is_blank),
                     OperatorRule('service_delivery_status', is_blank),
                     when=EqualsRule('kind', Interaction.Kind.INTERACTION),
+                ),
+                ValidationRule(
+                    'invalid_for_non_export_theme',
+                    OperatorRule('company_export', not_),
+                    when=NotRule(
+                        EqualsRule('theme', Interaction.Theme.EXPORT),
+                    ),
                 ),
                 ValidationRule(
                     'invalid_when_no_policy_feedback',
@@ -630,6 +643,7 @@ class InteractionSerializerV4(BaseInteractionSerializer):
             'dit_participants',
             'communication_channel',
             'grant_amount_offered',
+            'company_export',
             'investment_project',
             'large_capital_opportunity',
             'net_company_receipt',
@@ -693,6 +707,13 @@ class InteractionSerializerV4(BaseInteractionSerializer):
                     'invalid_for_non_interaction',
                     OperatorRule('investment_project', not_),
                     when=EqualsRule('kind', Interaction.Kind.SERVICE_DELIVERY),
+                ),
+                ValidationRule(
+                    'invalid_for_non_export_theme',
+                    OperatorRule('company_export', not_),
+                    when=NotRule(
+                        EqualsRule('theme', Interaction.Theme.EXPORT),
+                    ),
                 ),
                 ValidationRule(
                     'invalid_for_service_delivery',
