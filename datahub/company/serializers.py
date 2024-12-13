@@ -9,7 +9,6 @@ from django.db import models, transaction
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
 
-from datahub.company import consent
 from datahub.company.constants import (
     BusinessTypeConstant,
     OneListTierID,
@@ -274,28 +273,6 @@ class ContactV4Serializer(ContactSerializer):
                 ),
             ),
         ]
-
-
-class ConsentMarketingField(serializers.BooleanField):
-    """
-    ConsentMarketingField will lookup consent data.
-    The model that this fields is used must have an email field
-    BooleanField is subclassed here for validation.
-    """
-
-    def to_internal_value(self, data):
-        """Validate boolean on incoming data."""
-        return {
-            'accepts_dit_email_marketing': super().to_internal_value(data),
-        }
-
-    def to_representation(self, value):
-        """Lookup from consent service api/"""
-        try:
-            representation = consent.get_one(value.email)
-        except consent.ConsentAPIError:
-            representation = False
-        return representation
 
 
 class CompanyExportCountrySerializer(serializers.ModelSerializer):
