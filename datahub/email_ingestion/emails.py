@@ -27,7 +27,7 @@ def _get_base_url():
 
 
 def get_access_token(tenant_id, client_id, client_secret):
-    token_url = f'https://login.microsoftonline.com/{tenant_id}/oauth/v2.0/token'
+    token_url = f'https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token'
     token_data = {
         'grant_type': 'client_credentials',
         'client_id': client_id,

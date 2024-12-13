@@ -40,7 +40,7 @@ class TestMailbox:
         """
         tenant_id = settings.MAILBOX_INGESTION_TENANT_ID
         token_mock = requests_mock.post(
-            f'https://login.microsoftonline.com/{tenant_id}/oauth/v2.0/token',
+            f'https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token',
             json={'access_token': TOKEN},
             status_code=status.HTTP_200_OK,
         )
@@ -172,7 +172,7 @@ class TestMailbox:
         caplog.set_level('ERROR')
         tenant_id = settings.MAILBOX_INGESTION_TENANT_ID
         token_mock = requests_mock.post(
-            f'https://login.microsoftonline.com/{tenant_id}/oauth/v2.0/token',
+            f'https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token',
             json={'access_token': TOKEN},
             status_code=status.HTTP_200_OK,
         )
@@ -222,7 +222,7 @@ class TestMailbox:
         """
         tenant_id = settings.MAILBOX_INGESTION_TENANT_ID
         token_mock = requests_mock.post(
-            f'https://login.microsoftonline.com/{tenant_id}/oauth/v2.0/token',
+            f'https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token',
             json={'access_token': TOKEN},
             status_code=status.HTTP_200_OK,
         )

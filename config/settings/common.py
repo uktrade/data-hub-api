@@ -555,7 +555,7 @@ MAILBOX_INGESTION_GRAPH_URL = env(
     default='https://graph.microsoft.com/v1.0/',
 )
 MAILBOX_INGESTION_EMAIL = env(
-    'MAILBOX_INGESTION_GRAPH_URL',
+    'MAILBOX_INGESTION_EMAIL',
     default='',
 )
 
