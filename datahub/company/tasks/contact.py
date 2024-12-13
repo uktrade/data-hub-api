@@ -6,6 +6,7 @@ from typing import List
 
 import environ
 import requests
+
 from dateutil import parser
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -23,6 +24,7 @@ from datahub.core.queues.errors import RetryError
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.core.realtime_messaging import send_realtime_message
+from datahub.ingest.models import IngestedObject
 
 
 logger = logging.getLogger(__name__)
@@ -206,8 +208,16 @@ class ContactConsentIngestionTask:
             )
             return
 
+        if IngestedObject.objects.filter(object_key=file_key).exists():
+            logger.info(
+                'File %s has already been processed',
+                file_key,
+            )
+            return
+
         try:
             self.sync_file_with_database(s3_client, file_key)
+            IngestedObject.objects.create(object_key=file_key)
         except Exception as exc:
             logger.exception(
                 f'Error ingesting contact consent file {file_key}',
@@ -313,7 +323,12 @@ class ContactConsentIngestionTask:
                         consent_data=contact.consent_data,
                         consent_data_last_modified=contact.consent_data_last_modified,
                     )
-                    logger.info('Updated contact consent data for email %s in row %s', email, i)
+                    logger.info(
+                        'Updated consent data for contact id %s with email %s in file row %s',
+                        contact.id,
+                        email,
+                        i,
+                    )
 
             logger.info(
                 'Finished processing total %s rows for contact consent from file %s',

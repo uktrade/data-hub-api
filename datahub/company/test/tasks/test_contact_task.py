@@ -35,6 +35,8 @@ from datahub.company.tasks.contact import (
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.queues.errors import RetryError
 from datahub.core.test_utils import HawkMockJSONResponse
+from datahub.ingest.models import IngestedObject
+from datahub.ingest.test.factories import IngestedObjectFactory
 
 
 def generate_hawk_response(payload):
@@ -527,11 +529,35 @@ class TestContactConsentIngestionTask:
 
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
-    def test_ingest_calls_sync_with_newest_file_order(self, test_files):
+    def test_ingest_with_newest_file_key_equal_to_existing_file_key_does_not_call_sync(
+        self,
+        test_files,
+    ):
         """
-        Test that the ingest calls the sync with the files in correct order
+        Test that the task returns when the latest file is equal to an existing ingested file
         """
         setup_s3_bucket(BUCKET, test_files)
+        IngestedObjectFactory(object_key=test_files[-1])
+        task = ContactConsentIngestionTask()
+        with mock.patch.multiple(
+            task,
+            sync_file_with_database=mock.DEFAULT,
+        ):
+            task.ingest()
+            task.sync_file_with_database.assert_not_called()
+
+    @mock_aws
+    @override_settings(S3_LOCAL_ENDPOINT_URL=None)
+    def test_ingest_calls_sync_with_newest_file_when_file_is_new(
+        self,
+        test_files,
+    ):
+        """
+        Test that the ingest calls the sync with the latest file when the file key does
+        not exist in the list of previously ingested files
+        """
+        setup_s3_bucket(BUCKET, test_files)
+        IngestedObjectFactory()
         task = ContactConsentIngestionTask()
         with mock.patch.multiple(
             task,
@@ -542,6 +568,7 @@ class TestContactConsentIngestionTask:
                 mock.ANY,
                 test_files[-1],
             )
+            assert IngestedObject.objects.filter(object_key=test_files[-1]).exists()
 
     @mock_aws
     def test_sync_file_without_contacts_stops_job_processing(self):
