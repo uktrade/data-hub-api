@@ -20,6 +20,7 @@ from datahub.company.test.factories import (
     CompanyExportCountryFactory,
     CompanyFactory,
     ContactFactory,
+    ExportFactory,
 )
 from datahub.company.test.utils import format_expected_adviser
 from datahub.core.constants import Country, ExportBarrierType, Service
@@ -32,6 +33,7 @@ from datahub.interaction.models import (
     ServiceDeliveryStatus,
 )
 from datahub.interaction.test.factories import (
+    CompanyExportInteractionFactory,
     CompanyInteractionFactory,
     CompanyInteractionFactoryWithPolicyFeedback,
     CompanyReferralInteractionFactory,
@@ -91,6 +93,11 @@ class TestAddInteraction(APITestMixin):
             {
                 'was_policy_feedback_provided': True,
                 'policy_feedback_notes': 'Policy feedback notes',
+            },
+            # company interaction with company export
+            {
+                'theme': Interaction.Theme.EXPORT,
+                'company_export': ExportFactory,
             },
         ),
     )
@@ -185,6 +192,7 @@ class TestAddInteraction(APITestMixin):
                 'name': Service.inbound_referral.value.name,
             },
             'service_answers': None,
+            'company_export': request_data.get('company_export'),
             'investment_project': request_data.get('investment_project'),
             'archived_documents_url_path': '',
             'were_countries_discussed': None,
@@ -434,6 +442,7 @@ class TestAddInteraction(APITestMixin):
                 'name': Service.inbound_referral.value.name,
             },
             'service_answers': None,
+            'company_export': request_data.get('company_export'),
             'investment_project': request_data.get('investment_project'),
             'archived_documents_url_path': '',
             'were_countries_discussed': request_data.get('were_countries_discussed'),
@@ -1661,6 +1670,37 @@ class TestAddInteraction(APITestMixin):
                     ],
                 },
             ),
+            # cannot set company_export for interaction theme other than EXPORT
+            (
+                {
+                    'theme': Interaction.Theme.INVESTMENT,
+                    'kind': Interaction.Kind.INTERACTION,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Explore Ltd'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Explore Ltd'),
+                        ),
+                    ],
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'service': Service.inbound_referral.value.id,
+                    'communication_channel': partial(
+                        random_obj_for_model,
+                        CommunicationChannel,
+                    ),
+                    'was_policy_feedback_provided': False,
+                    'related_trade_agreements': [],
+                    'company_export': ExportFactory,
+                },
+                {
+                    'company_export': [
+                        'Company Export is only valid for Export theme.',
+                    ],
+                },
+            ),
         ),
     )
     def test_validation(self, data, errors):
@@ -1879,6 +1919,7 @@ class TestGetInteraction(APITestMixin):
     @pytest.mark.parametrize(
         'factory',
         (
+            CompanyExportInteractionFactory,
             CompanyInteractionFactory,
             CompanyInteractionFactoryWithPolicyFeedback,
             InvestmentProjectInteractionFactory,
@@ -1963,6 +2004,10 @@ class TestGetInteraction(APITestMixin):
                 'name': Service.inbound_referral.value.name,
             },
             'service_answers': None,
+            'company_export': {
+                'id': str(interaction.company_export.pk),
+                'title': interaction.company_export.title,
+            } if interaction.company_export else None,
             'investment_project': {
                 'id': str(interaction.investment_project.pk),
                 'name': interaction.investment_project.name,
@@ -2096,6 +2141,7 @@ class TestGetInteraction(APITestMixin):
                 'name': Service.inbound_referral.value.name,
             },
             'service_answers': None,
+            'company_export': None,
             'investment_project': {
                 'id': str(interaction.investment_project.pk),
                 'name': interaction.investment_project.name,

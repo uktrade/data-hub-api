@@ -260,6 +260,7 @@ class Command(BaseCleanupCommand):
             ),
             relation_filter_mapping={
                 CompanyExport._meta.get_field('wins'): (),
+                CompanyExport._meta.get_field('interactions'): (),
             },
         ),
         'company.Objective': ModelCleanupConfig(

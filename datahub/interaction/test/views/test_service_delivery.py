@@ -7,7 +7,13 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.settings import api_settings
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.models import Company
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyFactory,
+    ContactFactory,
+    ExportFactory,
+)
 from datahub.core.constants import Service
 from datahub.core.test_utils import APITestMixin, random_obj_for_model
 from datahub.event.test.factories import EventFactory
@@ -148,6 +154,7 @@ class TestAddServiceDelivery(APITestMixin):
                 'name': Service.inbound_referral.value.name,
             },
             'service_answers': None,
+            'company_export': None,
             'investment_project': None,
             'archived_documents_url_path': '',
             'were_countries_discussed': request_data.get('were_countries_discussed'),
@@ -461,6 +468,34 @@ class TestAddServiceDelivery(APITestMixin):
                     },
                 },
             ),
+            # cannot set company_export for interaction theme other than EXPORT
+            (
+                {
+                    'theme': Interaction.Theme.OTHER,
+                    'kind': Interaction.Kind.SERVICE_DELIVERY,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'company': lambda: CompanyFactory(name='Martian Explore Ltd'),
+                    'contacts': [
+                        lambda: ContactFactory(
+                            company=Company.objects.get(name='Martian Explore Ltd'),
+                        ),
+                    ],
+                    'company_export': ExportFactory,
+                    'service': Service.inbound_referral.value.id,
+                    'dit_participants': [
+                        {'adviser': AdviserFactory},
+                    ],
+                    'is_event': False,
+                    'was_policy_feedback_provided': False,
+                    'were_countries_discussed': False,
+                },
+                {
+                    'company_export': [
+                        'Company Export is only valid for Export theme.',
+                    ],
+                },
+            ),
         ),
     )
     def test_validation(self, data, errors):
@@ -468,7 +503,6 @@ class TestAddServiceDelivery(APITestMixin):
         data = resolve_data(data)
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, data)
-
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == errors
 

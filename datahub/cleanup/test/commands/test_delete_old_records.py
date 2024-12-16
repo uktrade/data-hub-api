@@ -57,6 +57,7 @@ from datahub.export_win.test.factories import (
 )
 from datahub.interaction.test.factories import (
     CompaniesInteractionFactory,
+    CompanyExportInteractionFactory,
     CompanyInteractionFactory,
     InteractionExportCountryFactory,
     InvestmentProjectInteractionFactory,
@@ -840,6 +841,12 @@ MAPPING = {
         'relations': [
             {
                 'factory': WinFactory,
+                'field': 'company_export',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [{}],
+            },
+            {
+                'factory': CompanyExportInteractionFactory,
                 'field': 'company_export',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [{}],
