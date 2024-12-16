@@ -210,7 +210,7 @@ class ContactConsentIngestionTask:
 
         if IngestedObject.objects.filter(object_key=file_key).exists():
             logger.info(
-                'File %s has already been processed',
+                'File for contact consent %s has already been processed',
                 file_key,
             )
             return
@@ -226,7 +226,7 @@ class ContactConsentIngestionTask:
             raise exc
 
     def get_grouped_contacts(self) -> dict[str, List[Contact]]:
-        contacts_qs = Contact.objects.all()
+        contacts_qs = Contact.objects.only('id', 'email', 'consent_data_last_modified').all()
         contact_dict = {}
         for d in contacts_qs:
             contact_dict.setdefault(d.email, []).append(d)
