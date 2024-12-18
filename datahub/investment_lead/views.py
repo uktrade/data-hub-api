@@ -18,30 +18,30 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
     filter_backends = [filters.OrderingFilter]
     ordering = ['-created_on']
 
-    def get_queryset(self):
-        """Apply filters to queryset based on query parameters (in GET operations)."""
-        queryset = EYBLead.objects.filter(archived=False).exclude(
-            Q(user_hashed_uuid='') | Q(triage_hashed_uuid=''),
-        )
+    def _filter_by_overseas_regions(self, queryset):
         overseas_region_ids = self.request.query_params.getlist('overseas_region')
-        country_ids = self.request.query_params.getlist('country')
-        company_name = self.request.query_params.get('company')
-        sector_ids = self.request.query_params.getlist('sector')
-        values = self.request.query_params.getlist('value')
-
         if overseas_region_ids:
             queryset = queryset.filter(
                 address_country__overseas_region__id__in=overseas_region_ids,
             )
+        return queryset
 
+    def _filter_by_countries(self, queryset):
+        country_ids = self.request.query_params.getlist('country')
         if country_ids:
             queryset = queryset.filter(address_country__id__in=country_ids)
+        return queryset
 
+    def _filter_by_company_name(self, queryset):
+        company_name = self.request.query_params.get('company')
         if company_name:
             queryset = queryset.filter(
                 Q(company__name__icontains=company_name) | Q(company_name__icontains=company_name),
             )
+        return queryset
 
+    def _filter_by_sectors(self, queryset):
+        sector_ids = self.request.query_params.getlist('sector')
         if sector_ids:
             # This will be a list of level 0 sector ids;
             # We want to find and return all leads with sectors that have these ancestors
@@ -49,7 +49,10 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
             for sector in Sector.objects.filter(pk__in=sector_ids):
                 descendent_sectors.extend(sector.get_descendants(include_self=True))
             queryset = queryset.filter(sector__in=descendent_sectors)
+        return queryset
 
+    def _filter_by_values(self, queryset):
+        values = self.request.query_params.getlist('value')
         if values:
             value_mappings = {
                 'high': True,
@@ -70,5 +73,18 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
             if has_unknown:
                 filter_query |= Q(is_high_value__isnull=True)
             queryset = queryset.filter(filter_query)
+        return queryset
+
+    def get_queryset(self):
+        """Apply filters to queryset based on query parameters (in GET operations)."""
+        queryset = EYBLead.objects.filter(archived=False).exclude(
+            Q(user_hashed_uuid='') | Q(triage_hashed_uuid=''),
+        )
+
+        queryset = self._filter_by_overseas_regions(queryset)
+        queryset = self._filter_by_countries(queryset)
+        queryset = self._filter_by_company_name(queryset)
+        queryset = self._filter_by_sectors(queryset)
+        queryset = self._filter_by_values(queryset)
 
         return queryset
