@@ -90,7 +90,6 @@ class BaseObjectIdentificationTask:
             function=ingestion_task_function,
             function_kwargs={
                 'object_key': latest_object_key,
-                's3_processor': self.s3_processor,
             },
             queue_name=self.long_queue_checker.queue.name,
             description=f'Ingest {latest_object_key}',
@@ -139,6 +138,7 @@ class BaseObjectIngestionTask:
         try:
             with smart_open.open(
                 f's3://{self.s3_processor.bucket}/{self.object_key}',
+                transport_params={'client': self.s3_processor.s3_client},
             ) as s3_object:
                 for line in s3_object:
                     deserialized_line = json.loads(line)

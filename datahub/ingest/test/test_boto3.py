@@ -30,6 +30,7 @@ pytestmark = pytest.mark.django_db
 
 class TestGetS3Client:
 
+    @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_get_s3_client_returns_boto3_instance(self):
         with mock.patch('datahub.ingest.boto3.boto3.client') as patched_s3_client:
             get_s3_client(TEST_AWS_REGION)

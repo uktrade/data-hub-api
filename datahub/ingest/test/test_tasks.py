@@ -216,7 +216,6 @@ class TestBaseObjectIdentificationTask:
             function=base_ingestion_task,
             function_kwargs={
                 'object_key': TEST_OBJECT_KEY,
-                's3_processor': identification_task.s3_processor,
             },
             queue_name='long-running',
             description=f'Ingest {TEST_OBJECT_KEY}',
