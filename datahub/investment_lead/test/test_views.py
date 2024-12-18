@@ -357,3 +357,103 @@ class TestEYBLeadListAPI(APITestMixin):
         oldest_timestamp = response.data['results'][1]['created_on']
 
         assert newest_timestamp > oldest_timestamp
+
+    def test_filter_by_hmtc_region(self, test_user_with_view_permissions):
+        """
+        Test filtering EYB leads by one hmtc region.
+
+        note: we test through Country rather than OverseasRegion because
+        the region is not exposed via API
+        """
+        default_country = Country.objects.get(pk=constants.Country.france.value.id)
+        unrelated_country = Country.objects.get(pk=constants.Country.canada.value.id)
+
+        default_overseas_region = default_country.overseas_region.pk
+
+        EYBLeadFactory(address_country_id=default_country.id)
+        EYBLeadFactory(address_country_id=unrelated_country.id)
+
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(EYB_LEAD_COLLECTION_URL)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+
+        response = api_client.get(
+            EYB_LEAD_COLLECTION_URL,
+            data={'overseas_region': default_overseas_region},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+
+        response_country_id = response.data['results'][0]['address']['country']['id']
+        response_country = Country.objects.get(pk=response_country_id)
+
+        assert response_country.overseas_region.pk == default_overseas_region
+
+    def test_filter_by_multiple_hmtc_regions(self, test_user_with_view_permissions):
+        """
+        Test filtering EYB leads by multiple hmtc regions.
+
+        note: we test through Country rather than OverseasRegion because
+        the region is not exposed via API
+        """
+        france_country = Country.objects.get(pk=constants.Country.france.value.id)
+        greece_country = Country.objects.get(pk=constants.Country.greece.value.id)
+        canada_country = Country.objects.get(pk=constants.Country.canada.value.id)
+        italy_country = Country.objects.get(pk=constants.Country.italy.value.id)
+        japan_country = Country.objects.get(pk=constants.Country.japan.value.id)
+
+        # Should include France, Greece, Italy
+        first_region = france_country.overseas_region
+
+        # Should include Canada
+        second_region = canada_country.overseas_region
+
+        EYBLeadFactory(address_country_id=france_country.id)
+        EYBLeadFactory(address_country_id=greece_country.id)
+        EYBLeadFactory(address_country_id=canada_country.id)
+        EYBLeadFactory(address_country_id=italy_country.id)
+        EYBLeadFactory(address_country_id=japan_country.id)
+
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(EYB_LEAD_COLLECTION_URL)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 5
+
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={
+            'overseas_region': [first_region.pk, second_region.pk],
+        })
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+        country_ids_in_results = set(
+            [lead['address']['country']['id'] for lead in response.data['results']],
+        )
+        assert {
+            str(france_country.pk),
+            str(greece_country.pk),
+            str(italy_country.pk),
+            str(canada_country.pk),
+        } == country_ids_in_results
+
+    def test_filter_by_non_existing_hmtc_region(self, test_user_with_view_permissions):
+        """
+        Test filtering EYB leads by non existent hmtc region is handled without error.
+
+        note: we test through Country rather than OverseasRegion because
+        the region is not exposed via API
+        """
+        non_existing_overseas_region_uuid = uuid.uuid4()
+        country = Country.objects.get(pk=constants.Country.france.value.id)
+        EYBLeadFactory(address_country_id=country.id)
+
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(EYB_LEAD_COLLECTION_URL)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+
+        response = api_client.get(
+            EYB_LEAD_COLLECTION_URL,
+            data={'overseas_region': str(non_existing_overseas_region_uuid)},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 0

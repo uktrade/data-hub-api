@@ -23,10 +23,16 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
         queryset = EYBLead.objects.filter(archived=False).exclude(
             Q(user_hashed_uuid='') | Q(triage_hashed_uuid=''),
         )
+        overseas_region_ids = self.request.query_params.getlist('overseas_region')
         country_ids = self.request.query_params.getlist('country')
         company_name = self.request.query_params.get('company')
         sector_ids = self.request.query_params.getlist('sector')
         values = self.request.query_params.getlist('value')
+
+        if overseas_region_ids:
+            queryset = queryset.filter(
+                address_country__overseas_region__id__in=overseas_region_ids,
+            )
 
         if country_ids:
             queryset = queryset.filter(address_country__id__in=country_ids)
