@@ -57,20 +57,9 @@ def setup_s3_files(bucket_name, test_file, test_file_path):
     mock_s3_client.put_object(Bucket=bucket_name, Key=test_file_path, Body=test_file)
 
 
-class MockSentryTransport(Transport):
-    def __init__(self):
-        self.events = []
-
-    def capture_event(self, event):
-        pass
-
-    def capture_envelope(self, envelope):
-        self.events.append(envelope)
-
-
-class TestStovaIngestionTasks:
-
-    base_stova_event = {
+@pytest.fixture
+def test_base_stova_event():
+    return {
         'id': 2367,
         'url': 'https://simmons.net/',
         'city': 'Lake William',
@@ -106,6 +95,20 @@ class TestStovaIngestionTasks:
         'standard_currency': 'MNT',
     }
 
+
+class MockSentryTransport(Transport):
+    def __init__(self):
+        self.events = []
+
+    def capture_event(self, event):
+        pass
+
+    def capture_envelope(self, envelope):
+        self.events.append(envelope)
+
+
+class TestStovaIngestionTasks:
+
     @pytest.mark.django_db
     @mock_aws
     def test_stova_data_file_ingestion(self, caplog, test_file, test_file_path):
@@ -126,12 +129,12 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.django_db
     @mock_aws
-    def test_skip_previously_ingested_records(self, test_file_path):
+    def test_skip_previously_ingested_records(self, test_file_path, test_base_stova_event):
         """
         Test that we skip updating records that have already been ingested
         """
         StovaEventFactory(stova_event_id=123456789)
-        data = self.base_stova_event
+        data = test_base_stova_event
         data['id'] = 123456789
         record = json.dumps(
             data,
@@ -160,17 +163,18 @@ class TestStovaIngestionTasks:
         assert expected in exception
 
     @pytest.mark.django_db
-    def test_stova_event_fields_are_saved(self):
+    def test_stova_event_fields_are_saved(self, test_base_stova_event):
         """
         Test that the ingested stova event fields are saved to the StovaEvent model.
         """
         S3ObjectProcessMock = mock.Mock()
         task = StovaEventIngestionTask('dummy-prefix', S3ObjectProcessMock)
-        task._process_record(self.base_stova_event)
+        data = test_base_stova_event
+        task._process_record(data)
         result = StovaEvent.objects.get(stova_event_id=2367)
 
-        self.base_stova_event.pop('id')
-        for field, file_value in self.base_stova_event.items():
+        data.pop('id')
+        for field, file_value in data.items():
             model_value = getattr(result, field)
 
             if type(model_value) is datetime:
