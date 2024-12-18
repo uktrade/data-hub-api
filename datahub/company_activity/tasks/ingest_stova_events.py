@@ -1,78 +1,92 @@
-import json
 import logging
 
-from smart_open import open
+from django.db import IntegrityError
 
-from datahub.company_activity.models import IngestedFile, StovaEvent
+from datahub.company_activity.models import StovaEvent
+from datahub.company_activity.tasks.constants import STOVA_EVENT_PREFIX
+from datahub.ingest.boto3 import S3ObjectProcessor
+from datahub.ingest.tasks import BaseObjectIdentificationTask, BaseObjectIngestionTask
+
 
 logger = logging.getLogger(__name__)
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 
-def ingest_stova_data(bucket, file):
-    logger.info(f'Ingesting file: {file} started')
-    task = StovaEventIngestionTask()
-    task.ingest(bucket, file)
-    logger.info(f'Ingesting file: {file} finished')
+def stova_identification_task() -> None:
+    logger.info('Stova event identification task started.')
+    identification_task = StovaEventIndentificationTask(prefix=STOVA_EVENT_PREFIX)
+    identification_task.identify_new_objects(stova_ingestion_task)
+    logger.info('Stova event identification task finished.')
 
 
-class StovaEventIngestionTask:
-    def __init__(self):
-        self._existing_ids = []
+def stova_ingestion_task(object_key: str) -> None:
+    logger.info(f'Stova event ingestion task started for file {object_key}.')
+    ingestion_task = StovaEventIngestionTask(
+        object_key=object_key,
+        s3_processor=S3ObjectProcessor(prefix=STOVA_EVENT_PREFIX),
+    )
+    ingestion_task.ingest_object()
+    logger.info(f'Stova event ingestion task finished for file {object_key}.')
 
-    def ingest(self, bucket: str, file: str) -> None:
-        path = f's3://{bucket}/{file}'
-        try:
-            with open(path) as s3_file:
-                for line in s3_file:
-                    jsn = json.loads(line)
-                    if not self._already_ingested(jsn.get('id')):
-                        self.json_to_model(jsn)
-        except Exception as e:
-            raise e
-        IngestedFile.objects.create(filepath=file)
 
-    def _already_ingested(self, id: int) -> bool:
-        if not self._existing_ids:
-            self._existing_ids = list(StovaEvent.objects.values_list('stova_event_id', flat=True))
-        return id in self._existing_ids
+class StovaEventIndentificationTask(BaseObjectIdentificationTask):
+    pass
 
-    @staticmethod
-    def json_to_model(jsn: dict) -> None:
+
+class StovaEventIngestionTask(BaseObjectIngestionTask):
+
+    existing_ids = []
+
+    def _process_record(self, record: dict) -> None:
+        """Saves an event from Stova from the S3 bucket into a `StovaEvent`"""
+        if not self.existing_ids:
+            self.existing_ids = list(StovaEvent.objects.values_list('stova_event_id', flat=True))
+
+        stova_event_id = record.get('id')
+        if stova_event_id in self.existing_ids:
+            logger.info(f'Record already exists for stova_event_id: {stova_event_id}')
+            return
+
         values = {
-            'stova_event_id': jsn.get('id'),
-            'url': jsn.get('url', ''),
-            'city': jsn.get('city', ''),
-            'code': jsn.get('code', ''),
-            'name': jsn.get('name', ''),
-            'state': jsn.get('state', ''),
-            'country': jsn.get('country', ''),
-            'max_reg': jsn.get('max_reg'),
-            'end_date': jsn.get('end_date'),
-            'timezone': jsn.get('timezone', ''),
-            'folder_id': jsn.get('folder_id'),
-            'live_date': jsn.get('live_date'),
-            'close_date': jsn.get('close_date'),
-            'created_by': jsn.get('created_by', ''),
-            'price_type': jsn.get('price_type', ''),
-            'start_date': jsn.get('start_date'),
-            'description': jsn.get('description', ''),
-            'modified_by': jsn.get('modified_by', ''),
-            'contact_info': jsn.get('contact_info', ''),
-            'created_date': jsn.get('created_date'),
-            'location_city': jsn.get('location_city', ''),
-            'location_name': jsn.get('location_name', ''),
-            'modified_date': jsn.get('modified_date'),
-            'client_contact': jsn.get('client_contact', ''),
-            'location_state': jsn.get('location_state', ''),
-            'default_language': jsn.get('default_language', ''),
-            'location_country': jsn.get('location_country', ''),
-            'approval_required': jsn.get('approval_required'),
-            'location_address1': jsn.get('location_address1', ''),
-            'location_address2': jsn.get('location_address2', ''),
-            'location_address3': jsn.get('location_address3', ''),
-            'location_postcode': jsn.get('location_postcode', ''),
-            'standard_currency': jsn.get('standard_currency', ''),
+            'stova_event_id': stova_event_id,
+            'url': record.get('url', ''),
+            'city': record.get('city', ''),
+            'code': record.get('code', ''),
+            'name': record.get('name', ''),
+            'state': record.get('state', ''),
+            'country': record.get('country', ''),
+            'max_reg': record.get('max_reg'),
+            'end_date': record.get('end_date'),
+            'timezone': record.get('timezone', ''),
+            'folder_id': record.get('folder_id'),
+            'live_date': record.get('live_date'),
+            'close_date': record.get('close_date'),
+            'created_by': record.get('created_by'),
+            'price_type': record.get('price_type', ''),
+            'start_date': record.get('start_date'),
+            'description': record.get('description', ''),
+            'modified_by': record.get('modified_by'),
+            'contact_info': record.get('contact_info', ''),
+            'created_date': record.get('created_date'),
+            'location_city': record.get('location_city', ''),
+            'location_name': record.get('location_name', ''),
+            'modified_date': record.get('modified_date'),
+            'client_contact': record.get('client_contact'),
+            'location_state': record.get('location_state', ''),
+            'default_language': record.get('default_language', ''),
+            'location_country': record.get('location_country', ''),
+            'approval_required': record.get('approval_required'),
+            'location_address1': record.get('location_address1', ''),
+            'location_address2': record.get('location_address2', ''),
+            'location_address3': record.get('location_address3', ''),
+            'location_postcode': record.get('location_postcode', ''),
+            'standard_currency': record.get('standard_currency', ''),
         }
 
-        StovaEvent.objects.create(**values)
+        try:
+            StovaEvent.objects.create(**values)
+        except IntegrityError as error:
+            logger.error(
+                'Error processing Stova event record, stova_event_id: {stova_event_id}. ',
+                f'Error: {error}',
+            )
