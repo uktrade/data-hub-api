@@ -167,8 +167,8 @@ class TestStovaIngestionTasks:
         """
         Test that the ingested stova event fields are saved to the StovaEvent model.
         """
-        S3ObjectProcessMock = mock.Mock()
-        task = StovaEventIngestionTask('dummy-prefix', S3ObjectProcessMock)
+        s3_processor_mock = mock.Mock()
+        task = StovaEventIngestionTask('dummy-prefix', s3_processor_mock)
         data = test_base_stova_event
         task._process_record(data)
         result = StovaEvent.objects.get(stova_event_id=2367)
