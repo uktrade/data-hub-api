@@ -368,7 +368,7 @@ class TestEYBLeadListAPI(APITestMixin):
         default_country = Country.objects.get(pk=constants.Country.france.value.id)
         unrelated_country = Country.objects.get(pk=constants.Country.canada.value.id)
 
-        default_overseas_region = default_country.overseas_region.pk
+        default_overseas_region = default_country.overseas_region_id
 
         EYBLeadFactory(address_country_id=default_country.id)
         EYBLeadFactory(address_country_id=unrelated_country.id)
@@ -388,7 +388,7 @@ class TestEYBLeadListAPI(APITestMixin):
         response_country_id = response.data['results'][0]['address']['country']['id']
         response_country = Country.objects.get(pk=response_country_id)
 
-        assert response_country.overseas_region.pk == default_overseas_region
+        assert response_country.overseas_region_id == default_overseas_region
 
     def test_filter_by_multiple_hmtc_regions(self, test_user_with_view_permissions):
         """
