@@ -1,5 +1,6 @@
 import logging
 
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 
 from datahub.company_activity.models import StovaEvent
@@ -87,6 +88,12 @@ class StovaEventIngestionTask(BaseObjectIngestionTask):
             StovaEvent.objects.create(**values)
         except IntegrityError as error:
             logger.error(
-                'Error processing Stova event record, stova_event_id: {stova_event_id}. ',
+                f'Error processing Stova event record, stova_event_id: {stova_event_id}. '
+                f'Error: {error}',
+            )
+        except ValidationError as error:
+            logger.error(
+                'Got unexpected value for a field when processing Stova event record, '
+                f'stova_event_id: {stova_event_id}. '
                 f'Error: {error}',
             )

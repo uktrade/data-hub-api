@@ -8,6 +8,7 @@ from unittest import mock
 import boto3
 import pytest
 
+from django.test import override_settings
 from moto import mock_aws
 from sentry_sdk import init
 from sentry_sdk.transport import Transport
@@ -15,6 +16,7 @@ from sentry_sdk.transport import Transport
 from datahub.company_activity.models import StovaEvent
 from datahub.company_activity.tasks.constants import BUCKET, REGION, STOVA_EVENT_PREFIX
 from datahub.company_activity.tasks.ingest_stova_events import (
+    stova_identification_task,
     stova_ingestion_task,
     StovaEventIngestionTask,
 )
@@ -121,7 +123,9 @@ class TestStovaIngestionTasks:
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
         with caplog.at_level(logging.INFO):
-            stova_ingestion_task(test_file_path)
+            stova_identification_task()
+            assert 'Stova event identification task started.' in caplog.text
+            assert 'Stova event identification task finished.' in caplog.text
             assert f'Stova event ingestion task started for file {test_file_path}' in caplog.text
             assert f'Stova event ingestion task finished for file {test_file_path}' in caplog.text
         assert StovaEvent.objects.count() == initial_stova_activity_count + 27
@@ -148,6 +152,7 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.django_db
     @mock_aws
+    @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_invalid_file(self, test_file_path):
         """
         Test that an exception is raised when the file is not valid
@@ -182,3 +187,52 @@ class TestStovaIngestionTasks:
                 continue
 
             assert model_value == file_value
+
+    @pytest.mark.django_db
+    def test_stova_event_fields_with_duplicate_event_ids(self, caplog, test_base_stova_event):
+        """
+        Test that if they are records with duplicate event ids, they are not created.
+
+        This checks for both scenarios where we have already stored an event in our DB and also
+        where the file contains two rows with the same event_id.
+        """
+        s3_processor_mock = mock.Mock()
+        task = StovaEventIngestionTask('dummy-prefix', s3_processor_mock)
+
+        existing_stova_event = StovaEventFactory(stova_event_id=123456789)
+        data = test_base_stova_event
+        data['id'] = existing_stova_event.stova_event_id
+
+        with caplog.at_level(logging.INFO):
+            task._process_record(data)
+            assert (
+                f'Record already exists for stova_event_id: {existing_stova_event.stova_event_id}'
+            ) in caplog.text
+
+        data['id'] = 999999
+        task._process_record(data)
+        with caplog.at_level(logging.ERROR):
+            task._process_record(data)
+            assert f'Error processing Stova event record, stova_event_id: {999999}' in caplog.text
+
+    @pytest.mark.django_db
+    def test_stova_event_ingestion_handles_unexpected_fields(self, caplog, test_base_stova_event):
+        """
+        Test that if they rows from stova contain data in an unexpected data type these are handled
+        and logged.
+        """
+        s3_processor_mock = mock.Mock()
+        task = StovaEventIngestionTask('dummy-prefix', s3_processor_mock)
+
+        data = test_base_stova_event
+        stova_event_id = data.get('id')
+
+        # This is expected to be a boolean
+        data['approval_required'] = 'not a boolean'
+
+        with caplog.at_level(logging.ERROR):
+            task._process_record(data)
+            assert (
+                'Got unexpected value for a field when processing Stova event record, '
+                f'stova_event_id: {stova_event_id}'
+            ) in caplog.text
