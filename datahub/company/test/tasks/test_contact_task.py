@@ -4,7 +4,6 @@ import logging
 import uuid
 
 from unittest import mock
-from unittest.mock import patch
 
 import boto3
 import pytest
@@ -15,13 +14,10 @@ from django.test import override_settings
 from django.utils import timezone
 from freezegun import freeze_time
 from moto import mock_aws
-from requests import ConnectTimeout
-from rest_framework import status
 
 from datahub.company.models.contact import Contact
 from datahub.company.tasks import (
     automatic_contact_archive,
-    update_contact_consent,
 )
 from datahub.company.tasks.contact import (
     BUCKET,
@@ -30,10 +26,8 @@ from datahub.company.tasks.contact import (
     ingest_contact_consent_data,
     REGION,
     schedule_automatic_contact_archive,
-    schedule_update_contact_consent,
 )
 from datahub.company.test.factories import CompanyFactory, ContactFactory
-from datahub.core.queues.errors import RetryError
 from datahub.core.test_utils import HawkMockJSONResponse
 from datahub.ingest.models import IngestedObject
 from datahub.ingest.test.factories import IngestedObjectFactory
@@ -46,178 +40,6 @@ def generate_hawk_response(payload):
         api_key=settings.CONSENT_SERVICE_HAWK_KEY,
         response=payload,
     )
-
-
-@pytest.mark.django_db
-class TestConsentServiceTask:
-    """
-    tests for the task that sends email marketing consent status to the
-    DIT consent service / legal basis API
-    """
-
-    @override_settings(
-        CONSENT_SERVICE_BASE_URL=None,
-    )
-    def test_not_configured_error(
-        self,
-    ):
-        """
-        Test that if feature flag is enabled, but environment variables are not set
-        then task will throw a caught exception and no retries or updates will occur
-        """
-        update_succeeds = update_contact_consent('example@example.com', True)
-        assert update_succeeds is False
-
-    @pytest.mark.parametrize(
-        'email_address, accepts_dit_email_marketing, modified_at',
-        (
-            ('example@example.com', True, None),
-            ('example@example.com', False, None),
-            ('example@example.com', True, '2020-01-01-12:00:00Z'),
-            ('example@example.com', False, '2020-01-01-12:00:00Z'),
-        ),
-    )
-    def test_task_makes_http_request(
-        self,
-        requests_mock,
-        email_address,
-        accepts_dit_email_marketing,
-        modified_at,
-    ):
-        """
-        Ensure correct http request with correct payload is generated when task
-        executes.
-        """
-        matcher = requests_mock.post(
-            '/api/v1/person/',
-            text=generate_hawk_response({}),
-            status_code=status.HTTP_201_CREATED,
-        )
-        update_contact_consent(
-            email_address,
-            accepts_dit_email_marketing,
-            modified_at=modified_at,
-        )
-        assert matcher.called_once
-        expected = {
-            'email': email_address,
-            'consents': ['email_marketing'] if accepts_dit_email_marketing else [],
-        }
-        if modified_at:
-            expected['modified_at'] = modified_at
-
-        assert matcher.last_request.json() == expected
-
-    @pytest.mark.parametrize(
-        'status_code',
-        (
-            (status.HTTP_404_NOT_FOUND),
-            (status.HTTP_403_FORBIDDEN),
-            (status.HTTP_500_INTERNAL_SERVER_ERROR),
-        ),
-    )
-    def test_task_retries_on_request_exceptions(
-        self,
-        requests_mock,
-        status_code,
-    ):
-        """
-        Test to ensure that rq receives exceptions like 5xx, 404 and then will retry based on
-        job_scheduler configuration
-        """
-        matcher = requests_mock.post(
-            '/api/v1/person/',
-            text=generate_hawk_response({}),
-            status_code=status_code,
-        )
-        with pytest.raises(RetryError):
-            update_contact_consent('example@example.com', True)
-        assert matcher.called_once
-
-    @patch('datahub.company.consent.APIClient.request', side_effect=ConnectTimeout)
-    def test_task_retries_on_connect_timeout(
-        self,
-        mock_post,
-    ):
-        """
-        Test to ensure that RQ retries on connect timeout by virtue of the exception forcing
-        a retry within RQ and configured settings
-        """
-        with pytest.raises(RetryError):
-            update_contact_consent('example@example.com', True)
-        assert mock_post.called
-
-    @patch('datahub.company.consent.APIClient.request', side_effect=Exception)
-    def test_task_doesnt_retry_on_other_exception(
-        self,
-        mock_post,
-    ):
-        """
-        Test to ensure that RQ raises on non-requests exception
-        """
-        update_succeeds = update_contact_consent('example@example.com', True)
-        assert mock_post.called
-        assert update_succeeds is False
-
-    @pytest.mark.parametrize(
-        'status_code',
-        (
-            (status.HTTP_200_OK),
-            (status.HTTP_201_CREATED),
-        ),
-    )
-    def test_update_succeeds(
-        self,
-        requests_mock,
-        status_code,
-    ):
-        """
-        Test success occurs when update succeeds
-        """
-        matcher = requests_mock.post(
-            '/api/v1/person/',
-            text=generate_hawk_response({}),
-            status_code=status_code,
-        )
-
-        update_success = update_contact_consent('example@example.com', True)
-
-        assert matcher.called_once
-        assert update_success is True
-
-    @pytest.mark.parametrize(
-        'bad_email',
-        (
-            None,
-            '',
-            '  ',
-        ),
-    )
-    def test_none_or_empty_email_assigned_fails(
-        self,
-        requests_mock,
-        bad_email,
-    ):
-        matcher = requests_mock.post(
-            '/api/v1/person/',
-            text=generate_hawk_response({}),
-            status_code=status.HTTP_201_CREATED,
-        )
-
-        update_success = update_contact_consent(bad_email, False)
-
-        assert not matcher.called_once
-        assert update_success is False
-
-    def test_job_schedules_with_correct_update_contact_consent_details(self):
-        actual_job = schedule_update_contact_consent('example@example.com', True)
-
-        assert actual_job is not None
-        assert actual_job._func_name == 'datahub.company.tasks.contact.update_contact_consent'
-        assert actual_job._args == ('example@example.com', True, None)
-        assert actual_job.retries_left == 5
-        assert actual_job.retry_intervals == [30, 961, 1024, 1089, 1156]
-        assert actual_job.origin == 'short-running'
 
 
 @pytest.mark.django_db

@@ -1,7 +1,5 @@
 from datetime import datetime, timezone
 
-from unittest.mock import Mock
-
 import pytest
 
 from django.urls import reverse
@@ -49,14 +47,6 @@ def get_expected_data_from_contact(contact):
     }
 
 
-@pytest.fixture
-def consent_get_many_mock(monkeypatch):
-    """Mocks the consent.get_many function"""
-    mock = Mock()
-    monkeypatch.setattr('datahub.company.consent.get_many', mock)
-    yield mock
-
-
 @pytest.mark.django_db
 class TestContactsDatasetViewSet(BaseDatasetViewTest):
     """
@@ -67,11 +57,13 @@ class TestContactsDatasetViewSet(BaseDatasetViewTest):
     factory = ContactFactory
 
     @pytest.mark.parametrize(
-        'contact_factory', (
+        'contact_factory',
+        (
             ArchivedContactFactory,
             ContactFactory,
             ContactWithOwnAddressFactory,
-        ))
+        ),
+    )
     def test_success(self, data_flow_api_client, contact_factory):
         """Test that endpoint returns with expected data for a single order"""
         contact = contact_factory()
@@ -97,8 +89,10 @@ class TestContactsDatasetViewSet(BaseDatasetViewTest):
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
         assert len(response_results) == 4
-        expected_contact_list = sorted([contact_3, contact_4],
-                                       key=lambda item: item.pk) + [contact_1, contact_2]
+        expected_contact_list = sorted([contact_3, contact_4], key=lambda item: item.pk) + [
+            contact_1,
+            contact_2,
+        ]
         for index, contact in enumerate(expected_contact_list):
             assert contact.email == response_results[index]['email']
 

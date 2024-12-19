@@ -3,7 +3,6 @@ from django.core.validators import validate_email
 from django.db.models import Case, CharField, Max, When
 from django.db.models.functions import Cast
 
-from datahub.company import consent
 from datahub.company.models import Contact as DBContact
 from datahub.core.query_utils import (
     get_aggregate_subquery,
@@ -12,7 +11,6 @@ from datahub.core.query_utils import (
     get_string_agg_subquery,
     get_top_related_expression_subquery,
 )
-from datahub.core.utils import slice_iterable_into_chunks
 from datahub.interaction.models import Interaction as DBInteraction
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.search.contact import ContactSearchApp
@@ -139,56 +137,7 @@ class SearchContactExportAPIView(SearchContactAPIViewMixin, SearchExportAPIView)
         'computed_postcode': 'Postcode',
         'full_telephone_number': 'Phone number',
         'email': 'Email address',
-        'accepts_dit_email_marketing': 'Accepts DIT email marketing',
         'date_of_latest_interaction': 'Date of latest interaction',
         'teams_of_latest_interaction': 'Teams of latest interaction',
         'created_by__dit_team__name': 'Created by team',
     }
-
-    def _add_consent_response(self, rows):
-        """
-        Transforms iterable to add user consent from the consent service.
-
-        The consent lookup makes an external API call to return consent.
-        For perfromance reasons the consent amount is limited by consent_page_size.
-        Due to this limitaion the iterable are sliced into chunks requesting consent for 100 rows
-        at a time.
-        """
-        # Slice iterable into chunks
-        row_chunks = slice_iterable_into_chunks(rows, self.consent_page_size)
-        for chunk in row_chunks:
-            """
-            Loop over the chunks and extract the email and item.
-            Save the item because the iterator cannot be used twice.
-            """
-            rows = list(chunk)
-            # Peform constent lookup on emails POST request
-            consent_lookups = consent.get_many(
-                [row['email'] for row in rows if self._is_valid_email(row['email'])],
-            )
-            for row in rows:
-                # Assign contact consent boolean to accepts_dit_email_marketing
-                # and yield modified result.
-                row['accepts_dit_email_marketing'] = consent_lookups.get(row['email'], False)
-                yield row
-
-    def _get_rows(self, ids, search_ordering):
-        """
-        Get row queryset for constent service.
-
-        This populates accepts_dit_email_marketing field from the consent service and
-        removes the accepts_dit_email_marketing from the field query because the field is not in
-        the db.
-        """
-        db_ordering = self._translate_search_ordering_to_django_ordering(search_ordering)
-        field_titles = self.field_titles.copy()
-        del field_titles['accepts_dit_email_marketing']
-        rows = self.queryset.filter(
-            pk__in=ids,
-        ).order_by(
-            *db_ordering,
-        ).values(
-            *field_titles,
-        ).iterator()
-
-        return self._add_consent_response(rows)
