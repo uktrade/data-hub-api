@@ -113,6 +113,7 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.django_db
     @mock_aws
+    @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_stova_data_file_ingestion(self, caplog, test_file, test_file_path):
         """
         Test that a Aventri/Stova data file is ingested correctly and the ingested file
@@ -133,6 +134,7 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.django_db
     @mock_aws
+    @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_skip_previously_ingested_records(self, test_file_path, test_base_stova_event):
         """
         Test that we skip updating records that have already been ingested
