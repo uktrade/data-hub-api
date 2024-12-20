@@ -16,7 +16,7 @@ from sentry_sdk.transport import Transport
 from datahub.company_activity.models import StovaEvent
 from datahub.company_activity.tasks.constants import BUCKET, REGION, STOVA_EVENT_PREFIX
 from datahub.company_activity.tasks.ingest_stova_events import (
-    stova_identification_task,
+    stova_identification_and_ingest_task,
     stova_ingestion_task,
     StovaEventIngestionTask,
 )
@@ -123,7 +123,7 @@ class TestStovaIngestionTasks:
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
         with caplog.at_level(logging.INFO):
-            stova_identification_task()
+            stova_identification_and_ingest_task()
             assert 'Stova event identification task started.' in caplog.text
             assert 'Stova event identification task finished.' in caplog.text
             assert f'Stova event ingestion task started for file {test_file_path}' in caplog.text

@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 
-def stova_identification_task() -> None:
+def stova_identification_and_ingest_task() -> None:
+    """Identifies the most recent file to be ingested and schedules a task to ingest it"""
     logger.info('Stova event identification task started.')
     identification_task = StovaEventIndentificationTask(prefix=STOVA_EVENT_PREFIX)
     identification_task.identify_new_objects(stova_ingestion_task)
@@ -21,6 +22,7 @@ def stova_identification_task() -> None:
 
 
 def stova_ingestion_task(object_key: str) -> None:
+    """Ingest the given key (file) from S3"""
     logger.info(f'Stova event ingestion task started for file {object_key}.')
     ingestion_task = StovaEventIngestionTask(
         object_key=object_key,
