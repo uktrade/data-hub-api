@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 
-def stova_identification_and_ingest_task() -> None:
+def ingest_stova_event_data() -> None:
     """Identifies the most recent file to be ingested and schedules a task to ingest it"""
     logger.info('Stova event identification task started.')
     identification_task = StovaEventIndentificationTask(prefix=STOVA_EVENT_PREFIX)
