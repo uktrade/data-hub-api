@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: f6671176-6493-43ba-a92d-899281efcb55
+  fields:
+    disabled_on: ~
+    order: 1325
+    segment: Stova Event Service
+    parent:
+    contexts: ["event"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0

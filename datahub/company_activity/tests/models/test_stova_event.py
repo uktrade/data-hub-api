@@ -29,6 +29,8 @@ class TestStovaEvent:
 
         assert datahub_event.address_country.name == 'United States'
 
+        assert str(datahub_event.service_id) == 'f6671176-6493-43ba-a92d-899281efcb55'
+
         stova_event.delete()
         assert not Event.objects.all().exists()
 
