@@ -43,7 +43,7 @@ class StovaEventIngestionTask(BaseObjectIngestionTask):
     def _process_record(self, record: dict) -> None:
         """Saves an event from Stova from the S3 bucket into a `StovaEvent`"""
         if not self.existing_ids:
-            self.existing_ids = list(StovaEvent.objects.values_list('stova_event_id', flat=True))
+            self.existing_ids = set(StovaEvent.objects.values_list('stova_event_id', flat=True))
 
         stova_event_id = record.get('id')
         if stova_event_id in self.existing_ids:
