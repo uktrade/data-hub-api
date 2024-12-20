@@ -57,11 +57,7 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
 ]
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
-    }
-}
+CACHES = {'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}}
 
 # Stop WhiteNoise emitting warnings when running tests without running collectstatic first
 WHITENOISE_AUTOREFRESH = True
@@ -124,7 +120,7 @@ DOCUMENT_BUCKETS = {
         'aws_access_key_id': 'bar',
         'aws_secret_access_key': 'baz',
         'aws_region': 'eu-west-2',
-    }
+    },
 }
 
 DIT_EMAIL_INGEST_BLOCKLIST = [
@@ -161,9 +157,6 @@ ADMIN_OAUTH2_CLIENT_ID = 'client-id'
 ADMIN_OAUTH2_CLIENT_SECRET = 'client-secret'
 ADMIN_OAUTH2_LOGOUT_PATH = 'http://sso-server/o/logout'
 
-CONSENT_SERVICE_BASE_URL = 'http://consent.service/'
-CONSENT_SERVICE_HAWK_ID = 'some-id'
-CONSENT_SERVICE_HAWK_KEY = 'some-secret'
 
 COMPANY_MATCHING_SERVICE_BASE_URL = 'http://content.matching/'
 COMPANY_MATCHING_HAWK_ID = 'some-id'
