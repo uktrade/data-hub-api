@@ -65,8 +65,8 @@ class StovaEvent(models.Model):
             self.create_or_update_datahub_event()
 
     def create_or_update_datahub_event(self) -> Event:
-        # Dates are converted from string to datetime after saving, so refresh self otherwise
-        # dates will still be string.
+        # Dates are converted from string to datetime after saving, so refresh otherwise dates will
+        # still be string.
         # https://docs.djangoproject.com/en/4.2/ref/models/instances/#what-happens-when-you-save
         self.refresh_from_db()
         event, _ = Event.objects.update_or_create(
@@ -82,10 +82,22 @@ class StovaEvent(models.Model):
                 'address_county': self.location_state,
                 'address_postcode': self.location_postcode,
                 'address_country': get_country_by_country_name(self.country, 'GB'),
+                'service_id': self.get_stova_event_service_id(),
                 'notes': self.description,
             },
         )
         return event
+
+    @staticmethod
+    def get_stova_event_service_id() -> str:
+        """
+        The frontend expects a service which we don't get from Stova. This service is created for
+        ingested stova events called "Stova Event Service". These service are metadata created in
+        migrations files so we can guarantee it exists before the application is run.
+
+        :returns: A id of a `Service` with the name "Stova Event Service".
+        """
+        return 'f6671176-6493-43ba-a92d-899281efcb55'
 
     @staticmethod
     def get_or_create_stova_event_type() -> EventType:
