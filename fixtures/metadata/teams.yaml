@@ -287,7 +287,7 @@
       - win
   model: auth.group
 - fields:
-    name: DIT_staff
+    name: DBT_staff
     permissions:
     - - view_advisor
       - company
@@ -592,14 +592,14 @@
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: DSO
   model: metadata.teamrole
   pk: 57329c18-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: UK IBC Office
   model: metadata.teamrole
   pk: 58329c18-6095-e211-a939-e4115bead28a
@@ -613,28 +613,28 @@
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: Govt Office of Region
   model: metadata.teamrole
   pk: 5b329c18-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: HQ Investment Team
   model: metadata.teamrole
   pk: 5c329c18-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: International Trade Director
   model: metadata.teamrole
   pk: 5d329c18-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     - - Regional account managers
     name: International Trade Team
   model: metadata.teamrole
@@ -642,7 +642,7 @@
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     - - Global account managers
     name: Global Account Manager
   model: metadata.teamrole
@@ -650,112 +650,112 @@
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: Market Unit
   model: metadata.teamrole
   pk: 5f329c18-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: OGD
   model: metadata.teamrole
   pk: 60329c18-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: Partner Organisation
   model: metadata.teamrole
   pk: 61329c18-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: Post
   model: metadata.teamrole
   pk: 62329c18-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: RDA
   model: metadata.teamrole
   pk: 63329c18-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: Regional Investment Team
   model: metadata.teamrole
   pk: 64329c18-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: Sector Team
   model: metadata.teamrole
   pk: 65329c18-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: UKTI HQ Department
   model: metadata.teamrole
   pk: 66329c18-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: UK ASEAN (ABC) Office
   model: metadata.teamrole
   pk: 6f6a2be2-0fb3-e211-a646-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: British Chamber of Commerce Overseas
   model: metadata.teamrole
   pk: 7144b707-f816-e311-a78e-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: ATO
   model: metadata.teamrole
   pk: 846cb21e-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: '2013-03-25T15:24Z'
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: UKTI Group
   model: metadata.teamrole
   pk: 856cb21e-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: '2013-03-25T15:24Z'
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: Regional Overseas Office
   model: metadata.teamrole
   pk: 866cb21e-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: BERR Business Relationship
   model: metadata.teamrole
   pk: 876cb21e-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: CBBC Office
   model: metadata.teamrole
   pk: 886cb21e-6095-e211-a939-e4115bead28a
 - fields:
     disabled_on: null
     groups:
-    - - DIT_staff
+    - - DBT_staff
     name: Overseas Business Network (OBN)
   model: metadata.teamrole
   pk: b4e69e92-7c82-e311-8dfb-e4115bead28a
@@ -4096,7 +4096,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: DIT Finance & Corporate Services
+    name: DBT Finance & Corporate Services
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
     tags: []
@@ -10241,7 +10241,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: DIT Education
+    name: DBT Education
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
     tags: []
