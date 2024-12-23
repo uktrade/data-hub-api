@@ -1173,7 +1173,7 @@ class TestSearchPermissions(APITestMixin):
 
     def test_investment_project_no_permissions(self):
         """Should return 403"""
-        user = create_test_user(dit_team=TeamFactory())
+        user = create_test_user(dbt_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:search:investment_project')
         response = api_client.get(url)
@@ -1194,12 +1194,12 @@ class TestSearchPermissions(APITestMixin):
         """Test that normal users can see all projects."""
         team = TeamFactory()
         team_others = TeamFactory()
-        adviser_1 = AdviserFactory(dit_team_id=team.id)
-        adviser_2 = AdviserFactory(dit_team_id=team_others.id)
+        adviser_1 = AdviserFactory(dbt_team_id=team.id)
+        adviser_2 = AdviserFactory(dbt_team_id=team_others.id)
 
         request_user = create_test_user(
             permission_codenames=permissions,
-            dit_team=team,
+            dbt_team=team,
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -1228,7 +1228,7 @@ class TestSearchPermissions(APITestMixin):
         """
         url = reverse('api-v3:search:investment_project')
 
-        adviser_other = AdviserFactory(dit_team_id=None)
+        adviser_other = AdviserFactory(dbt_team_id=None)
         request_user = create_test_user(
             permission_codenames=['view_associated_investmentproject'],
         )
@@ -1251,11 +1251,11 @@ class TestSearchPermissions(APITestMixin):
 
         team = TeamFactory()
         team_other = TeamFactory()
-        adviser_other = AdviserFactory(dit_team_id=team_other.id)
-        adviser_same_team = AdviserFactory(dit_team_id=team.id)
+        adviser_other = AdviserFactory(dbt_team_id=team_other.id)
+        adviser_same_team = AdviserFactory(dbt_team_id=team.id)
         request_user = create_test_user(
             permission_codenames=['view_associated_investmentproject'],
-            dit_team=team,
+            dbt_team=team,
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -1583,7 +1583,7 @@ class TestInvestmentProjectExportView(APITestMixin):
     )
     def test_user_without_permission_cannot_export(self, opensearch, permissions):
         """Test that a user without the correct permissions cannot export data."""
-        user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
+        user = create_test_user(dbt_team=TeamFactory(), permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
 
         url = reverse('api-v3:search:investment_project-export')
@@ -1594,14 +1594,14 @@ class TestInvestmentProjectExportView(APITestMixin):
         """Test that restricted users cannot see other teams' projects in the export."""
         team = TeamFactory()
         team_other = TeamFactory()
-        adviser_other = AdviserFactory(dit_team_id=team_other.id)
-        adviser_same_team = AdviserFactory(dit_team_id=team.id)
+        adviser_other = AdviserFactory(dbt_team_id=team_other.id)
+        adviser_same_team = AdviserFactory(dbt_team_id=team.id)
         request_user = create_test_user(
             permission_codenames=(
                 InvestmentProjectPermission.view_associated,
                 InvestmentProjectPermission.export,
             ),
-            dit_team=team,
+            dbt_team=team,
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -1882,12 +1882,12 @@ class TestBasicSearchPermissions(APITestMixin):
         """Test that normal users can see all projects."""
         team = TeamFactory()
         team_others = TeamFactory()
-        adviser_1 = AdviserFactory(dit_team_id=team.id)
-        adviser_2 = AdviserFactory(dit_team_id=team_others.id)
+        adviser_1 = AdviserFactory(dbt_team_id=team.id)
+        adviser_2 = AdviserFactory(dbt_team_id=team_others.id)
 
         request_user = create_test_user(
             permission_codenames=permissions,
-            dit_team=team,
+            dbt_team=team,
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -1924,11 +1924,11 @@ class TestBasicSearchPermissions(APITestMixin):
         """
         team = TeamFactory()
         team_other = TeamFactory()
-        adviser_other = AdviserFactory(dit_team_id=team_other.id)
-        adviser_same_team = AdviserFactory(dit_team_id=team.id)
+        adviser_other = AdviserFactory(dbt_team_id=team_other.id)
+        adviser_same_team = AdviserFactory(dbt_team_id=team.id)
         request_user = create_test_user(
             permission_codenames=['view_associated_investmentproject'],
-            dit_team=team,
+            dbt_team=team,
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -1976,7 +1976,7 @@ class TestBasicSearchPermissions(APITestMixin):
         Checks that a restricted user that doesn't have a team cannot view projects associated
         with other advisers that don't have teams.
         """
-        adviser_other = AdviserFactory(dit_team_id=None)
+        adviser_other = AdviserFactory(dbt_team_id=None)
         request_user = create_test_user(
             permission_codenames=['view_associated_investmentproject'],
         )
