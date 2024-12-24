@@ -6,15 +6,10 @@ import reversion
 from django.conf import settings
 from django.utils.timezone import now
 from freezegun import freeze_time
-from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
 from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
 
-from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
-from datahub.company.constants import (
-    CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
-)
 from datahub.company.models import Contact
 from datahub.company.test.factories import ArchivedContactFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
@@ -40,37 +35,16 @@ def generate_hawk_response(response):
     )
 
 
-@pytest.fixture
-def get_consent_fixture(requests_mock):
-    """Mock get call to consent service."""
-    yield lambda response: requests_mock.get(
-        f'{settings.CONSENT_SERVICE_BASE_URL}' f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
-        status_code=200,
-        text=generate_hawk_response(response),
-    )
-
-
 class AddContactBase(APITestMixin):
     """Add contact test case."""
 
     endpoint_namespace = None
 
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_with_manual_address(self, get_consent_fixture):
+    def test_with_manual_address(self):
         """Test add with manual address."""
         company = CompanyFactory()
-        get_consent_fixture(
-            {
-                'results': [
-                    {
-                        'consents': [
-                            'email_marketing',
-                        ],
-                        'email': 'foo@bar.com',
-                    },
-                ],
-            },
-        )
+
         url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = self.api_client.post(
             url,
@@ -97,7 +71,6 @@ class AddContactBase(APITestMixin):
                 },
                 'address_postcode': 'SW1A1AA',
                 'notes': 'lorem ipsum',
-                'accepts_dit_email_marketing': True,
             },
         )
 
@@ -137,7 +110,6 @@ class AddContactBase(APITestMixin):
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
-            'accepts_dit_email_marketing': True,
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': '',
@@ -205,7 +177,6 @@ class AddContactBase(APITestMixin):
         assert not response_data['address_country']
         assert not response_data['address_postcode']
         assert not response_data['notes']
-        assert not response_data['accepts_dit_email_marketing']
 
     def test_fails_with_invalid_email_address(self):
         """Test that fails if the email address is invalid."""
@@ -362,21 +333,10 @@ class TestAddContactV4(AddContactBase):
     endpoint_namespace = 'api-v4'
 
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_with_us_manual_address(self, get_consent_fixture):
+    def test_with_us_manual_address(self):
         """Test add with manual address."""
         company = CompanyFactory()
-        get_consent_fixture(
-            {
-                'results': [
-                    {
-                        'consents': [
-                            'email_marketing',
-                        ],
-                        'email': 'foo@bar.com',
-                    },
-                ],
-            },
-        )
+
         url = reverse('api-v4:contact:list')
         response = self.api_client.post(
             url,
@@ -408,7 +368,6 @@ class TestAddContactV4(AddContactBase):
                 },
                 'address_postcode': 'SW1A1AA',
                 'notes': 'lorem ipsum',
-                'accepts_dit_email_marketing': True,
                 'valid_email': True,
             },
         )
@@ -452,7 +411,6 @@ class TestAddContactV4(AddContactBase):
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
-            'accepts_dit_email_marketing': True,
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': '',
@@ -573,7 +531,6 @@ class EditContactBase(APITestMixin):
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
-            'accepts_dit_email_marketing': False,
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': contact.archived_documents_url_path,
@@ -771,7 +728,6 @@ class TestEditContactV4(EditContactBase):
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
-            'accepts_dit_email_marketing': False,
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': contact.archived_documents_url_path,
@@ -961,7 +917,6 @@ class ViewContactBase(APITestMixin):
             },
             'address_postcode': 'YO22 4JU',
             'notes': 'lorem ipsum',
-            'accepts_dit_email_marketing': False,
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': contact.archived_documents_url_path,
@@ -988,105 +943,6 @@ class ViewContactBase(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert 'archived_documents_url_path' not in response.json()
-
-    @pytest.mark.parametrize('accepts_marketing', (True, False))
-    def test_accepts_dit_email_marketing_consent_service(
-        self,
-        accepts_marketing,
-        requests_mock,
-    ):
-        """
-        Tests accepts_dit_email_marketing field is populated from the consent service.
-        """
-        contact = ContactFactory()
-        hawk_response = HawkMockJSONResponse(
-            api_id=settings.CONSENT_SERVICE_HAWK_ID,
-            api_key=settings.CONSENT_SERVICE_HAWK_KEY,
-            response={
-                'results': [
-                    {
-                        'email': contact.email,
-                        'consents': (
-                            [
-                                CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
-                            ]
-                            if accepts_marketing
-                            else []
-                        ),
-                    },
-                ],
-            },
-        )
-        requests_mock.get(
-            f'{settings.CONSENT_SERVICE_BASE_URL}' f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
-            status_code=200,
-            text=hawk_response,
-        )
-        api_client = self.create_api_client()
-
-        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.id})
-        response = api_client.get(url)
-
-        assert requests_mock.call_count == 1
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['accepts_dit_email_marketing'] == accepts_marketing
-
-    @pytest.mark.parametrize(
-        'response_status',
-        (
-            status.HTTP_400_BAD_REQUEST,
-            status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_403_FORBIDDEN,
-            status.HTTP_404_NOT_FOUND,
-            status.HTTP_405_METHOD_NOT_ALLOWED,
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-        ),
-    )
-    def test_accepts_dit_email_marketing_consent_service_http_error(
-        self,
-        response_status,
-        requests_mock,
-    ):
-        """Tests accepts_dit_email_marketing field return false if there is an error."""
-        contact = ContactFactory()
-        requests_mock.get(
-            f'{settings.CONSENT_SERVICE_BASE_URL}' f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
-            status_code=response_status,
-        )
-        api_client = self.create_api_client()
-
-        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.id})
-        response = api_client.get(url)
-
-        assert requests_mock.call_count == 1
-        assert response.json()['accepts_dit_email_marketing'] is False
-
-    @pytest.mark.parametrize(
-        'exceptions',
-        (
-            ConnectionError,
-            ConnectTimeout,
-            ReadTimeout,
-        ),
-    )
-    def test_accepts_dit_email_marketing_consent_service_error(
-        self,
-        exceptions,
-        requests_mock,
-    ):
-        """Tests accepts_dit_email_marketing field return false if there is an error."""
-        contact = ContactFactory()
-        requests_mock.get(
-            f'{settings.CONSENT_SERVICE_BASE_URL}' f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
-            exc=exceptions,
-        )
-        api_client = self.create_api_client()
-
-        url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.id})
-        response = api_client.get(url)
-
-        assert requests_mock.call_count == 1
-        assert response.json()['accepts_dit_email_marketing'] is False
 
 
 class TestViewContactV3(ViewContactBase):
