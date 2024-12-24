@@ -78,11 +78,11 @@ def setup_data(opensearch_with_collector):
         )
         OrderSubscriberFactory(
             order=order,
-            adviser=AdviserFactory(dbt_team_id=constants.Team.healthcare_uk.value.id),
+            adviser=AdviserFactory(dit_team_id=constants.Team.healthcare_uk.value.id),
         )
         OrderAssigneeFactory(
             order=order,
-            adviser=AdviserFactory(dbt_team_id=constants.Team.tees_valley_lep.value.id),
+            adviser=AdviserFactory(dit_team_id=constants.Team.tees_valley_lep.value.id),
             estimated_time=60,
         )
 
@@ -107,11 +107,11 @@ def setup_data(opensearch_with_collector):
         )
         OrderSubscriberFactory(
             order=order,
-            adviser=AdviserFactory(dbt_team_id=constants.Team.td_events_healthcare.value.id),
+            adviser=AdviserFactory(dit_team_id=constants.Team.td_events_healthcare.value.id),
         )
         OrderAssigneeFactory(
             order=order,
-            adviser=AdviserFactory(dbt_team_id=constants.Team.food_from_britain.value.id),
+            adviser=AdviserFactory(dit_team_id=constants.Team.food_from_britain.value.id),
             estimated_time=120,
         )
 
@@ -149,7 +149,7 @@ class TestSearchOrder(APITestMixin):
 
     def test_no_permissions(self):
         """Should return 403"""
-        user = create_test_user(dbt_team=TeamFactory())
+        user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:search:order')
         response = api_client.get(url)
@@ -513,7 +513,7 @@ class TestSearchOrder(APITestMixin):
         response = self.api_client.post(
             url,
             data={
-                'assigned_to_team': assignee.adviser.dbt_team.pk,
+                'assigned_to_team': assignee.adviser.dit_team.pk,
             },
         )
 
@@ -534,7 +534,7 @@ class TestOrderExportView(APITestMixin):
     )
     def test_user_without_permission_cannot_export(self, opensearch, permissions):
         """Test that a user without the correct permissions cannot export data."""
-        user = create_test_user(dbt_team=TeamFactory(), permission_codenames=permissions)
+        user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
 
         url = reverse('api-v3:search:order-export')
@@ -642,7 +642,7 @@ class TestOrderExportView(APITestMixin):
                     f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}'
                     f'/{order.contact.pk}',
                 'Lead adviser': get_attr_or_none(order.get_lead_assignee(), 'adviser.name'),
-                'Created by team': get_attr_or_none(order, 'created_by.dbt_team.name'),
+                'Created by team': get_attr_or_none(order, 'created_by.dit_team.name'),
                 'Date created': order.created_on,
                 'Delivery date': order.delivery_date,
                 'Date quote sent': get_attr_or_none(order, 'quote.created_on'),
