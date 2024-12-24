@@ -37,11 +37,11 @@ bigtree==0.22.3
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.35.81
+boto3==1.35.86
     # via
     #   -r requirements.in
     #   moto
-botocore==1.35.81
+botocore==1.35.86
     # via
     #   boto3
     #   moto
@@ -227,7 +227,7 @@ iniconfig==1.1.1
     # via pytest
 ipaddress==1.0.23
     # via mail-parser
-ipython==8.30.0
+ipython==8.31.0
     # via -r requirements-dev.in
 isort==5.11.4
     # via pylint
@@ -255,7 +255,7 @@ mccabe==0.7.0
     #   pylint
 mohawk==1.1.0
     # via -r requirements.in
-moto==5.0.23
+moto==5.0.24
     # via -r requirements-dev.in
 multidict==6.0.4
     # via
@@ -263,7 +263,7 @@ multidict==6.0.4
     #   yarl
 nodeenv==1.7.0
     # via pre-commit
-notifications-python-client==10.0.0
+notifications-python-client==10.0.1
     # via -r requirements.in
 numpy==1.24.3
     # via pandas
@@ -486,7 +486,7 @@ six==1.16.0
     #   python-dateutil
 slackclient==2.9.4
     # via -r requirements.in
-smart-open==7.0.5
+smart-open==7.1.0
     # via -r requirements.in
 snowballstemmer==2.2.0
     # via pydocstyle
