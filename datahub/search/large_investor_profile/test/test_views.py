@@ -617,7 +617,7 @@ class TestLargeInvestorProfileExportView(APITestMixin):
         self, opensearch, permissions, expected_status_code,
     ):
         """Test that a user without the correct permissions cannot export data."""
-        user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
+        user = create_test_user(dbt_team=TeamFactory(), permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
 
         url = reverse('api-v4:search:large-investor-profile-export')
