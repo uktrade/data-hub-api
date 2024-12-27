@@ -17,6 +17,7 @@ class StovaAttendee(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    stova_attendee_id = models.IntegerField(unique=True)
     stova_event_id = models.IntegerField(unique=True)
 
     created_by = models.IntegerField(null=True, blank=True)
