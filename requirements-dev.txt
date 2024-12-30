@@ -16,7 +16,7 @@ asgiref==3.6.0
     # via
     #   django
     #   django-axes
-astroid==3.3.5
+astroid==3.3.8
     # via pylint
 asttokens==2.2.1
     # via stack-data
@@ -383,7 +383,7 @@ pygments==2.15.0
     # via ipython
 pyjwt==2.6.0
     # via notifications-python-client
-pylint==3.3.2
+pylint==3.3.3
     # via
     #   -r requirements-dev.in
     #   pylint-django
