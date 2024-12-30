@@ -44,7 +44,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         """Saves an attendee from Stova from the S3 bucket into a `Stovaattendee`"""
         if not self.existing_ids:
             self.existing_ids = set(
-                StovaAttendee.objects.values_list('stova_attendee_id', flat=True)
+                StovaAttendee.objects.values_list('stova_attendee_id', flat=True),
             )
 
         stova_attendee_id = record.get('id')
