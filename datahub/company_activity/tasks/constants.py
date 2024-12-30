@@ -5,4 +5,5 @@ REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
 BUCKET = f"data-flow-bucket-{env('ENVIRONMENT', default='')}"
 PREFIX = 'data-flow/exports/'
 GREAT_PREFIX = f'{PREFIX}ExportGreatContactFormData/'
+STOVA_ATTENDEE_PREFIX = f'{PREFIX}ExportAventriAttendees/'
 STOVA_EVENT_PREFIX = f'{PREFIX}ExportAventriEvents/'
