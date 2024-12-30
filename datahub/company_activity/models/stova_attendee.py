@@ -20,9 +20,9 @@ class StovaAttendee(models.Model):
     stova_attendee_id = models.IntegerField(unique=True)
     stova_event_id = models.IntegerField(unique=True)
 
-    created_by = models.IntegerField(null=True, blank=True)
+    created_by = models.CharField(max_length=MAX_LENGTH)
     created_date = models.DateTimeField()
-    modified_by = models.IntegerField(null=True, blank=True)
+    modified_by = models.CharField(max_length=MAX_LENGTH)
     modified_date = models.DateTimeField()
 
     email = models.CharField(max_length=MAX_LENGTH)
