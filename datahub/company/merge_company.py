@@ -25,7 +25,7 @@ from datahub.company.models import (
     Objective,
     OneListCoreTeamMember,
 )
-from datahub.company_activity.models import CompanyActivity, GreatExportEnquiry
+from datahub.company_activity.models import CompanyActivity, GreatExportEnquiry, StovaAttendee
 from datahub.company_referral.models import CompanyReferral
 from datahub.dnb_api.utils import _get_rollback_version
 from datahub.export_win.models import LegacyExportWinsToDataHubCompany
@@ -72,6 +72,7 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     Objective.company.field,
     OneListCoreTeamMember.company.field,
     Order.company.field,
+    StovaAttendee.company.field,
     Task.company.field,
 
     # Merging is allowed if the source company has export countries, but note that
@@ -117,6 +118,7 @@ MERGE_CONFIGURATION = [
     MergeConfiguration(Order, ('company',), Company),
     MergeConfiguration(NewExportInteractionReminder, ('company',), Company),
     MergeConfiguration(NoRecentExportInteractionReminder, ('company',), Company),
+    MergeConfiguration(StovaAttendee, ('company',), Company),
     MergeConfiguration(Task, ('company',), Company),
     MergeConfiguration(CompanyListItem, ('company',), Company, company_list_item_updater),
     MergeConfiguration(PipelineItem, ('company',), Company, pipeline_item_updater),
