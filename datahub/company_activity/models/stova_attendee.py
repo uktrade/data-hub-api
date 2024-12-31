@@ -5,11 +5,13 @@ from django.db import models
 
 from datahub.company.models.company import Company
 from datahub.company.models.contact import Contact
+from datahub.core import reversion
 
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
+@reversion.register_base_model()
 class StovaAttendee(models.Model):
     """
     Stova can also be known as Aventri.
@@ -28,17 +30,19 @@ class StovaAttendee(models.Model):
     email = models.CharField(max_length=MAX_LENGTH)
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
-    contact = models.ForeignKey(
-        Contact,
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-        related_name='stova_attendee',
-        help_text='If a contact match can be found from the email, the relation is added.',
-    )
     attendee_questions = models.CharField(max_length=MAX_LENGTH)
 
     company_name = models.CharField(max_length=MAX_LENGTH)
+    category = models.CharField(max_length=MAX_LENGTH)
+    registration_status = models.CharField(max_length=MAX_LENGTH)
+
+    virtual_event_attendance = models.CharField(max_length=MAX_LENGTH)
+    language = models.CharField(max_length=MAX_LENGTH)
+
+    last_lobby_login = models.DateTimeField()
+
+    # Data Hub Fields
+    created_on = models.DateTimeField(auto_now_add=True)
     company = models.ForeignKey(
         Company,
         on_delete=models.PROTECT,
@@ -47,10 +51,11 @@ class StovaAttendee(models.Model):
         related_name='stova_attendee',
         help_text='If a company match can be found from company_name, the relation is added.',
     )
-    category = models.CharField(max_length=MAX_LENGTH)
-    registration_status = models.CharField(max_length=MAX_LENGTH)
-
-    virtual_event_attendance = models.CharField(max_length=MAX_LENGTH)
-    language = models.CharField(max_length=MAX_LENGTH)
-
-    last_lobby_login = models.DateTimeField()
+    contact = models.ForeignKey(
+        Contact,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='stova_attendee',
+        help_text='If a contact match can be found from the email, the relation is added.',
+    )
