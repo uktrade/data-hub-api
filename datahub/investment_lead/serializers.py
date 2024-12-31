@@ -367,7 +367,7 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
         source='company_website', required=False, allow_null=True, allow_blank=True, default='',
     )
     fullName = serializers.CharField(  # noqa: N815
-        source='full_name', allow_null=True, allow_blank=True, default=NOT_SET
+        source='full_name', allow_null=True, allow_blank=True, default=NOT_SET,
     )
     role = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='')
     email = serializers.CharField(required=True)
@@ -395,8 +395,8 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
             )
         return value
 
-    def validate_fullName(self, value):
-        """Default to Not set for empty values too """
+    def validate_fullName(self, value):  # noqa: N802
+        """Default to Not set for empty values too."""
         if not value:
             value = NOT_SET
         return value

@@ -285,16 +285,20 @@ class TestCreateEYBLeadUserSerializer:
         assert EYBLead.objects.count() == 1
         assert_ingested_eyb_user_data(instance, serializer.data)
 
-
     @pytest.mark.parametrize(
-        'value,expected_value', 
+        'value,expected_value',
         (
             (None, 'Not set'),
             ('', 'Not set'),
             ('Abc Def', 'Abc Def'),
-        )
+        ),
     )
-    def test_full_name_defaults_to_not_set_for_empty_or_null(self, eyb_lead_user_data, value, expected_value):
+    def test_full_name_defaults_to_not_set_for_empty_or_null(
+        self,
+        eyb_lead_user_data,
+        value,
+        expected_value,
+    ):
         """Tests null values and empty strings are handled correctly for non-required fields."""
         eyb_lead_user_data.update({
             'fullName': value,
