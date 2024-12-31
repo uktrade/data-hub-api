@@ -283,9 +283,9 @@ class StovaAttendeeFactory(factory.django.DjangoModelFactory):
     stova_attendee_id = factory.Faker('pyint', min_value=0, max_value=999999999)
 
     created_by = 'John'
-    created_date = '2024-05-10T08:06:53+00:00'
+    created_date = now()
     modified_by = 'John'
-    modified_date = '2024-05-10T08:06:53+00:00'
+    modified_date = now()
 
     email = 'john@test.com'
     first_name = 'John'
@@ -297,7 +297,7 @@ class StovaAttendeeFactory(factory.django.DjangoModelFactory):
     registration_status = 'The registration status'
     virtual_event_attendance = 'Virtual Event Attendance'
     language = 'English'
-    last_lobby_login = '2024-05-10T08:06:53+00:00'
+    last_lobby_login = now()
 
     class Meta:
         model = 'company_activity.StovaAttendee'

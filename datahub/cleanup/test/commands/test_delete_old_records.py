@@ -40,6 +40,7 @@ from datahub.company_activity.tests.factories import (
     CompanyActivityInvestmentProjectFactory,
     CompanyActivityOmisOrderFactory,
     GreatExportEnquiryFactory,
+    StovaAttendeeFactory,
 )
 from datahub.company_referral.test.factories import (
     CompanyReferralFactory,
@@ -226,6 +227,12 @@ MAPPING = {
             },
             {
                 'factory': CompanyActivityGreatExportEnquiryFactory,
+                'field': 'company',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [],
+            },
+            {
+                'factory': StovaAttendeeFactory,
                 'field': 'company',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [],
@@ -444,6 +451,16 @@ MAPPING = {
             },
             {
                 'factory': GreatExportEnquiryFactory,
+                'field': 'contact',
+                'expired_objects_kwargs': [],
+                'unexpired_objects_kwargs': [
+                    {
+                        'created_on': CONTACT_DELETE_BEFORE_DATETIME - relativedelta(days=1),
+                    },
+                ],
+            },
+            {
+                'factory': StovaAttendeeFactory,
                 'field': 'contact',
                 'expired_objects_kwargs': [],
                 'unexpired_objects_kwargs': [
