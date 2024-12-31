@@ -208,7 +208,6 @@ class TestCreateEYBLeadUserSerializer:
             'addressLine1',
             'town',
             'companyLocation',
-            'fullName',
             'email',
         ]
         for key in required_fields:
@@ -253,7 +252,6 @@ class TestCreateEYBLeadUserSerializer:
             'addressLine1': value,
             'town': value,
             'companyLocation': value,
-            'fullName': value,
             'email': value,
         }
         serializer = CreateEYBLeadUserSerializer(data=test_data)
@@ -269,6 +267,7 @@ class TestCreateEYBLeadUserSerializer:
         """Tests null values and empty strings are handled correctly for non-required fields."""
         eyb_lead_user_data.update({
             'dunsNumber': value,
+            'fullName': value,
             'addressLine2': value,
             'county': value,
             'postcode': value,
@@ -285,6 +284,28 @@ class TestCreateEYBLeadUserSerializer:
         assert isinstance(instance, EYBLead)
         assert EYBLead.objects.count() == 1
         assert_ingested_eyb_user_data(instance, serializer.data)
+
+
+    @pytest.mark.parametrize(
+        'value,expected_value', 
+        (
+            (None, 'Not set'),
+            ('', 'Not set'),
+            ('Abc Def', 'Abc Def'),
+        )
+    )
+    def test_full_name_defaults_to_not_set_for_empty_or_null(self, eyb_lead_user_data, value, expected_value):
+        """Tests null values and empty strings are handled correctly for non-required fields."""
+        eyb_lead_user_data.update({
+            'fullName': value,
+        })
+        serializer = CreateEYBLeadUserSerializer(data=eyb_lead_user_data)
+        assert serializer.is_valid()
+        instance = serializer.save()
+        assert isinstance(instance, EYBLead)
+        assert EYBLead.objects.count() == 1
+        assert_ingested_eyb_user_data(instance, serializer.data)
+        assert instance.full_name == expected_value
 
 
 class TestCreateEYBLeadMarketingSerializer:
