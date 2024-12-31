@@ -272,3 +272,32 @@ class StovaEventFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company_activity.StovaEvent'
+
+
+class StovaAttendeeFactory(factory.django.DjangoModelFactory):
+    """
+    Ingested Stova Attendee data factory.
+    """
+
+    stova_event_id = factory.Faker('pyint', min_value=0, max_value=999999999)
+    stova_attendee_id = factory.Faker('pyint', min_value=0, max_value=999999999)
+
+    created_by = 'John'
+    created_date = now()
+    modified_by = 'John'
+    modified_date = now()
+
+    email = 'john@test.com'
+    first_name = 'John'
+    last_name = 'Smith'
+    attendee_questions = 'This is a question'
+
+    company_name = 'A company name'
+    category = 'A category'
+    registration_status = 'The registration status'
+    virtual_event_attendance = 'Virtual Event Attendance'
+    language = 'English'
+    last_lobby_login = now()
+
+    class Meta:
+        model = 'company_activity.StovaAttendee'
