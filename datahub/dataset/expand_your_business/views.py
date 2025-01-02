@@ -1,13 +1,13 @@
 from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import Q
 
 from datahub.dataset.core.views import BaseFilterDatasetView
 from datahub.dataset.expand_your_business.pagination import EYBDatasetViewCursorPagination
-from datahub.dataset.utils import filter_data_by_modified_date
 from datahub.investment_lead.models import EYBLead
 
 
-class EYBDatasetView(BaseFilterDatasetView):
-    """A GET API view to return the data for recently modified tasks."""
+class EYBLeadsDatasetView(BaseFilterDatasetView):
+    """A GET API view to return the data for EYB leads."""
 
     pagination_class = EYBDatasetViewCursorPagination
 
@@ -16,12 +16,15 @@ class EYBDatasetView(BaseFilterDatasetView):
         return EYBLead.objects.select_related(
             'sector',
             'proposed_investment_region',
-            # 'investment_projects',
         ).annotate(
-            investment_project_ids=ArrayAgg('investment_projects__id', ordering=[
-                'investment_projects__name',
+            investment_project_ids=ArrayAgg(
                 'investment_projects__id',
-            ]),
+                ordering=[
+                    'investment_projects__name',
+                    'investment_projects__id',
+                ],
+                filter=Q(investment_projects__isnull=False),
+            ),
         ).values(
             'modified_on',
             # Triage component

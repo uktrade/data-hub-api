@@ -16,7 +16,7 @@ from datahub.dataset.company_objective.views import (
 from datahub.dataset.company_referral.views import CompanyReferralDatasetView
 from datahub.dataset.contact.views import ContactsDatasetView
 from datahub.dataset.event.views import EventsDatasetView
-from datahub.dataset.expand_your_business.views import EYBDatasetView
+from datahub.dataset.expand_your_business.views import EYBLeadsDatasetView
 from datahub.dataset.export_wins.views import (
     ExportWinsAdvisersDatasetView,
     ExportWinsBreakdownsDatasetView,
@@ -116,7 +116,7 @@ urlpatterns = [
     ),
     path(
         'expand-your-business-dataset',
-        EYBDatasetView.as_view(),
+        EYBLeadsDatasetView.as_view(),
         name='expand-your-business-dataset',
     ),
 ]
