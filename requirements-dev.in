@@ -13,7 +13,7 @@ requests-mock==1.12.1
 pip-tools==7.4.1
 piprot==0.9.11
 pre-commit==3.8.0
-moto==5.0.24
+moto==5.0.25
 
 # Code static analysis
 flake8==7.1.1
@@ -27,6 +27,6 @@ flake8-quotes==3.4.0
 flake8-string-format==0.3.0
 pep8-naming==0.14.1
 pydocstyle==6.3.0
-pylint==3.3.2
+pylint==3.3.3
 pylint-django==2.6.1
 pylint-pytest==1.1.7

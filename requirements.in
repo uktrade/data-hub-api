@@ -28,7 +28,7 @@ dj-database-url==2.3.0
 psycopg2-binary==2.9.10
 psycogreen==1.0.2
 
-boto3==1.35.86
+boto3==1.35.90
 
 notifications-python-client==10.0.1
 
@@ -61,7 +61,7 @@ requests_toolbelt==1.0.0
 sentry_sdk==2.19.2
 
 # RQ and associated helpers
-rq==2.0.0
+rq==2.1.0
 rq-scheduler==0.14.0
 
 # For logging tables

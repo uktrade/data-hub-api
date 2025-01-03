@@ -16,7 +16,7 @@ asgiref==3.6.0
     # via
     #   django
     #   django-axes
-astroid==3.3.5
+astroid==3.3.8
     # via pylint
 asttokens==2.2.1
     # via stack-data
@@ -33,15 +33,15 @@ backoff==2.2.1
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
-bigtree==0.22.3
+bigtree==0.23.0
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.35.86
+boto3==1.35.90
     # via
     #   -r requirements.in
     #   moto
-botocore==1.35.86
+botocore==1.35.90
     # via
     #   boto3
     #   moto
@@ -255,7 +255,7 @@ mccabe==0.7.0
     #   pylint
 mohawk==1.1.0
     # via -r requirements.in
-moto==5.0.24
+moto==5.0.25
     # via -r requirements-dev.in
 multidict==6.0.4
     # via
@@ -383,7 +383,7 @@ pygments==2.15.0
     # via ipython
 pyjwt==2.6.0
     # via notifications-python-client
-pylint==3.3.2
+pylint==3.3.3
     # via
     #   -r requirements-dev.in
     #   pylint-django
@@ -463,7 +463,7 @@ requests-toolbelt==1.0.0
     # via -r requirements.in
 responses==0.25.3
     # via moto
-rq==2.0.0
+rq==2.1.0
     # via
     #   -r requirements.in
     #   rq-scheduler
