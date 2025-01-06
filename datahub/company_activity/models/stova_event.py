@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.db import models, transaction
 
+from datahub.company_activity.models import StovaAttendee
 from datahub.event.models import Event, EventType
 from datahub.metadata.utils import get_country_by_country_name
 
@@ -57,6 +58,16 @@ class StovaEvent(models.Model):
     folder_id = models.IntegerField(null=True, blank=True)
     default_language = models.CharField(max_length=MAX_LENGTH)
     standard_currency = models.CharField(max_length=MAX_LENGTH)
+
+    attendee = models.ForeignKey(
+        StovaAttendee,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='stova_event',
+        help_text='If a stova attendee can match a stova event',
+    )
+    # attendee_id = models.IntegerField(unique=True)
 
     def save(self, *args, **kwargs) -> None:
         """Overwritten to create/update a DataHub event from data in a Stova Event."""

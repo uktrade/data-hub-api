@@ -3,7 +3,10 @@ import logging
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 
+from datahub.company.models import Company
+from datahub.company.models import Contact
 from datahub.company_activity.models import StovaAttendee
+from datahub.company_activity.models import StovaEvent
 from datahub.company_activity.tasks.constants import STOVA_ATTENDEE_PREFIX
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.tasks import BaseObjectIdentificationTask, BaseObjectIngestionTask
@@ -71,8 +74,17 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
             'modified_by': record.get('modified_by', ''),
         }
 
+        assignAtteendeeToEvent(values.stova_event_id, stova_attendee_id, **values)
+
+
+def assignAtteendeeToEvent(stova_event_id, stova_attendee_id, **values):
+    try:
+        event = StovaEvent.objects.filter(stova_event_id=stova_event_id)
         try:
-            StovaAttendee.objects.create(**values)
+            attendee = StovaAttendee.objects.create(**values)
+            assignAttendeeCompany(attendee)
+            assignAttendeeContact(attendee)
+
         except IntegrityError as error:
             logger.error(
                 f'Error processing Stova attendee record, stova_attendee_id: {stova_attendee_id}. '
@@ -84,3 +96,37 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
                 f'stova_attendee_id: {stova_attendee_id}. '
                 f'Error: {error}',
             )
+        event.attendee = attendee
+
+    except Exception():
+        logger.info(f'No event found for {stova_event_id}, skipping attendee')
+
+
+def assignAttendeeCompany(attendee):
+    if Company.objects.filter(name=attendee.company_name).exists():
+        attendee.company = Company.objects.filter(name=attendee.company_name)
+        attendee.save()
+    else:
+        new_company = Company(name=attendee.company_name)
+        new_company.save()
+        attendee.company = new_company
+        attendee.save()
+    # except Exception():
+    #     logger.info(f'No company name matched for {company_name}')
+
+
+def assignAttendeeContact(attendee):
+    if Contact.objects.filter(email=attendee.email).exists():
+        attendee.contact = Contact.objects.filter(email=attendee.email)
+        attendee.save()
+    else:
+        # create a contact based on email if company already exist for attendee
+        new_contact = Contact(
+            email=attendee.email,
+            first_name=attendee.first_name,
+            last_name=attendee.last_name,
+            company=attendee.company,
+        )
+        new_contact.save()
+        attendee.contact = new_contact
+        attendee.save()
