@@ -2648,3 +2648,34 @@ class TestListInteractions(APITestMixin):
                 'id': str(opportunity.pk),
                 'name': opportunity.name,
             }
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
+    def test_filtered_by_company_export(self, permissions):
+        """List of interactions filtered by company export"""
+        requester = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=requester)
+
+        contact = ContactFactory()
+        export = ExportFactory()
+        company = CompanyFactory()
+
+        CompanyInteractionFactory.create_batch(3, contacts=[contact])
+        CompanyInteractionFactory.create_batch(3, company=company)
+        export_interactions = CompanyExportInteractionFactory.create_batch(
+            2, company_export=export,
+        )
+
+        url = reverse('api-v4:interaction:collection')
+        response = api_client.get(
+            url,
+            {
+                'company_export_id': export.id,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 2
+        actual_ids = {i['id'] for i in response_data['results']}
+        expected_ids = {str(i.id) for i in export_interactions}
+        assert actual_ids == expected_ids
