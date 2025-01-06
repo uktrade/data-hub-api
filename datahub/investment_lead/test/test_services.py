@@ -289,3 +289,18 @@ class TestEYBLeadServices:
         assert eyb_lead.company.contacts.count() == 1
         contact = eyb_lead.company.contacts.first()
         assert_eyb_lead_matches_contact(contact, eyb_lead)
+
+    def test_leads_with_empty_triage_or_user_components_are_not_linked(self):
+        empty_string = ''
+        eyb_lead = EYBLeadFactory(
+            company=None,
+            triage_hashed_uuid=empty_string,
+            user_hashed_uuid=empty_string,
+            marketing_hashed_uuid=generate_hashed_uuid(),
+        )
+        assert eyb_lead.company is None
+
+        link_leads_to_companies()
+        eyb_lead.refresh_from_db()
+
+        assert eyb_lead.company is None
