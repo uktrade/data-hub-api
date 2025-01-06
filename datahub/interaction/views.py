@@ -65,6 +65,7 @@ class InteractionViewSetV4(ArchivableViewSetMixin, CoreViewSet):
         'event_id',
         'investment_project_id',
         'large_capital_opportunity_id',
+        'company_export_id',
     ]
     ordering_fields = (
         'company__name',
