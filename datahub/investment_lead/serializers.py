@@ -14,6 +14,7 @@ from datahub.metadata.models import (
     UKRegion,
 )
 
+NOT_SET = 'Not set'
 
 ARCHIVABLE_FIELDS = [
     'archived',
@@ -365,7 +366,9 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
     companyWebsite = serializers.CharField(  # noqa: N815
         source='company_website', required=False, allow_null=True, allow_blank=True, default='',
     )
-    fullName = serializers.CharField(source='full_name', required=True)  # noqa: N815
+    fullName = serializers.CharField(  # noqa: N815
+        source='full_name', allow_null=True, allow_blank=True, default=NOT_SET,
+    )
     role = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='')
     email = serializers.CharField(required=True)
     telephoneNumber = serializers.CharField(  # noqa: N815
@@ -390,6 +393,12 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
             raise serializers.ValidationError(
                 f'Company location/country ISO2 code "{value.upper()}" does not exist.',
             )
+        return value
+
+    def validate_fullName(self, value):  # noqa: N802
+        """Default to Not set for empty values too."""
+        if not value:
+            value = NOT_SET
         return value
 
     def get_related_fields_internal_value(self, data):
