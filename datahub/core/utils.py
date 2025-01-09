@@ -154,6 +154,8 @@ def format_currency_range_string(
                 if smart_more_or_less and values[1][-1] == '9':
                     values[1] = int(values[1]) + 1
                 return f'Less than {format_currency(values[1], symbol=symbol)}'
+        else:
+            values = string.split(separator)
         return f'{prefix}{format_currency_range(values, symbol=symbol)}'
     except ValueError:
         return upper_snake_case_to_sentence_case(string, glue='\n')

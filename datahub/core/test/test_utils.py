@@ -164,6 +164,68 @@ def test_format_currency_range_string(string, expected):
     assert format_currency_range_string(string, symbol='A$') == expected.replace('£', 'A$')
 
 
+@pytest.mark.parametrize(
+    'string,expected',
+    (
+        ('0...9999', 'Less than £10,000'),
+        ('0...10000', 'Less than £10,000'),
+        ('0...1000000', 'Less than £1 million'),
+        ('10000...500000', '£10,000 to £500,000'),
+        ('500001...1000000', '£500,001 to £1 million'),
+        ('1000001...2000000', '£1 million to £2 million'),
+        ('2000001...5000000', '£2 million to £5 million'),
+        ('5000001...10000000', '£5 million to £10 million'),
+        ('10000001+', 'More than £10 million'),
+        ('SPECIFIC_AMOUNT', 'Specific amount'),
+    ),
+)
+def test_format_currency_range_string_separator(string, expected):
+    """
+    Test range with separator symbol.
+    """
+    assert format_currency_range_string(string, separator='...') == expected
+
+
+@pytest.mark.parametrize(
+    'string,more_or_less,smart_more_or_less,expected',
+    (
+        ('0-9999', True, True, 'Less than £10,000'),
+        ('0-10000', True, True, 'Less than £10,000'),
+        ('0-1000000', True, True, 'Less than £1 million'),
+        ('10000001+', True, True, 'More than £10 million'),
+        ('SPECIFIC_AMOUNT', True, True, 'Specific amount'),
+        ('0-9999', True, False, 'Less than £9,999'),
+        ('0-10000', True, False, 'Less than £10,000'),
+        ('0-1000000', True, False, 'Less than £1 million'),
+        ('10000001+', True, False, 'More than £10 million'),
+        ('SPECIFIC_AMOUNT', True, False, 'Specific amount'),
+        # smart_more_or_less is not used when more_or_less is False.
+        ('0-9999', False, False, '£0 to £9,999'),
+        ('0-10000', False, False, '£0 to £10,000'),
+        ('0-1000000', False, False, '£0 to £1 million'),
+        ('10000001+', False, False, '£10 million'),
+        ('SPECIFIC_AMOUNT', False, False, 'Specific amount'),
+    ),
+)
+def test_format_currency_range_string_more_or_less_parameters(
+        string,
+        more_or_less,
+        smart_more_or_less,
+        expected,
+):
+    """
+    Test range with and without currency symbol.
+    """
+    assert format_currency_range_string(
+        string, more_or_less=more_or_less, smart_more_or_less=smart_more_or_less) == expected
+    assert format_currency_range_string(
+        string, more_or_less=more_or_less, smart_more_or_less=smart_more_or_less, symbol='') == \
+        expected.replace('£', '')
+    assert format_currency_range_string(
+        string, more_or_less=more_or_less, smart_more_or_less=smart_more_or_less, symbol='A$') == \
+        expected.replace('£', 'A$')
+
+
 def test_slice_iterable_into_chunks():
     """Test slice iterable into chunks."""
     size = 2
