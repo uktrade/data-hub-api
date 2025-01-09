@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 from datahub.company.models.company import Company
 from datahub.company.models.contact import Contact
+from datahub.core.utils import format_currency_range_string
 from datahub.investment_lead.models import EYBLead
 from datahub.metadata.models import Sector
 
@@ -124,8 +125,8 @@ def assert_retrieved_eyb_lead_data(instance: EYBLead, data: dict):
     assert str(instance.proposed_investment_region.id) == data['proposed_investment_region']['id']
     assert instance.proposed_investment_city == data['proposed_investment_city']
     assert instance.proposed_investment_location_none == data['proposed_investment_location_none']
-    assert instance.hiring == data['hiring']
-    assert instance.spend == data['spend']
+    assert format_currency_range_string(instance.hiring, symbol='') == data['hiring']
+    assert format_currency_range_string(instance.spend) == data['spend']
     assert instance.spend_other == data['spend_other']
     assert instance.is_high_value == data['is_high_value']
 
