@@ -123,12 +123,13 @@ def test_format_currency(value, expected):
     assert format_currency(str(value), symbol='A$') == expected.replace('£', 'A$')
     assert format_currency(value, symbol='A$') == expected.replace('£', 'A$')
 
+
 @pytest.mark.parametrize(
     'values,expected',
     (
         ([0, 1.5], '£0 to £1.50'),
         ([999999, 1000000], '£999,999 to £1 million'),
-        ([1234567, 7000000], '£1.23 million to £7 million'),        
+        ([1234567, 7000000], '£1.23 million to £7 million'),
         ([999990000, 999999999], '£999.99 million to £1 billion'),
         ([1200000000, 0.01], '£1.2 billion to £0.01'),
     ),

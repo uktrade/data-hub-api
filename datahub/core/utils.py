@@ -137,7 +137,7 @@ def format_currency_range_string(
     separator: (string) separator to use.
     more_or_less: (boolean) when true a range starting with 0 will be replace with Less than.
         E.g. '0 - 1000' will return 'Less than 1000'
-        and a number with the sufix+ will be replaced with More than. 
+        and a number with the sufix+ will be replaced with More than.
         E.g. '100+' will return 'More than 100'
     smart_more_or_less: (boolean) when true and more_or_less is set it will add one to any
         upper range ending on a 9.
