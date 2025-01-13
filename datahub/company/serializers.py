@@ -173,6 +173,14 @@ class ContactSerializer(PermittedFieldsModelSerializer):
     primary = serializers.BooleanField()
     valid_email = serializers.BooleanField(required=False, allow_null=True)
     consent_data = serializers.JSONField(required=False, allow_null=True)
+    consent_data_management_url = serializers.SerializerMethodField()
+
+    def get_consent_data_management_url(self, obj):
+        return (
+            f'{settings.CONSENT_DATA_MANAGEMENT_URL}{obj.email}'
+            if settings.CONSENT_DATA_MANAGEMENT_URL
+            else None
+        )
 
     def validate_email(self, value):
         """
@@ -229,10 +237,12 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             'modified_on',
             'address_area',
             'consent_data',
+            'consent_data_management_url',
         )
         read_only_fields = (
             'archived_documents_url_path',
             'consent_data',
+            'consent_data_management_url',
         )
         validators = [
             NotArchivedValidator(),
