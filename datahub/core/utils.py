@@ -132,7 +132,9 @@ def format_currency_range_string(
         symbol='£',
 ):
     """
-    Formats a range of ammounts according to Gov UK style guide
+    Formats a range of ammounts according to Gov UK style guide.
+    Note only numbers in specific formats are formatted, it doesn't detect number values within
+    a string of mixed numbers and text. 
     string: (string) the string containing the range to convert
     separator: (string) separator to use.
     more_or_less: (boolean) when true a range starting with 0 will be replace with Less than.
@@ -145,6 +147,7 @@ def format_currency_range_string(
     """
     try:
         prefix = ''
+        postfix = ''
         if more_or_less:
             if string[-1] == '+':
                 prefix = 'More than '
@@ -155,8 +158,11 @@ def format_currency_range_string(
                     values[1] = int(values[1]) + 1
                 return f'Less than {format_currency(values[1], symbol=symbol)}'
         else:
+            if string[-1] == '+':
+                postfix = '+'
+                string = string.rstrip('+')
             values = string.split(separator)
-        return f'{prefix}{format_currency_range(values, symbol=symbol)}'
+        return f'{prefix}{format_currency_range(values, symbol=symbol)}{postfix}'
     except ValueError:
         return upper_snake_case_to_sentence_case(string, glue='\n')
 
