@@ -149,7 +149,7 @@ def format_currency_range_string(
         prefix = ''
         postfix = ''
         if more_or_less:
-            if string[-1] == '+':
+            if string and string[-1] == '+':
                 prefix = 'More than '
                 string = string.rstrip('+')
             values = string.split(separator)
@@ -158,7 +158,7 @@ def format_currency_range_string(
                     values[1] = int(values[1]) + 1
                 return f'Less than {format_currency(values[1], symbol=symbol)}'
         else:
-            if string[-1] == '+':
+            if string and string[-1] == '+':
                 postfix = '+'
                 string = string.rstrip('+')
             values = string.split(separator)

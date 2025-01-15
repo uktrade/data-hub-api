@@ -189,6 +189,7 @@ def test_format_currency_range_string_separator(string, expected):
 @pytest.mark.parametrize(
     'string,more_or_less,smart_more_or_less,expected',
     (
+        ('', True, True, ''),
         ('0-9999', True, True, 'Less than £10,000'),
         ('0-10000', True, True, 'Less than £10,000'),
         ('0-1000000', True, True, 'Less than £1 million'),
@@ -204,6 +205,7 @@ def test_format_currency_range_string_separator(string, expected):
         ('0-10000', False, False, '£0 to £10,000'),
         ('0-1000000', False, False, '£0 to £1 million'),
         ('10000001+', False, False, '£10 million+'),
+        ('', False, False, ''),
         # Return string as Sentence case for invalid numbers
         ('SPECIFIC_AMOUNT', False, False, 'Specific amount'),
     ),
