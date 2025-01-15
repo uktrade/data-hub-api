@@ -82,6 +82,8 @@ def assignAtteendeeToEvent(stova_event_id, stova_attendee_id, **values):
         event = StovaEvent.objects.filter(stova_event_id=stova_event_id)
         try:
             attendee = StovaAttendee.objects.create(**values)
+            event.attendee = attendee
+            event.save()
             assignAttendeeCompany(attendee)
             assignAttendeeContact(attendee)
 
@@ -96,7 +98,6 @@ def assignAtteendeeToEvent(stova_event_id, stova_attendee_id, **values):
                 f'stova_attendee_id: {stova_attendee_id}. '
                 f'Error: {error}',
             )
-        event.attendee = attendee
 
     except Exception():
         logger.info(f'No event found for {stova_event_id}, skipping attendee')

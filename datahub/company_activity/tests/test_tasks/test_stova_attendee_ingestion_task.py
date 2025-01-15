@@ -22,7 +22,9 @@ from datahub.company_activity.tasks.ingest_stova_attendees import (
 )
 from datahub.company_activity.tests.factories import (
     StovaAttendeeFactory,
+    StovaEventFactory,
 )
+
 from datahub.ingest.models import IngestedObject
 
 
@@ -234,3 +236,21 @@ class TestStovaIngestionTasks:
                 'Got unexpected value for a field when processing Stova attendee record, '
                 f'stova_attendee_id: {stova_attendee_id}'
             ) in caplog.text
+
+    @pytest.mark.django_db
+    def test_stova_attendee_ingestion_assigns_attendee_to_event(self):
+        existing_stova_event = StovaEventFactory(stova_event_id=123456789)
+
+        stova_attendee = StovaAttendeeFactory(stova_event_id=123456789)
+
+        initial_stova_activity_count = StovaAttendee.objects.count()
+        initial_ingested_count = IngestedObject.objects.count()
+        setup_s3_bucket(BUCKET)
+        setup_s3_files(BUCKET, test_file, test_file_path)
+
+        # Check when saving an attendee that is assigned the attendee to the event
+        existing_stova_event.attendee = stova_attendee
+
+        assert existing_stova_event.attendee == initial_stova_activity_count + 35
+        assert IngestedObject.objects.count() == initial_ingested_count + 1
+        assert existing_stova_event.attendee == 123456789

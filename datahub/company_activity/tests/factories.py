@@ -269,6 +269,7 @@ class StovaEventFactory(factory.django.DjangoModelFactory):
     location_address3 = factory.Sequence(lambda x: f'{x} Bing Lane')
     location_postcode = factory.Faker('postcode')
     standard_currency = 'Sterling'
+    attendee = None
 
     class Meta:
         model = 'company_activity.StovaEvent'
