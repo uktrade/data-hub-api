@@ -1,9 +1,10 @@
 from django.contrib import admin
+from reversion.admin import VersionAdmin
 
 from datahub.investment_lead.models import EYBLead
 
 
-class EYBLeadAdmin(admin.ModelAdmin):
+class EYBLeadAdmin(VersionAdmin):
     search_fields = [
         'triage_hashed_uuid',
         'user_hashed_uuid',
