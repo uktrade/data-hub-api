@@ -6,6 +6,7 @@ from datetime import datetime
 import boto3
 import botocore.exceptions
 import environ
+import reversion
 
 from django.conf import settings
 from django.db.models import Q
@@ -147,12 +148,13 @@ class BaseEYBDataIngestionTask:
         serializer = self.serializer_class(data=obj)
         hashed_uuid = self._get_hashed_uuid(obj)
         if serializer.is_valid():
-            queryset = EYBLead.objects.filter(
-                Q(user_hashed_uuid=hashed_uuid)
-                | Q(triage_hashed_uuid=hashed_uuid)
-                | Q(marketing_hashed_uuid=hashed_uuid),
-            )
-            instance, created = queryset.update_or_create(defaults=serializer.validated_data)
+            with reversion.create_revision():
+                queryset = EYBLead.objects.filter(
+                    Q(user_hashed_uuid=hashed_uuid)
+                    | Q(triage_hashed_uuid=hashed_uuid)
+                    | Q(marketing_hashed_uuid=hashed_uuid),
+                )
+                instance, created = queryset.update_or_create(defaults=serializer.validated_data)
             if created:
                 self.created_hashed_uuids.append(hashed_uuid)
             else:

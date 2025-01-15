@@ -1,5 +1,7 @@
 import logging
 
+import reversion
+
 from django.db.models import Q
 
 from datahub.investment_lead.models import EYBLead
@@ -65,12 +67,13 @@ class EYBMarketingDataIngestionTask(BaseEYBDataIngestionTask):
         serializer = self.serializer_class(data=jsn)
         hashed_uuid = self._get_hashed_uuid(jsn)
         if serializer.is_valid():
-            queryset = EYBLead.objects.filter(
-                Q(user_hashed_uuid=hashed_uuid)
-                | Q(triage_hashed_uuid=hashed_uuid)
-                | Q(marketing_hashed_uuid=hashed_uuid),
-            )
-            instance, created = queryset.update_or_create(defaults=serializer.validated_data)
+            with reversion.create_revision():
+                queryset = EYBLead.objects.filter(
+                    Q(user_hashed_uuid=hashed_uuid)
+                    | Q(triage_hashed_uuid=hashed_uuid)
+                    | Q(marketing_hashed_uuid=hashed_uuid),
+                )
+                instance, created = queryset.update_or_create(defaults=serializer.validated_data)
             if created:
                 self.created_hashed_uuids.append(hashed_uuid)
             else:

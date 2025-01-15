@@ -34,6 +34,7 @@ def file_contents_faker(
         elif default_faker == 'user':
             records = [eyb_lead_user_record_faker()]
         elif default_faker == 'marketing':
+            nested = False  # marketing records are not nested
             records = [eyb_lead_marketing_record_faker()]
     json_lines = [
         json.dumps({'object': record}, default=str)

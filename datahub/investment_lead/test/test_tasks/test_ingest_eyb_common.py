@@ -5,11 +5,13 @@ from unittest.mock import MagicMock, patch
 
 import botocore.exceptions
 import pytest
+import reversion
 
 from django.conf import settings
 from freezegun import freeze_time
 from moto import mock_aws
 from redis import Redis
+from reversion.models import Version
 from rq import Queue, Worker
 from rq.job import Job
 
@@ -17,6 +19,7 @@ from datahub.company_activity.models import IngestedFile
 from datahub.company_activity.tests.factories import CompanyActivityIngestedFileFactory
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import DataHubScheduler
+from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import (
     CreateEYBLeadMarketingSerializer,
     CreateEYBLeadTriageSerializer,
@@ -44,6 +47,12 @@ from datahub.investment_lead.tasks.ingest_eyb_user import (
     ingest_eyb_user_data,
     ingest_eyb_user_file,
     USER_PREFIX,
+)
+from datahub.investment_lead.test.factories import (
+    eyb_lead_triage_record_faker,
+    eyb_lead_user_record_faker,
+    EYBLeadFactory,
+    generate_hashed_uuid,
 )
 from datahub.investment_lead.test.test_tasks.utils import (
     file_contents_faker,
@@ -298,3 +307,75 @@ class TestEYBCommonDataIngestionTasks:
         assert 'The specified key does not exist' in exception
         expected = f"key: '{file_path}'"
         assert expected in exception
+
+    @pytest.mark.parametrize(
+        'prefix, faker_type, ingest_data_task_class, serializer_class',
+        [
+            (
+                TRIAGE_PREFIX,
+                'triage',
+                EYBTriageDataIngestionTask,
+                CreateEYBLeadTriageSerializer,
+            ),
+            (
+                USER_PREFIX,
+                'user',
+                EYBUserDataIngestionTask,
+                CreateEYBLeadUserSerializer,
+            ),
+            (
+                MARKETING_PREFIX,
+                'marketing',
+                EYBMarketingDataIngestionTask,
+                CreateEYBLeadMarketingSerializer,
+            ),
+        ],
+    )
+    @mock_aws
+    def test_initial_revision_is_created_for_new_instance(
+        self, prefix, faker_type, ingest_data_task_class, serializer_class,
+    ):
+        file_path = f'{prefix}eybleadfile.jsonl.gz'
+        setup_s3_bucket(BUCKET, [file_path], [file_contents_faker(default_faker=faker_type)])
+        task = ingest_data_task_class(serializer_class, prefix)
+        task.ingest(BUCKET, file_path)
+        instance = EYBLead.objects.first()
+        assert instance is not None
+        assert Version.objects.get_for_object(instance).count() == 1
+
+    @pytest.mark.parametrize(
+        'prefix, faker, ingest_data_task_class, serializer_class',
+        [
+            (
+                TRIAGE_PREFIX,
+                eyb_lead_triage_record_faker,
+                EYBTriageDataIngestionTask,
+                CreateEYBLeadTriageSerializer,
+            ),
+            (
+                USER_PREFIX,
+                eyb_lead_user_record_faker,
+                EYBUserDataIngestionTask,
+                CreateEYBLeadUserSerializer,
+            ),
+            # Marketing ingestion task does not update records, so would not create revision
+        ],
+    )
+    @mock_aws
+    def test_new_revision_is_created_for_updated_instance(
+        self, prefix, faker, ingest_data_task_class, serializer_class,
+    ):
+        hashed_uuid = generate_hashed_uuid()
+        with reversion.create_revision():
+            instance = EYBLeadFactory(
+                triage_hashed_uuid=hashed_uuid,
+                user_hashed_uuid=hashed_uuid,
+            )
+        assert Version.objects.get_for_object(instance).count() == 1
+        file_path = f'{prefix}eybleadfile.jsonl.gz'
+        records = [faker({'hashedUuid': hashed_uuid})]
+        setup_s3_bucket(BUCKET, [file_path], [file_contents_faker(records)])
+        task = ingest_data_task_class(serializer_class, prefix)
+        task.ingest(BUCKET, file_path)
+        instance.refresh_from_db()
+        assert Version.objects.get_for_object(instance).count() == 2
