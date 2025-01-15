@@ -134,7 +134,7 @@ def format_currency_range_string(
     """
     Formats a range of ammounts according to Gov UK style guide.
     Note only numbers in specific formats are formatted, it doesn't detect number values within
-    a string of mixed numbers and text. 
+    a string of mixed numbers and text.
     string: (string) the string containing the range to convert
     separator: (string) separator to use.
     more_or_less: (boolean) when true a range starting with 0 will be replace with Less than.
