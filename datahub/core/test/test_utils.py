@@ -9,12 +9,16 @@ from datahub.core.constants import Constant
 from datahub.core.test.support.models import MetadataModel
 from datahub.core.utils import (
     force_uuid,
+    format_currency,
+    format_currency_range,
+    format_currency_range_string,
     get_financial_year,
     join_truthy_strings,
     load_constants_to_database,
     log_to_sentry,
     reverse_with_query_string,
     slice_iterable_into_chunks,
+    upper_snake_case_to_sentence_case,
 )
 
 
@@ -57,6 +61,170 @@ class TestForceUUID:
 def test_join_truthy_strings(args, sep, res):
     """Tests joining turthy strings."""
     assert join_truthy_strings(*args, sep=sep) == res
+
+
+@pytest.mark.parametrize(
+    'string,glue,expected',
+    (
+        ('UPPER_SNAKE_CASE', '+', 'Upper snake case'),
+        (['UPPER_SNAKE_CASE', 'LINE_2'], '+', 'Upper snake case+Line 2'),
+        (['UPPER_SNAKE_CASE', 'LINE_2'], '\n', 'Upper snake case\nLine 2'),
+        (['UPPER_SNAKE_CASE', 'LINE_2'], '. ', 'Upper snake case. Line 2'),
+    ),
+)
+def test_upper_snake_case_to_sentence_case(string, glue, expected):
+    """Test formatting currency"""
+    assert upper_snake_case_to_sentence_case(string, glue) == expected
+
+
+@pytest.mark.parametrize(
+    'string,expected',
+    (
+        ('UPPER_SNAKE_CASE', 'Upper snake case'),
+        (['UPPER_SNAKE_CASE', 'LINE_2'], 'Upper snake case Line 2'),
+    ),
+)
+def test_default_glue_upper_snake_case_to_sentence_case(string, expected):
+    """Test formatting currency"""
+    assert upper_snake_case_to_sentence_case(string) == expected
+
+
+@pytest.mark.parametrize(
+    'value,expected',
+    (
+        (0, '£0'),
+        (1, '£1'),
+        (1.5, '£1.50'),
+        (999999, '£999,999'),
+        (1000000, '£1 million'),
+        (1234567, '£1.23 million'),
+        (7000000, '£7 million'),
+        (999990000, '£999.99 million'),
+        (999999999, '£1 billion'),
+        (1000000000, '£1 billion'),
+        (1200000000, '£1.2 billion'),
+        (1234567890, '£1.23 billion'),
+        (7000000000, '£7 billion'),
+        (123000000000, '£123 billion'),
+        (1234000000000, '£1,234 billion'),
+        (1234500000000, '£1,234.5 billion'),
+    ),
+)
+def test_format_currency(value, expected):
+    """Test formatting currency"""
+    assert format_currency(str(value)) == expected
+    assert format_currency(value) == expected
+
+    # Test without currency symbols
+    assert format_currency(str(value), symbol='') == expected.replace('£', '')
+    assert format_currency(value, symbol='') == expected.replace('£', '')
+
+    # Test with different currency symbols
+    assert format_currency(str(value), symbol='A$') == expected.replace('£', 'A$')
+    assert format_currency(value, symbol='A$') == expected.replace('£', 'A$')
+
+
+@pytest.mark.parametrize(
+    'values,expected',
+    (
+        ([0, 1.5], '£0 to £1.50'),
+        ([999999, 1000000], '£999,999 to £1 million'),
+        ([1234567, 7000000], '£1.23 million to £7 million'),
+        ([999990000, 999999999], '£999.99 million to £1 billion'),
+        ([1200000000, 0.01], '£1.2 billion to £0.01'),
+    ),
+)
+def test_format_currency_range(values, expected):
+    assert format_currency_range(values) == expected
+    assert format_currency_range(values, symbol='') == expected.replace('£', '')
+    assert format_currency_range(values, symbol='A$') == expected.replace('£', 'A$')
+
+
+@pytest.mark.parametrize(
+    'string,expected',
+    (
+        ('0-9999', 'Less than £10,000'),
+        ('0-10000', 'Less than £10,000'),
+        ('0-1000000', 'Less than £1 million'),
+        ('10000-500000', '£10,000 to £500,000'),
+        ('500001-1000000', '£500,001 to £1 million'),
+        ('1000001-2000000', '£1 million to £2 million'),
+        ('2000001-5000000', '£2 million to £5 million'),
+        ('5000001-10000000', '£5 million to £10 million'),
+        ('10000001+', 'More than £10 million'),
+        ('SPECIFIC_AMOUNT', 'Specific amount'),
+    ),
+)
+def test_format_currency_range_string(string, expected):
+    """
+    Test range with and without currency symbol.
+    """
+    assert format_currency_range_string(string) == expected
+    assert format_currency_range_string(string, symbol='') == expected.replace('£', '')
+    assert format_currency_range_string(string, symbol='A$') == expected.replace('£', 'A$')
+
+
+@pytest.mark.parametrize(
+    'string,expected',
+    (
+        ('0...9999', 'Less than £10,000'),
+        ('0...10000', 'Less than £10,000'),
+        ('0...1000000', 'Less than £1 million'),
+        ('10000...500000', '£10,000 to £500,000'),
+        ('500001...1000000', '£500,001 to £1 million'),
+        ('1000001...2000000', '£1 million to £2 million'),
+        ('2000001...5000000', '£2 million to £5 million'),
+        ('5000001...10000000', '£5 million to £10 million'),
+        ('10000001+', 'More than £10 million'),
+        ('SPECIFIC_AMOUNT', 'Specific amount'),
+    ),
+)
+def test_format_currency_range_string_separator(string, expected):
+    """
+    Test range with separator symbol.
+    """
+    assert format_currency_range_string(string, separator='...') == expected
+
+
+@pytest.mark.parametrize(
+    'string,more_or_less,smart_more_or_less,expected',
+    (
+        ('0-9999', True, True, 'Less than £10,000'),
+        ('0-10000', True, True, 'Less than £10,000'),
+        ('0-1000000', True, True, 'Less than £1 million'),
+        ('10000001+', True, True, 'More than £10 million'),
+        ('SPECIFIC_AMOUNT', True, True, 'Specific amount'),
+        ('0-9999', True, False, 'Less than £9,999'),
+        ('0-10000', True, False, 'Less than £10,000'),
+        ('0-1000000', True, False, 'Less than £1 million'),
+        ('10000001+', True, False, 'More than £10 million'),
+        ('SPECIFIC_AMOUNT', True, False, 'Specific amount'),
+        # smart_more_or_less is not used when more_or_less is False.
+        ('0-9999', False, False, '£0 to £9,999'),
+        ('0-10000', False, False, '£0 to £10,000'),
+        ('0-1000000', False, False, '£0 to £1 million'),
+        ('10000001+', False, False, '£10 million+'),
+        # Return string as Sentence case for invalid numbers
+        ('SPECIFIC_AMOUNT', False, False, 'Specific amount'),
+    ),
+)
+def test_format_currency_range_string_more_or_less_parameters(
+        string,
+        more_or_less,
+        smart_more_or_less,
+        expected,
+):
+    """
+    Test range with and without currency symbol.
+    """
+    assert format_currency_range_string(
+        string, more_or_less=more_or_less, smart_more_or_less=smart_more_or_less) == expected
+    assert format_currency_range_string(
+        string, more_or_less=more_or_less, smart_more_or_less=smart_more_or_less, symbol='') == \
+        expected.replace('£', '')
+    assert format_currency_range_string(
+        string, more_or_less=more_or_less, smart_more_or_less=smart_more_or_less, symbol='A$') == \
+        expected.replace('£', 'A$')
 
 
 def test_slice_iterable_into_chunks():

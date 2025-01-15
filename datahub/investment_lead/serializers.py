@@ -6,6 +6,7 @@ from datahub.core.serializers import (
     AddressSerializer,
     NestedRelatedField,
 )
+from datahub.core.utils import format_currency_range_string
 from datahub.investment.project.models import InvestmentProject
 from datahub.investment_lead.models import EYBLead
 from datahub.metadata.models import (
@@ -506,3 +507,10 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
     )
     company = NestedRelatedField(Company)
     investment_projects = NestedRelatedField(InvestmentProject, many=True)
+
+    def get_related_fields_representation(self, instance):
+        """Provides related fields in a representation-friendly format."""
+        return {
+            'hiring': format_currency_range_string(instance.hiring, symbol=''),
+            'spend': format_currency_range_string(instance.spend),
+        }

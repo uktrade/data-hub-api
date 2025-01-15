@@ -72,6 +72,101 @@ def join_truthy_strings(*args, sep=' '):
     return sep.join(filter(None, args))
 
 
+def upper_snake_case_to_sentence_case(strings, glue=' '):
+    """
+    Formats string or strings from UPPER_SNAKE_CASE to Sentence case
+    """
+    if isinstance(strings, str):
+        strings = [strings]
+    return glue.join(list(map(lambda string: string.replace('_', ' ').capitalize(), strings)))
+
+
+def format_currency(value, symbol='£'):
+    """
+    Formats currency according to Gov UK style guide
+    value: (str, int, float)
+
+    https://www.gov.uk/guidance/style-guide/a-to-z#money and others
+    """
+    if isinstance(value, str):
+        try:
+            value = int(value)
+        except ValueError:
+            value = float(value)
+
+    # add million or billion multiplier
+    multiplier = ''
+    if value >= 1000000:
+        multiplier = ' million'
+        value = value / 1000000
+        # Check rounded value to avoid £1,000 million
+        if round(value, 2) >= 1000:
+            multiplier = ' billion'
+            value = round(value / 1000, 2)
+
+    # Only use decimals when pence are included (£75.50 not £75.00)
+    if (isinstance(value, float) and round(abs(value) % 1, 2) != 0.0):
+        # Don't use two decimals with multiplier if it would result in trailing 0.
+        if (multiplier != '' and round(abs(value * 10) % 1, 1) == 0.0):
+            formatter = ',.1f'
+        else:
+            formatter = ',.2f'
+    else:
+        formatter = ',.0f'
+    return f'{symbol}{value:{formatter}}{multiplier}'
+
+
+def format_currency_range(values, separator=' to ', symbol='£'):
+    """
+    Formats a range of ammounts according to Gov UK style guide
+    values: [(str, float, int), ...]
+    """
+    return separator.join(list(map(lambda value: format_currency(value, symbol=symbol), values)))
+
+
+def format_currency_range_string(
+        string,
+        separator='-',
+        more_or_less=True,
+        smart_more_or_less=True,
+        symbol='£',
+):
+    """
+    Formats a range of ammounts according to Gov UK style guide.
+    Note only numbers in specific formats are formatted, it doesn't detect number values within
+    a string of mixed numbers and text.
+    string: (string) the string containing the range to convert
+    separator: (string) separator to use.
+    more_or_less: (boolean) when true a range starting with 0 will be replace with Less than.
+        E.g. '0 - 1000' will return 'Less than 1000'
+        and a number with the sufix+ will be replaced with More than.
+        E.g. '100+' will return 'More than 100'
+    smart_more_or_less: (boolean) when true and more_or_less is set it will add one to any
+        upper range ending on a 9.
+        E.g. '0 - 9999' will return 'Less than 1000'
+    """
+    try:
+        prefix = ''
+        postfix = ''
+        if more_or_less:
+            if string[-1] == '+':
+                prefix = 'More than '
+                string = string.rstrip('+')
+            values = string.split(separator)
+            if values[0] == '0':
+                if smart_more_or_less and values[1][-1] == '9':
+                    values[1] = int(values[1]) + 1
+                return f'Less than {format_currency(values[1], symbol=symbol)}'
+        else:
+            if string[-1] == '+':
+                postfix = '+'
+                string = string.rstrip('+')
+            values = string.split(separator)
+        return f'{prefix}{format_currency_range(values, symbol=symbol)}{postfix}'
+    except ValueError:
+        return upper_snake_case_to_sentence_case(string, glue='\n')
+
+
 def generate_enum_code_from_queryset(model_queryset):
     """Generate the Enum code for a given constant model queryset.
 
