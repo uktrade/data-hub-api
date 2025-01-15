@@ -37,11 +37,11 @@ bigtree==0.23.0
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.35.92
+boto3==1.35.97
     # via
     #   -r requirements.in
     #   moto
-botocore==1.35.92
+botocore==1.35.97
     # via
     #   boto3
     #   moto
