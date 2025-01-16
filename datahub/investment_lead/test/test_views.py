@@ -1,5 +1,7 @@
 import uuid
 
+from datetime import datetime, timedelta, timezone
+
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -7,6 +9,7 @@ from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 from datahub.investment_lead.models import EYBLead
+from datahub.investment_lead.tasks.ingest_eyb_common import DATE_FORMAT
 from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.investment_lead.test.utils import assert_retrieved_eyb_lead_data
 from datahub.metadata.models import Country, Sector
@@ -84,6 +87,46 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.data['count'] == number_of_leads
         assert response.data['next'] is not None
         assert len(response.data['results']) == pagination_limit
+
+    def test_sorting_by_triage_created(self, test_user_with_view_permissions):
+        """Test the EYB leads can be sorted by triage_created field."""
+        now = datetime.now(tz=timezone.utc)
+        yesterday = now - timedelta(days=1)
+        EYBLeadFactory(triage_created=now)
+        EYBLeadFactory(triage_created=yesterday)
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+
+        # Descending
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'sortby': '-triage_created'})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['results'][0]['triage_created'] == now.strftime(DATE_FORMAT)
+        assert response.data['results'][1]['triage_created'] == yesterday.strftime(DATE_FORMAT)
+
+        # Ascending
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'sortby': 'triage_created'})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['results'][0]['triage_created'] == yesterday.strftime(DATE_FORMAT)
+        assert response.data['results'][1]['triage_created'] == now.strftime(DATE_FORMAT)
+
+    def test_sorting_by_company_name(self, test_user_with_view_permissions):
+        """Test the EYB leads can be sorted by company.name field."""
+        name_beginning_with_a = 'A Ltd'
+        name_beginning_with_z = 'Z Ltd'
+        EYBLeadFactory(company=CompanyFactory(name=name_beginning_with_a))
+        EYBLeadFactory(company=CompanyFactory(name=name_beginning_with_z))
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+
+        # Descending
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'sortby': '-company__name'})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['results'][0]['company']['name'] == name_beginning_with_z
+        assert response.data['results'][1]['company']['name'] == name_beginning_with_a
+
+        # Ascending
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'sortby': 'company__name'})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['results'][0]['company']['name'] == name_beginning_with_a
+        assert response.data['results'][1]['company']['name'] == name_beginning_with_z
 
     def test_filter_by_company_name(self, test_user_with_view_permissions):
         """Test filtering EYB leads by the EYBLead.company_name field."""
