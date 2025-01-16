@@ -85,6 +85,7 @@ def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
         company.address_country = eyb_lead.address_country
     company.address_postcode = eyb_lead.address_postcode
     company.website = eyb_lead.company_website
+    company.source = Company.Source.EYB
 
     company.save()
 
@@ -140,6 +141,7 @@ def create_company_contact_for_eyb_lead(eyb_lead: EYBLead):
     contact.last_name = eyb_lead.full_name
     contact.address_same_as_company = True
     contact.primary = True
+    contact.source = Contact.Source.EYB
 
     contact.save()
 
