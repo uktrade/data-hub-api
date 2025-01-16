@@ -416,7 +416,7 @@ class Company(ArchivableModel, BaseModel):
     source = models.CharField(
         max_length=MAX_LENGTH,
         choices=Source.choices,
-        default=Source.DATA_HUB,
+        blank=True,
         help_text=(
             'Where the company was created from, can be on Data Hub or from external sources.'
         ),
