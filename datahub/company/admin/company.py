@@ -119,6 +119,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
                     'export_sub_segment',
                     'strategy',
                     'is_out_of_business',
+                    'source',
                 ),
             },
         ),
@@ -217,12 +218,14 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
         'transferred_on',
         'transferred_from_display',
         'is_out_of_business',
+        'source',
     )
     list_display = (
         'name',
         'registered_address_country',
+        'source',
     )
-    list_filter = ('dnb_modified_on',)
+    list_filter = ('dnb_modified_on', 'source')
     inlines = (OneListCoreTeamMemberInline,)
     # Help text for read-only method fields
     transferred_from_display_text = 'Other records whose data has been transferred to this record.'
