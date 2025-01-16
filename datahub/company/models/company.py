@@ -74,8 +74,8 @@ class Company(ArchivableModel, BaseModel):
         """
 
         DATA_HUB = ('data_hub', 'Data Hub')
-        GREAT = ('great', 'Great')
         EYB = ('eyb', 'Expand Your Business')
+        GREAT = ('great', 'Great')
         STOVA = ('Stova', 'Stova')
 
     class TransferReason(models.TextChoices):

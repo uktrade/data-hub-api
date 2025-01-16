@@ -36,6 +36,7 @@ class Contact(ArchivableModel, BaseModel):
         """
 
         DATA_HUB = ('data_hub', 'Data Hub')
+        EYB = ('eyb', 'Expand Your Business')
         GREAT = ('great', 'Great')
         STOVA = ('Stova', 'Stova')
 
