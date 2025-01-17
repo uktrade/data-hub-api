@@ -3,6 +3,7 @@ import datetime
 import pytest
 from freezegun import freeze_time
 
+from datahub.company.models.company import Company
 from datahub.company.test.factories import CompanyFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 
@@ -156,7 +157,7 @@ def base_company_dict():
         'reference_code': '',
         'registered_address_area': None,
         'sector': '',
-        'source': '',
+        'source': Company.Source.DATA_HUB,
         'export_segment': '',
         'export_sub_segment': '',
         'trading_names': [],

@@ -147,6 +147,7 @@ class Contact(ArchivableModel, BaseModel):
         max_length=MAX_LENGTH,
         choices=Source.choices,
         blank=True,
+        default=Source.DATA_HUB,
         help_text=(
             'Where the contact was created from, can be on Data Hub or from external sources.'
         ),
