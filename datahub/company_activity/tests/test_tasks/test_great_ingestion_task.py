@@ -350,6 +350,61 @@ class TestGreatIngestionTasks:
         assert result.contact.source == Contact.Source.GREAT
 
     @pytest.mark.django_db
+    def test_company_contact_name_handling(self):
+        """
+        Test handling withheld names
+        """
+        company = CompanyFactory(company_number='123')
+        email = 'test@example.com'
+        assert not Contact.objects.filter(email=email).exists()
+        data = f"""
+            {{
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069",
+                "data": {{
+                    "company_registration_number": "{company.company_number}",
+                    "first_name": null,
+                    "last_name": null,
+                    "email": "{email}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        result = GreatExportEnquiry.objects.get(form_id='5249')
+        assert result.contact.first_name == ''
+        assert result.contact.last_name == ''
+        assert result.contact.email == email
+
+    @pytest.mark.django_db
+    def test_company_contact_when_match_not_definitive(self):
+        """
+        Test that if we're unable to match the contact to a single record
+        we create an additional record rather than risking assigning the
+        wrong contact
+        """
+        company = CompanyFactory(company_number='123')
+        first_name = 'John'
+        last_name = 'Smith'
+        ContactFactory(first_name=first_name, last_name=last_name)
+        ContactFactory(first_name=first_name, last_name=last_name)
+        assert Contact.objects.filter(first_name=first_name, last_name=last_name).count() == 2
+        data = f"""
+            {{
+                "id": "5249",
+                "created_at": "2024-09-19T14:00:34.069",
+                "data": {{
+                    "company_registration_number": "{company.company_number}",
+                    "first_name": "{first_name}",
+                    "last_name": "{last_name}"
+                }}
+            }}
+        """
+        task = GreatIngestionTask()
+        task.json_to_model(json.loads(data))
+        assert Contact.objects.filter(first_name=first_name, last_name=last_name).count() == 3
+
+    @pytest.mark.django_db
     def test_upper_business_size(self):
         """
         Test that the upper business size range is mapped correctly
