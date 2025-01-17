@@ -65,6 +65,7 @@ class TestEYBLeadServices:
         assert_eyb_lead_matches_company(company, eyb_lead)
 
         assert eyb_lead.company == company
+        assert eyb_lead.company.source == Company.Source.EYB
 
     @pytest.mark.parametrize(
         'duns_number_param',

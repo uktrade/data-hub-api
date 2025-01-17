@@ -37,10 +37,12 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
         'transferred_by',
         'consent_data',
         'consent_data_last_modified',
+        'source',
     )
     list_display = (
         'name',
         'company',
+        'source',
     )
     list_select_related = ('company',)
     exclude = (
@@ -49,6 +51,7 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified_on',
         'modified_by',
     )
+    list_filter = ('source',)
 
     def get_urls(self):
         model_meta = self.model._meta

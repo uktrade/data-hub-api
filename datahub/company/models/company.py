@@ -1,4 +1,5 @@
 """Company models."""
+
 import uuid
 
 from django.conf import settings
@@ -65,6 +66,17 @@ class OneListTier(BaseOrderedConstantModel):
 @reversion.register_base_model()
 class Company(ArchivableModel, BaseModel):
     """Representation of the company."""
+
+    class Source(models.TextChoices):
+        """
+        Where the Company was created from. Whether it was created on Data Hub or through
+        ingestion tasks from sources such as EYB, Great, Stova etc.
+        """
+
+        DATA_HUB = ('data_hub', 'Data Hub')
+        EYB = ('eyb', 'Expand Your Business')
+        GREAT = ('great', 'Great')
+        STOVA = ('Stova', 'Stova')
 
     class TransferReason(models.TextChoices):
         DUPLICATE = ('duplicate', 'Duplicate record')
@@ -399,6 +411,16 @@ class Company(ArchivableModel, BaseModel):
     is_out_of_business = models.BooleanField(
         default=False,
         help_text='This value is provided from DNB, and cannot be modified inside datahub',
+    )
+
+    source = models.CharField(
+        max_length=MAX_LENGTH,
+        choices=Source.choices,
+        blank=True,
+        default=Source.DATA_HUB,
+        help_text=(
+            'Where the company was created from, can be on Data Hub or from external sources.'
+        ),
     )
 
     # Fields export_win_* are being used to match wins from Export Win

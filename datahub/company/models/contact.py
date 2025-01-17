@@ -29,6 +29,17 @@ class Contact(ArchivableModel, BaseModel):
     Contact (a person at a company that DIT has had contact with).
     """
 
+    class Source(models.TextChoices):
+        """
+        Where the Contact was created from. Whether it was created on Data Hub or through
+        ingestion tasks from sources such as Great, Stova etc.
+        """
+
+        DATA_HUB = ('data_hub', 'Data Hub')
+        EYB = ('eyb', 'Expand Your Business')
+        GREAT = ('great', 'Great')
+        STOVA = ('Stova', 'Stova')
+
     class TransferReason(models.TextChoices):
         DUPLICATE = ('duplicate', 'Duplicate record')
 
@@ -132,6 +143,16 @@ class Contact(ArchivableModel, BaseModel):
         null=True,
     )
 
+    source = models.CharField(
+        max_length=MAX_LENGTH,
+        choices=Source.choices,
+        blank=True,
+        default=Source.DATA_HUB,
+        help_text=(
+            'Where the contact was created from, can be on Data Hub or from external sources.'
+        ),
+    )
+
     def get_absolute_url(self):
         """URL to the object in the Data Hub internal front end."""
         return get_front_end_url(self)
@@ -183,7 +204,6 @@ class Contact(ArchivableModel, BaseModel):
         self.archive(user, archived_reason)
 
     def merge_contact_fields(self, contact):
-
         fields = [
             'job_title',
             'title',

@@ -61,6 +61,7 @@ class GreatIngestionTask:
             address_postcode=data.get('business_postcode', ''),
             # Assume the export enquirer is UK based
             address_country=Country.objects.get(iso_alpha2_code='GB'),
+            source=Company.Source.GREAT,
         )
         logger.info(f'Could not match company for Great Export Enquiry: {form_id}.'
                     f'Created new company with id: {company.id}.')
@@ -76,6 +77,7 @@ class GreatIngestionTask:
             email=data.get('email', ''),
             primary=True,
             company=company,
+            source=Contact.Source.GREAT,
         )
         logger.info(f'Could not match contact for Great Export Enquiry: {form_id}.'
                     f'Created new contact with id: {contact.id}.')

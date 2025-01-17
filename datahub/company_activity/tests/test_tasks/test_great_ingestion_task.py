@@ -300,6 +300,7 @@ class TestGreatIngestionTasks:
         result = GreatExportEnquiry.objects.get(form_id='5249').company
         assert result.name == name
         assert result.address_country.iso_alpha2_code == 'GB'
+        assert result.source == Company.Source.GREAT
         expected_size = EmployeeRange.objects.get(name='50 to 249')
         assert result.employee_range == expected_size
         expected_type = BusinessType.objects.get(name='Private limited company')
@@ -310,6 +311,7 @@ class TestGreatIngestionTasks:
         assert contact_result.email == email
         assert contact_result.full_telephone_number == phone_number
         assert contact_result.primary is True
+        assert contact_result.source == Contact.Source.GREAT
 
     @pytest.mark.django_db
     def test_company_contact_creation(self):
@@ -345,6 +347,7 @@ class TestGreatIngestionTasks:
         assert result.contact.last_name == last_name
         assert result.contact.email == email
         assert result.contact.full_telephone_number == phone_number
+        assert result.contact.source == Contact.Source.GREAT
 
     @pytest.mark.django_db
     def test_upper_business_size(self):
