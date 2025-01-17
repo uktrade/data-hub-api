@@ -69,9 +69,15 @@ class GreatIngestionTask:
         return company
 
     def _create_contact(self, data, company, form_id):
+        first_name = data.get('first_name', '')
+        if first_name is None:
+            first_name = ''
+        last_name = data.get('last_name', '')
+        if last_name is None:
+            last_name = ''
         contact = Contact.objects.create(
-            first_name=data.get('first_name', ''),
-            last_name=data.get('last_name', ''),
+            first_name=first_name,
+            last_name=last_name,
             job_title=data.get('job_title', ''),
             full_telephone_number=data.get('uk_telephone_number', ''),
             email=data.get('email', ''),
@@ -108,17 +114,24 @@ class GreatIngestionTask:
         return Company.objects.filter(name=name).first()
 
     def _get_company_contact(self, data):
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
+        first_name = data.get('first_name', '')
+        last_name = data.get('last_name', '')
         phone_number = data.get('uk_telephone_number')
         email = data.get('email')
 
-        contacts = Contact.objects.filter(first_name=first_name, last_name=last_name)
+        contacts = Contact.objects.all()
+        if first_name:
+            contacts = contacts.filter(first_name=first_name)
+        if last_name:
+            contacts = contacts.filter(last_name=last_name)
         if phone_number:
             contacts = contacts.filter(full_telephone_number=phone_number)
         if email:
             contacts = contacts.filter(email=email)
-        if contacts.exists():
+        # If we have not been able to filter contacts down to exactly 1
+        # we should rather risk creating a duplicate to be manually merged
+        # than risk assigning to an incorrect contact
+        if contacts.count() == 1:
             return contacts.first()
 
     def _get_business_type(self, business_type_name):
