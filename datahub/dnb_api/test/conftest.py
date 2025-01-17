@@ -156,6 +156,7 @@ def base_company_dict():
         'reference_code': '',
         'registered_address_area': None,
         'sector': '',
+        'source': '',
         'export_segment': '',
         'export_sub_segment': '',
         'trading_names': [],
