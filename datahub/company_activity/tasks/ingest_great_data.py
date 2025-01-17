@@ -121,9 +121,9 @@ class GreatIngestionTask:
 
         contacts = Contact.objects.all()
         if first_name:
-            contacts.filter(first_name=first_name)
+            contacts = contacts.filter(first_name=first_name)
         if last_name:
-            contacts.filter(last_name=last_name)
+            contacts = contacts.filter(last_name=last_name)
         if phone_number:
             contacts = contacts.filter(full_telephone_number=phone_number)
         if email:
