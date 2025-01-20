@@ -375,3 +375,33 @@ class TestStovaIngestionTasks:
 
         assert StovaAttendee.objects.filter(stova_attendee_id=data['id']).exists() is False
         assert Company.objects.filter(name=data['company_name']).exists() is False
+
+    @pytest.mark.django_db
+    @mock_aws
+    @override_settings(S3_LOCAL_ENDPOINT_URL=None)
+    def test_stova_attendee_not_created_if_event_does_not_exist(
+        self, caplog, test_file, test_file_path,
+    ):
+        """
+        A StovaEvent needs to exist before ingesting the Stova Attendee.
+        """
+        setup_s3_bucket(BUCKET)
+        setup_s3_files(BUCKET, test_file, test_file_path)
+
+        with caplog.at_level(logging.INFO):
+            ingest_stova_attendee_data()
+            # These are from the fixture file.
+            assert (
+                'The event associated with this attendee does not exist, skipping attendee with '
+                'attendee_id 245 and event_id 3332' in caplog.text
+            )
+            assert (
+                'The event associated with this attendee does not exist, skipping attendee with '
+                'attendee_id 2947 and event_id 3032' in caplog.text
+            )
+            assert (
+                'The event associated with this attendee does not exist, skipping attendee with '
+                'attendee_id 2402 and event_id 8277' in caplog.text
+            )
+
+        assert StovaAttendee.objects.all().exists() is False
