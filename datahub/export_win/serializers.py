@@ -4,6 +4,8 @@ import reversion
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import transaction
+from django.utils.translation import gettext_lazy
+from rest_framework.exceptions import PermissionDenied
 
 from rest_framework.serializers import (
     BooleanField,
@@ -170,6 +172,12 @@ class LegacyCustomerResponseSerializer(ModelSerializer):
 
 class WinSerializer(ModelSerializer):
     """Win serializer."""
+
+    default_error_messages = {
+        'cannot_change_win': gettext_lazy(
+            'A win cannot be changed by contributing advisers.',
+        ),
+    }
 
     adviser = NestedAdviserField()
     company = NestedRelatedField(Company)
@@ -346,6 +354,11 @@ class WinSerializer(ModelSerializer):
 
     def update(self, instance, validated_data):
         """Update win, corresponding breakdowns and advisers."""
+        self._self_check_for_contributing_adviser(instance)
+
+        # adviser should never be updated
+        validated_data.pop('adviser', None)
+
         breakdowns = validated_data.pop('breakdowns', None)
         advisers = validated_data.pop('advisers', None) or validated_data.pop(
             'contributing_advisers',
@@ -380,6 +393,13 @@ class WinSerializer(ModelSerializer):
                 instance.team_members.set(team_members)
             reversion.set_comment('Win updated')
         return instance
+
+    def _self_check_for_contributing_adviser(self, instance):
+        """Checks if request is made by contributing adviser."""
+        request = self.context.get('request')
+        user = request.user if request else None
+        if user and user.id in instance.advisers.values_list('adviser_id', flat=True):
+            raise PermissionDenied(self.default_error_messages['cannot_change_win'])
 
 
 class LimitedExportWinSerializer(ModelSerializer):
