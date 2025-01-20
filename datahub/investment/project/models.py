@@ -437,6 +437,7 @@ class IProjectRequirementsAbstract(models.Model):
 
     client_requirements = models.TextField(blank=True, null=True)
     site_decided = models.BooleanField(null=True)
+    site_address_is_company_address = models.BooleanField(null=True, default=None)
     address_1 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
     address_2 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
     address_town = models.CharField(

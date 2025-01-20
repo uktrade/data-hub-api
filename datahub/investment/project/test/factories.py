@@ -70,6 +70,7 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     likelihood_to_land_id = LikelihoodToLand.high.value.id
     archived_documents_url_path = factory.Faker('uri_path')
     created_on = factory.LazyFunction(now)
+    site_address_is_company_address = None
 
     @to_many_field
     def business_activities(self):

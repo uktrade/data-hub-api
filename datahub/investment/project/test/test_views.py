@@ -159,6 +159,7 @@ class TestListView(APITestMixin):
             'client_cannot_provide_foreign_investment',
             'client_requirements',
             'site_decided',
+            'site_address_is_company_address',
             'address_1',
             'address_2',
             'address_town',
@@ -881,6 +882,7 @@ class TestRetrieveView(APITestMixin):
         project = InvestmentProjectFactory(
             client_requirements='client reqs',
             site_decided=True,
+            site_address_is_company_address=False,
             address_1='address 1',
             client_considering_other_countries=True,
             competitor_countries=countries,
@@ -899,6 +901,7 @@ class TestRetrieveView(APITestMixin):
         response_data = response.json()
         assert response_data['client_requirements'] == 'client reqs'
         assert response_data['site_decided'] is True
+        assert response_data['site_address_is_company_address'] is False
         assert response_data['client_considering_other_countries'] is True
         assert response_data['requirements_complete'] is True
         assert response_data['uk_company_decided'] is False
@@ -1382,6 +1385,7 @@ class TestPartialUpdateView(APITestMixin):
             client_considering_other_countries=False,
             client_requirements='client reqs',
             site_decided=False,
+            site_address_is_company_address=None,
             strategic_drivers=strategic_drivers,
             uk_region_locations=[random_obj_for_model(UKRegion)],
         )
@@ -1959,6 +1963,7 @@ class TestPartialUpdateView(APITestMixin):
         project = InvestmentProjectFactory(
             client_requirements='client reqs',
             site_decided=True,
+            site_address_is_company_address=False,
             address_1='address 1',
         )
         url = reverse(
@@ -1975,6 +1980,7 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['requirements_complete'] is False
         assert response_data['client_requirements'] == 'client reqs'
         assert response_data['site_decided'] is True
+        assert response_data['site_address_is_company_address'] is False
         assert response_data['address_1'] == 'address 1 new'
         assert response_data['address_2'] == 'address 2 new'
 

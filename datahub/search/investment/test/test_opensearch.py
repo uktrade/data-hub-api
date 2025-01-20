@@ -583,6 +583,7 @@ def test_mapping(opensearch):
                 'type': 'object',
             },
             'site_decided': {'type': 'boolean'},
+            'site_address_is_company_address': {'type': 'boolean'},
             'some_new_jobs': {'type': 'boolean'},
             'specific_programmes': {
                 'properties': {
