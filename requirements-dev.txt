@@ -37,11 +37,11 @@ bigtree==0.23.0
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.35.97
+boto3==1.36.2
     # via
     #   -r requirements.in
     #   moto
-botocore==1.35.97
+botocore==1.36.2
     # via
     #   boto3
     #   moto
@@ -469,7 +469,7 @@ rq==2.1.0
     #   rq-scheduler
 rq-scheduler==0.14.0
     # via -r requirements.in
-s3transfer==0.10.0
+s3transfer==0.11.1
     # via boto3
 sentry-sdk==2.19.2
     # via -r requirements.in
