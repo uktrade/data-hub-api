@@ -40,7 +40,6 @@ class StovaAttendeeIndentificationTask(BaseObjectIdentificationTask):
 
 
 class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
-
     existing_ids = []
 
     def _process_record(self, record: dict) -> None:
@@ -52,7 +51,9 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
 
         stova_attendee_id = record.get('id')
         if stova_attendee_id in self.existing_ids:
-            logger.info(f'Record already exists for stova_attendee_id: {stova_attendee_id}')
+            logger.info(
+                f'Record already exists for stova_attendee_id: {stova_attendee_id}'
+            )
             return
 
         values = {
@@ -74,12 +75,23 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
             'modified_by': record.get('modified_by', ''),
         }
 
-        assignAtteendeeToEvent(values.stova_event_id, stova_attendee_id, **values)
+        self.create_assignee(values)
 
+    def create_assignee(values):
+        """
+        Creates the Stova Assignee only if it matches a Stova Event.
+        """
+        event_id = values.get('stova_event_id', '')
+        attendee_id = values.get('id', '')
+        try:
+            event = StovaEvent.objects.get(stova_event_id=event_id)
+        except StovaEvent.DoesNotExist:
+            logger.info(
+                'The event associated with this attendee does not exist, skipping attendee'
+                f'with attendee_id {attendee_id} and event_id {event_id}'
+            )
+            return
 
-def assignAtteendeeToEvent(stova_event_id, stova_attendee_id, **values):
-    try:
-        event = StovaEvent.objects.filter(stova_event_id=stova_event_id)
         try:
             attendee = StovaAttendee.objects.create(**values)
             event.attendee = attendee
@@ -89,18 +101,15 @@ def assignAtteendeeToEvent(stova_event_id, stova_attendee_id, **values):
 
         except IntegrityError as error:
             logger.error(
-                f'Error processing Stova attendee record, stova_attendee_id: {stova_attendee_id}. '
+                f'Error processing Stova attendee record, stova_attendee_id: {attendee_id}. '
                 f'Error: {error}',
             )
         except ValidationError as error:
             logger.error(
                 'Got unexpected value for a field when processing Stova attendee record, '
-                f'stova_attendee_id: {stova_attendee_id}. '
+                f'stova_attendee_id: {attendee_id}. '
                 f'Error: {error}',
             )
-
-    except Exception():
-        logger.info(f'No event found for {stova_event_id}, skipping attendee')
 
 
 def assignAttendeeCompany(attendee):
