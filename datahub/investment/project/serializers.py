@@ -121,6 +121,7 @@ VALUE_FIELDS = (
 REQUIREMENTS_FIELDS = (
     'client_requirements',
     'site_decided',
+    'site_address_is_company_address',
     'address_1',
     'address_2',
     'address_town',

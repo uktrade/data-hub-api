@@ -117,6 +117,7 @@ class InvestmentProject(BaseSearchModel):
     )
     sector = fields.sector_field()
     site_decided = Boolean()
+    site_address_is_company_address = Boolean()
     some_new_jobs = Boolean()
     specific_programmes = fields.id_name_field()
     stage = fields.id_name_field()
