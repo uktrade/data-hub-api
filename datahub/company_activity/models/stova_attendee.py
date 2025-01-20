@@ -5,6 +5,7 @@ from django.db import models
 
 from datahub.company.models.company import Company
 from datahub.company.models.contact import Contact
+from datahub.company_activity.models.stova_event import StovaEvent
 from datahub.core import reversion
 
 
@@ -58,4 +59,17 @@ class StovaAttendee(models.Model):
         blank=True,
         related_name='stova_attendee',
         help_text='If a contact match can be found from the email, the relation is added.',
+    )
+
+    # The FK to the ingested Stova Event in Data Hub.
+    ingested_stova_event = models.ForeignKey(
+        StovaEvent,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='stova_attendee',
+        help_text=(
+            'Each attendee comes with a Stova Event ID which is stored as its raw value under '
+            'stova_attendee_id. This field is the FK to the ingrested Stova Event in Data Hub.',
+        ),
     )
