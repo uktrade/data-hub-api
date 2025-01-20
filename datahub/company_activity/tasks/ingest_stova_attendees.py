@@ -1,7 +1,7 @@
 import logging
 
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 
 from datahub.company.models import Company
 from datahub.company.models import Contact
@@ -43,7 +43,15 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
     existing_ids = []
 
     def _process_record(self, record: dict) -> None:
-        """Saves an attendee from Stova from the S3 bucket into a `Stovaattendee`"""
+        """
+        Processes a single stova attendee from the S3 Bucket and saves it to the `StovaAttendee`
+        model. It also attempts to match the contact and company from the given fields and if no
+        match is found it creates them.
+
+        :param record: The deserialize JSON row from the S3 Bucket containing stova attendee
+            details.
+        :returns: None
+        """
         if not self.existing_ids:
             self.existing_ids = set(
                 StovaAttendee.objects.values_list('stova_attendee_id', flat=True),
@@ -52,7 +60,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         stova_attendee_id = record.get('id')
         if stova_attendee_id in self.existing_ids:
             logger.info(
-                f'Record already exists for stova_attendee_id: {stova_attendee_id}'
+                f'Record already exists for stova_attendee_id: {stova_attendee_id}',
             )
             return
 
@@ -75,68 +83,119 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
             'modified_by': record.get('modified_by', ''),
         }
 
-        self.create_assignee(values)
-
-    def create_assignee(values):
-        """
-        Creates the Stova Assignee only if it matches a Stova Event.
-        """
-        event_id = values.get('stova_event_id', '')
-        attendee_id = values.get('id', '')
-        try:
-            event = StovaEvent.objects.get(stova_event_id=event_id)
-        except StovaEvent.DoesNotExist:
-            logger.info(
-                'The event associated with this attendee does not exist, skipping attendee'
-                f'with attendee_id {attendee_id} and event_id {event_id}'
-            )
+        event = self.get_event_from_attendee(values)
+        if not event:
             return
 
-        try:
-            attendee = StovaAttendee.objects.create(**values)
-            event.attendee = attendee
-            event.save()
-            assignAttendeeCompany(attendee)
-            assignAttendeeContact(attendee)
+        # Wrap in transaction as we don't want to create any companies/contacts/attendees if any of
+        # the steps fail.
+        with transaction.atomic():
+            company = self.get_or_create_company(values)
+            if not company:
+                return
 
+            contact = self.get_or_create_contact(values, company)
+            if not contact:
+                return
+
+            self.create_assignee(values, company, contact, event)
+
+    @staticmethod
+    def create_assignee(
+        values: dict,
+        company: Company,
+        contact: Contact,
+        event: StovaEvent,
+    ) -> None:
+        """
+        Creates the Stova Assignee only if it matches a Stova Event.
+
+        :param values: A dictionary of cleaned values from an ingested stova attendee record.
+        :param company: `Company` object which the assignee belongs to.
+        :param contact: A `Contact` found or created from the attendee record.
+        :param event: A `StovaEvent` which the attendee was part of.
+        :returns: None
+        """
+        try:
+            StovaAttendee.objects.create(
+                **values,
+                company=company,
+                contact=contact,
+                ingested_stova_event=event,
+            )
         except IntegrityError as error:
             logger.error(
-                f'Error processing Stova attendee record, stova_attendee_id: {attendee_id}. '
-                f'Error: {error}',
+                'Error processing Stova attendee record, stova_attendee_id: '
+                f'{values["stova_attendee_id"]}. Error: {error}',
             )
         except ValidationError as error:
             logger.error(
                 'Got unexpected value for a field when processing Stova attendee record, '
-                f'stova_attendee_id: {attendee_id}. '
-                f'Error: {error}',
+                f'stova_attendee_id: {values["stova_attendee_id"]}. Error: {error}',
             )
 
+    @staticmethod
+    def get_event_from_attendee(values: dict) -> StovaEvent | None:
+        event_id = values['stova_event_id']
+        attendee_id = values['stova_attendee_id']
+        try:
+            return StovaEvent.objects.get(stova_event_id=event_id)
+        except StovaEvent.DoesNotExist:
+            logger.info(
+                'The event associated with this attendee does not exist, skipping attendee with '
+                f'attendee_id {attendee_id} and event_id {event_id}',
+            )
+            return
 
-def assignAttendeeCompany(attendee):
-    if Company.objects.filter(name=attendee.company_name).exists():
-        attendee.company = Company.objects.filter(name=attendee.company_name)
-        attendee.save()
-    else:
-        new_company = Company(name=attendee.company_name)
-        new_company.save()
-        attendee.company = new_company
-        attendee.save()
-    # except Exception():
-    #     logger.info(f'No company name matched for {company_name}')
+    @staticmethod
+    def get_or_create_company(values: dict) -> Company | None:
+        """
+        Attempts to find an existing `Company` from the attendees company name, if one does not
+        exist create a new one.
 
+        :param values: A dictionary of cleaned values from an ingested stova attendee record.
+        :returns: An existing `Company` if found or a newly created `Company`.
+        """
+        company_name = values['company_name']
+        company = Company.objects.filter(name=company_name)
+        if company:
+            return company[0]
 
-def assignAttendeeContact(attendee):
-    if Contact.objects.filter(email=attendee.email).exists():
-        attendee.contact = Contact.objects.filter(email=attendee.email)
-        attendee.save()
-    else:
-        # create a contact based on email if company already exist for attendee
-        new_contact = Contact(
-            email=attendee.email,
-            first_name=attendee.first_name,
-            last_name=attendee.last_name,
-            company=attendee.company,
-        )
-        new_contact.save()
-        attendee.contact = new_contact
-        attendee.save()
+        try:
+            return Company.objects.create(name=company_name, source=Company.Source.STOVA)
+        except IntegrityError as error:
+            logger.error(
+                'Error creating company from Stova attendee record, stova_attendee_id: '
+                f'{values["stova_attendee_id"]}. Error: {error}',
+            )
+            return
+
+    @staticmethod
+    def get_or_create_contact(values: dict, company: Company) -> Contact | None:
+        """
+        Attempts to find an existing `Contact` from the attendees name, if one does not exist
+        create a new one.
+
+        :param values: A dictionary of cleaned values from an ingested stova attendee record.
+        :param company: A `Company` object.
+        :returns: An existing `Contact` if found or a newly created `Contact`.
+        """
+        contact = Contact.objects.filter(email=values['email'])
+        if contact:
+            return contact[0]
+
+        try:
+            return Contact.objects.create(
+                email=values['email'],
+                first_name=values['first_name'],
+                last_name=values['last_name'],
+                company=company,
+                source=Contact.Source.STOVA,
+                primary=True,
+            )
+        except IntegrityError as error:
+            logger.error(
+                'Error creating contact from Stova attendee record, stova_attendee_id: '
+                f'{values["stova_attendee_id"]}. Error: {error}',
+            )
+            return
