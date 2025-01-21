@@ -4,10 +4,11 @@ import json
 from datahub.ingest.boto3 import S3ObjectProcessor
 
 
-def compressed_json_faker(records: list[dict] = None) -> bytes:
+def compressed_json_faker(records: list[dict] = None, nested: bool = True) -> bytes:
     """Serializes and compresses records into a zipped JSON, encoded with UTF-8."""
     json_lines = [
         json.dumps({'object': record}, default=str)
+        if nested else json.dumps(record, default=str)
         for record in records
     ]
     compressed_content = gzip.compress('\n'.join(json_lines).encode('utf-8'))
