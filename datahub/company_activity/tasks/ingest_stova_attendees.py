@@ -157,9 +157,9 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         :returns: An existing `Company` if found or a newly created `Company`.
         """
         company_name = values['company_name']
-        company = Company.objects.filter(name=company_name)
-        if company.exists():
-            return company[0]
+        company = Company.objects.filter(name=company_name).first()
+        if company:
+            return company
 
         try:
             return Company.objects.create(name=company_name, source=Company.Source.STOVA)
@@ -173,16 +173,16 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
     @staticmethod
     def get_or_create_contact(values: dict, company: Company) -> Contact | None:
         """
-        Attempts to find an existing `Contact` from the attendees name, if one does not exist
-        create a new one.
+        Attempts to find an existing `Contact` from the attendees email, if one does
+        not exist create a new one.
 
         :param values: A dictionary of cleaned values from an ingested stova attendee record.
         :param company: A `Company` object.
         :returns: An existing `Contact` if found or a newly created `Contact`.
         """
-        contact = Contact.objects.filter(email=values['email'])
-        if contact.exists():
-            return contact[0]
+        contact = Contact.objects.filter(email=values['email']).first()
+        if contact:
+            return contact
 
         try:
             return Contact.objects.create(
