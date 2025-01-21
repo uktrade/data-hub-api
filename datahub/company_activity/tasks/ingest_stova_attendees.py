@@ -173,14 +173,14 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
     @staticmethod
     def get_or_create_contact(values: dict, company: Company) -> Contact | None:
         """
-        Attempts to find an existing `Contact` from the attendees email, if one does
+        Attempts to find an existing `Contact` from the attendees email and company, if one does
         not exist create a new one.
 
         :param values: A dictionary of cleaned values from an ingested stova attendee record.
         :param company: A `Company` object.
         :returns: An existing `Contact` if found or a newly created `Contact`.
         """
-        contact = Contact.objects.filter(email=values['email']).first()
+        contact = Contact.objects.filter(email=values['email'], company=company).first()
         if contact:
             return contact
 
