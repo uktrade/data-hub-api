@@ -23,8 +23,8 @@ class StovaEvent(models.Model):
     description = models.TextField()
     code = models.CharField(max_length=MAX_LENGTH)
 
-    created_by = models.IntegerField(null=True, blank=True)
-    modified_by = models.IntegerField(null=True, blank=True)
+    created_by = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
+    modified_by = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
 
     client_contact = models.IntegerField(null=True, blank=True)
     contact_info = models.CharField(max_length=MAX_LENGTH)
