@@ -18,6 +18,7 @@ from datahub.company.tasks.contact import (
 )
 from datahub.company.tasks.export_potential import update_company_export_potential_from_csv
 from datahub.company_activity.tasks.ingest_company_activity import ingest_activity_data
+from datahub.company_activity.tasks.ingest_stova_attendees import ingest_stova_attendee_data
 from datahub.company_activity.tasks.ingest_stova_events import ingest_stova_event_data
 from datahub.core.queues.constants import (
     EVERY_EIGHT_AM,
@@ -144,6 +145,11 @@ def schedule_jobs():
         function=ingest_stova_event_data,
         cron=EVERY_HOUR,
         description='Check S3 for new Stova Event files and schedule ingestion',
+    )
+    job_scheduler(
+        function=ingest_stova_attendee_data,
+        cron=EVERY_HOUR,
+        description='Check S3 for new Stova Attendee files and schedule ingestion',
     )
 
     if settings.ENABLE_ESTIMATED_LAND_DATE_REMINDERS:

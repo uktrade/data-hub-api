@@ -298,6 +298,9 @@ class StovaAttendeeFactory(factory.django.DjangoModelFactory):
     virtual_event_attendance = 'Virtual Event Attendance'
     language = 'English'
     last_lobby_login = now()
+    company = factory.SubFactory(CompanyFactory)
+    contact = factory.SubFactory(ContactFactory)
+    ingested_stova_event = factory.SubFactory(StovaEventFactory)
 
     class Meta:
         model = 'company_activity.StovaAttendee'
