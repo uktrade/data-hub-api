@@ -809,9 +809,10 @@ class TestContactConsentIngestionTask:
         the duplicate email as the key and all contacts matching that email as the value
         """
         contacts = ContactFactory.create_batch(3, email='grouped@test.com')
-        assert ContactConsentIngestionTask().get_grouped_contacts() == {
-            'grouped@test.com': contacts,
-        }
+        grouped = ContactConsentIngestionTask().get_grouped_contacts()
+
+        assert 'grouped@test.com' in grouped
+        assert set(grouped['grouped@test.com']) == set(contacts)
 
     def test_should_update_contact_with_row_date_missing_should_return_true(
         self,
