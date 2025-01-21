@@ -1300,7 +1300,8 @@ class TestUpdateWinView(APITestMixin):
     )
     def test_update_win_all_fields(self, advisers_field):
         """Tests successfully updating an export win with all fields only."""
-        win = WinFactory(adviser=self.user)
+        creator = AdviserFactory()
+        win = WinFactory(adviser=creator, team_members=[self.user])
         customer_response = CustomerResponse(win=win)
         customer_response.save()
 
@@ -1450,10 +1451,10 @@ class TestUpdateWinView(APITestMixin):
         expected_response_data = {
             'id': str(win.id),
             'adviser': {
-                'id': str(adviser.id),
-                'first_name': adviser.first_name,
-                'last_name': adviser.last_name,
-                'name': adviser.name,
+                'id': str(creator.id),
+                'first_name': creator.first_name,
+                'last_name': creator.last_name,
+                'name': creator.name,
             },
             # legacy field
             'adviser_name': win.adviser_name,
@@ -1925,7 +1926,7 @@ class TestUpdateWinView(APITestMixin):
                     WinAdviserFactory(win=win, adviser=self.user),
                     CustomerResponseFactory(win=win, agree_with_win=True),
                 ],
-                status.HTTP_200_OK,
+                status.HTTP_403_FORBIDDEN,
             ),
             (
                 lambda self: {},
@@ -1983,6 +1984,11 @@ class TestUpdateWinView(APITestMixin):
             assert win.description == 'Changed'
         else:
             assert win.description == 'Not changed'
+
+        if status_code == status.HTTP_403_FORBIDDEN:
+            assert response.json() == {
+                'detail': 'A win cannot be changed by contributing advisers.',
+            }
 
     @pytest.mark.parametrize(
         'request_data',
