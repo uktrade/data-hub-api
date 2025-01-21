@@ -287,11 +287,15 @@ class TestStovaIngestionTasks:
         test_file_path,
         test_base_stova_attendee,
     ):
-        existing_company_name = 'A company which already exists'
-        existing_company = CompanyFactory(name=existing_company_name)
+        """
+        Tests attendee uses existing company if a match is found. This also tests for the
+        case-insensitive matches.
+        """
+        existing_company = CompanyFactory(name='A COMPANY which already exists')
 
         data = test_base_stova_attendee
-        data['company_name'] = existing_company_name
+        # Same name with different case
+        data['company_name'] = 'a company which Already EXISTS'
         record = json.dumps(
             data,
             default=str,
@@ -312,11 +316,16 @@ class TestStovaIngestionTasks:
         test_file_path,
         test_base_stova_attendee,
     ):
-        existing_contact_email = 'existing_contact@dbt.com'
-        existing_contact = ContactFactory(email=existing_contact_email)
-
+        """
+        Tests attendee uses existing contact if a match is found. This also tests for the
+        case-insensitive matches.
+        """
         data = test_base_stova_attendee
-        data['email'] = existing_contact_email
+        company = CompanyFactory(name=data['company_name'])
+        existing_contact = ContactFactory(email='existing_contact@dbt.com', company=company)
+
+        # Same email with different case
+        data['email'] = 'Existing_CONTACT@dbt.com'
         record = json.dumps(
             data,
             default=str,
