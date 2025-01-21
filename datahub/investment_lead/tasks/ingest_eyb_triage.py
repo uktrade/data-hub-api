@@ -1,61 +1,51 @@
 import logging
 
 from datahub.core.queues.job_scheduler import job_scheduler
+from datahub.ingest.boto3 import S3ObjectProcessor
+from datahub.ingest.constants import DATA_FLOW_EXPORTS_PREFIX
 from datahub.investment_lead.serializers import CreateEYBLeadTriageSerializer
 from datahub.investment_lead.tasks.ingest_eyb_common import (
-    BaseEYBDataIngestionTask,
-    BaseEYBFileIngestionTask,
-    PREFIX,
+    BaseEYBIdentificationTask,
+    BaseEYBIngestionTask,
 )
-from datahub.investment_lead.tasks.ingest_eyb_user import ingest_eyb_user_file
+from datahub.investment_lead.tasks.ingest_eyb_user import eyb_user_identification_task
+
+
+TRIAGE_PREFIX = f'{DATA_FLOW_EXPORTS_PREFIX}DirectoryExpandYourBusinessTriageDataPipeline/'
 
 
 logger = logging.getLogger(__name__)
-TRIAGE_PREFIX = f'{PREFIX}DirectoryExpandYourBusinessTriageDataPipeline/'
 
 
-def ingest_eyb_triage_file():
-    logger.info('Checking for new EYB triage files')
-    task = EYBTriageFileIngestionTask()
-    task.ingest()
+def eyb_triage_identification_task() -> None:
+    logger.info('EYB triage identification task started...')
+    identification_task = EYBTriageIdentificationTask(prefix=TRIAGE_PREFIX)
+    identification_task.identify_new_objects(eyb_triage_ingestion_task)
+    logger.info('EYB triage identification task finished.')
 
 
-class EYBTriageFileIngestionTask(BaseEYBFileIngestionTask):
-    """Task to check for new triage file and trigger long running job."""
-
-    def _job_matches(self, job, file):
-        func_name = 'datahub.investment_lead.tasks.ingest_eyb_triage.ingest_eyb_triage_data'
-        return job.kwargs.get('file') == file and job.func_name == func_name
-
-    def ingest(self):
-        super().ingest(TRIAGE_PREFIX, self._job_matches, ingest_eyb_triage_data)
+class EYBTriageIdentificationTask(BaseEYBIdentificationTask):
+    """Class to identify new EYB triage objects and determine if they should be ingested."""
 
 
-def ingest_eyb_triage_data(bucket, file):
-    """Ingests triage data from the file passed in.
-
-    Schedules the user data ingestion job after the triage ingestion job to prevent
-    the risk of duplicate instances of the same lead being created.
-    Triage data and user data are combined using a UUID to create/update a single EYB Lead.
-    """
-    logger.info(f'Ingesting file: {file} started')
-    task = EYBTriageDataIngestionTask(
+def eyb_triage_ingestion_task(object_key: str) -> None:
+    logger.info('EYB triage ingestion task started...')
+    ingestion_task = EYBTriageIngestionTask(
+        object_key=object_key,
+        s3_processor=S3ObjectProcessor(prefix=TRIAGE_PREFIX),
         serializer_class=CreateEYBLeadTriageSerializer,
-        prefix=TRIAGE_PREFIX,
     )
-    task.ingest(bucket, file)
-    logger.info(f'Ingesting file: {file} finished')
+    ingestion_task.ingest_object()
+    logger.info('EYB triage ingestion task finished.')
 
-    # Chain next job (EYB user file) to avoid creating duplicate EYB Leads.
+    # Chain next job (EYB user object identification);
+    # This avoids creating duplicate EYB leads when ingesting different components simultaneously
     job_scheduler(
-        function=ingest_eyb_user_file,
-        description='Check S3 for new EYB user data files and ingest',
+        function=eyb_user_identification_task,
+        description='Identify new EYB user objects',
     )
-    logger.info('Ingest EYB triage data job has scheduled EYB user file job')
+    logger.info('EYB triage ingestion task has scheduled EYB user identification task')
 
 
-class EYBTriageDataIngestionTask(BaseEYBDataIngestionTask):
-    """Long running job to read the triage file contents and ingest the records."""
-
-    def _get_hashed_uuid(self, obj):
-        return obj.get('hashedUuid', None)
+class EYBTriageIngestionTask(BaseEYBIngestionTask):
+    """Class to ingest a specific EYB triage object from S3."""
