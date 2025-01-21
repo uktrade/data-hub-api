@@ -15,7 +15,14 @@ def trasform_govuk_payment_to_omis_payment_data(govuk_payment):
         return None
 
     card_details = govuk_payment['card_details']
+
+    # There have been some cases where billing_address & cardholder_name returns None
     billing_address = card_details['billing_address']
+    if billing_address is None:
+        billing_address = {'line1': '', 'line2': '', 'city': '', 'postcode': '', 'country': ''}
+    cardholder_name = card_details['cardholder_name']
+    if cardholder_name is None:
+        cardholder_name = ''
 
     return {
         'amount': govuk_payment['amount'],
