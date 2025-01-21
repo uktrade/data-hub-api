@@ -4,6 +4,7 @@ import factory
 import pytest
 import reversion
 from django.conf import settings
+from django.test import override_settings
 from django.utils.timezone import now
 from freezegun import freeze_time
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
@@ -56,6 +57,7 @@ class AddContactBase(APITestMixin):
     endpoint_namespace = None
 
     @freeze_time('2017-04-18 13:25:30.986208')
+    @override_settings(CONSENT_DATA_MANAGEMENT_URL=None)
     def test_with_manual_address(self, get_consent_fixture):
         """Test add with manual address."""
         company = CompanyFactory()
@@ -147,6 +149,7 @@ class AddContactBase(APITestMixin):
             'modified_on': '2017-04-18T13:25:30.986208Z',
             'valid_email': None,
             'consent_data': None,
+            'consent_data_management_url': None,
         }
 
     def test_with_address_same_as_company(self):
@@ -362,6 +365,7 @@ class TestAddContactV4(AddContactBase):
     endpoint_namespace = 'api-v4'
 
     @freeze_time('2017-04-18 13:25:30.986208')
+    @override_settings(CONSENT_DATA_MANAGEMENT_URL='http://domain.com/?email=')
     def test_with_us_manual_address(self, get_consent_fixture):
         """Test add with manual address."""
         company = CompanyFactory()
@@ -462,6 +466,7 @@ class TestAddContactV4(AddContactBase):
             'modified_on': '2017-04-18T13:25:30.986208Z',
             'valid_email': True,
             'consent_data': None,
+            'consent_data_management_url': 'http://domain.com/?email=foo@bar.com',
         }
 
     def test_fails_with_us_but_no_area(self):
@@ -502,6 +507,7 @@ class EditContactBase(APITestMixin):
 
     endpoint_namespace = None
 
+    @override_settings(CONSENT_DATA_MANAGEMENT_URL='http://domain.com/?email=')
     def test_patch(self):
         """Test that it successfully patches an existing contact."""
         with freeze_time('2017-04-18 13:25:30.986208'):
@@ -583,6 +589,7 @@ class EditContactBase(APITestMixin):
             'modified_on': '2017-04-19T13:25:30.986208Z',
             'valid_email': True,
             'consent_data': None,
+            'consent_data_management_url': 'http://domain.com/?email=foo@bar.com',
         }
 
     def test_cannot_update_if_archived(self):
@@ -694,6 +701,7 @@ class TestEditContactV4(EditContactBase):
 
     endpoint_namespace = 'api-v4'
 
+    @override_settings(CONSENT_DATA_MANAGEMENT_URL='http://domain.com/?email=')
     def test_patch_area(self):
         """Test that it successfully patch an existing contact."""
         with freeze_time('2017-04-18 13:25:30.986208'):
@@ -720,6 +728,7 @@ class TestEditContactV4(EditContactBase):
             )
 
         url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
+
         with freeze_time('2017-04-19 13:25:30.986208'):
             response = self.api_client.patch(
                 url,
@@ -781,6 +790,7 @@ class TestEditContactV4(EditContactBase):
             'modified_on': '2017-04-19T13:25:30.986208Z',
             'valid_email': True,
             'consent_data': None,
+            'consent_data_management_url': 'http://domain.com/?email=foo@bar.com',
         }
 
     def test_try_to_remove_area(self):
@@ -893,6 +903,7 @@ class ViewContactBase(APITestMixin):
     endpoint_namespace = None
 
     @freeze_time('2017-04-18 13:25:30.986208')
+    @override_settings(CONSENT_DATA_MANAGEMENT_URL='http://domain.com/?email=')
     def test_view(self):
         """Test view."""
         company = CompanyFactory()
@@ -971,6 +982,7 @@ class ViewContactBase(APITestMixin):
             'modified_on': '2017-04-18T13:25:30.986208Z',
             'valid_email': True,
             'consent_data': {'consent': True},
+            'consent_data_management_url': 'http://domain.com/?email=foo@bar.com',
         }
 
     def test_get_contact_without_view_document_permission(self):
@@ -1125,6 +1137,7 @@ class ContactListBase(APITestMixin):
         assert response.data['count'] == 5
 
     @freeze_time('2017-04-18 13:25:30.986208')
+    @override_settings(CONSENT_DATA_MANAGEMENT_URL='http://domain.com/?email=')
     def test_all_details(self):
         """Test response matches the inputted details when getting all contacts."""
         company = CompanyFactory()
@@ -1203,6 +1216,7 @@ class ContactListBase(APITestMixin):
                     },
                     'valid_email': True,
                     'consent_data': {'consent': False},
+                    'consent_data_management_url': 'http://domain.com/?email=foo@bar.com',
                 },
             ],
         }
