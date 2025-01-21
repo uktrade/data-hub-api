@@ -158,7 +158,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         """
         company_name = values['company_name']
         company = Company.objects.filter(name=company_name)
-        if company:
+        if company.exists():
             return company[0]
 
         try:
@@ -181,7 +181,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         :returns: An existing `Contact` if found or a newly created `Contact`.
         """
         contact = Contact.objects.filter(email=values['email'])
-        if contact:
+        if contact.exists():
             return contact[0]
 
         try:

@@ -302,7 +302,7 @@ class TestStovaIngestionTasks:
         stova_attendee_ingestion_task(test_file_path)
 
         attendee = StovaAttendee.objects.get(stova_attendee_id=data['id'])
-        assert attendee.company.id == existing_company.id
+        assert attendee.company_id == existing_company.id
 
     @pytest.mark.django_db
     @mock_aws
@@ -327,7 +327,7 @@ class TestStovaIngestionTasks:
         stova_attendee_ingestion_task(test_file_path)
 
         attendee = StovaAttendee.objects.get(stova_attendee_id=data['id'])
-        assert attendee.contact.id == existing_contact.id
+        assert attendee.contact_id == existing_contact.id
 
     @pytest.mark.django_db
     @mock_aws
