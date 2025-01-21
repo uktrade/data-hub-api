@@ -70,6 +70,6 @@ class StovaAttendee(models.Model):
         related_name='stova_attendee',
         help_text=(
             'Each attendee comes with a Stova Event ID which is stored as its raw value under '
-            'stova_attendee_id. This field is the FK to the ingrested Stova Event in Data Hub.',
+            'stova_attendee_id. This field is the FK to the ingested Stova Event in Data Hub.',
         ),
     )
