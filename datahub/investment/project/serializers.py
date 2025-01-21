@@ -326,7 +326,18 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         required=False,
         allow_null=True,
     )
-    investor_company = NestedRelatedField(Company, required=True, allow_null=False)
+    investor_company = NestedRelatedField(
+        Company,
+        [
+            'name',
+            'address_1',
+            'address_2',
+            'address_town',
+            'address_postcode',
+        ],
+        required=True,
+        allow_null=False,
+    )
     investor_company_country = NestedRelatedField(meta_models.Country, read_only=True)
     investor_type = NestedRelatedField(InvestorType, required=False, allow_null=True)
     intermediate_company = NestedRelatedField(Company, required=False, allow_null=True)
