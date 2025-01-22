@@ -42,6 +42,20 @@ class StovaAttendeeIndentificationTask(BaseObjectIdentificationTask):
 class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
     existing_ids = []
 
+    def _should_process_record(self, record: dict) -> bool:
+        """Checks whether the record has already been ingested or not."""
+        if not self.existing_ids:
+            self.existing_ids = set(
+                StovaAttendee.objects.values_list('stova_attendee_id', flat=True),
+            )
+
+        stova_attendee_id = record.get('id')
+        if stova_attendee_id in self.existing_ids:
+            logger.info(f'Record already exists for stova_attendee_id: {stova_attendee_id}')
+            return False
+
+        return True
+
     def _process_record(self, record: dict) -> None:
         """
         Processes a single stova attendee from the S3 Bucket and saves it to the `StovaAttendee`
@@ -52,20 +66,8 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
             details.
         :returns: None
         """
-        if not self.existing_ids:
-            self.existing_ids = set(
-                StovaAttendee.objects.values_list('stova_attendee_id', flat=True),
-            )
-
-        stova_attendee_id = record.get('id')
-        if stova_attendee_id in self.existing_ids:
-            logger.info(
-                f'Record already exists for stova_attendee_id: {stova_attendee_id}',
-            )
-            return
-
         values = {
-            'stova_attendee_id': stova_attendee_id,
+            'stova_attendee_id': record.get('id'),
             'stova_event_id': record.get('event_id', ''),
             'created_date': record.get('created_date'),
             'email': record.get('email', ''),

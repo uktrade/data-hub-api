@@ -40,18 +40,23 @@ class StovaEventIngestionTask(BaseObjectIngestionTask):
 
     existing_ids = []
 
-    def _process_record(self, record: dict) -> None:
-        """Saves an event from Stova from the S3 bucket into a `StovaEvent`"""
+    def _should_process_record(self, record: dict) -> bool:
+        """Checks whether the record has already been ingested or not."""
         if not self.existing_ids:
             self.existing_ids = set(StovaEvent.objects.values_list('stova_event_id', flat=True))
 
         stova_event_id = record.get('id')
         if stova_event_id in self.existing_ids:
             logger.info(f'Record already exists for stova_event_id: {stova_event_id}')
-            return
+            return False
 
+        return True
+
+    def _process_record(self, record: dict) -> None:
+        """Saves an event from Stova from the S3 bucket into a `StovaEvent`"""
+        stova_event_id = record.get('id')
         values = {
-            'stova_event_id': stova_event_id,
+            'stova_event_id': record.get('id'),
             'url': record.get('url', ''),
             'city': record.get('city', ''),
             'code': record.get('code', ''),

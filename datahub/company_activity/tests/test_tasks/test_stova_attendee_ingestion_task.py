@@ -219,13 +219,15 @@ class TestStovaIngestionTasks:
         data = test_base_stova_attendee
         data['id'] = existing_stova_attendee.stova_attendee_id
 
+        # Check that the record should not be processed if it already exists.
         with caplog.at_level(logging.INFO):
-            task._process_record(data)
+            assert task._should_process_record(data) is False
             assert (
                 'Record already exists for stova_attendee_id: '
                 f'{existing_stova_attendee.stova_attendee_id}'
             ) in caplog.text
 
+        # Check that if there are duplicate IDs in the JSON but not our DB, this is handled.
         data['id'] = 999999
         task._process_record(data)
         with caplog.at_level(logging.ERROR):
