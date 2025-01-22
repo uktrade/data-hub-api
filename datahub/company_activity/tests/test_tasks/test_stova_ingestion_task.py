@@ -85,7 +85,7 @@ def test_base_stova_event():
         'location_city': 'Port Laurenside',
         'location_name': '271 Carlos Key\nWest Sarah WV 98592',
         'modified_date': '2024-10-08 10:48:36.205154+00:00',
-        'client_contact': 3174,
+        'client_contact': 'example-contact-info@example.com',
         'location_state': 'Arkansas',
         'default_language': 'sa',
         'location_country': 'United States Minor Outlying Islands',
