@@ -166,3 +166,28 @@ class TestIProjectSerializer:
         assert str(
             serializer.validated_data['country_investment_originates_from'],
         ) == constants.Country.argentina.value.name
+
+    def test_investor_company_required_fields(self):
+        """Tests require fields for investor_company"""
+        project = InvestmentProjectFactory()
+        serializer = IProjectSerializer(project)
+        assert serializer.data['investor_company']['id'] == str(project.investor_company.id)
+        assert (
+            serializer.data['investor_company']['name'] == project.investor_company.name
+        )
+        assert (
+            serializer.data['investor_company']['address_1']
+            == project.investor_company.address_1
+        )
+        assert (
+            serializer.data['investor_company']['address_2']
+            == project.investor_company.address_2
+        )
+        assert (
+            serializer.data['investor_company']['address_town']
+            == project.investor_company.address_town
+        )
+        assert (
+            serializer.data['investor_company']['address_postcode']
+            == project.investor_company.address_postcode
+        )
