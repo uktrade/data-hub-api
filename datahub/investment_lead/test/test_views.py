@@ -9,12 +9,12 @@ from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 from datahub.investment_lead.models import EYBLead
-from datahub.investment_lead.tasks.ingest_eyb_common import DATE_FORMAT
 from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.investment_lead.test.utils import assert_retrieved_eyb_lead_data
 from datahub.metadata.models import Country, Sector
 
 
+DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 EYB_LEAD_COLLECTION_URL = reverse('api-v4:investment-lead:eyb-lead-collection')
 
 
