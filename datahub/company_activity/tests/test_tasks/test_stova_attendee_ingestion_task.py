@@ -203,15 +203,10 @@ class TestStovaIngestionTasks:
             assert model_value == file_value
 
     @pytest.mark.django_db
-    def test_stova_attendee_fields_with_duplicate_attendee_ids(
+    def test_stova_attendee_fields_with_duplicate_attendee_ids_in_db(
         self, caplog, test_base_stova_attendee,
     ):
-        """
-        Test that if they are records with duplicate attendee ids, they are not created.
-
-        This checks for both scenarios where we have already stored an attendee in our DB and also
-        where the file contains two rows with the same attendee_id.
-        """
+        """Test already ingested records to do pass the `_should_process_record` check."""
         s3_processor_mock = mock.Mock()
         task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
 
@@ -219,7 +214,6 @@ class TestStovaIngestionTasks:
         data = test_base_stova_attendee
         data['id'] = existing_stova_attendee.stova_attendee_id
 
-        # Check that the record should not be processed if it already exists.
         with caplog.at_level(logging.INFO):
             assert task._should_process_record(data) is False
             assert (
@@ -227,7 +221,17 @@ class TestStovaIngestionTasks:
                 f'{existing_stova_attendee.stova_attendee_id}'
             ) in caplog.text
 
-        # Check that if there are duplicate IDs in the JSON but not our DB, this is handled.
+    @pytest.mark.django_db
+    def test_stova_attendee_fields_with_duplicate_attendee_ids_in_json(
+        self, caplog, test_base_stova_attendee,
+    ):
+        """
+        Test records which have duplicate IDs in their JSON do not raise errors and are handled.
+        """
+        s3_processor_mock = mock.Mock()
+        task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
+
+        data = test_base_stova_attendee
         data['id'] = 999999
         task._process_record(data)
         with caplog.at_level(logging.ERROR):
