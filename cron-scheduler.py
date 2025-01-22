@@ -17,9 +17,13 @@ from datahub.company.tasks.contact import (
     schedule_automatic_contact_archive,
 )
 from datahub.company.tasks.export_potential import update_company_export_potential_from_csv
-from datahub.company_activity.tasks.ingest_company_activity import ingest_activity_data
-from datahub.company_activity.tasks.ingest_stova_attendees import ingest_stova_attendee_data
-from datahub.company_activity.tasks.ingest_stova_events import ingest_stova_event_data
+from datahub.company_activity.tasks.ingest_company_activity import (
+    company_activity_identification_task,
+)
+from datahub.company_activity.tasks.ingest_stova_attendees import (
+    stova_attendee_identification_task,
+)
+from datahub.company_activity.tasks.ingest_stova_events import stova_event_identification_task
 from datahub.core.queues.constants import (
     EVERY_EIGHT_AM,
     EVERY_EIGHT_THIRTY_AM_ON_FIRST_EACH_MONTH,
@@ -132,9 +136,9 @@ def schedule_jobs():
         description='Update companies from dnb service',
     )
     job_scheduler(
-        function=ingest_activity_data,
+        function=company_activity_identification_task,
         cron=EVERY_HOUR,
-        description='Check S3 for new Company Activity data files and schedule ingestion',
+        description='Identify new company activity objects',
     )
     job_scheduler(
         function=eyb_triage_identification_task,
@@ -142,14 +146,14 @@ def schedule_jobs():
         description='Identify new EYB triage objects',
     )
     job_scheduler(
-        function=ingest_stova_event_data,
+        function=stova_event_identification_task,
         cron=EVERY_HOUR,
-        description='Check S3 for new Stova Event files and schedule ingestion',
+        description='Identify new Stova event objects',
     )
     job_scheduler(
-        function=ingest_stova_attendee_data,
+        function=stova_attendee_identification_task,
         cron=EVERY_HOUR,
-        description='Check S3 for new Stova Attendee files and schedule ingestion',
+        description='Identify new Stova attendee objects',
     )
 
     if settings.ENABLE_ESTIMATED_LAND_DATE_REMINDERS:

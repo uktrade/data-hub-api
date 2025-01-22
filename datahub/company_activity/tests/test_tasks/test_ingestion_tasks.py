@@ -19,7 +19,7 @@ from datahub.company_activity.models import IngestedFile
 from datahub.company_activity.tasks import ingest_great_data
 from datahub.company_activity.tasks.constants import BUCKET, GREAT_PREFIX, REGION
 from datahub.company_activity.tasks.ingest_company_activity import (
-    ingest_activity_data, TWO_HOURS_IN_SECONDS,
+    company_activity_identification_task, TWO_HOURS_IN_SECONDS,
 )
 from datahub.core.queues.constants import EVERY_HOUR
 from datahub.core.queues.job_scheduler import job_scheduler
@@ -62,7 +62,7 @@ class TestCompanyActivityIngestionTasks:
 
         scheduler = Scheduler(queue, connection=Redis.from_url(settings.REDIS_BASE_URL))
         scheduled_jobs = scheduler.get_jobs()
-        func = 'datahub.company_activity.tasks.ingest_company_activity.ingest_activity_data'
+        func = 'datahub.company_activity.tasks.ingest_company_activity.company_activity_identification_task'  # noqa
         scheduled_job = [job for job in scheduled_jobs if job.func_name == func][0]
         assert scheduled_job.meta['cron_string'] == EVERY_HOUR
 
@@ -94,7 +94,7 @@ class TestCompanyActivityIngestionTasks:
         initial_job_count = rq_queue.count
 
         with caplog.at_level(logging.INFO):
-            ingest_activity_data()
+            company_activity_identification_task()
             assert 'Checking for new Company Activity data files' in caplog.text
             assert f'Scheduled ingestion of {new_file}' in caplog.text
 
@@ -129,7 +129,7 @@ class TestCompanyActivityIngestionTasks:
         initial_job_count = rq_queue.count
 
         with caplog.at_level(logging.INFO):
-            ingest_activity_data()
+            company_activity_identification_task()
             assert f'{new_file} has already been ingested' in caplog.text
         assert rq_queue.count == initial_job_count
 
@@ -160,7 +160,7 @@ class TestCompanyActivityIngestionTasks:
         initial_job_count = rq_queue.count
 
         with caplog.at_level(logging.INFO):
-            ingest_activity_data()
+            company_activity_identification_task()
             assert f'{new_file} has already been queued for ingestion' in caplog.text
         assert rq_queue.count == initial_job_count
 
@@ -189,7 +189,7 @@ class TestCompanyActivityIngestionTasks:
         mock_worker_instance.get_current_job = MagicMock(return_value=mock_job)
         mock_worker.all.return_value = [mock_worker_instance]
 
-        ingest_activity_data()
+        company_activity_identification_task()
         assert rq_queue.count == initial_job_count
 
     @pytest.mark.django_db
@@ -213,7 +213,7 @@ class TestCompanyActivityIngestionTasks:
         mock_worker_instance = Worker(['long-running'], connection=redis)
         mock_worker_instance.get_current_job = MagicMock(return_value=None)
         mock_worker.all.return_value = [mock_worker_instance]
-        ingest_activity_data()
+        company_activity_identification_task()
         assert rq_queue.count == initial_job_count + 1
 
     @pytest.mark.django_db
@@ -232,7 +232,7 @@ class TestCompanyActivityIngestionTasks:
                 IngestedFile.objects.create(filepath=file)
 
         with caplog.at_level(logging.INFO):
-            ingest_activity_data()
+            company_activity_identification_task()
             assert f'Ingesting file: {new_file} started' in caplog.text
 
     @mock_aws
@@ -242,5 +242,5 @@ class TestCompanyActivityIngestionTasks:
         """
         setup_s3_bucket(BUCKET, [])
         with caplog.at_level(logging.INFO):
-            ingest_activity_data()
+            company_activity_identification_task()
             assert 'No files found' in caplog.text

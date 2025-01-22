@@ -18,7 +18,7 @@ from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.company_activity.models import StovaAttendee
 from datahub.company_activity.tasks.constants import BUCKET, REGION, STOVA_ATTENDEE_PREFIX
 from datahub.company_activity.tasks.ingest_stova_attendees import (
-    ingest_stova_attendee_data,
+    stova_attendee_identification_task,
     stova_attendee_ingestion_task,
     StovaAttendeeIngestionTask,
 )
@@ -129,7 +129,7 @@ class TestStovaIngestionTasks:
         create_stova_event_records()
 
         with caplog.at_level(logging.INFO):
-            ingest_stova_attendee_data()
+            stova_attendee_identification_task()
             assert 'Stova attendee identification task started.' in caplog.text
             assert 'Stova attendee identification task finished.' in caplog.text
             assert (
@@ -404,7 +404,7 @@ class TestStovaIngestionTasks:
         setup_s3_files(BUCKET, test_file, test_file_path)
 
         with caplog.at_level(logging.INFO):
-            ingest_stova_attendee_data()
+            stova_attendee_identification_task()
             # These are from the fixture file.
             assert (
                 'The event associated with this attendee does not exist, skipping attendee with '

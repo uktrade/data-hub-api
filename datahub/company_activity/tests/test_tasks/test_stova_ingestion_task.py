@@ -16,8 +16,8 @@ from sentry_sdk.transport import Transport
 from datahub.company_activity.models import StovaEvent
 from datahub.company_activity.tasks.constants import BUCKET, REGION, STOVA_EVENT_PREFIX
 from datahub.company_activity.tasks.ingest_stova_events import (
-    ingest_stova_event_data,
-    stova_ingestion_task,
+    stova_event_identification_task,
+    stova_event_ingestion_task,
     StovaEventIngestionTask,
 )
 from datahub.company_activity.tests.factories import (
@@ -124,7 +124,7 @@ class TestStovaIngestionTasks:
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
         with caplog.at_level(logging.INFO):
-            ingest_stova_event_data()
+            stova_event_identification_task()
             assert 'Stova event identification task started.' in caplog.text
             assert 'Stova event identification task finished.' in caplog.text
             assert f'Stova event ingestion task started for file {test_file_path}' in caplog.text
@@ -149,7 +149,7 @@ class TestStovaIngestionTasks:
         test_file = gzip.compress(record.encode('utf-8'))
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
-        stova_ingestion_task(test_file_path)
+        stova_event_ingestion_task(test_file_path)
         assert StovaEvent.objects.filter(stova_event_id=123456789).count() == 1
 
     @pytest.mark.django_db
@@ -163,7 +163,7 @@ class TestStovaIngestionTasks:
         init(transport=mock_transport)
         setup_s3_bucket(BUCKET)
         with pytest.raises(Exception) as e:
-            stova_ingestion_task(test_file_path)
+            stova_event_ingestion_task(test_file_path)
         exception = e.value.args[0]
         assert 'The specified key does not exist' in exception
         expected = "key: 'data-flow/exports/ExportAventriEvents/" 'stovaEventFake2.jsonl.gz'
