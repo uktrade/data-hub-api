@@ -83,7 +83,7 @@ def test_ingestion_task_schedules_user_identification_task(
     triage_object_key, s3_object_processor, caplog,
 ):
     records = [eyb_lead_triage_record_faker()]
-    object_definition = (triage_object_key, compressed_json_faker(records, nested=True))
+    object_definition = (triage_object_key, compressed_json_faker(records, nest_records=True))
     upload_objects_to_s3(s3_object_processor, [object_definition])
 
     with (

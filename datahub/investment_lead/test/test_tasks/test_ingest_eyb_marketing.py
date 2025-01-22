@@ -81,7 +81,7 @@ def test_ingestion_task_success(
     marketing_object_key, s3_object_processor, caplog,
 ):
     records = [eyb_lead_marketing_record_faker()]
-    object_definition = (marketing_object_key, compressed_json_faker(records, nested=False))
+    object_definition = (marketing_object_key, compressed_json_faker(records, nest_records=False))
     upload_objects_to_s3(s3_object_processor, [object_definition])
 
     with caplog.at_level(logging.INFO):
@@ -110,7 +110,7 @@ def test_ingestion_task_does_not_update_existing(
             'utm_source': 'Advert',
         }),
     ]
-    object_definition = (marketing_object_key, compressed_json_faker(records, nested=False))
+    object_definition = (marketing_object_key, compressed_json_faker(records, nest_records=False))
     upload_objects_to_s3(s3_object_processor, [object_definition])
 
     eyb_marketing_ingestion_task(marketing_object_key)
