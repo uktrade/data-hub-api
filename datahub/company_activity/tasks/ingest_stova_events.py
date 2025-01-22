@@ -74,7 +74,7 @@ class StovaEventIngestionTask(BaseObjectIngestionTask):
             'location_city': record.get('location_city', ''),
             'location_name': record.get('location_name', ''),
             'modified_date': record.get('modified_date'),
-            'client_contact': record.get('client_contact'),
+            'client_contact': record.get('client_contact', ''),
             'location_state': record.get('location_state', ''),
             'default_language': record.get('default_language', ''),
             'location_country': record.get('location_country', ''),
