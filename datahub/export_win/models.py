@@ -700,6 +700,7 @@ class CustomerResponse(BaseModel):
     agree_with_win = models.BooleanField(
         null=True,
         verbose_name='Please confirm these details are correct',
+        db_index=True,
     )
     case_study_willing = models.BooleanField(
         verbose_name=('Would you be willing for DBT/Exporting is GREAT to feature your success '

@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 
 from django.conf import settings
-from django.db.models import Max, Min, Q
+from django.db.models import Case, Count, Max, Min, Q, Value, When
 
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -175,6 +175,18 @@ class WinViewSet(CoreViewSet):
             win = get_object_or_404(queryset, pk=kwargs['pk'])
         serializer = self.get_serializer(win)
         return Response(serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+
+        # include totals for each Win status
+        counts = self.get_queryset().aggregate(
+            null=Count(Case(When(customer_response__agree_with_win__isnull=True, then=Value(1)))),
+            true=Count(Case(When(customer_response__agree_with_win=True, then=Value(1)))),
+            false=Count(Case(When(customer_response__agree_with_win=False, then=Value(1)))),
+        )
+        response.data.update({'confirmed': counts})
+        return response
 
     @action(methods=['post'], detail=True, schema=StubSchema())
     def resend_export_win(self, request, *args, **kwargs):

@@ -472,6 +472,7 @@ class TestListWinView(APITestMixin):
         response_data = response.json()
 
         assert response_data['count'] == 4
+        assert sum(response_data['confirmed'].values()) == 4
 
     def test_list_default_sorting(self):
         """Tests wins are sorted."""
@@ -529,6 +530,9 @@ class TestListWinView(APITestMixin):
         results = response.json()
 
         assert len(results['results']) == results_length
+        assert results['confirmed'][confirmed] == results_length
+        # Totals are unaffected by filtering
+        assert sum(results['confirmed'].values()) == 6
 
         expected = {
             'true': True,
@@ -621,6 +625,7 @@ class TestListWinView(APITestMixin):
         assert len(results['results']) == results_length
         if results_length == 1:
             assert results['results'][0]['id'] == str(win.id)
+            assert sum(results['confirmed'].values()) == 1
 
 
 class TestCreateWinView(APITestMixin):
