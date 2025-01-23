@@ -326,18 +326,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         required=False,
         allow_null=True,
     )
-    investor_company = NestedRelatedField(
-        Company,
-        [
-            'name',
-            'address_1',
-            'address_2',
-            'address_town',
-            'address_postcode',
-        ],
-        required=True,
-        allow_null=False,
-    )
+    investor_company = NestedRelatedField(Company, required=True, allow_null=False)
     investor_company_country = NestedRelatedField(meta_models.Country, read_only=True)
     investor_type = NestedRelatedField(InvestorType, required=False, allow_null=True)
     intermediate_company = NestedRelatedField(Company, required=False, allow_null=True)
@@ -422,7 +411,18 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         many=True,
         required=False,
     )
-    uk_company = NestedRelatedField(Company, required=False, allow_null=True)
+    uk_company = NestedRelatedField(
+        Company,
+        [
+            'name',
+            'address_1',
+            'address_2',
+            'address_town',
+            'address_postcode',
+        ],
+        required=False,
+        allow_null=True,
+    )
     incomplete_fields = serializers.ListField(child=serializers.CharField(), read_only=True)
     requirements_complete = serializers.SerializerMethodField()
 

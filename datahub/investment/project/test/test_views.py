@@ -745,10 +745,6 @@ class TestRetrieveView(APITestMixin):
         assert response_data['investor_company'] == {
             'id': str(investor_company.id),
             'name': investor_company.name,
-            'address_1': investor_company.address_1,
-            'address_2': investor_company.address_2,
-            'address_postcode': investor_company.address_postcode,
-            'address_town': investor_company.address_town,
         }
         assert response_data['investor_company_country'] == {
             'id': str(investor_company.address_country.id),
