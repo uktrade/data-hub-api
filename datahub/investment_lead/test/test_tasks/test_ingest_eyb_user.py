@@ -83,7 +83,9 @@ def test_ingestion_task_triggers_company_linking(
     user_object_key, s3_object_processor, caplog,
 ):
     records = [eyb_lead_user_record_faker()]
-    object_definition = (user_object_key, compressed_json_faker(records, nest_records=True))
+    object_definition = (
+        user_object_key, compressed_json_faker(records, key_to_nest_records_under='object'),
+    )
     upload_objects_to_s3(s3_object_processor, [object_definition])
 
     with (
@@ -102,7 +104,9 @@ def test_ingestion_task_schedules_marketing_identification_task(
     user_object_key, s3_object_processor, caplog,
 ):
     records = [eyb_lead_user_record_faker()]
-    object_definition = (user_object_key, compressed_json_faker(records, nest_records=True))
+    object_definition = (
+        user_object_key, compressed_json_faker(records, key_to_nest_records_under='object'),
+    )
     upload_objects_to_s3(s3_object_processor, [object_definition])
 
     with (

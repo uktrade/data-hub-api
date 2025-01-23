@@ -95,7 +95,7 @@ class TestEYBCompanyContactLinking:
             (user_object_key, user_records, user_object_processor),
         ]:
             object_definition = (
-                object_key, compressed_json_faker(records, nest_records=True),
+                object_key, compressed_json_faker(records, key_to_nest_records_under='object'),
             )
             upload_objects_to_s3(object_processor, [object_definition])
 
@@ -156,7 +156,7 @@ class TestEYBCompanyContactLinking:
             (user_object_key, user_records, user_object_processor),
         ]:
             object_definition = (
-                object_key, compressed_json_faker(records, nest_records=True),
+                object_key, compressed_json_faker(records, key_to_nest_records_under='object'),
             )
             upload_objects_to_s3(object_processor, [object_definition])
 
