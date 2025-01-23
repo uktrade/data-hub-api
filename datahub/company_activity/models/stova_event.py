@@ -27,12 +27,12 @@ class StovaEvent(models.Model):
     modified_by = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
 
     client_contact = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
-    contact_info = models.CharField(max_length=MAX_LENGTH)
+    contact_info = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
 
     country = models.CharField(max_length=MAX_LENGTH)
     city = models.CharField(max_length=MAX_LENGTH)
     state = models.CharField(max_length=MAX_LENGTH)
-    timezone = models.CharField(max_length=MAX_LENGTH)
+    timezone = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
     url = models.TextField()
     max_reg = models.IntegerField(null=True, blank=True)
 
