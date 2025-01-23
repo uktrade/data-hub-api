@@ -1,61 +1,55 @@
 import logging
 
 from datahub.core.queues.job_scheduler import job_scheduler
+from datahub.ingest.boto3 import S3ObjectProcessor
+from datahub.ingest.constants import DATA_FLOW_EXPORTS_PREFIX
 from datahub.investment_lead.serializers import CreateEYBLeadUserSerializer
 from datahub.investment_lead.services import link_leads_to_companies
 from datahub.investment_lead.tasks.ingest_eyb_common import (
-    BaseEYBDataIngestionTask,
-    BaseEYBFileIngestionTask,
-    PREFIX,
+    BaseEYBIdentificationTask,
+    BaseEYBIngestionTask,
 )
-from datahub.investment_lead.tasks.ingest_eyb_marketing import (
-    ingest_eyb_marketing_file,
-)
+from datahub.investment_lead.tasks.ingest_eyb_marketing import eyb_marketing_identification_task
+
+
+USER_PREFIX = f'{DATA_FLOW_EXPORTS_PREFIX}DirectoryExpandYourBusinessUserDataPipeline/'
 
 
 logger = logging.getLogger(__name__)
-USER_PREFIX = f'{PREFIX}DirectoryExpandYourBusinessUserDataPipeline/'
 
 
-def ingest_eyb_user_file():
-    logger.info('Checking for new EYB user files')
-    task = EYBUserFileIngestionTask()
-    task.ingest()
+def eyb_user_identification_task() -> None:
+    logger.info('EYB user identification task started...')
+    identification_task = EYBUserIdentificationTask(prefix=USER_PREFIX)
+    identification_task.identify_new_objects(eyb_user_ingestion_task)
+    logger.info('EYB user identification task finished.')
 
 
-class EYBUserFileIngestionTask(BaseEYBFileIngestionTask):
-    """Task to check for new user file and trigger long running job."""
-
-    def _job_matches(self, job, file):
-        func_name = 'datahub.investment_lead.tasks.ingest_eyb_user.ingest_eyb_user_data'
-        return job.kwargs.get('file') == file and job.func_name == func_name
-
-    def ingest(self):
-        super().ingest(USER_PREFIX, self._job_matches, ingest_eyb_user_data)
+class EYBUserIdentificationTask(BaseEYBIdentificationTask):
+    """Class to identify new EYB user objects and determine if they should be ingested."""
 
 
-def ingest_eyb_user_data(bucket, file):
-    logger.info(f'Ingesting file: {file} started')
-    task = EYBUserDataIngestionTask(
+def eyb_user_ingestion_task(object_key: str) -> None:
+    logger.info('EYB user ingestion task started...')
+    ingestion_task = EYBUserIngestionTask(
+        object_key=object_key,
+        s3_processor=S3ObjectProcessor(prefix=USER_PREFIX),
         serializer_class=CreateEYBLeadUserSerializer,
-        prefix=USER_PREFIX,
     )
-    task.ingest(bucket, file)
-    logger.info(f'Ingesting file: {file} finished')
+    ingestion_task.ingest_object()
+    logger.info('EYB user ingestion task finished.')
 
     link_leads_to_companies()
     logger.info('Linked leads to companies')
 
-    # Chain next job (EYB marketing file) to avoid creating duplicate EYB Leads.
+    # Chain next job (EYB marketing object identification);
+    # This avoids creating duplicate EYB leads when ingesting different components simultaneously
     job_scheduler(
-        function=ingest_eyb_marketing_file,
-        description='Check S3 for new EYB marketing files and ingest',
+        function=eyb_marketing_identification_task,
+        description='Identify new EYB marketing objects',
     )
-    logger.info('Ingest EYB user data job has scheduled EYB marketing file job')
+    logger.info('EYB user ingestion task has scheduled EYB marketing identification task')
 
 
-class EYBUserDataIngestionTask(BaseEYBDataIngestionTask):
-    """Long running job to read the user file contents and ingest the records."""
-
-    def _get_hashed_uuid(self, obj):
-        return obj.get('hashedUuid', None)
+class EYBUserIngestionTask(BaseEYBIngestionTask):
+    """Class to ingest a specific EYB user object from S3."""

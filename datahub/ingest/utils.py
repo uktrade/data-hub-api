@@ -4,10 +4,17 @@ import json
 from datahub.ingest.boto3 import S3ObjectProcessor
 
 
-def compressed_json_faker(records: list[dict] = None) -> bytes:
-    """Serializes and compresses records into a zipped JSON, encoded with UTF-8."""
+def compressed_json_faker(
+    records: list[dict] = None, key_to_nest_records_under: str = '',
+) -> bytes:
+    """Serializes and compresses records into a zipped JSON, encoded with UTF-8.
+
+    The `key_to_nest_records_under` argument indicates wether records should be nested under
+    the specified key; something that is common for records transported by Data Flow pipelines.
+    """
     json_lines = [
-        json.dumps({'object': record}, default=str)
+        json.dumps({key_to_nest_records_under: record}, default=str) if key_to_nest_records_under
+        else json.dumps(record, default=str)
         for record in records
     ]
     compressed_content = gzip.compress('\n'.join(json_lines).encode('utf-8'))

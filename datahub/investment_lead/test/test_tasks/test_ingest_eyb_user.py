@@ -1,35 +1,29 @@
 import logging
 
-from datetime import (
-    datetime,
-    timedelta,
-)
-from unittest.mock import patch
+from unittest import mock
 
 import pytest
+import reversion
 
-from django.conf import settings
 from moto import mock_aws
-from redis import Redis
-from rq import Queue
+from reversion.models import Version
 
-
-from datahub.company_activity.models import IngestedFile
-from datahub.company_activity.tests.factories import CompanyActivityIngestedFileFactory
-from datahub.core import constants
-from datahub.core.queues.scheduler import DataHubScheduler
+from datahub.ingest.boto3 import S3ObjectProcessor
+from datahub.ingest.constants import (
+    AWS_REGION,
+    S3_BUCKET_NAME,
+)
+from datahub.ingest.utils import (
+    compressed_json_faker,
+    upload_objects_to_s3,
+)
 from datahub.investment_lead.models import EYBLead
-from datahub.investment_lead.tasks.ingest_eyb_common import (
-    BUCKET,
-    DATE_FORMAT,
-)
-from datahub.investment_lead.tasks.ingest_eyb_triage import (
-    ingest_eyb_triage_data,
-    TRIAGE_PREFIX,
-)
+from datahub.investment_lead.serializers import CreateEYBLeadUserSerializer
+from datahub.investment_lead.tasks.ingest_eyb_marketing import eyb_marketing_identification_task
 from datahub.investment_lead.tasks.ingest_eyb_user import (
-    ingest_eyb_user_data,
-    ingest_eyb_user_file,
+    eyb_user_identification_task,
+    eyb_user_ingestion_task,
+    EYBUserIngestionTask,
     USER_PREFIX,
 )
 from datahub.investment_lead.test.factories import (
@@ -37,227 +31,189 @@ from datahub.investment_lead.test.factories import (
     EYBLeadFactory,
     generate_hashed_uuid,
 )
-from datahub.investment_lead.test.test_tasks.utils import (
-    file_contents_faker,
-    setup_s3_bucket,
-)
 
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def test_user_file_path():
-    return f'{USER_PREFIX}user.jsonl.gz'
+def s3_object_processor(s3_client):
+    """Fixture for an S3ObjectProcessor instance."""
+    return S3ObjectProcessor(
+        prefix=USER_PREFIX,
+        region=AWS_REGION,
+        bucket=S3_BUCKET_NAME,
+        s3_client=s3_client,
+    )
 
 
 @pytest.fixture
-def test_user_file_paths():
-    file_names = [
-        '1.jsonl.gz',
-        '2.jsonl.gz',
-        '3.jsonl.gz',
-        '4.jsonl.gz',
-        '5.jsonl.gz',
-    ]
-    return list(map(lambda x: USER_PREFIX + x, file_names))
+def user_object_key():
+    return f'{USER_PREFIX}object.json.gz'
 
 
-class TestEYBUserFileIngestionTasks:
-
-    # Patch so that we can test the job is queued, rather than having it be run instantly
-    @patch(
-        'datahub.core.queues.job_scheduler.DataHubScheduler',
-        return_value=DataHubScheduler(is_async=True),
-    )
-    @mock_aws
-    def test_user_ingestion_job_is_scheduled_after_triage_ingestion_job_finishes(
-        self, mock, caplog,
+@mock_aws
+def test_identification_task_schedules_ingestion_task(user_object_key, caplog):
+    with (
+        mock.patch('datahub.ingest.tasks.job_scheduler') as mock_scheduler,
+        mock.patch.object(
+            S3ObjectProcessor, 'get_most_recent_object_key', return_value=user_object_key,
+        ),
+        mock.patch.object(S3ObjectProcessor, 'has_object_been_ingested', return_value=False),
+        caplog.at_level(logging.INFO),
     ):
-        """Test that a task is scheduled to check for new EYB user files.
+        eyb_user_identification_task()
 
-        Unlike the EYB triage files, this task is not scheduled via cron-scheduler.py;
-        rather, it is scheduled upon the successful completion of the ingest_eyb_triage_data.
-        """
-        redis = Redis.from_url(settings.REDIS_BASE_URL)
-        rq_queue = Queue('short-running', connection=redis)
-        rq_queue.empty()
-        initial_job_count = rq_queue.count
+        assert 'EYB user identification task started...' in caplog.text
+        assert f'Scheduled ingestion of {user_object_key}' in caplog.text
+        assert 'EYB user identification task finished.' in caplog.text
 
-        file_path = f'{TRIAGE_PREFIX}triage.jsonl.gz'
-        file_contents = file_contents_faker(default_faker='triage')
-        setup_s3_bucket(BUCKET, [file_path], [file_contents])
-        with caplog.at_level(logging.INFO):
-            ingest_eyb_triage_data(BUCKET, file_path)
-            assert f'Ingesting file: {file_path} finished' in caplog.text
-            assert 'Ingest EYB triage data job has scheduled EYB user file job' in caplog.text
+        mock_scheduler.assert_called_once_with(
+            function=eyb_user_ingestion_task,
+            function_kwargs={
+                'object_key': user_object_key,
+            },
+            queue_name='long-running',
+            description=f'Ingest {user_object_key}',
+        )
 
-        assert rq_queue.count == initial_job_count + 1
-        jobs = rq_queue.jobs
-        job = jobs[-1]
-        job_function_name = 'datahub.investment_lead.tasks.ingest_eyb_user.ingest_eyb_user_file'
-        assert job.func_name == job_function_name
 
-    @pytest.mark.django_db
-    # Patch so that we can test the job is queued, rather than having it be run instantly
-    @patch(
-        'datahub.core.queues.job_scheduler.DataHubScheduler',
-        return_value=DataHubScheduler(is_async=True),
+@mock_aws
+def test_ingestion_task_triggers_company_linking(
+    user_object_key, s3_object_processor, caplog,
+):
+    records = [eyb_lead_user_record_faker()]
+    object_definition = (
+        user_object_key, compressed_json_faker(records, key_to_nest_records_under='object'),
     )
-    @mock_aws
-    def test_ingestion_job_is_queued_for_new_user_files(self, mock, test_user_file_paths, caplog):
-        """Tests that when a new file is found, a job is queued to ingest it."""
-        new_file_path = USER_PREFIX + '5.jsonl.gz'
-        setup_s3_bucket(BUCKET, test_user_file_paths)
-        for file_path in test_user_file_paths:
-            if not file_path == new_file_path:
-                IngestedFile.objects.create(filepath=file_path)
+    upload_objects_to_s3(s3_object_processor, [object_definition])
 
-        redis = Redis.from_url(settings.REDIS_BASE_URL)
-        rq_queue = Queue('long-running', connection=redis)
-        rq_queue.empty()
-        initial_job_count = rq_queue.count
+    with (
+        mock.patch('datahub.investment_lead.tasks.ingest_eyb_user.link_leads_to_companies')
+        as mocked_company_linking_task,
+        caplog.at_level(logging.INFO),
+    ):
+        eyb_user_ingestion_task(user_object_key)
 
-        with caplog.at_level(logging.INFO):
-            ingest_eyb_user_file()
-            assert 'Checking for new EYB user files' in caplog.text
-            assert f'Scheduled ingestion of {new_file_path}' in caplog.text
-
-        assert rq_queue.count == initial_job_count + 1
-        jobs = rq_queue.jobs
-        job = jobs[-1]
-        ingestion_task = 'datahub.investment_lead.tasks.ingest_eyb_user.ingest_eyb_user_data'
-        assert job.func_name == ingestion_task
-        assert job.kwargs['bucket'] == BUCKET
-        assert job.kwargs['file'] == new_file_path
+        mocked_company_linking_task.assert_called_once()
+        assert 'Linked leads to companies' in caplog.text
 
 
-class TestEYBUserDataIngestionTasks:
-    @mock_aws
-    def test_user_file_is_ingested(self, caplog, test_user_file_path):
-        """
-        Test that a EYB user data file is ingested correctly and the ingested
-        file is added to the IngestedFile table
-        """
-        initial_eyb_lead_count = EYBLead.objects.count()
-        initial_ingested_count = IngestedFile.objects.count()
-        file_contents = file_contents_faker(default_faker='user')
-        setup_s3_bucket(BUCKET, [test_user_file_path], [file_contents])
-        with caplog.at_level(logging.INFO):
-            ingest_eyb_user_data(BUCKET, test_user_file_path)
-            assert f'Ingesting file: {test_user_file_path} started' in caplog.text
-            assert f'Ingesting file: {test_user_file_path} finished' in caplog.text
-        assert EYBLead.objects.count() > initial_eyb_lead_count
-        assert IngestedFile.objects.count() == initial_ingested_count + 1
+@mock_aws
+def test_ingestion_task_schedules_marketing_identification_task(
+    user_object_key, s3_object_processor, caplog,
+):
+    records = [eyb_lead_user_record_faker()]
+    object_definition = (
+        user_object_key, compressed_json_faker(records, key_to_nest_records_under='object'),
+    )
+    upload_objects_to_s3(s3_object_processor, [object_definition])
 
-    @mock_aws
-    def test_user_data_ingestion_updates_existing_fields(self, test_user_file_path):
-        """
-        Test that for records which have been previously ingested, updated fields
-        have their new values ingested
-        """
-        united_kingdom_id = constants.Country.united_kingdom.value.id
-        hashed_uuid = generate_hashed_uuid()
-        EYBLeadFactory(user_hashed_uuid=hashed_uuid, address_country_id=united_kingdom_id)
-        assert EYBLead.objects.count() == 1
-        records = [
-            eyb_lead_user_record_faker({
-                'hashedUuid': hashed_uuid,
-                'companyLocation': 'FR',
-            }),
-        ]
-        file_contents = file_contents_faker(records)
-        setup_s3_bucket(BUCKET, [test_user_file_path], [file_contents])
-        ingest_eyb_user_data(BUCKET, test_user_file_path)
-        assert EYBLead.objects.count() == 1
-        updated = EYBLead.objects.get(user_hashed_uuid=hashed_uuid)
-        assert str(updated.address_country_id) == constants.Country.france.value.id
+    with (
+        mock.patch('datahub.investment_lead.tasks.ingest_eyb_user.job_scheduler')
+        as mock_scheduler,
+        caplog.at_level(logging.INFO),
+    ):
+        eyb_user_ingestion_task(user_object_key)
 
-    @mock_aws
-    def test_unmodified_user_records_are_skipped_during_ingestion(self, faker):
-        """
-        Test that we skip updating records whose modified date is older than the last
-        file ingestion date
-        """
-        hashed_uuid = generate_hashed_uuid()
-        yesterday = datetime.strftime(datetime.now() - timedelta(1), DATE_FORMAT)
-        file_path = f'{USER_PREFIX}1.jsonl.gz'
-        new_file_path = f'{USER_PREFIX}2.jsonl.gz'
-        CompanyActivityIngestedFileFactory(
-            file_created=datetime.now(),
-            filepath=file_path,
+        assert 'EYB user ingestion task started...' in caplog.text
+        assert 'EYB user ingestion task finished.' in caplog.text
+        assert EYBLead.objects.filter(user_hashed_uuid=records[0]['hashedUuid']).exists()
+
+        assert 'EYB user ingestion task has scheduled EYB marketing identification task' \
+            in caplog.text
+        mock_scheduler.assert_called_once_with(
+            function=eyb_marketing_identification_task,
+            description='Identify new EYB marketing objects',
         )
-        records = [
-            {
-                'hashedUuid': hashed_uuid,
-                'created': yesterday,
-                'modified': yesterday,
-                'companyName': faker.company(),
-                'addressLine1': faker.street_address(),
-                'town': faker.city(),
-                'companyLocation': faker.country_code(),
-                'fullName': faker.name(),
-                'email': faker.email(),
-            },
-        ]
-        file = file_contents_faker(records)
-        setup_s3_bucket(BUCKET, [new_file_path], [file])
-        ingest_eyb_user_data(BUCKET, new_file_path)
+
+
+@mock_aws
+class TestEYBUserIngestionTask:
+
+    @pytest.fixture
+    def ingestion_task(self, user_object_key):
+        return EYBUserIngestionTask(
+            object_key=user_object_key,
+            s3_processor=S3ObjectProcessor(prefix=USER_PREFIX),
+            serializer_class=CreateEYBLeadUserSerializer,
+        )
+
+    def test_get_hashed_uuid(self, ingestion_task):
+        record = eyb_lead_user_record_faker()
+        assert ingestion_task._get_hashed_uuid(record) == record['hashedUuid']
+
+    def test_get_record_from_line(self, ingestion_task):
+        deserialized_line = {'object': eyb_lead_user_record_faker()}
+        assert ingestion_task._get_record_from_line(deserialized_line) == \
+            deserialized_line['object']
+
+    def test_process_record_creates_eyb_lead_instance(self, ingestion_task):
+        hashed_uuid = generate_hashed_uuid()
+        record = eyb_lead_user_record_faker({'hashedUuid': hashed_uuid})
+
+        ingestion_task._process_record(record)
+
+        assert len(ingestion_task.created_ids) == 1
+        assert len(ingestion_task.updated_ids) == 0
+        assert len(ingestion_task.errors) == 0
+        assert EYBLead.objects.filter(user_hashed_uuid=hashed_uuid).exists()
+
+    def test_process_record_creates_initial_revision_for_new_instance(self, ingestion_task):
+        hashed_uuid = generate_hashed_uuid()
+        record = eyb_lead_user_record_faker({'hashedUuid': hashed_uuid})
+
+        ingestion_task._process_record(record)
+
+        instance = EYBLead.objects.get(user_hashed_uuid=hashed_uuid)
+        assert Version.objects.get_for_object(instance).count() == 1
+
+    def test_process_record_updates_eyb_lead_instance(self, ingestion_task):
+        hashed_uuid = generate_hashed_uuid()
+        existing_lead = EYBLeadFactory(
+            user_hashed_uuid=hashed_uuid,
+            role='Developer',
+        )
+        assert EYBLead.objects.count() == 1
+
+        new_role = 'CEO'
+        record = eyb_lead_user_record_faker(
+            {'hashedUuid': hashed_uuid, 'role': new_role},
+        )
+
+        ingestion_task._process_record(record)
+        existing_lead.refresh_from_db()
+
+        assert len(ingestion_task.created_ids) == 0
+        assert len(ingestion_task.updated_ids) == 1
+        assert len(ingestion_task.errors) == 0
+        assert EYBLead.objects.count() == 1
+        assert existing_lead.role == new_role
+
+    def test_process_record_creates_new_revision_for_updated_instance(self, ingestion_task):
+        hashed_uuid = generate_hashed_uuid()
+        with reversion.create_revision():
+            existing_lead = EYBLeadFactory(
+                user_hashed_uuid=hashed_uuid,
+                role='Developer',
+            )
+        assert Version.objects.get_for_object(existing_lead).count() == 1
+
+        record = eyb_lead_user_record_faker(
+            {'hashedUuid': hashed_uuid, 'role': 'CEO'},
+        )
+        ingestion_task._process_record(record)
+        existing_lead.refresh_from_db()
+
+        assert Version.objects.get_for_object(existing_lead).count() == 2
+
+    def test_process_record_handles_invalid_data(self, ingestion_task):
+        hashed_uuid = generate_hashed_uuid()
+        record = {'hashedUuid': hashed_uuid}  # records with missing fields are invalid
+        ingestion_task._process_record(record)
+
+        assert len(ingestion_task.created_ids) == 0
+        assert len(ingestion_task.updated_ids) == 0
+        assert len(ingestion_task.errors) == 1
+        assert ingestion_task.errors[0]['record'] == record
         assert EYBLead.objects.count() == 0
-
-    @mock_aws
-    def test_incoming_user_records_trigger_correct_logging(self, caplog):
-        """Test that incoming user correct logging messages.
-
-        If created -> hashed uuid is in the created list;
-        If updated existing record -> hashed uuid is in the updated list;
-        If failed validation -> errors captured in the error list.
-        """
-        today = datetime.now()
-        yesterday = datetime.now() - timedelta(days=1)
-
-        created_hashed_uuid = generate_hashed_uuid()
-        updated_hashed_uuid = generate_hashed_uuid()
-        failed_hashed_uuid = generate_hashed_uuid()
-
-        EYBLeadFactory(
-            triage_hashed_uuid=updated_hashed_uuid,
-            user_hashed_uuid=updated_hashed_uuid,
-        )
-        assert EYBLead.objects.count() == 1
-
-        records = [
-            # Created record
-            eyb_lead_user_record_faker({
-                'hashedUuid': created_hashed_uuid,
-                'created': today,
-                'modified': today,
-            }),
-            # Updated record
-            eyb_lead_user_record_faker({
-                'hashedUuid': updated_hashed_uuid,
-                'created': yesterday,
-                'modified': today,
-            }),
-            # Failed record
-            {
-                'hashedUuid': failed_hashed_uuid,
-                'created': today,
-                'modified': today,
-            },
-        ]
-
-        file_path = f'{USER_PREFIX}1.jsonl.gz'
-        CompanyActivityIngestedFileFactory(
-            file_created=yesterday,
-            filepath=file_path,
-        )
-        file_contents = file_contents_faker(records)
-        setup_s3_bucket(BUCKET, [file_path], [file_contents])
-        with caplog.at_level(logging.INFO):
-            ingest_eyb_user_data(BUCKET, file_path)
-            assert f"1 records created: ['{created_hashed_uuid}']" in caplog.text
-            assert f"1 records updated: ['{updated_hashed_uuid}']" in caplog.text
-            assert '1 records failed validation:' in caplog.text
-            assert f"'index': '{failed_hashed_uuid}'" in caplog.text
-        assert EYBLead.objects.count() == 2

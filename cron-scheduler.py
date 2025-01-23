@@ -17,9 +17,13 @@ from datahub.company.tasks.contact import (
     schedule_automatic_contact_archive,
 )
 from datahub.company.tasks.export_potential import update_company_export_potential_from_csv
-from datahub.company_activity.tasks.ingest_company_activity import ingest_activity_data
-from datahub.company_activity.tasks.ingest_stova_attendees import ingest_stova_attendee_data
-from datahub.company_activity.tasks.ingest_stova_events import ingest_stova_event_data
+from datahub.company_activity.tasks.ingest_company_activity import (
+    company_activity_identification_task,
+)
+from datahub.company_activity.tasks.ingest_stova_attendees import (
+    stova_attendee_identification_task,
+)
+from datahub.company_activity.tasks.ingest_stova_events import stova_event_identification_task
 from datahub.core.queues.constants import (
     EVERY_EIGHT_AM,
     EVERY_EIGHT_THIRTY_AM_ON_FIRST_EACH_MONTH,
@@ -53,7 +57,7 @@ from datahub.export_win.tasks import (
 # from datahub.investment.project.tasks import (
 #     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
 # )
-from datahub.investment_lead.tasks.ingest_eyb_triage import ingest_eyb_triage_file
+from datahub.investment_lead.tasks.ingest_eyb_triage import eyb_triage_identification_task
 from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
 from datahub.reminder.migration_tasks import run_ita_users_migration, run_post_users_migration
 from datahub.reminder.tasks import (
@@ -132,24 +136,24 @@ def schedule_jobs():
         description='Update companies from dnb service',
     )
     job_scheduler(
-        function=ingest_activity_data,
+        function=company_activity_identification_task,
         cron=EVERY_HOUR,
-        description='Check S3 for new Company Activity data files and schedule ingestion',
+        description='Identify new company activity objects and schedule their ingestion',
     )
     job_scheduler(
-        function=ingest_eyb_triage_file,
+        function=eyb_triage_identification_task,
         cron=EVERY_HOUR,
-        description='Check S3 for new EYB triage data files and schedule ingestion',
+        description='Identify new EYB triage objects and schedule their ingestion',
     )
     job_scheduler(
-        function=ingest_stova_event_data,
+        function=stova_event_identification_task,
         cron=EVERY_HOUR,
-        description='Check S3 for new Stova Event files and schedule ingestion',
+        description='Identify new Stova event objects and schedule their ingestion',
     )
     job_scheduler(
-        function=ingest_stova_attendee_data,
+        function=stova_attendee_identification_task,
         cron=EVERY_HOUR,
-        description='Check S3 for new Stova Attendee files and schedule ingestion',
+        description='Identify new Stova attendee objects and schedule their ingestion',
     )
 
     if settings.ENABLE_ESTIMATED_LAND_DATE_REMINDERS:

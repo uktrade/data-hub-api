@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 TWO_HOURS_IN_SECONDS = 7200
 
 
-def ingest_activity_data():
+def company_activity_identification_task():
     logger.info('Checking for new Company Activity data files')
     task = CompanyActivityIngestionTask()
     task.ingest()
