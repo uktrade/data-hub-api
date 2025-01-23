@@ -138,22 +138,22 @@ def schedule_jobs():
     job_scheduler(
         function=company_activity_identification_task,
         cron=EVERY_HOUR,
-        description='Identify new company activity objects',
+        description='Identify new company activity objects and schedule their ingestion',
     )
     job_scheduler(
         function=eyb_triage_identification_task,
         cron=EVERY_HOUR,
-        description='Identify new EYB triage objects',
+        description='Identify new EYB triage objects and schedule their ingestion',
     )
     job_scheduler(
         function=stova_event_identification_task,
         cron=EVERY_HOUR,
-        description='Identify new Stova event objects',
+        description='Identify new Stova event objects and schedule their ingestion',
     )
     job_scheduler(
         function=stova_attendee_identification_task,
         cron=EVERY_HOUR,
-        description='Identify new Stova attendee objects',
+        description='Identify new Stova attendee objects and schedule their ingestion',
     )
 
     if settings.ENABLE_ESTIMATED_LAND_DATE_REMINDERS:
