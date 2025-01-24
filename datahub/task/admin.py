@@ -45,6 +45,12 @@ class TaskAdmin(BaseModelAdminMixin, VersionAdmin):
         'investment_project',
         'company',
         'interaction',
+        'created_by',
+        'modified_by',
+        'archived_by',
+    )
+    autocomplete_fields = (
+        'advisers',
     )
 
     form = TaskAdminForm
