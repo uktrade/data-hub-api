@@ -1,5 +1,4 @@
-from datetime import date
-import datetime
+from datetime import date, datetime
 
 import factory
 import pytest
@@ -934,7 +933,7 @@ class ViewContactBase(APITestMixin):
             notes='lorem ipsum',
             valid_email=True,
             consent_data={'consent': True},
-            consent_data_last_modified=datetime.datetime.now(),
+            consent_data_last_modified=datetime.now(),
         )
         url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
