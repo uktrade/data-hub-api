@@ -99,7 +99,7 @@ class AddContactBase(APITestMixin):
                 },
                 'address_postcode': 'SW1A1AA',
                 'notes': 'lorem ipsum',
-                'accepts_dit_email_marketing': True,
+                'accepts_dbt_email_marketing': True,
             },
         )
 
@@ -139,7 +139,7 @@ class AddContactBase(APITestMixin):
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
-            'accepts_dit_email_marketing': True,
+            'accepts_dbt_email_marketing': True,
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': '',
@@ -208,7 +208,7 @@ class AddContactBase(APITestMixin):
         assert not response_data['address_country']
         assert not response_data['address_postcode']
         assert not response_data['notes']
-        assert not response_data['accepts_dit_email_marketing']
+        assert not response_data['accepts_dbt_email_marketing']
 
     def test_fails_with_invalid_email_address(self):
         """Test that fails if the email address is invalid."""
@@ -412,7 +412,7 @@ class TestAddContactV4(AddContactBase):
                 },
                 'address_postcode': 'SW1A1AA',
                 'notes': 'lorem ipsum',
-                'accepts_dit_email_marketing': True,
+                'accepts_dbt_email_marketing': True,
                 'valid_email': True,
             },
         )
@@ -456,7 +456,7 @@ class TestAddContactV4(AddContactBase):
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
-            'accepts_dit_email_marketing': True,
+            'accepts_dbt_email_marketing': True,
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': '',
@@ -579,7 +579,7 @@ class EditContactBase(APITestMixin):
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
-            'accepts_dit_email_marketing': False,
+            'accepts_dbt_email_marketing': False,
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': contact.archived_documents_url_path,
@@ -780,7 +780,7 @@ class TestEditContactV4(EditContactBase):
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
-            'accepts_dit_email_marketing': False,
+            'accepts_dbt_email_marketing': False,
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': contact.archived_documents_url_path,
@@ -972,7 +972,7 @@ class ViewContactBase(APITestMixin):
             },
             'address_postcode': 'YO22 4JU',
             'notes': 'lorem ipsum',
-            'accepts_dit_email_marketing': False,
+            'accepts_dbt_email_marketing': False,
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': contact.archived_documents_url_path,
@@ -1041,7 +1041,7 @@ class ViewContactBase(APITestMixin):
 
         assert requests_mock.call_count == 1
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['accepts_dit_email_marketing'] == accepts_marketing
+        assert response.json()['accepts_dbt_email_marketing'] == accepts_marketing
 
     @pytest.mark.parametrize(
         'response_status',
@@ -1071,7 +1071,7 @@ class ViewContactBase(APITestMixin):
         response = api_client.get(url)
 
         assert requests_mock.call_count == 1
-        assert response.json()['accepts_dit_email_marketing'] is False
+        assert response.json()['accepts_dbt_email_marketing'] is False
 
     @pytest.mark.parametrize(
         'exceptions',
@@ -1098,7 +1098,7 @@ class ViewContactBase(APITestMixin):
         response = api_client.get(url)
 
         assert requests_mock.call_count == 1
-        assert response.json()['accepts_dit_email_marketing'] is False
+        assert response.json()['accepts_dbt_email_marketing'] is False
 
 
 class TestViewContactV3(ViewContactBase):
@@ -1120,7 +1120,7 @@ class ContactListBase(APITestMixin):
 
     def test_contact_list_no_permissions(self):
         """Should return 403"""
-        user = create_test_user(dit_team=TeamFactory())
+        user = create_test_user(dbt_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse(f'{self.endpoint_namespace}:contact:list')
         response = api_client.get(url)

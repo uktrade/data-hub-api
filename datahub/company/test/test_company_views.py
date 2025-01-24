@@ -45,7 +45,7 @@ class TestListCompanies(APITestMixin):
 
     def test_companies_list_no_permissions(self):
         """Should return 403"""
-        user = create_test_user(dit_team=TeamFactory())
+        user = create_test_user(dbt_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:company:collection')
         response = api_client.get(url)
@@ -444,16 +444,16 @@ class TestGetCompany(APITestMixin):
                 'first_name': ghq.one_list_account_owner.first_name,
                 'last_name': ghq.one_list_account_owner.last_name,
                 'contact_email': ghq.one_list_account_owner.contact_email,
-                'dit_team': {
-                    'id': str(ghq.one_list_account_owner.dit_team.id),
-                    'name': ghq.one_list_account_owner.dit_team.name,
+                'dbt_team': {
+                    'id': str(ghq.one_list_account_owner.dbt_team.id),
+                    'name': ghq.one_list_account_owner.dbt_team.name,
                     'uk_region': {
-                        'id': str(ghq.one_list_account_owner.dit_team.uk_region.pk),
-                        'name': ghq.one_list_account_owner.dit_team.uk_region.name,
+                        'id': str(ghq.one_list_account_owner.dbt_team.uk_region.pk),
+                        'name': ghq.one_list_account_owner.dbt_team.uk_region.name,
                     },
                     'country': {
-                        'id': str(ghq.one_list_account_owner.dit_team.country.pk),
-                        'name': ghq.one_list_account_owner.dit_team.country.name,
+                        'id': str(ghq.one_list_account_owner.dbt_team.country.pk),
+                        'name': ghq.one_list_account_owner.dbt_team.country.name,
                     },
                 },
             },
@@ -786,16 +786,16 @@ class TestGetCompany(APITestMixin):
                 'first_name': global_account_manager.first_name,
                 'last_name': global_account_manager.last_name,
                 'contact_email': global_account_manager.contact_email,
-                'dit_team': {
-                    'id': str(global_account_manager.dit_team.id),
-                    'name': global_account_manager.dit_team.name,
+                'dbt_team': {
+                    'id': str(global_account_manager.dbt_team.id),
+                    'name': global_account_manager.dbt_team.name,
                     'uk_region': {
-                        'id': str(global_account_manager.dit_team.uk_region.pk),
-                        'name': global_account_manager.dit_team.uk_region.name,
+                        'id': str(global_account_manager.dbt_team.uk_region.pk),
+                        'name': global_account_manager.dbt_team.uk_region.name,
                     },
                     'country': {
-                        'id': str(global_account_manager.dit_team.country.pk),
-                        'name': global_account_manager.dit_team.country.name,
+                        'id': str(global_account_manager.dbt_team.country.pk),
+                        'name': global_account_manager.dbt_team.country.name,
                     },
                 },
             }
