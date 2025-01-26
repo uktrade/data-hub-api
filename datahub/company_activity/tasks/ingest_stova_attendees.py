@@ -3,13 +3,15 @@ import logging
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 
-from datahub.company.models import Company
+from datahub.company.models import Advisor, Company
 from datahub.company.models import Contact
 from datahub.company_activity.models import StovaAttendee
 from datahub.company_activity.models import StovaEvent
 from datahub.company_activity.tasks.constants import STOVA_ATTENDEE_PREFIX
+from datahub.event.models import Event
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.tasks import BaseObjectIdentificationTask, BaseObjectIngestionTask
+from datahub.interaction.models import Interaction, InteractionDITParticipant
 
 
 logger = logging.getLogger(__name__)
@@ -89,15 +91,33 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         if not event:
             return
 
+        # Advisor required to create an interaction from the Attendee
+        advisor = self.get_advisor_from_event(event)
+        if not advisor:
+            return
+
         # Wrap in transaction as we don't want to create any companies/contacts/attendees if any of
         # the steps fail.
         with transaction.atomic():
             company = self.get_or_create_company(values)
             if not company:
+                transaction.rollback()
                 return
 
             contact = self.get_or_create_contact(values, company)
             if not contact:
+                transaction.rollback()
+                return
+
+            interaction = self.create_interaction_for_event_and_contact(
+                values,
+                company,
+                contact,
+                event.datahub_event.first(),
+                advisor=advisor,
+            )
+            if not interaction:
+                transaction.rollback()
                 return
 
             self.create_assignee(values, company, contact, event)
@@ -198,6 +218,62 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         except IntegrityError as error:
             logger.error(
                 'Error creating contact from Stova attendee record, stova_attendee_id: '
+                f'{values["stova_attendee_id"]}. Error: {error}',
+            )
+            return
+
+    @staticmethod
+    def get_advisor_from_event(event) -> Advisor | None:
+        """Attempts to get an email from the event to match them as an advisor."""
+        advisor = Advisor.objects.filter(email=event.modified_by).first()
+        if not advisor:
+            return
+        return advisor
+
+    @staticmethod
+    def create_interaction_for_event_and_contact(
+        values: dict,
+        company: Company,
+        contact: Contact,
+        datahub_event: Event,
+        advisor: Advisor,
+    ) -> Interaction | None:
+        """
+        Creates an `Interaction` for the contact, company and event.
+
+        Business Logic:
+        To show as an attendee of an `Event` on Data Hub, you must be a `Contact` and be listed as
+        a `Contact` on an `Interaction` for that `Event`.
+
+        :param values: A dictionary of cleaned values from an ingested stova attendee record.
+        :param company: A `Company` object.
+        :param contact: A `Contact` found or created from the attendee record.
+        :param datahub_event: The DataHub Event created from the StovaEvent.
+        :param advisor: An `Advisor` object.
+        """
+        try:
+            interaction = Interaction.objects.create(
+                company=company,
+                event=datahub_event,
+                date=datahub_event.start_date,
+                kind=Interaction.Kind.SERVICE_DELIVERY,
+                theme=Interaction.Theme.OTHER,
+                service_id=datahub_event.service.id,
+                subject=f'Attended {datahub_event.name}',
+                was_policy_feedback_provided=False,
+                were_countries_discussed=False,
+            )
+            interaction.contacts.add(contact)
+            InteractionDITParticipant.objects.create(
+                advisor=advisor,
+                interaction=interaction,
+                team=advisor.dit_team,
+            )
+            interaction.dit_participants.add(advisor)
+            return Interaction
+        except IntegrityError as error:
+            logger.error(
+                'Error creating interaction from Stova attendee record, stova_attendee_id: '
                 f'{values["stova_attendee_id"]}. Error: {error}',
             )
             return

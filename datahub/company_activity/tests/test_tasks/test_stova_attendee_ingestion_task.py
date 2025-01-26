@@ -14,7 +14,7 @@ from sentry_sdk import init
 from sentry_sdk.transport import Transport
 
 from datahub.company.models import Company
-from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.company_activity.models import StovaAttendee
 from datahub.company_activity.tasks.constants import BUCKET, REGION, STOVA_ATTENDEE_PREFIX
 from datahub.company_activity.tasks.ingest_stova_attendees import (
@@ -66,7 +66,8 @@ def setup_s3_files(bucket_name, test_file, test_file_path):
 @pytest.fixture
 def test_base_stova_attendee():
     event_id = 1234
-    StovaEventFactory(stova_event_id=event_id)
+    adviser = AdviserFactory()
+    StovaEventFactory(stova_event_id=event_id, modified_by=adviser.email)
 
     return {
         'id': 2367,
