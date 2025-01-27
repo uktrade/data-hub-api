@@ -345,7 +345,11 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
     """
     project = InvestmentProjectFactory(
         stage_id=InvestmentProjectStage.won.value.id,
-        likelihood_to_land_id=None)
+        likelihood_to_land_id=None,
+        address_1=None,
+        address_town=None,
+        address_postcode=None,
+    )
     adviser = AdviserFactory()
 
     opensearch_with_signals.indices.refresh()
@@ -367,10 +371,7 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
         'non_fdi_r_and_d_budget',
         'new_tech_to_uk',
         'export_revenue',
-        'address_1',
-        'address_town',
-        'address_postcode',
-        'actual_uk_regions',
+        'site_address_is_company_address',
         'delivery_partners',
         'actual_land_date',
         'specific_programmes',
@@ -396,9 +397,7 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
     project.non_fdi_r_and_d_budget = True
     project.new_tech_to_uk = True
     project.export_revenue = True
-    project.address_1 = 'Downing Street'
-    project.address_town = 'London'
-    project.address_postcode = 'SW1A 2AA'
+    project.site_address_is_company_address = False
     project.actual_land_date = date(2020, 1, 1)
     project.total_investment = Decimal('100.00')
     project.foreign_equity_investment = Decimal('50.00')
@@ -410,7 +409,6 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
 
     assert result.hits[0]['incomplete_fields'] == [
         'strategic_drivers',
-        'actual_uk_regions',
         'delivery_partners',
         'specific_programmes',
         'uk_company',
@@ -419,6 +417,9 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
         'likelihood_to_land',
         'competitor_countries',
         'uk_region_locations',
+        'address_1',
+        'address_town',
+        'address_postcode',
         'average_salary',
         'associated_non_fdi_r_and_d_project',
     ]
@@ -429,7 +430,6 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
     (
         ('competitor_countries', lambda: Country.objects.all()[:3]),
         ('uk_region_locations', lambda: UKRegion.objects.all()[:3]),
-        ('actual_uk_regions', lambda: UKRegion.objects.all()[:2]),
         ('delivery_partners', lambda: InvestmentDeliveryPartner.objects.all()[:2]),
         ('strategic_drivers', lambda: InvestmentStrategicDriver.objects.all()[:1]),
     ),
