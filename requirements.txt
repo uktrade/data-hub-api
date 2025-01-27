@@ -27,13 +27,13 @@ backoff==2.2.1
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
-bigtree==0.23.0
+bigtree==0.23.1
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.36.2
+boto3==1.36.6
     # via -r requirements.in
-botocore==1.36.2
+botocore==1.36.6
     # via
     #   boto3
     #   s3transfer
