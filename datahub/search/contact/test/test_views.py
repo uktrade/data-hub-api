@@ -1,4 +1,3 @@
-import urllib.parse
 import uuid
 from cgi import parse_header
 from csv import DictReader
@@ -13,8 +12,6 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.consent import CONSENT_SERVICE_PERSON_PATH_LOOKUP
-from datahub.company.constants import CONSENT_SERVICE_EMAIL_CONSENT_TYPE
 from datahub.company.models import Contact, ContactPermission
 from datahub.company.test.factories import (
     AdviserFactory,
@@ -200,9 +197,11 @@ class TestSearch(APITestMixin):
 
         other_companies = CompanyFactory.create_batch(
             3,
-            sector=factory.LazyFunction(lambda: random_obj_for_queryset(
-                SectorModel.objects.exclude(pk__in=sectors_ids),
-            )),
+            sector=factory.LazyFunction(
+                lambda: random_obj_for_queryset(
+                    SectorModel.objects.exclude(pk__in=sectors_ids),
+                ),
+            ),
         )
         ContactFactory.create_batch(
             3,
@@ -234,7 +233,6 @@ class TestSearch(APITestMixin):
             ('his', 'whiskers and tabby'),
             ('ers', 'whiskers and tabby'),
             ('1a', '1a'),
-
             # trading names
             ('maine coon egyptian mau', 'whiskers and tabby'),
             ('maine', 'whiskers and tabby'),
@@ -242,7 +240,6 @@ class TestSearch(APITestMixin):
             ('ine oon', 'whiskers and tabby'),
             ('ine mau', 'whiskers and tabby'),
             ('3a', '1a'),
-
             # non-matches
             ('whi lorem', None),
             ('wh', None),
@@ -253,7 +250,10 @@ class TestSearch(APITestMixin):
         ),
     )
     def test_filter_by_company_name(
-        self, opensearch_with_collector, name_term, matched_company_name,
+        self,
+        opensearch_with_collector,
+        name_term,
+        matched_company_name,
     ):
         """Tests filtering contact by company name."""
         matching_company1 = CompanyFactory(
@@ -314,7 +314,8 @@ class TestSearch(APITestMixin):
         assert response.data['results'][0]['first_name'] == contact.first_name
 
     @pytest.mark.parametrize(
-        'archived', (
+        'archived',
+        (
             True,
             False,
         ),
@@ -363,10 +364,7 @@ class TestSearch(APITestMixin):
         response_data = response.json()
         results = response_data['results']
         assert response_data['count'] == 3
-        assert all(
-            (not result['created_on'] is None) == created_on_exists
-            for result in results
-        )
+        assert all((not result['created_on'] is None) == created_on_exists for result in results)
 
     def test_search_contact_by_company_id(self, opensearch_with_collector, setup_data):
         """Tests filtering by company id."""
@@ -536,14 +534,12 @@ class TestContactExportView(APITestMixin):
             ('address_country.name', 'computed_address_country_name'),
         ),
     )
-    @pytest.mark.parametrize('accepts_dit_email_marketing', (True, False))
     def test_export(
         self,
         opensearch_with_collector,
         request_sortby,
         orm_ordering,
         requests_mock,
-        accepts_dit_email_marketing,
     ):
         """Test export of contact search results."""
         ArchivedContactFactory()
@@ -574,7 +570,8 @@ class TestContactExportView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {'filename': 'Data Hub - Contacts - 2018-01-01-11-12-13.csv'},
+            'attachment',
+            {'filename': 'Data Hub - Contacts - 2018-01-01-11-12-13.csv'},
         )
 
         sorted_contacts = Contact.objects.annotate(
@@ -583,81 +580,78 @@ class TestContactExportView(APITestMixin):
                 'company__address_country__name',
             ),
         ).order_by(
-            orm_ordering, 'pk',
-        )
-
-        matcher = requests_mock.get(
-            f'{settings.CONSENT_SERVICE_BASE_URL}'
-            f'{CONSENT_SERVICE_PERSON_PATH_LOOKUP}',
-            text=generate_hawk_response({
-                'results': [{
-                    'email': contact.email,
-                    'consents': [
-                        CONSENT_SERVICE_EMAIL_CONSENT_TYPE,
-                    ] if accepts_dit_email_marketing else [],
-                } for contact in sorted_contacts],
-            }),
-            status_code=status.HTTP_200_OK,
+            orm_ordering,
+            'pk',
         )
 
         reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
         assert reader.fieldnames == list(SearchContactExportAPIView.field_titles.values())
+        front_end_prefixes = settings.DATAHUB_FRONTEND_URL_PREFIXES
 
-        expected_row_data = format_csv_data([
-            {
-                'Name': contact.name,
-                'Job title': contact.job_title,
-                'Date created': contact.created_on,
-                'Archived': contact.archived,
-                'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}/{contact.pk}',
-                'Company': get_attr_or_none(contact, 'company.name'),
-                'Company sector': get_attr_or_none(contact, 'company.sector.name'),
-                'Company link':
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{contact.company.pk}',
-                'Company UK region': get_attr_or_none(contact, 'company.uk_region.name'),
-                'Area':
-                    (contact.company.address_area and contact.company.address_area.name)
-                    if contact.address_same_as_company
-                    else (contact.address_area and contact.address_area.name),
-                'Country':
-                    contact.company.address_country.name
-                    if contact.address_same_as_company
-                    else contact.address_country.name,
-                'Postcode':
-                    contact.company.address_postcode
-                    if contact.address_same_as_company
-                    else contact.address_postcode,
-                'Phone number': contact.full_telephone_number,
-                'Email address': contact.email,
-                'Accepts DIT email marketing': accepts_dit_email_marketing,
-                'Date of latest interaction':
-                    max(contact.interactions.all(), key=attrgetter('date')).date
-                    if contact.interactions.all() else None,
-                'Teams of latest interaction': _format_interaction_team_names(
-                    max(contact.interactions.all(), key=attrgetter('date')),
-                ) if contact.interactions.exists() else None,
-                'Created by team': get_attr_or_none(contact, 'created_by.dit_team.name'),
-            }
-            for contact in sorted_contacts
-        ])
+        expected_row_data = format_csv_data(
+            [
+                {
+                    'Name': contact.name,
+                    'Job title': contact.job_title,
+                    'Date created': contact.created_on,
+                    'Archived': contact.archived,
+                    'Link': f'{front_end_prefixes["contact"]}/{contact.pk}',
+                    'Company': get_attr_or_none(contact, 'company.name'),
+                    'Company sector': get_attr_or_none(contact, 'company.sector.name'),
+                    'Company link': f'{front_end_prefixes["company"]}/{contact.company.pk}',
+                    'Company UK region': get_attr_or_none(contact, 'company.uk_region.name'),
+                    'Area': (
+                        (contact.company.address_area and contact.company.address_area.name)
+                        if contact.address_same_as_company
+                        else (contact.address_area and contact.address_area.name)
+                    ),
+                    'Country': (
+                        contact.company.address_country.name
+                        if contact.address_same_as_company
+                        else contact.address_country.name
+                    ),
+                    'Postcode': (
+                        contact.company.address_postcode
+                        if contact.address_same_as_company
+                        else contact.address_postcode
+                    ),
+                    'Phone number': contact.full_telephone_number,
+                    'Email address': contact.email,
+                    'Date of latest interaction': (
+                        max(contact.interactions.all(), key=attrgetter('date')).date
+                        if contact.interactions.all()
+                        else None
+                    ),
+                    'Teams of latest interaction': (
+                        _format_interaction_team_names(
+                            max(contact.interactions.all(), key=attrgetter('date')),
+                        )
+                        if contact.interactions.exists()
+                        else None
+                    ),
+                    'Created by team': get_attr_or_none(contact, 'created_by.dit_team.name'),
+                }
+                for contact in sorted_contacts
+            ],
+        )
 
         actual_row_data = [dict(row) for row in reader]
         assert len(actual_row_data) == len(expected_row_data)
         for index, row in enumerate(actual_row_data):
             assert row == expected_row_data[index]
-        assert matcher.call_count == 1
-        assert matcher.last_request.query == urllib.parse.urlencode(
-            {'email': [c.email for c in sorted_contacts]}, doseq=True,
-        )
 
 
 def _format_interaction_team_names(interaction):
-    names = interaction.dit_participants.values_list(
-        'team__name',
-        flat=True,
-    ).order_by(
-        'team__name',
-    ).distinct()
+    names = (
+        interaction.dit_participants.values_list(
+            'team__name',
+            flat=True,
+        )
+        .order_by(
+            'team__name',
+        )
+        .distinct()
+    )
 
     return ', '.join(names)
 
