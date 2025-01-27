@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 import factory
 import pytest
@@ -149,6 +149,7 @@ class AddContactBase(APITestMixin):
             'modified_on': '2017-04-18T13:25:30.986208Z',
             'valid_email': None,
             'consent_data': None,
+            'consent_data_last_modified': None,
             'consent_data_management_url': None,
         }
 
@@ -466,6 +467,7 @@ class TestAddContactV4(AddContactBase):
             'modified_on': '2017-04-18T13:25:30.986208Z',
             'valid_email': True,
             'consent_data': None,
+            'consent_data_last_modified': None,
             'consent_data_management_url': 'http://domain.com/?email=foo@bar.com',
         }
 
@@ -589,6 +591,7 @@ class EditContactBase(APITestMixin):
             'modified_on': '2017-04-19T13:25:30.986208Z',
             'valid_email': True,
             'consent_data': None,
+            'consent_data_last_modified': None,
             'consent_data_management_url': 'http://domain.com/?email=foo@bar.com',
         }
 
@@ -790,6 +793,7 @@ class TestEditContactV4(EditContactBase):
             'modified_on': '2017-04-19T13:25:30.986208Z',
             'valid_email': True,
             'consent_data': None,
+            'consent_data_last_modified': None,
             'consent_data_management_url': 'http://domain.com/?email=foo@bar.com',
         }
 
@@ -929,6 +933,7 @@ class ViewContactBase(APITestMixin):
             notes='lorem ipsum',
             valid_email=True,
             consent_data={'consent': True},
+            consent_data_last_modified=datetime.now(),
         )
         url = reverse(f'{self.endpoint_namespace}:contact:detail', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
@@ -982,6 +987,7 @@ class ViewContactBase(APITestMixin):
             'modified_on': '2017-04-18T13:25:30.986208Z',
             'valid_email': True,
             'consent_data': {'consent': True},
+            'consent_data_last_modified': '2017-04-18T13:25:30.986208Z',
             'consent_data_management_url': 'http://domain.com/?email=foo@bar.com',
         }
 
@@ -1216,6 +1222,7 @@ class ContactListBase(APITestMixin):
                     },
                     'valid_email': True,
                     'consent_data': {'consent': False},
+                    'consent_data_last_modified': None,
                     'consent_data_management_url': 'http://domain.com/?email=foo@bar.com',
                 },
             ],

@@ -237,11 +237,13 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             'modified_on',
             'address_area',
             'consent_data',
+            'consent_data_last_modified',
             'consent_data_management_url',
         )
         read_only_fields = (
             'archived_documents_url_path',
             'consent_data',
+            'consent_data_last_modified',
             'consent_data_management_url',
         )
         validators = [
