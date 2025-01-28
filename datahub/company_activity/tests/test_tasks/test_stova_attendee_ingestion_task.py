@@ -9,8 +9,8 @@ from django.test import override_settings
 from moto import mock_aws
 
 from datahub.company.models import Advisor as Adviser, Company, Contact
-from datahub.company.test.factories import CompanyFactory, ContactFactory
-from datahub.company_activity.models import StovaAttendee, StovaEvent
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company_activity.models import StovaAttendee
 from datahub.company_activity.tasks.constants import STOVA_ATTENDEE_PREFIX
 from datahub.company_activity.tasks.ingest_stova_attendees import (
     stova_attendee_identification_task,
@@ -438,7 +438,7 @@ class TestStovaIngestionTasks:
         self, test_base_stova_attendee, s3_object_processor, test_file_path,
     ):
         """
-        Test that the Stova Attendee ingestions creates an Interaction from the contact (attendee), 
+        Test that the Stova Attendee ingestion creates an Interaction from the contact (attendee),
         the event (stova event) and the default adviser.
         """
         data = test_base_stova_attendee
@@ -474,3 +474,30 @@ class TestStovaIngestionTasks:
         assert interaction.date.date() == datahub_event.start_date
         assert interaction.service_id == datahub_event.service_id
         assert interaction.subject == f'Attended {datahub_event.name}'
+
+    @pytest.mark.django_db
+    def test_stova_attendee_ingestion_handles_interaction_creation_fail(
+        self, s3_object_processor, test_file_path, caplog,
+    ):
+        """Test that errors raised when creating an interaction are logged."""
+        data = {'stova_attendee_id': 1234}
+        ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
+
+        # The Event start_date is used in the interaction as date but is nullable in Event but
+        # required by Interactions.
+        datahub_event = StovaEventFactory().datahub_event.first()
+        datahub_event.start_date = None
+        datahub_event.save()
+
+        with caplog.at_level(logging.ERROR):
+            interaction = ingestion_task.create_interaction_for_event_and_contact(
+                data,
+                CompanyFactory(),
+                ContactFactory(),
+                datahub_event,
+                AdviserFactory(),
+            )
+            assert (
+                'Error creating interaction from Stova attendee record, stova_attendee_id: 1234'
+            ) in caplog.text
+            assert interaction is None
