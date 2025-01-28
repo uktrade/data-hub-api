@@ -8,9 +8,9 @@ import pytest
 from django.test import override_settings
 from moto import mock_aws
 
-from datahub.company.models import Advisor as Adviser, Company
+from datahub.company.models import Advisor as Adviser, Company, Contact
 from datahub.company.test.factories import CompanyFactory, ContactFactory
-from datahub.company_activity.models import StovaAttendee
+from datahub.company_activity.models import StovaAttendee, StovaEvent
 from datahub.company_activity.tasks.constants import STOVA_ATTENDEE_PREFIX
 from datahub.company_activity.tasks.ingest_stova_attendees import (
     stova_attendee_identification_task,
@@ -26,6 +26,7 @@ from datahub.ingest.utils import (
     compressed_json_faker,
     upload_objects_to_s3,
 )
+from datahub.interaction.models import Interaction
 
 
 @pytest.fixture
@@ -431,3 +432,45 @@ class TestStovaIngestionTasks:
             last_name='Adviser',
             is_active=False,
         ).count() == 1
+
+    @pytest.mark.django_db
+    def test_stova_attendee_ingestion_creates_interaction(
+        self, test_base_stova_attendee, s3_object_processor, test_file_path,
+    ):
+        """
+        Test that the Stova Attendee ingestions creates an Interaction from the contact (attendee), 
+        the event (stova event) and the default adviser.
+        """
+        data = test_base_stova_attendee
+        email = 'attendee_in_interaction@test.com'
+        data['email'] = email
+        object_definition = (test_file_path, compressed_json_faker([data]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
+
+        ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
+        ingestion_task.ingest_object()
+
+        stova_attendee = StovaAttendee.objects.get(email=email)
+
+        contact = Contact.objects.filter(email=stova_attendee.email).first()
+        assert contact is not None
+
+        interaction = Interaction.objects.filter(
+            contacts__id=contact.id,
+        ).first()
+        assert interaction is not None
+        assert interaction.company == contact.company
+        assert interaction.kind == Interaction.Kind.SERVICE_DELIVERY
+        assert interaction.is_event is True
+        assert interaction.theme == Interaction.Theme.OTHER
+        assert interaction.was_policy_feedback_provided is False
+        assert interaction.were_countries_discussed is False
+        assert interaction.dit_participants.all().first().adviser.email == (
+            'stova_default@businessandtrade.gov.uk'
+        )
+
+        datahub_event = stova_attendee.ingested_stova_event.datahub_event.first()
+        assert interaction.event_id == datahub_event.id
+        assert interaction.date.date() == datahub_event.start_date
+        assert interaction.service_id == datahub_event.service_id
+        assert interaction.subject == f'Attended {datahub_event.name}'
