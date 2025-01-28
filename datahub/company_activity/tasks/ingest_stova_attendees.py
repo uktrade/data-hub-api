@@ -73,6 +73,9 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         model. It also attempts to match the contact and company from the given fields and if no
         match is found it creates them.
 
+        This function uses the transaction.atomic decorator to rollback changes when exceptions are
+        raised.
+
         :param record: The deserialize JSON row from the S3 Bucket containing stova attendee
             details.
         :returns: None
@@ -100,36 +103,25 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         if not event:
             return
 
-        # Advisor required to create an interaction from the Attendee
-        advisor = self.get_advisor_from_event(event)
-        if not advisor:
+        company = self.get_or_create_company(values)
+        if not company:
             return
 
-        # Wrap in transaction as we don't want to create any companies/contacts/attendees if any of
-        # the steps fail.
-        with transaction.atomic():
-            company = self.get_or_create_company(values)
-            if not company:
-                transaction.rollback()
-                return
+        contact = self.get_or_create_contact(values, company)
+        if not contact:
+            return
 
-            contact = self.get_or_create_contact(values, company)
-            if not contact:
-                transaction.rollback()
-                return
+        interaction = self.create_interaction_for_event_and_contact(
+            values,
+            company,
+            contact,
+            event.datahub_event.first(),
+            adviser=self.default_advisor,
+        )
+        if not interaction:
+            return
 
-            interaction = self.create_interaction_for_event_and_contact(
-                values,
-                company,
-                contact,
-                event.datahub_event.first(),
-                advisor=advisor,
-            )
-            if not interaction:
-                transaction.rollback()
-                return
-
-            self.create_assignee(values, company, contact, event)
+        self.create_assignee(values, company, contact, event)
 
     @staticmethod
     def create_assignee(
