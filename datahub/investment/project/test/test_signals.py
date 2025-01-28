@@ -7,6 +7,7 @@ from datahub.core.constants import (
     Country as CountryConstant,
     InvestmentProjectStage as InvestmentProjectStageConstant,
 )
+# from core.models import Country
 from datahub.core.test_utils import random_obj_for_model
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.models import InvestmentBusinessActivity
@@ -136,3 +137,49 @@ class TestInvestorCompanyUpdate:
                 str(project.country_investment_originates_from_id)
                 == CountryConstant.japan.value.id
             )
+
+
+@pytest.mark.django_db
+class TestSiteAddressIsCompanyAddressUpdate:
+    """
+    Tests for the site_address_is_company_address signal.
+    """
+
+    def test_update_site_address_is_company_address(self):
+        """
+        Test that updated site address is company address
+        """
+        uk_company = CompanyFactory(
+            address_country_id=CountryConstant.united_kingdom.value.id,
+            address_1='Old Admiralty Building',
+            address_2='whitehall',
+            address_town='London',
+            address_postcode='SW1A 2AA',
+        )
+        projects = InvestmentProjectFactory.create_batch(
+            2,
+            investor_company=uk_company,
+            site_address_is_company_address=True,
+            address_1=uk_company.address_1,
+            address_2=uk_company.address_2,
+            address_town=uk_company.address_town,
+            address_postcode=uk_company.address_postcode,
+        )
+
+        for project in projects:
+            assert project.site_address_is_company_address is True
+            assert project.address_1 == 'Old Admiralty Building'
+            assert project.address_2 == 'whitehall'
+            assert project.address_town == 'London'
+            assert project.address_postcode == 'SW1A 2AA'
+
+        uk_company.address_1 = '10 Downing Street'
+        uk_company.address_2 = 'Whitehall'
+        uk_company.address_town = 'Manchester'
+        uk_company.address_postcode = 'M1 1AA'
+        uk_company.save()
+
+        for project in projects:
+            project.refresh_from_db()
+
+            assert project.site_address_is_company_address

@@ -121,3 +121,29 @@ def update_country_investment_originates_from(sender, **kwargs):
             investment_project.save(
                 update_fields=('country_investment_originates_from',),
             )
+
+
+def update_site_address_is_company_address(sender, **kwargs):
+    """
+    Updates investment project addresses when an investor company's address changes.
+    """
+    instance = kwargs['instance']
+    created = kwargs['created']
+    if not created:
+        investment_projects = InvestmentProject.objects.filter(
+            uk_company_id=instance.pk,
+        )
+
+        for investment_project in investment_projects:
+            if investment_project.site_address_is_company_address:
+                investment_project.address_1 = instance.address_1
+                investment_project.address_2 = instance.address_2
+                investment_project.address_town = instance.address_town
+                investment_project.address_postcode = instance.address_postcode
+
+            investment_project.save(
+                update_fields=(
+                    'address_1', 'address_2', 'address_town',
+                    'address_postcode',
+                ),
+            )
