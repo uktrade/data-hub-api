@@ -1,22 +1,17 @@
-import gzip
-import json
 import logging
 
 from datetime import datetime
 from unittest import mock
 
-import boto3
 import pytest
 
 from django.test import override_settings
 from moto import mock_aws
-from sentry_sdk import init
-from sentry_sdk.transport import Transport
 
-from datahub.company.models import Company
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.models import Advisor as Adviser, Company
+from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.company_activity.models import StovaAttendee
-from datahub.company_activity.tasks.constants import BUCKET, REGION, STOVA_ATTENDEE_PREFIX
+from datahub.company_activity.tasks.constants import STOVA_ATTENDEE_PREFIX
 from datahub.company_activity.tasks.ingest_stova_attendees import (
     stova_attendee_identification_task,
     stova_attendee_ingestion_task,
@@ -26,8 +21,11 @@ from datahub.company_activity.tests.factories import (
     StovaAttendeeFactory,
     StovaEventFactory,
 )
-
 from datahub.ingest.models import IngestedObject
+from datahub.ingest.utils import (
+    compressed_json_faker,
+    upload_objects_to_s3,
+)
 
 
 @pytest.fixture
@@ -43,31 +41,15 @@ def test_file_path():
     return f'{STOVA_ATTENDEE_PREFIX}stovaAttendeeFake.jsonl.gz'
 
 
-@mock_aws
-def setup_s3_client():
-    return boto3.client('s3', REGION)
-
-
-@mock_aws
-def setup_s3_bucket(bucket_name):
-    mock_s3_client = setup_s3_client()
-    mock_s3_client.create_bucket(
-        Bucket=bucket_name,
-        CreateBucketConfiguration={'LocationConstraint': REGION},
-    )
-
-
-@mock_aws
-def setup_s3_files(bucket_name, test_file, test_file_path):
-    mock_s3_client = setup_s3_client()
-    mock_s3_client.put_object(Bucket=bucket_name, Key=test_file_path, Body=test_file)
+@pytest.fixture
+def prefix():
+    return STOVA_ATTENDEE_PREFIX
 
 
 @pytest.fixture
 def test_base_stova_attendee():
     event_id = 1234
-    adviser = AdviserFactory()
-    StovaEventFactory(stova_event_id=event_id, modified_by=adviser.email)
+    StovaEventFactory(stova_event_id=event_id)
 
     return {
         'id': 2367,
@@ -89,17 +71,6 @@ def test_base_stova_attendee():
     }
 
 
-class MockSentryTransport(Transport):
-    def __init__(self):
-        self.events = []
-
-    def capture_event(self, event):
-        pass
-
-    def capture_envelope(self, envelope):
-        self.events.append(envelope)
-
-
 def create_stova_event_records():
     """
     Attendees will only be ingested if their associated StovaEvent exists. This creates some
@@ -116,15 +87,18 @@ class TestStovaIngestionTasks:
     @pytest.mark.django_db
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
-    def test_stova_data_file_ingestion(self, caplog, test_file, test_file_path):
+    def test_stova_data_file_ingestion(
+        self, caplog, test_file, test_file_path, s3_object_processor,
+    ):
         """
         Test that a Aventri/Stova data file is ingested correctly and the ingested file
         is added to the IngestedObject table
         """
         initial_stova_activity_count = StovaAttendee.objects.count()
         initial_ingested_count = IngestedObject.objects.count()
-        setup_s3_bucket(BUCKET)
-        setup_s3_files(BUCKET, test_file, test_file_path)
+
+        object_definition = (test_file_path, test_file)
+        upload_objects_to_s3(s3_object_processor, [object_definition])
 
         # Create events for the attendees to be assigned to
         create_stova_event_records()
@@ -145,33 +119,28 @@ class TestStovaIngestionTasks:
     @pytest.mark.django_db
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
-    def test_skip_previously_ingested_records(self, test_file_path, test_base_stova_attendee):
-        """
-        Test that we skip updating records that have already been ingested
-        """
+    def test_skip_previously_ingested_records(
+        self, test_file_path, test_base_stova_attendee, s3_object_processor,
+    ):
+        """Test that we skip updating records that have already been ingested"""
         StovaAttendeeFactory(stova_attendee_id=123456789)
         data = test_base_stova_attendee
         data['id'] = 123456789
-        record = json.dumps(
-            data,
-            default=str,
-        )
-        test_file = gzip.compress(record.encode('utf-8'))
-        setup_s3_bucket(BUCKET)
-        setup_s3_files(BUCKET, test_file, test_file_path)
+
+        object_definition = (test_file_path, compressed_json_faker([data]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
+
         stova_attendee_ingestion_task(test_file_path)
         assert StovaAttendee.objects.filter(stova_attendee_id=123456789).count() == 1
 
     @pytest.mark.django_db
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
+    @pytest.mark.usefixtures('s3_client')
     def test_invalid_file(self, test_file_path):
         """
         Test that an exception is raised when the file is not valid
         """
-        mock_transport = MockSentryTransport()
-        init(transport=mock_transport)
-        setup_s3_bucket(BUCKET)
         with pytest.raises(Exception) as e:
             stova_attendee_ingestion_task(test_file_path)
         exception = e.value.args[0]
@@ -205,18 +174,19 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.django_db
     def test_stova_attendee_fields_with_duplicate_attendee_ids_in_db(
-        self, caplog, test_base_stova_attendee,
+        self, test_file_path, test_base_stova_attendee, s3_object_processor, caplog,
     ):
-        """Test already ingested records to do pass the `_should_process_record` check."""
-        s3_processor_mock = mock.Mock()
-        task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
-
         existing_stova_attendee = StovaAttendeeFactory(stova_attendee_id=123456789)
         data = test_base_stova_attendee
         data['id'] = existing_stova_attendee.stova_attendee_id
 
+        object_definition = (test_file_path, compressed_json_faker([data]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
+
+        ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
         with caplog.at_level(logging.INFO):
-            assert task._should_process_record(data) is False
+            ingestion_task.ingest_object()
+            assert ingestion_task._should_process_record(data) is False
             assert (
                 'Record already exists for stova_attendee_id: '
                 f'{existing_stova_attendee.stova_attendee_id}'
@@ -271,15 +241,11 @@ class TestStovaIngestionTasks:
         self,
         test_file_path,
         test_base_stova_attendee,
+        s3_object_processor,
     ):
         data = test_base_stova_attendee
-        record = json.dumps(
-            data,
-            default=str,
-        )
-        test_file = gzip.compress(record.encode('utf-8'))
-        setup_s3_bucket(BUCKET)
-        setup_s3_files(BUCKET, test_file, test_file_path)
+        object_definition = (test_file_path, compressed_json_faker([data]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
         stova_attendee_ingestion_task(test_file_path)
 
         attendee = StovaAttendee.objects.get(stova_attendee_id=data['id'])
@@ -293,6 +259,7 @@ class TestStovaIngestionTasks:
         self,
         test_file_path,
         test_base_stova_attendee,
+        s3_object_processor,
     ):
         """
         Tests attendee uses existing company if a match is found. This also tests for the
@@ -303,13 +270,8 @@ class TestStovaIngestionTasks:
         data = test_base_stova_attendee
         # Same name with different case
         data['company_name'] = 'a company which Already EXISTS'
-        record = json.dumps(
-            data,
-            default=str,
-        )
-        test_file = gzip.compress(record.encode('utf-8'))
-        setup_s3_bucket(BUCKET)
-        setup_s3_files(BUCKET, test_file, test_file_path)
+        object_definition = (test_file_path, compressed_json_faker([data]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
         stova_attendee_ingestion_task(test_file_path)
 
         attendee = StovaAttendee.objects.get(stova_attendee_id=data['id'])
@@ -322,6 +284,7 @@ class TestStovaIngestionTasks:
         self,
         test_file_path,
         test_base_stova_attendee,
+        s3_object_processor,
     ):
         """
         Tests attendee uses existing contact if a match is found. This also tests for the
@@ -333,13 +296,8 @@ class TestStovaIngestionTasks:
 
         # Same email with different case
         data['email'] = 'Existing_CONTACT@dbt.com'
-        record = json.dumps(
-            data,
-            default=str,
-        )
-        test_file = gzip.compress(record.encode('utf-8'))
-        setup_s3_bucket(BUCKET)
-        setup_s3_files(BUCKET, test_file, test_file_path)
+        object_definition = (test_file_path, compressed_json_faker([data]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
         stova_attendee_ingestion_task(test_file_path)
 
         attendee = StovaAttendee.objects.get(stova_attendee_id=data['id'])
@@ -352,18 +310,14 @@ class TestStovaIngestionTasks:
         self,
         test_file_path,
         test_base_stova_attendee,
+        s3_object_processor,
     ):
         invalid_company_name = None
 
         data = test_base_stova_attendee
         data['company_name'] = invalid_company_name
-        record = json.dumps(
-            data,
-            default=str,
-        )
-        test_file = gzip.compress(record.encode('utf-8'))
-        setup_s3_bucket(BUCKET)
-        setup_s3_files(BUCKET, test_file, test_file_path)
+        object_definition = (test_file_path, compressed_json_faker([data]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
         stova_attendee_ingestion_task(test_file_path)
 
         assert StovaAttendee.objects.filter(stova_attendee_id=data['id']).exists() is False
@@ -375,18 +329,14 @@ class TestStovaIngestionTasks:
         self,
         test_file_path,
         test_base_stova_attendee,
+        s3_object_processor,
     ):
         invalid_contact_email = None
 
         data = test_base_stova_attendee
         data['email'] = invalid_contact_email
-        record = json.dumps(
-            data,
-            default=str,
-        )
-        test_file = gzip.compress(record.encode('utf-8'))
-        setup_s3_bucket(BUCKET)
-        setup_s3_files(BUCKET, test_file, test_file_path)
+        object_definition = (test_file_path, compressed_json_faker([data]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
         stova_attendee_ingestion_task(test_file_path)
 
         assert StovaAttendee.objects.filter(stova_attendee_id=data['id']).exists() is False
@@ -396,13 +346,13 @@ class TestStovaIngestionTasks:
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_stova_attendee_not_created_if_event_does_not_exist(
-        self, caplog, test_file, test_file_path,
+        self, caplog, test_file, test_file_path, s3_object_processor,
     ):
         """
         A StovaEvent needs to exist before ingesting the Stova Attendee.
         """
-        setup_s3_bucket(BUCKET)
-        setup_s3_files(BUCKET, test_file, test_file_path)
+        object_definition = (test_file_path, test_file)
+        upload_objects_to_s3(s3_object_processor, [object_definition])
 
         with caplog.at_level(logging.INFO):
             stova_attendee_identification_task()
@@ -421,3 +371,63 @@ class TestStovaIngestionTasks:
             )
 
         assert StovaAttendee.objects.all().exists() is False
+
+    @pytest.mark.django_db
+    def test_stova_attendee_ingestion_creates_default_adviser(
+        self, test_base_stova_attendee, s3_object_processor, test_file_path,
+    ):
+        """Test a default adviser is created when a default does not already exist."""
+        data = test_base_stova_attendee
+        object_definition = (test_file_path, compressed_json_faker([data]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
+
+        ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
+        assert Adviser.objects.filter(
+            email='stova_default@businessandtrade.gov.uk',
+            first_name='Stova Default',
+            last_name='Adviser',
+            is_active=False,
+        ).first() is None
+
+        ingestion_task.ingest_object()
+
+        assert Adviser.objects.filter(
+            email='stova_default@businessandtrade.gov.uk',
+            first_name='Stova Default',
+            last_name='Adviser',
+            is_active=False,
+        ).first() is not None
+
+    @pytest.mark.django_db
+    def test_stova_attendee_ingestion_uses_existing_default_adviser_if_exists(
+        self, test_base_stova_attendee, s3_object_processor, test_file_path,
+    ):
+        """Test the default advisor is reused and not created again for each record."""
+        data = test_base_stova_attendee
+        object_definition = (test_file_path, compressed_json_faker([data]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
+
+        ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
+
+        Adviser.objects.get_or_create(
+            email='stova_default@businessandtrade.gov.uk',
+            first_name='Stova Default',
+            last_name='Adviser',
+            is_active=False,
+        )
+
+        assert Adviser.objects.filter(
+            email='stova_default@businessandtrade.gov.uk',
+            first_name='Stova Default',
+            last_name='Adviser',
+            is_active=False,
+        ).count() == 1
+
+        ingestion_task.ingest_object()
+
+        assert Adviser.objects.filter(
+            email='stova_default@businessandtrade.gov.uk',
+            first_name='Stova Default',
+            last_name='Adviser',
+            is_active=False,
+        ).count() == 1

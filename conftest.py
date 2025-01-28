@@ -124,7 +124,12 @@ def aws_credentials():
 
 
 @pytest.fixture
-def s3_client(aws_credentials):
+def bucket_name():
+    return TEST_S3_BUCKET_NAME
+
+
+@pytest.fixture
+def s3_client(aws_credentials, bucket_name):
     """Fixture for a mocked S3 client.
 
     Also creates a bucket named `test-bucket` in the same region.
@@ -132,7 +137,7 @@ def s3_client(aws_credentials):
     with mock_aws():
         s3_client = boto3.client('s3', region_name=TEST_AWS_REGION)
         s3_client.create_bucket(
-            Bucket=TEST_S3_BUCKET_NAME,
+            Bucket=bucket_name,
             CreateBucketConfiguration={'LocationConstraint': TEST_AWS_REGION},
         )
         yield s3_client
