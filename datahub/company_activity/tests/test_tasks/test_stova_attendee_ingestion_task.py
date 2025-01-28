@@ -501,3 +501,27 @@ class TestStovaIngestionTasks:
                 'Error creating interaction from Stova attendee record, stova_attendee_id: 1234'
             ) in caplog.text
             assert interaction is None
+
+    @pytest.mark.django_db
+    @mock.patch(
+        'datahub.company_activity.tasks.ingest_stova_attendees'
+        '.StovaAttendeeIngestionTask.get_event_from_attendee',
+    )
+    def test_stova_attendee_does_not_create_attendee_when_interaction_fails(
+        self, mocked_get_event_from_attendee, test_base_stova_attendee,
+    ):
+        """Test that no Stova Attendee is created if the interaction fails to create."""
+        # Make event invalid for an interaction
+        stova_event = StovaEventFactory()
+        datahub_event = stova_event.datahub_event.all().first()
+        datahub_event.start_date = None
+        datahub_event.save()
+        stova_event.refresh_from_db()
+        mocked_get_event_from_attendee.return_value = stova_event
+
+        s3_processor_mock = mock.Mock()
+        task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
+        data = test_base_stova_attendee
+        task._process_record(data)
+
+        assert StovaAttendee.objects.count() == 0
