@@ -224,12 +224,17 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
             return
 
     @staticmethod
-    def get_advisor_from_event(event) -> Advisor | None:
-        """Attempts to get an email from the event to match them as an advisor."""
-        advisor = Advisor.objects.filter(email=event.modified_by).first()
-        if not advisor:
-            return
-        return advisor
+    def get_or_create_default_stova_adviser() -> Adviser:
+        """
+        Get or create a default fake Adviser in order to create interactions for Stova Attendees.
+        """
+        adviser, _ = Adviser.objects.get_or_create(
+            email='stova_default@businessandtrade.gov.uk',
+            first_name='Stova Default',
+            last_name='Adviser',
+            is_active=False,
+        )
+        return adviser
 
     @staticmethod
     def create_interaction_for_event_and_contact(
@@ -237,7 +242,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         company: Company,
         contact: Contact,
         datahub_event: Event,
-        advisor: Advisor,
+        adviser: Adviser,
     ) -> Interaction | None:
         """
         Creates an `Interaction` for the contact, company and event.
@@ -250,7 +255,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         :param company: A `Company` object.
         :param contact: A `Contact` found or created from the attendee record.
         :param datahub_event: The DataHub Event created from the StovaEvent.
-        :param advisor: An `Advisor` object.
+        :param adviser: An `Adviser` object.
         """
         try:
             interaction = Interaction.objects.create(
@@ -265,12 +270,10 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
                 were_countries_discussed=False,
             )
             interaction.contacts.add(contact)
-            InteractionDITParticipant.objects.create(
-                advisor=advisor,
+            interaction.dit_participants.add(InteractionDITParticipant.objects.create(
+                adviser=adviser,
                 interaction=interaction,
-                team=advisor.dit_team,
-            )
-            interaction.dit_participants.add(advisor)
+            ))
             return Interaction
         except IntegrityError as error:
             logger.error(
