@@ -3,7 +3,7 @@ import logging
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 
-from datahub.company.models import Advisor, Company
+from datahub.company.models import Advisor as Adviser, Company
 from datahub.company.models import Contact
 from datahub.company_activity.models import StovaAttendee
 from datahub.company_activity.models import StovaEvent
@@ -43,14 +43,10 @@ class StovaAttendeeIndentificationTask(BaseObjectIdentificationTask):
 
 class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
     existing_ids = []
+    default_advisor = None
 
     def _should_process_record(self, record: dict) -> bool:
         """Checks whether the record has already been ingested or not."""
-        if not self.existing_ids:
-            self.existing_ids = set(
-                StovaAttendee.objects.values_list('stova_attendee_id', flat=True),
-            )
-
         stova_attendee_id = record.get('id')
         if stova_attendee_id in self.existing_ids:
             logger.info(f'Record already exists for stova_attendee_id: {stova_attendee_id}')
@@ -58,6 +54,19 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
 
         return True
 
+    def ingest_object(self) -> None:
+        """
+        Overriden to run queries only required once per ingestion rather than per record inside
+        the ingestion.
+        """
+        if not self.existing_ids:
+            self.existing_ids = set(
+                StovaAttendee.objects.values_list('stova_attendee_id', flat=True),
+            )
+        self.default_advisor = self.get_or_create_default_stova_adviser()
+        return super().ingest_object()
+
+    @transaction.atomic
     def _process_record(self, record: dict) -> None:
         """
         Processes a single stova attendee from the S3 Bucket and saves it to the `StovaAttendee`
