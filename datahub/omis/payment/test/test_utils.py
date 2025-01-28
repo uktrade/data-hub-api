@@ -1,3 +1,4 @@
+import pytest
 from dateutil.parser import parse as dateutil_parse
 
 from datahub.omis.order.test.factories import OrderWithAcceptedQuoteFactory
@@ -62,6 +63,7 @@ class TestGetOmisPaymentDataFromGovukPayment:
             'billing_address_country': 'GB',
         }
 
+    @pytest.mark.django_db
     def test_when_card_detail_fields_are_none(self):
         """
         Test if card details with billing and card holder name is set to ""

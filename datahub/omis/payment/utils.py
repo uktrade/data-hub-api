@@ -33,7 +33,7 @@ def trasform_govuk_payment_to_omis_payment_data(govuk_payment):
         'received_on': dateutil_parse(govuk_payment['created_date']).date(),
 
         # card details
-        'cardholder_name': card_details['cardholder_name'],
+        'cardholder_name': cardholder_name,
         'card_brand': card_details['card_brand'],
         'billing_email': govuk_payment['email'],
         'billing_address_1': billing_address['line1'],
