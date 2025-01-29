@@ -270,6 +270,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
                 were_countries_discussed=False,
             )
             interaction.contacts.add(contact)
+            interaction.companies.add(company)
             interaction.dit_participants.add(InteractionDITParticipant.objects.create(
                 adviser=adviser,
                 interaction=interaction,

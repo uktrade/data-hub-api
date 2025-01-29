@@ -460,6 +460,8 @@ class TestStovaIngestionTasks:
         ).first()
         assert interaction is not None
         assert interaction.company == contact.company
+        assert interaction.companies.all().count() == 1
+        assert interaction.companies.all().first() == contact.company
         assert interaction.kind == Interaction.Kind.SERVICE_DELIVERY
         assert interaction.is_event is True
         assert interaction.theme == Interaction.Theme.OTHER
