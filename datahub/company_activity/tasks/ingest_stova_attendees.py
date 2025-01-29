@@ -3,13 +3,15 @@ import logging
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 
-from datahub.company.models import Company
+from datahub.company.models import Advisor as Adviser, Company
 from datahub.company.models import Contact
 from datahub.company_activity.models import StovaAttendee
 from datahub.company_activity.models import StovaEvent
 from datahub.company_activity.tasks.constants import STOVA_ATTENDEE_PREFIX
+from datahub.event.models import Event
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.tasks import BaseObjectIdentificationTask, BaseObjectIngestionTask
+from datahub.interaction.models import Interaction, InteractionDITParticipant
 
 
 logger = logging.getLogger(__name__)
@@ -41,14 +43,10 @@ class StovaAttendeeIndentificationTask(BaseObjectIdentificationTask):
 
 class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
     existing_ids = []
+    default_advisor = None
 
     def _should_process_record(self, record: dict) -> bool:
         """Checks whether the record has already been ingested or not."""
-        if not self.existing_ids:
-            self.existing_ids = set(
-                StovaAttendee.objects.values_list('stova_attendee_id', flat=True),
-            )
-
         stova_attendee_id = record.get('id')
         if stova_attendee_id in self.existing_ids:
             logger.info(f'Record already exists for stova_attendee_id: {stova_attendee_id}')
@@ -56,11 +54,27 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
 
         return True
 
+    def ingest_object(self) -> None:
+        """
+        Overriden to run queries only required once per ingestion rather than per record inside
+        the ingestion.
+        """
+        if not self.existing_ids:
+            self.existing_ids = set(
+                StovaAttendee.objects.values_list('stova_attendee_id', flat=True),
+            )
+        self.default_advisor = self.get_or_create_default_stova_adviser()
+        return super().ingest_object()
+
+    @transaction.atomic
     def _process_record(self, record: dict) -> None:
         """
         Processes a single stova attendee from the S3 Bucket and saves it to the `StovaAttendee`
         model. It also attempts to match the contact and company from the given fields and if no
         match is found it creates them.
+
+        This function uses the transaction.atomic decorator to rollback changes when exceptions are
+        raised.
 
         :param record: The deserialize JSON row from the S3 Bucket containing stova attendee
             details.
@@ -89,18 +103,25 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         if not event:
             return
 
-        # Wrap in transaction as we don't want to create any companies/contacts/attendees if any of
-        # the steps fail.
-        with transaction.atomic():
-            company = self.get_or_create_company(values)
-            if not company:
-                return
+        company = self.get_or_create_company(values)
+        if not company:
+            return
 
-            contact = self.get_or_create_contact(values, company)
-            if not contact:
-                return
+        contact = self.get_or_create_contact(values, company)
+        if not contact:
+            return
 
-            self.create_assignee(values, company, contact, event)
+        interaction = self.create_interaction_for_event_and_contact(
+            values,
+            company,
+            contact,
+            event.datahub_event.first(),
+            adviser=self.default_advisor,
+        )
+        if not interaction:
+            return
+
+        self.create_assignee(values, company, contact, event)
 
     @staticmethod
     def create_assignee(
@@ -198,6 +219,66 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         except IntegrityError as error:
             logger.error(
                 'Error creating contact from Stova attendee record, stova_attendee_id: '
+                f'{values["stova_attendee_id"]}. Error: {error}',
+            )
+            return
+
+    @staticmethod
+    def get_or_create_default_stova_adviser() -> Adviser:
+        """
+        Get or create a default fake Adviser in order to create interactions for Stova Attendees.
+        """
+        adviser, _ = Adviser.objects.get_or_create(
+            email='stova_default@businessandtrade.gov.uk',
+            first_name='Stova Default',
+            last_name='Adviser',
+            is_active=False,
+        )
+        return adviser
+
+    @staticmethod
+    def create_interaction_for_event_and_contact(
+        values: dict,
+        company: Company,
+        contact: Contact,
+        datahub_event: Event,
+        adviser: Adviser,
+    ) -> Interaction | None:
+        """
+        Creates an `Interaction` for the contact, company and event.
+
+        Business Logic:
+        To show as an attendee of an `Event` on Data Hub, you must be a `Contact` and be listed as
+        a `Contact` on an `Interaction` for that `Event`.
+
+        :param values: A dictionary of cleaned values from an ingested stova attendee record.
+        :param company: A `Company` object.
+        :param contact: A `Contact` found or created from the attendee record.
+        :param datahub_event: The DataHub Event created from the StovaEvent.
+        :param adviser: An `Adviser` object.
+        """
+        try:
+            interaction = Interaction.objects.create(
+                company=company,
+                event=datahub_event,
+                date=datahub_event.start_date,
+                kind=Interaction.Kind.SERVICE_DELIVERY,
+                theme=Interaction.Theme.OTHER,
+                service_id=datahub_event.service.id,
+                subject=f'Attended {datahub_event.name}',
+                was_policy_feedback_provided=False,
+                were_countries_discussed=False,
+            )
+            interaction.contacts.add(contact)
+            interaction.companies.add(company)
+            interaction.dit_participants.add(InteractionDITParticipant.objects.create(
+                adviser=adviser,
+                interaction=interaction,
+            ))
+            return Interaction
+        except IntegrityError as error:
+            logger.error(
+                'Error creating interaction from Stova attendee record, stova_attendee_id: '
                 f'{values["stova_attendee_id"]}. Error: {error}',
             )
             return
