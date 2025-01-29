@@ -388,7 +388,7 @@ class TestStovaIngestionTasks:
             first_name='Stova Default',
             last_name='Adviser',
             is_active=False,
-        ).first() is None
+        ).exists() is False
 
         ingestion_task.ingest_object()
 
@@ -397,7 +397,7 @@ class TestStovaIngestionTasks:
             first_name='Stova Default',
             last_name='Adviser',
             is_active=False,
-        ).first() is not None
+        ).exists() is True
 
     @pytest.mark.django_db
     def test_stova_attendee_ingestion_uses_existing_default_adviser_if_exists(
@@ -460,14 +460,14 @@ class TestStovaIngestionTasks:
         ).first()
         assert interaction is not None
         assert interaction.company == contact.company
-        assert interaction.companies.all().count() == 1
-        assert interaction.companies.all().first() == contact.company
+        assert interaction.companies.count() == 1
+        assert interaction.companies.first() == contact.company
         assert interaction.kind == Interaction.Kind.SERVICE_DELIVERY
         assert interaction.is_event is True
         assert interaction.theme == Interaction.Theme.OTHER
         assert interaction.was_policy_feedback_provided is False
         assert interaction.were_countries_discussed is False
-        assert interaction.dit_participants.all().first().adviser.email == (
+        assert interaction.dit_participants.first().adviser.email == (
             'stova_default@businessandtrade.gov.uk'
         )
 
@@ -515,7 +515,7 @@ class TestStovaIngestionTasks:
         """Test that no Stova Attendee is created if the interaction fails to create."""
         # Make event invalid for an interaction
         stova_event = StovaEventFactory()
-        datahub_event = stova_event.datahub_event.all().first()
+        datahub_event = stova_event.datahub_event.first()
         datahub_event.start_date = None
         datahub_event.save()
         stova_event.refresh_from_db()
