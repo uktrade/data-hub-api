@@ -20,12 +20,18 @@ class InternationalTelephoneValidator(RegexValidator):
     """
     Validator for international telephone numbers.
 
-    Validates that phone number is composed of characters found in telephone numbers -
-    0-9, a space, hyphens, or open / close brackets - optionally preceded with a plus sign.
+    Validates that a phone number is composed of characters found in telephone numbers:
+    0-9, spaces, hyphens, full stops, or open/close brackets, optionally preceded with a plus sign.
+    Extensions can be included using 'ext' or 'x' followed by digits.
     """
 
-    regex = r'^\+?[\d() -]{1,}$'
-    message = 'Phone number must be composed of numeric characters.'
+    regex = r'^\+?[\d().\- ]+(?:\s*(?:ext|ext.|x)\s*\d+)?$'
+    message = (
+        'Phone number must be composed of valid characters. '
+        'These include: 0-9, spaces, hyphens, full stops, or open/close brackets, '
+        'optionally preceded with a plus sign. Extensions can be included using '
+        "'ext' or 'x' followed by digits."
+    )
 
 
 class TelephoneCountryCodeValidator(RegexValidator):
