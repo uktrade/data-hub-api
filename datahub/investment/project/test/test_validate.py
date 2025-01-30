@@ -18,7 +18,6 @@ from datahub.investment.project.serializers import (
 from datahub.investment.project.test.factories import (
     ActiveInvestmentProjectFactory,
     InvestmentProjectFactory,
-    VerifyWinInvestmentProjectFactory,
 )
 from datahub.investment.project.validate import (
     _get_desired_stage_order,
@@ -272,7 +271,6 @@ def test_validate_verify_win_instance_failure():
         total_investment=100,
         client_considering_other_countries=False,
         client_requirements='client reqs',
-        site_address_is_company_address=None,
         site_decided=False,
         strategic_drivers=strategic_drivers,
         uk_region_locations=[random_obj_for_model(UKRegion)],
@@ -289,7 +287,10 @@ def test_validate_verify_win_instance_failure():
         'non_fdi_r_and_d_budget': 'This field is required.',
         'new_tech_to_uk': 'This field is required.',
         'export_revenue': 'This field is required.',
-        'site_address_is_company_address': 'This field is required.',
+        'address_1': 'This field is required.',
+        'address_town': 'This field is required.',
+        'address_postcode': 'This field is required.',
+        'actual_uk_regions': 'This field is required.',
         'delivery_partners': 'This field is required.',
         'client_cannot_provide_foreign_investment': 'This field is required.',
         'foreign_equity_investment': 'This field is required.',
@@ -344,7 +345,6 @@ def test_validate_verify_win_instance_with_cond_fields():
         number_new_jobs=10,
         client_considering_other_countries=False,
         client_requirements='client reqs',
-        site_address_is_company_address=False,
         site_decided=False,
         strategic_drivers=strategic_drivers,
         uk_region_locations=[random_obj_for_model(UKRegion)],
@@ -396,62 +396,3 @@ def test_likelihood_to_land_assign_pm_stage_missing_error():
 def test_get_desired_stage_order(desired_stage, next_stage, expected_stage_order):
     """Test get desired stage order."""
     assert _get_desired_stage_order(desired_stage, next_stage) == expected_stage_order
-
-
-def test_site_address_is_company_address_is_marked_incomplete_at_active_stage():
-    project = ActiveInvestmentProjectFactory(
-        site_address_is_company_address=None,
-        address_1=None,
-        address_town=None,
-        address_postcode=None,
-    )
-    incomplete_fields = project.incomplete_fields  # this calls validate(self, next_stage=True)
-    assert 'site_address_is_company_address' in incomplete_fields
-    # Address fields are conditionally marked if site_address_is_company_address has a value
-    assert 'address_1' not in incomplete_fields
-    assert 'address_town' not in incomplete_fields
-    assert 'address_postcode' not in incomplete_fields
-
-
-@pytest.mark.parametrize('value', (True, False))
-def test_site_address_fields_are_marked_incomplete_at_active_stage(value):
-    project = ActiveInvestmentProjectFactory(
-        site_address_is_company_address=False,
-        address_1=None,
-        address_town=None,
-        address_postcode=None,
-    )
-    incomplete_fields = project.incomplete_fields  # this calls validate(self, next_stage=True)
-    assert 'site_address_is_company_address' not in incomplete_fields
-    # Address fields are conditionally marked if site_address_is_company_address has a value
-    assert 'address_1' in incomplete_fields
-    assert 'address_town' in incomplete_fields
-    assert 'address_postcode' in incomplete_fields
-
-
-def test_site_address_is_company_address_is_required_at_verify_win_stage():
-    project = VerifyWinInvestmentProjectFactory(
-        site_address_is_company_address=None,
-    )
-    errors = validate(instance=project)
-    assert 'site_address_is_company_address' in errors
-    # Address fields are conditionally required if site_address_is_company_address has a value
-    assert 'address_1' not in errors
-    assert 'address_town' not in errors
-    assert 'address_postcode' not in errors
-
-
-@pytest.mark.parametrize('value', (True, False))
-def test_site_address_fields_are_required_at_verify_win_stage_after_condition_met(value):
-    project = VerifyWinInvestmentProjectFactory(
-        site_address_is_company_address=value,
-        address_1=None,
-        address_town=None,
-        address_postcode=None,
-    )
-    errors = validate(instance=project)
-    assert 'site_address_is_company_address' not in errors
-    # Address fields are conditionally required if site_address_is_company_address has a value
-    assert 'address_1' in errors
-    assert 'address_town' in errors
-    assert 'address_postcode' in errors
