@@ -33,10 +33,6 @@ def _get_to_many_id(instance):
     return instance.id
 
 
-def _is_not_none(value):
-    return value is not None
-
-
 class InvestmentProjectStageValidationConfig:
     """Investment Project stage validation config."""
 
@@ -58,7 +54,10 @@ class InvestmentProjectStageValidationConfig:
             'non_fdi_r_and_d_budget': Stage.verify_win.value,
             'new_tech_to_uk': Stage.verify_win.value,
             'export_revenue': Stage.verify_win.value,
-            'site_address_is_company_address': Stage.verify_win.value,
+            'address_1': Stage.verify_win.value,
+            'address_town': Stage.verify_win.value,
+            'address_postcode': Stage.verify_win.value,
+            'actual_uk_regions': Stage.verify_win.value,
             'delivery_partners': Stage.verify_win.value,
             'actual_land_date': Stage.verify_win.value,
             'specific_programmes': Stage.verify_win.value,
@@ -105,18 +104,6 @@ class InvestmentProjectStageValidationConfig:
             'uk_region_locations':
                 CondValRule(
                     'allow_blank_possible_uk_regions', False, Stage.assign_pm.value,
-                ),
-            'address_1':
-                CondValRule(
-                    'site_address_is_company_address', _is_not_none, Stage.verify_win.value,
-                ),
-            'address_town':
-                CondValRule(
-                    'site_address_is_company_address', _is_not_none, Stage.verify_win.value,
-                ),
-            'address_postcode':
-                CondValRule(
-                    'site_address_is_company_address', _is_not_none, Stage.verify_win.value,
                 ),
             'foreign_equity_investment':
                 CondValRule(

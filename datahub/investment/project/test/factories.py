@@ -168,7 +168,6 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
     non_fdi_r_and_d_budget = False
     new_tech_to_uk = True
     export_revenue = True
-    site_address_is_company_address = False
     address_1 = factory.Faker('street_address')
     address_town = factory.Faker('city')
     address_postcode = factory.Faker('postcode')
