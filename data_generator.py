@@ -30,7 +30,7 @@ from datahub.company.test.factories import (
     ContactFactory,
     SubsidiaryFactory,
 )
-
+from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 class DisableSignals:
     def __init__(self, disabled_signals=None):

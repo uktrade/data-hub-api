@@ -81,8 +81,12 @@ def refresh_gross_value_added_value_for_fdi_investment_projects():
     which sets the Gross Value added data for a project.
     """
     investment_projects = get_investment_projects_to_refresh_gva_values()
+    processed_ids = set()
     for project in investment_projects.iterator():
+        if project.id in processed_ids:
+            continue
         project.save(update_fields=['gross_value_added', 'gva_multiplier'])
+        processed_ids.add(project.id)
 
     logger.info(
         'Task refresh_gross_value_added_value_for_fdi_investment_projects completed',
