@@ -31,6 +31,7 @@ from datahub.company.test.factories import (
     SubsidiaryFactory,
 )
 
+
 class DisableSignals:
     def __init__(self, disabled_signals=None):
         self.stashed_signals = defaultdict(list)
@@ -114,4 +115,3 @@ with DisableSignals():
 
     elapsed = time.time() - start_time
     print(f'{timedelta(seconds=elapsed)}')  # noqa
-    

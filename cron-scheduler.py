@@ -53,11 +53,10 @@ from datahub.export_win.tasks import (
     update_notify_email_delivery_status_for_customer_response,
     update_notify_email_delivery_status_for_customer_response_token,
 )
-
-from datahub.investment_lead.tasks.ingest_eyb_triage import eyb_triage_identification_task
 from datahub.investment.project.tasks import (
     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
 )
+from datahub.investment_lead.tasks.ingest_eyb_triage import eyb_triage_identification_task
 from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
 from datahub.reminder.migration_tasks import run_ita_users_migration, run_post_users_migration
 from datahub.reminder.tasks import (
