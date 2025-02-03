@@ -107,7 +107,7 @@ env = environ.Env()
 REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
 BUCKET = f"data-flow-bucket-{env('ENVIRONMENT', default='')}"
 PREFIX = 'data-flow/exports/'
-CONSENT_PREFIX = f'{PREFIX}MergeConsentsPipeline/'
+CONSENT_PREFIX = f'{PREFIX}ExportConsentToS3/'
 
 
 class ContactConsentIngestionTask:
