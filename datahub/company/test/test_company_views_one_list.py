@@ -113,6 +113,73 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         assert versions[0].field_dict['one_list_tier_id'] == new_one_list_tier.id
         assert versions[0].field_dict['one_list_account_owner_id'] == global_account_manager.id
 
+    # @pytest.mark.parametrize(
+    #     'company_factory,can_edit',
+    #     (
+    #         pytest.param(
+    #             pytest.param(
+    #                 lambda: CompanyFactory(
+    #                     one_list_account_owner=AdviserFactory(),
+    #                     one_list_tier=random_non_ita_one_list_tier(),
+    #                 ),
+    #             ),
+    #             True,
+    #         ),
+    #         pytest.param(
+    #             pytest.param(
+    #                 lambda: CompanyFactory(
+    #                     one_list_account_owner=AdviserFactory(),
+    #                     one_list_tier=random_non_ita_one_list_tier(),
+    #                 ),
+    #                 id='existing-global-account-manager',
+    #             ),
+    #             False,
+    #         ),
+    #     ),
+    # )
+    @pytest.mark.django_db
+    def test_assigns_one_list_tier_by_global_account_manager(
+        self,
+        # company_factory,
+        # can_edit,
+    ):
+        """
+        Test that a global account manager:
+
+        - can update the One List tier of the company they are managing
+        - can not update the One List tier of a company they are not managing.
+        """
+        company = CompanyFactory(
+            one_list_account_owner=AdviserFactory(),
+            one_list_tier=random_non_ita_one_list_tier(),
+        )
+        api_client = self.create_api_client(user=company.one_list_account_owner)
+        url = self._get_url(company)
+
+        new_one_list_tier = random_non_ita_one_list_tier()
+
+        global_account_manager = AdviserFactory()
+
+        response = api_client.post(
+            url,
+            {
+                'one_list_tier': new_one_list_tier.id,
+                'global_account_manager': global_account_manager.id,
+            },
+        )
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        company.refresh_from_db()
+        assert company.one_list_account_owner == global_account_manager
+        assert company.one_list_tier_id == new_one_list_tier.pk
+        assert company.modified_by == one_list_editor
+
+        # Check that object version is stored correctly
+        versions = Version.objects.get_for_object(company)
+        assert versions.count() == 1
+        assert versions[0].field_dict['one_list_tier_id'] == new_one_list_tier.id
+        assert versions[0].field_dict['one_list_account_owner_id'] == global_account_manager.id
+
     @pytest.mark.parametrize(
         'company_factory,adviser_id_fn,new_one_list_tier_id_fn,expected_errors',
         (

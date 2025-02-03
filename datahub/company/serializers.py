@@ -5,6 +5,7 @@ from typing import Optional
 from uuid import UUID
 
 from django.conf import settings
+from datahub.core.permissions import HasPermissions
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy
 from rest_framework import serializers
@@ -58,6 +59,7 @@ from datahub.core.validators import (
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import TeamWithGeographyField
 from datahub.metadata.utils import convert_usd_to_gbp
+# from permissions import CompanyModelPermissions
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -665,9 +667,17 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             ),
         )
         permissions = {
+            # HasPermissions(CompanyModelPermissions),
             f'company.{CompanyPermission.view_company_document}': 'archived_documents_url_path',
             'company.view_companyexportcountry': 'export_countries',
         }
+
+        # permission_classes=[
+        #     HasPermissions(
+        #         f'company.{CompanyPermission.change_company}',
+        #         f'company.{CompanyPermission.change_one_list_core_team_member}',
+        #     ),
+        # ],
 
 
 class AssignRegionalAccountManagerSerializer(serializers.Serializer):

@@ -9,6 +9,10 @@ from datahub.core.permissions import (
 )
 from datahub.core.utils import StrEnum
 from datahub.investment.project.models import InvestmentProject
+from datahub.company.models import Company, CompanyPermission
+from rest_framework.permissions import BasePermission
+from datahub.core.permissions import HasPermissions
+
 
 class _PermissionTemplate(StrEnum):
     """Permission codename templates."""
@@ -17,6 +21,23 @@ class _PermissionTemplate(StrEnum):
     associated = '{app_label}.{action}_associated_{model_name}'
     standard = '{app_label}.{action}_{model_name}'
     stage_to_won = '{app_label}.{action}_stage_to_won_{model_name}'
+
+    # f'company.{CompanyPermission.change_company}',
+    # f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
+
+
+class IsAccountManagerOnCompany(BasePermission):
+    """
+    Allows access only to users that are account managers for the current company.
+    """
+
+    def has_permission(self, request, view):
+        return HasPermissions(
+            f'company.{CompanyPermission.change_company}',
+            f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
+        )
+
+        # return bool(request.user and request.user.is_authenticated)
 
 
 class CompanyModelPermissions(ViewBasedModelPermissions):
@@ -30,7 +51,7 @@ class CompanyModelPermissions(ViewBasedModelPermissions):
     """
 
     many_to_many = False
-    model = InvestmentProject
+    model = Company
 
     permission_mapping = {
         'add': (
@@ -41,9 +62,17 @@ class CompanyModelPermissions(ViewBasedModelPermissions):
             _PermissionTemplate.associated,
         ),
         'change': (
+            _PermissionTemplate.standard,
             _PermissionTemplate.all,
-            _PermissionTemplate.associated,
-            _PermissionTemplate.stage_to_won,
+            # _PermissionTemplate.associated,
+            # _PermissionTemplate.stage_to_won,
+            # CompanyPermission.add_company,
+            # CompanyPermission.
+            # CompanyPermission.change_company,
+            # CompanyPermission.change_one_list_tier_and_global_account_manager,
+            CompanyPermission.change_company,
+            CompanyPermission.change_one_list_tier_and_global_account_manager,
+            CompanyPermission.change_one_list_core_team_member,
         ),
         'delete': (
             _PermissionTemplate.standard,
