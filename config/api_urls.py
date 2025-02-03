@@ -10,6 +10,7 @@ from datahub.company.urls import company as company_urls
 from datahub.company.urls import contact as contact_urls
 from datahub.company.urls import export as export_urls
 from datahub.company.urls import objective as objective_urls
+from datahub.company_activity.urls import urls as company_activity_urls
 from datahub.company_referral import urls as company_referral_urls
 from datahub.dataset import urls as dataset_urls
 from datahub.dnb_api import urls as dnb_api_urls
@@ -28,7 +29,6 @@ from datahub.reminder import urls as reminder_urls
 from datahub.search import urls as search_urls
 from datahub.task import urls as task_urls
 from datahub.user.company_list import urls as company_list_urls
-
 # API V1
 
 router_v1 = routers.SimpleRouter()
@@ -104,5 +104,9 @@ v4_urls = [
     path(
         'investment-lead/',
         include((investment_lead_urls, 'investment-lead'), namespace='investment-lead'),
+    ),
+    path(
+        'company-activity/', include((company_activity_urls,
+                                     'company-activity'), namespace='company-activity'),
     ),
 ]
