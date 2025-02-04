@@ -152,7 +152,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         assert versions[0].field_dict['one_list_account_owner_id'] == company.one_list_account_owner.id
 
     @pytest.mark.django_db
-    def test_cannot_assign_one_list_tier_by_other_global_account_manager(
+    def test_returns_403_on_editing_one_list_tier_by_other_global_account_manager(
         self,
     ):
         """
