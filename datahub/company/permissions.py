@@ -1,80 +1,17 @@
-from django.db.models.query_utils import Q
-from rest_framework.filters import BaseFilterBackend
-
-from datahub.core.permissions import (
-    get_model_action_for_view_action,
-    IsAssociatedToObjectPermission,
-    ObjectAssociationCheckerBase,
-    ViewBasedModelPermissions,
-)
-from datahub.core.utils import StrEnum
-from datahub.investment.project.models import InvestmentProject
-from datahub.company.models import Company, CompanyPermission
 from rest_framework.permissions import BasePermission
-from datahub.core.permissions import HasPermissions
 
-
-class _PermissionTemplate(StrEnum):
-    """Permission codename templates."""
-
-    all = '{app_label}.{action}_all_{model_name}'
-    associated = '{app_label}.{action}_associated_{model_name}'
-    standard = '{app_label}.{action}_{model_name}'
-    stage_to_won = '{app_label}.{action}_stage_to_won_{model_name}'
-
-    # f'company.{CompanyPermission.change_company}',
-    # f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
+from datahub.company.models import CompanyPermission
 
 
 class IsAccountManagerOnCompany(BasePermission):
     """
-    Allows access only to users that are account managers for the current company.
+    Allows users:
+    - that have change_company and change_one_list_tier_and_global_account_manager permissions
+    - or that are one_list_account_owners (account managers/ITA Leads) for the current record.
     """
 
-    def has_permission(self, request, view):
-        return HasPermissions(
+    def has_object_permission(self, request, view, obj):
+        return request.user.has_perms([
             f'company.{CompanyPermission.change_company}',
             f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
-        )
-
-        # return bool(request.user and request.user.is_authenticated)
-
-
-class CompanyModelPermissions(ViewBasedModelPermissions):
-    """
-    Custom permissions class for investment views.
-
-    This differs from the standard DjangoModelPermissions class in that:
-    - the permissions mapping is based on view/model actions rather than HTTP methods
-    - the user only needs to have one the permissions corresponding to each action, rather than
-      all of them
-    """
-
-    many_to_many = False
-    model = Company
-
-    permission_mapping = {
-        'add': (
-            _PermissionTemplate.standard,
-        ),
-        'view': (
-            _PermissionTemplate.all,
-            _PermissionTemplate.associated,
-        ),
-        'change': (
-            _PermissionTemplate.standard,
-            _PermissionTemplate.all,
-            # _PermissionTemplate.associated,
-            # _PermissionTemplate.stage_to_won,
-            # CompanyPermission.add_company,
-            # CompanyPermission.
-            # CompanyPermission.change_company,
-            # CompanyPermission.change_one_list_tier_and_global_account_manager,
-            CompanyPermission.change_company,
-            CompanyPermission.change_one_list_tier_and_global_account_manager,
-            CompanyPermission.change_one_list_core_team_member,
-        ),
-        'delete': (
-            _PermissionTemplate.standard,
-        ),
-    }
+        ]) or (obj.one_list_account_owner == request.user)

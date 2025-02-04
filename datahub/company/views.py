@@ -30,8 +30,8 @@ from datahub.company.models import (
     Contact,
     Objective,
 )
-from datahub.company.permissions import CompanyModelPermissions, IsAccountManagerOnCompany
 from datahub.company.pagination import ContactPageSize
+from datahub.company.permissions import IsAccountManagerOnCompany
 from datahub.company.queryset import (
     get_contact_queryset,
     get_export_country_queryset,
