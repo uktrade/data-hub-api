@@ -42,6 +42,7 @@ class SearchEventQuerySerializer(EntitySearchQuerySerializer):
     start_date_before = RelaxedDateTimeField(required=False)
     teams = SingleOrListField(child=StringUUIDField(), required=False)
     uk_region = SingleOrListField(child=StringUUIDField(), required=False)
+    stova_event = SingleOrListField(child=StringUUIDField(), required=False)
 
     SORT_BY_FIELDS = (
         'id',

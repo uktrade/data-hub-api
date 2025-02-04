@@ -35,6 +35,8 @@ class Event(BaseSearchModel):
     teams = fields.id_name_partial_field()
     uk_region = fields.id_name_partial_field()
 
+    stova_event = fields.id_name_field()
+
     MAPPINGS = {
         'address_country': dict_utils.id_name_dict,
         'event_type': dict_utils.id_name_dict,
@@ -45,6 +47,7 @@ class Event(BaseSearchModel):
         'service': dict_utils.id_name_dict,
         'teams': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'uk_region': dict_utils.id_name_dict,
+        'stova_event': dict_utils.id_name_dict,
     }
 
     COMPUTED_MAPPINGS = {}

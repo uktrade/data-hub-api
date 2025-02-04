@@ -17,6 +17,7 @@ class EventSearchApp(SearchApp):
         'lead_team',
         'uk_region',
         'service',
+        'stova_event',
     ).prefetch_related(
         'related_programmes',
         'teams',
