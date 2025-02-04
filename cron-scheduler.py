@@ -37,7 +37,7 @@ from datahub.core.queues.constants import (
     EVERY_TEN_MINUTES,
     EVERY_TEN_PM,
     EVERY_THREE_AM,
-    # EVERY_THREE_AM_ON_TWENTY_EIGHTH_EACH_MONTH,
+    EVERY_THREE_AM_ON_TWENTY_EIGHTH_EACH_MONTH,
     EVERY_TWO_AM,
     HALF_DAY_IN_SECONDS,
     ONE_HOUR_IN_SECONDS,
@@ -53,10 +53,9 @@ from datahub.export_win.tasks import (
     update_notify_email_delivery_status_for_customer_response,
     update_notify_email_delivery_status_for_customer_response_token,
 )
-
-# from datahub.investment.project.tasks import (
-#     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
-# )
+from datahub.investment.project.tasks import (
+    schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
+)
 from datahub.investment_lead.tasks.ingest_eyb_triage import eyb_triage_identification_task
 from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
 from datahub.reminder.migration_tasks import run_ita_users_migration, run_post_users_migration
@@ -163,12 +162,11 @@ def schedule_jobs():
             description='schedule_generate_estimated_land_date_reminders',
         )
 
-    # TODO: uncomment this once the infinite loop issue (when refreshing GVA) has been fixed
-    # job_scheduler(
-    #     function=schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
-    #     cron=EVERY_THREE_AM_ON_TWENTY_EIGHTH_EACH_MONTH,
-    #     description='schedule_refresh_gross_value_added_value_for_fdi_investment_projects',
-    # )
+    job_scheduler(
+        function=schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
+        cron=EVERY_THREE_AM_ON_TWENTY_EIGHTH_EACH_MONTH,
+        description='schedule_refresh_gross_value_added_value_for_fdi_investment_projects',
+    )
 
     if settings.ENABLE_ESTIMATED_LAND_DATE_REMINDERS_EMAIL_DELIVERY_STATUS:
         job_scheduler(
