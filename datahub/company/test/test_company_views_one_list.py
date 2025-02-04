@@ -149,7 +149,8 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         versions = Version.objects.get_for_object(company)
         assert versions.count() == 1
         assert versions[0].field_dict['one_list_tier_id'] == new_one_list_tier.id
-        assert versions[0].field_dict['one_list_account_owner_id'] == company.one_list_account_owner.id
+        assert versions[0].field_dict['one_list_account_owner_id'] == \
+            company.one_list_account_owner.id
 
     @pytest.mark.django_db
     def test_returns_403_on_editing_one_list_tier_by_other_global_account_manager(
