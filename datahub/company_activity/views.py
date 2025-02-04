@@ -7,5 +7,3 @@ from datahub.company_activity.serializers.stova import StovaEventSerializer
 class StovaEventRetrieveAPIView(RetrieveAPIView):
     queryset = StovaEvent.objects.all()
     serializer_class = StovaEventSerializer
-    permission_classes = []
-    authentication_classes = []

@@ -7,16 +7,15 @@ from datahub.core.test_utils import (
     create_test_user,
     format_date_or_datetime,
 )
-from datahub.metadata.test.factories import TeamFactory
 
 
-class TestGetEventView(APITestMixin):
+class TestGetStovaEventView(APITestMixin):
     """Get single event view tests."""
 
     def test_stova_event_details_no_permissions(self):
         """Should return 403"""
         stova_event = StovaEventFactory()
-        user = create_test_user(dit_team=TeamFactory())
+        user = create_test_user()
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:company-activity:stova-event:detail', kwargs={'pk': stova_event.pk})
         response = api_client.get(url)
@@ -25,13 +24,15 @@ class TestGetEventView(APITestMixin):
     def test_get(self):
         """Test getting a single stova event."""
         stova_event = StovaEventFactory()
+        user = create_test_user(permission_codenames=['view_stovaevent'])
+        api_client = self.create_api_client(user=user)
         url = reverse('api-v4:company-activity:stova-event:detail', kwargs={'pk': stova_event.pk})
 
-        response = self.api_client.get(url)
+        response = api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         expected_response_data = {
-            'datahub_event': [str(stova_event.datahub_event.values_list('id', flat=True).last())],
+            'datahub_event': [str(stova_event.datahub_event.first().id)],
             'id': str(stova_event.id),
             'stova_event_id': stova_event.stova_event_id,
             'name': stova_event.name,
