@@ -1,0 +1,6 @@
+- model: company.onelisttier
+  pk: bd1bf800-8d53-e311-aef3-441ea13961e2
+  fields:
+    disabled_on: null
+    name: Tier C - FDI Sector Advisory Services Team Accounts
+    order: 500.0
