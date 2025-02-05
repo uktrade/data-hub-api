@@ -129,7 +129,9 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
 
         url = self._get_url(company)
 
-        new_one_list_tier = random_non_ita_one_list_tier()
+        new_one_list_tier = random_non_ita_one_list_tier(
+            exclude=company.one_list_tier,
+        )
 
         response = api_client.post(
             url,
@@ -168,7 +170,9 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
 
         url = self._get_url(company)
 
-        new_one_list_tier = random_non_ita_one_list_tier()
+        new_one_list_tier = random_non_ita_one_list_tier(
+            exclude=company.one_list_tier,
+        )
 
         response = api_client.post(
             url,

@@ -5,11 +5,16 @@ from datahub.core.test_utils import (
 )
 
 
-def random_non_ita_one_list_tier():
-    """Returns random non ITA One List tier."""
+def random_non_ita_one_list_tier(exclude=None):
+    """
+    Returns random non ITA One List tier.
+    :param exclude: OneListTier object to also exclude
+    """
     queryset = OneListTier.objects.exclude(
         pk=OneListTierID.tier_d_international_trade_advisers.value,
     )
+    if exclude is not None:
+        queryset.exclude(pk=exclude.id)
     return random_obj_for_queryset(queryset)
 
 
