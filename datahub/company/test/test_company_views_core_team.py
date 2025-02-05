@@ -219,6 +219,53 @@ class TestUpdateOneListCoreTeam(APITestMixin):
             },
         )
 
+    def _assert_update_core_team_members(
+        self,
+        one_list_company,
+        existing_team_count,
+        new_team_count,
+        api_client,
+    ):
+        url = self._get_url(one_list_company)
+
+        if existing_team_count:
+            team_member_advisers = AdviserFactory.create_batch(existing_team_count)
+            OneListCoreTeamMemberFactory.create_batch(
+                len(team_member_advisers),
+                company=one_list_company,
+                adviser=factory.Iterator(team_member_advisers),
+            )
+
+        old_core_team_members = [
+            core_team_member.adviser.id
+            for core_team_member in one_list_company.one_list_core_team_members.all()
+        ]
+
+        new_core_team_members = [
+            adviser.id for adviser in AdviserFactory.create_batch(2)
+        ] if new_team_count else []
+
+        response = api_client.patch(
+            url,
+            {
+                'core_team_members':
+                [
+                    {
+                        'adviser': adviser_id,
+                    } for adviser_id in new_core_team_members
+                ],
+            },
+        )
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        core_team_members = [
+            core_team_member.adviser.id
+            for core_team_member in one_list_company.one_list_core_team_members.all()
+        ]
+
+        assert core_team_members != old_core_team_members
+        assert core_team_members == new_core_team_members
+
     def test_returns_401_if_unauthenticated(self, api_client):
         """Test that a 401 is returned if no credentials are provided."""
         company = CompanyFactory()
@@ -264,45 +311,51 @@ class TestUpdateOneListCoreTeam(APITestMixin):
     ):
         """Test that core team members can be updated."""
         api_client = self.create_api_client(user=one_list_editor)
-        url = self._get_url(one_list_company)
 
-        if existing_team_count:
-            team_member_advisers = AdviserFactory.create_batch(existing_team_count)
-            OneListCoreTeamMemberFactory.create_batch(
-                len(team_member_advisers),
-                company=one_list_company,
-                adviser=factory.Iterator(team_member_advisers),
-            )
+        self._assert_update_core_team_members(
+            one_list_company, existing_team_count, new_team_count, api_client)
 
-        old_core_team_members = [
-            core_team_member.adviser.id
-            for core_team_member in one_list_company.one_list_core_team_members.all()
-        ]
-
-        new_core_team_members = [
-            adviser.id for adviser in AdviserFactory.create_batch(2)
-        ] if new_team_count else []
-
-        response = api_client.patch(
-            url,
-            {
-                'core_team_members':
-                [
-                    {
-                        'adviser': adviser_id,
-                    } for adviser_id in new_core_team_members
-                ],
-            },
+    @pytest.mark.parametrize(
+        'existing_team_count,new_team_count',
+        (
+            (0, 2),
+            (2, 2),
+            (2, 0),
+        ),
+    )
+    def test_account_manage_can_update_core_team_members(
+        self,
+        existing_team_count,
+        new_team_count,
+    ):
+        """
+        Test that an account manager can update core team members.
+        """
+        company = CompanyFactory(
+            one_list_account_owner=AdviserFactory(),
+            one_list_tier=random_non_ita_one_list_tier(),
         )
-        assert response.status_code == status.HTTP_204_NO_CONTENT
+        api_client = self.create_api_client(user=company.one_list_account_owner)
 
-        core_team_members = [
-            core_team_member.adviser.id
-            for core_team_member in one_list_company.one_list_core_team_members.all()
-        ]
+        self._assert_update_core_team_members(
+            company, existing_team_count, new_team_count, api_client)
 
-        assert core_team_members != old_core_team_members
-        assert core_team_members == new_core_team_members
+    def test_returns_403_if_account_manager_updates_other_company(self):
+        """
+        Test that a 403 is returned if an account manager tries to update the core team from
+        a company they are not the account manage for.
+        """
+        account_managers_company = CompanyFactory(
+            one_list_account_owner=AdviserFactory(),
+            one_list_tier=random_non_ita_one_list_tier(),
+        )
+        api_client = self.create_api_client(user=account_managers_company.one_list_account_owner)
+
+        company = CompanyFactory()
+        url = self._get_url(company)
+
+        response = api_client.patch(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_cannot_update_duplicate_core_team_members(self, one_list_company, one_list_editor):
         """Test that duplicate team members cannot be updated."""

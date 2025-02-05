@@ -31,6 +31,7 @@ from datahub.company.models import (
     Objective,
 )
 from datahub.company.pagination import ContactPageSize
+from datahub.company.permissions import IsAccountManagerOnCompany
 from datahub.company.queryset import (
     get_contact_queryset,
     get_export_country_queryset,
@@ -221,10 +222,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         methods=['post'],
         detail=True,
         permission_classes=[
-            HasPermissions(
-                f'company.{CompanyPermission.change_company}',
-                f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
-            ),
+            IsAccountManagerOnCompany,
         ],
         schema=StubSchema(),
     )
@@ -275,10 +273,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         methods=['patch'],
         detail=True,
         permission_classes=[
-            HasPermissions(
-                f'company.{CompanyPermission.change_company}',
-                f'company.{CompanyPermission.change_one_list_core_team_member}',
-            ),
+            IsAccountManagerOnCompany,
         ],
         schema=StubSchema(),
     )
