@@ -1,6 +1,9 @@
 from unittest.mock import Mock
 
 import pytest
+import reversion
+
+from reversion.models import Version
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import (
@@ -140,46 +143,61 @@ class TestInvestorCompanyUpdate:
 
 
 @pytest.mark.django_db
-class TestSiteAddressIsCompanyAddressUpdate:
-    """
-    Tests for the site_address_is_company_address signal.
-    """
+class TestUpdateProjectSiteAddressFieldsWhenCompanyAddressChanges:
 
-    def test_update_site_address_is_company_address(self):
-        """
-        Test that updated site address is company address
-        """
-        uk_company = CompanyFactory(
-            address_country_id=CountryConstant.united_kingdom.value.id,
-            address_1='Old Admiralty Building',
-            address_2='whitehall',
-            address_town='London',
-            address_postcode='SW1A 2AA',
-        )
-        projects = InvestmentProjectFactory.create_batch(
-            2,
-            investor_company=uk_company,
-            site_address_is_company_address=True,
-            address_1=uk_company.address_1,
-            address_2=uk_company.address_2,
-            address_town=uk_company.address_town,
-            address_postcode=uk_company.address_postcode,
-        )
+    def test_update_project_site_address_fields_when_company_address_changes(self):
+        """Test post save signal updates site address in applicable investment projects."""
+        old_address_fields = {
+            'address_1': 'Old Admiralty Building',
+            'address_2': 'Whitehall',
+            'address_town': 'London',
+            'address_postcode': 'SW1A 2AA',
+        }
+        # setup models
+        with reversion.create_revision():
+            uk_based_company = CompanyFactory(
+                address_country_id=CountryConstant.united_kingdom.value.id,
+                **old_address_fields,
+            )
+            project_to_update = InvestmentProjectFactory(
+                uk_company=uk_based_company,
+                site_address_is_company_address=True,
+                **old_address_fields,
+            )
+            project_to_not_update = InvestmentProjectFactory(
+                uk_company=uk_based_company,
+                site_address_is_company_address=False,
+                **old_address_fields,
+            )
 
-        for project in projects:
-            assert project.site_address_is_company_address is True
-            assert project.address_1 == 'Old Admiralty Building'
-            assert project.address_2 == 'whitehall'
-            assert project.address_town == 'London'
-            assert project.address_postcode == 'SW1A 2AA'
+        # initial assertions
+        assert Version.objects.get_for_object(project_to_update).count() == 1
+        assert Version.objects.get_for_object(project_to_not_update).count() == 1
 
-        uk_company.address_1 = '10 Downing Street'
-        uk_company.address_2 = 'Whitehall'
-        uk_company.address_town = 'Manchester'
-        uk_company.address_postcode = 'M1 1AA'
-        uk_company.save()
+        # update company address
+        new_address_fields = {
+            'address_1': '10 Downing Street',
+            'address_2': 'Whitehall',
+            'address_town': 'Manchester',
+            'address_postcode': 'M1 1AA',
+        }
+        for attribute, value in new_address_fields.items():
+            setattr(uk_based_company, attribute, value)
+        uk_based_company.save()
 
-        for project in projects:
-            project.refresh_from_db()
+        # final assertions
+        project_to_update.refresh_from_db()
+        assert project_to_update.site_address_is_company_address is True
+        assert project_to_update.address_1 == new_address_fields['address_1']
+        assert project_to_update.address_2 == new_address_fields['address_2']
+        assert project_to_update.address_town == new_address_fields['address_town']
+        assert project_to_update.address_postcode == new_address_fields['address_postcode']
+        assert Version.objects.get_for_object(project_to_update).count() == 2
 
-            assert project.site_address_is_company_address
+        project_to_not_update.refresh_from_db()
+        assert project_to_not_update.site_address_is_company_address is False
+        assert project_to_not_update.address_1 == old_address_fields['address_1']
+        assert project_to_not_update.address_2 == old_address_fields['address_2']
+        assert project_to_not_update.address_town == old_address_fields['address_town']
+        assert project_to_not_update.address_postcode == old_address_fields['address_postcode']
+        assert Version.objects.get_for_object(project_to_not_update).count() == 1
