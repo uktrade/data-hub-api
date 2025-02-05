@@ -36,6 +36,7 @@ def test_event_dbmodel_to_dict(opensearch):
         'uk_region',
         'service',
         'disabled_on',
+        'stova_event',
     }
 
     assert result.keys() == keys
