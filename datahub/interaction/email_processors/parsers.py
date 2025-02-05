@@ -111,10 +111,9 @@ class BaseEmailParser:
         return contacts
 
     def _extract_and_validate_sender_adviser(self):
-        try:
-            sender_email = self.message.from_[0][1]
-        except IndexError:
+        if not self.message.from_ or self.message.from_ == [('', '')]:
             raise MalformedEmailError('Email was malformed - missing "from" header.')
+        sender_email = self.message.from_[0][1]
         if not was_email_sent_by_dit(self.message):
             raise SenderUnverifiedError(
                 'The meeting email did not pass our minimal checks to be verified as '
