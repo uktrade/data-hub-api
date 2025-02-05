@@ -74,13 +74,13 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         ),
     )
     @pytest.mark.django_db
-    def test_assigns_one_list_tier_and_global_account_manager(
+    def test_assigns_one_list_tier_and_account_manager(
         self,
         company_factory,
         one_list_editor,
     ):
         """
-        Test that a One List tier and global account manager can be assigned to:
+        Test that a One List tier and account manager can be assigned to:
 
         - a company not on the One List
         - a company on random One List tier except 'Tier D - International Trade Adviser Accounts'
@@ -114,11 +114,11 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         assert versions[0].field_dict['one_list_account_owner_id'] == global_account_manager.id
 
     @pytest.mark.django_db
-    def test_assigns_one_list_tier_by_global_account_manager(
+    def test_assigns_one_list_tier_by_account_manager(
         self,
     ):
         """
-        Test that a global account manager:
+        Test that an account manager:
         - can update the One List tier of the company they are managing
         """
         company = CompanyFactory(
@@ -155,11 +155,11 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
             company.one_list_account_owner.id
 
     @pytest.mark.django_db
-    def test_returns_403_on_editing_one_list_tier_by_other_global_account_manager(
+    def test_returns_403_on_editing_one_list_tier_by_other_account_manager(
         self,
     ):
         """
-        Test that a global account manager:
+        Test that an account manager:
         - can not update the One List tier of a company they are not managing.
         """
         company = CompanyFactory(

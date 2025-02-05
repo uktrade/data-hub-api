@@ -273,10 +273,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         methods=['patch'],
         detail=True,
         permission_classes=[
-            HasPermissions(
-                f'company.{CompanyPermission.change_company}',
-                f'company.{CompanyPermission.change_one_list_core_team_member}',
-            ),
+            IsAccountManagerOnCompany,
         ],
         schema=StubSchema(),
     )
