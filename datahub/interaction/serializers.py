@@ -195,7 +195,7 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
     is_event = serializers.BooleanField(required=False, allow_null=True)
     event = NestedRelatedField(
         Event,
-        extra_fields=('name', 'stova_event_id',),
+        extra_fields=('name', 'stova_event_id'),
         required=False,
         allow_null=True,
     )
