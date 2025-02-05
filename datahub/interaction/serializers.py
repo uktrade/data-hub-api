@@ -193,7 +193,13 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
         CommunicationChannel, required=False, allow_null=True,
     )
     is_event = serializers.BooleanField(required=False, allow_null=True)
-    event = NestedRelatedField(Event, required=False, allow_null=True)
+    event = NestedRelatedField(
+        Event,
+        extra_fields=('name', 'stova_event_id',),
+        required=False,
+        allow_null=True,
+    )
+
     investment_project = NestedInvestmentProjectField(required=False, allow_null=True)
     company_export = NestedCompanyExportField(required=False, allow_null=True)
     large_capital_opportunity = NestedRelatedField(
