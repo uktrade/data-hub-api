@@ -171,6 +171,18 @@ def test_mapping(opensearch):
                 'type': 'object',
             },
             'start_date': {'type': 'date'},
+            'stova_event': {
+                'properties': {
+                    'id': {
+                        'type': 'keyword',
+                    },
+                    'name': {
+                        'normalizer': 'lowercase_asciifolding_normalizer',
+                        'type': 'keyword',
+                    },
+                },
+                'type': 'object',
+            },
             'teams': {
                 'properties': {
                     'id': {'type': 'keyword'},
