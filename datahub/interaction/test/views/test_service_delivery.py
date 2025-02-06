@@ -103,6 +103,16 @@ class TestAddServiceDelivery(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
 
+        event = request_data.get('event')
+        if event:
+            event_response = {
+                'id': event['id'],
+                'name': event['name'],
+                'stova_event_id': None,
+            }
+        else:
+            event_response = None
+
         assert response_data == {
             'id': response_data['id'],
             'kind': Interaction.Kind.SERVICE_DELIVERY,
@@ -148,7 +158,7 @@ class TestAddServiceDelivery(APITestMixin):
                 'last_name': contact.last_name,
                 'job_title': contact.job_title,
             }],
-            'event': request_data.get('event'),
+            'event': event_response,
             'service': {
                 'id': str(Service.inbound_referral.value.id),
                 'name': Service.inbound_referral.value.name,
@@ -530,6 +540,7 @@ class TestUpdateServiceDelivery(APITestMixin):
         assert response_data['event'] == {
             'id': str(event.pk),
             'name': event.name,
+            'stova_event_id': None,
         }
 
     def test_change_event_service_delivery_to_non_event(self):
