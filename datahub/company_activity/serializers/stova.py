@@ -8,6 +8,7 @@ class StovaEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = StovaEvent
         fields = [
+            # Reverse FK to data hub `Event`
             'datahub_event',
             'id',
             'stova_event_id',
