@@ -8,7 +8,13 @@ def activity_interaction_field():
     return Object(
         properties={
             'id': Keyword(),
-            'subject': Text(index=False),
+            'subject': Text(
+                fields={
+                    'english': fields.EnglishText(),
+                    'keyword': fields.NormalizedKeyword(),
+                    'trigram': fields.TrigramText(),
+                },
+            ),
             'service': fields.id_name_partial_field(),
             'kind': Text(index=False),
             'date': Date(),
@@ -39,7 +45,13 @@ def activity_investment_field():
     return Object(
         properties={
             'id': Keyword(),
-            'name': Text(index=False),
+            'name': Text(
+                fields={
+                    'english': fields.EnglishText(),
+                    'keyword': fields.NormalizedKeyword(),
+                    'trigram': fields.TrigramText(),
+                },
+            ),
             'investment_type': fields.id_name_field(),
             'estimated_land_date': Date(),
             'total_investment': Text(index=False),

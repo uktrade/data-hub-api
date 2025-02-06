@@ -288,6 +288,9 @@ class SearchAPIView(APIView):
             limit=validated_data['limit'],
         )
 
+        print("query START ----------")
+        print(query.query.to_dict())
+
         results = execute_search_query(limited_query)
 
         response = {
