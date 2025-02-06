@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .. import views
+from datahub.company_activity import views
 
 urlpatterns = [
     path('<uuid:pk>', views.StovaEventRetrieveAPIView.as_view(), name='detail'),
