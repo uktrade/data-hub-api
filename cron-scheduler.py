@@ -57,6 +57,9 @@ from datahub.investment.project.tasks import (
     schedule_refresh_gross_value_added_value_for_fdi_investment_projects,
 )
 from datahub.investment_lead.tasks.ingest_eyb_triage import eyb_triage_identification_task
+from datahub.metadata.tasks import (
+    postcode_data_identification_task,
+)
 from datahub.omis.payment.tasks import refresh_pending_payment_gateway_sessions
 from datahub.reminder.migration_tasks import run_ita_users_migration, run_post_users_migration
 from datahub.reminder.tasks import (
@@ -153,6 +156,11 @@ def schedule_jobs():
         function=stova_attendee_identification_task,
         cron=EVERY_HOUR,
         description='Identify new Stova attendee objects and schedule their ingestion',
+    )
+    job_scheduler(
+        function=postcode_data_identification_task,
+        cron=EVERY_MIDNIGHT,
+        description='Identify new Postcode objects and schedule their ingestion',
     )
 
     if settings.ENABLE_ESTIMATED_LAND_DATE_REMINDERS:
