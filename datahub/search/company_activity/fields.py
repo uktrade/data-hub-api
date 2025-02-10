@@ -45,13 +45,7 @@ def activity_investment_field():
     return Object(
         properties={
             'id': Keyword(),
-            'name': Text(
-                fields={
-                    'english': fields.EnglishText(),
-                    'keyword': fields.NormalizedKeyword(),
-                    'trigram': fields.TrigramText(),
-                },
-            ),
+            'name': Text(index=False),
             'investment_type': fields.id_name_field(),
             'estimated_land_date': Date(),
             'total_investment': Text(index=False),
