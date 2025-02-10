@@ -459,3 +459,81 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         assert response_data['count'] == (
             parent_company.activities.count() + company.activities.count()
         )
+
+
+    @pytest.mark.parametrize(
+        'subject_term,matched_interaction_subject',
+        (
+            # interaction subject
+            ('Touch', 'Touch point interaction'),
+            ('Have', 'Have another go'),
+            # non-matches
+            ('Blah', None),
+        ),
+    )
+    def test_filter_by_company_interaction_subject(
+        self,
+        opensearch_with_collector,
+        subject_term,
+        matched_interaction_subject,
+    ):
+        """Tests filtering activities by company interaction subject."""
+        company = CompanyFactory()
+
+        CompanyInteractionFactory(company=company, subject='Touch point interaction')
+        CompanyInteractionFactory(company=company, subject='Have another go')
+        CompanyInteractionFactory(company=company, subject='Some dummy data in here')
+
+        opensearch_with_collector.flush_and_refresh()
+
+        url = reverse('api-v4:search:company-activity')
+
+        response = self.api_client.post(
+            url,
+            data={
+                'original_query': '',
+                'subject': subject_term,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        match = CompanyActivity.objects.filter(
+            interaction__subject=matched_interaction_subject,
+        ).first()
+        
+        if match:
+            assert response.data['count'] == 1
+            assert len(response.data['results']) == 1
+            assert response.data['results'][0]['id'] == str(match.id)
+        else:
+            assert response.data['count'] == 0
+            assert len(response.data['results']) == 0
+
+    
+    def test_sort_by_interaction_subject(self, opensearch_with_collector):
+        """Tests sorting of results by interaction subject A-Z"""
+        url = reverse('api-v4:search:company-activity')
+
+        company = CompanyFactory()
+
+        interactions = [
+            CompanyInteractionFactory(company=company, subject='Touch point interaction'),
+            CompanyInteractionFactory(company=company, subject='Have another go'),
+            CompanyInteractionFactory(company=company, subject='Some dummy data in here'),
+        ]
+
+        opensearch_with_collector.flush_and_refresh()
+
+        response = self.api_client.post(url, {'sortby': 'subject'})
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        # Extract subjects directly from the interaction objects and sort them
+        sorted_subjects = sorted(interaction.subject for interaction in interactions)
+
+        assert response_data['count'] == len(interactions)
+
+        # Assert the sorted subjects in the response match the expected sorted subjects
+        assert [item['interaction']['subject'] for item in response_data['results']] == sorted_subjects
+
