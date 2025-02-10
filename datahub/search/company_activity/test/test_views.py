@@ -460,14 +460,11 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
             parent_company.activities.count() + company.activities.count()
         )
 
-
     @pytest.mark.parametrize(
         'subject_term,matched_interaction_subject',
         (
-            # interaction subject
             ('Touch', 'Touch point interaction'),
             ('Have', 'Have another go'),
-            # non-matches
             ('Blah', None),
         ),
     )
@@ -500,7 +497,6 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         match = CompanyActivity.objects.filter(
             interaction__subject=matched_interaction_subject,
         ).first()
-        
         if match:
             assert response.data['count'] == 1
             assert len(response.data['results']) == 1
@@ -509,13 +505,10 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
             assert response.data['count'] == 0
             assert len(response.data['results']) == 0
 
-    
     def test_sort_by_interaction_subject(self, opensearch_with_collector):
-        """Tests sorting of results by interaction subject A-Z"""
+        # Tests sorting of results by interaction subject A-Z
         url = reverse('api-v4:search:company-activity')
-
         company = CompanyFactory()
-
         interactions = [
             CompanyInteractionFactory(company=company, subject='Touch point interaction'),
             CompanyInteractionFactory(company=company, subject='Have another go'),
@@ -535,5 +528,5 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         assert response_data['count'] == len(interactions)
 
         # Assert the sorted subjects in the response match the expected sorted subjects
-        assert [item['interaction']['subject'] for item in response_data['results']] == sorted_subjects
-
+        assert [item['interaction']['subject']
+                for item in response_data['results']] == sorted_subjects

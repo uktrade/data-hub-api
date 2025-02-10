@@ -52,8 +52,6 @@ class CompanyActivity(BaseSearchModel):
         'id',
         'company.name',
         'company.name.trigram',
-        'investment.name',
-        'investment.name.trigram'
         'interaction.subject',
-        'interaction.subject.trigram'
+        'interaction.subject.trigram',
     )

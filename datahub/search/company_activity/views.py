@@ -51,7 +51,7 @@ class SearchCompanyActivityAPIViewMixin:
             'referral.created_by.id',
         ],
         'subject': [
-            'interaction.subject', # to find 2-letter words
+            'interaction.subject',  # to find 2-letter words
             'interaction.subject.trigram',
         ],
     }
