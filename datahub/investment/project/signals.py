@@ -1,3 +1,5 @@
+import reversion
+
 from django.db.models import Q
 from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
@@ -121,3 +123,30 @@ def update_country_investment_originates_from(sender, **kwargs):
             investment_project.save(
                 update_fields=('country_investment_originates_from',),
             )
+
+
+@receiver(
+    post_save,
+    sender=Company,
+    dispatch_uid='update_project_site_address_fields_when_company_address_changes_from_post_save',
+)
+def update_project_site_address_fields_when_company_address_changes(sender, **kwargs):
+    """Updates site address in applicable projects when the company's address changes."""
+    instance = kwargs['instance']
+    created = kwargs['created']
+    if not created:
+        investment_projects = InvestmentProject.objects.filter(
+            uk_company_id=instance.pk,
+            site_address_is_company_address=True,
+        )
+        for investment_project in investment_projects:
+            with reversion.create_revision():
+                investment_project.address_1 = instance.address_1
+                investment_project.address_2 = instance.address_2
+                investment_project.address_town = instance.address_town
+                investment_project.address_postcode = instance.address_postcode
+                investment_project.save(
+                    update_fields=[
+                        'address_1', 'address_2', 'address_town', 'address_postcode',
+                    ],
+                )
