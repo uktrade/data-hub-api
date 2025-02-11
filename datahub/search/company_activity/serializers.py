@@ -22,9 +22,12 @@ class SearchCompanyActivityQuerySerializer(EntitySearchQuerySerializer):
     date_after = RelaxedDateTimeField(required=False)
     date_before = RelaxedDateTimeField(required=False)
 
+    subject = serializers.CharField(required=False)
+
     include_parent_companies = serializers.BooleanField(required=False, default=False)
     include_subsidiary_companies = serializers.BooleanField(required=False, default=False)
 
     SORT_BY_FIELDS = (
         'date',
+        'subject',
     )

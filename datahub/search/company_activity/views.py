@@ -16,7 +16,9 @@ class SearchCompanyActivityAPIViewMixin:
 
     search_app = CompanyActivitySearchApp
     serializer_class = SearchCompanyActivityQuerySerializer
-    es_sort_by_remappings = {}
+    es_sort_by_remappings = {
+        'subject': 'interaction.subject.keyword',
+    }
     fields_to_exclude = ()
 
     FILTER_FIELDS = (
@@ -28,6 +30,7 @@ class SearchCompanyActivityAPIViewMixin:
         'company_name',
         'activity_source',
         'dit_participants__adviser',
+        'subject',
     )
 
     REMAP_FIELDS = {
@@ -46,6 +49,10 @@ class SearchCompanyActivityAPIViewMixin:
             'interaction.dit_participants.adviser.id',
             'referral.recipient.id',
             'referral.created_by.id',
+        ],
+        'subject': [
+            'interaction.subject',  # to find 2-letter words
+            'interaction.subject.trigram',
         ],
     }
 

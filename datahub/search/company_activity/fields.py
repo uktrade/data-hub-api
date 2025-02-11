@@ -8,7 +8,13 @@ def activity_interaction_field():
     return Object(
         properties={
             'id': Keyword(),
-            'subject': Text(index=False),
+            'subject': Text(
+                fields={
+                    'english': fields.EnglishText(),
+                    'keyword': fields.NormalizedKeyword(),
+                    'trigram': fields.TrigramText(),
+                },
+            ),
             'service': fields.id_name_partial_field(),
             'kind': Text(index=False),
             'date': Date(),
