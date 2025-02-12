@@ -1,8 +1,12 @@
 import logging
 
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
+
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.tasks import BaseObjectIdentificationTask, BaseObjectIngestionTask
 from datahub.metadata.constants import POSTCODE_DATA_PREFIX
+from datahub.metadata.models import PostcodeData
 
 
 logger = logging.getLogger(__name__)
@@ -32,4 +36,44 @@ class PostcodeDataIndentificationTask(BaseObjectIdentificationTask):
 
 
 class PostcodeDataIngestionTask(BaseObjectIngestionTask):
-    pass
+
+    existing_ids = []
+
+    def _should_process_record(self, record: dict) -> bool:
+        """Checks whether the record has already been ingested or not."""
+        if not self.existing_ids:
+            self.existing_ids = set(PostcodeData.objects.values_list(
+                'postcode_data_id', flat=True))
+
+        postcode_data_id = record.get('id')
+        if postcode_data_id in self.existing_ids:
+            logger.info(f'Record already exists for postcode_data_id: {postcode_data_id}')
+            return False
+
+        return True
+
+    def _process_record(self, record: dict) -> None:
+        """Processes a single record.
+        Saves postcode data from the S3 bucket into `PostcodeData`
+        """
+        postcode_data_id = record.get('id')
+        values = {
+            'postcode_data_id': record.get('id'),
+            'country': record.get('country', ''),
+            'city': record.get('city', ''),
+            'state': record.get('state', ''),
+        }
+
+        try:
+            PostcodeData.objects.create(**values)
+        except IntegrityError as error:
+            logger.error(
+                f'Error processing postcode data record, postcode_data_id: {postcode_data_id}. '
+                f'Error: {error}',
+            )
+        except ValidationError as error:
+            logger.error(
+                'Got unexpected value for a field when processing postcode data record, '
+                f'postcode_data_id: {postcode_data_id}. '
+                f'Error: {error}',
+            )

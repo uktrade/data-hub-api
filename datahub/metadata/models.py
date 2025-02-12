@@ -417,5 +417,3 @@ class PostcodeData(models.Model):
     country = models.CharField(max_length=MAX_LENGTH)
     city = models.CharField(max_length=MAX_LENGTH)
     state = models.CharField(max_length=MAX_LENGTH)
-
-
