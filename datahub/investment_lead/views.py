@@ -17,7 +17,7 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
     serializer_class = RetrieveEYBLeadSerializer
     filter_backends = [filters.OrderingFilter]
     ordering = ['-triage_modified']
-    ordering_fields = ['triage_modified','triage_created', 'company__name']
+    ordering_fields = ['triage_modified', 'triage_created', 'company__name']
 
     def _filter_by_overseas_regions(self, queryset):
         overseas_region_ids = self.request.query_params.getlist('overseas_region')
