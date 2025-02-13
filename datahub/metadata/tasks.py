@@ -59,9 +59,10 @@ class PostcodeDataIngestionTask(BaseObjectIngestionTask):
         postcode_data_id = record.get('id')
         values = {
             'postcode_data_id': record.get('id'),
-            'country': record.get('country', ''),
-            'city': record.get('city', ''),
-            'state': record.get('state', ''),
+            'postcode': record.get('postcode', ''),
+            'modified_on': record.get('modified_on', ''),
+            'postcode_region': record.get('postcode_data_region', ''),
+            'publication_date': record.get('publication_date'),
         }
 
         try:
