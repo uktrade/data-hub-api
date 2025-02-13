@@ -88,6 +88,26 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.data['next'] is not None
         assert len(response.data['results']) == pagination_limit
 
+    def test_sorting_by_triage_modified(self, test_user_with_view_permissions):
+        """Test the EYB leads can be sorted by triage_modified field."""
+        now = datetime.now(tz=timezone.utc)
+        yesterday = now - timedelta(days=1)
+        EYBLeadFactory(triage_modified=now)
+        EYBLeadFactory(triage_modified=yesterday)
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+
+        # Descending
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'sortby': '-triage_modified'})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['results'][0]['triage_modified'] == now.strftime(DATE_FORMAT)
+        assert response.data['results'][1]['triage_modified'] == yesterday.strftime(DATE_FORMAT)
+
+        # Ascending
+        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={'sortby': 'triage_modified'})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['results'][0]['triage_modified'] == yesterday.strftime(DATE_FORMAT)
+        assert response.data['results'][1]['triage_modified'] == now.strftime(DATE_FORMAT)
+
     def test_sorting_by_triage_created(self, test_user_with_view_permissions):
         """Test the EYB leads can be sorted by triage_created field."""
         now = datetime.now(tz=timezone.utc)
