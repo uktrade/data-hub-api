@@ -1,4 +1,3 @@
-import uuid
 from uuid import uuid4
 
 from django.conf import settings
@@ -408,12 +407,16 @@ class ExportBarrierType(BaseOrderedConstantModel):
     """Export barrier type (used for company interactions)."""
 
 
-class PostcodeData(models.Model):
+class PostcodeData(BaseConstantModel):
     """Postcode data (for the manual addition of a company)."""
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-
     postcode = models.CharField(max_length=MAX_LENGTH)
-    country = models.CharField(max_length=MAX_LENGTH)
-    city = models.CharField(max_length=MAX_LENGTH)
-    state = models.CharField(max_length=MAX_LENGTH)
+    modified_on = models.DateTimeField(auto_now=True, null=True)
+    postcode_region = models.ForeignKey(
+        UKRegion,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
+    publication_date = models.DateTimeField()
