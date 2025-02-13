@@ -1,7 +1,8 @@
 import logging
 
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError
+from uuid import UUID
+
+from rest_framework import serializers
 
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.tasks import BaseObjectIdentificationTask, BaseObjectIngestionTask
@@ -37,6 +38,15 @@ class PostcodeDataIndentificationTask(BaseObjectIdentificationTask):
 
 class PostcodeDataIngestionTask(BaseObjectIngestionTask):
 
+    def __init__(
+        self,
+        object_key: str,
+        s3_processor: S3ObjectProcessor,
+        serializer_class: serializers.Serializer,
+    ) -> None:
+        self.serializer_class = serializer_class
+        super().__init__(object_key, s3_processor)
+
     existing_ids = []
 
     def _should_process_record(self, record: dict) -> bool:
@@ -52,29 +62,34 @@ class PostcodeDataIngestionTask(BaseObjectIngestionTask):
 
         return True
 
+    def _get_hashed_uuid(self, record: dict) -> str:
+        """Gets the hashed uuid from the incoming record."""
+        return record['hashedUuid']
+
+    def _get_record_from_line(self, deserialized_line: dict) -> dict:
+        """Extracts the record from the deserialized line."""
+        return deserialized_line['object']
+
     def _process_record(self, record: dict) -> None:
         """Processes a single record.
-        Saves postcode data from the S3 bucket into `PostcodeData`
-        """
-        postcode_data_id = record.get('id')
-        values = {
-            'postcode_data_id': record.get('id'),
-            'postcode': record.get('postcode', ''),
-            'modified_on': record.get('modified_on', ''),
-            'postcode_region': record.get('postcode_data_region', ''),
-            'publication_date': record.get('publication_date'),
-        }
 
-        try:
-            PostcodeData.objects.create(**values)
-        except IntegrityError as error:
-            logger.error(
-                f'Error processing postcode data record, postcode_data_id: {postcode_data_id}. '
-                f'Error: {error}',
+        This method should take a single record, update an existing instance,
+        or create a new one, and return None.
+        """
+        serializer = self.serializer_class(data=record)
+        if serializer.is_valid():
+            primary_key = UUID(serializer.validated_data.pop('id'))
+            queryset = PostcodeData.objects.filter(pk=primary_key)
+            instance, created = queryset.update_or_create(
+                pk=primary_key,
+                defaults=serializer.validated_data,
             )
-        except ValidationError as error:
-            logger.error(
-                'Got unexpected value for a field when processing postcode data record, '
-                f'postcode_data_id: {postcode_data_id}. '
-                f'Error: {error}',
-            )
+            if created:
+                self.created_ids.append(str(instance.id))
+            else:
+                self.updated_ids.append(str(instance.id))
+        else:
+            self.errors.append({
+                'record': record,
+                'errors': serializer.errors,
+            })
