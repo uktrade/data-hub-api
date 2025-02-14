@@ -252,4 +252,4 @@ class TestStovaIngestionTasks:
                 f'stova_event_id: {stova_event_id}'
             ) in caplog.text
 
-            assert ('approval_required') in caplog.text
+            assert 'approval_required' in caplog.text
