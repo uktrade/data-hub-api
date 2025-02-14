@@ -253,3 +253,48 @@ class TestStovaIngestionTasks:
             ) in caplog.text
 
             assert 'approval_required' in caplog.text
+
+    @pytest.mark.django_db
+    def test_stova_event_ingestion_rejects_event_if_missing_required_field(
+        self, caplog, test_base_stova_event,
+    ):
+        """
+        Some fields are required by Data Hub events, if a Stova Event does not provide these fields
+        the stova event will not be ingested.
+        """
+        s3_processor_mock = mock.Mock()
+        task = StovaEventIngestionTask('dummy-prefix', s3_processor_mock)
+
+        data = test_base_stova_event
+        stova_event_id = data.get('id')
+
+        # This is required so a Stova Event can be saved as a Data Hub event.
+        data['name'] = None
+
+        with caplog.at_level(logging.INFO):
+            task._process_record(data)
+            assert (
+                f'Stova Event with id {stova_event_id} does not have required field name. '
+                'This stova event will not be processed into Data Hub.'
+            ) in caplog.text
+
+        assert StovaEvent.objects.count() == 0
+
+    @pytest.mark.django_db
+    def test_stova_event_ingestion_converts_null_fields_to_empty_string(
+        self, test_base_stova_event,
+    ):
+        """
+        Some fields are required to be an empty string by Data Hub Events, they do not accept
+        null values.
+        """
+        s3_processor_mock = mock.Mock()
+        task = StovaEventIngestionTask('dummy-prefix', s3_processor_mock)
+
+        data = test_base_stova_event
+        # This must be empty string to be saved, test it gets converted from None
+        data['description'] = None
+        task._process_record(data)
+
+        assert StovaEvent.objects.count() == 1
+        assert StovaEvent.objects.first().description == ''

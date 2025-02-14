@@ -51,9 +51,48 @@ class StovaEventIngestionTask(BaseObjectIngestionTask):
 
         return True
 
+    @staticmethod
+    def _required_fields() -> list:
+        """
+        Returns a list of fields required for to make a StovaEvent a Data Hub Event.
+        Any fields listed here but not provided by Stova will be rejected from ingestion.
+
+        :return: Required fields to save a StovaEvent.
+        """
+        return [
+            'stova_event_id',
+            'name',
+            'location_address1',
+            'location_city',
+        ]
+
+    @staticmethod
+    def _convert_fields_from_null_to_blank(values: dict) -> dict:
+        """
+        Coverts values from the stova record which could be null into empty strings for saving
+        as a Data Hub event.
+
+        :param values: A single Stova Event record from an S3 bucket.
+        :return: A single Stova Event record with null/None values replaced with empty strings.
+        """
+        fields_required_as_blank = [
+            'location_address2',
+            'location_address3',
+            'location_state',
+            'location_postcode',
+            'description',
+        ]
+
+        for field in fields_required_as_blank:
+            if values[field] is None:
+                values[field] = ''
+
+        return values
+
     def _process_record(self, record: dict) -> None:
         """Saves an event from Stova from the S3 bucket into a `StovaEvent`"""
         stova_event_id = record.get('id')
+
         values = {
             'stova_event_id': record.get('id'),
             'url': record.get('url', ''),
@@ -89,6 +128,17 @@ class StovaEventIngestionTask(BaseObjectIngestionTask):
             'location_postcode': record.get('location_postcode', ''),
             'standard_currency': record.get('standard_currency', ''),
         }
+
+        required_fields = self._required_fields()
+        for field in required_fields:
+            if values[field] is None or values[field] == '':
+                logger.info(
+                    f'Stova Event with id {stova_event_id} does not have required field {field}. '
+                    'This stova event will not be processed into Data Hub.',
+                )
+                return
+
+        self._convert_fields_from_null_to_blank(values)
 
         try:
             stova_event = StovaEvent(**values)
