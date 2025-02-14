@@ -213,7 +213,7 @@ class TestStovaIngestionTasks:
         self, caplog, test_base_stova_event,
     ):
         """
-        Test records which have duplicate IDs in their JSON do not raise errors and are logged.
+        Tests records which have duplicate IDs should have errors logged.
         """
         s3_processor_mock = mock.Mock()
         task = StovaEventIngestionTask('dummy-prefix', s3_processor_mock)
@@ -223,13 +223,18 @@ class TestStovaIngestionTasks:
         task._process_record(data)
         with caplog.at_level(logging.ERROR):
             task._process_record(data)
-            assert f'Error processing Stova event record, stova_event_id: {999999}' in caplog.text
+            assert (
+                'Got unexpected value for a field when processing Stova event record, '
+                "stova_event_id: 999999. Error: {'stova_event_id': ['Stova event with this "
+                "Stova event id already exists.']" in caplog.text
+            )
 
     @pytest.mark.django_db
     def test_stova_event_ingestion_handles_unexpected_fields(self, caplog, test_base_stova_event):
         """
         Test that if they rows from stova contain data in an unexpected data type these are handled
         and logged.
+        Also assert the errored field is displayed.
         """
         s3_processor_mock = mock.Mock()
         task = StovaEventIngestionTask('dummy-prefix', s3_processor_mock)
@@ -246,3 +251,5 @@ class TestStovaIngestionTasks:
                 'Got unexpected value for a field when processing Stova event record, '
                 f'stova_event_id: {stova_event_id}'
             ) in caplog.text
+
+            assert 'approval_required' in caplog.text
