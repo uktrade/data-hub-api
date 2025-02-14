@@ -21,7 +21,7 @@ class StovaEvent(models.Model):
     stova_event_id = models.IntegerField(unique=True)
     name = models.TextField()
     description = models.TextField()
-    code = models.CharField(max_length=MAX_LENGTH)
+    code = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
 
     created_by = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
     modified_by = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
@@ -32,7 +32,7 @@ class StovaEvent(models.Model):
     country = models.CharField(max_length=MAX_LENGTH)
     city = models.CharField(max_length=MAX_LENGTH)
     state = models.CharField(max_length=MAX_LENGTH)
-    timezone = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
+    timezone = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, default='')
     url = models.TextField()
     max_reg = models.IntegerField(null=True, blank=True)
 
