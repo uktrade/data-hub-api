@@ -242,6 +242,7 @@ else:
 
 # Set the session cookie in admin, defaults to 20 minutes
 SESSION_COOKIE_AGE = env('SESSION_COOKIE_AGE', default=20 * 60)
+SESSION_COOKIE_SECURE = True
 
 # Staff SSO integration settings
 
