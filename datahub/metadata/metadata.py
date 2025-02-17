@@ -6,6 +6,7 @@ from datahub.metadata.serializers import (
     CountrySerializer,
     ExchangeRateSerializer,
     InvestmentProjectStageSerializer,
+    PostcodeSerializer,
     SectorSerializer,
     ServiceSerializer,
     TeamSerializer,
@@ -104,3 +105,8 @@ registry.register(
 )
 registry.register(metadata_id='fdi-value', model=models.FDIValue)
 registry.register(metadata_id='export-barrier', model=models.ExportBarrierType)
+registry.register(
+    metadata_id='postcode-data',
+    model=models.PostcodeData,
+    serializer=PostcodeSerializer,
+)
