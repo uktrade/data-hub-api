@@ -1,9 +1,20 @@
+import logging
+
+from unittest import mock
+
 import pytest
+from moto import mock_aws
 from mptt.exceptions import InvalidMove
 
 from datahub.core.constants import Sector as SectorConstants
 from datahub.core.exceptions import DataHubError
+from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.metadata.models import Sector, Service
+from datahub.metadata.tasks import (
+    postcode_data_identification_task,
+    postcode_data_ingestion_task,
+    POSTCODE_DATA_PREFIX,
+)
 from datahub.metadata.test.factories import SectorFactory
 
 pytestmark = pytest.mark.django_db
@@ -155,3 +166,35 @@ def test_service_with_children_has_no_contexts():
     """
     services = Service.objects.filter(children__isnull=False)
     assert all(service.contexts == [] for service in services)
+
+
+class TestPostcodeDataIngestionTask:
+
+    @pytest.fixture
+    def postcode_object_key():
+        return f'{POSTCODE_DATA_PREFIX}object.json.gz'
+
+    @mock_aws
+    def test_identification_task_schedules_ingestion_task(self, postcode_object_key, caplog):
+        with (
+            mock.patch('datahub.ingest.tasks.job_scheduler') as mock_scheduler,
+            mock.patch.object(
+                S3ObjectProcessor, 'get_most_recent_object_key', return_value=postcode_object_key,
+            ),
+            mock.patch.object(S3ObjectProcessor, 'has_object_been_ingested', return_value=False),
+            caplog.at_level(logging.INFO),
+        ):
+            postcode_data_identification_task()
+
+            assert 'Postcode data identification task started...' in caplog.text
+            assert f'Scheduled ingestion of {postcode_object_key}' in caplog.text
+            assert 'Postcode identification task finished.' in caplog.text
+
+        mock_scheduler.assert_called_once_with(
+            function=postcode_data_ingestion_task,
+            function_kwargs={
+                'object_key': postcode_object_key,
+            },
+            queue_name='long-running',
+            description=f'Ingest {postcode_object_key}',
+        )

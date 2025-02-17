@@ -119,3 +119,15 @@ class AdministrativeAreasFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'metadata.AdministrativeArea'
+
+
+class PostcodeDataFactory(factory.django.DjangoModelFactory):
+    """Postcode data factory"""
+
+    postcode = factory.Faker('postcode')
+    modified_on = '2025-10-08T08:06:53+00:00'
+    postcode_region = factory.Faker('postcode_region')
+    publication_date = '2025-02-02T08:08:52+00:00'
+
+    class Meta:
+        model = 'metadata.PostcodeData'
