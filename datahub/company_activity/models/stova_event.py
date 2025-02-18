@@ -20,7 +20,7 @@ class StovaEvent(models.Model):
 
     stova_event_id = models.IntegerField(unique=True)
     name = models.TextField()
-    description = models.TextField()
+    description = models.TextField(blank=True)
     code = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
 
     created_by = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
@@ -33,7 +33,7 @@ class StovaEvent(models.Model):
     city = models.CharField(max_length=MAX_LENGTH)
     state = models.CharField(max_length=MAX_LENGTH)
     timezone = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, default='')
-    url = models.TextField()
+    url = models.TextField(blank=True, null=True)
     max_reg = models.IntegerField(null=True, blank=True)
 
     created_date = models.DateTimeField()
@@ -43,14 +43,14 @@ class StovaEvent(models.Model):
     close_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
 
-    location_state = models.CharField(max_length=MAX_LENGTH)
+    location_state = models.CharField(max_length=MAX_LENGTH, blank=True)
     location_country = models.CharField(max_length=MAX_LENGTH)
     location_address1 = models.CharField(max_length=MAX_LENGTH)
-    location_address2 = models.CharField(max_length=MAX_LENGTH)
-    location_address3 = models.CharField(max_length=MAX_LENGTH)
+    location_address2 = models.CharField(max_length=MAX_LENGTH, blank=True)
+    location_address3 = models.CharField(max_length=MAX_LENGTH, blank=True)
     location_city = models.CharField(max_length=MAX_LENGTH)
-    location_name = models.CharField(max_length=MAX_LENGTH)
-    location_postcode = models.CharField(max_length=MAX_LENGTH)
+    location_name = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    location_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
 
     approval_required = models.BooleanField()
     price_type = models.CharField(max_length=MAX_LENGTH)
