@@ -65,10 +65,6 @@ class PostcodeDataIngestionTask(BaseObjectIngestionTask):
         """Gets the hashed uuid from the incoming record."""
         return record['hashedUuid']
 
-    def _get_record_from_line(self, deserialized_line: dict) -> dict:
-        """Extracts the record from the deserialized line."""
-        return deserialized_line['object']
-
     def _process_record(self, record: dict) -> None:
         """Processes a single record.
 
