@@ -1,42 +1,41 @@
 import logging
 
-from uuid import UUID
-
 from rest_framework import serializers
 
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.tasks import BaseObjectIdentificationTask, BaseObjectIngestionTask
 from datahub.metadata.constants import POSTCODE_DATA_PREFIX
 from datahub.metadata.models import PostcodeData
+from datahub.metadata.serializers import PostcodeDataSerializer
 
 
 logger = logging.getLogger(__name__)
 
 
 def postcode_data_identification_task() -> None:
-    """Identifies the most recent file to be ingested and schedules a task to ingest it"""
-    logger.info('Postcode data identification task started.')
+    logger.info('Postcode data identification task started...')
     identification_task = PostcodeDataIndentificationTask(prefix=POSTCODE_DATA_PREFIX)
     identification_task.identify_new_objects(postcode_data_ingestion_task)
     logger.info('Postcode data identification task finished.')
 
 
+class PostcodeDataIndentificationTask(BaseObjectIdentificationTask):
+    """Class to identify new postcode data objects and determine if they should be ingested."""
+
+
 def postcode_data_ingestion_task(object_key: str) -> None:
-    """Ingest the given key (file) from S3"""
-    logger.info(f'Postcode data ingestion task started for file {object_key}.')
+    logger.info('Postcode data ingestion task started...')
     ingestion_task = PostcodeDataIngestionTask(
         object_key=object_key,
         s3_processor=S3ObjectProcessor(prefix=POSTCODE_DATA_PREFIX),
+        serializer_class=PostcodeDataSerializer,
     )
     ingestion_task.ingest_object()
-    logger.info(f'Postcode data ingestion task finished for file {object_key}.')
-
-
-class PostcodeDataIndentificationTask(BaseObjectIdentificationTask):
-    pass
+    logger.info('Postcode data ingestion task finished.')
 
 
 class PostcodeDataIngestionTask(BaseObjectIngestionTask):
+    """Class to ingest a postcode object from S3."""
 
     def __init__(
         self,
@@ -78,10 +77,10 @@ class PostcodeDataIngestionTask(BaseObjectIngestionTask):
         """
         serializer = self.serializer_class(data=record)
         if serializer.is_valid():
-            primary_key = UUID(serializer.validated_data.pop('id'))
-            queryset = PostcodeData.objects.filter(pk=primary_key)
+            hashed_uuid = self._get_hashed_uuid(record)
+            queryset = PostcodeData.objects.filter(hashed_uuid=hashed_uuid)
             instance, created = queryset.update_or_create(
-                pk=primary_key,
+                hashed_uuid=hashed_uuid,
                 defaults=serializer.validated_data,
             )
             if created:

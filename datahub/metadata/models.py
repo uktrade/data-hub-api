@@ -410,6 +410,7 @@ class ExportBarrierType(BaseOrderedConstantModel):
 class PostcodeData(BaseConstantModel):
     """Postcode data (for the manual addition of a company)."""
 
+    hashed_uuid = models.CharField(max_length=MAX_LENGTH, default='', blank=True)
     postcode = models.CharField(max_length=MAX_LENGTH)
     modified_on = models.DateTimeField(auto_now=True, null=True)
     postcode_region = models.ForeignKey(
