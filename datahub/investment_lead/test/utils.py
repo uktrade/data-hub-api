@@ -164,6 +164,9 @@ def assert_retrieved_eyb_lead_data(instance: EYBLead, data: dict):
     assert instance.utm_content == data.get('utm_content')
     assert instance.marketing_hashed_uuid == data.get('marketing_hashed_uuid')
 
+    # Audit log
+    assert 'audit_log' in data.keys()
+
 
 def assert_eyb_lead_matches_company(company: Company, eyb_lead: EYBLead):
     assert eyb_lead.duns_number == company.duns_number
