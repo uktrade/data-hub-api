@@ -2,6 +2,7 @@ from django.db.models import Q
 from rest_framework import serializers
 
 from datahub.company.models import Company
+from datahub.core.audit import AuditLogField
 from datahub.core.serializers import (
     AddressSerializer,
     NestedRelatedField,
@@ -497,7 +498,7 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
         fields = [
             f for f in ALL_FIELDS
             if f not in ADDRESS_FIELDS
-        ] + ['address', 'investment_projects']
+        ] + ['address', 'investment_projects', 'audit_log']
 
     sector = NestedRelatedField(Sector)
     proposed_investment_region = NestedRelatedField(UKRegion)
@@ -507,6 +508,7 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
     )
     company = NestedRelatedField(Company)
     investment_projects = NestedRelatedField(InvestmentProject, many=True)
+    audit_log = AuditLogField(read_only=True)
 
     def get_related_fields_representation(self, instance):
         """Provides related fields in a representation-friendly format."""
