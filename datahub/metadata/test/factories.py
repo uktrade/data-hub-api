@@ -1,9 +1,17 @@
+import hashlib
+import uuid
+
+from datetime import timezone
+
 from random import randrange, sample
 
 import factory
+from faker import Faker
 
 from datahub.core import constants
 from datahub.metadata.models import Service
+
+fake = Faker(locale='en_GB')
 
 
 class ServiceFactory(factory.django.DjangoModelFactory):
@@ -121,6 +129,12 @@ class AdministrativeAreasFactory(factory.django.DjangoModelFactory):
         model = 'metadata.AdministrativeArea'
 
 
+def generate_hashed_uuid():
+    new_uuid = uuid.uuid4()
+    hashed_uuid = hashlib.sha256(new_uuid.bytes).hexdigest()
+    return hashed_uuid
+
+
 class PostcodeDataFactory(factory.django.DjangoModelFactory):
     """Postcode data factory"""
 
@@ -131,3 +145,20 @@ class PostcodeDataFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'metadata.PostcodeData'
+
+
+def postcode_data_record_faker(overrides: dict | None = None) -> dict:
+    data = {
+        'hashedUuid': generate_hashed_uuid(),
+        'postcode': fake.postcode(),
+        'modified_on': fake.date_time_between(
+            start_date='-1y', tzinfo=timezone.utc,
+        ),
+        'publication_date': fake.date_time_between(
+            start_date='-1y', tzinfo=timezone.utc,
+        ),
+        'postcode_region': constants.UKRegion.london.name,
+    }
+    if overrides:
+        data.update(overrides)
+    return data
