@@ -109,9 +109,9 @@ class MockSentryTransport(Transport):
         self.events.append(envelope)
 
 
+@pytest.mark.django_db
 class TestStovaIngestionTasks:
 
-    @pytest.mark.django_db
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_stova_data_file_ingestion(self, caplog, test_file, test_file_path):
@@ -132,7 +132,6 @@ class TestStovaIngestionTasks:
         assert StovaEvent.objects.count() == initial_stova_activity_count + 27
         assert IngestedObject.objects.count() == initial_ingested_count + 1
 
-    @pytest.mark.django_db
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_skip_previously_ingested_records(self, test_file_path, test_base_stova_event):
@@ -152,7 +151,6 @@ class TestStovaIngestionTasks:
         stova_event_ingestion_task(test_file_path)
         assert StovaEvent.objects.filter(stova_event_id=123456789).count() == 1
 
-    @pytest.mark.django_db
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_invalid_file(self, test_file_path):
@@ -169,7 +167,6 @@ class TestStovaIngestionTasks:
         expected = "key: 'data-flow/exports/ExportAventriEvents/" 'stovaEventFake2.jsonl.gz'
         assert expected in exception
 
-    @pytest.mark.django_db
     def test_stova_event_fields_are_saved(self, test_base_stova_event):
         """
         Test that the ingested stova event fields are saved to the StovaEvent model.
@@ -190,7 +187,6 @@ class TestStovaIngestionTasks:
 
             assert model_value == file_value
 
-    @pytest.mark.django_db
     def test_stova_event_fields_with_duplicate_attendee_ids_in_db(
         self, caplog, test_base_stova_event,
     ):
@@ -208,7 +204,6 @@ class TestStovaIngestionTasks:
                 f'Record already exists for stova_event_id: {existing_stova_event.stova_event_id}'
             ) in caplog.text
 
-    @pytest.mark.django_db
     def test_stova_event_fields_with_duplicate_attendee_ids_in_json(
         self, caplog, test_base_stova_event,
     ):
@@ -229,7 +224,6 @@ class TestStovaIngestionTasks:
                 "Stova event id already exists.']" in caplog.text
             )
 
-    @pytest.mark.django_db
     def test_stova_event_ingestion_handles_unexpected_fields(self, caplog, test_base_stova_event):
         """
         Test that if they rows from stova contain data in an unexpected data type these are handled
@@ -254,9 +248,17 @@ class TestStovaIngestionTasks:
 
             assert 'approval_required' in caplog.text
 
-    @pytest.mark.django_db
-    def test_stova_event_ingestion_rejects_event_if_missing_required_field(
-        self, caplog, test_base_stova_event,
+    @pytest.mark.parametrize(
+        'required_field',
+        (
+            'id',
+            'name',
+            'location_address1',
+            'location_city',
+        ),
+    )
+    def test_stova_event_ingestion_rejects_event_if_missing_required_fields(
+        self, caplog, test_base_stova_event, required_field,
     ):
         """
         Some fields are required by Data Hub events, if a Stova Event does not provide these fields
@@ -266,23 +268,31 @@ class TestStovaIngestionTasks:
         task = StovaEventIngestionTask('dummy-prefix', s3_processor_mock)
 
         data = test_base_stova_event
-        stova_event_id = data.get('id')
 
         # This is required so a Stova Event can be saved as a Data Hub event.
-        data['name'] = None
+        data[required_field] = None
 
         with caplog.at_level(logging.INFO):
             task._process_record(data)
             assert (
-                f'Stova Event with id {stova_event_id} does not have required field name. '
-                'This stova event will not be processed into Data Hub.'
+                f'Stova Event with id {data.get("id")} does not have required field '
+                f'{required_field}. This stova event will not be processed into Data Hub.'
             ) in caplog.text
 
         assert StovaEvent.objects.count() == 0
 
-    @pytest.mark.django_db
+    @pytest.mark.parametrize(
+        'null_field',
+        (
+            'location_address2',
+            'location_address3',
+            'location_state',
+            'location_postcode',
+            'description',
+        ),
+    )
     def test_stova_event_ingestion_converts_null_fields_to_empty_string(
-        self, test_base_stova_event,
+        self, test_base_stova_event, null_field,
     ):
         """
         Some fields are required to be an empty string by Data Hub Events, they do not accept
@@ -293,8 +303,8 @@ class TestStovaIngestionTasks:
 
         data = test_base_stova_event
         # This must be empty string to be saved, test it gets converted from None
-        data['description'] = None
+        data[null_field] = None
         task._process_record(data)
 
         assert StovaEvent.objects.count() == 1
-        assert StovaEvent.objects.first().description == ''
+        assert getattr(StovaEvent.objects.first(), null_field) == ''

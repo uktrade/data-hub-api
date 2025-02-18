@@ -60,7 +60,7 @@ class StovaEventIngestionTask(BaseObjectIngestionTask):
         :return: Required fields to save a StovaEvent.
         """
         return [
-            'stova_event_id',
+            'id',
             'name',
             'location_address1',
             'location_city',
@@ -93,52 +93,52 @@ class StovaEventIngestionTask(BaseObjectIngestionTask):
         """Saves an event from Stova from the S3 bucket into a `StovaEvent`"""
         stova_event_id = record.get('id')
 
-        values = {
-            'stova_event_id': record.get('id'),
-            'url': record.get('url', ''),
-            'city': record.get('city', ''),
-            'code': record.get('code', ''),
-            'name': record.get('name', ''),
-            'state': record.get('state', ''),
-            'country': record.get('country', ''),
-            'max_reg': record.get('max_reg'),
-            'end_date': record.get('end_date'),
-            'timezone': record.get('timezone', ''),
-            'folder_id': record.get('folder_id'),
-            'live_date': record.get('live_date'),
-            'close_date': record.get('close_date'),
-            'created_by': record.get('created_by', ''),
-            'price_type': record.get('price_type', ''),
-            'start_date': record.get('start_date'),
-            'description': record.get('description', ''),
-            'modified_by': record.get('modified_by', ''),
-            'contact_info': record.get('contact_info', ''),
-            'created_date': record.get('created_date'),
-            'location_city': record.get('location_city', ''),
-            'location_name': record.get('location_name', ''),
-            'modified_date': record.get('modified_date'),
-            'client_contact': record.get('client_contact', ''),
-            'location_state': record.get('location_state', ''),
-            'default_language': record.get('default_language', ''),
-            'location_country': record.get('location_country', ''),
-            'approval_required': record.get('approval_required'),
-            'location_address1': record.get('location_address1', ''),
-            'location_address2': record.get('location_address2', ''),
-            'location_address3': record.get('location_address3', ''),
-            'location_postcode': record.get('location_postcode', ''),
-            'standard_currency': record.get('standard_currency', ''),
-        }
-
         required_fields = self._required_fields()
         for field in required_fields:
-            if values[field] is None or values[field] == '':
+            if record[field] is None or record[field] == '':
                 logger.info(
                     f'Stova Event with id {stova_event_id} does not have required field {field}. '
                     'This stova event will not be processed into Data Hub.',
                 )
                 return
 
-        self._convert_fields_from_null_to_blank(values)
+        cleaned_record = self._convert_fields_from_null_to_blank(record)
+
+        values = {
+            'stova_event_id': cleaned_record.get('id'),
+            'url': cleaned_record.get('url', ''),
+            'city': cleaned_record.get('city', ''),
+            'code': cleaned_record.get('code', ''),
+            'name': cleaned_record.get('name', ''),
+            'state': cleaned_record.get('state', ''),
+            'country': cleaned_record.get('country', ''),
+            'max_reg': cleaned_record.get('max_reg'),
+            'end_date': cleaned_record.get('end_date'),
+            'timezone': cleaned_record.get('timezone', ''),
+            'folder_id': cleaned_record.get('folder_id'),
+            'live_date': cleaned_record.get('live_date'),
+            'close_date': cleaned_record.get('close_date'),
+            'created_by': cleaned_record.get('created_by', ''),
+            'price_type': cleaned_record.get('price_type', ''),
+            'start_date': cleaned_record.get('start_date'),
+            'description': cleaned_record.get('description', ''),
+            'modified_by': cleaned_record.get('modified_by', ''),
+            'contact_info': cleaned_record.get('contact_info', ''),
+            'created_date': cleaned_record.get('created_date'),
+            'location_city': cleaned_record.get('location_city', ''),
+            'location_name': cleaned_record.get('location_name', ''),
+            'modified_date': cleaned_record.get('modified_date'),
+            'client_contact': cleaned_record.get('client_contact', ''),
+            'location_state': cleaned_record.get('location_state', ''),
+            'default_language': cleaned_record.get('default_language', ''),
+            'location_country': cleaned_record.get('location_country', ''),
+            'approval_required': cleaned_record.get('approval_required'),
+            'location_address1': cleaned_record.get('location_address1', ''),
+            'location_address2': cleaned_record.get('location_address2', ''),
+            'location_address3': cleaned_record.get('location_address3', ''),
+            'location_postcode': cleaned_record.get('location_postcode', ''),
+            'standard_currency': cleaned_record.get('standard_currency', ''),
+        }
 
         try:
             stova_event = StovaEvent(**values)

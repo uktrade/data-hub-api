@@ -43,7 +43,7 @@ class StovaEvent(models.Model):
     close_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
 
-    location_state = models.CharField(max_length=MAX_LENGTH)
+    location_state = models.CharField(max_length=MAX_LENGTH, blank=True)
     location_country = models.CharField(max_length=MAX_LENGTH)
     location_address1 = models.CharField(max_length=MAX_LENGTH)
     location_address2 = models.CharField(max_length=MAX_LENGTH, blank=True)
