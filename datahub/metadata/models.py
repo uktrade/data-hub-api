@@ -410,7 +410,6 @@ class ExportBarrierType(BaseOrderedConstantModel):
 class PostcodeData(BaseConstantModel):
     """Postcode data (for the manual addition of a company)."""
 
-    hashed_uuid = models.CharField(max_length=MAX_LENGTH, default='', blank=True)
     postcode = models.CharField(max_length=MAX_LENGTH)
     modified_on = models.DateTimeField(auto_now=True, null=True)
     postcode_region = models.ForeignKey(
@@ -420,4 +419,4 @@ class PostcodeData(BaseConstantModel):
         on_delete=models.SET_NULL,
         related_name='+',
     )
-    publication_date = models.DateTimeField()
+    publication_date = models.DateTimeField(null=True, blank=True)
