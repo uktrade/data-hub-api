@@ -27,10 +27,10 @@ class StovaEvent(models.Model):
     modified_by = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
 
     client_contact = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
-    contact_info = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
+    contact_info = models.TextField(blank=True, default='')
 
-    country = models.CharField(max_length=MAX_LENGTH)
-    city = models.CharField(max_length=MAX_LENGTH)
+    country = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    city = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     state = models.CharField(max_length=MAX_LENGTH)
     timezone = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, default='')
     url = models.TextField(blank=True, null=True)
@@ -44,7 +44,7 @@ class StovaEvent(models.Model):
     end_date = models.DateTimeField(null=True, blank=True)
 
     location_state = models.CharField(max_length=MAX_LENGTH, blank=True)
-    location_country = models.CharField(max_length=MAX_LENGTH)
+    location_country = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     location_address1 = models.CharField(max_length=MAX_LENGTH)
     location_address2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     location_address3 = models.CharField(max_length=MAX_LENGTH, blank=True)
