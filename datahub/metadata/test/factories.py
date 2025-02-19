@@ -1,6 +1,4 @@
-import hashlib
 import uuid
-
 from datetime import timezone
 
 from random import randrange, sample
@@ -129,12 +127,6 @@ class AdministrativeAreasFactory(factory.django.DjangoModelFactory):
         model = 'metadata.AdministrativeArea'
 
 
-def generate_hashed_uuid():
-    new_uuid = uuid.uuid4()
-    hashed_uuid = hashlib.sha256(new_uuid.bytes).hexdigest()
-    return hashed_uuid
-
-
 class PostcodeDataFactory(factory.django.DjangoModelFactory):
     """Postcode data factory"""
 
@@ -149,7 +141,7 @@ class PostcodeDataFactory(factory.django.DjangoModelFactory):
 
 def postcode_data_record_faker(overrides: dict | None = None) -> dict:
     data = {
-        'hashedUuid': generate_hashed_uuid(),
+        'id': str(uuid.uuid4()),
         'postcode': fake.postcode(),
         'modified_on': fake.date_time_between(
             start_date='-1y', tzinfo=timezone.utc,

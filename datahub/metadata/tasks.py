@@ -52,7 +52,7 @@ class PostcodeDataIngestionTask(BaseObjectIngestionTask):
         """Checks whether the record has already been ingested or not."""
         if not self.existing_ids:
             self.existing_ids = set(PostcodeData.objects.values_list(
-                'postcode_data_id', flat=True))
+                'id', flat=True))
 
         postcode_data_id = record.get('id')
         if postcode_data_id in self.existing_ids:
@@ -60,10 +60,6 @@ class PostcodeDataIngestionTask(BaseObjectIngestionTask):
             return False
 
         return True
-
-    def _get_hashed_uuid(self, record: dict) -> str:
-        """Gets the hashed uuid from the incoming record."""
-        return record['hashedUuid']
 
     def _process_record(self, record: dict) -> None:
         """Processes a single record.
@@ -73,10 +69,10 @@ class PostcodeDataIngestionTask(BaseObjectIngestionTask):
         """
         serializer = self.serializer_class(data=record)
         if serializer.is_valid():
-            hashed_uuid = self._get_hashed_uuid(record)
-            queryset = PostcodeData.objects.filter(hashed_uuid=hashed_uuid)
+            primary_key = serializer.validated_data.pop('id')
+            queryset = PostcodeData.objects.filter(pk=primary_key)
             instance, created = queryset.update_or_create(
-                hashed_uuid=hashed_uuid,
+                pk=primary_key,
                 defaults=serializer.validated_data,
             )
             if created:

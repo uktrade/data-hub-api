@@ -1,8 +1,11 @@
 import logging
+import uuid
 
 from unittest import mock
+from uuid import uuid4
 
 import pytest
+from faker import Faker
 from moto import mock_aws
 
 from datahub.ingest.boto3 import S3ObjectProcessor
@@ -15,11 +18,12 @@ from datahub.metadata.tasks import (
     PostcodeDataIngestionTask,
 )
 from datahub.metadata.test.factories import (
-    generate_hashed_uuid,
     postcode_data_record_faker,
 )
 
 pytestmark = pytest.mark.django_db
+
+fake = Faker(locale='en_GB')
 
 
 @pytest.fixture
@@ -64,16 +68,27 @@ class TestPostcodeDataIngestionTask:
             serializer_class=PostcodeDataSerializer,
         )
 
-    def test_get_hashed_uuid(self, ingestion_task):
-        record = postcode_data_record_faker()
-        assert ingestion_task._get_hashed_uuid(record) == record['hashedUuid']
+    @pytest.mark.django_db
+    def test_should_process_new_record(self, ingestion_task):
+        new_id = uuid4()
+        record = {'id': new_id}
+
+        assert ingestion_task._should_process_record(record) is True
+
+    @pytest.mark.django_db
+    def test_should_process_existing_record(self, ingestion_task):
+        existing_id = uuid4()
+        PostcodeData.objects.create(id=existing_id)
+        record = {'id': existing_id}
+
+        assert ingestion_task._should_process_record(record) is False
 
     def test_process_record_creates_postcode_data_instance(self, ingestion_task):
-        hashed_uuid = generate_hashed_uuid()
-        record = postcode_data_record_faker({'hashed_uuid': hashed_uuid})
+        primary_key = str(uuid.uuid4())
+        record = postcode_data_record_faker({'id': primary_key})
         ingestion_task._process_record(record)
 
         assert len(ingestion_task.created_ids) == 1
         assert len(ingestion_task.updated_ids) == 0
         assert len(ingestion_task.errors) == 0
-        assert PostcodeData.objects.filter(hashed_uuid=hashed_uuid).exists()
+        assert PostcodeData.objects.filter(pk=primary_key).exists()
