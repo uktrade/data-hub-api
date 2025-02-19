@@ -31,7 +31,7 @@ class StovaAttendee(models.Model):
     email = models.CharField(max_length=MAX_LENGTH)
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
-    attendee_questions = models.CharField(max_length=MAX_LENGTH)
+    attendee_questions = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
     company_name = models.CharField(max_length=MAX_LENGTH)
     category = models.CharField(max_length=MAX_LENGTH)
