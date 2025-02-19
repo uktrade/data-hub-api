@@ -31,7 +31,7 @@ class StovaEvent(models.Model):
 
     country = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     city = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    state = models.CharField(max_length=MAX_LENGTH)
+    state = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     timezone = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, default='')
     url = models.TextField(blank=True, null=True)
     max_reg = models.IntegerField(null=True, blank=True)
