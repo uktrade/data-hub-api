@@ -527,3 +527,23 @@ class TestStovaIngestionTasks:
         task._process_record(data)
 
         assert StovaAttendee.objects.count() == 0
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize(
+        'company_name',
+        (
+            '',
+            None,
+        ),
+    )
+    def test_get_or_create_company__returns_when_company_name_empty(
+        self, s3_object_processor, test_file_path, caplog, company_name,
+    ):
+        """Tests empty company names are logged and no company is created."""
+        data = {'stova_attendee_id': 1234, 'company_name': company_name}
+        ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
+
+        with caplog.at_level(logging.INFO):
+            company = ingestion_task.get_or_create_company(data)
+            assert 'No company name available, skipping attendee 1234' in caplog.text
+            assert company is None

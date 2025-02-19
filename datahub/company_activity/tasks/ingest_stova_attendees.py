@@ -180,6 +180,12 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         :returns: An existing `Company` if found or a newly created `Company`.
         """
         company_name = values['company_name']
+        if company_name == '' or company_name is None:
+            logger.info(
+                f'No company name available, skipping attendee {values["stova_attendee_id"]}',
+            )
+            return
+
         company = Company.objects.filter(name__iexact=company_name).first()
         if company:
             return company
