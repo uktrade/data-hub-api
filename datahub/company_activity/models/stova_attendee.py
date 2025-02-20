@@ -23,10 +23,10 @@ class StovaAttendee(models.Model):
     stova_attendee_id = models.IntegerField(unique=True)
     stova_event_id = models.IntegerField(unique=True)
 
-    created_by = models.CharField(max_length=MAX_LENGTH)
-    created_date = models.DateTimeField()
-    modified_by = models.CharField(max_length=MAX_LENGTH)
-    modified_date = models.DateTimeField()
+    created_by = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    created_date = models.DateTimeField(blank=True, null=True)
+    modified_by = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    modified_date = models.DateTimeField(blank=True, null=True)
 
     email = models.CharField(max_length=MAX_LENGTH)
     first_name = models.CharField(max_length=MAX_LENGTH)
@@ -34,13 +34,13 @@ class StovaAttendee(models.Model):
     attendee_questions = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
     company_name = models.CharField(max_length=MAX_LENGTH)
-    category = models.CharField(max_length=MAX_LENGTH)
-    registration_status = models.CharField(max_length=MAX_LENGTH)
+    category = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    registration_status = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
-    virtual_event_attendance = models.CharField(max_length=MAX_LENGTH)
-    language = models.CharField(max_length=MAX_LENGTH)
+    virtual_event_attendance = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    language = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
-    last_lobby_login = models.DateTimeField()
+    last_lobby_login = models.DateTimeField(blank=True, null=True)
 
     # Data Hub Fields
     created_on = models.DateTimeField(auto_now_add=True)
