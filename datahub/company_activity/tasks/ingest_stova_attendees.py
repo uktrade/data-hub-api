@@ -66,6 +66,23 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         self.default_advisor = self.get_or_create_default_stova_adviser()
         return super().ingest_object()
 
+    @staticmethod
+    def _required_fields() -> list:
+        """
+        Returns a list of fields required for to make a StovaAttendee a Data Hub Contact.
+        Any fields listed here but not provided by Stova will be rejected from ingestion.
+
+        :return: Required fields to save a StovaAttendee.
+        """
+        return [
+            'id',
+            'event_id',
+            'company_name',
+            'first_name',
+            'last_name',
+            'email',
+        ]
+
     @transaction.atomic
     def _process_record(self, record: dict) -> None:
         """
@@ -80,6 +97,15 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
             details.
         :returns: None
         """
+        required_fields = self._required_fields()
+        for field in required_fields:
+            if record[field] is None or record[field] == '':
+                logger.info(
+                    f'Stova Attendee with id {record["id"]} does not have required field {field}. '
+                    'This stova attendee will not be processed into Data Hub.',
+                )
+                return
+
         values = {
             'stova_attendee_id': record.get('id'),
             'stova_event_id': record.get('event_id', ''),
