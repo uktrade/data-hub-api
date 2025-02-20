@@ -14,12 +14,12 @@ logger = logging.getLogger(__name__)
 
 def postcode_data_identification_task() -> None:
     logger.info('Postcode data identification task started...')
-    identification_task = PostcodeDataIndentificationTask(prefix=POSTCODE_DATA_PREFIX)
+    identification_task = PostcodeDataIdentificationTask(prefix=POSTCODE_DATA_PREFIX)
     identification_task.identify_new_objects(postcode_data_ingestion_task)
     logger.info('Postcode data identification task finished.')
 
 
-class PostcodeDataIndentificationTask(BaseObjectIdentificationTask):
+class PostcodeDataIdentificationTask(BaseObjectIdentificationTask):
     """Class to identify new postcode data objects and determine if they should be ingested."""
 
 
