@@ -39,6 +39,7 @@ from datahub.core.queues.constants import (
     EVERY_THREE_AM,
     EVERY_THREE_AM_ON_TWENTY_EIGHTH_EACH_MONTH,
     EVERY_TWO_AM,
+    EVERY_WEEK,
     HALF_DAY_IN_SECONDS,
     ONE_HOUR_IN_SECONDS,
 )
@@ -159,7 +160,7 @@ def schedule_jobs():
     )
     job_scheduler(
         function=postcode_data_identification_task,
-        cron=EVERY_MIDNIGHT,
+        cron=EVERY_WEEK,
         description='Identify new Postcode objects and schedule their ingestion',
     )
 
