@@ -194,6 +194,36 @@ class TestStovaIngestionTasks:
             ) in caplog.text
 
     @pytest.mark.django_db
+    def test_stova_attendee_can_have_same_event(
+        self,
+        test_file_path,
+        test_base_stova_attendee,
+        s3_object_processor,
+    ):
+        shared_stova_event_id = 123456789
+        StovaEventFactory(stova_event_id=shared_stova_event_id)
+
+        data = test_base_stova_attendee.copy()
+        data['id'] = 12345
+        data['event_id'] = shared_stova_event_id
+        data2 = test_base_stova_attendee.copy()
+        data2['id'] = 54321
+        data2['event_id'] = shared_stova_event_id
+
+        object_definition = (test_file_path, compressed_json_faker([data, data2]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
+
+        ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
+        ingestion_task.ingest_object()
+
+        assert StovaAttendee.objects.get(
+            stova_attendee_id=12345,
+        ).stova_event_id == shared_stova_event_id
+        assert StovaAttendee.objects.get(
+            stova_attendee_id=54321,
+        ).stova_event_id == shared_stova_event_id
+
+    @pytest.mark.django_db
     def test_stova_attendee_fields_with_duplicate_attendee_ids_in_json(
         self, caplog, test_base_stova_attendee,
     ):
