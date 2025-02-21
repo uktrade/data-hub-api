@@ -15,7 +15,7 @@ DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 def stova_event_identification_task() -> None:
     """Identifies the most recent file to be ingested and schedules a task to ingest it"""
     logger.info('Stova event identification task started.')
-    identification_task = StovaEventIndentificationTask(prefix=STOVA_EVENT_PREFIX)
+    identification_task = StovaEventIdentificationTask(prefix=STOVA_EVENT_PREFIX)
     identification_task.identify_new_objects(stova_event_ingestion_task)
     logger.info('Stova event identification task finished.')
 
@@ -31,7 +31,7 @@ def stova_event_ingestion_task(object_key: str) -> None:
     logger.info(f'Stova event ingestion task finished for file {object_key}.')
 
 
-class StovaEventIndentificationTask(BaseObjectIdentificationTask):
+class StovaEventIdentificationTask(BaseObjectIdentificationTask):
     pass
 
 
