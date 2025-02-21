@@ -547,3 +547,40 @@ class TestStovaIngestionTasks:
             company = ingestion_task.get_or_create_company(data)
             assert 'No company name available, skipping attendee 1234' in caplog.text
             assert company is None
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize(
+        'required_field',
+        (
+            'id',
+            'event_id',
+            'company_name',
+            'first_name',
+            'last_name',
+            'email',
+        ),
+    )
+    def test_stova_attendee_ingestion_rejects_attendee_if_missing_required_fields(
+        self,
+        caplog,
+        test_base_stova_attendee,
+        required_field,
+    ):
+        """
+        Some fields are required by Data Hub events, if a Stova Event does not provide these fields
+        the stova event will not be ingested.
+        """
+        s3_processor_mock = mock.Mock()
+        task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
+
+        data = test_base_stova_attendee
+        data[required_field] = None
+
+        with caplog.at_level(logging.INFO):
+            task._process_record(data)
+            assert (
+                f'Stova Attendee with id {data["id"]} does not have required field '
+                f'{required_field}. This stova attendee will not be processed into Data Hub.'
+            ) in caplog.text
+
+        assert StovaAttendee.objects.count() == 0
