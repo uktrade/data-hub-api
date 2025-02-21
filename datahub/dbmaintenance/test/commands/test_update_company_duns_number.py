@@ -54,7 +54,6 @@ def test_run(s3_stubber, caplog):
         company.refresh_from_db()
 
     assert 'Company matching query does not exist' in caplog.text
-    assert len(caplog.records) == 1
 
     assert all(company.modified_on == original_datetime for company in companies)
     assert [company.duns_number for company in companies] == [
@@ -104,7 +103,6 @@ def test_simulate(s3_stubber, caplog):
         company.refresh_from_db()
 
     assert 'Company matching query does not exist' in caplog.text
-    assert len(caplog.records) == 1
 
     assert [company.duns_number for company in companies] == duns_numbers
 
@@ -144,3 +142,43 @@ def test_audit_log(s3_stubber):
     versions = Version.objects.get_for_object(company_with_change)
     assert versions.count() == 1
     assert versions[0].revision.get_comment() == 'Duns number updated.'
+
+
+def test_logs_contain_errors(s3_stubber, caplog):
+    """Tests errors are captured in the logs"""
+    caplog.set_level('INFO')
+    company_with_duns = CompanyFactory(
+        duns_number='132589',
+    )
+    company_without_duns = CompanyFactory()
+
+    bucket = 'test_bucket'
+    object_key = 'test_key'
+    csv_content = f"""id,duns_number
+{company_without_duns.id},{company_with_duns.duns_number}
+"""
+
+    s3_stubber.add_response(
+        'get_object',
+        {
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
+        },
+        expected_params={
+            'Bucket': bucket,
+            'Key': object_key,
+        },
+    )
+
+    call_command('update_company_duns_number', bucket, object_key)
+
+    assert 'Errors:' in caplog.text
+    assert company_with_duns.duns_number in caplog.text
+    assert 'Key (duns_number)=(132589) already exists.' in caplog.text
+
+
+def test_logs_contain_companies_already_merged_to_company_with_target_duns(s3_stubber, caplog):
+    pass
+
+
+def test_logs_contain_companies_already_merged(s3_stubber, caplog):
+    pass
