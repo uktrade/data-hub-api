@@ -166,7 +166,7 @@ faker==15.3.4
     # via factory-boy
 filelock==3.17.0
     # via virtualenv
-flake8==7.1.1
+flake8==7.1.2
     # via
     #   -r requirements-dev.in
     #   flake8-bugbear
