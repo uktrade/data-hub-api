@@ -21,7 +21,7 @@ class StovaAttendee(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     stova_attendee_id = models.IntegerField(unique=True)
-    stova_event_id = models.IntegerField(unique=True)
+    stova_event_id = models.IntegerField()
 
     created_by = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     created_date = models.DateTimeField(blank=True, null=True)
