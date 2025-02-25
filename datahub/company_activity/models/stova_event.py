@@ -27,7 +27,7 @@ class StovaEvent(models.Model):
     modified_by = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
 
     client_contact = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
-    contact_info = models.TextField(blank=True, default='')
+    contact_info = models.TextField(blank=True, default='', null=True)
 
     country = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     city = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
