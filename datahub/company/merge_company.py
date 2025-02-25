@@ -53,6 +53,7 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     Company._meta.get_field('company_list_items').remote_field,
     Company._meta.get_field('pipeline_list_items').remote_field,
     Company._meta.get_field('wins').remote_field,
+    Company._meta.get_field('transferred_from').remote_field,
     CompanyActivity.company.field,
     CompanyExport.company.field,
     CompanyReferral.company.field,
@@ -74,7 +75,6 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     Order.company.field,
     StovaAttendee.company.field,
     Task.company.field,
-
     # Merging is allowed if the source company has export countries, but note that
     # they aren't moved to the target company (these can be manually moved in
     # the front end if required)
