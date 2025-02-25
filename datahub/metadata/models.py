@@ -412,7 +412,7 @@ class PostcodeData(BaseConstantModel):
 
     postcode = models.CharField(max_length=MAX_LENGTH)
     modified_on = models.DateTimeField(auto_now=True, null=True)
-    postcode_region = models.ForeignKey(
+    postcode = models.ForeignKey(
         UKRegion,
         blank=True,
         null=True,

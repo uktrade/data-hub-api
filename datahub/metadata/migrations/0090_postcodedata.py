@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('postcode', models.CharField(max_length=255)),
                 ('modified_on', models.DateTimeField(auto_now=True, null=True)),
                 ('publication_date', models.DateTimeField(blank=True, null=True)),
-                ('postcode_region', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='metadata.ukregion')),
+                ('region', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='metadata.ukregion')),
             ],
             options={
                 'ordering': ('name',),
