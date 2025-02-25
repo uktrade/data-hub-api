@@ -37,11 +37,11 @@ bigtree==0.24.0
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.36.16
+boto3==1.36.26
     # via
     #   -r requirements.in
     #   moto
-botocore==1.36.16
+botocore==1.36.26
     # via
     #   boto3
     #   moto
@@ -82,7 +82,7 @@ coverage[toml]==7.6.4
     # via pytest-cov
 crontab==1.0.0
     # via rq-scheduler
-cryptography==43.0.1
+cryptography==44.0.1
     # via moto
 dbt-copilot-python==0.2.2
     # via -r requirements.in
@@ -114,7 +114,7 @@ django==4.2.19
     #   django-reversion
     #   djangorestframework
     #   drf-redesign
-django-axes==7.0.1
+django-axes==7.0.2
     # via -r requirements.in
 django-csp==3.8
     # via -r requirements.in
@@ -166,7 +166,7 @@ faker==15.3.4
     # via factory-boy
 filelock==3.17.0
     # via virtualenv
-flake8==7.1.1
+flake8==7.1.2
     # via
     #   -r requirements-dev.in
     #   flake8-bugbear
@@ -255,7 +255,7 @@ mccabe==0.7.0
     #   pylint
 mohawk==1.1.0
     # via -r requirements.in
-moto==5.0.28
+moto==5.1.0
     # via -r requirements-dev.in
 multidict==6.0.4
     # via
@@ -409,7 +409,7 @@ pytest==8.3.4
     #   pytest-xdist
 pytest-cov==6.0.0
     # via -r requirements-dev.in
-pytest-django==4.9.0
+pytest-django==4.10.0
     # via -r requirements-dev.in
 pytest-mock==3.14.0
     # via -r requirements-dev.in
@@ -471,9 +471,9 @@ rq-scheduler==0.14.0
     # via -r requirements.in
 s3transfer==0.11.1
     # via boto3
-sentry-sdk==2.20.0
+sentry-sdk==2.22.0
     # via -r requirements.in
-simplejson==3.19.3
+simplejson==3.20.1
     # via -r requirements.in
 six==1.16.0
     # via
