@@ -897,16 +897,22 @@ class TestDuplicateCompanyMerger:
         merge_companies(source_company_b, source_company_c, adviser)
 
         assert source_company_a.archived
-        assert str(source_company_a.transferred_to.id) == str(source_company_c.id)
+        assert source_company_a.transferred_to.id == source_company_c.id
         assert source_company_b.archived
-        assert str(source_company_b.transferred_to.id) == str(source_company_c.id)
+        assert source_company_b.transferred_to.id == source_company_c.id
 
-        assert str(source_company_c.transferred_from.all()[0].id) == str(source_company_a.id)
-        assert str(source_company_c.transferred_from.all()[1].id) == str(source_company_b.id)
-
+        assert source_company_c.transferred_from.filter(
+            id=source_company_a.id,
+        ).exists() is True
+        assert (
+            source_company_c.transferred_from.filter(
+                id=source_company_b.id,
+            ).exists()
+            is True
+        )
         merge_companies(source_company_c, target_company, adviser)
         assert source_company_c.archived
-        assert str(source_company_c.transferred_to.id) == str(target_company.id)
+        assert source_company_c.transferred_to.id == target_company.id
 
     def test_company_merged_merges_with_merged_company_successfully(self):
         adviser = AdviserFactory()
@@ -920,23 +926,48 @@ class TestDuplicateCompanyMerger:
 
         # Check non merged companies can merge
         assert source_company_a.archived
-        assert str(source_company_a.transferred_to.id) == str(source_company_b.id)
-        assert str(source_company_b.transferred_from.all()[0].id) == str(source_company_a.id)
+        assert source_company_a.transferred_to.id == source_company_b.id
+        assert (
+            source_company_b.transferred_from.filter(
+                id=source_company_a.id,
+            ).exists()
+            is True
+        )
 
         # Check non merged companies can merge
         assert source_company_c.archived
-        assert str(source_company_c.transferred_to.id) == str(source_company_d.id)
-        assert str(source_company_d.transferred_from.all()[0].id) == str(source_company_c.id)
+        assert source_company_c.transferred_to.id == source_company_d.id
+        assert (
+            source_company_d.transferred_from.filter(
+                id=source_company_c.id,
+            ).exists()
+            is True
+        )
 
         # Check merged companies can merge together
         merge_companies(source_company_b, source_company_d, adviser)
         assert source_company_b.archived
-        assert str(source_company_b.transferred_to.id) == str(source_company_d.id)
+        assert source_company_b.transferred_to.id == source_company_d.id
 
         # Check history of companies still exist with correct order of previously merged companies
-        assert str(source_company_d.transferred_from.all()[0].id) == str(source_company_c.id)
-        assert str(source_company_d.transferred_from.all()[1].id) == str(source_company_b.id)
-        assert str(source_company_b.transferred_from.all()[0].id) == str(source_company_a.id)
+        assert (
+            source_company_d.transferred_from.filter(
+                id=source_company_c.id,
+            ).exists()
+            is True
+        )
+        assert (
+            source_company_d.transferred_from.filter(
+                id=source_company_b.id,
+            ).exists()
+            is True
+        )
+        assert (
+            source_company_b.transferred_from.filter(
+                id=source_company_a.id,
+            ).exists()
+            is True
+        )
 
     def test_relations_from_merged_company_merges_with_target_successfully(self):
         adviser = AdviserFactory()
