@@ -886,6 +886,40 @@ class TestDuplicateCompanyMerger:
             company=target_company,
         ).count() == 2
 
+    def test_company_merged_mergies_with_non_merged_company(self):
+        adviser = AdviserFactory()
+        source_company_a = CompanyFactory()
+        source_company_b = CompanyFactory()
+        target_company = CompanyFactory()
+
+        merge_companies(source_company_a, source_company_b, adviser)
+
+        assert source_company_a.archived
+        assert str(source_company_a.transferred_to.id) == str(source_company_b.id)
+
+        merge_companies(source_company_b, target_company, adviser)
+        assert source_company_b.archived
+        assert str(source_company_b.transferred_to.id) == str(target_company.id)
+
+    def test_company_merged_mergies_with_merged_company(self):
+        adviser = AdviserFactory()
+        source_company_a = CompanyFactory()
+        source_company_b = CompanyFactory()
+        source_company_c = CompanyFactory()
+        source_company_d = CompanyFactory()
+
+        merge_companies(source_company_a, source_company_b, adviser)
+        merge_companies(source_company_c, source_company_d, adviser)
+
+        assert source_company_a.archived
+        assert str(source_company_a.transferred_to.id) == str(source_company_b.id)
+
+        assert source_company_c.archived
+        assert str(source_company_c.transferred_to.id) == str(source_company_d.id)
+
+        merge_companies(source_company_b, source_company_d, adviser)
+        assert source_company_b.source_company_b
+        assert str(source_company_b.transferred_to.id) == str(source_company_d.id)
 
 @pytest.mark.django_db
 class TestCompanyMerge:
