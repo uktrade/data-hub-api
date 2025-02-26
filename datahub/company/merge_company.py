@@ -133,9 +133,6 @@ def merge_companies(source_company: Company, target_company: Company, user):
     """
     Merges the source company into the target company.
     MergeNotAllowedError will be raised if the merge is not allowed.
-
-    Companies with relations to another Company are not allowed to be merged. They would need to
-    be manually updated in the Admin before merging.
     """
     is_source_valid, invalid_obj = is_model_a_valid_merge_source(
         source_company,
