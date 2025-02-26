@@ -921,6 +921,7 @@ class TestDuplicateCompanyMerger:
         assert source_company_b.archived
         assert str(source_company_b.transferred_to.id) == str(source_company_d.id)
 
+
 @pytest.mark.django_db
 class TestCompanyMerge:
 
