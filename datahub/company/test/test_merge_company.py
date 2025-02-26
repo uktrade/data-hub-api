@@ -886,7 +886,7 @@ class TestDuplicateCompanyMerger:
             company=target_company,
         ).count() == 2
 
-    def test_company_merged_merges_with_non_merged_company_successfully(self):
+    def test_company_with_merges_can_merge_to_non_merged_company(self):
         adviser = AdviserFactory()
         source_company_a = CompanyFactory()
         source_company_b = CompanyFactory()
@@ -913,36 +913,24 @@ class TestDuplicateCompanyMerger:
         merge_companies(source_company_c, target_company, adviser)
         assert source_company_c.archived
         assert source_company_c.transferred_to.id == target_company.id
-
-    def test_company_merged_merges_with_merged_company_successfully(self):
-        adviser = AdviserFactory()
-        source_company_a = CompanyFactory()
-        source_company_b = CompanyFactory()
-        source_company_c = CompanyFactory()
-        source_company_d = CompanyFactory()
-
-        merge_companies(source_company_a, source_company_b, adviser)
-        merge_companies(source_company_c, source_company_d, adviser)
-
-        # Check non merged companies can merge
-        assert source_company_a.archived
-        assert source_company_a.transferred_to.id == source_company_b.id
         assert (
-            source_company_b.transferred_from.filter(
-                id=source_company_a.id,
-            ).exists()
-            is True
-        )
-
-        # Check non merged companies can merge
-        assert source_company_c.archived
-        assert source_company_c.transferred_to.id == source_company_d.id
-        assert (
-            source_company_d.transferred_from.filter(
+            target_company.transferred_from.filter(
                 id=source_company_c.id,
             ).exists()
             is True
         )
+
+    def test_company_with_merges_can_merge_with_company_that_has_merges(self):
+        adviser = AdviserFactory()
+        source_company_a = CompanyFactory()
+        # source_company_b will be a merged company
+        source_company_b = CompanyFactory()
+        source_company_c = CompanyFactory()
+        # source_company_d will be a merged company
+        source_company_d = CompanyFactory()
+
+        merge_companies(source_company_a, source_company_b, adviser)
+        merge_companies(source_company_c, source_company_d, adviser)
 
         # Check merged companies can merge together
         merge_companies(source_company_b, source_company_d, adviser)
