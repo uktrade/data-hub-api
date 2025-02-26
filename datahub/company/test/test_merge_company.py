@@ -886,6 +886,156 @@ class TestDuplicateCompanyMerger:
             company=target_company,
         ).count() == 2
 
+    def test_company_with_merges_can_merge_to_non_merged_company(self):
+        adviser = AdviserFactory()
+        source_company_a = CompanyFactory()
+        source_company_b = CompanyFactory()
+        source_company_c = CompanyFactory()
+        target_company = CompanyFactory()
+
+        merge_companies(source_company_a, source_company_c, adviser)
+        merge_companies(source_company_b, source_company_c, adviser)
+
+        assert source_company_a.archived
+        assert source_company_a.transferred_to.id == source_company_c.id
+        assert source_company_b.archived
+        assert source_company_b.transferred_to.id == source_company_c.id
+
+        assert source_company_c.transferred_from.filter(
+            id=source_company_a.id,
+        ).exists() is True
+        assert (
+            source_company_c.transferred_from.filter(
+                id=source_company_b.id,
+            ).exists()
+            is True
+        )
+        merge_companies(source_company_c, target_company, adviser)
+        assert source_company_c.archived
+        assert source_company_c.transferred_to.id == target_company.id
+        assert (
+            target_company.transferred_from.filter(
+                id=source_company_c.id,
+            ).exists()
+            is True
+        )
+
+    def test_company_with_merges_can_merge_with_company_that_has_merges(self):
+        adviser = AdviserFactory()
+        source_company_a = CompanyFactory()
+        # source_company_b will be a merged company
+        source_company_b = CompanyFactory()
+        source_company_c = CompanyFactory()
+        # source_company_d will be a merged company
+        source_company_d = CompanyFactory()
+
+        merge_companies(source_company_a, source_company_b, adviser)
+        merge_companies(source_company_c, source_company_d, adviser)
+
+        # Check merged companies can merge together
+        merge_companies(source_company_b, source_company_d, adviser)
+        assert source_company_b.archived
+        assert source_company_b.transferred_to.id == source_company_d.id
+
+        # Check history of companies still exist with correct order of previously merged companies
+        assert (
+            source_company_d.transferred_from.filter(
+                id=source_company_c.id,
+            ).exists()
+            is True
+        )
+        assert (
+            source_company_d.transferred_from.filter(
+                id=source_company_b.id,
+            ).exists()
+            is True
+        )
+        assert (
+            source_company_b.transferred_from.filter(
+                id=source_company_a.id,
+            ).exists()
+            is True
+        )
+
+    def test_relations_from_merged_company_merges_with_target_successfully(self):
+        adviser = AdviserFactory()
+
+        # Has 10 relations we expect to be in our target company
+        all_relation_company = CompanyFactory()
+
+        # Has no relations
+        source_company_merged = CompanyFactory()
+        target_company = CompanyFactory()
+
+        # Source company with same adviser as target company
+        OneListCoreTeamMemberFactory(adviser=adviser, company=all_relation_company)
+        OneListCoreTeamMemberFactory(adviser=AdviserFactory(), company=all_relation_company)
+        OneListCoreTeamMemberFactory(adviser=adviser, company=source_company_merged)
+        ExportFactory(company=all_relation_company)
+        ExportFactory(company=source_company_merged)
+        ObjectiveFactory(company=all_relation_company)
+        ObjectiveFactory(company=source_company_merged)
+        EYBLeadFactory(company=all_relation_company)
+        EYBLeadFactory(company=source_company_merged)
+        CompleteLargeCapitalInvestorProfileFactory(investor_company=all_relation_company)
+        CompleteLargeCapitalInvestorProfileFactory(investor_company=source_company_merged)
+        LargeCapitalOpportunityFactory(promoters=[all_relation_company])
+        LargeCapitalOpportunityFactory(promoters=[source_company_merged])
+        # Shared one, should not be merged.
+        LargeCapitalOpportunityFactory(promoters=[source_company_merged, all_relation_company])
+        NewExportInteractionReminderFactory(company=all_relation_company)
+        NewExportInteractionReminderFactory(company=source_company_merged)
+        NoRecentExportInteractionReminderFactory(company=all_relation_company)
+        NoRecentExportInteractionReminderFactory(company=source_company_merged)
+        TaskFactory(company=all_relation_company)
+        TaskFactory(company=source_company_merged)
+        LegacyExportWinsToDataHubCompanyFactory(company=all_relation_company)
+        LegacyExportWinsToDataHubCompanyFactory(company=source_company_merged)
+
+        merge_companies(all_relation_company, source_company_merged, adviser)
+
+        merge_companies(source_company_merged, target_company, adviser)
+
+        assert OneListCoreTeamMember.objects.filter(
+            company=target_company,
+        ).count() == 2
+
+        assert CompanyExport.objects.filter(
+            company=target_company,
+        ).count() == 2
+
+        assert Objective.objects.filter(
+            company=target_company,
+        ).count() == 2
+
+        assert EYBLead.objects.filter(
+            company=target_company,
+        ).count() == 2
+
+        assert LargeCapitalInvestorProfile.objects.filter(
+            investor_company=target_company,
+        ).count() == 2
+
+        assert LargeCapitalOpportunity.objects.filter(
+            promoters=target_company,
+        ).count() == 3
+
+        assert NewExportInteractionReminder.objects.filter(
+            company=target_company,
+        ).count() == 2
+
+        assert NoRecentExportInteractionReminder.objects.filter(
+            company=target_company,
+        ).count() == 2
+
+        assert Task.objects.filter(
+            company=target_company,
+        ).count() == 2
+
+        assert LegacyExportWinsToDataHubCompany.objects.filter(
+            company=target_company,
+        ).count() == 2
+
 
 @pytest.mark.django_db
 class TestCompanyMerge:
