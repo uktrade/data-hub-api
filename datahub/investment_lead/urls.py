@@ -1,6 +1,6 @@
 from django.urls import path
 
-from datahub.investment_lead.views import EYBLeadViewSet, EYBLeadAuditViewSet
+from datahub.investment_lead.views import EYBLeadAuditViewSet, EYBLeadViewSet
 
 
 eyb_lead_collection = EYBLeadViewSet.as_view({
