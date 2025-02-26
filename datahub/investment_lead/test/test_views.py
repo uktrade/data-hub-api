@@ -2,6 +2,7 @@ import uuid
 
 from datetime import datetime, timedelta, timezone
 
+import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -11,6 +12,7 @@ from datahub.core.test_utils import APITestMixin
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.investment_lead.test.utils import assert_retrieved_eyb_lead_data
+from datahub.investment_lead.views import EYBLeadAuditViewSet
 from datahub.metadata.models import Country, Sector
 
 
@@ -520,3 +522,10 @@ class TestEYBLeadListAPI(APITestMixin):
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 0
+
+
+class TestEYBLeadAuditAPI(APITestMixin):
+    @pytest.mark.parametrize('view_set', (EYBLeadAuditViewSet,))
+    def test_view_set_name(self, view_set):
+        """Test that the view name is a string."""
+        assert isinstance(view_set().get_view_name(), str)
