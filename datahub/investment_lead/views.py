@@ -4,6 +4,7 @@ from django.db.models import Q
 
 from rest_framework import filters
 
+from datahub.core.audit import AuditViewSet
 from datahub.core.viewsets import SoftDeleteCoreViewSet
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import RetrieveEYBLeadSerializer
@@ -89,3 +90,13 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
         queryset = self._filter_by_values(queryset)
 
         return queryset
+
+
+class EYBLeadAuditViewSet(AuditViewSet):
+    """EYB lead audit views."""
+
+    queryset = EYBLead.objects.all()
+
+    def get_view_name(self):
+        """Returns the view set name for the DRF UI."""
+        return 'EYB lead audit log'
