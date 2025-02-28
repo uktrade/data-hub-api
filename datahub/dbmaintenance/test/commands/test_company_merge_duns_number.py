@@ -56,7 +56,7 @@ def test_logs_contain_errors(s3_stubber, caplog):
     caplog.set_level('INFO')
     global_company = CompanyFactory()
     company_source = CompanyFactory(
-        global_headquarters=global_company
+        global_headquarters=global_company,
     )
     company_with_duns = CompanyFactory(duns_number='12345678', archived=True)
 
