@@ -7,7 +7,7 @@ from django.core.management import call_command
 from freezegun import freeze_time
 from reversion.models import Version
 
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import CompanyFactory, DuplicateCompanyFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -144,8 +144,8 @@ def test_audit_log(s3_stubber):
     assert versions[0].revision.get_comment() == 'Duns number updated.'
 
 
-def test_logs_contain_errors(s3_stubber, caplog):
-    """Tests errors are captured in the logs"""
+def test_companies_which_already_have_the_target_duns_are_logged(s3_stubber, caplog):
+    """Tests log contains company error for company which already has duns"""
     caplog.set_level('INFO')
     company_with_duns = CompanyFactory(
         duns_number='132589',
@@ -172,13 +172,76 @@ def test_logs_contain_errors(s3_stubber, caplog):
     call_command('update_company_duns_number', bucket, object_key)
 
     assert 'Errors:' in caplog.text
-    assert company_with_duns.duns_number in caplog.text
-    assert 'Key (duns_number)=(132589) already exists.' in caplog.text
+    assert (
+        'Cannot assign duns number to company as another company already has this duns number. '
+    ) in caplog.text
+    assert f'Company with duns already: {company_with_duns.id}' in caplog.text
 
 
-def test_logs_contain_companies_already_merged_to_company_with_target_duns(s3_stubber, caplog):
-    pass
+def test_companies_which_are_already_merged_into_target_are_logged(s3_stubber, caplog):
+    """
+    Tests log contains error if the source company has already been merged into a company which
+    has the target duns number.
+    """
+    caplog.set_level('INFO')
+    company_with_duns = CompanyFactory(
+        duns_number='132589',
+    )
+    company_already_merged = DuplicateCompanyFactory(transferred_to=company_with_duns)
+
+    bucket = 'test_bucket'
+    object_key = 'test_key'
+    csv_content = f"""id,duns_number
+{company_already_merged.id},{company_with_duns.duns_number}
+"""
+
+    s3_stubber.add_response(
+        'get_object',
+        {
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
+        },
+        expected_params={
+            'Bucket': bucket,
+            'Key': object_key,
+        },
+    )
+
+    call_command('update_company_duns_number', bucket, object_key)
+
+    assert (
+        'Total companies already merged with company matching target duns so not updated: 1'
+    ) in caplog.text
 
 
-def test_logs_contain_companies_already_merged(s3_stubber, caplog):
-    pass
+def test_companies_which_are_already_merged_but_not_into_target_are_logged(s3_stubber, caplog):
+    """
+    Tests log contains error if the source company has already been merged into another company.
+    """
+    caplog.set_level('INFO')
+    company_with_duns = CompanyFactory(
+        duns_number='132589',
+    )
+    company_already_merged = DuplicateCompanyFactory(transferred_to=CompanyFactory())
+
+    bucket = 'test_bucket'
+    object_key = 'test_key'
+    csv_content = f"""id,duns_number
+{company_already_merged.id},{company_with_duns.duns_number}
+"""
+
+    s3_stubber.add_response(
+        'get_object',
+        {
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
+        },
+        expected_params={
+            'Bucket': bucket,
+            'Key': object_key,
+        },
+    )
+
+    call_command('update_company_duns_number', bucket, object_key)
+
+    assert (
+        'Total companies already merged and marked as duplicates so not updated: 1'
+    ) in caplog.text
