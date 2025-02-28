@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from io import BytesIO
+from unittest import mock
 
 import factory
 import pytest
@@ -245,3 +246,46 @@ def test_companies_which_are_already_merged_but_not_into_target_are_logged(s3_st
     assert (
         'Total companies already merged and marked as duplicates so not updated: 1'
     ) in caplog.text
+
+
+@mock.patch(
+    'datahub.dbmaintenance.management.commands.update_company_duns_number.Command'
+    '.is_duns_already_assigned_to_another_company',
+)
+def test_unexpected_errors_are_logged(
+    mocked_func,
+    s3_stubber,
+    caplog,
+):
+    """
+    Tests log contains error if the source company has already been merged into another company.
+    """
+    mocked_func.return_value = False
+    caplog.set_level('INFO')
+    company_with_duns = CompanyFactory(
+        duns_number='132589',
+    )
+    company_without_duns = CompanyFactory()
+
+    bucket = 'test_bucket'
+    object_key = 'test_key'
+    csv_content = f"""id,duns_number
+{company_without_duns.id},{company_with_duns.duns_number}
+"""
+
+    s3_stubber.add_response(
+        'get_object',
+        {
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
+        },
+        expected_params={
+            'Bucket': bucket,
+            'Key': object_key,
+        },
+    )
+
+    call_command('update_company_duns_number', bucket, object_key)
+
+    assert 'IntegrityError' in caplog.text
+    assert 'duplicate key value violates unique constraint' in caplog.text
+    assert f'Key (duns_number)=({company_with_duns.duns_number}) already exists' in caplog.text
