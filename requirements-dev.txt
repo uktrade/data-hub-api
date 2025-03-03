@@ -33,15 +33,15 @@ backoff==2.2.1
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
-bigtree==0.24.0
+bigtree==0.25.1
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.36.26
+boto3==1.37.4
     # via
     #   -r requirements.in
     #   moto
-botocore==1.36.26
+botocore==1.37.4
     # via
     #   boto3
     #   moto
@@ -227,7 +227,7 @@ iniconfig==1.1.1
     # via pytest
 ipaddress==1.0.23
     # via mail-parser
-ipython==8.32.0
+ipython==8.33.0
     # via -r requirements-dev.in
 isort==5.11.4
     # via pylint
@@ -255,7 +255,7 @@ mccabe==0.7.0
     #   pylint
 mohawk==1.1.0
     # via -r requirements.in
-moto==5.1.0
+moto==5.1.1
     # via -r requirements-dev.in
 multidict==6.0.4
     # via
@@ -399,7 +399,7 @@ pyproject-hooks==1.0.0
     # via
     #   build
     #   pip-tools
-pytest==8.3.4
+pytest==8.3.5
     # via
     #   -r requirements-dev.in
     #   pylint-pytest

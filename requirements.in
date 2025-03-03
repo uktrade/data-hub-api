@@ -6,7 +6,7 @@ django-axes==7.0.2
 django-csp==3.8
 django-environ==0.12.0
 django-extensions==3.2.3
-django-filter==24.3
+django-filter==25.1
 django-log-formatter-asim==0.0.6
 django-mptt==0.16.0
 django-pglocks==1.0.4
@@ -28,7 +28,7 @@ dj-database-url==2.3.0
 psycopg2-binary==2.9.10
 psycogreen==1.0.2
 
-boto3==1.36.26
+boto3==1.37.4
 
 notifications-python-client==10.0.1
 
