@@ -112,3 +112,31 @@ def test_subsidiary_logs(s3_stubber, caplog):
 
     assert 'List of Source Companies with Subsidiaries: ' in caplog.text
     assert str(subsidiary_company.id) in caplog.text
+
+
+def test_non_subsidiary_logs(s3_stubber, caplog):
+    """Tests subsidiary list in log is empty"""
+    caplog.set_level('INFO')
+    non_subsidiary_company = CompanyFactory()
+    company_with_duns = CompanyFactory(duns_number='12345678')
+
+    bucket = 'test_bucket'
+    object_key = 'test_key'
+    csv_content = f"""id,duns
+{non_subsidiary_company.id},{company_with_duns.duns_number}
+"""
+
+    s3_stubber.add_response(
+        'get_object',
+        {
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
+        },
+        expected_params={
+            'Bucket': bucket,
+            'Key': object_key,
+        },
+    )
+
+    call_command('company_merge_duns_number', bucket, object_key)
+
+    assert 'List of Source Companies with Subsidiaries: []' in caplog.text
