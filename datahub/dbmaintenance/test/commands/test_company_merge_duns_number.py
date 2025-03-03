@@ -111,7 +111,7 @@ def test_subsidiary_logs(s3_stubber, caplog):
     call_command('company_merge_duns_number', bucket, object_key)
 
     assert 'List of Source Companies with Subsidiaries: ' in caplog.text
-    assert f"{str(company.id)}" in caplog.text
+    assert f'{str(company.id)}' in caplog.text
 
 
 def test_non_subsidiary_logs(s3_stubber, caplog):
