@@ -1,0 +1,14 @@
+- model: export_win.associatedprogramme
+  pk: 085aedc6-22d4-4738-91af-fdf440453e3a
+  fields:
+    disabled_on: null
+    name: "Export Summit Flagship 2025"
+    export_win_id: "118"
+    order: 100
+- model: export_win.associatedprogramme
+  pk: 3141ef39-c447-4da8-9078-a262bad19c96
+  fields:
+    disabled_on: null
+    name: "Export Summit Roadshows 2025"
+    export_win_id: "119"
+    order: 110
