@@ -88,13 +88,13 @@ def test_logs_contain_errors(s3_stubber, caplog):
 def test_subsidiary_logs(s3_stubber, caplog):
     """Tests subsidiary errors are captured in the logs"""
     caplog.set_level('INFO')
-    subsidiary_company = SubsidiaryFactory()
+    company = CompanyFactory()
+    SubsidiaryFactory(global_headquarters=company)
     company_with_duns = CompanyFactory(duns_number='12345678')
-
     bucket = 'test_bucket'
     object_key = 'test_key'
     csv_content = f"""id,duns
-{subsidiary_company.id},{company_with_duns.duns_number}
+{company.id},{company_with_duns.duns_number}
 """
 
     s3_stubber.add_response(
@@ -110,8 +110,8 @@ def test_subsidiary_logs(s3_stubber, caplog):
 
     call_command('company_merge_duns_number', bucket, object_key)
 
-    assert 'List of Source Companies with Subsidiaries: '
-    f"{str(subsidiary_company.id)}" in caplog.text
+    assert 'List of Source Companies with Subsidiaries: ' in caplog.text
+    assert f"{str(company.id)}" in caplog.text
 
 
 def test_non_subsidiary_logs(s3_stubber, caplog):

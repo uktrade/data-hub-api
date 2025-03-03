@@ -37,7 +37,7 @@ class Command(CSVBaseCommand):
         source_company = Company.objects.get(pk=source_pk)
         target_company = Company.objects.get(duns_number=target_duns)
 
-        if source_company.subsidiaries.exists():
+        if source_company.subsidiaries.all().exists():
             self.additional_logging['companies_with_subsidiaries'].append(str(source_company.id))
         if target_company.archived:
             self.additional_logging['target_companies_archived'].append(str(target_company.id))
