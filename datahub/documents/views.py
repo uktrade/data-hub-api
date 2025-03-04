@@ -1,5 +1,6 @@
 """Document views."""
 from django.core.exceptions import PermissionDenied
+from rest_framework import filters, status
 from rest_framework.decorators import action
 
 from datahub.core.schemas import StubSchema
@@ -67,3 +68,14 @@ class GenericDocumentViewSet(SoftDeleteCoreViewSet):
 
     queryset = GenericDocument.objects.all()
     serializer_class = GenericDocumentSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering = ['-created_on']
+    ordering_fields = ['created_on']
+
+    def get_queryset(self):
+        """Apply filters to queryset based on query parameters (in GET operations)."""
+        queryset = GenericDocument.objects.filter(archived=False)
+        related_object_id = self.request.query_params.get('related_object_id')
+        if related_object_id:
+            queryset = queryset.filter(related_object_id=related_object_id)
+        return queryset
