@@ -22,3 +22,12 @@ class DocumentFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'documents.Document'
+
+
+class SharePointDocumentFactory(factory.django.DjangoModelFactory):
+
+    title = factory.Faker('text', max_nb_chars=20)
+    url = factory.Faker('url')
+
+    class Meta:
+        model = 'documents.SharePointDocument'

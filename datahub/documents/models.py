@@ -201,3 +201,14 @@ class AbstractEntityDocumentModel(BaseModel):
 
     class Meta:
         abstract = True
+
+
+class SharePointDocument(BaseModel, ArchivableModel):
+    """Model to represent documents in SharePoint."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    title = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH, blank=True, default='')
+    url = models.URLField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
+
+    def __str__(self):
+        return self.title
