@@ -2,7 +2,10 @@ from datetime import timezone
 
 import factory
 
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyFactory,
+)
 from datahub.documents.models import UploadStatus
 
 
@@ -31,3 +34,14 @@ class SharePointDocumentFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'documents.SharePointDocument'
+
+
+class CompanySharePointDocumentFactory(factory.django.DjangoModelFactory):
+    """Generates a GenericDocument instance linking a Company to a SharePointDocument."""
+
+    document = factory.SubFactory(SharePointDocumentFactory)
+    related_object = factory.SubFactory(CompanyFactory)
+    archived = False
+
+    class Meta:
+        model = 'documents.GenericDocument'

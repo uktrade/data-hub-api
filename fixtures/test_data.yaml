@@ -2509,3 +2509,20 @@
       url: https://sharepoint.example.com/financial-statement,
       archived: false,
     }
+
+- model: documents.genericdocument
+  pk: a1a39417-0f9e-403c-afc0-cb7ecefb1d6b
+  fields: {
+      document_type: ["documents", "sharepointdocument"],
+      document_object_id: a1a39417-0f9e-403c-afc0-cb7ecefb1d6b, # ID of Project Proposal document
+      related_object_type: ["company", "company"],
+      related_object_id: 731bdcc1-f685-4c8e-bd66-b356b2c16995, # ID of Mars Components Ltd
+    }
+- model: documents.genericdocument
+  pk: b89ac8d4-fb3a-438b-868c-8ddb793b2adb
+  fields: {
+      document_type: ["documents", "sharepointdocument"],
+      document_object_id: 08a8c016-71b1-4851-869c-1223742cf6e5, # ID of Financial Statement document
+      related_object_type: ["company", "company"],
+      related_object_id: 731bdcc1-f685-4c8e-bd66-b356b2c16995, # ID of Mars Components Ltd
+    }

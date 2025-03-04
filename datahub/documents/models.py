@@ -2,6 +2,8 @@ import uuid
 from logging import getLogger
 
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models, transaction
 from django.utils.timezone import now
 
@@ -212,3 +214,50 @@ class SharePointDocument(BaseModel, ArchivableModel):
 
     def __str__(self):
         return self.title
+
+
+class GenericDocument(BaseModel, ArchivableModel):
+    """A single model to represent documents of varying types.
+
+    The idea behind this model is to serve as a single interaction point for documents,
+    irrespective of type. For example, those uploaded to an S3 bucket, or those stored in
+    SharePoint. Each type of document will have different CRUD operations, but this model,
+    along with it's serializer and viewset, will enable all actions from a single endpoint.
+
+    This model has two generic relations:
+    1. To the type-specific document model instance (e.g. SharePointDocument or UploadableDocument)
+    2. To the model instance the document relates to (e.g. Company, or InvestmentProject)
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+    # Generic relation to type-specific document model instance
+    document_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        related_name='documents',
+    )
+    document_object_id = models.UUIDField()
+    document = GenericForeignKey('document_type', 'document_object_id')
+
+    # Generic relation to model instance the document relates to
+    related_object_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        related_name='related_documents',
+    )
+    related_object_id = models.UUIDField()
+    related_object = GenericForeignKey('related_object_type', 'related_object_id')
+
+    class Meta:
+        indexes = [
+            models.Index(fields=[
+                'document_type',
+                'document_object_id',
+                'related_object_type',
+                'related_object_id',
+            ]),
+        ]
+
+    def __str__(self):
+        return f'{self.document} for {self.related_object}'
